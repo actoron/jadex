@@ -894,22 +894,28 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		// Check if contained in includes.
 		for(int i=0; !included && i<includes.length; i++)
 		{
-			if(cidnames==null)
-				cidnames	= extractNames(cid);
-			for(int j=0; !included && j<cidnames.length; j++)
+			if(includes[i]!=null)
 			{
-				included	= cidnames[j].startsWith(includes[i]);
+				if(cidnames==null)
+					cidnames	= extractNames(cid);
+				for(int j=0; !included && j<cidnames.length; j++)
+				{
+					included	= cidnames[j].startsWith(includes[i]);
+				}
 			}
 		}
 		
 		// Check if not contained in excludes.
 		for(int i=0; included && i<excludes.length; i++)
 		{
-			if(cidnames==null)
-				cidnames	= extractNames(cid);
-			for(int j=0; included && j<cidnames.length; j++)
+			if(excludes[i]!=null)
 			{
-				included	= !cidnames[j].startsWith(excludes[i]);
+				if(cidnames==null)
+					cidnames	= extractNames(cid);
+				for(int j=0; included && j<cidnames.length; j++)
+				{
+					included	= !cidnames[j].startsWith(excludes[i]);
+				}
 			}
 		}
 

@@ -34,6 +34,11 @@ public interface IChatService
 	public IFuture<String>	getNickName();
 	
 	/**
+	 *  Get the user image.
+	 */
+	public IFuture<byte[]>	getImage();
+	
+	/**
 	 *  Post a message
 	 *  @param nick The sender's nick name.
 	 *  @param text The text message.
@@ -41,11 +46,12 @@ public interface IChatService
 	public IFuture<Void> message(String nick, String text, boolean privatemessage);
 	
 	/**
-	 *  Post a status or nick name change.
+	 *  Post a status or nick name, or image change.
 	 *  @param nick The (possibly changed) nick name.
 	 *  @param status The new status.
+	 *  @param image The new image.
 	 */
-	public IFuture<Void> status(String nick, String status);
+	public IFuture<Void> status(String nick, String status, byte[] image);
 	
 	/**
 	 *  Send a file.

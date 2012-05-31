@@ -1,5 +1,7 @@
 package jadex.tools.chat;
 
+import java.awt.Image;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -7,6 +9,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
 
 /**
@@ -24,7 +27,8 @@ public class ChatUser
 		"red",		SGUI.makeIcon(ChatPanel.class, "images/user_red.png"),
 		IChatService.STATE_IDLE,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
 		IChatService.STATE_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_green_typing.png"),
-		IChatService.STATE_DEAD, SGUI.makeIcon(ChatPanel.class, "images/user_gray.png")
+		IChatService.STATE_DEAD, SGUI.makeIcon(ChatPanel.class, "images/user_gray.png"),
+		"image",	SGUI.makeIcon(ChatPanel.class, "images/user_anon.png")
 	});
 	
 	//-------- attributes --------
@@ -43,6 +47,9 @@ public class ChatUser
 	
 	/** The cached nickname. */
 	protected String nick;
+	
+	/** The image. */
+	protected byte[] image;
 	
 	//-------- constructors --------
 	
@@ -163,6 +170,52 @@ public class ChatUser
 	{
 		this.nick = nick;
 	}
+	
+	/**
+	 *  Test if nickname is unknown.
+	 */
+	public boolean isNickUnknown()
+	{
+		return "unknown".equals(nick);
+	}
+
+	/**
+	 *  Get the image.
+	 *  @return the image.
+	 */
+	public byte[] getImage()
+	{
+		byte[] ret = image;
+		if(image==null)
+		{
+			try
+			{
+				Image img = ((ImageIcon)icons.get("image")).getImage();
+				ret = SGUI.imageToStandardBytes(img, "image/png");
+			}
+			catch(Exception e)
+			{
+			}
+		}	
+		return ret;
+	}
+
+	/**
+	 *  Test if image is unknown.
+	 */
+	public boolean isImageUnknown()
+	{
+		return image==null;
+	}
+	
+	/**
+	 *  Set the image.
+	 *  @param image The image to set.
+	 */
+	public void setImage(byte[] image)
+	{
+		this.image = image;
+	}
 
 	/**
 	 *  Get the cid.
@@ -172,4 +225,25 @@ public class ChatUser
 	{
 		return cid;
 	}
+
+	/**
+	 *  Get the chat.
+	 *  @return the chat.
+	 */
+	public IChatService getChat()
+	{
+		return chat;
+	}
+
+	/**
+	 *  renamed to not be bean conform
+	 *  Set the chat.
+	 *  @param chat The chat to set.
+	 */
+	public void setChatService(IChatService chat)
+	{
+		this.chat = chat;
+	}
+	
+	
 }

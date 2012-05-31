@@ -45,6 +45,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -61,6 +62,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -158,7 +160,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected Map<IComponentIdentifier, ChatUser>	users;
 	
 	/** The user table. */
-	protected JTable	table;
+	protected JTable	usertable;
 	
 	/** The typing state. */
 	protected boolean	typing;
@@ -207,12 +209,32 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 					{
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-//						IComponentIdentifier	cid	= (IComponentIdentifier)value;
 						ChatUser cu = (ChatUser)value;
 						this.setText(cu.getNick()+" ["+cu.getComponentIdentifier()+"]");
 						this.setToolTipText("State: "+cu);
 						Icon	icon	= cu.getIcon();
 						this.setIcon(icon);
+						return this;
+					}
+				};
+				
+				DefaultTableCellRenderer usericonrend = new DefaultTableCellRenderer()
+				{
+					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+					{
+						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+						ChatUser cu = (ChatUser)value;
+//						System.out.println("cu: "+cu.getNick()+" "+cu.getImage());
+						this.setText("");
+						byte[] imgdata	= cu.getImage();
+						if(imgdata!=null)
+						{
+							this.setIcon(new ImageIcon(imgdata));
+						}
+						else
+						{
+							this.setIcon(null);
+						}
 						return this;
 					}
 				};
@@ -301,17 +323,18 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 				final JLabel lto = new JLabel("To: all");
 				
-				table	= new JTable(new UserTableModel());
-				table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+				usertable	= new JTable(new UserTableModel());
+				usertable.setRowHeight(32);
+				usertable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 				{
 					public void valueChanged(ListSelectionEvent e)
 					{
 //						System.out.println(SUtil.arrayToString(table.getSelectedRows()));
-						int[] sels = table.getSelectedRows();
+						int[] sels = usertable.getSelectedRows();
 						StringBuffer buf = new StringBuffer("To: ");
 						for(int i=0; i<sels.length; i++)
 						{
-							ChatUser cu = (ChatUser)table.getModel().getValueAt(sels[i], 0);
+							ChatUser cu = (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
 							buf.append(cu.getNick());
 							if(i+1<sels.length)
 								buf.append(", ");
@@ -324,9 +347,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				});
 				
-				JScrollPane userpan = new JScrollPane(table);
-				table.getColumnModel().getColumn(0).setCellRenderer(userrend);
-				table.setTransferHandler(new TransferHandler()
+				JScrollPane userpan = new JScrollPane(usertable);
+				usertable.getColumnModel().getColumn(0).setCellRenderer(usericonrend);
+				usertable.getColumnModel().getColumn(1).setCellRenderer(userrend);
+				usertable.setTransferHandler(new TransferHandler()
 				{
 					public boolean	canImport(TransferHandler.TransferSupport support)
 					{
@@ -347,7 +371,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						try
 						{
 							JTable.DropLocation	droploc	= (JTable.DropLocation)support.getDropLocation();
-							ChatUser cu	= (ChatUser)table.getModel().getValueAt(droploc.getRow(), 0);
+							ChatUser cu	= (ChatUser)usertable.getModel().getValueAt(droploc.getRow(), 0);
 							
 							List<?>	files	= (List<?>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 //							System.out.println("importData: "+files);
@@ -383,9 +407,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						if(e.isPopupTrigger()) 
 						{
-							int row = table.rowAtPoint(e.getPoint());
-							table.setRowSelectionInterval(row, row);
-							ChatUser cu = (ChatUser)((UserTableModel)table.getModel()).getValueAt(row, 0);
+							int row = usertable.rowAtPoint(e.getPoint());
+							usertable.setRowSelectionInterval(row, row);
+							ChatUser cu = (ChatUser)((UserTableModel)usertable.getModel()).getValueAt(row, 0);
 							createMenu(cu.getComponentIdentifier()).show(e.getComponent(), e.getX(), e.getY());
 						}
 					}
@@ -411,8 +435,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						return menu;
 					}
 				};
-				table.addMouseListener(lis);
-				table.getTableHeader().addMouseListener(lis);
+				usertable.addMouseListener(lis);
+				usertable.getTableHeader().addMouseListener(lis);
 				
 				PropertiesPanel pp = new PropertiesPanel();
 				
@@ -448,6 +472,57 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				});
 				
+				
+				final JTextField tfava = new JTextField();
+				tfava.setEditable(false);
+				JButton buava = new JButton("...");
+				JPanel apan = new JPanel(new BorderLayout());
+				apan.add(tfava, BorderLayout.CENTER);
+				apan.add(buava, BorderLayout.EAST);
+				pp.addComponent("Image: ", apan);
+				final JFileChooser fcava = new JFileChooser(".");
+				fcava.setFileFilter(new FileFilter()
+				{
+					public String getDescription()
+					{
+						return "*.jpg, *.png";
+					}
+					
+					public boolean accept(File f)
+					{
+						return f.isDirectory() || f.getName().endsWith(".jpg") || f.getName().endsWith(".png");
+					}
+				});
+				buava.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						fcava.showOpenDialog(panel);
+						File sel = fcava.getSelectedFile();
+						if(sel!=null && sel.exists())
+						{
+							try
+							{
+								FileInputStream fis = new FileInputStream(sel);
+								byte[] data = new byte[fis.available()];
+								
+								int read = 0;
+								while(read<data.length)
+								{
+									read+=fis.read(data, read, data.length-read);
+								}
+
+								getService().setImage(data);
+								
+								tfava.setText(SUtil.convertPathToRelative(sel.getAbsolutePath()));
+							}
+							catch(Exception ex)
+							{
+								ex.printStackTrace();
+							}
+						}
+					}
+				});
 				
 				final JComboBox jcom = new JComboBox(new String[]{NOTIFICATION_FILE_ABORT, 
 					NOTIFICATION_FILE_COMPLETE, NOTIFICATION_NEW_FILE, NOTIFICATION_NEW_MSG, NOTIFICATION_NEW_USER});
@@ -547,7 +622,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						table.getSelectionModel().clearSelection();
+						usertable.getSelectionModel().clearSelection();
 						lto.setText("To: all");
 					}
 				});
@@ -588,7 +663,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						if(newtyping!=typing)
 						{
 							typing	= newtyping;
-							postStatus(typing ? IChatService.STATE_TYPING : IChatService.STATE_IDLE);
+							postStatus(typing ? IChatService.STATE_TYPING : IChatService.STATE_IDLE, null);
 						}
 					}			
 				});
@@ -682,7 +757,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-							setUserState(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick());
+							System.out.println("state change: "+ce.getComponentIdentifier()+" "+ce.getNick()+" "+ce.getImage());
+							setUserState(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick(), ce.getImage());
 						}
 						else if(ChatEvent.TYPE_FILE.equals(ce.getType()))
 						{
@@ -745,7 +821,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			}
 		});
 		
-		timer = new Timer(5000, new ActionListener()
+		timer = new Timer(10000, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -755,7 +831,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					
 					getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
 					{
-						public void customIntermediateResultAvailable(IChatService chat)
+						public void customIntermediateResultAvailable(final IChatService chat)
 						{
 							final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
 							if(deadusers!=null)
@@ -765,18 +841,34 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							{
 								chat.getNickName().addResultListener(new SwingDefaultResultListener<String>()
 								{
-									public void customResultAvailable(String nick)
+									public void customResultAvailable(final String nick)
 									{
-										ChatUser cu	= new ChatUser(cid);
-										cu.setNick(nick);
-										users.put(cid, cu);
-										((DefaultTableModel)table.getModel()).fireTableDataChanged();
-										table.getParent().invalidate();
-										table.getParent().doLayout();
-										table.repaint();
+										chat.getImage().addResultListener(new SwingDefaultResultListener<byte[]>()
+										{
+											public void customResultAvailable(byte[] img)
+											{
+												setUserState(cid, nick, null, img);
+//												System.out.println("found: "+nick+" "+img);
+//												ChatUser cu	= new ChatUser(cid);
+//												cu.setNick(nick);
+//												if(img!=null)
+//													cu.setImage(img);
+//												users.put(cid, cu);
+//												
+//												((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
+//												usertable.getParent().invalidate();
+//												usertable.getParent().doLayout();
+//												usertable.repaint();
+											}
+										});
 									}
 								});
 							}
+							else
+							{
+								updateChatUser(cu);
+							}
+							
 						}
 						public void customExceptionOccurred(Exception exception)
 						{
@@ -788,6 +880,79 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		timer.start();
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void updateChatUser(final ChatUser cu)
+	{
+		if(cu.isNickUnknown())
+		{
+			getChatService(cu).addResultListener(new IResultListener<IChatService>()
+			{
+				public void resultAvailable(IChatService cs)
+				{
+					cs.getNickName().addResultListener(new SwingDefaultResultListener<String>()
+					{
+						public void customResultAvailable(final String nick)
+						{
+							setUserState(cu.getComponentIdentifier(), null, nick, null);
+						}
+					});
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+		}
+		
+		if(cu.isImageUnknown())
+		{
+			getChatService(cu).addResultListener(new IResultListener<IChatService>()
+			{
+				public void resultAvailable(IChatService cs)
+				{
+					cs.getImage().addResultListener(new SwingDefaultResultListener<byte[]>()
+					{
+						public void customResultAvailable(final byte[] img)
+						{
+							setUserState(cu.getComponentIdentifier(), null, null, img);
+						}
+					});
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IChatService> getChatService(final ChatUser cu)
+	{
+		if(cu.getChat()!=null)
+		{
+			return new Future(cu.getChat());
+		}
+		else
+		{
+			final Future<IChatService> ret = new Future<IChatService>();
+			IFuture<IChatService> fut = SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), cu.getComponentIdentifier(), IChatService.class);
+			fut.addResultListener(new DelegationResultListener<IChatService>(ret)
+			{
+				public void customResultAvailable(IChatService cs)
+				{
+					cu.setChatService(cs);
+					super.customResultAvailable(cs);
+				}
+			});
+			return ret;
+		}
 	}
 	
 	/**
@@ -824,11 +989,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void>	tell(String text, final int request)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		int[] sels = table.getSelectedRows();
+		int[] sels = usertable.getSelectedRows();
 		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
 		for(int i=0; i<sels.length; i++)
 		{
-			recs[i] = ((ChatUser)table.getModel().getValueAt(sels[i], 0)).getComponentIdentifier();
+			recs[i] = ((ChatUser)usertable.getModel().getValueAt(sels[i], 0)).getComponentIdentifier();
 		}
 		getService().message(text, recs, true).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
@@ -849,10 +1014,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Post the local state to available chatters
 	 */
-	public IFuture<Void>	postStatus(String status)
+	public IFuture<Void>	postStatus(String status, byte[] image)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		getService().status(status).addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		getService().status(status, image).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
 			public void intermediateResultAvailable(final IChatService chat)
 			{
@@ -902,10 +1067,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				if(users.containsKey(cid))
 					users.get(cid).setState(IChatService.STATE_DEAD);
 			}
-			((DefaultTableModel)table.getModel()).fireTableDataChanged();
-			table.getParent().invalidate();
-			table.getParent().doLayout();
-			table.repaint();
+			((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
+			usertable.getParent().invalidate();
+			usertable.getParent().doLayout();
+			usertable.repaint();
 		}
 	}
 	
@@ -914,28 +1079,31 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void	setReceiving(final IChatService chat, final int receiving, final boolean b)
 	{
-		// Called on component thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
-				if(deadusers!=null)
-					deadusers.remove(cid);
-				ChatUser	cu	= users.get(cid);
-				if(cu==null)
-				{
-					cu	= new ChatUser(chat);
-					users.put(cid, cu);
-				}
-			
-				cu.setReceiving(receiving, b);
-				((DefaultTableModel)table.getModel()).fireTableDataChanged();
-				table.getParent().invalidate();
-				table.getParent().doLayout();
-				table.repaint();
-			}
-		});
+		IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
+		setUserState(cid, null, null, null, receiving, b);
+		
+//		// Called on component thread.
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
+//				if(deadusers!=null)
+//					deadusers.remove(cid);
+//				ChatUser	cu	= users.get(cid);
+//				if(cu==null)
+//				{
+//					cu	= new ChatUser(chat);
+//					users.put(cid, cu);
+//				}
+//			
+//				cu.setReceiving(receiving, b);
+//				((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
+//				usertable.getParent().invalidate();
+//				usertable.getParent().doLayout();
+//				usertable.repaint();
+//			}
+//		});
 	}
 
 	//-------- methods called from service --------
@@ -963,18 +1131,20 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						
 						notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
 						
-						if(deadusers!=null)
-							deadusers.remove(cid);
-						ChatUser	cu	= users.get(cid);
-						if(cu==null)
-						{
-							cu	= new ChatUser(cid);
-							users.put(cid, cu);
-							((DefaultTableModel)table.getModel()).fireTableDataChanged();
-							table.getParent().invalidate();
-							table.getParent().doLayout();
-							table.repaint();
-						}
+						setUserState(cid, null, null, null);
+						
+//						if(deadusers!=null)
+//							deadusers.remove(cid);
+//						ChatUser	cu	= users.get(cid);
+//						if(cu==null)
+//						{
+//							cu	= new ChatUser(cid);
+//							users.put(cid, cu);
+//							((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
+//							usertable.getParent().invalidate();
+//							usertable.getParent().doLayout();
+//							usertable.repaint();
+//						}
 					}
 				});
 			}
@@ -984,7 +1154,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier cid, final String newstate, final String nickname)
+	public void	setUserState(final IComponentIdentifier cid, final String newstate, final String nickname, final byte[] image)
+	{
+		this.setUserState(cid, newstate, nickname, image, -1, false);
+	}
+	
+	/**
+	 *  Add a user or change its state.
+	 */
+	public void	setUserState(final IComponentIdentifier cid, final String newstate, final String nickname, 
+		final byte[] image, final int id, final boolean rec)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -1009,10 +1188,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					cu.setState(newstate);
 				if(nickname!=null)
 					cu.setNick(nickname);
-				((DefaultTableModel)table.getModel()).fireTableDataChanged();
-				table.getParent().invalidate();
-				table.getParent().doLayout();
-				table.repaint();
+				if(image!=null)
+					cu.setImage(image);
+				if(id!=-1)
+					cu.setReceiving(id, rec);
+				((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
+				usertable.getParent().invalidate();
+				usertable.getParent().doLayout();
+				usertable.repaint();
 				
 				if(isnew)
 				{
@@ -1444,7 +1627,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public class UserTableModel	extends DefaultTableModel
 	{
-		protected String[]	columns	= new String[]{"Users"};
+		protected String[]	columns	= new String[]{"Avatar", "Users"};
 		
 		public int getColumnCount()
 		{

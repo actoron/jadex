@@ -360,7 +360,7 @@ public class HttpReceiver
 						URL	url	= new URL(adr+(adr.endsWith("/") ? "servers" : "/servers"));
 						con	= url.openConnection();
 						cons.add((HttpURLConnection)con);
-						if(con.getContentType().startsWith("text/plain"))
+						if(con.getContentType()!=null && con.getContentType().startsWith("text/plain"))
 						{
 							String	curadrs	= new Scanner(con.getInputStream()).useDelimiter("\\A").next();
 							log(Level.INFO, "Relay transport got server addresses from: "+adr+", "+curadrs);

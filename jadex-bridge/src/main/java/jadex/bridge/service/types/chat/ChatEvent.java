@@ -35,6 +35,9 @@ public class ChatEvent
 	
 	/** Flag for privat message. */
 	protected boolean privatemessage;
+	
+	/** The image. */
+	protected byte[] image;
 
 	//-------- constructors --------
 	
@@ -49,13 +52,14 @@ public class ChatEvent
 	/**
 	 *  Create a new chat event.
 	 */
-	public ChatEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage)
+	public ChatEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage, byte[] image)
 	{
 		this.type	= type;
 		this.nick	= nick;
 		this.cid	= cid;
 		this.value	= value;
 		this.privatemessage = privatemessage;
+		this.image = image;
 	}
 	
 	//-------- accessors --------
@@ -143,4 +147,21 @@ public class ChatEvent
 		this.privatemessage = privatemessage;
 	}
 
+	/**
+	 *  Get the image.
+	 *  @return the image.
+	 */
+	public byte[] getImage()
+	{
+		return image;
+	}
+
+	/**
+	 *  Set the image.
+	 *  @param image The image to set.
+	 */
+	public void setImage(byte[] image)
+	{
+		this.image = image;
+	}
 }

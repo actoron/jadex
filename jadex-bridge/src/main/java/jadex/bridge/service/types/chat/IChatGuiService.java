@@ -24,6 +24,16 @@ public interface IChatGuiService
 	 */
 	public IFuture<String>	getNickName();
 	
+	/**
+	 *  Set the image.
+	 */
+	public IFuture<Void>	setImage(byte[] image);
+	
+	/**
+	 *  Get the image.
+	 */
+	public IFuture<byte[]>	getImage();
+	
 	// download directory
 	
 	// notification sounds (only gui settings!?)
@@ -57,7 +67,7 @@ public interface IChatGuiService
 	 *  Post a status change.
 	 *  @param status The new status.
 	 */
-	public IIntermediateFuture<IChatService> status(final String status);
+	public IIntermediateFuture<IChatService> status(String status, byte[] image);
 
 	//-------- file handling --------
 	
