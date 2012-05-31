@@ -801,7 +801,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void customIntermediateResultAvailable(IChatService chat)
 					{
-						setReceiving(chat, -1, false);
+						final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
+						updateChatUser(cid, chat);
 					}
 					public void customExceptionOccurred(Exception exception)
 					{
@@ -834,41 +835,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						public void customIntermediateResultAvailable(final IChatService chat)
 						{
 							final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
-							if(deadusers!=null)
-								deadusers.remove(cid);
-							ChatUser	cu	= users.get(cid);
-							if(cu==null)
-							{
-								chat.getNickName().addResultListener(new SwingDefaultResultListener<String>()
-								{
-									public void customResultAvailable(final String nick)
-									{
-										chat.getImage().addResultListener(new SwingDefaultResultListener<byte[]>()
-										{
-											public void customResultAvailable(byte[] img)
-											{
-												setUserState(cid, nick, null, img);
-//												System.out.println("found: "+nick+" "+img);
-//												ChatUser cu	= new ChatUser(cid);
-//												cu.setNick(nick);
-//												if(img!=null)
-//													cu.setImage(img);
-//												users.put(cid, cu);
-//												
-//												((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
-//												usertable.getParent().invalidate();
-//												usertable.getParent().doLayout();
-//												usertable.repaint();
-											}
-										});
-									}
-								});
-							}
-							else
-							{
-								updateChatUser(cu);
-							}
-							
+							updateChatUser(cid, chat);
 						}
 						public void customExceptionOccurred(Exception exception)
 						{
@@ -885,7 +852,43 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 * 
 	 */
-	protected void updateChatUser(final ChatUser cu)
+	protected void updateChatUser(IComponentIdentifier cid, IChatService cs)
+	{
+		ChatUser	cu	= users.get(cid);
+		if(cu==null)
+		{
+			createChatUser(cid, cs);
+		}
+		else
+		{
+			updateExistingChatUser(cu);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void createChatUser(final IComponentIdentifier cid, final IChatService chat)
+	{
+		chat.getNickName().addResultListener(new SwingDefaultResultListener<String>()
+		{
+			public void customResultAvailable(final String nick)
+			{
+				chat.getImage().addResultListener(new SwingDefaultResultListener<byte[]>()
+				{
+					public void customResultAvailable(byte[] img)
+					{
+						setUserState(cid, null, nick, img);
+					}
+				});
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void updateExistingChatUser(final ChatUser cu)
 	{
 		if(cu.isNickUnknown())
 		{
@@ -1081,29 +1084,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
 		setUserState(cid, null, null, null, receiving, b);
-		
-//		// Called on component thread.
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
-//				if(deadusers!=null)
-//					deadusers.remove(cid);
-//				ChatUser	cu	= users.get(cid);
-//				if(cu==null)
-//				{
-//					cu	= new ChatUser(chat);
-//					users.put(cid, cu);
-//				}
-//			
-//				cu.setReceiving(receiving, b);
-//				((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
-//				usertable.getParent().invalidate();
-//				usertable.getParent().doLayout();
-//				usertable.repaint();
-//			}
-//		});
 	}
 
 	//-------- methods called from service --------
@@ -1132,19 +1112,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
 						
 						setUserState(cid, null, null, null);
-						
-//						if(deadusers!=null)
-//							deadusers.remove(cid);
-//						ChatUser	cu	= users.get(cid);
-//						if(cu==null)
-//						{
-//							cu	= new ChatUser(cid);
-//							users.put(cid, cu);
-//							((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
-//							usertable.getParent().invalidate();
-//							usertable.getParent().doLayout();
-//							usertable.repaint();
-//						}
 					}
 				});
 			}

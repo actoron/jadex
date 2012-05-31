@@ -8,6 +8,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -61,7 +62,7 @@ import java.util.Set;
  *  Chat service implementation.
  */
 @Service
-public class ChatService implements IChatService, IChatGuiService, IPropertiesProvider
+public class ChatService implements IChatService, IChatGuiService
 {
 	//-------- attributes --------
 	
@@ -102,18 +103,25 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 		if(!running)
 		{
 			running	= true;
-	
+			
+			final PropProvider pp = new PropProvider();
 			agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					settings.registerPropertiesProvider(agent.getComponentIdentifier().getLocalName(), ChatService.this)
+					settings.registerPropertiesProvider(agent.getComponentIdentifier().getLocalName(), pp)
 						.addResultListener(new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							proceed();
+//							pp.isCalled().addResultListener(new DelegationResultListener<Void>(ret)
+//							{
+//								public void customResultAvailable(Void result)
+//								{
+									proceed();
+//								}
+//							});
 						}
 					});
 				}
@@ -1092,30 +1100,53 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 	
 	//-------- IPropertiesProvider interface --------
 	
-	/**
-	 *  Update from given properties.
-	 */
-	public IFuture<Void> setProperties(Properties props)
-	{
-		String tmp = props.getStringProperty("nickname");
-		if(tmp!=null)
-			setNickName(tmp);
-		tmp = props.getStringProperty("image");
-		if(tmp!=null)
-			setImage(Base64.decode(tmp.getBytes()));
-		return IFuture.DONE;
-	}
+	
 	
 	/**
-	 *  Write current state into properties.
+	 * 
 	 */
-	public IFuture<Properties> getProperties()
+	@Reference
+	public class PropProvider implements IPropertiesProvider
 	{
-		Properties	props	= new Properties();
-		// Only save as executing when in normal mode.
-		props.addProperty(new Property("nickname", nick));
-		if(image!=null)
-			props.addProperty(new Property("image", new String(Base64.encode(image))));
-		return new Future<Properties>(props);
+		protected Future<Void> called = new Future<Void>();
+		
+		/**
+		 * 
+		 */
+		public IFuture<Void> isCalled()
+		{
+			return called;
+		}
+		
+		/**
+		 *  Update from given properties.
+		 */
+		public IFuture<Void> setProperties(Properties props)
+		{
+			String tmp = props.getStringProperty("nickname");
+			if(tmp!=null)
+				setNickName(tmp);
+			tmp = props.getStringProperty("image");
+			if(tmp!=null)
+				setImage(Base64.decode(tmp.getBytes()));
+			
+			called.setResultIfUndone(null);
+			
+			return IFuture.DONE;
+		}
+		
+		/**
+		 *  Write current state into properties.
+		 */
+		public IFuture<Properties> getProperties()
+		{
+			Properties	props	= new Properties();
+			// Only save as executing when in normal mode.
+			props.addProperty(new Property("nickname", nick));
+			if(image!=null)
+				props.addProperty(new Property("image", new String(Base64.encode(image))));
+			return new Future<Properties>(props);
+		}
 	}
+	
 }
