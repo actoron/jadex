@@ -304,11 +304,11 @@ public class SGUI
 	 */
 	public static void showError(Component parent, String errortitle, String errormessage, final Exception exception)
 	{
-//		if(exception!=null)
-//		{
-//			Thread.dumpStack();
-//			exception.printStackTrace();
-//		}
+		if(exception!=null)
+		{
+			Thread.dumpStack();
+			exception.printStackTrace();
+		}
 		
 		final String	text;
 		String	exmsg	= exception==null ? null : exception.getMessage();
