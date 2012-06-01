@@ -41,20 +41,7 @@ public class ExceptionInfo
 		// todo: possibly add support for saving all nested causes.
 		
 		// Strip remote exception to conserve real exception
-		while(ex instanceof RemoteException)
-		{
-			Throwable t = ex.getCause();
-			if(t instanceof Exception)
-			{
-				ex = (Exception)t;
-			}
-			else
-			{
-				break;
-			}
-		}
-		
-		this.type = ex.getClass();
+		this.type = ex instanceof RemoteException? ((RemoteException)ex).getType(): ex.getClass();
 		this.message = ex.getMessage();
 		StackTraceElement[] stes =  ex.getStackTrace();
 		if(stes!=null)
