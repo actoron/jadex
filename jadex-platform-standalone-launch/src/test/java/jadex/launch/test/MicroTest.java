@@ -39,6 +39,9 @@ public class MicroTest	extends ComponentTestSuite
 			"messagequeue\\User",
 			"messagequeue/replicated/User",
 			"messagequeue\\replicated\\User",
+			"Display",
+			"Generate",
+			"Calculate",
 			
 			// Non-tests that don't stop until finished (why?)
 			"AgentCreationAgent",	
