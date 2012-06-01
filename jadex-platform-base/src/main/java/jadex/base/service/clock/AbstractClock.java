@@ -66,7 +66,7 @@ public abstract class AbstractClock implements IClock
 		this.currenttime = starttime;
 		this.delta = delta;
 		this.state = STATE_SUSPENDED;
-		this.listeners = SCollection.createArrayList();
+		this.listeners = Collections.synchronizedList(SCollection.createArrayList());
 		
 		// Sorted set for all entries ordered by due time.
 		this.timers	= Collections.synchronizedSortedSet(new TreeSet(new Comparator()
@@ -444,8 +444,9 @@ public abstract class AbstractClock implements IClock
 	protected void notifyListeners(ChangeEvent ce)
 	{
 //		System.out.println(""+this.getClass()+" "+ce);
-		for(int i=0; i<listeners.size(); i++)
-			((IChangeListener)listeners.get(i)).changeOccurred(ce);
+		IChangeListener[]	cls	= (IChangeListener[])listeners.toArray(new IChangeListener[0]);
+		for(int i=0; i<cls.length; i++)
+			cls[i].changeOccurred(ce);
 	}
 	
 	/**
