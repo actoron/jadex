@@ -1169,6 +1169,16 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
+	 *  Announce that addresses of transports might have changed.
+	 */
+	public IFuture<Void>	refreshAddresses()
+	{
+		addresses	= null;
+		return IFuture.DONE;
+	}
+
+	
+	/**
 	 *  Update component identifier.
 	 *  @param cid The component identifier.
 	 *  @return The component identifier.

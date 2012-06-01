@@ -131,6 +131,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 								{
 									if(addresses[i].startsWith(SRelay.ADDRESS_SCHEMES[j]))
 									{
+										
 										receivers.add(new ComponentIdentifier("__relay"+i,
 											new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
 									}
@@ -160,7 +161,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 							}
 							else
 							{
-								fut.setResult(null);
+								fut.setException(new RuntimeException("No relay addresses found."));
 							}
 						}
 					});
@@ -176,6 +177,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					sending	= false;
 					if(!(exception instanceof ComponentTerminatedException))
 					{
 						agent.getLogger().info("Sending awareness info to server...failed: "+exception);

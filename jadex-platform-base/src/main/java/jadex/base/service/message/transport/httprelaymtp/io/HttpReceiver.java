@@ -1,6 +1,6 @@
 package jadex.base.service.message.transport.httprelaymtp.io;
 
-import jadex.base.service.message.transport.codecs.GZIPCodec;
+import jadex.base.service.message.MapSendTask;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
@@ -18,7 +19,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Binding;
-import jadex.xml.bean.JavaReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -268,7 +269,7 @@ public class HttpReceiver
 	/**
 	 *  Post a received awareness info to awareness service (if any).
 	 */
-	protected void	postAwarenessInfo(final byte[] data, final int type)
+	protected void	postAwarenessInfo(final byte[] data, final int type, final Map<Byte, ICodec> codecs)
 	{
 		SServiceProvider.getService(access.getServiceProvider(), IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IAwarenessManagementService>()
@@ -277,8 +278,7 @@ public class HttpReceiver
 			{
 				try
 				{
-					AwarenessInfo	info	= (AwarenessInfo)JavaReader.objectFromByteArray(
-						GZIPCodec.decodeBytes(data, getClass().getClassLoader()), getClass().getClassLoader());
+					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader());
 					awa.addAwarenessInfo(info);
 				}
 				catch(Exception e)
@@ -471,78 +471,84 @@ public class HttpReceiver
 		{
 			public void customResultAvailable(final IMessageService ms)
 			{
-				threadpool.execute(new Runnable()
+				ms.getAllCodecs().addResultListener(new ExceptionDelegationResultListener<Map<Byte,ICodec>, Void>(ret)
 				{
-					public void run()
+					public void customResultAvailable(final Map<Byte,ICodec> codecs)
 					{
-						HttpURLConnection	con	= null;
-						try
+						threadpool.execute(new Runnable()
 						{
-							String	xmlid	= HttpReceiver.this.access.getComponentIdentifier().getRoot().getName();
-							URL	url	= new URL(adr.substring(6)+"?id="+URLEncoder.encode(xmlid, "UTF-8")); // strip 'relay-' prefix.
-							con	= (HttpURLConnection)url.openConnection();
-							cons.add(con);
-							con.setUseCaches(false);
-							
-	//						// Hack!!! Do not validate server (todo: enable/disable by platform argument).
-	//						if(con instanceof HttpsURLConnection)
-	//						{
-	//							HttpsURLConnection httpscon = (HttpsURLConnection) con;  
-	//					        httpscon.setHostnameVerifier(new HostnameVerifier()  
-	//					        {        
-	//					            public boolean verify(String hostname, SSLSession session)  
-	//					            {  
-	//					                return true;  
-	//					            }  
-	//					        });												
-	//						}
-							
-							InputStream	in	= con.getInputStream();
-							address	= adr;
-							transport.connected(address, false);
-							while(true)
+							public void run()
 							{
-								// Read message type.
-								int	b	= in.read();
-								if(b==-1)
+								HttpURLConnection	con	= null;
+								try
 								{
-									throw new IOException("Stream closed");
-								}
-								else if(b==SRelay.MSGTYPE_PING)
-								{
-	//								System.out.println("Received ping");
-								}
-								else if(b==SRelay.MSGTYPE_AWAINFO)
-								{
-									final byte[] rawmsg = readMessage(in);
-									postAwarenessInfo(rawmsg, b);
-								}
-								else if(b==SRelay.MSGTYPE_DEFAULT)
-								{
-									final byte[] rawmsg = readMessage(in);
-									if(rawmsg!=null)
+									String	xmlid	= HttpReceiver.this.access.getComponentIdentifier().getRoot().getName();
+									URL	url	= new URL(adr.substring(6)+"?id="+URLEncoder.encode(xmlid, "UTF-8")); // strip 'relay-' prefix.
+									con	= (HttpURLConnection)url.openConnection();
+									cons.add(con);
+									con.setUseCaches(false);
+									
+			//						// Hack!!! Do not validate server (todo: enable/disable by platform argument).
+			//						if(con instanceof HttpsURLConnection)
+			//						{
+			//							HttpsURLConnection httpscon = (HttpsURLConnection) con;  
+			//					        httpscon.setHostnameVerifier(new HostnameVerifier()  
+			//					        {        
+			//					            public boolean verify(String hostname, SSLSession session)  
+			//					            {  
+			//					                return true;  
+			//					            }  
+			//					        });												
+			//						}
+									
+									InputStream	in	= con.getInputStream();
+									address	= adr;
+									transport.connected(address, false);
+									while(true)
 									{
-										try
+										// Read message type.
+										int	b	= in.read();
+										if(b==-1)
 										{
-											ms.deliverMessage(rawmsg);
+											throw new IOException("Stream closed");
 										}
-										catch(Exception e)
+										else if(b==SRelay.MSGTYPE_PING)
 										{
-											log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+rawmsg);
+			//								System.out.println("Received ping");
 										}
-									}
+										else if(b==SRelay.MSGTYPE_AWAINFO)
+										{
+											final byte[] rawmsg = readMessage(in);
+											postAwarenessInfo(rawmsg, b, codecs);
+										}
+										else if(b==SRelay.MSGTYPE_DEFAULT)
+										{
+											final byte[] rawmsg = readMessage(in);
+											if(rawmsg!=null)
+											{
+												try
+												{
+													ms.deliverMessage(rawmsg);
+												}
+												catch(Exception e)
+												{
+													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+rawmsg);
+												}
+											}
+										}
+									}		
 								}
-							}		
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-						
-						if(con!=null)
-						{
-							cons.remove(con);
-						}
+								catch(Exception e)
+								{
+									ret.setException(e);
+								}
+								
+								if(con!=null)
+								{
+									cons.remove(con);
+								}
+							}
+						});						
 					}
 				});
 			}

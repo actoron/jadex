@@ -89,6 +89,11 @@ public interface IMessageService extends IService
 	public IFuture<Void> removeMessageCodec(Class codec);
 	
 	/**
+	 *  Announce that addresses of transports might have changed.
+	 */
+	public IFuture<Void>	refreshAddresses();
+	
+	/**
 	 *  Update component identifier with current addresses.
 	 *  @param cid The component identifier.
 	 *  @return The component identifier.

@@ -12,6 +12,8 @@ import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.xml.bean.JavaReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -313,7 +315,19 @@ public class RelayServlet extends HttpServlet
 			// Read message and extract awareness info content.
 			byte[] buffer = readData(in, length-1);
 			MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
-			AwarenessInfo	info	= (AwarenessInfo)msg.getMessage().get(SFipa.CONTENT);
+			AwarenessInfo	info;
+			if(SFipa.JADEX_RAW.equals(msg.getMessage().get(SFipa.LANGUAGE)))
+			{
+				info = (AwarenessInfo)msg.getMessage().get(SFipa.CONTENT);
+			}
+			else if(SFipa.JADEX_XML.equals(msg.getMessage().get(SFipa.LANGUAGE)))
+			{
+				info = (AwarenessInfo)JavaReader.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), getClass().getClassLoader());
+			}
+			else //if(SFipa.JADEX_BINARY.equals(msg.getMessage().get(SFipa.LANGUAGE)))
+			{
+				info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader());
+			}
 			sendAwarenessInfos(info);
 		}
 		else
@@ -374,7 +388,10 @@ public class RelayServlet extends HttpServlet
 		
 		if(platform!=null || AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
 		{
-			byte[]	info	= MapSendTask.encodeMessage(awainfo, defcodecs, getClass().getClassLoader());
+			byte[]	data	= MapSendTask.encodeMessage(awainfo, defcodecs, getClass().getClassLoader());
+			byte[]	info	= new byte[data.length+4];
+			System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
+			System.arraycopy(data, 0, info, 4, data.length);
 			
 			Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
 			for(int i=0; i<entries.length; i++)
@@ -396,7 +413,10 @@ public class RelayServlet extends HttpServlet
 					// Send other awareness infos to newly connected platform.
 					if(initial)
 					{
-						byte[]	info2	= MapSendTask.encodeMessage(awainfo2, defcodecs, getClass().getClassLoader());
+						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, defcodecs, getClass().getClassLoader());
+						byte[]	info2	= new byte[data2.length+4];
+						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
+						System.arraycopy(data2, 0, info2, 4, data2.length);
 						
 						try
 						{

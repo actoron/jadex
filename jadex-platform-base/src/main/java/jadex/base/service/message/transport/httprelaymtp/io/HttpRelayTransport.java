@@ -5,7 +5,9 @@ import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -199,34 +201,36 @@ public class HttpRelayTransport implements ITransport
 	 */
 	protected void	connected(final String address, final boolean dead)
 	{
-		Long	oldtime	= addresses.get(address);
+		final String	httpadr	= address.substring(6);
+		
+		Long	oldtime	= addresses.get(httpadr);
 		// Remove all old entries with start address (e.g. also awareness urls).
 		if(!dead)
 		{
 			String[]	aadrs	= addresses.keySet().toArray(new String[0]);
 			for(int i=0; i<aadrs.length; i++)
 			{
-				if(aadrs[i].startsWith(address))
+				if(aadrs[i].startsWith(httpadr))
 				{
 					addresses.remove(aadrs[i]);
 				}
 			}
 		}
-		addresses.put(address, new Long(dead ? -System.currentTimeMillis() : System.currentTimeMillis()));
+		addresses.put(httpadr, new Long(dead ? -System.currentTimeMillis() : System.currentTimeMillis()));
 		
 		ISendTask[]	readytasks	= null;
 		synchronized(readyqueue)
 		{
-			Collection<ISendTask>	queue	= readyqueue.get(address);
+			Collection<ISendTask>	queue	= readyqueue.get(httpadr);
 			if(queue!=null)
 			{
 				readytasks	= queue.toArray(new ISendTask[queue.size()]);
-				readyqueue.remove(address);
+				readyqueue.remove(httpadr);
 			}
 		}
 		for(int i=0; readytasks!=null && i<readytasks.length; i++)
 		{
-			internalSendMessage(address, readytasks[i]);
+			internalSendMessage(httpadr, readytasks[i]);
 		}
 		
 		// inform awa when olddead
@@ -234,29 +238,52 @@ public class HttpRelayTransport implements ITransport
 		if(dead != olddead)
 		{
 			// Inform awareness manager (if any).
-			try
+			component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
-				component.getServiceContainer().searchService(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener<IRelayAwarenessService>()
+				public IFuture<Void> execute(final IInternalAccess ia)
 				{
-					public void resultAvailable(IRelayAwarenessService ras)
+					ia.getServiceContainer().searchService(IMessageService.class, Binding.SCOPE_PLATFORM)
+						.addResultListener(new IResultListener<IMessageService>()
 					{
-						if(dead)
-							ras.disconnected("relay-"+address);
-						else
-							ras.connected("relay-"+address);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// No awa service -> ignore awa infos.
-					}
-				});
-			}
-			catch(Exception e)
-			{
-				// Hack!!! shouldn't use (internal) component from external thread.
-			}
+						public void resultAvailable(IMessageService ms)
+						{
+							ms.refreshAddresses().addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									ia.getServiceContainer().searchService(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+										.addResultListener(new IResultListener<IRelayAwarenessService>()
+									{
+										public void resultAvailable(IRelayAwarenessService ras)
+										{
+											if(dead)
+												ras.disconnected(address);
+											else
+												ras.connected(address);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											// No awa service -> ignore awa infos.
+										}
+									});
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ia.getLogger().info("Relay transport problem refreshing addresses: "+exception);
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// No message service -> ignore awa infos.
+						}
+					});
+					return IFuture.DONE;
+				}
+			});
 		}
 	}
 	
