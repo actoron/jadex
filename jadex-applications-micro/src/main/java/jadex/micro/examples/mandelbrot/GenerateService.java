@@ -187,20 +187,25 @@ public class GenerateService implements IGenerateService
 	@ServiceShutdown
 	public IFuture<Void>	shutdown()
 	{
+		System.out.println("shutdown: "+agent.getAgentName());
 		final Future<Void>	ret	= new Future<Void>();
 		if(panel!=null)
 		{
+			System.out.println("shutdown1: "+agent.getAgentName());
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
+					System.out.println("shutdown2: "+agent.getAgentName());
 					SGUI.getWindowParent(panel).dispose();
 					ret.setResult(null);
+					System.out.println("shutdown3: "+agent.getAgentName());
 				}
 			});
 		}
 		else
 		{
+			System.out.println("shutdown4: "+agent.getAgentName());
 			ret.setResult(null);
 		}
 		return ret;

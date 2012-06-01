@@ -1,7 +1,5 @@
 package jadex.micro.examples.mandelbrot;
 
-import javax.swing.plaf.InternalFrameUI;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -53,7 +51,7 @@ public class CalculateAgent extends MicroAgent
 		final Future<Void> ret = new Future<Void>();
 		
 		final long delay = ((Number)getArgument("delay")).longValue();
-		IComponentStep step = new IComponentStep<Void>()
+		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
