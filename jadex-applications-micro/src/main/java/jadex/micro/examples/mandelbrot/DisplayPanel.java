@@ -7,6 +7,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -28,7 +29,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
@@ -339,7 +339,7 @@ public class DisplayPanel extends JComponent
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
-										fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DisplayPanel.this)
+										fut.addResultListener(new SwingResultListener<IComponentManagementService>()
 										{
 											public void customResultAvailable(IComponentManagementService cms)
 											{
@@ -352,29 +352,26 @@ public class DisplayPanel extends JComponent
 														if(!progress.isFinished())
 														{
 															cms.getExternalAccess(progress.getProviderId())
-																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																.addResultListener(new SwingResultListener<IExternalAccess>()
 															{
-																public void customResultAvailable(Object result)
+																public void customResultAvailable(IExternalAccess	ea)
 																{
-																	IExternalAccess	ea	= (IExternalAccess)result;
 																	// It is not really possible to define the progress services as required service.
 																	// Needs component specific progress service.
 																	SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
-																		.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																		.addResultListener(new SwingResultListener<IProgressService>()
 																	{
-																		public void customResultAvailable(Object result)
+																		public void customResultAvailable(IProgressService	ps)
 																		{
-																			IProgressService	ps	= (IProgressService)result;
 																			if(ps!=null)
 																			{
 																				ps.getProgress(progress.getTaskId())
-																					.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																					.addResultListener(new SwingResultListener<Integer>()
 																				{
-																					public void customResultAvailable(Object result)
+																					public void customResultAvailable(Integer current)
 																					{
 																						if(progressdata!=null && progressdata.containsKey(progress))
 																						{
-																							Integer	current	= (Integer)result;
 																							Integer	percent	= (Integer)progressdata.get(progress);
 																							if(current.intValue()>percent.intValue())
 																							{
@@ -931,17 +928,16 @@ public class DisplayPanel extends JComponent
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredService("generateservice")
-					.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+					.addResultListener(new SwingResultListener<Object>()
 				{
 					public void customResultAvailable(Object result)
 					{
 						IGenerateService	gs	= (IGenerateService)result;
-						IFuture	fut	= gs.generateArea(ad);
-						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+						gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(AreaData result)
 							{
-								DisplayPanel.this.setResults((AreaData)result);
+								DisplayPanel.this.setResults(result);
 							}
 							public void customExceptionOccurred(Exception exception)
 							{
@@ -950,6 +946,13 @@ public class DisplayPanel extends JComponent
 								super.customExceptionOccurred(exception);
 							}
 						});
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						// Service not found -> ignore
+						calculating	= false;
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
 					}
 				});
 				return IFuture.DONE;
