@@ -65,7 +65,7 @@ public class ComponentStartTest implements	Test
 //					System.out.println("killing: "+comp.getFilename());
 //					SyncExecutionService.DEBUG	= true;
 //				}
-				cms.destroyComponent(cid).get(new ThreadSuspendable(), 3000000);
+				cms.destroyComponent(cid).get(new ThreadSuspendable(), 30000);
 //				System.out.println("killed: "+comp.getFilename());
 			}
 			catch(ComponentTerminatedException cte)
