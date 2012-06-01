@@ -167,7 +167,7 @@ public class JSplitPanel extends JSplitPane
 	public double getProportionalDividerLocation()
 	{
 		double full = getOrientation() == JSplitPane.HORIZONTAL_SPLIT? getWidth()-getDividerSize(): getHeight()-getDividerSize();
-		double ret = full==0? 0: ((double)getDividerLocation())/full;
+		double ret = full<=0? 0: ((double)getDividerLocation())/full;
 		return ret;
 	}
 }

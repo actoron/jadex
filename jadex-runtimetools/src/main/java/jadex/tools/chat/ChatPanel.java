@@ -1880,8 +1880,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		Properties	props	= new Properties();
 		props.addProperty(new Property("autorefresh", ""+autorefresh));
 		props.addProperty(new Property("sound", ""+sound));
-		props.addProperty(new Property("listpan", ""+listpan.getProportionalDividerLocation()));
-		props.addProperty(new Property("horsplit", ""+horsplit.getProportionalDividerLocation()));
+		double lp =listpan.getProportionalDividerLocation();
+		if(lp>0)
+			props.addProperty(new Property("listpan", ""+lp));
+		double hs = horsplit.getProportionalDividerLocation();
+		if(hs>0)
+			props.addProperty(new Property("horsplit", ""+hs));
 		for(String key: notificationsounds.keySet())
 		{
 			props.addProperty(new Property(key, notificationsounds.get(key)));
