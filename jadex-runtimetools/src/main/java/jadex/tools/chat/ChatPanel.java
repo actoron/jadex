@@ -335,7 +335,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				usertable	= new JTable(new UserTableModel());
 //				usertable.setTableHeader(new ResizeableTableHeader(usertable.getColumnModel()));
-				usertable.setRowHeight(32);
+				usertable.setRowHeight(40);
 				usertable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 				{
 					public void valueChanged(ListSelectionEvent e)
