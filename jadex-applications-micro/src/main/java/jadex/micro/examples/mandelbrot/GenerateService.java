@@ -61,6 +61,7 @@ public class GenerateService implements IGenerateService
 	@ServiceStart
 	public void start()
 	{
+		System.out.println("start: "+agent.getAgentName());
 		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
 		
 		this.manager	= new ServicePoolManager(agent, "calculateservices", new IServicePoolHandler()
