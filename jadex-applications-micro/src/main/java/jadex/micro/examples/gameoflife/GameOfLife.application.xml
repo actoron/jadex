@@ -41,7 +41,7 @@
 			</env:dataviews>
 			
 			<env:perspectives>
-				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="main" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="cell" width="1.0" height="1.0">
 						<env:rectangle color="yellow">
 							<env:drawcondition>$object.alive</env:drawcondition> 

@@ -70,7 +70,7 @@
 			</env:actiontypes>
 		
 			<env:perspectives>
-				<env:perspective name="icon" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="icon" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="firefly" width="1.0" height="1.0">
 						<env:property name="color" dynamic="true">$object.flashing? Color.YELLOW: Color.gray</env:property>
 						<env:property name="rotation" dynamic="true">
@@ -86,7 +86,7 @@
 					</env:prelayers>
 				</env:perspective>
 				
-				<env:perspective name="abstract" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="abstract" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="firefly" width="1.0" height="1.0">
 						<env:property name="color" dynamic="true">$object.flashing? Color.yellow: Color.gray</env:property>
 						<env:property name="rotation" dynamic="true">

@@ -46,6 +46,13 @@ import javax.swing.UIManager;
  */
 public class Perspective2D extends TypedPropertyObject implements IPerspective
 {
+	//-------- constants --------
+	
+	/** Global flag for turning off OpenGL from starter. */
+	public static boolean	OPENGL	= true;
+	
+	//-------- attributes --------
+	
 	/** Name of the presentation */
 	protected String name;
 	
@@ -123,7 +130,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		this.objectShift = new Vector2Double();
 		this.selectorDistance = new Vector1Double(1.0);
 		this.selectCycle = 0;
-		this.tryopengl = true;
+		this.tryopengl = OPENGL;
 		
 		this.displayorder = null;
 		
@@ -662,7 +669,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		frame.pack();
 		frame.setSize(1, 1);
 		
-		if (tryopengl)
+		if (tryopengl && OPENGL)
 		{
 			// Try OpenGL...
 			try
@@ -717,7 +724,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		}
 		
 		IViewport viewport = null;
-		if (tryopengl)
+		if (tryopengl && OPENGL)
 		{
 			try
 			{

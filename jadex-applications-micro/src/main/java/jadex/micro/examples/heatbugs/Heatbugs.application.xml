@@ -81,7 +81,7 @@
 			</env:actiontypes>
 			
 			<env:perspectives>
-				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="main" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="patch" width="1.0" height="1.0">
 						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat)),0,0)</env:property>
 						<env:property name="heat_rounded" dynamic="true">((int)($object.heat*10))/10.0</env:property>
@@ -94,7 +94,7 @@
 					</env:drawable>
 				</env:perspective>
 				
-				<env:perspective name="values" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="values" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="patch" width="1.0" height="1.0">
 						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat)),0,0)</env:property>
 						<env:property name="heat_rounded" dynamic="true">((int)($object.heat*10))/10.0</env:property>

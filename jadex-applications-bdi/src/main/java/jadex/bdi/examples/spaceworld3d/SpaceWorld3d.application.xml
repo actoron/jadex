@@ -120,7 +120,7 @@
 			
 			
 			<env:perspectives>
-			<env:perspective name="Complex3D" class="Perspective3D" opengl="true" >
+			<env:perspective name="Complex3D" class="Perspective3D">
 
 				
 				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">

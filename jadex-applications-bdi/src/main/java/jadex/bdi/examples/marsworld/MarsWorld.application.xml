@@ -120,7 +120,7 @@
 			
 			
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="true">
+				<env:perspective name="icons" class="Perspective2D">
 				
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">

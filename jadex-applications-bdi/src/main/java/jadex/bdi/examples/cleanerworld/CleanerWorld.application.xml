@@ -140,7 +140,7 @@
 			</env:actiontypes>
 			
 			<env:perspectives>			
-				<env:perspective name="icons" class="Perspective2D" opengl="true" invertyaxis="false">
+				<env:perspective name="icons" class="Perspective2D" invertyaxis="false">
 					<env:property name="alpha" dynamic="true">100-(int)(Math.sin($space.timeofday/86400.0*2*Math.PI)*50+50)</env:property>
 					<env:property name="color" dynamic="true">new java.awt.Color(0,0,0, $perspective.alpha)</env:property>
 					

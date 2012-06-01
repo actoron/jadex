@@ -73,6 +73,7 @@ public class ComponentTestSuite extends TestSuite
 			"-saveonexit", "false",
 			"-welcome", "false",
 			"-autoshutdown", "false",
+			"-opengl", "false",
 			"-printpass", "false"
 		}, path, root, excludes, timeout, broken, start);
 	}

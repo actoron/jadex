@@ -84,7 +84,7 @@
 			</env:avatarmappings>
 			
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="true">
+				<env:perspective name="icons" class="Perspective2D">
 					<env:drawable objecttype="disaster" width="0.08" height="0.08">
 						<env:property name="drawsize" dynamic="true">new Vector2Double($object.getProperty("size").intValue()*0.005)</env:property>
 						<env:ellipse layer="1" size="drawsize" abssize="true" color="#FAFA1E99">

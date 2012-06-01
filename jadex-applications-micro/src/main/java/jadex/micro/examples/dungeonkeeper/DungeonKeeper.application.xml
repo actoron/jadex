@@ -55,7 +55,7 @@
 			</env:actiontypes>
 		
 			<env:perspectives>
-				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="main" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="field" width="1.0" height="1.0">
 						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/solidrock.png">
 							<env:drawcondition>InitMapProcess.IMPENETRABLE_ROCK.equals($object.type)</env:drawcondition> 

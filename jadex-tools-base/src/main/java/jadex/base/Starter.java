@@ -93,6 +93,9 @@ public class Starter
 	/** The stack compaction disable flag. */
 	public static final String NOSTACKCOMPACTION = "nostackcompaction";
 	
+	/** The opengl disable flag. */
+	public static final String OPENGL = "opengl";
+	
 	/** The reserved platform parameters. */
 	public static final Set<String> RESERVED;
 	
@@ -110,6 +113,7 @@ public class Starter
 		RESERVED.add(PARAMETERCOPY);
 		RESERVED.add(DEBUGFUTURES);
 		RESERVED.add(NOSTACKCOMPACTION);
+		RESERVED.add(OPENGL);
 	}
 	
 //	/** The shutdown in progress flag. */
@@ -233,6 +237,14 @@ public class Starter
 				else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
 				{
 					Future.NO_STACK_COMPACTION	= true;
+				}
+				else if(OPENGL.equals(key) && "false".equals(val))
+				{
+					Class<?>	p2d	= SReflect.classForName0("jadex.extension.envsupport.observer.perspective.Perspective2D", Starter.class.getClassLoader());
+					if(p2d!=null)
+					{
+						p2d.getField("OPENGL").set(null, Boolean.FALSE);
+					}
 				}
 				else
 				{

@@ -148,7 +148,7 @@
 			
 			<!-- Perspectives define the user-interface appearance. -->
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
 						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector/images/collector.png" />
@@ -176,7 +176,7 @@
 					</env:prelayers>
 				</env:perspective>
 					
-				<env:perspective name="abstract" class="Perspective2D" opengl="true" objectplacement="center">
+				<env:perspective name="abstract" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="collector" width="1.0" height="1.0">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
 						<env:triangle layer="2" color="red" />
