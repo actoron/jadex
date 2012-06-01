@@ -186,6 +186,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** The timer. */
 	protected Timer timer;
 	
+	/** The split panel on left hand side. */
+	protected JSplitPanel listpan;
+	
+	/** The main split panel between left and right. */
+	protected JSplitPanel	horsplit;
+	
 	//-------- constructors --------
 	
 	/**
@@ -220,6 +226,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				DefaultTableCellRenderer usericonrend = new DefaultTableCellRenderer()
 				{
+					{
+						this.setHorizontalAlignment(JLabel.CENTER);
+					}
+					
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 					{
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
@@ -324,6 +334,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				final JLabel lto = new JLabel("To: all");
 				
 				usertable	= new JTable(new UserTableModel());
+//				usertable.setTableHeader(new ResizeableTableHeader(usertable.getColumnModel()));
 				usertable.setRowHeight(32);
 				usertable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 				{
@@ -437,6 +448,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				};
 				usertable.addMouseListener(lis);
 				usertable.getTableHeader().addMouseListener(lis);
+//				usertable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+				usertable.getColumnModel().getColumn(0).setMinWidth(32);
+				usertable.getColumnModel().getColumn(0).setPreferredWidth(64);
+				usertable.getColumnModel().getColumn(0).setMaxWidth(64);
 				
 				PropertiesPanel pp = new PropertiesPanel();
 				
@@ -628,8 +643,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 				
 				
-				JSplitPanel	listpan	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, userpan, pp);
-				listpan.setDividerLocation(0.6);
+				listpan	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, userpan, pp);
+				listpan.setDividerLocation(0.5);
 				listpan.setOneTouchExpandable(true);
 //				listpan.add(userpan, BorderLayout.CENTER);
 //				listpan.add(pp, BorderLayout.SOUTH);
@@ -693,12 +708,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				tf.addActionListener(al);
 				send.addActionListener(al);
 
-				JSplitPanel	split	= new JSplitPanel(JSplitPanel.HORIZONTAL_SPLIT, listpan, main);
-				split.setOneTouchExpandable(true);
-				split.setDividerLocation(0.3);
+				horsplit	= new JSplitPanel(JSplitPanel.HORIZONTAL_SPLIT, listpan, main);
+				horsplit.setOneTouchExpandable(true);
+				horsplit.setDividerLocation(0.3);
 				
 				JPanel msgpane = new JPanel(new BorderLayout());
-				msgpane.add(split, BorderLayout.CENTER);
+				msgpane.add(horsplit, BorderLayout.CENTER);
 				msgpane.add(south, BorderLayout.SOUTH);
 				
 //				JSplitPanel udpane = new JSplitPanel(JSplitPanel.VERTICAL_SPLIT);
@@ -757,7 +772,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-							System.out.println("state change: "+ce.getComponentIdentifier()+" "+ce.getNick()+" "+ce.getImage());
+//							System.out.println("state change: "+ce.getComponentIdentifier()+" "+ce.getNick()+" "+ce.getImage());
 							setUserState(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick(), ce.getImage());
 						}
 						else if(ChatEvent.TYPE_FILE.equals(ce.getType()))
@@ -1831,7 +1846,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		String snd = props.getStringProperty("sound");
 		if(snd!=null)
 			sound = Boolean.parseBoolean(snd);
-			
+		double lp = props.getDoubleProperty("listpan");
+		if(lp!=0)
+			listpan.setDividerLocation(lp);
+		double hs = props.getDoubleProperty("horsplit");
+		if(hs!=0)
+			horsplit.setDividerLocation(hs);
+		
 		snd = props.getStringProperty(NOTIFICATION_FILE_ABORT);
 		if(snd!=null)
 			notificationsounds.put(NOTIFICATION_FILE_ABORT, snd);
@@ -1859,6 +1880,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		Properties	props	= new Properties();
 		props.addProperty(new Property("autorefresh", ""+autorefresh));
 		props.addProperty(new Property("sound", ""+sound));
+		props.addProperty(new Property("listpan", ""+listpan.getProportionalDividerLocation()));
+		props.addProperty(new Property("horsplit", ""+horsplit.getProportionalDividerLocation()));
 		for(String key: notificationsounds.keySet())
 		{
 			props.addProperty(new Property(key, notificationsounds.get(key)));

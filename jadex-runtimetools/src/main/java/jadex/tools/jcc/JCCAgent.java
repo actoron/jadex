@@ -53,16 +53,16 @@ public class JCCAgent extends MicroAgent
 //				StarterServicePlugin.class.getName(),
 //				DFServicePlugin.class.getName(),
 //				ConversationPlugin.class.getName(),
-				"jadex.tools.comanalyzer.ComanalyzerPlugin",
+//				"jadex.tools.comanalyzer.ComanalyzerPlugin",
 				TestCenterPlugin.class.getName(),
 //				JadexdocPlugin.class.getName(),
 				SimulationServicePlugin.class.getName(),
 				DebuggerPlugin.class.getName(),
 //				RuleProfilerPlugin.class.getName(),
-				LibraryServicePlugin.class.getName(),
+//				LibraryServicePlugin.class.getName(),
 				AwarenessComponentPlugin.class.getName(),
 				ComponentViewerPlugin.class.getName(),
-				DeployerPlugin.class.getName()
+//				DeployerPlugin.class.getName()
 			},
 		saveonexit).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 		return ret;
