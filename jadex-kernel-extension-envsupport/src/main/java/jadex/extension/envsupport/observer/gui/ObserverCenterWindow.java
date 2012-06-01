@@ -40,6 +40,8 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	protected Set knownpluginviews;
 	
+	protected boolean disposed;
+	
 	/** Creates the main window.
 	 * 
 	 *  @param title title of the window
@@ -55,30 +57,33 @@ public class ObserverCenterWindow extends JFrame
 		{
 			public void run()
 			{
-				menubar = new JMenuBar();
-//				menubar.add(new JMenu("Test"));
-				setJMenuBar(menubar);
-
-				toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-				getContentPane().add(toolbar, BorderLayout.NORTH);
-
-				mainpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-				mainpane.setOneTouchExpandable(true);
-				getContentPane().add(mainpane, BorderLayout.CENTER);
-
-				JPanel pluginpanel = new JPanel(new CardLayout());
-				mainpane.setLeftComponent(pluginpanel);
-				
-				JPanel perspectivepanel = new JPanel(new CardLayout());
-				mainpane.setRightComponent(perspectivepanel);
-
-				setResizable(true);
-				setBackground(null);
-				pack();
-				setSize(800, 600);
-				setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
-				setVisible(true);
-				mainpane.setDividerLocation(250);
+				if(!disposed)
+				{
+					menubar = new JMenuBar();
+	//				menubar.add(new JMenu("Test"));
+					setJMenuBar(menubar);
+	
+					toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
+					getContentPane().add(toolbar, BorderLayout.NORTH);
+	
+					mainpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+					mainpane.setOneTouchExpandable(true);
+					getContentPane().add(mainpane, BorderLayout.CENTER);
+	
+					JPanel pluginpanel = new JPanel(new CardLayout());
+					mainpane.setLeftComponent(pluginpanel);
+					
+					JPanel perspectivepanel = new JPanel(new CardLayout());
+					mainpane.setRightComponent(perspectivepanel);
+	
+					setResizable(true);
+					setBackground(null);
+					pack();
+					setSize(800, 600);
+					setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
+					setVisible(true);
+					mainpane.setDividerLocation(250);
+				}
 			}
 		};
 		
@@ -100,6 +105,12 @@ public class ObserverCenterWindow extends JFrame
 //			{
 //			}
 		}
+	}
+	
+	public void dispose()
+	{
+		disposed	= true;
+		super.dispose();
 	}
 	
 	/** Adds a menu
