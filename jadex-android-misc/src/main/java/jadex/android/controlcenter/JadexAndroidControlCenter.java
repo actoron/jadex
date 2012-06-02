@@ -3,6 +3,7 @@ package jadex.android.controlcenter;
 import jadex.android.JadexAndroidContext;
 import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
+import jadex.android.controlcenter.settings.ISettings;
 import jadex.base.service.settings.AndroidSettingsService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -21,9 +22,11 @@ import jadex.micro.annotation.Binding;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -31,40 +34,86 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.provider.Contacts.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * A Simple Control Center for Jadex-Android. Provides Access to configurable
+ * Components and Services. Because Android doesn't provide a way to set Option
+ * Menus for Child PreferenceScreens, this Activity is instantiated once for
+ * every child PreferenceScreen that is displayed. It then displays the child
+ * PreferenceScreen and delegates calls to the child Settings Implementation.
+ * 
+ * (See
+ * http://stackoverflow.com/questions/5032141/adding-menus-to-child-preference
+ * -screens)
+ * 
+ */
 public class JadexAndroidControlCenter extends PreferenceActivity {
 
+	private static final String EXTRA_SHOWCHILDPREFSCREEN = "showChildPrefScreen";
+	private static final String EXTRA_SETTINGSKEY = "settingsKey";
 	private SharedPreferences sharedPreferences;
 	private PreferenceCategory servicesCat;
 	private PreferenceCategory componentsCat;
+	private ISettings displayedChildSettings;
+	
+	static private Map<String, ISettings> childSettings;
+	
+	static {
+		childSettings = new HashMap<String, ISettings>();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.setTitle("Control Center");
-		sharedPreferences = JadexAndroidContext.getInstance().getAndroidContext()
-				.getSharedPreferences(AndroidSettingsService.DEFAULT_PREFS_NAME, Context.MODE_PRIVATE);
 
-		Map<String, ?> prefs = sharedPreferences.getAll();
-
-		setPreferenceScreen(createPreferenceHierarchy(prefs));
+		// Are we displaying Preferences for a child Prefscreen?
+		if (getIntent().getBooleanExtra(EXTRA_SHOWCHILDPREFSCREEN, false)) {
+			String settingsKey = getIntent().getStringExtra(EXTRA_SETTINGSKEY);
+			displayedChildSettings = childSettings.get(settingsKey);
+			if (displayedChildSettings != null) {
+				// display child preferences, enables us to control the options menu
+				PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
+				setPreferenceScreen(root);
+				displayedChildSettings.setPreferenceScreen(root);
+				//PreferenceScreen prefScreen = (PreferenceScreen) findPreference(settingsKey);
+				this.setTitle(settingsKey);
+			} else {
+				// display error
+			}
+		} else {
+			setPreferenceScreen(createPreferenceHierarchy());
+			this.setTitle("Control Center");
+		}
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		menu.add("Refresh");
-		return true;
+		if (displayedChildSettings != null) {
+			// child functionality
+			return displayedChildSettings.onCreateOptionsMenu(menu);
+		} else {
+			// main functionality
+			menu.add("Refresh");
+			return true;
+		}
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		refreshControlCenter();
-		return true;
+		if (displayedChildSettings != null) {
+			// child functionality
+			return displayedChildSettings.onOptionsItemSelected(item); 
+		} else {
+			// main functionality
+			refreshControlCenter();
+			return true;
+		}
 	}
 
-	private PreferenceScreen createPreferenceHierarchy(Map<String, ?> prefs) {
+	private PreferenceScreen createPreferenceHierarchy() {
 		final PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 
 		servicesCat = new PreferenceCategory(this);
@@ -82,6 +131,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 	private void refreshControlCenter() {
 		servicesCat.removeAll();
 		componentsCat.removeAll();
+		childSettings.clear();
 		addDummyPrefs();
 
 		if (JadexAndroidContext.getInstance().isJadexRunning()) {
@@ -176,9 +226,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 		if (guiClass != null) {
 			try {
 				AServiceSettings settings = (AServiceSettings) guiClass.getConstructor(IService.class).newInstance(service);
-				PreferenceScreen screen = this.getPreferenceManager().createPreferenceScreen(this);
-				root.addPreference(screen);
-				settings.setPreferenceRoot(screen);
+				addSettings(root,settings);
 				return true;
 			} catch (InstantiationException e) {
 				e.printStackTrace();
@@ -200,9 +248,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 	protected boolean addComponentSettings(PreferenceGroup root, IExternalAccess component, Class<?> guiClass) {
 		try {
 			AComponentSettings settings = (AComponentSettings) guiClass.getConstructor(IExternalAccess.class).newInstance(component);
-			PreferenceScreen screen = this.getPreferenceManager().createPreferenceScreen(this);
-			root.addPreference(screen);
-			settings.setPreferenceScreen(screen);
+			addSettings(root,settings);
 			return true;
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -218,6 +264,19 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	protected void addSettings(PreferenceGroup root, ISettings settings) {
+		PreferenceScreen screen = this.getPreferenceManager().createPreferenceScreen(this);
+		root.addPreference(screen);
+		Intent i = new Intent(this, JadexAndroidControlCenter.class);
+		i.putExtra(EXTRA_SHOWCHILDPREFSCREEN, true);
+		i.putExtra(EXTRA_SETTINGSKEY, settings.getTitle());
+		childSettings.put(settings.getTitle(), settings);
+		screen.setIntent(i);
+		screen.setKey(settings.getTitle());
+		screen.setTitle(settings.getTitle());
+		//settings.setPreferenceScreen(screen);
 	}
 
 	private Class<?> getGuiClass(final Object clid) {

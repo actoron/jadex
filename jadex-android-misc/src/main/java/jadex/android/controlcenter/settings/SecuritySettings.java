@@ -8,6 +8,8 @@ import jadex.commons.future.DefaultResultListener;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class SecuritySettings extends AServiceSettings {
 
@@ -16,6 +18,16 @@ public class SecuritySettings extends AServiceSettings {
 	public SecuritySettings(IService secservice) {
 		super(secservice);
 		this.secService = (ISecurityService) service;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return false;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return false;
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package jadex.android.controlcenter.settings;
 
-import jadex.android.controlcenter.DiscoveryPreference;
 import jadex.android.controlcenter.JadexBooleanPreference;
 import jadex.android.controlcenter.JadexIntegerPreference;
 import jadex.base.service.awareness.management.AwarenessManagementAgent;
@@ -35,6 +34,8 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 public class AwarenessSettings extends AComponentSettings implements OnPreferenceChangeListener {
@@ -44,7 +45,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	private JadexIntegerPreference spdelay;
 	private JadexBooleanPreference cbfast;
 	private JadexBooleanPreference[] cbmechanisms;
-	private PreferenceScreen infoCat;
+	private PreferenceCategory infoCat;
 
 	/**
 	 * Enum for preference keys
@@ -55,6 +56,20 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 	public AwarenessSettings(IExternalAccess extAcc) {
 		super(extAcc);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add("Refresh");
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		refreshSettings();
+		refreshDiscoveryMechanisms();
+		refreshDiscoveryInfos();
+		return true;
 	}
 
 	@Override
@@ -207,7 +222,8 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			mechanismsCat.addPreference(disMechanism);
 		}
 
-		infoCat = screen.getPreferenceManager().createPreferenceScreen(screen.getContext());
+		infoCat = new PreferenceCategory(screen.getContext()); 
+				//screen.getPreferenceManager().createPreferenceScreen(screen.getContext());
 		screen.addPreference(infoCat);
 		infoCat.setTitle("Discovery Info");
 
