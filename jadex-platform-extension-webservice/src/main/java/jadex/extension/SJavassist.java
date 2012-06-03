@@ -67,6 +67,9 @@ public class SJavassist
 	 */
 	public static CtClass getCtClass(Class clazz, ClassPool pool)
 	{
+		if(clazz==null)
+			throw new IllegalArgumentException("Class must not null.");
+		
 		CtClass ret = null;
 		try
 		{

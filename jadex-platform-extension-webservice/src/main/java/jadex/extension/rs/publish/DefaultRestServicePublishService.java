@@ -181,9 +181,9 @@ public class DefaultRestServicePublishService implements IPublishService
 			Class<?> baseclazz = pi.getMapping()!=null? pi.getMapping().getType(cl): null;
 			
 			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, cl, baseclazz, mapprops);
-			System.out.println("Produced methods: ");
-			for(int i=0; i<rmis.size(); i++)
-				System.out.println(rmis.get(i));
+//			System.out.println("Produced methods: ");
+//			for(int i=0; i<rmis.size(); i++)
+//				System.out.println(rmis.get(i));
 			Class<?> rsimpl = createProxyClass(service, cl, baseclazz, mapprops, rmis);
 			
 			Map<String, Object> props = new HashMap<String, Object>();
@@ -354,7 +354,10 @@ public class DefaultRestServicePublishService implements IPublishService
 					.getDeclaredMethod(rmi.getDelegateMethodName());
 				
 				// Do not generate method if user has implemented it by herself
+//				System.out.println("return type: "+rmi.getName()+" "+rmi.getReturnType());
 				Class<?> rt = SReflect.unwrapGenericType(rmi.getReturnType());
+				if(rt==null && rmi.getReturnType() instanceof Class) 
+					rt = (Class<?>)rmi.getReturnType();
 				CtClass rettype = SJavassist.getCtClass(rt, pool);
 				CtClass[] paramtypes = SJavassist.getCtClasses(rmi.getParameterTypes(), pool);
 				CtClass[] exceptions = SJavassist.getCtClasses(rmi.getExceptionTypes(), pool);
@@ -500,7 +503,13 @@ public class DefaultRestServicePublishService implements IPublishService
 							
 			ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
 			proxyclazz.freeze();
+			
 			System.out.println("create proxy class: "+ret.getName());
+//			Method[] ms = ret.getMethods();
+//			for(Method m: ms)
+//			{
+//				System.out.println("m: "+m);
+//			}
 		}
 		
 		return ret;
@@ -571,7 +580,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				targetmethod = service.getClass().getMethod(mname, method.getParameterTypes());
 			}
 			
-			//System.out.println("target: "+targetmethod);
+//			System.out.println("target: "+targetmethod);
 			
 			Object[] targetparams = params;
 			if(method.isAnnotationPresent(ParametersMapper.class))
