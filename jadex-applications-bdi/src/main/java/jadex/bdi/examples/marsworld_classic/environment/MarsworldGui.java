@@ -76,6 +76,8 @@ public class MarsworldGui	extends JFrame
 
 	/** The marsworld panel. */ 
 	protected JPanel	map;
+	
+	protected boolean disposed;
 
 	//-------- constructors --------
 
@@ -174,70 +176,73 @@ public class MarsworldGui	extends JFrame
 				{
 					public void run()
 					{
-						JLabel sentrylabel = new JLabel(": Sentry Agent", icons.getIcon("sentry"), JLabel.LEADING);
-						JLabel prodname = new JLabel(": Production Agent", icons.getIcon("production"), JLabel.LEADING);
-						JLabel carryname = new JLabel(": Carry Agent", icons.getIcon("carry"), JLabel.LEADING);
-						JLabel homename = new JLabel(": Homebase", icons.getIcon("homebase"), JLabel.LEADING);
-						JLabel targetname = new JLabel(": Target", icons.getIcon("target"), JLabel.LEADING);
-		
-						JTextPane helptext = new JTextPane();
-						helptext.setText("A group of robots is searching for ore on Mars...\n\n" +
-							"This example was inspired by the book " +
-							"'Multiagentsystems' written by Jaques Ferber.");
-						helptext.setEnabled(false);
-						helptext.setEditable(false);
-		
-						JPanel p1 = new JPanel();
-						p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
-						p1.add(homename);
-						p1.add(sentrylabel);
-						p1.add(prodname);
-						p1.add(carryname);
-						p1.add(targetname);
-						//p1.setBounds(513, 224, 148, 186);
-						p1.setBorder(BorderFactory.createTitledBorder(null, "Description",
-							TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,null));
-		
-						JPanel p2 = new JPanel();
-						p2.setLayout(new GridBagLayout());
-						p2.add(helptext, new GridBagConstraints(0, 0, 1, 1, 1, 0,
-							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-						//p2.setBounds(515, 10, 143, 177);
-						p2.setBorder(BorderFactory.createTitledBorder(null, "Mars Robots",
-							TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-		
-		
-						Insets insets = new Insets(2, 4, 2, 4);
-						JPanel content = new JPanel();
-						content.setLayout(new GridBagLayout());
-						content.add(map, new GridBagConstraints(0, 0, 1, 3, 1, 1,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-						content.add(p1, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-							GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
-						content.add(p2, new GridBagConstraints(1, 1, 1, 1, 0, 0,
-							GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
-						content.add(new JPanel(), new GridBagConstraints(1, 2, 1, 1, 0, 1,
-							GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
-						content.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-						content.setEnabled(false);
-		
-						p2.setMinimumSize(new Dimension((int)p1.getMinimumSize().getWidth(), 160));
-						p2.setPreferredSize(new Dimension((int)p1.getPreferredSize().getWidth(),  160));
-		
-						setContentPane(content);
-						setSize(600, 450);
-						setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
-						setVisible(true);
-						
-						// Continuously repaint the gui.
-						timer	= new Timer(100, new ActionListener()
+						if(!disposed)
 						{
-							public void actionPerformed(ActionEvent e)
+							JLabel sentrylabel = new JLabel(": Sentry Agent", icons.getIcon("sentry"), JLabel.LEADING);
+							JLabel prodname = new JLabel(": Production Agent", icons.getIcon("production"), JLabel.LEADING);
+							JLabel carryname = new JLabel(": Carry Agent", icons.getIcon("carry"), JLabel.LEADING);
+							JLabel homename = new JLabel(": Homebase", icons.getIcon("homebase"), JLabel.LEADING);
+							JLabel targetname = new JLabel(": Target", icons.getIcon("target"), JLabel.LEADING);
+			
+							JTextPane helptext = new JTextPane();
+							helptext.setText("A group of robots is searching for ore on Mars...\n\n" +
+								"This example was inspired by the book " +
+								"'Multiagentsystems' written by Jaques Ferber.");
+							helptext.setEnabled(false);
+							helptext.setEditable(false);
+			
+							JPanel p1 = new JPanel();
+							p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+							p1.add(homename);
+							p1.add(sentrylabel);
+							p1.add(prodname);
+							p1.add(carryname);
+							p1.add(targetname);
+							//p1.setBounds(513, 224, 148, 186);
+							p1.setBorder(BorderFactory.createTitledBorder(null, "Description",
+								TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,null));
+			
+							JPanel p2 = new JPanel();
+							p2.setLayout(new GridBagLayout());
+							p2.add(helptext, new GridBagConstraints(0, 0, 1, 1, 1, 0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+							//p2.setBounds(515, 10, 143, 177);
+							p2.setBorder(BorderFactory.createTitledBorder(null, "Mars Robots",
+								TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+			
+			
+							Insets insets = new Insets(2, 4, 2, 4);
+							JPanel content = new JPanel();
+							content.setLayout(new GridBagLayout());
+							content.add(map, new GridBagConstraints(0, 0, 1, 3, 1, 1,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
+							content.add(p1, new GridBagConstraints(1, 0, 1, 1, 0, 0,
+								GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
+							content.add(p2, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+								GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
+							content.add(new JPanel(), new GridBagConstraints(1, 2, 1, 1, 0, 1,
+								GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+							content.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+							content.setEnabled(false);
+			
+							p2.setMinimumSize(new Dimension((int)p1.getMinimumSize().getWidth(), 160));
+							p2.setPreferredSize(new Dimension((int)p1.getPreferredSize().getWidth(),  160));
+			
+							setContentPane(content);
+							setSize(600, 450);
+							setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
+							setVisible(true);
+							
+							// Continuously repaint the gui.
+							timer	= new Timer(100, new ActionListener()
 							{
-								MarsworldGui.this.map.repaint();
-							}
-						});
-						timer.start();
+								public void actionPerformed(ActionEvent e)
+								{
+									MarsworldGui.this.map.repaint();
+								}
+							});
+							timer.start();
+						}
 					}
 				});
 				
@@ -320,6 +325,12 @@ public class MarsworldGui	extends JFrame
 //				timer.start();
 //			}
 //		});
+	}
+	
+	public void dispose()
+	{
+		disposed	= true;
+		super.dispose();
 	}
 
 	//-------- methods --------
