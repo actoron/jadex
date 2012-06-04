@@ -944,8 +944,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-//		if(getDescription(cid)!=null && "Application".equals(getDescription(cid).getType()))
-//			System.out.println("destroy: "+cid.getName());
+		if(cid.toString().indexOf("Mandelbrot")!=-1)
+			System.out.println("destroy: "+cid.getName());
 //		else if(getDescription(cid)==null) 
 //			System.out.println("destroy: null");
 //		if(cid.getParent()==null)
@@ -1021,16 +1021,16 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				ad	= infos.getAdapter();
 				if(ad==null || ad.getException()!=null)
 				{
-//					if("Application".equals(getDescription(cid).getType()))
-//						System.out.println("init future exception: "+cid.getName());
+					if(cid.toString().indexOf("Mandelbrot")!=-1)
+						System.out.println("init future exception: "+cid.getName());
 					infos.getInitFuture().setException(ad.getException());
 				}
 				
 				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
 				else
 				{
-//					if("Application".equals(getDescription(cid).getType()))
-//						System.out.println("Queued component termination during init: "+cid.getName());
+					if(cid.toString().indexOf("Mandelbrot")!=-1)
+						System.out.println("Queued component termination during init: "+cid.getName());
 					logger.info("Queued component termination during init: "+cid.getName());
 				}
 			}
@@ -1042,8 +1042,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				// Kill subcomponents
 				if(adapter==null)
 				{
-//					if("Application".equals(getDescription(cid).getType()))
-//						System.out.println("Terminating component structure adapter is null: "+cid.getName());
+					if(cid.toString().indexOf("Mandelbrot")!=-1)
+						System.out.println("Terminating component structure adapter is null: "+cid.getName());
 //					
 					// Todo: need to kill children!? How to reproduce this case!?
 					logger.info("Terminating component structure adapter is null: "+cid.getName());
@@ -1051,8 +1051,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				}
 				else
 				{
-//					if("Application".equals(getDescription(cid).getType()))
-//						System.out.println("Terminating component structure: "+cid.getName());
+					if(cid.toString().indexOf("Mandelbrot")!=-1)
+						System.out.println("Terminating component structure: "+cid.getName());
 //					
 					logger.info("Terminating component structure: "+cid.getName());
 					final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
@@ -1064,6 +1064,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 					{
 						public void resultAvailable(List<Exception> result)
 						{
+							if(cid.toString().indexOf("Mandelbrot")!=-1)
+								System.out.println("Terminated component structure: "+cid.getName());
+							
 							logger.info("Terminated component structure: "+cid.getName());
 							CleanupCommand	cc	= null;
 							IFuture<Void>	fut	= null;
@@ -1075,13 +1078,15 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 									// Component may be already killed (e.g. when autoshutdown).
 									if(adapter!=null)
 									{
-//										System.out.println("destroy1: "+cid);//+" "+component.getParent().getComponentIdentifier().getLocalName());
+										if(cid.toString().indexOf("Mandelbrot")!=-1)
+											System.out.println("destroy1: "+cid.getName());
 										
 										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 										// todo: killcomponent should only be called once for each component?
 										if(!ccs.containsKey(cid))
 										{
-	//										System.out.println("killing a: "+cid);
+											if(cid.toString().indexOf("Mandelbrot")!=-1)
+												System.out.println("killing a: "+cid);
 											
 											cc	= new CleanupCommand(cid);
 											ccs.put(cid, cc);
@@ -1091,7 +1096,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 										}
 										else
 										{
-	//										System.out.println("killing b: "+cid);
+											if(cid.toString().indexOf("Mandelbrot")!=-1)
+												System.out.println("killing b: "+cid);
 											
 											cc = (CleanupCommand)ccs.get(cid);
 										}
