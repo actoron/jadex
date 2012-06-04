@@ -79,10 +79,12 @@ public class GenerateService implements IGenerateService
 				final AreaData	data	= (AreaData)user;	// global area
 				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
 				
+				System.out.println("invoke: "+service);
 				agent.getRequiredService("displayservice").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
+						System.out.println("display: "+result);
 						final IDisplayService	ds	= (IDisplayService)result;
 						final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
 							new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
@@ -91,26 +93,26 @@ public class GenerateService implements IGenerateService
 						{
 							public void resultAvailable(Object result)
 							{
-//								System.out.println("calc start: "+service);
+								System.out.println("calc start: "+service);
 								((ICalculateService)service).calculateArea(ad).addResultListener(
 									new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(final Object calcresult)
 									{
-//										System.out.println("calc end");
+										System.out.println("calc end");
 										pd.setFinished(true);
 										ds.displayIntermediateResult(pd).addResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
-//												System.out.println("da");
+												System.out.println("da");
 												// Use result from calculation service instead of result from display service.
 												ret.setResult(calcresult);
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
-//												System.out.println("da2");
+												System.out.println("da2");
 												// Use result from calculation service instead of exception from display service.
 												ret.setResult(calcresult);
 											}
