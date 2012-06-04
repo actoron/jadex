@@ -11,8 +11,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Color;
@@ -128,13 +128,13 @@ public class MarsworldGui	extends JFrame
 				});
 				return IFuture.DONE;
 			}
-		}).addResultListener(new IResultListener<Void>()
+		}).addResultListener(new SwingResultListener<Void>()
 		{
-			public void resultAvailable(Void result)
+			public void customResultAvailable(Void result)
 			{
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				if(timer!=null)
 					timer.stop();
