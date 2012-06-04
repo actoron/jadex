@@ -5,6 +5,7 @@ import jadex.android.controlcenter.JadexStringPreference;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DefaultResultListener;
+import android.os.Handler;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
@@ -32,12 +33,20 @@ public class SecuritySettings extends AServiceSettings {
 
 	@Override
 	protected void createPreferenceHierarchy(PreferenceScreen screen) {
+		final Handler uiHandler = new Handler();
 		final JadexBooleanPreference usePw = new JadexBooleanPreference(screen.getContext());
 		usePw.setTitle("Use Password");
+		usePw.setEnabled(false);
 		secService.isUsePassword().addResultListener(new DefaultResultListener<Boolean>() {
 			@Override
-			public void resultAvailable(Boolean result) {
-				usePw.setValue(result);
+			public void resultAvailable(final Boolean result) {
+				uiHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						usePw.setValue(result);
+						usePw.setEnabled(true);
+					}
+				});
 			}
 		});
 		usePw.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -51,10 +60,18 @@ public class SecuritySettings extends AServiceSettings {
 
 		final JadexStringPreference password = new JadexStringPreference(screen.getContext());
 		password.setTitle("Password");
+		password.setEnabled(false);
 		secService.getLocalPassword().addResultListener(new DefaultResultListener<String>() {
 			@Override
-			public void resultAvailable(String result) {
-				password.setValue(result);
+			public void resultAvailable(final String result) {
+				uiHandler.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						password.setValue(result);
+						password.setEnabled(true);
+					}
+				});
 			}
 		});
 		password.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {

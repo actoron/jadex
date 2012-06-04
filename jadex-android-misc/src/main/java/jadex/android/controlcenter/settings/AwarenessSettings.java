@@ -22,16 +22,17 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.annotations.IncludeFields;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import android.os.Handler;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.view.Menu;
@@ -46,6 +47,8 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	private JadexBooleanPreference cbfast;
 	private JadexBooleanPreference[] cbmechanisms;
 	private PreferenceCategory infoCat;
+	private PreferenceScreen screen;
+	private Handler uiHandler;
 
 	/**
 	 * Enum for preference keys
@@ -57,13 +60,13 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	public AwarenessSettings(IExternalAccess extAcc) {
 		super(extAcc);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add("Refresh");
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		refreshSettings();
@@ -74,7 +77,8 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 	@Override
 	protected void createPreferenceHierarchy(final PreferenceScreen screen) {
-		final Handler uiHandler = new Handler();
+		this.screen = screen;
+		uiHandler = new Handler();
 
 		// --- Proxy Settings ---
 		PreferenceCategory proxyCat = new PreferenceCategory(screen.getContext());
@@ -222,8 +226,8 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			mechanismsCat.addPreference(disMechanism);
 		}
 
-		infoCat = new PreferenceCategory(screen.getContext()); 
-				//screen.getPreferenceManager().createPreferenceScreen(screen.getContext());
+		infoCat = new PreferenceCategory(screen.getContext());
+		// screen.getPreferenceManager().createPreferenceScreen(screen.getContext());
 		screen.addPreference(infoCat);
 		infoCat.setTitle("Discovery Info");
 
@@ -305,7 +309,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	 * Refresh the discovery infos.
 	 */
 	protected void refreshDiscoveryInfos() {
-		final Handler uiHandler = new Handler();
 		extAcc.scheduleStep(new IComponentStep<DiscoveryInfo[]>() {
 			@Classname("getDiscoveryInfos")
 			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia) {
@@ -321,35 +324,79 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 			@Override
 			public void resultAvailable(final DiscoveryInfo[] ds) {
-				uiHandler.post(new Runnable() {
+				List<Preference> newDisPrefs = new ArrayList<Preference>();
+				if (ds.length == 0) {
+					final Preference dummyPref = new Preference(infoCat.getContext());
+					dummyPref.setTitle("No Discovery Infos available.");
+					newDisPrefs.add(dummyPref);
+				} else {
 
-					@Override
-					public void run() {
-						infoCat.removeAll();
-						if (ds.length == 0) {
-							Preference dummyPref = new Preference(infoCat.getContext());
-							dummyPref.setTitle("No Discovery Infos available.");
-							infoCat.addPreference(dummyPref);
-						} else {
+					for (int i = 0; i < ds.length; i++) {
+						final DiscoveryInfo info = ds[i];
+						DiscoveryPreference disPref = new DiscoveryPreference(infoCat.getContext(), info);
+						disPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
-							for (int i = 0; i < ds.length; i++) {
-								DiscoveryInfo info = ds[i];
-								DiscoveryPreference disPref = new DiscoveryPreference(infoCat.getContext(), info);
-								disPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-									@Override
-									public boolean onPreferenceClick(Preference preference) {
-										return false;
-									}
-								});
-								infoCat.addPreference(disPref);
+							@Override
+							public boolean onPreferenceChange(Preference preference, Object value) {
+								final Boolean create = (Boolean) value;
+								final IComponentIdentifier proxy = info.getProxy() != null && info.getProxy().isDone()
+										&& info.getProxy().getException() == null ? info.getProxy().get(null) : null;
+								if (create && info.getProxy() == null || !create && proxy != null) {
+									// setting changed -> create or
+									// delete proxy
+									extAcc.scheduleStep(new IComponentStep<Void>() {
+										@Classname("createDeleteProxy")
+										public IFuture<Void> execute(IInternalAccess ia) {
+											IFuture<Void> ret;
+											AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
+											DiscoveryInfo dif = agent.getDiscoveryInfo(info.getComponentIdentifier());
+											if (create && dif != null) {
+												final Future<Void> fut = new Future<Void>();
+												ret = fut;
+												agent.createProxy(dif).addResultListener(
+														new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut) {
+															public void customResultAvailable(IComponentIdentifier result) {
+																fut.setResult(null);
+															}
+														});
+											} else if (dif != null) {
+												ret = agent.deleteProxy(dif);
+											} else {
+												ret = IFuture.DONE;
+											}
+											return ret;
+										}
+									}).addResultListener(new DefaultResultListener<Void>() {
+										public void exceptionOccurred(Exception exception) {
+											exception.printStackTrace();
+											uiHandler.post(new Runnable() {
+												@Override
+												public void run() {
+													Toast.makeText(screen.getContext(), "Could not start/stop Proxy for " + info.getComponentIdentifier(),
+															Toast.LENGTH_LONG).show();
+												}
+											});
+										};
+
+										@Override
+										public void resultAvailable(Void result) {
+											refreshDiscoveryInfos();
+										}
+									});
+								}
+								return true;
 							}
-						}
+						});
+						newDisPrefs.add(disPref);
 					}
-				});
+				}
+				for (Preference disPref : newDisPrefs) {
+					infoCat.removeAll();
+					infoCat.addPreference(disPref);
+				}
 			}
 		});
 	}
-	
 
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {

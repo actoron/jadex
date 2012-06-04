@@ -35,8 +35,11 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.provider.Contacts.Settings;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 
 /**
  * A Simple Control Center for Jadex-Android. Provides Access to configurable
@@ -78,7 +81,6 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 				PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 				setPreferenceScreen(root);
 				displayedChildSettings.setPreferenceScreen(root);
-				//PreferenceScreen prefScreen = (PreferenceScreen) findPreference(settingsKey);
 				this.setTitle(settingsKey);
 			} else {
 				// display error
@@ -112,7 +114,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 			return true;
 		}
 	}
-
+	
 	private PreferenceScreen createPreferenceHierarchy() {
 		final PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 

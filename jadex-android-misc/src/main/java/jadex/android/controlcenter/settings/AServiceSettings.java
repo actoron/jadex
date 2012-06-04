@@ -1,7 +1,13 @@
 package jadex.android.controlcenter.settings;
 
 import jadex.bridge.service.IService;
+import android.app.Activity;
 import android.preference.PreferenceScreen;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 public abstract class AServiceSettings implements ISettings {
 
@@ -25,5 +31,4 @@ public abstract class AServiceSettings implements ISettings {
 	public String getTitle() {
 		return title;
 	}
-
 }
