@@ -14,7 +14,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,8 +23,8 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -453,7 +452,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				usertable.getColumnModel().getColumn(0).setPreferredWidth(64);
 				usertable.getColumnModel().getColumn(0).setMaxWidth(64);
 				
-				PropertiesPanel pp = new PropertiesPanel();
+				PropertiesPanel pp = new PropertiesPanel("Settings");
 				
 				final JTextField tfnick = new JTextField();
 				JButton bunick = new JButton("Set");
@@ -479,11 +478,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				});
 				
-				getService().getNickName().addResultListener(new SwingDefaultResultListener<String>()
+				getService().getNickName().addResultListener(new SwingResultListener<String>()
 				{
 					public void customResultAvailable(String result)
 					{
 						tfnick.setText(result);
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						// Ignore...
 					}
 				});
 				
@@ -691,7 +695,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						tf.setText("");
 						typing	= false;
 						final int	request	= startRequest();
-						tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>()
+						tell(msg, request).addResultListener(new SwingResultListener<Void>()
 						{
 							public void customResultAvailable(Void result)
 							{
@@ -885,17 +889,27 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void createChatUser(final IComponentIdentifier cid, final IChatService chat)
 	{
-		chat.getNickName().addResultListener(new SwingDefaultResultListener<String>()
+		chat.getNickName().addResultListener(new SwingResultListener<String>()
 		{
 			public void customResultAvailable(final String nick)
 			{
-				chat.getImage().addResultListener(new SwingDefaultResultListener<byte[]>()
+				chat.getImage().addResultListener(new SwingResultListener<byte[]>()
 				{
 					public void customResultAvailable(byte[] img)
 					{
 						setUserState(cid, null, nick, img);
 					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						setUserState(cid, null, nick, null);
+					}
 				});
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				setUserState(cid, null, null, null);
 			}
 		});
 	}
@@ -911,11 +925,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				public void resultAvailable(IChatService cs)
 				{
-					cs.getNickName().addResultListener(new SwingDefaultResultListener<String>()
+					cs.getNickName().addResultListener(new SwingResultListener<String>()
 					{
 						public void customResultAvailable(final String nick)
 						{
 							setUserState(cu.getComponentIdentifier(), null, nick, null);
+						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
 						}
 					});
 				}
@@ -932,11 +950,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				public void resultAvailable(IChatService cs)
 				{
-					cs.getImage().addResultListener(new SwingDefaultResultListener<byte[]>()
+					cs.getImage().addResultListener(new SwingResultListener<byte[]>()
 					{
 						public void customResultAvailable(final byte[] img)
 						{
 							setUserState(cu.getComponentIdentifier(), null, null, img);
+						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
 						}
 					});
 				}
@@ -1109,26 +1131,25 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage)
 	{
 		SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener<IClockService>()
+			.addResultListener(new SwingResultListener<IClockService>()
 		{
-			public void resultAvailable(final IClockService clock)
+			public void customResultAvailable(final IClockService clock)
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						StringBuffer buf = new StringBuffer();
-						buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
-							.append(nick).append("]: ").append(text).append(lf);
+				StringBuffer buf = new StringBuffer();
+				buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
+					.append(nick).append("]: ").append(text).append(lf);
 //							.append(cid.getName()).append("]: ").append(text).append(lf);
-						append(privatemessage? Color.RED: Color.BLACK, buf.toString(), chatarea);
+				append(privatemessage? Color.RED: Color.BLACK, buf.toString(), chatarea);
 //						chatarea.append(Color.BLACK, buf.toString());
-						
-						notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
-						
-						setUserState(cid, null, null, null);
-					}
-				});
+				
+				notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
+				
+				setUserState(cid, null, null, null);
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				// Ignore...
 			}
 		});
 	}
