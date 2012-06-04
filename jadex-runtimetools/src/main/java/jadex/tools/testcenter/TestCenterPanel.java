@@ -1,6 +1,6 @@
 package jadex.tools.testcenter;
 
-import jadex.base.gui.SRemoteGui;
+import jadex.base.SRemoteGui;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;

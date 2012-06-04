@@ -1,8 +1,8 @@
 package jadex.tools.starter;
 
+import jadex.base.SRemoteGui;
 import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
-import jadex.base.gui.SRemoteGui;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;

@@ -1,5 +1,7 @@
 package jadex.base.gui;
 
+import jadex.base.RemoteCMSListener;
+import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;

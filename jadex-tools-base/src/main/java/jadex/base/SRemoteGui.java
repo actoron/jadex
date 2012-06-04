@@ -1,4 +1,4 @@
-package jadex.base.gui;
+package jadex.base;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;

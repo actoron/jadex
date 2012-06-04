@@ -1,7 +1,7 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.SRemoteGui;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;

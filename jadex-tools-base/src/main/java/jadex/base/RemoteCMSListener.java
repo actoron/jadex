@@ -1,4 +1,4 @@
-package jadex.base.gui;
+package jadex.base;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
@@ -26,16 +26,16 @@ public class RemoteCMSListener	implements ICMSComponentListener
 	//-------- constants --------
 	
 	/** The event type for an added component (value is component description). */
-	protected static final String	EVENT_COMPONENT_ADDED	= "component-added";
+	public static final String	EVENT_COMPONENT_ADDED	= "component-added";
 	
 	/** The event type for a changed component (value is component description). */
-	protected static final String	EVENT_COMPONENT_CHANGED	= "component-changed";
+	public static final String	EVENT_COMPONENT_CHANGED	= "component-changed";
 	
 	/** The event type for a removed component (value is component description). */
-	protected static final String	EVENT_COMPONENT_REMOVED	= "component-removed";
+	public static final String	EVENT_COMPONENT_REMOVED	= "component-removed";
 	
 	/** The event type for a removed component (value is collection of change events). */
-	protected static final String	EVENT_BULK	= "bulk-event";
+	public static final String	EVENT_BULK	= "bulk-event";
 	
 	/** Update delay. */
 	// todo: make configurable.
