@@ -1340,7 +1340,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				{
 					public void run() 
 					{
-						// Todo: fix termination such that external entries are properly executed!?
 						if(state.containsObject(ragent))
 						{
 							if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
@@ -1899,6 +1898,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IFuture	addComponentListener(IComponentListener listener)
 	{
+//		System.out.println("Added: "+listener+", "+getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
 		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 		return IFuture.DONE;
 	}

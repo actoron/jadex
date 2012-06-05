@@ -1,8 +1,5 @@
 package jadex.bridge;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -10,8 +7,12 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -133,6 +134,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	{
 		// Initialize timeout
 		final Object mon = this;
+		final Exception ex	= new TimeoutException();
 		
 		exta.scheduleStep(new IComponentStep<Void>()
 		{
@@ -169,7 +171,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 												}
 											}
 											if(notify)
-												listener.exceptionOccurred(new TimeoutException());
+												listener.exceptionOccurred(ex!=null ? ex : new TimeoutException());
 										}
 									};
 									

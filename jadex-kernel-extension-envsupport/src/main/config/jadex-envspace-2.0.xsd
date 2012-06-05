@@ -298,6 +298,11 @@
 							<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="drawable3d" type="drawable3d" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="prelayers" type="layers" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Layers that are shown behind the space objects (drawn before). </xs:documentation>
@@ -363,6 +368,68 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<xs:complexType name="drawable3d">
+		<xs:annotation>
+			<xs:documentation>Container element for the definition of how a 3d space object should look like.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+ 				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="box" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Box display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="cylinder" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Cylinder display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="torus" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Torus display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sphere" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Sphere display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="dome" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Dome display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="object3d" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>3D object display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="text3d" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sky" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Skymap. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="rndterrain" type="drawableelement3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Skymap. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:attribute name="objecttype" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string" use="required"/>
+				<xs:attribute name="height" type="xs:string" use="required"/>
+				<xs:attribute name="depth" type="xs:string" use="required"/>
+				<xs:attribute name="rotation3d" type="xs:string"/>
+				<xs:attribute name="hasSpaceobject" type="xs:boolean"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 	<xs:complexType name="drawableelement">
 		<xs:annotation>
 			<xs:documentation>Abstract base type for all kinds of concrete drawable elements.</xs:documentation>
@@ -389,6 +456,49 @@
 		<xs:attribute name="abssize" type="xs:string"/>
 		<xs:attribute name="absrot" type="xs:string"/>
 		<xs:attribute name="color" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="drawableelement3d">
+		<xs:annotation>
+			<xs:documentation>Abstract base type for all kinds of concrete 3d drawable elements.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement">
+				<!-- Todo: introduce sub elements with specific attributes! -->
+				<xs:attribute name="depth" type="xs:string"/>
+				<xs:attribute name="alphamap" type="xs:string"/>
+				<xs:attribute name="circleSamples" type="xs:string"/>
+				<xs:attribute name="down" type="xs:string"/>
+				<xs:attribute name="east" type="xs:string"/>
+				<xs:attribute name="north" type="xs:string"/>
+				<xs:attribute name="hasLightMaterials" type="xs:string"/>
+				<xs:attribute name="innerRadius" type="xs:string"/>
+				<xs:attribute name="isSphere" type="xs:string"/>
+				<xs:attribute name="iterations" type="xs:string"/>
+				<xs:attribute name="maxradius" type="xs:string"/>
+				<xs:attribute name="minradius" type="xs:string"/>
+				<xs:attribute name="modelpath" type="xs:string"/>
+				<xs:attribute name="outerRadius" type="xs:string"/>
+				<xs:attribute name="radialSamples" type="xs:string"/>
+				<xs:attribute name="samples" type="xs:string"/>
+				<xs:attribute name="radius" type="xs:string"/>
+				<xs:attribute name="seed" type="xs:string"/>
+				<xs:attribute name="skypath" type="xs:string"/>
+				<xs:attribute name="south" type="xs:string"/>
+				<xs:attribute name="terrapath" type="xs:string"/>
+				<xs:attribute name="tex01val" type="xs:string"/>
+				<xs:attribute name="tex02val" type="xs:string"/>
+				<xs:attribute name="tex03val" type="xs:string"/>
+				<xs:attribute name="text" type="xs:string"/>
+				<xs:attribute name="texture01" type="xs:string"/>
+				<xs:attribute name="texture02" type="xs:string"/>
+				<xs:attribute name="texture03" type="xs:string"/>
+				<xs:attribute name="texturepath" type="xs:string"/>
+				<xs:attribute name="tiles" type="xs:string"/>
+				<xs:attribute name="up" type="xs:string"/>
+				<xs:attribute name="west" type="xs:string"/>
+				<xs:attribute name="z" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="texturedrectangle">
 		<xs:annotation>

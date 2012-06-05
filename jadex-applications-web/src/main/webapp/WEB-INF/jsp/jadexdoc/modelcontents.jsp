@@ -25,8 +25,8 @@
 	{
 %>
 	<tr <%= jaxcent ? "id=\"config"+i+"\"" : "class=\""+ (i%2==0 ? "even\"" : "odd\"") %>>
-		<td class="name"><%= confs[i].getName() %></td>
-		<td class="desc"><%= confs[i].getDescription() %></td>
+		<td class="name" style="cursor:pointer;"><%= confs[i].getName() %></td>
+		<td class="desc" style="cursor:pointer;"><%= confs[i].getDescription() %></td>
 	</tr>
 <%	} %>
 </table>

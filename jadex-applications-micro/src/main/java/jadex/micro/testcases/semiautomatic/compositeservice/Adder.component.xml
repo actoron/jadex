@@ -11,7 +11,7 @@
 	name="Adder" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<arguments>
-		<argument name="arg">"default"</argument>
+		<argument name="arg" class="String">"default"</argument>
 	</arguments>
 	
 	<services>

@@ -5,14 +5,12 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +21,12 @@ import java.util.Map;
  */
 public class BasicService implements IInternalService
 {	
+	//-------- constants --------
+	
+	/** Default service timeout. */
+	// Hack!!! field to be set by starter and read by Timeout annotation
+	public static long	DEFTIMEOUT	= 30000;
+	
 	//-------- attributes --------
 
 	/** The id counter. */
@@ -73,7 +77,7 @@ public class BasicService implements IInternalService
 			GuiClass gui = (GuiClass)type.getAnnotation(GuiClass.class);
 			guiclazz = gui.value();
 			if(this.properties==null)
-				this.properties = new HashMap();
+				this.properties = new HashMap<String, Object>();
 			this.properties.put("componentviewer.viewerclass", guiclazz);
 //			System.out.println("found: "+guiclazz);
 		}
@@ -82,7 +86,7 @@ public class BasicService implements IInternalService
 			GuiClassName gui = (GuiClassName)type.getAnnotation(GuiClassName.class);
 			guiclazz = gui.value();
 			if(this.properties==null)
-				this.properties = new HashMap();
+				this.properties = new HashMap<String, Object>();
 			this.properties.put("componentviewer.viewerclass", guiclazz);
 //			System.out.println("found: "+guiclazz);
 		}
@@ -95,7 +99,7 @@ public class BasicService implements IInternalService
 				guiClasses[i] = guis[i].value();
 			}
 			if(this.properties==null) 
-				this.properties = new HashMap();
+				this.properties = new HashMap<String, Object>();
 			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
 	}
@@ -118,7 +122,7 @@ public class BasicService implements IInternalService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class implclazz, IResourceIdentifier rid, Class<?> type)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type)
 	{
 		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid);
 	}
@@ -159,7 +163,16 @@ public class BasicService implements IInternalService
 	 */
 	public Map<String, Object> getPropertyMap()
 	{
-		return properties!=null? properties: Collections.EMPTY_MAP; 
+		Map<String, Object>	ret;
+		if(properties!=null)
+		{
+			ret	= properties;
+		}
+		else
+		{
+			ret	= Collections.emptyMap();
+		}
+		return ret;
 	}
 	
 	/**
@@ -259,7 +272,7 @@ public class BasicService implements IInternalService
 	 *  Generate a unique name.
 	 *  @param The calling service class.
 	 */
-	public static String generateServiceName(Class service)
+	public static String generateServiceName(Class<?> service)
 	{
 		synchronized(BasicService.class)
 		{
@@ -305,45 +318,5 @@ public class BasicService implements IInternalService
 			return getServiceIdentifier().equals(((IService) obj).getServiceIdentifier());
 		}
 		return false;
-	}
-	
-	/**
-	 *  Get the default timeout for a method.
-	 */
-	public static long getMethodTimeout(Object object, Method method, boolean remote)
-	{
-		long ret = Timeout.UNSET;
-		
-		Class<?>[] allinterfaces = SReflect.getSuperInterfaces(object.getClass().getInterfaces());
-		
-		long deftimeout	= Timeout.UNSET;
-		for(int i=0; deftimeout==Timeout.UNSET && i<allinterfaces.length; i++)
-		{
-			// Default timeout for interface (only if method is declared in this interface)
-			if(allinterfaces[i].isAnnotationPresent(Timeout.class) && 
-				SReflect.getMethod(allinterfaces[i], method.getName(), method.getParameterTypes())!=null)
-			{
-				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
-				deftimeout = remote? ta.remote(): ta.local();
-				if(Timeout.UNSET==deftimeout)
-					deftimeout = ta.value();
-			}
-		}
-		
-		// Timeout on method overrides global timeout settings
-		if(method.isAnnotationPresent(Timeout.class))
-		{
-			Timeout	ta	= method.getAnnotation(Timeout.class);
-			ret = remote? ta.remote(): ta.local();
-			if(Timeout.UNSET==ret)
-				ret = ta.value();
-		}
-		
-		if(Timeout.UNSET!=deftimeout && Timeout.UNSET==ret)
-		{
-			ret = deftimeout;
-		}
-		
-		return ret;
 	}
 }

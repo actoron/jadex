@@ -120,7 +120,8 @@ public class MarsworldGui	extends JFrame
 						{
 							public void run()
 							{
-								MarsworldGui.this.timer.stop();
+								if(timer!=null)
+									timer.stop();
 								MarsworldGui.this.dispose();
 							}
 						});
@@ -232,6 +233,7 @@ public class MarsworldGui	extends JFrame
 							setSize(600, 450);
 							setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
 							setVisible(true);
+//							System.out.println("marsworld set visible");
 							
 							// Continuously repaint the gui.
 							timer	= new Timer(100, new ActionListener()
@@ -432,8 +434,15 @@ public class MarsworldGui	extends JFrame
 				g.drawRect(x-wx/2, y-wy/2, wx, wy);
 				g.drawString("Collected ore: "+home.getOre(), x-wx/2, y+wy/2+12);
 				SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-				g.drawString("Remaining time: "+sdf.format(new Date(env.getHomebase()
-					.getRemainingMissionTime())), x-wx/2, y+wy/2+22);
+				try
+				{
+					g.drawString("Remaining time: "+sdf.format(new Date(env.getHomebase()
+							.getRemainingMissionTime())), x-wx/2, y+wy/2+22);
+				}
+				catch(NullPointerException e)
+				{
+					// Can happen when clock already terminated but dipose() not yet called on swing thread.
+				}
 				/*Image img = (Image)images.get("homebase");
 				if(img!=null)
 				{

@@ -15,7 +15,7 @@
 	</imports>
 	
 	<arguments>
-		<argument name="delay">5000L</argument>
+		<argument name="delay" class="long">5000L</argument>
 	</arguments>
 	
 	<componenttypes>

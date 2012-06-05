@@ -6,7 +6,7 @@
 	name="Result" package="jadex.micro.testcases">
 
 	<arguments>
-		<result name="res">"default"</result>
+		<result name="res" class="String">"default"</result>
 	</arguments>	
 	
 	<configurations>

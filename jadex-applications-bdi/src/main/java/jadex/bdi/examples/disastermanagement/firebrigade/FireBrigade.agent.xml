@@ -75,10 +75,10 @@
 					+ $goalbase.getGoals("clear_chemicals").length>1
 			</dropcondition>
 			<deliberation cardinality="1"/>
+			<publish class="IExtinguishFireService" method="extinguishFire"/>
 			<targetcondition>
 				$goal.disaster.fire==0
 			</targetcondition>
-			<goalpublish class="IExtinguishFireService" method="extinguishFire"/>
 		</achievegoal>
 
 		<!-- Goal to clear chemicals. -->
@@ -90,10 +90,10 @@
 					+ $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
 			</dropcondition>
 			<deliberation cardinality="1"/>
+			<publish class="IClearChemicalsService" method="clearChemicals"/>
 			<targetcondition>
 				$goal.disaster.chemicals==0
 			</targetcondition>
-			<goalpublish class="IClearChemicalsService" method="clearChemicals"/>
 		</achievegoal>
 	</goals>
 	

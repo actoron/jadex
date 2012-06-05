@@ -16,7 +16,7 @@ public interface IService //extends IRemotable
 	
 	/** Empty service array. */
 	public static final IService[] EMPTY_SERVICES = new IService[0];
-	
+
 	//-------- methods --------
 
 	/**

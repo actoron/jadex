@@ -11,6 +11,7 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -52,11 +53,6 @@ public class Starter
 	/** The component factory to be used for platform component. */
 	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
 
-//	/** The termination timeout. */
-//	// Todo: use configuration/argument value if present.
-//	public static final long	TERMINATION_TIMEOUT	= 20000;
-
-	
 	/** The configuration file. */
 	public static final String CONFIGURATION_FILE = "conf";
 	
@@ -84,6 +80,9 @@ public class Starter
 	/** The parameter copy flag. */
 	public static final String PARAMETERCOPY = "parametercopy";
 
+	/** The default timeout. */
+	public static final String DEFTIMEOUT = "deftimeout";
+	
 	/** The realtime timeout flag. */
 	public static final String REALTIMETIMEOUT = "realtimetimeout";
 	
@@ -114,6 +113,7 @@ public class Starter
 		RESERVED.add(DEBUGFUTURES);
 		RESERVED.add(NOSTACKCOMPACTION);
 		RESERVED.add(OPENGL);
+		RESERVED.add(DEFTIMEOUT);
 	}
 	
 //	/** The shutdown in progress flag. */
@@ -233,6 +233,11 @@ public class Starter
 				else if(DEBUGFUTURES.equals(key) && "true".equals(val))
 				{
 					Future.DEBUG	= true;
+				}
+				else if(DEFTIMEOUT.equals(key))
+				{
+					val = SJavaParser.evaluateExpression(args[i+1], null);
+					BasicService.DEFTIMEOUT	= ((Number)val).longValue();
 				}
 				else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
 				{

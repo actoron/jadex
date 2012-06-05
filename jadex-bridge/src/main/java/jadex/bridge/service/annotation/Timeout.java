@@ -1,5 +1,7 @@
 package jadex.bridge.service.annotation;
 
+import jadex.bridge.service.BasicService;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,10 +26,10 @@ public @interface Timeout
 	public static final long UNSET = -2;
 
 	/** Constant for remote default timeout. */
-	public static final long DEFAULT_REMOTE = 30000;
+	public static final long DEFAULT_REMOTE = BasicService.DEFTIMEOUT;
 
 	/** Constant for local default timeout. */
-	public static final long DEFAULT_LOCAL = DEFAULT_REMOTE;
+	public static final long DEFAULT_LOCAL = BasicService.DEFTIMEOUT;
 
 	/**
 	 *  The timeout period after which the remote invocation

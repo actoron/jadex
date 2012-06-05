@@ -329,15 +329,14 @@ public class OAVBDIMetaModel
 	//-------- goalpublish --------
 	
 	/** The goal publish type. */
-	public static OAVObjectType goalpublish_type;
+	public static OAVObjectType publish_type;
 	
 	/** Goal publish has service name. */
-//	public static OAVAttributeType goalpublish_has_servicename;
-	public static OAVAttributeType goalpublish_has_classname;
-	public static OAVAttributeType goalpublish_has_class;
+	public static OAVAttributeType publish_has_classname;
+	public static OAVAttributeType publish_has_class;
 
 	/** Goal publish has service method name. */
-	public static OAVAttributeType goalpublish_has_methodname;
+	public static OAVAttributeType publish_has_methodname;
 
 	
 	//-------- service --------
@@ -1006,7 +1005,7 @@ public class OAVBDIMetaModel
 //		beliefsetreference_type = bdimm_type_model.createType("mbeliefsetreference", typedelementreference_type);
 		beliefsetreference_type = bdimm_type_model.createType("mbeliefsetreference", elementreference_type);
 		inhibits_type = bdimm_type_model.createType("minhibits", condition_type);
-		goalpublish_type = bdimm_type_model.createType("mgoalpublish", modelelement_type);
+		publish_type = bdimm_type_model.createType("mpublish", modelelement_type);
 		goal_type = bdimm_type_model.createType("mgoal", processableelement_type);
 		goalreference_type = bdimm_type_model.createType("mgoalreference", elementreference_type);
 		performgoal_type = bdimm_type_model.createType("mperformgoal", goal_type);
@@ -1177,10 +1176,9 @@ public class OAVBDIMetaModel
 		inhibits_has_inhibit = inhibits_type.createAttributeType("minhibits_has_inhibit", OAVJavaType.java_string_type, OAVAttributeType.NONE, INHIBITS_WHEN_ACTIVE);
 		
 		// goalpublish
-//		goalpublish_has_servicename = goalpublish_type.createAttributeType("mgoalpublish_has_servicename", OAVJavaType.java_string_type);
-		goalpublish_has_classname = goalpublish_type.createAttributeType("mgoalpublish_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
-		goalpublish_has_class = goalpublish_type.createAttributeType("mgoalpublish_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
-		goalpublish_has_methodname = goalpublish_type.createAttributeType("mgoalpublish_has_method", OAVJavaType.java_string_type);
+		publish_has_classname = publish_type.createAttributeType("mpublish_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		publish_has_class = publish_type.createAttributeType("mpublish_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
+		publish_has_methodname = publish_type.createAttributeType("mpublish_has_method", OAVJavaType.java_string_type);
 		
 		// goal
 		//goal_has_exported = new OAVAttributeType("goal_has_exported", java_boolean_type, Boolean.FALSE);
@@ -1199,7 +1197,7 @@ public class OAVBDIMetaModel
 		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(Integer.MAX_VALUE));
 		goal_has_unique = goal_type.createAttributeType("mgoal_has_unique", OAVJavaType.java_boolean_type);
 		goal_has_excludedparameter = goal_type.createAttributeType("mgoal_has_excludedparameter", OAVJavaType.java_string_type, OAVAttributeType.LIST);	// Todo: parameter sets?
-		goal_has_publish = goal_type.createAttributeType("mgoal_has_goalpublish", goalpublish_type);
+		goal_has_publish = goal_type.createAttributeType("mgoal_has_publish", publish_type);
 		
 		// perform goal
 		

@@ -424,8 +424,8 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				Object publish = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_publish);
 				if(publish!=null)
 				{
-					Class<?> gpc = (Class<?>)state.getAttributeValue(publish, OAVBDIMetaModel.goalpublish_has_class);
-					String method = (String)state.getAttributeValue(publish, OAVBDIMetaModel.goalpublish_has_methodname);
+					Class<?> gpc = (Class<?>)state.getAttributeValue(publish, OAVBDIMetaModel.publish_has_class);
+					String method = (String)state.getAttributeValue(publish, OAVBDIMetaModel.publish_has_methodname);
 					List<Object[]> tmp = pubs.get(gpc);
 					if(tmp==null)
 					{

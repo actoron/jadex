@@ -451,6 +451,8 @@ public class AgentRules
 		
 		ObjectCondition ragentcon = new ObjectCondition(OAVBDIRuntimeModel.agent_type);
 		ragentcon.addConstraint(new BoundConstraint(null, ragent));
+		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, 
+			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED, IOperator.NOTEQUAL));
 		ragentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_actions, com, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
