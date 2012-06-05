@@ -39,6 +39,9 @@ public class MicroTest	extends ComponentTestSuite
 			"messagequeue\\User",
 			"messagequeue/replicated/User",
 			"messagequeue\\replicated\\User",
+			
+			// Todo: fix race condition between shutdown and autocreate
+			"mandelbrot",
 //			"Display",
 //			"Generate",
 //			"Calculate",
