@@ -608,7 +608,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		
 		if(binding.isCreate() && binding.getComponentType()!=null)
 		{
-			System.out.println("Create comp: "+provider+", "+binding.getComponentType());
+//			System.out.println("Create comp: "+provider+", "+binding.getComponentType());
 			getParentAccess(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)

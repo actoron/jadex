@@ -26,7 +26,7 @@ public class CalculateService implements ICalculateService
 	 */
 	public IFuture<AreaData> calculateArea(AreaData data)
 	{
-		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
+//		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
 		
 		agent.setHadJob(true);
 		agent.setTaskId(data.getId());
@@ -125,7 +125,7 @@ public class CalculateService implements ICalculateService
 		data.setData(res);
 		ret.setResult(data);
 		
-		System.out.println("calc finished: "+data.getId()+" "+agent.getComponentIdentifier());
+//		System.out.println("calc finished: "+data.getId()+" "+agent.getComponentIdentifier());
 		return ret;
 	}
 	
