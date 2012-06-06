@@ -426,24 +426,23 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				Object[] step = removeStep();
 				Future future = (Future)step[1];
 				
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+				
 				// Correct to execute them in try catch?!
 				try
 				{
-					Object res = ((IComponentStep)step[0]).execute(microagent);
-					if(res instanceof IFuture)
-					{
-						((IFuture)res).addResultListener(new DelegationResultListener(future));
-					}
-					else
-					{
-						future.setResult(res);
-					}
+					IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
+					res.addResultListener(new DelegationResultListener(future));
 				}
 				catch(RuntimeException e)
 				{
 					future.setExceptionIfUndone(e);
 					throw e;
 				}
+				
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
 			}
 	
 			return steps!=null && !steps.isEmpty();

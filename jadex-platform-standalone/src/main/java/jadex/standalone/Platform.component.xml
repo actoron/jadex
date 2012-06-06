@@ -112,7 +112,9 @@
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
 		<argument name="realtimetimeout" class="boolean">true</argument>
-
+		<!-- Flag if CIDs may be reused (true for not). -->
+		<argument name="uniqueids" class="boolean">false</argument>
+		
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
 		<!-- The base classloader. -->
@@ -276,7 +278,7 @@
 		<providedservice name="cms" class="jadex.bridge.service.types.cms.IComponentManagementService">
 			<implementation>
 				new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy, $args.realtimetimeout)
+					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.df.IDF">

@@ -8,6 +8,7 @@ public interface IComponentChangeEvent
 	public static final String EVENT_TYPE_OCCURRENCE	= "noticed";
 	public static final String EVENT_TYPE_BULK = "bulk";
 	
+	public static final String SOURCE_CATEGORY_EXECUTION = "Execution";
 	public static final String SOURCE_CATEGORY_COMPONENT = "Component";
 	public static final String SOURCE_CATEGORY_PLAN	   = "Plan";
 	public static final String SOURCE_CATEGORY_GOAL	   = "Goal";

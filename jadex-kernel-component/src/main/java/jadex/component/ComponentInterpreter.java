@@ -1,6 +1,8 @@
 package jadex.component;
 
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -176,17 +178,12 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			if(step!=null)
 			{
 				Future future = (Future)step[1];
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
 				try
 				{
-					Object res = ((IComponentStep)step[0]).execute(this);
-					if(res instanceof IFuture)
-					{
-						((IFuture)res).addResultListener(new DelegationResultListener(future));
-					}
-					else
-					{
-						future.setResult(res);
-					}
+					IFuture<?> res = ((IComponentStep<?>)step[0]).execute(this);
+					res.addResultListener(new DelegationResultListener(future));
 				}
 				catch(RuntimeException e)
 				{
@@ -194,6 +191,8 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					future.setExceptionIfUndone(e);
 					throw e;
 				}
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
 			}
 			
 			boolean ret;

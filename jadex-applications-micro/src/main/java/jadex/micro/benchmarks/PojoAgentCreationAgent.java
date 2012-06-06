@@ -1,6 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentStepAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -20,6 +21,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.testcases.AAgent;
 
 import java.util.HashMap;
 import java.util.Map;

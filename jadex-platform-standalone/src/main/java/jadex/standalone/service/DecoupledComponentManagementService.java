@@ -37,9 +37,9 @@ public class DecoupledComponentManagementService extends jadex.base.service.cms.
 	 *  Create a new component execution service.
 	 *  @param exta	The service provider.
 	 */
-	public DecoupledComponentManagementService(IComponentAdapter root, IBootstrapFactory factory, boolean copy, boolean realtime)
+	public DecoupledComponentManagementService(IComponentAdapter root, IBootstrapFactory factory, boolean copy, boolean realtime, boolean uniqueids)
 	{
-		super(root, factory, copy, realtime);
+		super(root, factory, copy, realtime, uniqueids);
 	}
 	
 	/**

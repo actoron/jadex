@@ -650,6 +650,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				listpan	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, userpan, pp);
 				listpan.setDividerLocation(0.5);
 				listpan.setOneTouchExpandable(true);
+				listpan.setResizeWeight(1);
 //				listpan.add(userpan, BorderLayout.CENTER);
 //				listpan.add(pp, BorderLayout.SOUTH);
 
@@ -1045,6 +1046,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			public void finished()
 			{
 				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
 		

@@ -18,8 +18,10 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.GoalDelegationHandler;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
+import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -606,14 +608,21 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				state.notifyEventListeners();
 				state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 	
-				rulesystem.getAgenda().fireRule();
+				if(!rulesystem.getAgenda().isEmpty())
+				{
+					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+					rulesystem.getAgenda().fireRule();
 	
-				act	= rulesystem.getAgenda().getLastActivation();
-	//			System.err.println("here: "+act+", "+rulesystem.getAgenda().getActivations());
-				state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-				state.expungeStaleObjects();
-				state.notifyEventListeners();
-				state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+					act	= rulesystem.getAgenda().getLastActivation();
+		//			System.err.println("here: "+act+", "+rulesystem.getAgenda().getActivations());
+					state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+					state.expungeStaleObjects();
+					state.notifyEventListeners();
+					state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+				}
 	
 				return !rulesystem.getAgenda().isEmpty();
 			}

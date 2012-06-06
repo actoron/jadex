@@ -140,6 +140,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	/** The time service. */
 	protected IClockService clockservice;
 	
+	/** Flag to enable unique id generation. */
+	protected boolean uniqueids;
+	
     //-------- constructors --------
 
     /**
@@ -148,7 +151,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
      */
     public DecoupledComponentManagementService(IComponentAdapter root)
 	{
-    	this(root, null, true, true);
+    	this(root, null, true, true, false);
     }
     
     /**
@@ -156,12 +159,13 @@ public abstract class DecoupledComponentManagementService implements IComponentM
      *  @param exta	The service provider.
      */
     public DecoupledComponentManagementService(IComponentAdapter root, 
-    	IBootstrapFactory componentfactory, boolean copy, boolean realtime)
+    	IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean uniqueids)
 	{
 		this.root = root;
 		this.componentfactory = componentfactory;
 		this.copy = copy;
 		this.realtime = realtime;
+		this.uniqueids = uniqueids;
 		
 		// Todo: why some collections synchronized? single thread access!?
 		this.adapters = SCollection.createHashMap();
@@ -2293,7 +2297,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		if(platformname==null)
 			platformname = ((IComponentIdentifier)agent.getServiceContainer().getId()).getName();
 		ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
-		if(adapters.containsKey(ret) || initinfos.containsKey(ret))
+		if(uniqueids || adapters.containsKey(ret) || initinfos.containsKey(ret))
 		{
 			do
 			{
