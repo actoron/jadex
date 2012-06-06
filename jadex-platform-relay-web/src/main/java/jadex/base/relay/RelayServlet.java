@@ -154,6 +154,7 @@ public class RelayServlet extends HttpServlet
 				{
 					// Fetch array to avoid concurrency problems
 					request.setAttribute("platforms", platforms.values().toArray(new PlatformInfo[0]));
+					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
 				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);

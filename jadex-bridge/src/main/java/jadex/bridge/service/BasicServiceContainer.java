@@ -899,6 +899,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			ret = deftimeout;
 		}
 		
-		return ret==Timeout.UNSET? remote? Timeout.DEFAULT_REMOTE: Timeout.DEFAULT_LOCAL: ret;
+		return ret==Timeout.UNSET? remote? BasicService.DEFAULT_REMOTE: BasicService.DEFAULT_LOCAL: ret;
 	}
 }

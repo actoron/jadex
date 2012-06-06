@@ -3,6 +3,9 @@
 <html>
 	<head>
 		<title>Jadex Relay Transport Status</title>
+		<% if(request.getAttribute("refresh")!=null)  { %>
+		<meta http-equiv="refresh" content="<%= request.getAttribute("refresh") %>">
+		<% } %>
 		<style type="text/css">
 		<%@ include file="style.css" %>
 		</style>

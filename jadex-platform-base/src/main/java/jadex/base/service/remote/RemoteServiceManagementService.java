@@ -24,7 +24,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.AnyResultSelector;
 import jadex.bridge.service.search.IResultSelector;
@@ -240,7 +239,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
 						
-						sendMessage(rrms, cid, content, callid, Timeout.DEFAULT_REMOTE, fut);
+						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut);
 					}
 				});
 				
@@ -346,7 +345,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, cid, content, callid, Timeout.DEFAULT_REMOTE, fut);
+						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut);
 //					}
 //				});
 				

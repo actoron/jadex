@@ -25,12 +25,6 @@ public @interface Timeout
 	/** Constant for unset. */
 	public static final long UNSET = -2;
 
-	/** Constant for remote default timeout. */
-	public static final long DEFAULT_REMOTE = BasicService.DEFTIMEOUT;
-
-	/** Constant for local default timeout. */
-	public static final long DEFAULT_LOCAL = BasicService.DEFTIMEOUT;
-
 	/**
 	 *  The timeout period after which the remote invocation
 	 *  is aborted when no result is received.
