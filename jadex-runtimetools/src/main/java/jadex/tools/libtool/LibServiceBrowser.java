@@ -83,7 +83,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 //				List entries = (List)result;
 				for(int i=0; i<result.size(); i++)
 				{
-					classpaths.addEntry(result.get(i).toString());
+					classpaths.addEntry(result.get(i).getLocalIdentifier().getUrl().toString());
 				}
 			}
 		});			
@@ -271,15 +271,15 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
 			{
 				// todo: make synchronized
-				if(!classpaths.containsEntry(rid.toString()))
-					classpaths.addEntry(rid.toString());
+				if(!classpaths.containsEntry(rid.getLocalIdentifier().getUrl().toString()))
+					classpaths.addEntry(rid.getLocalIdentifier().getUrl().toString());
 				return IFuture.DONE;
 			}
 			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
 			{
 				// todo: make synchronized
-				if(classpaths.containsEntry(rid.toString()))
-					classpaths.removeEntry(rid.toString());
+				if(classpaths.containsEntry(rid.getLocalIdentifier().getUrl().toString()))
+					classpaths.removeEntry(rid.getLocalIdentifier().getUrl().toString());
 				return IFuture.DONE;
 			}
 		};
@@ -303,7 +303,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 //						List entries = (List)result;
 				for(int i=0; i<result.size(); i++)
 				{
-					classpaths.addEntry(result.get(i).toString());
+					classpaths.addEntry(result.get(i).getLocalIdentifier().getUrl().toString());
 				}
 			}
 		});	

@@ -13,10 +13,10 @@
 	</imports>
 	
 	<arguments>
-		<argument name="defaultkernels">null</argument>
+		<argument name="defaultkernels" class="String[]">null</argument>
 		<!-- <argument name="ignorekernels">new String[] {"KernelBDI.component.xml"}</argument> -->
-		<argument name="ignorekernels">null</argument>
-		<argument name="ignoreextensions">null</argument>
+		<argument name="ignorekernels" class="String[]">null</argument>
+		<argument name="ignoreextensions" class="String[]">null</argument>
 	</arguments>
 	
 	<componenttypes>
