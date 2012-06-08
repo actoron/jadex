@@ -7,7 +7,9 @@ import jadex.commons.SUtil;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -113,6 +116,7 @@ public class ClassChooserPanel	extends JPanel
 			for(int i=0; i<urls.length; i++)
 			{
 //				System.out.println("Scanning: "+entry);
+				System.out.println("url: "+urls[i].toURI());
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
@@ -196,6 +200,47 @@ public class ClassChooserPanel	extends JPanel
 //			classloader	= new URLClassLoader(urls, null);
 //		}
 		return classloader;	
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		IFilter ffil = new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				File f = (File)obj;
+				String fn = f.getName();
+				return fn.indexOf("Plugin")!=-1 && 
+					fn.indexOf("$")==-1 && fn.indexOf("Panel")==-1;
+			}
+		};
+		
+		IFilter cfil = new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				Class<?> cl = (Class<?>)obj;
+				boolean ret = !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+				return ret;
+			}
+		};
+		
+		URL[] urls = new URL[0];
+		ClassLoader cl = ClassChooserPanel.class.getClassLoader();
+		if(cl instanceof URLClassLoader)
+			urls = ((URLClassLoader)cl).getURLs();
+		
+		ClassChooserPanel ccp = new ClassChooserPanel(ffil, cfil, urls, cl);
+		int res	= JOptionPane.showOptionDialog(null, ccp, "", JOptionPane.YES_NO_CANCEL_OPTION,
+		JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
+		if(0==res)
+		{
+			Class<?> plcl = (Class<?>)ccp.getSelectedElement();
+			System.out.println(plcl);
+		}
 	}
 	
 }

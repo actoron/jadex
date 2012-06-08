@@ -269,7 +269,7 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 										}
 										catch(Exception e)
 										{
-											e.printStackTrace();
+//											e.printStackTrace();
 											re.setException(e);
 										}
 										return re;
