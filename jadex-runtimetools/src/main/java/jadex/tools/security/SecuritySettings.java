@@ -2,15 +2,17 @@ package jadex.tools.security;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.ICommand;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.tools.generic.AutoRefreshPanel;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -20,7 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -30,14 +31,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.JSplitPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
 
 /**
- *  The library plugin.
+ *  The security settings panel.
  */
 public class SecuritySettings	implements IServiceViewerPanel
 {
@@ -55,8 +54,14 @@ public class SecuritySettings	implements IServiceViewerPanel
 	/** Show / hide password characters in gui. */
 	protected JCheckBox	cbshowchars;
 	
-	/** The remote passwords. */
-	protected DefaultTableModel	tmremote;
+	/** The trusted lan option. */
+	protected JCheckBox cbtrulan;
+
+	/** The platform passwords panel. */
+	protected PasswordTablePanel ppp;
+	
+	/** The network passwords panel. */
+	protected PasswordTablePanel npp;
 	
 	/** The inner panel. */
 	protected JComponent	inner;
@@ -87,6 +92,17 @@ public class SecuritySettings	implements IServiceViewerPanel
 		cbshowchars.setToolTipText("Show / hide password characters in gui");
 		buapply.setMargin(new Insets(0, 0, 0, 0));
 		
+		cbtrulan = new JCheckBox("Trust platforms from the same network (caution)");
+		cbtrulan.setToolTipText("The trusted networks are not password protected per default. Enter password to disable spoofing.");
+		cbtrulan.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				secservice.setTrustedLanMode(cbtrulan.isSelected());
+				doRefresh();
+			}
+		});
+		
 		// The local password settings.
 		JPanel	plocal	= new JPanel(new GridBagLayout());
 		plocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Password Settings"));
@@ -106,17 +122,52 @@ public class SecuritySettings	implements IServiceViewerPanel
 		plocal.add(buapply, gbc);
 		gbc.weightx	= 1;
 		plocal.add(cbshowchars, gbc);
+		gbc.gridy++;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		plocal.add(cbtrulan, gbc);
 		
-		// The remote password settings.
-		JPanel	premote	= new JPanel(new BorderLayout());
-		premote.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Remote Password Settings"));
-		tmremote	= new DefaultTableModel(new String[]{"Platform Name", "Password"}, 0);
-		premote.add(new JScrollPane(new JTable(tmremote)), BorderLayout.CENTER);
+		ICommand paddrem = new ICommand()
+		{
+			public void execute(Object args)
+			{
+				String[] tmp = (String[])args;
+				secservice.setPlatformPassword(new ComponentIdentifier(tmp[0]), tmp[1]).addResultListener(new SwingDefaultResultListener<Void>()
+				{
+					public void customResultAvailable(Void result)
+					{
+						doRefresh();
+					}
+				});
+			}
+		};
+		ICommand naddrem = new ICommand()
+		{
+			public void execute(Object args)
+			{
+				String[] tmp = (String[])args;
+				secservice.setNetworkPassword(tmp[0], tmp[1]).addResultListener(new SwingDefaultResultListener<Void>()
+				{
+					public void customResultAvailable(Void result)
+					{
+						doRefresh();
+					}
+				});
+			}
+		};
+		
+		ppp = new PasswordTablePanel("Remote Platform Password Settings", new String[]{"Platform Name", "Password"}, paddrem, paddrem);
+		npp = new PasswordTablePanel("Network Password Settings", new String[]{"Network Name", "Password"}, naddrem, naddrem);
+		
+		JSplitPanel sp = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+		sp.setOneTouchExpandable(true);
+		sp.setDividerLocation(0.5);
+		sp.add(ppp);
+		sp.add(npp);
 		
 		// Overall layout.
 		this.inner	= new JPanel(new BorderLayout());
 		inner.add(plocal, BorderLayout.NORTH);
-		inner.add(premote, BorderLayout.CENTER);
+		inner.add(sp, BorderLayout.CENTER);
 		
 		// Gui listeners.
 		buapply.setEnabled(false);
@@ -193,43 +244,48 @@ public class SecuritySettings	implements IServiceViewerPanel
 			public void customResultAvailable(Boolean usepass)
 			{
 				cbusepass.setSelected(usepass.booleanValue());
-				secservice.getLocalPassword().addResultListener(new SwingDefaultResultListener<String>()
+				
+				secservice.isTrustedLanMode().addResultListener(new SwingDefaultResultListener<Boolean>()
 				{
-					public void customResultAvailable(String password)
+					public void customResultAvailable(Boolean trustedlan)
 					{
-						if(password!=null)
-						{
-							tfpass.setText(password);
-						}
+						cbtrulan.setSelected(trustedlan.booleanValue());
 						
-						secservice.getStoredPasswords().addResultListener(new SwingDefaultResultListener<Map<String, String>>()
+						secservice.getLocalPassword().addResultListener(new SwingDefaultResultListener<String>()
 						{
-							public void customResultAvailable(Map<String, String> passwords)
+							public void customResultAvailable(String password)
 							{
-								// Update table in place to avoid GUI flickering.
-								for(int i=tmremote.getRowCount()-1; i>=0; i--)
+								if(password!=null)
 								{
-									// Update existing value.
-									if(passwords.containsKey(tmremote.getValueAt(i, 0)))
-									{
-										String	newval	= passwords.remove(tmremote.getValueAt(i, 0));
-										tmremote.setValueAt(newval, i, 1);
-									}
-									
-									// Remove non-existing values.
-									else
-									{
-										tmremote.removeRow(i);
-									}
-								}
-								// Add new values.
-								for(Iterator<String> it=passwords.keySet().iterator(); it.hasNext(); )
-								{
-									String	key	= it.next();
-									tmremote.addRow(new Object[]{key, passwords.get(key)});
+									tfpass.setText(password);
 								}
 								
-								ret.setResult(null);								
+								secservice.getPlatformPasswords().addResultListener(new SwingDefaultResultListener<Map<String, String>>()
+								{
+									public void customResultAvailable(Map<String, String> passwords)
+									{
+		//								System.out.println("plat passes: "+passwords);
+										ppp.update(passwords);
+										
+										secservice.getNetworkPasswords().addResultListener(new SwingDefaultResultListener<Map<String, String>>()
+										{
+											public void customResultAvailable(Map<String, String> passwords)
+											{
+		//										System.out.println("net passes: "+passwords);
+												npp.update(passwords);
+												ret.setResult(null);								
+											}
+										});
+									}
+								});
+								
+								
+							}
+							
+							// Todo: SwingExceptionDelegationResultListener
+							public void customExceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
 							}
 						});
 					}
@@ -241,12 +297,6 @@ public class SecuritySettings	implements IServiceViewerPanel
 					}
 				});
 			}
-			
-			// Todo: SwingExceptionDelegationResultListener
-			public void customExceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
 		});
 		
 		return ret;
@@ -257,18 +307,19 @@ public class SecuritySettings	implements IServiceViewerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return new AutoRefreshPanel()
-		{
-			public IFuture<Void> refresh()
-			{
-				return SecuritySettings.this.doRefresh();
-			}
-			
-			public IFuture<JComponent> createInnerPanel()
-			{
-				return new Future<JComponent>(inner);
-			}
-		};
+		return inner;
+//		return new AutoRefreshPanel()
+//		{
+//			public IFuture<Void> refresh()
+//			{
+//				return SecuritySettings.this.doRefresh();
+//			}
+//			
+//			public IFuture<JComponent> createInnerPanel()
+//			{
+//				return new Future<JComponent>(inner);
+//			}
+//		};
 	}
 		
 	/**
@@ -296,6 +347,6 @@ public class SecuritySettings	implements IServiceViewerPanel
 	{
 		Properties	props	= new Properties();
 		props.addProperty(new Property("showchars", Boolean.toString(cbshowchars.isSelected())));
-		return new Future<Properties>();
+		return new Future<Properties>(props);
 	}
 }

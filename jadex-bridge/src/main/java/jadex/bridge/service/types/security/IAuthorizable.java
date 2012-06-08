@@ -1,5 +1,8 @@
 package jadex.bridge.service.types.security;
 
+import java.util.List;
+
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Reference;
 
 
@@ -41,12 +44,12 @@ public interface IAuthorizable
 	 *  MD5 is fast, produces only small digests to reduce network traffic and can still be considered secure
 	 *  for short periods of time.
 	 */
-	public byte[]	getAuthenticationData();
+	public List<byte[]>	getAuthenticationData();
 	
 	/**
 	 *  Set the authentication data.
 	 *  Is automatically called by the security service if necessary, when the request is preprocessed.
 	 *  @param authdata	The authentication data.
 	 */
-	public void	setAuthenticationData(byte[] authdata);
+	public void	setAuthenticationData(List<byte[]> authdata);
 }

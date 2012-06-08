@@ -20,6 +20,7 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,10 +29,18 @@ import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -66,7 +75,17 @@ public class SecurityService implements ISecurityService
 	protected String	password;
 	
 	/** The stored passwords. */
-	protected Map<String, String>	passwords;
+	protected Map<String, String>	platformpasses;
+	
+	/** The stored passwords. */
+	protected Map<String, String>	networkpasses;
+
+	
+	/** The trusted lan mode. */
+	protected boolean trustedlan;
+	
+//	/** The trusted lan network names. */
+//	protected List<String> trustednets;
 	
 	//-------- setup --------
 	
@@ -95,7 +114,9 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	start()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		this.passwords	= new LinkedHashMap<String, String>();
+		this.platformpasses	= new LinkedHashMap<String, String>();
+		this.networkpasses	= new LinkedHashMap<String, String>();
+//		this.trustednets = new ArrayList<String>();
 		
 		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
@@ -132,14 +153,26 @@ public class SecurityService implements ISecurityService
 //											System.out.println("usepass: "+usepass);
 										}
 										password	= props.getStringProperty("password");
+										
 										if(props.getProperty("passwords")!=null)
 										{
-											passwords	= JavaReader.objectFromXML(props.getStringProperty("passwords"), ia.getClassLoader());
+											platformpasses	= JavaReader.objectFromXML(props.getStringProperty("passwords"), ia.getClassLoader());
 										}
 										else
 										{
-											passwords	= new LinkedHashMap<String, String>();
+											platformpasses	= new LinkedHashMap<String, String>();
 										}
+										
+										if(props.getProperty("networks")!=null)
+										{
+											networkpasses	= JavaReader.objectFromXML(props.getStringProperty("networks"), ia.getClassLoader());
+										}
+										else
+										{
+											networkpasses	= new LinkedHashMap<String, String>();
+										}
+										
+										setTrustedLanMode(props.getBooleanProperty("trustedlan"));
 										return IFuture.DONE;
 									}
 								});
@@ -154,7 +187,9 @@ public class SecurityService implements ISecurityService
 										Properties	ret	= new Properties();
 										ret.addProperty(new Property("usepass", usepass==null? Boolean.TRUE.toString(): usepass.toString()));
 										ret.addProperty(new Property("password", password));
-										ret.addProperty(new Property("passwords", JavaWriter.objectToXML(passwords, ia.getClassLoader())));
+										ret.addProperty(new Property("passwords", JavaWriter.objectToXML(platformpasses, ia.getClassLoader())));
+										ret.addProperty(new Property("networks", JavaWriter.objectToXML(networkpasses, ia.getClassLoader())));
+										ret.addProperty(new Property("trustedlan", ""+trustedlan));
 										return new Future<Properties>(ret);
 									}
 								});
@@ -215,7 +250,7 @@ public class SecurityService implements ISecurityService
 				{
 					public void customResultAvailable(Void result)
 					{
-						SecurityService.this.passwords	= null;
+						SecurityService.this.platformpasses	= null;
 						ret.setResult(null);
 					}
 				});
@@ -224,7 +259,7 @@ public class SecurityService implements ISecurityService
 			public void exceptionOccurred(Exception exception)
 			{
 				// No settings service: ignore.
-				SecurityService.this.passwords	= null;
+				SecurityService.this.platformpasses	= null;
 				ret.setResult(null);
 			}
 		});
@@ -318,10 +353,10 @@ public class SecurityService implements ISecurityService
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
-	public IFuture<String>	getTargetPassword(IComponentIdentifier target)
+	public IFuture<String>	getPlatformPassword(IComponentIdentifier target)
 	{
 		String	starget	= target.getPlatformPrefix();
-		String	ret	= passwords.get(starget);
+		String	ret	= platformpasses.get(starget);
 		if(ret==null && starget.equals(component.getComponentIdentifier().getPlatformPrefix()))
 		{
 			ret	= this.password;
@@ -339,29 +374,113 @@ public class SecurityService implements ISecurityService
 	 *  @param password	The password or null if no password should be used.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
-	public IFuture<Void>	setTargetPassword(IComponentIdentifier target, String password)
+	public IFuture<Void>	setPlatformPassword(IComponentIdentifier target, String password)
 	{
 		if(password!=null)
 		{
-			passwords.put(target.getPlatformPrefix(), password);
+			platformpasses.put(target.getPlatformPrefix(), password);
 		}
 		else
 		{
 			// Use remove to avoid keeping old mappings forever (name would still be stored otherwise)
-			passwords.remove(target.getPlatformPrefix());
+			platformpasses.remove(target.getPlatformPrefix());
 		}
 		return IFuture.DONE;		
 	}
 
 	/**
+	 *  Get the password for a network.
+	 *  @param target	The id of the target component.
+	 *  @return	The stored password. Returns null if no password is stored, unless the
+	 *    component is a local component in which case the local password (if any) is returned.
+	 */
+	// Todo: password is transferred in plain text unless transport uses encryption.
+	public IFuture<String>	getNetworkPassword(String network)
+	{
+		String	ret	= networkpasses.get(network);
+		return new Future<String>(ret);
+	}
+
+	/**
+	 *  Set the password for a network.
+	 *  @param network	The id of the network.
+	 *  @param password	The password or null if no password should be used.
+	 */
+	// Todo: password is transferred in plain text unless transport uses encryption.
+	public IFuture<Void>	setNetworkPassword(String network, String password)
+	{
+		if(password!=null)
+		{
+			networkpasses.put(network, password);
+		}
+		else
+		{
+			// Use remove to avoid keeping old mappings forever (name would still be stored otherwise)
+			networkpasses.remove(network);
+		}
+		return IFuture.DONE;	
+	}
+	
+	/**
 	 *  Get all stored passwords.
 	 *  @return A map containing the stored passwords as pairs (platform name -> password).
 	 */
 	// Todo: passwords are transferred in plain text unless transport uses encryption.
-	public IFuture<Map<String, String>>	getStoredPasswords()
+	public IFuture<Map<String, String>>	getPlatformPasswords()
 	{
-		return new Future<Map<String, String>>(passwords);
+		return new Future<Map<String, String>>(platformpasses);
 	}	
+	
+	/**
+	 *  Get all stored network passwords.
+	 *  @return A map containing the stored passwords as pairs (network name -> password).
+	 */
+	// Todo: passwords are transferred in plain text unless transport uses encryption.
+	public IFuture<Map<String, String>>	getNetworkPasswords()
+	{
+		return new Future<Map<String, String>>(networkpasses);
+	}
+	
+	/**
+	 *  Set the trusted lan mode.
+	 *  @param allowed The flag if it is allowed.
+	 */
+	public IFuture<Void> setTrustedLanMode(boolean allowed)
+	{
+		List<InetAddress> addrs = getNetworkIps();
+		
+		if(allowed)
+		{
+			for(InetAddress addr: addrs)
+			{
+				if(!networkpasses.keySet().contains(addr.getHostAddress()))
+				{
+					setNetworkPassword(addr.getHostAddress(), "");
+//					trustednets.add(addr.getHostAddress());
+				}
+			}
+		}
+		else if(!allowed)
+		{
+			for(InetAddress addr: addrs)
+			{
+				setNetworkPassword(addr.getHostAddress(), null);
+			}
+		}
+		
+		this.trustedlan = allowed;
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the trusted lan mode.
+	 *  @return True if is in trusted lan mode.
+	 */
+	public IFuture<Boolean> isTrustedLanMode()
+	{
+		return new Future<Boolean>(trustedlan? Boolean.TRUE: Boolean.FALSE);
+	}
 
 	//-------- request validation --------
 	
@@ -379,11 +498,30 @@ public class SecurityService implements ISecurityService
 			{
 				if(Math.abs(request.getTimestamp()-System.currentTimeMillis())<3000000)	// Todo: make freshness period configurable.
 				{
-					if(!Arrays.equals(request.getAuthenticationData(), buildDigest(request.getTimestamp(), password)))
+					List<byte[]> digests = request.getAuthenticationData();
+					
+					boolean ok = false;
+					
+					// test if other knows my password
+					ok = checkDigest(buildDigest(request.getTimestamp(), password), digests);
+					
+					// test if other shares one of my networks
+					if(!ok)
+					{
+						for(String net: networkpasses.keySet())
+						{
+							byte[] netdig = buildDigest(request.getTimestamp(), net+networkpasses.get(net));
+							ok = checkDigest(netdig, digests);
+							if(ok)
+								break;
+						}
+					}
+					
+					if(!ok)
 					{
 //						System.out.println("received auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+request.getTimestamp());
 //						System.out.println("expected auth data: "+new String(Base64.encode(buildDigest(request.getTimestamp(), password)))+", "+password);
-						error	= "Password incorrect.";
+						error	= "No valid authentication.";
 					}
 				}
 				else
@@ -400,6 +538,67 @@ public class SecurityService implements ISecurityService
 		return error==null ? new Future<Void>((Void)null) : new Future<Void>(new SecurityException(error+" "+request));
 	}
 	
+	/**
+	 *  Check if the test digest in contained in the digest list. 
+	 */
+	protected boolean checkDigest(byte[] test, List<byte[]> digests)
+	{
+		boolean ret = false;
+		for(byte[] dig: digests)
+		{
+			ret = Arrays.equals(dig, test);
+			if(ret)
+				break;
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<InetAddress> getNetworkIps()
+	{
+		List<InetAddress> ret = new ArrayList<InetAddress>();
+		try
+		{
+			// Generate network identifiers
+			for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+			{
+				NetworkInterface ni = nis.nextElement();
+				for(InterfaceAddress ifa: ni.getInterfaceAddresses())
+				{
+					InetAddress addr = ifa.getAddress();
+	//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+					
+					if(addr.isLoopbackAddress())
+					{
+						// ignore
+					}
+					else if(addr.isLinkLocalAddress())
+					{
+						// ignore
+					}
+					else if(addr.isSiteLocalAddress())
+					{
+						InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
+						ret.add(ad);
+					}
+					else
+					{
+						InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
+						ret.add(ad);
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
+	
 	
 	/**
 	 *  Preprocess a request.
@@ -409,19 +608,41 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Void>	preprocessRequest(IAuthorizable request, IComponentIdentifier target)
 	{
+		long	timestamp	= System.currentTimeMillis();
+		request.setTimestamp(timestamp);
+		
+		List<byte[]> authdata = new ArrayList<byte[]>();
+		
+		// First password of target
 		String	stripped	= target.getPlatformPrefix();
 		// Use stored password or local password for local targets.  
-		String	pw	= passwords.containsKey(stripped) ? passwords.get(stripped)
+		String	pw	= platformpasses.containsKey(stripped) ? platformpasses.get(stripped)
 			: stripped.equals(component.getComponentIdentifier().getPlatformPrefix()) ? password : null;
-		
+
 		if(pw!=null)
 		{
-			long	timestamp	= System.currentTimeMillis();
-			byte[]	authdata	= buildDigest(timestamp, pw);
-			request.setTimestamp(timestamp);
-			request.setAuthenticationData(authdata);
+			authdata.add(buildDigest(timestamp, pw));
 //			System.out.println("sending auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+pw+", "+timestamp);
 		}
+		
+		// Add all network authentications
+		for(String net: networkpasses.keySet())
+		{
+			authdata.add(buildDigest(timestamp, net+networkpasses.get(net)));
+		}
+		
+		// Add trusted authentications (in case other has turned on lan trusted and this one not)
+		if(!trustedlan)
+		{
+			for(InetAddress addr: getNetworkIps())
+			{
+				authdata.add(buildDigest(timestamp, addr.getHostAddress()));
+			}
+		}
+		
+		request.setAuthenticationData(authdata);
+		
+//		System.out.println(authdata.size());
 		
 		return IFuture.DONE;
 	}

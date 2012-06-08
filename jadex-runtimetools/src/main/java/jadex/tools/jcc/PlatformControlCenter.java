@@ -6,6 +6,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -752,7 +753,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					{
 						final IControlCenterPlugin	plugin	= (IControlCenterPlugin)plugs.get(i);
 //						System.out.println("Fetching plugin properties: "+plugin.getName());
-						plugin.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+						
+						plugin.getProperties().addResultListener(new TimeoutResultListener(10000, getJCCAccess(), new SwingDelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -764,7 +766,14 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 //								System.out.println("Fetched plugin properties: "+plugin.getName());
 								crl.resultAvailable(null);
 							}
-						});
+							
+							public void customExceptionOccurred(Exception exception)
+							{
+								System.out.println("Plugin propetry saving error: "+plugin.getName());
+								setStatusText("Plugin propetry saving error: "+plugin.getName());
+								crl.resultAvailable(null);
+							}
+						}));
 					}
 				}
 			});

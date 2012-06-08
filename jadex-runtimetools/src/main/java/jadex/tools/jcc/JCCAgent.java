@@ -16,6 +16,7 @@ import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.deployer.DeployerPlugin;
 import jadex.tools.dfbrowser.DFServicePlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
+import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
@@ -62,6 +63,7 @@ public class JCCAgent extends MicroAgent
 //				LibraryServicePlugin.class.getName(),
 				AwarenessComponentPlugin.class.getName(),
 				ComponentViewerPlugin.class.getName(),
+				SecurityServicePlugin.class.getName()
 //				DeployerPlugin.class.getName()
 			},
 		saveonexit).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));

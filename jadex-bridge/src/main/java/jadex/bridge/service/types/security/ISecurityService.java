@@ -53,6 +53,7 @@ public interface ISecurityService
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<Void>	setLocalPassword(String password);
 
+	
 	/**
 	 *  Get the password for a target component.
 	 *  @param target	The id of the target component.
@@ -60,7 +61,7 @@ public interface ISecurityService
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
-	public IFuture<String>	getTargetPassword(IComponentIdentifier target);
+	public IFuture<String>	getPlatformPassword(IComponentIdentifier target);
 
 	/**
 	 *  Set the password for a target component.
@@ -72,14 +73,50 @@ public interface ISecurityService
 	 *  @param password	The password or null if no password should be used.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
-	public IFuture<Void>	setTargetPassword(IComponentIdentifier target, String password);
+	public IFuture<Void>	setPlatformPassword(IComponentIdentifier target, String password);
 	
 	/**
-	 *  Get all stored passwords.
+	 *  Get the password for a network.
+	 *  @param target	The id of the target component.
+	 *  @return	The stored password. Returns null if no password is stored, unless the
+	 *    component is a local component in which case the local password (if any) is returned.
+	 */
+	// Todo: password is transferred in plain text unless transport uses encryption.
+	public IFuture<String>	getNetworkPassword(String network);
+
+	/**
+	 *  Set the password for a network.
+	 *  @param network	The id of the network.
+	 *  @param password	The password or null if no password should be used.
+	 */
+	// Todo: password is transferred in plain text unless transport uses encryption.
+	public IFuture<Void>	setNetworkPassword(String network, String password);
+
+	/**
+	 *  Get all stored platform passwords.
 	 *  @return A map containing the stored passwords as pairs (platform name -> password).
 	 */
 	// Todo: passwords are transferred in plain text unless transport uses encryption.
-	public IFuture<Map<String, String>>	getStoredPasswords();
+	public IFuture<Map<String, String>>	getPlatformPasswords();
+	
+	/**
+	 *  Get all stored network passwords.
+	 *  @return A map containing the stored passwords as pairs (network name -> password).
+	 */
+	// Todo: passwords are transferred in plain text unless transport uses encryption.
+	public IFuture<Map<String, String>>	getNetworkPasswords();
+
+	/**
+	 *  Set the trusted lan mode.
+	 *  @param allowed The flag if it is allowed.
+	 */
+	public IFuture<Void> setTrustedLanMode(boolean allowed);
+	
+	/**
+	 *  Get the trusted lan mode.
+	 *  @return True if is in trusted lan mode.
+	 */
+	public IFuture<Boolean> isTrustedLanMode();
 	
 	//-------- request validation --------
 	

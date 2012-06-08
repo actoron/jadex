@@ -4,11 +4,13 @@ import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
@@ -239,7 +241,20 @@ public class ControlCenter
 		final Future<Void>	ret	= new Future<Void>();
 //		System.out.println("Fetching JCC properties.");
 		
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("Could not save settings: "+exception);
+			}
+		});
+		
 		// Get properties of latest platform panel.
+//		pcc.getProperties().addResultListener(new TimeoutResultListener<Properties>(5000, jccaccess, new SwingDelegationResultListener(ret)
 		pcc.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

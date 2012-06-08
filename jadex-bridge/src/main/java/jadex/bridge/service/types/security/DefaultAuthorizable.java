@@ -2,7 +2,12 @@ package jadex.bridge.service.types.security;
 
 import jadex.bridge.service.annotation.Security;
 
-public class DefaultAuthorizable implements IAuthorizable
+import java.util.List;
+
+/**
+ *  Default implementation for a authorizable.
+ */
+public abstract class DefaultAuthorizable implements IAuthorizable
 {
 	//-------- attributes --------
 	
@@ -10,7 +15,7 @@ public class DefaultAuthorizable implements IAuthorizable
 	protected long	timestamp;
 	
 	/** The authentication data. */
-	protected byte[]	authdata;
+	protected List<byte[]>	authdata;
 	
 	//-------- constructors --------
 	
@@ -46,7 +51,7 @@ public class DefaultAuthorizable implements IAuthorizable
 	 *  The authentication data.
 	 *  The data is calculated by building an MD5 hash from the target platform password and the timestamp.
 	 */
-	public byte[]	getAuthenticationData()
+	public List<byte[]>	getAuthenticationData()
 	{
 		return authdata;
 	}
@@ -62,7 +67,7 @@ public class DefaultAuthorizable implements IAuthorizable
 	/**
 	 *  Set the authentication data.
 	 */
-	public void	setAuthenticationData(byte[] authdata)
+	public void	setAuthenticationData(List<byte[]> authdata)
 	{
 		this.authdata	= authdata;
 	}

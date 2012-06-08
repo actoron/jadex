@@ -101,4 +101,13 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	{
 		return null;
 	}
+	
+	/**
+	 *  The origin of the request.
+	 *  May be used for blacklist/whitelist authentication.
+	 */
+	public IComponentIdentifier	getOrigin()
+	{
+		return getSender();
+	}
 }

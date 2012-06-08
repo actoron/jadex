@@ -1936,24 +1936,41 @@ public class SUtil
 		return buffer;
 	}
 	
+//	/**
+//	 *  Convert an ip to a long.
+//	 *  @param ip The ip address.
+//	 *  @return The long.
+//	 */
+//	public static long ipToLong(InetAddress ip)
+//	{
+//		byte[] octets = ip.getAddress();
+//		long result = 0;
+//		for(byte octet : octets)
+//		{
+//			result <<= 8;
+//			result |= octet & 0xff;
+//		}
+//		return result;
+//	}
+
 	/**
 	 *  Convert bytes to an integer.
 	 */
-	public static int bytesToLong(byte[] buffer)
+	public static long bytesToLong(byte[] buffer)
 	{
 		if(buffer.length != 8)
 		{
 			throw new IllegalArgumentException("buffer length must be 8 bytes!");
 		}
 
-		int value = (0xFF & buffer[0]) << 56;
+		long value = (0xFF & buffer[0]) << 56;
 		value |= (0xFF & buffer[1]) << 48;
-		value |= (0xFF & buffer[1]) << 40;
-		value |= (0xFF & buffer[1]) << 32;
-		value |= (0xFF & buffer[1]) << 24;
-		value |= (0xFF & buffer[1]) << 16;
-		value |= (0xFF & buffer[2]) << 8;
-		value |= (0xFF & buffer[3]);
+		value |= (0xFF & buffer[2]) << 40;
+		value |= (0xFF & buffer[3]) << 32;
+		value |= (0xFF & buffer[4]) << 24;
+		value |= (0xFF & buffer[5]) << 16;
+		value |= (0xFF & buffer[6]) << 8;
+		value |= (0xFF & buffer[7]);
 
 		return value;
 	}
@@ -1966,17 +1983,50 @@ public class SUtil
 		byte[] buffer = new byte[8];
 
 		buffer[0] = (byte)(val >>> 56);
-		buffer[0] = (byte)(val >>> 48);
-		buffer[0] = (byte)(val >>> 40);
-		buffer[0] = (byte)(val >>> 32);
-		buffer[0] = (byte)(val >>> 24);
-		buffer[1] = (byte)(val >>> 16);
-		buffer[2] = (byte)(val >>> 8);
-		buffer[3] = (byte)val;
+		buffer[1] = (byte)(val >>> 48);
+		buffer[2] = (byte)(val >>> 40);
+		buffer[3] = (byte)(val >>> 32);
+		buffer[4] = (byte)(val >>> 24);
+		buffer[5] = (byte)(val >>> 16);
+		buffer[6] = (byte)(val >>> 8);
+		buffer[7] = (byte)val;
 
 		return buffer;
 	}
 	
+	/**
+	 *  Get the network ip for an internet address and the prefix length.
+	 *  Example: ip: 134.100.33.22 / prefixlen: 24 (c class) -> 134.100.33.0
+	 *  @param addr The internet address.
+	 *  @param prefixlen The prefix length.
+	 *  @return The net address.
+	 */
+	public static InetAddress getNetworkIp(InetAddress addr, short prefixlen)
+	{
+		InetAddress ret = null;
+		try
+		{
+			if(addr instanceof Inet4Address)
+			{
+				int ad = SUtil.bytesToInt(addr.getAddress());
+				ad >>= 32-prefixlen;
+				ad <<= 32-prefixlen;
+				ret = InetAddress.getByAddress(SUtil.intToBytes(ad));
+			}
+			else if(addr instanceof Inet6Address)
+			{
+				long ad = SUtil.bytesToLong(addr.getAddress());
+				ad >>= 64-prefixlen;
+				ad <<= 64-prefixlen;
+				ret = InetAddress.getByAddress(SUtil.longToBytes(ad));
+			}
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get bytes as human readable string.
