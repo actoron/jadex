@@ -197,13 +197,13 @@ public class HttpRelayTransport implements ITransport
 	}
 	
 	/**
-	 *  Called from receiver thread, when it connects to a address.
+	 *  Called from receiver thread, when it connects to an address.
 	 */
 	protected void	connected(final String address, final boolean dead)
 	{
 		final String	httpadr	= address.substring(6);
 		
-		Long	oldtime	= addresses.get(httpadr);
+//		Long	oldtime	= addresses.get(httpadr);
 		// Remove all old entries with start address (e.g. also awareness urls).
 		if(!dead)
 		{
@@ -234,9 +234,10 @@ public class HttpRelayTransport implements ITransport
 		}
 		
 		// inform awa when olddead
-		boolean	olddead	= oldtime==null || oldtime.longValue()<=0;
-		if(dead != olddead)
-		{
+//		boolean	olddead	= oldtime==null || oldtime.longValue()<=0;
+//		System.out.println("Dead old: "+dead+", "+olddead);
+//		if(dead != olddead)	// Todo: fix race condition!?
+//		{
 			// Inform awareness manager (if any).
 			component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
@@ -284,7 +285,7 @@ public class HttpRelayTransport implements ITransport
 					return IFuture.DONE;
 				}
 			});
-		}
+//		}
 	}
 	
 	/**

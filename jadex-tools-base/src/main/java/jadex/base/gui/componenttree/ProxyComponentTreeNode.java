@@ -3,21 +3,20 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.RemoteException;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collections;
 import java.util.List;
@@ -67,9 +66,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Create a new service container node.
 	 */
 	public ProxyComponentTreeNode(final ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, ComponentIconCache iconcache)
+		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
 	{
-		super(parent, model, tree, desc, cms, iconcache);
+		super(parent, model, tree, desc, cms, iconcache, access);
 		this.state = STATE_UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
@@ -198,38 +197,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		
 		if(cid==null)
 		{
-			cms.getExternalAccess(desc.getName()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+			SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
-				public void customResultAvailable(final IExternalAccess exta)
+				public void customResultAvailable(IProxyAgentService pas)
 				{
-					exta.scheduleStep(new IComponentStep<IComponentIdentifier>()
-					{
-						@Classname("rem")
-						public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
-						{
-//							ProxyAgent pa = (ProxyAgent)ia;
-//							return new Future<IComponentIdentifier>(pa.getRemotePlatformIdentifier());
-							// Hack!!! Avoid dependency to platform-base
-							try
-							{
-								return new Future<IComponentIdentifier>((IComponentIdentifier)ia.getClass()
-									.getMethod("getRemotePlatformIdentifier", new Class<?>[0])
-									.invoke(ia, new Object[0]));
-							}
-							catch(Exception e)
-							{
-								return new Future<IComponentIdentifier>(e);
-							}
-						}
-					}).addResultListener(new SwingDelegationResultListener<IComponentIdentifier>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
-							cid = result;
-							model.fireNodeChanged(ProxyComponentTreeNode.this);		// Update in case icon hasn't been painted yet.
-							super.customResultAvailable(result);
-						}
-					});
+					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 				}
 			});
 		}

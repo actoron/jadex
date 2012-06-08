@@ -62,7 +62,6 @@ public abstract class SendHandler
 				final Future<Void> ret = new Future<Void>();
 				if(!agent.isKilled() && sendid.equals(getSendId()))
 				{
-//					System.out.println(System.currentTimeMillis()+" sending: "+agent.getMicroAgent().getComponentIdentifier());
 					createAwarenessInfo().addResultListener(agent.getMicroAgent()
 						.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 					{

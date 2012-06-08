@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -15,6 +16,7 @@ import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
@@ -319,6 +321,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			}
 			else
 			{
+				dif.setComponentIdentifier(sender);
 				dif.setTime(getClockTime());
 				dif.setDelay(info.getDelay());
 				dif.setRemoteExcluded(remoteexcluded);
@@ -349,6 +352,37 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 //							}
 //						});
 //					}
+			}
+			
+			// Update proxy to reflect new addresses.
+			else if(dif.getProxy()!=null)
+			{
+				final IComponentIdentifier	remote	= dif.getComponentIdentifier();
+				dif.getProxy().addResultListener(new IResultListener<IComponentIdentifier>()
+				{
+					public void resultAvailable(IComponentIdentifier cid)
+					{
+						SServiceProvider.getService(getServiceProvider(), cid, IProxyAgentService.class)
+							.addResultListener(new IResultListener<IProxyAgentService>()
+						{
+							public void resultAvailable(IProxyAgentService pas)
+							{
+								pas.setRemoteComponentIdentifier(remote);
+								//	.addResultListener() -> ignore
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// No proxy: ingore.
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// No proxy: ingore.
+					}
+				});
 			}
 		}
 		else

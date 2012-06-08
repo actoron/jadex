@@ -2,7 +2,6 @@ package jadex.bridge.service.types.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
@@ -12,7 +11,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Interface for remote management service.
  */
-public interface IRemoteServiceManagementService extends IService
+public interface IRemoteServiceManagementService
 {	
 	/**
 	 *  Get service proxies from a remote component.

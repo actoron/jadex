@@ -1,33 +1,19 @@
 package jadex.bridge.service.types.remote;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
+
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.types.chat.ChatEvent;
-import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.ICommand;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
-import jadex.commons.future.TerminableIntermediateFuture;
 
 /**
  * 

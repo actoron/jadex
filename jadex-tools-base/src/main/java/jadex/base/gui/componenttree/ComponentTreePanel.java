@@ -886,7 +886,7 @@ public class ComponentTreePanel extends JSplitPane
 							}
 							if(root==null)
 								throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
-							model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
+							model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic, access));
 							// Expand root node.
 							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
 							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));

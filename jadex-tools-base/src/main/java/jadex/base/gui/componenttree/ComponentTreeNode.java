@@ -57,6 +57,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	/** The component management service. */
 	protected final IComponentManagementService	cms;
 		
+	/** The platform access. */
+	protected IExternalAccess	access;
+		
 	/** The icon cache. */
 	protected final ComponentIconCache	iconcache;
 		
@@ -81,7 +84,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 *  Create a new service container node.
 	 */
 	public ComponentTreeNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, ComponentIconCache iconcache)
+		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
 	{
 		super(parent, model, tree);
 		
@@ -92,6 +95,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		this.desc	= desc;
 		this.cms	= cms;
 		this.iconcache	= iconcache;
+		this.access	= access;
 		
 		model.registerNode(this);
 		
@@ -209,16 +213,17 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		ITreeNode	node	= getModel().getNode(desc.getName());
 		if(node==null)
 		{
+			
 			boolean proxy = "jadex.base.service.remote.Proxy".equals(desc.getModelName())
 				// Only create proxy nodes for local proxy components to avoid infinite nesting.
 				&& ((IActiveComponentTreeNode)getModel().getRoot()).getComponentIdentifier().getName().equals(desc.getName().getPlatformName());
 			if(proxy)
 			{
-				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache);
+				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache, access);
 			}
 			else
 			{
-				node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache);
+				node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache, access);
 			}
 		}
 		return node;

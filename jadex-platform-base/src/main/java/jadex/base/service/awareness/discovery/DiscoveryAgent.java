@@ -7,8 +7,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -33,6 +33,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -541,7 +542,7 @@ public abstract class DiscoveryAgent
 				{
 					public void customResultAvailable(IComponentIdentifier root)
 					{
-						AwarenessInfo info = new AwarenessInfo(getRoot(), state, getDelay(), getIncludes(), getExcludes(), masterid);
+						AwarenessInfo info = new AwarenessInfo(root, state, getDelay(), getIncludes(), getExcludes(), masterid);
 						ret.setResult(info);
 					}
 				}));
