@@ -1,7 +1,8 @@
 package jadex.android.controlcenter.settings;
 
-import jadex.android.controlcenter.JadexBooleanPreference;
-import jadex.android.controlcenter.JadexIntegerPreference;
+import jadex.android.controlcenter.preference.DiscoveryPreference;
+import jadex.android.controlcenter.preference.JadexBooleanPreference;
+import jadex.android.controlcenter.preference.JadexIntegerPreference;
 import jadex.base.service.awareness.management.AwarenessManagementAgent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -33,14 +34,24 @@ import java.util.Set;
 import android.os.Handler;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+/**
+ * Settings implementation for {@link AwarenessManagementAgent}.
+ */
 public class AwarenessSettings extends AComponentSettings implements OnPreferenceChangeListener {
-
+	
+	/**
+	 * Handler to change UI objects from non-ui threads.
+	 */
+	private Handler uiHandler;
+	
+	// UI members
 	private JadexBooleanPreference cbautoCreate;
 	private JadexBooleanPreference cbautoDelete;
 	private JadexIntegerPreference spdelay;
@@ -48,7 +59,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	private JadexBooleanPreference[] cbmechanisms;
 	private PreferenceCategory infoCat;
 	private PreferenceScreen screen;
-	private Handler uiHandler;
 
 	/**
 	 * Enum for preference keys
@@ -89,12 +99,14 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		cbautoCreate.setTitle("Create On Discovery");
 		cbautoCreate.setKey(PREFKEYS.FAST.toString());
 		cbautoCreate.setOnPreferenceChangeListener(this);
+		cbautoCreate.setEnabled(false);
 		proxyCat.addPreference(cbautoCreate);
 
 		cbautoDelete = new JadexBooleanPreference(screen.getContext());
 		cbautoDelete.setTitle("Delete On Disappearance");
 		cbautoDelete.setKey(PREFKEYS.AUTODELETE.toString());
 		cbautoDelete.setOnPreferenceChangeListener(this);
+		cbautoDelete.setEnabled(false);
 		proxyCat.addPreference(cbautoDelete);
 
 		// --- Discovery Settings ---
@@ -106,12 +118,14 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		spdelay.setTitle("Info send delay");
 		spdelay.setKey(PREFKEYS.DELAY.toString());
 		spdelay.setOnPreferenceChangeListener(this);
+		spdelay.setEnabled(false);
 		discoveryCat.addPreference(spdelay);
 
 		cbfast = new JadexBooleanPreference(screen.getContext());
 		cbfast.setTitle("Fast startup awareness");
 		cbfast.setKey(PREFKEYS.FAST.toString());
 		cbfast.setOnPreferenceChangeListener(this);
+		cbfast.setEnabled(false);
 		discoveryCat.addPreference(cbfast);
 
 		// --- Discovery Mechanisms ---
@@ -125,15 +139,22 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		cbmechanisms = new JadexBooleanPreference[dis.length];
 		for (int i = 0; i < dis.length; i++) {
 			final JadexBooleanPreference disMechanism = new JadexBooleanPreference(screen.getContext());
+			disMechanism.setEnabled(false);
 			cbmechanisms[i] = disMechanism;
 			final String disType = dis[i].getName();
 			disMechanism.setTitle(disType);
 			disMechanism.setKey(disType);
+			disMechanism.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					disMechanism.setEnabled(false);
+					return true;
+				}
+			});
 			disMechanism.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					disMechanism.setEnabled(false);
-
 					final boolean on = (Boolean) newValue;
 					extAcc.scheduleStep(new IComponentStep<Void>() {
 						@Classname("deoractivateDiscoveryMechanism")
@@ -240,6 +261,9 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	 * Apply Discovery Mechanism settings to GUI.
 	 */
 	protected void refreshDiscoveryMechanisms() {
+		for (JadexBooleanPreference mechanism : cbmechanisms) {
+			mechanism.setEnabled(false);
+		}
 		extAcc.scheduleStep(new IComponentStep<Set<String>>() {
 			@Classname("getDiscoveryMechanisms")
 			public IFuture<Set<String>> execute(IInternalAccess ia) {
@@ -270,6 +294,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 				for (int i = 0; i < cbmechanisms.length; i++) {
 					// System.out.println("test: "+cbmechanisms[i].getText()+" "+localtypes);
 					cbmechanisms[i].setChecked(localtypes.contains(cbmechanisms[i].getTitle()));
+					cbmechanisms[i].setEnabled(true);
 				}
 			}
 		});
@@ -279,6 +304,11 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	 * Apply settings to GUI.
 	 */
 	protected void refreshSettings() {
+		cbautoCreate.setEnabled(false);
+		cbautoDelete.setEnabled(false);
+		spdelay.setEnabled(false);
+		cbfast.setEnabled(false);
+		
 		ThreadSuspendable sus = new ThreadSuspendable();
 		AwarenessSettingsDO settings = extAcc.scheduleStep(new IComponentStep<AwarenessSettingsDO>() {
 			@Override
@@ -303,6 +333,11 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		cbfast.setChecked(settings.fast);
 		// includes.setEntries(settings.includes);
 		// excludes.setEntries(settings.excludes);
+		
+		cbautoCreate.setEnabled(true);
+		cbautoDelete.setEnabled(true);
+		spdelay.setEnabled(true);
+		cbfast.setEnabled(true);
 	}
 
 	/**

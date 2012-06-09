@@ -61,9 +61,9 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 	private PreferenceCategory servicesCat;
 	private PreferenceCategory componentsCat;
 	private ISettings displayedChildSettings;
-	
+
 	static private Map<String, ISettings> childSettings;
-	
+
 	static {
 		childSettings = new HashMap<String, ISettings>();
 	}
@@ -77,7 +77,8 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 			String settingsKey = getIntent().getStringExtra(EXTRA_SETTINGSKEY);
 			displayedChildSettings = childSettings.get(settingsKey);
 			if (displayedChildSettings != null) {
-				// display child preferences, enables us to control the options menu
+				// display child preferences, enables us to control the options
+				// menu
 				PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 				setPreferenceScreen(root);
 				displayedChildSettings.setPreferenceScreen(root);
@@ -91,6 +92,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 		}
 	}
 
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		if (displayedChildSettings != null) {
@@ -107,14 +109,19 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (displayedChildSettings != null) {
 			// child functionality
-			return displayedChildSettings.onOptionsItemSelected(item); 
+			return displayedChildSettings.onOptionsItemSelected(item);
 		} else {
 			// main functionality
 			refreshControlCenter();
 			return true;
 		}
 	}
-	
+
+	/**
+	 * Creates the root preference Hierarchy.
+	 * 
+	 * @return root {@link PreferenceScreen}.
+	 */
 	private PreferenceScreen createPreferenceHierarchy() {
 		final PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 
@@ -130,6 +137,10 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 		return root;
 	}
 
+	/**
+	 * Initiates a lookup for Services and Components which have an available
+	 * GUIClass Annotation and list them.
+	 */
 	private void refreshControlCenter() {
 		servicesCat.removeAll();
 		componentsCat.removeAll();
@@ -152,18 +163,16 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 				@Override
 				public void resultAvailable(Collection<IService> result) {
 					for (IService service : result) {
-						if (addServiceSettings(servicesCat, service)) {
-							Preference dummyPref = servicesCat.findPreference("dummy");
-							if (dummyPref != null)
-								servicesCat.removePreference(dummyPref);
-						}
+						intermediateResultAvailable(service);
 					}
 				}
 
 				@Override
 				public void intermediateResultAvailable(IService service) {
 					if (addServiceSettings(servicesCat, service)) {
-						servicesCat.removePreference(servicesCat.findPreference("dummy"));
+						Preference dummyPref = servicesCat.findPreference("dummy");
+						if (dummyPref != null)
+							servicesCat.removePreference(dummyPref);
 					}
 				}
 
@@ -181,7 +190,8 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 										cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>() {
 											@Override
 											public void resultAvailable(final IExternalAccess acc) {
-												Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS, getClassLoader());
+												Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
+														getClassLoader());
 
 												final Class<?> clazz = getGuiClass(clid);
 
@@ -207,6 +217,9 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 		}
 	}
 
+	/**
+	 * Adds dummy preferences to show that no services/components are found.
+	 */
 	private void addDummyPrefs() {
 		servicesCat.removeAll();
 		componentsCat.removeAll();
@@ -223,12 +236,13 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 	}
 
 	protected boolean addServiceSettings(PreferenceGroup root, IService service) {
-		final Object clid = service.getPropertyMap() != null ? service.getPropertyMap().get(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS) : null;
+		final Object clid = service.getPropertyMap() != null ? service.getPropertyMap().get(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS)
+				: null;
 		Class<?> guiClass = getGuiClass(clid);
 		if (guiClass != null) {
 			try {
 				AServiceSettings settings = (AServiceSettings) guiClass.getConstructor(IService.class).newInstance(service);
-				addSettings(root,settings);
+				addSettings(root, settings);
 				return true;
 			} catch (InstantiationException e) {
 				e.printStackTrace();
@@ -250,7 +264,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 	protected boolean addComponentSettings(PreferenceGroup root, IExternalAccess component, Class<?> guiClass) {
 		try {
 			AComponentSettings settings = (AComponentSettings) guiClass.getConstructor(IExternalAccess.class).newInstance(component);
-			addSettings(root,settings);
+			addSettings(root, settings);
 			return true;
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -267,7 +281,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 		}
 		return false;
 	}
-	
+
 	protected void addSettings(PreferenceGroup root, ISettings settings) {
 		PreferenceScreen screen = this.getPreferenceManager().createPreferenceScreen(this);
 		root.addPreference(screen);
@@ -278,9 +292,14 @@ public class JadexAndroidControlCenter extends PreferenceActivity {
 		screen.setIntent(i);
 		screen.setKey(settings.getTitle());
 		screen.setTitle(settings.getTitle());
-		//settings.setPreferenceScreen(screen);
+		// settings.setPreferenceScreen(screen);
 	}
 
+	/**
+	 * Returns the class with the given Class name or the first available class from a Class name Array.
+	 * @param clid Name of the class or Array of names of classes.
+	 * @return The first found Class or <code>null</code>.
+	 */
 	private Class<?> getGuiClass(final Object clid) {
 		Class<?> guiClass = null;
 		if (clid instanceof String) {

@@ -1,14 +1,12 @@
 package jadex.android.controlcenter.settings;
 
-import android.app.Activity;
-import android.preference.PreferenceScreen;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import jadex.bridge.IExternalAccess;
+import android.preference.PreferenceScreen;
 
+/**
+ * Basic Settings Implementation for Components.
+ * Sets the Title and Service.
+ */
 public abstract class AComponentSettings implements ISettings {
 
 	protected IExternalAccess extAcc;
@@ -19,6 +17,13 @@ public abstract class AComponentSettings implements ISettings {
 		this.title = extAcc.getModel().getName();
 	}
 
+	/**
+	 * This Method is called when the Settings' Preference Hierarchy will be
+	 * added to the parent PreferenceScreen.
+	 * Add your whole Preference Hierarchy here.
+	 * 
+	 * @param screen
+	 */
 	protected abstract void createPreferenceHierarchy(PreferenceScreen screen);
 
 	@Override

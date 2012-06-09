@@ -1,4 +1,4 @@
-package jadex.android.controlcenter;
+package jadex.android.controlcenter.preference;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -3,6 +3,7 @@ package jadex.bridge.service.types.simulation;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IChangeListener;
@@ -11,7 +12,10 @@ import jadex.commons.future.IFuture;
 /**
  *  Interface for the time simulation service.
  */
-@GuiClassName("jadex.tools.simcenter.SimServiceViewerPanel")
+@GuiClassNames({
+	@GuiClassName("jadex.tools.simcenter.SimServiceViewerPanel"),
+	@GuiClassName("jadex.android.controlcenter.settings.SimulationSettings")
+})
 public interface ISimulationService	extends IService
 {
 	//-------- constants --------

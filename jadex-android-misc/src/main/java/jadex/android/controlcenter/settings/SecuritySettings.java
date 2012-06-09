@@ -1,7 +1,7 @@
 package jadex.android.controlcenter.settings;
 
-import jadex.android.controlcenter.JadexBooleanPreference;
-import jadex.android.controlcenter.JadexStringPreference;
+import jadex.android.controlcenter.preference.JadexBooleanPreference;
+import jadex.android.controlcenter.preference.JadexStringPreference;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DefaultResultListener;
@@ -12,6 +12,9 @@ import android.preference.PreferenceScreen;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * Settings implementation for {@link ISecurityService}.
+ */
 public class SecuritySettings extends AServiceSettings {
 
 	private ISecurityService secService;

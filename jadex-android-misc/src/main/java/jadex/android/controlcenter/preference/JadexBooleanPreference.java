@@ -1,4 +1,4 @@
-package jadex.android.controlcenter;
+package jadex.android.controlcenter.preference;
 
 import android.content.Context;
 import android.preference.CheckBoxPreference;

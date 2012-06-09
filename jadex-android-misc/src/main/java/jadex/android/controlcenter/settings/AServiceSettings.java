@@ -1,14 +1,11 @@
 package jadex.android.controlcenter.settings;
 
 import jadex.bridge.service.IService;
-import android.app.Activity;
 import android.preference.PreferenceScreen;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
+/**
+ * Basic Settings Implementation for Services. Sets the Title and Service.
+ */
 public abstract class AServiceSettings implements ISettings {
 
 	protected IService service;
@@ -19,6 +16,13 @@ public abstract class AServiceSettings implements ISettings {
 		title = service.getServiceIdentifier().getServiceType().getType().getSimpleName();
 	}
 
+	/**
+	 * This Method is called when the Settings' Preference Hierarchy will be
+	 * added to the parent PreferenceScreen.
+	 * Add your whole Preference Hierarchy here.
+	 * 
+	 * @param screen
+	 */
 	protected abstract void createPreferenceHierarchy(PreferenceScreen screen);
 
 	@Override
@@ -26,7 +30,7 @@ public abstract class AServiceSettings implements ISettings {
 		screen.setTitle(title);
 		createPreferenceHierarchy(screen);
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return title;

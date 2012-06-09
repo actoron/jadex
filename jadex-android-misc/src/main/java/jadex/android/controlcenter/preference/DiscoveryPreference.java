@@ -1,18 +1,14 @@
-package jadex.android.controlcenter.settings;
+package jadex.android.controlcenter.preference;
 
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 
 import java.text.SimpleDateFormat;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.preference.DialogPreference;
-import android.preference.Preference;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class DiscoveryPreference extends DialogPreference {
 
