@@ -1035,7 +1035,12 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
         // logs to the console. Set Level to given property value
 		if(addconsole!=null)
 		{
-            ConsoleHandler console = new ConsoleHandler();
+			Handler console;
+			/*if[android]
+			console = new jadex.commons.android.AndroidHandler();
+			 else[android]*/
+			console = new ConsoleHandler();
+			/* end[android]*/
             console.setLevel(addconsole);
             logger.addHandler(console);
         }

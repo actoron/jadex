@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Map;
 
 /**
  * Provides Access to the Android Application Context and Android Resources such
@@ -22,8 +21,7 @@ public interface IAndroidContextService {
 	 * @return {@link FileOutputStream}
 	 * @throws FileNotFoundException
 	 */
-	public FileOutputStream openFileOutputStream(String name)
-			throws FileNotFoundException;
+	public FileOutputStream openFileOutputStream(String name) throws FileNotFoundException;
 
 	/**
 	 * Opens a File InputStream and returns it
@@ -33,8 +31,7 @@ public interface IAndroidContextService {
 	 * @return {@link FileInputStream}
 	 * @throws FileNotFoundException
 	 */
-	public FileInputStream openFileInputStream(String name)
-			throws FileNotFoundException;
+	public FileInputStream openFileInputStream(String name) throws FileNotFoundException;
 
 	/**
 	 * Returns a File
@@ -62,4 +59,19 @@ public interface IAndroidContextService {
 	 */
 	public boolean dispatchUiEvent(IJadexAndroidEvent event);
 
+	/**
+	 * Queries the Android Wifimanager for DHCP Infos and returns the Netmask,
+	 * if any.
+	 * 
+	 * @return dhcp netmask or -1, if none
+	 */
+	public int getDhcpNetmask();
+
+	/**
+	 * Queries the Android Wifimanager for DHCP Infos and returns the assigned
+	 * IP Address, if any.
+	 * 
+	 * @return IP Address or -1, if none
+	 */
+	public int getDhcpInetAdress();
 }

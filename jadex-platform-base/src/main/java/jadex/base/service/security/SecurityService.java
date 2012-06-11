@@ -44,10 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/* if[android]
-import android.util.Log;
-end[android]*/
-
 @Service
 public class SecurityService implements ISecurityService
 {
@@ -203,11 +199,7 @@ public class SecurityService implements ISecurityService
 								{
 									if(printpass && (usepass==null || usepass.booleanValue()))
 									{
-										/* if[android]
-										Log.i("jadex-android", "Generated platform password: "+password);
-										else[android] */
 										System.out.println("Generated platform password: "+password);
-										/* end[android] */
 									}
 									settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
 								}
@@ -215,11 +207,7 @@ public class SecurityService implements ISecurityService
 								{
 									if(printpass && (usepass==null || usepass.booleanValue()))
 									{
-										/* if[android]
-										Log.i("jadex-android", "Using stored platform password: "+password);
-										else[android] */
 										System.out.println("Using stored platform password: "+password);
-										/* end[android] */
 									}
 									super.customResultAvailable(result);
 								}
@@ -297,11 +285,7 @@ public class SecurityService implements ISecurityService
 			
 			if(printpass && (usepass==null || usepass.booleanValue()))
 			{
-				/* if[android]
-				Log.i("jadex-android", "Using stored platform password: "+password);
-				else[android] */
 				System.out.println("Using stored platform password: "+password);
-				/* end[android] */
 			}
 		}
 		return ret;
@@ -336,11 +320,7 @@ public class SecurityService implements ISecurityService
 			ret	= IFuture.DONE;
 			if(printpass && (usepass==null || usepass.booleanValue()))
 			{
-				/* if[android]
-				Log.i("jadex-android", "Using new platform password: "+password);
-				else[android] */
 				System.out.println("Using new platform password: "+password);
-				/* end[android] */
 			}
 		}
 		return ret;

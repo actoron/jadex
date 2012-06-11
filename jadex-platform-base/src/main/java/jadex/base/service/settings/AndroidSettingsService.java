@@ -65,7 +65,6 @@ public class AndroidSettingsService extends SettingsService {
 	@Override
 	protected synchronized Properties readPropertiesFromStore() {
 		this.preferences = contextService.getSharedPreferences(DEFAULT_PREFS_NAME);
-		// preferences.setString("securityservice.password", "andori");
 		Properties props = new Properties();
 		try {
 			props = super.readPropertiesFromStore();

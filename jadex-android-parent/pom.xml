@@ -115,6 +115,14 @@
 												<token>java.beans</token>
 												<value>javaa.beans</value>
 											</replacement>
+											<replacement>
+												<token>System.out.println\(</token>
+												<value>jadex.commons.android.Logger.i\(</value>
+											</replacement>
+											<replacement>
+												<token>System.err.println\(</token>
+												<value>jadex.commons.android.Logger.e\(</value>
+											</replacement>
 										</replacements>
 									</configuration>
 								</execution>

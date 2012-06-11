@@ -303,7 +303,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		prop = component.getProperty("logging.addConsoleHandler");
 		if(prop!=null)
 		{
-            ConsoleHandler console = new ConsoleHandler();
+			Handler console;
+			/*if[android]
+			console = new jadex.commons.android.AndroidHandler();
+			 else[android]*/
+			console = new ConsoleHandler();
+			/* end[android]*/
+			
             console.setLevel(Level.parse(prop.toString()));
             logger.addHandler(console);
         }

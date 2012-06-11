@@ -9,6 +9,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.android.IJadexAndroidEvent;
 import jadex.bridge.service.types.android.IPreferences;
+import jadex.commons.android.Logger;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
@@ -16,64 +17,83 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import android.Manifest.permission;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 /**
- * Provides Access to the Android Application Context and 
- * Android Resources such as Files and Properties 
- *
+ * Provides Access to the Android Application Context and Android Resources such
+ * as Files and Properties
+ * 
  */
-public class AndroidContextService extends BasicService implements AndroidContextChangeListener, IAndroidContextService{
+public class AndroidContextService extends BasicService implements AndroidContextChangeListener, IAndroidContextService {
 
 	private Context context;
 	private JadexAndroidContext jadexAndroidContext;
+	private boolean hasWifiPermission;
 
 	/**
 	 * Constructor
+	 * 
 	 * @param provider
 	 */
 	public AndroidContextService(IServiceProvider provider) {
 		super(provider.getId(), IAndroidContextService.class, null);
 		jadexAndroidContext = JadexAndroidContext.getInstance();
 		jadexAndroidContext.addContextChangeListener(this);
+
+		int perm = context.checkCallingOrSelfPermission(permission.ACCESS_WIFI_STATE);
+		hasWifiPermission = perm == PackageManager.PERMISSION_GRANTED;
+		if (!hasWifiPermission) {
+			Logger.e("For full functionality (checking Netmask and IP Address), this Application needs PERMISSION.ACCESS_WIFI_STATE");
+		}
 	}
-	
+
 	@Override
 	public IFuture<Void> startService() {
 		return super.startService();
 	}
-	
+
 	@Override
 	public IFuture<Void> shutdownService() {
 		JadexAndroidContext.getInstance().removeContextChangeListener(this);
 		return super.shutdownService();
 	}
-	
-	/* (non-Javadoc)
-	 * @see jadex.android.service.IAndroidContextService#openFileOutputStream(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * jadex.android.service.IAndroidContextService#openFileOutputStream(java
+	 * .lang.String)
 	 */
 	@Override
 	public FileOutputStream openFileOutputStream(String name) throws FileNotFoundException {
 		checkContext();
 		return context.openFileOutput(name, Context.MODE_PRIVATE);
 	}
-	
-	/* (non-Javadoc)
-	 * @see jadex.android.service.IAndroidContextService#openFileInputStream(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * jadex.android.service.IAndroidContextService#openFileInputStream(java
+	 * .lang.String)
 	 */
 	@Override
 	public FileInputStream openFileInputStream(String name) throws FileNotFoundException {
 		checkContext();
 		return context.openFileInput(name);
 	}
-	
+
 	@Override
 	public File getFile(String name) {
 		checkContext();
 		return context.getFileStreamPath(name);
 	}
-
 
 	@Override
 	public IPreferences getSharedPreferences(String name) {
@@ -90,7 +110,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	public void onContextCreate(Context ctx) {
 		this.context = ctx;
 	}
-	
+
 	private void checkContext() throws JadexAndroidContextNotFoundError {
 		if (context == null) {
 			throw new JadexAndroidContextNotFoundError();
@@ -106,5 +126,27 @@ public class AndroidContextService extends BasicService implements AndroidContex
 			return false;
 		}
 	}
-	
+
+	@Override
+	public int getDhcpNetmask() {
+		if (hasWifiPermission) {
+			WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+			DhcpInfo dhcpInfo = wifi.getDhcpInfo();
+			return dhcpInfo != null ? dhcpInfo.netmask : -1;
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
+	public int getDhcpInetAdress() {
+		if (hasWifiPermission) {
+			WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+			DhcpInfo dhcpInfo = wifi.getDhcpInfo();
+			return dhcpInfo != null ? dhcpInfo.ipAddress : -1;
+		} else {
+			return -1;
+		}
+	}
+
 }

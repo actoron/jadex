@@ -308,7 +308,10 @@
 		</providedservice>
 		<!-- Todo start before message service because of relay !? -->
 		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
-			<implementation>new jadex.base.service.security.SecurityService($args.usepass, $args.printpass)</implementation>
+			<implementation>
+			Boolean.TRUE.equals($args.android) 
+			? jadex.base.service.security.AndroidSecurityService.class.getConstructor(new Class[]{Boolean.class, Boolean.class}).newInstance(new Object[]{$args.usepass, $args.printpass})
+			: new jadex.base.service.security.SecurityService($args.usepass, $args.printpass)</implementation>
 		</providedservice>
 		
 		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">

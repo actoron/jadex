@@ -2351,7 +2351,7 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		/* if_not[android] */
+		/* if_not[android8] */
 		try
 		{
 			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
@@ -2371,7 +2371,7 @@ public class SUtil
 		{
 //			e.printStackTrace();
 		}
-		/* end[android] */
+		/* end[android8] */
 		
 		return ret;
 	}

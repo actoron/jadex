@@ -270,6 +270,16 @@ public class AndroidSettingsServiceTest extends TestCase {
 			public boolean dispatchUiEvent(IJadexAndroidEvent event) {
 				return false;
 			}
+
+			@Override
+			public int getDhcpNetmask() {
+				return -1;
+			}
+
+			@Override
+			public int getDhcpInetAdress() {
+				return -1;
+			}
 		};
 
 		return ass;

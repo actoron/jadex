@@ -107,7 +107,7 @@ public class NIOTCPTransport implements ITransport
 			/* if[android8]
 			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 			java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-			end[android]*/
+			end[android8]*/
 			
 			// Causes problem with maven too (only with Win firewall?)
 			// http://www.thatsjava.com/java-core-apis/28232/
