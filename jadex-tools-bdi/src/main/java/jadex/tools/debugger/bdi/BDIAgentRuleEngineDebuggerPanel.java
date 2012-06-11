@@ -1,7 +1,5 @@
 package jadex.tools.debugger.bdi;
 
-import java.awt.BorderLayout;
-
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -10,7 +8,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
-import jadex.tools.debugger.gui.IDebuggerPanel;
+import jadex.tools.debugger.IDebuggerPanel;
+
+import java.awt.BorderLayout;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
