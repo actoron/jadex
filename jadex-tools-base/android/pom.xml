@@ -135,6 +135,7 @@
 						jadex/base/PlatformApplet.java,
 						jadex/base/test/
 					</excludes>
+					<includes>${munge-default-includes}</includes>
 				</configuration>
 			</plugin>
 			

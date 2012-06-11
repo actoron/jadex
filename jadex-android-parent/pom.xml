@@ -14,7 +14,8 @@
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.1.1</android-maven-plugin-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<munge-default-excludes>**/.svn/,**/ui/,**/gui/,**/*.png</munge-default-excludes>
+		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
+		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes>
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
 	</properties>
 
@@ -79,6 +80,7 @@
 								<mungedDirectory>${basedir}/${munge-generated-sources-dir}</mungedDirectory>
 								<symbols>android,android8</symbols>
 								<excludes>${munge-default-excludes}</excludes>
+								<includes>${munge-default-includes}</includes>
 							</configuration>
 						</plugin>
 
