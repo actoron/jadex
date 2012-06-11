@@ -37,9 +37,6 @@ public class ExternalAccess implements IExternalAccess
 	/** The provider. */
 	protected IServiceProvider provider;
 	
-	/** The component creation time. */
-	protected long creationtime;
-	
 	// -------- constructors --------
 
 	/**
@@ -51,7 +48,6 @@ public class ExternalAccess implements IExternalAccess
 		this.adapter = interpreter.getComponentAdapter();
 		this.tostring = interpreter.getComponentIdentifier().getLocalName();
 		this.provider = interpreter.getServiceContainer();
-		this.creationtime = interpreter.getCreationTime();
 	}
 
 	//-------- methods --------
@@ -71,15 +67,6 @@ public class ExternalAccess implements IExternalAccess
 	public IComponentIdentifier	getComponentIdentifier()
 	{
 		return adapter.getComponentIdentifier();
-	}
-	
-	/**
-	 *  Get the creation time of the component.
-	 *  @return	The component creation time.
-	 */
-	public long	getCreationTime()
-	{
-		return creationtime;
 	}
 	
 //	/**

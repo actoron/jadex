@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -53,6 +54,12 @@ public interface IInternalAccess
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	public IComponentDescription	getComponentDescription();
 	
 	/**
 	 *  Get the service provider.

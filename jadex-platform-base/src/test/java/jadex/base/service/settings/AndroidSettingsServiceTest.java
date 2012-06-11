@@ -21,6 +21,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.android.IJadexAndroidEvent;
 import jadex.bridge.service.types.android.IPreferences;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -318,6 +319,11 @@ public class AndroidSettingsServiceTest extends TestCase {
 		@Override
 		public IComponentIdentifier getComponentIdentifier() {
 			return componentIdentifier;
+		}
+
+		@Override
+		public IComponentDescription getComponentDescription() {
+			return null;
 		}
 
 		@Override

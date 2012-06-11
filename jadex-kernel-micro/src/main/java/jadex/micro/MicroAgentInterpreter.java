@@ -427,7 +427,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				Future future = (Future)step[1];
 				
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				
 				// Correct to execute them in try catch?!
 				try
@@ -442,7 +442,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				}
 				
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 			}
 	
 			return steps!=null && !steps.isEmpty();
@@ -700,7 +700,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			if(componentlisteners!=null)
 			{
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
-					step[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), getStepDetails((IComponentStep)step[0])));
+					step[0].toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step[0])));
 			}
 		}
 	}
@@ -717,7 +717,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		if(componentlisteners!=null)
 		{
 			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret[0].getClass().getName(),
-				ret[0].toString(), microagent.getComponentIdentifier(), getCreationTime(), getStepDetails((IComponentStep)ret[0])));
+				ret[0].toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)ret[0])));
 		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;

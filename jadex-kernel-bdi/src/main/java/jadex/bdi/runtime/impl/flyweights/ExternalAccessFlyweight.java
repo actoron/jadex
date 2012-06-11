@@ -39,9 +39,6 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	/** The parent component identifier. */
 	protected IComponentIdentifier	parent;
 	
-	/** The component creation time. */
-	protected long creationtime;
-
 	//-------- constructors --------
 	
 	/**
@@ -56,7 +53,6 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		this.provider = getInterpreter().getServiceProvider();
 		this.cid = getInterpreter().getAgentAdapter().getComponentIdentifier();
 		this.parent = getInterpreter().getParent().getComponentIdentifier();
-		this.creationtime = getInterpreter().getCreationTime();
 	}
 
 	//-------- methods --------
@@ -86,15 +82,6 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	public IComponentIdentifier	getComponentIdentifier()
 	{
 		return cid;
-	}
-	
-	/**
-	 *  Get the creation time of the component.
-	 *  @return	The component creation time.
-	 */
-	public long	getCreationTime()
-	{
-		return creationtime;
 	}
 	
 	/**

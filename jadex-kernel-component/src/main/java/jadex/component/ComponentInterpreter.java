@@ -179,7 +179,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			{
 				Future future = (Future)step[1];
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				try
 				{
 					IFuture<?> res = ((IComponentStep<?>)step[0]).execute(this);
@@ -192,7 +192,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					throw e;
 				}
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 			}
 			
 			boolean ret;

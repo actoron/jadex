@@ -35,12 +35,6 @@ public interface IExternalAccess //extends IRemotable
 	public IComponentIdentifier	getComponentIdentifier();
 	
 	/**
-	 *  Get the creation time of the component.
-	 *  @return	The component creation time.
-	 */
-	public long	getCreationTime();
-	
-	/**
 	 *  Get the service provider.
 	 *  @return The service provider.
 	 */

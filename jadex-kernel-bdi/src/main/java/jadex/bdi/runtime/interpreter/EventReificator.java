@@ -341,7 +341,7 @@ public class EventReificator implements IOAVStateListener
 				scope = bdiint.getAgent();
 			
 			event.setTime(time);
-			event.setComponentCreationTime(bdiint.getCreationTime());
+			event.setComponentCreationTime(bdiint.getComponentDescription().getCreationTime());
 			
 			if(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||

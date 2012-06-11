@@ -566,7 +566,7 @@ public class BDIViewerPanel extends JPanel
 			{
 				Object	belief	= it.next();
 				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getExternalAccess().getCreationTime(), info));
+				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
 			}
 		}
 		
@@ -578,7 +578,7 @@ public class BDIViewerPanel extends JPanel
 			{
 				Object	beliefset	= it.next();
 				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getExternalAccess().getCreationTime(), info));
+				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
 			}
 		}
 		
@@ -590,7 +590,7 @@ public class BDIViewerPanel extends JPanel
 			{
 				Object	goal	= it.next();
 				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getExternalAccess().getCreationTime(), info));
+				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
 			}
 		}
 		
@@ -602,7 +602,7 @@ public class BDIViewerPanel extends JPanel
 			{
 				Object	plan	= it.next();
 				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getExternalAccess().getCreationTime(), info));
+				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
 			}
 		}
 		

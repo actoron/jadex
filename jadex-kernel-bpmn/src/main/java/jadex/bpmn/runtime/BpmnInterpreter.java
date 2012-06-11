@@ -360,10 +360,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			if(!isFinished(pool, lane) && isReady(pool, lane))
 			{
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				executeStep(pool, lane);
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 			}
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
@@ -1587,7 +1587,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public IComponentChangeEvent createThreadEvent(String type, ProcessThread thread)
 	{
 		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
-			thread.getId(), getComponentIdentifier(), getCreationTime(),
+			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(),
 			IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(type) ? null : createProcessThreadInfo(thread));
 	}
 	
@@ -1597,7 +1597,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public IComponentChangeEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
 	{
 		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
-			thread.getId(), getComponentIdentifier(), getCreationTime(), createProcessThreadInfo(thread));
+			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(), createProcessThreadInfo(thread));
 	}
 	
 	/**

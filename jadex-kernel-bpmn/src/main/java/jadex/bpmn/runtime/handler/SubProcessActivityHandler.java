@@ -241,7 +241,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 										newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
 										thread.getThreadContext().addThread(newthread);
 										ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-											thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(newthread));
+											thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
 										instance.notifyListeners(cce);
 									}
 								}

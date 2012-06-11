@@ -367,18 +367,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	/**
-	 *  Return the creation time of the component,
-	 *  expressed in system time.
-	 *  
-	 *  @return The creation time of the component.
-	 */
-	public long getCreationTime()
-	{
-//		return creationtime;
-		return getComponentAdapter().getDescription().getCreationTime();
-	}
-	
-	/**
 	 *  Get a space of the application.
 	 *  @param name	The name of the space.
 	 *  @return	The space.

@@ -309,7 +309,7 @@ public class MicroAgentViewPanel extends JPanel
 					{
 						Object[]	step	= (Object[])steps.get(i);
 						events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, MicroAgentInterpreter.TYPE_STEP, step[0].getClass().getName(),
-							step[0].toString(), ma.getComponentIdentifier(), interpreter.getCreationTime(), interpreter.getStepDetails((IComponentStep)step[0])));
+							step[0].toString(), ma.getComponentIdentifier(), interpreter.getComponentDescription().getCreationTime(), interpreter.getStepDetails((IComponentStep)step[0])));
 					}
 				}
 				catch(Exception e)

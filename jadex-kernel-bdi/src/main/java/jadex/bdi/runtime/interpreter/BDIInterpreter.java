@@ -108,9 +108,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The state. */
 	protected IOAVState state;
 	
-	/** Creation time, Hack? Should be in state? */
-	protected long creationtime;
-	
 	/** The reference to the agent instance in the state.*/
 	protected Object ragent;
 	
@@ -269,9 +266,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		// Hack! todo:
 		interpreters.put(state, this);
-		
-		//TODO: Hack! Should be simulation time!
-		creationtime = System.currentTimeMillis();
 		
 //		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
@@ -611,7 +605,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				if(!rulesystem.getAgenda().isEmpty())
 				{
 					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 					rulesystem.getAgenda().fireRule();
 	
 					act	= rulesystem.getAgenda().getLastActivation();
@@ -621,7 +615,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					state.notifyEventListeners();
 					state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getCreationTime(), null));
+							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				}
 	
 				return !rulesystem.getAgenda().isEmpty();
@@ -1877,17 +1871,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		return new CapabilityFlyweight(state, initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
-	
-	/**
-	 *  Return the creation time of the component.
-	 *  
-	 *  @return The creation time of the component.
-	 */
-	public long getCreationTime()
-	{
-		return creationtime;
-	}
-	
+		
 	/**
 	 *  Get the component listeners.
 	 *  @return The component listeners.
