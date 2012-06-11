@@ -39,14 +39,6 @@ public class AppProviderService implements IAppProviderService<IMandelbrotServic
 		return new Future<AppMetaInfo>(ami);
 	}
 
-//	/**
-//	 * 
-//	 */
-//	public IFuture<Class<? extends IAppGui<DisplayService>>> getApplicationGui(String guitype)
-//	{
-//		return new Future<Class<? extends IAppGui<DisplayService>>>((Class)null);
-//	}
-	
 	/**
 	 * 
 	 */
