@@ -1928,10 +1928,10 @@ public class SUtil
 	{
 		byte[] buffer = new byte[4];
 
-		buffer[0] = (byte)(val >>> 24);
-		buffer[1] = (byte)(val >>> 16);
-		buffer[2] = (byte)(val >>> 8);
-		buffer[3] = (byte)val;
+		buffer[0] = (byte)((val >>> 24) & 0xFF);
+		buffer[1] = (byte)((val >>> 16) & 0xFF);
+		buffer[2] = (byte)((val >>> 8) & 0xFF);
+		buffer[3] = (byte)(val & 0xFF);
 
 		return buffer;
 	}
@@ -1960,17 +1960,17 @@ public class SUtil
 	{
 		if(buffer.length != 8)
 		{
-			throw new IllegalArgumentException("buffer length must be 8 bytes!");
+			throw new IllegalArgumentException("Buffer length must be 8 bytes: "+arrayToString(buffer));
 		}
 
-		long value = (0xFF & buffer[0]) << 56;
-		value |= (0xFF & buffer[1]) << 48;
-		value |= (0xFF & buffer[2]) << 40;
-		value |= (0xFF & buffer[3]) << 32;
-		value |= (0xFF & buffer[4]) << 24;
-		value |= (0xFF & buffer[5]) << 16;
-		value |= (0xFF & buffer[6]) << 8;
-		value |= (0xFF & buffer[7]);
+		long value = (0xFFL & buffer[0]) << 56L;
+		value |= (0xFFL & buffer[1]) << 48L;
+		value |= (0xFFL & buffer[2]) << 40L;
+		value |= (0xFFL & buffer[3]) << 32L;
+		value |= (0xFFL & buffer[4]) << 24L;
+		value |= (0xFFL & buffer[5]) << 16L;
+		value |= (0xFFL & buffer[6]) << 8L;
+		value |= (0xFFL & buffer[7]);
 
 		return value;
 	}
@@ -1982,14 +1982,14 @@ public class SUtil
 	{
 		byte[] buffer = new byte[8];
 
-		buffer[0] = (byte)(val >>> 56);
-		buffer[1] = (byte)(val >>> 48);
-		buffer[2] = (byte)(val >>> 40);
-		buffer[3] = (byte)(val >>> 32);
-		buffer[4] = (byte)(val >>> 24);
-		buffer[5] = (byte)(val >>> 16);
-		buffer[6] = (byte)(val >>> 8);
-		buffer[7] = (byte)val;
+		buffer[0] = (byte)((val >>> 56) & 0xFF);
+		buffer[1] = (byte)((val >>> 48) & 0xFF);
+		buffer[2] = (byte)((val >>> 40) & 0xFF);
+		buffer[3] = (byte)((val >>> 32) & 0xFF);
+		buffer[4] = (byte)((val >>> 24) & 0xFF);
+		buffer[5] = (byte)((val >>> 16) & 0xFF);
+		buffer[6] = (byte)((val >>> 8) & 0xFF);
+		buffer[7] = (byte)(val & 0xFF);
 
 		return buffer;
 	}
@@ -2009,16 +2009,23 @@ public class SUtil
 			if(addr instanceof Inet4Address)
 			{
 				int ad = SUtil.bytesToInt(addr.getAddress());
-				ad >>= 32-prefixlen;
+				ad >>>= 32-prefixlen;
 				ad <<= 32-prefixlen;
 				ret = InetAddress.getByAddress(SUtil.intToBytes(ad));
 			}
 			else if(addr instanceof Inet6Address)
 			{
-				long ad = SUtil.bytesToLong(addr.getAddress());
-				ad >>= 64-prefixlen;
-				ad <<= 64-prefixlen;
-				ret = InetAddress.getByAddress(SUtil.longToBytes(ad));
+				// Use only first 64 bit of IPv6 address.
+				byte[]	baddr	= new byte[8];
+				System.arraycopy(addr.getAddress(), 0, baddr, 0, 8);
+				long ad = SUtil.bytesToLong(baddr);
+				System.arraycopy(SUtil.longToBytes(ad), 0, baddr, 0, 8);
+				ad >>>= 8;
+				System.arraycopy(SUtil.longToBytes(ad), 0, baddr, 0, 8);
+				ad <<= 8;
+				baddr	= new byte[16];
+				System.arraycopy(SUtil.longToBytes(ad), 0, baddr, 0, 8);
+				ret = InetAddress.getByAddress(baddr);
 			}
 		}
 		catch(Exception e)
