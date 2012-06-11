@@ -270,13 +270,13 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
-			// Hack!!! add protocol if not present to allow comparison with library service URLs.
+			// Convert file path or jar url to file url as used in lib service. 
 			final String filepath = ((IFileNode)node).getFilePath();
-			final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
-				? filepath : "file:"+filepath;
-//			final URL	url	= SUtil.toURL(filepath);
-//			System.out.println("adding file: "+url);
-//			System.out.println("adding url: "+url);
+			final String filename = filepath.startsWith("jar:")
+				? filepath.endsWith("!/") ? filepath.substring(4, filepath.length()-2)
+					: filepath.endsWith("!") ? filepath.substring(4, filepath.length()-1) : filepath.substring(4)
+				: filepath.startsWith("file:") ? filepath : "file:"+filepath;
+			
 			exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
 			{
 				@Classname("addurl")

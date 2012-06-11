@@ -147,7 +147,9 @@ public class ModelFileFilter implements IRemoteFilter
 			}
 			else
 			{
-				URL	furl	= SUtil.toURL(file.getAbsolutePath());
+				String	furl	= SUtil.toURL(file.getAbsolutePath()).toString();
+				if(furl.startsWith("jar:"))
+					furl	= furl.substring(4);
 				IResourceIdentifier	rid	= null;
 				for(Iterator<URL> it=rids.keySet().iterator(); rid==null && it.hasNext(); )
 				{
