@@ -119,7 +119,7 @@ import java.util.TimerTask;
 //			@Component(name="registry", type="Registry")
 		})
 })
-@Properties(@NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}"))
+@Properties(@NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.gui.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}"))
 @ProvidedServices(
 	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$component"))
 )

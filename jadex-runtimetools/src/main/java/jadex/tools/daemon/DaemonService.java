@@ -11,6 +11,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IMicroExternalAccess;
+import jadex.tools.daemon.gui.DaemonAgent;
 
 /**
  *  The daemon service.

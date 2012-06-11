@@ -197,9 +197,9 @@
 		<componenttype filename="jadex/base/service/chat/Chat.component.xml" name="chat"/>
 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
 		
-		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
-		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
-		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
+		<!-- <componenttype filename="jadex/tools/jcc/gui/JCC.agent.xml" name="jcc"/> -->
+		<!--<componenttype filename="jadex/tools/jcc/gui/JCCAgent.class" name="jcc"/>-->
+		<componenttype filename="/jadex/tools/jcc/gui/JCCAgent.class" name="jcc"/>
 	</componenttypes>
 	
 	<services>

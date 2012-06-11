@@ -10,7 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.gui.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
-import jadex.tools.debugger.IDebuggerPanel;
+import jadex.tools.debugger.gui.IDebuggerPanel;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

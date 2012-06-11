@@ -14,7 +14,7 @@ import java.util.List;
  *  Interface for the Library Service. It provides a platform service
  *  for dynamic loading and unloading of classes, libraries and resources.
  */
-@GuiClassName("jadex.tools.libtool.LibServiceBrowser")
+@GuiClassName("jadex.tools.libtool.gui.LibServiceBrowser")
 public interface ILibraryService
 {
 	//-------- methods --------

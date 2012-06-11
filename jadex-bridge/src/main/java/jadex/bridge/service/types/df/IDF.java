@@ -12,7 +12,7 @@ import java.util.Date;
  *  Interface for the directory facilitator (DF). Provides services for registering,
  *  modifying, deregistering and searching of component resp. service descriptions.
  */
-@GuiClassName("jadex.tools.dfbrowser.DFBrowserPanel")
+@GuiClassName("jadex.tools.dfbrowser.gui.DFBrowserPanel")
 public interface IDF	extends IService
 {
 	/**
