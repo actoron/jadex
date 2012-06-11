@@ -83,7 +83,7 @@ public class InvokerAgent
 					tc.addReport(rep);
 				}
 				
-				testRemote(3, 100).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
+				testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
 				{
 					public void customResultAvailable(Collection<TestReport> result)
 					{
@@ -226,16 +226,20 @@ public class InvokerAgent
 	 */
 	protected IFuture<TestReport>	testTerminate(int testno, ITerminableService service, long delay)
 	{
+//		System.out.println(agent.getComponentIdentifier()+": testTerminate1");
+		
 		final Future<Void> tmp = new Future<Void>();
 		ITerminableFuture<String> fut = service.getResult(delay);
 		fut.addResultListener(new IResultListener<String>()
 		{
 			public void resultAvailable(String result)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminate2");
 				tmp.setException(new RuntimeException("Termination did not occur: "+result));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminate3");
 				if(exception instanceof FutureTerminatedException || 
 					(exception instanceof RemoteException && ((RemoteException)exception).getType().equals(FutureTerminatedException.class)))
 				{
@@ -255,11 +259,13 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(Void result)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminate4");
 				tr.setSucceeded(true);
 				ret.setResult(tr);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminate5");
 				tr.setFailed(exception.getMessage());
 				ret.setResult(tr);
 			}
@@ -273,6 +279,8 @@ public class InvokerAgent
 	 */
 	protected IFuture<TestReport>	testTerminateAction(int testno, ITerminableService service, long delay)
 	{
+//		System.out.println(agent.getComponentIdentifier()+": testTerminateAction1");
+		
 		final Future<Void> tmp = new Future<Void>();
 		
 		final ITerminableFuture<String> fut = service.getResult(delay);
@@ -284,10 +292,12 @@ public class InvokerAgent
 			}
 			public void customResultAvailable(Collection<Void> result)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminateAction2");
 				tmp.setResult(null);
 			}
 			public void finished()
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminateAction3");
 				tmp.setResult(null);
 			}
 		});
@@ -298,11 +308,13 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(Void result)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminateAction4");
 				tr.setSucceeded(true);
 				ret.setResult(tr);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println(agent.getComponentIdentifier()+": testTerminateAction5");
 				tr.setFailed(exception.getMessage());
 				ret.setResult(tr);
 			}
