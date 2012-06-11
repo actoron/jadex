@@ -1,29 +1,21 @@
 package jadex.bridge.service.types.appstore;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IFuture;
 
 /**
  *  Interface for applications that want to provider
  *  themselves as app in the store.
  */
+@Security(Security.UNRESTRICTED)
 public interface IAppProviderService<T>
 {
-//	/** Constant for swing gui. */
-//	public final static String GUI_TYPE_SWING = "Swing"; 
-//	
-//	/** Constant for android gui. */
-//	public final static String GUI_TYPE_ANDROID = "Android"; 
-	
 	/**
-	 * 
+	 *  Get meta information about an application.
+	 *  @return The meta info.
 	 */
 	public IFuture<AppMetaInfo> getAppMetaInfo();
 
-	/**
-	 * 
-	 */
-//	public IFuture<Class<? extends IAppGui<T>>> getApplicationGui(String guitype);
-	
 	/**
 	 *  Get the application instance as entrance point.
 	 *  @return The application.

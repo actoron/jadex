@@ -10,10 +10,10 @@ import jadex.bridge.service.types.appstore.IAppProviderService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -137,38 +137,38 @@ public class AppStorePanel extends JPanel
 		
 		apps.clear();
 		IIntermediateFuture<IAppProviderService> fut = SServiceProvider.getServices(access.getServiceProvider(), IAppProviderService.class, RequiredServiceInfo.SCOPE_GLOBAL);
-		fut.addResultListener(new IntermediateExceptionDelegationResultListener<IAppProviderService, Void>(ret)
+		fut.addResultListener(new SwingIntermediateExceptionDelegationResultListener<IAppProviderService, Void>(ret)
 		{
 			protected boolean fin = false;
 			protected int cnt = 0;
 			
-			public void intermediateResultAvailable(final IAppProviderService ser)
+			public void customIntermediateResultAvailable(final IAppProviderService ser)
 			{
 				cnt++;
-				ser.getAppMetaInfo().addResultListener(new IResultListener<AppMetaInfo>()
+				ser.getAppMetaInfo().addResultListener(new SwingResultListener<AppMetaInfo>()
 				{
-					public void resultAvailable(AppMetaInfo ami)
+					public void customResultAvailable(AppMetaInfo ami)
 					{
-						System.out.println("found: "+ami);
+//						System.out.println("found: "+ami);
 						if(!apps.containsKey(ser))
 						{
 							// todo: save according to id
 							apps.put(ser, ami);
 						}
 						
-						if(fin && --cnt==0)
+						if(--cnt==0 && fin)
 							ret.setResult(null);
 					}
 					
-					public void exceptionOccurred(Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
-						if(fin && --cnt==0)
+						if(--cnt==0 && fin)
 							ret.setResult(null);
 					}
 				});
 			}
 			
-			public void finished()
+			public void customFinished()
 			{
 				if(cnt==0)
 				{
@@ -304,7 +304,7 @@ public class AppStorePanel extends JPanel
 		{
 			final JPopupMenu menu = new JPopupMenu();
 			
-			menu.add(new JMenuItem("test"));
+//			menu.add(new JMenuItem("test"));
 			
 			IFuture<Object> fut = (IFuture<Object>)aps.getApplication();
 			fut.addResultListener(new SwingDefaultResultListener<Object>()
@@ -355,6 +355,10 @@ public class AppStorePanel extends JPanel
 							}
 						});
 						menu.add(mi);
+						menu.invalidate();
+						menu.doLayout();
+						menu.pack();
+						menu.repaint();
 					}
 				}
 			});
