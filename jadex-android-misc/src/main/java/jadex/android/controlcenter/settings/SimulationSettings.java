@@ -36,6 +36,7 @@ import java.util.Iterator;
 import android.os.Handler;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.view.Menu;
@@ -163,10 +164,33 @@ public class SimulationSettings extends AServiceSettings {
 
 		controlCat.addPreference(ctrl_play);
 		controlCat.addPreference(ctrl_pause);
+		
+		
+		
+		ctrl_pause.setOnPreferenceClickListener(pauseClickListener);
+		ctrl_play.setOnPreferenceClickListener(playClickListener);
 
 		getProperties();
 		refreshClockSettings();
 	}
+	
+	private OnPreferenceClickListener pauseClickListener = new OnPreferenceClickListener() {
+		
+		@Override
+		public boolean onPreferenceClick(Preference preference) {
+			
+			return true;
+		}
+	};
+	
+	private OnPreferenceClickListener playClickListener = new OnPreferenceClickListener() {
+		
+		@Override
+		public boolean onPreferenceClick(Preference preference) {
+			
+			return true;
+		}
+	};
 
 	/**
 	 * Update the view.
