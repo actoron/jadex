@@ -140,7 +140,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	static
 	{
 		NOTIFICATION_SOUNDS	= new HashMap<String, String>();
-		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_USER, "sounds/pling.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_USER, "../sounds/pling.wav");
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_MSG, "../sounds/ping.wav");
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_FILE, "../sounds/cuckoo_clock.wav");
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_COMPLETE, "../sounds/music_box.wav");

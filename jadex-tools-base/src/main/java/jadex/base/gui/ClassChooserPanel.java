@@ -116,7 +116,7 @@ public class ClassChooserPanel	extends JPanel
 			for(int i=0; i<urls.length; i++)
 			{
 //				System.out.println("Scanning: "+entry);
-				System.out.println("url: "+urls[i].toURI());
+//				System.out.println("url: "+urls[i].toURI());
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
