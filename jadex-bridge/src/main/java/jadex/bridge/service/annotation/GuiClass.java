@@ -17,5 +17,5 @@ public @interface GuiClass
 	/**
 	 *  Supply a class implementing the gui.
 	 */
-	public Class value();
+	public Class<?> value();
 }

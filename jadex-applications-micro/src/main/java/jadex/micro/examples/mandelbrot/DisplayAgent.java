@@ -34,7 +34,10 @@ import javax.swing.SwingUtilities;
  *  Agent offering a display service.
  */
 @Description("Agent offering a display service.")
-@ProvidedServices(@ProvidedService(type=IDisplayService.class, implementation=@Implementation(DisplayService.class)))
+@ProvidedServices({
+	@ProvidedService(type=IDisplayService.class, implementation=@Implementation(DisplayService.class))//,
+//	@ProvidedService(type=IAppProviderService.class, implementation=@Implementation(AppProviderService.class))
+})
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
 	@RequiredService(name="progressservice", type=IProgressService.class),

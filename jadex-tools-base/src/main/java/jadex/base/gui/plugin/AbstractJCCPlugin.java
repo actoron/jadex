@@ -86,6 +86,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					ret.setException(e);
 				}
 			}

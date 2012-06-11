@@ -12,6 +12,7 @@
 		<import>jadex.bridge.serviceclock.IClockService</import>
 		<import>jadex.bridge.service.SServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
+		<import>jadex.bridge.service.types.appstore.*</import>
 	</imports>
 	
 	<arguments>
@@ -37,6 +38,13 @@
 			<implementation>
 				<binding componenttype="Display"/>
 			</implementation>
+		</providedservice>
+		
+		<providedservice class="IMandelbrotService">
+			<implementation class="MandelbrotService"/>
+		</providedservice>
+		<providedservice class="IAppProviderService">
+			<implementation class="AppProviderService"/>
 		</providedservice>
 	</services>
 	
