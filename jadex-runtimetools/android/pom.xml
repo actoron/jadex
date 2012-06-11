@@ -130,7 +130,8 @@
 				<configuration>
 					<excludes>${munge-default-excludes},
 					jadex/tools/debugger/**/*,
-					jadex/tools/appstore/*
+					jadex/tools/appstore/*,
+					jadex/tools/chat/*,
 					</excludes>
 				</configuration>
 			</plugin>

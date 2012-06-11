@@ -11,7 +11,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IMicroExternalAccess;
-import jadex.tools.daemon.gui.DaemonAgent;
 
 /**
  *  The daemon service.
@@ -49,7 +48,7 @@ public class DaemonService extends BasicService implements IDaemonService
 			@Classname("startPlatform")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)ia;
+				IPlatformController agent = (IPlatformController)ia;
 				agent.startPlatform(opt).addResultListener(new DelegationResultListener(ret));
 				return IFuture.DONE;
 			}
@@ -71,7 +70,7 @@ public class DaemonService extends BasicService implements IDaemonService
 			@Classname("shutdownPlatform")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)ia;
+				IPlatformController agent = (IPlatformController)ia;
 				agent.shutdownPlatform(cid).addResultListener(new DelegationResultListener(ret));
 				return IFuture.DONE;
 			}
@@ -93,7 +92,7 @@ public class DaemonService extends BasicService implements IDaemonService
 			@Classname("getPlatforms")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)ia;
+				IPlatformController agent = (IPlatformController)ia;
 				agent.getPlatforms().addResultListener(new DelegationResultListener(ret));
 				return IFuture.DONE;
 			}
@@ -113,7 +112,7 @@ public class DaemonService extends BasicService implements IDaemonService
 			@Classname("addChangeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)ia;
+				IPlatformController agent = (IPlatformController)ia;
 				agent.addChangeListener(listener);
 				return IFuture.DONE;
 			}
@@ -131,7 +130,7 @@ public class DaemonService extends BasicService implements IDaemonService
 			@Classname("removeChangeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)ia;
+				IPlatformController agent = (IPlatformController)ia;
 				agent.removeChangeListener(listener);
 				return IFuture.DONE;
 			}

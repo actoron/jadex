@@ -879,6 +879,7 @@
 				<module>jadex-kernel-bdi/android</module>
 				<module>jadex-kernel-bdibpmn/android</module>
 				<module>jadex-platform-standalone/android</module>
+				<module>jadex-android-runtimetools/android</module>
 			</modules>
 		</profile>
 		
@@ -964,6 +965,7 @@
 				<module>jadex-kernel-bdi/android</module>
 				<module>jadex-kernel-bdibpmn/android</module>
 				<module>jadex-platform-standalone/android</module>
+				<module>jadex-android-runtimetools/android</module>
 <!-- 				<module>docs/android/jadex-android-example-project-maven</module> -->
 			</modules>
 		</profile>

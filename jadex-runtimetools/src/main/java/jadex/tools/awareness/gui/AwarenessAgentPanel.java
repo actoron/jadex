@@ -25,6 +25,7 @@ import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.annotations.IncludeFields;
+import jadex.tools.awareness.AwarenessSettingsData;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -97,7 +98,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	protected int timerdelay;
 	
 	/** The latest settings of the agent. */
-	protected AwarenessSettings	settings;
+	protected AwarenessSettingsData	settings;
 	
 //	/** The IP address text field. */
 //	protected JTextField	tfipaddress;
@@ -585,13 +586,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	protected IFuture<Void>	refreshSettings()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		component.scheduleStep(new IComponentStep<AwarenessSettings>()
+		component.scheduleStep(new IComponentStep<AwarenessSettingsData>()
 		{
 			@Classname("refreshSettings")
-			public IFuture<AwarenessSettings> execute(IInternalAccess ia)
+			public IFuture<AwarenessSettingsData> execute(IInternalAccess ia)
 			{
 				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
-				AwarenessSettings	ret	= new AwarenessSettings();
+				AwarenessSettingsData	ret	= new AwarenessSettingsData();
 //				Object[]	ai	= agent.getAddressInfo();
 //				ret.address	= (InetAddress)ai[0];
 //				ret.port	= (Integer)ai[1];
@@ -601,11 +602,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				ret.autodelete	= agent.isAutoDeleteProxy();
 				ret.includes	= agent.getIncludes();
 				ret.excludes	= agent.getExcludes();
-				return new Future<AwarenessSettings>(ret);
+				return new Future<AwarenessSettingsData>(ret);
 			}
-		}).addResultListener(new SwingExceptionDelegationResultListener<AwarenessSettings, Void>(ret)
+		}).addResultListener(new SwingExceptionDelegationResultListener<AwarenessSettingsData, Void>(ret)
 		{
-			public void customResultAvailable(AwarenessSettings result)
+			public void customResultAvailable(AwarenessSettingsData result)
 			{
 				updateSettings(result);
 				ret.setResult(null);
@@ -712,7 +713,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		// Send remote settings.
 		try
 		{
-			final AwarenessSettings	settings	= new AwarenessSettings();	// local variable for XML transfer
+			final AwarenessSettingsData	settings	= new AwarenessSettingsData();	// local variable for XML transfer
 //			settings.address	= InetAddress.getByName(tfipaddress.getText());
 //			settings.port = Integer.parseInt(tfport.getText());
 			settings.delay = ((Number)spdelay.getValue()).longValue()*1000;
@@ -772,7 +773,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Apply settings to GUI.
 	 */
-	protected void updateSettings(AwarenessSettings settings)
+	protected void updateSettings(AwarenessSettingsData settings)
 	{
 		this.settings	= settings;
 //		tfipaddress.setText(settings.address.getHostAddress());
@@ -785,37 +786,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		excludes.setEntries(settings.excludes);		
 	}
 
-	/**
-	 *  The awareness settings transferred between GUI and agent.
-	 */
-	@IncludeFields
-	public static class AwarenessSettings
-	{
-		/** The inet address. */
-		public InetAddress address;
-		
-		/** The port. */
-		public int port;
-		
-		/** The delay. */
-		public long delay;
-		
-		/** The fast awareness flag. */
-		public boolean fast;
-		
-		/** The autocreate flag. */
-		public boolean autocreate;
-		
-		/** The autocreate flag. */
-		public boolean autodelete;
-		
-		/** The includes list. */
-		public String[]	includes;
-		
-		/** The excludes list. */
-		public String[]	excludes;
-	}
-	
 	/**
 	 *  Action to add or remote an entry to/from the includes/excludes list.
 	 */

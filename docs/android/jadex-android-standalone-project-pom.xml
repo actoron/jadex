@@ -40,6 +40,7 @@
 				<module>modules/jadex-android-kernel-bdi</module>
 				<module>modules/jadex-android-kernel-bdibpmn</module>
 				<module>modules/jadex-android-platform-standalone</module>
+				<module>modules/jadex-android-runtimetools</module>
 			</modules>
 		</profile>
 
@@ -125,6 +126,7 @@
 				<module>modules/jadex-android-kernel-bdi</module>
 				<module>modules/jadex-android-kernel-bdibpmn</module>
 				<module>modules/jadex-android-platform-standalone</module>
+				<module>modules/jadex-android-runtimetools</module>
 			</modules>
 		</profile>
 	</profiles>

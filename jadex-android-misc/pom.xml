@@ -30,6 +30,11 @@
 			<artifactId>jadex-android-tools-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+			<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-runtimetools</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

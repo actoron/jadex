@@ -811,6 +811,15 @@ public class SGUI
 		return style + font.getSize() + " " + font.getName();
 	}
 	
+	/**
+	 * Use SwingUtilities to put the given runnable in the AWT Event queue.
+	 * 
+	 * @param runnable
+	 */
+	public static void invokeLater(Runnable runnable) {
+		SwingUtilities.invokeLater(runnable);
+	}
+	
 //	/** Lookup table for divider locations (split->Integer).*/
 //	protected static Map	locations;
 //

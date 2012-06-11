@@ -26,6 +26,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.IncludeFields;
+import jadex.tools.simcenter.ClockState;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -355,73 +356,6 @@ public class SimulationSettings extends AServiceSettings {
 			ret = dateformat.format(new Date(time));
 
 		return ret;
-	}
-
-	/**
-	 * Information about the clock to be transferred.
-	 */
-	@IncludeFields
-	public static class ClockState {
-		// -------- attributes --------
-
-		/** The clock type. */
-		public String type;
-
-		/** The current time. */
-		public long time;
-
-		/** The current tick. */
-		public double tick;
-
-		/** The start time. */
-		public long starttime;
-
-		/** The clock delta. */
-		public long delta;
-
-		/** The clock dilation. */
-		public double dilation;
-
-		/** Changing clock type allowed? */
-		public boolean changeallowed;
-
-		// -------- constructors --------
-
-		/**
-		 * Bean constructor.
-		 */
-		public ClockState() {
-		}
-
-		/**
-		 * Create a clock state object.
-		 */
-		public ClockState(String type, long time, double tick, long starttime, long delta, double dilation, boolean changeallowed) {
-			this.type = type;
-			this.time = time;
-			this.tick = tick;
-			this.starttime = starttime;
-			this.delta = delta;
-			this.dilation = dilation;
-			this.changeallowed = changeallowed;
-		}
-
-		// -------- methods --------
-
-		/**
-		 * The hash code. Overridden to have only one clock state per update.
-		 */
-		public int hashCode() {
-			return 123;
-		}
-
-		/**
-		 * Test if two objects are equal. Overridden to have only one clock
-		 * state per update.
-		 */
-		public boolean equals(Object obj) {
-			return obj instanceof ClockState;
-		}
 	}
 
 	/**

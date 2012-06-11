@@ -21,6 +21,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.annotations.IncludeFields;
+import jadex.tools.awareness.AwarenessSettingsData;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -310,18 +311,18 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		cbfast.setEnabled(false);
 		
 		ThreadSuspendable sus = new ThreadSuspendable();
-		AwarenessSettingsDO settings = extAcc.scheduleStep(new IComponentStep<AwarenessSettingsDO>() {
+		AwarenessSettingsData settings = extAcc.scheduleStep(new IComponentStep<AwarenessSettingsData>() {
 			@Override
-			public IFuture<AwarenessSettingsDO> execute(IInternalAccess ia) {
+			public IFuture<AwarenessSettingsData> execute(IInternalAccess ia) {
 				AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
-				AwarenessSettingsDO ret = new AwarenessSettingsDO();
+				AwarenessSettingsData ret = new AwarenessSettingsData();
 				ret.delay = agent.getDelay();
 				ret.fast = agent.isFastAwareness();
 				ret.autocreate = agent.isAutoCreateProxy();
 				ret.autodelete = agent.isAutoDeleteProxy();
 				ret.includes = agent.getIncludes();
 				ret.excludes = agent.getExcludes();
-				return new Future<AwarenessSettingsDO>(ret);
+				return new Future<AwarenessSettingsData>(ret);
 			}
 		}).get(sus);
 
@@ -436,7 +437,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		// local variable for XML transfer
-		final AwarenessSettingsDO settings = new AwarenessSettingsDO();
+		final AwarenessSettingsData settings = new AwarenessSettingsData();
 		settings.delay = ((long) spdelay.getInt()) * 1000;
 		settings.fast = cbfast.isChecked();
 		settings.autocreate = cbautoCreate.isChecked();
@@ -476,33 +477,4 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		return true;
 	}
 
-	/**
-	 * The awareness settings transferred between GUI and agent.
-	 */
-	@IncludeFields
-	public static class AwarenessSettingsDO {
-		/** The inet address. */
-		public InetAddress address;
-
-		/** The port. */
-		public int port;
-
-		/** The delay. */
-		public long delay;
-
-		/** The fast awareness flag. */
-		public boolean fast;
-
-		/** The autocreate flag. */
-		public boolean autocreate;
-
-		/** The autocreate flag. */
-		public boolean autodelete;
-
-		/** The includes list. */
-		public String[] includes;
-
-		/** The excludes list. */
-		public String[] excludes;
-	}
 }
