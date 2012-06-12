@@ -206,13 +206,12 @@
 						
 						<!--  Sonstiges -->
 						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F10" />
-					</env:drawable3d>
+				</env:drawable3d>
+				
 					
-					<env:drawable3d objecttype="carry" width="0.1" height="0.1" depth="0.1">
-				 	<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
+				<env:drawable3d objecttype="carry" width="0.1" height="0.1" depth="0.1">
 					<env:property name="turn180" dynamic="false">new Vector3Double(0, Math.PI/2, 0)</env:property>	
 					<env:property name="rotation90" dynamic="false">new Vector3Double(0, Math.PI/188*90, 0)</env:property>	
-						<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0010" />
 						
 	
 	
@@ -220,7 +219,7 @@
 	
 		
 					
-						<env:object3d width="0.01" height="0.01" depth="0.01" x="0" y="-0.2" z="0.0" modelpath="jadex3d/models/space/misc/box/ammo.j3o" hasLightMaterials="true"> 
+					<env:object3d width="0.01" height="0.01" depth="0.01" x="0" y="-0.2" z="0.0" modelpath="jadex3d/models/space/misc/box/ammo.j3o" hasLightMaterials="true"> 
 							   <env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition> 
 						</env:object3d>
 						
