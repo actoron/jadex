@@ -547,29 +547,36 @@ public class SecurityService implements ISecurityService
 				NetworkInterface ni = nis.nextElement();
 				for(InterfaceAddress ifa: ni.getInterfaceAddresses())
 				{
-					InetAddress addr = ifa.getAddress();
-	//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
-					
-					if(addr.isLoopbackAddress())
+					if(ifa!=null)	// Yes, there may be a null in the list. grrr.
 					{
-						// ignore
-					}
-					else if(addr.isLinkLocalAddress())
-					{
-						// ignore
-					}
-					else if(addr.isSiteLocalAddress())
-					{
-						InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
-						ret.add(ad);
-					}
-					else
-					{
-						InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
-						ret.add(ad);
+						InetAddress addr = ifa.getAddress();
+		//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+						
+						if(addr.isLoopbackAddress())
+						{
+							// ignore
+						}
+						else if(addr.isLinkLocalAddress())
+						{
+							// ignore
+						}
+						else if(addr.isSiteLocalAddress())
+						{
+							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
+							ret.add(ad);
+						}
+						else
+						{
+							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
+							ret.add(ad);
+						}
 					}
 				}
 			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
 		}
 		catch(Exception e)
 		{

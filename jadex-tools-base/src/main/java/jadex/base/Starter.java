@@ -200,6 +200,15 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(String[] args)
 	{
+		// Fix below doesn't work. WLAN address is missing :-(
+//		// ANDROID: Selector.open() causes an exception in a 2.2
+//		// emulator due to IPv6 addresses, see:
+//		// http://code.google.com/p/android/issues/detail?id=9431
+//		// Also fixes Java bug on windows 7 regarding network prefix:
+//		// http://bugs.sun.com/view_bug.do?bug_id=6707289
+//		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+//		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
+
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		try
