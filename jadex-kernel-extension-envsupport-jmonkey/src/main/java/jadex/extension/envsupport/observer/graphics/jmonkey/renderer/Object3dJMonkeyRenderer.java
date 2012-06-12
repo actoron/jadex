@@ -44,6 +44,7 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		}
 		else if(cblue != 64)
 		{
+			System.out.println("cBLUE!");
 			float alpha= ((float)c.getAlpha())/255;
 			ColorRGBA color = new ColorRGBA(((float)c.getRed())/255,((float)c.getGreen())/255,((float)c.getBlue())/255, alpha);
 			mat.setColor("Color",color);
@@ -51,8 +52,8 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		}
 		else if(!vp.getCapabilities().contains("VertexTextureFetch")&&hasLight)
 		{
-			mat= new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
-			object.setMaterial(mat);
+//			mat= new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
+//			object.setMaterial(mat);
 			
 			
 //			Material mat_tt = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

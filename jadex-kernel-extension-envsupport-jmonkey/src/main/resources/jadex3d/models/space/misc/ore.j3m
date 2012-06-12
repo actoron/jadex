@@ -1,0 +1,10 @@
+Material ore : Common/MatDefs/Misc/Unshaded.j3md {
+    MaterialParameters {
+        ColorMap : Flip  jadex3d/models/space/misc/512x512_seamless_texture_11.jpg
+        GlowColor : 1.0 0.8352941 0.0 0.5
+        Color : 1.0 0.7529412 0.2901961 1.0
+    }
+
+    AdditionalRenderState {
+    }
+}

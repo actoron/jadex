@@ -85,7 +85,14 @@ public class MonkeyApp extends SimpleApplication
 		DirectionalLight sun = new DirectionalLight();
 		sun.setDirection(new Vector3f(1, 0, -2).normalizeLocal());
 		sun.setColor(ColorRGBA.White);
+		
+		DirectionalLight sun2 = new DirectionalLight();
+		sun2.setDirection(new Vector3f(-2, 0, 1).normalizeLocal());
+		sun2.setColor(ColorRGBA.White);
+		
+		
 		rootNode.addLight(sun);
+		rootNode.addLight(sun2);
 
 		initKeys();
 
