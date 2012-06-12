@@ -41,6 +41,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RelayServlet extends HttpServlet
 {
+	//-------- constants --------
+
+	/** The directory for settings and statistics. */ 
+	public final static File	SYSTEMDIR	= new File(System.getProperty("user.home"), ".relaystats");
+	
 	//-------- attributes --------
 	
 	/** The relay map (id -> queue for pending requests). */
@@ -76,6 +81,8 @@ public class RelayServlet extends HttpServlet
 		CodecFactory	cfac	= new CodecFactory();
 		codecs	= cfac.getAllCodecs();
 		defcodecs	= cfac.getDefaultCodecs();
+		
+		System.out.println("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
 	}
 	
 	/**

@@ -13,6 +13,12 @@
 		envsupport applications.
 	</description>
 
+	<properties>
+		<!-- <jmonkey.version>3.0.0.20120512-SNAPSHOT</jmonkey.version> -->
+		<jmonkey.version>[3.0.0-SNAPSHOT,)</jmonkey.version>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+	</properties>
+
 	<licenses>
 		<license>
 			<name>LGPL License</name>
@@ -73,14 +79,7 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<!-- <parent> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-settings</artifactId> 
-		<version>${jadexVersion}</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
-		</parent> -->
-
-	<properties>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-	</properties>
-
+	
 	<build>
 		<resources>
 			<resource>
@@ -158,102 +157,101 @@
 			<id>sonatype-public</id>
 			<name>sonatype public</name>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
-			<snapshots>true</snapshots>
 		</repository>
 	</repositories>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>jmonkeyengine3</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>jME3-core</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
 		</dependency>
 			
 		<dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jME3-terrain</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
         </dependency> 
 
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>jME3-lwjgl</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>jME3-lwjgl-natives</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>lwjgl</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		
         <dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jME3-blender</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
             <scope>runtime</scope>
         </dependency>    
                
         <dependency>
            	<groupId>com.jme3</groupId>
            	<artifactId>jME3-desktop</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
         </dependency>  
                  
         <dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jME3-plugins</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
             <scope>runtime</scope>
-        </dependency>   
+        </dependency>
         
         <!-- todo: remove!? -->
        <dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jME3-testdata</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
             <scope>runtime</scope>
        </dependency>
        
        <dependency>
              <groupId>com.jme3</groupId>
              <artifactId>jME3-jogg</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
+			<version>${jmonkey.version}</version>
              <scope>runtime</scope>
        </dependency>      
             
        <dependency>
-             <groupId>com.jme3</groupId>
-             <artifactId>j-ogg-oggd</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
-             <scope>runtime</scope>
+            <groupId>com.jme3</groupId>
+            <artifactId>j-ogg-oggd</artifactId>
+			<version>${jmonkey.version}</version>
+            <scope>runtime</scope>
        </dependency>  
                 
        <dependency>
-             <groupId>com.jme3</groupId>
-             <artifactId>j-ogg-vorbisd</artifactId>
-			<version>[3.0.0-SNAPSHOT,]</version>
-             <scope>runtime</scope>
-      </dependency>  
+            <groupId>com.jme3</groupId>
+            <artifactId>j-ogg-vorbisd</artifactId>
+			<version>${jmonkey.version}</version>
+            <scope>runtime</scope>
+      </dependency> 
 
 		<!-- Provided scope for jadex dependencies to exclude them from addon.zip.  -->
-		
+
        <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-javaparser</artifactId>
@@ -274,6 +272,7 @@
 			<version>2.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 	</dependencies>
+	
 </project>

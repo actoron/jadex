@@ -165,8 +165,7 @@ public class GeoIPService
 				{
 					lastupdate	= update;
 					
-					String	systemdir	= new File(System.getProperty("user.home"), ".relaystats").getAbsolutePath();
-					File	dbfile	= new File(systemdir, "GeoLiteCity.dat");
+					File	dbfile	= new File(RelayServlet.SYSTEMDIR, "GeoLiteCity.dat");
 					
 					try
 					{

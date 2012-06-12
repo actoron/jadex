@@ -2,7 +2,6 @@ package jadex.base.relay;
 
 import jadex.bridge.ComponentIdentifier;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -52,9 +51,7 @@ public class StatsDB
 		try
 		{
 			// Set up derby and create a database connection
-			String	systemdir	= new File(System.getProperty("user.home"), ".relaystats").getAbsolutePath();
-			System.out.println("Storing relay stats in: "+systemdir);
-			System.setProperty("derby.system.home", systemdir);		
+			System.setProperty("derby.system.home", RelayServlet.SYSTEMDIR.getAbsolutePath());		
 			// New instance required in case derby is reloaded in same VM (e.g. servlet container).
 			Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
 			con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
@@ -305,7 +302,7 @@ public class StatsDB
 		
 		for(int i=1; i<5; i++)
 		{
-			PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
+			/*PlatformInfo	pi	=*/ new PlatformInfo("somid"+i, "hostip", "somename", "prot");
 		}
 //		printPlatformInfos(db.getAllPlatformInfos());
 		
