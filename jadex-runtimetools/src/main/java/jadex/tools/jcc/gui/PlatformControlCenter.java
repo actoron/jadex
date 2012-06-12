@@ -630,6 +630,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					public void customResultAvailable(ClassLoader cl)
 					{
 						List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
+						List<Object[]> create = new ArrayList<Object[]>();
 						for(int i=0; i<ps.length; i++)
 						{
 							IControlCenterPlugin plg = getPluginForName(ps[i].getType());
@@ -647,12 +648,15 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 									plg = addPlugin(ps[i].getName(), cl);
 									if(plg!=null)
 									{
+										newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
 										toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
 									}
+									create.add(new Object[]{ps[i].getName(), i});
 								}
 							}
 						}
 						plugins = newpls;
+						
 						pccpanel.updateToolBar(null);
 					}
 				});

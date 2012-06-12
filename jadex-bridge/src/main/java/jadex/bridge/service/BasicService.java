@@ -25,13 +25,13 @@ public class BasicService implements IInternalService
 	
 	/** Default service timeout. */
 	// Hack!!! field to be set by starter and read by Timeout annotation
-	public static long	DEFTIMEOUT	= 30000;
+//	public static long	DEFTIMEOUT	= 30000;
 	
 	/** Constant for remote default timeout. */
-	public static final long DEFAULT_REMOTE = BasicService.DEFTIMEOUT;
+	public static long DEFAULT_REMOTE = 30000;//BasicService.DEFTIMEOUT;
 
 	/** Constant for local default timeout. */
-	public static final long DEFAULT_LOCAL = BasicService.DEFTIMEOUT;
+	public static long DEFAULT_LOCAL = 30000;//BasicService.DEFTIMEOUT;
 	
 	//-------- attributes --------
 

@@ -192,7 +192,7 @@ public class ServicePoolManager
 		// Find new available service(s).
 		if(!searching)
 		{
-			System.out.println("searching services");			
+//			System.out.println("searching services");			
 			searching	= true;
 			
 //			System.out.println("wurksn0");

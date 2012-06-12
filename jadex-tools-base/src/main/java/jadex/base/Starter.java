@@ -246,7 +246,11 @@ public class Starter
 				else if(DEFTIMEOUT.equals(key))
 				{
 					val = SJavaParser.evaluateExpression(args[i+1], null);
-					BasicService.DEFTIMEOUT	= ((Number)val).longValue();
+//					BasicService.DEFTIMEOUT	= ((Number)val).longValue();
+					long to	= ((Number)val).longValue();
+					BasicService.DEFAULT_LOCAL = to;
+					BasicService.DEFAULT_REMOTE = to;
+//					System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
 				}
 				else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
 				{
