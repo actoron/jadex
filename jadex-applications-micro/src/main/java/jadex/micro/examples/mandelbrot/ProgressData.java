@@ -30,6 +30,9 @@ public class ProgressData
 	/** The state (finished or not). */
 	protected boolean finished;
 	
+	/** The display id. */
+	protected String displayid;
+	
 	//-------- constructors --------
 	
 	/**
@@ -42,7 +45,8 @@ public class ProgressData
 	/**
 	 *  Create a new ProgressData.
 	 */
-	public ProgressData(IComponentIdentifier providerid, Object taskid, Rectangle area, boolean finished, int imagewidth, int imageheight)
+	public ProgressData(IComponentIdentifier providerid, Object taskid, Rectangle area, boolean finished, 
+		int imagewidth, int imageheight, String displayid)
 	{
 		this.providerid	= providerid;
 		this.taskid	= taskid;
@@ -50,6 +54,7 @@ public class ProgressData
 		this.finished	= finished;
 		this.imagewidth = imagewidth;
 		this.imageheight = imageheight;
+		this.displayid = displayid;
 	}
 	
 	//-------- methods --------
@@ -152,6 +157,24 @@ public class ProgressData
 	public void setImageHeight(int imageheight)
 	{
 		this.imageheight = imageheight;
+	}
+
+	/**
+	 *  Get the displayid.
+	 *  @return the displayid.
+	 */
+	public String getDisplayId()
+	{
+		return displayid;
+	}
+
+	/**
+	 *  Set the displayid.
+	 *  @param displayid The displayid to set.
+	 */
+	public void setDisplayId(String displayid)
+	{
+		this.displayid = displayid;
 	}
 
 	/**

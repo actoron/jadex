@@ -88,7 +88,7 @@ public class GenerateService implements IGenerateService
 						final IDisplayService	ds	= (IDisplayService)result;
 						final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
 							new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
-							false, data.getSizeX(), data.getSizeY());
+							false, data.getSizeX(), data.getSizeY(), ad.getDisplayId());
 						ds.displayIntermediateResult(pd).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
@@ -269,7 +269,7 @@ public class GenerateService implements IGenerateService
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
 				areas.add(new AreaData(xstart, xend, ystart, yend,
 					data.getSizeX()-restx, data.getSizeY()-resty, sizex, sizey,
-					data.getMax(), 0, 0, data.getAlgorithm(), null, null));
+					data.getMax(), 0, 0, data.getAlgorithm(), null, null, data.getDisplayId()));
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				restx	-= sizex;
 			}

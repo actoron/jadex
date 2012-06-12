@@ -42,7 +42,7 @@ public class MandelbrotPanel extends JPanel implements IAppGui
 		this.agent = agent;
 		this.service = (IMandelbrotService)service;
 		
-		dispanel = new DisplayPanel(agent);
+		dispanel = new DisplayPanel(agent, this.service);
 		
 		this.add(dispanel, BorderLayout.CENTER);
 		return IFuture.DONE;

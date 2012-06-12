@@ -6,6 +6,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
@@ -27,9 +29,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.swing.JComponent;
 import javax.swing.JProgressBar;
@@ -55,6 +59,9 @@ public class DisplayPanel extends JComponent
 	
 	/** The service provider. */
 	protected IExternalAccess agent;
+	
+	/** The mandelbrot service. */
+	protected IMandelbrotService manservice;
 	
 	/** The colors for drawing. */
 	protected Color[]	colors;
@@ -85,171 +92,212 @@ public class DisplayPanel extends JComponent
 	
 	/** End point for dragging (if any). */
 	protected Point	enddrag;
+	
+	/** The display id. */
+	protected String displayid;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new display panel.
 	 */
-	public DisplayPanel(final IExternalAccess agent)
+	public DisplayPanel(final IExternalAccess agent, IMandelbrotService manservice)
 	{
 		this.agent	= agent;
-		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red}, true);
-		calcDefaultImage();
+		this.manservice = manservice;
+		this.displayid = ""+UUID.randomUUID();
 		
-		// Dragging with right mouse button.
-		MouseAdapter draghandler = new MouseAdapter()
+		manservice.getDisplayService().addResultListener(new SwingDefaultResultListener<IDisplayService>()
 		{
-			public void mousePressed(MouseEvent e)
+			public void customResultAvailable(IDisplayService result)
 			{
-				if(!calculating && e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1 && image!=null)
+				ISubscriptionIntermediateFuture<Object> sub = result.subscribeToDisplayUpdates(displayid);
+				sub.addResultListener(new IIntermediateResultListener<Object>()
 				{
-					startdrag = new Point(e.getX(), e.getY());
-					range	= null;
-					point	= null;
-				}
-				else
-				{
-					startdrag	= null;
-				}
-			}
-			
-			public void mouseDragged(MouseEvent e)
-			{
-				if(startdrag!=null)
-				{
-					enddrag = new Point(e.getX(), e.getY());
-					repaint();
-				}
-			}
-			
-			public void mouseReleased(MouseEvent e)
-			{
-				if(startdrag!=null && enddrag!=null)
-				{
-//					System.out.println("dragged: "+startdrag+" "+enddrag);
-					dragImage();
-				}
-			}
-		};
-		addMouseMotionListener(draghandler);
-		addMouseListener(draghandler);
-				
-		// Zooming with mouse wheel.
-		addMouseWheelListener(new MouseAdapter()
-		{
-			public void mouseWheelMoved(MouseWheelEvent e)
-			{
-				if(!calculating)
-				{
-					int sa = e.getScrollAmount();
-					double	dir = Math.signum(e.getWheelRotation());
-					double	percent	= 10*sa;
-					double	factor;
-					if(dir>0)
+					public void resultAvailable(Collection<Object> result)
 					{
-						factor	= (100+percent)/100;
 					}
-					else
-					{
-						factor	= 100/(100+percent);
-					}
-					zoomImage(e.getX(), e.getY(), factor);
-				}
-			}
-		});
-		
-		// Selecting range and default area.
-		addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if(SwingUtilities.isRightMouseButton(e))
-				{
-					calcDefaultImage();
-				}
-				
-				else if(!calculating && range!=null)
-				{
-					if(e.getX()>=range.x && e.getX()<=range.x+range.width
-						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
-					{
-						zoomIntoRange();
-					}
-				}
-			}
-			
-			public void mousePressed(MouseEvent e)
-			{
-				if(!calculating)
-				{
-					if(SwingUtilities.isRightMouseButton(e))
-					{
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					}
-					else
-					{
-						point	= e.getPoint();
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-					}
-				}
-			}
-			
-			public void mouseReleased(MouseEvent e)
-			{
-				if(!calculating)
-				{
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				}
-			}
-		});
-		addMouseMotionListener(new MouseAdapter()
-		{
-			public void mouseMoved(MouseEvent e)
-			{
-				if(!calculating && range!=null)
-				{
-					if(e.getX()>=range.x && e.getX()<=range.x+range.width
-						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
-					{
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					}
-					else
-					{
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
-					}
-				}
-			}
-			
-			public void mouseDragged(MouseEvent e)
-			{
-				if(!calculating && point!=null)
-				{
-					range	= new Rectangle(
-						point.x<e.getX() ? point.x : e.getX(),
-						point.y<e.getY() ? point.y : e.getY(),
-						Math.abs(point.x-e.getX()), Math.abs(point.y-e.getY()));
 					
-					repaint();
-				}
-			}
-		});
-		
-		// ESC stops dragging / range selection
-		setFocusable(true);
-		addKeyListener(new KeyAdapter()
-		{
-			public void keyPressed(KeyEvent e)
-			{
-				if(e.getKeyCode()==KeyEvent.VK_ESCAPE)
+					public void intermediateResultAvailable(Object result)
+					{
+						if(result instanceof AreaData)
+						{
+							setResults((AreaData)result);
+						}
+						else if(result instanceof ProgressData)
+						{
+							addProgress((ProgressData)result);
+						}
+					}
+					
+					public void finished()
+					{
+						// todo: close
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+				
+				setColorScheme(new Color[]{new Color(50, 100, 0), Color.red}, true);
+				calcDefaultImage();
+				
+				// Dragging with right mouse button.
+				MouseAdapter draghandler = new MouseAdapter()
 				{
-					range	= null;
-					point	= null;
-					startdrag	= null;
-					enddrag	= null;
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
-					repaint();
-				}
+					public void mousePressed(MouseEvent e)
+					{
+						if(!calculating && e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1 && image!=null)
+						{
+							startdrag = new Point(e.getX(), e.getY());
+							range	= null;
+							point	= null;
+						}
+						else
+						{
+							startdrag	= null;
+						}
+					}
+					
+					public void mouseDragged(MouseEvent e)
+					{
+						if(startdrag!=null)
+						{
+							enddrag = new Point(e.getX(), e.getY());
+							repaint();
+						}
+					}
+					
+					public void mouseReleased(MouseEvent e)
+					{
+						if(startdrag!=null && enddrag!=null)
+						{
+//							System.out.println("dragged: "+startdrag+" "+enddrag);
+							dragImage();
+						}
+					}
+				};
+				addMouseMotionListener(draghandler);
+				addMouseListener(draghandler);
+						
+				// Zooming with mouse wheel.
+				addMouseWheelListener(new MouseAdapter()
+				{
+					public void mouseWheelMoved(MouseWheelEvent e)
+					{
+						if(!calculating)
+						{
+							int sa = e.getScrollAmount();
+							double	dir = Math.signum(e.getWheelRotation());
+							double	percent	= 10*sa;
+							double	factor;
+							if(dir>0)
+							{
+								factor	= (100+percent)/100;
+							}
+							else
+							{
+								factor	= 100/(100+percent);
+							}
+							zoomImage(e.getX(), e.getY(), factor);
+						}
+					}
+				});
+				
+				// Selecting range and default area.
+				addMouseListener(new MouseAdapter()
+				{
+					public void mouseClicked(MouseEvent e)
+					{
+						if(SwingUtilities.isRightMouseButton(e))
+						{
+							calcDefaultImage();
+						}
+						
+						else if(!calculating && range!=null)
+						{
+							if(e.getX()>=range.x && e.getX()<=range.x+range.width
+								&& e.getY()>=range.y && e.getY()<=range.y+range.height)
+							{
+								zoomIntoRange();
+							}
+						}
+					}
+					
+					public void mousePressed(MouseEvent e)
+					{
+						if(!calculating)
+						{
+							if(SwingUtilities.isRightMouseButton(e))
+							{
+								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+							}
+							else
+							{
+								point	= e.getPoint();
+								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+							}
+						}
+					}
+					
+					public void mouseReleased(MouseEvent e)
+					{
+						if(!calculating)
+						{
+							DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						}
+					}
+				});
+				addMouseMotionListener(new MouseAdapter()
+				{
+					public void mouseMoved(MouseEvent e)
+					{
+						if(!calculating && range!=null)
+						{
+							if(e.getX()>=range.x && e.getX()<=range.x+range.width
+								&& e.getY()>=range.y && e.getY()<=range.y+range.height)
+							{
+								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+							}
+							else
+							{
+								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
+							}
+						}
+					}
+					
+					public void mouseDragged(MouseEvent e)
+					{
+						if(!calculating && point!=null)
+						{
+							range	= new Rectangle(
+								point.x<e.getX() ? point.x : e.getX(),
+								point.y<e.getY() ? point.y : e.getY(),
+								Math.abs(point.x-e.getX()), Math.abs(point.y-e.getY()));
+							
+							repaint();
+						}
+					}
+				});
+				
+				// ESC stops dragging / range selection
+				setFocusable(true);
+				addKeyListener(new KeyAdapter()
+				{
+					public void keyPressed(KeyEvent e)
+					{
+						if(e.getKeyCode()==KeyEvent.VK_ESCAPE)
+						{
+							range	= null;
+							point	= null;
+							startdrag	= null;
+							enddrag	= null;
+							DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
+							repaint();
+						}
+					}
+				});
 			}
 		});
 	}
@@ -338,7 +386,9 @@ public class DisplayPanel extends JComponent
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
+										// do not depend on hosting component!
+//										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
+										IFuture<IComponentManagementService>	fut	= SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IComponentManagementService.class);
 										fut.addResultListener(new SwingResultListener<IComponentManagementService>()
 										{
 											public void customResultAvailable(IComponentManagementService cms)
@@ -846,8 +896,14 @@ public class DisplayPanel extends JComponent
 		final Rectangle	bounds	= getInnerBounds(false);
 		double	rratio	= (double)settings.getSizeX()/settings.getSizeY();
 		double	bratio	= (double)bounds.width/bounds.height;
+		
 		// Calculate pixel width/height of area.
-		if(rratio<bratio)
+		if(bounds.width==0 || bounds.height==0)
+		{
+			bounds.width	= settings.getSizeX();
+			bounds.height	= settings.getSizeY();
+		}
+		else if(rratio<bratio)
 		{
 			int	width	= (int)(bounds.height*rratio);
 			bounds.width	= width;
@@ -857,11 +913,7 @@ public class DisplayPanel extends JComponent
 			int	height	= (int)(bounds.width/rratio);
 			bounds.height	= height;
 		}
-		else if(bounds.width==0 || bounds.height==0)
-		{
-			bounds.width	= settings.getSizeX();
-			bounds.height	= settings.getSizeY();
-		}
+		
 		
 		// Clear image for painting only background.
 		DisplayPanel.this.image	= createImage(bounds.width, bounds.height);
@@ -917,46 +969,81 @@ public class DisplayPanel extends JComponent
 			settings	= data;
 		
 		final AreaData ad	= new AreaData(x1, x2, y1, y2, sizex, sizey,
-			settings.getMax(), settings.getParallel(), settings.getTaskSize(), settings.getAlgorithm());
+			settings.getMax(), settings.getParallel(), settings.getTaskSize(), settings.getAlgorithm(), displayid);
 		
 		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		calculating	= true;
 		repaint();
 		
-		agent.scheduleStep(new IComponentStep<Void>()
+		if(manservice!=null)
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			manservice.getGenerateService()
+				.addResultListener(new SwingResultListener<IGenerateService>()
 			{
-				ia.getServiceContainer().getRequiredService("generateservice")
-					.addResultListener(new SwingResultListener<Object>()
+				public void customResultAvailable(IGenerateService gs)
 				{
-					public void customResultAvailable(Object result)
+	//				IGenerateService	gs	= (IGenerateService)result;
+					gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
 					{
-						IGenerateService	gs	= (IGenerateService)result;
-						gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
+						public void customResultAvailable(AreaData result)
 						{
-							public void customResultAvailable(AreaData result)
-							{
-								DisplayPanel.this.setResults(result);
-							}
-							public void customExceptionOccurred(Exception exception)
-							{
-								calculating	= false;
-								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-								super.customExceptionOccurred(exception);
-							}
-						});
-					}
-					
-					public void customExceptionOccurred(Exception exception)
+							DisplayPanel.this.setResults(result);
+						}
+						public void customExceptionOccurred(Exception exception)
+						{
+							calculating	= false;
+							DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+							super.customExceptionOccurred(exception);
+						}
+					});
+				}
+				
+				public void customExceptionOccurred(Exception exception)
+				{
+					// Service not found -> ignore
+					calculating	= false;
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
+				}
+			});
+		}
+		else
+		{
+			agent.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					ia.getServiceContainer().getRequiredService("generateservice")
+						.addResultListener(new SwingResultListener<Object>()
 					{
-						// Service not found -> ignore
-						calculating	= false;
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
+						public void customResultAvailable(Object result)
+						{
+							IGenerateService	gs	= (IGenerateService)result;
+							gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
+							{
+								public void customResultAvailable(AreaData result)
+								{
+									DisplayPanel.this.setResults(result);
+								}
+								public void customExceptionOccurred(Exception exception)
+								{
+									calculating	= false;
+									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									super.customExceptionOccurred(exception);
+								}
+							});
+						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
+							// Service not found -> ignore
+							calculating	= false;
+							DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
+						}
+					});
+					return IFuture.DONE;
+				}
+			});
+		}
 	}
+	
 }

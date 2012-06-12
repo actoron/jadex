@@ -333,33 +333,37 @@ public class AppStorePanel extends JPanel
 									final IService appser = (IService)result;
 									Map<String, Object> props = appser.getPropertyMap();
 									Class<?> guiclass = (Class<?>)props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+									JFrame fr;
 									try
 									{
 										final IAppGui gui = (IAppGui)guiclass.newInstance();
+										if(gui instanceof JFrame)
+										{
+											fr = (JFrame)gui;
+											fr.setLocation(SGUI.calculateMiddlePosition(fr));
+											fr.pack();
+											fr.setVisible(true);
+										}
+										else if(gui instanceof JComponent)
+										{	
+											fr = new JFrame();
+											fr.setLayout(new BorderLayout());
+											fr.add((JComponent)gui, BorderLayout.CENTER);
+//											fr.add(new JButton("a"), BorderLayout.SOUTH);
+											fr.setLocation(SGUI.calculateMiddlePosition(fr));
+											fr.pack();
+//											fr.setSize(400, 200);
+											fr.setVisible(true);
+										}
+										else
+										{
+											System.out.println("Unknown gui type: "+gui);
+										}
 										gui.init(access, appser).addResultListener(new SwingDefaultResultListener<Void>()
 										{
 											public void customResultAvailable(Void result)
 											{
-												JFrame fr;
-												if(gui instanceof JFrame)
-												{
-													fr = (JFrame)gui;
-													fr.setLocation(SGUI.calculateMiddlePosition(fr));
-													fr.pack();
-													fr.setVisible(true);
-												}
-												else if(gui instanceof JComponent)
-												{	
-													fr = new JFrame();
-													fr.add((JComponent)gui, BorderLayout.CENTER);
-													fr.setLocation(SGUI.calculateMiddlePosition(fr));
-													fr.pack();
-													fr.setVisible(true);
-												}
-												else
-												{
-													System.out.println("Unknown gui type: "+gui);
-												}
+												
 											}
 										});
 									}

@@ -9,6 +9,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
@@ -41,7 +42,8 @@ import javax.swing.SwingUtilities;
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
 	@RequiredService(name="progressservice", type=IProgressService.class),
-	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="cmsservice", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })
 public class DisplayAgent extends MicroAgent
 {
@@ -60,15 +62,16 @@ public class DisplayAgent extends MicroAgent
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Hack!!! Swing code not on swing thread!?
-		DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess());
-
-//		addService(new DisplayService(this));
-		
-		final IExternalAccess	access	= getExternalAccess();
-		SwingUtilities.invokeLater(new Runnable()
+		IFuture<IMandelbrotService> fut = getRequiredService("mandelservice");
+		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
 		{
-			public void run()
+			public void customResultAvailable(IMandelbrotService result)
 			{
+				DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess(), result);
+
+//				addService(new DisplayService(this));
+				
+				final IExternalAccess	access	= getExternalAccess();
 				final JFrame	frame	= new JFrame(getAgentName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 

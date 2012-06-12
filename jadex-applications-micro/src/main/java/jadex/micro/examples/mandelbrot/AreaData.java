@@ -51,6 +51,9 @@ public class AreaData
 	/** The result data. */
 	protected short[][]	data;
 	
+	/** The display id. */
+	protected String displayid;
+	
 	/**
 	 *  Create an empty area data.
 	 */
@@ -63,17 +66,17 @@ public class AreaData
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm)
+		int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm, String displayid)
 	{
-		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, par, tasksize, algorithm, null, null);
+		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, par, tasksize, algorithm, null, null, displayid);
 	}
 
 	/**
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int xoff, int yoff, int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm,
-			IComponentIdentifier cid, short[][] data)
+		int xoff, int yoff, int sizex, int sizey, short max, int par, int tasksize, IFractalAlgorithm algorithm,
+		IComponentIdentifier cid, short[][] data, String displayid)
 	{
 		this.xstart = xstart;
 		this.xend = xend;
@@ -89,6 +92,7 @@ public class AreaData
 		this.algorithm = algorithm;
 		this.cid = cid;
 		this.data = data;
+		this.displayid = displayid;
 	}
 
 	/**
@@ -396,11 +400,32 @@ public class AreaData
 		this.algorithm	= algorithm;
 	}
 
+	/**
+	 *  Get the string representation.
+	 */
 	public String toString()
 	{
 		return "AreaData(x="+xoff+", y="+yoff+")";
 	}
 	
+	/**
+	 *  Get the displayid.
+	 *  @return the displayid.
+	 */
+	public String getDisplayId()
+	{
+		return displayid;
+	}
+
+	/**
+	 *  Set the displayid.
+	 *  @param displayid The displayid to set.
+	 */
+	public void setDisplayId(String displayid)
+	{
+		this.displayid = displayid;
+	}
+
 	/**
 	 *	Value for identifying this area data. 
 	 */

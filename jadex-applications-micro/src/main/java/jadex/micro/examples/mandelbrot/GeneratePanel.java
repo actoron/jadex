@@ -98,7 +98,7 @@ public class GeneratePanel extends JPanel
 								{
 									IGenerateService gs = (IGenerateService)result;
 									
-									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize, algorithm);
+									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize, algorithm, null);
 									gs.generateArea(ad).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)

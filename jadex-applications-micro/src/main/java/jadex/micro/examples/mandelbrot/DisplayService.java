@@ -3,6 +3,12 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  The service allows displaying results in the frame
@@ -17,6 +23,9 @@ public class DisplayService implements IDisplayService
 	@ServiceComponent
 	protected DisplayAgent agent;
 	
+	/** The display subscribers. */
+	protected Map<String, SubscriptionIntermediateFuture<Object>> subscribers = new HashMap<String, SubscriptionIntermediateFuture<Object>>();
+
 	//-------- IDisplayService interface --------
 
 	/**
@@ -25,7 +34,22 @@ public class DisplayService implements IDisplayService
 	public IFuture<Void> displayResult(AreaData result)
 	{
 //		System.out.println("displayRes");
-		agent.getPanel().setResults(result);
+//		agent.getPanel().setResults(result);
+		String id = result.getDisplayId();
+		if(id!=null)
+		{
+			SubscriptionIntermediateFuture<Object> sub = subscribers.get(id);
+			sub.addIntermediateResult(result);
+		}
+		else
+		{
+			// todo: use default display
+			for(Iterator<SubscriptionIntermediateFuture<Object>> it=subscribers.values().iterator(); it.hasNext(); )
+			{
+				SubscriptionIntermediateFuture<Object> sub = it.next();
+				sub.addIntermediateResult(result);
+			}
+		}
 		return IFuture.DONE;
 	}
 
@@ -36,7 +60,33 @@ public class DisplayService implements IDisplayService
 	public IFuture<Void> displayIntermediateResult(ProgressData progress)
 	{
 //		System.out.println("displayInRes");
-		agent.getPanel().addProgress(progress);
+//		agent.getPanel().addProgress(progress);
+		String id = progress.getDisplayId();
+		if(id!=null)
+		{
+			SubscriptionIntermediateFuture<Object> sub = subscribers.get(id);
+			sub.addIntermediateResult(progress);
+		}
+		else
+		{
+			// todo: use default display
+			for(Iterator<SubscriptionIntermediateFuture<Object>> it=subscribers.values().iterator(); it.hasNext(); )
+			{
+				SubscriptionIntermediateFuture<Object> sub = it.next();
+				sub.addIntermediateResult(progress);
+			}
+		}
+		
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Subscribe to display events.
+	 */
+	public ISubscriptionIntermediateFuture<Object> subscribeToDisplayUpdates(String displayid)
+	{
+		SubscriptionIntermediateFuture<Object> ret = new SubscriptionIntermediateFuture<Object>();
+		subscribers.put(displayid, ret);
+		return ret;
 	}
 }

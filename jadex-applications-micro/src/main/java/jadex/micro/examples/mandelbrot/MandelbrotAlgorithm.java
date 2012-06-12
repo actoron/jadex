@@ -48,7 +48,7 @@ public class MandelbrotAlgorithm implements IFractalAlgorithm
 	 */
 	public AreaData	getDefaultSettings()
 	{
-		return new AreaData(-2, 1, -1.5, 1.5, 100, 100, (short)256, 10, 300, this);
+		return new AreaData(-2, 1, -1.5, 1.5, 100, 100, (short)256, 10, 300, this, null);
 	}
 	
 	/**

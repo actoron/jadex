@@ -49,7 +49,7 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	 */
 	public AreaData	getDefaultSettings()
 	{
-		return new AreaData(1.7, 4, 2.7, 4.2, 230, 150, (short)160, 10, 300, this);
+		return new AreaData(1.7, 4, 2.7, 4.2, 230, 150, (short)160, 10, 300, this, null);
 	}
 
 	/**
