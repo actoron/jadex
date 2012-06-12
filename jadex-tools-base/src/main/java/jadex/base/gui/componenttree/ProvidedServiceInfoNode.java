@@ -7,11 +7,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

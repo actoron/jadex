@@ -47,7 +47,7 @@ public class ServiceIdFilter implements IRemoteFilter
 	 *  Set the id.
 	 *  @param id The id to set.
 	 */
-	public void setId(Class sid)
+	public void setId(Object sid)
 	{
 		this.sid = sid;
 	}

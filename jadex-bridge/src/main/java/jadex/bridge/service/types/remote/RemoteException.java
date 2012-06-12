@@ -19,8 +19,6 @@ public class RemoteException extends RuntimeException
 	public RemoteException(Class<?> type, String message)
 	{
 		super(message);
-		if(type.equals(RemoteException.class))
-			System.out.println("gurke");
 		this.type	= type;
 	}
 	

@@ -278,36 +278,33 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(IServiceProvider provider, final IServiceIdentifier sid)
 	{
-//		synchronized(profiling)
-//		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-		
-		try
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
-			provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
-				getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), new IdResultSelector(sid))
-				.addResultListener(new DelegationResultListener(ret)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				public void customResultAvailable(Object result)
+				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
-					Collection res = (Collection)result;
-					if(res==null || res.size()==0)
-						exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
-					else
-						super.customResultAvailable(res.iterator().next());
-				}
-			});
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
+					public void customResultAvailable(IExternalAccess ea)
+					{
+						ea.getServiceProvider().getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_LOCAL),
+							getVisitDecider(true, RequiredServiceInfo.SCOPE_LOCAL), new IdResultSelector(sid))
+							.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
+						{
+							public void customResultAvailable(Collection<IService> res)
+							{
+								if(res==null || res.size()==0)
+									exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
+								else
+									ret.setResult((T)res.iterator().next());
+							}
+						});
+					}
+				});
+			}
+		});
 		
 		return ret;
 	}

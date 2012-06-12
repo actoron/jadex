@@ -133,15 +133,7 @@ public class BinarySerializer
 	public static Object objectFromByteArray(byte[] val, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader)
 	{
 		DecodingContext context = new DecodingContext(val, postprocessors, usercontext, classloader);
-		try
-		{
-			return decodeObject(context);
-		}
-		catch (Exception e)
-		{
-//			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		return decodeObject(context);
 	}
 	
 	/**

@@ -23,7 +23,7 @@ import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -89,7 +90,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	protected Properties	props;
 	
 	/** The active component node viewable state. */
-	protected Map viewables;
+	protected Map<Object, IFuture<Boolean>> viewables;
 	
 	//-------- constructors --------
 	
@@ -99,7 +100,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	public ComponentViewerPlugin()
 	{
 		this.panels	= new HashMap();
-		this.viewables = Collections.synchronizedMap(new HashMap());
+		this.viewables = Collections.synchronizedMap(new HashMap<Object, IFuture<Boolean>>());
 	}
 	
 	//-------- IControlCenterPlugin interface --------
@@ -512,37 +513,41 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 */
 	protected boolean isNodeViewable(final ITreeNode node)
 	{
-//		System.out.println("called isVis: "+node.getId());
+		assert SwingUtilities.isEventDispatchThread();
+		
+//		if(node.getId().toString().indexOf("SecurityService")!=-1)
+//			System.out.println("called isVis: "+node.getId());
 		boolean ret = false;
 		if(node instanceof ProvidedServiceInfoNode)
 		{
 			final IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
 			if(sid!=null)
 			{
-				Boolean viewable = (Boolean)viewables.get(sid);
+				IFuture<Boolean> viewable = viewables.get(sid);
 				if(viewable!=null)
 				{
-					ret = viewable.booleanValue();
-//					System.out.println("isVis result: "+node.getId()+" "+ret);
+					if(viewable.isDone() && viewable.getException()==null)
+					{
+						ret = viewable.get(null).booleanValue();
+//						System.out.println("isVis result: "+node.getId()+" "+ret);
+					}
 				}
 				else
 				{
+					final Future<Boolean>	fut	= new Future<Boolean>();
+					viewables.put(sid, fut);
+					final long start	= System.currentTimeMillis();
 					// Unknown -> start search to find out asynchronously
 					SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), sid)
-						.addResultListener(new SwingDefaultResultListener()
+						.addResultListener(new SwingExceptionDelegationResultListener<Object, Boolean>(fut)
 					{
 						public void customResultAvailable(Object result)
 						{
 							IService service = (IService)result;
 							Map	props = service.getPropertyMap();
 							boolean vis = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
-							viewables.put(sid, vis? Boolean.TRUE: Boolean.FALSE);
-//							System.out.println("isVis first res: "+viewables.get(sid));
+							fut.setResult(vis? Boolean.TRUE: Boolean.FALSE);
 							node.refresh(false);
-						}
-						public void customExceptionOccurred(Exception exception)
-						{
-							// ignore
 						}
 					});
 				}
@@ -560,55 +565,42 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			// todo: how to initiate a repaint in case the the cid is null
 			if(cid!=null)
 			{
-				Boolean viewable = (Boolean)viewables.get(cid);
+				IFuture<Boolean> viewable = viewables.get(cid);
 				if(viewable!=null)
 				{
-					ret = viewable.booleanValue();
-//					System.out.println("isVis result: "+node.getId()+" "+ret);
+					if(viewable.isDone() && viewable.getException()==null)
+					{
+						ret = viewable.get(null).booleanValue();
+//						System.out.println("isVis result: "+node.getId()+" "+ret);
+					}
 				}
 				else
 				{
+					final Future<Boolean>	fut	= new Future<Boolean>();
+					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
 					SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new SwingResultListener()
+						.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Boolean>(fut)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(final IComponentManagementService cms)
 						{
-							final IComponentManagementService cms = (IComponentManagementService)result;
-							
-							cms.getExternalAccess(cid).addResultListener(new SwingResultListener()
+							cms.getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(final IExternalAccess exta)
 								{
-									final IExternalAccess exta = (IExternalAccess)result;
 									getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
-										.addResultListener(new SwingResultListener<ClassLoader>()
+										.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{
 											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
+											fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
 //											System.out.println("isVis first res: "+viewables.get(cid));
 											node.refresh(false);
 										}
-										public void customExceptionOccurred(Exception exception)
-										{
-											// ignore
-										}
-
 									});
 								}
-								
-								public void customExceptionOccurred(Exception exception)
-								{
-									// Happens e.g. when remote classes not locally available or platform is shutting down.
-//									exception.printStackTrace();
-								}
 							});
-						}
-						public void customExceptionOccurred(Exception exception)
-						{
-							// ignore
 						}
 					});
 				}

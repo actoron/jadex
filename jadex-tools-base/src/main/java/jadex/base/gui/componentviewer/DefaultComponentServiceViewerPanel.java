@@ -20,6 +20,7 @@ import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -92,12 +93,10 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		final Future<Void> ret = new Future<Void>();
 		
 		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
-			.addResultListener(new DefaultResultListener()
+			.addResultListener(new DefaultResultListener<ClassLoader>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final ClassLoader cl)
 			{
-				final ClassLoader cl = (ClassLoader)result;
-		
 				final List panels = new ArrayList();
 				
 				final CollectionResultListener lis = new CollectionResultListener(
@@ -125,24 +124,29 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				});
 				
 				// Component panel.
-				Object clid = exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl);
-				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
-				if(clid!=null)
+				Class<?>[]	classes	= getGuiClasses(exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl), cl);
+				boolean	found	= false;
+				for(int i=0; !found && i<classes.length; i++)
 				{
 					try
 					{
-						IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+						IComponentViewerPanel panel = (IComponentViewerPanel)classes[i].newInstance();
+						found	= true;
 						panels.add(new Object[]{"component", panel});
 						panel.init(jcc, getActiveComponent()).addResultListener(lis);
 					}
 					catch(Exception e)
 					{
-						lis.exceptionOccurred(e);
+						if(found)
+						{
+							lis.exceptionOccurred(e);
+						}
 					}
 				}
-				else 
+				
+				if(!found) 
 				{
-					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clid));
+					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl)));
 				}
 				
 				// Service panels.
@@ -151,13 +155,14 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 					for(int i=0; i<services.size(); i++)
 					{
 						IService ser = (IService)services.get(i);
-						clid = ser.getPropertyMap()!=null ? ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
-						clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
-						if(clid!=null)
+						classes	= getGuiClasses(ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS), cl);
+						found	= false;
+						for(int j=0; !found && j<classes.length; j++)
 						{
 							try
 							{
-								IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
+								IServiceViewerPanel panel = (IServiceViewerPanel)classes[j].newInstance();
+								found	= true;
 //								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
 								panels.add(new Object[]{SReflect.getUnqualifiedTypeName(ser.getServiceIdentifier()
 									.getServiceType().getTypeName()), panel});
@@ -165,14 +170,16 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							}
 							catch(Exception e)
 							{
-								System.out.println("err: "+clid+" "+clazz);
-								e.printStackTrace();
-								lis.exceptionOccurred(e);
+								if(found)
+								{
+									lis.exceptionOccurred(e);
+								}
 							}
 						}
-						else
+						
+						if(!found) 
 						{
-							lis.exceptionOccurred(null);
+							lis.exceptionOccurred(new RuntimeException("No viewerclass: "+ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)));
 						}
 					}
 				}
@@ -196,5 +203,36 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	public JComponent getComponent()
 	{
 		return panel;
+	}
+	
+	/**
+	 *  Get the gui classes for a property.
+	 */
+	protected static Class<?>[]	getGuiClasses(Object prop, ClassLoader cl)
+	{
+		List<Class<?>>	classes	= new ArrayList<Class<?>>();
+		
+		if(SReflect.isIterable(prop))
+		{
+			for(Iterator<?>	it=SReflect.getIterator(prop); it.hasNext(); )
+			{
+				Object	tmp	= it.next();
+				Class<?>	clazz	= tmp instanceof Class? (Class<?>)tmp: tmp instanceof String? SReflect.classForName0((String)tmp, cl): null;
+				if(clazz!=null)
+				{
+					classes.add(clazz);
+				}
+			}			
+		}
+		else
+		{
+			Class<?>	clazz	= prop instanceof Class? (Class<?>)prop: prop instanceof String? SReflect.classForName0((String)prop, cl): null;
+			if(clazz!=null)
+			{
+				classes.add(clazz);
+			}			
+		}
+
+		return classes.toArray(new Class<?>[0]);
 	}
 }
