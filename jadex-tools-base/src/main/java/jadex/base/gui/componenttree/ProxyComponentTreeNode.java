@@ -202,7 +202,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			{
 				public void customResultAvailable(IProxyAgentService pas)
 				{
-					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier rcid)
+						{
+							cid	= rcid;
+							super.customResultAvailable(rcid);
+						}
+					});
 				}
 			});
 		}
