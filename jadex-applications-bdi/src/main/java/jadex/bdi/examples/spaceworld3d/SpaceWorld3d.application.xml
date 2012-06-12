@@ -72,7 +72,7 @@
 				<env:objecttype name="sentry">
 				<env:property name="tick360" class="double" dynamic="true">$properties.clock.getTick()%360
 					</env:property>	
-					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*(($properties.clock.getTick())%10),0.2,0.1*(($properties.clock.getTick())%10))
+					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.2*(($properties.clock.getTick())%10),0.2*(($properties.clock.getTick())%10),0.2*(($properties.clock.getTick())%10))
 					</env:property>	
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
@@ -137,54 +137,64 @@
 				
 				<!-- H O M E B A S E -->
 				<env:drawable3d objecttype="homebase" width="0.2" height="0.2" depth="0.2" rotation3d="false">
-					<env:property name="oresize" dynamic="true">new Vector3Double(0.72f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/1000.0),0.72f)</env:property>
+					<env:property name="oresize" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/300.0))</env:property>
 					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
 					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
-					<env:property name="rotate270" dynamic="false">new Vector3Double((Math.PI/180)*270, 0, 0)</env:property>
+					<env:property name="rotate45" dynamic="false">new Vector3Double(0, (Math.PI/180)*45, 0)</env:property>
 					
 				
 				
 				
-					<env:text3d  width="2" height="2" depth="1"  x="0" y="4" z="0" text="$textda$" color="#FFFFFFFF"></env:text3d>
+					<env:text3d  width="2" height="2" depth="1"  rotation="rotate45" x="0.2" y="0.2" z="0.2" text="$textda$" color="#FFFFFFFF"></env:text3d>
 				
-					<!--Box for Ore -->
-					<env:box  width="1" height="0.01" depth="1" x="-1" y="0.01" z="1" color="#D2B48CFF" />
-
-					<env:box  width="0.001" height="0.15" depth="1.0" x="-2" y="0.15" z="1" color="#FF7F24FF" />
-					<env:box  width="1.0" height="0.15" depth="0.01" x="-1" y="0.15" z="2" color="#FF7F24FF" />
+				<env:sphere width="0.25" height="0.25" depth="0.25" x="0" y="0" z="0"  color="#FFFF00FF"/>
+				
+				
+					<env:object3d width="0.03" height="0.03" depth="0.03" x="-1.5" y="-2.2" z="0.5" modelpath="jadex3d/models/space/misc/station/konostationobj.j3o" hasLightMaterials="true"/> 
 					
-					
-
-					<env:sphere size="oresize" x="-1" y="0" z="1"  color="#FFA54FFF">
-							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+				
+					<env:sphere width="2" height="0.002" depth="2" x="1" y="-3" z="1"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/yellowblack.jpg">
 					</env:sphere>
+
+					<env:dome radius="1" size="oresize" samples="30" depth="2" x="1" y="-3" z="1"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/oretex.jpg">
+						
+					</env:dome>
 				
 
 				</env:drawable3d>
 				
 				<!--ERZVORKOMMEN  -->
 				<env:drawable3d objecttype="target" width="0.2" height="0.2" depth="0.2">
-				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.5,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.5)</env:property>
-				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/400.0))</env:property>
+				  	<env:property name="oresize" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/600.0))</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/600.0))</env:property>
 					<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
 					<env:property name="rotated" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8, 0, 0)</env:property>
 
 						<!-- Nullpunkt  -->
-						<env:sphere width="0.02" height="0.02" depth="0.02" x="0" y="0" z="0" color="#FFB90FFF" />
+						<env:object3d width="0.1" height="0.1" depth="0.1" x="0" y="-0.2" z="0" modelpath="jadex3d/models/space/misc/rock01.j3o" hasLightMaterials="true"> 
+							<env:drawcondition>
+								$object.getProperty("ore")==0
+							</env:drawcondition>
+						</env:object3d>
+						<env:object3d size="oresize" x="0" y="-0.4" z="0" modelpath="jadex3d/models/space/misc/rock01_ore.j3o" hasLightMaterials="true"> 
+							<env:drawcondition>
+								($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:object3d>
 						
 						<!--Abgebautes erz  -->
-						<env:sphere size="capa"  x="0" y="0" z="0" color="#FFB90FFF">
+						<env:sphere size="capa"  x="0" y="-0.2" z="0" color="#FFFFFFFF" texturepath="jadex3d/textures/solid/oretex.jpg">
 							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
 						</env:sphere>
 						
 						<!-- Markierung  -->
-						<env:cylinder height="0.70" radius="0.05" rotation="rotate90" x="0" y="0.35" z="0" color="#FFFF00FF" >
+						<env:cylinder height="0.25" radius="0.025" rotation="rotate90" x="0" y="0.125" z="0" color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/iron01.jpg">
 							<env:drawcondition>
 								$object.getProperty("state").equals("analyzed")
 								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
 							</env:drawcondition>
 						</env:cylinder>
-						<env:dome radius="0.1" samples="30" x="0" y="0.70" z="0" color="#FF4500FF" >
+						<env:dome radius="0.1" samples="30" x="0" y="0.25" z="0" color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/yellowblack.jpg">
 							<env:drawcondition>
 								$object.getProperty("state").equals("analyzed")
 								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
@@ -211,51 +221,41 @@
 			</env:drawable3d>
 				
 
-				<env:drawable3d objecttype="sentry" width="0.18" height="0.18" depth="0.18">
+				<env:drawable3d objecttype="sentry" width="0.1" height="0.1" depth="0.1">
 				<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
-				<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
-				<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+				<env:property name="rotate" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
 				<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
-				
-				
-						<env:text3d  width="1" height="1" depth="1" x="-1" y="2.0" z="1" text="moin" color="#000000FF" />
-						<!--  Radarkreisel -->
-						<env:torus width="1" height="0.75" depth="1" rotation="rotatedyn" innerRadius="0.035" outerRadius="0.3" radialSamples="10" circleSamples="15" x="0.05" y="0.8" z="0.0" />
-						<env:box  width="0.45" height="0.01" depth="0.01" rotation="rotatedyn"  x="0.05" y="0.8" z="0.0" />
-						<env:box  width="0.01" height="0.01" depth="0.25" rotation="rotatedyn"  x="0.05" y="0.8" z="0.0"  color="#FF0000FF"/>
-						<env:cylinder rotation="rotate" height="0.5" radius="0.03"  x="0.05" y="0.7" z="0.0" color="#FFFFFFFF"/>
 						
-						<env:object3d width="1.7" height="1.7" depth="1.7" x="0" y="0.0" z="0.0" modelpath="jadex3d/models/vehicles/tank/sentrytank.j3o" hasLightMaterials="false"/> 
+						<env:object3d width="0.05" height="0.05" depth="0.05" x="0" y="0.0" z="0.0" rotation="rotate" modelpath="jadex3d/models/space/spacefrigate/spacefrigate.j3o" hasLightMaterials="true"/> 
 						
 						
 						<!--  Sonstiges -->
-						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F15" />
-						<env:sphere  size="visionsize" x="0.0" y="0.0" z="0.0" color="#FFFF0010" />
+						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F10" />
 					</env:drawable3d>
 					
-					<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15">
+					<env:drawable3d objecttype="carry" width="0.1" height="0.1" depth="0.1">
 				 	<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
-					<env:property name="-turn90" dynamic="false">new Vector3Double(0, -(Math.PI/180)*90, 0)</env:property>	
+					<env:property name="turn180" dynamic="false">new Vector3Double(0, Math.PI/2, 0)</env:property>	
+					<env:property name="rotation90" dynamic="false">new Vector3Double(0, Math.PI/188*90, 0)</env:property>	
 						<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0010" />
 						
-						
-						 <env:object3d width="1.5" height="1.5" depth="1.5" rotation="-turn90" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o" hasLightMaterials="false"/> 
+	
+	
+					<env:object3d width="0.05" height="0.05" depth="0.05" rotation="rotation90" x="0" y="0.0" z="-0.2" modelpath="jadex3d/models/space/carrier/spaceship.j3o" hasLightMaterials="true" /> 
+	
+		
 					
-						<env:box width="0.2" height="0.2" depth="0.2"  x="0.0" y="0.22" z="0.4"  color="#FFFFFFFF" texturepath="jadex3d/textures/solid/wood.jpg">
-							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
-						</env:box>
+						<env:object3d width="0.01" height="0.01" depth="0.01" x="0" y="-0.2" z="0.0" modelpath="jadex3d/models/space/misc/box/ammo.j3o" hasLightMaterials="true"> 
+							   <env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition> 
+						</env:object3d>
+						
 					</env:drawable3d>
 					
-					<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
-					<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
-					<env:property name="turn90" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
-					<env:text3d  width="2" height="2" depth="2"   x="0" y="1.5" z="0" text="moin" color="#FFFFFFFF" />	
+					<env:drawable3d objecttype="producer" width="0.1" height="0.1" depth="0.1">
+					<env:property name="rotation" dynamic="false">new Vector3Double(0, (Math.PI/180)*180, 0)</env:property>
 						
+						<env:object3d width="0.025" height="0.025" depth="0.025" rotation="rotation" x="0" y="0.0" z="0.0"  modelpath="jadex3d/models/space/smallship/ship.j3o" hasLightMaterials="true"/> 
 						
-						<!-- Assertion from Jmonkey -->
-						
- 						<env:object3d width="0.20" height="0.2" depth="0.2" x="0" y="0.25" z="0.0"  rotation="turn90" modelpath="jadex3d/models/vehicles/digger/digger.j3o" hasLightMaterials="false"/> 
-						<env:sphere  size="visionsize" x="0" y="0.00" z="0" color="#FFFF0010" />
 					</env:drawable3d>
 					
 				</env:perspective>	
@@ -287,7 +287,7 @@
 
 	<configurations>
 		
- 		
+ 	<!--  
  		
  		<configuration name="Multi">
 			<extensions>
@@ -302,12 +302,12 @@
 				<env:envspace name="my3dspace" type="3dspace" width="2" height ="2" depth ="2">
 					<env:objects>
 						<env:object type="homebase">
-							<env:property name="space">$space</env:property><!-- hack!!! -->
+							<env:property name="space">$space</env:property>
 							<env:property name="missiontime">
 								3000000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
-						<env:object type="target" number="50">
+						<env:object type="target" number="80">
 							<env:property name="ore">Math.random()>0.2 ? (Integer)(5+Math.random()*35)*5 : 0</env:property>
 						</env:object>
 					</env:objects>
@@ -317,12 +317,13 @@
 	 			</env:envspace>
 			</extensions>
 			<components>
-				<component type="Sentry" number="1"/> <!-- todo: support more than one sentry (requires coordination between sentries) -->
+				<component type="Sentry" number="1"/> 
   				<component type="Producer" number="5"/>
 				<component type="Carry" number="10"/>
 			</components>
  		</configuration>
  		
+ 		-->	
  		
  		<configuration name="1 Sentry / 2 Producers / 3 Carries">
 			<extensions>
@@ -340,9 +341,10 @@
 							<env:property name="position">new Vector3Double(0.3,0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								90000 + $properties.clock.getTime()
+								900000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
+						
 						<env:object type="target">
 							<env:property name="position">new Vector3Double(0.1, 0.15, 0.2)</env:property>
 							<env:property name="ore">0</env:property>
@@ -363,19 +365,26 @@
 							<env:property name="ore">100</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector3Double(0.8,0.8,0.8)</env:property>
-							<env:property name="ore">75</env:property>
+							<env:property name="position">new Vector3Double(0.0,0.5 ,0.5)</env:property>
+							<env:property name="ore">100</env:property>
 						</env:object>
+						
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.0,1 ,1)</env:property>
+							<env:property name="ore">100</env:property>
+						</env:object>
+
 						<env:object type="target">
 							<env:property name="position">new Vector3Double(0.0,0.0,0.0)</env:property>
 							<env:property name="ore">75</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector3Double(1.0,1.0,1.0)</env:property>
+							<env:property name="position">new Vector3Double(0.9,0.9,0.9)</env:property>
 							<env:property name="ore">75</env:property>
 						</env:object>
+						
 						<env:object type="target">
-							<env:property name="position">new Vector3Double(1.0,0.0,1.0)</env:property>
+							<env:property name="position">new Vector3Double(0.9,0.0,0.9)</env:property>
 							<env:property name="ore">75</env:property>
 						</env:object>
 					</env:objects>
