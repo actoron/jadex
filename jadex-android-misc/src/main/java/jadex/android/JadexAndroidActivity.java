@@ -212,22 +212,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	}
 	
 	private IFuture<IComponentManagementService> getCMS() {
-		return jadexAndroidContext.getExternalPlattformAccess().scheduleStep(new IComponentStep<IComponentManagementService>() {
-			@Classname("create-component")
-			public IFuture<IComponentManagementService> execute(
-					IInternalAccess ia) {
-				Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-				SServiceProvider
-						.getService(ia.getServiceContainer(),
-								IComponentManagementService.class,
-								RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(
-								ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
-										ret)));
-
-				return ret;
-			}
-		});
+		return jadexAndroidContext.getCMS();
 	}
 	
 	private IFuture<IMessageService> getMS() {

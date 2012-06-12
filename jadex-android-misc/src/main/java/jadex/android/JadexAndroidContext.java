@@ -1,8 +1,17 @@
 package jadex.android;
 
 import jadex.android.exception.WrongEventClassException;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.android.IJadexAndroidEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -205,6 +214,26 @@ public class JadexAndroidContext {
 			removed = list.remove(rec);
 		}
 		return removed;
+	}
+
+	public IFuture<IComponentManagementService> getCMS()
+	{
+		return getExternalPlattformAccess().scheduleStep(new IComponentStep<IComponentManagementService>() {
+			@Classname("create-component")
+			public IFuture<IComponentManagementService> execute(
+					IInternalAccess ia) {
+				Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
+				SServiceProvider
+						.getService(ia.getServiceContainer(),
+								IComponentManagementService.class,
+								RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(
+								ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
+										ret)));
+
+				return ret;
+			}
+		});
 	}
 
 }

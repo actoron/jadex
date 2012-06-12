@@ -91,5 +91,5 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 		onDialogClosed(result);
 		view = getView(view, parent);
 	}
-	
+
 }
