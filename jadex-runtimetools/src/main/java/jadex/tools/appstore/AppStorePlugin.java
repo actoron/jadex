@@ -21,8 +21,8 @@ public class AppStorePlugin extends AbstractJCCPlugin
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"deployer",	SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/deployer.png"),
-		"deployer_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/deployer_sel.png"),
+		"appstore",	SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/appstore.png"),
+		"appstore_sel", SGUI.makeIcon(DeployerPlugin.class, "/jadex/tools/common/images/appstore_sel.png"),
 	});
 
 	//-------- attributes --------
@@ -47,7 +47,7 @@ public class AppStorePlugin extends AbstractJCCPlugin
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
-		return selected? icons.getIcon("deployer_sel"): icons.getIcon("deployer");
+		return selected? icons.getIcon("appstore_sel"): icons.getIcon("appstore");
 	}
 
 	/**

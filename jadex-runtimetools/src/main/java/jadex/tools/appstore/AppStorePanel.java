@@ -6,6 +6,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.appstore.AppMetaInfo;
+import jadex.bridge.service.types.appstore.IAppGui;
 import jadex.bridge.service.types.appstore.IAppProviderService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -154,6 +155,7 @@ public class AppStorePanel extends JPanel
 						{
 							// todo: save according to id
 							apps.put(ser, ami);
+							refreshAppTable();
 						}
 						
 						if(--cnt==0 && fin)
@@ -205,13 +207,21 @@ public class AppStorePanel extends JPanel
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("ref table");
-				((DefaultTableModel)apptable.getModel()).fireTableDataChanged();
-				apptable.getParent().invalidate();
-				apptable.getParent().doLayout();
-				apptable.repaint();
+				refreshAppTable();
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void refreshAppTable()
+	{
+		// System.out.println("ref table");
+		((DefaultTableModel)apptable.getModel()).fireTableDataChanged();
+		apptable.getParent().invalidate();
+		apptable.getParent().doLayout();
+		apptable.repaint();
 	}
 	
 	/**
@@ -320,32 +330,38 @@ public class AppStorePanel extends JPanel
 							{
 								if(result instanceof IService)
 								{
-									IService appser = (IService)result;
+									final IService appser = (IService)result;
 									Map<String, Object> props = appser.getPropertyMap();
 									Class<?> guiclass = (Class<?>)props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 									try
 									{
-										Object gui = guiclass.newInstance();
-										JFrame fr;
-										if(gui instanceof JFrame)
+										final IAppGui gui = (IAppGui)guiclass.newInstance();
+										gui.init(access, appser).addResultListener(new SwingDefaultResultListener<Void>()
 										{
-											fr = (JFrame)gui;
-											fr.setLocation(SGUI.calculateMiddlePosition(fr));
-											fr.pack();
-											fr.setVisible(true);
-										}
-										else if(gui instanceof JComponent)
-										{	
-											fr = new JFrame();
-											fr.add((JComponent)gui, BorderLayout.CENTER);
-											fr.setLocation(SGUI.calculateMiddlePosition(fr));
-											fr.pack();
-											fr.setVisible(true);
-										}
-										else
-										{
-											System.out.println("Unknown gui type: "+gui);
-										}
+											public void customResultAvailable(Void result)
+											{
+												JFrame fr;
+												if(gui instanceof JFrame)
+												{
+													fr = (JFrame)gui;
+													fr.setLocation(SGUI.calculateMiddlePosition(fr));
+													fr.pack();
+													fr.setVisible(true);
+												}
+												else if(gui instanceof JComponent)
+												{	
+													fr = new JFrame();
+													fr.add((JComponent)gui, BorderLayout.CENTER);
+													fr.setLocation(SGUI.calculateMiddlePosition(fr));
+													fr.pack();
+													fr.setVisible(true);
+												}
+												else
+												{
+													System.out.println("Unknown gui type: "+gui);
+												}
+											}
+										});
 									}
 									catch(Exception ex)
 									{

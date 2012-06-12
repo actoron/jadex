@@ -1,20 +1,20 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.types.appstore.IAppGui;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
  * 
  */
-public class MandelbrotPanel extends JPanel implements IAppGui<IMandelbrotService>
+public class MandelbrotPanel extends JPanel implements IAppGui
 {
 	/** The agent. */
 	protected IExternalAccess agent;
@@ -37,10 +37,10 @@ public class MandelbrotPanel extends JPanel implements IAppGui<IMandelbrotServic
 	/**
 	 * 
 	 */
-	public IFuture<Void> init(IExternalAccess agent, IMandelbrotService service)
+	public IFuture<Void> init(IExternalAccess agent, IService service)
 	{
 		this.agent = agent;
-		this.service = service;
+		this.service = (IMandelbrotService)service;
 		
 		dispanel = new DisplayPanel(agent);
 		
