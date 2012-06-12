@@ -138,11 +138,6 @@
 				</configuration>
 			</plugin>
 			
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-			</plugin>
-			
 			<!-- Java 1.6 javax.xml.stream.* -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
