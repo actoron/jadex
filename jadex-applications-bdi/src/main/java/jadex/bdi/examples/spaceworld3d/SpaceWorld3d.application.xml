@@ -147,7 +147,7 @@
 				
 					<env:text3d  width="2" height="2" depth="1"  rotation="rotate45" x="0.2" y="0.2" z="0.2" text="$textda$" color="#FFFFFFFF"></env:text3d>
 				
-				<env:sphere width="0.25" height="0.25" depth="0.25" x="0" y="0" z="0"  color="#FFFF00FF"/>
+				<env:sphere width="0.01" height="0.01" depth="0.01" x="0" y="0" z="0"  color="#FFFF00FF"/>
 				
 				
 					<env:object3d width="0.03" height="0.03" depth="0.03" x="-1.5" y="-2.2" z="0.5" modelpath="jadex3d/models/space/misc/station/konostationobj.j3o" hasLightMaterials="true"/> 
