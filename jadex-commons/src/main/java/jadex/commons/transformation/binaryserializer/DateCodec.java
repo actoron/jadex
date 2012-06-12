@@ -56,9 +56,9 @@ public class DateCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		long time = ((Date) object).getTime();
+		long time = ((Date)object).getTime();
 		ByteBuffer buf = ec.getByteBuffer(8);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putLong(time);

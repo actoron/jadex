@@ -1056,7 +1056,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		else if(!set) // attribute info is null or string
 		{
 			// Write as normal bean attribute.
-			
 			// Try to find bean class information
 			
 			Map props = introspector.getBeanProperties(object.getClass(), true, true);

@@ -133,6 +133,7 @@ public class ServicePoolManager
 		{
 			Iterator	it	= free.values().iterator();
 			IService	service	= (IService)it.next();
+//			System.out.println("retry: "+service);
 			it.remove();
 			// Re-adding services makes them look for new tasks.
 			addService(service);
@@ -146,41 +147,39 @@ public class ServicePoolManager
 	 */
 	protected void	searchServices()
 	{
-		// Find new available service(s).
-		if(!searching)
+		// Start timer to be triggered when search is not finished after 1 second.
+		if(timer==null)
 		{
-//			System.out.println("searching services");			
-			searching	= true;
-			
-			// Start timer to be triggered when search is not finished after 1 second.
 			component.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					IClockService	cs	= (IClockService)result;
-					assert	timer==null;
-					timer	= cs.createTimer(1000, new ITimedObject()
+					if(timer==null)
 					{
-						public void timeEventOccurred(long currenttime)
+						timer	= cs.createTimer(1000, new ITimedObject()
 						{
-							component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+							public void timeEventOccurred(long currenttime)
 							{
-								public IFuture<Void> execute(IInternalAccess ia)
+								component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 								{
-									timer	= null;
-									// Create new services when there are remaining tasks.
-									createServices();
-									return IFuture.DONE;
-								}
-								
-								public String toString()
-								{
-									return "Search timeout for: "+name;
-								}
-							});
-						}
-					});
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										timer	= null;
+										// Create new services when there are remaining tasks.
+										createServices();
+										return IFuture.DONE;
+									}
+									
+									public String toString()
+									{
+										return "Search timeout for: "+name;
+									}
+								});
+							}
+						});
+					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -188,6 +187,13 @@ public class ServicePoolManager
 					// No timeout supported; ignore
 				}
 			});
+		}
+		
+		// Find new available service(s).
+		if(!searching)
+		{
+			System.out.println("searching services");			
+			searching	= true;
 			
 //			System.out.println("wurksn0");
 			component.getServiceContainer().getRequiredServices(name).addResultListener(
@@ -255,6 +261,7 @@ public class ServicePoolManager
 				
 				public void resultAvailable(Collection result)
 				{
+					searching	= false;		
 					// ignored
 //					System.out.println("wurksnrr");
 				}

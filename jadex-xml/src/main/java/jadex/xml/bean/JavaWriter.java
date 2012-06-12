@@ -16,15 +16,14 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
-import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
 /* if_not[android] */
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Rectangle;
 /* end[android] */
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -357,6 +356,19 @@ public class JavaWriter extends Writer
 				));
 			end[android] */
 			typeinfos.add(ti_image);
+			
+			/* if_not[android] */
+			// java.awt.Rectangle
+			TypeInfo ti_rect = new TypeInfo(null, new ObjectInfo(Rectangle.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null)),
+				new AttributeInfo(new AccessInfo("y", null)),
+				new AttributeInfo(new AccessInfo("width", null)),
+				new AttributeInfo(new AccessInfo("height", null))},
+				null
+			));
+			typeinfos.add(ti_rect);
+			/* end[android] */
 			
 			// java.lang.String
 //			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{

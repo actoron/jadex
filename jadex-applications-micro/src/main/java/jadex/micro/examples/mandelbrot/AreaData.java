@@ -1,12 +1,14 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.Base64;
 
 
 /**
  * Struct for calculation of a specific mandelbrot cutout.
  */
+//@Reference(remote=false)
 public class AreaData
 {
 	/** The x start. */

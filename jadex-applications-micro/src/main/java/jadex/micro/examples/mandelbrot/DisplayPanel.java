@@ -120,6 +120,7 @@ public class DisplayPanel extends JComponent
 					
 					public void intermediateResultAvailable(Object result)
 					{
+//						System.out.println("rec: "+result.getClass());
 						if(result instanceof AreaData)
 						{
 							setResults((AreaData)result);

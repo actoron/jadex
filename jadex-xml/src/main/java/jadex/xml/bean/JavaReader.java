@@ -26,6 +26,7 @@ import jadex.xml.reader.Reader;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
@@ -519,6 +520,28 @@ public class JavaReader
 				}
 			));
 			typeinfos.add(ti_image);
+			
+			// java.awt.Rectangle
+			TypeInfo ti_rect = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Rectangle")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						int x = (int)Double.parseDouble((String)rawattributes.get("x"));
+						int y = (int)Double.parseDouble((String)rawattributes.get("y"));
+						int w = (int)Double.parseDouble((String)rawattributes.get("width"));
+						int h = (int)Double.parseDouble((String)rawattributes.get("height"));
+						return new Rectangle(x, y, w, h);
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("x", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("y", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("width", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("height", null, AccessInfo.IGNORE_READWRITE)),
+				}
+			));
+			typeinfos.add(ti_rect);
 			
 			TypeInfo ti_enum = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Enum")}),
 				new ObjectInfo(new IBeanObjectCreator()

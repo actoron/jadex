@@ -54,119 +54,127 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	{
 		// includefields component of key is call based to avoid reflection calls during cache hits.
 		Tuple3<Class, Boolean, Boolean> beaninfokey = new Tuple3<Class, Boolean, Boolean>(clazz, includemethods, includefields);
-		Map ret = (Map)beaninfos.get(beaninfokey);
-		
-		if(ret == null)
+		Map ret = null;
+		try
 		{
-			if(clazz.isAnnotationPresent(IncludeFields.class))
-			{
-				includefields = true;
-			}
-			if(!includefields)
-			{
-				try
-				{
-					Field incfield = clazz.getField("INCLUDE_FIELDS");
-					if(incfield.getBoolean(null))
-						includefields = true;
-				}
-				catch (Exception e)
-				{
-				}
-			}
+			ret = (Map)beaninfos.get(beaninfokey);
 			
-			// todo: allow including single method pairs
-			ret = new HashMap();
-
-			if(includemethods)
+			if(ret == null)
 			{
-				Method[] ms = clazz.getMethods();
-				HashMap getters = new HashMap();
-				ArrayList setters = new ArrayList();
-				for(int i = 0; i < ms.length; i++)
+				if(clazz.isAnnotationPresent(IncludeFields.class))
 				{
-					String method_name = ms[i].getName();
-					if((method_name.startsWith("is") || method_name.startsWith("get"))
-						&& ms[i].getParameterTypes().length == 0)
+					includefields = true;
+				}
+				if(!includefields)
+				{
+					try
 					{
-						getters.put(method_name, ms[i]);
+						Field incfield = clazz.getField("INCLUDE_FIELDS");
+						if(incfield.getBoolean(null))
+							includefields = true;
 					}
-					else if(method_name.startsWith("set")
-						&& ms[i].getParameterTypes().length == 1)
+					catch (Exception e)
 					{
-						setters.add(ms[i]);
 					}
 				}
+				
+				// todo: allow including single method pairs
+				ret = new HashMap();
 	
-				Iterator it = setters.iterator();
-	
-				while(it.hasNext())
+				if(includemethods)
 				{
-					Method setter = (Method)it.next();
-					String setter_name = setter.getName();
-					String property_name = setter_name.substring(3);
-					Method getter = (Method)getters.get("get" + property_name);
-					if(getter == null)
-						getter = (Method)getters.get("is" + property_name);
-	
-					if(getter != null)
+					Method[] ms = clazz.getMethods();
+					HashMap getters = new HashMap();
+					ArrayList setters = new ArrayList();
+					for(int i = 0; i < ms.length; i++)
 					{
-						Class[] setter_param_type = setter.getParameterTypes();
-						String property_java_name = Character.toLowerCase(property_name.charAt(0))
-							+ property_name.substring(1);
-						
-						boolean exclude = false;
-						try
+						String method_name = ms[i].getName();
+						if((method_name.startsWith("is") || method_name.startsWith("get"))
+							&& ms[i].getParameterTypes().length == 0)
 						{
-							Field f = clazz.getField(property_name);
-							exclude = f.isAnnotationPresent(Exclude.class);
+							getters.put(method_name, ms[i]);
 						}
-						catch(NoSuchFieldException e)
+						else if(method_name.startsWith("set")
+							&& ms[i].getParameterTypes().length == 1)
 						{
+							setters.add(ms[i]);
 						}
-						
-						if(!exclude)
+					}
+		
+					Iterator it = setters.iterator();
+		
+					while(it.hasNext())
+					{
+						Method setter = (Method)it.next();
+						String setter_name = setter.getName();
+						String property_name = setter_name.substring(3);
+						Method getter = (Method)getters.get("get" + property_name);
+						if(getter == null)
+							getter = (Method)getters.get("is" + property_name);
+		
+						if(getter != null)
 						{
-							ret.put(property_java_name, createBeanProperty(property_java_name, 
-								getter.getReturnType(), getter, setter, setter_param_type[0]));
+							Class[] setter_param_type = setter.getParameterTypes();
+							String property_java_name = Character.toLowerCase(property_name.charAt(0))
+								+ property_name.substring(1);
+							
+							boolean exclude = false;
+							try
+							{
+								Field f = clazz.getField(property_name);
+								exclude = f.isAnnotationPresent(Exclude.class);
+							}
+							catch(NoSuchFieldException e)
+							{
+							}
+							
+							if(!exclude)
+							{
+								ret.put(property_java_name, createBeanProperty(property_java_name, 
+									getter.getReturnType(), getter, setter, setter_param_type[0]));
+							}
 						}
 					}
 				}
-			}
-			
-			// Get all public fields.
-			Field[] fields = clazz.getFields();
-			for(int i = 0; i < fields.length; i++)
-			{
-				String property_java_name = fields[i].getName();
-				if((includefields || fields[i].isAnnotationPresent(Include.class)) 
-					&& fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
-				{
-					ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
-				}
-			}
-			
-			// Get final values (val$xyz fields) for anonymous classes.
-			if(clazz.isAnonymousClass())
-			{
-				fields = clazz.getDeclaredFields();
+				
+				// Get all public fields.
+				Field[] fields = clazz.getFields();
 				for(int i = 0; i < fields.length; i++)
 				{
 					String property_java_name = fields[i].getName();
-					if(property_java_name.startsWith("val$"))
+					if((includefields || fields[i].isAnnotationPresent(Include.class)) 
+						&& fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
 					{
-						property_java_name = property_java_name.substring(4);
-						if(!ret.containsKey(property_java_name))
+						ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
+					}
+				}
+				
+				// Get final values (val$xyz fields) for anonymous classes.
+				if(clazz.isAnonymousClass())
+				{
+					fields = clazz.getDeclaredFields();
+					for(int i = 0; i < fields.length; i++)
+					{
+						String property_java_name = fields[i].getName();
+						if(property_java_name.startsWith("val$"))
 						{
-							ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], true));
+							property_java_name = property_java_name.substring(4);
+							if(!ret.containsKey(property_java_name))
+							{
+								ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], true));
+							}
 						}
 					}
 				}
+	
+				beaninfos.put(beaninfokey, ret);
 			}
-
-			beaninfos.put(beaninfokey, ret);
 		}
-
+		catch(Throwable t)
+		{
+			System.out.println("err: "+clazz);
+		}
+		
 		return ret;
 	}
 	

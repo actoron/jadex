@@ -120,6 +120,7 @@ public class GenerateService implements IGenerateService
 									}
 									public void exceptionOccurred(Exception exception)
 									{
+//										System.out.println("ex");
 										super.exceptionOccurred(exception);
 									}
 								});

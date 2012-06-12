@@ -46,6 +46,7 @@ public class Traverser
 		/* if_not[android]*/
 		processors.add(new ColorProcessor());
 		processors.add(new ImageProcessor());
+		processors.add(new RectangleProcessor());
 		/* end[android] */
 		processors.add(new TimestampProcessor());
 		processors.add(new LogRecordProcessor());
@@ -144,7 +145,7 @@ public class Traverser
 		
 		if(object!=null)
 		{
-//			if(object.getClass().getName().indexOf("SpaceObject")!=-1)
+//			if(object.getClass().getName().indexOf("ProgressData")!=-1)
 //				System.out.println("oooo");
 			
 			boolean fin = false;
@@ -182,7 +183,7 @@ public class Traverser
 	 *  Special handling for duplicate objects.
 	 */
 	public void handleDuplicate(Object object, Class<?> clazz, Object match, 
-			List<ITraverseProcessor> processors, boolean clone, Object context)
+		List<ITraverseProcessor> processors, boolean clone, Object context)
 	{
 	}
 }

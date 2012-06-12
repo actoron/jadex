@@ -92,7 +92,6 @@ public class BeanProcessor implements ITraverseProcessor
 					throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
 				}
 			}
-			
 //			clazz = clazz.getSuperclass();
 		}
 	}

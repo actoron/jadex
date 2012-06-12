@@ -68,6 +68,7 @@ public class BinarySerializer
 		/*if_not[android] */
 		ENCODER_HANDLERS.add(new ColorCodec());
 		ENCODER_HANDLERS.add(new ImageCodec());
+		ENCODER_HANDLERS.add(new RectangleCodec());
 		/*end[android]*/
 		ENCODER_HANDLERS.add(new URLCodec());
 		ENCODER_HANDLERS.add(new TupleCodec());

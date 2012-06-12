@@ -8,7 +8,9 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
@@ -130,6 +132,7 @@ public abstract class Test extends TestCase
 				/* if_not[android]*/
 				testColor();
 				testImage();
+				testRectangle();
 				/* end[android]*/
 			}
 			long dur = System.currentTimeMillis()-start;
@@ -160,7 +163,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-//		System.out.println("xml is:"+new String((byte[])written));
+//		System.out.println("written is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
@@ -536,6 +539,14 @@ public abstract class Test extends TestCase
 				return equal ? 0 : 1;
 			}
 		});
+	}
+	
+	/**
+	 *  Test if awt rectangle works.
+	 */
+	public void testRectangle() throws Exception
+	{
+		doWriteAndRead(new Rectangle(new Dimension(20, 30)));
 	}
 	
 	/**
