@@ -156,6 +156,10 @@
 		<argument name="relaytransport" class="boolean">true</argument>
 		<!-- Address(es) for relay transport (one or more addresses separated by commas). -->
 		<argument name="relayaddress" class="String">jadex.base.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
+		<!-- Flag if ssltcp transport is enabled. -->
+		<argument name="ssltcptransport" class="boolean">true</argument>
+		<!-- Port for SSL TCP transport. -->
+		<argument name="ssltcpport" class="int">44334</argument>
 		
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
 		<argument name="extensions" class="String">
@@ -264,6 +268,7 @@
 					$args.localtransport? new jadex.base.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null,
 					$args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
 					$args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
+					$args.ssltcptransport? new jadex.base.service.message.transport.ssltcpmtp.SSLTCPTransport($component.getServiceProvider(), $args.ssltcpport): null,
 					$args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.io.HttpRelayTransport($component, $args.relayaddress): null
 				},
 				new jadex.bridge.service.types.message.MessageType[]
@@ -333,6 +338,7 @@
 			<arguments>
 				<argument name="tcpport">0</argument>
 				<argument name="niotcpport">0</argument>
+				<argument name="ssltcpport">0</argument>
 				<argument name="platformname">null</argument>
 			</arguments>
 			

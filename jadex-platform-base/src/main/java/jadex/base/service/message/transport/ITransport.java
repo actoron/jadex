@@ -23,7 +23,6 @@ public interface ITransport
 	
 	/**
 	 *  Test if a transport is applicable for the target address.
-	 *  
 	 *  @return True, if the transport is applicable for the address.
 	 */
 	public boolean	isApplicable(String address);

@@ -35,18 +35,16 @@ class TCPOutputConnection
 	
 	/**
 	 *  Create a new tcp connection for sending data. 
-	 *  @param iaddr
-	 *  @param iport
-	 *  @param enc
-	 *  @throws IOException
 	 */
-	public TCPOutputConnection(InetAddress iaddr, int iport, Cleaner cleaner) throws IOException
+//	public TCPOutputConnection(InetAddress iaddr, int iport, Cleaner cleaner, Socket sock) throws IOException
+	public TCPOutputConnection(Cleaner cleaner, Socket sock) throws IOException
 	{
+		this.sock = sock;
 //		try
 //		{
 //			System.out.println("TCP Connection: "+iaddr+":"+iport);
-			this.sock = new Socket();
-			sock.connect(new InetSocketAddress(iaddr, iport), TIMEOUT);
+//			this.sock = new Socket();
+//			sock.connect(new InetSocketAddress(iaddr, iport), TIMEOUT);
 //			System.out.println("TCP Connection: "+iaddr+":"+iport+" established");
 //		}
 //		catch(IOException e)
@@ -83,6 +81,7 @@ class TCPOutputConnection
 		}
 		catch(IOException e)
 		{
+			e.printStackTrace();
 			close();
 		}
 		

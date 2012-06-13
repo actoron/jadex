@@ -21,6 +21,7 @@ import jadex.commons.future.IResultListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -67,7 +68,7 @@ public class TCPTransport implements ITransport
 	
 	/** Default port. */
 	protected final static int DEFAULT_PORT	= 9876;
-	
+
 	//-------- attributes --------
 	
 	/** The platform. */
@@ -148,9 +149,8 @@ public class TCPTransport implements ITransport
 		{
 			// Set up receiver side.
 			// If port==0 -> any free port
-			this.serversocket = new ServerSocket(port);
+			this.serversocket = createServerSocket();
 			this.port = serversocket.getLocalPort();
-
 			
 			String[]	addresses	= SUtil.getNetworkAddresses();
 			this.addresses	= new String[addresses.length];
@@ -261,29 +261,39 @@ public class TCPTransport implements ITransport
 	}
 	
 	//-------- methods --------
+
+	/**
+	 *  Create a server socket.
+	 *  @return The server socket.
+	 */
+	public ServerSocket createServerSocket() throws Exception
+	{
+		return new ServerSocket(port);
+	}
+	
+	/**
+	 *  Create a client socket.
+	 *  @return The client socket.
+	 */
+	public Socket createClientSocket(String host, int port) throws Exception
+	{
+		return new Socket(host, port);
+	}
 	
 	/**
 	 *  Test if a transport is applicable for the target address.
 	 *  
 	 *  @return True, if the transport is applicable for the address.
 	 */
-	public boolean	isApplicable(String address)
+	public boolean	isApplicable(String address)	
 	{
 		boolean	ret	= false;
-//		for(int i=0; !ret && i<task.getReceivers().length; i++)
-//		{
-//			String[]	raddrs	= task.getReceivers()[i].getAddresses();
-//			for(int j=0; !ret && j<raddrs.length; j++)
-//			{
-//				for(int k=0; !ret && k<getServiceSchemas().length; k++)
-//				{
-//					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
-//				}
-//			}			
-//		}
+		for(int i=0; !ret && i<getServiceSchemas().length; i++)
+		{
+			ret	= address.startsWith(getServiceSchemas()[i]);
+		}
 		return ret;
 	}
-	
 	
 	/**
 	 *  Send a message to the given address.
@@ -450,7 +460,8 @@ public class TCPTransport implements ITransport
 					}
 	
 					// todo: which resource identifier to use for outgoing connections?
-					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address));
+//					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address), createClientSocket());
+					ret = new TCPOutputConnection(new Cleaner(address), createClientSocket(hostname, iport));
 					connections.put(address, ret);
 				}
 				catch(Exception e)
