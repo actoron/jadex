@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.testcases.TestAgent;
 
 import java.util.Collection;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class Initiator2Agent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform().addResultListener(agent.createResultListener(
+		createPlatform(null).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

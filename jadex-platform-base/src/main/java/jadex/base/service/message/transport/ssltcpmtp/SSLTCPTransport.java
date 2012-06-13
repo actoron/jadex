@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -88,11 +89,10 @@ public class SSLTCPTransport extends TCPTransport
 				// This allows ssl handshake without signed certificates.
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 				tmf.init(ks);				
-				X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
-				SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
-				context.init(kmf.getKeyManagers(), new TrustManager[]{tm}, null);
+				NaiveTrustManager tm = new NaiveTrustManager();
+				context.init(kmf.getKeyManagers(), new TrustManager[]{tm}, new SecureRandom());
 
-				context.init(kmf.getKeyManagers(), null, null);
+//				context.init(kmf.getKeyManagers(), null, null);
 			}
 			catch(Exception e)
 			{
@@ -138,31 +138,19 @@ public class SSLTCPTransport extends TCPTransport
 	/**
 	 *  Trust manager that does not check certificates. 
 	 */
-	protected static class SavingTrustManager implements X509TrustManager
+	protected static class NaiveTrustManager implements X509TrustManager
 	{
-		private final X509TrustManager tm;
-
-		private X509Certificate[] chain;
-
-		SavingTrustManager(X509TrustManager tm)
-		{
-			this.tm = tm;
-		}
-
 		public X509Certificate[] getAcceptedIssuers()
 		{
-			throw new UnsupportedOperationException();
+			return null;
 		}
 
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException
 		{
-			throw new UnsupportedOperationException();
 		}
 
 		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException
 		{
-			this.chain = chain;
-			tm.checkServerTrusted(chain, authType);
 		}
 	}
 	

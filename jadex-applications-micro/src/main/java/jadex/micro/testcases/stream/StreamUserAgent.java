@@ -24,6 +24,7 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.micro.testcases.TestAgent;
 
 /**
  *  Agent that provides a service with a stream.
@@ -77,7 +78,7 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		createPlatform().addResultListener(agent.createResultListener(
+		createPlatform(null).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

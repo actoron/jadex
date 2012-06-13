@@ -1,4 +1,4 @@
-package jadex.micro.testcases.stream;
+package jadex.micro.testcases;
 
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -14,6 +14,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -32,6 +33,7 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 @Agent
@@ -95,7 +97,7 @@ public abstract class TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<IExternalAccess> createPlatform()
+	protected IFuture<IExternalAccess> createPlatform(String[] args)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
@@ -103,12 +105,33 @@ public abstract class TestAgent
 		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
-		Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//			"-logging_level", "java.util.logging.Level.INFO",
-//			"-gui", "false", "-usepass", "false", "-simulation", "false"
-			"-gui", "false", "-simulation", "false", "-printpass", "false"
-		}).addResultListener(agent.createResultListener(
+//				"-logging_level", "java.util.logging.Level.INFO",
+//				"-gui", "false", "-usepass", "false", "-simulation", "false"
+			"-gui", "false", "-simulation", "false", "-printpass", "false"};
+		
+		if(args!=null && args.length>0)
+		{
+			Map<String, String> argsmap = new HashMap<String, String>();
+			for(int i=0; i<defargs.length; i++)
+			{
+				argsmap.put(defargs[i], defargs[++i]);
+			}
+			for(int i=0; i<args.length; i++)
+			{
+				argsmap.put(args[i], args[++i]);
+			}
+			defargs = new String[argsmap.size()*2];
+			for(String key: argsmap.keySet())
+			{
+				argsmap.put(key, argsmap.get(key));
+			}
+		}
+
+		System.out.println("platform args: "+SUtil.arrayToString(defargs));
+		
+		Starter.createPlatform(defargs).addResultListener(agent.createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)));
 		
 		return ret;
@@ -159,52 +182,5 @@ public abstract class TestAgent
 		
 		return ret;
 	}
-
-	/**
-	 * 
-	 */
-	public static class TestReportListener implements IResultListener<Long>
-	{
-		protected TestReport tr;
-		
-		protected Future<TestReport> delegate;
-		
-		protected long length;
-		
-		/**
-		 * 
-		 */
-		public TestReportListener(TestReport tr, Future<TestReport> delegate, long length)
-		{
-			this.tr = tr;
-			this.delegate = delegate;
-			this.length = length;
-		}
-
-		/**
-		 * 
-		 */
-		public void resultAvailable(Long result)
-		{
-			if(result.longValue()==length)
-			{
-				tr.setSucceeded(true);
-			}
-			else
-			{
-				tr.setFailed("Wrong length (current / expected): ("+result+" / "+StreamProviderAgent.getWriteLength()+")");
-			}
-			delegate.setResult(tr);
-		}
-
-		/**
-		 * 
-		 */
-		public void exceptionOccurred(Exception exception)
-		{
-			System.out.println("ex: "+exception);
-			tr.setFailed("Exception: "+exception.getMessage());
-			delegate.setResult(tr);
-		}
-	}
+	
 }
