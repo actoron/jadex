@@ -83,6 +83,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
+import javax.swing.UIDefaults;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -104,6 +105,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 {
 	//-------- constants --------
 	
+	/** The icons. */
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
+	{
+		"play", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/common/images/arrowright.png")
+	});
+	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
 	
@@ -124,15 +131,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The notification sound for an aborted or failed file transfer. */
 	public static final String	NOTIFICATION_FILE_ABORT	= "file abort";
-	
-	/** The sound flag. */
-	protected boolean sound;
-	
-	/** The autorefresh flag. */
-	protected boolean autorefresh;
-	
-	/** The custom notification sounds. */
-	protected Map<String, String> notificationsounds;
 	
 	/** The default notification sounds. */
 	protected static Map<String, String>	NOTIFICATION_SOUNDS;
@@ -191,7 +189,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The main split panel between left and right. */
 	protected JSplitPanel	horsplit;
+
+	/** The sound flag. */
+	protected boolean sound;
 	
+	/** The autorefresh flag. */
+	protected boolean autorefresh;
+	
+	/** The custom notification sounds. */
+	protected Map<String, String> notificationsounds;
+
 	//-------- constructors --------
 	
 	/**
@@ -457,6 +464,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				final JTextField tfnick = new JTextField();
 				JButton bunick = new JButton("Set");
+				bunick.setMargin(new Insets(1, 1, 1, 1));
 				JPanel ppan = new JPanel(new BorderLayout());
 				ppan.add(tfnick, BorderLayout.CENTER);
 				ppan.add(bunick, BorderLayout.EAST);
@@ -496,6 +504,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				final JTextField tfava = new JTextField();
 				tfava.setEditable(false);
 				JButton buava = new JButton("...");
+				buava.setMinimumSize(bunick.getMinimumSize());
+				buava.setMaximumSize(bunick.getMaximumSize());
+				buava.setPreferredSize(bunick.getPreferredSize());
 				JPanel apan = new JPanel(new BorderLayout());
 				apan.add(tfava, BorderLayout.CENTER);
 				apan.add(buava, BorderLayout.EAST);
@@ -548,11 +559,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					NOTIFICATION_FILE_COMPLETE, NOTIFICATION_NEW_FILE, NOTIFICATION_NEW_MSG, NOTIFICATION_NEW_USER});
 				final JTextField jtxt = new JTextField();
 				jtxt.setEditable(false);
-				
-				
 				jtxt.setText(getNotificationSound((String)jcom.getSelectedItem()));
-				
 				final JButton jbut = new JButton("...");
+				jbut.setMinimumSize(bunick.getMinimumSize());
+				jbut.setMaximumSize(bunick.getMaximumSize());
+				jbut.setPreferredSize(bunick.getPreferredSize());
+				final JButton playbut = new JButton(icons.getIcon("play"));
+				playbut.setMinimumSize(bunick.getMinimumSize());
+				playbut.setMaximumSize(bunick.getMaximumSize());
+				playbut.setPreferredSize(bunick.getPreferredSize());
 				final JFileChooser jfil = new JFileChooser(".");
 				jfil.setFileFilter(new FileFilter()
 				{
@@ -602,12 +617,28 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 					}
 				});
-				JPanel pan = new JPanel(new BorderLayout());
-				pan.add(jcom, BorderLayout.CENTER);
-				pan.add(jbut, BorderLayout.EAST);
-//				pan.add(jbut, BorderLayout.EAST);
+				playbut.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						playSound((String)jcom.getSelectedItem());
+					}
+				});
+				JPanel pan = new JPanel(new GridBagLayout());
+				GridBagConstraints	gbc	= new GridBagConstraints();
+				gbc.fill	= GridBagConstraints.BOTH;
+				gbc.weightx	= 1;
+				pan.add(jcom, gbc);
+				gbc.weightx	= 0;
+				gbc.gridwidth	= GridBagConstraints.REMAINDER;
+				pan.add(playbut, gbc);
+				gbc.weightx	= 1;
+				gbc.gridwidth	= GridBagConstraints.RELATIVE;
+				pan.add(jtxt, gbc);
+				gbc.weightx	= 0;
+				gbc.gridwidth	= GridBagConstraints.REMAINDER;
+				pan.add(jbut, gbc);
 				pp.addComponent("Sound files: ", pan);
-				pp.addFullLineComponent("sf", jtxt);
 				
 				final JCheckBox cb = pp.createCheckBox("Sound enabled: ", sound, true, 0);
 				cb.addActionListener(new ActionListener()
@@ -1374,28 +1405,37 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			
 			if(!quiet && sound)
 			{
-				try
-				{
-					Clip	clip	= AudioSystem.getClip();
-//					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
-					String filename = getNotificationSound(type);
-					URL	url	= this.getClass().getResource(filename);
-					if(url==null)
-					{
-						File f = new File(filename);
-						if(f.exists())
-							url = f.toURI().toURL();
-					}
-					// Cannot use stream due to jar starter bug.
-					AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
-					clip.open(ais);
-					clip.start();
-				}
-				catch(Exception e)
-				{
-					System.err.println("Couldn't play notification sound '"+type+"': "+e);
-				}
+				playSound(type);
 			}
+		}
+	}
+
+	/**
+	 *  Play the notification sound for the selected event.
+	 *  @param type	The notification event.
+	 */
+	protected void playSound(String type)
+	{
+		try
+		{
+			Clip	clip	= AudioSystem.getClip();
+//					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
+			String filename = getNotificationSound(type);
+			URL	url	= this.getClass().getResource(filename);
+			if(url==null)
+			{
+				File f = new File(filename);
+				if(f.exists())
+					url = f.toURI().toURL();
+			}
+			// Cannot use stream due to jar starter bug.
+			AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
+			clip.open(ais);
+			clip.start();
+		}
+		catch(Exception e)
+		{
+			System.err.println("Couldn't play notification sound '"+type+"': "+e);
 		}
 	}
 	
