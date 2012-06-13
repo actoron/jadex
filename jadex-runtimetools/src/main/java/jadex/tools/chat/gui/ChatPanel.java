@@ -460,11 +460,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				usertable.getColumnModel().getColumn(0).setPreferredWidth(64);
 				usertable.getColumnModel().getColumn(0).setMaxWidth(64);
 				
+				Insets	binsets	= new Insets(1, 3, 1, 3);
 				PropertiesPanel pp = new PropertiesPanel("Settings");
-				
 				final JTextField tfnick = new JTextField();
 				JButton bunick = new JButton("Set");
-				bunick.setMargin(new Insets(1, 1, 1, 1));
+				bunick.setMargin(binsets);
 				JPanel ppan = new JPanel(new BorderLayout());
 				ppan.add(tfnick, BorderLayout.CENTER);
 				ppan.add(bunick, BorderLayout.EAST);
@@ -659,6 +659,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 				
 				JButton rsb = pp.createButton("Reset sounds: ", "Reset");
+				rsb.setMargin(binsets);
 				rsb.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -669,6 +670,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 				
 				JButton b = pp.createButton("Reset receivers: ", "Reset");
+				b.setMargin(binsets);
 				b.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
