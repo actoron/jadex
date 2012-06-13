@@ -58,9 +58,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -1420,8 +1422,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		try
 		{
-			Clip	clip	= AudioSystem.getClip();
-//					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
 			String filename = getNotificationSound(type);
 			URL	url	= this.getClass().getResource(filename);
 			if(url==null)
@@ -1432,8 +1432,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			}
 			// Cannot use stream due to jar starter bug.
 			AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
+//			Clip	clip	= AudioSystem.getClip();
+			AudioFormat	format	= ais.getFormat();
+			DataLine.Info	info	= new DataLine.Info(Clip.class, format);
+			Clip	clip	= (Clip)AudioSystem.getLine(info);
 			clip.open(ais);
 			clip.start();
+//			while(clip.isRunning())
+//			{
+//				Thread.yield();
+//			}
 		}
 		catch(Exception e)
 		{
