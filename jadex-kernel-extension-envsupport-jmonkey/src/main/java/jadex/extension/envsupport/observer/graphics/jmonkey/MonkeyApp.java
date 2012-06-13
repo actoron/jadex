@@ -44,6 +44,10 @@ public class MonkeyApp extends SimpleApplication
 {
 
 	private boolean			_walkCam;
+	
+	private boolean			 _followCam;
+	
+	private boolean			 _chaseCamera;
 
 	private float			_areaSize;
 
@@ -76,6 +80,7 @@ public class MonkeyApp extends SimpleApplication
 		_staticNode = new Node("staticNode");
 		_gridNode = new Node("gridNode");
 		_walkCam = false;
+		_followCam = false;
 		_selectedTarget = -1;
 		_selectedSpatial = null;
 	}
@@ -120,6 +125,7 @@ public class MonkeyApp extends SimpleApplication
 		// You can map one or several inputs to one named action
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 
+		inputManager.addMapping("ChaseCam", new KeyTrigger(KeyInput.KEY_F3));
 		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
 		inputManager.addMapping("ChangeCam", new KeyTrigger(KeyInput.KEY_F6));
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
@@ -177,43 +183,68 @@ public class MonkeyApp extends SimpleApplication
 				{
 					if(_selectedSpatial != null)
 					{
+						_followCam = !_followCam;
+						
+						
+						 if(_followCam)
+						 {
+							
+							 ((Node)_selectedSpatial).attachChild(_camNode);
+							 _camNode.setEnabled(true);
+							 _camNode.setLocalTranslation(new Vector3f(0, 0.5f , -3.3f));
+							 
+							 _chaseCam.setEnabled(false);
+							 flyCam.setEnabled(false);
+						 }
+						 else
+						 {
+							 ((Node)_selectedSpatial).detachChild(_camNode);
+							 _camNode.setEnabled(false);
+							 flyCam.setEnabled(true);
+						 }
 						 
-
-						 
-						 //Attach the camNode to the target:
-//						 ((Node)_selectedSpatial).attachChild(_camNode);
-						 
-//						 cam.setLocation(new Vector3f(0, 0, 0).mult(_areaSize));
-						 
-						 //Move camNode, e.g. behind and above the target:
-//						 _camNode.setLocalTranslation(new Vector3f(-10, 0, 0));
-						 
-						 //Rotate the camNode to look at the target:
-						 
-//						 _camNode.lookAt(Vector3f.ZERO,
-//						 Vector3f.UNIT_Y);
-//						
-//						 System.out.println("_selectedSpatial.getLocalTranslation() : " + _selectedSpatial.getLocalTranslation().toString());
-
-//						// Disable the default flyby cam
-//						flyCam.setEnabled(false);
-//						// Enable a chase cam for this target (typically the
-//						// player).
-//
-						_chaseCam.setEnabled(true);
-						_chaseCam.setSpatial(_selectedSpatial);
-						 
-						 flyCam.setEnabled(false);
-
-
 					}
 					else
 					{
-
-						_chaseCam.setEnabled(false);
+						_camNode.removeFromParent();
+						_camNode.setEnabled(false);
 						flyCam.setEnabled(true);
 					}
 
+				}
+				
+				else if(keyPressed && name.equals("ChaseCam"))
+				{
+					if(_selectedSpatial != null)
+					{
+						_chaseCamera = !_chaseCamera;
+						
+						
+						 if(_chaseCamera)
+						 {
+							
+							 _chaseCam.setSpatial(_selectedSpatial);
+							 _chaseCam.setEnabled(true);
+							 
+							_camNode.removeFromParent();
+							_camNode.setEnabled(false);
+								
+							 flyCam.setEnabled(false);
+						 }
+						 else
+						 {
+							 
+							 _chaseCam.setEnabled(false);
+							 flyCam.setEnabled(true);
+						 }
+						 
+					}
+					else
+					{
+						
+						_chaseCam.setEnabled(false);
+						flyCam.setEnabled(true);
+					}
 
 				}
 			}
@@ -222,6 +253,7 @@ public class MonkeyApp extends SimpleApplication
 
 		inputManager.addListener(actionListener, new String[]{"Random"});
 		inputManager.addListener(actionListener, new String[]{"Grid"});
+		inputManager.addListener(actionListener, new String[]{"ChaseCam"});
 		inputManager.addListener(actionListener, new String[]{"ChangeCam"});
 		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
@@ -235,9 +267,11 @@ public class MonkeyApp extends SimpleApplication
 	{
 		
 		 //create the camera Node
-		_camNode = new CameraNode("Camera Node", cam);
-		 //This mode means that camera copies the movements of the target:
+		_camNode = new CameraNode("CameraNode", cam);
 		 _camNode.setControlDir(ControlDirection.SpatialToCamera);
+		_camNode.setEnabled(false);
+		 //This mode means that camera copies the movements of the target:
+		 
 		 
 		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
 		_chaseCam.setSmoothMotion(true);
@@ -285,17 +319,12 @@ public class MonkeyApp extends SimpleApplication
 	}
 
 	public void simpleUpdate(float tpf)
-	{
-		
-		System.out.println("pos" + _camNode.getLocalTranslation().toString());
-		
-		System.out.println("poscam" + cam.getLocation());
-		 
+	{		
 		if(_walkCam)
 		{
-			Vector3f loc = cam.getLocation();
-			loc.setY(getHeightAt(loc.x, loc.z));
-			cam.setLocation(loc);
+//			Vector3f loc = cam.getLocation();
+//			loc.setY(getHeightAt(loc.x, loc.z));
+//			cam.setLocation(loc);
 		}
 
 	}

@@ -73,6 +73,8 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 		
 		if(draw)
 		{	
+
+			
 				Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj, primitive.getRotation(), vp));
 				rotation = new Vector3f(rotationD.getXAsFloat(), rotationD.getYAsFloat(), rotationD.getZAsFloat());	
 				
@@ -146,7 +148,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			_fetcher.setValue("$perspective", vp.getPerspective());
 			draw = ((Boolean)drawcondition.getValue(_fetcher)).booleanValue();
 		}
-
+		
 		if(draw)
 		{
 			Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj, primitive.getRotation(), vp));

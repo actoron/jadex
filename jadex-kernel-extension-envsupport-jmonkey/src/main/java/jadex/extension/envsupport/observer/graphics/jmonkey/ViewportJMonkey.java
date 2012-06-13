@@ -140,6 +140,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		AppSettings settings = new AppSettings(true);
 
+		//TODO: was passiert? :)
+//		settings.setRenderer(AppSettings.LWJGL_OPENGL1);
+		
+		
 		_app.setPauseOnLostFocus(false);
 		_app.setSettings(settings);
 		_app.createCanvas();
