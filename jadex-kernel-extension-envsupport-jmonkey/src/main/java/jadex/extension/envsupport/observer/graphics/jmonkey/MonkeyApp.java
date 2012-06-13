@@ -10,6 +10,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapText;
+import com.jme3.input.ChaseCamera;
 import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -24,9 +25,11 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.CameraControl.ControlDirection;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.HillHeightMap;
@@ -43,8 +46,8 @@ public class MonkeyApp extends SimpleApplication
 	private boolean			_walkCam;
 
 	private float			_areaSize;
-	
-	private float 			_spaceSize;
+
+	private float			_spaceSize;
 
 	private Node			_geometryNode;
 
@@ -54,10 +57,16 @@ public class MonkeyApp extends SimpleApplication
 
 	private TerrainQuad		_terrain;
 
+	private Spatial			_selectedSpatial;
+
+	private ChaseCamera		_chaseCam;
+	
+	private CameraNode _camNode;
+
 	// Helper Classes
 	private monkeyApp_Grid	_gridHandler;
-	
-	private int				 _selectedTarget;
+
+	private int				_selectedTarget;
 
 	public MonkeyApp()
 	{
@@ -68,6 +77,7 @@ public class MonkeyApp extends SimpleApplication
 		_gridNode = new Node("gridNode");
 		_walkCam = false;
 		_selectedTarget = -1;
+		_selectedSpatial = null;
 	}
 
 	@Override
@@ -85,14 +95,17 @@ public class MonkeyApp extends SimpleApplication
 		DirectionalLight sun = new DirectionalLight();
 		sun.setDirection(new Vector3f(1, 0, -2).normalizeLocal());
 		sun.setColor(ColorRGBA.White);
-		
+
 		DirectionalLight sun2 = new DirectionalLight();
 		sun2.setDirection(new Vector3f(-2, 0, 1).normalizeLocal());
 		sun2.setColor(ColorRGBA.White);
-		
-		
+
+
 		rootNode.addLight(sun);
 		rootNode.addLight(sun2);
+
+
+		
 
 		initKeys();
 
@@ -107,6 +120,7 @@ public class MonkeyApp extends SimpleApplication
 		// You can map one or several inputs to one named action
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 
+		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
 		inputManager.addMapping("ChangeCam", new KeyTrigger(KeyInput.KEY_F6));
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
@@ -138,13 +152,13 @@ public class MonkeyApp extends SimpleApplication
 					}
 
 				}
-				
-				
+
+
 				if(name.equals("Select") && keyPressed)
 				{
 					fireSelection();
 				}
-				
+
 				else if(name.equals("ZoomIn"))
 				{
 					moveCamera(1, false);
@@ -158,6 +172,50 @@ public class MonkeyApp extends SimpleApplication
 					_walkCam = !_walkCam;
 
 				}
+
+				else if(keyPressed && name.equals("FollowCam"))
+				{
+					if(_selectedSpatial != null)
+					{
+						 
+
+						 
+						 //Attach the camNode to the target:
+//						 ((Node)_selectedSpatial).attachChild(_camNode);
+						 
+//						 cam.setLocation(new Vector3f(0, 0, 0).mult(_areaSize));
+						 
+						 //Move camNode, e.g. behind and above the target:
+//						 _camNode.setLocalTranslation(new Vector3f(-10, 0, 0));
+						 
+						 //Rotate the camNode to look at the target:
+						 
+//						 _camNode.lookAt(Vector3f.ZERO,
+//						 Vector3f.UNIT_Y);
+//						
+//						 System.out.println("_selectedSpatial.getLocalTranslation() : " + _selectedSpatial.getLocalTranslation().toString());
+
+//						// Disable the default flyby cam
+//						flyCam.setEnabled(false);
+//						// Enable a chase cam for this target (typically the
+//						// player).
+//
+						_chaseCam.setEnabled(true);
+						_chaseCam.setSpatial(_selectedSpatial);
+						 
+						 flyCam.setEnabled(false);
+
+
+					}
+					else
+					{
+
+						_chaseCam.setEnabled(false);
+						flyCam.setEnabled(true);
+					}
+
+
+				}
 			}
 
 		};
@@ -168,15 +226,26 @@ public class MonkeyApp extends SimpleApplication
 		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
 		inputManager.addListener(actionListener, new String[]{"Select"});
+		inputManager.addListener(actionListener, new String[]{"FollowCam"});
 
 
 	}
 
 	public void setCam(String modus)
 	{
+		
+		 //create the camera Node
+		_camNode = new CameraNode("Camera Node", cam);
+		 //This mode means that camera copies the movements of the target:
+		 _camNode.setControlDir(ControlDirection.SpatialToCamera);
+		 
+		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
+		_chaseCam.setSmoothMotion(true);
+		_chaseCam.setDefaultDistance(100f);
+		_chaseCam.setEnabled(false);
 
 		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(_areaSize * 1.1f, _areaSize*0.6f, _areaSize * 1.2f));
+		cam.setLocation(new Vector3f(_areaSize * 1.5f, _areaSize * 0.8f, _areaSize * 1.5f));
 		cam.lookAt(new Vector3f(1, 2, 1), Vector3f.UNIT_Y);
 		flyCam.setEnabled(true);
 		flyCam.setMoveSpeed(20);
@@ -217,6 +286,11 @@ public class MonkeyApp extends SimpleApplication
 
 	public void simpleUpdate(float tpf)
 	{
+		
+		System.out.println("pos" + _camNode.getLocalTranslation().toString());
+		
+		System.out.println("poscam" + cam.getLocation());
+		 
 		if(_walkCam)
 		{
 			Vector3f loc = cam.getLocation();
@@ -318,8 +392,8 @@ public class MonkeyApp extends SimpleApplication
 			rootNode.attachChild(_terrain);
 		}
 	}
-	
-	private boolean gridCreated =  false;
+
+	private boolean	gridCreated	= false;
 
 	public void setSpaceSize(double scale, boolean isGrid)
 	{
@@ -338,6 +412,7 @@ public class MonkeyApp extends SimpleApplication
 
 	private void fireSelection()
 	{
+		_selectedSpatial = null;
 		// Reset results list.
 		CollisionResults results = new CollisionResults();
 		// Convert screen click
@@ -353,17 +428,18 @@ public class MonkeyApp extends SimpleApplication
 		// between ray and all
 		// nodes in results
 		// list.
-//		rootNode.collideWith(ray, results);
+		// rootNode.collideWith(ray, results);
 		_geometryNode.collideWith(ray, results);
 
 		int selection = -1;
+		Spatial selectedspatial = null;
 		if(results.size() > 0)
 		{
 			Geometry target = results.getClosestCollision().getGeometry();
 			// Here comes the
 			// action:
 			Spatial selectedsp = target;
-			
+
 			// we look for the SpaceObject-Parent
 			if(selectedsp != null)
 			{
@@ -371,13 +447,32 @@ public class MonkeyApp extends SimpleApplication
 				{
 					selectedsp = selectedsp.getParent();
 				}
-				
+
 				selection = Integer.parseInt(selectedsp.getName());
+				selectedspatial = selectedsp;
 			}
 		}
 		setSelectedTarget(selection);
-		
+		setSelectedSpatial(selectedspatial);
+
 	} // else if ...
+
+
+	/**
+	 * @param _selectedSpatial the _selectedSpatial to set
+	 */
+	private void setSelectedSpatial(Spatial selectedspatial)
+	{
+		this._selectedSpatial = selectedspatial;
+	}
+
+	/**
+	 * @return the _selectedSpatial
+	 */
+	public Spatial getSelectedSpatialt()
+	{
+		return _selectedSpatial;
+	}
 
 	/**
 	 * @return the _selectedTarget
