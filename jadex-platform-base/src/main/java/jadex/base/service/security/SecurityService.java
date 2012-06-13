@@ -560,14 +560,12 @@ public class SecurityService implements ISecurityService
 						{
 							// ignore
 						}
-						else if(addr.isSiteLocalAddress())
+						else // if(addr.isSiteLocalAddress()) or other
 						{
-							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
-							ret.add(ad);
-						}
-						else
-						{
-							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), ifa.getNetworkPrefixLength());
+							// Hack!!! Use sensible default prefix when -1 due to jdk on windows bug
+							// http://bugs.sun.com/view_bug.do?bug_id=6707289
+							short	prefix	= ifa.getNetworkPrefixLength();
+							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), prefix!=-1 ? prefix : 24);
 							ret.add(ad);
 						}
 					}
