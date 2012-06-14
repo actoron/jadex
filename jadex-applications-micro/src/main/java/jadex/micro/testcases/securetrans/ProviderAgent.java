@@ -1,6 +1,7 @@
 package jadex.micro.testcases.securetrans;
 
 import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
@@ -13,6 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@Service
 public class ProviderAgent implements ITestService
 {
 	/**

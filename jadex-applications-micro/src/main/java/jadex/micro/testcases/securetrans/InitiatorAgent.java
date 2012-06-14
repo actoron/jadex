@@ -21,16 +21,24 @@ import jadex.micro.testcases.TestAgent;
 import java.util.Collection;
 
 /**
+ *  Test if the @SecureTransmission accnotation works.
+ *  Uses a service with two method signaures, one unsecured / one secured.
+ *  Uses a cross platform setting with / without secure transport.
+ *  (Assumes that the host platform has a secure transport).
  *  
+ *  Tests if:
+ *  a) with a secure transport both methods can be invoked.
+ *  b) without the secure cannot! and the unsecure can be invoked.
  */
 @Agent
-@RequiredServices({
+@RequiredServices(
+{
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 })
 public class InitiatorAgent extends TestAgent
 {
 	/**
-	 * 
+	 *  Perform the tests.
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
@@ -55,16 +63,8 @@ public class InitiatorAgent extends TestAgent
 		return ret;
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture<TestReport> testLocal(int testno)
-//	{
-//		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno);
-//	}
-	
 	/**
-	 * 
+	 *  Test with secure transport.
 	 */
 	protected IFuture<TestReport> testWithSec(final int testno)
 	{
@@ -98,13 +98,13 @@ public class InitiatorAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test without secure transport.
 	 */
 	protected IFuture<TestReport> testWithoutSec(final int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.createResultListener(
+		createPlatform(new String[]{"-ssltcptransport", "false"}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -133,8 +133,8 @@ public class InitiatorAgent extends TestAgent
 	
 	/**
 	 *  Perform the test. Consists of the following steps:
-	 *  - start a receiver agent
-	 *  - create connection
+	 *  Create provider agent
+	 *  Call methods on it
 	 */
 	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final boolean hassectrans)
 	{
@@ -168,28 +168,31 @@ public class InitiatorAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Call the service methods.
 	 */
 	public IFuture<TestReport> callService(IComponentIdentifier cid, final boolean hassectrans, int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		final TestReport tr = new TestReport("#"+testno, "Test if secure transmission works");
+		final TestReport tr = new TestReport("#"+testno, "Test if secure transmission works "+(hassectrans? "with ": "without ")+"secure transport.");
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				ts.secMethod("secArg").addResultListener(new IResultListener<Void>()
+				ts.secMethod("sec_arg").addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
+						// Must succeed with secure transport.
 						proceed(ts, hassectrans);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						// Must not succeed without secure transport.
+//						exception.printStackTrace();
 						proceed(ts, !hassectrans);
 					}
 				});
@@ -197,7 +200,7 @@ public class InitiatorAgent extends TestAgent
 			
 			protected void proceed(ITestService ts, final boolean ok)
 			{
-				ts.secMethod("secArg").addResultListener(new IResultListener<Void>()
+				ts.unsecMethod("unsec_arg").addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{

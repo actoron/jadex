@@ -123,9 +123,12 @@ public abstract class TestAgent
 				argsmap.put(args[i], args[++i]);
 			}
 			defargs = new String[argsmap.size()*2];
+			int i=0;
 			for(String key: argsmap.keySet())
 			{
-				argsmap.put(key, argsmap.get(key));
+				defargs[i*2]= key; 
+				defargs[i*2+1] = argsmap.get(key);
+				i++;
 			}
 		}
 

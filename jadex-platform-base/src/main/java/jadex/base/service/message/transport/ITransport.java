@@ -1,5 +1,7 @@
 package jadex.base.service.message.transport;
 
+import java.util.Map;
+
 import jadex.base.service.message.ISendTask;
 import jadex.commons.future.IFuture;
 
@@ -26,6 +28,12 @@ public interface ITransport
 	 *  @return True, if the transport is applicable for the address.
 	 */
 	public boolean	isApplicable(String address);
+	
+	/**
+	 *  Test if a transport satisfies the non-functional requirements.
+	 *  @return True, if the transport satisfies the non-functional requirements.
+	 */
+	public boolean	isNonFunctionalSatisfied(Map<String, Object> nonfunc);
 	
 	/**
 	 *  Send a message to the given address.

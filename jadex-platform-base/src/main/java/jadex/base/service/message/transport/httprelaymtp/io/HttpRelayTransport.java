@@ -4,6 +4,7 @@ import jadex.base.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -84,14 +85,20 @@ public class HttpRelayTransport implements ITransport
                     {
                     	return null;
                     }
-                    public void checkClientTrusted( java.security.cert.X509Certificate[] certs, String authType ) { }
-                    public void checkServerTrusted( java.security.cert.X509Certificate[] certs, String authType ) { }
+                    
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) 
+                    { 
+                    }
+                    
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) 
+                    { 
+                    }
                 }
 	        };
 	
 	        // Install the all-trusting trust manager
-            SSLContext sc = SSLContext.getInstance( "TLS" );
-            sc.init( null, trustAllCerts, new java.security.SecureRandom() );
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init( null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
             {
@@ -290,7 +297,6 @@ public class HttpRelayTransport implements ITransport
 	
 	/**
 	 *  Test if a transport is applicable for the target address.
-	 *  
 	 *  @return True, if the transport is applicable for the address.
 	 */
 	public boolean	isApplicable(String address)
@@ -301,6 +307,17 @@ public class HttpRelayTransport implements ITransport
 			applicable	= address.startsWith(getServiceSchemas()[i]);
 		}
 		return applicable;		
+	}
+	
+	/**
+	 *  Test if a transport satisfies the non-functional requirements.
+	 *  @return True, if the transport satisfies the non-functional requirements.
+	 */
+	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
+	{
+		// todo: how to check if https connection?
+		Boolean sec = nonfunc!=null? (Boolean)nonfunc.get(RemoteServiceManagementService.SECURE_TRANSMISSION): null;
+		return sec==null || !sec.booleanValue();
 	}
 	
 	/**

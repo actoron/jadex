@@ -161,8 +161,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //								System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
 						
 						// Post-process.
-						final IFuture<Void>	post	= com instanceof AbstractRemoteCommand
-							? ((AbstractRemoteCommand)com).postprocessCommand(RemoteServiceManagementAgent.this, rms.getRemoteReferenceModule(), getComponentIdentifier()) : IFuture.DONE;
+						final IFuture<Void>	post	= com instanceof AbstractRemoteCommand? 
+							((AbstractRemoteCommand)com).postprocessCommand(RemoteServiceManagementAgent.this, rms.getRemoteReferenceModule(), getComponentIdentifier()) : IFuture.DONE;
 						
 						// Validate command.
 						final Future<Void>	valid	= new Future<Void>();
@@ -299,7 +299,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 												reply.put(SFipa.CONTENT, result);
 //												System.out.println("content: "+result);
 //												System.out.println("reply: "+callid);
-												sendMessage(reply, mt);
+												sendMessage(reply, mt, null, nonfunc);
 											}
 										}));
 									}

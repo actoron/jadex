@@ -3,6 +3,7 @@ package jadex.base.service.message.transport.tcpmtp;
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -282,7 +283,6 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Test if a transport is applicable for the target address.
-	 *  
 	 *  @return True, if the transport is applicable for the address.
 	 */
 	public boolean	isApplicable(String address)	
@@ -293,6 +293,16 @@ public class TCPTransport implements ITransport
 			ret	= address.startsWith(getServiceSchemas()[i]);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Test if a transport satisfies the non-functional requirements.
+	 *  @return True, if the transport satisfies the non-functional requirements.
+	 */
+	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
+	{
+		Boolean sec = nonfunc!=null? (Boolean)nonfunc.get(RemoteServiceManagementService.SECURE_TRANSMISSION): null;
+		return sec==null || !sec.booleanValue();
 	}
 	
 	/**

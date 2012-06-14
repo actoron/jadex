@@ -427,7 +427,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> me, MessageType mt)
 	{
-		return sendMessage(me, mt, null);
+		return sendMessage(me, mt, null, null);
 	}
 	
 	/**
@@ -435,7 +435,8 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> me, final MessageType mt, final byte[] codecids)
+	public IFuture<Void> sendMessage(final Map<String, Object> me, final MessageType mt, 
+		final byte[] codecids, final Map<String, Object> nonfunc)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -445,7 +446,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 			public void customResultAvailable(IMessageService ms)
 			{
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
-					interpreter.getModel().getResourceIdentifier(), null, codecids, null)
+					interpreter.getModel().getResourceIdentifier(), null, codecids, nonfunc)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 		});

@@ -1,6 +1,7 @@
 package jadex.base.service.message.transport.localmtp;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
@@ -92,6 +93,16 @@ public class LocalTransport implements ITransport
 				&& address.substring(getServiceSchemas()[i].length()).equals(container.getId().getPlatformName());
 		}
 		return applicable;
+	}
+	
+	/**
+	 *  Test if a transport satisfies the non-functional requirements.
+	 *  @return True, if the transport satisfies the non-functional requirements.
+	 */
+	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
+	{
+		// Local satisfies all?!
+		return true;
 	}
 	
 	/**

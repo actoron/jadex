@@ -2,6 +2,7 @@ package jadex.base.service.message.transport.niotcpmtp;
 
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -21,6 +22,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -181,6 +183,16 @@ public class NIOTCPTransport implements ITransport
 			ret	= address.startsWith(getServiceSchemas()[i]);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Test if a transport satisfies the non-functional requirements.
+	 *  @return True, if the transport satisfies the non-functional requirements.
+	 */
+	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
+	{
+		Boolean sec = nonfunc!=null? (Boolean)nonfunc.get(RemoteServiceManagementService.SECURE_TRANSMISSION): null;
+		return sec==null || !sec.booleanValue();
 	}
 	
 	/**
