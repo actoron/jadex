@@ -46,19 +46,26 @@ public class StreamUserAgent extends TestAgent
 //		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 //		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 
-		testLocal(1, tc).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-		{
-			public void customResultAvailable(Integer testcnt)
-			{
-				testRemote(testcnt.intValue(), tc).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//		testLocal(1, tc).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//		{
+//			public void customResultAvailable(Integer testcnt)
+//			{
+//				testRemote(testcnt.intValue(), tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(1, tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
-					public void customResultAvailable(Integer result)
+					public void customResultAvailable(Integer testcnt)
 					{
-						ret.setResult(null);
+						testRemote(testcnt.intValue(), tc, false).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+						{
+							public void customResultAvailable(Integer result)
+							{
+								ret.setResult(null);
+							}
+						}));
 					}
 				}));
-			}
-		}));
+//			}
+//		}));
 		
 		return ret;
 	}
@@ -74,7 +81,7 @@ public class StreamUserAgent extends TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<Integer> testRemote(final int testno, final Testcase tc)
+	protected IFuture<Integer> testRemote(final int testno, final Testcase tc, final boolean sec)
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
@@ -83,22 +90,44 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTests(testno, platform.getServiceProvider(), platform.getComponentIdentifier(), tc)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
+				if(!sec)
 				{
-					public void customResultAvailable(final Integer result)
+					performTests(testno, platform.getServiceProvider(), platform.getComponentIdentifier(), tc)
+						.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
 					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				}));
+						public void customResultAvailable(final Integer result)
+						{
+							platform.killComponent();
+	//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+	//						{
+	//							public void customResultAvailable(Map<String, Object> v)
+	//							{
+	//								ret.setResult(result);
+	//							}
+	//						});
+							ret.setResult(result);
+						}
+					}));
+				}
+				else
+				{
+					performSecureTests(testno, platform.getServiceProvider(), platform.getComponentIdentifier(), tc)
+						.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
+					{
+						public void customResultAvailable(final Integer result)
+						{
+							platform.killComponent();
+	//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+	//						{
+	//							public void customResultAvailable(Map<String, Object> v)
+	//							{
+	//								ret.setResult(result);
+	//							}
+	//						});
+							ret.setResult(result);
+						}
+					}));
+				}
 			}
 		}));
 		
@@ -140,6 +169,68 @@ public class StreamUserAgent extends TestAgent
 											{
 												tc.addReport(result);
 												testPassOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+												{
+													public void customResultAvailable(TestReport result)
+													{
+														tc.addReport(result);
+														destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Integer>(ret)
+														{
+															public void customResultAvailable(Map<String,Object> result) 
+															{
+																ret.setResult(new Integer(cnt[0]));
+															}
+														});
+													}
+												});
+											}
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Integer> performSecureTests(int testcnt,IServiceProvider provider, IComponentIdentifier root, final Testcase tc)
+	{
+		final Future<Integer> ret = new Future<Integer>();
+		
+		final int[] cnt = new int[]{testcnt};
+		
+		createComponent(provider, "jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Integer>(ret)
+		{
+			public void customResultAvailable(final IComponentIdentifier cid) 
+			{
+				SServiceProvider.getService(agent.getServiceProvider(), cid, IStreamService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
+				{
+					public void customResultAvailable(final IStreamService ss)
+					{
+						testSecureGetInputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+						{
+							public void customResultAvailable(TestReport result)
+							{
+								tc.addReport(result);
+								testSecureGetOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+								{
+									public void customResultAvailable(TestReport result)
+									{
+										tc.addReport(result);
+										testSecurePassInputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+										{
+											public void customResultAvailable(TestReport result)
+											{
+												tc.addReport(result);
+												testSecurePassOutputStream(cnt[0]++, ss).addResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
@@ -248,6 +339,97 @@ public class StreamUserAgent extends TestAgent
 		ServiceInputConnection con = new ServiceInputConnection();
 		
 		ss.passOutputStream(con.getOutputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+		
+		StreamProviderAgent.read(con);
+		
+		return ret;
+	}
+	
+	
+	
+	/**
+	 * 
+	 */
+	protected IFuture<TestReport> testSecureGetInputStream(int testno, IStreamService ss)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+		final TestReport tr = new TestReport("#"+testno, "Test getSecureInputStream()");
+		
+		ss.getSecureInputStream().addResultListener(new IResultListener<IInputConnection>()
+		{
+			public void resultAvailable(IInputConnection con)
+			{
+				System.out.println("received icon: "+con.getNonFunctionalProperties());
+				
+				StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("ex: "+exception);
+				tr.setFailed("Exception: "+exception.getMessage());
+				ret.setResult(tr);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<TestReport> testSecureGetOutputStream(int testno, IStreamService ss)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+		final TestReport tr = new TestReport("#"+testno, "Test getSecureOutputStream()");
+		
+		ss.getSecureOutputStream().addResultListener(new IResultListener<IOutputConnection>()
+		{
+			public void resultAvailable(final IOutputConnection con)
+			{
+				System.out.println("received ocon: "+con.getNonFunctionalProperties());
+				
+				StreamProviderAgent.write(con, agent).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("ex: "+exception);
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<TestReport> testSecurePassInputStream(int testno, IStreamService ss)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+		final TestReport tr = new TestReport("#"+testno, "Test passSecureInputStream()");
+		
+		final ServiceOutputConnection con = new ServiceOutputConnection();
+		
+		ss.passSecureInputStream(con.getInputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+
+		StreamProviderAgent.write(con, agent);
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<TestReport> testSecurePassOutputStream(int testno, IStreamService ss)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+		final TestReport tr = new TestReport("#"+testno, "Test passSecureInputStream()");
+		
+		ServiceInputConnection con = new ServiceInputConnection();
+		
+		ss.passSecureOutputStream(con.getOutputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
 		
 		StreamProviderAgent.read(con);
 		

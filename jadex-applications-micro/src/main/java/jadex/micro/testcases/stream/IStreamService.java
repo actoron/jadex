@@ -2,6 +2,7 @@ package jadex.micro.testcases.stream;
 
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.future.IFuture;
 
 /**
@@ -32,5 +33,34 @@ public interface IStreamService
 	 *  @param con The output stream.
 	 */
 	public IFuture<Long> passOutputStream(IOutputConnection con);
+	
+	
+	/**
+	 *  Pass an input stream to the user.
+	 *  @return The input stream.
+	 */
+	@SecureTransmission
+	public IFuture<IInputConnection> getSecureInputStream();
+
+	/**
+	 *  Pass an output stream to the user.
+	 *  @return The input stream.
+	 */
+	@SecureTransmission
+	public IFuture<IOutputConnection> getSecureOutputStream();
+
+	/**
+	 *  Pass an Input stream to the user.
+	 *  @return The Input stream.
+	 */
+	@SecureTransmission
+	public IFuture<Long> passSecureInputStream(IInputConnection con);
+	
+	/**
+	 *  Pass an output stream from the user.
+	 *  @param con The output stream.
+	 */
+	@SecureTransmission
+	public IFuture<Long> passSecureOutputStream(IOutputConnection con);
 	
 }

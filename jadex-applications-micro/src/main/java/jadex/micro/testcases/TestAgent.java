@@ -72,7 +72,7 @@ public abstract class TestAgent
 		{
 			public void resultAvailable(Void result)
 			{
-//				System.out.println("tests finished");
+				System.out.println("tests finished");
 
 				agent.setResultValue("testresults", tc);
 				ret.setResult(null);
