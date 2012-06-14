@@ -1,24 +1,8 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        GlowMap : Flip jadex3d/models/space/smallship/s_1024_S.jpg
         DiffuseMap : Flip jadex3d/models/space/smallship/s_1024_C.jpg
-        EnvMap : Flip jadex3d/models/space/smallship/s_1024_S.jpg
-        Specular : 0.8 0.8 0.0 1.0
-        Diffuse : 1.0 1.0 0.0 1.0
-        EnvMapAsSphereMap : false
-        Ambient : 1.0 0.2 0.2 1.0
-        UseMaterialColors : false
-        SeparateTexCoord : false
+
     }
     AdditionalRenderState {
-      FaceCull Back
-      Wireframe Off
-      DepthWrite On
-      PolyOffset 0.0 0.0
-      AlphaTestFalloff 0.0
-      Blend Off
-      PointSprite Off
-      ColorWrite On
-      DepthTest On
     }
 }
