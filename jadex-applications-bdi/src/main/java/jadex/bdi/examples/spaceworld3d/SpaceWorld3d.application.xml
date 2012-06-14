@@ -125,8 +125,8 @@
 				
 				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
 
-					<env:sky skypath="jadex3d/textures/sky/space/stars/" west="right.jpg" east="leftJadex.jpg" north="back.jpg" south="frontEarthSmall.jpg" up="top.jpg" down="bottom.jpg" isSphere="false" />  
-						<!--  
+					<env:sky skypath="jadex3d/textures/sky/space/nebula02/" west="right.jpg" east="left.jpg" north="back.jpg" south="front.jpg" up="top.jpg" down="bottom.jpg" isSphere="false" />  
+					<!--  
 					<env:rndterrain width="1" height="0.2" depth="1"  
 		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
 					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
@@ -144,7 +144,7 @@
 					<env:text3d  width="2" height="2" depth="1"  rotation="rotate45" x="0.2" y="0.2" z="0.2" text="$textda$" color="#FFFFFFFF"></env:text3d>
 				
 					<env:sphere width="0.01" height="0.01" depth="0.01" x="0" y="0" z="0"  color="#FFFF00FF"/>
-		
+		  
 					<env:object3d width="0.03" height="0.03" depth="0.03" x="-1.5" y="-2.2" z="0.5" modelpath="jadex3d/models/space/misc/station/konostationobj.j3o" hasLightMaterials="true"/> 
 
 					<env:sphere width="2" height="0.002" depth="2" x="1" y="-3" z="1"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/yellowblack.jpg">
@@ -152,7 +152,7 @@
 
 					<env:dome radius="1" size="oresize" samples="30" depth="2" x="1" y="-3" z="1"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/oretex.jpg">
 					</env:dome>
-				
+			
 				</env:drawable3d>
 				
 				<!--ERZVORKOMMEN  -->
@@ -200,7 +200,7 @@
 				<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
 				<env:property name="rotate" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
 				<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
-						
+					
 						<env:object3d width="0.05" height="0.05" depth="0.05" x="0" y="0.0" z="0.0" rotation="rotate" modelpath="jadex3d/models/space/spacefrigate/spacefrigate.j3o" hasLightMaterials="true"/> 
 						
 						
@@ -227,7 +227,7 @@
 					
 					<env:drawable3d objecttype="producer" width="0.1" height="0.1" depth="0.1">
 					<env:property name="rotation" dynamic="false">new Vector3Double(0, (Math.PI/180)*180, 0)</env:property>
-						
+						  
 						<env:object3d width="0.025" height="0.025" depth="0.025" rotation="rotation" x="0" y="0.0" z="0.0"  modelpath="jadex3d/models/space/smallship/ship.j3o" hasLightMaterials="true"/> 
 						
 					</env:drawable3d>
