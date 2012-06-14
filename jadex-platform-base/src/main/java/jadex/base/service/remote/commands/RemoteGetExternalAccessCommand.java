@@ -83,14 +83,16 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 //						IExternalAccess exta = (IExternalAccess)result;
 //						ProxyInfo pi = RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), cid, exta);
 //						ret.setResult(new RemoteResultCommand(exta, null, callid, true));
-						ret.addIntermediateResult(new RemoteResultCommand(null, exta, null, callid, true));
+						ret.addIntermediateResult(new RemoteResultCommand(null, exta, null, callid, 
+							true, null, getNonFunctionalProperties()));
 						ret.setFinished();
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 //						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-						ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
+						ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false, 
+							null, getNonFunctionalProperties()));
 						ret.setFinished();
 					}
 				});
@@ -99,7 +101,8 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 			public void exceptionOccurred(Exception exception)
 			{
 //				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-				ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
+				ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false, 
+					null, getNonFunctionalProperties()));
 				ret.setFinished();
 			}
 		});

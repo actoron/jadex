@@ -1,6 +1,14 @@
 package jadex.base.service.message;
 
 import jadex.base.AbstractComponentAdapter;
+import jadex.base.service.message.streams.AbstractConnectionHandler;
+import jadex.base.service.message.streams.AckInfo;
+import jadex.base.service.message.streams.InitInfo;
+import jadex.base.service.message.streams.InputConnection;
+import jadex.base.service.message.streams.InputConnectionHandler;
+import jadex.base.service.message.streams.OutputConnection;
+import jadex.base.service.message.streams.OutputConnectionHandler;
+import jadex.base.service.message.streams.StreamSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
@@ -218,27 +226,27 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 * 
 	 */
-	public IInputConnection getParticipantInputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant)
+	public IInputConnection getParticipantInputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
-		return initInputConnection(conid, initiator, participant);
+		return initInputConnection(conid, initiator, participant, nonfunc);
 	}
 	
 	/**
 	 * 
 	 */
-	public IOutputConnection getParticipantOutputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant)
+	public IOutputConnection getParticipantOutputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
-		return initOutputConnection(conid, initiator, participant);
+		return initOutputConnection(conid, initiator, participant, nonfunc);
 	}
 	
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public OutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public OutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
-		OutputConnectionHandler och = new OutputConnectionHandler(this);
+		OutputConnectionHandler och = new OutputConnectionHandler(this, nonfunc);
 		OutputConnection con = new OutputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, och);
 		icons.put(conid, och);
@@ -248,19 +256,19 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
-		return new Future<IOutputConnection>(internalCreateOutputConnection(sender, receiver));
+		return new Future<IOutputConnection>(internalCreateOutputConnection(sender, receiver, nonfunc));
 	}
 
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
-		InputConnectionHandler ich = new InputConnectionHandler(this);
+		InputConnectionHandler ich = new InputConnectionHandler(this, nonfunc);
 		InputConnection con = new InputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, ich);
 		icons.put(conid, ich);
@@ -270,9 +278,9 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
 	{
-		return new Future<IInputConnection>(internalCreateInputConnection(sender, receiver));
+		return new Future<IInputConnection>(internalCreateInputConnection(sender, receiver, nonfunc));
 	}
 
 	/**
@@ -1401,7 +1409,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Send message(s) executable.
 	 */
-	protected class SendManager implements IExecutable
+	public class SendManager implements IExecutable
 	{
 		//-------- attributes --------
 		
@@ -1635,8 +1643,8 @@ public class MessageService extends BasicService implements IMessageService
 				// Handle output connection participant side
 				if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
 				{
-					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-					initInputConnection(conid, recs[0], recs[1]);
+					InitInfo ii = (InitInfo)data;
+					initInputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
 				}
 				else if(type==StreamSendTask.ACKINIT_OUTPUT_PARTICIPANT)
 				{
@@ -1733,8 +1741,8 @@ public class MessageService extends BasicService implements IMessageService
 				
 				else if(type==StreamSendTask.INIT_INPUT_INITIATOR)
 				{
-					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-					initOutputConnection(conid, recs[0], recs[1]);
+					InitInfo ii = (InitInfo)data;
+					initOutputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
 				}
 				else if(type==StreamSendTask.ACKINIT_INPUT_PARTICIPANT)
 				{
@@ -2103,7 +2111,8 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Create local input connection side after receiving a remote init output message.
 	 *  May be called multiple times and does nothing, if connection already exists.
 	 */
-	protected IInputConnection	initInputConnection(final int conid, final IComponentIdentifier initiator, final IComponentIdentifier participant)
+	protected IInputConnection	initInputConnection(final int conid, final IComponentIdentifier initiator, 
+		final IComponentIdentifier participant, final Map<String, Object> nonfunc)
 	{
 		boolean	created;
 		InputConnectionHandler ich	= null;
@@ -2113,7 +2122,7 @@ public class MessageService extends BasicService implements IMessageService
 			ich	= (InputConnectionHandler)pcons.get(new Integer(conid));
 			if(ich==null)
 			{
-				ich = new InputConnectionHandler(MessageService.this);
+				ich = new InputConnectionHandler(MessageService.this, nonfunc);
 				con = new InputConnection(initiator, participant, conid, false, ich);
 				pcons.put(new Integer(conid), ich);
 //				System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
@@ -2145,6 +2154,12 @@ public class MessageService extends BasicService implements IMessageService
 				}
 			});
 		}
+		else
+		{
+			// If connection arrives late
+			if(nonfunc!=null)
+				ich.setNonFunctionalProperties(nonfunc);
+		}
 		
 		return con;
 	}
@@ -2153,7 +2168,8 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Create local output connection side after receiving a remote init input message.
 	 *  May be called multiple times and does nothing, if connection already exists.
 	 */
-	protected IOutputConnection	initOutputConnection(final int conid, final IComponentIdentifier initiator, final IComponentIdentifier participant)
+	protected IOutputConnection	initOutputConnection(final int conid, final IComponentIdentifier initiator, 
+		final IComponentIdentifier participant, final Map<String, Object> nonfunc)
 	{
 		boolean	created;
 		OutputConnectionHandler och;
@@ -2163,7 +2179,7 @@ public class MessageService extends BasicService implements IMessageService
 			och	= (OutputConnectionHandler) pcons.get(new Integer(conid));
 			if(och==null)
 			{
-				och = new OutputConnectionHandler(MessageService.this);
+				och = new OutputConnectionHandler(MessageService.this, nonfunc);
 				con = new OutputConnection(initiator, participant, conid, false, och);
 				pcons.put(new Integer(conid), och);
 //				System.out.println("created: "+con.hashCode());
@@ -2176,7 +2192,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 		
-		if(och!=null)
+		if(created)
 		{
 			och.initReceived();
 			
@@ -2191,10 +2207,16 @@ public class MessageService extends BasicService implements IMessageService
 					if(component != null)
 					{
 						component.receiveStream(fcon);
-	//							pcons.put(new Integer(conid), con);
+	//					pcons.put(new Integer(conid), con);
 					}
 				}
 			});
+		}
+		else
+		{
+			// If connection arrives late
+			if(nonfunc!=null)
+				och.setNonFunctionalProperties(nonfunc);
 		}
 		
 		return con;

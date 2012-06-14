@@ -2,6 +2,7 @@ package jadex.bridge.service.types.remote;
 
 
 import java.io.OutputStream;
+import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -157,6 +158,17 @@ public class ServiceInputConnection implements IInputConnection
 	{
 		if(con!=null)
 			return con.getParticipant();
+		else
+			throw new RuntimeException("Uninitialized connection.");
+	}
+	
+	/**
+	 *  Get the non-functional properties of the connection.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		if(con!=null)
+			return con.getNonFunctionalProperties();
 		else
 			throw new RuntimeException("Uninitialized connection.");
 	}

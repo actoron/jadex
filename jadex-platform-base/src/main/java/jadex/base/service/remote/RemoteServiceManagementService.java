@@ -2,9 +2,9 @@ package jadex.base.service.remote;
 
 import jadex.base.contentcodecs.JadexBinaryContentCodec;
 import jadex.base.contentcodecs.JadexXMLContentCodec;
-import jadex.base.service.message.InputConnection;
 import jadex.base.service.message.MessageService;
-import jadex.base.service.message.OutputConnection;
+import jadex.base.service.message.streams.InputConnection;
+import jadex.base.service.message.streams.OutputConnection;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
@@ -810,7 +810,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
-					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), icp.getInitiator(), icp.getParticipant());
+					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
+						icp.getInitiator(), icp.getParticipant(), null); // non-func is delivered via init
 					return icon;
 				}
 				catch(RuntimeException e)
@@ -837,7 +838,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
-					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), ocp.getInitiator(), ocp.getParticipant());
+					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
+						ocp.getInitiator(), ocp.getParticipant(), null); // non-func is delivered via init
 					return ocon;
 				}
 				catch(RuntimeException e)
@@ -955,9 +957,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)context.getRootObject()).getReceiver();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)context.getRootObject();
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
+						RemoteServiceManagementService.this.component.getComponentIdentifier(), 
+						com.getReceiver(), com.getNonFunctionalProperties());
 					con.setConnectionId(ocon.getConnectionId());
 					con.setOutputConnection(ocon);
 					return con;
@@ -984,9 +988,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)context.getRootObject()).getReceiver();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)context.getRootObject();
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
+						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
 					con.setConnectionId(icon.getConnectionId());
 					con.setInputConnection(icon);
 					return con;
@@ -1045,7 +1050,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
-					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), icp.getInitiator(), icp.getParticipant());
+					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
+						icp.getInitiator(), icp.getParticipant(), null); // non-func is delivered via init
 					return icon;
 				}
 				catch(RuntimeException e)
@@ -1068,7 +1074,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
-					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), ocp.getInitiator(), ocp.getParticipant());
+					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
+						ocp.getInitiator(), ocp.getParticipant(), null); // non-func is delivered via init
 					return ocon;
 				}
 				catch(RuntimeException e)
@@ -1177,9 +1184,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
+						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
 					con.setOutputConnection(ocon);
 					con.setConnectionId(ocon.getConnectionId());
 					return con;
@@ -1205,9 +1213,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				try
 				{
-					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
+					AbstractRemoteCommand com = (AbstractRemoteCommand)((EncodingContext)context).getRootObject();
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
+						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
 					con.setConnectionId(icon.getConnectionId());
 					con.setInputConnection(icon);
 					return con;

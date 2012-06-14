@@ -1,9 +1,9 @@
 package jadex.base.service.marshal;
 
-import jadex.base.service.message.InputConnection;
-import jadex.base.service.message.LocalInputConnectionHandler;
-import jadex.base.service.message.LocalOutputConnectionHandler;
-import jadex.base.service.message.OutputConnection;
+import jadex.base.service.message.streams.InputConnection;
+import jadex.base.service.message.streams.LocalInputConnectionHandler;
+import jadex.base.service.message.streams.LocalOutputConnectionHandler;
+import jadex.base.service.message.streams.OutputConnection;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;

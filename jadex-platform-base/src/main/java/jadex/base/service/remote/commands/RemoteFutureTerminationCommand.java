@@ -92,7 +92,8 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 			});
 		}
 		
-		ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, false));
+		ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, 
+			false, null, getNonFunctionalProperties()));
 		ret.setFinished();
 		return ret;
 	}

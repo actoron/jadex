@@ -15,6 +15,7 @@ import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  A service output connection can be used to write data to a remote input connection.
@@ -149,6 +150,17 @@ public class ServiceOutputConnection implements IOutputConnection
 	{
 		if(con!=null)
 			return con.getParticipant();
+		else
+			throw new RuntimeException("Uninitialized connection.");
+	}
+	
+	/**
+	 *  Get the non-functional properties of the connection.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		if(con!=null)
+			return con.getNonFunctionalProperties();
 		else
 			throw new RuntimeException("Uninitialized connection.");
 	}

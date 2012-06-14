@@ -105,7 +105,6 @@ public class StreamUserAgent extends TestAgent
 		return ret;
 	}
 	
-	
 	/**
 	 * 
 	 */

@@ -1,18 +1,14 @@
 package jadex.base.service.remote.commands;
 
-import java.util.TimerTask;
-
 import jadex.base.service.remote.RemoteServiceManagementService;
-import jadex.base.service.remote.RemoteServiceManagementService.TimeoutTimerTask;
 import jadex.base.service.remote.RemoteServiceManagementService.WaitingCallInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
+
+import java.util.Map;
 
 /**
  * 
@@ -29,20 +25,21 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	{
 	}
 
-	/**
-	 *  Create a new remote intermediate result command.
-	 */
-	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref)
-	{
-		this(realreceiver, result, callid, isref, null, false);
-	}
+//	/**
+//	 *  Create a new remote intermediate result command.
+//	 */
+//	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref)
+//	{
+//		this(realreceiver, result, callid, isref, null, false);
+//	}
 	
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, String methodname, boolean finished)
+	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, 
+		String methodname, boolean finished, Map<String, Object> nonfunc)
 	{
-		super(realreceiver, result, null, callid, isref, methodname);
+		super(realreceiver, result, null, callid, isref, methodname, nonfunc);
 		this.finished = finished;
 	}
 	

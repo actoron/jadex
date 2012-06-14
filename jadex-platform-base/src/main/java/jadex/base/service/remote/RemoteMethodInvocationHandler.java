@@ -311,8 +311,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //			if("getServices".equals(method.getName()))
 //				debugcallid	= callid;
 			
+			// non-func is in command to let stream handlers access the properties in RMI processing
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
-				pr.getRemoteReference(), method, args, callid, IComponentIdentifier.LOCAL.get());
+				pr.getRemoteReference(), method, args, callid, IComponentIdentifier.LOCAL.get(), nonfunc);
 			
 			// Can be invoked directly, because internally redirects to agent thread.
 //			System.out.println("invoke: "+method.getName());

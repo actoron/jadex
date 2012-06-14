@@ -1,5 +1,7 @@
 package jadex.base.service.remote.commands;
 
+import java.util.Map;
+
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.bridge.IComponentIdentifier;
@@ -22,14 +24,24 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	/** The receiver (for processing the command in rmipreprocessor, will not be transferred). */
 	protected IComponentIdentifier receiver;
 	
+	/** The non-functional properties. */
+	protected Map<String, Object> nonfunc;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Bean constructor.
 	 */
-	public AbstractRemoteCommand()//IComponentIdentifier receiver)
+	public AbstractRemoteCommand()
 	{
-//		this.receiver = receiver;
+	}
+	
+	/**
+	 *  Bean constructor.
+	 */
+	public AbstractRemoteCommand(Map<String, Object> nonfunc)
+	{
+		this.nonfunc = nonfunc;
 	}
 	
 	//-------- methods --------
@@ -109,5 +121,23 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	public IComponentIdentifier	getOrigin()
 	{
 		return getSender();
+	}
+	
+	/**
+	 *  Get the non-functional properties of the call.
+	 *  @return The non-functional properties of the call.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		return nonfunc;
+	}
+	
+	/**
+	 *  Get the non-functional properties of the call.
+	 *  @return The non-functional properties of the call.
+	 */
+	public void setNonFunctionalProperties(Map<String, Object> nonfunc)
+	{
+		this.nonfunc = nonfunc;
 	}
 }

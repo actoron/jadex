@@ -1,5 +1,7 @@
 package jadex.micro.testcases.securetrans;
 
+import jadex.bridge.IInputConnection;
+import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.future.IFuture;
 
@@ -19,4 +21,5 @@ public interface ITestService
 	 *  Call a method that can use any transport.
 	 */
 	public IFuture<Void> unsecMethod(String msg);
+	
 }

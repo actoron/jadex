@@ -171,14 +171,16 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								}
 								
 //								ret.setResult(new RemoteResultCommand(content, null , callid, false));
-								ret.addIntermediateResult(new RemoteResultCommand(null, content, null , callid, false));
+								ret.addIntermediateResult(new RemoteResultCommand(null, content, null, callid, 
+									false, null, getNonFunctionalProperties()));
 								ret.setFinished();
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 //								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-								ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
+								ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, 
+									false, null, getNonFunctionalProperties()));
 								ret.setFinished();
 							}
 						});
@@ -187,7 +189,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 					public void exceptionOccurred(Exception exception)
 					{
 //						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-						ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
+						ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, 
+							false, null, getNonFunctionalProperties()));
 						ret.setFinished();
 					}
 				});
@@ -196,7 +199,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 			public void exceptionOccurred(Exception exception)
 			{
 //				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-				ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
+				ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, 
+					false, null, getNonFunctionalProperties()));
 				ret.setFinished();
 			}
 		});

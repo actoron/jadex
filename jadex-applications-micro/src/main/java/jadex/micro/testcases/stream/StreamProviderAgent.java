@@ -78,7 +78,7 @@ public class StreamProviderAgent implements IStreamService
 	}
 	
 	/**
-	 * 
+	 *  Read data from an input connection.
 	 */
 	public static IFuture<Long> read(IInputConnection con)
 	{
@@ -113,7 +113,7 @@ public class StreamProviderAgent implements IStreamService
 	}
 	
 	/**
-	 * 
+	 *  Write data to a output connection.
 	 */
 	public static IFuture<Long> write(final IOutputConnection con, final IInternalAccess agent)
 	{

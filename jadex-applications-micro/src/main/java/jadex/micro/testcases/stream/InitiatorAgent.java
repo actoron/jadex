@@ -134,7 +134,7 @@ public class InitiatorAgent extends TestAgent
 				{
 					public void customResultAvailable(IMessageService ms)
 					{
-						ms.createOutputConnection(agent.getComponentIdentifier(), cid)
+						ms.createOutputConnection(agent.getComponentIdentifier(), cid, null)
 							.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)
 						{
 							public void customResultAvailable(final IOutputConnection ocon) 

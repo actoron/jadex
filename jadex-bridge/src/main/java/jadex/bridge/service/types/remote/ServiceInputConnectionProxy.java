@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.remote;
 
 import java.io.OutputStream;
+import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -152,6 +153,14 @@ public class ServiceInputConnectionProxy implements IInputConnection
 //	{
 //		throw new UnsupportedOperationException();
 //	}
+	
+	/**
+	 *  Get the non-functional properties of the connection.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 *  Read all data from output stream to the connection.

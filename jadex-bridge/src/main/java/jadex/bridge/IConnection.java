@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 
 /**
  * 
@@ -26,5 +28,10 @@ public interface IConnection
 	 */
 	// todo: make IFuture<Void> ?
 	public void close();
+	
+	/**
+	 *  Get the non-functional properties of the connection.
+	 */
+	public Map<String, Object> getNonFunctionalProperties();
 }
 

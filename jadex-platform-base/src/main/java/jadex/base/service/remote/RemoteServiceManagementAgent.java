@@ -163,7 +163,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						// Post-process.
 						final IFuture<Void>	post	= com instanceof AbstractRemoteCommand? 
 							((AbstractRemoteCommand)com).postprocessCommand(RemoteServiceManagementAgent.this, rms.getRemoteReferenceModule(), getComponentIdentifier()) : IFuture.DONE;
-						
+						final Map<String, Object> nonfunc = com instanceof AbstractRemoteCommand? ((AbstractRemoteCommand)com).getNonFunctionalProperties(): null;
+							
 						// Validate command.
 						final Future<Void>	valid	= new Future<Void>();
 						post.addResultListener(new DelegationResultListener<Void>(valid)
@@ -217,7 +218,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								if(!(exception instanceof ComponentTerminatedException))
 								{
 									getLogger().info("RMS rejected unauthorized command: "+msg.get(SFipa.SENDER)+", "+com);
-									reply.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
+									reply.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false, null, nonfunc));
 									reply.setFinished();
 								}
 							}
@@ -234,14 +235,14 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						}
 						else
 						{
-							reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received broken message content: "+content), callid, false));
+							reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received broken message content: "+content), callid, false, null, null));
 							reply.setFinished();
 						}
 					}
 					else
 					{
 						getLogger().info("RMS received unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
-						reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received unexpected message content: "+content), callid, false));
+						reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received unexpected message content: "+content), callid, false, null, null));
 						reply.setFinished();
 					}
 

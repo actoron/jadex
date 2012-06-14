@@ -14,6 +14,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 
+import java.util.Map;
+
 /**
  *  Command that represents the result(s) of a remote command.
  *  Notifies the caller about the result.
@@ -49,19 +51,21 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	{
 	}
 
-	/**
-	 *  Create a new remote result command.
-	 */
-	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, boolean isref)
-	{
-		this(sender, result, exception, callid, isref, null);
-	}
+//	/**
+//	 *  Create a new remote result command.
+//	 */
+//	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, boolean isref)
+//	{
+//		this(sender, result, exception, callid, isref, null);
+//	}
 	
 	/**
 	 *  Create a new remote result command.
 	 */
-	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, boolean isref, String methodname)
+	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, 
+		boolean isref, String methodname, Map<String, Object> nonfunc)
 	{
+		super(nonfunc);
 //		if(methodname!=null && methodname.equals("getInputStream"))
 //			System.out.println("callid of getResult result: "+callid+" "+result);
 		
