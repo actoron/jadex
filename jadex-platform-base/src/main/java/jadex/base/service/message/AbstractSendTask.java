@@ -159,6 +159,7 @@ public abstract class AbstractSendTask implements ISendTask
 	 */
 	public Map<String, Object> getNonFunctionalProperties()
 	{
+//		System.out.println("nonfunc: "+nonfunc);
 		return nonfunc;
 	}
 

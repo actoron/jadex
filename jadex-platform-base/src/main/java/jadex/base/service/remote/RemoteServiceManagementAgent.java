@@ -299,7 +299,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 												reply.put(SFipa.CONTENT, result);
 //												System.out.println("content: "+result);
 //												System.out.println("reply: "+callid);
-												sendMessage(reply, mt, null, null);//nonfunc);
+												sendMessage(reply, mt, null);
 											}
 										}));
 									}

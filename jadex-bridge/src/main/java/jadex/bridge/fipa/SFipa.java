@@ -159,6 +159,7 @@ public class SFipa
 	public static final String X_TIMESTAMP = "x_timestamp";
 	public static final String X_RID = "x_rid";
 	public static final String X_RECEIVER = "x_receiver";
+	public static final String X_NONFUNCTIONAL = "x_nonfunctional";
 
 	/** The allowed message attributes. */
 	public static Set MESSAGE_ATTRIBUTES;

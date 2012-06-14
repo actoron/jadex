@@ -287,7 +287,7 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> origmsg, final MessageType type, 
 		IComponentIdentifier osender, final IResourceIdentifier rid, 
-		final IComponentIdentifier realrec, final byte[] codecids, final Map<String, Object> nonfunc)
+		final IComponentIdentifier realrec, final byte[] codecids)//, final Map<String, Object> nonfunc)
 	{
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
@@ -411,7 +411,7 @@ public class MessageService extends BasicService implements IMessageService
 							public void customResultAvailable(IExternalAccess exta)
 							{
 //								System.out.println("msgservice calling doSendMessage()");
-								doSendMessage(msg, type, exta, cl, ret, codecids, nonfunc);
+								doSendMessage(msg, type, exta, cl, ret, codecids);
 							}
 						});
 					}
@@ -426,7 +426,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Extracted method to be callable from listener.
 	 */
 	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, 
-		ClassLoader cl, Future<Void> ret, byte[] codecids, Map<String, Object> nonfunc)
+		ClassLoader cl, Future<Void> ret, byte[] codecids)
 	{
 		Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 
@@ -467,7 +467,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else if(value!=null && !((value instanceof String) || (value instanceof byte[])) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
-					|| name.equals(type.getResourceIdIdentifier())))
+				|| name.equals(type.getResourceIdIdentifier()) || name.equals(type.getNonFunctionalPropertiesIdentifier())))
 			{	
 				// HACK!!!
 				if(SFipa.FIPA_MESSAGE_TYPE.equals(type) && !msgcopy.containsKey(SFipa.LANGUAGE))
@@ -580,7 +580,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, nonfunc);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl);
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}

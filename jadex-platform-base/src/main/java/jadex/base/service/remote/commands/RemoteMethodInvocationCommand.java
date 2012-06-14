@@ -81,8 +81,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	public RemoteMethodInvocationCommand(RemoteReference rr, Method method, 
 		Object[] parametervalues, String callid, IComponentIdentifier caller)
 	{
-//		if(method.getName().equals("getResult"))
-//			System.out.println("callid of getResult: "+callid);
+		if(method.getName().equals("secMethod"))
+			System.out.println("callid of getResult: "+callid);
 		
 		this.rr = rr;
 		this.method = method;

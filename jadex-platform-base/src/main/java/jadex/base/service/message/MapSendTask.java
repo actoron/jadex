@@ -4,6 +4,7 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
 
@@ -40,9 +41,9 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public MapSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs, ClassLoader classloader, Map<String, Object> nonfunc)//, SendManager manager)
+		ITransport[] transports, ICodec[] codecs, ClassLoader classloader)//, SendManager manager)
 	{
-		super(receivers, transports, codecs, nonfunc);
+		super(receivers, transports, codecs, (Map<String, Object>)message.get(SFipa.X_NONFUNCTIONAL));
 		if(codecs==null || codecs.length==0)
 			throw new IllegalArgumentException("Codecs must not null.");
 		

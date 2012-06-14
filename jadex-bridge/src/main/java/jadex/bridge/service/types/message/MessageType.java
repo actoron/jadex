@@ -181,6 +181,12 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 *  @return The resource identifier id.
 	 */
 	public abstract String getResourceIdIdentifier();
+	
+	/**
+	 *  Get the identifier for fetching the non-functional properties.
+	 *  @return The non-functional properties.
+	 */
+	public abstract String getNonFunctionalPropertiesIdentifier();
 
 	/**
 	 *  Get the identifier for fetching the resource identifier id.

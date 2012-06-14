@@ -561,6 +561,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.SENDER, component.getComponentIdentifier());
 							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 							msg.put(SFipa.CONVERSATION_ID, callid);
+							msg.put(SFipa.X_NONFUNCTIONAL, nonfunc);
 							
 							getResourceIdentifier(ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
 								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
@@ -595,7 +596,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														{
 															msg.put(SFipa.CONTENT, content);
 															
-															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), realrec, null, nonfunc)
+															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), realrec, null)
 																.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 															{
 																public void customResultAvailable(Void result)
@@ -637,7 +638,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
-	 * 
+	 *  Timeout timer task for sent messages.
 	 */
 	public static class TimeoutTimerTask extends TimerTask
 	{
@@ -652,7 +653,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		protected long timeout;
 		
 		/**
-		 * 
+		 *  Create a new timer task.
 		 */
 		public TimeoutTimerTask(long timeout, Future<?> future, String callid, 
 			IComponentIdentifier receiver, RemoteServiceManagementService rms)
@@ -665,7 +666,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}
 		
 		/**
-		 * 
+		 *  Create a new timer task.
 		 */
 		public TimeoutTimerTask(TimeoutTimerTask tt)
 		{
@@ -673,7 +674,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}
 		
 		/**
-		 * 
+		 *  Start the timer task.
 		 */
 		public void start()
 		{
@@ -681,7 +682,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}
 
 		/**
-		 * 
+		 *  Run the task.
 		 */
 		public void run()
 		{
@@ -711,7 +712,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	};
 
 	/**
-	 * 
+	 *  Waiting call info.
 	 */
 	public static class WaitingCallInfo
 	{

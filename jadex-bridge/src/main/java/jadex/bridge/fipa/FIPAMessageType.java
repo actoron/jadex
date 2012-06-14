@@ -44,7 +44,8 @@ public class FIPAMessageType extends MessageType
 			new MessageType.ParameterSpecification(SFipa.X_MESSAGE_ID, String.class, false),
 			new MessageType.ParameterSpecification(SFipa.X_TIMESTAMP, String.class, false),
 			new MessageType.ParameterSpecification(SFipa.X_RID, IResourceIdentifier.class, false),
-			new MessageType.ParameterSpecification(SFipa.X_RECEIVER, IComponentIdentifier.class, false)
+			new MessageType.ParameterSpecification(SFipa.X_RECEIVER, IComponentIdentifier.class, false),
+			new MessageType.ParameterSpecification(SFipa.X_NONFUNCTIONAL, Map.class, SFipa.X_NONFUNCTIONAL, false, false)
 		},
 
 		// Second parameter represents the parameter sets.
@@ -110,6 +111,15 @@ public class FIPAMessageType extends MessageType
 	public String	getRealReceiverIdentifier()
 	{
 		return SFipa.X_RECEIVER;
+	}
+	
+	/**
+	 *  Get the identifier for fetching the non-functional properties.
+	 *  @return The non-functional properties.
+	 */
+	public String getNonFunctionalPropertiesIdentifier()
+	{
+		return SFipa.X_NONFUNCTIONAL;
 	}
 
 	/**

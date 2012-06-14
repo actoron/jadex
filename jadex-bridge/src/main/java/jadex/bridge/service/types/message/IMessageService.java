@@ -30,7 +30,7 @@ public interface IMessageService extends IService
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, 
 		IComponentIdentifier sender, IResourceIdentifier rid, IComponentIdentifier realrec, 
-		byte[] codecids, Map<String, Object> nonfunc);
+		byte[] codecids);//, Map<String, Object> nonfunc);
 	
 //	/**
 //	 *  Deliver a message to some components.

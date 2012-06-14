@@ -197,7 +197,6 @@ public class HttpReceiver
 					f.setAccessible(true);
 					Object	client	= f.get(acon[i]);
 					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
-					
 				}
 				catch(Exception e)
 				{
