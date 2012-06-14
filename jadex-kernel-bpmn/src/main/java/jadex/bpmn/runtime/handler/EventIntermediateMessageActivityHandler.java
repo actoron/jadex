@@ -178,7 +178,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						
 						thread.setWaiting(true);
 						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), 
-							instance.getModel().getResourceIdentifier(), null, codecids)
+							instance.getModel().getResourceIdentifier(), null, codecids, null)
 							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
