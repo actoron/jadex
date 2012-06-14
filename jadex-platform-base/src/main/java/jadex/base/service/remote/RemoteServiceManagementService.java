@@ -123,7 +123,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 
 	/** The default timeout. */
 	public static long DEFAULT_TIMEOUT = 15000;
-		
+
+	/** Secure transmission setting. */
+	public static String SECURE_TRANSMISSION = "secure_transmission";
+
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -239,7 +243,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
 						
-						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut);
+						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null); // todo: non-func
 					}
 				});
 				
@@ -345,7 +349,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut);
+						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null); // todo: non-func
 //					}
 //				});
 				
@@ -505,7 +509,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  (Can safely be called from any thread).
 	 */
 	public void sendMessage(final IComponentIdentifier receiver, final IComponentIdentifier realrec, final Object content,
-		final String callid, final long to, final Future<Object> future)
+		final String callid, final long to, final Future<Object> future, final Map<String, Object> nonfunc)
 	{
 //		System.out.println("RMS sending: "+content+" "+receiver);
 		
@@ -591,7 +595,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														{
 															msg.put(SFipa.CONTENT, content);
 															
-															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), realrec, null)
+															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), realrec, null, nonfunc)
 																.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 															{
 																public void customResultAvailable(Void result)

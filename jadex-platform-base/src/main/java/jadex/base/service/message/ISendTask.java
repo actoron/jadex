@@ -57,4 +57,10 @@ public interface ISendTask
 	 *  	when/if message sending was successful. 
 	 */
 	public void ready(IResultCommand<IFuture<Void>, Void> send);
+	
+	/**
+	 *  Get the non-functional requirements.
+	 *  @return The non-functional properties.
+	 */
+	public Map<String, Object> getNonFunctionalProperties();
 }

@@ -40,6 +40,9 @@ public class ProxyInfo
 	/** The timeouts for methods (method-info -> long). */
 	protected Map timeouts;
 	
+	/** The secure transport methods. */
+	protected Set secure;
+	
 	//-------- constructors --------
 	
 	/**
@@ -177,8 +180,6 @@ public class ProxyInfo
 	{
 		return replacements!=null && replacements.containsKey(new MethodInfo(m));
 	}
-	
-	
 	
 	/**
 	 *  Get the target remote interfaces.
@@ -338,6 +339,45 @@ public class ProxyInfo
 		return synchronous!=null && synchronous.contains(new MethodInfo(m));
 	}
 
+	/**
+	 *  Get the secure.
+	 *  @return the secure.
+	 */
+	public Set getSecureMethods()
+	{
+		return secure;
+	}
+
+	/**
+	 *  Set the secure.
+	 *  @param secure The secure to set.
+	 */
+	public void setSecureMethods(Set secure)
+	{
+		this.secure = secure;
+	}
+	
+	/**
+	 *  Add an secure method.
+	 *  @param m Method.
+	 */
+	public void addSecureMethod(MethodInfo m)
+	{
+		if(secure==null)
+			secure = new HashSet();
+		secure.add(m);
+	}
+	
+	/**
+	 *  Test if method is secure.
+	 *  @param m Method to test.
+	 *  @return True, if is secure.
+	 */
+	public boolean isSecure(Method m)
+	{
+		return secure!=null && secure.contains(new MethodInfo(m));
+	}
+	
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

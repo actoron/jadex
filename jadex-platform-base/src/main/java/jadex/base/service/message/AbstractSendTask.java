@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.base.service.message.transport.ITransport;
@@ -45,6 +46,9 @@ public abstract class AbstractSendTask implements ISendTask
 	/** The transports to be tried. */
 	protected List<ITransport> transports;
 	
+	/** The non-functional properties. */
+	protected Map<String, Object> nonfunc;
+	
 
 	/** The future for the sending result. */
 	protected Future<Void>	future;
@@ -64,7 +68,7 @@ public abstract class AbstractSendTask implements ISendTask
 	 *  Create a new task.
 	 */
 	public AbstractSendTask(IComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs)
+		ITransport[] transports, ICodec[] codecs, Map<String, Object> nonfunc)
 	{
 		codecs = codecs==null? new ICodec[0]: codecs;
 
@@ -81,6 +85,7 @@ public abstract class AbstractSendTask implements ISendTask
 		this.receivers = receivers.clone();
 		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));
 		this.codecs	= codecs.clone();
+		this.nonfunc = nonfunc;
 		this.future	= new Future<Void>();
 	}
 	
@@ -146,6 +151,15 @@ public abstract class AbstractSendTask implements ISendTask
 	public void setData(byte[] data)
 	{
 		this.data = data;
+	}
+	
+	/**
+	 *  Get the non-functional requirements.
+	 *  @return The non-functional properties.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		return nonfunc;
 	}
 
 	/**

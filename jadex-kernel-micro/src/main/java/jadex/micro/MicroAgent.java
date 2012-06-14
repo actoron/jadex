@@ -445,7 +445,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 			public void customResultAvailable(IMessageService ms)
 			{
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
-					interpreter.getModel().getResourceIdentifier(), null, codecids)
+					interpreter.getModel().getResourceIdentifier(), null, codecids, null)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 		});

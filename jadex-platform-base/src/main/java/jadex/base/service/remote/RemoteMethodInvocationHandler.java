@@ -22,6 +22,8 @@ import jadex.commons.transformation.annotations.Classname;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Class that implements the Java proxy InvocationHandler, which
@@ -77,8 +79,20 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		final String callid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
 		
 		ProxyInfo pi = pr.getProxyInfo();
+		
 		// Get method timeout
 		final long to = pi.getMethodTimeout(method);
+		
+		// Get the secure transmission
+		boolean sec = pi.isSecure(method);
+		
+		Map<String, Object> nf = null;
+		if(sec)
+		{
+			nf = new HashMap<String, Object>();
+			nf.put(RemoteServiceManagementService.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
+		}
+		final Map<String, Object> nonfunc = nf; 
 		
 		Future future;
 		Class type = method.getReturnType();
@@ -112,7 +126,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
-							content, mycallid, to, res);
+							content, mycallid, to, res, nonfunc);
 					}
 				}
 				
@@ -152,7 +166,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-							null, content, mycallid, to, res);
+							null, content, mycallid, to, res, nonfunc);
 					}
 				}
 				
@@ -192,7 +206,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-							null, content, mycallid, to, res);
+							null, content, mycallid, to, res, nonfunc);
 					}
 				}
 				
@@ -305,7 +319,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //			if(method.getName().equals("getResult"))
 //				System.out.println("sending invoke");
 			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-				null, content, callid, to, future);
+				null, content, callid, to, future, nonfunc);
 			
 			// Provide alternative immediate future result, if method is asynchronous.
 			if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))

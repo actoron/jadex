@@ -346,7 +346,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			getConnectionId(), getConnection().isInitiatorSide()? new IComponentIdentifier[]{getConnection().getParticipant()}: new IComponentIdentifier[]{getConnection().getInitiator()}, 
-			getTransports(), usecodecs? getCodecs(): null, seqnumber);
+			getTransports(), usecodecs? getCodecs(): null, seqnumber, null); // todo: non-func
 	}
 	
 	/**

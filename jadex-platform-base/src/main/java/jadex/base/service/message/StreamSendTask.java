@@ -138,9 +138,9 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public StreamSendTask(byte type, Object message, int streamid, IComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs, Integer seqnumber)
+		ITransport[] transports, ICodec[] codecs, Integer seqnumber, Map<String, Object> nonfunc)
 	{
-		super(receivers, transports, codecs);
+		super(receivers, transports, codecs, nonfunc);
 		this.type = type;
 		this.message = message;
 		this.streamid = streamid;

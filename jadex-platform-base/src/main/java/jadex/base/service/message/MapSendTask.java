@@ -33,16 +33,16 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	
 	/** The classloader. */
 	protected ClassLoader classloader;
-
+	
 	//-------- constructors --------- 
 
 	/**
 	 *  Create a new manager send task.
 	 */
 	public MapSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs, ClassLoader classloader)//, SendManager manager)
+		ITransport[] transports, ICodec[] codecs, ClassLoader classloader, Map<String, Object> nonfunc)//, SendManager manager)
 	{
-		super(receivers, transports, codecs);
+		super(receivers, transports, codecs, nonfunc);
 		if(codecs==null || codecs.length==0)
 			throw new IllegalArgumentException("Codecs must not null.");
 		

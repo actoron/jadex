@@ -25,10 +25,12 @@ public interface IMessageService extends IService
 	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
 	 *  @param codecids The codecs to use for encoding (if different from default).
+	 *  @param nonfunc The non functional properties that need to be preserved.
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, 
-		IComponentIdentifier sender, IResourceIdentifier rid, IComponentIdentifier realrec, byte[] codecids);
+		IComponentIdentifier sender, IResourceIdentifier rid, IComponentIdentifier realrec, 
+		byte[] codecids, Map<String, Object> nonfunc);
 	
 //	/**
 //	 *  Deliver a message to some components.

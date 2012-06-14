@@ -286,7 +286,8 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> origmsg, final MessageType type, 
-		IComponentIdentifier osender, final IResourceIdentifier rid, final IComponentIdentifier realrec, final byte[] codecids)
+		IComponentIdentifier osender, final IResourceIdentifier rid, 
+		final IComponentIdentifier realrec, final byte[] codecids, final Map<String, Object> nonfunc)
 	{
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
@@ -410,7 +411,7 @@ public class MessageService extends BasicService implements IMessageService
 							public void customResultAvailable(IExternalAccess exta)
 							{
 //								System.out.println("msgservice calling doSendMessage()");
-								doSendMessage(msg, type, exta, cl, ret, codecids);
+								doSendMessage(msg, type, exta, cl, ret, codecids, nonfunc);
 							}
 						});
 					}
@@ -425,7 +426,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Extracted method to be callable from listener.
 	 */
 	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, 
-		ClassLoader cl, Future<Void> ret, byte[] codecids)
+		ClassLoader cl, Future<Void> ret, byte[] codecids, Map<String, Object> nonfunc)
 	{
 		Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 
@@ -579,7 +580,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, nonfunc);
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
