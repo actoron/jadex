@@ -51,12 +51,12 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(Integer testcnt)
 			{
-				testRemote(testcnt.intValue(), tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 //				testRemote(1, tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
-						testRemote(testcnt.intValue(), tc, false).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+						testRemote(testcnt.intValue(), tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 						{
 							public void customResultAvailable(Integer result)
 							{

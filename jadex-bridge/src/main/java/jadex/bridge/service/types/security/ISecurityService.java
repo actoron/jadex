@@ -118,6 +118,20 @@ public interface ISecurityService
 	 */
 	public IFuture<Boolean> isTrustedLanMode();
 	
+	/**
+	 *  Set the keystore info.
+	 *  @return The path to the keystore. The password of the store. The password of the key.
+	 */
+	public IFuture<String[]> getKeystoreInfo();
+	
+	/**
+	 *  Set the keystore info.
+	 *  @param path The path to the keystore.
+	 *  @param storepass The password of the store.
+	 *  @param keypass The password of the key.
+	 */
+	public IFuture<Void> setKeystoreInfo(String path, String storepass, String keypass);
+	
 	//-------- request validation --------
 	
 	/**

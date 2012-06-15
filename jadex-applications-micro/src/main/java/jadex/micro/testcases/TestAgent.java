@@ -80,6 +80,8 @@ public abstract class TestAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
+				
 				agent.setResultValue("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();	

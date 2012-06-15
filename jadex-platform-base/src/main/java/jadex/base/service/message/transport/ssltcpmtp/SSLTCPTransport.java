@@ -3,6 +3,14 @@ package jadex.base.service.message.transport.ssltcpmtp;
 import jadex.base.service.message.transport.tcpmtp.TCPTransport;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SSecurity;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.io.FileInputStream;
 import java.net.ServerSocket;
@@ -43,6 +51,15 @@ public class SSLTCPTransport extends TCPTransport
 	/** The ssl context. */
 	protected SSLContext context;
 	
+	/** The keystore path. */
+	protected String storepath;
+	
+	/** The keystore password. */
+	protected String storepass;
+	
+	/** The key password. */
+	protected String keypass;
+	
 	//-------- constructors --------
 
 	/**
@@ -52,7 +69,7 @@ public class SSLTCPTransport extends TCPTransport
 	 */
 	public SSLTCPTransport(final IServiceProvider container, int port)
 	{
-		super(container, port, true);
+		this(container, port, true);
 	}
 
 	/**
@@ -66,6 +83,33 @@ public class SSLTCPTransport extends TCPTransport
 	}
 	
 	/**
+	 *  Start the transport.
+	 */
+	public IFuture<Void> start()
+	{
+		final Future<Void> ret = new Future<Void>();
+	
+		SServiceProvider.getService(container, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
+		{
+			public void customResultAvailable(ISecurityService ss)
+			{
+				ss.getKeystoreInfo().addResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+				{
+					public void customResultAvailable(String[] info)
+					{
+						setKeystoreInfo(info[0], info[1], info[2]);
+						
+						SSLTCPTransport.super.start().addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the ssl context.
 	 */
 	public SSLContext getSSLContext()
@@ -74,19 +118,13 @@ public class SSLTCPTransport extends TCPTransport
 		{
 			try
 			{
-				KeyManagerFactory kmf;
-				KeyStore ks;
-				char[] storepass = "keystore".toCharArray();
-				char[] keypass = "keystore".toCharArray();
-				String storename = "./keystore";
-				
 				context = SSLContext.getInstance("TLS");
-				kmf = KeyManagerFactory.getInstance("SunX509");
-				FileInputStream fin = new FileInputStream(storename);
-				ks = KeyStore.getInstance("JKS");
-				ks.load(fin, storepass);
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 				
-				kmf.init(ks, keypass);
+				// possibly create a new keystore on disk
+				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, "jadex");
+				
+				kmf.init(ks, keypass.toCharArray());
 				
 				// This allows ssl handshake without signed certificates.
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -147,6 +185,19 @@ public class SSLTCPTransport extends TCPTransport
 //		Boolean sec = nonfunc!=null? (Boolean)nonfunc.get(RemoteServiceManagementService.SECURE_TRANSMISSION): null;
 //		return sec==null || !sec.booleanValue();
 		return true;
+	}
+	
+	/**
+	 *  Set the keystore info.
+	 */
+	public void setKeystoreInfo(String storepath, String storepass, String keypass)
+	{
+		this.storepath = storepath;
+		this.storepass = storepass;
+		this.keypass = keypass;
+		
+		// reset context
+		this.context = null;
 	}
 	
 	/**

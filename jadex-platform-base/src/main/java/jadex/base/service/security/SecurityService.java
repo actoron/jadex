@@ -71,13 +71,19 @@ public class SecurityService implements ISecurityService
 	
 	/** The stored passwords. */
 	protected Map<String, String>	networkpasses;
-
 	
 	/** The trusted lan mode. */
 	protected boolean trustedlan;
 	
-//	/** The trusted lan network names. */
-//	protected List<String> trustednets;
+	
+	/** The path to the keystore. */
+	protected String storepath;
+	
+	/** The keystore password. */
+	protected String storepass;
+	
+	/** The key password. */
+	protected String keypass;
 	
 	//-------- setup --------
 	
@@ -97,6 +103,9 @@ public class SecurityService implements ISecurityService
 		this.usepass = usepass;
 		this.fixedUsepass = usepass != null;
 		this.printpass = printpass;
+		this.storepath = "./keystore";
+		this.storepass = "keystore";
+		this.keypass = "keystore";
 	}
 	
 	/**
@@ -464,6 +473,32 @@ public class SecurityService implements ISecurityService
 	public IFuture<Boolean> isTrustedLanMode()
 	{
 		return new Future<Boolean>(trustedlan? Boolean.TRUE: Boolean.FALSE);
+	}
+	
+	/**
+	 *  Set the keystore info.
+	 *  @return The path to the keystore. The password of the store. The password of the key.
+	 */
+	public IFuture<String[]> getKeystoreInfo()
+	{
+		return new Future<String[]>(new String[]{storepath, storepass, keypass});
+	}
+	
+	/**
+	 *  Set the keystore info.
+	 *  @param storepath The path to the keystore.
+	 *  @param storepass The password of the store.
+	 *  @param keypass The password of the key.
+	 */
+	public IFuture<Void> setKeystoreInfo(String storepath, String storepass, String keypass)
+	{
+		if(storepath!=null)
+			this.storepath = storepath;
+		if(storepass!=null)
+			this.storepass = storepass;
+		if(keypass!=null)
+			this.keypass = keypass;
+		return IFuture.DONE;
 	}
 
 	//-------- request validation --------
