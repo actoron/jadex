@@ -10,6 +10,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -32,7 +33,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(@RequiredService(name="ss", type=IStreamService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
-@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="8"))
+@Arguments(@Argument(name="testcnt", clazz=int.class, defaultvalue="12"))
 public class StreamUserAgent extends TestAgent
 {
 	/**
@@ -46,12 +47,12 @@ public class StreamUserAgent extends TestAgent
 //		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 //		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 
-//		testLocal(1, tc).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-//		{
-//			public void customResultAvailable(Integer testcnt)
-//			{
-//				testRemote(testcnt.intValue(), tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-				testRemote(1, tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+		testLocal(1, tc).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+		{
+			public void customResultAvailable(Integer testcnt)
+			{
+				testRemote(testcnt.intValue(), tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//				testRemote(1, tc, true).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
@@ -64,14 +65,14 @@ public class StreamUserAgent extends TestAgent
 						}));
 					}
 				}));
-//			}
-//		}));
+			}
+		}));
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Test the local case.
 	 */
 	protected IFuture<Integer> testLocal(int testno, Testcase tc)
 	{
@@ -79,7 +80,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test the remote case.
 	 */
 	protected IFuture<Integer> testRemote(final int testno, final Testcase tc, final boolean sec)
 	{
@@ -135,7 +136,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Perform the tests.
 	 */
 	protected IFuture<Integer> performTests(int testcnt,IServiceProvider provider, IComponentIdentifier root, final Testcase tc)
 	{
@@ -197,7 +198,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Perform the secure tests.
 	 */
 	protected IFuture<Integer> performSecureTests(int testcnt,IServiceProvider provider, IComponentIdentifier root, final Testcase tc)
 	{
@@ -259,7 +260,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test 'getInputStream()'.
 	 */
 	protected IFuture<TestReport> testGetInputStream(int testno, IStreamService ss)
 	{
@@ -286,7 +287,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test 'getOututStream()'.
 	 */
 	protected IFuture<TestReport> testGetOutputStream(int testno, IStreamService ss)
 	{
@@ -312,7 +313,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test 'passInputStream()'.
 	 */
 	protected IFuture<TestReport> testPassInputStream(int testno, IStreamService ss)
 	{
@@ -329,7 +330,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test 'passOututStream()'.
 	 */
 	protected IFuture<TestReport> testPassOutputStream(int testno, IStreamService ss)
 	{
@@ -348,7 +349,7 @@ public class StreamUserAgent extends TestAgent
 	
 	
 	/**
-	 * 
+	 *  Test 'getSecureInputStream()'.
 	 */
 	protected IFuture<TestReport> testSecureGetInputStream(int testno, IStreamService ss)
 	{
@@ -360,8 +361,17 @@ public class StreamUserAgent extends TestAgent
 			public void resultAvailable(IInputConnection con)
 			{
 				System.out.println("received icon: "+con.getNonFunctionalProperties());
-				
-				StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+				Map<String, Object> props = con.getNonFunctionalProperties();
+				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+				if(sec==null || !sec.booleanValue())
+				{
+					tr.setFailed("Received unsecure input stream in 'getSecureInputStream'");
+					ret.setResult(tr);
+				}
+				else
+				{
+					StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -376,7 +386,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test 'getSecureOututStream()'.
 	 */
 	protected IFuture<TestReport> testSecureGetOutputStream(int testno, IStreamService ss)
 	{
@@ -388,8 +398,17 @@ public class StreamUserAgent extends TestAgent
 			public void resultAvailable(final IOutputConnection con)
 			{
 				System.out.println("received ocon: "+con.getNonFunctionalProperties());
-				
-				StreamProviderAgent.write(con, agent).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+				Map<String, Object> props = con.getNonFunctionalProperties();
+				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+				if(sec==null || !sec.booleanValue())
+				{
+					tr.setFailed("Received unsecure output stream in 'getSecureOutputStream'");
+					ret.setResult(tr);
+				}
+				else
+				{
+					StreamProviderAgent.write(con, agent).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -403,7 +422,7 @@ public class StreamUserAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Test 'passSecureInputStream()'.
 	 */
 	protected IFuture<TestReport> testSecurePassInputStream(int testno, IStreamService ss)
 	{
@@ -419,8 +438,9 @@ public class StreamUserAgent extends TestAgent
 		return ret;
 	}
 	
+
 	/**
-	 * 
+	 *  Test 'passSecureOututStream()'.
 	 */
 	protected IFuture<TestReport> testSecurePassOutputStream(int testno, IStreamService ss)
 	{

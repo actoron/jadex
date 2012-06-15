@@ -132,7 +132,7 @@ public abstract class TestAgent
 			}
 		}
 
-		System.out.println("platform args: "+SUtil.arrayToString(defargs));
+//		System.out.println("platform args: "+SUtil.arrayToString(defargs));
 		
 		Starter.createPlatform(defargs).addResultListener(agent.createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)));

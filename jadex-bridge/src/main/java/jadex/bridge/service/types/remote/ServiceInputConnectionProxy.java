@@ -27,6 +27,9 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	/** The participant id. */
 	protected IComponentIdentifier	participant;
 	
+	/** The non-functional properties. */
+	protected Map<String, Object> nonfunc;
+	
 	/**
 	 * 
 	 */
@@ -51,6 +54,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 		con.setOutputConnection(ocon);
 		initiator	= ocon.getInitiator();
 		participant	= ocon.getParticipant();
+		nonfunc = ocon.getNonFunctionalProperties();
 	}
 	
 	/**
@@ -106,6 +110,24 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	{
 		this.participant = participant;
 	}
+	
+	/**
+	 *  Get the non-functional properties of the connection.
+	 *  @return The properties.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		return nonfunc;
+	}
+	
+	/**
+	 *  Set the non-functional properties of the connection.
+	 *  @param nonfunc The properties.
+	 */
+	public void setNonFunctionalProperties(Map<String, Object> nonfunc)
+	{
+		this.nonfunc = nonfunc;
+	}
 
 	/**
 	 * 
@@ -153,15 +175,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 //	{
 //		throw new UnsupportedOperationException();
 //	}
-	
-	/**
-	 *  Get the non-functional properties of the connection.
-	 */
-	public Map<String, Object> getNonFunctionalProperties()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
+		
 	/**
 	 *  Read all data from output stream to the connection.
 	 *  The result is an intermediate future that reports back the size that was read.

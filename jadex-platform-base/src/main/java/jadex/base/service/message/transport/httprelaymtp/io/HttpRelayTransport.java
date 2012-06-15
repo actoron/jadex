@@ -8,6 +8,7 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IResultCommand;
@@ -316,7 +317,7 @@ public class HttpRelayTransport implements ITransport
 	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
 	{
 		// todo: how to check if https connection?
-		Boolean sec = nonfunc!=null? (Boolean)nonfunc.get(RemoteServiceManagementService.SECURE_TRANSMISSION): null;
+		Boolean sec = nonfunc!=null? (Boolean)nonfunc.get(SecureTransmission.SECURE_TRANSMISSION): null;
 		return sec==null || !sec.booleanValue();
 	}
 	

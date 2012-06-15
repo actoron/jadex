@@ -5,6 +5,7 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -90,7 +91,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		if(sec)
 		{
 			nf = new HashMap<String, Object>();
-			nf.put(RemoteServiceManagementService.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
+			nf.put(SecureTransmission.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
 		}
 		final Map<String, Object> nonfunc = nf; 
 		

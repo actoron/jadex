@@ -19,8 +19,10 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.rmi.server.RemoteServer;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Agent that provides a service with a stream.
@@ -106,7 +108,17 @@ public class StreamProviderAgent implements IStreamService
 	@SecureTransmission
 	public IFuture<Long> passSecureInputStream(IInputConnection con)
 	{
-		return passInputStream(con);
+		System.out.println("rec: "+con.getNonFunctionalProperties());
+		Map<String, Object> props = con.getNonFunctionalProperties();
+		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+		if(sec==null || !sec.booleanValue())
+		{
+			return new Future<Long>(new RuntimeException("Received unsecure stream in 'passSecureInputStream'"));
+		}
+		else
+		{
+			return passInputStream(con);
+		}
 	}
 	
 	/**
@@ -116,7 +128,17 @@ public class StreamProviderAgent implements IStreamService
 	@SecureTransmission
 	public IFuture<Long> passSecureOutputStream(IOutputConnection con)
 	{
-		return passOutputStream(con);
+		System.out.println("rec: "+con.getNonFunctionalProperties());
+		Map<String, Object> props = con.getNonFunctionalProperties();
+		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+		if(sec==null || !sec.booleanValue())
+		{
+			return new Future<Long>(new RuntimeException("Received unsecure stream in 'passSecureOutputStream'"));
+		}
+		else
+		{
+			return passOutputStream(con);
+		}
 	}
 	
 	/**

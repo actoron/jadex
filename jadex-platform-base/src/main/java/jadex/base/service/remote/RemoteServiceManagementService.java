@@ -124,10 +124,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The default timeout. */
 	public static long DEFAULT_TIMEOUT = 15000;
 
-	/** Secure transmission setting. */
-	public static String SECURE_TRANSMISSION = "secure_transmission";
-
-	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -811,7 +807,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
 					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
-						icp.getInitiator(), icp.getParticipant(), null); // non-func is delivered via init
+						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
 					return icon;
 				}
 				catch(RuntimeException e)
@@ -839,7 +835,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
 					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
-						ocp.getInitiator(), ocp.getParticipant(), null); // non-func is delivered via init
+						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
 					return ocon;
 				}
 				catch(RuntimeException e)
@@ -1051,7 +1047,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
 					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
-						icp.getInitiator(), icp.getParticipant(), null); // non-func is delivered via init
+						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
 					return icon;
 				}
 				catch(RuntimeException e)
@@ -1075,7 +1071,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
 					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
-						ocp.getInitiator(), ocp.getParticipant(), null); // non-func is delivered via init
+						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
 					return ocon;
 				}
 				catch(RuntimeException e)

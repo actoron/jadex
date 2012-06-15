@@ -147,8 +147,8 @@ public class MarshalService extends BasicService implements IMarshalService
 			{
 				ServiceInputConnectionProxy sicp = (ServiceInputConnectionProxy)object;
 				
-				LocalInputConnectionHandler ich = new LocalInputConnectionHandler();
-				LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(ich);
+				LocalInputConnectionHandler ich = new LocalInputConnectionHandler(sicp.getNonFunctionalProperties());
+				LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(sicp.getNonFunctionalProperties(), ich);
 				ich.setConnectionHandler(och);
 
 				InputConnection icon = new InputConnection(null, null, sicp.getConnectionId(), false, ich);
@@ -174,8 +174,8 @@ public class MarshalService extends BasicService implements IMarshalService
 			{
 				ServiceOutputConnectionProxy socp = (ServiceOutputConnectionProxy)object;
 				
-				LocalOutputConnectionHandler och = new LocalOutputConnectionHandler();
-				LocalInputConnectionHandler ich = new LocalInputConnectionHandler(och);
+				LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(socp.getNonFunctionalProperties());
+				LocalInputConnectionHandler ich = new LocalInputConnectionHandler(socp.getNonFunctionalProperties(), och);
 				och.setConnectionHandler(ich);
 
 				InputConnection icon = new InputConnection(null, null, socp.getConnectionId(), false, ich);

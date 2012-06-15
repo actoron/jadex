@@ -28,6 +28,10 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	/** The participant id. */
 	protected IComponentIdentifier	participant;
 
+	/** The non-functional properties. */
+	protected Map<String, Object> nonfunc;
+
+	
 	/**
 	 * 
 	 */
@@ -52,6 +56,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 		con.setInputConnection(icon);
 		initiator	= icon.getInitiator();
 		participant	= icon.getParticipant();
+		nonfunc = icon.getNonFunctionalProperties();
 	}
 	
 	/**
@@ -109,6 +114,24 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	}
 	
 	/**
+	 *  Get the non-functional properties of the connection.
+	 *  @return The properties.
+	 */
+	public Map<String, Object> getNonFunctionalProperties()
+	{
+		return nonfunc;
+	}
+	
+	/**
+	 *  Set the non-functional properties of the connection.
+	 *  @param nonfunc The properties.
+	 */
+	public void setNonFunctionalProperties(Map<String, Object> nonfunc)
+	{
+		this.nonfunc = nonfunc;
+	}
+	
+	/**
 	 *  Write the content to the stream.
 	 *  @param data The data.
 	 */
@@ -147,14 +170,6 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	 *  Do write all data from the input stream.  
 	 */
 	public ITerminableIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 *  Get the non-functional properties of the connection.
-	 */
-	public Map<String, Object> getNonFunctionalProperties()
 	{
 		throw new UnsupportedOperationException();
 	}

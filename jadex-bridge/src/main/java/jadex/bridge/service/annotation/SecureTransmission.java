@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SecureTransmission
 {
+	/** Secure transmission setting. */
+	public static String SECURE_TRANSMISSION = "secure_transmission";
 }

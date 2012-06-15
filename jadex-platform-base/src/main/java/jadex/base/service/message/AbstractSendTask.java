@@ -200,6 +200,12 @@ public abstract class AbstractSendTask implements ISendTask
 		}
 		else
 		{
+			// For debug viewing which transports are used
+//			if(this instanceof MapSendTask)
+//				System.out.println("map sendoptions: "+sendpairs);
+//			else
+//				System.out.println("stream sendoptions: "+sendpairs);
+			
 			for(Tuple2<ITransport, String> sendpair: sendpairs)
 			{
 				sendpair.getFirstEntity().sendMessage(sendpair.getSecondEntity(), this);
