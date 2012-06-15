@@ -74,7 +74,7 @@
 					</env:property>	
 					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.2*(($properties.clock.getTick())%10),0.2*(($properties.clock.getTick())%10),0.2*(($properties.clock.getTick())%10))
 					</env:property>	
-					<env:property name="vision" class="double">0.1</env:property>
+					<env:property name="vision" class="double">0.2</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector3" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
