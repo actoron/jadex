@@ -250,9 +250,15 @@ public class BeanCodec extends AbstractCodec
 			basename = basename.substring(0, marker);
 		}
 		basename += "$";
-		
-		int exclude = Integer.valueOf(startname.substring(marker + 1, startname.indexOf('$', marker + 1)));
-		
+		int exclude;
+		try {
+			//exclude = Integer.valueOf(startname.substring(marker + 1, startname.indexOf('$', marker + 1)));
+			exclude = Integer.valueOf(startname.substring(marker + 1, startname.length()));
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 		Class ret = null;
 		
 		int classindex = 0;
