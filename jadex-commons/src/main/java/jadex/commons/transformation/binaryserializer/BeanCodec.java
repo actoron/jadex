@@ -112,20 +112,13 @@ public class BeanCodec extends AbstractCodec
 	{
 		
 		Map props = intro.getBeanProperties(clazz, true, false);
-		
 		int size = (int) context.readVarInt();
 		for (int i = 0; i < size; ++i)
 		{
 			String name = context.readString();
 			Object val = null;
 			val = BinarySerializer.decodeObject(context);
-			try{
 			((BeanProperty) props.get(name)).setPropertyValue(object, val);
-			}
-			catch(NullPointerException e)
-			{
-				throw new RuntimeException(e);
-			}
 		}
 		
 		return object;

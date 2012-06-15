@@ -34,19 +34,15 @@ public class MultiCollectionCodec extends AbstractCodec
 		MultiCollection ret = null;
 		try
 		{
-			//FIXME: Separation of sub-object decoding not possible with current MultiMap interface?
-			Map map = (Map) BinarySerializer.decodeObject(context);
-			Class type = SReflect.classForName(context.readClassname(), context.getClassloader());
-			
 			if(MultiCollection.class.equals(clazz))
 			{
-				ret = new MultiCollection(map, type);
+				ret = new MultiCollection();
 			}
 			else
 			{
 				// use reflection due to subclasses
 				Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
-				ret = (MultiCollection) c.newInstance(new Object[] { map, type });
+				ret = (MultiCollection) c.newInstance();
 			}
 		}
 		catch (Exception e)
@@ -55,6 +51,41 @@ public class MultiCollectionCodec extends AbstractCodec
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Decodes and adds sub-objects during decoding.
+	 *  
+	 *  @param object The instantiated object.
+	 *  @param clazz The class of the object.
+	 *  @param context The decoding context.
+	 *  @return The finished object.
+	 */
+	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	{
+		Map map = (Map) BinarySerializer.decodeObject(context);
+		String classname = context.readClassname();
+		Class type = SReflect.classForName0(classname, context.getClassloader());
+		if (type == null)
+		{
+			throw new RuntimeException("MultiCollection type not found: " + String.valueOf(classname));
+		}
+		
+		try
+		{
+			Field field = SReflect.getField(clazz, "map");
+			field.setAccessible(true);
+			field.set(object, map);
+			field = SReflect.getField(clazz, "type");
+			field.setAccessible(true);
+			field.set(object, type);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return object;
 	}
 	
 	/**

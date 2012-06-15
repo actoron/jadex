@@ -41,6 +41,7 @@ import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
@@ -194,16 +195,17 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public Map<Class<?>, Object[]> getCodecInfo()
 	{
-		final Map<Class<?>, Object[]> infos = new HashMap<Class<?>, Object[]>();
-		final Object[] xmlinfo = new Object[2];
-		final Object[] bininfo = new Object[2];
-		infos.put(JadexXMLContentCodec.class, xmlinfo);
+		Map<Class<?>, Object[]> infos = new HashMap<Class<?>, Object[]>();
+
+		Object[] bininfo = new Object[]{getBinaryReadInfo(), getBinaryWriteInfo()};
 		infos.put(JadexBinaryContentCodec.class, bininfo);
 		
-		xmlinfo[0] = getXMLReadInfo();
-		xmlinfo[1] = getXMLWriteInfo();
-		bininfo[0] = getBinaryReadInfo();
-		bininfo[1] = getBinaryWriteInfo();
+		// Only use xml if jadex-xml module present (todo: remove compile time dependency)
+		if(!SReflect.isAndroid() && SReflect.classForName0("jadex.xml.reader.Reader", getClass().getClassLoader())!=null)
+		{
+			Object[] xmlinfo = new Object[]{getXMLReadInfo(), getXMLWriteInfo()};
+			infos.put(JadexXMLContentCodec.class, xmlinfo);
+		}
 		
 		return infos;
 	}

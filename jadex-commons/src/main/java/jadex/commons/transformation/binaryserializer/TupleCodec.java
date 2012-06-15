@@ -6,6 +6,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -34,14 +35,36 @@ public class TupleCodec extends AbstractCodec
 	 */
 	public Object createObject(Class clazz, DecodingContext context)
 	{
-		// FIXME: Incorrect behavior in case of self-referencing tuples, similar to the MultiMap problem.
-		Object[] entities = (Object[]) BinarySerializer.decodeObject(context);
 		Tuple ret = null;
 		if (clazz.equals(Tuple2.class))
-			ret = new Tuple2(entities[0], entities[1]);
+			ret = new Tuple2(null, null);
 		else
-			ret =  new Tuple(entities);
+			ret =  new Tuple(null);
 		return ret;
+	}
+	
+	/**
+	 *  Decodes and adds sub-objects during decoding.
+	 *  
+	 *  @param object The instantiated object.
+	 *  @param clazz The class of the object.
+	 *  @param context The decoding context.
+	 *  @return The finished object.
+	 */
+	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	{
+		Object[] entities = (Object[]) BinarySerializer.decodeObject(context);
+		try
+		{
+			Field fentities = SReflect.getField(object.getClass(), "entities");
+			fentities.setAccessible(true);
+			fentities.set(object, entities);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return object;
 	}
 	
 	/**
