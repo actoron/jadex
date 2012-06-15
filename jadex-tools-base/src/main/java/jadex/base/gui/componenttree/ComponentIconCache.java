@@ -13,7 +13,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
@@ -144,14 +145,15 @@ public class ComponentIconCache
 					{
 //						System.out.println("Searching for icon: "+type+" at "+exta);
 						SComponentFactory.getFileTypeIcon(exta, type)
-							.addResultListener(new SwingDelegationResultListener<Icon>(ret)
+							.addResultListener(new SwingExceptionDelegationResultListener<byte[], Icon>(ret)
 						{
-							public void customResultAvailable(Icon result)
+							public void customResultAvailable(byte[] result)
 							{
 								if(result!=null)
 								{
-									icons.put(type, result);
-									super.customResultAvailable(result);
+									Icon	icon	= new ImageIcon(result);
+									icons.put(type, icon);
+									ret.setResult(icon);
 								}
 								else
 								{

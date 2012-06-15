@@ -1,12 +1,11 @@
 package jadex.bridge.service.types.deployment;
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.swing.filechooser.FileSystemView;
 
 /**
  *  A file data represents a java.io.File that
@@ -16,6 +15,31 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class FileData
 {
+	//-------- constants --------
+	
+	/** File system view (use reflection due to not available for android). */
+	protected static Object	fsview;
+	
+	/** Method to check for floppy drive (use reflection due to not available for android). */
+	protected static Method	isfloppy;
+	
+	/** Method to get display name (use reflection due to not available for android). */
+	protected static Method	getdisplayname;
+	
+	static
+	{
+		try
+		{
+			Class<?>	clazz	= SReflect.classForName0("javax.swing.filechooser.FileSystemView", FileData.class.getClassLoader());
+			fsview	= clazz!=null ? clazz.getMethod("getFileSystemView", new Class<?>[0]).invoke(null, new Object[0]) : null;
+			isfloppy	= clazz!=null ? clazz.getMethod("isFloppyDrive", new Class<?>[]{File.class}) : null;
+			getdisplayname	= clazz!=null ? clazz.getMethod("getSystemDisplayName", new Class<?>[]{File.class}) : null;
+		}
+		catch(Exception e)
+		{
+		}
+	}
+	
 	//-------- attributes --------
 	
 	/** The file name. */
@@ -73,12 +97,21 @@ public class FileData
 		this.path = file.getPath();
 		this.directory = SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
-		/* if_not[android] */
-		this.lastmodified = FileSystemView.getFileSystemView().isFloppyDrive(file)
-			? 0 : file.lastModified();
-		/* end[android] */
+		boolean	floppy	= false;
+		if(fsview!=null)
+		{
+			try
+			{
+				floppy	= ((Boolean)isfloppy.invoke(fsview, new Object[]{file})).booleanValue();
+			}
+			catch(Exception e)
+			{
+				
+			}
+		}
+		this.lastmodified = floppy ? 0 : file.lastModified();
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
-		this.separator = file.separatorChar;
+		this.separator = File.separatorChar;
 		this.prefix = getPrefixLength(file);
 	}
 	
@@ -161,12 +194,22 @@ public class FileData
 	 */
 	public static String getDisplayName(File file)
 	{
-		/* if_not[android] */
-		String ret = FileSystemView.getFileSystemView().isFloppyDrive(file) 
-			? null : FileSystemView.getFileSystemView().getSystemDisplayName(file);
-		/* else[android]
-		String ret = null;
-		end[android] */
+		String	ret	= null;
+		if(fsview!=null)
+		{
+			try
+			{
+				if(!((Boolean)isfloppy.invoke(fsview, new Object[]{file})).booleanValue())
+				{
+					ret = (String)getdisplayname.invoke(fsview, new Object[]{file});
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		if(ret==null || ret.length()==0)
 			ret = file.getName();
 		if(ret==null || ret.length()==0)

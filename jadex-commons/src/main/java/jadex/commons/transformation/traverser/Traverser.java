@@ -43,11 +43,12 @@ public class Traverser
 		processors.add(new CollectionProcessor());
 		processors.add(new IteratorProcessor());
 		processors.add(new EnumerationProcessor());
-		/* if_not[android]*/
-		processors.add(new ColorProcessor());
-		processors.add(new ImageProcessor());
-		processors.add(new RectangleProcessor());
-		/* end[android] */
+		if(!SReflect.isAndroid())
+		{
+			processors.add(new ColorProcessor());
+			processors.add(new ImageProcessor());
+			processors.add(new RectangleProcessor());
+		}
 		processors.add(new TimestampProcessor());
 		processors.add(new LogRecordProcessor());
 		processors.add(new DateProcessor());

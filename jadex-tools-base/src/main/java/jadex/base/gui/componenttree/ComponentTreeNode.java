@@ -281,6 +281,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	public JComponent	getPropertiesComponent()
 	{
+		// Refresh to update cid addresses later.
+		refresh(false);
+		
 		if(propcomp==null)
 		{
 			propcomp	= new ComponentProperties();

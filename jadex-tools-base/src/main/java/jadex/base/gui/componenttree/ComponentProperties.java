@@ -1,7 +1,6 @@
 package jadex.base.gui.componenttree;
 
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;

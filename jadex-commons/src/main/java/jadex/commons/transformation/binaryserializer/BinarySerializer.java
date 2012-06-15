@@ -65,11 +65,12 @@ public class BinarySerializer
 		ENCODER_HANDLERS.add(new EnumerationCodec());
 		ENCODER_HANDLERS.add(new MultiCollectionCodec());
 		ENCODER_HANDLERS.add(new MapCodec());
-		/*if_not[android] */
-		ENCODER_HANDLERS.add(new ColorCodec());
-		ENCODER_HANDLERS.add(new ImageCodec());
-		ENCODER_HANDLERS.add(new RectangleCodec());
-		/*end[android]*/
+		if(!SReflect.isAndroid())
+		{
+			ENCODER_HANDLERS.add(new ColorCodec());
+			ENCODER_HANDLERS.add(new ImageCodec());
+			ENCODER_HANDLERS.add(new RectangleCodec());
+		}
 		ENCODER_HANDLERS.add(new URLCodec());
 		ENCODER_HANDLERS.add(new TupleCodec());
 		ENCODER_HANDLERS.add(new DateCodec());

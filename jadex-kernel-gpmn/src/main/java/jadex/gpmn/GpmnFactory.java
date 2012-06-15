@@ -20,6 +20,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.LazyResource;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -27,14 +28,11 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.SGUI;
 import jadex.gpmn.model.MGpmnModel;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.Icon;
-import javax.swing.UIDefaults;
 
 /**
  *  Factory for loading gpmn processes. 
@@ -50,13 +48,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/** The gpmn process file type. */
 	public static final String	FILETYPE_GPMNPROCESS = "GPMN Process";
 	
-	/**
-	 * The image icons.
-	 */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"gpmn_process",	SGUI.makeIcon(GpmnFactory.class, "/jadex/gpmn/images/gpmn_process.png"),
-	});
+	/** The image icon. */
+	protected static final LazyResource ICON = new LazyResource(GpmnFactory.class, "/jadex/gpmn/images/gpmn_process.png");
 	
 	//-------- attributes --------
 	
@@ -244,10 +237,26 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public IFuture<Icon> getComponentTypeIcon(String type)
+	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-		return new Future<Icon>(type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("gpmn_process") : null);
-	}
+		Future<byte[]>	ret	= new Future<byte[]>();
+		if(type.equals(FILETYPE_GPMNPROCESS))
+		{
+			try
+			{
+				ret.setResult(ICON.getData());
+			}
+			catch(IOException e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}	
 
 	/**
 	 *  Get the component type of a model.

@@ -94,12 +94,15 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 				{
 					Starter.createPlatform(new String[]
 					{
-						"-logging_level", "java.util.logging.Level.INFO",
+						"-componentfactory", "jadex.micro.MicroAgentFactory",
+						"-conf", "jadex.standalone.PlatformAgent",
+						"-logging", "true",
 						"-platformname", "and_" + createRandomPlattformID(),
 						"-extensions", "null",
 						"-wspublish", "false",
 						"-rspublish", "false",
-						"-kernels", "\"component, micro\"",
+						"-kernels", "\"micro\"",
+//						"-kernels", "\"component, micro\"",
 	//					"-tcptransport", "false",
 						"-niotcptransport", "false",
 	//					"-relaytransport", "true",
@@ -108,12 +111,11 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 	//					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 						"-saveonexit", "false",
 						"-gui", "false",
-						"-autoshutdown", "false"
-//						"-binarymessages", "true"
+						"-autoshutdown", "false",
+						"-binarymessages", "true"
 	//					"-awamechanisms", "new String[]{\"Relay\"}",
 	//					"-awareness", "false",
 	//					"-usepass", "false",
-//						"-binarymessages", "true"
 					}).addResultListener(new DelegationResultListener<IExternalAccess>(platform));
 				}
 			}).start();

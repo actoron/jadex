@@ -9,21 +9,22 @@
 	<name>jadex-android-benchmark-project-maven</name>
 
 	<dependencies>
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-misc</artifactId>
+			<artifactId>jadex-kernel-micro</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-kernel-bdibpmn</artifactId>
+			<artifactId>jadex-platform-standalone</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-platform-standalone</artifactId>
+			<artifactId>jadex-tools-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		

@@ -14,12 +14,13 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreeModel;
@@ -46,7 +47,7 @@ public class ModelIconCache implements IIconCache
 	//-------- attributes --------
 	
 	/** The icon cache. */
-	protected final Map	myicons;
+	protected final Map<Object, Icon>	myicons;
 	
 	/** The service provider. */
 	protected final IExternalAccess exta;
@@ -61,7 +62,7 @@ public class ModelIconCache implements IIconCache
 	 */
 	public ModelIconCache(IExternalAccess exta, JTree tree)
 	{
-		this.myicons	= new HashMap();
+		this.myicons	= new HashMap<Object, Icon>();
 		this.exta	= exta;
 		this.tree	= tree;
 	}
@@ -107,16 +108,15 @@ public class ModelIconCache implements IIconCache
 	//			System.out.println("getIcon: "+type);
 				final String file = ((IFileNode)node).getFilePath(); 
 				
-				createResourceIdentifier(node).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>(tree)
+				createResourceIdentifier(node).addResultListener(new SwingResultListener<IResourceIdentifier>()
 				{
 					public void customResultAvailable(IResourceIdentifier rid)
 					{
 						SComponentFactory.getFileType(exta, file, rid)
-							.addResultListener(new SwingDefaultResultListener(tree)
+							.addResultListener(new SwingResultListener<String>()
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(final String type)
 							{
-								final String type = (String)result;
 								if(type!=null)
 								{
 									Icon icon = (Icon)myicons.get(type);
@@ -124,13 +124,19 @@ public class ModelIconCache implements IIconCache
 									{
 	//									System.out.println("deep: "+type+" "+file);
 										SComponentFactory.getFileTypeIcon(exta, type)
-											.addResultListener(new SwingDefaultResultListener(tree)
+											.addResultListener(new SwingResultListener<byte[]>()
 										{
-											public void customResultAvailable(Object result)
+											public void customResultAvailable(byte[] result)
 											{
-												myicons.put(node, (Icon)result);
-												myicons.put(type, (Icon)result);
+												Icon	icon	= new ImageIcon(result); 
+												myicons.put(node, icon);
+												myicons.put(type, icon);
 												refresh(node);
+											}
+											
+											public void customExceptionOccurred(Exception exception)
+											{
+												// ignore...
 											}
 										});
 									}
@@ -141,7 +147,17 @@ public class ModelIconCache implements IIconCache
 									}
 								}					
 							}
+							
+							public void customExceptionOccurred(Exception exception)
+							{
+								// ignore...
+							}
 						});
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						// ignore...
 					}
 				});
 			}

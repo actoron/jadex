@@ -1169,6 +1169,22 @@ public class SReflect
 //	{
 //		System.out.println(getMethodName());
 //	}
+	
+	/** Cached flag for android check. */
+	protected static Boolean isandroid;
+	
+	/**
+	 *  Test if running on android.
+	 */
+	public static boolean	isAndroid()
+	{
+		if(isandroid==null)
+		{
+			isandroid	= new Boolean(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
+//			System.out.println("Android: "+isandroid);
+		}
+		return isandroid.booleanValue();
+	}
 }
 
 

@@ -1,5 +1,7 @@
 package jadex.commons.collection;
 
+import jadex.commons.SReflect;
+
 import java.lang.ref.ReferenceQueue;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -9,7 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 /**
  *  A map with weak values.
@@ -213,24 +214,27 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 					{
 						final Entry<K, WeakEntry<V>> ret = oit.next();
 						final WeakEntry<V> we = ret.getValue();
-						/* if[android8] 
-						return new Entry<K, V>() {
-							@Override
-							public K getKey() {
-								return ret.getKey();
-							}
-							@Override
-							public V getValue() {
-								return we != null ? we.get() : null;
-							}
-							@Override
-							public V setValue(V arg0) {
-								return getValue();
-							}
-						};
-						else[android8] */
-						return new AbstractMap.SimpleEntry<K, V>(ret.getKey(), we!=null ? we.get() : null);
-						/* end[android8] */
+						if(SReflect.isAndroid())	// todo: only for android 8
+						{
+							return new Entry<K, V>() {
+								@Override
+								public K getKey() {
+									return ret.getKey();
+								}
+								@Override
+								public V getValue() {
+									return we != null ? we.get() : null;
+								}
+								@Override
+								public V setValue(V arg0) {
+									return getValue();
+								}
+							};
+						}
+						else
+						{
+							return new AbstractMap.SimpleEntry<K, V>(ret.getKey(), we!=null ? we.get() : null);
+						}
 					}
 					public void remove()
 					{

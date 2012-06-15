@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.swing.Icon;
 
 
 /**
@@ -283,24 +282,23 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	/* if_not[android] */
-	public static IFuture<Icon> getFileTypeIcon(IExternalAccess exta, final String type)
+	public static IFuture<byte[]> getFileTypeIcon(IExternalAccess exta, final String type)
 	{
-		Future<Icon> ret = new Future<Icon>();
+		Future<byte[]> ret = new Future<byte[]>();
 		
-		exta.scheduleStep(new IComponentStep<Icon>()
+		exta.scheduleStep(new IComponentStep<byte[]>()
 		{
 			@Classname("getFileTypeIcon")
-			public IFuture<Icon> execute(final IInternalAccess ia)
+			public IFuture<byte[]> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<byte[]> ret = new Future<byte[]>();
 				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Object, byte[]>(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
-						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener(ret));
+						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener<byte[]>(ret));
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -317,11 +315,10 @@ public class SComponentFactory
 				}));
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<byte[]>(ret));
 		
 		return ret;
 	}
-	/* end[android] */
 
 	/**
 	 * Get a default icon for a file type.

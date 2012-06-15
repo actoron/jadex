@@ -17,9 +17,7 @@ import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-/* if_not[android8] */
 import java.net.InterfaceAddress;
-/* end[android8] */
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -2351,27 +2349,28 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		/* if_not[android8] */
-		try
+		if(!SReflect.isAndroid())
 		{
-			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
-			List iads = ni.getInterfaceAddresses();
-			if(iads!=null)
+			try
 			{
-				for(int i=0; i<iads.size() && ret==-1; i++)
+				NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
+				List<InterfaceAddress> iads = ni.getInterfaceAddresses();
+				if(iads!=null)
 				{
-					InterfaceAddress ia = (InterfaceAddress)iads.get(i);
-					if(ia.getAddress() instanceof Inet4Address)
-						ret = ia.getNetworkPrefixLength();
+					for(int i=0; i<iads.size() && ret==-1; i++)
+					{
+						InterfaceAddress ia = iads.get(i);
+						if(ia.getAddress() instanceof Inet4Address)
+							ret = ia.getNetworkPrefixLength();
+					}
 				}
+				
 			}
-			
+			catch(Exception e)
+			{
+	//			e.printStackTrace();
+			}
 		}
-		catch(Exception e)
-		{
-//			e.printStackTrace();
-		}
-		/* end[android8] */
 		
 		return ret;
 	}

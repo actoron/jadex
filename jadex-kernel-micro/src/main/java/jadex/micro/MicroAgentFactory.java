@@ -18,6 +18,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -26,13 +27,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import jadex.commons.gui.SGUI;
-
-import javax.swing.Icon;
-import javax.swing.UIDefaults;
 
 /**
  *  Factory for creating micro agents.
@@ -48,13 +46,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/** The micro agent file type. */
 	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
 	
-	/** The image icons. */
-	/* if_not[android] */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"micro_agent",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png"),
-	});
-	/* end[android] */
+	/** The image icon. */
+	protected static final LazyResource ICON = new LazyResource(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png");
 
 	//-------- attributes --------
 	
@@ -355,16 +348,26 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* if_not[android] */
-	public IFuture<Icon> getComponentTypeIcon(String type)
+	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-		return new Future<Icon>(type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null);
-	}
-	/* else[android]
-	public IFuture<Void> getComponentTypeIcon(String type) {
-		return new Future(null);
-	}
-	end[android] */
+		Future<byte[]>	ret	= new Future<byte[]>();
+		if(type.equals(FILETYPE_MICROAGENT))
+		{
+			try
+			{
+				ret.setResult(ICON.getData());
+			}
+			catch(IOException e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}	
 
 	/**
 	 *  Get the component type of a model.

@@ -18,6 +18,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.LazyResource;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -26,10 +27,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.component.ComponentInterpreter;
-import jadex.component.ComponentModelLoader;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.kernelbase.IBootstrapFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,12 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* $if !android $ */
-import jadex.commons.gui.SGUI;
-
-import javax.swing.Icon;
-import javax.swing.UIDefaults;
-/* $endif $ */
 
 
 /**
@@ -65,15 +60,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 //	/** The application file extension. */
 //	public static final String	FILE_EXTENSION_APPLICATION	= ".application.xml";
 
-	/**
-	 * The image icons.
-	 */
-	/* $if !android $ */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"application", SGUI.makeIcon(ApplicationComponentFactory.class, "/jadex/application/images/application.png"),
-	});
-	/* $endif $ */
+	/** The image icon. */
+	protected static final LazyResource	ICON = new LazyResource(ApplicationComponentFactory.class, "/jadex/application/images/application.png");
 	
 	//-------- attributes --------
 	
@@ -392,16 +380,26 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* $if !android $ */
-	public IFuture<Icon> getComponentTypeIcon(String type)
+	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-		return new Future<Icon>(type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null);
+		Future<byte[]>	ret	= new Future<byte[]>();
+		if(type.equals(FILETYPE_APPLICATION))
+		{
+			try
+			{
+				ret.setResult(ICON.getData());
+			}
+			catch(IOException e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}	
-	/* $else $
-	public IFuture<Void> getComponentTypeIcon(String type) {
-		return new Future(null);
-	}
-	$endif $ */
 
 	/**
 	 *  Get the component type of a model.
@@ -420,7 +418,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
-	public Map	getProperties(String type)
+	public Map<String, Object>	getProperties(String type)
 	{
 		return FILETYPE_APPLICATION.equals(type)
 			? Collections.EMPTY_MAP : null;

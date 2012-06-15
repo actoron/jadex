@@ -25,6 +25,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.LazyResource;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -40,16 +41,13 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import jadex.commons.gui.SGUI;
-
-import javax.swing.Icon;
-import javax.swing.UIDefaults;
 
 /**
  *  Factory for creating Jadex V2 BDI agents.
@@ -69,16 +67,11 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/** The BDI capability file type. */
 	public static final String	FILETYPE_BDICAPABILITY	= "BDI Capability";
 	
-	/**
-	 * The image icons.
-	 */
-	/* if_not[android] */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"bdi_agent",	SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdi/images/bdi_agent.png"),
-		"bdi_capability",	SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdi/images/bdi_capability.png")
-	});
-	/* end[android] */
+	/** The agent icon. */
+	protected static final LazyResource	ICON_AGENT = new LazyResource(BDIAgentFactory.class, "/jadex/bdi/images/bdi_agent.png");
+	
+	/** The capability icon. */
+	protected static final LazyResource	ICON_CAPABILITY = new LazyResource(BDIAgentFactory.class, "/jadex/bdi/images/bdi_capability.png");
 
 	//-------- attributes --------
 	
@@ -476,17 +469,37 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* if_not[android] */
-	public IFuture<Icon> getComponentTypeIcon(String type)
+	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-		return new Future<Icon>(type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
-			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null);
-	}
-	/* else[android]
-	public IFuture<Void> getComponentTypeIcon(String type) {
-		return new Future(null);
-	}
-	end[android] */
+		Future<byte[]>	ret	= new Future<byte[]>();
+		if(type.equals(FILETYPE_BDIAGENT))
+		{
+			try
+			{
+				ret.setResult(ICON_AGENT.getData());
+			}
+			catch(IOException e)
+			{
+				ret.setException(e);
+			}
+		}
+		else if(type.equals(FILETYPE_BDICAPABILITY))
+		{
+			try
+			{
+				ret.setResult(ICON_CAPABILITY.getData());
+			}
+			catch(IOException e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}	
 
 	/**
 	 *  Get the component type of a model.

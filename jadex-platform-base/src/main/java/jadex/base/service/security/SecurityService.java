@@ -20,17 +20,13 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -150,22 +146,18 @@ public class SecurityService implements ISecurityService
 										}
 										password	= props.getStringProperty("password");
 										
-										if(props.getProperty("passwords")!=null)
+										Property[]	passes	= props.getProperties("passwords");
+										platformpasses	= new LinkedHashMap<String, String>();
+										for(int i=0; i<passes.length; i++)
 										{
-											platformpasses	= JavaReader.objectFromXML(props.getStringProperty("passwords"), ia.getClassLoader());
-										}
-										else
-										{
-											platformpasses	= new LinkedHashMap<String, String>();
+											platformpasses.put(passes[i].getName(), passes[i].getValue());
 										}
 										
-										if(props.getProperty("networks")!=null)
+										Property[]	networks	= props.getProperties("networks");
+										networkpasses	= new LinkedHashMap<String, String>();
+										for(int i=0; i<networks.length; i++)
 										{
-											networkpasses	= JavaReader.objectFromXML(props.getStringProperty("networks"), ia.getClassLoader());
-										}
-										else
-										{
-											networkpasses	= new LinkedHashMap<String, String>();
+											networkpasses.put(networks[i].getName(), networks[i].getValue());
 										}
 										
 										setTrustedLanMode(props.getBooleanProperty("trustedlan"));
@@ -183,8 +175,20 @@ public class SecurityService implements ISecurityService
 										Properties	ret	= new Properties();
 										ret.addProperty(new Property("usepass", usepass==null? Boolean.TRUE.toString(): usepass.toString()));
 										ret.addProperty(new Property("password", password));
-										ret.addProperty(new Property("passwords", JavaWriter.objectToXML(platformpasses, ia.getClassLoader())));
-										ret.addProperty(new Property("networks", JavaWriter.objectToXML(networkpasses, ia.getClassLoader())));
+										if(platformpasses!=null)
+										{
+											for(String platform: platformpasses.keySet())
+											{
+												ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
+											}
+										}
+										if(networkpasses!=null)
+										{
+											for(String network: networkpasses.keySet())
+											{
+												ret.addProperty(new Property(network, "networks", platformpasses.get(network)));
+											}
+										}
 										ret.addProperty(new Property("trustedlan", ""+trustedlan));
 										return new Future<Properties>(ret);
 									}

@@ -1432,7 +1432,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			}
 			// Cannot use stream due to jar starter bug.
 			AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
-//			Clip	clip	= AudioSystem.getClip();
 			AudioFormat	format	= ais.getFormat();
 			DataLine.Info	info	= new DataLine.Info(Clip.class, format);
 			Clip	clip	= (Clip)AudioSystem.getLine(info);

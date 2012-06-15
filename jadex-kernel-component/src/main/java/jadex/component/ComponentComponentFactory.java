@@ -18,6 +18,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.LazyResource;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -28,6 +29,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.kernelbase.IBootstrapFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,10 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.commons.gui.SGUI;
-import javax.swing.Icon;
-import javax.swing.UIDefaults;
 
 /**
  *  Factory for default contexts.
@@ -59,15 +57,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 //	/** The application file extension. */
 //	public static final String	FILE_EXTENSION_APPLICATION	= ".application.xml";
 
-	/**
-	 * The image icons.
-	 */
-	/* if_not[android] */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"component", SGUI.makeIcon(ComponentComponentFactory.class, "/jadex/component/images/component.png")
-	});
-	/* end[android] */
+	/** The image icon. */
+	protected static final LazyResource ICON = new LazyResource(ComponentComponentFactory.class, "/jadex/component/images/component.png");
 	
 	//-------- attributes --------
 	
@@ -383,16 +374,26 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* if_not[android] */
-	public IFuture<Icon> getComponentTypeIcon(String type)
+	public IFuture<byte[]> getComponentTypeIcon(String type)
 	{
-		return new Future<Icon>(type.equals(FILETYPE_COMPONENT)? icons.getIcon("component"): null);
-	}
-	/* else[android]
-	public IFuture<Void> getComponentTypeIcon(String type) {
-		return new Future(null);
-	}
-	end[android] */
+		Future<byte[]>	ret	= new Future<byte[]>();
+		if(type.equals(FILETYPE_COMPONENT))
+		{
+			try
+			{
+				ret.setResult(ICON.getData());
+			}
+			catch(IOException e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}	
 
 	/**
 	 *  Get the component type of a model.
