@@ -62,11 +62,11 @@ public class UUIDCodec extends AbstractCodec
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		UUID uuid = (UUID)object;
-		ByteBuffer buf = ec.getByteBuffer(8);
+		ByteBuffer buf = ec.getByteBuffer(16);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putLong(uuid.getMostSignificantBits());
-		buf = ec.getByteBuffer(8);
-		buf.order(ByteOrder.BIG_ENDIAN);
+//		buf = ec.getByteBuffer(8);
+//		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putLong(uuid.getLeastSignificantBits());
 		
 		return object;

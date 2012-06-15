@@ -4,11 +4,14 @@ import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Codec for encoding and decoding collections.
@@ -47,7 +50,16 @@ public class CollectionCodec extends AbstractCodec
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException(e);
+			if(SReflect.isSupertype(Set.class, clazz))
+			{
+				// Using linked hash set as default to avoid loosing order if has order.
+				coll = new LinkedHashSet();
+			}
+			else //if(isSupertype(List.class, clazz))
+			{
+				coll = new ArrayList();
+			}
+//			throw new RuntimeException(e);
 		}
 		
 		return coll;

@@ -37,8 +37,17 @@ public class MultiCollectionCodec extends AbstractCodec
 			//FIXME: Separation of sub-object decoding not possible with current MultiMap interface?
 			Map map = (Map) BinarySerializer.decodeObject(context);
 			Class type = SReflect.classForName(context.readClassname(), context.getClassloader());
-			Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
-			ret = (MultiCollection) c.newInstance(new Object[] { map, type });
+			
+			if(MultiCollection.class.equals(clazz))
+			{
+				ret = new MultiCollection(map, type);
+			}
+			else
+			{
+				// use reflection due to subclasses
+				Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
+				ret = (MultiCollection) c.newInstance(new Object[] { map, type });
+			}
 		}
 		catch (Exception e)
 		{

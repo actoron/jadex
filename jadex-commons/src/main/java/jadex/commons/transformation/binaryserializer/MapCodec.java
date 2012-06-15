@@ -6,6 +6,7 @@ import jadex.commons.transformation.traverser.Traverser;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,14 +35,15 @@ public class MapCodec extends AbstractCodec
 		Map ret = null;
 		try
 		{
-			if (Collections.EMPTY_MAP.getClass().equals(clazz))
+			if(Collections.EMPTY_MAP.getClass().equals(clazz))
 				ret = Collections.EMPTY_MAP;
 			else
 				ret = (Map) clazz.newInstance();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			ret = new LinkedHashMap();
+//			throw new RuntimeException(e);
 		}
 		
 		return ret;
