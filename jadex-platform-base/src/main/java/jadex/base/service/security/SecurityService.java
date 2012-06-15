@@ -21,6 +21,7 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -36,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +88,10 @@ public class SecurityService implements ISecurityService
 	/** The key password. */
 	protected String keypass;
 	
+	/** The currently valid digests. */
+	protected Map<String, Tuple2<Long, byte[]>> digests;
+
+	
 	//-------- setup --------
 	
 	/**
@@ -101,6 +107,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService(Boolean usepass, boolean printpass)
 	{
+		this.digests = new HashMap<String, Tuple2<Long, byte[]>>();
 		this.usepass = usepass;
 		this.fixedUsepass = usepass != null;
 		this.printpass = printpass;
@@ -570,6 +577,27 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
+	 *  Get the digest.
+	 */
+	public byte[] getDigest(long timestamp, String secret)
+	{
+		byte[] ret;
+		Tuple2<Long, byte[]> tst = digests.get(secret);
+		Long ts = new Long(timestamp);
+		if(tst!=null && tst.getFirstEntity().equals(ts))
+		{
+//			System.out.println("reuse: "+timestamp+" "+secret);
+			ret = tst.getSecondEntity();
+		}
+		else
+		{
+			ret = buildDigest(timestamp, secret);
+			digests.put(secret, new Tuple2<Long, byte[]>(ts, ret));
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Check if the test digest in contained in the digest list. 
 	 */
 	protected boolean checkDigest(byte[] test, List<byte[]> digests)
@@ -585,7 +613,7 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
-	 * 
+	 *  Get the network ip.
 	 */
 	protected List<InetAddress> getNetworkIps()
 	{
@@ -645,6 +673,9 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	preprocessRequest(IAuthorizable request, IComponentIdentifier target)
 	{
 		long	timestamp	= System.currentTimeMillis();
+//		System.out.println("ts1: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
+		timestamp = timestamp>>>16<<16; // New digest every minute
+//		System.out.println("ts2: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
 		request.setTimestamp(timestamp);
 		
 		List<byte[]> authdata = new ArrayList<byte[]>();
@@ -657,14 +688,14 @@ public class SecurityService implements ISecurityService
 
 		if(pw!=null)
 		{
-			authdata.add(buildDigest(timestamp, pw));
+			authdata.add(getDigest(timestamp, pw));
 //			System.out.println("sending auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+pw+", "+timestamp);
 		}
 		
 		// Add all network authentications
 		for(String net: networkpasses.keySet())
 		{
-			authdata.add(buildDigest(timestamp, net+networkpasses.get(net)));
+			authdata.add(getDigest(timestamp, net+networkpasses.get(net)));
 		}
 		
 		// Add trusted authentications (in case other has turned on lan trusted and this one not)
@@ -672,7 +703,7 @@ public class SecurityService implements ISecurityService
 		{
 			for(InetAddress addr: getNetworkIps())
 			{
-				authdata.add(buildDigest(timestamp, addr.getHostAddress()));
+				authdata.add(getDigest(timestamp, addr.getHostAddress()));
 			}
 		}
 		
@@ -688,12 +719,13 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Build the digest given the timestamp and password.
 	 */
-	public static byte[]	buildDigest(long timestamp, String password)
+	public static byte[]	buildDigest(long timestamp, String secret)
 	{
+//		System.out.println("build digest: "+timestamp+" "+secret);
 		try
 		{
-			MessageDigest	md	= MessageDigest.getInstance("MD5");
-			byte[]	input	= (byte[])SUtil.joinArrays(password.getBytes(), SUtil.longToBytes(timestamp));
+			MessageDigest	md	= MessageDigest.getInstance("SHA-384");
+			byte[]	input	= (byte[])SUtil.joinArrays(secret.getBytes(), SUtil.longToBytes(timestamp));
 			byte[]	output	= md.digest(input);
 			return output;
 		}
