@@ -439,7 +439,7 @@ public class RemoteFileSystemView extends FileSystemView
 		{
 			exta.scheduleStep(new IComponentStep<FileData[]>()
 			{
-				@Classname("getFiles")
+				@Classname("getRoots")
 				public IFuture<FileData[]> execute(IInternalAccess ia)
 				{
 //					FileSystemView view = FileSystemView.getFileSystemView();
