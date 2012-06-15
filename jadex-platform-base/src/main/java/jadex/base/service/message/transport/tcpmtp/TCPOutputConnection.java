@@ -81,7 +81,7 @@ class TCPOutputConnection
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			close();
 		}
 		

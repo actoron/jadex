@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -159,14 +160,17 @@ public class SecurityService implements ISecurityService
 										platformpasses	= new LinkedHashMap<String, String>();
 										for(int i=0; i<passes.length; i++)
 										{
-											platformpasses.put(passes[i].getName(), passes[i].getValue());
+											String val = passes[i].getValue();
+											platformpasses.put(passes[i].getName(), val==null? "": val);
 										}
 										
 										Property[]	networks	= props.getProperties("networks");
 										networkpasses	= new LinkedHashMap<String, String>();
 										for(int i=0; i<networks.length; i++)
 										{
-											networkpasses.put(networks[i].getName(), networks[i].getValue());
+//											System.out.println("value:"+networks[i].getValue()+".");
+											String val = networks[i].getValue();
+											networkpasses.put(networks[i].getName(), val==null? "": val);
 										}
 										
 										setTrustedLanMode(props.getBooleanProperty("trustedlan"));
@@ -308,6 +312,7 @@ public class SecurityService implements ISecurityService
 	 *  Get the local password.
 	 *  @return	The password of the local platform (if any).
 	 */
+	@SecureTransmission
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<String>	getLocalPassword()
 	{
@@ -319,6 +324,7 @@ public class SecurityService implements ISecurityService
 	 *  @param password	The password of the local platform. 
 	 *  @throws  Exception, when a null password is provided and use password is true.
 	 */
+	@SecureTransmission
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<Void>	setLocalPassword(String password)
 	{
@@ -345,6 +351,7 @@ public class SecurityService implements ISecurityService
 	 *  @return	The stored password. Returns null if no password is stored, unless the
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */
+	@SecureTransmission
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<String>	getPlatformPassword(IComponentIdentifier target)
 	{
@@ -366,6 +373,7 @@ public class SecurityService implements ISecurityService
 	 *  @param target	The id of the target component.
 	 *  @param password	The password or null if no password should be used.
 	 */
+	@SecureTransmission
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<Void>	setPlatformPassword(IComponentIdentifier target, String password)
 	{
@@ -387,6 +395,7 @@ public class SecurityService implements ISecurityService
 	 *  @return	The stored password. Returns null if no password is stored, unless the
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */
+	@SecureTransmission
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<String>	getNetworkPassword(String network)
 	{
@@ -399,6 +408,7 @@ public class SecurityService implements ISecurityService
 	 *  @param network	The id of the network.
 	 *  @param password	The password or null if no password should be used.
 	 */
+	@SecureTransmission
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<Void>	setNetworkPassword(String network, String password)
 	{
@@ -418,6 +428,7 @@ public class SecurityService implements ISecurityService
 	 *  Get all stored passwords.
 	 *  @return A map containing the stored passwords as pairs (platform name -> password).
 	 */
+	@SecureTransmission
 	// Todo: passwords are transferred in plain text unless transport uses encryption.
 	public IFuture<Map<String, String>>	getPlatformPasswords()
 	{
@@ -428,6 +439,7 @@ public class SecurityService implements ISecurityService
 	 *  Get all stored network passwords.
 	 *  @return A map containing the stored passwords as pairs (network name -> password).
 	 */
+	@SecureTransmission
 	// Todo: passwords are transferred in plain text unless transport uses encryption.
 	public IFuture<Map<String, String>>	getNetworkPasswords()
 	{
