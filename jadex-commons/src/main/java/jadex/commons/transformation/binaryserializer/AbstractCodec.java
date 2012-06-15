@@ -105,6 +105,11 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	public Object decode(Class clazz, DecodingContext context)
 	{
 		Object ret = createObject(clazz, context);
+		// Remap class in case there was a search for the correct inner class.
+		if (ret != null)
+		{
+			clazz = ret.getClass();
+		}
 		recordKnownDecodedObject(ret, context);
 		ret = decodeSubObjects(ret, clazz, context);
 		return ret;

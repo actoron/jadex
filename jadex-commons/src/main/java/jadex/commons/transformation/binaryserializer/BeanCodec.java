@@ -119,7 +119,13 @@ public class BeanCodec extends AbstractCodec
 			String name = context.readString();
 			Object val = null;
 			val = BinarySerializer.decodeObject(context);
+			try{
 			((BeanProperty) props.get(name)).setPropertyValue(object, val);
+			}
+			catch(NullPointerException e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		
 		return object;
@@ -250,15 +256,7 @@ public class BeanCodec extends AbstractCodec
 			basename = basename.substring(0, marker);
 		}
 		basename += "$";
-		int exclude;
-		try {
-			//exclude = Integer.valueOf(startname.substring(marker + 1, startname.indexOf('$', marker + 1)));
-			exclude = Integer.valueOf(startname.substring(marker + 1, startname.length()));
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		int exclude = Integer.valueOf(startname.substring(marker + 1, startname.length()));
 		Class ret = null;
 		
 		int classindex = 0;
@@ -291,13 +289,19 @@ public class BeanCodec extends AbstractCodec
 				}
 				catch (ClassNotFoundException e)
 				{
-					searching = false;
+					if (classindex != 0)
+					{
+						searching = false;
+					}
 				}
 			}
 			++classindex;
 		}
 		
-		ret = findCorrectInnerClass(level + 1, startname, annotatedname, classloader);
+		if (ret == null)
+		{
+			ret = findCorrectInnerClass(level + 1, startname, annotatedname, classloader);
+		}
 		
 		return ret;
 	}
