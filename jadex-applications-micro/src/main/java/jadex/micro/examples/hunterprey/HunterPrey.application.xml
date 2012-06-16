@@ -16,8 +16,9 @@
 	name="HunterPrey" package="jadex.micro.examples.hunterprey">
 	
 	<imports>
+		<import>jadex.extension.envsupport.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
-		<import>jadex.extension.envsupport.environment.space2d.*</import>
+				<import>jadex.extension.envsupport.environment.space2d.*</import>
 		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
@@ -182,6 +183,12 @@
 	<componenttypes>
 		<componenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
 	</componenttypes>
+	
+	<services>
+	    <providedservice class="IEnvironmentService">
+	        <implementation>new EnvironmentService("my2dspace")</implementation>
+	    </providedservice>
+	</services>
 
 	<configurations>
 		<configuration name="One Micro Prey">
