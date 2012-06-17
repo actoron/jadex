@@ -3,8 +3,6 @@ package jadex.micro.examples.hunterprey;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.extension.envsupport.IEnvironmentService;
-import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -13,16 +11,13 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  A prey implemented using the EnvSupport service interface.
  */
 @Agent
 @RequiredServices(
-	@RequiredService(name="env", type=IEnvironmentService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
+	@RequiredService(name="env", type=IHunterPreyEnvironmentService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class ServicePreyAgent
 {
 	//-------- attributes --------
@@ -33,7 +28,7 @@ public class ServicePreyAgent
 	
 	/** The environment. */
 	@AgentService(name="env")
-	protected IEnvironmentService	env;
+	protected IHunterPreyEnvironmentService	env;
 	
 	/** The last movement direction. */
 	protected String lastdir;
@@ -46,11 +41,11 @@ public class ServicePreyAgent
 	@AgentCreated
 	public void	start()
 	{
-		env.register("prey").addResultListener(new IntermediateDefaultResultListener<Collection<ISpaceObject>>(agent.getLogger())
+		env.registerPrey().addResultListener(new IntermediateDefaultResultListener<Object>(agent.getLogger())
 		{
-			public void intermediateResultAvailable(Collection<ISpaceObject> result)
+			public void intermediateResultAvailable(Object percept)
 			{
-				perceptReceived(result);
+				perceptReceived(percept);
 			}
 		});
 	}
@@ -70,9 +65,7 @@ public class ServicePreyAgent
 			lastdir	= Math.random()>0.5 ? MoveAction.DIRECTION_LEFT : MoveAction.DIRECTION_RIGHT;
 		}
 
-		Map<String, Object>	params	= new HashMap<String, Object>();
-		params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
-		env.performAction("move", params).addResultListener(new IResultListener<Void>()
+		env.move(lastdir).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -91,8 +84,8 @@ public class ServicePreyAgent
 	/**
 	 *  Called on each received percept.
 	 */
-	public void	perceptReceived(Collection<ISpaceObject> percept)
+	public void	perceptReceived(Object percept)
 	{
-		System.out.println("Percept "+agent.getComponentIdentifier()+": "+percept);
+		System.out.println(agent.getComponentIdentifier()+" percept received: "+percept);
 	}
 }

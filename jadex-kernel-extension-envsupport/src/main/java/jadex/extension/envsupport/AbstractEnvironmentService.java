@@ -4,7 +4,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -25,8 +24,7 @@ import java.util.Map;
 /**
  *  Environment service implementation.
  */
-@Service
-public class EnvironmentService	implements	IEnvironmentService
+public abstract class AbstractEnvironmentService
 {
 	//-------- attributes --------
 	
@@ -46,7 +44,7 @@ public class EnvironmentService	implements	IEnvironmentService
 	 *  Create an environment service for a given space.
 	 *  @param spacename	The name of the space instance.
 	 */
-	public EnvironmentService(String spacename)
+	public AbstractEnvironmentService(String spacename)
 	{
 		this.spacename	= spacename; 
 	}
@@ -60,10 +58,10 @@ public class EnvironmentService	implements	IEnvironmentService
 	 *  @return	A future through which percepts are published to the agent (component).
 	 *    Termination of the future deregisters the agent (component).
 	 */
-	public ISubscriptionIntermediateFuture<Collection<ISpaceObject>>	register(final String objecttype)
+	public ISubscriptionIntermediateFuture<Object>	register(final String objecttype)
 	{
-		final SubscriptionIntermediateFuture<Collection<ISpaceObject>>	ret	=
-			new SubscriptionIntermediateFuture<Collection<ISpaceObject>>(new Runnable()
+		final SubscriptionIntermediateFuture<Object>	ret	=
+			new SubscriptionIntermediateFuture<Object>(new Runnable()
 		{
 			public void run()
 			{
@@ -73,7 +71,7 @@ public class EnvironmentService	implements	IEnvironmentService
 		});
 		
 		getCallingComponent().addResultListener(
-			new ExceptionDelegationResultListener<IComponentDescription, Collection<Collection<ISpaceObject>>>(ret)
+			new ExceptionDelegationResultListener<IComponentDescription, Collection<Object>>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)
 			{
