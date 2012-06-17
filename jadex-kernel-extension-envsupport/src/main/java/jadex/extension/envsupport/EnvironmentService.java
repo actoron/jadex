@@ -1,18 +1,25 @@
 package jadex.extension.envsupport;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +37,7 @@ public class EnvironmentService	implements	IEnvironmentService
 	/** The environment space instance name used for space lookup. */
 	protected String	spacename;
 	
-	/** The environment space (cached on first access). */
+	/** The environment space. */
 	protected IEnvironmentSpace	space;
 	
 	//-------- constructors --------
@@ -55,20 +62,24 @@ public class EnvironmentService	implements	IEnvironmentService
 	 */
 	public ISubscriptionIntermediateFuture<Collection<ISpaceObject>>	register(final String objecttype)
 	{
-		SubscriptionIntermediateFuture<Collection<ISpaceObject>>	ret	=
+		final SubscriptionIntermediateFuture<Collection<ISpaceObject>>	ret	=
 			new SubscriptionIntermediateFuture<Collection<ISpaceObject>>(new Runnable()
 		{
 			public void run()
 			{
 				// Todo: destroy avatar on termination.
+				System.out.println("Terminated...");
 			}
 		});
 		
-		getSpace().addResultListener(new ExceptionDelegationResultListener<IEnvironmentSpace, Collection<Collection<ISpaceObject>>>(ret)
+		getCallingComponent().addResultListener(
+			new ExceptionDelegationResultListener<IComponentDescription, Collection<Collection<ISpaceObject>>>(ret)
 		{
-			public void customResultAvailable(IEnvironmentSpace space)
+			public void customResultAvailable(IComponentDescription desc)
 			{
-				space.createSpaceObject(objecttype, null, null);
+				Map<String, Object>	props	= new HashMap<String, Object>();
+				props.put(ISpaceObject.PROPERTY_OWNER, desc);
+				space.createSpaceObject(objecttype, props, null);
 			}
 		});
 		
@@ -82,35 +93,75 @@ public class EnvironmentService	implements	IEnvironmentService
 	 *  @param actiontype	The type name of the action as defined in the environment.
 	 *  @param parameters	Parameters for the action, if any. 
 	 */
-	public IFuture<Void>	performAction(String actiontype, Map<String, Object> parameters)
+	public IFuture<Void>	performAction(final String actiontype, final Map<String, Object> parameters)
 	{
-		return IFuture.DONE;
+		final Future<Void>	ret	= new Future<Void>();
+		
+		getCallingComponent().addResultListener(
+			new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
+		{
+			public void customResultAvailable(IComponentDescription desc)
+			{
+				parameters.put(ISpaceAction.ACTOR_ID, desc);
+				space.performSpaceAction(actiontype, parameters, new ExceptionDelegationResultListener<Object, Void>(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	//-------- helper methods --------
 	
 	/**
-	 *  Get the environment space.
+	 *  Get description of the calling component.
 	 */
-	protected IFuture<IEnvironmentSpace>	getSpace()
+	protected IFuture<IComponentDescription>	getCallingComponent()
 	{
-		final Future<IEnvironmentSpace>	ret	= new Future<IEnvironmentSpace>();
-		if(space!=null)
-		{
-			ret.setResult(space);
-		}
-		else
+		final Future<IComponentDescription>	ret	= new Future<IComponentDescription>();
+		final IComponentIdentifier	caller	= IComponentIdentifier.CALLER.get();
+		
+		// Hack!!! Space cannot be looked up in service start as service is initialized before envsupport extension.
+		final Future<Void>	spacedone	= new Future<Void>();
+		if(space==null)
 		{
 			component.getExternalAccess().getExtension(spacename)
-				.addResultListener(new ExceptionDelegationResultListener<IExtensionInstance, IEnvironmentSpace>(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IExtensionInstance, IComponentDescription>(ret)
 			{
 				public void customResultAvailable(IExtensionInstance result)
 				{
 					space	= (IEnvironmentSpace)result;
-					ret.setResult(space);
+					spacedone.setResult(null);
 				}
 			});
 		}
+		else
+		{
+			spacedone.setResult(null);
+		}
+
+		// Get component description.
+		spacedone.addResultListener(new ExceptionDelegationResultListener<Void, IComponentDescription>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				component.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription>(ret)
+				{
+					public void customResultAvailable(IComponentManagementService cms)
+					{
+						cms.getComponentDescription(caller)
+							.addResultListener(new DelegationResultListener<IComponentDescription>(ret));
+					}
+				});
+			}
+		});
+		
 		return ret;
 	}
 }
