@@ -1,6 +1,5 @@
 package javaxx.xml.stream;
 
-import android.util.Log;
 import javaxx.xml.stream.FactoryConfigurationError;
 import javaxx.xml.stream.FactoryFinder;
 import javaxx.xml.stream.XMLEventWriter;
@@ -104,16 +103,8 @@ public abstract class XMLOutputFactory {
    * @throws FactoryConfigurationError if an instance of this factory cannot be loaded
    */
 	public static XMLOutputFactory newInstance() throws FactoryConfigurationError {
-		Object find = null;
-		try {
-			find = FactoryFinder.find("javaxx.xml.stream.XMLOutputFactory",
-					"jadex.android.xmlpullparser.XMLPullOutputFactory");
-		} catch (FactoryConfigurationError e) {
-		}
-		if (find == null) {
-			find = FactoryFinder.find("javaxx.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
-		}
-		return (XMLOutputFactory) find;
+		 return (XMLOutputFactory) FactoryFinder.find("javax.xml.stream.XMLOutputFactory",
+                 "com.sun.xml.internal.stream.XMLOutputFactoryImpl");
 	}
 
   /**

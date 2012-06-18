@@ -1,5 +1,6 @@
 package jadex.xml.writer;
 
+import jadex.commons.SReflect;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.xml.IPreProcessor;
@@ -14,17 +15,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/* if_not[android] */
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
-/* else[android]
-import javaxx.xml.XMLConstants;
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.XMLOutputFactory;
-import javaxx.xml.stream.XMLStreamWriter;
-end[android] */
 
 /**
  *  XML writer for conversion of objects to XML.
@@ -43,6 +37,13 @@ public class Writer
 
 	/** The default encoding. */
 	public static String DEFAULT_ENCODING = "utf-8";
+	
+	static {
+		if (SReflect.isAndroid()) {
+			System.setProperty("javax.xml.stream.XMLOutputFactory", "jadex.android.xmlpullparser.XMLPullOutputFactory");
+			System.setProperty("javax.xml.stream.XMLInputFactory", "jadex.android.xmlpullparser.XMLPullInputFactory");
+		}
+	}
 	
 	/** The xml output factory. */
 	protected static final XMLOutputFactory	FACTORY = XMLOutputFactory.newInstance();
