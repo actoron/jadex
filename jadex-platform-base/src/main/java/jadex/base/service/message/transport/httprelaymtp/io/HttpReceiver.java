@@ -140,9 +140,10 @@ public class HttpReceiver
 				
 				protected void restart(Exception e)
 				{
-					if(address!=null)
+					String copy = address;
+					if(copy!=null)
 					{
-						HttpReceiver.this.transport.connected(address, true);
+						HttpReceiver.this.transport.connected(copy, true);
 						address	= null;
 					}
 					
