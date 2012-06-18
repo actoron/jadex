@@ -29,122 +29,148 @@ import android.util.Log;
  * as Files and Properties
  * 
  */
-public class AndroidContextService extends BasicService implements AndroidContextChangeListener, IAndroidContextService {
+public class AndroidContextService extends BasicService implements AndroidContextChangeListener, IAndroidContextService
+{
 
+	/** The Android Application Context */
 	private Context context;
+	
+	/** The {@link JadexAndroidContext} */
 	private JadexAndroidContext jadexAndroidContext;
-	private boolean hasWifiPermission;
+	
+	/** Cache the Wifi permission check */
+	private Boolean hasWifiPermission;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param provider
 	 */
-	public AndroidContextService(IServiceProvider provider) {
+	public AndroidContextService(IServiceProvider provider)
+	{
 		super(provider.getId(), IAndroidContextService.class, null);
 		jadexAndroidContext = JadexAndroidContext.getInstance();
 		jadexAndroidContext.addContextChangeListener(this);
-
-		int perm = context.checkCallingOrSelfPermission(permission.ACCESS_WIFI_STATE);
-		hasWifiPermission = perm == PackageManager.PERMISSION_GRANTED;
-		if (!hasWifiPermission) {
-			Logger.e("For full functionality (checking Netmask and IP Address), this Application needs PERMISSION.ACCESS_WIFI_STATE");
-		}
 	}
 
 	@Override
-	public IFuture<Void> startService() {
+	public IFuture<Void> startService()
+	{
 		return super.startService();
 	}
 
 	@Override
-	public IFuture<Void> shutdownService() {
+	public IFuture<Void> shutdownService()
+	{
 		JadexAndroidContext.getInstance().removeContextChangeListener(this);
 		return super.shutdownService();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * 
 	 * @see
 	 * jadex.android.service.IAndroidContextService#openFileOutputStream(java
-	 * .lang.String)
-	 */
+	 * .lang.String) */
 	@Override
-	public FileOutputStream openFileOutputStream(String name) throws FileNotFoundException {
+	public FileOutputStream openFileOutputStream(String name) throws FileNotFoundException
+	{
 		checkContext();
 		return context.openFileOutput(name, Context.MODE_PRIVATE);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * 
 	 * @see
 	 * jadex.android.service.IAndroidContextService#openFileInputStream(java
-	 * .lang.String)
-	 */
+	 * .lang.String) */
 	@Override
-	public FileInputStream openFileInputStream(String name) throws FileNotFoundException {
+	public FileInputStream openFileInputStream(String name) throws FileNotFoundException
+	{
 		checkContext();
 		return context.openFileInput(name);
 	}
 
 	@Override
-	public File getFile(String name) {
+	public File getFile(String name)
+	{
 		checkContext();
 		return context.getFileStreamPath(name);
 	}
 
 	@Override
-	public IPreferences getSharedPreferences(String name) {
+	public IPreferences getSharedPreferences(String name)
+	{
 		checkContext();
 		return AndroidSharedPreferencesWrapper.wrap(context.getSharedPreferences(name, Context.MODE_PRIVATE));
 	}
 
 	@Override
-	public void onContextDestroy(Context ctx) {
+	public void onContextDestroy(Context ctx)
+	{
 		this.context = null;
 	}
 
 	@Override
-	public void onContextCreate(Context ctx) {
+	public void onContextCreate(Context ctx)
+	{
 		this.context = ctx;
+
+		if (hasWifiPermission == null)
+		{
+			int perm = context.checkCallingOrSelfPermission(permission.ACCESS_WIFI_STATE);
+			hasWifiPermission = perm == PackageManager.PERMISSION_GRANTED;
+			if (!hasWifiPermission)
+			{
+				Logger.e("For full functionality (checking Netmask and IP Address), this Application needs PERMISSION.ACCESS_WIFI_STATE");
+			}
+		}
 	}
 
-	private void checkContext() throws JadexAndroidContextNotFoundError {
-		if (context == null) {
+	private void checkContext() throws JadexAndroidContextNotFoundError
+	{
+		if (context == null)
+		{
 			throw new JadexAndroidContextNotFoundError();
 		}
 	}
 
 	@Override
-	public boolean dispatchUiEvent(IJadexAndroidEvent event) {
-		try {
+	public boolean dispatchUiEvent(IJadexAndroidEvent event)
+	{
+		try
+		{
 			return jadexAndroidContext.dispatchEvent(event);
-		} catch (WrongEventClassException e) {
+		} catch (WrongEventClassException e)
+		{
 			Log.e("AndroidContextService", e.getMessage());
 			return false;
 		}
 	}
 
 	@Override
-	public int getDhcpNetmask() {
-		if (hasWifiPermission) {
+	public int getDhcpNetmask()
+	{
+		if (hasWifiPermission)
+		{
 			WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 			DhcpInfo dhcpInfo = wifi.getDhcpInfo();
 			return dhcpInfo != null ? dhcpInfo.netmask : -1;
-		} else {
+		} else
+		{
 			return -1;
 		}
 	}
 
 	@Override
-	public int getDhcpInetAdress() {
-		if (hasWifiPermission) {
+	public int getDhcpInetAdress()
+	{
+		if (hasWifiPermission)
+		{
 			WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 			DhcpInfo dhcpInfo = wifi.getDhcpInfo();
 			return dhcpInfo != null ? dhcpInfo.ipAddress : -1;
-		} else {
+		} else
+		{
 			return -1;
 		}
 	}
