@@ -2351,25 +2351,7 @@ public class SUtil
 		short ret = -1;
 		if(!SReflect.isAndroid() || SReflect.getAndroidVersion() > 8)
 		{
-			try
-			{
-				NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
-				List<InterfaceAddress> iads = ni.getInterfaceAddresses();
-				if(iads!=null)
-				{
-					for(int i=0; i<iads.size() && ret==-1; i++)
-					{
-						InterfaceAddress ia = iads.get(i);
-						if(ia.getAddress() instanceof Inet4Address)
-							ret = ia.getNetworkPrefixLength();
-					}
-				}
-				
-			}
-			catch(Exception e)
-			{
-	//			e.printStackTrace();
-			}
+			ret	= SNonAndroid.getNetworkPrefixLength(iadr);
 		}
 		
 		return ret;
