@@ -52,6 +52,7 @@ import java.util.logging.Level;
 	"jadex.base.service.message.transport.*",
 	"jadex.base.service.message.transport.localmtp.*",
 	"jadex.base.service.message.transport.tcpmtp.*",
+	"jadex.base.service.message.transport.ssltcpmtp.*",
 	"jadex.base.service.message.transport.niotcpmtp.*",
 	"jadex.base.service.message.transport.httprelaymtp.*",
 	"jadex.base.service.message.transport.httprelaymtp.nio.*",
@@ -113,6 +114,8 @@ import java.util.logging.Level;
 	@Argument(name="niotcpport", clazz=int.class, defaultvalue="8765"),
 	@Argument(name="relaytransport", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="relayaddress", clazz=String.class, defaultvalue="jadex.base.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
+	@Argument(name="ssltcptransport", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="ssltcpport", clazz=int.class, defaultvalue="44334"),
 
 	@Argument(name="extensions", clazz=String.class, defaultvalue="\"jadex/extension/envsupport/EnvSupportAgent.class, jadex/extension/agr/AGRAgent.class\""),
 
@@ -138,7 +141,7 @@ import java.util.logging.Level;
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/base/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class"),
-	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class")
+	@ComponentType(name="jcc", filename="jadex/tools/jcc/gui/JCCAgent.class")
 })
 
 @ProvidedServices({
@@ -150,14 +153,14 @@ import java.util.logging.Level;
 	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="$args.maven_dependencies ? jadex.base.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.base.service.library.BasicDependencyService()")),
 	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="$args.libpath==null? new LibraryService(): new LibraryService(new URLClassLoader(SUtil.toURLs($args.libpath), $args.baseclassloader==null ? LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation): new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.base.service.message.MessageService($component.getExternalAccess(), $component.getLogger(), new jadex.base.service.message.transport.ITransport[]{$args.localtransport? new jadex.base.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null,$args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,$args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,$args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.io.HttpRelayTransport($component, $args.relayaddress): null}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)")),
+	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.base.service.message.MessageService($component.getExternalAccess(), $component.getLogger(), new jadex.base.service.message.transport.ITransport[]{$args.localtransport? new jadex.base.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null, $args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null, $args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null, $args.ssltcptransport? new jadex.base.service.message.transport.ssltcpmtp.SSLTCPTransport($component.getServiceProvider(), $args.ssltcpport): null, $args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.io.HttpRelayTransport($component, $args.relayaddress): null}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new DecoupledComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)")),
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()")),
 	@ProvidedService(type=IPublishService.class, name="publish_ws", implementation=@Implementation(expression="Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null")),
-	@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null")),
-	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)"))
+	@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null"))
 })
 
 @RequiredServices({
@@ -174,6 +177,7 @@ import java.util.logging.Level;
 	@Configuration(name="auto", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
+		@NameValue(name="ssltcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="extensions", type="extensions", daemon=true, number="$args.extensions!=null ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
@@ -195,6 +199,7 @@ import java.util.logging.Level;
 	}),
 	@Configuration(name="fixed", arguments={
 		@NameValue(name="tcpport", value="0"),
+		@NameValue(name="ssltcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={

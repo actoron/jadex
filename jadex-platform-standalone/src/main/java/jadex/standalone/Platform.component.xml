@@ -260,7 +260,6 @@
 				: new jadex.base.service.clock.ClockService(new jadex.base.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)
 			</implementation>
 		</providedservice>
-		<!-- Start before message service because of relay and ssl!? -->
 		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
 			<implementation>
 			Boolean.TRUE.equals($args.android) 
