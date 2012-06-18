@@ -13,7 +13,7 @@ import java.net.Socket;
 /**
  *  TCP output connection for sending messages to a specific target address. 
  */
-class TCPOutputConnection
+public class TCPOutputConnection
 {
 	//-------- constants --------
 	

@@ -3,7 +3,8 @@ package jadex.base.service.message.transport.tcpmtp;
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.remote.RemoteServiceManagementService;
+import jadex.base.service.message.transport.httprelaymtp.io.HttpReceiver;
+import jadex.base.service.message.transport.httprelaymtp.io.HttpRelayTransport;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -19,17 +20,16 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Binding;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -97,6 +97,9 @@ public class TCPTransport implements ITransport
 	
 	/** The cleanup timer. */
 	protected Timer	timer;
+	
+	/** The thread pool. */
+	protected IThreadPoolService threadpool;
 	
 	//-------- constructors --------
 	
@@ -169,6 +172,8 @@ public class TCPTransport implements ITransport
 			{
 				public void customResultAvailable(final IThreadPoolService tp)
 				{
+					threadpool = tp;
+					
 					ret.setResult(null);
 					tp.execute(new Runnable()
 					{
@@ -319,54 +324,91 @@ public class TCPTransport implements ITransport
 	 *  @param address The address to send to.
 	 *  @param task A task representing the message to send.
 	 */
-	public void	sendMessage(String address, final ISendTask task)
+	public void	sendMessage(final String address, final ISendTask task)
 	{
-		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
+		threadpool.execute(new Runnable()
 		{
-			public IFuture<Void> execute(Void args)
+			public void run()
 			{
-				IFuture<Void>	ret	= null;
-				
-				// Fetch all addresses
-				Set<String>	addresses	= new LinkedHashSet<String>();
-				for(int i=0; i<task.getReceivers().length; i++)
+				final TCPOutputConnection con = getConnection(address, true);
+				if(con!=null)
 				{
-					String[]	raddrs	= task.getReceivers()[i].getAddresses();
-					for(int j=0; j<raddrs.length; j++)
+					task.ready(new IResultCommand<IFuture<Void>, Void>()
 					{
-						addresses.add(raddrs[j]);
-					}			
+						public IFuture<Void> execute(Void args)
+						{
+							if(con.send(task.getProlog(), task.getData()))
+							{
+//								System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
+								return IFuture.DONE;
+							}
+							else
+							{
+								return new Future<Void>(new RuntimeException("Send failed: "+con));
+							}
+						}
+					});
 				}
-
-				// Iterate over all different addresses and try to send
-				// to missing and appropriate receivers
-				String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
-				for(int i=0; ret==null && i<addrs.length; i++)
+				else
 				{
-					TCPOutputConnection con = getConnection(addrs[i], true);
-					if(con!=null)
+					IResultCommand<IFuture<Void>, Void>	send = new IResultCommand<IFuture<Void>, Void>()
 					{
-						if(con.send(task.getProlog(), task.getData()))
+						public IFuture<Void> execute(Void args)
 						{
-//							System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
-							ret	= IFuture.DONE;
+							return new Future<Void>(new RuntimeException("Send failed"));
 						}
-						else
-						{
-							ret	= new Future<Void>(new RuntimeException("Send failed: "+con));
-						}
-					}
+					};
+					task.ready(send);
 				}
-				
-				if(ret==null)
-				{
-					ret	= new Future<Void>(new RuntimeException("No working connection."));			
-				}
-				
-				return ret;
 			}
-		};
-		task.ready(send);
+		});
+		
+//		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
+//		{
+//			public IFuture<Void> execute(Void args)
+//			{
+//				IFuture<Void>	ret	= null;
+//				
+//				// Fetch all addresses
+//				Set<String>	addresses	= new LinkedHashSet<String>();
+//				for(int i=0; i<task.getReceivers().length; i++)
+//				{
+//					String[]	raddrs	= task.getReceivers()[i].getAddresses();
+//					for(int j=0; j<raddrs.length; j++)
+//					{
+//						addresses.add(raddrs[j]);
+//					}			
+//				}
+//
+//				// Iterate over all different addresses and try to send
+//				// to missing and appropriate receivers
+//				String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
+//				for(int i=0; ret==null && i<addrs.length; i++)
+//				{
+//					TCPOutputConnection con = getConnection(addrs[i], true);
+//					if(con!=null)
+//					{
+//						if(con.send(task.getProlog(), task.getData()))
+//						{
+////							System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
+//							ret	= IFuture.DONE;
+//						}
+//						else
+//						{
+//							ret	= new Future<Void>(new RuntimeException("Send failed: "+con));
+//						}
+//					}
+//				}
+//				
+//				if(ret==null)
+//				{
+//					ret	= new Future<Void>(new RuntimeException("No working connection."));			
+//				}
+//				
+//				return ret;
+//			}
+//		};
+//		task.ready(send);
 	}
 	
 	/**
