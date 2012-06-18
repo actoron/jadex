@@ -20,7 +20,7 @@ public class AndroidSecurityService extends SecurityService
 
 	public AndroidSecurityService(Boolean usepass, Boolean printpass, Boolean trustedlan)
 	{
-		super(usepass, printpass, trustedlan);
+		super(usepass, printpass, trustedlan, null, null);
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class AndroidSecurityService extends SecurityService
 	public IFuture<Void> start()
 	{
 		IFuture<IAndroidContextService> service = SServiceProvider.getService(
-				component.getServiceContainer(), IAndroidContextService.class);
+			component.getServiceContainer(), IAndroidContextService.class);
 		service.addResultListener(new DefaultResultListener<IAndroidContextService>()
 		{
 			@Override

@@ -104,16 +104,25 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(Boolean.TRUE, true, Boolean.FALSE);
+		this(Boolean.TRUE, true, Boolean.FALSE, null, null);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan)
+	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, String[] networknames, String[] networkpasses)
 	{
 		this.platformpasses	= new LinkedHashMap<String, String>();
 		this.networkpasses	= new LinkedHashMap<String, String>();
+		
+		if(networknames!=null)
+		{
+			for(int i=0; i<networknames.length; i++)
+			{
+				this.networkpasses.put(networknames[i], networkpasses==null? "": networkpasses[i]);
+			}
+		}
+		
 		this.digests = new HashMap<String, Tuple2<Long, byte[]>>();
 		this.usepass = usepass!=null? usepass.booleanValue(): true;
 		this.argsusepass = usepass != null;
@@ -175,7 +184,7 @@ public class SecurityService implements ISecurityService
 										}
 										
 										Property[]	passes	= props.getProperties("passwords");
-										platformpasses	= new LinkedHashMap<String, String>();
+//										platformpasses	= new LinkedHashMap<String, String>();
 										for(int i=0; i<passes.length; i++)
 										{
 											String val = passes[i].getValue();
@@ -191,7 +200,7 @@ public class SecurityService implements ISecurityService
 										}
 											
 										Property[]	networks	= props.getProperties("networks");
-										networkpasses	= new LinkedHashMap<String, String>();
+//										networkpasses	= new LinkedHashMap<String, String>();
 										for(int i=0; i<networks.length; i++)
 										{
 //											System.out.println("value:"+networks[i].getValue()+".");
@@ -489,7 +498,6 @@ public class SecurityService implements ISecurityService
 				if(!networkpasses.keySet().contains(addr.getHostAddress()))
 				{
 					setNetworkPassword(addr.getHostAddress(), "");
-//					trustednets.add(addr.getHostAddress());
 				}
 			}
 		}
