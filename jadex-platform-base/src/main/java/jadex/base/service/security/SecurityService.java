@@ -171,6 +171,16 @@ public class SecurityService implements ISecurityService
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
+										String spa = props.getStringProperty("storepath");
+										if(spa!=null && spa.length()>0)
+											storepath = spa;
+										String sps = props.getStringProperty("storepass");
+										if(sps!=null && spa.length()>0)
+											storepass = sps;
+										String kp = props.getStringProperty("keypass");
+										if(kp!=null && kp.length()>0)
+											keypass = kp;
+										
 										if(!argsusepass)
 										{
 											usepass = props.getBooleanProperty("usepass");
@@ -240,6 +250,11 @@ public class SecurityService implements ISecurityService
 											}
 										}
 										ret.addProperty(new Property("trustedlan", ""+trustedlan));
+										
+										ret.addProperty(new Property("storepath", storepath));
+										ret.addProperty(new Property("storepass", storepass));
+										ret.addProperty(new Property("keypass", keypass));
+										
 										return new Future<Properties>(ret);
 									}
 								});

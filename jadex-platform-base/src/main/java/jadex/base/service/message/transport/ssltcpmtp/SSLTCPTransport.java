@@ -122,6 +122,7 @@ public class SSLTCPTransport extends TCPTransport
 				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 				
 				// possibly create a new keystore on disk
+//				System.out.println("Using keystore: "+storepath+" "+storepass+" "+keypass);
 				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, "jadex");
 				
 				kmf.init(ks, keypass.toCharArray());

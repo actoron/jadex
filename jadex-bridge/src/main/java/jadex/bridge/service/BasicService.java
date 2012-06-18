@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
@@ -50,14 +51,8 @@ public class BasicService implements IInternalService
 	/** The service properties. */
 	protected Map<String, Object> properties;
 	
-//	/** The publish info. */
-//	protected PublishInfo publishinfo;
-	
 	/** The provider id. */
 	protected IComponentIdentifier providerid;
-	
-//	/** The type. */
-//	protected Class type;
 	
 	//-------- constructors --------
 
@@ -191,21 +186,11 @@ public class BasicService implements IInternalService
 	}
 	
 //	/**
-//	 *  Get the publish info.
-//	 *  @return The publish info.
+//	 *  Get the hosting component of the service.
+//	 *  @return The component.
 //	 */
-//	public PublishInfo getPublishInfo()
+//	public IFuture<IExternalAccess> getComponent()
 //	{
-//		return publishinfo;
-//	}
-//	
-//	/**
-//	 *  Set the publishinfo.
-//	 *  @param publishinfo The publishinfo to set.
-//	 */
-//	public void setPublishInfo(PublishInfo publishinfo)
-//	{
-//		this.publishinfo = publishinfo;
 //	}
 
 	/**

@@ -1,6 +1,5 @@
 package jadex.bridge.service;
 
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
@@ -31,16 +30,17 @@ public interface IService //extends IRemotable
 	 *  @return True, if service can be used.
 	 */
 	public IFuture<Boolean> isValid();
-	
-//	/**
-//	 *  Get the hosting component of the service.
-//	 *  @return The component.
-//	 */
-//	public IFuture<IExternalAccess> getComponent();
-	
+		
 	/**
 	 *  Get the map of properties (considered as constant).
 	 *  @return The service property map (if any).
 	 */
 	public Map<String, Object> getPropertyMap();
+
+	// todo: ?! currently BasicService only has 
+//	/**
+//	 *  Get the hosting component of the service.
+//	 *  @return The component.
+//	 */
+//	public IFuture<IExternalAccess> getComponent();
 }

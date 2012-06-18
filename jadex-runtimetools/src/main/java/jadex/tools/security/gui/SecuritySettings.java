@@ -8,11 +8,13 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.ICommand;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -22,12 +24,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -35,6 +40,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *  The security settings panel.
@@ -67,6 +73,15 @@ public class SecuritySettings	implements IServiceViewerPanel
 	/** The inner panel. */
 	protected JComponent	inner;
 	
+	/** The keystore path. */
+	protected JTextField tfstorepath;
+	
+	/** The keystore password. */
+	protected  JTextField tfstorepass;
+	
+	/** The key password. */
+	protected JTextField tfkeypass;
+
 	//-------- methods --------
 	
 	/**
@@ -104,6 +119,55 @@ public class SecuritySettings	implements IServiceViewerPanel
 			}
 		});
 		
+		tfstorepath = new JTextField(10);
+		JButton bustpa = new JButton("...");
+		tfstorepass = new JTextField(10);
+		tfkeypass = new JTextField(10);
+		JButton bustoreset = new JButton("Set");
+
+		final JFileChooser fc = new JFileChooser(".");
+//		fcava.setFileFilter(new FileFilter()
+//		{
+//			public String getDescription()
+//			{
+//				return "*.jpg, *.png";
+//			}
+//			
+//			public boolean accept(File f)
+//			{
+//				return f.isDirectory() || f.getName().endsWith(".jpg") || f.getName().endsWith(".png");
+//			}
+//		});
+		bustpa.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fc.showOpenDialog(inner);
+				File sel = fc.getSelectedFile();
+				if(sel!=null && sel.exists())
+				{
+					try
+					{
+						tfstorepath.setText(SUtil.convertPathToRelative(sel.getAbsolutePath()));
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		bustoreset.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String p = tfstorepath.getText();
+				String relp = SUtil.convertPathToRelative(p);
+				secservice.setKeystoreInfo(relp, tfstorepass.getText(), tfkeypass.getText());
+			}
+		});
+		
 		// The local password settings.
 		JPanel	plocal	= new JPanel(new GridBagLayout());
 		plocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Password Settings"));
@@ -112,7 +176,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 		gbc.weightx	= 0;
 		gbc.weighty	= 0;
 		gbc.anchor	= GridBagConstraints.WEST;
-		gbc.fill	= GridBagConstraints.NONE;
+		gbc.fill	= GridBagConstraints.VERTICAL;
 		gbc.gridy	= 0;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		plocal.add(cbusepass, gbc);
@@ -126,6 +190,28 @@ public class SecuritySettings	implements IServiceViewerPanel
 		gbc.gridy++;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		plocal.add(cbtrulan, gbc);
+		
+		JPanel slocal	= new JPanel(new GridBagLayout());
+		slocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Keystore Settings"));
+		int x=0;
+		int y=0;
+		slocal.add(new JLabel("Key store location: "), new GridBagConstraints(x++, y, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
+		slocal.add(tfstorepath, new GridBagConstraints(x++, y, 1, 1, 1, 1, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
+		slocal.add(bustpa, new GridBagConstraints(x++, y, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
+//		x=0;
+		slocal.add(new JLabel("Key store password:"), new GridBagConstraints(x++, y, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
+		slocal.add(tfstorepass, new GridBagConstraints(x++, y, 1, 1, 1, 1, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
+		slocal.add(new JLabel("Key password:"), new GridBagConstraints(x++, y, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
+		slocal.add(tfkeypass, new GridBagConstraints(x++, y, 1, 1, 1, 1, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
+		slocal.add(bustoreset, new GridBagConstraints(x++, y, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
 		
 		ICommand paddrem = new ICommand()
 		{
@@ -165,9 +251,19 @@ public class SecuritySettings	implements IServiceViewerPanel
 		sp.add(ppp);
 		sp.add(npp);
 		
+//		JSplitPanel sp2 = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+//		sp2.setOneTouchExpandable(true);
+//		sp2.setDividerLocation(0.5);
+//		sp2.add(plocal);
+//		sp2.add(slocal);
+		
+		JPanel no = new JPanel(new BorderLayout());
+		no.add(plocal, BorderLayout.NORTH);
+		no.add(slocal, BorderLayout.SOUTH);
+		
 		// Overall layout.
 		this.inner	= new JPanel(new BorderLayout());
-		inner.add(plocal, BorderLayout.NORTH);
+		inner.add(no, BorderLayout.NORTH);
 		inner.add(sp, BorderLayout.CENTER);
 		
 		// Gui listeners.
@@ -240,19 +336,19 @@ public class SecuritySettings	implements IServiceViewerPanel
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Initialize values from security service.
-		secservice.isUsePassword().addResultListener(new SwingDefaultResultListener<Boolean>()
+		secservice.isUsePassword().addResultListener(new SwingExceptionDelegationResultListener<Boolean, Void>(ret)
 		{
 			public void customResultAvailable(Boolean usepass)
 			{
 				cbusepass.setSelected(usepass.booleanValue());
 				
-				secservice.isTrustedLanMode().addResultListener(new SwingDefaultResultListener<Boolean>()
+				secservice.isTrustedLanMode().addResultListener(new SwingExceptionDelegationResultListener<Boolean, Void>(ret)
 				{
 					public void customResultAvailable(Boolean trustedlan)
 					{
 						cbtrulan.setSelected(trustedlan.booleanValue());
 						
-						secservice.getLocalPassword().addResultListener(new SwingDefaultResultListener<String>()
+						secservice.getLocalPassword().addResultListener(new SwingExceptionDelegationResultListener<String, Void>(ret)
 						{
 							public void customResultAvailable(String password)
 							{
@@ -261,40 +357,36 @@ public class SecuritySettings	implements IServiceViewerPanel
 									tfpass.setText(password);
 								}
 								
-								secservice.getPlatformPasswords().addResultListener(new SwingDefaultResultListener<Map<String, String>>()
+								secservice.getPlatformPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
 								{
 									public void customResultAvailable(Map<String, String> passwords)
 									{
 		//								System.out.println("plat passes: "+passwords);
 										ppp.update(passwords);
 										
-										secservice.getNetworkPasswords().addResultListener(new SwingDefaultResultListener<Map<String, String>>()
+										secservice.getNetworkPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
 										{
 											public void customResultAvailable(Map<String, String> passwords)
 											{
 		//										System.out.println("net passes: "+passwords);
 												npp.update(passwords);
-												ret.setResult(null);								
+												
+												secservice.getKeystoreInfo().addResultListener(new SwingExceptionDelegationResultListener<String[], Void>(ret)
+												{
+													public void customResultAvailable(String[] info)
+													{
+														tfstorepath.setText(info[0]);
+														tfstorepass.setText(info[1]);
+														tfkeypass.setText(info[2]);
+														ret.setResult(null);			
+													}
+												});
 											}
 										});
 									}
 								});
-								
-								
-							}
-							
-							// Todo: SwingExceptionDelegationResultListener
-							public void customExceptionOccurred(Exception exception)
-							{
-								ret.setException(exception);
 							}
 						});
-					}
-					
-					// Todo: SwingExceptionDelegationResultListener
-					public void customExceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
 					}
 				});
 			}
