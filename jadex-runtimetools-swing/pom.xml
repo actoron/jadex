@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-runtimetools</artifactId>
+	<artifactId>jadex-runtimetools-swing</artifactId>
 	<packaging>jar</packaging>
 	<version>2.1-SNAPSHOT</version>
-	<name>jadex-runtimetools</name>
+	<name>jadex-runtimetools-swing</name>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
@@ -169,35 +169,35 @@
 		</dependency>
 		 -->
 		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-commons</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-commons</artifactId> -->
+<!-- 			<version>2.1-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-javaparser</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-javaparser</artifactId> -->
+<!-- 			<version>2.1-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-xml</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-xml</artifactId> -->
+<!-- 			<version>2.1-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-bridge</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-bridge</artifactId> -->
+<!-- 			<version>2.1-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-micro</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-kernel-micro</artifactId> -->
+<!-- 			<version>2.1-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -205,7 +205,6 @@
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
 		
-		<!-- Todo: use service interface instead of dependency to awareness management agent -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-base</artifactId>
