@@ -4,6 +4,8 @@ import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.awareness.management.AwarenessManagementAgent;
+import jadex.base.service.awareness.management.AwarenessManagementAgentHelper;
+import jadex.base.service.awareness.management.AwarenessSettingsData;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -16,8 +18,6 @@ import jadex.commons.gui.EditableList;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.tools.awareness.AwarenessSettingsData;
-import jadex.tools.awareness.AwarenessSettingsHelper;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -127,7 +127,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	protected JCheckBox[] cbmechanisms;
 
 	/** The Helper for GUI-independent tasks. **/
-	protected AwarenessSettingsHelper helper;
+	protected AwarenessManagementAgentHelper helper;
 
 		
 	//-------- methods --------
@@ -142,7 +142,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	{
 		this.jcc = jcc;
 		this.component = component;
-		this.helper = new AwarenessSettingsHelper(component);
+		this.helper = new AwarenessManagementAgentHelper(component);
 		
 		this.panel = new JPanel(new GridBagLayout());
 		

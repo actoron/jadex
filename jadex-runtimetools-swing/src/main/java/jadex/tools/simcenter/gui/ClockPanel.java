@@ -1,5 +1,6 @@
 package jadex.tools.simcenter.gui;
 
+import jadex.base.service.simulation.ClockState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -14,8 +15,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.annotations.IncludeFields;
-import jadex.tools.simcenter.ClockState;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

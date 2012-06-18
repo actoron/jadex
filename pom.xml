@@ -451,7 +451,7 @@
 				<module>jadex-rules-tools</module>
 
 				<module>jadex-tools-base</module>
-				<module>jadex-runtimetools</module>
+				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
@@ -557,7 +557,7 @@
 				<module>jadex-rules-tools</module>
 
 				<module>jadex-tools-base</module>
-				<module>jadex-runtimetools</module>
+				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
@@ -617,7 +617,7 @@
 				<module>jadex-rules-tools</module>
 
 				<module>jadex-tools-base</module>
-				<module>jadex-runtimetools</module>
+				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
@@ -679,7 +679,7 @@
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-applib-bdi</module>
 				<module>jadex-applications-bdi</module>
-				<module>jadex-runtimetools</module>
+				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
@@ -817,7 +817,7 @@
 				<module>jadex-rules-tools</module>
 
 				<module>jadex-tools-base</module>
-				<module>jadex-runtimetools</module>
+				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
@@ -879,7 +879,8 @@
 				<module>jadex-kernel-bdi/android</module>
 				<module>jadex-kernel-bdibpmn/android</module>
 				<module>jadex-platform-standalone/android</module>
-				<module>jadex-runtimetools/android</module>
+				
+				<module>jadex-runtimetools-android</module>
 			</modules>
 		</profile>
 		
@@ -965,7 +966,8 @@
 				<module>jadex-kernel-bdi/android</module>
 				<module>jadex-kernel-bdibpmn/android</module>
 				<module>jadex-platform-standalone/android</module>
-				<module>jadex-runtimetools/android</module>
+				
+				<module>jadex-runtimetools-android</module>
 <!-- 				<module>docs/android/jadex-android-example-project-maven</module> -->
 			</modules>
 		</profile>

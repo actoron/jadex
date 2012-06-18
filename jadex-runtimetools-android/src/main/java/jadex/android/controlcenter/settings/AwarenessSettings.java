@@ -4,14 +4,14 @@ import jadex.android.controlcenter.preference.DiscoveryPreference;
 import jadex.android.controlcenter.preference.JadexBooleanPreference;
 import jadex.android.controlcenter.preference.JadexIntegerPreference;
 import jadex.base.service.awareness.management.AwarenessManagementAgent;
+import jadex.base.service.awareness.management.AwarenessManagementAgentHelper;
+import jadex.base.service.awareness.management.AwarenessSettingsData;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.tools.awareness.AwarenessSettingsData;
-import jadex.tools.awareness.AwarenessSettingsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	private PreferenceCategory infoCat;
 	private PreferenceScreen screen;
 
-	private AwarenessSettingsHelper helper;
+	private AwarenessManagementAgentHelper helper;
 
 	private String[] excludes;
 
@@ -60,7 +60,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	public AwarenessSettings(IExternalAccess extAcc)
 	{
 		super(extAcc);
-		helper = new AwarenessSettingsHelper(extAcc);
+		helper = new AwarenessManagementAgentHelper(extAcc);
 	}
 
 	@Override
