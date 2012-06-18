@@ -285,7 +285,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3UqQtZC0EeGQ-JqABL_81g" key="12:0" value="name12"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3UqQtpC0EeGQ-JqABL_81g" key="12:1" value="jadex.bridge.service.types.security.ISecurityService"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3UqQt5C0EeGQ-JqABL_81g" key="12:2" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3UqQuJC0EeGQ-JqABL_81g" key="12:3" value="new jadex.base.service.security.SecurityService(true, true)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3UqQuJC0EeGQ-JqABL_81g" key="12:3" value="new jadex.base.service.security.SecurityService(true, true, true, null, null)"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3Uq3wJC0EeGQ-JqABL_81g" key="12:4" value="jadex_providedservices_table_Initial-Impl_faacd85b-5471-488e-beda-5e0d32aae8fb_complex"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_f9qCZZv-EeCTM9TB44euIw" source="jadex_providedservices_table_Initial-Impl_cc456de9-5d3a-412c-8399-73343899efe9_complex"/>
