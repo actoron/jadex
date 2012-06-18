@@ -89,15 +89,22 @@ public class SGUI
 	public static boolean HAS_GUI = true;
 	static
 	{
-		try
+		if (SReflect.isAndroid()) 
 		{
-			HAS_GUI = !(GraphicsEnvironment.isHeadless() ||
-					 	  GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
-		}
-		catch (Error e)
-		{
-			// On system misconfigurations, Java throws an Error (grr).
 			HAS_GUI = false;
+		} 
+		else 
+		{
+			try
+			{
+				HAS_GUI = !(GraphicsEnvironment.isHeadless() ||
+						 	  GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
+			}
+			catch (Error e)
+			{
+				// On system misconfigurations, Java throws an Error (grr).
+				HAS_GUI = false;
+			}
 		}
 	}
 		
