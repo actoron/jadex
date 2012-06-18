@@ -623,7 +623,11 @@ public class TCPTransport implements ITransport
 				public void run()
 				{
 					logger.info("Timeout reached for: "+address);
-					removeConnection(address);						
+					// Hack?! might already be shutdowned, should do better cleanup 
+					if(connections!=null)
+					{
+						removeConnection(address);						
+					}
 				}
 			};
 			timer.schedule(timertask, MAX_KEEPALIVE);
