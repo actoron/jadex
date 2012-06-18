@@ -141,6 +141,8 @@
 		<argument name="usepass" class="Boolean"/>
 		<!-- Flag if the platform password should be printed to the console. -->
 		<argument name="printpass" class="boolean">true</argument>
+		<!-- Flag if trusted lan should be used. -->
+		<argument name="trustedlan" class="Boolean"/>
 		
 		<!-- Flag if local transport is enabled. -->
 		<argument name="localtransport" class="boolean">true</argument>
@@ -263,8 +265,8 @@
 		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
 			<implementation>
 			Boolean.TRUE.equals($args.android) 
-			? jadex.base.service.security.AndroidSecurityService.class.getConstructor(new Class[]{Boolean.class, Boolean.class}).newInstance(new Object[]{$args.usepass, $args.printpass})
-			: new jadex.base.service.security.SecurityService($args.usepass, $args.printpass)</implementation>
+			? jadex.base.service.security.AndroidSecurityService.class.getConstructor(new Class[]{Boolean.class, Boolean.class}).newInstance(new Object[]{$args.usepass, $args.printpass, $args.trustedlan})
+			: new jadex.base.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan)</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.message.IMessageService">
 			<implementation proxytype="raw">

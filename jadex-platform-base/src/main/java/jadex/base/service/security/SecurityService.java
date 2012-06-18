@@ -38,9 +38,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -58,10 +60,10 @@ public class SecurityService implements ISecurityService
 	protected IInternalAccess	component;
 	
 	/** Flag to enable / disable password protection. */
-	protected Boolean	usepass;
+	protected boolean	usepass;
 	
 	/** Determines if password was specified during creation. (i.e. in Platform Configuration) */
-	protected boolean fixedUsepass;
+	protected boolean argsusepass;
 	
 	/** Print password on startup or change. */
 	protected boolean	printpass;
@@ -77,6 +79,9 @@ public class SecurityService implements ISecurityService
 	
 	/** The trusted lan mode. */
 	protected boolean trustedlan;
+	
+	/** Determines if trusted lan was specified during creation. */
+	protected boolean argstrustedlan;
 	
 	
 	/** The path to the keystore. */
@@ -99,18 +104,22 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(Boolean.TRUE, true);
+		this(Boolean.TRUE, true, Boolean.FALSE);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(Boolean usepass, boolean printpass)
+	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan)
 	{
+		this.platformpasses	= new LinkedHashMap<String, String>();
+		this.networkpasses	= new LinkedHashMap<String, String>();
 		this.digests = new HashMap<String, Tuple2<Long, byte[]>>();
-		this.usepass = usepass;
-		this.fixedUsepass = usepass != null;
+		this.usepass = usepass!=null? usepass.booleanValue(): true;
+		this.argsusepass = usepass != null;
 		this.printpass = printpass;
+		setTrustedLanMode(trustedlan!=null? trustedlan.booleanValue(): false);
+		this.argstrustedlan = trustedlan != null;
 		this.storepath = "./keystore";
 		this.storepass = "keystore";
 		this.keypass = "keystore";
@@ -123,8 +132,6 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	start()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		this.platformpasses	= new LinkedHashMap<String, String>();
-		this.networkpasses	= new LinkedHashMap<String, String>();
 //		this.trustednets = new ArrayList<String>();
 		
 		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -155,13 +162,17 @@ public class SecurityService implements ISecurityService
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										if(!fixedUsepass)
+										if(!argsusepass)
 										{
-											boolean up = props.getBooleanProperty("usepass");
-											usepass	= up? Boolean.TRUE: Boolean.FALSE;
+											usepass = props.getBooleanProperty("usepass");
 //											System.out.println("usepass: "+usepass);
 										}
 										password	= props.getStringProperty("password");
+										
+										if(!argstrustedlan)
+										{
+											setTrustedLanMode(props.getBooleanProperty("trustedlan"));
+										}
 										
 										Property[]	passes	= props.getProperties("passwords");
 										platformpasses	= new LinkedHashMap<String, String>();
@@ -171,16 +182,26 @@ public class SecurityService implements ISecurityService
 											platformpasses.put(passes[i].getName(), val==null? "": val);
 										}
 										
+										// Not allowed to add internal trusted platforms if flag is false
+										List<InetAddress> addrs = getNetworkIps();
+										Set<String> trs = new HashSet<String>();
+										for(InetAddress addr: addrs)
+										{
+											trs.add(addr.getHostAddress());
+										}
+											
 										Property[]	networks	= props.getProperties("networks");
 										networkpasses	= new LinkedHashMap<String, String>();
 										for(int i=0; i<networks.length; i++)
 										{
 //											System.out.println("value:"+networks[i].getValue()+".");
 											String val = networks[i].getValue();
-											networkpasses.put(networks[i].getName(), val==null? "": val);
+											if(trustedlan || !trs.contains(networks[i].getName()))
+											{
+												networkpasses.put(networks[i].getName(), val==null? "": val);
+											}
 										}
 										
-										setTrustedLanMode(props.getBooleanProperty("trustedlan"));
 										return IFuture.DONE;
 									}
 								});
@@ -193,7 +214,7 @@ public class SecurityService implements ISecurityService
 									public IFuture<Properties> execute(IInternalAccess ia)
 									{
 										Properties	ret	= new Properties();
-										ret.addProperty(new Property("usepass", usepass==null? Boolean.TRUE.toString(): usepass.toString()));
+										ret.addProperty(new Property("usepass", ""+usepass));
 										ret.addProperty(new Property("password", password));
 										if(platformpasses!=null)
 										{
@@ -221,7 +242,7 @@ public class SecurityService implements ISecurityService
 								// If new password was generated, save settings such that new platform instances use it.
 								if(genpass)
 								{
-									if(printpass && (usepass==null || usepass.booleanValue()))
+									if(printpass && usepass)
 									{
 										System.out.println("Generated platform password: "+password);
 									}
@@ -229,7 +250,7 @@ public class SecurityService implements ISecurityService
 								}
 								else
 								{
-									if(printpass && (usepass==null || usepass.booleanValue()))
+									if(printpass && usepass)
 									{
 										System.out.println("Using stored platform password: "+password);
 									}
@@ -287,7 +308,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Boolean>	isUsePassword()
 	{
-		return new Future<Boolean>(usepass==null? Boolean.TRUE: usepass);
+		return new Future<Boolean>(usepass);
 	}
 
 	/**
@@ -304,10 +325,10 @@ public class SecurityService implements ISecurityService
 		}
 		else
 		{
-			this.usepass	= enable? Boolean.TRUE: Boolean.FALSE;
+			this.usepass	= enable;
 			ret	= IFuture.DONE;
 			
-			if(printpass && (usepass==null || usepass.booleanValue()))
+			if(printpass && usepass)
 			{
 				System.out.println("Using stored platform password: "+password);
 			}
@@ -336,7 +357,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	setLocalPassword(String password)
 	{
 		IFuture<Void>	ret;
-		if(password==null && (usepass==null || usepass.booleanValue()))
+		if(password==null && usepass)
 		{
 			ret	= new Future<Void>(new IllegalStateException("Cannot set password to null, when password protection is enabled."));
 		}
@@ -344,7 +365,7 @@ public class SecurityService implements ISecurityService
 		{
 			this.password	= password;
 			ret	= IFuture.DONE;
-			if(printpass && (usepass==null || usepass.booleanValue()))
+			if(printpass && usepass)
 			{
 				System.out.println("Using new platform password: "+password);
 			}
@@ -530,7 +551,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	validateRequest(IAuthorizable request)
 	{
 		String	error	= null;
-		if(Security.PASSWORD.equals(request.getSecurityLevel()) && (usepass==null || usepass.booleanValue()) && password!=null)
+		if(Security.PASSWORD.equals(request.getSecurityLevel()) && usepass && password!=null)
 		{
 			if(request.getAuthenticationData()!=null)
 			{

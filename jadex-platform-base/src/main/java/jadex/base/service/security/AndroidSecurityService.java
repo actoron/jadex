@@ -12,22 +12,28 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class AndroidSecurityService extends SecurityService {
 
-	protected IAndroidContextService contextService;
-	
-	public AndroidSecurityService(Boolean usepass, Boolean printpass) {
-		super(usepass, printpass);
+@Service
+public class AndroidSecurityService extends SecurityService
+{
+	protected IAndroidContextService	contextService;
+
+	public AndroidSecurityService(Boolean usepass, Boolean printpass, Boolean trustedlan)
+	{
+		super(usepass, printpass, trustedlan);
 	}
 
 	@Override
 	@ServiceStart
-	public IFuture<Void> start() {
-		IFuture<IAndroidContextService> service = SServiceProvider.getService(component.getServiceContainer(), IAndroidContextService.class);
-		service.addResultListener(new DefaultResultListener<IAndroidContextService>() {
+	public IFuture<Void> start()
+	{
+		IFuture<IAndroidContextService> service = SServiceProvider.getService(
+				component.getServiceContainer(), IAndroidContextService.class);
+		service.addResultListener(new DefaultResultListener<IAndroidContextService>()
+		{
 			@Override
-			public void resultAvailable(IAndroidContextService result) {
+			public void resultAvailable(IAndroidContextService result)
+			{
 				contextService = result;
 			}
 		});
@@ -36,20 +42,26 @@ public class AndroidSecurityService extends SecurityService {
 
 	/* if[android8] */
 	@Override
-	protected List<InetAddress> getNetworkIps() {
+	protected List<InetAddress> getNetworkIps()
+	{
 		List<InetAddress> ret = new ArrayList<InetAddress>();
 		int dhcpNetmask = contextService.getDhcpNetmask();
 		int dhcpInetAdress = contextService.getDhcpInetAdress();
 
-		if (dhcpInetAdress != -1 && dhcpNetmask != -1) {
+		if(dhcpInetAdress != -1 && dhcpNetmask != -1)
+		{
 			int network = (dhcpNetmask & dhcpInetAdress);
 			byte[] quads = new byte[4];
-			for (int k = 0; k < 4; k++) {
-				quads[k] = (byte) ((network >> k * 8) & 0xFF);
+			for(int k = 0; k < 4; k++)
+			{
+				quads[k] = (byte)((network >> k * 8) & 0xFF);
 			}
-			try {
+			try
+			{
 				ret.add(InetAddress.getByAddress(quads));
-			} catch (UnknownHostException e) {
+			}
+			catch(UnknownHostException e)
+			{
 			}
 		}
 		return ret;
