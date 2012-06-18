@@ -1185,6 +1185,41 @@ public class SReflect
 		}
 		return isandroid.booleanValue();
 	}
+	
+	/** Cached android version */
+	protected static Integer androidVersion;
+
+	/**
+	 * Get Android API version. Possible values:
+	 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.htm
+	 * 
+	 * @return Android API version or -1, if not running on Android
+	 */
+	public static int getAndroidVersion()
+	{
+		if (androidVersion == null)
+		{
+			androidVersion = -1;
+			if (isAndroid())
+			{
+				Class build = classForName0("android.os.Build", SReflect.class.getClassLoader());
+				Class[] staticClasses = build.getDeclaredClasses();
+				for (Class sclass : staticClasses)
+				{
+					if ("VERSION".equals(sclass.getSimpleName()))
+					{
+						try
+						{
+							androidVersion = (Integer) sclass.getField("SDK_INT").get(null);
+						} catch (Exception e)
+						{
+						}
+					}
+				}
+			}
+		}
+		return androidVersion.intValue();
+	}
 }
 
 

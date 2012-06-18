@@ -214,7 +214,7 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 					{
 						final Entry<K, WeakEntry<V>> ret = oit.next();
 						final WeakEntry<V> we = ret.getValue();
-						if(SReflect.isAndroid())	// todo: only for android 8
+						if(SReflect.isAndroid() && SReflect.getAndroidVersion() <= 8)	// todo: only for android 8
 						{
 							return new Entry<K, V>() {
 								@Override

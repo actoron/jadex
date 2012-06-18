@@ -2349,7 +2349,7 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		if(!SReflect.isAndroid())
+		if(!SReflect.isAndroid() || SReflect.getAndroidVersion() > 8)
 		{
 			try
 			{
