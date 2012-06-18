@@ -112,7 +112,8 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 						"-saveonexit", "false",
 						"-gui", "false",
 						"-autoshutdown", "false",
-						"-binarymessages", "true"
+						"-binarymessages", "true",
+						"-android", "true"
 	//					"-awamechanisms", "new String[]{\"Relay\"}",
 	//					"-awareness", "false",
 	//					"-usepass", "false",
