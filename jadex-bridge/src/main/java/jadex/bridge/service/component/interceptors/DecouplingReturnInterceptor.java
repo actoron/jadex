@@ -185,8 +185,9 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					public void customResultAvailable(IComponentManagementService cms)
 					{
-//						if(sic.getMethod().getName().indexOf("getClassLoader")!=-1)
-//							System.out.println("back to: "+caller+" for: "+sic.getMethod());
+//						if(sic.getMethod().getName().indexOf("createComponent")!=-1)
+//							System.out.println("back to: "+caller+" for: "+sic.getMethod()+" "+sic.getArguments());
+						
 						IComponentAdapter adap = cms.getComponentAdapter(caller);
 						if(adap!=null)
 						{

@@ -394,7 +394,7 @@ public abstract class ComponentManagementService extends BasicService implements
 													{
 														public IFuture<Void> execute(IInternalAccess ia)
 														{
-															//											System.out.println("model is: "+model+" "+modelname);
+															//	System.out.println("model is: "+model+" "+modelname);
 															factory.loadModel(model, cinfo.getImports(), rid)
 																.addResultListener(new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier>(inited)
 															{
@@ -466,7 +466,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																						
 																						synchronized(adapters)
 																						{
-						//																	System.out.println("created: "+ad);
+//																							System.out.println("created: "+ad);
 																							
 																							// Init successfully finished. Add description and adapter.
 																							InitInfo	info	= initinfos.get(cid);
