@@ -305,14 +305,14 @@ public class MessageService extends BasicService implements IMessageService
 		final Future<Void> ret = new Future<Void>();
 		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
 		
-//		System.out.println("on0: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+		System.out.println("on0: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 
 		libservice.getClassLoader(rid)
 			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
 			public void customResultAvailable(final ClassLoader cl)
 			{
-//				System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+				System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 				
 //				IComponentIdentifier sender = adapter.getComponentIdentifier();
 				if(sender==null)
@@ -426,7 +426,7 @@ public class MessageService extends BasicService implements IMessageService
 							public void customResultAvailable(IExternalAccess exta)
 							{
 //								System.out.println("msgservice calling doSendMessage()");
-//								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 								doSendMessage(msg, type, exta, cl, ret, codecids);
 							}
 						});
