@@ -66,10 +66,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					FutureFunctionality func = new FutureFunctionality()
 					{
-						public IFuture<Void> notifyListener(final IResultListener listener)
+						public void notifyListener(final IResultListener listener)
 						{
-							final Future<Void> ret = new Future<Void>();
-							
 							// Do not reschedule remotely
 							if(caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
 							{
@@ -87,7 +85,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 													public void run()
 													{
 //														System.out.println("out re: "+mycnt);
-														ret.setResult(null);
+														listener.resultAvailable(null);
 													}
 												});
 //												getExternalAccess(caller).addResultListener(new IResultListener<IExternalAccess>()
@@ -116,13 +114,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											catch(ComponentTerminatedException e)
 											{
 //												System.out.println("out ex2: "+mycnt);
-												ret.setResult(null);
+												listener.resultAvailable(null);
 											}
 										}
 										else
 										{
 //											System.out.println("out nore: "+mycnt);
-											ret.setResult(null);
+											listener.resultAvailable(null);
 										}
 									};
 									
@@ -130,23 +128,22 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 //										System.out.println("out norepos: "+mycnt);
 										// No thread conversion possible
-										ret.setResult(null);
+										listener.resultAvailable(null);
 									};
 								});
 							}
 							else
 							{
-								ret.setResult(null);
+								listener.resultAvailable(null);
 							}
-							return ret;
 						};
 						
 						/**
 						 *  For intermediate results this method is called.
 						 */
-						public IFuture<Void> startScheduledNotifications()
+						public void startScheduledNotifications(IResultListener<Void> notify)
 						{
-							return notifyListener(null);
+							notifyListener(notify);
 						}
 					};
 					
@@ -188,7 +185,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					public void customResultAvailable(IComponentManagementService cms)
 					{
-//						System.out.println("back to: "+caller+" for: "+sic.getMethod());
+//						if(sic.getMethod().getName().indexOf("getClassLoader")!=-1)
+//							System.out.println("back to: "+caller+" for: "+sic.getMethod());
 						IComponentAdapter adap = cms.getComponentAdapter(caller);
 						if(adap!=null)
 						{

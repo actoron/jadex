@@ -121,12 +121,20 @@ public class FutureFunctionality
 		return IFuture.DONE;
 	}
 	
+//	/**
+//	 *  Notify the listener.
+//	 */
+//	public IFuture<Void> notifyListener(final IResultListener<?> listener)
+//	{
+//		return IFuture.DONE;
+//	}
+	
 	/**
 	 *  Notify the listener.
 	 */
-	public IFuture<Void> notifyListener(final IResultListener<?> listener)
+	public void notifyListener(final IResultListener<?> notify)
 	{
-		return IFuture.DONE;
+		notify.resultAvailable(null);
 	}
 	
 //	/**
@@ -138,11 +146,11 @@ public class FutureFunctionality
 //	}
 	
 	/**
-	 * 
+	 *  Start the notifications.
 	 */
-	public IFuture<Void> startScheduledNotifications()
+	public void startScheduledNotifications(IResultListener<Void> notify)
 	{
-		return IFuture.DONE;
+		notify.resultAvailable(null);
 	}
 	
 	/**
@@ -469,14 +477,15 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
      */
-    protected void	startScheduledNotifications()
+    protected void startScheduledNotifications()
     {
-    	func.startScheduledNotifications().addResultListener(new IResultListener<Void>()
+    	func.startScheduledNotifications(new IResultListener<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void resultAvailable(Void result)
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
-			}	
+			}
+	
 			public void exceptionOccurred(Exception exception)
 			{
 				// Todo: why set exception on future!?
@@ -484,7 +493,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}
 		});
     }
-	
+    
 	/**
 	 *  Terminate the future.
 	 */
@@ -718,12 +727,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
      */
     protected void	startScheduledNotifications()
     {
-    	func.startScheduledNotifications().addResultListener(new IResultListener<Void>()
+    	func.startScheduledNotifications(new IResultListener<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void resultAvailable(Void result)
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
-			}	
+			}
+	
 			public void exceptionOccurred(Exception exception)
 			{
 				// Todo: why set exception on future!?
@@ -855,18 +865,32 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	 */
 	protected void notifyListener(final IResultListener<Object> listener)
 	{
-		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
+		func.notifyListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
-			}	
+			}
+
 			public void exceptionOccurred(Exception exception)
 			{
 				// Todo: why set exception on future!?
 				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
+				
+//		).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// Todo: why set exception on future!?
+//				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
 	}
 	
 	/**
@@ -1093,12 +1117,13 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
      */
     protected void	startScheduledNotifications()
     {
-    	func.startScheduledNotifications().addResultListener(new IResultListener<Void>()
+    	func.startScheduledNotifications(new IResultListener<Void>()
 		{
-			public void resultAvailable(Void v)
+			public void resultAvailable(Void result)
 			{
 				DelegatingIntermediateFuture.super.startScheduledNotifications();
-			}	
+			}
+	
 			public void exceptionOccurred(Exception exception)
 			{
 				// Todo: why set exception on future!?
@@ -1201,18 +1226,33 @@ class DelegatingFuture extends Future<Object>
 	 */
 	protected void notifyListener(final IResultListener<Object> listener)
 	{
-		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
+		func.notifyListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				DelegatingFuture.super.notifyListener(listener);
-			}	
+			}
+	
 			public void exceptionOccurred(Exception exception)
 			{
 				// Todo: why set exception on future!?
 				DelegatingFuture.super.setExceptionIfUndone(exception);
 			}
 		});
+		
+//		IFuture<Void>	nlfut	= func.notifyListener(listener);
+//		nlfut.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				DelegatingFuture.super.notifyListener(listener);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// Todo: why set exception on future!?
+//				DelegatingFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
 	}
 };
 

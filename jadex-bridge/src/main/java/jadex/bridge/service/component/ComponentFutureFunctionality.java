@@ -34,9 +34,8 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
-	public IFuture<Void> notifyListener(IResultListener<?> listener) 
+	public void notifyListener(final IResultListener<?> notify) 
 	{
-		final Future<Void> ret = new Future<Void>();
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
 		{
@@ -46,7 +45,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(null);
+						notify.resultAvailable(null);
 //						ComponentIntermediateFuture.super.notifyListener(listener);
 						return IFuture.DONE;
 					}
@@ -54,18 +53,52 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 			}
 			catch(ComponentTerminatedException e)
 			{
+				notify.exceptionOccurred(e);
 //				ComponentIntermediateFuture.super.notifyListener(listener);
-				ret.setResult(null);
 			}
 		}
 		else
 		{
-			ret.setResult(null);
+			notify.resultAvailable(null);
 //			super.notifyListener(listener);
 		}
-		
-		return ret;
 	};
+	
+//	/**
+//	 *  Schedule listener notification on component thread. 
+//	 */
+//	public IFuture<Void> notifyListener(IResultListener<?> listener) 
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		// Hack!!! Notify multiple listeners at once?
+//		if(adapter.isExternalThread())
+//		{
+//			try
+//			{
+//				ea.scheduleStep(new IComponentStep<Void>()
+//				{
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ret.setResult(null);
+////						ComponentIntermediateFuture.super.notifyListener(listener);
+//						return IFuture.DONE;
+//					}
+//				});
+//			}
+//			catch(ComponentTerminatedException e)
+//			{
+////				ComponentIntermediateFuture.super.notifyListener(listener);
+//				ret.setResult(null);
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+////			super.notifyListener(listener);
+//		}
+//		
+//		return ret;
+//	};
 	
 //	/**
 //	 *  Schedule listener notification on component thread. 
@@ -104,38 +137,46 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 //	}
 	
 	/**
-	 * 
+	 *  Start the notifications.
 	 */
-	public IFuture<Void> startScheduledNotifications()
+	public void startScheduledNotifications(IResultListener<Void> notify)
 	{
-		final Future<Void> ret = new Future<Void>();
-		// Hack!!! Notify multiple results at once?
-		if(adapter.isExternalThread())
-		{
-			try
-			{
-				ea.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ret.setResult(null);
-//						ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
-						return IFuture.DONE;
-					}
-				});
-			}
-			catch(ComponentTerminatedException e)
-			{
-				ret.setException(e);
-//				ComponentIntermediateFuture.super.notifyListener(listener);
-			}				
-		}
-		else
-		{
-			ret.setResult(null);
-//			super.notifyIntermediateResult(listener, result);
-		}
-		
-		return ret;
+		notifyListener(notify);
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public IFuture<Void> startScheduledNotifications()
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		// Hack!!! Notify multiple results at once?
+//		if(adapter.isExternalThread())
+//		{
+//			try
+//			{
+//				ea.scheduleStep(new IComponentStep<Void>()
+//				{
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ret.setResult(null);
+////						ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
+//						return IFuture.DONE;
+//					}
+//				});
+//			}
+//			catch(ComponentTerminatedException e)
+//			{
+//				ret.setException(e);
+////				ComponentIntermediateFuture.super.notifyListener(listener);
+//			}				
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+////			super.notifyIntermediateResult(listener, result);
+//		}
+//		
+//		return ret;
+//	}
 };
