@@ -40,6 +40,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 /**
  *  Starter class for  
  */
@@ -136,6 +139,15 @@ public class Starter
 	 */
 	public static void main(String[] args)
 	{
+//		try
+//		{
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+		
 		createPlatform(args).addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(final IExternalAccess access)

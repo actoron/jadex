@@ -108,7 +108,8 @@
 				</env:perceptgenerator>
 				
 				<env:perceptprocessor componenttype="MicroPrey" class="MicroPreyVisionProcessor"/>
-
+				<env:perceptprocessor class="ServiceVisionProcessor"/>
+				
 			</env:percepttypes>
 			
 			<env:actiontypes>

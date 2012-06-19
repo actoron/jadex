@@ -2037,6 +2037,19 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						proc = (IPerceptProcessor)tmp[1];
 				}
 			}
+			if(proc==null)
+			{
+				procs	= (List)perceptprocessors.get(null);
+				if(procs!=null)
+				{
+					for(int i=0; i<procs.size() && proc==null; i++)
+					{
+						Object[] tmp = (Object[])procs.get(i);
+						if(tmp[0]==null || ((Collection)tmp[0]).contains(typename))
+							proc = (IPerceptProcessor)tmp[1];
+					}
+				}
+			}
 			
 			if(proc!=null)
 				perceptlist.schedulePercept(typename, data, comp, avatar, proc);

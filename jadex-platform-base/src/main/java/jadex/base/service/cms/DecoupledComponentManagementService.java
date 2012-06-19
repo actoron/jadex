@@ -35,6 +35,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.DebugException;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;

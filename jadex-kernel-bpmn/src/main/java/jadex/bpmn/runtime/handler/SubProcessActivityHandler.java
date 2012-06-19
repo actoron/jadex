@@ -10,6 +10,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -336,11 +337,16 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							thread.setNonWaiting();
-							thread.setException(exception);
-							instance.step(activity, instance, thread, null);
-//							System.out.println("exception: "+exception);
-//							exception.printStackTrace();
+							// Hack!!! Ignore exception, when component already terminated.
+							if(!(exception instanceof ComponentTerminatedException)
+								|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
+							{
+								thread.setNonWaiting();
+								thread.setException(exception);
+								instance.step(activity, instance, thread, null);
+	//							System.out.println("exception: "+exception);
+	//							exception.printStackTrace();
+							}
 						}
 					};
 					

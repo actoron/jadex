@@ -677,7 +677,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	 */
 	public String	getName()
 	{
-		return controlcenter.getPlatformAccess().getComponentIdentifier().getName();
+		// GTK look and feel calls this already in constructor. grrr
+		return controlcenter==null ? null : controlcenter.getPlatformAccess().getComponentIdentifier().getName();
 	}
 	
 	//-------- IPropertiesProvider interface --------

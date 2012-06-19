@@ -21,10 +21,11 @@
 <stringAttribute key="org.eclipse.hyades.trace.ui.ATTR_DESTINATION_PROJECT" value="ProfileProject"/>
 <booleanAttribute key="org.eclipse.hyades.trace.ui.ATTR_PROFILE_TO_FILE" value="false"/>
 <stringAttribute key="org.eclipse.hyades.trace.ui.ATTR_PROFILING_SET" value="tptp-dummy-profiling-set-Jadex Standalone"/>
-<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.classpathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_05"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-rspublish true -configname auto -decoupledcms false -looging true  -binarymessages true"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-platform-standalone-launch"/>
-<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dswing.defaultllaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#10;-DXbootclasspath/a:C:\Programme\jprofiler5\bin\agent.jar&#13;&#10;-Dagentlib:jprofilerti"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.motif.MotifLookAndFeel&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#10;-DXbootclasspath/a:C:\Programme\jprofiler5\bin\agent.jar&#13;&#10;-Dagentlib:jprofilerti"/>
 </launchConfiguration>
