@@ -73,7 +73,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							// Do not reschedule remotely
 							if(caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
 							{
-								getAdapter(caller).addResultListener(new IResultListener<IComponentAdapter>()
+								getAdapter(caller, sic).addResultListener(new IResultListener<IComponentAdapter>()
 								{
 									public void resultAvailable(IComponentAdapter adapter) 
 									{
@@ -175,7 +175,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	/**
 	 *  Get or find the component adapter.
 	 */
-	public IFuture<IComponentAdapter> getAdapter(final IComponentIdentifier caller)
+	public IFuture<IComponentAdapter> getAdapter(final IComponentIdentifier caller, final ServiceInvocationContext sic)
 	{
 		final Future<IComponentAdapter> ret = new Future<IComponentAdapter>();
 		
@@ -188,7 +188,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					public void customResultAvailable(IComponentManagementService cms)
 					{
-//						System.out.println("found: "+cms.getComponentAdapter(caller)+" for: "+caller);
+//						System.out.println("back to: "+caller+" for: "+sic.getMethod());
 						IComponentAdapter adap = cms.getComponentAdapter(caller);
 						if(adap!=null)
 						{

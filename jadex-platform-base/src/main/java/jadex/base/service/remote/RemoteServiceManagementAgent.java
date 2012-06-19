@@ -200,7 +200,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							public void resultAvailable(Void result)
 							{
 								RemoteServiceManagementService.getResourceIdentifier(getServiceProvider(), ((AbstractRemoteCommand)com).getRealReceiver())
-									.addResultListener(new DefaultResultListener<IResourceIdentifier>()
+									.addResultListener(createResultListener(new DefaultResultListener<IResourceIdentifier>()
 								{
 									public void resultAvailable(final IResourceIdentifier srid) 
 									{
@@ -209,7 +209,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
 											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
 									}
-								});
+								}));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -247,7 +247,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					}
 
 					// Send reply.
-					reply.addResultListener(new IntermediateDefaultResultListener<IRemoteCommand>()
+					reply.addResultListener(createResultListener(new IntermediateDefaultResultListener<IRemoteCommand>()
 					{
 						public void intermediateResultAvailable(IRemoteCommand result)
 						{
@@ -316,7 +316,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								super.exceptionOccurred(exception);
 							}
 						}
-					});
+					}));
 				}
 				
 				public void exceptionOccurred(Exception exception)
