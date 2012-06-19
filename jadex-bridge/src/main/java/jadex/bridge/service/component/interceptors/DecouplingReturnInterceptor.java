@@ -1,15 +1,16 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -35,7 +36,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	public DecouplingReturnInterceptor(IExternalAccess ea, IComponentAdapter adapter)
 	{
 		assert ea!=null;
-		assert adapter!=null;
+//		assert adapter!=null;
 		this.ea = ea;
 		this.adapter = adapter;
 	}
@@ -46,9 +47,15 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
+//	static int cnt;
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		Future<Void> fut	= new Future<Void>();
+//		final int mycnt=cnt++;
+//		System.out.println("in:"+mycnt+" "+sic.getMethod().getName()+" "+sic.getArguments());
+		
+		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
+		
 		sic.invoke().addResultListener(new DelegationResultListener<Void>(fut)
 		{
 			public void customResultAvailable(Void result)
@@ -62,33 +69,75 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						public IFuture<Void> notifyListener(final IResultListener listener)
 						{
 							final Future<Void> ret = new Future<Void>();
-							// Hack!!! Notify multiple listeners at once?
-							if(adapter.isExternalThread())
+							
+							// Do not reschedule remotely
+							if(caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
 							{
-								try
+								getAdapter(caller).addResultListener(new IResultListener<IComponentAdapter>()
 								{
-									ea.scheduleStep(new IComponentStep<Void>()
+									public void resultAvailable(IComponentAdapter adapter) 
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										// Hack!!! Notify multiple listeners at once?
+										if(adapter.isExternalThread())
 										{
-											ret.setResult(null);
-//											ComponentIntermediateFuture.super.notifyListener(listener);
-											return IFuture.DONE;
+											try
+											{
+												adapter.invokeLater(new Runnable()
+												{
+													public void run()
+													{
+//														System.out.println("out re: "+mycnt);
+														ret.setResult(null);
+													}
+												});
+//												getExternalAccess(caller).addResultListener(new IResultListener<IExternalAccess>()
+//												{
+//													public void resultAvailable(IExternalAccess ea)
+//													{
+//														ea.scheduleStep(new IComponentStep<Void>()
+//														{
+//															public IFuture<Void> execute(IInternalAccess ia)
+//															{
+//																System.out.println("out re: "+mycnt);
+//																ret.setResult(null);
+//																return IFuture.DONE;
+//															}
+//														});
+//													}
+//													
+//													public void exceptionOccurred(Exception exception)
+//													{
+//														System.out.println("out ex1: "+mycnt);
+//														ret.setResult(null);
+//													}
+//												});
+												
+											}
+											catch(ComponentTerminatedException e)
+											{
+//												System.out.println("out ex2: "+mycnt);
+												ret.setResult(null);
+											}
 										}
-									});
-								}
-								catch(ComponentTerminatedException e)
-								{
-//									ComponentIntermediateFuture.super.notifyListener(listener);
-									ret.setResult(null);
-								}
+										else
+										{
+//											System.out.println("out nore: "+mycnt);
+											ret.setResult(null);
+										}
+									};
+									
+									public void exceptionOccurred(Exception exception) 
+									{
+//										System.out.println("out norepos: "+mycnt);
+										// No thread conversion possible
+										ret.setResult(null);
+									};
+								});
 							}
 							else
 							{
 								ret.setResult(null);
-//								super.notifyListener(listener);
 							}
-							
 							return ret;
 						};
 						
@@ -112,9 +161,90 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //						sic.setResult(new ComponentFuture(ea, adapter, (IFuture)res));
 //					}
 				}
+//				else
+//				{
+//					System.out.println("out nofut: "+mycnt);
+//				}
+				
 				super.customResultAvailable(null);
 			}
 		});
 		return fut; 
 	}
+	
+	/**
+	 *  Get or find the component adapter.
+	 */
+	public IFuture<IComponentAdapter> getAdapter(final IComponentIdentifier caller)
+	{
+		final Future<IComponentAdapter> ret = new Future<IComponentAdapter>();
+		
+		if(adapter==null)
+		{
+			if(caller!=null)
+			{
+				SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentAdapter>(ret)
+				{
+					public void customResultAvailable(IComponentManagementService cms)
+					{
+//						System.out.println("found: "+cms.getComponentAdapter(caller)+" for: "+caller);
+						IComponentAdapter adap = cms.getComponentAdapter(caller);
+						if(adap!=null)
+						{
+							ret.setResult(adap);
+						}
+						else
+						{
+							ret.setException(new RuntimeException("No adapter"));
+						}
+					}
+				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("No adapter"));
+			}
+		}
+		else
+		{
+			ret.setResult(adapter);
+		}
+		
+		return ret;
+	}
+	
+//	/**
+//	 *  Get or find the external access.
+//	 */
+//	public IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier caller)
+//	{
+//		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+//		
+//		if(adapter==null)
+//		{
+//			if(caller!=null)
+//			{
+//				SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IComponentManagementService.class)
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
+//						System.out.println("found: "+cms.getComponentAdapter(caller)+" for: "+caller);
+//						cms.getExternalAccess(caller).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+//					}
+//				});
+//			}
+//			else
+//			{
+//				ret.setException(new RuntimeException("No external access"));
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(ea);
+//		}
+//		
+//		return ret;
+//	}
 }

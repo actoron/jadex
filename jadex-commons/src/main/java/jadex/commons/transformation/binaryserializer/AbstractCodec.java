@@ -36,7 +36,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  Runs the preprocessors.
 	 */
 	protected Object runPreProcessors(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		List<ITraverseProcessor> preprocessors = ((EncodingContext) context).getPreprocessors();
 		//System.out.println(preprocessors);

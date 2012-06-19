@@ -307,16 +307,22 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				public void resultAvailable(IComponentIdentifier result)
 				{
 					LockEntry kt = lockentries.get(cinfo.getParent());
-					kt.removeLocker(lockkey);
-					if(kt.getLockerCount()==0)
-						lockentries.remove(cinfo.getParent());
+					if(kt!=null)
+					{
+						kt.removeLocker(lockkey);
+						if(kt.getLockerCount()==0)
+							lockentries.remove(cinfo.getParent());
+					}
 				}
 				public void exceptionOccurred(Exception exception)
 				{
 					LockEntry kt = lockentries.get(cinfo.getParent());
-					kt.removeLocker(lockkey);
-					if(kt.getLockerCount()==0)
-						lockentries.remove(cinfo.getParent());
+					if(kt!=null)
+					{
+						kt.removeLocker(lockkey);
+						if(kt.getLockerCount()==0)
+							lockentries.remove(cinfo.getParent());
+					}
 				}
 			}));
 		}

@@ -59,7 +59,7 @@ import java.util.WeakHashMap;
 public class RemoteReferenceModule
 {
 	/** Debug flag. */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	/** The default lease time. */
 //	public static long DEFAULT_LEASETIME = 15000;

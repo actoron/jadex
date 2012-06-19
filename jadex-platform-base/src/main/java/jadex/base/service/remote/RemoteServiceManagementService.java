@@ -460,10 +460,21 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public Object removeProcessingCall(String callid)
+	public void removeProcessingCall(final String callid)
 	{
-		getRemoteReferenceModule().checkThread();
-		return processingcalls.remove(callid);
+//		getRemoteReferenceModule().checkThread();
+		
+		component.scheduleStep(new IComponentStep<Object>()
+		{
+			@Classname("remProcCall")
+			public IFuture<Object> execute(IInternalAccess ia)
+			{
+				processingcalls.remove(callid);
+				return new Future<Object>((Object)null);
+			}
+		});
+		
+//		return processingcalls.remove(callid);
 	}
 	
 	/**
@@ -471,6 +482,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public void addTerminationCommand(String callid, Runnable command)
 	{
+		getRemoteReferenceModule().checkThread();
+		
 		terminationcommands.put(callid, command);
 	}
 	
@@ -479,6 +492,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public Runnable removeTerminationCommand(String callid)
 	{
+		getRemoteReferenceModule().checkThread();
+		
 		return terminationcommands.remove(callid);
 	}
 	
@@ -540,7 +555,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							putWaitingCall(callid, future, tt);
 							
 							// Remove waiting call when future is done
-							future.addResultListener(new IResultListener<Object>()
+							future.addResultListener(ia.createResultListener(new IResultListener<Object>()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -551,7 +566,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									removeWaitingCall(callid);								
 									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
 								}
-							});
+							}));
 							
 	//						System.out.println("Waitingcalls: "+waitingcalls.size());
 							

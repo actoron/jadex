@@ -36,13 +36,13 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				{
 					public void resultAvailable(Object result)
 					{
-						if (!thread.isCanceled())
+						if(!thread.isCanceled())
 							instance.notify(activity, thread, null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if (!thread.isCanceled())
+						if(!thread.isCanceled())
 						{
 							thread.setException(exception);
 							instance.notify(activity, thread, null);
