@@ -2258,7 +2258,7 @@ public class SUtil
 		
 		try
 		{
-			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			Enumeration e = getNetworkInterfaces();
 			while(e.hasMoreElements() && ret==null)
 			{
 				NetworkInterface ni = (NetworkInterface)e.nextElement();
@@ -2297,7 +2297,7 @@ public class SUtil
 		
 		try
 		{
-			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			Enumeration e = getNetworkInterfaces();
 			while(e.hasMoreElements() && ret==null)
 			{
 				NetworkInterface ni = (NetworkInterface)e.nextElement();
@@ -2426,6 +2426,26 @@ public class SUtil
 	    }
 	    return count;
 	}
+
+	/** The cached network interfaces. */
+	protected static Enumeration<NetworkInterface>	NIS;
+	
+	/** The time of the last caching of network interfaces. */
+	protected static long	NISTIME;
+	
+	/**
+	 *  Get the network interfaces.
+	 *  The result is cached for a short time period to speed things up.
+	 */
+	public static Enumeration<NetworkInterface>	getNetworkInterfaces()	throws SocketException
+	{
+		if(NIS==null || (System.currentTimeMillis()-NISTIME)>30000)
+		{
+			NIS	= NetworkInterface.getNetworkInterfaces();
+			NISTIME	= System.currentTimeMillis();
+		}
+		return NIS;
+	}
 	
 	/**
 	 *  Get the addresses to be used for transports.
@@ -2441,7 +2461,7 @@ public class SUtil
 		boolean	v4	= false;	// true when one v4 address was added.
 		boolean	v6	= false;	// true when one v6 address was added.
 		
-		for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+		for(Enumeration<NetworkInterface> nis = getNetworkInterfaces(); nis.hasMoreElements(); )
 		{
 			NetworkInterface ni = nis.nextElement();
 			for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )

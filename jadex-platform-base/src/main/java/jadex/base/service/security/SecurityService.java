@@ -665,7 +665,7 @@ public class SecurityService implements ISecurityService
 		try
 		{
 			// Generate network identifiers
-			for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+			for(Enumeration<NetworkInterface> nis = SUtil.getNetworkInterfaces(); nis.hasMoreElements(); )
 			{
 				NetworkInterface ni = nis.nextElement();
 				for(InterfaceAddress ifa: ni.getInterfaceAddresses())
