@@ -22,8 +22,9 @@
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.extension.envsupport.dataview.*</import>
-		<import>jadex.micro.examples.hunterprey.*</import>
-		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.micro.examples.hunterprey.service.*</import>
+		<import>jadex.micro.examples.hunterprey.service.impl.*</import>
+				<import>jadex.extension.envsupport.observer.perspective.*</import>
 	</imports>
 	
 	<extensiontypes>

@@ -1,10 +1,17 @@
-package jadex.micro.examples.hunterprey;
+package jadex.micro.examples.hunterprey.service.impl;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.extension.envsupport.AbstractEnvironmentService;
+import jadex.extension.envsupport.environment.ISpaceAction;
+import jadex.micro.examples.hunterprey.MoveAction;
+import jadex.micro.examples.hunterprey.service.IFood;
+import jadex.micro.examples.hunterprey.service.IHunterPreyEnvironmentService;
+import jadex.micro.examples.hunterprey.service.IPreyPerceivable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,9 +39,12 @@ public class HunterPreyEnvironmentService	extends AbstractEnvironmentService	imp
 	 *  @return	The subscription will publish the percepts for the prey.
 	 *    Termination of the subscription will destroy the prey avatar.
 	 */
-	public ISubscriptionIntermediateFuture<Object>	registerPrey()
+	public ISubscriptionIntermediateFuture<Collection<IPreyPerceivable>>	registerPrey()
 	{
-		return super.register("prey");
+		ISubscriptionIntermediateFuture<Object>	sif	= super.register("prey");
+		SubscriptionIntermediateDelegationFuture<Collection<IPreyPerceivable>>	ret
+			= new SubscriptionIntermediateDelegationFuture<Collection<IPreyPerceivable>>(sif);
+		return ret;
 	}
 	
 	/**
@@ -49,5 +59,18 @@ public class HunterPreyEnvironmentService	extends AbstractEnvironmentService	imp
 		Map<String, Object>	parameters	= new HashMap<String, Object>();
 		parameters.put(MoveAction.PARAMETER_DIRECTION, direction);
 		return super.performAction("move", parameters);
+	}
+
+	/**
+	 *  Perform an eat action for the avatar of the calling component.
+	 *  @param food The food to eat.
+	 *  @return	The future returns, when the action is done.
+	 *    If the action could not be performed an exception is returned.
+	 */
+	public IFuture<Void>	eat(IFood food)
+	{		
+		Map<String, Object>	parameters	= new HashMap<String, Object>();
+		parameters.put(ISpaceAction.OBJECT_ID, space.getSpaceObject(((Food)food).getId()));
+		return super.performAction("eat", parameters);
 	}
 }
