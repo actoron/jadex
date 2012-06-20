@@ -71,7 +71,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		return descriptionMapping;
 	}
 
-	@Override
+//	@Override
 	public void initSpace(IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher fetcher) {
 		super.setInitData(ia, config, fetcher);
 		super.initSpace();
