@@ -160,7 +160,6 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(obj, primitive.getPosition(), vp));	
 			positionlocal =   new Vector3f(positionlocalD.getXAsFloat(), positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());	
 
-
 			float[] angles = {rotation.x, rotation.y, rotation.z};
 			quatation = sp.getLocalRotation().fromAngles(angles);
 			

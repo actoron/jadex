@@ -2,6 +2,7 @@ package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
 import java.awt.Color;
 
+import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
@@ -22,7 +23,9 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			Object obj, ViewportJMonkey vp)
 	{
-		String file = (String)((Object3d) primitive).getModelPath();
+//		String file = (String)((Object3d) primitive).getModelPath();
+		
+		String file = ((String)dc.getBoundValue(obj, ((Object3d)primitive).getModelPath(), vp));
 		
 		Boolean hasLight = (Boolean)((Object3d) primitive).isHasLightMaterials();
 
