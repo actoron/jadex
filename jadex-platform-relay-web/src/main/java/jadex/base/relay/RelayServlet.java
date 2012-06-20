@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -44,7 +45,33 @@ public class RelayServlet extends HttpServlet
 	//-------- constants --------
 
 	/** The directory for settings and statistics. */ 
-	public final static File	SYSTEMDIR	= new File(System.getProperty("user.home"), ".relaystats");
+	public final static File	SYSTEMDIR;
+	
+	static
+	{
+		File dir;
+		String	home	= System.getenv("RELAY_HOME");	// System.getProperty() does not return environment variables, but just server VM properties.
+		if(home!=null)
+		{
+			dir	= new File(home);
+		}
+		else
+		{
+			dir	= new File(System.getProperty("user.home"), ".relaystats");
+		}
+		
+		if(!dir.exists())
+		{
+			dir.mkdirs();
+		}
+		else if(!dir.isDirectory())
+		{
+			throw new RuntimeException("Settings path '"+dir+"' is not a directory.");
+		}
+		SYSTEMDIR	= dir;
+		
+		System.out.println("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
+	}
 	
 	//-------- attributes --------
 	
@@ -69,6 +96,9 @@ public class RelayServlet extends HttpServlet
 //	/** Counter for sent messages (for testing). */	
 //	protected int sent;
 	
+	/** The peer list. */
+	protected PeerList	peers;
+	
 	//-------- constructors --------
 
 	/**
@@ -76,13 +106,12 @@ public class RelayServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
-		map	= Collections.synchronizedMap(new HashMap<String, IBlockingQueue<Message>>());
-		platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
+		this.map	= Collections.synchronizedMap(new HashMap<String, IBlockingQueue<Message>>());
+		this.platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 		CodecFactory	cfac	= new CodecFactory();
-		codecs	= cfac.getAllCodecs();
-		defcodecs	= cfac.getDefaultCodecs();
-		
-		System.out.println("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
+		this.codecs	= cfac.getAllCodecs();
+		this.defcodecs	= cfac.getDefaultCodecs();
+		this.peers	= new PeerList();
 	}
 	
 	/**

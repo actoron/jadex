@@ -623,7 +623,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						playSound((String)jcom.getSelectedItem());
+						playSound((String)jcom.getSelectedItem(), true);
 					}
 				});
 				JPanel pan = new JPanel(new GridBagLayout());
@@ -1409,7 +1409,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			
 			if(!quiet && sound)
 			{
-				playSound(type);
+				playSound(type, false);
 			}
 		}
 	}
@@ -1418,7 +1418,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 *  Play the notification sound for the selected event.
 	 *  @param type	The notification event.
 	 */
-	protected void playSound(String type)
+	protected void playSound(String type, boolean verbose)
 	{
 		try
 		{
@@ -1444,7 +1444,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		}
 		catch(Exception e)
 		{
-			System.err.println("Couldn't play notification sound '"+type+"': "+e);
+			if(verbose)
+			{
+				System.err.println("Couldn't play notification sound '"+type+"': "+e);
+				e.printStackTrace();
+			}
 		}
 	}
 	
