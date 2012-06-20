@@ -326,42 +326,50 @@ public class TCPTransport implements ITransport
 	 */
 	public void	sendMessage(final String address, final ISendTask task)
 	{
-		threadpool.execute(new Runnable()
+		final IResultCommand<IFuture<Void>, Void>	send = new IResultCommand<IFuture<Void>, Void>()
 		{
-			public void run()
+			public IFuture<Void> execute(Void args)
 			{
-				final TCPOutputConnection con = getConnection(address, true);
-				if(con!=null)
-				{
-					task.ready(new IResultCommand<IFuture<Void>, Void>()
-					{
-						public IFuture<Void> execute(Void args)
-						{
-							if(con.send(task.getProlog(), task.getData()))
-							{
-//								System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
-								return IFuture.DONE;
-							}
-							else
-							{
-								return new Future<Void>(new RuntimeException("Send failed: "+con));
-							}
-						}
-					});
-				}
-				else
-				{
-					IResultCommand<IFuture<Void>, Void>	send = new IResultCommand<IFuture<Void>, Void>()
-					{
-						public IFuture<Void> execute(Void args)
-						{
-							return new Future<Void>(new RuntimeException("Send failed"));
-						}
-					};
-					task.ready(send);
-				}
+				return new Future<Void>(new RuntimeException("Send failed"));
 			}
-		});
+		};
+		
+		if(connections==null)
+		{
+			task.ready(send);
+		}
+		else
+		{
+			threadpool.execute(new Runnable()
+			{
+				public void run()
+				{
+					final TCPOutputConnection con = getConnection(address, true);
+					if(con!=null)
+					{
+						task.ready(new IResultCommand<IFuture<Void>, Void>()
+						{
+							public IFuture<Void> execute(Void args)
+							{
+								if(con.send(task.getProlog(), task.getData()))
+								{
+	//								System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
+									return IFuture.DONE;
+								}
+								else
+								{
+									return new Future<Void>(new RuntimeException("Send failed: "+con));
+								}
+							}
+						});
+					}
+					else
+					{
+						task.ready(send);
+					}
+				}
+			});
+		}
 		
 //		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 //		{
@@ -450,6 +458,9 @@ public class TCPTransport implements ITransport
 	 */
 	protected TCPOutputConnection getConnection(String address, boolean create)
 	{
+		if(connections==null)
+			return null;
+		
 		address = address.toLowerCase();
 		
 		Object ret = connections.get(address);
