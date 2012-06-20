@@ -159,10 +159,14 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				invoke(ts, 0, 10000).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				final int max = 1000;
+				final long start = System.currentTimeMillis();
+				invoke(ts, 0, max).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
+						long dur = System.currentTimeMillis()-start;
+						System.out.println("Needed per call [ms]: "+((double)dur)/max);
 						tr.setSucceeded(true);
 						ret.setResult(tr);
 					}
