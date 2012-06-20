@@ -81,14 +81,7 @@ public class FoldController implements mxIEventListener
 			}
 		}
 		
-		// Delete the visual representation
-		//deletiontargets.add(plan);
-		//IActivationPlan baplan = (IActivationPlan) plan.getPlan();
-		//modelcontainer.getGraph().removeCells(deletiontargets.toArray());
-		//System.err.println(modelcontainer.getGraph().getModel().getGeometry(plan).getHeight());
-		//modelcontainer.getGraph().getModel().setCollapsed(plan, false);
 		modelcontainer.getGraph().getModel().setVisible(plan, false);
-		//deletiontargets = null;
 		
 		// Insert virtual edges
 		List<VVirtualActivationEdge> edgegroup = new ArrayList<VVirtualActivationEdge>();

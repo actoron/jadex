@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IControllerAccess;
 import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.IViewAccess;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
@@ -30,13 +30,13 @@ public class EdgeCreationController implements mxIEventListener
 	protected IModelContainer modelcontainer;
 	
 	/** Access to controllers. */
-	protected IControllerAccess controlleraccess;
+	protected IViewAccess viewaccess;
 	
 	/** Creates a new edge creation controller. */
-	public EdgeCreationController(IModelContainer container, IControllerAccess access)
+	public EdgeCreationController(IModelContainer container, IViewAccess access)
 	{
 		this.modelcontainer = container;
-		this.controlleraccess = access;
+		this.viewaccess = access;
 	}
 	
 	public void invoke(Object sender, mxEventObject evt)
@@ -90,7 +90,7 @@ public class EdgeCreationController implements mxIEventListener
 			IGoal gsource = vsource.getGoal();
 			IGoal gtarget = vtarget.getGoal();
 			
-			if (IModelContainer.SUPPRESSION_EDGE_MODE.equals(controlleraccess.getEditMode()))
+			if (IViewAccess.SUPPRESSION_EDGE_MODE.equals(viewaccess.getEditMode()))
 			{
 				IEdge edge = modelcontainer.getGpmnModel().createEdge(gsource, gtarget, ISuppressionEdge.class);
 				VEdge vedge = new VEdge((VElement) source, (VElement) target, edge);

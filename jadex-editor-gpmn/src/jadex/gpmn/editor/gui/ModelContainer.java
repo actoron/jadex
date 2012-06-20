@@ -58,6 +58,15 @@ public class ModelContainer implements IModelContainer
 	}
 	
 	/**
+	 *  Sets the visual graph component.
+	 *  @param component The component.
+	 */
+	public void setGraphComponent(mxGraphComponent component)
+	{
+		graphcomponent = component;
+	}
+	
+	/**
 	 *  Sets the GPMN model.
 	 *  @param model The model.
 	 */

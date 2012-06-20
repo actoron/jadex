@@ -6,15 +6,13 @@ import jadex.gpmn.editor.gui.controllers.EdgeReconnectController;
 import jadex.gpmn.editor.gui.controllers.FoldController;
 import jadex.gpmn.editor.gui.controllers.MouseController;
 import jadex.gpmn.editor.gui.controllers.SMenuControllerFactory;
+import jadex.gpmn.editor.gui.controllers.SelectionController;
 import jadex.gpmn.editor.gui.controllers.ValueChangeController;
 import jadex.gpmn.editor.gui.propertypanels.BasePropertyPanel;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetColor;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
-import jadex.gpmn.editor.model.visual.SequentialMarker;
-import jadex.gpmn.editor.model.visual.VGoal;
 import jadex.gpmn.editor.model.visual.VNode;
-import jadex.gpmn.editor.model.visual.VPlan;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -44,36 +41,27 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.mxgraph.model.mxICell;
+import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxKeyboardHandler;
 import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxStylesheet;
 
-public class EditorWindow extends JFrame implements IControllerAccess
+public class EditorWindow extends JFrame implements IControllerAccess, IViewAccess
 {
-	public static String VERSION = "1.0";
+	public static String VERSION = "0.9";
 	
 	/** The model factory. */
 	protected IGpmnModelFactory mfactory;
 	
-	/** The model. */
-	//protected IGpmnModel gpmnmodel;
-	
 	/** The pane containing the graph and the property view. */
 	protected JSplitPane viewpane;
-	
-	/** The graph component. */
-	//protected mxGraphComponent graphcomponent;
-	
-	/** The current graph. */
-	//protected GpmnGraph graph;
 	
 	/** The model container */
 	protected IModelContainer modelcontainer;
@@ -83,6 +71,18 @@ public class EditorWindow extends JFrame implements IControllerAccess
 	
 	/** The select tool. */
 	protected JToggleButton selecttool;
+	
+	/** The value change controller. */
+	protected ValueChangeController valuechangecontroller;
+	
+	/** The selection controller. */
+	protected SelectionController selectioncontroller;
+	
+	/** The edge reconnect controller. */
+	protected EdgeReconnectController edgereconnectcontroller;
+	
+	/** The edge creation controller. */
+	protected EdgeCreationController edgecreationcontroller;
 	
 	/** The fold controller */
 	protected FoldController foldcontroller;
@@ -124,15 +124,19 @@ public class EditorWindow extends JFrame implements IControllerAccess
 				
 				getContentPane().add(viewpane, BorderLayout.CENTER);
 				
-				GpmnGraph graph = createGraph();
-				IGpmnModel gpmnmodel = mfactory.createModel();
+				modelcontainer = new ModelContainer(null, null);
 				
-				//Graph<VNode, VEdge> g = new DirectedSparseMultigraph<VNode, VEdge>();
-				//g.addVertex(new VNode());
-				//VNode node = new VNode(new Goal());
-				//g.addVertex(new VNode());
-				//graph.setCellStyle(vgoal.getStyle(), new Object[]{vgoal});
+				valuechangecontroller = new ValueChangeController(modelcontainer);
+				selectioncontroller = new SelectionController(modelcontainer, EditorWindow.this);
+				edgereconnectcontroller = new EdgeReconnectController(modelcontainer, EditorWindow.this);
+				foldcontroller = new FoldController(modelcontainer, EditorWindow.this);
+				GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
+				
+				IGpmnModel gpmnmodel = mfactory.createModel();
+				modelcontainer.setGpmnModel(gpmnmodel);
+				
 				mxGraphComponent graphcomponent = new GpmnGraphComponent(graph);
+				modelcontainer.setGraphComponent(graphcomponent);
 				graphcomponent.setDragEnabled(false);
 				graphcomponent.setPanning(true);
 				graphcomponent.setCenterZoom(false);
@@ -142,7 +146,6 @@ public class EditorWindow extends JFrame implements IControllerAccess
 				graphcomponent.setBackground(Color.WHITE);
 				graphcomponent.setOpaque(true);
 				graphcomponent.setTextAntiAlias(true);
-				//new mxEdgeHandler(graphcomponent, null).;
 				graphcomponent.setCellEditor(new mxCellEditor(graphcomponent)
 				{
 					protected boolean useLabelBounds(mxCellState state)
@@ -152,15 +155,14 @@ public class EditorWindow extends JFrame implements IControllerAccess
 					}
 				});
 				
-				modelcontainer = new ModelContainer(graphcomponent, gpmnmodel);
-				
+				edgecreationcontroller = new EdgeCreationController(modelcontainer, EditorWindow.this);
 				graphcomponent.getConnectionHandler().addListener(mxEvent.CONNECT,
-						new EdgeCreationController(modelcontainer, EditorWindow.this));
+						edgecreationcontroller);
 				
 				deletioncontroller = new DeletionController(modelcontainer);
 				synchModels();
 				
-				MouseController mc = new MouseController(modelcontainer, EditorWindow.this);
+				MouseController mc = new MouseController(modelcontainer, EditorWindow.this, EditorWindow.this);
 				graphcomponent.getGraphControl().addMouseListener(mc);
 				graphcomponent.getGraphControl().addMouseWheelListener(mc);
 				
@@ -192,8 +194,6 @@ public class EditorWindow extends JFrame implements IControllerAccess
 				
 				new mxRubberband(graphcomponent);
 				
-				//JScrollPane gcsp = new JScrollPane(graphcomponent);
-				//graphpane.setTopComponent(gcsp);
 				viewpane.setTopComponent(graphcomponent);
 				
 				setPropertPanel(SPropertyPanelFactory.EMPTY_PANEL);
@@ -213,20 +213,41 @@ public class EditorWindow extends JFrame implements IControllerAccess
 				filemenu.add(exititem);
 				menubar.add(filemenu);
 				
+				
+				JMenu viewmenu = new JMenu("View");
+				/* Styles */
+				final ButtonGroup stylegroup = new ButtonGroup();
+				final JRadioButtonMenuItem colorview = new JRadioButtonMenuItem(SMenuControllerFactory.createStyleController(modelcontainer, new GpmnStylesheetColor()));
+				colorview.setSelected(true);
+				colorview.setText("Color");
+				stylegroup.add(colorview);
+				viewmenu.add(colorview);
+				final JRadioButtonMenuItem grayview = new JRadioButtonMenuItem(SMenuControllerFactory.createStyleController(modelcontainer, new GpmnStylesheetGrayscale()));
+				grayview.setText("Grayscale");
+				stylegroup.add(grayview);
+				viewmenu.add(grayview);
+				menubar.add(viewmenu);
+				
 				openitem.setAction(new AbstractAction("Open...")
 				{
 					public void actionPerformed(ActionEvent e)
 					{
 						JFileChooser fc = new JFileChooser();
+						FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
+						fc.addChoosableFileFilter(filter);
+						fc.setFileFilter(filter);
 						int result = fc.showOpenDialog(EditorWindow.this);
 						if (JFileChooser.APPROVE_OPTION == result)
 						{
 							try
 							{
-								GpmnGraph graph = createGraph();
 								IGpmnModel gpmnmodel = mfactory.createModel();
-								gpmnmodel.getModelCodec().readModel(fc.getSelectedFile(), graph);
-								modelcontainer.setGpmnModel(gpmnmodel);
+								mxIGraphModel graphmodel = gpmnmodel.getModelCodec().readModel(fc.getSelectedFile());
+								
+								// Funny, we need a new graph or we get quirky graphics... Bug?
+								GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
+								graph.setModel(graphmodel);
+								stylegroup.setSelected(colorview.getModel(), true);
 								modelcontainer.setGraph(graph);
 								modelcontainer.getGraphComponent().refresh();
 							}
@@ -243,6 +264,9 @@ public class EditorWindow extends JFrame implements IControllerAccess
 					public void actionPerformed(ActionEvent e)
 					{
 						JFileChooser fc = new JFileChooser();
+						FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
+						fc.addChoosableFileFilter(filter);
+						fc.setFileFilter(filter);
 						int result = fc.showSaveDialog(EditorWindow.this);
 						if (JFileChooser.APPROVE_OPTION == result)
 						{
@@ -257,21 +281,6 @@ public class EditorWindow extends JFrame implements IControllerAccess
 						}
 					}
 				});
-				
-				JMenu viewmenu = new JMenu("View");
-				
-				/* Styles */
-				ButtonGroup stylegroup = new ButtonGroup();
-				JRadioButtonMenuItem colorview = new JRadioButtonMenuItem(SMenuControllerFactory.createStyleController(modelcontainer, new GpmnStylesheetColor()));
-				colorview.setSelected(true);
-				colorview.setText("Color");
-				stylegroup.add(colorview);
-				viewmenu.add(colorview);
-				JRadioButtonMenuItem grayview = new JRadioButtonMenuItem(SMenuControllerFactory.createStyleController(modelcontainer, new GpmnStylesheetGrayscale()));
-				grayview.setText("Grayscale");
-				stylegroup.add(grayview);
-				viewmenu.add(grayview);
-				menubar.add(viewmenu);
 				
 				setJMenuBar(menubar);
 				
@@ -298,12 +307,30 @@ public class EditorWindow extends JFrame implements IControllerAccess
 	}
 	
 	/**
-	 *  Sets the select tool as the current tool.
+	 *  Returns the tool group.
 	 *  
+	 *  @return The tool group.
 	 */
-	public void setSelectTool()
+	public ButtonGroup getToolGroup()
 	{
-		toolgroup.setSelected(selecttool.getModel(), true);
+		return toolgroup;
+	}
+	
+	/**
+	 *  Returns the select tool.
+	 *  
+	 *  @return The select tool.
+	 */
+	public JToggleButton getSelectTool()
+	{
+		return selecttool;
+	}
+	
+	public void setPropertPanel(BasePropertyPanel panel)
+	{
+		int loc = viewpane.getDividerLocation();
+		viewpane.setBottomComponent(panel);
+		viewpane.setDividerLocation(loc);
 	}
 	
 	/**
@@ -325,6 +352,46 @@ public class EditorWindow extends JFrame implements IControllerAccess
 	}
 	
 	/**
+	 *  Returns the controller for handling value changes.
+	 *   
+	 *  @return The controller.
+	 */
+	public ValueChangeController getValueChangeController()
+	{
+		return valuechangecontroller;
+	}
+	
+	/**
+	 *  Returns the controller for handling selections.
+	 *   
+	 *  @return The controller.
+	 */
+	public SelectionController getSelectionController()
+	{
+		return selectioncontroller;
+	}
+	
+	/**
+	 *  Returns the controller for handling edge reconnects.
+	 *   
+	 *  @return The controller.
+	 */
+	public EdgeReconnectController getEdgeReconnectController()
+	{
+		return edgereconnectcontroller;
+	}
+	
+	/**
+	 *  Returns the controller for handling edge creation.
+	 *   
+	 *  @return The controller.
+	 */
+	public EdgeCreationController getEdgeCreationController()
+	{
+		return edgecreationcontroller;
+	}
+	
+	/**
 	 *  Returns the controller for folding.
 	 *   
 	 *  @return Fold controller.
@@ -342,194 +409,65 @@ public class EditorWindow extends JFrame implements IControllerAccess
 	protected void addTools(JToolBar editingtools)
 	{
 		// Selections
-		selecttool = new JToggleButton();
-		selecttool.getModel().setActionCommand(IModelContainer.SELECT_MODE);
-		selecttool.setContentAreaFilled(false);
-		selecttool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/select_on.png")));
-		selecttool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/select_on.png")));
-		selecttool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/select_off.png")));
-		selecttool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		selecttool.setMargin(new Insets(0, 0, 0, 0));
-		selecttool.setToolTipText("Select");
+		selecttool = createTool(IViewAccess.SELECT_MODE, "select_on.png", "select_off.png", "Select");
 		toolgroup.add(selecttool);
 		editingtools.add(selecttool);
 		
 		toolgroup.setSelected(selecttool.getModel(), true);
 		
-		JToggleButton tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.CONTROL_POINT_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/cpadd_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/cpadd_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/cpadd_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Control Point");
+		JToggleButton tool = createTool(IViewAccess.CONTROL_POINT_MODE, "cpadd_on.png", "cpadd_off.png", "Add Control Point");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Goal Tools
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.ACHIEVE_GOAL_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/agoal_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/agoal_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/agoal_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Achieve Goal");
+		tool = createTool(IViewAccess.ACHIEVE_GOAL_MODE, "agoal_on.png", "agoal_off.png", "Add Achieve Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.PERFORM_GOAL_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/pgoal_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/pgoal_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/pgoal_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Perform Goal");
+		tool = createTool(IViewAccess.PERFORM_GOAL_MODE, "pgoal_on.png", "pgoal_off.png", "Add Perform Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.MAINTAIN_GOAL_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/mgoal_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/mgoal_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/mgoal_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Maintain Goal");
+		tool = createTool(IViewAccess.MAINTAIN_GOAL_MODE, "mgoal_on.png", "mgoal_off.png", "Add Maintain Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.QUERY_GOAL_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/qgoal_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/qgoal_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/qgoal_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Query Goal");
+		tool = createTool(IViewAccess.QUERY_GOAL_MODE, "qgoal_on.png", "qgoal_off.png", "Add Query Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Plan Tools
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.BPMN_PLAN_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/bpmnplan_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/bpmnplan_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/bpmnplan_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add BPMN Plan");
+		tool = createTool(IViewAccess.BPMN_PLAN_MODE, "bpmnplan_on.png", "bpmnplan_off.png", "Add BPMN Plan");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.ACTIVATION_PLAN_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/actplan_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/actplan_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/actplan_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Activation Plan");
+		tool = createTool(IViewAccess.ACTIVATION_PLAN_MODE, "actplan_on.png", "actplan_off.png", "Add Activation Plan");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Edge Tools
-		tool = new JToggleButton();
-		tool.getModel().setActionCommand(IModelContainer.SUPPRESSION_EDGE_MODE);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/suppedge_on.png")));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/suppedge_on.png")));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/suppedge_off.png")));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Suppression Edge");
+		tool = createTool(IViewAccess.SUPPRESSION_EDGE_MODE, "suppedge_on.png", "suppedge_off.png", "Draw Suppression Edge");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 	}
 	
-	protected GpmnGraph createGraph()
+	protected JToggleButton createTool(String mode, String onimage, String offimage, String tooltip)
 	{
-		final GpmnGraph graph = new GpmnGraph();
-		
-		graph.getModel().addListener(mxEvent.EXECUTE, new ValueChangeController(modelcontainer));
-		
-		graph.getSelectionModel().addListener(mxEvent.CHANGE, new mxIEventListener()
-		{
-			public void invoke(Object sender, mxEventObject evt)
-			{
-				//TODO: JGraphX Bug! added and removed are switched.
-				String removed = "added";
-				String added = "removed";
-				
-				if (evt.getProperty(added) != null)
-				{
-					boolean nodes = false;
-					List addedcells = (List) evt.getProperty(added);
-					for (int i = 0; i < addedcells.size(); ++i)
-					{
-						if (!nodes && addedcells.get(i) instanceof VNode)
-						{
-							nodes = true;
-						}
-						else if ((addedcells.get(i) instanceof VGoal.VGoalType) ||
-								 (addedcells.get(i) instanceof VPlan.VPlanType) ||
-								 (addedcells.get(i) instanceof SequentialMarker))
-						{
-							mxICell marker = (mxICell) addedcells.get(i);
-							mxICell parent = marker.getParent();
-							graph.removeSelectionCell(marker);
-							graph.addSelectionCell(parent);
-						}
-					}
-					
-					if (nodes && !IModelContainer.SELECT_MODE.equals(toolgroup.getSelection().getActionCommand()))
-					{
-						setSelectTool();
-					}
-				}
-				else if (evt.getProperty(removed) != null && graph.getSelectionCount() == 0)
-				{
-					//TODO: Add context panel.
-					setPropertPanel(SPropertyPanelFactory.EMPTY_PANEL);
-				}
-				
-				if (graph.getSelectionCount() == 1)
-				{
-					setPropertPanel(SPropertyPanelFactory.createPanel(graph));
-				}
-			}
-		});
-		
-		graph.addListener(mxEvent.CONNECT_CELL, new EdgeReconnectController(modelcontainer, EditorWindow.this));
-		
-		foldcontroller = new FoldController(modelcontainer, EditorWindow.this);
-		graph.addListener(mxEvent.CELLS_FOLDED, foldcontroller);
-		
-		mxStylesheet defaultsheet = new GpmnStylesheetColor();
-		graph.setStylesheet(defaultsheet);
-		
-		return graph;
-	}
-	
-	protected void setPropertPanel(BasePropertyPanel panel)
-	{
-		int loc = viewpane.getDividerLocation();
-		viewpane.setBottomComponent(panel);
-		viewpane.setDividerLocation(loc);
+		JToggleButton tool = new JToggleButton();
+		tool.getModel().setActionCommand(mode);
+		tool.setContentAreaFilled(false);
+		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/" + onimage)));
+		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/" + onimage)));
+		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/" + offimage)));
+		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
+		tool.setMargin(new Insets(0, 0, 0, 0));
+		tool.setToolTipText("Add Suppression Edge");
+		return tool;
 	}
 }

@@ -97,13 +97,13 @@ public class GpmnModel implements IGpmnModel
 		else if (IActivationPlan.class.equals(nodetype))
 		{
 			ActivationPlan p = new ActivationPlan(this);
-			p.setName("Unknown Plan");
+			p.setName("Unnamed Plan");
 			node = p;
 		}
 		else if (IBpmnPlan.class.equals(nodetype))
 		{
 			BpmnPlan p = new BpmnPlan(this);
-			p.setName("Unknown Plan");
+			p.setName("Unnamed Plan");
 			node = p;
 		}
 		

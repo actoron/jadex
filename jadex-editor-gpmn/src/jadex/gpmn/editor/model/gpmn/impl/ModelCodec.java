@@ -33,6 +33,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxGraphModel;
+import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxGraph;
 
@@ -512,13 +514,15 @@ public class ModelCodec implements IModelCodec
 	 *  @param file The model file.
 	 *  @param graph The visual graph.
 	 */
-	public void readModel(File file, GpmnGraph graph) throws Exception
+	public mxIGraphModel readModel(File file) throws Exception
 	{
 		FileInputStream fis = new FileInputStream(file);
 		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 		XMLStreamReader reader = fac.createXMLStreamReader(fis);
-		
 		model.clear();
+		mxIGraphModel graphmodel = new mxGraphModel();
+		Object root = graphmodel.getRoot();
+		Object parent = graphmodel.getChildAt(root, 0);
 		
 		Map<String, Goal> goals = new HashMap<String, Goal>();
 		Map<String, AbstractPlan> plans = new HashMap<String, AbstractPlan>();
@@ -604,6 +608,60 @@ public class ModelCodec implements IModelCodec
 		    		current = new Object[3];
 		    		((Object[]) current)[0] = ISuppressionEdge.class;
 		    	}
+		    	else if ("creationcondition".equals(localname))
+		    	{
+		    		Goal goal = (Goal) current;
+		    		String lang = reader.getAttributeValue("", "language");
+		    		if (lang != null)
+		    		{
+		    			goal.setCreationConditionLanguage(lang);
+		    		}
+		    	}
+		    	else if ("contextcondition".equals(localname))
+		    	{
+		    		Goal goal = (Goal) current;
+		    		String lang = reader.getAttributeValue("", "language");
+		    		if (lang != null)
+		    		{
+		    			goal.setContextConditionLanguage(lang);
+		    		}
+		    	}
+		    	else if ("dropcondition".equals(localname))
+		    	{
+		    		Goal goal = (Goal) current;
+		    		String lang = reader.getAttributeValue("", "language");
+		    		if (lang != null)
+		    		{
+		    			goal.setDropConditionLanguage(lang);
+		    		}
+		    	}
+		    	else if ("targetcondition".equals(localname))
+		    	{
+		    		Goal goal = (Goal) current;
+		    		String lang = reader.getAttributeValue("", "language");
+		    		if (lang != null)
+		    		{
+		    			goal.setTargetConditionLanguage(lang);
+		    		}
+		    	}
+		    	else if ("failurecondition".equals(localname))
+		    	{
+		    		Goal goal = (Goal) current;
+		    		String lang = reader.getAttributeValue("", "language");
+		    		if (lang != null)
+		    		{
+		    			goal.setFailureConditionLanguage(lang);
+		    		}
+		    	}
+		    	else if ("maintaincondition".equals(localname))
+		    	{
+		    		Goal goal = (Goal) current;
+		    		String lang = reader.getAttributeValue("", "language");
+		    		if (lang != null)
+		    		{
+		    			goal.setMaintainConditionLanguage(lang);
+		    		}
+		    	}
 		    	else if ("vgoal".equals(localname))
 		    	{
 		    		double x = Double.parseDouble(reader.getAttributeValue("", "x"));
@@ -656,9 +714,12 @@ public class ModelCodec implements IModelCodec
 		    			Goal goal = goals.get(name);
 		    			vgoal.setValue(goal);
 		    			vgoals.put(name, vgoal);
-		    			graph.getModel().beginUpdate();
+		    			graphmodel.beginUpdate();
+		    			graphmodel.add(parent, vgoal, graphmodel.getChildCount(parent));
+		    			graphmodel.endUpdate();
+		    			/*graph.getModel().beginUpdate();
 		    			graph.addCell(vgoal);
-		    			graph.getModel().endUpdate();
+		    			graph.getModel().endUpdate();*/
 		    		}
 		    	}
 		    	else if ("goaltype".equals(localname))
@@ -673,66 +734,36 @@ public class ModelCodec implements IModelCodec
 		    		String condition = reader.getText();
 		    		Goal goal = (Goal) current;
 		    		goal.setCreationCondition(condition);
-		    		String lang = reader.getAttributeValue("", "language");
-		    		if (lang != null)
-		    		{
-		    			goal.setCreationConditionLanguage(lang);
-		    		}
 		    	}
 		    	else if ("contextcondition".equals(localname))
 		    	{
 		    		String condition = reader.getText();
 		    		Goal goal = (Goal) current;
 		    		goal.setContextCondition(condition);
-		    		String lang = reader.getAttributeValue("", "language");
-		    		if (lang != null)
-		    		{
-		    			goal.setContextConditionLanguage(lang);
-		    		}
 		    	}
 		    	else if ("dropcondition".equals(localname))
 		    	{
 		    		String condition = reader.getText();
 		    		Goal goal = (Goal) current;
 		    		goal.setDropCondition(condition);
-		    		String lang = reader.getAttributeValue("", "language");
-		    		if (lang != null)
-		    		{
-		    			goal.setDropConditionLanguage(lang);
-		    		}
 		    	}
 		    	else if ("targetcondition".equals(localname))
 		    	{
 		    		String condition = reader.getText();
 		    		Goal goal = (Goal) current;
 		    		goal.setTargetCondition(condition);
-		    		String lang = reader.getAttributeValue("", "language");
-		    		if (lang != null)
-		    		{
-		    			goal.setTargetConditionLanguage(lang);
-		    		}
 		    	}
 		    	else if ("failurecondition".equals(localname))
 		    	{
 		    		String condition = reader.getText();
 		    		Goal goal = (Goal) current;
 		    		goal.setFailureCondition(condition);
-		    		String lang = reader.getAttributeValue("", "language");
-		    		if (lang != null)
-		    		{
-		    			goal.setFailureConditionLanguage(lang);
-		    		}
 		    	}
 		    	else if ("maintaincondition".equals(localname))
 		    	{
 		    		String condition = reader.getText();
 		    		Goal goal = (Goal) current;
 		    		goal.setMaintainCondition(condition);
-		    		String lang = reader.getAttributeValue("", "language");
-		    		if (lang != null)
-		    		{
-		    			goal.setMaintainConditionLanguage(lang);
-		    		}
 		    	}
 		    	else if ("deliberation".equals(localname))
 		    	{
@@ -767,9 +798,12 @@ public class ModelCodec implements IModelCodec
 		    			}
 		    			
 		    			vplans.put(name, vplan);
-		    			graph.getModel().beginUpdate();
+		    			graphmodel.beginUpdate();
+		    			graphmodel.add(parent, vplan, graphmodel.getChildCount(parent));
+		    			graphmodel.endUpdate();
+		    			/*graph.getModel().beginUpdate();
 		    			graph.addCell(vplan);
-		    			graph.getModel().endUpdate();
+		    			graph.getModel().endUpdate();*/
 		    		}
 		    		else if (current instanceof Object[] && "virtualactivationedge".equals(((Object[]) current)[0]))
 		    		{
@@ -806,7 +840,10 @@ public class ModelCodec implements IModelCodec
 		    			}
 		    			VEdge vedge = new VEdge(source, target, edge);
 		    			current = vedge;
-		    			graph.addCell(vedge);
+		    			graphmodel.beginUpdate();
+		    			graphmodel.add(parent, vedge, graphmodel.getChildCount(parent));
+		    			graphmodel.endUpdate();
+		    			//graph.addCell(vedge);
 		    		}
 		    		else if (current instanceof Object[])
 		    		{
@@ -848,9 +885,12 @@ public class ModelCodec implements IModelCodec
 		    			VVirtualActivationEdge edge = new VVirtualActivationEdge(source, target, group, plan);
 		    			group.add(edge);
 		    			
-		    			graph.getModel().beginUpdate();
+		    			graphmodel.beginUpdate();
+		    			graphmodel.add(parent, edge, graphmodel.getChildCount(parent));
+		    			graphmodel.endUpdate();
+		    			/*graph.getModel().beginUpdate();
 		    			graph.addCell(edge);
-		    			graph.getModel().endUpdate();
+		    			graph.getModel().endUpdate();*/
 		    		}
 		    		else
 		    		{
@@ -877,6 +917,8 @@ public class ModelCodec implements IModelCodec
 		    	}
 		    }
 		}
+		
+		return graphmodel;
 	}
 	
 	protected void printlnIndent(PrintStream ps, int num, String line)
