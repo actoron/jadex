@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Carry agent for carrying ore.</H3>
+
+	This Agent is called by the Production
+	Agent to carry the produced ore. 
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Rotation"
+	package="jadex.bdi.examples.showroom3d.rotation">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.bdi.examples.*</import>
+		<import>jadex.bdi.examples.showroom3d.rotation.*</import>
+		<import>jadex.extension.envsupport.environment.space3d.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="type" class="String" argument="true">
+		</belief>
+	
+		<!-- Environment. -->
+		<belief name="environment" class="ContinuousSpace3D">
+ 			<fact class="IFuture">$scope.getParentAccess().getExtension("my3dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject" exported="true">
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+	</beliefs>
+
+	<goals>
+		<performgoal name="rotation" retry="true" exclude="never" exported="true" retrydelay="100">
+  		</performgoal>
+
+	</goals>
+
+	<plans>
+		<!-- Rotate. -->
+		<plan name="rotate">
+			<body class="RotationPlan"/>
+			<trigger>
+				<goal ref="rotation"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<properties>
+   		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+   		<property name="rotation">new Vector3Double(0.0,0.0,0.0)</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<!-- Create a goal for walking around. -->
+				<initialgoal cref="rotation"/>
+			</goals>
+			<plans>
+				<initialplan ref="rotate"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
