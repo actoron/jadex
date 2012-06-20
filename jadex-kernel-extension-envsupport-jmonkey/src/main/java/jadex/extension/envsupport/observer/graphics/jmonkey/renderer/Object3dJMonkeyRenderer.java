@@ -26,6 +26,10 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 //		String file = (String)((Object3d) primitive).getModelPath();
 		
 		String file = ((String)dc.getBoundValue(obj, ((Object3d)primitive).getModelPath(), vp));
+		if(file==null)
+		{
+			 file = (String)((Object3d) primitive).getModelPath();
+		}
 		
 		Boolean hasLight = (Boolean)((Object3d) primitive).isHasLightMaterials();
 
