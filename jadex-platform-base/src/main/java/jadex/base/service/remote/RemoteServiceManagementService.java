@@ -295,7 +295,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		final Future<T>	ret	= new Future<T>();
 		
 		getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope),
-				SServiceProvider.getVisitDecider(false, scope), new TypeResultSelector(service, true))
+			SServiceProvider.getVisitDecider(false, scope), new TypeResultSelector(service, true))
 			.addResultListener(new ExceptionDelegationResultListener<Object, T>(ret)
 		{
 			public void customResultAvailable(Object result)

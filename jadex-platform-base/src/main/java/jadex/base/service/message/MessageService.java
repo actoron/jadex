@@ -2075,6 +2075,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			final ClassLoader cl = classloader!=null? classloader: component.getComponentInstance().getClassLoader();
 			Map	message	= (Map)decoded.get(cl);
+			final boolean decode = message==null;
 			if(message==null)
 			{
 				if(receivers.length>1)
@@ -2087,6 +2088,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					// Skip creation of copy when only one receiver.
 					message	= msg;
+					
 				}
 			}
 			final Map fmessage = message;
@@ -2100,31 +2102,34 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							// Conversion via platform specific codecs
-							IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
-							for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
+							if(decode)
 							{
-								String name = (String)it.next();
-								Object value = fmessage.get(name);
-																	
-								IContentCodec codec = messagetype.findContentCodec(compcodecs, fmessage, name);
-								if(codec==null)
-									codec = messagetype.findContentCodec(getContentCodecs(), fmessage, name);
-								
-								if(codec!=null)
+								// Conversion via platform specific codecs
+								IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
+								for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
 								{
-									try
+									String name = (String)it.next();
+									Object value = fmessage.get(name);
+																		
+									IContentCodec codec = messagetype.findContentCodec(compcodecs, fmessage, name);
+									if(codec==null)
+										codec = messagetype.findContentCodec(getContentCodecs(), fmessage, name);
+									
+									if(codec!=null)
 									{
-										Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()));
-										fmessage.put(name, val);
-									}
-									catch(Exception e)
-									{
-										if(!(e instanceof ContentException))
+										try
 										{
-											e = new ContentException(new String((byte[])value), e);
+											Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()));
+											fmessage.put(name, val);
 										}
-										fmessage.put(name, e);
+										catch(Exception e)
+										{
+											if(!(e instanceof ContentException))
+											{
+												e = new ContentException(new String((byte[])value), e);
+											}
+											fmessage.put(name, e);
+										}
 									}
 								}
 							}
