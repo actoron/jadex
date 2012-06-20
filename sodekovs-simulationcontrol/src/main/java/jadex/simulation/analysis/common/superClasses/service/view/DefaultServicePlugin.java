@@ -5,7 +5,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
-import jadex.tools.generic.AbstractServicePlugin;
+import jadex.tools.generic.gui.AbstractServicePlugin;
 
 import javax.swing.Icon;
 

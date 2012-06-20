@@ -73,7 +73,8 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 
 	@Override
 	public void initSpace(IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher fetcher) {
-		super.initSpace(ia, config, fetcher);
+		super.setInitData(ia, config, fetcher);
+		super.initSpace();
 
 		initSpaces();
 		initDeco4mas();
