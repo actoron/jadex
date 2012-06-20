@@ -1,10 +1,8 @@
-package jadex.base.service.message.transport.httprelaymtp.io;
+package jadex.base.service.message.transport.httprelaymtp;
 
 import jadex.base.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.httprelaymtp.SRelay;
-import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -20,10 +18,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Binding;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,9 +43,6 @@ public class HttpRelayTransport implements ITransport
 	
 	/** The maximum number of workers for an address. */
 	protected static final int	MAX_WORKERS;
-	
-	/** A buffer for reading response data (ignored but needs to be read for connection to be reusable). */
-	protected static final byte[]	RESPONSE_BUF	= new byte[8192];
 	
 //	/** Lock for synchronizing access to the URL connection pool. */
 //	protected static final Object	POOL_LOCK	= new Object();
@@ -127,6 +118,9 @@ public class HttpRelayTransport implements ITransport
 	/** The default relay server lookup addresses. */
 	protected String	defaddresses;
 	
+	/** The connection manager. */
+	protected HttpConnectionManager	conman;
+	
 	/** The receiver process. */
 	protected HttpReceiver	receiver;
 	
@@ -172,6 +166,32 @@ public class HttpRelayTransport implements ITransport
 		}
 	}
 	
+	//-------- accessors --------
+	
+	/**
+	 *  Get the default addresses.
+	 */
+	public String	getDefaultAddresses()
+	{
+		return defaddresses;
+	}
+	
+	/**
+	 *  Get the thread pool.
+	 */
+	public IThreadPoolService	getThreadPool()
+	{
+		return threadpool;
+	}
+	
+	/**
+	 *  Get the connection manager.
+	 */
+	public HttpConnectionManager	getConnectionManager()
+	{
+		return conman;
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -186,7 +206,8 @@ public class HttpRelayTransport implements ITransport
 			public void customResultAvailable(IThreadPoolService tps)
 			{
 				threadpool	= tps;
-				receiver	= new HttpReceiver(HttpRelayTransport.this, component.getExternalAccess(), defaddresses, threadpool);
+				conman	= new HttpConnectionManager();
+				receiver	= new HttpReceiver(HttpRelayTransport.this, component.getExternalAccess());
 				receiver.start();
 				ret.setResult(null);
 			}
@@ -199,8 +220,8 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
-		// Stop the reciever.
 		this.receiver.stop();
+		this.conman.dispose();
 		return IFuture.DONE;
 	}
 	
@@ -452,17 +473,8 @@ public class HttpRelayTransport implements ITransport
 //					System.out.println("pinging: "+address);
 					try
 					{
-						URL	url	= new URL(address + (address.endsWith("/") ? "ping" : "/ping"));
-						HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-						con.connect();
-						int	code	= con.getResponseCode();
-						if(code!=HttpURLConnection.HTTP_OK)
-							throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+						conman.ping(address);
 						addresses.put(address, new Long(System.currentTimeMillis()));
-						while(con.getInputStream().read(RESPONSE_BUF)!=-1)
-						{
-						}
-						con.getInputStream().close();
 					}
 					catch(Exception e)
 					{
@@ -568,47 +580,9 @@ public class HttpRelayTransport implements ITransport
 								// Message service only calls transport.sendMessage() with receivers on same destination
 								// so just use first to fetch platform id.
 								IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
-								byte[]	iddata	= targetid.getName().getBytes("UTF-8");
-								
-								HttpURLConnection	con;
-								OutputStream	out;
-								int	code;
-								URL	url	= new URL(address);
-								con	= (HttpURLConnection)url.openConnection();
-			
-								con.setRequestMethod("POST");
-								con.setDoOutput(true);
-								con.setUseCaches(false);
-								con.setRequestProperty("Content-Type", "application/octet-stream");
-								con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
-
-//								synchronized(POOL_LOCK)
-								{
-									con.connect();
-							
-									out	= con.getOutputStream();
-
-									out.write(SUtil.intToBytes(iddata.length));
-									out.write(iddata);
-									out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
-									out.write(task.getProlog());
-									out.write(task.getData());
-									out.flush();
-	//								out.close();
-							
-									code	= con.getResponseCode();
-								}
-								
-								if(code!=HttpURLConnection.HTTP_OK)
-								{
-									throw new IOException("HTTP code "+code+": "+con.getResponseMessage()+" target="+targetid);
-								}
+								byte[][]	data	= new byte[][]{task.getProlog(), task.getData()};
+								conman.postMessage(address, targetid, data);
 								addresses.put(address, new Long(System.currentTimeMillis()));
-								while(con.getInputStream().read(RESPONSE_BUF)!=-1)
-								{
-								}
-//								con.getInputStream().close();
-								
 								ret.setResult(null);
 							}
 							catch(Exception e)

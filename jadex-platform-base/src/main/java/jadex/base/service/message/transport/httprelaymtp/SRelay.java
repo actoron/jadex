@@ -1,8 +1,9 @@
 package jadex.base.service.message.transport.httprelaymtp;
 
 
+
 /**
- *  Constants for relay service.
+ *  Constants and helper methods for relay server and transport.
  */
 public class SRelay
 {
@@ -14,7 +15,7 @@ public class SRelay
 	/** The default ports corresponding to the address schemes (http=80, https=443). */
 	public static final int[]	DEFAULT_PORTS	= new int[]{80, 443};
 	
-	/** Default relay address(es). */
+	/** Default relay address(es) used by the platform for finding available servers. */
 	public static final String	DEFAULT_ADDRESS	= "relay-http://relay.activecomponents.org/, relay-http://relay1.activecomponents.org/jadex-platform-relay-web, relay-http://jadex.informatik.uni-hamburg.de/relay/";
 //	public static final String	DEFAULT_ADDRESS	= "relay-http://relay1.activecomponents.org/jadex-platform-relay-web";
 	

@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -119,6 +118,8 @@ public class RelayServlet extends HttpServlet
 	 */
 	public void destroy()
 	{
+		this.peers.dispose();
+		
 		if(map!=null && !map.isEmpty())
 		{
 			for(Iterator<IBlockingQueue<Message>> it=map.values().iterator(); it.hasNext(); )
@@ -184,6 +185,12 @@ public class RelayServlet extends HttpServlet
 				}
 				else if("/servers".equals(request.getServletPath()))
 				{
+					String	peerurl	= request.getParameter("peerurl");
+					if(peerurl!=null)
+					{
+						peers.addPeer(peerurl, false);
+					}
+					request.setAttribute("peers", peers.getURLs(request));					
 					view	= "/WEB-INF/jsp/servers.jsp";
 				}
 				else
@@ -372,24 +379,30 @@ public class RelayServlet extends HttpServlet
 			ServletInputStream	in	= request.getInputStream();
 			String	targetid	= readString(in);
 			boolean	sent	= false;
-			IBlockingQueue<Message>	queue	= map.get(targetid);
-			if(queue!=null)
+			
+			// Only send message when request is not https or target is also connected via https.
+			PlatformInfo	targetpi	= platforms.get(targetid);
+			if(targetpi!=null && !request.getScheme().equals("https") || targetpi.getScheme().equals("https"))
 			{
-				try
+				IBlockingQueue<Message>	queue	= map.get(targetid);
+				if(queue!=null)
 				{
-					Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
-					queue.enqueue(msg);
-//					synchronized(this)
-//					{
-//						queued++;
-//					}
-//					System.out.println("queued: "+queued);
-					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
-					sent	= true;
-				}
-				catch(Exception e)
-				{
-					// timeout or platform just disconnected
+					try
+					{
+						Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
+						queue.enqueue(msg);
+	//					synchronized(this)
+	//					{
+	//						queued++;
+	//					}
+	//					System.out.println("queued: "+queued);
+						msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
+						sent	= true;
+					}
+					catch(Exception e)
+					{
+						// timeout or platform just disconnected
+					}
 				}
 			}
 			

@@ -281,7 +281,7 @@
 					$args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
 					$args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
 					$args.ssltcptransport? new jadex.base.service.message.transport.ssltcpmtp.SSLTCPTransport($component.getServiceProvider(), $args.ssltcpport): null,
-					$args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.io.HttpRelayTransport($component, $args.relayaddress): null
+					$args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress): null
 				},
 				new jadex.bridge.service.types.message.MessageType[]
 				{

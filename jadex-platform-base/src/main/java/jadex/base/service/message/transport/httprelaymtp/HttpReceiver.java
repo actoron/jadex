@@ -1,7 +1,6 @@
-package jadex.base.service.message.transport.httprelaymtp.io;
+package jadex.base.service.message.transport.httprelaymtp;
 
 import jadex.base.service.message.MapSendTask;
-import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -11,7 +10,6 @@ import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -22,18 +20,11 @@ import jadex.micro.annotation.Binding;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,20 +43,11 @@ public class HttpReceiver
 	/** The transport. */
 	protected HttpRelayTransport	transport;
 
-	/** The thread pool. */
-	protected IThreadPoolService	threadpool;
-	
 	/** The shutdown flag. */
 	protected boolean	shutdown;
 	
-	/** The connections (if any). */
-	protected List<HttpURLConnection>	cons;
-	
 	/** The external access. */
 	protected IExternalAccess access;
-	
-	/** The default addresses. */
-	protected String defaddresses;
 	
 	/** The current connected server address (if any). */
 	protected String address;
@@ -78,13 +60,10 @@ public class HttpReceiver
 	/**
 	 *  Create a new receiver.
 	 */
-	public HttpReceiver(HttpRelayTransport transport, IExternalAccess access, String defaddresses, IThreadPoolService threadpool)
+	public HttpReceiver(HttpRelayTransport transport, IExternalAccess access)
 	{
 		this.transport	= transport;
 		this.access	= access;
-		this.defaddresses	= defaddresses;
-		this.threadpool	= threadpool;
-		this.cons	= Collections.synchronizedList(new ArrayList<HttpURLConnection>());
 	}
 	
 	//-------- methods --------
@@ -184,46 +163,6 @@ public class HttpReceiver
 	public void	stop()
 	{
 		shutdown	= true;
-		
-		HttpURLConnection[]	acon	= cons.toArray(new HttpURLConnection[0]);
-		for(int i=0; i<acon.length; i++)
-		{
-			// Use sun.net.www.http.HttpClient.closeServer()
-			// as con.disconnect() just blocks for sun default implementation :-(
-			if(acon[i].getClass().getName().equals("sun.net.www.protocol.http.HttpURLConnection"))
-			{
-				try
-				{
-					Field	f	= acon[i].getClass().getDeclaredField("http");
-					f.setAccessible(true);
-					Object	client	= f.get(acon[i]);
-					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
-				}
-				catch(Exception e)
-				{
-					acon[i].disconnect();	// Hangs until next ping :-(
-				}
-			}
-			// Special treatment for android impl not needed, because disconnect() works fine. 
-//			else if()
-//			{
-//				// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
-//				// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
-//				// Socket socket	= connection.socket;
-//				Field	f	= con.getClass().getDeclaredField("connection");
-//				f.setAccessible(true);
-//				Object	connection	= f.get(con);
-//				f	= connection.getClass().getDeclaredField("socket");
-//				f.setAccessible(true);
-//				Socket	socket	= (Socket)f.get(connection);
-//				socket.close();				
-//			}
-			else
-			{
-				acon[i].disconnect();
-			}			
-		}
-		
 		access	= null;
 		address	= null;
 	}
@@ -333,10 +272,10 @@ public class HttpReceiver
 	 */
 	protected IFuture<String>	fetchServerAddresses()
 	{
-		log(Level.INFO, "Relay transport fetching server addresses from: "+defaddresses);
+		log(Level.INFO, "Relay transport fetching server addresses from: "+transport.getDefaultAddresses());
 		
 		final Future<String>	ret	= new Future<String>();
-		StringTokenizer	stok	= new StringTokenizer(defaddresses, ", ");
+		StringTokenizer	stok	= new StringTokenizer(transport.getDefaultAddresses(), ", ");
 		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(stok.countTokens(), true,
 			new ExceptionDelegationResultListener<Void, String>(ret)
 		{
@@ -347,37 +286,39 @@ public class HttpReceiver
 			}
 		});
 		
-		while(stok.hasMoreTokens())
+		while(stok.hasMoreTokens() && !ret.isDone())
 		{
-			final String	adr	= stok.nextToken().trim().substring(6);	// strip 'relay-' prefix.
-			threadpool.execute(new Runnable()
+			final String	adr	= stok.nextToken().trim();
+			transport.getThreadPool().execute(new Runnable()
 			{
 				public void run()
 				{
-					URLConnection	con	= null;
-					try
+					if(!ret.isDone())
 					{
-						URL	url	= new URL(adr+(adr.endsWith("/") ? "servers" : "/servers"));
-						con	= url.openConnection();
-						cons.add((HttpURLConnection)con);
-						if(con.getContentType()!=null && con.getContentType().startsWith("text/plain"))
+						try
 						{
-							String	curadrs	= new Scanner(con.getInputStream()).useDelimiter("\\A").next();
+							String	curadrs	= transport.getConnectionManager().getServers(adr);
 							log(Level.INFO, "Relay transport got server addresses from: "+adr+", "+curadrs);
 							ret.setResultIfUndone(curadrs);
 						}
-						crl.resultAvailable(null);
-					}
-					catch(Exception e)
-					{
-						crl.exceptionOccurred(e);
-					}
-					if(con!=null)
-					{
-						cons.remove(con);
+						catch(Exception e)
+						{
+							crl.exceptionOccurred(e);
+						}
 					}
 				}
 			});
+			
+			if(!ret.isDone())
+			{
+				try
+				{
+					Thread.sleep(20);	// Short delay to give servers a chance to reply.
+				}
+				catch(InterruptedException e)
+				{
+				}
+			}
 		}
 		
 		return ret;
@@ -410,35 +351,23 @@ public class HttpReceiver
 			}
 		});
 		
-		for(int i=0; i<adrs.size(); i++)
+		for(int i=0; !ret.isDone() && i<adrs.size(); i++)
 		{
 			final String	adr	= adrs.get(i);
-			threadpool.execute(new Runnable()
+			transport.getThreadPool().execute(new Runnable()
 			{
 				public void run()
 				{
 					if(!ret.isDone())
 					{
-						URLConnection	con	= null;
 						try
 						{
-							URL	url	= new URL(adr.substring(6)+(adr.endsWith("/") ? "ping" : "/ping")); // strip 'relay-' prefix.
-							con	= url.openConnection();
-							cons.add((HttpURLConnection)con);
-							if(((HttpURLConnection)con).getResponseCode()==200)
-							{
-								log(Level.INFO, "Relay transport found server: "+adr);
-								ret.setResultIfUndone(adr);
-							}
-							crl.resultAvailable(null);
+							transport.getConnectionManager().ping(adr);
+							ret.setResultIfUndone(adr);
 						}
 						catch(Exception e)
 						{
 							crl.exceptionOccurred(e);
-						}
-						if(con!=null)
-						{
-							cons.remove(con);
 						}
 					}
 				}
@@ -475,34 +404,18 @@ public class HttpReceiver
 				{
 					public void customResultAvailable(final Map<Byte,ICodec> codecs)
 					{
-						threadpool.execute(new Runnable()
+						transport.getThreadPool().execute(new Runnable()
 						{
 							public void run()
 							{
 								HttpURLConnection	con	= null;
 								try
 								{
-									String	xmlid	= HttpReceiver.this.access.getComponentIdentifier().getRoot().getName();
-									URL	url	= new URL(adr.substring(6)+"?id="+URLEncoder.encode(xmlid, "UTF-8")); // strip 'relay-' prefix.
-									con	= (HttpURLConnection)url.openConnection();
-									cons.add(con);
-									con.setUseCaches(false);
-									
-			//						// Hack!!! Do not validate server (todo: enable/disable by platform argument).
-			//						if(con instanceof HttpsURLConnection)
-			//						{
-			//							HttpsURLConnection httpscon = (HttpsURLConnection) con;  
-			//					        httpscon.setHostnameVerifier(new HostnameVerifier()  
-			//					        {        
-			//					            public boolean verify(String hostname, SSLSession session)  
-			//					            {  
-			//					                return true;  
-			//					            }  
-			//					        });												
-			//						}
+									con	= transport.getConnectionManager().openReceiverConnection(adr,
+										HttpReceiver.this.access.getComponentIdentifier());
 									
 									InputStream	in	= con.getInputStream();
-									address	= adr;
+									address	= HttpConnectionManager.relayAddress(adr);
 									transport.connected(address, false);
 									while(true)
 									{
@@ -545,7 +458,7 @@ public class HttpReceiver
 								
 								if(con!=null)
 								{
-									cons.remove(con);
+									transport.getConnectionManager().remove(con);
 								}
 							}
 						});						
