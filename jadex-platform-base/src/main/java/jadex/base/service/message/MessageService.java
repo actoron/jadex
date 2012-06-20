@@ -2036,7 +2036,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				if(++i[0]<receivers.length)
 				{
-					deliverToReceiver(receivers, i[0], cms, classloader, decoded, msg, logger, messagetype);
+					deliverToReceiver(receivers, i[0], cms, classloader, decoded, msg, logger, messagetype).addResultListener(this);
 				}
 				else
 				{
@@ -2046,14 +2046,7 @@ public class MessageService extends BasicService implements IMessageService
 
 			public void exceptionOccurred(Exception exception)
 			{
-				if(++i[0]<receivers.length)
-				{
-					deliverToReceiver(receivers, i[0], cms, classloader, decoded, msg, logger, messagetype);
-				}
-				else
-				{
-					ret.setResult(null);
-				}
+				resultAvailable(null);
 			}
 		});
 		
@@ -2066,6 +2059,8 @@ public class MessageService extends BasicService implements IMessageService
 	protected IFuture<Void> deliverToReceiver(final IComponentIdentifier[] receivers, final int i, final IComponentManagementService cms, ClassLoader classloader, 
 		final Map decoded, final Map msg, final Logger logger, final MessageType messagetype)
 	{
+//		System.out.println("dtr: "+SUtil.arrayToString(receivers)+" "+i);
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		final IComponentIdentifier receiver = receivers[i];
