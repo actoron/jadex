@@ -1,6 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
@@ -28,7 +29,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Panel displaying goal properties.
@@ -42,9 +42,9 @@ public class GoalPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public GoalPropertyPanel(mxGraph graph, VGoal vgoal)
+	public GoalPropertyPanel(IModelContainer container, VGoal vgoal)
 	{
-		super(graph);
+		super(container);
 		this.goal = vgoal;
 		
 		setLayout(new GridBagLayout());

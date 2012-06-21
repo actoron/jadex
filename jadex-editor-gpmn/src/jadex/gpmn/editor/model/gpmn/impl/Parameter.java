@@ -1,9 +1,11 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
+import jadex.gpmn.editor.model.gpmn.IParameter;
+
 /**
  *  A parameter element.
  */
-public class Parameter
+public class Parameter implements IParameter
 {
 	/** The name. */
 	protected String name;
@@ -22,6 +24,10 @@ public class Parameter
 	 */
 	public Parameter()
 	{
+		this.name = IParameter.DEFAULT_NAME;
+		this.type = "java.lang.Object";
+		this.value = "";
+		this.set = false;
 	}
 	
 	/**

@@ -1,21 +1,41 @@
 package jadex.gpmn.editor.model.gpmn;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface IContext
 {
+	/**
+	 *  Adds a new parameter.
+	 */
+	public void addParameter();
+	
 	/**
 	 *  Adds a parameter.
 	 *  
 	 *  @param parameter The parameter.
 	 */
 	public void addParameter(IParameter parameter);
+	
 	/**
 	 *  Removes a parameter.
 	 *  
 	 *  @param name The name of the parameter.
 	 */
 	public void removeParameter(String name);
+	
+	/**
+	 *  Removes a parameter.
+	 *  
+	 *  @param index The parameter index.
+	 */
+	public void removeParameter(int index);
+	
+	/**
+	 *  Removes parameters.
+	 *  
+	 *  @param indexes The parameter indexes.
+	 */
+	public void removeParameters(int[] indexes);
 	
 	/**
 	 *  Renames a parameter.
@@ -30,12 +50,12 @@ public interface IContext
 	 *
 	 *  @return The parameters.
 	 */
-	public Collection<IParameter> getParameters();
+	public List<IParameter> getParameters();
 
 	/**
 	 *  Sets the parameters.
 	 *
 	 *  @param parameters The parameters.
 	 */
-	public void setParameters(Collection<IParameter> parameters);
+	public void setParameters(List<IParameter> parameters);
 }

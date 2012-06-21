@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
@@ -51,7 +52,6 @@ import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxStylesheet;
 
 public class EditorWindow extends JFrame implements IControllerAccess, IViewAccess
 {
@@ -196,13 +196,11 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				
 				viewpane.setTopComponent(graphcomponent);
 				
-				setPropertPanel(SPropertyPanelFactory.EMPTY_PANEL);
-				
 				/* Menu */
 				JMenuBar menubar = new JMenuBar();
 				
 				JMenu filemenu = new JMenu("File");
-				JMenuItem newitem = new JMenuItem("New");
+				JMenuItem newitem = new JMenuItem("");
 				JMenuItem openitem = new JMenuItem();
 				JMenuItem saveasitem = new JMenuItem();
 				JMenuItem exititem = new JMenuItem("Exit");
@@ -228,6 +226,20 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				viewmenu.add(grayview);
 				menubar.add(viewmenu);
 				
+				newitem.setAction(new AbstractAction("New")
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						// TODO: Pick right sheet.
+						GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
+						IGpmnModel gpmnmodel = mfactory.createModel();
+						stylegroup.setSelected(colorview.getModel(), true);
+						modelcontainer.setGpmnModel(gpmnmodel);
+						modelcontainer.setGraph(graph);
+						modelcontainer.getGraphComponent().refresh();
+					}
+				});
+				
 				openitem.setAction(new AbstractAction("Open...")
 				{
 					public void actionPerformed(ActionEvent e)
@@ -242,14 +254,21 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 							try
 							{
 								IGpmnModel gpmnmodel = mfactory.createModel();
-								mxIGraphModel graphmodel = gpmnmodel.getModelCodec().readModel(fc.getSelectedFile());
+								File file = fc.getSelectedFile();
+								if (!file.getName().endsWith(".gpmn"))
+								{
+									file = new File(file.getAbsolutePath() + ".gpmn");
+								}
+								mxIGraphModel graphmodel = gpmnmodel.getModelCodec().readModel(file);
 								
 								// Funny, we need a new graph or we get quirky graphics... Bug?
 								GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
 								graph.setModel(graphmodel);
 								stylegroup.setSelected(colorview.getModel(), true);
+								modelcontainer.setGpmnModel(gpmnmodel);
 								modelcontainer.setGraph(graph);
 								modelcontainer.getGraphComponent().refresh();
+								setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 							}
 							catch (Exception e1)
 							{
@@ -272,7 +291,12 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 						{
 							try
 							{
-								modelcontainer.getGpmnModel().getModelCodec().writeModel(fc.getSelectedFile(), modelcontainer.getGraph());
+								File file = fc.getSelectedFile();
+								if (!file.getName().endsWith(".gpmn"))
+								{
+									file = new File(file.getAbsolutePath() + ".gpmn");
+								}
+								modelcontainer.getGpmnModel().getModelCodec().writeModel(file, modelcontainer.getGraph());
 							}
 							catch (IOException e1)
 							{
@@ -284,6 +308,7 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				
 				setJMenuBar(menubar);
 				
+				setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 				
 				pack();
 				Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();

@@ -6,6 +6,21 @@ package jadex.gpmn.editor.model.gpmn;
  */
 public interface IParameter
 {
+	/** Parameter default name. */
+	public static final String DEFAULT_NAME = "UnnamedParameter";
+	
+	/** Names of the properties. */
+	public static final String[] PROPERTYNAMES = new String[] { "Name",
+																"Type",
+																"Value",
+																"Set" };
+	
+	/** Types of the properties. */
+	public static final Class[]  PROPERTYTYPES = new Class[] { String.class,
+															   String.class,
+															   String.class,
+															   Boolean.class};
+	
 	/**
 	 *  Get the name.
 	 *  @return The name.

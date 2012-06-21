@@ -1,5 +1,9 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
+import jadex.gpmn.editor.gui.GpmnGraph;
+import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.model.gpmn.IGpmnModel;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,24 +18,22 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import com.mxgraph.view.mxGraph;
-
 /**
  *  Class for property panels.
  *
  */
 public class BasePropertyPanel extends JPanel
 {
-	/** The graph. */
-	private mxGraph graph;
+	/** The model container. */
+	protected IModelContainer modelcontainer;
 	
 	/**
 	 *  Creates a new property panel.
-	 *  @param vgraph The graph.
+	 *  @param container The model container.
 	 */
-	public BasePropertyPanel(mxGraph graph)
+	public BasePropertyPanel(IModelContainer container)
 	{
-		this.graph = graph;
+		this.modelcontainer = container;
 	}
 	
 	/**
@@ -39,9 +41,19 @@ public class BasePropertyPanel extends JPanel
 	 *  
 	 *  @return The graph.
 	 */
-	public mxGraph getGraph()
+	public GpmnGraph getGraph()
 	{
-		return graph;
+		return modelcontainer.getGraph();
+	}
+	
+	/**
+	 *  Returns the GPMN model.
+	 *  
+	 *  @return The model.
+	 */
+	public IGpmnModel getModel()
+	{
+		return modelcontainer.getGpmnModel();
 	}
 	
 	/** Default text field border used for text areas. */

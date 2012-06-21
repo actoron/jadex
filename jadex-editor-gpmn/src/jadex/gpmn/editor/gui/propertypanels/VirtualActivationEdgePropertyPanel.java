@@ -1,5 +1,6 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
+import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
@@ -19,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Panel displaying virtual edge properties.
@@ -33,9 +33,9 @@ public class VirtualActivationEdgePropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public VirtualActivationEdgePropertyPanel(mxGraph graph, VVirtualActivationEdge vedge)
+	public VirtualActivationEdgePropertyPanel(IModelContainer container, VVirtualActivationEdge vedge)
 	{
-		super(graph);
+		super(container);
 		this.edge = vedge;
 		
 		setLayout(new GridLayout(1, 2));

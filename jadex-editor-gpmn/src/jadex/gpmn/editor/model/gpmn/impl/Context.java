@@ -3,14 +3,28 @@ package jadex.gpmn.editor.model.gpmn.impl;
 import jadex.gpmn.editor.model.gpmn.IContext;
 import jadex.gpmn.editor.model.gpmn.IParameter;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Context implements IContext
 {
-	/** The context parameters */
-	public Map<String, IParameter> parameters = new HashMap<String, IParameter>();
+	/** The context parameters name map */
+	public Map<String, Integer> parameternames = new HashMap<String, Integer>();
+	
+	/** The parameter list */
+	public List<IParameter> parameters = new ArrayList<IParameter>();
+	
+	/**
+	 *  Adds a new parameter.
+	 */
+	public void addParameter()
+	{
+		IParameter param = new Parameter();
+		addParameter(param);
+	}
 	
 	/**
 	 *  Adds a parameter.
@@ -19,7 +33,17 @@ public class Context implements IContext
 	 */
 	public void addParameter(IParameter parameter)
 	{
-		parameters.put(parameter.getName(), parameter);
+		int index = parameters.size();
+		parameters.add(parameter);
+		String basename = parameter.getName();
+		String name = basename;
+		int counter = 0;
+		while (parameternames.containsKey(name))
+		{
+			name = basename + String.valueOf(counter++);
+		}
+		parameter.setName(name);
+		parameternames.put(name, index);
 	}
 	
 	/**
@@ -29,7 +53,35 @@ public class Context implements IContext
 	 */
 	public void removeParameter(String name)
 	{
-		parameters.remove(name);
+		int index = parameternames.remove(name);
+		parameters.remove(index);
+	}
+	
+	/**
+	 *  Removes a parameter.
+	 *  
+	 *  @param index The parameter index.
+	 */
+	public void removeParameter(int index)
+	{
+		IParameter param = parameters.remove(index);
+		parameternames.remove(param.getName());
+	}
+	
+	/**
+	 *  Removes parameters.
+	 *  
+	 *  @param indexes The parameter indexes.
+	 */
+	public void removeParameters(int[] indexes)
+	{
+		IParameter[] removals = new IParameter[indexes.length];
+		for (int i = 0; i < indexes.length; ++i)
+		{
+			removals[i] = parameters.get(indexes[i]);
+			parameternames.remove(removals[i].getName());
+		}
+		parameters.removeAll(Arrays.asList(removals));
 	}
 	
 	/**
@@ -40,9 +92,19 @@ public class Context implements IContext
 	 */
 	public void renameParameter(String oldname, String newname)
 	{
-		IParameter parameter = parameters.remove(oldname);
-		parameter.setName(newname);
-		addParameter(parameter);
+		if (newname.length() == 0)
+		{
+			newname = IParameter.DEFAULT_NAME;
+		}
+		int index = parameternames.remove(oldname);
+		String basename = newname;
+		int counter = 0;
+		while (parameternames.containsKey(newname))
+		{
+			newname = basename + String.valueOf(counter++);
+		}
+		parameters.get(index).setName(newname);
+		parameternames.put(newname, index);
 	}
 	
 	/**
@@ -50,9 +112,9 @@ public class Context implements IContext
 	 *
 	 *  @return The parameters.
 	 */
-	public Collection<IParameter> getParameters()
+	public List<IParameter> getParameters()
 	{
-		return parameters.values();
+		return parameters;
 	}
 
 	/**
@@ -60,12 +122,13 @@ public class Context implements IContext
 	 *
 	 *  @param parameters The parameters.
 	 */
-	public void setParameters(Collection<IParameter> parameters)
+	public void setParameters(List<IParameter> parameters)
 	{
-		this.parameters = new HashMap<String, IParameter>();
+		this.parameters.clear();
+		this.parameternames.clear();
 		for (IParameter parameter : parameters)
 		{
-			this.parameters.put(parameter.getName(), parameter);
+			addParameter(parameter);
 		}
 	}
 	

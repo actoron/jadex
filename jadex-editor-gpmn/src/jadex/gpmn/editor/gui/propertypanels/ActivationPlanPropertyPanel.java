@@ -1,5 +1,6 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
+import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
@@ -19,7 +20,6 @@ import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Panel displaying activation plan properties.
@@ -33,9 +33,9 @@ public class ActivationPlanPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public ActivationPlanPropertyPanel(mxGraph graph, VPlan vplan)
+	public ActivationPlanPropertyPanel(IModelContainer container, VPlan vplan)
 	{
-		super(graph);
+		super(container);
 		this.plan = vplan;
 		
 		setLayout(new GridLayout(1, 2));

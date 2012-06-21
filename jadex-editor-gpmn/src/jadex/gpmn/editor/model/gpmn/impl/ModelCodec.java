@@ -1,14 +1,15 @@
 package jadex.gpmn.editor.model.gpmn.impl;
 
-import jadex.gpmn.editor.gui.GpmnGraph;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IBpmnPlan;
+import jadex.gpmn.editor.model.gpmn.IContext;
 import jadex.gpmn.editor.model.gpmn.IEdge;
 import jadex.gpmn.editor.model.gpmn.IElement;
 import jadex.gpmn.editor.model.gpmn.IGoal;
 import jadex.gpmn.editor.model.gpmn.IModelCodec;
 import jadex.gpmn.editor.model.gpmn.INode;
+import jadex.gpmn.editor.model.gpmn.IParameter;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
 import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
 import jadex.gpmn.editor.model.gpmn.ModelConstants;
@@ -74,6 +75,38 @@ public class ModelCodec implements IModelCodec
 		printlnIndent(ps, ind++, "<gpmn:gpmn xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gpmn=\"http://jadex.sourceforge.net/gpmn\" version=\"" + VERSION + "\">");
 		
 		printlnIndent(ps, ind++, "<gpmn:gpmnmodel>");
+		
+		List<IParameter> cp = gm.getContext().getParameters();
+		if (cp.size() > 0)
+		{
+			printlnIndent(ps, ind++, "<gpmn:context>");
+			
+			for (IParameter p : cp)
+			{
+				printlnIndent(ps, ind++, "<gpmn:parameter>");
+				
+				printIndent(ps, ind, "<gpmn:parametername>");
+				ps.print(p.getName());
+				ps.println("</gpmn:parametername>");
+				
+				printIndent(ps, ind, "<gpmn:parametertype>");
+				ps.print(p.getType());
+				ps.println("</gpmn:parametertype>");
+				
+				printIndent(ps, ind, "<gpmn:parametervalue>");
+				ps.print(p.getValue());
+				ps.println("</gpmn:parametervalue>");
+				
+				if (p.isSet())
+				{
+					printlnIndent(ps, ind, "<gpmn:parameterset />");
+				}
+				
+				printlnIndent(ps, --ind, "</gpmn:parameter>");
+			}
+			
+			printlnIndent(ps, --ind, "</gpmn:context>");
+		}
 		
 		printlnIndent(ps, ind++, "<gpmn:goals>");
 		Set<INode> goals = gm.getNodeSet(IGoal.class);
@@ -539,7 +572,11 @@ public class ModelCodec implements IModelCodec
 		    if (reader.getEventType() == XMLStreamReader.START_ELEMENT)
 		    {
 		    	localname = reader.getLocalName();
-		    	if ("goal".equals(localname))
+		    	if ("parameter".equals(localname))
+		    	{
+		    		current = new Parameter();
+		    	}
+		    	else if ("goal".equals(localname))
 		    	{
 		    		Goal goal = (Goal) model.createNode(IGoal.class);
 		    		goal.setRetry(false);
@@ -695,11 +732,34 @@ public class ModelCodec implements IModelCodec
 		    }
 		    else if (reader.getEventType() == XMLStreamReader.END_ELEMENT)
 		    {
+		    	if ("parameter".equals(reader.getLocalName()))
+		    	{
+		    		model.getContext().addParameter((Parameter) current);
+		    	}
 		    	localname = null;
 		    }
 		    else if (reader.getEventType() == XMLStreamReader.CHARACTERS)
 		    {
-		    	if ("goalname".equals(localname))
+		    	if ("parametername".equals(localname))
+		    	{
+		    		String name = reader.getText();
+		    		((Parameter) current).setName(name);
+		    	}
+		    	else if ("parametertype".equals(localname))
+		    	{
+		    		String type = reader.getText();
+		    		((Parameter) current).setType(type);
+		    	}
+		    	else if ("parametervalue".equals(localname))
+		    	{
+		    		String val = reader.getText();
+		    		((Parameter) current).setValue(val);
+		    	}
+		    	else if ("parameterset".equals(localname))
+		    	{
+		    		((Parameter) current).setSet(true);
+		    	}
+		    	else if ("goalname".equals(localname))
 		    	{
 		    		String name = reader.getText();
 		    		if (current instanceof Goal)

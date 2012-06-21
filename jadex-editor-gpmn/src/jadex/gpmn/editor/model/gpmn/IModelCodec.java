@@ -1,7 +1,5 @@
 package jadex.gpmn.editor.model.gpmn;
 
-import jadex.gpmn.editor.gui.GpmnGraph;
-
 import java.io.File;
 import java.io.IOException;
 

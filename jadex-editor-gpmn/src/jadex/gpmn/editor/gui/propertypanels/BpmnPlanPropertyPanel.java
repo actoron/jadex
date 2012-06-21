@@ -1,6 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IBpmnPlan;
 import jadex.gpmn.editor.model.visual.VPlan;
@@ -14,8 +15,6 @@ import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 
-import com.mxgraph.view.mxGraph;
-
 /**
  *  Panel displaying BPMN plan properties.
  *
@@ -28,9 +27,9 @@ public class BpmnPlanPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public BpmnPlanPropertyPanel(mxGraph graph, VPlan vplan)
+	public BpmnPlanPropertyPanel(IModelContainer container, VPlan vplan)
 	{
-		super(graph);
+		super(container);
 		this.plan = vplan;
 		
 		setLayout(new GridLayout(1, 2));
