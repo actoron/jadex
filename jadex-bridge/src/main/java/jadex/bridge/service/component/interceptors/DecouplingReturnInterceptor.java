@@ -68,7 +68,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						public void notifyListener(final IResultListener<Void> listener)
 						{
 							// Do not reschedule remotely
-							if(caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
+							if(adapter!=null || caller!=null && caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
 							{
 								getAdapter(caller, sic).addResultListener(new IResultListener<IComponentAdapter>()
 								{
