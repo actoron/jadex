@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.environment;
 
 import jadex.extension.envsupport.math.IVector1;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.IBooleanCondition;
 import jadex.commons.SimplePropertyObject;
 
@@ -47,16 +48,28 @@ public abstract class AbstractTask extends SimplePropertyObject implements IObje
 	{
 	}
 
+//	/**
+//	 *  Executes the task.
+//	 *  Handles exceptions. Subclasses should implement doExecute() instead.
+//	 *  @param space	The environment in which the task is executing.
+//	 *  @param obj	The object that is executing the task.
+//	 *  @param progress	The time that has passed according to the environment executor.
+//	 */
+//	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+//	{
+//	}
+	
 	/**
 	 *  Executes the task.
-	 *  Handles exceptions. Subclasses should implement doExecute() instead.
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
+	 *  @param clock	The clock service.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 	}
+
 
 	/**
 	 *  Check if a task is finished and should be removed.

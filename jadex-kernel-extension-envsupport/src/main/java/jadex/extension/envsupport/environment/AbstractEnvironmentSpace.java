@@ -348,15 +348,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					this.addSpaceProcessType(name, clazz, props);
 				}
 			}
-			
 	
 			// Create task types.
-			List tasks = mspacetype.getPropertyList("tasktypes");
-			if(tasks!=null)
+			List tasktypes = mspacetype.getPropertyList("tasktypes");
+			if(tasktypes!=null)
 			{
-				for(int i=0; i<tasks.size(); i++)
+				for(int i=0; i<tasktypes.size(); i++)
 				{
-					Map mtask = (Map)tasks.get(i);
+					Map mtask = (Map)tasktypes.get(i);
 					List props = (List)mtask.get("properties");
 					String name = (String)MEnvSpaceType.getProperty(mtask, "name");
 					Class clazz = (Class)MEnvSpaceType.getProperty(mtask, "clazz");
@@ -413,11 +412,29 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						num	= ((Number)MEnvSpaceType.getProperty(mobj, "number")).intValue();
 					}
 					
+					List tasks = (List)mobj.get("tasks");
+					
 					for(int j=0; j<num; j++)
 					{
 						fetcher.setValue("$number", new Integer(j));
+						fetcher.setValue("$n", new Integer(j));
 						Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
-						this.createSpaceObject((String)MEnvSpaceType.getProperty(mobj, "type"), props, null);
+						
+						ISpaceObject so = this.createSpaceObject((String)MEnvSpaceType.getProperty(mobj, "type"), props, null);
+					
+						if(tasks!=null)
+						{
+							for(int k=0; k<tasks.size(); k++)
+							{
+								Map mtask = (Map)tasks.get(k);
+								List mtprops = (List)mtask.get("properties");
+								Map tprops = MEnvSpaceType.convertProperties(mtprops, fetcher);
+								String type = (String)MEnvSpaceType.getProperty(mtask, "type");
+								
+								this.createObjectTask(type, tprops, so.getId());
+				//				System.out.println("Create space process: "+getProperty(mproc, "type"));
+							}
+						}
 					}
 				}
 			}

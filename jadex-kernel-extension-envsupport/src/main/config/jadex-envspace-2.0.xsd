@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-envspace" xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:element name="envspacetype" type="envspacetype">
 		<xs:annotation>
 			<xs:documentation>Declaration of an environment space. The concrete type of the space can be defined using the class.</xs:documentation>
@@ -374,7 +374,7 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
- 				<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="box" type="drawableelement3d" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Box display element.</xs:documentation>
@@ -463,7 +463,6 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement">
-				<!-- Todo: introduce sub elements with specific attributes! -->
 				<xs:attribute name="depth" type="xs:string"/>
 				<xs:attribute name="alphamap" type="xs:string"/>
 				<xs:attribute name="circleSamples" type="xs:string"/>
@@ -608,6 +607,9 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="task" type="task" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="number" type="xs:string"/>
 			</xs:extension>
@@ -795,5 +797,12 @@
 		<xs:sequence>
 			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="task">
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 </xs:schema>

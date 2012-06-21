@@ -1952,6 +1952,14 @@ public class MEnvSpaceType
 			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "task"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
+			new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			})));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}), new ObjectInfo(MObjectTypeProperty.class),
 			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value"), atexconv),
 			new AttributeInfo[] {
@@ -2061,8 +2069,16 @@ public class MEnvSpaceType
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("number", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null))
+			},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri, "task"), "tasks", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 			
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "task")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(ti_po, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			})));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatar")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
