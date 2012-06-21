@@ -207,16 +207,18 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public synchronized IFuture<Void>	shutdownService()
 	{
-		libservice.removeLibraryServiceListener(libservicelistener);
-//		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				ILibraryService libService = (ILibraryService) result;
-//				libService.removeLibraryServiceListener(libservicelistener);
-//			}
-//		});
-		return super.shutdownService();
+		final Future<Void>	ret	= new Future<Void>();
+		libservice.removeLibraryServiceListener(libservicelistener)
+			.addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ComponentComponentFactory.super.shutdownService()
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+			
+		return ret;
 	}
 	
 	//-------- IComponentFactory interface --------

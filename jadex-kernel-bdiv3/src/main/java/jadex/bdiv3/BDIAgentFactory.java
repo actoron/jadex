@@ -142,16 +142,18 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public synchronized IFuture<Void>	shutdownService()
 	{
-		libservice.removeLibraryServiceListener(libservicelistener);
-//		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				ILibraryService libService = (ILibraryService) result;
-//				libService.removeLibraryServiceListener(libservicelistener);
-//			}
-//		});
-		return super.shutdownService();
+		final Future<Void>	ret	= new Future<Void>();
+		libservice.removeLibraryServiceListener(libservicelistener)
+			.addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				BDIAgentFactory.super.shutdownService()
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+			
+		return ret;
 	}
 	
 	//-------- IAgentFactory interface --------

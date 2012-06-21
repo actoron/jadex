@@ -1,9 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.DelegationResultListener;
@@ -125,9 +127,19 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									
 									public void exceptionOccurred(Exception exception) 
 									{
-//										System.out.println("out norepos: "+mycnt);
-										// No thread conversion possible
-										listener.exceptionOccurred(exception);
+										// Hack !!! If cms not found during platform shutdown forward listener result on platform thread.
+										if(caller.equals(caller.getRoot()) &&
+											(exception instanceof ServiceNotFoundException
+											|| exception instanceof ComponentTerminatedException))
+										{
+											listener.resultAvailable(null);
+										}
+										else
+										{
+	//										System.out.println("out norepos: "+mycnt);
+											// No thread conversion possible
+											listener.exceptionOccurred(exception);
+										}
 									};
 								});
 							}

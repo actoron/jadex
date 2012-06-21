@@ -1899,6 +1899,11 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 			if(ii!=null)
 				ret	= ii.getAdapter();
 		}
+		// Hack, to retrieve root adapter in bootstrapping phase.
+		if(cid.equals(root.getComponentIdentifier()))
+		{
+			ret	= root;
+		}
 		return ret;
 	}
 

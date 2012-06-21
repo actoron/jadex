@@ -31,7 +31,7 @@ public class PlatformsTest extends TestCase
 	// Base arguments used for every platform.
 	String[]	BASEARGS	= new String[]
     {
-//		"-logging_level", "java.util.logging.Level.INFO",
+		"-logging", "true",
 //		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
 		"-platformname", "testcases",
