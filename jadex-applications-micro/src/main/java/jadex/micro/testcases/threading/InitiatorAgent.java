@@ -37,12 +37,12 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1, 10000).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2, 1000).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -59,11 +59,11 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Test local.
 	 */
-	protected IFuture<TestReport> testLocal(final int testno)
+	protected IFuture<TestReport> testLocal(final int testno, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, true)
+		performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, max, true)
 			.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
@@ -78,7 +78,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Test remote.
 	 */
-	protected IFuture<TestReport> testRemote(final int testno)
+	protected IFuture<TestReport> testRemote(final int testno, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
@@ -87,7 +87,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, false)
+				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, max, false)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -114,7 +114,7 @@ public class InitiatorAgent extends TestAgent
 	 *  Create provider agent
 	 *  Call methods on it
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final boolean hassectrans)
+	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final int max, final boolean hassectrans)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -138,7 +138,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				callService(cid, hassectrans, testno).addResultListener(new DelegationResultListener<TestReport>(ret));
+				callService(cid, hassectrans, testno, max).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 		});
 		
@@ -148,7 +148,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	public IFuture<TestReport> callService(IComponentIdentifier cid, final boolean hassectrans, int testno)
+	public IFuture<TestReport> callService(IComponentIdentifier cid, final boolean hassectrans, int testno, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
@@ -159,7 +159,6 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				final int max = 10000;
 				final long start = System.currentTimeMillis();
 				invoke(ts, 0, max).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
