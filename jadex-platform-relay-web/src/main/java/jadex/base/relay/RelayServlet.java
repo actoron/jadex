@@ -346,7 +346,7 @@ public class RelayServlet extends HttpServlet
 //		s	= request.getQueryString();
 //		s	= request.getServletPath();
 //		s	= request.getRequestURL().toString();
-		if("/awareness".equals(request.getServletPath()))
+		if("/awareness".equals(request.getServletPath()) || "/awareness/".equals(request.getServletPath()))	// new code always adds slash.
 		{
 			ServletInputStream	in	= request.getInputStream();
 			// Read target id.
@@ -382,7 +382,7 @@ public class RelayServlet extends HttpServlet
 			
 			// Only send message when request is not https or target is also connected via https.
 			PlatformInfo	targetpi	= platforms.get(targetid);
-			if(targetpi!=null && !request.getScheme().equals("https") || targetpi.getScheme().equals("https"))
+			if(targetpi!=null && (!request.getScheme().equals("https") || targetpi.getScheme().equals("https")))
 			{
 				IBlockingQueue<Message>	queue	= map.get(targetid);
 				if(queue!=null)

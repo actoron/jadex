@@ -97,7 +97,8 @@ public class PeerList
 		}
 		
 		// Todo: check that specified url is valid and connects to this server.
-		this.url	= HttpConnectionManager.relayAddress(props.getProperty(PROPERTY_URL));
+		this.url	= "".equals(props.getProperty(PROPERTY_URL)) ? ""
+			: HttpConnectionManager.relayAddress(props.getProperty(PROPERTY_URL));
 		
 		StringTokenizer	stok	= new StringTokenizer(props.getProperty(PROPERTY_PEERS), ",");
 		while(stok.hasMoreTokens())

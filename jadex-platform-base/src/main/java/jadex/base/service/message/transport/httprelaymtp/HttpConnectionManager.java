@@ -291,7 +291,7 @@ public class HttpConnectionManager
 		{
 			address	= address.substring(6);
 		}
-		if(!address.endsWith("/"))
+		if(!address.endsWith("/") && !address.endsWith("/awareness"))	// For compatibility with old servers: don't add slash (Todo: remove)
 		{
 			address	+= "/";
 		}
@@ -308,7 +308,7 @@ public class HttpConnectionManager
 		{
 			address	= "relay-"+address;
 		}
-		if(!address.endsWith("/"))
+		if(!address.endsWith("/") && !address.endsWith("/awareness"))	// For compatibility with old servers: don't add slash (Todo: remove)
 		{
 			address	+= "/";
 		}

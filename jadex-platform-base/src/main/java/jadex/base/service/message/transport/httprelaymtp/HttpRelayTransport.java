@@ -153,7 +153,7 @@ public class HttpRelayTransport implements ITransport
 		StringTokenizer	stok	= new StringTokenizer(defaddresses, ",");
 		while(stok.hasMoreTokens())
 		{
-			String	adr	= stok.nextToken().trim();
+			String	adr	= HttpConnectionManager.relayAddress(stok.nextToken().trim());
 			boolean	found	= false;
 			for(int i=0; !found && i<getServiceSchemas().length; i++)
 			{
