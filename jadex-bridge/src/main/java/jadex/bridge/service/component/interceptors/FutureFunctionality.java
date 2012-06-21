@@ -132,7 +132,7 @@ public class FutureFunctionality
 	/**
 	 *  Notify the listener.
 	 */
-	public void notifyListener(final IResultListener<?> notify)
+	public void notifyListener(final IResultListener<Void> notify)
 	{
 		notify.resultAvailable(null);
 	}

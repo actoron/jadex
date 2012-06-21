@@ -1,6 +1,5 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -66,7 +65,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					FutureFunctionality func = new FutureFunctionality()
 					{
-						public void notifyListener(final IResultListener listener)
+						public void notifyListener(final IResultListener<Void> listener)
 						{
 							// Do not reschedule remotely
 							if(caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
@@ -111,10 +110,10 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //												});
 												
 											}
-											catch(ComponentTerminatedException e)
+											catch(Exception e)
 											{
 //												System.out.println("out ex2: "+mycnt);
-												listener.resultAvailable(null);
+												listener.exceptionOccurred(e);
 											}
 										}
 										else
@@ -128,7 +127,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 //										System.out.println("out norepos: "+mycnt);
 										// No thread conversion possible
-										listener.resultAvailable(null);
+										listener.exceptionOccurred(exception);
 									};
 								});
 							}
@@ -147,7 +146,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						}
 					};
 					
-					Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+					Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 					sic.setResult(fut);
 //					if(res instanceof IIntermediateFuture)
 //					{

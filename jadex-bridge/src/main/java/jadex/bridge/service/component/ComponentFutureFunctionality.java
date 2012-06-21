@@ -6,7 +6,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -34,7 +33,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
-	public void notifyListener(final IResultListener<?> notify) 
+	public void notifyListener(final IResultListener<Void> notify) 
 	{
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())

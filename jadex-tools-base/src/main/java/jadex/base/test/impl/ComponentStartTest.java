@@ -94,6 +94,6 @@ public class ComponentStartTest implements	Test
 	 */
 	public String toString()
 	{
-		return comp.getFullName();
+		return "start: "+comp.getFullName();
 	}	
 }
