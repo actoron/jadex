@@ -955,7 +955,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-//		if(cid.toString().indexOf("Mandelbrot")!=-1)
+//		if(cid.toString().indexOf("MegaParallel")!=-1)
 //			System.out.println("destroy: "+cid.getName());
 //		else if(getDescription(cid)==null) 
 //			System.out.println("destroy: null");

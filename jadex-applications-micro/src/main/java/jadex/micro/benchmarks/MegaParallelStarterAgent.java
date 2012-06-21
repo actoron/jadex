@@ -105,7 +105,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 										});
 									}
 								}
-							})).addResultListener(createResultListener(new DefaultResultListener()
+							})).addResultListener(createResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -131,6 +131,13 @@ public class MegaParallelStarterAgent extends MicroAgent
 											}
 										});
 									}
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									// ignore
+									// In case of ComponentStartTest the agent will be started
+									// and immediately terminated but already has scheduled
+									// all creation actions to the cms.
 								}
 							}));
 						}

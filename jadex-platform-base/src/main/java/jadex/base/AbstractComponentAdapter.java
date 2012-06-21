@@ -956,7 +956,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		getLogger().info("fatal error: "+getComponentIdentifier()+e.getMessage());
 		if(getComponentIdentifier().getParent()==null)
 		{
-			System.err.println("fatal error: "+getComponentIdentifier());
+			System.err.println("fatal platform error: "+getComponentIdentifier());
 			e.printStackTrace();
 		}
 		

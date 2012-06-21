@@ -159,7 +159,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				final int max = 1000;
+				final int max = 10000;
 				final long start = System.currentTimeMillis();
 				invoke(ts, 0, max).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
