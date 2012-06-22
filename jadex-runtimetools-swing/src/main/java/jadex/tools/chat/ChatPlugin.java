@@ -1,4 +1,4 @@
-package jadex.tools.chat.gui;
+package jadex.tools.chat;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;

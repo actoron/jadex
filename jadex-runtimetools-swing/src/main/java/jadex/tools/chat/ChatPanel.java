@@ -1,4 +1,4 @@
-package jadex.tools.chat.gui;
+package jadex.tools.chat;
 
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -25,7 +25,6 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.tools.chat.ChatUser;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -140,11 +139,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	static
 	{
 		NOTIFICATION_SOUNDS	= new HashMap<String, String>();
-		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_USER, "../sounds/pling.wav");
-		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_MSG, "../sounds/ping.wav");
-		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_FILE, "../sounds/cuckoo_clock.wav");
-		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_COMPLETE, "../sounds/music_box.wav");
-		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_ABORT, "../sounds/blurps.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_USER, "sounds/pling.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_MSG, "sounds/ping.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_FILE, "sounds/cuckoo_clock.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_COMPLETE, "sounds/music_box.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_ABORT, "sounds/blurps.wav");
 	}
 	
 	//-------- attributes --------
@@ -1014,7 +1013,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		if(cu.getChat()!=null)
 		{
-			return new Future(cu.getChat());
+			return new Future<IChatService>(cu.getChat());
 		}
 		else
 		{

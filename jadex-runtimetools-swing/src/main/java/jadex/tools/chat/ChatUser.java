@@ -7,7 +7,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.tools.chat.gui.ChatPanel;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;

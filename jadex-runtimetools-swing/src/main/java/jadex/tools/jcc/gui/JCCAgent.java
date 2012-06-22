@@ -10,7 +10,7 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.tools.awareness.gui.AwarenessComponentPlugin;
-import jadex.tools.chat.gui.ChatPlugin;
+import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.security.gui.SecurityServicePlugin;
 import jadex.tools.simcenter.gui.SimulationServicePlugin;
