@@ -191,6 +191,9 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		{
 			if(caller!=null)
 			{
+//				if(caller.toString().indexOf("ServiceCall")!=-1)
+//					System.out.println("sdfkl j");
+				
 				SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentAdapter>(ret)
 				{

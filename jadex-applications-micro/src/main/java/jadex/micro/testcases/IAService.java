@@ -10,5 +10,5 @@ public interface IAService
 	/**
 	 *  Dummy test method.
 	 */
-	public IFuture test();
+	public IFuture<Void> test();
 }
