@@ -154,6 +154,11 @@ public class ComponentIconCache
 									Icon	icon	= new ImageIcon(result);
 									icons.put(type, icon);
 									ret.setResult(icon);
+									
+//									JFrame f = new JFrame();
+//									f.add(new JLabel(icon), BorderLayout.CENTER);
+//									f.pack();
+//									f.show();
 								}
 								else
 								{

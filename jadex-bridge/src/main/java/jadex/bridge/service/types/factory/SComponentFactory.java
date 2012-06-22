@@ -17,9 +17,14 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.awt.BorderLayout;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 
 
@@ -298,7 +303,19 @@ public class SComponentFactory
 					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
-						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener<byte[]>(ret));
+//						System.out.println("fac: "+type+" "+fac);
+						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener<byte[]>(ret)
+						{
+							public void customResultAvailable(byte[] result)
+							{
+//								JFrame f = new JFrame();
+//								f.add(new JLabel(new ImageIcon(result)), BorderLayout.CENTER);
+//								f.pack();
+//								f.show();
+								super.customResultAvailable(result);
+							}
+						}
+						);
 					}
 					
 					public void exceptionOccurred(Exception exception)

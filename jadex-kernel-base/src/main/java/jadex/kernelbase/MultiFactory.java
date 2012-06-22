@@ -495,9 +495,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void resultAvailable(Object result)
 			{
-				if (result != null)
+				if(result != null)
 				{
-					((IComponentFactory) result).getComponentType(model, imports, rid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+					((IComponentFactory)result).getComponentType(model, imports, rid)
+						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 				}
 				else
 				{
@@ -528,7 +529,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public String[] getComponentTypes()
 	{
-		return (String[]) componenttypes.toArray(new String[componenttypes.size()]);
+		return (String[])componenttypes.toArray(new String[componenttypes.size()]);
 		//return (String[]) iconcache.keySet().toArray(new String[iconcache.size()]);
 	}
 
@@ -929,27 +930,27 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 															public void resultAvailable(Object result)
 															{
 																final IComponentFactory kernel = (IComponentFactory) result;
-																if (kernel == null)
+																if(kernel == null)
 																{
 																	ret.setResult(null);
 																	return;
 																}
-																for (int i = 0; i < kexts.length; ++i)
+																for(int i = 0; i < kexts.length; ++i)
 																{
 																	factorycache.put(kexts[i], kernel);
 																}
 																
 																// If this is a new kernel, gather types and icons
-																if (!activatedkernels.contains(kernelmodel))
+																if(!activatedkernels.contains(kernelmodel))
 																{
 																	final String[] types = kernel.getComponentTypes();
 																	componenttypes.addAll(Arrays.asList(types));
 																	
 																	activatedkernels.add(kernelmodel);
 																	
-																	if (SGUI.HAS_GUI)
+																	if(SGUI.HAS_GUI)
 																	{
-																		IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
+																		final IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
 																		{
 																			public void customResultAvailable(Object result)
 																			{
@@ -967,21 +968,34 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																					};
 																				}));
 																			};
-																		}))
+																		})));
+																		
+																		for(int i = 0; i < types.length; ++i)
 																		{
-																			public void intermediateResultAvailable(Object result)
+																			final int fi = i;
+																			kernel.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
 																			{
-																				iconcache.put(types[getCnt() - 1], result);
-																			};
-																		});
-																		for (int i = 0; i < types.length; ++i)
-																			kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
+																				public void resultAvailable(byte[] result)
+																				{
+																					iconcache.put(types[fi], result);
+																					typecounter.resultAvailable(null);
+																				}
+																				public void exceptionOccurred(Exception exception)
+																				{
+																					typecounter.exceptionOccurred(exception);
+																				}
+																			});
+																		}
 																	}
 																	else
+																	{
 																		ret.setResult(kernel);
+																	}
 																}
 																else
+																{
 																	ret.setResult(kernel);
+																}
 															}
 														}));
 													}

@@ -477,6 +477,10 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 			try
 			{
 				ret.setResult(ICON_AGENT.getData());
+//				JFrame f = new JFrame();
+//				f.add(new JLabel(new ImageIcon(ICON_AGENT.getData())), BorderLayout.CENTER);
+//				f.pack();
+//				f.show();
 			}
 			catch(IOException e)
 			{
