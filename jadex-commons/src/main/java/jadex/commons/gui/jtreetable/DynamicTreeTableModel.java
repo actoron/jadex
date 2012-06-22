@@ -169,7 +169,7 @@ public class DynamicTreeTableModel extends AbstractTreeTableModel
 				return method.invoke(node, (Object[])null);
 			}
 		}
-		catch(Throwable th)
+		catch(Exception th)
 		{
 		}
 
@@ -248,7 +248,7 @@ public class DynamicTreeTableModel extends AbstractTreeTableModel
 				}
 			}
 		}
-		catch(Throwable th)
+		catch(Exception th)
 		{
 			System.out.println("exception: "+th);
 		}

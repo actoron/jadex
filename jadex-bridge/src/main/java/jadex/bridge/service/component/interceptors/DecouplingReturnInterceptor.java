@@ -8,6 +8,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -112,10 +113,29 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //												});
 												
 											}
-											catch(Exception e)
+											catch(final Exception e)
 											{
-//												System.out.println("out ex2: "+mycnt);
-												listener.exceptionOccurred(e);
+												// Did not work because component is already terminated
+//												SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IThreadPoolService.class)
+//													.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IExternalAccess>(ret)
+//												{
+//													public void customResultAvailable(IThreadPoolService tp)
+//													{
+//														tp.execute(new Runnable()
+//														{
+//															public void run() 
+//															{
+//																System.out.println("Rescheduled to rescue new thread: "+e);
+////																System.out.println("out ex2: "+mycnt);
+//																listener.exceptionOccurred(e);
+//															}
+//														});
+//													}
+//													public void exceptionOccurred(Exception exception)
+//													{
+														listener.exceptionOccurred(e);
+//													}
+//												});	
 											}
 										}
 										else
