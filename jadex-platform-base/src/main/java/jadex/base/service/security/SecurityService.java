@@ -665,9 +665,8 @@ public class SecurityService implements ISecurityService
 		try
 		{
 			// Generate network identifiers
-			for(Enumeration<NetworkInterface> nis = SUtil.getNetworkInterfaces(); nis.hasMoreElements(); )
+			for(NetworkInterface ni: SUtil.getNetworkInterfaces())
 			{
-				NetworkInterface ni = nis.nextElement();
 				for(InterfaceAddress ifa: ni.getInterfaceAddresses())
 				{
 					if(ifa!=null)	// Yes, there may be a null in the list. grrr.

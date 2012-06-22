@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -27,6 +26,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -2258,10 +2258,8 @@ public class SUtil
 		
 		try
 		{
-			Enumeration e = getNetworkInterfaces();
-			while(e.hasMoreElements() && ret==null)
+			for(NetworkInterface ni: getNetworkInterfaces())
 			{
-				NetworkInterface ni = (NetworkInterface)e.nextElement();
 				Enumeration e2 = ni.getInetAddresses();
 				while(e2.hasMoreElements() && ret==null)
 				{
@@ -2297,10 +2295,8 @@ public class SUtil
 		
 		try
 		{
-			Enumeration e = getNetworkInterfaces();
-			while(e.hasMoreElements() && ret==null)
+			for(NetworkInterface ni: getNetworkInterfaces())
 			{
-				NetworkInterface ni = (NetworkInterface)e.nextElement();
 				Enumeration e2 = ni.getInetAddresses();
 				while(e2.hasMoreElements() && ret==null)
 				{
@@ -2428,7 +2424,7 @@ public class SUtil
 	}
 
 	/** The cached network interfaces. */
-	protected static Enumeration<NetworkInterface>	NIS;
+	protected static List<NetworkInterface>	NIS;
 	
 	/** The time of the last caching of network interfaces. */
 	protected static long	NISTIME;
@@ -2437,11 +2433,11 @@ public class SUtil
 	 *  Get the network interfaces.
 	 *  The result is cached for a short time period to speed things up.
 	 */
-	public static Enumeration<NetworkInterface>	getNetworkInterfaces()	throws SocketException
+	public static List<NetworkInterface> getNetworkInterfaces()	throws SocketException
 	{
 		if(NIS==null || (System.currentTimeMillis()-NISTIME)>30000)
 		{
-			NIS	= NetworkInterface.getNetworkInterfaces();
+			NIS = Collections.list(NetworkInterface.getNetworkInterfaces());
 			NISTIME	= System.currentTimeMillis();
 		}
 		return NIS;
@@ -2461,9 +2457,8 @@ public class SUtil
 		boolean	v4	= false;	// true when one v4 address was added.
 		boolean	v6	= false;	// true when one v6 address was added.
 		
-		for(Enumeration<NetworkInterface> nis = getNetworkInterfaces(); nis.hasMoreElements(); )
+		for(NetworkInterface ni: getNetworkInterfaces())
 		{
-			NetworkInterface ni = nis.nextElement();
 			for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
 			{
 				InetAddress addr = iadrs.nextElement();
