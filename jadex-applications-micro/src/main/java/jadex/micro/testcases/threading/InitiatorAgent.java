@@ -21,7 +21,8 @@ import jadex.micro.testcases.TestAgent;
 import java.util.Collection;
 
 /**
- * 
+ *  Test if service invocations are decoupled back to the caller thread
+ *  with the DecouplingReturnInterceptor.
  */
 @Agent
 @RequiredServices(
@@ -160,13 +161,21 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final ITestService ts)
 			{
 				final long start = System.currentTimeMillis();
-				invoke(ts, 0, max).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				invoke(ts, 0, max).addResultListener(new ExceptionDelegationResultListener<Integer, TestReport>(ret)
 				{
-					public void customResultAvailable(Void result)
+					public void customResultAvailable(Integer result)
 					{
 						long dur = System.currentTimeMillis()-start;
 						System.out.println("Needed per call [ms]: "+((double)dur)/max);
-						tr.setSucceeded(true);
+						System.out.println("Calls per second: "+((double)max)/dur*1000);
+						if(result==0)
+						{
+							tr.setSucceeded(true);
+						}
+						else
+						{
+							tr.setFailed("Invocations failed: "+result);
+						}
 						ret.setResult(tr);
 					}
 				});
@@ -176,34 +185,36 @@ public class InitiatorAgent extends TestAgent
 	}
 	
 	/**
-	 * 
+	 *  Invoke the method.
 	 */
-	protected IFuture<Void> invoke(final ITestService ts, final int i, final int max)
+	protected IFuture<Integer> invoke(final ITestService ts, final int i, final int max)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<Integer> ret = new Future<Integer>();
 		
 		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
 		
+		final int[] errcnt = new int[1];
 		ts.test().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				if(!caller.equals(IComponentIdentifier.LOCAL.get()))
 				{
-					System.out.println("err: "+caller+" "+IComponentIdentifier.LOCAL.get());
+					errcnt[0]++;
+//					System.out.println("err: "+caller+" "+IComponentIdentifier.LOCAL.get());
 				}
-				else
-				{
-					System.out.println("ok: "+i);
-				}
+//				else
+//				{
+//					System.out.println("ok: "+i);
+//				}
 				
 				if(i<max)
 				{
-					invoke(ts, i+1, max).addResultListener(new DelegationResultListener<Void>(ret));
+					invoke(ts, i+1, max).addResultListener(new DelegationResultListener<Integer>(ret));
 				}
 				else
 				{
-					ret.setResult(null);
+					ret.setResult(new Integer(errcnt[0]));
 				}
 			}
 		
