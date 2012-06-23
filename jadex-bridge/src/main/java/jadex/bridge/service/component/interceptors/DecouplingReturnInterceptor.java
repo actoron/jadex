@@ -30,17 +30,21 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
+	/** The thread pool. */
+	protected IThreadPoolService tp;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingReturnInterceptor(IExternalAccess ea, IComponentAdapter adapter)
+	public DecouplingReturnInterceptor(IExternalAccess ea, IComponentAdapter adapter, IThreadPoolService tp)
 	{
 		assert ea!=null;
 //		assert adapter!=null;
 		this.ea = ea;
 		this.adapter = adapter;
+		this.tp = tp;
 	}
 	
 	//-------- methods --------
@@ -121,20 +125,29 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //												{
 //													public void customResultAvailable(IThreadPoolService tp)
 //													{
-//														tp.execute(new Runnable()
-//														{
-//															public void run() 
-//															{
-//																System.out.println("Rescheduled to rescue new thread: "+e);
-////																System.out.println("out ex2: "+mycnt);
-//																listener.exceptionOccurred(e);
-//															}
-//														});
+														Runnable run = new Runnable()
+														{
+															public void run() 
+															{
+//																System.out.println("Rescheduled to rescue thread: "+e);
+//																System.out.println("out ex2: "+mycnt);
+																listener.exceptionOccurred(e);
+															}
+														};
+														if(tp!=null)
+														{
+															tp.execute(run);
+														}
+														else
+														{
+															Thread t = new Thread(run);
+															t.start();
+														}
 //													}
 //													public void exceptionOccurred(Exception exception)
 //													{
-														listener.exceptionOccurred(e);
-//													}
+//														listener.exceptionOccurred(e);
+////												}
 //												});	
 											}
 										}

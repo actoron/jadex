@@ -42,6 +42,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -579,6 +580,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
+		
 		final Future<Void> fut = new Future<Void>();
 		IFuture<Void>	ret	= fut;
 		
@@ -996,6 +998,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					final IComponentManagementService ces = (IComponentManagementService)result;
 					createComponent(components, ces, model, 0, ret);
 				}
+				public void exceptionOccurred(Exception exception)
+				{
+					// TODO Auto-generated method stub
+					super.exceptionOccurred(exception);
+				}
 			}));
 		}
 		else
@@ -1151,21 +1158,30 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture<IInternalService> addService(String name, Class type, String proxytype, 
-		IServiceInvocationInterceptor[] ics, Object service, ProvidedServiceInfo info)
+	public IFuture<IInternalService> addService(final String name, final Class type, final String proxytype, 
+		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info)
 	{
+//		System.out.println("addS:"+service);
+
 		assert !getComponentAdapter().isExternalThread();
 		final Future<IInternalService> ret = new Future<IInternalService>();
 		
-		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier());
-		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
+		getThreadPoolService().addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IInternalService>(ret)
 		{
-			public void customResultAvailable(Void result)
+			public void customResultAvailable(IThreadPoolService tp)
 			{
-				ret.setResult(proxy);
+				final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
+					getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), tp);
+				getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						ret.setResult(proxy);
+					}
+				});
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -1173,90 +1189,119 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Add a service to the component. 
 	 *  @param info The provided service info.
 	 */
-	protected IFuture<Void>	initService(final ProvidedServiceInfo info, IModelInfo model)
+	protected IFuture<Void>	initService(final ProvidedServiceInfo info, final IModelInfo model)
 	{
 		final Future<Void> ret = new Future<Void>();
 		assert !getComponentAdapter().isExternalThread();
 		
-		try
+		getThreadPoolService().addResultListener(createResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
 		{
-			final ProvidedServiceImplementation	impl	= info.getImplementation();
-			
-			// Virtual service (e.g. promoted)
-			if(impl!=null && impl.getBinding()!=null)
+			public void customResultAvailable(IThreadPoolService tp)
 			{
-				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
-					getClassLoader()))+":virtual", info.getType().getType(getClassLoader()));
-				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-					rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
-				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-					getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader());
-				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
-			}
-			else
-			{
-				Object	ser	= null;
-				if(impl!=null && impl.getValue()!=null)
+				try
 				{
-					// todo: other Class imports, how can be found out?
-					try
+					final ProvidedServiceImplementation	impl	= info.getImplementation();
+					// Virtual service (e.g. promoted)
+					if(impl!=null && impl.getBinding()!=null)
 					{
-						ser = UnparsedExpression.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
-//						System.out.println("added: "+ser+" "+model.getName());
+						RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
+							getClassLoader()))+":virtual", info.getType().getType(getClassLoader()));
+						IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
+							rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
+						final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
+							getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader(), tp);
+						getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 					}
-					catch(RuntimeException e)
+					else
 					{
-						e.printStackTrace();
-						throw new RuntimeException("Service creation error: "+info, e);
-					}
-				}
-				else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
-				{
-					ser = impl.getClazz().getType(getClassLoader()).newInstance();
-				}
-				
-				// Implementation may null to disable service in some configurations.
-				if(ser!=null)
-				{
-					UnparsedExpression[] ins = info.getImplementation().getInterceptors();
-					IServiceInvocationInterceptor[] ics = null;
-					if(ins!=null)
-					{
-						ics = new IServiceInvocationInterceptor[ins.length];
-						for(int i=0; i<ins.length; i++)
+						Object	ser	= null;
+						if(impl!=null && impl.getValue()!=null)
 						{
-							if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
+							// todo: other Class imports, how can be found out?
+							try
 							{
-								ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), getClassLoader());
+								ser = UnparsedExpression.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
+//								System.out.println("added: "+ser+" "+model.getName());
 							}
-							else
+							catch(RuntimeException e)
 							{
-								ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz().getType(getClassLoader(), model.getAllImports()).newInstance();
+								e.printStackTrace();
+								throw new RuntimeException("Service creation error: "+info, e);
 							}
 						}
-					}
-					
-					final Class type = info.getType().getType(getClassLoader());
-					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info)
-						.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
-					{
-						public void customResultAvailable(final IInternalService service)
+						else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
+						{
+							ser = impl.getClazz().getType(getClassLoader()).newInstance();
+						}
+						
+						// Implementation may null to disable service in some configurations.
+						if(ser!=null)
+						{
+							UnparsedExpression[] ins = info.getImplementation().getInterceptors();
+							IServiceInvocationInterceptor[] ics = null;
+							if(ins!=null)
+							{
+								ics = new IServiceInvocationInterceptor[ins.length];
+								for(int i=0; i<ins.length; i++)
+								{
+									if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
+									{
+										ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), getClassLoader());
+									}
+									else
+									{
+										ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz().getType(getClassLoader(), model.getAllImports()).newInstance();
+									}
+								}
+							}
+							
+							final Class type = info.getType().getType(getClassLoader());
+							addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info)
+								.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
+							{
+								public void customResultAvailable(final IInternalService service)
+								{
+									ret.setResult(null);
+								}
+							});
+						}
+						else
 						{
 							ret.setResult(null);
 						}
-					});
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					ret.setResult(null);
+//					e.printStackTrace();
+					ret.setException(e);
 				}
 			}
-		}
-		catch(Exception e)
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the thread pool.
+	 */
+	protected IFuture<IThreadPoolService> getThreadPoolService()
+	{
+		final Future<IThreadPoolService> ret = new Future<IThreadPoolService>();
+		
+		getServiceContainer().searchService(IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IThreadPoolService>()
 		{
-//			e.printStackTrace();
-			ret.setException(e);
-		}
+			public void resultAvailable(IThreadPoolService tp)
+			{
+				ret.setResult(tp);
+			}
+			
+			public void exceptionOccurred(Exception e)
+			{
+				ret.setResult(null);
+			}
+		});
 		
 		return ret;
 	}

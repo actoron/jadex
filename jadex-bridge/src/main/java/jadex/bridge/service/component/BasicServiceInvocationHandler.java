@@ -24,6 +24,7 @@ import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -330,7 +331,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, boolean realtime, IResourceIdentifier rid)
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
+		boolean realtime, IResourceIdentifier rid, IThreadPoolService tp)
 	{
 		IInternalService	ret;
 		
@@ -347,7 +349,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service);
-			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, realtime);
+			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, realtime, tp);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
@@ -498,8 +500,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	protected static void addInterceptors(BasicServiceInvocationHandler handler, Object service, 
 		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, 
-		boolean copy, boolean realtime)
+		boolean copy, boolean realtime, IThreadPoolService tp)
 	{
+//		System.out.println("addI:"+service);
+
 		// Only add standard interceptors if not raw.
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
@@ -514,7 +518,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy, realtime));
 			}
-			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ia.getExternalAccess(), null));
+			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ia.getExternalAccess(), null, tp));
 		}
 		
 		if(ics!=null)
@@ -531,12 +535,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  provided service that is not offered by the component itself.
 	 */
 	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
-		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader)
+		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, IThreadPoolService tp)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid, adapter.getLogger());
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null));
-		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, null));
+		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, null, tp));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader)}, handler); //sid.getServiceType()
 	}
@@ -545,8 +549,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
-		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
+		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, IThreadPoolService tp)
 	{
+//		System.out.println("cRSP:"+service.getServiceIdentifier());
 		IService ret = service;
 		
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
@@ -557,7 +562,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
-				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter));
+				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter, tp));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{

@@ -526,7 +526,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			System.out.println("container is null: "+component+", "+getComponentIdentifier());
 		}
 //		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
-		if(cms==null)
+		if(cms==null || cms.getException()!=null)
 		{
 			cms	= SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
 		}

@@ -147,7 +147,7 @@ public class ParallelSearchManager implements ISearchManager
 		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
 			&& decider.searchNode(start, source, provider, ischild, endret.getIntermediateResults()))
 		{
-//			if(provider!=null && selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Chat")!=-1)
+//			if(provider!=null && selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Component")!=-1)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
 			provider.getServices(lsm, decider, selector).addResultListener(new IResultListener()

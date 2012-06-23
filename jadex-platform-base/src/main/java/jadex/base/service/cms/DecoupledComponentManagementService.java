@@ -221,7 +221,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	public IFuture<IModelInfo> loadComponentModel(final String filename, final IResourceIdentifier rid)
 	{
-//		if(filename!=null && filename.indexOf("RemoteServiceManagementAgent")!=-1)
+//		if(filename!=null && filename.indexOf("Remote")!=-1)
 //			System.out.println("cache miss: "+filename);
 		
 		final Future<IModelInfo> ret = new Future<IModelInfo>();

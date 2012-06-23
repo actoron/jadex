@@ -2,6 +2,7 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
@@ -21,6 +22,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -52,6 +54,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
+	
+	/** The thread pool. */
+	protected IThreadPoolService tp;
 
 	/** The component type. */
 	protected String type;
@@ -145,7 +150,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, null, null));
+					instance.getExternalAccess(), adapter, (IService)result, null, null, null, tp));
 			}
 		});
 		
@@ -168,7 +173,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null, tp));
 			}
 		});
 		return (IFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
@@ -191,7 +196,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null, tp));
 			}
 		});
 		return (IFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
@@ -213,7 +218,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customIntermediateResultAvailable(Object result)
 			{
 				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-					adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+					adapter, (IService)result, null, new RequiredServiceInfo(type), null, tp));
 			}
 		});
 		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
@@ -235,7 +240,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customIntermediateResultAvailable(Object result)
 			{
 				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-					adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+					adapter, (IService)result, null, new RequiredServiceInfo(type), null, tp));
 			}
 		});
 		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
@@ -347,9 +352,17 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				cms = result;
 //				System.out.println("Has cms: "+getId()+" "+cms);
 				
-				// Services may need other services and thus need to be able to search
-				// the container.
-				ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener<Void>(ret));
+				SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IThreadPoolService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
+				{
+					public void customResultAvailable(final IThreadPoolService result)
+					{
+						tp = result;
+						// Services may need other services and thus need to be able to search
+						// the container.
+						ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
 			}
 		});
 		

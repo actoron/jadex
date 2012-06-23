@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
@@ -16,6 +17,7 @@ import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -752,16 +754,23 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 //				System.out.println("createProxy 1:"+service);
-				final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
-				IFuture<IService>	fut	= access.scheduleStep(new IComponentStep<IService>()
+				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener<IThreadPoolService>(ret)
 				{
-					public IFuture<IService> execute(IInternalAccess ia)
+					public void customResultAvailable(final IThreadPoolService tp)
 					{
-//						System.out.println("createProxy 2:"+service);
-						return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, adapter, service, DefaultServiceFetcher.this, info, binding));
+						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
+						IFuture<IService>	fut	= access.scheduleStep(new IComponentStep<IService>()
+						{
+							public IFuture<IService> execute(IInternalAccess ia)
+							{
+		//						System.out.println("createProxy 2:"+service);
+								return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, adapter, service, DefaultServiceFetcher.this, info, binding, tp));
+							}
+						});
+						fut.addResultListener(new DelegationResultListener(ret));
 					}
 				});
-				fut.addResultListener(new DelegationResultListener(ret));
 			}
 		});
 		

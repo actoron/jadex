@@ -195,7 +195,7 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope)
 	{
-//		if(type.toString().indexOf("IFile")!=-1)// && scope.equals("local"))
+//		if(type.toString().indexOf("IComponentM")!=-1 && scope.equals("upwards"))
 //			System.out.println("here22");
 		
 //		synchronized(profiling)
