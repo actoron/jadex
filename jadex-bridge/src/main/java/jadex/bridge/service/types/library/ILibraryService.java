@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.library;
 
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
@@ -121,6 +122,13 @@ public interface ILibraryService
 	 *  @return The list of urls.
 	 */
 	public IFuture<List<URL>> getAllURLs();
+	
+	/**
+	 *  Get the jar for a rid. 
+	 *  @param rid The rid.
+	 *  @return The jar.
+	 */
+	public IFuture<IInputConnection> getJar(IResourceIdentifier rid);
 	
 //	/**
 //	 *  Get the non-managed classpath entries as strings.

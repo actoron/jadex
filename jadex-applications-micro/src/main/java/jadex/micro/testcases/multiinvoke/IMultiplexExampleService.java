@@ -5,6 +5,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  *  Multiplex Interface for IExampleService.
@@ -75,4 +76,11 @@ public interface IMultiplexExampleService
 	@TargetMethod("getItems")
 	public IFuture<Collection<String>> getItems4(int num);
 	
+	
+	// automated task distribution
+//	/**
+//	 * 
+//	 */
+//	@CallDistributor(ExampleDistributor.class)
+//	public IFuture<List<Integer>> add(List<Integer> a, List<Integer> b);
 }

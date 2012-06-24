@@ -18,4 +18,8 @@ public interface IExampleService
 	 */
 	public IIntermediateFuture<String> getItems(int num);
 	
+//	/**
+//	 *  Add two ints.
+//	 */
+//	public IFuture<Integer> add(Integer a, Integer b);
 }

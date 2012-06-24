@@ -1,5 +1,7 @@
 package jadex.base.service.library;
 
+import jadex.base.service.message.streams.InputConnection;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -11,6 +13,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -24,6 +27,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -544,7 +549,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	//-------- internal methods --------
 	
 	/**
-	 *  Get or create a classloader for an url.
+	 *  Get or create a classloader for a rid.
 	 */
 	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, 
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
@@ -818,6 +823,50 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 	}
 
+	
+	/**
+	 *  Get the jar for a rid. 
+	 *  @param rid The rid.
+	 *  @return The jar.
+	 */
+	public IFuture<IInputConnection> getJar(IResourceIdentifier rid)
+	{
+		final Future<IInputConnection> ret = new Future<IInputConnection>();
+		
+		boolean fin = false;
+		
+		// Has rid a local file desc on this platform?
+		if(isLocal(rid))
+		{
+			URL url = rid.getLocalIdentifier().getUrl();
+			File f = new File(url.getFile());
+			if(url.getFile().endsWith(".jar") && f.exists())
+			{
+				try
+				{
+					FileInputStream fis = new FileInputStream(f);
+					ServiceOutputConnection soc = new ServiceOutputConnection();
+					ret.setResult(soc.getInputConnection());
+					soc.writeFromInputStream(fis, component.getExternalAccess());
+					fin = true;
+				}
+				catch(IOException e)
+				{
+				}
+			}
+		}
+	
+		if(!fin)
+			ret.setException(new RuntimeException("Could not find resource: "+rid));
+		
+//		if(!fin && rid.getGlobalIdentifier()!=null)
+//		{
+//			// todo: get local location from dependency service? 
+//		}
+		
+		return ret;
+	}
+	
 	//-------- methods --------
 
 //	/**
