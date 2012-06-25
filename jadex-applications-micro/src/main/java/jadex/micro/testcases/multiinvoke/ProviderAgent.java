@@ -67,4 +67,12 @@ public class ProviderAgent implements IExampleService
 		
 		return ret;
 	}
+	
+	/**
+	 *  Add two ints.
+	 */
+	public IFuture<Integer> add(int a, int b)
+	{
+		return new Future<Integer>(new Integer(a+b));
+	}
 }

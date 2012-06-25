@@ -56,7 +56,7 @@ public class UserAgent
 			{
 				final int cmpcnt = 5;
 				final int rescnt = 5;
-				final int testcnt = 8;
+				final int testcnt = 10;
 				final List<TestReport> reports = new ArrayList<TestReport>();
 				
 				CounterResultListener<Void> endlis = new CounterResultListener<Void>(testcnt, new IResultListener<Void>()
@@ -110,6 +110,22 @@ public class UserAgent
 				tr = new TestReport("#4b", "Test flattened future version.");
 				reports.add(tr);
 				ser.getItems4(rescnt).addResultListener(new CustomResultListener<Collection<String>>(tr, cmpcnt*rescnt, endlis));
+
+				// sequential multiplexer
+			
+				List<Object[]> tasks = new ArrayList<Object[]>();
+				tasks.add(new Object[]{new Integer(1), new Integer(2)});
+				tasks.add(new Object[]{new Integer(3), new Integer(4)});
+				tasks.add(new Object[]{new Integer(5), new Integer(6)});
+				
+				tr = new TestReport("#5a", "Test sequential multuplexer.");
+				reports.add(tr);
+				ser.add(tasks).addResultListener(new CustomIntermediateResultListener<Integer>(tr, 3, endlis));
+			
+				tr = new TestReport("#5b", "Test sequential multuplexer with collector.");
+				reports.add(tr);
+				ser.sum(tasks).addResultListener(new CustomResultListener<Integer>(tr, 1, endlis));
+
 			}	
 		});
 
@@ -135,6 +151,7 @@ public class UserAgent
 		
 		public void intermediateResultAvailable(T result)
 		{
+			System.out.println("result: "+result);
 			cnt++;
 		}
 		
@@ -182,10 +199,17 @@ public class UserAgent
 		
 		public void resultAvailable(T result)
 		{
-			if(result instanceof Collection && ((Collection<?>)result).size()==rescnt)
+			System.out.println("result: "+result);
+
+			if(result instanceof Collection && ((Collection<?>)result).size()==rescnt
+				|| rescnt==1)
+			{
 				tr.setSucceeded(true);
+			}
 			else
+			{
 				tr.setReason("Wrong number of results: "+result);
+			}
 			endlis.resultAvailable(null);
 		}
 		

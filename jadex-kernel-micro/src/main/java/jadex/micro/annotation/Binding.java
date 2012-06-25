@@ -1,6 +1,7 @@
 package jadex.micro.annotation;
 
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 import java.lang.annotation.ElementType;

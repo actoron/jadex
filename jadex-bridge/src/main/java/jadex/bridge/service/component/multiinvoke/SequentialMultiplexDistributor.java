@@ -1,11 +1,15 @@
 package jadex.bridge.service.component.multiinvoke;
 
 import jadex.bridge.service.IService;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +35,18 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 
 	/** The waiting for service calls. */
 	protected List<Future<IService>> waitingcalls;
+	
+	/**
+	 *  Start the distributor.
+	 */
+	public IIntermediateFuture<Object> init(Method method, Object[] args, 
+		IFilter<Tuple2<IService, Object[]>> filter, IParameterConverter conv)
+	{
+		this.waitingcalls = new ArrayList<Future<IService>>();
+		this.freeservices = new ArrayList<IService>();
+		this.busyservices = new ArrayList<IService>();
+		return super.init(method, args, filter, conv);
+	}
 	
 	/**
 	 *  Add a new service.
@@ -82,7 +98,8 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 	 */
 	public Object[] getArguments()
 	{
-		return itargs.next();
+		Object[] ar = getArgumentIterator().next();
+		return conv==null? ar: conv.convertParameters(ar);
 	}
 	
 	/**
@@ -91,7 +108,7 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 	 */
 	public boolean hasArguments()
 	{
-		return itargs.hasNext();
+		return getArgumentIterator().hasNext();
 	}
 	
 	/**
@@ -154,17 +171,19 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 	/**
 	 *  Check perform call.
 	 */
-	public void checkPerformCall(final IService service)
+	public void checkPerformCall(IService service)
 	{
 		if(hasArguments())
 		{
+			final Object[] args = getArguments(); // must immediately fetch args
 			getFreeService(service).addResultListener(new IResultListener<IService>()
 			{
-				public void resultAvailable(IService result)
+				public void resultAvailable(final IService ser)
 				{
 					try
 					{
-						Object res = performCall(service, getArguments());
+						Object res = performCall(ser, args);
+						results.addIntermediateResult(res);
 						
 						if(res instanceof IFuture)
 						{
@@ -172,7 +191,7 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 							{
 								public void resultAvailable(Object result) 
 								{
-									freeService(service);
+									freeService(ser);
 								}
 								
 								public void exceptionOccurred(Exception exception)
@@ -183,12 +202,12 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 						}
 						else
 						{
-							freeService(service);
+							freeService(ser);
 						}
 					}
 					catch(Exception e)
 					{
-						freeService(service);
+						freeService(ser);
 					}
 				}
 				
@@ -200,7 +219,7 @@ public class SequentialMultiplexDistributor extends SimpleMultiplexDistributor
 		}
 		else
 		{
-			results.setFinished();
+			results.setFinishedIfUndone();
 		}
 	}
 }

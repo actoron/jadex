@@ -428,7 +428,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				if(parametermapper!=null)
 				{
 					annot = new Annotation(constpool, SJavassist.getCtClass(ParametersMapper.class, pool));
-					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
+					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.bridge.service.annotation.Value.class, pool));
 					if(parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
 						value.addMemberValue("value", new StringMemberValue(parametermapper.getExpression(), constpool));
 					if(parametermapper.getClazz()!=null && !parametermapper.getClazz().equals(Object.class))
@@ -441,7 +441,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				if(resultmapper!=null)
 				{
 					annot = new Annotation(constpool, SJavassist.getCtClass(ResultMapper.class, pool));
-					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
+					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.bridge.service.annotation.Value.class, pool));
 					if(resultmapper.getExpression()!=null && resultmapper.getExpression().length()==0)
 						value.addMemberValue("value", new StringMemberValue(resultmapper.getExpression(), constpool));
 					if(resultmapper.getClazz()!=null && !resultmapper.getClazz().equals(Object.class))

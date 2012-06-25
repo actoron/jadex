@@ -1,10 +1,10 @@
 package jadex.webservice.examples.rs.chart;
 
+import jadex.bridge.service.annotation.Value;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
-import jadex.micro.annotation.Value;
 
 import java.awt.Color;
 

@@ -24,7 +24,8 @@ public interface IMultiplexDistributor
 	/**
 	 *  Init the call distributor.
 	 */
-	public IIntermediateFuture<Object> init(Method method, Object[] args, IFilter<Tuple2<IService, Object[]>> filter);
+	public IIntermediateFuture<Object> init(Method method, Object[] args, 
+		IFilter<Tuple2<IService, Object[]>> filter, IParameterConverter conv);
 	
 	/**
 	 *  Add a new service.

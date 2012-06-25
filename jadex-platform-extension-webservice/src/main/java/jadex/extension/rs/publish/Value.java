@@ -79,7 +79,7 @@ public class Value
 	/**
 	 *  Evaluate a value.
 	 */
-	public static Object evaluate(jadex.micro.annotation.Value value, String[] imports) throws Exception
+	public static Object evaluate(jadex.bridge.service.annotation.Value value, String[] imports) throws Exception
 	{
 		Object ret = null;
 		

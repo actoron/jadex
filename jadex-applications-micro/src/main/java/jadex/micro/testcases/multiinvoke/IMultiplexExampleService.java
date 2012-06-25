@@ -1,6 +1,9 @@
 package jadex.micro.testcases.multiinvoke;
 
+import jadex.bridge.service.annotation.MultiplexCollector;
+import jadex.bridge.service.annotation.MultiplexDistributor;
 import jadex.bridge.service.annotation.TargetMethod;
+import jadex.bridge.service.component.multiinvoke.SequentialMultiplexDistributor;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
@@ -78,9 +81,23 @@ public interface IMultiplexExampleService
 	
 	
 	// automated task distribution
+	
 	/**
-	 * 
+	 *  Perform a list of additions.
 	 */
-	@CallDistributor(ExampleDistributor.class)
-	public IFuture<List<Integer>> add(List<Integer> a, List<Integer> b);
+	@MultiplexDistributor(SequentialMultiplexDistributor.class)
+	@TargetMethod(value="add", parameters={int.class, int.class})
+	public IIntermediateFuture<Integer> add(List<Object[]> vals);
+	
+	/**
+	 *  Perform a list of additions and summing up.
+	 */
+	@MultiplexDistributor(SequentialMultiplexDistributor.class)
+	@MultiplexCollector(SumMultiplexCollector.class)
+	@TargetMethod(value="add", parameters={int.class, int.class})
+	public IFuture<Integer> sum(List<Object[]> vals);
+
+	// todo?
+//	public IFuture<List<Integer>> add(List<Integer> a, List<Integer> b);
+
 }

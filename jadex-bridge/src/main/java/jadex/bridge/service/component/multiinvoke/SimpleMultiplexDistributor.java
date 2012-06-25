@@ -31,25 +31,20 @@ public class SimpleMultiplexDistributor implements IMultiplexDistributor
 	/** The service filter. */
 	protected IFilter<Tuple2<IService, Object[]>> filter;
 	
-	/** The args. */
-	protected Object[] myargs;
-	
-//	/**
-//	 *  Create a new distributor.
-//	 */
-//	public SimpleMultiplexDistributor()
-//	{
-//	}
+	/** The parameter converter. */
+	protected IParameterConverter conv;
 	
 	/**
 	 *  Start the distributor.
 	 */
-	public IIntermediateFuture<Object> init(Method method, Object[] args, IFilter<Tuple2<IService, Object[]>> filter)
+	public IIntermediateFuture<Object> init(Method method, Object[] args, 
+		IFilter<Tuple2<IService, Object[]>> filter, IParameterConverter conv)
 	{
 		this.method = method;
 		this.args = args;
 		this.filter = filter==null? new ConstantFilter<Tuple2<IService, Object[]>>(true): filter;
-
+		this.conv = conv;
+		
 		results = new IntermediateFuture<Object>();
 		return results;
 	}
@@ -77,7 +72,7 @@ public class SimpleMultiplexDistributor implements IMultiplexDistributor
 	 */
 	public Object[] getArguments()
 	{
-		return args;
+		return conv==null? args: conv.convertParameters(args);
 	}
 	
 	/**
@@ -101,6 +96,9 @@ public class SimpleMultiplexDistributor implements IMultiplexDistributor
 	 */
 	public Object performCall(IService service, Object[] args) throws Exception
 	{
+		if(service==null)
+			throw new IllegalArgumentException("Service must not be null.");
+		
 		if(filter.filter(new Tuple2<IService, Object[]>(service, args)))
 		{
 			return method.invoke(service, args);
@@ -110,4 +108,13 @@ public class SimpleMultiplexDistributor implements IMultiplexDistributor
 			throw new RuntimeException("Filter prohibted call.");
 		}
 	}
+	
+//	public static Map<String, Class<? extends IMultiplexDistributor>> mapping;
+//	
+//	static
+//	{
+//		mapping = new HashMap<String, Class<? extends IMultiplexDistributor>>();
+//		mapping.put(MultiplexDistributor.ONE_TO_ALL, SimpleMultiplexDistributor.class);
+//		mapping.put(MultiplexDistributor.ONE_TO_ALL, SequentialMultiplexDistributor.class);
+//	}
 }

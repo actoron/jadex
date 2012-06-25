@@ -3,27 +3,25 @@ package jadex.bridge.service.component.multiinvoke;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.MultiplexCollector;
 import jadex.bridge.service.annotation.MultiplexDistributor;
 import jadex.bridge.service.annotation.TargetMethod;
+import jadex.bridge.service.annotation.Value;
 import jadex.commons.IFilter;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Invocation handler for multiplexing service calls.
@@ -75,43 +73,30 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		// Get the method on original interface
 		
 		String methodname = method.getName();
+		Class<?>[] params = method.getParameterTypes();
 		Method muxmethod = muxservicetype.getMethod(methodname, method.getParameterTypes());
 		if(muxmethod.isAnnotationPresent(TargetMethod.class))
-			methodname = muxmethod.getAnnotation(TargetMethod.class).value();
-		final Method sermethod = servicetype.getMethod(methodname, method.getParameterTypes());
+		{
+			TargetMethod tm = muxmethod.getAnnotation(TargetMethod.class);
+			methodname = tm.value();
+			if(tm.parameters().length>0)
+				params = tm.parameters();
+		}
+		final Method sermethod = servicetype.getMethod(methodname, params);
 		
 		IIntermediateFuture<Object> fut = agent.getServiceContainer().getRequiredServices(reqname);
 
-		boolean flatten = true;
-		
-		Type motype = method.getGenericReturnType();
-			
-		if(SReflect.isSupertype(IIntermediateFuture.class, SReflect.getClass(motype)))
-		{
-			Type mitype = SReflect.getInnerGenericType(motype);
-			flatten = !SReflect.isSupertype(IFuture.class, SReflect.getClass(mitype));
-		}
-		else if(SReflect.isSupertype(IFuture.class, SReflect.getClass(motype)))
-		{
-			Type mitype = SReflect.getInnerGenericType(motype);
-			if(SReflect.isSupertype(Collection.class, SReflect.getClass(mitype)))
-			{
-				Type miitype = SReflect.getInnerGenericType(mitype);
-				flatten = !SReflect.isSupertype(IFuture.class, SReflect.getClass(miitype));
-			}
-		}
-		
 		if(SReflect.isSupertype(IIntermediateFuture.class, rettype))
 		{
 			final IntermediateFuture<Object> ret = new IntermediateFuture<Object>();
 			gret = ret;
-			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten, muxmethod));
+			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, muxmethod));
 		}
 		else if(SReflect.isSupertype(IFuture.class, rettype))
 		{
 			final Future<Object> ret = new Future<Object>();
 			gret = ret;
-			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten, muxmethod));
+			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, muxmethod));
 		}
 		else
 		{
@@ -128,158 +113,41 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 	{
 		//-------- attributes --------
 		
-		/** The future. */
-		protected Future<Object> fut;
-		
-		/** The future. */
-		protected IntermediateFuture<Object> ifut;
-		
-		/** The service method. */
-		protected Method method;
-		
-		/** The arguments. */
-		protected Object[] args;
-		
-		/** Flag if flatten. */
-		protected boolean flatten;
-		
-		/** The list of calls. */
-		protected List<Future<Void>> calls;
-		
-		/** The list of results (if ret is not intermediate future). */
-		protected List<Object> callresults;
-		
 		/** The call distributor. */
-		protected IMultiplexDistributor cdis;
-		
-		/** The call results. */
-		protected IIntermediateFuture<Object> cdisres;
+		protected IMultiplexDistributor muldis;
 		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a new listener.
 		 */
-		public IntermediateMethodResultListener(Future<Object> fut, Method method, Object[] args, 
-			final boolean flatten, Method muxmethod)
+		public IntermediateMethodResultListener(Future fut, Method method, Object[] args, Method muxmethod)
 		{
-			this.fut = fut;
-			init(method, args, flatten, muxmethod);
-		}
-		
-		/**
-		 *  Create a new listener.
-		 */
-		public IntermediateMethodResultListener(IntermediateFuture<Object> ifut, Method method, 
-			Object[] args, boolean flatten, Method muxmethod)
-		{
-			this.ifut = ifut;
-			init(method, args, flatten, muxmethod);
-		}
-		
-		/**
-		 *  Init to share code.
-		 */
-		public void init(Method method, Object[] args, boolean flatten, Method muxmethod)
-		{
-			this.method = method;
-			this.args = args;
-			this.flatten = flatten;
-			this.calls = new ArrayList<Future<Void>>();
-			
-			IMultiplexDistributor md = null;
-			Class<? extends IMultiplexDistributor> cdcl = null;
+			Class<? extends IMultiplexDistributor> cdcl = SimpleMultiplexDistributor.class;
 			IFilter<Tuple2<IService, Object[]>> fil = null;
+			IParameterConverter conv = null;
 			if(muxmethod.isAnnotationPresent(MultiplexDistributor.class))
 			{
 				MultiplexDistributor mda = muxmethod.getAnnotation(MultiplexDistributor.class);
-				cdcl = mda.type();
-				String filex = mda.filter();
-				if(filex.length()>0)
-				{
-					try
-					{
-						fil = (IFilter<Tuple2<IService, Object[]>>)SJavaParser.evaluateExpression(filex, agent.getFetcher());
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
+				fil = (IFilter<Tuple2<IService, Object[]>>)createValue(mda.filter(), agent.getFetcher());
+				conv = (IParameterConverter)createValue(mda.paramconverter(), agent.getFetcher());
+				cdcl = mda.value();
 			}
+			muldis = (IMultiplexDistributor)createValue(cdcl);
+			IIntermediateFuture<Object> muldisres = muldis.init(method, args, fil, conv);
 			
-			// Create multiplex distributor
-			if(cdcl!=null)
+			Class<? extends IMultiplexCollector> mccl = FlattenMultiplexCollector.class;
+			if(muxmethod.isAnnotationPresent(MultiplexCollector.class))
 			{
-				try
-				{
-					md = cdcl.newInstance();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				MultiplexCollector mc = muxmethod.getAnnotation(MultiplexCollector.class);
+				mccl = mc.value();
 			}
-			if(md==null)
-			{
-				md = new SimpleMultiplexDistributor();
-			}
-			
-			// Init distributor
-			this.cdisres = cdis.init(method, args, fil);
-			cdisres.addResultListener(new DistributorListener());
+			IMultiplexCollector coll = (IMultiplexCollector)createValue(mccl);
+			coll.init(fut, method, args, muxmethod);
+			muldisres.addResultListener(coll);
 		}
 		
 		//-------- methods --------
-		
-		/**
-		 *  Add a result.
-		 *  @param result The result.
-		 */
-		protected void addResult(Object result)
-		{
-			if(ifut!=null)
-			{
-				ifut.addIntermediateResult(result);
-			}
-			else
-			{
-				if(callresults==null)
-					callresults = new ArrayList<Object>();
-				callresults.add(result);
-			}
-		}
-		
-		/**
-		 *  Set finished.
-		 */
-		protected void setFinished()
-		{
-			if(ifut!=null)
-			{
-				ifut.setFinished();
-			}
-			else
-			{
-				fut.setResult(callresults);
-			}
-		}
-		
-		/**
-		 *  Set an exception.
-		 *  @param exception The exception.
-		 */
-		protected void setException(Exception exception)
-		{
-			if(ifut!=null)
-			{
-				ifut.setException(exception);
-			}
-			else
-			{
-				fut.setException(exception);
-			}
-		}
 		
 		/**
 		 *  Called when a service has been found.
@@ -289,7 +157,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		{
 //			System.out.println("service found: "+Thread.currentThread()+" "+agent.isComponentThread());
 			// Found service -> invoke method
-			cdis.addService((IService)result);
+			muldis.addService((IService)result);
 		}
 		
 		/**
@@ -297,7 +165,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		 */
 		public void finished()
 		{
-			cdis.serviceSearchFinished();
+			muldis.serviceSearchFinished();
 		}
 		
 		/**
@@ -319,389 +187,68 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		 */
 		public void exceptionOccurred(Exception exception)
 		{
-			setException(exception);
-		}
-		
-		/**
-		 * 
-		 */
-		class DistributorListener implements IIntermediateResultListener<Object>
-		{
-			public void intermediateResultAvailable(Object result)
-			{
-				if(flatten)
-				{
-					if(result instanceof IIntermediateFuture)
-					{
-						final Future<Void> call = new Future<Void>();
-						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
-						{
-							public void intermediateResultAvailable(Object result)
-							{
-								if(!agent.isComponentThread())
-									Thread.dumpStack();
-								
-//								System.out.println("ser iresult: "+agent.isComponentThread());
-								addResult(result);
-							}
-							public void finished()
-							{
-//								System.out.println("ser fini: "+agent.isComponentThread());
-								call.setResult(null);
-//								opencalls.remove(call);
-							}
-							public void resultAvailable(Collection<Object> result)
-							{
-//								System.out.println("ser resulta: "+agent.isComponentThread());
-
-								for(Iterator<Object> it=result.iterator(); it.hasNext(); )
-								{
-									addResult(result);
-								}
-								call.setResult(null);
-//								opencalls.remove(call);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-//								System.out.println("ex: "+exception);
-								call.setResult(null);
-//								opencalls.remove(call);
-							}
-						};
-						calls.add(call);
-						((IIntermediateFuture<Object>)result).addResultListener(lis);
-					}
-					else if(result instanceof IFuture)
-					{
-						final Future<Void> call = new Future<Void>();
-						IResultListener<Object> lis = new IResultListener<Object>()
-						{
-							public void resultAvailable(Object result)
-							{
-//								System.out.println("ser resultb: "+agent.isComponentThread());
-								
-								addResult(result);
-								call.setResult(null);
-//								opencalls.remove(this);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-//								System.out.println("ex: "+exception);
-								call.setResult(null);
-//								opencalls.remove(this);
-							}
-						};
-						calls.add(call);
-						((IFuture<Object>)result).addResultListener(lis);
-					}
-					else
-					{
-						addResult(result);
-					}
-				}
-				else
-				{
-					addResult(result);
-				}
-			}
-			
-			public void finished()
-			{
-//				System.out.println("fin: "+Thread.currentThread()+" "+agent.isComponentThread());
-				if(calls.size()>0)
-				{
-					CounterResultListener<Void> lis = new CounterResultListener<Void>(calls.size(), true, new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-//							System.out.println("countlis1: "+agent.isComponentThread());
-
-							setFinished();
-						}
-
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-					for(int i=0; i<calls.size(); i++)
-					{
-						Future<Void> fut = calls.get(i);
-						fut.addResultListener(lis);
-					}
-				}
-				else
-				{
-					setFinished();
-				}
-			}
-			
-			public void resultAvailable(Collection<Object> result)
-			{
-				for(Iterator<Object> it=result.iterator(); it.hasNext(); )
-				{
-					intermediateResultAvailable(it.next());
-				}
-				finished();
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				setException(exception);
-			}
+			muldis.serviceSearchFinished(); // todo: propagate ex?
+//			setException(exception);
 		}
 	}
 	
-//	/**
-//	 *  Listener that invokes service methods and delegates the results.
-//	 */
-//	public class IntermediateMethodResultListener<T> implements IIntermediateResultListener<T>
-//	{
-//		//-------- attributes --------
-//		
-//		/** The future. */
-//		protected Future<Object> fut;
-//		
-//		/** The future. */
-//		protected IntermediateFuture<Object> ifut;
-//		
-//		/** The service method. */
-//		protected Method method;
-//		
-//		/** The arguments. */
-//		protected Object[] args;
-//		
-//		/** Flag if flatten. */
-//		protected boolean flatten;
-//		
-//		/** The list of calls. */
-//		protected List<Future<Void>> calls;
-//		
-//		/** The list of results (if ret is not intermediate future). */
-//		protected List<Object> callresults;
-//		
-//		//-------- constructors --------
-//		
-//		/**
-//		 *  Create a new listener.
-//		 */
-//		public IntermediateMethodResultListener(Future<Object> fut, Method method, Object[] args, boolean flatten)
-//		{
-//			this.fut = fut;
-//			this.method = method;
-//			this.args = args;
-//			this.flatten = flatten;
-//			this.calls = new ArrayList<Future<Void>>();
-//		}
-//		
-//		/**
-//		 *  Create a new listener.
-//		 */
-//		public IntermediateMethodResultListener(IntermediateFuture<Object> ifut, Method method, Object[] args, boolean flatten)
-//		{
-//			this.ifut = ifut;
-//			this.method = method;
-//			this.args = args;
-//			this.flatten = flatten;
-//			this.calls = new ArrayList<Future<Void>>();
-//		}
-//		
-//		//-------- methods --------
-//		
-//		/**
-//		 *  Add a result.
-//		 *  @param result The result.
-//		 */
-//		protected void addResult(Object result)
-//		{
-//			if(ifut!=null)
-//			{
-//				ifut.addIntermediateResult(result);
-//			}
-//			else
-//			{
-//				if(callresults==null)
-//					callresults = new ArrayList<Object>();
-//				callresults.add(result);
-//			}
-//		}
-//		
-//		/**
-//		 *  Set finished.
-//		 */
-//		protected void setFinished()
-//		{
-//			if(ifut!=null)
-//			{
-//				ifut.setFinished();
-//			}
-//			else
-//			{
-//				fut.setResult(callresults);
-//			}
-//		}
-//		
-//		/**
-//		 *  Set an exception.
-//		 *  @param exception The exception.
-//		 */
-//		protected void setException(Exception exception)
-//		{
-//			if(ifut!=null)
-//			{
-//				ifut.setException(exception);
-//			}
-//			else
-//			{
-//				fut.setException(exception);
-//			}
-//		}
-//		
-//		/**
-//		 *  Called when a service has been found.
-//		 *  @param result The result.
-//		 */
-//		public void intermediateResultAvailable(T result)
-//		{
-////			System.out.println("service found: "+Thread.currentThread()+" "+agent.isComponentThread());
-//			// Found service -> invoke method
-//			try
-//			{
-//				Object serres = method.invoke(result, args);
-//				
-//				if(flatten)
-//				{
-//					if(serres instanceof IIntermediateFuture)
-//					{
-//						final Future<Void> call = new Future<Void>();
-//						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
-//						{
-//							public void intermediateResultAvailable(Object result)
-//							{
-//								if(!agent.isComponentThread())
-//									Thread.dumpStack();
-//								
-////								System.out.println("ser iresult: "+agent.isComponentThread());
-//								addResult(result);
-//							}
-//							public void finished()
-//							{
-////								System.out.println("ser fini: "+agent.isComponentThread());
-//								call.setResult(null);
-////								opencalls.remove(call);
-//							}
-//							public void resultAvailable(Collection<Object> result)
-//							{
-////								System.out.println("ser resulta: "+agent.isComponentThread());
-//
-//								for(Iterator<Object> it=result.iterator(); it.hasNext(); )
-//								{
-//									addResult(result);
-//								}
-//								call.setResult(null);
-////								opencalls.remove(call);
-//							}
-//							public void exceptionOccurred(Exception exception)
-//							{
-////								System.out.println("ex: "+exception);
-//								call.setResult(null);
-////								opencalls.remove(call);
-//							}
-//						};
-//						calls.add(call);
-//						((IIntermediateFuture<Object>)serres).addResultListener(lis);
-//					}
-//					else if(serres instanceof IFuture)
-//					{
-//						final Future<Void> call = new Future<Void>();
-//						IResultListener<Object> lis = new IResultListener<Object>()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-////								System.out.println("ser resultb: "+agent.isComponentThread());
-//								
-//								addResult(result);
-//								call.setResult(null);
-////								opencalls.remove(this);
-//							}
-//							public void exceptionOccurred(Exception exception)
-//							{
-////								System.out.println("ex: "+exception);
-//								call.setResult(null);
-////								opencalls.remove(this);
-//							}
-//						};
-//						calls.add(call);
-//						((IFuture<Object>)serres).addResultListener(lis);
-//					}
-//					else
-//					{
-//						addResult(serres);
-//					}
-//				}
-//				else
-//				{
-//					addResult(serres);
-//				}
-//			}
-//			catch(Exception e)
-//			{
-//				// What to do with invocation error? use flag if propagate?
-//			}
-//		}
-//		
-//		/**
-//		 *  Called when all services have been found.
-//		 */
-//		public void finished()
-//		{
-////			System.out.println("fin: "+Thread.currentThread()+" "+agent.isComponentThread());
-//			if(calls.size()>0)
-//			{
-//				CounterResultListener<Void> lis = new CounterResultListener<Void>(calls.size(), true, new IResultListener<Void>()
-//				{
-//					public void resultAvailable(Void result)
-//					{
-////						System.out.println("countlis1: "+agent.isComponentThread());
-//
-//						setFinished();
-//					}
-//
-//					public void exceptionOccurred(Exception exception)
-//					{
-//					}
-//				});
-//				for(int i=0; i<calls.size(); i++)
-//				{
-//					Future<Void> fut = calls.get(i);
-//					fut.addResultListener(lis);
-//				}
-//			}
-//			else
-//			{
-//				setFinished();
-//			}
-//		}
-//		
-//		/**
-//		 *  Called when services have been found.
-//		 *  @param result The result.
-//		 */
-//		public void resultAvailable(Collection<T> result)
-//		{
-//			for(Iterator<T> it=result.iterator(); it.hasNext(); )
-//			{
-//				intermediateResultAvailable(it.next());
-//			}
-//			finished();
-//		}
-//		
-//		/**
-//		 *  Called when an exception has occurred.
-//		 *  @param exception The exception.
-//		 */
-//		public void exceptionOccurred(Exception exception)
-//		{
-//			setException(exception);
-//		}
-//	}
+	/**
+	 *  Convert value annotation to object.
+	 */
+	public static Object createValue(Value val, IValueFetcher fetcher)
+	{
+		Object ret = null;
+		
+		if(!Object.class.equals(val.clazz()))
+		{
+			try
+			{
+				ret = val.clazz().newInstance();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		else if(val.value().length()>0)
+		{
+			try
+			{
+				ret = (IFilter<Tuple2<IService, Object[]>>)SJavaParser.evaluateExpression(val.value(), fetcher);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a value from a class.
+	 */
+	public static Object createValue(Class<?> clazz)
+	{
+		Object ret = null;
+		
+		if(clazz==null)
+			throw new IllegalArgumentException("Class must not null.");
+		
+		// Create multiplex distributor
+		if(clazz!=null)
+		{
+			try
+			{
+				ret = clazz.newInstance();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return ret;
+	}
+	
 }

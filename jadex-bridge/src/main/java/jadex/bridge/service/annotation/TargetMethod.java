@@ -18,8 +18,8 @@ public @interface TargetMethod
 	 */
 	public String value();
 	
-//	/**
-//	 *  The method parameters.
-//	 */
-//	public Class<?>[] parameters() default {};
+	/**
+	 *  The method parameters.
+	 */
+	public Class<?>[] parameters() default {};
 }

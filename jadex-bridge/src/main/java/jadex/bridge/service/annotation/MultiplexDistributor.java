@@ -10,8 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Target method annotation. Can be used to express
- *  to what exact service method a call should be routed to.
+ *  
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -22,14 +21,19 @@ public @interface MultiplexDistributor
 	
 	/** The default one (argument) to each (service) distribution strategy. */
 	public static final Class<? extends IMultiplexDistributor> ONE_TO_EACH = SequentialMultiplexDistributor.class;
-
+	
 	/**
 	 *  The multiplex distributor class.
 	 */
-	public Class<? extends IMultiplexDistributor> type() default SimpleMultiplexDistributor.class; // ONE_TO_ALL
+	public Class<? extends IMultiplexDistributor> value() default SimpleMultiplexDistributor.class; // ONE_TO_ALL
 	
 	/**
-	 *  The filter expression.
+	 *  The service filter.
 	 */
-	public String filter();
+	public Value filter() default @Value();
+	
+	/**
+	 *  The parameter converter.
+	 */
+	public Value paramconverter() default @Value();
 }
