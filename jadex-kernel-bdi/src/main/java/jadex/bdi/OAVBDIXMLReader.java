@@ -37,8 +37,10 @@ import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
+import jadex.xml.writer.XMLWriterFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,7 +64,7 @@ public class OAVBDIXMLReader
 	
 	/** The singleton reader instance. */
 	protected static AReader reader;
-	protected static Writer writer;
+	protected static AWriter writer;
 	
 	/** The manager. */
 	protected static TypeInfoPathManager manager;
@@ -565,7 +567,7 @@ public class OAVBDIXMLReader
 				reportError(context, msg);
 			}
 		});
-		writer = new Writer();
+		writer = XMLWriterFactory.getInstance().createWriter();
 		
 		manager = new TypeInfoPathManager(typeinfos);
 		readerhandler = new BeanObjectReaderHandler(typeinfos);
@@ -584,7 +586,7 @@ public class OAVBDIXMLReader
 	/**
 	 *  Get the writer instance.
 	 */
-	public static Writer getWriter()
+	public static AWriter getWriter()
 	{
 		return writer;
 	}

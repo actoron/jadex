@@ -317,7 +317,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				includefields	= object.getClass().isAnnotationPresent(IncludeFields.class);
 				if(!includefields)
 				{
-					Field field = object.getClass().getField(Writer.XML_INCLUDE_FIELDS);
+					Field field = object.getClass().getField(AWriter.XML_INCLUDE_FIELDS);
 					if(SReflect.getWrappedType(field.getType()).equals(Boolean.class))
 					{
 						includefields = ((Boolean)field.get(object)).booleanValue();

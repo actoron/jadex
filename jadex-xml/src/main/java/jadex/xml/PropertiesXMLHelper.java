@@ -11,7 +11,8 @@ import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.QName;
 import jadex.xml.writer.IObjectWriterHandler;
-import jadex.xml.writer.Writer;
+import jadex.xml.writer.AWriter;
+import jadex.xml.writer.XMLWriterFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,7 +79,7 @@ public class PropertiesXMLHelper
 	 */
 	public static String write(Object val, ClassLoader classloader)
 	{
-		return Writer.objectToXML(new Writer(), val, classloader, getObjectWriterHandler());
+		return AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(), val, classloader, getObjectWriterHandler());
 	}
 	
 	/**
@@ -86,7 +87,7 @@ public class PropertiesXMLHelper
 	 */
 	public static void write(Object val, OutputStream os, ClassLoader classloader)
 	{
-		Writer.objectToOutputStream(new Writer(), val, os, classloader, null, getObjectWriterHandler());
+		AWriter.objectToOutputStream(XMLWriterFactory.getInstance().createWriter(), val, os, classloader, null, getObjectWriterHandler());
 	}
 	
 	/**

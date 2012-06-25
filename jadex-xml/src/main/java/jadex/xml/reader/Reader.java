@@ -129,12 +129,11 @@ public class Reader extends AReader
 	
 	//-------- methods --------
 	
-	/**
-	 *  Read properties from xml.
-	 *  @param input The input stream.
-	 *  @param classloader The classloader.
-	 * 	@param context The context.
- 	 */
+	/*
+	 * (non-Javadoc)
+	 * @see jadex.xml.reader.AReader#read(jadex.xml.TypeInfoPathManager, jadex.xml.reader.IObjectReaderHandler, java.io.Reader, java.lang.ClassLoader, java.lang.Object)
+	 */
+	@Override
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, java.io.Reader input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
@@ -145,12 +144,11 @@ public class Reader extends AReader
 		return read(tipmanager, handler, parser, classloader, callcontext);
 	}
 	
-	/**
-	 *  Read properties from xml.
-	 *  @param input The input stream.
-	 *  @param classloader The classloader.
-	 * 	@param context The context.
- 	 */
+	/*
+	 * (non-Javadoc)
+	 * @see jadex.xml.reader.AReader#read(jadex.xml.TypeInfoPathManager, jadex.xml.reader.IObjectReaderHandler, java.io.InputStream, java.lang.ClassLoader, java.lang.Object)
+	 */
+	@Override
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;

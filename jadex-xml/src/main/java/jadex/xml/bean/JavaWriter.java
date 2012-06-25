@@ -6,7 +6,6 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.gui.SGUI;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -18,8 +17,9 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.stax.QName;
+import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
-import jadex.xml.writer.Writer;
+import jadex.xml.writer.XMLWriterFactory;
 
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -38,12 +38,12 @@ import java.util.logging.LogRecord;
 /**
  * Java specific reader that supports collection classes and arrays.
  */
-public class JavaWriter extends Writer
+public class JavaWriter
 {
 	//-------- attributes --------
 	
 	/** The static writer instance. */
-	protected static Writer writer;
+	protected static AWriter writer;
 	
 	/** The object handler. */
 	protected static IObjectWriterHandler handler;
@@ -53,11 +53,9 @@ public class JavaWriter extends Writer
 	
 	/**
 	 *  Create a new reader.
-	 *  @param readerhandler The handler.
 	 */
 	public JavaWriter()
 	{
-		super(true);
 	}
 	
 	//-------- methods --------
@@ -732,7 +730,7 @@ public class JavaWriter extends Writer
 	 */
 	public static String objectToXML(Object val, ClassLoader classloader, IObjectWriterHandler handler)
 	{
-		return Writer.objectToXML(getInstance(), val, classloader, handler==null? getObjectHandler(): handler);
+		return AWriter.objectToXML(getInstance(), val, classloader, handler==null? getObjectHandler(): handler);
 	}
 	
 	/**
@@ -740,7 +738,7 @@ public class JavaWriter extends Writer
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, IObjectWriterHandler handler)
 	{
-		return Writer.objectToByteArray(getInstance(), val, classloader, handler==null? getObjectHandler(): handler);
+		return AWriter.objectToByteArray(getInstance(), val, classloader, handler==null? getObjectHandler(): handler);
 	}
 	
 	/**
@@ -748,15 +746,15 @@ public class JavaWriter extends Writer
 	 */
 	public static void objectToOutputStream(Object val, OutputStream os, ClassLoader classloader, IObjectWriterHandler handler)
 	{
-		Writer.objectToOutputStream(getInstance(), val, os, classloader, null, handler==null? getObjectHandler(): handler);
+		AWriter.objectToOutputStream(getInstance(), val, os, classloader, null, handler==null? getObjectHandler(): handler);
 	}
 	
 	
 	/**
-	 *  Get the default Java writer.
-	 *  @return The Java writer.
+	 *  Get the default XML Writer.
+	 *  @return The XML writer.
 	 */
-	private static Writer getInstance()
+	private static AWriter getInstance()
 	{
 		if(writer==null)
 		{
@@ -764,7 +762,7 @@ public class JavaWriter extends Writer
 			{
 				if(writer==null)
 				{
-					writer = new JavaWriter();
+					writer = XMLWriterFactory.getInstance().createWriter();
 				}
 			}
 		}

@@ -49,15 +49,6 @@ public abstract class AReader
 	 */
 	public abstract Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, InputStream input, final ClassLoader classloader,
 			final Object callcontext) throws Exception;
-
-//	/**
-//	 *  Read properties from xml.
-//	 *  @param input The input stream.
-//	 *  @param classloader The classloader.
-//	 * 	@param context The context.
-//	 */
-//	public abstract Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, XMLStreamReader parser, final ClassLoader classloader,
-//			final Object callcontext) throws Exception;
 	
 	/**
 	 *  @param val The string value.

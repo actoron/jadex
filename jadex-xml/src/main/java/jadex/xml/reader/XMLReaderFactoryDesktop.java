@@ -7,10 +7,6 @@ import jadex.xml.stax.XMLReporter;
 
 public class XMLReaderFactoryDesktop extends XMLReaderFactory
 {
-	public XMLReaderFactoryDesktop() {
-		super();
-	}
-
 	@Override
 	public AReader createReader()
 	{

@@ -1,51 +1,29 @@
 package jadex.xml.writer;
 
-import jadex.commons.SReflect;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.xml.IPreProcessor;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.TypeInfo;
+import jadex.xml.stax.QName;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
-
-import jadex.xml.stax.QName;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
  *  XML writer for conversion of objects to XML.
  */
-public class Writer
+public class Writer extends AWriter
 {
 	//-------- static part --------
 	
-	/** Constant for indicating if public fields should be written. 
-		The field has to be declared as public and its value
-		will be used to determine if fields should be included. */
-	public static final String XML_INCLUDE_FIELDS = "XML_INCLUDE_FIELDS";
-	
-	/** The linefeed separator. */
-	public static final String lf = (String)System.getProperty("line.separator");
-
-	/** The default encoding. */
-	public static String DEFAULT_ENCODING = "utf-8";
-	
-	static {
-		if (SReflect.isAndroid()) {
-			System.setProperty("javax.xml.stream.XMLOutputFactory", "jadex.android.xmlpullparser.XMLPullOutputFactory");
-			System.setProperty("javax.xml.stream.XMLInputFactory", "jadex.android.xmlpullparser.XMLPullInputFactory");
-		}
-	}
 	
 	/** The xml output factory. */
 	protected static final XMLOutputFactory	FACTORY = XMLOutputFactory.newInstance();
@@ -132,7 +110,7 @@ public class Writer
 	 *  Must have tag parameter to support writing an object using an arbitrary tag.
 	 *  Cannot write tag in beforehand, because it must be written in one pass. 
 	 */
-	public void writeObject(WriteContext wc, Object object, QName tag) throws Exception
+	protected void writeObject(WriteContext wc, Object object, QName tag) throws Exception
 	{
 		XMLStreamWriter writer = wc.getWriter();
 		List stack = wc.getStack();
@@ -415,7 +393,7 @@ public class Writer
 	/**
 	 *  Write the start of an object.
 	 */
-	public void writeStartObject(XMLStreamWriter writer, QName tag, int level) throws Exception
+	protected void writeStartObject(XMLStreamWriter writer, QName tag, int level) throws Exception
 	{
 		writeIndentation(writer, level);
 			
@@ -444,7 +422,7 @@ public class Writer
 	/**
 	 *  Write the end of an object.
 	 */
-	public void writeEndObject(XMLStreamWriter writer, int level) throws Exception
+	protected void writeEndObject(XMLStreamWriter writer, int level) throws Exception
 	{
 		writeIndentation(writer, level);
 		writer.writeEndElement();
@@ -454,7 +432,7 @@ public class Writer
 	/**
 	 *  Write the indentation.
 	 */
-	public void writeIndentation(XMLStreamWriter writer, int level) throws Exception
+	protected void writeIndentation(XMLStreamWriter writer, int level) throws Exception
 	{
 		if(indent)
 		{
@@ -487,83 +465,4 @@ public class Writer
 //		return ret.toString();
 	}
 	
-	/**
-	 *  Convert to a string.
-	 */
-	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, IObjectWriterHandler handler)
-	{
-		try
-		{
-			return new String(objectToByteArray(writer, val, classloader, handler), "UTF-8");
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			System.err.println("Warning: no UTF-8 available");
-			return new String(objectToByteArray(writer, val, classloader, handler));
-		}
-	}
-	
-	/**
-	 *  Convert to a string.
-	 */
-	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, Object context, IObjectWriterHandler handler)
-	{
-		try
-		{
-			return new String(objectToByteArray(writer, val, classloader, context, handler), "UTF-8");
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			System.err.println("Warning: no UTF-8 available");
-			return new String(objectToByteArray(writer, val, classloader, context, handler));
-		}
-	}
-	
-	/**
-	 *  Convert to a byte array.
-	 */
-	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader, IObjectWriterHandler handler)
-	{
-		return objectToByteArray(writer, val, classloader, null, handler);
-	}
-	
-	
-	
-	/**
-	 *  Convert to a byte array.
-	 */
-	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader, Object context, IObjectWriterHandler handler)
-	{
-		try
-		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			writer.write(handler, val, bos, classloader, context);
-			byte[] ret = bos.toByteArray();
-			bos.close();
-			return ret;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-//			System.out.println("Exception writing: "+val);
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 *  Write to output stream.
-	 */
-	public static void objectToOutputStream(Writer writer, Object val, OutputStream os, ClassLoader classloader, Object context, IObjectWriterHandler handler)
-	{
-		try
-		{
-			writer.write(handler, val, os, classloader, context);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-//			System.out.println("Exception writing: "+val);
-			throw new RuntimeException(e);
-		}
-	}
 }
