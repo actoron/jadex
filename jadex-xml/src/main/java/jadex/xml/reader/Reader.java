@@ -459,7 +459,7 @@ public class Reader extends AReader
 							// Handle unset attributes (possibly have default value).
 							for(Iterator it=attrs.iterator(); it.hasNext(); )
 							{
-								QName attrname = convertStaXQNameToQName((javax.xml.namespace.QName)it.next());
+								QName attrname = (QName) it.next();
 								Object attrinfo = typeinfo.getAttributeInfo(attrname);
 								
 								// Hack. want to read attribute info here
