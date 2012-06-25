@@ -1,6 +1,11 @@
 package jadex.bridge.service.component.multiinvoke;
 
+import jadex.bridge.service.IService;
+import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateFuture;
+
+import java.lang.reflect.Method;
 
 /**
  *  Interface for multiplex call distributor.
@@ -14,18 +19,18 @@ import jadex.commons.future.IIntermediateFuture;
  *  - with which arguments
  *  - when finished
  */
-public interface ICallDistributor
+public interface IMultiplexDistributor
 {
 	/**
-	 *  Start the call distributor.
+	 *  Init the call distributor.
 	 */
-	public IIntermediateFuture<Object> start();
+	public IIntermediateFuture<Object> init(Method method, Object[] args, IFilter<Tuple2<IService, Object[]>> filter);
 	
 	/**
 	 *  Add a new service.
 	 *  @param service The service.
 	 */
-	public void addService(Object service);
+	public void addService(IService service);
 	
 	/**
 	 *  Search for services has finished.
