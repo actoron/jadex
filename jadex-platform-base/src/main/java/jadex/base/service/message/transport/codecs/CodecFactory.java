@@ -1,9 +1,8 @@
 package jadex.base.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
+import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -65,7 +64,9 @@ public class CodecFactory
 		codeccache = SCollection.createHashMap();
 		if(codecs==null)
 		{
-			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
+			codecs = !SReflect.isAndroid()
+				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
+				: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 			//codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, JadexXMLCodec.class, GZIPCodec.class};
 		}
 		for(int i=0; i<codecs.length; i++)
@@ -75,9 +76,15 @@ public class CodecFactory
 		}
 		
 		if(default_codecs!=null && default_codecs.length>0)
+		{
 			default_ids = getIds(default_codecs);
+		}
 		else
-			default_ids = new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID};
+		{
+			default_ids = !SReflect.isAndroid()
+				? new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}
+				: new byte[]{JadexBinaryCodec.CODEC_ID, GZIPCodec.CODEC_ID};
+		}
 	}
 	
 	/**

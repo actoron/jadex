@@ -160,8 +160,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 */
 	public static Object decodeMessage(byte[] rawmsg, Map<Byte, ICodec> codecs, ClassLoader cl)
 	{
-		int	idx	= 0;
-		byte rmt = rawmsg[idx++];
+		int	idx	= 1;	// Skip message type.
 		byte[] codec_ids = new byte[rawmsg[idx++]];
 		for(int i=0; i<codec_ids.length; i++)
 		{
@@ -176,5 +175,19 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 		}
 		
 		return tmp;
+	}
+
+	/**
+	 *  Get the codecs that have been used for encoding the message.
+	 */
+	public static ICodec[] getCodecs(byte[] rawmsg, Map<Byte, ICodec> codecs)
+	{
+		int	idx	= 1;	// Skip message type.
+		ICodec[] mcodecs = new ICodec[rawmsg[idx++]];
+		for(int i=0; i<mcodecs.length; i++)
+		{
+			mcodecs[i] = codecs.get(new Byte(rawmsg[idx++]));
+		}
+		return mcodecs;
 	}
 }

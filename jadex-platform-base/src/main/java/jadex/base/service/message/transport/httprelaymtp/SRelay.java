@@ -17,7 +17,7 @@ public class SRelay
 	
 	/** Default relay address(es) used by the platform for finding available servers. */
 	public static final String	DEFAULT_ADDRESS	= "relay-http://relay.activecomponents.org/, relay-http://relay1.activecomponents.org/jadex-platform-relay-web, relay-http://jadex.informatik.uni-hamburg.de/relay/";
-//	public static final String	DEFAULT_ADDRESS	= "relay-http://relay1.activecomponents.org/jadex-platform-relay-web";
+//	public static final String	DEFAULT_ADDRESS	= "relay-http://relay1.activecomponents.org:8080/jadex-platform-relay-web";
 	
 	/** The default message type (followed by arbitrary message content from some sender). */
 	public static final byte	MSGTYPE_DEFAULT	= 1;

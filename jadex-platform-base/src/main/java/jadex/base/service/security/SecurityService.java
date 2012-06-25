@@ -20,6 +20,7 @@ import jadex.commons.Base64;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -662,45 +663,48 @@ public class SecurityService implements ISecurityService
 	protected List<InetAddress> getNetworkIps()
 	{
 		List<InetAddress> ret = new ArrayList<InetAddress>();
-		try
+		if(!SReflect.isAndroid()) // Todo: alternative to NetworkInterface.getInterfaceAddresses()?
 		{
-			// Generate network identifiers
-			for(NetworkInterface ni: SUtil.getNetworkInterfaces())
+			try
 			{
-				for(InterfaceAddress ifa: ni.getInterfaceAddresses())
+				// Generate network identifiers
+				for(NetworkInterface ni: SUtil.getNetworkInterfaces())
 				{
-					if(ifa!=null)	// Yes, there may be a null in the list. grrr.
+					for(InterfaceAddress ifa: ni.getInterfaceAddresses())
 					{
-						InetAddress addr = ifa.getAddress();
-		//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
-						
-						if(addr.isLoopbackAddress())
+						if(ifa!=null)	// Yes, there may be a null in the list. grrr.
 						{
-							// ignore
-						}
-						else if(addr.isLinkLocalAddress())
-						{
-							// ignore
-						}
-						else // if(addr.isSiteLocalAddress()) or other
-						{
-							// Hack!!! Use sensible default prefix when -1 due to jdk on windows bug
-							// http://bugs.sun.com/view_bug.do?bug_id=6707289
-							short	prefix	= ifa.getNetworkPrefixLength();
-							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), prefix!=-1 ? prefix : 24);
-							ret.add(ad);
+							InetAddress addr = ifa.getAddress();
+			//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+							
+							if(addr.isLoopbackAddress())
+							{
+								// ignore
+							}
+							else if(addr.isLinkLocalAddress())
+							{
+								// ignore
+							}
+							else // if(addr.isSiteLocalAddress()) or other
+							{
+								// Hack!!! Use sensible default prefix when -1 due to jdk on windows bug
+								// http://bugs.sun.com/view_bug.do?bug_id=6707289
+								short	prefix	= ifa.getNetworkPrefixLength();
+								InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), prefix!=-1 ? prefix : 24);
+								ret.add(ad);
+							}
 						}
 					}
 				}
 			}
-		}
-		catch(RuntimeException e)
-		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		
 		return ret;

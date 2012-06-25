@@ -1,6 +1,7 @@
 package jadex.base.relay;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -66,6 +67,9 @@ public class PlatformInfo
 	
 	/** The awareness info (if any). */
 	protected AwarenessInfo	awainfo;
+	
+	/** The preferred codecs (if any). */
+	protected ICodec[] pcodecs;
 	
 	//-------- constructors --------
 	
@@ -396,5 +400,23 @@ public class PlatformInfo
 	public void setConnectDate(Date contime)
 	{
 		this.connect_time	= contime;
-	}	
+	}
+
+	/**
+	 *  Get the preferred codecs.
+	 *  The relay server will send awareness infos to the platform using this codecs.
+	 */
+	public ICodec[] getPreferredCodecs()
+	{
+		return pcodecs;
+	}
+	
+	/**
+	 *  Set the preferred codecs.
+	 *  The relay server will send awareness infos to the platform using this codecs.
+	 */
+	public void setPreferredCodecs(ICodec[] pcodecs)
+	{
+		this.pcodecs	= pcodecs;
+	}
 }

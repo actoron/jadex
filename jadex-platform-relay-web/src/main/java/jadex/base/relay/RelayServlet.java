@@ -83,9 +83,6 @@ public class RelayServlet extends HttpServlet
 	/** The available codecs for awareness infos (cached for speed). */
 	protected Map<Byte, ICodec>	codecs;
 	
-	/** The default codecs for awareness infos (cached for speed). */
-	protected ICodec[]	defcodecs;
-	
 	/** Counter for open GET connections (for testing). */
 	protected int	opencnt1	= 0;
 	/** Counter for open POST connections (for testing). */
@@ -109,7 +106,6 @@ public class RelayServlet extends HttpServlet
 		this.platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
-		this.defcodecs	= cfac.getDefaultCodecs();
 		this.peers	= new PeerList();
 	}
 	
@@ -312,7 +308,7 @@ public class RelayServlet extends HttpServlet
 					if(awainfo!=null)
 					{
 						awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-						sendAwarenessInfos(awainfo);
+						sendAwarenessInfos(awainfo, platform.getPreferredCodecs());
 					}
 			//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 					for(int i=0; i<items.size(); i++)
@@ -359,6 +355,7 @@ public class RelayServlet extends HttpServlet
 			// Read message and extract awareness info content.
 			byte[] buffer = readData(in, length-1);
 			MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+			ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 			AwarenessInfo	info;
 			if(SFipa.JADEX_RAW.equals(msg.getMessage().get(SFipa.LANGUAGE)))
 			{
@@ -372,7 +369,7 @@ public class RelayServlet extends HttpServlet
 			{
 				info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader());
 			}
-			sendAwarenessInfos(info);
+			sendAwarenessInfos(info, pcodecs);
 		}
 		else
 		{
@@ -425,7 +422,7 @@ public class RelayServlet extends HttpServlet
 	/**
 	 *  Send awareness messages for a new or changed awareness info.
 	 */
-	protected void	sendAwarenessInfos(AwarenessInfo awainfo)
+	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs)
 	{
 		// Update platform awareness info.
 		String	id	= awainfo.getSender().getPlatformName();
@@ -434,11 +431,12 @@ public class RelayServlet extends HttpServlet
 		if(platform!=null)
 		{
 			platform.setAwarenessInfo(awainfo);
+			platform.setPreferredCodecs(pcodecs);
 		}
 		
 		if(platform!=null || AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
 		{
-			byte[]	data	= MapSendTask.encodeMessage(awainfo, defcodecs, getClass().getClassLoader());
+			byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
 			byte[]	info	= new byte[data.length+4];
 			System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
 			System.arraycopy(data, 0, info, 4, data.length);
@@ -463,7 +461,7 @@ public class RelayServlet extends HttpServlet
 					// Send other awareness infos to newly connected platform.
 					if(initial)
 					{
-						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, defcodecs, getClass().getClassLoader());
+						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, p2.getPreferredCodecs(), getClass().getClassLoader());
 						byte[]	info2	= new byte[data2.length+4];
 						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
 						System.arraycopy(data2, 0, info2, 4, data2.length);
