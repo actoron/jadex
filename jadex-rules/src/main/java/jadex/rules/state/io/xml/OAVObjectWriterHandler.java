@@ -18,11 +18,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
+import jadex.xml.stax.QName;
 
 
 /**

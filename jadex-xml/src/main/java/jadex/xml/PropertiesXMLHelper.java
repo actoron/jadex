@@ -9,6 +9,7 @@ import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.QName;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
@@ -16,8 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
 
 /**
  *  A simple static helper class for reading and writing jadex.commons.Properties.

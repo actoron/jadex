@@ -23,8 +23,9 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
-import jadex.xml.reader.Reader;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XMLReporter;
 
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -44,8 +45,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLReporter;
 
 
 /**

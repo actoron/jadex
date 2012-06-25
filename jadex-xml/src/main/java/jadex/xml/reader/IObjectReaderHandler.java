@@ -7,11 +7,7 @@ import jadex.xml.TypeInfo;
 import java.util.List;
 import java.util.Map;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
+import jadex.xml.stax.QName;
 
 /**
  *  Interface for object reader handler.

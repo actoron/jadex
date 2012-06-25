@@ -1,6 +1,6 @@
 package jadex.xml.reader;
 
-import javax.xml.stream.XMLReporter;
+import jadex.xml.stax.XMLReporter;
 
 public class XMLReaderFactoryAndroid extends XMLReaderFactory
 {

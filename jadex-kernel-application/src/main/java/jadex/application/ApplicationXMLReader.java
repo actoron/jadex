@@ -16,11 +16,8 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 
 import java.util.Set;
-/* $if !android $ */
-import javax.xml.namespace.QName;
-/* $else $
-import javaxx.xml.namespace.QName;
-$endif $ */
+
+import jadex.xml.stax.QName;
 
 /**
  *  Reader for loading component XML models into a Java representation states.

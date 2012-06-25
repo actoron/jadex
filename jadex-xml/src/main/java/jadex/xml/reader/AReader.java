@@ -10,8 +10,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
+import jadex.xml.stax.QName;
 
+/**
+ * XML Reader abstract class.
+ */
 public abstract class AReader
 {
 	//-------- constants --------

@@ -19,6 +19,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.stax.QName;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 import jadex.xml.writer.WriteContext;
 
@@ -34,11 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
 
 /**
  *  Java bean version for fetching write info for an object. 

@@ -17,6 +17,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.stax.QName;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
@@ -33,8 +34,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
 
 /**
  * Java specific reader that supports collection classes and arrays.

@@ -2,11 +2,7 @@ package jadex.xml.reader;
 
 import java.util.Arrays;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
+import jadex.xml.stax.QName;
 
 /**
  *  Data for linking two objects.

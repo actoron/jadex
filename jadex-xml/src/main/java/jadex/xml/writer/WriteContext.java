@@ -10,11 +10,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-/* if_not[android] */
 import javax.xml.stream.XMLStreamWriter;
-/* else[android]
-import javaxx.xml.stream.XMLStreamWriter;
-end[android] */
 
 /**
  *  Context for writing an xml.

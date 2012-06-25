@@ -12,17 +12,13 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.stax.QName;
 import jadex.xml.writer.Writer;
 
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-/* $if !android $ */
-import javax.xml.namespace.QName;
-/* $else $
-import javaxx.xml.namespace.QName;
-$endif $ */
 
 /**
  *  Main class to execute tutorial lesson.

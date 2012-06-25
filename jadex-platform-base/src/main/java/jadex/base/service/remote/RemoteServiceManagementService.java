@@ -88,11 +88,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android]*/
+import jadex.xml.stax.QName;
 
 
 /**

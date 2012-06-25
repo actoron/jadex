@@ -21,11 +21,7 @@ import jadex.xml.reader.ReadContext;
 import java.util.List;
 import java.util.Map;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
+import jadex.xml.stax.QName;
 
 
 /**
@@ -317,7 +313,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		
 		if(!linked)
 		{
-			context.getReporter().report("Could not link: "+elem+" "+parent, "Could not link", context, context.getParser().getLocation());
+			context.getReporter().report("Could not link: "+elem+" "+parent, "Could not link", context, context.getLocation());
 //			throw new RuntimeException("Could not link: "+elem+" "+parent);
 		}
 	}

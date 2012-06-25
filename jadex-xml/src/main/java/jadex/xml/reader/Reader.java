@@ -22,7 +22,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
+
+import jadex.xml.stax.QName;
+import jadex.xml.stax.StaxLocationWrapper;
+import jadex.xml.stax.StaxXMLReporterWrapper;
+
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLReporter;
@@ -165,7 +169,7 @@ public class Reader extends AReader
  	 */
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
-		ReadContext readcontext = new ReadContext(tipmanager, handler, parser, factory.getXMLReporter(), callcontext, classloader);
+		ReadContext readcontext = new ReadContext(tipmanager, handler, parser, StaxXMLReporterWrapper.fromXMLReporter(factory.getXMLReporter()), callcontext, classloader);
 		READ_CONTEXT.set(readcontext);
 		try
 		{
@@ -208,7 +212,7 @@ public class Reader extends AReader
 		catch(RuntimeException e)
 		{
 //			e.printStackTrace();
-			Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
+			jadex.xml.stax.Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : StaxLocationWrapper.fromLocation(parser.getLocation());
 			readcontext.getReporter().report(e.toString(), "XML error", readcontext, loc);
 		}
 		finally
@@ -285,12 +289,12 @@ public class Reader extends AReader
 			Object object = null;
 			
 //			System.out.println("here: "+parser.getPrefix()+" "+parser.getNamespaceURI()+" "+parser.getLocalName()+" "+parser.getName());
-			QName localname = parser.getName();
+			jadex.xml.stax.QName localname = convertStaXQNameToQName(parser.getName());
 			
 //			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 //				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 			
-			QName[] fullpath = readcontext.getXMLPath(localname);
+			jadex.xml.stax.QName[] fullpath = readcontext.getXMLPath(localname);
 			
 			// Get type info and corresponding handler.
 			TypeInfo typeinfo = readcontext.getPathManager().getTypeInfo(localname, fullpath, rawattrs);
@@ -307,7 +311,7 @@ public class Reader extends AReader
 				}
 				else
 				{
-					readcontext.getReporter().report("No handler for element: "+localname, "type info error", readcontext, parser.getLocation());
+					readcontext.getReporter().report("No handler for element: "+localname, "type info error", readcontext, StaxLocationWrapper.fromLocation(parser.getLocation()));
 				}
 			}
 			
@@ -346,12 +350,12 @@ public class Reader extends AReader
 					if(readcontext.getReadObjects().containsKey(idref))
 					{
 						object = readcontext.getReadObjects().get(idref);
-						StackElement se = new StackElement(handler, localname, object, rawattrs, typeinfo, parser.getLocation());
+						StackElement se = new StackElement(handler, localname, object, rawattrs, typeinfo, StaxLocationWrapper.fromLocation(parser.getLocation()));
 						readcontext.addStackElement(se);
 					}
 					else
 					{
-						StackElement se = new StackElement(handler, localname, null, rawattrs, typeinfo, parser.getLocation());
+						StackElement se = new StackElement(handler, localname, null, rawattrs, typeinfo, StaxLocationWrapper.fromLocation(parser.getLocation()));
 						readcontext.addStackElement(se);
 						readcontext.getReporter().report("idref not contained: "+idref, "idref error", se, se.getLocation());						
 					}
@@ -374,7 +378,7 @@ public class Reader extends AReader
 					catch(Exception e)
 					{
 //						e.printStackTrace();
-						readcontext.getReporter().report(e.toString(), "creation error", readcontext, parser.getLocation());
+						readcontext.getReporter().report(e.toString(), "creation error", readcontext, StaxLocationWrapper.fromLocation(parser.getLocation()));
 					}
 					
 					if(DEBUG && object==null)
@@ -394,7 +398,7 @@ public class Reader extends AReader
 						readcontext.getReadObjects().put(id, object);
 					}
 					
-					readcontext.addStackElement(new StackElement(handler, localname, object, rawattrs, typeinfo, parser.getLocation()));
+					readcontext.addStackElement(new StackElement(handler, localname, object, rawattrs, typeinfo, StaxLocationWrapper.fromLocation(parser.getLocation())));
 				
 					// Handle attributes.
 					int atcnt = attrcnt;
@@ -457,7 +461,7 @@ public class Reader extends AReader
 							// Handle unset attributes (possibly have default value).
 							for(Iterator it=attrs.iterator(); it.hasNext(); )
 							{
-								QName attrname = (QName)it.next();
+								QName attrname = convertStaXQNameToQName((javax.xml.namespace.QName)it.next());
 								Object attrinfo = typeinfo.getAttributeInfo(attrname);
 								
 								// Hack. want to read attribute info here
@@ -506,8 +510,8 @@ public class Reader extends AReader
 //			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 //				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 			
-			QName localname = parser.getName();
-			QName[] fullpath = readcontext.getXMLPath();
+			jadex.xml.stax.QName localname = convertStaXQNameToQName(parser.getName());
+			jadex.xml.stax.QName[] fullpath = readcontext.getXMLPath();
 			final TypeInfo typeinfo = readcontext.getPathManager().getTypeInfo(localname, fullpath, topse.getRawAttributes());
 	
 			// Hack. Change object to content when it is element of its own.
@@ -582,20 +586,20 @@ public class Reader extends AReader
 						final int fi = i;
 						readcontext.getPostProcessors().put(new Integer(postprocs[i].getPass()), new IPostProcessorCall()
 						{
-							public void callPostProcessor() throws XMLStreamException
+							public void callPostProcessor() throws Exception
 							{
 								try
 								{
 									Object check = postprocs[fi].postProcess(readcontext, ftopse.getObject());
 									if(check!=null)
 									{
-										readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
+										readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse!=null ? ftopse.getLocation() : (readcontext.getLocation()));																				
 									}
 								}
-								catch(RuntimeException e)
+								catch(Exception e)
 								{
 //									e.printStackTrace();
-									readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
+									readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getLocation());																				
 								}
 							}
 						});
@@ -629,7 +633,7 @@ public class Reader extends AReader
 				if(readcontext.getStackSize()>1)
 				{
 					StackElement pse = readcontext.getStackElement(readcontext.getStackSize()-2);
-					List pathname = new ArrayList();
+					ArrayList<jadex.xml.stax.QName> pathname = new ArrayList<jadex.xml.stax.QName>();
 					pathname.add(localname);
 					for(int i=readcontext.getStackSize()-3; i>=0 && pse.getObject()==null; i--)
 					{
@@ -649,13 +653,13 @@ public class Reader extends AReader
 						{
 							IObjectLinker linker = (IObjectLinker)(patypeinfo!=null && patypeinfo.getLinker()!=null? patypeinfo.getLinker(): pse.getReaderHandler());
 							linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
-								(QName[])pathname.toArray(new QName[pathname.size()]), readcontext);
+								pathname.toArray(new jadex.xml.stax.QName[pathname.size()]), readcontext);
 						}
 						else
 						{
 							// Save the finished object as child for its parent.
 							readcontext.addChild(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo, 
-								(QName[])pathname.toArray(new QName[pathname.size()])));	
+								(jadex.xml.stax.QName[])pathname.toArray(new jadex.xml.stax.QName[pathname.size()])));	
 						}
 					}
 					else
@@ -674,5 +678,29 @@ public class Reader extends AReader
 		}
 	}
 	
+	private static QName convertStaXQNameToQName(javax.xml.namespace.QName qname) {
+		return new QName(qname.getNamespaceURI(), qname.getLocalPart(), qname.getPrefix());
+	}
 	
+//	private static javax.xml.namespace.QName convertQNameToStaxQName(jadex.xml.wrapper.QName qname) {
+//		return new javax.xml.namespace.QName(qname.getNamespaceURI(), qname.getLocalPart(), qname.getPrefix());
+//	}
+	
+//	private static javax.xml.namespace.QName[] convertQNameToStaxQName(jadex.xml.wrapper.QName[] qnames) {
+//		javax.xml.namespace.QName[] result = new javax.xml.namespace.QName[qnames.length];
+//		for (int i = 0; i < result.length; i++)
+//		{
+//			result[i] = convertQNameToStaxQName(qnames[i]);
+//		}
+//		return result;
+//	}
+//	
+//	private static jadex.xml.wrapper.QName[] convertStaXQNameToQName(javax.xml.namespace.QName[] qnames) {
+//		jadex.xml.wrapper.QName[] result = new jadex.xml.wrapper.QName[qnames.length];
+//		for (int i = 0; i < result.length; i++)
+//		{
+//			result[i] = convertStaXQNameToQName(qnames[i]);
+//		}
+//		return result;
+//	}
 }

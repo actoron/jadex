@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.xml.stax.QName;
 
 /**
  * Provides static Methods for generating TypeInfos that depend on AWT Classes.

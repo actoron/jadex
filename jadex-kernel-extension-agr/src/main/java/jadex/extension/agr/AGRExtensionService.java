@@ -3,11 +3,7 @@ package jadex.extension.agr;
 import java.util.HashSet;
 import java.util.Set;
 
-/* $if !android $ */
-import javax.xml.namespace.QName;
-/* $else $
-import javaxx.xml.namespace.QName;
-$endif $ */
+import jadex.xml.stax.QName;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;

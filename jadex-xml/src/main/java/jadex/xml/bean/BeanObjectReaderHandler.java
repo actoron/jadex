@@ -23,6 +23,9 @@ import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
 import jadex.xml.reader.ReadContext;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.StaxLocationWrapper;
+import jadex.xml.stax.StaxXMLReporterWrapper;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -42,9 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import javax.xml.namespace.QName;
-
 
 /**
  *  Handler for reading XML into Java beans.
@@ -259,7 +259,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							}
 							else
 							{
-								context.getReporter().report("Anonymous class problem.", "Creation problem.", context, context.getParser().getLocation());
+								context.getReporter().report("Anonymous class problem.", "Creation problem.", context, context.getLocation());
 							}
 						}
 						else
@@ -412,7 +412,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				else
 				{
 					ret	= null;
-					context.getReporter().report("No converter known for: "+clazz, "content error", context, context.getParser().getLocation());
+					context.getReporter().report("No converter known for: "+clazz, "content error", context, context.getLocation());
 				}
 			}
 		}
@@ -442,7 +442,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			if(!set)
 			{
 				context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
-					"attribute error", context, context.getParser().getLocation());
+					"attribute error", context, context.getLocation());
 			}
 		}
 		else if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getDefaultValue()!=null)
@@ -451,7 +451,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			if(!set)
 			{
 				context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
-					"attribute error", context, context.getParser().getLocation());
+					"attribute error", context, context.getLocation());
 			}
 		}
 	}
@@ -530,7 +530,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(!linked)
 		{
-			context.getReporter().report("Could not link: "+object+" "+parent, "link error", context, context.getParser().getLocation());
+			context.getReporter().report("Could not link: "+object+" "+parent, "link error", context, context.getLocation());
 		}
 	}
 	
@@ -676,7 +676,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(!linked)
 		{
-			context.getReporter().report("Could not bulk link: "+childs+" "+parent, "link error", context, context.getParser().getLocation());
+			context.getReporter().report("Could not bulk link: "+childs+" "+parent, "link error", context, context.getLocation());
 		}
 	}
 	
@@ -755,7 +755,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 			catch(Exception e)
 			{
-				context.getReporter().report("Warning. Bulk link initiated but not successful: "+childs+" "+parent+" "+e, "warning", context, context.getParser().getLocation());
+				context.getReporter().report("Warning. Bulk link initiated but not successful: "+childs+" "+parent+" "+e, "warning", context, context.getLocation());
 			
 				for(int i=0; i<childs.size(); i++)
 				{
@@ -817,13 +817,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking key getter method: "+e.getTargetException(),
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 						catch(Exception e)
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking key getter method: "+e,
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 					}
 					else if(kh instanceof Field)
@@ -836,7 +836,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure getting key field: "+e,
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 					}
 					else if(kh instanceof IReturnValueCommand)
@@ -846,7 +846,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					else
 					{
 						context.getReporter().report("Unknown key help: "+kh,
-							"attribute error", context, context.getParser().getLocation());
+							"attribute error", context, context.getLocation());
 					}
 				}
 				else
@@ -873,13 +873,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 						catch(Exception e)
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking setter method: "+e,
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 					}
 					else if(sh instanceof Field)
@@ -902,7 +902,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure setting field: "+e,
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 					}
 					else if(sh instanceof IReturnValueCommand)
@@ -913,7 +913,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					else
 					{
 						context.getReporter().report("Unknown map store help: "+sh,
-							"attribute error", context, context.getParser().getLocation());
+							"attribute error", context, context.getLocation());
 					}
 				}
 				// Set map value with guessing method name.
@@ -942,13 +942,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 								{
 									// Ignore -> try other way of setting attribute
 //									context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//										"attribute error", context, context.getParser().getLocation());
+//										"attribute error", context, context.getLocation());
 								}
 								catch(Exception e)
 								{
 									// Ignore -> try other way of setting attribute
 //									context.getReporter().report("Failure invoking setter method: "+e,
-//										"attribute error", context, context.getParser().getLocation());
+//										"attribute error", context, context.getLocation());
 								}
 							}
 						}
@@ -977,19 +977,19 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 						catch(Exception e)
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking setter method: "+e,
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 					}
 					else
 					{
 						context.getReporter().report("Read method should have one parameter: "+bai+" "+m,
-							"attribute error", context, context.getParser().getLocation());
+							"attribute error", context, context.getLocation());
 					}
 				}
 				else if(sh instanceof Field)
@@ -1005,7 +1005,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						// Ignore -> try other way of setting attribute
 //						context.getReporter().report("Failure setting field: "+e,
-//							"attribute error", context, context.getParser().getLocation());
+//							"attribute error", context, context.getLocation());
 					}
 				}
 				else if(sh instanceof IReturnValueCommand)
@@ -1016,7 +1016,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				else
 				{
 					context.getReporter().report("Unknown store help: "+sh,
-						"attribute error", context, context.getParser().getLocation());
+						"attribute error", context, context.getLocation());
 				}
 			}
 		}
@@ -1094,14 +1094,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //				{
 //					// Ignore -> try other way of setting attribute
 //					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//						"attribute error", context, context.getParser().getLocation());
+//						"attribute error", context, context.getLocation());
 //				}
 				catch(Exception e)
 				{
 //					e.printStackTrace();
 					// Ignore -> try other way of setting attribute
 //					context.getReporter().report("Failure setting attribute: "+e,
-//						"attribute error", context, context.getParser().getLocation());
+//						"attribute error", context, context.getLocation());
 				}
 			}
 			else if(prop instanceof Classname)
@@ -1181,19 +1181,19 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 						catch(Exception e)
 						{
 							// Ignore -> try other way of setting attribute
 //							context.getReporter().report("Failure invoking setter method: "+e,
-//								"attribute error", context, context.getParser().getLocation());
+//								"attribute error", context, context.getLocation());
 						}
 					}
 					else
 					{
 						context.getReporter().report("Read method should have one parameter: "+bai+" "+m,
-							"attribute error", context, context.getParser().getLocation());
+							"attribute error", context, context.getLocation());
 					}
 				}
 				else if(sh instanceof Field)
@@ -1209,13 +1209,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						// Ignore -> try other way of setting attribute
 //						context.getReporter().report("Failure setting field: "+e,
-//							"attribute error", context, context.getParser().getLocation());
+//							"attribute error", context, context.getLocation());
 					}
 				}
 				else
 				{
 					context.getReporter().report("Unknown store help: "+sh,
-						"attribute error", context, context.getParser().getLocation());
+						"attribute error", context, context.getLocation());
 				}
 			}
 		}
@@ -1261,13 +1261,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				{
 					// Ignore -> try other way of setting attribute
 //					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//						"attribute error", context, context.getParser().getLocation());
+//						"attribute error", context, context.getLocation());
 				}
 				catch(Exception e)
 				{
 					// Ignore -> try other way of setting attribute
 //					context.getReporter().report("Failure setting attribute: "+e,
-//						"attribute error", context, context.getParser().getLocation());
+//						"attribute error", context, context.getLocation());
 				}
 			}
 			
@@ -1343,13 +1343,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //					System.out.println("here");
 				// Ignore -> try other way of setting attribute
 //				context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//					"attribute error", context, context.getParser().getLocation());
+//					"attribute error", context, context.getLocation());
 			}
 			catch(Exception e)
 			{
 //				 Ignore -> try other way of setting attribute
 //				context.getReporter().report("Failure invoking setter method: "+e,
-//					"attribute error", context, context.getParser().getLocation());
+//					"attribute error", context, context.getLocation());
 			}
 		}
 		
@@ -1394,13 +1394,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			{
 				// Ignore -> try other way of setting attribute
 //				context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//					"attribute error", context, context.getParser().getLocation());
+//					"attribute error", context, context.getLocation());
 			}
 			catch(Exception e)
 			{
 				// Ignore -> try other way of setting attribute
 //				context.getReporter().report("Failure invoking setter method: "+e,
-//					"attribute error", context, context.getParser().getLocation());
+//					"attribute error", context, context.getLocation());
 			}
 		}
 		
@@ -1494,13 +1494,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //					{
 //						// Ignore -> try other way of setting attribute
 ////						context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
-////							"link error", context, context.getParser().getLocation());
+////							"link error", context, context.getLocation());
 //					}
 //					catch(Exception e)
 //					{
 //						// Ignore -> try other way of setting attribute
 ////						context.getReporter().report("Failure invoking link method: "+e,
-////							"link error", context, context.getParser().getLocation());
+////							"link error", context, context.getLocation());
 //					}
 //				}
 //				else if(object instanceof String)
@@ -1518,13 +1518,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //						{
 //							// Ignore -> try other way of setting attribute
 ////							context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
-////								"link error", context, context.getParser().getLocation());
+////								"link error", context, context.getLocation());
 //						}
 //						catch(Exception e)
 //						{
 //							// Ignore -> try other way of setting attribute
 ////							context.getReporter().report("Failure invoking link method: "+e,
-////								"link error", context, context.getParser().getLocation());
+////								"link error", context, context.getLocation());
 //						}
 //					}
 //				}
@@ -1564,13 +1564,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //				{
 //					// Ignore -> try other way of setting attribute
 ////					context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
-////						"link error", context, context.getParser().getLocation());
+////						"link error", context, context.getLocation());
 //				}
 //				catch(Exception e)
 //				{
 //					// Ignore -> try other way of setting attribute
 ////					context.getReporter().report("Failure invoking link method: "+e,
-////						"link error", context, context.getParser().getLocation());
+////						"link error", context, context.getLocation());
 //				}
 //			}
 //		}
@@ -1651,7 +1651,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		else
 		{
 			context.getReporter().report("Conversion to target no possible: "+targetclass+" "+vals,
-				"convert error", context, context.getParser().getLocation());
+				"convert error", context, context.getLocation());
 		}
 		
 		return ret;

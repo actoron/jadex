@@ -75,9 +75,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLReporter;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.Location;
+import jadex.xml.stax.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -1574,7 +1574,7 @@ public class BpmnXMLReader
 								{
 									((ReadContext)context).getReporter().report("Type not found: "+typename, null, null, null);
 								}
-								catch(XMLStreamException e)
+								catch(Exception e)
 								{
 									throw new RuntimeException(e);
 								}

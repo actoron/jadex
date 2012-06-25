@@ -1,6 +1,9 @@
 package jadex.xml.reader;
 
-import javax.xml.stream.XMLReporter;
+import jadex.xml.stax.JadexXMLReporterWrapper;
+import jadex.xml.stax.StaxXMLReporterWrapper;
+import jadex.xml.stax.XMLReporter;
+
 
 public class XMLReaderFactoryDesktop extends XMLReaderFactory
 {
@@ -23,13 +26,13 @@ public class XMLReaderFactoryDesktop extends XMLReaderFactory
 	@Override
 	public AReader createReader(boolean bulklink, boolean validate, XMLReporter reporter)
 	{
-		return new Reader(bulklink, validate, reporter);
+		return new Reader(bulklink, validate, JadexXMLReporterWrapper.fromXMLReporter(reporter));
 	}
 
 	@Override
 	public AReader createReader(boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter)
 	{
-		return new Reader(bulklink, validate, coalescing, reporter);
+		return new Reader(bulklink, validate, coalescing, JadexXMLReporterWrapper.fromXMLReporter(reporter));
 	}
 
 }

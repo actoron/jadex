@@ -1,14 +1,9 @@
 package jadex.xml;
 
 import jadex.commons.IFilter;
+import jadex.xml.stax.QName;
 
 import java.util.StringTokenizer;
-
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
 
 /**
  *  Info for an xml element, i.e. identifying tag(path), filter etc. 

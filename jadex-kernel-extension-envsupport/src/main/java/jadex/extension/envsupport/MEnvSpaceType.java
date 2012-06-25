@@ -68,7 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.xml.stax.QName;
 
 /**
  *  Java representation of environment space type for xml description.

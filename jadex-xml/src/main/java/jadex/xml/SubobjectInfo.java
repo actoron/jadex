@@ -1,9 +1,6 @@
 package jadex.xml;
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
+
+import jadex.xml.stax.QName;
 
 /**
  *  Info object for subobjects, i.e. objects that are contained in another object.

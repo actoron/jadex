@@ -1,6 +1,7 @@
 package jadex.xml;
 
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.stax.QName;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,11 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
 /**
  *  Mapping from tag (or path fragment) to object.
  */

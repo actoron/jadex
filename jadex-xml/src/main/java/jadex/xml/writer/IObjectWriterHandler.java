@@ -4,12 +4,7 @@ import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
 import jadex.xml.TypeInfo;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
-
+import jadex.xml.stax.QName;
 
 /**
  *  Interface for an object writer handler.

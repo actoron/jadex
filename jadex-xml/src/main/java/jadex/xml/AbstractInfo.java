@@ -2,15 +2,9 @@ package jadex.xml;
 
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.xml.stax.QName;
 
 import java.util.Comparator;
-
-/* if_not[android] */
-import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
-
 
 /**
  *  Superclass for XML object type/link infos.

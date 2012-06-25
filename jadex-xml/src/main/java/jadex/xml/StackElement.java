@@ -2,18 +2,12 @@ package jadex.xml;
 
 import jadex.commons.SUtil;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.stax.Location;
+import jadex.xml.stax.QName;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-/* if_not[android] */
-import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-/* else[android]
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-end[android] */
 
 /**
  *  A struct to represent an element on the stack while parsing.

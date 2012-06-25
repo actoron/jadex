@@ -57,17 +57,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLReporter;
-import javax.xml.stream.XMLStreamException;
-/* else[android]
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
-end[android] */
+import jadex.xml.stax.QName;
+import jadex.xml.stax.Location;
+import jadex.xml.stax.XMLReporter;
 
 
 /**
@@ -169,7 +161,7 @@ public class ComponentXMLReader
 	{
 		this.reader = XMLReaderFactory.getInstance().createReader(false, false, new XMLReporter()
 		{
-			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
+			public void report(String msg, String type, Object info, Location location) throws Exception
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();

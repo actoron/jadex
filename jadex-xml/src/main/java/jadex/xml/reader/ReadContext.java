@@ -10,15 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/* if_not[android] */
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLReporter;
+import jadex.xml.stax.Location;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.StaxLocationWrapper;
+import jadex.xml.stax.XMLReporter;
+
 import javax.xml.stream.XMLStreamReader;
-/* else[android]
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamReader;
-end[android] */
 
 /**
  *  Context for reader that stores all relevant information of the read process.
@@ -259,6 +256,14 @@ public class ReadContext implements IContext
 	public int getStackSize()
 	{
 		return stack.size();
+	}
+	
+	/**
+	 * Returns the current parser location.
+	 * @return Location
+	 */
+	public Location getLocation() {
+		return StaxLocationWrapper.fromLocation(parser.getLocation());
 	}
 	
 	/**

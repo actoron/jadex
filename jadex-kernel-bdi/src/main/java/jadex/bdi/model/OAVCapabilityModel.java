@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.xml.stax.QName;
 
 /**
  *  The capability model contains the OAV capability model in a state
