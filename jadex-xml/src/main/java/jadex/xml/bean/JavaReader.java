@@ -22,7 +22,9 @@ import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.Reader;
+import jadex.xml.reader.XMLReaderFactory;
 
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -54,7 +56,7 @@ public class JavaReader
 	//-------- attributes --------
 	
 	/** The reader. */
-	protected static Reader reader;
+	protected static AReader reader;
 	
 	/** The path manager. */
 	protected static TypeInfoPathManager pathmanager;
@@ -838,7 +840,7 @@ public class JavaReader
 	 */
 	public static Object objectFromInputStream(InputStream val, ClassLoader classloader)
 	{
-		return Reader.objectFromInputStream(getInstance(), val, classloader, getPathManager(), getObjectHandler());
+		return AReader.objectFromInputStream(getInstance(), val, classloader, getPathManager(), getObjectHandler());
 	}
 	
 	/**
@@ -848,7 +850,7 @@ public class JavaReader
 	 */
 	public static <T> T objectFromXML(String val, ClassLoader classloader, TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
-		return (T)Reader.objectFromXML(getInstance(), val, classloader,
+		return (T)AReader.objectFromXML(getInstance(), val, classloader,
 			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
 	}
 	
@@ -861,7 +863,7 @@ public class JavaReader
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, 
 		TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
-		return Reader.objectFromByteArray(getInstance(), val, classloader, 
+		return AReader.objectFromByteArray(getInstance(), val, classloader, 
 			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
 	}
 	
@@ -874,7 +876,7 @@ public class JavaReader
 	public static Object objectFromInputStream(InputStream val, ClassLoader classloader,
 		TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
-		return Reader.objectFromInputStream(getInstance(), val, classloader, 
+		return AReader.objectFromInputStream(getInstance(), val, classloader, 
 			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
 	}
 	
@@ -882,7 +884,7 @@ public class JavaReader
 	 *  Get the default Java reader.
 	 *  @return The Java reader.
 	 */
-	private static Reader getInstance()
+	private static AReader getInstance()
 	{
 		if(reader==null)
 		{
@@ -890,7 +892,7 @@ public class JavaReader
 			{
 				if(reader==null)
 				{
-					reader	= new Reader(false, false, false, null);
+					reader	= XMLReaderFactory.getInstance().createReader(false, false, false, null);
 				}
 			}
 		}
@@ -901,9 +903,9 @@ public class JavaReader
 	 *  Get the default Java reader.
 	 *  @return The Java reader.
 	 */
-	private static Reader	getReader(XMLReporter reporter)
+	private static AReader	getReader(XMLReporter reporter)
 	{
-		return new Reader(false, false, false, reporter);
+		return XMLReaderFactory.getInstance().createReader(false, false, false, reporter);
 	}
 	
 	/**

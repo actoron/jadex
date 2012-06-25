@@ -34,8 +34,9 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectLinker;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.ReadContext;
-import jadex.xml.reader.Reader;
+import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
@@ -61,7 +62,7 @@ public class OAVBDIXMLReader
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
-	protected static Reader reader;
+	protected static AReader reader;
 	protected static Writer writer;
 	
 	/** The manager. */
@@ -556,12 +557,12 @@ public class OAVBDIXMLReader
 		
 		// Different readers and writers should not work on the same typeinfos
 		// because they may alter them (e.g. add additional array types).
-		reader = new Reader(false, false, new XMLReporter()
+		reader = XMLReaderFactory.getInstance().createReader(false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
-				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
+				IContext	context	= (IContext)AReader.READ_CONTEXT.get();
 				reportError(context, msg);
 			}
 		});
@@ -576,7 +577,7 @@ public class OAVBDIXMLReader
 	/**
 	 *  Get the reader instance.
 	 */
-	public static Reader getReader()
+	public static AReader getReader()
 	{
 		return reader;
 	}

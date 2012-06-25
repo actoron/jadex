@@ -54,7 +54,7 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.StackElement;
-import jadex.xml.reader.Reader;
+import jadex.xml.reader.AReader;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	protected Map	properties;
 	
 	/** The reader (cached for speed, todo: weak for memory). */
-	protected Reader	reader;
+	protected AReader	reader;
 	
 	/** The platform root. */
 	protected IComponentIdentifier	root;

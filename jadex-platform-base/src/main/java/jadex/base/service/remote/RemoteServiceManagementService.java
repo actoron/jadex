@@ -75,7 +75,7 @@ import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.reader.Reader;
+import jadex.xml.reader.AReader;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
@@ -147,7 +147,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	protected Writer writer;
 	
 	/** The rmi xml to object reader. */
-	protected Reader reader;
+	protected AReader reader;
 	
 	/** Preprocessors for binary encoding. */
 	protected List<ITraverseProcessor> binpreprocs;

@@ -23,7 +23,9 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.Reader;
+import jadex.xml.reader.XMLReaderFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,7 +57,7 @@ public class GpmnXMLReader
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
-	protected static Reader	reader;
+	protected static AReader	reader;
 	
 	/** The manager. */
 	protected static TypeInfoPathManager manager;
@@ -68,7 +70,7 @@ public class GpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader();
+		reader = XMLReaderFactory.getInstance().createReader();
 		manager = new TypeInfoPathManager(getXMLMapping());
 		handler = new BeanObjectReaderHandler(getXMLMapping());
 	}

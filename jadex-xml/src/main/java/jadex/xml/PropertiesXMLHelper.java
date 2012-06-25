@@ -6,8 +6,9 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.reader.Reader;
+import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
@@ -16,11 +17,7 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-/* if_not[android] */
 import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
 
 /**
  *  A simple static helper class for reading and writing jadex.commons.Properties.
@@ -100,7 +97,7 @@ public class PropertiesXMLHelper
 	 */
 	public static <T> T read(String val, ClassLoader classloader)
 	{
-		return (T)Reader.objectFromXML(new Reader(), val, classloader, getPathManager(), getObjectReaderHandler());
+		return (T)AReader.objectFromXML(XMLReaderFactory.getInstance().createReader(), val, classloader, getPathManager(), getObjectReaderHandler());
 	}
 	
 	/**
@@ -110,7 +107,7 @@ public class PropertiesXMLHelper
 	 */
 	public static <T> T read(InputStream is, ClassLoader classloader)
 	{
-		return (T)Reader.objectFromInputStream(new Reader(), is, classloader, getPathManager(), getObjectReaderHandler());
+		return (T)AReader.objectFromInputStream(XMLReaderFactory.getInstance().createReader(), is, classloader, getPathManager(), getObjectReaderHandler());
 	}
 	
 	

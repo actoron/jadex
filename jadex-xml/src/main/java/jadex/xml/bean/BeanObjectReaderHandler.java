@@ -19,10 +19,10 @@ import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
 import jadex.xml.reader.ReadContext;
-import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -43,11 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-/* if_not[android] */
 import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
 
 
 /**
@@ -188,7 +184,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			QName tag = (QName)type;
 			if(tag.equals(SXML.NULL))
 			{	
-				ret = Reader.NULL;
+				ret = AReader.NULL;
 			}
 			else
 			{
@@ -274,7 +270,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					else if(String.class.equals(clazz))
 					{
-						ret = Reader.STRING_MARKER;
+						ret = AReader.STRING_MARKER;
 					}
 				}
 			}
@@ -489,7 +485,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			int cnt = context.getArrayCount(parent);
 			
-			if(!Reader.NULL.equals(object))
+			if(!AReader.NULL.equals(object))
 				Array.set(parent, cnt, object);
 			
 			linked = true;
@@ -568,7 +564,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				int cnt = context.getArrayCount(parent);
 				
 				Object object = childs.get(i);
-				if(!Reader.NULL.equals(object))
+				if(!AReader.NULL.equals(object))
 					Array.set(parent, cnt, object);
 			}
 			
@@ -790,7 +786,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		boolean	set	= false;
 		
-		if(Reader.NULL.equals(val))
+		if(AReader.NULL.equals(val))
 		{
 			set	= true;
 		}

@@ -57,8 +57,10 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
+import jadex.xml.reader.XMLReaderFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -112,7 +114,7 @@ public class BpmnXMLReader
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
-	protected static Reader	reader;
+	protected static AReader	reader;
 	
 	public static IPostProcessor configpp = new IPostProcessor()
 	{
@@ -155,13 +157,13 @@ public class BpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader(false, false, new XMLReporter()
+		reader = XMLReaderFactory.getInstance().createReader(false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();
-				IContext	context	= (IContext)(info instanceof IContext ? info : Reader.READ_CONTEXT.get());
+				IContext	context	= (IContext)(info instanceof IContext ? info : AReader.READ_CONTEXT.get());
 				Tuple	stack	= new Tuple(info instanceof StackElement[] ? (StackElement[])info : ((ReadContext)context).getStack());
 				
 				Map	user	= (Map)context.getUserContext();

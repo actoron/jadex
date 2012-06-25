@@ -42,8 +42,10 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
+import jadex.xml.reader.XMLReaderFactory;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class ComponentXMLReader
 	//-------- attributes --------
 	
 	/** The reader instance. */
-	protected Reader reader;
+	protected AReader reader;
 	
 	/** The manager. */
 	protected TypeInfoPathManager manager;
@@ -165,13 +167,13 @@ public class ComponentXMLReader
 	 */
 	public ComponentXMLReader(Set mappings)
 	{
-		this.reader = new Reader(false, false, new XMLReporter()
+		this.reader = XMLReaderFactory.getInstance().createReader(false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();
-				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
+				IContext	context	= (IContext)AReader.READ_CONTEXT.get();
 				Map	user	= (Map)context.getUserContext();
 				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 				String	pos;
