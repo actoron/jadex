@@ -24,9 +24,6 @@ import jadex.xml.XMLInfo;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.Rectangle;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
@@ -232,23 +229,6 @@ public class JavaReader
 				new SubObjectConverter(entryconv, null), true, null)
 			}));
 			typeinfos.add(ti_unmap);
-			
-			// java.util.Color
-			IStringObjectConverter coconv = new IStringObjectConverter()
-			{
-				public Object convertString(String val, IContext context)
-				{
-					/* if_not[android] */
-					return Color.decode(val);
-					/* else[android]
-					return null;
-					end[android]*/
-				}
-			};
-			
-			TypeInfo ti_color = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}), 
-				null, new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(coconv, null))));
-			typeinfos.add(ti_color);
 			
 			TypeInfo ti_class = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}),
 				new ObjectInfo(new IBeanObjectCreator()
@@ -484,64 +464,6 @@ public class JavaReader
 				}
 			));
 			typeinfos.add(ti_inetaddr);
-			
-			// Image
-			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt.image", "Image")}),
-				new ObjectInfo(new IBeanObjectCreator()
-				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
-					{
-						/* if_not[android] */
-						Image ret = null;
-						String encdata = (String)rawattributes.get("imgdata");
-						byte[] data = Base64.decode(encdata.getBytes());
-						
-						String classname = (String)rawattributes.get("classname");
-						ret = SGUI.imageFromBytes(data, SReflect.findClass(classname, null, context.getClassLoader()));
-						
-//						if(classname.indexOf("Toolkit")!=-1)
-//						{
-//							Toolkit t = Toolkit.getDefaultToolkit();
-//							ret = t.createImage(data);
-//						}
-//						else
-//						{
-//							ret = ImageIO.read(new ByteArrayInputStream(data));
-//						}
-						return ret;
-						/* else[android]
-						return null;
-						end[android]*/
-					}
-				}),
-				new MappingInfo(null, new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("imgdata", null, AccessInfo.IGNORE_READWRITE)),
-					new AttributeInfo(new AccessInfo("classname", null, AccessInfo.IGNORE_READWRITE))
-				}
-			));
-			typeinfos.add(ti_image);
-			
-			// java.awt.Rectangle
-			TypeInfo ti_rect = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Rectangle")}),
-				new ObjectInfo(new IBeanObjectCreator()
-				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
-					{
-						int x = (int)Double.parseDouble((String)rawattributes.get("x"));
-						int y = (int)Double.parseDouble((String)rawattributes.get("y"));
-						int w = (int)Double.parseDouble((String)rawattributes.get("width"));
-						int h = (int)Double.parseDouble((String)rawattributes.get("height"));
-						return new Rectangle(x, y, w, h);
-					}
-				}),
-				new MappingInfo(null, new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("x", null, AccessInfo.IGNORE_READWRITE)),
-					new AttributeInfo(new AccessInfo("y", null, AccessInfo.IGNORE_READWRITE)),
-					new AttributeInfo(new AccessInfo("width", null, AccessInfo.IGNORE_READWRITE)),
-					new AttributeInfo(new AccessInfo("height", null, AccessInfo.IGNORE_READWRITE)),
-				}
-			));
-			typeinfos.add(ti_rect);
 			
 			TypeInfo ti_enum = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Enum")}),
 				new ObjectInfo(new IBeanObjectCreator()
@@ -874,6 +796,10 @@ public class JavaReader
 					new AttributeInfo(new AccessInfo("leastSignificantBits", null, AccessInfo.IGNORE_READWRITE))
 			}));
 			typeinfos.add(ti_uuid);
+			
+			if (!SReflect.isAndroid()) {
+				typeinfos.addAll(STypeInfosAWT.getReaderTypeInfos());
+			}
 		}
 		catch(NoSuchMethodException e)
 		{

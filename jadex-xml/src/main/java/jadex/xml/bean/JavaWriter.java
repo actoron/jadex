@@ -20,11 +20,6 @@ import jadex.xml.XMLInfo;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
-/* if_not[android] */
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.Rectangle;
-/* end[android] */
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
@@ -40,9 +35,6 @@ import java.util.logging.LogRecord;
 
 /* if_not[android] */
 import javax.xml.namespace.QName;
-/* else[android]
-import javaxx.xml.namespace.QName;
-end[android] */
 
 /**
  * Java specific reader that supports collection classes and arrays.
@@ -57,9 +49,6 @@ public class JavaWriter extends Writer
 	/** The object handler. */
 	protected static IObjectWriterHandler handler;
 	
-	/* if_not[android] */
-	protected static final Color TRANSPARENT_WHITE = new Color( 255, 255, 255, 0); 
-	/* end[android] */
 	
 	//-------- constructors --------
 	
@@ -190,26 +179,7 @@ public class JavaWriter extends Writer
 //			typeinfos.add(ti_unlist);
 			// java.util.UnmodifyableMap
 			
-			// java.util.Color
-			IObjectStringConverter coconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					/* if_not[android] */
-					return ""+((Color)val).getRGB();
-					/* else[android]
-					return "";
-					end[android] */
-				}
-			};
-			/* if_not[android] */
-			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(Color.class), new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
-			/* else[android]
-			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(null), new MappingInfo(null, null,
-					new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
-			end[android] */
-			typeinfos.add(ti_color);
+		
 			
 			// java.util.Date
 			// Ignores several redundant bean attributes for performance reasons.
@@ -306,28 +276,6 @@ public class JavaWriter extends Writer
 			));
 			typeinfos.add(ti_inetaddr);
 			
-			// java.awt.image.RenderedImage
-			IObjectStringConverter imgconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, IContext context)
-				{
-					try
-					{
-						/* if_not[android] */
-						byte[] buf = SGUI.imageToStandardBytes((Image)val, "image/png");
-						return new String(Base64.encode(buf));	
-						/* else[android]
-						return "";
-						end[android] */
-					}
-					catch(Exception e)
-					{
-						// todo: use context report
-						throw new RuntimeException(e);
-					}
-				}
-			};
-			
 			// java.lang.Class
 			IObjectStringConverter oclconv = new IObjectStringConverter()
 			{
@@ -337,38 +285,6 @@ public class JavaWriter extends Writer
 					return ret;
 				}
 			};
-			
-			/* if_not[android] */
-			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
-				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
-				new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
-				new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, oclconv))},
-				null
-			));
-			/* else[android]
-			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
-					new ObjectInfo(null), new MappingInfo(null, new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
-					new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
-					new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
-					null
-				));
-			end[android] */
-			typeinfos.add(ti_image);
-			
-			/* if_not[android] */
-			// java.awt.Rectangle
-			TypeInfo ti_rect = new TypeInfo(null, new ObjectInfo(Rectangle.class), 
-				new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("x", null)),
-				new AttributeInfo(new AccessInfo("y", null)),
-				new AttributeInfo(new AccessInfo("width", null)),
-				new AttributeInfo(new AccessInfo("height", null))},
-				null
-			));
-			typeinfos.add(ti_rect);
-			/* end[android] */
 			
 			// java.lang.String
 //			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{
@@ -776,6 +692,10 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_uuid);
+			
+			if (!SReflect.isAndroid()) {
+				typeinfos.addAll(STypeInfosAWT.getWriterTypeInfos());
+			}
 		}
 		catch(Exception e)
 		{
