@@ -3,9 +3,15 @@ package jadex.extension.envsupport.observer.graphics.jmonkey;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 
 import java.security.KeyRep;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.jme3.animation.AnimChannel;
+import com.jme3.animation.AnimControl;
+import com.jme3.animation.AnimEventListener;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
@@ -40,7 +46,7 @@ import com.jme3.terrain.heightmap.HillHeightMap;
  * 
  * @author 7willuwe
  */
-public class MonkeyApp extends SimpleApplication
+public class MonkeyApp extends SimpleApplication implements AnimEventListener
 {
 
 	private boolean			_walkCam;
@@ -91,7 +97,7 @@ public class MonkeyApp extends SimpleApplication
 
 		// Create the Cam
 		setCam("Default");
-
+		Logger.getLogger("").setLevel(Level.SEVERE);
 
 		// this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
@@ -176,40 +182,6 @@ public class MonkeyApp extends SimpleApplication
 				else if(keyPressed && name.equals("ChangeCam"))
 				{
 					_walkCam = !_walkCam;
-
-				}
-
-				else if(keyPressed && name.equals("FollowCam"))
-				{
-					if(_selectedSpatial != null)
-					{
-						_followCam = !_followCam;
-						
-						
-						 if(_followCam)
-						 {
-							
-							 ((Node)_selectedSpatial).attachChild(_camNode);
-							 _camNode.setEnabled(true);
-							 _camNode.setLocalTranslation(new Vector3f(0, 0.5f , -3.3f));
-							 
-							 _chaseCam.setEnabled(false);
-							 flyCam.setEnabled(false);
-						 }
-						 else
-						 {
-							 ((Node)_selectedSpatial).detachChild(_camNode);
-							 _camNode.setEnabled(false);
-							 flyCam.setEnabled(true);
-						 }
-						 
-					}
-					else
-					{
-						_camNode.removeFromParent();
-						_camNode.setEnabled(false);
-						flyCam.setEnabled(true);
-					}
 
 				}
 				
@@ -517,6 +489,20 @@ public class MonkeyApp extends SimpleApplication
 	public void setSelectedTarget(int selectedTarget)
 	{
 		this._selectedTarget = selectedTarget;
+	}
+
+	@Override
+	public void onAnimChange(AnimControl control, AnimChannel channel, String animName)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }
