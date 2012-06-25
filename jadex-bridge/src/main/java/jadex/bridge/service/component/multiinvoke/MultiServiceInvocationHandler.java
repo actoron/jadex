@@ -1,9 +1,13 @@
 package jadex.bridge.service.component.multiinvoke;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.MultiplexDistributor;
 import jadex.bridge.service.annotation.TargetMethod;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -11,6 +15,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -70,9 +75,9 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		// Get the method on original interface
 		
 		String methodname = method.getName();
-		Method muxsermethod = muxservicetype.getMethod(methodname, method.getParameterTypes());
-		if(muxsermethod.isAnnotationPresent(TargetMethod.class))
-			methodname = muxsermethod.getAnnotation(TargetMethod.class).value();
+		Method muxmethod = muxservicetype.getMethod(methodname, method.getParameterTypes());
+		if(muxmethod.isAnnotationPresent(TargetMethod.class))
+			methodname = muxmethod.getAnnotation(TargetMethod.class).value();
 		final Method sermethod = servicetype.getMethod(methodname, method.getParameterTypes());
 		
 		IIntermediateFuture<Object> fut = agent.getServiceContainer().getRequiredServices(reqname);
@@ -96,19 +101,17 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 			}
 		}
 		
-		// Normal case, return type should be intermediate future
-		SimpleCallDistributor cd = new SimpleCallDistributor(sermethod, args);
 		if(SReflect.isSupertype(IIntermediateFuture.class, rettype))
 		{
 			final IntermediateFuture<Object> ret = new IntermediateFuture<Object>();
 			gret = ret;
-			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten, cd));
+			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten, muxmethod));
 		}
 		else if(SReflect.isSupertype(IFuture.class, rettype))
 		{
 			final Future<Object> ret = new Future<Object>();
 			gret = ret;
-			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten, cd));
+			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten, muxmethod));
 		}
 		else
 		{
@@ -147,7 +150,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		protected List<Object> callresults;
 		
 		/** The call distributor. */
-		protected ICallDistributor cdis;
+		protected IMultiplexDistributor cdis;
 		
 		/** The call results. */
 		protected IIntermediateFuture<Object> cdisres;
@@ -158,33 +161,72 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		 *  Create a new listener.
 		 */
 		public IntermediateMethodResultListener(Future<Object> fut, Method method, Object[] args, 
-			final boolean flatten, ICallDistributor cdis)
+			final boolean flatten, Method muxmethod)
 		{
 			this.fut = fut;
-			this.method = method;
-			this.args = args;
-			this.flatten = flatten;
-			this.cdis = cdis;
-			this.calls = new ArrayList<Future<Void>>();
-			this.cdisres = cdis.start();
-			
-			cdisres.addResultListener(new DistributorListener());
+			init(method, args, flatten, muxmethod);
 		}
 		
 		/**
 		 *  Create a new listener.
 		 */
 		public IntermediateMethodResultListener(IntermediateFuture<Object> ifut, Method method, 
-			Object[] args, boolean flatten, ICallDistributor cdis)
+			Object[] args, boolean flatten, Method muxmethod)
 		{
 			this.ifut = ifut;
+			init(method, args, flatten, muxmethod);
+		}
+		
+		/**
+		 *  Init to share code.
+		 */
+		public void init(Method method, Object[] args, boolean flatten, Method muxmethod)
+		{
 			this.method = method;
 			this.args = args;
 			this.flatten = flatten;
-			this.cdis = cdis;
 			this.calls = new ArrayList<Future<Void>>();
-			this.cdisres = cdis.start();
-
+			
+			IMultiplexDistributor md = null;
+			Class<? extends IMultiplexDistributor> cdcl = null;
+			IFilter<Tuple2<IService, Object[]>> fil = null;
+			if(muxmethod.isAnnotationPresent(MultiplexDistributor.class))
+			{
+				MultiplexDistributor mda = muxmethod.getAnnotation(MultiplexDistributor.class);
+				cdcl = mda.type();
+				String filex = mda.filter();
+				if(filex.length()>0)
+				{
+					try
+					{
+						fil = (IFilter<Tuple2<IService, Object[]>>)SJavaParser.evaluateExpression(filex, agent.getFetcher());
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			// Create multiplex distributor
+			if(cdcl!=null)
+			{
+				try
+				{
+					md = cdcl.newInstance();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			if(md==null)
+			{
+				md = new SimpleMultiplexDistributor();
+			}
+			
+			// Init distributor
+			this.cdisres = cdis.init(method, args, fil);
 			cdisres.addResultListener(new DistributorListener());
 		}
 		
@@ -247,7 +289,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		{
 //			System.out.println("service found: "+Thread.currentThread()+" "+agent.isComponentThread());
 			// Found service -> invoke method
-			cdis.addService(result);
+			cdis.addService((IService)result);
 		}
 		
 		/**

@@ -78,9 +78,9 @@ public interface IMultiplexExampleService
 	
 	
 	// automated task distribution
-//	/**
-//	 * 
-//	 */
-//	@CallDistributor(ExampleDistributor.class)
-//	public IFuture<List<Integer>> add(List<Integer> a, List<Integer> b);
+	/**
+	 * 
+	 */
+	@CallDistributor(ExampleDistributor.class)
+	public IFuture<List<Integer>> add(List<Integer> a, List<Integer> b);
 }

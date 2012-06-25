@@ -3,12 +3,12 @@ package jadex.commons;
 /**
  *  Generic filter interface.
  */
-public interface IFilter
+public interface IFilter<T>
 {
 	//-------- constants --------
 	
 	/** A filter that always returns true. */
-	public static final IFilter ALWAYS = new IFilter()
+	public static final IFilter<Object> ALWAYS = new IFilter<Object>()
 	{
 		public boolean filter(Object obj) 
 		{
@@ -17,7 +17,7 @@ public interface IFilter
 	};
 	
 	/** A filter that always returns false. */
-	public static final IFilter NEVER = new IFilter()
+	public static final IFilter<Object> NEVER = new IFilter<Object>()
 	{
 		public boolean filter(Object obj) 
 		{
@@ -31,5 +31,5 @@ public interface IFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public boolean filter(Object obj);
+	public boolean filter(T obj);
 }
