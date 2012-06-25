@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>The Show Room for random 3D Spaceobjects</H3>
+	<H3>The Show Room for Medieval 3D Spaceobjects</H3>
 
-	3D Showroom of Spaceobjects created by us or licensed under Creative Commons
-Attribution 3.0 <br><br>
+	3D Showroom of Medieval 3D Characters created and animated by Botanicus (http://opengameart.org/users/botanic) under Creative Commons
+Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 	
 	Shortkeys: <br>
 	F8 - Grid On/OFF<br>
@@ -22,7 +22,7 @@ Attribution 3.0 <br><br>
 	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="ShowRoom3d" package="jadex.bdi.examples.showroom3d">
+	name="ShowRoomCharMedieval" package="jadex.bdi.examples.showroom3d">
 	
 	<imports>
 		<import>jadex.extension.envsupport.environment.space3d.*</import>
@@ -43,39 +43,33 @@ Attribution 3.0 <br><br>
 	
 	<arguments>
 		<argument name="types" class="String[]">
-			new String[]{"jadex3d/models/vehicles/digger/digger.j3o", 
-			"jadex3d/models/space/misc/rock01.j3o", 
-			"jadex3d/models/space/carrier/spaceship.j3o", 
-			"jadex3d/models/space/spacefrigate/spacefrigate.j3o",
-			 "jadex3d/models/vehicles/forklift/forklift.j3o",
-			 "jadex3d/models/vehicles/tank/sentrytank.j3o",
-			 "jadex3d/models/space/smallship/ship.j3o",
-			 "jadex3d/models/space/misc/box/ammo.j3o",
-			 "jadex3d/models/space/misc/station/konostationobj.j3o"}
+			new String[]{"jadex3d/models/characters/medieval/archer/archer.j3o", 
+			"jadex3d/models/characters/medieval/berzerk/berzerk.j3o", 
+			"jadex3d/models/characters/medieval/cerberus/cerberus.j3o", 
+			"jadex3d/models/characters/medieval/diablous/diablous.j3o",
+			 "jadex3d/models/characters/medieval/femalemage/femalemage.j3o",
+			 "jadex3d/models/characters/medieval/femalepriest/femalepriest.j3o",
+			 "jadex3d/models/characters/medieval/knight/knight.j3o"}
 			 
 		</argument>
 		
 		<argument name="size" class="Vector3Double[]">
-			new Vector3Double[]{new Vector3Double(0.3), 
-			new Vector3Double(0.5), 
-			new Vector3Double(0.075), 
-			new Vector3Double(0.075),
-			new Vector3Double(2.9),
-			new Vector3Double(2.9),
-			new Vector3Double(0.025),
-			new Vector3Double(0.01),
-			new Vector3Double(0.005)}
+			new Vector3Double[]{new Vector3Double(0.1), 
+			new Vector3Double(0.1), 
+			new Vector3Double(0.05), 
+			new Vector3Double(0.1),
+			new Vector3Double(0.1),
+			new Vector3Double(0.1),
+			new Vector3Double(0.1)}
 		</argument>
 		<argument name="posloc" class="Vector3Double[]">
-			new Vector3Double[]{new Vector3Double(0.0,0.16,0.0), 
+			new Vector3Double[]{new Vector3Double(0.0,0.5,0.0), 
 			new Vector3Double(0.0,0.5,0.0), 
-			new Vector3Double(0.0,0.1,0.0), 
-			new Vector3Double(0.0,0.3,0.0), 
-			new Vector3Double(0.0,0.0,0.0),
-			new Vector3Double(0.0,0.0,0.0),
-			new Vector3Double(0.0,0.2,0.0),
-			new Vector3Double(0.0,0.0,0.0),
-			new Vector3Double(0.0,0.6,0.0)}
+			new Vector3Double(0.0,0.65,0.0), 
+			new Vector3Double(0.0,0.5,0.0), 
+			new Vector3Double(0.0,0.6,0.0),
+			new Vector3Double(0.0,0.5,0.0),
+			new Vector3Double(0.0,0.5,0.0)}
 		</argument>
 	</arguments>
 	
@@ -94,16 +88,7 @@ Attribution 3.0 <br><br>
 			 
 				</env:objecttype>
 				
-			</env:objecttypes>
-						
-			<env:tasktypes>
-			<!--  
-				<env:tasktype name="move" class="MoveTask" />
-				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
-				<env:tasktype name="produce" class="ProduceOreTask" />
-				<env:tasktype name="load" class="LoadOreTask" />
-			-->
-			</env:tasktypes>			
+			</env:objecttypes>		
 						
 			<env:dataviews>
 				<env:dataview name="all_view" class="GeneralDataView3D" />
@@ -117,18 +102,6 @@ Attribution 3.0 <br><br>
 			
 			<env:perspectives>
 			<env:perspective name="Complex3D" class="Perspective3D">
-
-				
-				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
-
-					<env:sky skypath="jadex3d/textures/sky/space/nebula02/" west="right.jpg" east="left.jpg" north="back.jpg" south="front.jpg" up="top.jpg" down="bottom.jpg" isSphere="false" />  
-					<!--  
-					<env:rndterrain width="1" height="0.2" depth="1"  
-		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
-					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
-					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" />
-					-->
-				</env:drawable3d>
 				
 				<env:drawable3d objecttype="rotationplattform" width="0.2" height="0.2" depth="0.2" rotation3d="false">
 				
@@ -141,8 +114,7 @@ Attribution 3.0 <br><br>
 				
 					
 			</env:perspective>	
-				
-				
+
 			</env:perspectives>
 				
 
@@ -205,16 +177,7 @@ Attribution 3.0 <br><br>
 							<env:property name="posloc">$args.posloc[6]</env:property>
 							<env:property name="size">$args.size[6]</env:property>
 						</env:object>
-						<env:object type="rotationplattform">
-							<env:property name="type">$args.types[7]</env:property>
-							<env:property name="posloc">$args.posloc[7]</env:property>
-							<env:property name="size">$args.size[7]</env:property>
-						</env:object>
-						<env:object type="rotationplattform">
-							<env:property name="type">$args.types[8]</env:property>
-							<env:property name="posloc">$args.posloc[8]</env:property>
-							<env:property name="size">$args.size[8]</env:property>
-						</env:object>
+					
 					</env:objects>
 			
 					<env:observers>
@@ -223,7 +186,6 @@ Attribution 3.0 <br><br>
 					</env:observers>
 	 			</env:envspace>
 			</extensions>
-
 			 
  		</configuration>
  		
