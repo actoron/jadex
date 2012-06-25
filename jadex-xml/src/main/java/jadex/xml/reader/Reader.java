@@ -129,11 +129,12 @@ public class Reader extends AReader
 	
 	//-------- methods --------
 	
-	/*
-	 * (non-Javadoc)
-	 * @see jadex.xml.reader.AReader#read(jadex.xml.TypeInfoPathManager, jadex.xml.reader.IObjectReaderHandler, java.io.Reader, java.lang.ClassLoader, java.lang.Object)
+	/**
+	 *  Read properties from xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
+	 * 	@param context The context.
 	 */
-	@Override
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, java.io.Reader input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
@@ -144,11 +145,12 @@ public class Reader extends AReader
 		return read(tipmanager, handler, parser, classloader, callcontext);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see jadex.xml.reader.AReader#read(jadex.xml.TypeInfoPathManager, jadex.xml.reader.IObjectReaderHandler, java.io.InputStream, java.lang.ClassLoader, java.lang.Object)
+	/**
+	 *  Read properties from xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
+	 * 	@param context The context.
 	 */
-	@Override
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
@@ -210,7 +212,7 @@ public class Reader extends AReader
 		catch(RuntimeException e)
 		{
 //			e.printStackTrace();
-			jadex.xml.stax.Location	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : StaxLocationWrapper.fromLocation(parser.getLocation());
+			jadex.xml.stax.ILocation	loc	= readcontext.getStackSize()>0 ? readcontext.getTopStackElement().getLocation() : StaxLocationWrapper.fromLocation(parser.getLocation());
 			readcontext.getReporter().report(e.toString(), "XML error", readcontext, loc);
 		}
 		finally

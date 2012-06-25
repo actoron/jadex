@@ -17,8 +17,7 @@ public class StaxXMLReporterWrapper implements jadex.xml.stax.XMLReporter
 		return new StaxXMLReporterWrapper(reporter);
 	}
 
-	@Override
-	public void report(String message, String errorType, Object relatedInformation, jadex.xml.stax.Location location) throws Exception
+	public void report(String message, String errorType, Object relatedInformation, jadex.xml.stax.ILocation location) throws Exception
 	{
 //		try
 //		{

@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.xml.stax.QName;
-import jadex.xml.stax.Location;
+import jadex.xml.stax.ILocation;
 import jadex.xml.stax.XMLReporter;
 
 
@@ -161,7 +161,7 @@ public class ComponentXMLReader
 	{
 		this.reader = XMLReaderFactory.getInstance().createReader(false, false, new XMLReporter()
 		{
-			public void report(String msg, String type, Object info, Location location) throws Exception
+			public void report(String msg, String type, Object info, ILocation location) throws Exception
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();

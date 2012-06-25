@@ -2,7 +2,7 @@ package jadex.xml;
 
 import jadex.commons.SUtil;
 import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.stax.Location;
+import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class StackElement
 	protected TypeInfo typeinfo;
 	
 	/** The location of the start tag. */
-	protected Location	location;
+	protected ILocation	location;
 	
 	//-------- constructors --------
 	
@@ -73,7 +73,7 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map rawattrs, TypeInfo typeinfo, Location location)
+	public StackElement(IObjectReaderHandler readerhandler, QName tag, Object object, Map rawattrs, TypeInfo typeinfo, ILocation location)
 	{
 		this.readerhandler	= readerhandler;
 		this.tag = tag;
@@ -168,7 +168,7 @@ public class StackElement
 	 *  Get the location.
 	 *  @return The location.
 	 */
-	public Location getLocation()
+	public ILocation getLocation()
 	{
 		return this.location;
 	}

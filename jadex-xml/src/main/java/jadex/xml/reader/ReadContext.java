@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jadex.xml.stax.Location;
+import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.StaxLocationWrapper;
 import jadex.xml.stax.XMLReporter;
@@ -262,7 +262,7 @@ public class ReadContext implements IContext
 	 * Returns the current parser location.
 	 * @return Location
 	 */
-	public Location getLocation() {
+	public ILocation getLocation() {
 		return StaxLocationWrapper.fromLocation(parser.getLocation());
 	}
 	

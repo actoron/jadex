@@ -13,7 +13,6 @@ public class JadexXMLReporterWrapper implements XMLReporter
 		this.reporter = reporter;
 	}
 
-	@Override
 	public void report(String message, String errorType, Object relatedInformation, Location location) throws XMLStreamException
 	{
 		try

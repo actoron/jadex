@@ -76,7 +76,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import jadex.xml.stax.QName;
-import jadex.xml.stax.Location;
+import jadex.xml.stax.ILocation;
 import jadex.xml.stax.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 
@@ -159,7 +159,7 @@ public class BpmnXMLReader
 	{
 		reader = XMLReaderFactory.getInstance().createReader(false, false, new XMLReporter()
 		{
-			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
+			public void report(String msg, String type, Object info, ILocation location) throws XMLStreamException
 			{
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();
