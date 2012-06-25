@@ -3,13 +3,27 @@ package jadex.xml.reader;
 import jadex.commons.SReflect;
 import jadex.xml.stax.XMLReporter;
 
+/**
+ * Factory to create XML Readers.
+ */
 public abstract class XMLReaderFactory
 {
+	
+	//-------- attributes --------
 
+	/** The instance of this factory */
 	private static XMLReaderFactory INSTANCE;
 	
+	//-------- constructors --------
+
+	/** Constructor */
 	protected XMLReaderFactory(){}
 
+	//-------- methods --------
+	/**
+	 * Returns the instance of this factory.
+	 * @return the factory instance
+	 */
 	public static XMLReaderFactory getInstance()
 	{
 		if (INSTANCE == null) {
@@ -24,12 +38,35 @@ public abstract class XMLReaderFactory
 		return INSTANCE;
 	}
 	
-
+	/**
+	 * Creates a new default XML Reader.
+	 * @return reader
+	 */
 	public abstract AReader createReader();
 	
+	/**
+	 * Creates a new XML Reader
+	 * @param bulklink
+	 * @return
+	 */
 	public abstract AReader createReader(boolean bulklink);
 	
+	/**
+	 * Creates a new XML Reader
+	 * @param bulklink
+	 * @param validate
+	 * @param reporter
+	 * @return
+	 */
 	public abstract AReader createReader(boolean bulklink, boolean validate, XMLReporter reporter);
 	
+	/**
+	 * Creates a new XML Reader
+	 * @param bulklink
+	 * @param validate
+	 * @param coalescing
+	 * @param reporter
+	 * @return
+	 */
 	public abstract AReader createReader(boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter);
 }

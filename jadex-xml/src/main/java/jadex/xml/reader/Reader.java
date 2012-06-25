@@ -678,6 +678,11 @@ public class Reader extends AReader
 		}
 	}
 	
+	/**
+	 * Converts a StaX QName object to a jadex.xml.stax.qname object.
+	 * @param qname
+	 * @return QName
+	 */
 	private static QName convertStaXQNameToQName(javax.xml.namespace.QName qname) {
 		return new QName(qname.getNamespaceURI(), qname.getLocalPart(), qname.getPrefix());
 	}
