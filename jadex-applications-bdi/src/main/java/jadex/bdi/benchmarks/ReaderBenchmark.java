@@ -7,7 +7,7 @@ import jadex.component.ComponentXMLReader;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.javaimpl.OAVStateFactory;
-import jadex.xml.reader.Reader;
+import jadex.xml.reader.AReader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class ReaderBenchmark
 	//	Configuration.setFallbackConfiguration("jadex/config/batch_conf.properties");
 		
 		// Do not measure first loading.
-		Reader	reader	= OAVBDIXMLReader.getReader(); 
+		AReader	reader	= OAVBDIXMLReader.getReader(); 
 		IOAVState	state	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //		IOAVState	state	= new JenaOAVState();
 		
@@ -80,7 +80,7 @@ public class ReaderBenchmark
 	}
 
 
-	protected static IOAVState[] loadOAVModels(String arg, Reader reader, int cnt) throws Exception
+	protected static IOAVState[] loadOAVModels(String arg, AReader reader, int cnt) throws Exception
 	{
 		IOAVState[] states	= new IOAVState[cnt];
 		for(int i=0; i<states.length; i++)
