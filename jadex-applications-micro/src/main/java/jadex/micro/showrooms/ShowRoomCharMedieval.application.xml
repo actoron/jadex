@@ -102,10 +102,13 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 			<env:perspective name="Complex3D" class="Perspective3D">
 				<env:drawable3d objecttype="rotationplattform" width="0.2" height="0.2" depth="0.2" rotation3d="false">
 				
-					<env:sphere width="1" height="0.01" depth="1" rotation="rota" x="0.0" y="0.0" z="0.0"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/red.jpg" />
-		 
-					<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true"/> 
-			
+					
+					<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true"> 
+					
+						<env:animation name="Walk" channel="chanA" loop="false">
+							
+						</env:animation>
+				</env:object3d>
 				</env:drawable3d>
 			</env:perspective>	
 			</env:perspectives>
