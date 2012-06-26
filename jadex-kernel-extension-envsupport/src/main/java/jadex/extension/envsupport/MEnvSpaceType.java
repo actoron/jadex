@@ -1045,7 +1045,7 @@ public class MEnvSpaceType
 							}
 						}
 						
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, exp, anims);
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, exp, fanims);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
