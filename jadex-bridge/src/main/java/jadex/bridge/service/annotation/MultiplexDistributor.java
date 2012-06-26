@@ -16,11 +16,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MultiplexDistributor
 {
-	/** The default one (argument) to all (services) distribution strategy. */
-	public static final Class<? extends IMultiplexDistributor> ONE_TO_ALL = SimpleMultiplexDistributor.class;
-	
-	/** The default one (argument) to each (service) distribution strategy. */
-	public static final Class<? extends IMultiplexDistributor> ONE_TO_EACH = SequentialMultiplexDistributor.class;
+//	/** The default one (argument) to all (services) distribution strategy. */
+//	public static final Class<? extends IMultiplexDistributor> ONE_TO_ALL = SimpleMultiplexDistributor.class;
+//	
+//	/** The default one (argument) to each (service) distribution strategy. */
+//	public static final Class<? extends IMultiplexDistributor> ONE_TO_EACH = SequentialMultiplexDistributor.class;
 	
 	/**
 	 *  The multiplex distributor class.

@@ -1032,8 +1032,20 @@ public class MEnvSpaceType
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
 
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, exp);
-//						//////////////
+						List anims = (List)args.get("animation");
+						List fanims = null;
+						if(anims!=null)
+						{
+							fanims = new ArrayList();
+							for(int i=0; i<anims.size(); i++)
+							{
+								Map srcanim = (Map)anims.get(i);
+								Animation anim = (Animation)((IObjectCreator)getProperty(srcanim, "creator")).createObject(srcanim);
+								fanims.add(anim);
+							}
+						}
+						
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, exp, anims);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1054,7 +1066,7 @@ public class MEnvSpaceType
 					{
 						String name = (String)getProperty(args, "name");
 						String channel = (String)getProperty(args, "channel");
-						Boolean loop = (Boolean)getProperty(args, "creator");
+						Boolean loop = (Boolean)getProperty(args, "loop");
 						if(channel==null)
 						{
 							channel = "default";
@@ -1062,7 +1074,6 @@ public class MEnvSpaceType
 
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "animationcondition");
 						return new Animation(name, channel, loop, exp);
-						//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				}, 
