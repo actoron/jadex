@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 /**
  *  Contains information for provided service implementation:
@@ -32,6 +33,9 @@ public class ProvidedServiceImplementation	extends UnparsedExpression
 	public ProvidedServiceImplementation()
 	{
 		// bean constructor.
+		
+		// Set default proxy type (Hack!!! specify in xml mapping?)
+		proxytype	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 package jadex.javaparser.javaccimpl;
 
 import jadex.commons.IValueFetcher;
+import jadex.commons.SUtil;
 
 
 /**
@@ -54,6 +55,22 @@ public class ParameterNode	extends ExpressionNode
 	public ParameterNode[]	getUnboundParameterNodes()
 	{
 		return new ParameterNode[]{this};
+	}
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		return super.equals(o) && SUtil.equals(getText(), ((ParameterNode)o).getText());
+	}
+	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		return super.hashCode()*31 + (getText()!=null ? getText().hashCode() : 1);
 	}
 }
 

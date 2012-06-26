@@ -2,6 +2,7 @@ package jadex.javaparser.javaccimpl;
 
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 
 /**
@@ -82,6 +83,23 @@ public class TypeNode	extends ExpressionNode
 	public String toPlainString()
 	{
 		return getText();			
+	}
+
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		return super.equals(o) && SUtil.equals(getValue(null), ((TypeNode)o).getValue(null));
+	}
+	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		return super.hashCode()*31 + (getValue(null)!=null ? getValue(null).hashCode() : 1);
 	}
 }
 

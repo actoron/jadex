@@ -231,5 +231,22 @@ public class ArrayNode	extends ExpressionNode
 
 		return ret;
 	}
+
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		return super.equals(o) && type==((ArrayNode)o).getType();
+	}
+	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		return super.hashCode()*31 + type;
+	}
 }
 

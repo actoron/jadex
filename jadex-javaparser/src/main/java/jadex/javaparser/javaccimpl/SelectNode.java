@@ -7,6 +7,7 @@ import jadex.commons.collection.SortedList;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -425,6 +426,34 @@ public class SelectNode	extends ExpressionNode
 		{
 			throw new ParseException("Unknown ordering direction: "+order);
 		}
+	}
+
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		return super.equals(o) && mode==((SelectNode)o).mode
+			&& order==((SelectNode)o).order
+			&& orderby==((SelectNode)o).orderby
+			&& where==((SelectNode)o).where
+			&& (vars==null && ((SelectNode)o).vars==null
+				|| vars!=null && ((SelectNode)o).vars!=null && Arrays.equals(vars, ((SelectNode)o).vars));
+	}
+	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		int	ret	= super.hashCode();
+		ret	= ret*31 + mode;
+		ret	= ret*31 + order;
+		ret	= ret*31 + (orderby ? 1 : 2);
+		ret	= ret*31 + (where ? 1 : 2);
+		ret	= ret*31 + (vars!=null ? 1+Arrays.hashCode(vars) : 1);
+		return ret;
 	}
 }
 

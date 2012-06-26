@@ -3,8 +3,6 @@ package jadex.base.service.message.transport.tcpmtp;
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.httprelaymtp.HttpReceiver;
-import jadex.base.service.message.transport.httprelaymtp.HttpRelayTransport;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -20,7 +18,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.annotation.Binding;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -528,9 +525,11 @@ public class TCPTransport implements ITransport
 					connections.put(address, ret);
 				}
 				catch(Exception e)
-				{ 
-					connections.put(address, new TCPDeadConnection());
-					
+				{
+					if(connections!=null)	// May be already shut down.
+					{
+						connections.put(address, new TCPDeadConnection());
+					}
 	//				logger.warning("Could not create connection: "+e.getMessage());
 					//e.printStackTrace();
 				}

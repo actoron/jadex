@@ -262,5 +262,21 @@ public class BooleanNode	extends ExpressionNode
 			throw new ParseException("Unknown operator: "+operator);
 		}
 	}
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		return super.equals(o) && op==((BooleanNode)o).op;
+	}
+	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		return super.hashCode()*31 + op;
+	}
 }
 

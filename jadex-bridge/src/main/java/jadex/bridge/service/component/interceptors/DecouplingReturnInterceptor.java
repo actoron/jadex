@@ -136,7 +136,17 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 														};
 														if(tp!=null)
 														{
-															tp.execute(run);
+															// Hack!!! Thread pool service should be asynchronous.
+															try
+															{
+																tp.execute(run);
+															}
+															catch(RuntimeException re)
+															{
+																// Happens when thread pool already terminated.
+																Thread t = new Thread(run);
+																t.start();																
+															}
 														}
 														else
 														{

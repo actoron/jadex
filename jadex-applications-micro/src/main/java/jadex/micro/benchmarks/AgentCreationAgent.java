@@ -101,7 +101,7 @@ public class AgentCreationAgent extends MicroAgent
 		final int max = ((Integer)args.get("max")).intValue();
 		final boolean nested = ((Boolean)args.get("nested")).booleanValue();
 		
-		System.out.println("1Created peer: "+num);
+		System.out.println("Created peer: "+num);
 		
 		if(num<max)
 		{

@@ -78,7 +78,6 @@ import java.util.logging.Level;
 @Arguments({
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
 	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name="android", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="adapterfactory", clazz=Class.class, defaultvalue="ComponentAdapterFactory.class"),
 	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
@@ -149,7 +148,7 @@ import java.util.logging.Level;
 
 @ProvidedServices({
 	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IAndroidContextService.class, implementation=@Implementation(expression="Boolean.TRUE.equals($args.android)? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): null")),
+	@ProvidedService(type=IAndroidContextService.class, implementation=@Implementation(expression="SReflect.isAndroid() ? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): null")),
 	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(expression="new SettingsService($component, $args.saveonexit)")),
 	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new AsyncExecutionService($component.getServiceProvider()): new SyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
@@ -172,7 +171,7 @@ import java.util.logging.Level;
 
 @Properties(
 {
-	@NameValue(name="componentviewer.viewerclass", value="$args.android ? null : jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
+	@NameValue(name="componentviewer.viewerclass", value="jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
 	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
 })
 

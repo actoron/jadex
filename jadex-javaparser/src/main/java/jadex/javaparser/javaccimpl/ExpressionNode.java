@@ -296,5 +296,32 @@ public abstract class ExpressionNode	extends SimpleNode	implements IParsedExpres
 		throw new RuntimeException("Exception while evaluating expression: "
 				+root.toPlainString()+"\n"+sw);
 	}
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		boolean	ret	= o!=null && o.getClass().equals(getClass())
+			&& jjtGetNumChildren()==((ExpressionNode)o).jjtGetNumChildren();
+		for(int i=0; ret && i<jjtGetNumChildren(); i++)
+		{
+			ret	= jjtGetChild(i).equals(((ExpressionNode)o).jjtGetChild(i));
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		int ret	= 31 + getClass().hashCode();
+		for(int i=0; i<jjtGetNumChildren(); i++)
+		{
+			ret	= ret*31 + jjtGetChild(i).hashCode();
+		}
+		return ret;
+	}
 }
 

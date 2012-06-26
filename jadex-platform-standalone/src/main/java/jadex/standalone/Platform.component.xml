@@ -87,8 +87,6 @@
 		<argument name="platformname" class="String">"jadex"</argument>
 		<!-- The configuration to use. -->	
 		<argument name="configname" class="String">"auto"</argument>
-		<!-- Running on Android? -->
-		<argument name="android" class="boolean">false</argument>
 		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
 		<argument name="autoshutdown" class="boolean">true</argument>
 		<!-- Tell the starter to use the standalone adapter factory (usually no need to change). -->	
@@ -220,16 +218,14 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.android.IAndroidContextService">
 			<implementation>
-				Boolean.TRUE.equals($args.android)
+				jadex.commons.SReflect.isAndroid()
 				? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
 				: null
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
 			<implementation>
-				Boolean.TRUE.equals($args.android)
-				? jadex.base.service.settings.AndroidSettingsService.class.getConstructor(new Class[]{jadex.bridge.IInternalAccess.class, boolean.class, boolean.class}).newInstance(new Object[]{$component, $args.saveonexit, true})
-				: new jadex.base.service.settings.SettingsService($component, $args.saveonexit)
+				new jadex.base.service.settings.SettingsService($component, $args.saveonexit)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
@@ -268,9 +264,8 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
 			<implementation>
-			Boolean.TRUE.equals($args.android) 
-			? jadex.base.service.security.AndroidSecurityService.class.getConstructor(new Class[]{Boolean.class, Boolean.class}).newInstance(new Object[]{$args.usepass, $args.printpass, $args.trustedlan})
-			: new jadex.base.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass})</implementation>
+				new jadex.base.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass})
+			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.message.IMessageService">
 			<implementation proxytype="raw">
@@ -292,7 +287,7 @@
 				)
 			</implementation>
 		</providedservice>
-		<providedservice name="cms" class="jadex.bridge.service.types.cms.IComponentManagementService">
+		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService">
 			<implementation>
 				new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)
@@ -329,7 +324,7 @@
 	</services>
 
 	<properties>
-		<property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>
+		<property name="componentviewer.viewerclass">jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class</property>
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
@@ -347,7 +342,7 @@
 			</arguments>
 			
 			<components>
-				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !$args.android) ? 1 : 0">
+				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
 					</arguments>
@@ -370,7 +365,7 @@
 					</arguments>
 				</component>
 				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !$args.android) ? 1 : 0">
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="saveonexit">$args.saveonexit</argument>
 					</arguments>
@@ -381,7 +376,7 @@
 		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
 		<configuration name="fixed">
 			<components>
-				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !$args.android) ? 1 : 0">
+				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
 					</arguments>
@@ -403,7 +398,7 @@
 					</arguments>
 				</component>
 				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !$args.android) ? 1 : 0">
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="saveonexit">$args.saveonexit</argument>
 					</arguments>

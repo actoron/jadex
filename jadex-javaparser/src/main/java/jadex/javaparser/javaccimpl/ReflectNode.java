@@ -924,7 +924,27 @@ public class ReflectNode	extends ExpressionNode
 		}
 		return method;
 	}
+
+	/**
+	 *  Test if two nodes are equal.
+	 */
+	public boolean	equals(Object o)
+	{
+		return super.equals(o) && type==((ReflectNode)o).type
+			&& SUtil.equals(getText(), ((ReflectNode)o).getText());
+	}
 	
+	/**
+	 *  Get the hash code for the node.
+	 */
+	public int hashCode()
+	{
+		int	ret	= super.hashCode();
+		ret	= ret*31 + type;
+		ret	= ret*31 + getText()!=null ? getText().hashCode() : 1;
+		return ret;
+	}
+
 	//-------- deserialization handling --------
 
 	/**
