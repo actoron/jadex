@@ -1,8 +1,10 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
-import java.util.List;
-
 import jadex.javaparser.IParsedExpression;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * 
@@ -15,7 +17,11 @@ public class Object3d extends Primitive3d
 	/** Light Materials - to deal with possible render Errors  */
 	protected boolean _hasLightMaterials;
 	
-	protected List<Animation> _animations;
+	protected ArrayList<Animation> _animations;
+	
+	protected TreeSet<String> _channels;
+	
+	protected boolean _rigDebug;
 
 	/**
 	 * Creates default Polygon.
@@ -42,12 +48,23 @@ public class Object3d extends Primitive3d
 	 * @param texturePath
 	 * @param drawcondition
 	 */
-	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String texturePath, boolean hasLightMaterials, IParsedExpression drawcondition, List<Animation> animations)
+	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String texturePath, boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, List<Animation> animations)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, texturePath, drawcondition);
 		_modelPath = modelPath;
 		_hasLightMaterials = hasLightMaterials;
-		_animations = animations;
+		_rigDebug = rigDebug;
+		_animations = (ArrayList<Animation>)animations;
+		_channels = new TreeSet<String>();
+		if(_animations != null)
+		{
+			for(Animation a : _animations)
+			{
+				_channels.add(a.getChannel());
+			}
+		}
+
+		System.out.println("_channels:" + _channels.toString() + " Size: " + _channels.size());
 	}
 	
 	
@@ -90,16 +107,44 @@ public class Object3d extends Primitive3d
 	/**
 	 * @return the _animations
 	 */
-	public List<Animation> getAnimations()
+	public ArrayList<Animation> getAnimations()
 	{
 		return _animations;
 	}
 	/**
 	 * @param _animations the _animations to set
 	 */
-	public void setAnimations(List<Animation> _animations)
+	public void setAnimations(ArrayList<Animation> _animations)
 	{
 		this._animations = _animations;
+	}
+	/**
+	 * @return the _channels
+	 */
+	public TreeSet<String> getChannels()
+	{
+		return _channels;
+	}
+	/**
+	 * @param _channels the _channels to set
+	 */
+	public void setChannels(TreeSet<String> channels)
+	{
+		this._channels = channels;
+	}
+	/**
+	 * @return the _rigDebug
+	 */
+	public boolean isRigDebug()
+	{
+		return this._rigDebug;
+	}
+	/**
+	 * @param _rigDebug the _rigDebug to set
+	 */
+	public void setRigDebug(boolean rigDebug)
+	{
+		this._rigDebug = rigDebug;
 	}
 	
 
