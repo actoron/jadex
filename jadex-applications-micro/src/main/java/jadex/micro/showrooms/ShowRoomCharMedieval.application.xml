@@ -49,7 +49,8 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 			"jadex3d/models/characters/medieval/diablous/diablous.j3o",
 			 "jadex3d/models/characters/medieval/femalemage/femalemage.j3o",
 			 "jadex3d/models/characters/medieval/femalepriest/femalepriest.j3o",
-			 "jadex3d/models/characters/medieval/knight/knight.j3o"}
+			 "jadex3d/models/characters/medieval/knight/knight.j3o",
+			 "jadex3d/models/characters/medieval/mage/mage.j3o"}
 			 
 		</argument>
 		
@@ -60,14 +61,16 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 			new Vector3Double(0.1),
 			new Vector3Double(0.1),
 			new Vector3Double(0.1),
-			new Vector3Double(0.1)}
+			new Vector3Double(0.1),
+			new Vector3Double(0.05)}
 		</argument>
 		<argument name="posloc" class="Vector3Double[]">
 			new Vector3Double[]{new Vector3Double(0.0,0.5,0.0), 
-			new Vector3Double(0.0,0.5,0.0), 
+			new Vector3Double(0.0,0.45,0.0), 
 			new Vector3Double(0.0,0.65,0.0), 
 			new Vector3Double(0.0,0.5,0.0), 
 			new Vector3Double(0.0,0.6,0.0),
+			new Vector3Double(0.0,0.5,0.0),
 			new Vector3Double(0.0,0.5,0.0),
 			new Vector3Double(0.0,0.5,0.0)}
 		</argument>
@@ -82,6 +85,7 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 				<env:property name="tick360" class="int" dynamic="true">$properties.clock.getTick()%360
 				</env:property>	
 				<env:property name="type" class="String">"jadex3d/models/space/misc/rock01.j3o"</env:property>
+				<env:property name="status" class="String">"Walk"</env:property>
 				<env:property name="size" class="Vector3Double">new Vector3Double(0.1,0.1,0.1)</env:property>
 				<env:property name="posloc" class="Vector3Double">new Vector3Double(0.0,0.0,0.0)</env:property>
 				<env:property name="rota" class="IVector3" dynamic="true">$object.getProperty("rotation")</env:property>
@@ -101,12 +105,15 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 			<env:perspectives>
 			<env:perspective name="Complex3D" class="Perspective3D">
 				<env:drawable3d objecttype="rotationplattform" width="0.2" height="0.2" depth="0.2" rotation3d="false">
-				
-					
 					<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true"> 
-					
 						<env:animation name="Walk" channel="chanA" loop="false">
-							
+						<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
+						</env:animation>
+						<env:animation name="Idle" channel="chanA" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
+						</env:animation>
+						<env:animation name="Attack" channel="chanA" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("Attack")</env:animationcondition>
 						</env:animation>
 				</env:object3d>
 				</env:drawable3d>
@@ -175,6 +182,12 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 							<env:property name="type">$args.types[6]</env:property>
 							<env:property name="posloc">$args.posloc[6]</env:property>
 							<env:property name="size">$args.size[6]</env:property>
+							<env:task type="rotation"/>
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[7]</env:property>
+							<env:property name="posloc">$args.posloc[7]</env:property>
+							<env:property name="size">$args.size[7]</env:property>
 							<env:task type="rotation"/>
 						</env:object>
 					
