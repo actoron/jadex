@@ -126,7 +126,15 @@ Attribution 3.0 <br><br>
 				
 					<env:sphere width="1" height="0.01" depth="1" rotation="rota" x="0.0" y="0.0" z="0.0"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/red.jpg" />
 		 
-					<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true"/> 
+					<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true">
+						<env:animation name="WalkBottom" channel="legs" loop="true">
+							<env:animationcondition abort="true">$object.getProperty("status").equals("Walk")</env:animationcondition>
+						</env:animation>
+						<env:animation name="WalkTop" channel="body" loop="true">
+							<env:animationcondition abort="true">$object.getProperty("status").equals("Walk")</env:animationcondition>
+						</env:animation>
+					</env:object3d>
+					
 			
 				</env:drawable3d>
 
