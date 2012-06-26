@@ -3,6 +3,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Diffuse : 1.0 1.0 0.4 1.0
         UseMaterialColors : true
         LowQuality : true
+        FilterMode : 0
     }
     AdditionalRenderState {
       FaceCull Back

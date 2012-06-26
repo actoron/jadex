@@ -5,7 +5,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         DiffuseMap : Flip jadex3d/models/vehicles/forklift/forklift01_diffuse.jpg
         Diffuse : 1.0 1.0 1.0 1.0
         UseMaterialColors : true
-        Shininess : 20.0
+        Shininess : 0.0
         Specular : 1.0 1.0 1.0 1.0
         LowQuality : true
     }
