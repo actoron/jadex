@@ -233,7 +233,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 							if(!a.getName().equals(chan.getAnimationName()))
 							{
 								chan.setAnim(a.getName());
-								System.out.println("animation! " + a.getName());
+//								System.out.println("animation! " + a.getName());
 							}
 							
 							
