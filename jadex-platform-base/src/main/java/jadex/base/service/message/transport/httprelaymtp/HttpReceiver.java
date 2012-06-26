@@ -222,7 +222,8 @@ public class HttpReceiver
 				}
 				catch(Exception e)
 				{
-					System.out.println("Error receiving awareness info: "+e);										
+					// Todo: logger?
+//					System.out.println("Error receiving awareness info: "+e);
 				}
 			}
 			

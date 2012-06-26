@@ -1,10 +1,13 @@
 package jadex.commons;
 
+import java.io.File;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.List;
+
+import javax.swing.filechooser.FileSystemView;
 
 /**
  *  Helper class for methods used from non-android code.
@@ -44,4 +47,19 @@ public class SNonAndroid
 		return ret;
 	}
 
+	/**
+	 *  Check if a file represents a floppy.
+	 */
+	public static boolean isFloppyDrive(File file)
+	{
+		return FileSystemView.getFileSystemView().isFloppyDrive(file);
+	}
+
+	/**
+	 *  Get the display name (e.g. of a system drive).
+	 */
+	public static String getDisplayName(File file)
+	{
+		return FileSystemView.getFileSystemView().getSystemDisplayName(file);
+	}
 }

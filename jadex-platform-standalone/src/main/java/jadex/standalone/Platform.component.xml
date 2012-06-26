@@ -324,7 +324,7 @@
 	</services>
 
 	<properties>
-		<property name="componentviewer.viewerclass">jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class</property>
+		<property name="componentviewer.viewerclass">jadex.commons.SReflect.isAndroid() ? null : jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class</property>
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->

@@ -171,7 +171,7 @@ import java.util.logging.Level;
 
 @Properties(
 {
-	@NameValue(name="componentviewer.viewerclass", value="jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
+	@NameValue(name="componentviewer.viewerclass", value="SReflect.isAndroid() ? null : jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
 	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
 })
 

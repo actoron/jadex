@@ -2568,4 +2568,24 @@ public class SUtil
 			this.out	= out;
 		}
 	}
+
+	//-------- FileSystemView abstraction for Android --------
+	
+	/**
+	 *  Check if a file represents a floppy.
+	 *  Returns false on android.
+	 */
+	public static boolean isFloppyDrive(File file)
+	{
+		return SReflect.isAndroid() ? false : SNonAndroid.isFloppyDrive(file);
+	}
+
+	/**
+	 *  Get the display name (e.g. of a system drive).
+	 *  Returns null on android.
+	 */
+	public static String getDisplayName(File file)
+	{
+		return SReflect.isAndroid() ? null : SNonAndroid.getDisplayName(file);
+	}
 }

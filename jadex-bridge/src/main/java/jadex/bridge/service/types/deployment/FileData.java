@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.deployment;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.File;
@@ -15,31 +14,6 @@ import java.lang.reflect.Method;
  */
 public class FileData
 {
-	//-------- constants --------
-	
-	/** File system view (use reflection due to not available for android). */
-	protected static Object	fsview;
-	
-	/** Method to check for floppy drive (use reflection due to not available for android). */
-	protected static Method	isfloppy;
-	
-	/** Method to get display name (use reflection due to not available for android). */
-	protected static Method	getdisplayname;
-	
-	static
-	{
-		try
-		{
-			Class<?>	clazz	= SReflect.classForName0("javax.swing.filechooser.FileSystemView", FileData.class.getClassLoader());
-			fsview	= clazz!=null ? clazz.getMethod("getFileSystemView", new Class<?>[0]).invoke(null, new Object[0]) : null;
-			isfloppy	= clazz!=null ? clazz.getMethod("isFloppyDrive", new Class<?>[]{File.class}) : null;
-			getdisplayname	= clazz!=null ? clazz.getMethod("getSystemDisplayName", new Class<?>[]{File.class}) : null;
-		}
-		catch(Exception e)
-		{
-		}
-	}
-	
 	//-------- attributes --------
 	
 	/** The file name. */
@@ -97,19 +71,7 @@ public class FileData
 		this.path = file.getPath();
 		this.directory = SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
-		boolean	floppy	= false;
-		if(fsview!=null)
-		{
-			try
-			{
-				floppy	= ((Boolean)isfloppy.invoke(fsview, new Object[]{file})).booleanValue();
-			}
-			catch(Exception e)
-			{
-				
-			}
-		}
-		this.lastmodified = floppy ? 0 : file.lastModified();
+		this.lastmodified = SUtil.isFloppyDrive(file) ? 0 : file.lastModified();	// Hack to avoid access to floppy disk.
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 		this.separator = File.separatorChar;
 		this.prefix = getPrefixLength(file);
@@ -194,21 +156,7 @@ public class FileData
 	 */
 	public static String getDisplayName(File file)
 	{
-		String	ret	= null;
-		if(fsview!=null)
-		{
-			try
-			{
-				if(!((Boolean)isfloppy.invoke(fsview, new Object[]{file})).booleanValue())
-				{
-					ret = (String)getdisplayname.invoke(fsview, new Object[]{file});
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
+		String	ret	= SUtil.isFloppyDrive(file) ? null : SUtil.getDisplayName(file);	// Hack to avoid access to floppy disk.
 		
 		if(ret==null || ret.length()==0)
 			ret = file.getName();
