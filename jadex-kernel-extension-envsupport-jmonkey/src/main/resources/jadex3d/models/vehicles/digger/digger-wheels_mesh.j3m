@@ -3,6 +3,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Specular : 0.9411765 0.9411765 0.9411765 1.0
         UseMaterialColors : true
         Diffuse : 0.2 0.2 0.2 1.0
+        LowQuality : true
     }
     AdditionalRenderState {
       FaceCull Back

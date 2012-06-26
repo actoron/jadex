@@ -5,6 +5,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         GlowColor : 1.0 1.0 1.0 1.0
         Shininess : 0.0
         Specular : 1.0 1.0 1.0 1.0
+        LowQuality : true
     }
     AdditionalRenderState {
       FaceCull Back
