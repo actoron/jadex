@@ -1,7 +1,9 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
 import jadex.extension.envsupport.math.Vector3Double;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
@@ -10,7 +12,11 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+
+import com.jme3.animation.AnimChannel;
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
@@ -133,6 +139,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				
 					spatial.setMaterial(mat_tt);
 				}
+			
 		}
 
 		return spatial;
@@ -168,7 +175,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			sp.setLocalTranslation(positionlocal.mult(2));
 			sp.setLocalRotation(quatation);
 			
-//			 Special Case: 3d-Text
+//			 Special Case 01: 3d-Text
 			if(primitive.getType() == 7)
 			{
 				if(sp instanceof Node)
@@ -194,6 +201,47 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 
 				}
 					
+			}
+			
+			// Special Case 02: Animation Updates
+			if(primitive.getType()==6)
+			{
+				boolean animation = ((Node)sp).getUserData("Animation");
+				if(animation)
+				{
+
+					HashMap<String, AnimChannel> anichannels = vp.getAnimChannels();
+					
+					ArrayList<Animation> animations = ((Object3d) primitive).getAnimations();
+					
+					for(Animation a : animations)
+					{
+						
+						IParsedExpression animationcondition = a.getAnimationCondition();
+						boolean animActive = animationcondition==null;
+						if(!animActive)
+						{
+							_fetcher.setValue("$object", obj);
+							_fetcher.setValue("$perspective", vp.getPerspective());
+							animActive = ((Boolean)animationcondition.getValue(_fetcher)).booleanValue();
+						}
+						
+						if(animActive)
+						{
+							
+							AnimChannel chan = anichannels.get(a.getChannel()+" "+ obj.hashCode() + " " +identifier);
+							if(!a.getName().equals(chan.getAnimationName()))
+							{
+								chan.setAnim(a.getName());
+								System.out.println("animation! " + a.getName());
+							}
+							
+							
+						}
+					}
+				}
+				
+			
 			}
 		}
 		else

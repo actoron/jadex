@@ -1,30 +1,39 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeSet;
 
-import jadex.extension.envsupport.math.Vector3Double;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 
-import com.jme3.bounding.BoundingBox;
+import com.jme3.animation.AnimChannel;
+import com.jme3.animation.AnimControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.debug.SkeletonDebugger;
 import com.jme3.texture.Texture;
+import com.jme3.scene.Node;
 
 
 public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 {
 	/** Object for jMonkey. */
 	private Spatial object;
+	
+	private AnimControl control;
 
+	private HashMap<String, AnimChannel> animChannels; 
+	
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			Object obj, ViewportJMonkey vp)
-	{
-//		String file = (String)((Object3d) primitive).getModelPath();
-		
+	{	
+
 		String file = ((String)dc.getBoundValue(obj, ((Object3d)primitive).getModelPath(), vp));
 		if(file==null)
 		{
@@ -36,6 +45,49 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
         object = assetManager.loadModel(file);
         
         object.setName(identifier);
+        
+		TreeSet<String> channels = 		((TreeSet<String>)dc.getBoundValue(obj, ((Object3d)primitive).getChannels(), vp));
+//		List<Animation> animations = 	((List<Animation>)dc.getBoundValue(obj, ((Object3d)primitive).getAnimations(), vp));
+		
+		((Node)object).setUserData("Animation", false);
+		
+		control = object.getControl(AnimControl.class);
+		if(control != null)
+		{
+			control = object.getControl(AnimControl.class);
+			
+			
+			if((Boolean)((Object3d) primitive).isRigDebug())
+			{
+				// Show for Debugging
+				System.out.println("Animations for " + file + " \n" + "Identifier: " +  identifier + ": \n");
+			    for (String anim : control.getAnimationNames()) { System.out.println(anim); }
+			    SkeletonDebugger skeletonDebug = 
+			            new SkeletonDebugger("skeleton", control.getSkeleton());
+			    Material mat2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			    mat2.setColor("Color", ColorRGBA.Green);
+			    mat2.getAdditionalRenderState().setDepthTest(false);
+			    skeletonDebug.setMaterial(mat2);
+			    ((Node)object).attachChild(skeletonDebug);
+			}
+
+		    
+		    if(channels.size()>0)
+		    {
+		    	((Node)object).setUserData("Animation", true);
+		    	animChannels = new HashMap<String, AnimChannel>();
+		    	for(String c : channels)
+		    	{
+		    		vp.getAnimChannels().put(c+" "+ obj.hashCode() + " " + identifier, control.createChannel());
+		    		
+		    	}
+		    	
+		    }
+		    
+		    
+		}
+		
+		
         
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		
@@ -57,26 +109,6 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 			mat.setColor("Color",color);
 			object.setMaterial(mat);
 		}
-		else if(!vp.getCapabilities().contains("VertexTextureFetch")&&hasLight)
-		{
-//			mat= new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
-//			object.setMaterial(mat);
-			
-			
-//			Material mat_tt = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-//
-//			mat_tt.setColor("Color",ColorRGBA.White);
-//			object.setMaterial(mat_tt);
-//			if(!primitive.getTexturePath().equals(""))
-//			{
-//			
-//				Texture tex_ml = assetManager.loadTexture(primitive.getTexturePath());
-//				mat_tt.setTexture("ColorMap", tex_ml);
-//			}
-//			
-//			object.setMaterial(mat_tt);
-		}
-
 		
 
 		

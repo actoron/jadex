@@ -25,12 +25,14 @@ import jadex.extension.envsupport.observer.perspective.Perspective3D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.jme3.animation.AnimChannel;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Quaternion;
@@ -104,6 +106,11 @@ public class ViewportJMonkey extends AbstractViewport3d
 	private final static int				_scaleApp		= 100;
 
 	private boolean							_isGrid			= false;
+	
+	/**
+	 *  Animation Stuff
+	 */
+	private HashMap<String, AnimChannel> _animChannels; 
 
 	/** The 3d renderers. */
 	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[10];
@@ -133,14 +140,15 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
-
 		_classloader = classloader;
+		
+		// Animation Channels
+		_animChannels = new HashMap<String, AnimChannel>();
 
+		// The Monkey Application
 		_app = new MonkeyApp();
-
 		AppSettings settings = new AppSettings(true);
 
-		//TODO: was passiert? :)
 //		settings.setRenderer(AppSettings.LWJGL_OPENGL1);
 		
 		
@@ -163,23 +171,23 @@ public class ViewportJMonkey extends AbstractViewport3d
 		{
 			public Object call()
 			{
-				_scale = _scaleApp / (float)areaXDim_;
-				_app.setSpaceSize(areaXDim_, _isGrid);
-
+				_geometryNode = updateMonkey(objectList_);
+				
 				if(_firstrun)
 				{
+					_scale = _scaleApp / (float)areaXDim_;
+					_app.setSpaceSize(areaXDim_, _isGrid);
 					_capabilities = _app.getCaps();
 					_staticNode = createStatics(_staticvisuals);
 					_staticNode.setLocalScale(_scale);
 					_app.setStaticGeometry(_staticNode);
+					_geometryNode.setLocalScale(_scale);
 					_firstrun = false;
+					_app.setChannels(_animChannels);
 				}
-
-				_geometryNode = updateMonkey(objectList_);
-
-				_geometryNode.setLocalScale(_scale);
-
 				_app.setGeometry(_geometryNode);
+
+				
 				rendering = false;
 				return null;
 			};
@@ -308,7 +316,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 			// for Object´s that has to be removed from the 3d Szene
 			_drawObjectsRefresh = new HashSet<Object>();
 
-			// Step 2 : Create all visible Visuals
+			// Step 2 : Create and/or update all visible Visuals
 			createAndUpdateVisuals(objectList);
 
 			// Step 3 : Set and Create the Visualiszation of the Selected Object
@@ -610,6 +618,24 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 		_isGrid = isGrid;
 
+	}
+
+
+	/**
+	 * @return the _animChannels
+	 */
+	public HashMap<String, AnimChannel> getAnimChannels()
+	{
+		return _animChannels;
+	}
+
+
+	/**
+	 * @param _animChannels the _animChannels to set
+	 */
+	public void setAnimChannels(HashMap<String, AnimChannel> _animChannels)
+	{
+		this._animChannels = _animChannels;
 	}
 
 

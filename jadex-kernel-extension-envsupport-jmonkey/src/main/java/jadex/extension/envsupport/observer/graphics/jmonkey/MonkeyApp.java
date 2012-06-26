@@ -5,6 +5,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import java.security.KeyRep;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,9 +78,12 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private monkeyApp_Grid	_gridHandler;
 
 	private int				_selectedTarget;
+	
+	private HashMap<String, AnimChannel> _animChannels; 
 
 	public MonkeyApp()
 	{
+		
 		_areaSize = 100f;
 		_spaceSize = 1f;
 		_geometryNode = new Node("geometryNode");
@@ -94,10 +98,11 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	@Override
 	public void simpleInitApp()
 	{
-
+		
 		// Create the Cam
 		setCam("Default");
 		Logger.getLogger("").setLevel(Level.SEVERE);
+		viewPort.setBackgroundColor(ColorRGBA.LightGray);
 
 		// this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
@@ -502,6 +507,18 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName)
 	{
 		// TODO Auto-generated method stub
+		
+	}
+
+	public void setChannels(HashMap<String, AnimChannel> animChannels)
+	{
+		this._animChannels = animChannels;
+		
+	}
+	
+	public HashMap<String, AnimChannel> getChannels()
+	{
+		return this._animChannels;
 		
 	}
 
