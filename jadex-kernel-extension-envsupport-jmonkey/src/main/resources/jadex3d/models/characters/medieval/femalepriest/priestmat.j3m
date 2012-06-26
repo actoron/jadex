@@ -1,7 +1,7 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         DiffuseMap : jadex3d/models/characters/medieval/femalepriest/priest_texture.png
-        Diffuse : 0.64000005 0.64000005 0.64000005 1.0
+        Diffuse : 0.94000005 0.94000005 0.94000005 1.0
         UseMaterialColors : true
         ParallaxHeight : 0.05
         Ambient : 0.8 0.8 0.8 1.0
