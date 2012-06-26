@@ -73,14 +73,14 @@
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
 							</env:animation>
 							
-							<env:animation name="Dance" channel="base" loop="true">
+							<env:animation name="Dance" channel="top" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("idle")</env:animationcondition>
 							</env:animation>
-							<!--  
-							<env:animation name="IdleTop" channel="top" loop="true">
+							 
+							<env:animation name="RunBase" channel="base" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("idle")</env:animationcondition>
 							</env:animation>
-							-->
+							
 						</env:object3d>
 						
 						

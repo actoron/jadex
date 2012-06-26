@@ -941,7 +941,7 @@ public class ReflectNode	extends ExpressionNode
 	{
 		int	ret	= super.hashCode();
 		ret	= ret*31 + type;
-		ret	= ret*31 + getText()!=null ? getText().hashCode() : 1;
+		ret	= ret*31 + (getText()!=null ? getText().hashCode() : 1);
 		return ret;
 	}
 
