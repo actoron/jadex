@@ -1,5 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import java.util.List;
+
 import jadex.javaparser.IParsedExpression;
 
 /**
@@ -12,6 +14,8 @@ public class Object3d extends Primitive3d
 	
 	/** Light Materials - to deal with possible render Errors  */
 	protected boolean _hasLightMaterials;
+	
+	protected List<Animation> _animations;
 
 	/**
 	 * Creates default Polygon.
@@ -38,12 +42,14 @@ public class Object3d extends Primitive3d
 	 * @param texturePath
 	 * @param drawcondition
 	 */
-	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String texturePath, boolean hasLightMaterials, IParsedExpression drawcondition)
+	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String texturePath, boolean hasLightMaterials, IParsedExpression drawcondition, List<Animation> animations)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, texturePath, drawcondition);
 		_modelPath = modelPath;
 		_hasLightMaterials = hasLightMaterials;
+		_animations = animations;
 	}
+	
 	
 	/**
 	 *  Set the primitive type (Disabled).
@@ -80,6 +86,20 @@ public class Object3d extends Primitive3d
 	 */
 	public void setHasLightMaterials(boolean hasLightMaterials) {
 		this._hasLightMaterials = hasLightMaterials;
+	}
+	/**
+	 * @return the _animations
+	 */
+	public List<Animation> getAnimations()
+	{
+		return _animations;
+	}
+	/**
+	 * @param _animations the _animations to set
+	 */
+	public void setAnimations(List<Animation> _animations)
+	{
+		this._animations = _animations;
 	}
 	
 

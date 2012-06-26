@@ -20,6 +20,7 @@ import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Cylinder3d;
@@ -1037,7 +1038,36 @@ public class MEnvSpaceType
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "animation"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "animation")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null,
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("channel", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("loop", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						String name = (String)getProperty(args, "name");
+						String channel = (String)getProperty(args, "channel");
+						Boolean loop = (Boolean)getProperty(args, "creator");
+						if(channel==null)
+						{
+							channel = "default";
+						}				
+
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "animationcondition");
+						return new Animation(name, channel, loop, exp);
+						//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				}, 
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "animationcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "arrow")}), new ObjectInfo(MultiCollection.class),
