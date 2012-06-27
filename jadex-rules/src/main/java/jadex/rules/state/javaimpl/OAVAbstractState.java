@@ -2066,10 +2066,12 @@ public abstract class OAVAbstractState	implements IOAVState
 	protected boolean	isManaged(Object value)
 	{
 		// Value is a directly contained object or java bean/object (i.e. not basic value)
-		return value!=null &&
-//			(objects.containsKey(value)
-			(internalContainsObject(value)
-					|| !generator.isId(value) && !tmodel.getJavaType(value.getClass()).getKind().equals(OAVJavaType.KIND_VALUE)); 
+		return value!=null && !tmodel.getJavaType(value.getClass()).getKind().equals(OAVJavaType.KIND_VALUE)
+			&& (!generator.isId(value) || internalContainsObject(value));
+//		return value!=null &&
+//				(!generator.isId(value) && !tmodel.getJavaType(value.getClass()).getKind().equals(OAVJavaType.KIND_VALUE)
+//					|| internalContainsObject(value));
+
 	}
 	
 	/**

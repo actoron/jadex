@@ -1,0 +1,8 @@
+06-26 15:02:14.214: I/dalvikvm(327): Could not find method sun.reflect.Reflection.getCallerClass, referenced from method jadex.base.LoggerWrapper.findResourceBundle
+
+06-26 15:02:42.154: I/dalvikvm(327): Could not find method java.net.NetworkInterface.getInterfaceAddresses, referenced from method jadex.base.service.security.SecurityService.getNetworkIps
+
+06-26 15:03:39.715: I/dalvikvm(327): Could not find method java.awt.Desktop.getDesktop, referenced from method jadex.base.service.deployment.DeploymentService.openFile
+
+06-26 15:03:39.715: D/dalvikvm(327): VFY: dead code 0x000d-0014 in Ljadex/base/service/deployment/DeploymentService;.openFile (Ljava/lang/String;)Ljadex/commons/future/IFuture;
+
