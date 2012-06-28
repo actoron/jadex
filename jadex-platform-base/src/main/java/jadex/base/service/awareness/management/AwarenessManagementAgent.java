@@ -90,6 +90,7 @@ import java.util.TimerTask;
 	@ComponentType(name="Multicast", filename="jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
 	@ComponentType(name="Scanner", filename="jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
 	@ComponentType(name="Registry", filename="jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
+	@ComponentType(name="Message", filename="jadex/base/service/awareness/discovery/message/MessageDiscoveryAgent.class"),
 	@ComponentType(name="Relay", filename="jadex/base/service/awareness/discovery/relay/RelayDiscoveryAgent.class")
 })
 @Configurations(

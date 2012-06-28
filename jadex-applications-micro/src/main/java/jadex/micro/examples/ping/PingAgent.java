@@ -2,7 +2,6 @@ package jadex.micro.examples.ping;
 
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 
 import java.util.Map;
@@ -23,17 +22,11 @@ public class PingAgent extends MicroAgent
 		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
-			createReply(msg, mt).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					Map reply = (Map)result;
-					reply.put(SFipa.CONTENT, "alive");
-					reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-					reply.put(SFipa.SENDER, getComponentIdentifier());
-					sendMessage(reply, mt);
-				}
-			});
+			Map reply = createReply(msg, mt);
+			reply.put(SFipa.CONTENT, "alive");
+			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+			reply.put(SFipa.SENDER, getComponentIdentifier());
+			sendMessage(reply, mt);
 		}
 		else
 		{

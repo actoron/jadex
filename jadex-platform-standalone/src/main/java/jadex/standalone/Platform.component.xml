@@ -124,7 +124,7 @@
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the awareness agent discovery mechanisms. -->
-		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast", "Relay"}</argument>
+		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast", "Message", "Relay"}</argument>
 		<!-- <argument name="awamechanisms" class="String[]">new String[]{"Broadcast"}</argument>-->
 		<!-- Include entries for awareness agent. -->
 		<argument name="awaincludes" class="String">""</argument>

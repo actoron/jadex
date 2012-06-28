@@ -576,9 +576,9 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public IFuture<Map<String, Object>> createReply(Map<String, Object> msg, MessageType mt)
+	public Map<String, Object> createReply(Map<String, Object> msg, MessageType mt)
 	{
-		return new Future<Map<String, Object>>(mt.createReply(msg));
+		return mt.createReply(msg);
 	}
 	
 	/**

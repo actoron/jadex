@@ -1,6 +1,7 @@
 package jadex.base.service.message;
 
 import jadex.base.AbstractComponentAdapter;
+import jadex.base.service.awareness.discovery.message.IMessageAwarenessService;
 import jadex.base.service.message.streams.AbstractConnectionHandler;
 import jadex.base.service.message.streams.AckInfo;
 import jadex.base.service.message.streams.InitInfo;
@@ -1944,8 +1945,33 @@ public class MessageService extends BasicService implements IMessageService
 			final IComponentIdentifier[] receivers	= me.getReceivers();
 //			System.out.println("Received message: "+SUtil.arrayToString(receivers));
 			final MessageType	messagetype	= getMessageType(type);
-			final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 			
+			// Announce receiver to message awareness
+			final IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
+			component.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					SServiceProvider.getService(ia.getServiceContainer(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(ia.createResultListener(new IResultListener<IMessageAwarenessService>()
+					{
+						public void resultAvailable(IMessageAwarenessService mws)
+						{
+							mws.announceComponentIdentifier(sender);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// ignore if message awareness service not found
+						}
+					}));
+					
+					return IFuture.DONE; 
+				}
+			});
+			
+			final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
+
 			// Content decoding works as follows:
 			// Find correct classloader for each receiver by
 			// a) if message contains rid ask library service for classloader (global rids are resolved with maven, locals possibly with peer to peer jar transfer)

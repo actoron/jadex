@@ -127,6 +127,19 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //		System.out.println("RMS "+getComponentIdentifier()+" received message from "+msg.get(SFipa.SENDER)
 //			+": "+tmp.substring(0, Math.min(tmp.length(), 80)));
 		
+		// Handle pings for message awareness (hack that rms does this?)
+		if((SFipa.QUERY_IF.equals(msg.get(SFipa.PERFORMATIVE)) 
+			|| SFipa.QUERY_REF.equals(msg.get(SFipa.PERFORMATIVE))) 
+			&& "ping".equals(msg.get(SFipa.CONTENT)))
+		{
+			Map rep = createReply(msg, mt);
+			rep.put(SFipa.CONTENT, "alive");
+			rep.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+			rep.put(SFipa.SENDER, getComponentIdentifier());
+			sendMessage(rep, mt);
+			return;
+		}
+		
 		final IResourceIdentifier[] rid = new IResourceIdentifier[1];
 		
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
@@ -284,25 +297,20 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 									public void resultAvailable(Void v)
 									{
-										createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener<Map<String, Object>>()
+										Map reply = createReply(msg, mt);
+										if(rid[0]!=null)
 										{
-											public void resultAvailable(Map<String, Object> reply)
-											{
-												if(rid[0]!=null)
-												{
-//													System.out.println("rid: "+rid+" "+result.getClass());
-													reply.put(SFipa.X_RID, rid[0]);
-												}
-//												else
-//												{
-//													System.out.println("no rid: "+result.getClass());
-//												}
-												reply.put(SFipa.CONTENT, result);
-//												System.out.println("content: "+result);
-//												System.out.println("reply: "+callid);
-												sendMessage(reply, mt, null);
-											}
-										}));
+//											System.out.println("rid: "+rid+" "+result.getClass());
+											reply.put(SFipa.X_RID, rid[0]);
+										}
+//										else
+//										{
+//											System.out.println("no rid: "+result.getClass());
+//										}
+										reply.put(SFipa.CONTENT, result);
+//										System.out.println("content: "+result);
+//										System.out.println("reply: "+callid);
+										sendMessage(reply, mt, null);
 									}
 								});
 							}
