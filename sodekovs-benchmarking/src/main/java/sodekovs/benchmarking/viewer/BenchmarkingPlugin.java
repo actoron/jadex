@@ -1,7 +1,8 @@
 package sodekovs.benchmarking.viewer;
 
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -39,13 +40,14 @@ public class BenchmarkingPlugin extends AbstractServicePlugin
 	/**
 	 *  Create the service panel.
 	 */
-	public IFuture createServicePanel(IService service)
+	public IFuture<IAbstractViewerPanel> createServicePanel(IService service)
 	{
-		final Future ret = new Future();
+		System.out.println("Starting Plugin?");
+		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		final BenchmarkingPanel brp = new BenchmarkingPanel();
-		brp.init(getJCC(), service).addResultListener(new DelegationResultListener(ret)
+		brp.init(getJCC(), service).addResultListener(new ExceptionDelegationResultListener<Void, IAbstractViewerPanel>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				ret.setResult(brp);
 			}
