@@ -3,7 +3,6 @@ package jadex.base.service.awareness.discovery.message;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.message.MessageService.SendManager;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -14,12 +13,10 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.AbstractMessageHandler;
-import jadex.micro.IMessageHandler;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -30,6 +27,13 @@ import java.util.Map;
 
 
 /**
+ *  Discovery agent that is based on message receipt.
+ *  
+ *  The message service announces the sender of each incoming
+ *  message to the IMessageAwarenessService of this agent.
+ *  
+ *  The agent will announce the underlying platform and uses
+ *  ping messages to its rms to check if it is still present.
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=IMessageAwarenessService.class,
@@ -48,9 +52,26 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	 *  Announce a potentially new component identifier.
 	 *  @param cid The component identifier.
 	 */
-	public IFuture<Void> announceComponentIdentifier(final IComponentIdentifier cid)
+	public IFuture<Void> announceComponentIdentifier(IComponentIdentifier ccid)
 	{
-		performAnnouncements(cid);
+		// Only handle platforms
+		IComponentIdentifier cid = ccid.getRoot();
+		
+		// Return in case of self message.
+		if(getMicroAgent().getComponentIdentifier().getRoot().equals(cid))
+			return IFuture.DONE;
+		
+		// Do not start another check if already contained
+		if(announcements.containsKey(cid))
+		{
+			// Update time
+			announcements.put(cid, System.currentTimeMillis());
+		}
+		else
+		{
+//			System.out.println("enter: "+cid);
+			performAnnouncements(cid);
+		}
 		
 		return IFuture.DONE;
 	}
@@ -67,12 +88,16 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 		announceAwareness(info);
 		
 		// Check alive via sending ping message before delay is due
-		doWaitFor((long)(getDelay()-getDelay()*0.1), new IComponentStep<Void>()
+		long del = (long)(getDelay()-((double)getDelay())*0.1);
+		
+//		System.out.println("performing: "+cid+" "+del+" "+System.currentTimeMillis());
+		
+		doWaitFor(del, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				Map<String, Object> msg = new HashMap<String, Object>();
-				ComponentIdentifier rec = new ComponentIdentifier("rms"+cid.getPlatformName(), cid.getAddresses());
+				ComponentIdentifier rec = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 				msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rec});
 				msg.put(SFipa.CONTENT, "ping");
 				msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
@@ -81,12 +106,13 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 				{
 					public void handleMessage(Map msg, MessageType type)
 					{
+//						System.out.println("received reply: "+msg);
 						performAnnouncements(cid);
 					}
 					
 					public void timeoutOccurred()
 					{
-						System.out.println("Received no ping reply, removed: "+cid);
+//						System.out.println("Received no ping reply, removed: "+cid);
 						announcements.remove(cid);
 					}
 				});

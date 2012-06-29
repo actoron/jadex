@@ -93,33 +93,12 @@ import java.util.TimerTask;
 	@ComponentType(name="Message", filename="jadex/base/service/awareness/discovery/message/MessageDiscoveryAgent.class"),
 	@ComponentType(name="Relay", filename="jadex/base/service/awareness/discovery/relay/RelayDiscoveryAgent.class")
 })
-@Configurations(
+/**@Configurations(
 {
-	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000"), 
-		components=
-		{
-//			@Component(type="Broadcast")
-//			@Component(name="multicast", type="Multicast")
-//			@Component(name="scanner", type="Scanner")
-//			@Component(name="registry", type="Registry")
-		}),
-	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
-		components=
-		{
-//			@Component(type="Broadcast")
-//			@Component(name="multicast", type="Multicast")
-//			@Component(name="scanner", type="Scanner")
-//			@Component(name="registry", type="Registry")
-		}),
-	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
-		components=
-		{
-//			@Component(type="Broadcast")
-//			@Component(name="multicast", type="Multicast")
-//			@Component(name="scanner", type="Scanner")
-//			@Component(name="registry", type="Registry")
-		})
-})
+	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000")), 
+	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
+	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
+})*/
 @Properties(@NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.gui.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}"))
 @ProvidedServices(
 	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$component"))
@@ -216,6 +195,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				});
 				
 				CreationInfo info = new CreationInfo(getComponentIdentifier());
+				info.setConfiguration(getConfiguration());
+				Map args = new HashMap();
+				args.put("delay", getArgument("delay"));
+				info.setArguments(args);
 				for(int i=0; i<mechas.length; i++)
 				{
 //					System.out.println("mecha: "+mechas[i]);

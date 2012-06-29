@@ -678,6 +678,7 @@ public class MicroClassReader
 		Map argus = (Map)toset.get("arguments");
 		if(argus!=null)
 			modelinfo.setArguments((IArgument[])argus.values().toArray(new IArgument[argus.size()]));
+//		System.out.println("arguments: "+argus);
 		
 		Map res = (Map)toset.get("results");
 		if(res!=null)

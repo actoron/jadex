@@ -860,10 +860,14 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					handler.timeoutOccurred();
-					if(handler.isRemove())
+					// Only call timeout when handler is still present
+					if(messagehandlers.contains(handler))
 					{
-						removeMessageHandler(handler);
+						handler.timeoutOccurred();
+						if(handler.isRemove())
+						{
+							removeMessageHandler(handler);
+						}
 					}
 					return IFuture.DONE;
 				}

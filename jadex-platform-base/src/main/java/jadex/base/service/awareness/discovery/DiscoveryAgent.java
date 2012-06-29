@@ -25,10 +25,7 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Configuration;
-import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -46,12 +43,12 @@ import java.util.TimerTask;
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior).")
 })
-@Configurations(
+/*@Configurations(
 {
 	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000")),
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
-})
+})*/
 @ProvidedServices(
 	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(DiscoveryService.class))
 )
@@ -120,6 +117,8 @@ public abstract class DiscoveryAgent
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+//		System.out.println("delay: "+delay);
 		
 		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IMessageService.class)
 			.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
