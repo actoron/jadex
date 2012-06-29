@@ -49,7 +49,10 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		TreeSet<String> channels = 		((TreeSet<String>)dc.getBoundValue(obj, ((Object3d)primitive).getChannels(), vp));
 //		List<Animation> animations = 	((List<Animation>)dc.getBoundValue(obj, ((Object3d)primitive).getAnimations(), vp));
 		
-		((Node)object).setUserData("Animation", false);
+		
+		object.setUserData("Animation", false);
+		
+
 		
 		control = object.getControl(AnimControl.class);
 		if(control != null)
@@ -78,7 +81,7 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		    	animChannels = new HashMap<String, AnimChannel>();
 		    	for(String c : channels)
 		    	{
-		    		vp.getAnimChannels().put(c+" "+ obj.hashCode() + " " + identifier, control.createChannel());
+		    		vp.getAnimChannels().put(c+" "+ obj.hashCode(), control.createChannel());
 		    		
 		    	}
 		    	

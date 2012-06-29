@@ -206,7 +206,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			// Special Case 02: Animation Updates
 			if(primitive.getType()==6)
 			{
-				boolean animation = ((Node)sp).getUserData("Animation");
+				boolean animation = sp.getUserData("Animation");
 				if(animation)
 				{
 
@@ -229,7 +229,9 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						if(animActive)
 						{
 							
-							AnimChannel chan = anichannels.get(a.getChannel()+" "+ obj.hashCode() + " " +identifier);
+							System.out.println("anichannels: " + anichannels.toString());
+							System.out.println("a.getChannel()++ obj.hashCode() +  +" + a.getChannel()+" "+ obj.hashCode() + " " +identifier);
+							AnimChannel chan = anichannels.get(a.getChannel()+" "+ obj.hashCode());
 							if(!a.getName().equals(chan.getAnimationName()))
 							{
 								chan.setAnim(a.getName());
