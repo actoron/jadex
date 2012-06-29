@@ -121,18 +121,13 @@
 			
 			<env:perspectives>
 			<env:perspective name="Complex3D" class="Perspective3D">
-
-				
 				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
 				<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
-
 					<env:sky skypath="jadex3d/textures/sky/sky01/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
-						
 					<env:rndterrain width="1" height="0.2" depth="1"  
 		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
 					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
 					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" />
-
 				</env:drawable3d>
 				
 				<!-- H O M E B A S E -->
@@ -142,24 +137,18 @@
 					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
 					<env:property name="rotate270" dynamic="false">new Vector3Double((Math.PI/180)*270, 0, 0)</env:property>
 					
-				
-				
+					<env:object3d width=".5" height=".5" depth=".5"  modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true">
+							<env:animation name="Wave" channel="chan01" loop="true"/>
+					</env:object3d>			
 				
 					<env:text3d  width="2" height="2" depth="1"  x="0" y="4" z="0" text="$textda$" color="#FFFFFFFF"></env:text3d>
-				
 					<!--Box for Ore -->
 					<env:box  width="1" height="0.01" depth="1" x="-1" y="0.01" z="1" color="#D2B48CFF" />
-
-					<env:box  width="0.001" height="0.15" depth="1.0" x="-2" y="0.15" z="1" color="#FF7F24FF" />
-					<env:box  width="1.0" height="0.15" depth="0.01" x="-1" y="0.15" z="2" color="#FF7F24FF" />
-					
-					
 
 					<env:sphere size="oresize" x="-1" y="0" z="1"  color="#FFA54FFF">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 					</env:sphere>
 				
-
 				</env:drawable3d>
 				
 				<!--ERZVORKOMMEN  -->
@@ -177,20 +166,14 @@
 							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
 						</env:sphere>
 						
-						<!-- Markierung  -->
-						<env:cylinder height="1" radius="0.05" rotation="rotate90" x="1" y="0.5" z="1" color="#FFFF00FF" >
+						<env:object3d width=".5" height=".5" depth=".5"  rotation="rotate90" modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true">
+							<env:animation name="Wave" channel="chan" loop="true">
+							</env:animation>
 							<env:drawcondition>
-								$object.getProperty("state").equals("analyzed")
+							$object.getProperty("state").equals("analyzed")
 								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
 							</env:drawcondition>
-						</env:cylinder>
-						<env:dome radius="0.1" samples="30" x="1" y="1.0" z="1" color="#FF4500FF" >
-							<env:drawcondition>
-								$object.getProperty("state").equals("analyzed")
-								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
-							</env:drawcondition>
-						</env:dome>
-
+						</env:object3d>
 
 						<!-- Noch nicht Analysiert -->
 						<env:sphere width="0.05" height="0.05" depth="0.05" x="0" y="0" z="0.0" color="#00FF00FF">
@@ -212,56 +195,38 @@
 				
 
 				<env:drawable3d objecttype="sentry" width="0.18" height="0.18" depth="0.18">
-				<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
-				<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
-				<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
-				<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
+					<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
+					<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
+					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
 				
-				
-						<env:text3d  width="1" height="1" depth="1" x="-1" y="2.0" z="1" text="moin" color="#000000FF" />
-						<!--  Radarkreisel -->
-						<env:torus width="1" height="0.75" depth="1" rotation="rotatedyn" innerRadius="0.035" outerRadius="0.3" radialSamples="10" circleSamples="15" x="0.05" y="0.8" z="0.0" />
-						<env:box  width="0.45" height="0.01" depth="0.01" rotation="rotatedyn"  x="0.05" y="0.8" z="0.0" />
-						<env:box  width="0.01" height="0.01" depth="0.25" rotation="rotatedyn"  x="0.05" y="0.8" z="0.0"  color="#FF0000FF"/>
-						<env:cylinder rotation="rotate" height="0.5" radius="0.03"  x="0.05" y="0.7" z="0.0" color="#FFFFFFFF"/>
-						
-						<env:object3d width="1.7" height="1.7" depth="1.7" x="0" y="0.0" z="0.0" modelpath="jadex3d/models/vehicles/tank/sentrytank.j3o" hasLightMaterials="false"/> 
+					<env:object3d width="1.7" height="1.7" depth="1.7" x="0" y="0.0" z="0.0" modelpath="jadex3d/models/vehicles/tank/sentrytank.j3o" hasLightMaterials="false"/> 
 						
 						
 						<!--  Sonstiges -->
-						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F15" />
-						<env:sphere  size="visionsize" x="0.0" y="0.0" z="0.0" color="#FFFF0010" />
-					</env:drawable3d>
+					<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F15" />
+					<env:sphere  size="visionsize" x="0.0" y="0.0" z="0.0" color="#FFFF0010" />
 					
-					<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15">
+				</env:drawable3d>
+					
+				<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15">
 				 	<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
 					<env:property name="-turn90" dynamic="false">new Vector3Double(0, -(Math.PI/180)*90, 0)</env:property>	
-						<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0010" />
-						
-						
-						 <env:object3d width="1.5" height="1.5" depth="1.5" rotation="-turn90" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o" hasLightMaterials="false"/> 
+					<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0010" />
+					<env:object3d width="1.5" height="1.5" depth="1.5" rotation="-turn90" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o" hasLightMaterials="false"/> 
+					<env:box width="0.2" height="0.2" depth="0.2"  x="0.0" y="0.22" z="0.4"  color="#FFFFFFFF" texturepath="jadex3d/textures/solid/wood.jpg">
+						<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+					</env:box>
+				</env:drawable3d>
 					
-						<env:box width="0.2" height="0.2" depth="0.2"  x="0.0" y="0.22" z="0.4"  color="#FFFFFFFF" texturepath="jadex3d/textures/solid/wood.jpg">
-							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
-						</env:box>
-					</env:drawable3d>
-					
-					<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
+				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
 					<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.2f,$object.getProperty("vision").doubleValue()*10)</env:property>
 					<env:property name="turn90" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
-					<env:text3d  width="2" height="2" depth="2"   x="0" y="1.5" z="0" text="moin" color="#FFFFFFFF" />	
-						
-						
-						<!-- Assertion from Jmonkey -->
-						
- 						<env:object3d width="0.20" height="0.2" depth="0.2" x="0" y="0.25" z="0.0"  rotation="turn90" modelpath="jadex3d/models/vehicles/digger/digger.j3o" hasLightMaterials="false"/> 
+					<env:object3d width="0.20" height="0.2" depth="0.2" x="0" y="0.25" z="0.0"  rotation="turn90" modelpath="jadex3d/models/vehicles/digger/digger.j3o" hasLightMaterials="false"/> 
 						<env:sphere  size="visionsize" x="0" y="0.00" z="0" color="#FFFF0010" />
-					</env:drawable3d>
-					
+					</env:drawable3d>	
 				</env:perspective>	
-				
-				
-				
+
 			</env:perspectives>
 				
 
