@@ -118,7 +118,7 @@ public abstract class DiscoveryAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		System.out.println("delay: "+delay);
+//		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 		
 		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IMessageService.class)
 			.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)

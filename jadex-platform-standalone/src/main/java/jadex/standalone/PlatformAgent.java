@@ -97,7 +97,8 @@ import java.util.logging.Level;
 	@Argument(name="chat", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="awamechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\", \"Multicast\", \"Relay\"}"),
+	@Argument(name="awamechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\", \"Multicast\", \"Message\", \"Relay\"}"),
+	@Argument(name="awadelay", clazz=long.class, defaultvalue="20000"),
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
 	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),
 
@@ -194,6 +195,7 @@ import java.util.logging.Level;
 		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
+				@NameValue(name="delay", value="$args.awadelay"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
