@@ -42,7 +42,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	{
 		super(parent, model, tree);
 		
-		assert file!=null;
+//		assert file!=null;
 		
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 		
@@ -118,7 +118,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 			List	siblings	= getParent().getCachedChildren();
 			for(int i=0; siblings!=null && i<siblings.size(); i++)
 			{
-				if(siblings.get(i)!=this)
+				if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
 				{
 					File	sib	= ((FileNode)siblings.get(i)).getFile();
 					if(FileData.getDisplayName(sib).equals(name) && !sib.getPath().endsWith(file.getPath()))
@@ -193,7 +193,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 *  Get the corresponding relative path for a file.
 	 *  Handles jars specially.
 	 */
-	protected String convertPathToRelative(File file)
+	protected static String convertPathToRelative(File file)
 	{
 		String	ret;
 		if(file instanceof JarAsDirectory)

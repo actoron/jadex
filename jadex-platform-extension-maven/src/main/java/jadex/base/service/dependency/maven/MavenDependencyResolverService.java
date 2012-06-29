@@ -10,6 +10,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -218,21 +219,25 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
 	 *  @return A map containing the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	public IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	loadDependencies(IResourceIdentifier rid)
+	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>	
+		loadDependencies(IResourceIdentifier rid, boolean workspace)
 	{
 		logger.info("Loading dependencies for: "+rid);
-		IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	ret;
+		
+		IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> ret;
 		try
 		{
 			Map<IResourceIdentifier, List<IResourceIdentifier>>	rids	= new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
-			loadDependencies(rid, rids);
-			ret	= new Future<Map<IResourceIdentifier,List<IResourceIdentifier>>>(rids);
+			rid = loadDependencies(rid, rids, workspace);
+			ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(
+				new Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>(rid, rids));
 		}
 		catch(Exception e)
 		{
-			ret	= new Future<Map<IResourceIdentifier,List<IResourceIdentifier>>>(e);			
+			ret	= new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(e);			
 		}
 
+		System.out.println("loaded dep: "+rid+" "+workspace);
 		return ret;
 	}
 	
@@ -265,9 +270,13 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
 	 *  @param rids	A map for inserting the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	protected void	loadDependencies(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids) throws Exception
+	protected IResourceIdentifier	loadDependencies(IResourceIdentifier rid, 
+		Map<IResourceIdentifier, List<IResourceIdentifier>> rids, boolean workspace) throws Exception
 	{
 		logger.info("Loading dependencies: "+rid);
+
+		IResourceIdentifier ret = rid;
+		
 		// Resolve from local URL.
 		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getComponentIdentifier()))
 		{
@@ -281,25 +290,36 @@ public class MavenDependencyResolverService	implements IDependencyService
 				rids.put(rid, deprids);
 				for(int i=0; i<deps.size(); i++)
 				{
-					try
+					boolean fin = false;
+
+					if(workspace)
 					{
-						session.setWorkspaceReader(new MavenWorkspaceReader(model, this));
-						ArtifactRequest	ar	= new ArtifactRequest(SMaven.convertDependency(deps.get(i)), repositories, null);
-						ArtifactResult res = system.resolveArtifact(session, ar);
-						Artifact	art	= res.getArtifact();
-						ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())),
-							getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));
-						deprids.add(deprid);
-						loadDependencies(deprid, rids);
+						try
+						{
+							session.setWorkspaceReader(new MavenWorkspaceReader(model, this));
+							ArtifactRequest	ar	= new ArtifactRequest(SMaven.convertDependency(deps.get(i)), repositories, null);
+							ArtifactResult res = system.resolveArtifact(session, ar);
+							Artifact	art	= res.getArtifact();
+							ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())),
+								getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));
+							deprids.add(deprid);
+							ret = loadDependencies(deprid, rids, workspace);
+							fin = true;
+						}
+						catch(Exception e)
+						{
+	//						logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
+						}
 					}
-					catch(Exception e)
+					
+					if(!fin)
 					{
 						Artifact	art	= SMaven.convertDependency(deps.get(i));
 						IResourceIdentifier	deprid	= new ResourceIdentifier(null,
 							getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));	
 						deprid	= loadDependenciesWithAether(deprid, rids);
+						ret = deprid;
 						deprids.add(deprid);
-//						logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
 					}
 				}
 			}
@@ -308,7 +328,8 @@ public class MavenDependencyResolverService	implements IDependencyService
 		// Resolve artifact from global RID, if available.
 		if(!rids.containsKey(rid) && rid.getGlobalIdentifier()!=null)
 		{
-			loadDependenciesWithAether(rid, rids);
+			rid = loadDependenciesWithAether(rid, rids);
+			ret = rid;
 		}
 		
 		// If no dependency information avaliable, continue with empty dependency list but print warning.
@@ -318,6 +339,8 @@ public class MavenDependencyResolverService	implements IDependencyService
 			List<IResourceIdentifier>	empty	= Collections.emptyList();
 			rids.put(rid, empty);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -540,7 +563,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 *  @param	version	The artifact version.
 	 *  @return The coordinates as string ('groupid:id:version').
 	 */
-	protected static String getCoordinates(String groupid, String id, String version)
+	public static String getCoordinates(String groupid, String id, String version)
 	{
 		String gid;
 		StringBuffer	gidbuf	= new StringBuffer();

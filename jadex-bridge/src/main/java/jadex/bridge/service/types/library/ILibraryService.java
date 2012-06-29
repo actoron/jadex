@@ -24,7 +24,7 @@ public interface ILibraryService
 	 *  Add a new resource identifier.
 	 *  @param rid The resource identifier.
 	 */
-	public IFuture<Void> addResourceIdentifier(@CheckNotNull IResourceIdentifier rid);
+	public IFuture<IResourceIdentifier> addResourceIdentifier(@CheckNotNull IResourceIdentifier rid);
 	
 	/**
 	 *  Remove a resource identifier.

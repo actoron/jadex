@@ -38,12 +38,12 @@ public class JarNode extends DirNode
 	
 	//-------- methods --------
 	
-	/**
-	 *  Get the file represented by this node.
-	 */
-	public File getFile()
-	{
-		assert file!=null;
-		return this.file;
-	}
+//	/**
+//	 *  Get the file represented by this node.
+//	 */
+//	public File getFile()
+//	{
+//		assert file!=null;
+//		return this.file;
+//	}
 }

@@ -461,6 +461,7 @@
 				<module>jadex-platform-standalone-launch</module>
 				<module>jadex-platform-relay-web</module>
 				<module>jadex-platform-extension-webservice</module>
+				<module>jadex-platform-extension-maven</module>
 				
 				<!-- <module>jadex-apleis</module> -->
 			</modules>

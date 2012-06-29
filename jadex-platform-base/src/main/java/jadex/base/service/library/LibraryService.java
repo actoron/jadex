@@ -1,6 +1,5 @@
 package jadex.base.service.library;
 
-import jadex.base.service.message.streams.InputConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -18,6 +17,7 @@ import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -157,21 +157,34 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Add a new resource identifier.
 	 *  @param rid The resource identifier.
+	 *  @return The possibly completed rid (may contain an additional local rid when global was given):
 	 */
-	public IFuture<Void> addResourceIdentifier(final IResourceIdentifier rid)
+	public IFuture<IResourceIdentifier> addResourceIdentifier(IResourceIdentifier rid)
 	{
-//		System.out.println("add "+rid);
-		final Future<Void> ret = new Future<Void>();
+		System.out.println("add "+rid);
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		getClassLoader(rid, null, rid).addResultListener(
-			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
+		getDependencies(rid).addResultListener(new ExceptionDelegationResultListener
+			<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
 		{
-			public void customResultAvailable(DelegationURLClassLoader result)
+			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
 			{
-				addManaged(rid);
-				ret.setResult(null);
+				final IResourceIdentifier rid = result.getFirstEntity();
+				System.out.println("add end "+rid);
+				
+				getClassLoader(rid, null, rid).addResultListener(
+					new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
+				{
+					public void customResultAvailable(DelegationURLClassLoader result)
+					{
+						addManaged(rid);
+						ret.setResult(rid);
+					}
+				});
 			}
 		});
+		
+		
 		
 		return ret;
 	}
@@ -341,9 +354,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					public void customResultAvailable(final IResourceIdentifier rid)
 					{
 						addResourceIdentifier(rid).addResultListener(
-							new ExceptionDelegationResultListener<Void, IResourceIdentifier>(ret)
+							new ExceptionDelegationResultListener<IResourceIdentifier, IResourceIdentifier>(ret)
 						{
-							public void customResultAvailable(Void result)
+							public void customResultAvailable(IResourceIdentifier result)
 							{
 								ret.setResult(rid);
 							}
@@ -584,12 +597,13 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				
 				if(alldeps==null)
 				{
+//					System.out.println("getdeps in getcl: "+rid);
 					getDependencies(rid).addResultListener(
-						new ExceptionDelegationResultListener<Map<IResourceIdentifier, List<IResourceIdentifier>>, DelegationURLClassLoader>(ret)
+						new ExceptionDelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>, DelegationURLClassLoader>(ret)
 					{
-						public void customResultAvailable(Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
+						public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 						{
-							createClassLoader(rid, deps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
+							createClassLoader(rid, deps.getSecondEntity(), support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 							{
 								public void customResultAvailable(DelegationURLClassLoader result)
 								{
@@ -700,16 +714,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Get the dependent urls.
 	 */
-	protected IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>> getDependencies(final IResourceIdentifier rid)
+	protected IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> getDependencies(final IResourceIdentifier rid)
 	{
-		final Future<Map<IResourceIdentifier, List<IResourceIdentifier>>> ret = new Future<Map<IResourceIdentifier, List<IResourceIdentifier>>>();
+		final Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>();
 		
 		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Map<IResourceIdentifier, List<IResourceIdentifier>>>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
 			{
-				drs.loadDependencies(rid).addResultListener(new DelegationResultListener<Map<IResourceIdentifier,List<IResourceIdentifier>>>(ret));
+				// todo!!!
+				drs.loadDependencies(rid, true).addResultListener(new DelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(ret));
 			}
 		});
 		

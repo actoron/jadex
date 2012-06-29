@@ -10,6 +10,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -67,13 +68,15 @@ public class BasicDependencyService implements IDependencyService
 	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
 	 *  @return A map containing the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	public IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	loadDependencies(IResourceIdentifier rid)
+	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>	
+		loadDependencies(IResourceIdentifier rid, boolean workspace)
 	{
 		// todo: implement dependencies based on manifest
 		
 		Map<IResourceIdentifier, List<IResourceIdentifier>> res = new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
 		res.put(rid, new ArrayList<IResourceIdentifier>());
-		return new Future<Map<IResourceIdentifier, List<IResourceIdentifier>>>(res);
+		return new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(
+			new Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>(rid, res));
 	}
 	
 	/**

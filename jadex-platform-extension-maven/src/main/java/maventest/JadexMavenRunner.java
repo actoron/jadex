@@ -7,6 +7,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 
 import java.io.File;
 import java.net.URL;
@@ -60,8 +61,8 @@ public class JadexMavenRunner
 		Set<URL>	urls	= new HashSet<URL>();
 		for(int i=0; i<rids.length; i++)
 		{
-			Map<IResourceIdentifier, List<IResourceIdentifier>>	dependencies	= mh.loadDependencies(rids[i]).get(null);
-			for(IResourceIdentifier rid: dependencies.keySet())
+			Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rids[i], true).get(null);
+			for(IResourceIdentifier rid: dependencies.getSecondEntity().keySet())
 			{
 				urls.add(rid.getLocalIdentifier().getUrl());
 			}

@@ -6,6 +6,7 @@ import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
+import jadex.base.gui.filetree.RIDJarNode;
 import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -31,6 +32,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,8 +116,9 @@ public class ModelTreePanel extends FileTreePanel
 		setMenuItemConstructor(mic);
 		actions.put(CollapseAllAction.getName(), new CollapseAllAction(this));
 		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(this) : new AddPathAction(this));
+		actions.put(AddRIDAction.getName(), new AddRIDAction(this));
 		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
-		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), 
+		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), actions.get(AddRIDAction.getName()),
 			actions.get(AddRemotePathAction.getName()), mic}));
 		setMenuItemConstructor(mic);
 		setIconCache(ic);
@@ -270,60 +273,125 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
-			// Convert file path or jar url to file url as used in lib service. 
-			final String filepath = ((IFileNode)node).getFilePath();
-			final String filename = filepath.startsWith("jar:")
-				? filepath.endsWith("!/") ? filepath.substring(4, filepath.length()-2)
-					: filepath.endsWith("!") ? filepath.substring(4, filepath.length()-1) : filepath.substring(4)
-				: filepath.startsWith("file:") ? filepath : "file:"+filepath;
-			
-			exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
+			if(node instanceof RIDJarNode)
 			{
-				@Classname("addurl")
-				public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
+				final IResourceIdentifier rid = ((RIDJarNode)node).getResourceIdentifier();
+				
+				exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
 				{
-					final URL	url	= SUtil.toURL(filename);
-					final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
-					IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+					@Classname("addrid")
+					public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
 					{
-						public void customResultAvailable(final ILibraryService ls)
+						final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
+						IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
 						{
-							ls.addURL(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+							public void customResultAvailable(final ILibraryService ls)
 							{
-								public void customResultAvailable(IResourceIdentifier rid)
+								ls.addResourceIdentifier(rid).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
 								{
-									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-								}
-							});
-						}
-					});
-					
-					return ret;
-				}
-			}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
-			{
-				public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
+									public void customResultAvailable(IResourceIdentifier rid)
+									{
+										ret.setResult(new Tuple2<URL, IResourceIdentifier>(null, rid));
+									}
+								});
+							}
+						});
+						
+						return ret;
+					}
+				}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
 				{
-					// Todo: remove entries on remove.
-//					System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
-					rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
-					rootpathentries.put(filepath, tup.getSecondEntity());
-					
-					ModelTreePanel.super.addNode(node);
-				}
-				public void customExceptionOccurred(final Exception exception)
-				{
-					localexta.scheduleStep(new IComponentStep<Void>()
+					public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
 					{
-						public IFuture<Void> execute(IInternalAccess ia)
+						// Todo: remove entries on remove.
+						try
 						{
-							ia.getLogger().warning(exception.toString());
-							return IFuture.DONE;
+							System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
+							File f = new File(tup.getSecondEntity().getLocalIdentifier().getUrl().toURI());
+							rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
+							rootpathentries.put(f.getAbsolutePath(), tup.getSecondEntity());
+							
+							((RIDJarNode)node).setFile(f);
+							ModelTreePanel.super.addNode(node);
 						}
-					});					
-				}
-			});
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							customExceptionOccurred(e);
+						}
+					}
+					
+					public void customExceptionOccurred(final Exception exception)
+					{
+						localexta.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								ia.getLogger().warning(exception.toString());
+								return IFuture.DONE;
+							}
+						});					
+					}
+				});
+			}
+			else
+			{
+				// Convert file path or jar url to file url as used in lib service. 
+				final String filepath = ((IFileNode)node).getFilePath();
+				final String filename = filepath.startsWith("jar:")
+					? filepath.endsWith("!/") ? filepath.substring(4, filepath.length()-2)
+						: filepath.endsWith("!") ? filepath.substring(4, filepath.length()-1) : filepath.substring(4)
+					: filepath.startsWith("file:") ? filepath : "file:"+filepath;
+				
+				exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
+				{
+					@Classname("addurl")
+					public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
+					{
+						final URL	url	= SUtil.toURL(filename);
+						final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
+						IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+						{
+							public void customResultAvailable(final ILibraryService ls)
+							{
+								ls.addURL(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+								{
+									public void customResultAvailable(IResourceIdentifier rid)
+									{
+										ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+									}
+								});
+							}
+						});
+						
+						return ret;
+					}
+				}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
+				{
+					public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
+					{
+						// Todo: remove entries on remove.
+	//					System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
+						rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
+						rootpathentries.put(filepath, tup.getSecondEntity());
+						
+						ModelTreePanel.super.addNode(node);
+					}
+					public void customExceptionOccurred(final Exception exception)
+					{
+						localexta.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								ia.getLogger().warning(exception.toString());
+								return IFuture.DONE;
+							}
+						});					
+					}
+				});
+			}
 		}
 		else
 		{

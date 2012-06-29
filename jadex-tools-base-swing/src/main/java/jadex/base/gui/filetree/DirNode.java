@@ -2,7 +2,6 @@ package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.bridge.IResourceIdentifier;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
@@ -14,6 +13,7 @@ import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -99,6 +99,9 @@ public class DirNode extends FileNode
 	 */
 	protected IFuture listFiles()
 	{
+		if(file==null)
+			return new Future(new ArrayList());
+		
 		final Future ret = new Future();
 		final File[] files = file.listFiles();
 		final CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.length, true, new DelegationResultListener(ret));

@@ -4,6 +4,7 @@ import jadex.base.service.dependency.maven.MavenDependencyResolverService;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.commons.Tuple2;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class MavenTest2
 			{
 				System.out.println("\nDependencies for: "+files[i]);
 				IResourceIdentifier	rid	= mh.getResourceIdentifier(MavenDependencyResolverService.getUrl(files[i])).get(null);
-				Map<IResourceIdentifier, List<IResourceIdentifier>>	dependencies	= mh.loadDependencies(rid).get(null);
-				printDependencies(rid, dependencies, 0, new ArrayList<Boolean>());
+				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get(null);
+				printDependencies(rid, dependencies.getSecondEntity(), 0, new ArrayList<Boolean>());
 			}
 			catch(Exception e)
 			{
@@ -52,8 +53,8 @@ public class MavenTest2
 			{
 				System.out.println("\nDependencies for: "+gids[i]);
 				IResourceIdentifier	rid	= new ResourceIdentifier(null, gids[i]);
-				Map<IResourceIdentifier, List<IResourceIdentifier>>	dependencies	= mh.loadDependencies(rid).get(null);
-				printDependencies(rid, dependencies, 0, new ArrayList<Boolean>());
+				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get(null);
+				printDependencies(rid, dependencies.getSecondEntity(), 0, new ArrayList<Boolean>());
 			}
 			catch(Exception e)
 			{

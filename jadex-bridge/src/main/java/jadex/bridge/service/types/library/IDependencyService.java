@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.library;
 
 import jadex.bridge.IResourceIdentifier;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
 import java.net.URL;
@@ -18,7 +19,8 @@ public interface IDependencyService
 	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
 	 *  @return A map containing the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	public IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	loadDependencies(IResourceIdentifier rid);
+	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>	
+		loadDependencies(IResourceIdentifier rid, boolean workspace);
 	
 	/**
 	 *  Get the resource identifier for an url.

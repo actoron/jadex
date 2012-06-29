@@ -3,6 +3,7 @@ package jadex.tools.starter.gui;
 import jadex.base.gui.ComponentIdentifierDialog;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.modeltree.AddPathAction;
+import jadex.base.gui.modeltree.AddRIDAction;
 import jadex.base.gui.modeltree.CollapseAllAction;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
@@ -108,6 +109,13 @@ public class StarterPlugin extends AbstractJCCPlugin
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
+		ret.add(b);
+		
+		b = new JButton(((StarterPluginPanel)getView()).getModelTreePanel().getAction(AddRIDAction.getName()));
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+//		b.setEnabled(true);
 		ret.add(b);
 		
 		b = new JButton(((StarterPluginPanel)getView()).getModelTreePanel().getAction(RemovePathAction.getName()));
