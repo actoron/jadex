@@ -63,7 +63,6 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 			if((Boolean)((Object3d) primitive).isRigDebug())
 			{
 				// Show for Debugging
-				System.out.println("Animations for " + file + " \n" + "Identifier: " +  identifier + ": \n");
 			    for (String anim : control.getAnimationNames()) { System.out.println(anim); }
 			    SkeletonDebugger skeletonDebug = 
 			            new SkeletonDebugger("skeleton", control.getSkeleton());
@@ -106,7 +105,6 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		}
 		else if(cblue != 64)
 		{
-			System.out.println("cBLUE!");
 			float alpha= ((float)c.getAlpha())/255;
 			ColorRGBA color = new ColorRGBA(((float)c.getRed())/255,((float)c.getGreen())/255,((float)c.getBlue())/255, alpha);
 			mat.setColor("Color",color);
