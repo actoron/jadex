@@ -134,10 +134,9 @@
 				<env:drawable3d objecttype="homebase" width="0.2" height="0.2" depth="0.2" rotation3d="false">
 					<env:property name="oresize" dynamic="true">new Vector3Double(0.72f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/1000.0),0.72f)</env:property>
 					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
-					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
-					<env:property name="rotate270" dynamic="false">new Vector3Double((Math.PI/180)*270, 0, 0)</env:property>
+					<env:property name="rotatey" dynamic="false">new Vector3Double(0, (Math.PI/180)*180, 0)</env:property>
 					
-					<env:object3d width=".1" height=".1" depth=".1"  modelpath="jadex3d/models/buildings/mixed/jadexflag.j3o" hasLightMaterials="true">
+					<env:object3d width=".1" height=".1" depth=".1" rotation="rotatey" modelpath="jadex3d/models/buildings/mixed/jadexflag.j3o" hasLightMaterials="true">
 							<env:animation name="Wave" channel="chan01" loop="true"/>
 					</env:object3d>			
 				
