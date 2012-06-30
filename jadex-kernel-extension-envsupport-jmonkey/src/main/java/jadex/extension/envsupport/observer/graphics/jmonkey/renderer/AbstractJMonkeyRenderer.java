@@ -228,9 +228,6 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						
 						if(animActive)
 						{
-							
-							System.out.println("anichannels: " + anichannels.toString());
-							System.out.println("a.getChannel()++ obj.hashCode() +  +" + a.getChannel()+" "+ obj.hashCode() + " " +identifier);
 							AnimChannel chan = anichannels.get(a.getChannel()+" "+ obj.hashCode());
 							if(!a.getName().equals(chan.getAnimationName()))
 							{
