@@ -137,7 +137,7 @@
 					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
 					<env:property name="rotate270" dynamic="false">new Vector3Double((Math.PI/180)*270, 0, 0)</env:property>
 					
-					<env:object3d width=".5" height=".5" depth=".5"  modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true">
+					<env:object3d width=".1" height=".1" depth=".1"  modelpath="jadex3d/models/buildings/mixed/jadexflag.j3o" hasLightMaterials="true">
 							<env:animation name="Wave" channel="chan01" loop="true"/>
 					</env:object3d>			
 				
