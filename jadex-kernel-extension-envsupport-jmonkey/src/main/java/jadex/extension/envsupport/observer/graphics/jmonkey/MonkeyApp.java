@@ -1,13 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import jadex.extension.envsupport.math.IVector3;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
-
-import java.security.KeyRep;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,13 +11,10 @@ import com.jme3.animation.AnimEventListener;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
-import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
-import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -34,16 +25,12 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl.ControlDirection;
-import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -128,7 +115,10 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		al.setColor(ColorRGBA.White.mult(0.5f));
 		rootNode.addLight(al);
 		
-		
+//		  FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
+//		  BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
+//		  fpp.addFilter(bf);
+//		  viewPort.addProcessor(fpp);
 		
 	    pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
 	    pssmRenderer.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
@@ -257,6 +247,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
 		inputManager.addListener(actionListener, new String[]{"Select"});
 		inputManager.addListener(actionListener, new String[]{"FollowCam"});
+		
 
 
 	}
@@ -273,16 +264,16 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		 
 		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
 		_chaseCam.setSmoothMotion(true);
-		_chaseCam.setDefaultDistance(1000f);
+		_chaseCam.setDefaultDistance(100f);
 		_chaseCam.setEnabled(false);
 
 		/** Configure cam to look at scene */
 		cam.setLocation(new Vector3f(_appDimension * 1.2f, _appDimension / 2, _appDimension / 2));
 		cam.lookAt(new Vector3f(_appDimension/2, 0, _appDimension/2), Vector3f.UNIT_Y);
 		cam.setFrustumNear(1f);
-		cam.setFrustumFar(1500f);
+		cam.setFrustumFar(_appDimension*5);
 		flyCam.setEnabled(true);
-		flyCam.setMoveSpeed(200);
+		flyCam.setMoveSpeed(_appDimension);
 		
 		
 //		Camera cam_n    = cam.clone();
@@ -442,6 +433,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			_terrain.setLocalTranslation(trans);
 			_terrain.setLocalScale(scale);
 			_terrain.setMaterial(mat);
+			_terrain.setShadowMode(ShadowMode.Receive);
 			rootNode.attachChild(_terrain);
 		}
 	}
