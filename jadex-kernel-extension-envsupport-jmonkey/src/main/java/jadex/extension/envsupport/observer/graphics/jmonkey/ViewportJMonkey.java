@@ -103,7 +103,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 
 	/** The overal scale for the Application */
-	private final static int				_scaleApp		= 100;
+	private final static int				_scaleApp		= 500;
 
 	private boolean							_isGrid			= false;
 	
@@ -134,9 +134,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 	 * @param perspective the selected Perspective
 	 * @param ClassLoader the Classloader
 	 */
-	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader)
+	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize)
 	{
-		super(perspective);
+		super(perspective, spacesize);
 
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
@@ -145,11 +145,12 @@ public class ViewportJMonkey extends AbstractViewport3d
 		// Animation Channels
 		_animChannels = new HashMap<String, AnimChannel>();
 
-		// The Monkey Application
-		_app = new MonkeyApp();
+		//TODO: scaling komplett 
+		_scale = _scaleApp / areaSize_.getXAsFloat();
+		
+		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat());
 		AppSettings settings = new AppSettings(true);
 
-//		settings.setRenderer(AppSettings.LWJGL_OPENGL1);
 		
 		
 		_app.setPauseOnLostFocus(false);
@@ -162,6 +163,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
 
+
+
+
 		// Drawstuff
 		_drawObjects = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsRefresh = Collections.synchronizedSet(new HashSet<Object>());
@@ -173,21 +177,19 @@ public class ViewportJMonkey extends AbstractViewport3d
 			{
 				_geometryNode = updateMonkey(objectList_);
 				
+
 				if(_firstrun)
 				{
-					_scale = _scaleApp / (float)areaXDim_;
-					_app.setSpaceSize(areaXDim_, _isGrid);
 					_capabilities = _app.getCaps();
 					_staticNode = createStatics(_staticvisuals);
-					_staticNode.setLocalScale(_scale);
 					_app.setStaticGeometry(_staticNode);
-					_geometryNode.setLocalScale(_scale);
-					_firstrun = false;
 					_app.setChannels(_animChannels);
+					_firstrun = false;
+					_staticNode.setLocalScale(_scale);
+					_geometryNode.setLocalScale(_scale);
 				}
 				_app.setGeometry(_geometryNode);
 
-				
 				rendering = false;
 				return null;
 			};
@@ -583,7 +585,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		_app.stop();
 
-		// System.out.println("ViewportJmonkey: STOP STOP STOP");
+		System.out.println("ViewportJmonkey: STOP STOP STOP");
 
 	}
 

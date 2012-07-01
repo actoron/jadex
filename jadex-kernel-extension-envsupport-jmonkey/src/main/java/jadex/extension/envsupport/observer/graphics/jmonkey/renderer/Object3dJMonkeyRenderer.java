@@ -15,7 +15,9 @@ import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.debug.SkeletonDebugger;
 import com.jme3.texture.Texture;
 import com.jme3.scene.Node;
@@ -89,30 +91,9 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		    
 		}
 		
-		
-        
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		
-		Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
-		int cblue = c.getBlue();
 
-		if(!primitive.getTexturePath().equals(""))
-		{
-			mat.setColor("Color",ColorRGBA.White);
-			Texture tex_ml = assetManager.loadTexture(primitive.getTexturePath());
-			mat.setTexture("ColorMap", tex_ml);
-			object.setMaterial(mat);
-		}
-		else if(cblue != 64)
-		{
-			float alpha= ((float)c.getAlpha())/255;
-			ColorRGBA color = new ColorRGBA(((float)c.getRed())/255,((float)c.getGreen())/255,((float)c.getBlue())/255, alpha);
-			mat.setColor("Color",color);
-			object.setMaterial(mat);
-		}
-		
 
-		
+		object.setShadowMode(ShadowMode.Cast);
 
 		return object;
 

@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 
 import java.security.KeyRep;
@@ -26,17 +27,24 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl.ControlDirection;
+import com.jme3.shadow.BasicShadowRenderer;
+import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.HillHeightMap;
@@ -52,11 +60,9 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	private boolean			_walkCam;
 	
-	private boolean			 _followCam;
-	
 	private boolean			 _chaseCamera;
 
-	private float			_areaSize;
+	private float			_appDimension;
 
 	private float			_spaceSize;
 
@@ -80,17 +86,19 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private int				_selectedTarget;
 	
 	private HashMap<String, AnimChannel> _animChannels; 
+	
+	private PssmShadowRenderer pssmRenderer;
 
-	public MonkeyApp()
+	public MonkeyApp(float dim, float spaceSize)
 	{
 		
-		_areaSize = 100f;
-		_spaceSize = 1f;
+		_appDimension = dim;
+
+		_spaceSize = spaceSize;
 		_geometryNode = new Node("geometryNode");
 		_staticNode = new Node("staticNode");
 		_gridNode = new Node("gridNode");
 		_walkCam = false;
-		_followCam = false;
 		_selectedTarget = -1;
 		_selectedSpatial = null;
 	}
@@ -108,20 +116,31 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		this.rootNode.attachChild(_staticNode);
 
 
-		DirectionalLight sun = new DirectionalLight();
-		sun.setDirection(new Vector3f(1, 0, -2).normalizeLocal());
-		sun.setColor(ColorRGBA.White);
-
-		DirectionalLight sun2 = new DirectionalLight();
-		sun2.setDirection(new Vector3f(-2, 0, 1).normalizeLocal());
-		sun2.setColor(ColorRGBA.White);
-
-
-		rootNode.addLight(sun);
-		rootNode.addLight(sun2);
-
-
 		
+		DirectionalLight sun = new DirectionalLight();
+		sun.setColor(ColorRGBA.White);
+		sun.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal());
+		rootNode.addLight(sun);
+
+		AmbientLight al = new AmbientLight();
+		al.setColor(ColorRGBA.White.mult(0.5f));
+		rootNode.addLight(al);
+		
+		
+		
+	    pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
+	    pssmRenderer.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
+	    pssmRenderer.setShadowIntensity(0.6f);
+	    viewPort.addProcessor(pssmRenderer);
+	    
+
+
+	    rootNode.setShadowMode(ShadowMode.Off);
+
+		//TODO faulheit, ist nie grid:!
+		_gridHandler = new monkeyApp_Grid(_appDimension, _spaceSize, assetManager, false);
+		_gridNode = _gridHandler.getGrid();
+		this.rootNode.attachChild(_geometryNode);
 
 		initKeys();
 
@@ -243,7 +262,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	public void setCam(String modus)
 	{
 		
-		 //create the camera Node
+//		 create the camera Node
 		_camNode = new CameraNode("CameraNode", cam);
 		 _camNode.setControlDir(ControlDirection.SpatialToCamera);
 		_camNode.setEnabled(false);
@@ -252,14 +271,39 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		 
 		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
 		_chaseCam.setSmoothMotion(true);
-		_chaseCam.setDefaultDistance(100f);
+		_chaseCam.setDefaultDistance(1000f);
 		_chaseCam.setEnabled(false);
 
 		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(_areaSize * 1.5f, _areaSize * 0.8f, _areaSize * 1.5f));
-		cam.lookAt(new Vector3f(1, 2, 1), Vector3f.UNIT_Y);
+		cam.setLocation(new Vector3f(_appDimension * 1.2f, _appDimension / 2, _appDimension / 2));
+		cam.lookAt(new Vector3f(_appDimension/2, 0, _appDimension/2), Vector3f.UNIT_Y);
+		cam.setFrustumNear(1f);
+		cam.setFrustumFar(1500f);
 		flyCam.setEnabled(true);
-		flyCam.setMoveSpeed(20);
+		flyCam.setMoveSpeed(200);
+		
+		
+//		Camera cam_n    = cam.clone();
+//		cam.setViewPort( 0.0f , 1.0f   ,   0.0f , 1.0f );
+//		cam_n.setViewPort( 0.8f , 1.0f   ,   0.8f , 1.0f );
+//		cam_n.setLocation(new Vector3f(_areaSize/2, _areaSize*1.5f, _areaSize/2));
+//		cam_n.lookAt(new Vector3f(_areaSize/2, 0, _areaSize/2), Vector3f.UNIT_Y);
+//		 
+//		
+//		ViewPort view = renderManager.createMainView("View of camera #1", cam);
+////		view.setEnabled(true);
+//		view.setClearFlags(true, true, true);
+//		view.attachScene(rootNode);
+//		view.setBackgroundColor(ColorRGBA.Black);
+//		
+//		ViewPort view_n = renderManager.createMainView("View of camera #2", cam_n);
+////		view_n.setEnabled(true);
+//		view_n.setClearFlags(true, true, true);
+//		view_n.attachScene(rootNode);
+//		view_n.setBackgroundColor(ColorRGBA.Black);
+
+		
+
 
 
 	}
@@ -299,9 +343,9 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	{		
 		if(_walkCam)
 		{
-//			Vector3f loc = cam.getLocation();
-//			loc.setY(getHeightAt(loc.x, loc.z));
-//			cam.setLocation(loc);
+			Vector3f loc = cam.getLocation();
+			loc.setY(getHeightAt(loc.x, loc.z));
+			cam.setLocation(loc);
 		}
 
 	}
@@ -314,6 +358,10 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	public void setGeometry(Node geometry)
 	{
 		_geometryNode = geometry;
+		
+		
+		
+
 
 		this.rootNode.attachChild(_geometryNode);
 
@@ -335,10 +383,11 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		{
 			terra.removeFromParent();
 			_terrain = (TerrainQuad)terra;
-			_terrain.setLocalTranslation(_areaSize / 2, 0, _areaSize / 2);
+			_terrain.setLocalTranslation(_appDimension / 2, 0, _appDimension / 2);
 			/** 5. The LOD (level of detail) depends on were the camera is: */
 			TerrainLodControl control = new TerrainLodControl(_terrain, getCamera());
 			_terrain.addControl(control);
+			_terrain.setShadowMode(ShadowMode.Receive);
 
 			this.rootNode.attachChild(_terrain);
 		}
@@ -365,8 +414,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	{
 		if(_terrain != null)
 		{
-			vec = vec.mult(_areaSize);
-			return _terrain.getHeight(vec) / _areaSize;
+			vec = vec.mult(_appDimension/_spaceSize);
+			return _terrain.getHeight(vec) / _appDimension  *_spaceSize;
 		}
 
 		return 0;
@@ -380,7 +429,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			HillHeightMap heightmap = null;
 			try
 			{
-				heightmap = new HillHeightMap(257, 2000, 25, 100, (long)((byte)100 * Math.random()));
+				heightmap = new HillHeightMap(513, 2000, 25, 100, (long)((byte)100 * Math.random()));
 			}
 			catch(Exception ex)
 			{
@@ -390,30 +439,14 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			Vector3f scale = _terrain.getLocalScale();
 			Vector3f trans = _terrain.getLocalTranslation();
 			rootNode.detachChildNamed("Terrain");
-			_terrain = new TerrainQuad("Terrain", 65, 257, heightmap.getHeightMap());
+			_terrain = new TerrainQuad("Terrain", 65, 513, heightmap.getHeightMap());
 
 			_terrain.setLocalTranslation(trans);
 			_terrain.setLocalScale(scale);
 			_terrain.setMaterial(mat);
+			_terrain.setShadowMode(ShadowMode.Receive);
 			rootNode.attachChild(_terrain);
 		}
-	}
-
-	private boolean	gridCreated	= false;
-
-	public void setSpaceSize(double scale, boolean isGrid)
-	{
-		if(!gridCreated)
-		{
-			_spaceSize = (float)scale;
-			// Create the Grid
-			_gridHandler = new monkeyApp_Grid(_areaSize, _spaceSize, assetManager, isGrid);
-			_gridNode = _gridHandler.getGrid();
-			this.rootNode.attachChild(_geometryNode);
-			gridCreated = true;
-		}
-
-
 	}
 
 	private void fireSelection()

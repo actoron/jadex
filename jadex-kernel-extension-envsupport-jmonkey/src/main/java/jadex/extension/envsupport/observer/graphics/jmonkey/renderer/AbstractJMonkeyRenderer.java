@@ -21,10 +21,12 @@ import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
+import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -104,44 +106,54 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				// Set the local Rotation
 				spatial.setLocalRotation(quatation);
 				
+				
+				
 				// Set the Material
 				if((spatial instanceof Geometry) && primitive.getType()!=6  && primitive.getType()!=8 &&  primitive.getType()!=9) // And not a Node -> Object3D
 				{   
-					Material mat_tt = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-//					Material mat_tt = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");				
-//					Material mat_t2 = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
-//				mat_tt.getAdditionalRenderState().setWireframe(true);
-					
-
-					
+					spatial.setShadowMode(ShadowMode.Cast);
+					Material mat_tt = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");				
 					Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
 					float alpha= ((float)c.getAlpha())/255;
 					ColorRGBA color = new ColorRGBA(((float)c.getRed())/255,((float)c.getGreen())/255,((float)c.getBlue())/255, alpha);
-					mat_tt.setColor("Color",color);
-					
-					
-//					mat_tt.setBoolean("UseMaterialColors",true);  // Set some parameters, e.g. blue.
-//					mat_tt.setColor("Ambient", color);   // ... color of this object
-//					mat_tt.setColor("Diffuse", color);   // ... color of light being reflected
+
 			        
 					if(alpha < 1)
 					{
 						 mat_tt.getAdditionalRenderState().setBlendMode(BlendMode.Alpha); // activate transparency
 						 spatial.setQueueBucket(Bucket.Translucent);
+						 spatial.setQueueBucket(Bucket.Transparent);
 					}
-				
-					if(!primitive.getTexturePath().equals(""))
-					{
+					String texturepath = primitive.getTexturePath();
 					
-						Texture tex_ml = assetManager.loadTexture(primitive.getTexturePath());
+					if(!texturepath.equals(""))
+					{
+						mat_tt = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+					
+						Texture tex_ml = assetManager.loadTexture(texturepath);
+						mat_tt.setColor("Color",color);
 						mat_tt.setTexture("ColorMap", tex_ml);
+						
+						
+
 					}
+					else
+					{
+						mat_tt.setColor("Diffuse", color);
+						mat_tt.setColor("Ambient", color );
+						mat_tt.setBoolean("UseMaterialColors",true);
+					}
+					
+					
+
+
 				
 					spatial.setMaterial(mat_tt);
 				}
 			
 		}
 
+		
 		return spatial;
 	}
 
