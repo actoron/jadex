@@ -51,10 +51,10 @@ public class Torus3d extends Primitive3d
 	public Torus3d(Object position, Object rotation, Object size, int absFlags,
 			Object c, String texturePath, double innerRadius,
 			double outerRadius, int circleSamples, int radialSamples,
-			IParsedExpression drawcondition)
+			IParsedExpression drawcondition, String shadowtype)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_TORUS, position, rotation, size,
-				absFlags, c, texturePath, drawcondition);
+				absFlags, c, texturePath, drawcondition, shadowtype);
 		_innerRadius = innerRadius;
 		_outerRadius = outerRadius;
 		_circleSamples = circleSamples;

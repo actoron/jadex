@@ -37,9 +37,9 @@ public class Text3d extends Primitive3d
 	 * @param c modulation color or binding
 	 * @param modelPath resource path of the texture
 	 */
-	public Text3d(Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, String text, IParsedExpression drawcondition)
+	public Text3d(Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, String text, IParsedExpression drawcondition, String shadowtype)
 	{
-		super(Primitive3d.PRIMITIVE_TYPE_TEXT3D, position, rotation, size, absFlags, c, texturePath, drawcondition);
+		super(Primitive3d.PRIMITIVE_TYPE_TEXT3D, position, rotation, size, absFlags, c, texturePath, drawcondition, shadowtype);
 		_text = text;
 	}
 	

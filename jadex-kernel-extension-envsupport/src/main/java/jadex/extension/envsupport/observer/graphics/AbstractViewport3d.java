@@ -64,12 +64,16 @@ public abstract class AbstractViewport3d implements IViewport3d
 	private double				zoomLimit_;
 	
 	
-	public AbstractViewport3d(IPerspective perspective, IVector3 areasize)
+	private boolean							isGrid_			= false;
+	
+	
+	public AbstractViewport3d(IPerspective perspective, IVector3 areasize, boolean isGrid)
 	{
 		rendering = false;
 		this.perspective = perspective;
 		size_ = new Vector3Double(1.0);
 		position_ = Vector3Double.ZERO.copy();
+		isGrid_	= isGrid;
 		preserveAR_ = true;
 		areaSize_ = areasize;
 		paddedSize_ = new Vector2Double(1.0);
@@ -234,6 +238,11 @@ public abstract class AbstractViewport3d implements IViewport3d
 		return perspective;
 	}
 	
+	public void isGridSpace(boolean isGrid)
+	{
+		isGrid_ = isGrid;
+
+	}
 	
 	
 	

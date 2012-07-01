@@ -27,6 +27,8 @@ public class Terrain3d extends Primitive3d
 	protected int _maxradius;
 	protected int _seed;
 	
+	protected String _shadowtype;
+	
 
 	
 	protected ArrayList<TerrainTexture> _terrainTexture = new ArrayList<TerrainTexture>(); 
@@ -40,7 +42,7 @@ public class Terrain3d extends Primitive3d
 	public Terrain3d(String terrapath, String alphamap, String heightmap,
 			String texture01, String texture02, String texture03,
 			String texture04, String texture05, Integer tex01val, Integer tex02val,
-			Integer tex03val, Integer tex04val, Integer tex05val, int patchsize, int picsize)
+			Integer tex03val, Integer tex04val, Integer tex05val, int patchsize, int picsize, String shadowtype)
 	{
 		super();
 		type = Primitive3d.PRIMITIVE_TYPE_TERRAIN;
@@ -56,6 +58,8 @@ public class Terrain3d extends Primitive3d
 		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val: 1));
 		_picsize = picsize;
 		_patchsize = patchsize;
+		_shadowtype = shadowtype;
+
 	}
 
 	/**
@@ -66,6 +70,7 @@ public class Terrain3d extends Primitive3d
 	 * @param yrotation yrotation or rotation-binding
 	 * @param zrotation zrotation or rotation-binding
 	 * @param size size or size-binding
+	 * @param shadowtype 
 	 * @param absFlags flags for setting position, size and rotation as
 	 *        absolutes
 	 * @param c modulation color or binding
@@ -75,7 +80,7 @@ public class Terrain3d extends Primitive3d
 			String terrapath, String alphamap, String heightmap,
 			String texture01, String texture02, String texture03,
 			String texture04, String texture05, Integer tex01val, Integer tex02val,
-			Integer tex03val, Integer tex04val, Integer tex05val, int patchsize, int picsize)
+			Integer tex03val, Integer tex04val, Integer tex05val, int patchsize, int picsize, String shadowtype)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_TERRAIN, position, rotation, size, null);
 		
@@ -90,6 +95,7 @@ public class Terrain3d extends Primitive3d
 		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val: 1));
 		_picsize = picsize;
 		_patchsize = patchsize;
+		_shadowtype = shadowtype;
 	}
 
 	public Terrain3d(Object position, Object rotation, Object size,
@@ -98,7 +104,7 @@ public class Terrain3d extends Primitive3d
 			String texture01, String texture02, String texture03,
 			String texture04, String texture05, Integer tex01val,
 			Integer tex02val, Integer tex03val, Integer tex04val,
-			Integer tex05val)
+			Integer tex05val, String shadowtype)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_TERRAIN, position, rotation, size, null);
 		_isRnd = true;
@@ -115,6 +121,7 @@ public class Terrain3d extends Primitive3d
 		_minradius = minradius;
 		_maxradius = maxradius;
 		_seed = seed;
+		_shadowtype = shadowtype;
 	}
 
 	/**

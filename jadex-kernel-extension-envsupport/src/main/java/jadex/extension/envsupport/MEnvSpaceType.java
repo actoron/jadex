@@ -623,6 +623,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -657,8 +658,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -685,6 +691,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -718,8 +725,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp, shadowtype);
 						//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
@@ -748,6 +760,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
@@ -783,8 +796,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, height, exp);
+						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, height, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -811,6 +829,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("planes", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("samples", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
@@ -869,8 +888,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, (int)samples, (int)planes, exp);
+						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, (int)samples, (int)planes, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -897,6 +921,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("innerRadius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("outerRadius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("circleSamples", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
@@ -959,8 +984,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp);
+						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -988,6 +1018,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("modelpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("hasLightMaterials", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("rigDebug", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
@@ -1050,8 +1081,12 @@ public class MEnvSpaceType
 								fanims.add(anim);
 							}
 						}
-						
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, rigDebug, exp, fanims);
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1106,6 +1141,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1143,8 +1179,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1171,6 +1212,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("text", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
@@ -1205,8 +1247,13 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, (String)getProperty(args, "text"), exp);
+						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, (String)getProperty(args, "text"), exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1284,6 +1331,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("tex05val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("patchsize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("picsize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1326,10 +1374,16 @@ public class MEnvSpaceType
 						Integer patchsize = (Integer)getProperty(args, "patchsize");
 						Integer picsize = (Integer)getProperty(args, "picsize");
 						
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
 						
 
-						return new Terrain3d(position, rotation, size, terrapath, alphamap, heightmap, texture01, texture02, texture03, texture04, texture05, tex01val, tex02val, tex03val, tex04val, tex05val, patchsize, picsize);
+						return new Terrain3d(position, rotation, size, terrapath, alphamap, heightmap, texture01, texture02, texture03, texture04, texture05, tex01val, tex02val, tex03val, tex04val, tex05val, patchsize, picsize, shadowtype);
 //						//////////////
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
@@ -1369,6 +1423,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("tex03val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("tex04val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("tex05val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1411,11 +1466,17 @@ public class MEnvSpaceType
 						Integer minradius = (Integer)getProperty(args, "minradius");
 						Integer maxradius = (Integer)getProperty(args, "maxradius");
 						Integer seed = (Integer)getProperty(args, "seed");
+						
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
 
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
 						
 
-						return new Terrain3d(position, rotation, size, tiles, iterations, minradius, maxradius, seed, terrapath, alphamap, texture01, texture02, texture03, texture04, texture05, tex01val, tex02val, tex03val, tex04val, tex05val);
+						return new Terrain3d(position, rotation, size, tiles, iterations, minradius, maxradius, seed, terrapath, alphamap, texture01, texture02, texture03, texture04, texture05, tex01val, tex02val, tex03val, tex04val, tex05val, shadowtype);
 //						//////////////
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))

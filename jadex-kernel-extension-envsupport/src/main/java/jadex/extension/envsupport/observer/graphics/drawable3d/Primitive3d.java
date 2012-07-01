@@ -9,21 +9,20 @@ public class Primitive3d extends AbstractVisual3d
 	public static final int ABSOLUTE_POSITION = 1;
 	public static final int ABSOLUTE_SIZE = 2;
 	public static final int ABSOLUTE_ROTATION = 4;
-	
 	public static final int PRIMITIVE_TYPE_SPHERE			 = 0;
 	public static final int PRIMITIVE_TYPE_BOX		 	 	 = 1;
 	public static final int PRIMITIVE_TYPE_CYLINDER			 = 2;
 	public static final int PRIMITIVE_TYPE_ARROW			= 3;
 	public static final int PRIMITIVE_TYPE_DOME		 		= 4;
 	public static final int PRIMITIVE_TYPE_TORUS			 = 5;
-	
 	public static final int PRIMITIVE_TYPE_OBJECT3D	 		= 6;
-	
 	public static final int PRIMITIVE_TYPE_TEXT3D			 = 7;
-	
-	public static final int PRIMITIVE_TYPE_SKY	 		= 8;
-	
+	public static final int PRIMITIVE_TYPE_SKY	 			= 8;
 	public static final int PRIMITIVE_TYPE_TERRAIN	 		= 9;
+	
+	public static final String SHADOW_OFF = "Off";
+	public static final String SHADOW_CAST = "Cast";
+	public static final String SHADOW_RECEIVE = "Receive";
 	
 	/** Enable DrawableCombiner position */
 	protected boolean enableDCPos;
@@ -49,10 +48,14 @@ public class Primitive3d extends AbstractVisual3d
 	/** Primitive type */
 	protected int type;
 	
+	/** Primitive shadow */
+	protected String shadowtype;
+	
 	public Primitive3d()
 	{
 		super();
 		type = PRIMITIVE_TYPE_SPHERE;
+		shadowtype = "Off";
 		enableDCPos = false;
 		enableDCSize = false;
 		enableDCRot = false;
@@ -80,6 +83,7 @@ public class Primitive3d extends AbstractVisual3d
 			c = Color.DARK_GRAY;
 		setColor(c);
 		setTexturePath("");
+		setShadowtype(SHADOW_OFF);
 	}
 	
 	
@@ -93,7 +97,7 @@ public class Primitive3d extends AbstractVisual3d
 	 * @param size size or size-binding
 	 * @param c the drawable's color or color binding
 	 */
-	public Primitive3d(int type, Object position, Object rotation, Object size, Object c, IParsedExpression drawcondition)
+	public Primitive3d(int type, Object position, Object rotation, Object size, Object c, IParsedExpression drawcondition, String shadowtype)
 	{
 		super(position, rotation, size);
 		this.type = type;
@@ -102,6 +106,15 @@ public class Primitive3d extends AbstractVisual3d
 			c = Color.WHITE;
 		setColor(c);
 		setTexturePath("");
+		if(shadowtype.equals(SHADOW_CAST)||shadowtype.equals(SHADOW_RECEIVE)||shadowtype.equals(SHADOW_OFF))
+		{
+			setShadowtype(shadowtype);
+		}
+		else
+		{
+			setShadowtype(SHADOW_OFF);
+		}
+
 		this.drawcondition = drawcondition;
 	}
 	
@@ -116,7 +129,7 @@ public class Primitive3d extends AbstractVisual3d
 	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param c the drawable's color or color binding
 	 */
-	public Primitive3d(int type, Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, IParsedExpression drawcondition)
+	public Primitive3d(int type, Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, IParsedExpression drawcondition, String shadowtype)
 	{
 		super(position, rotation, size);
 		this.type = type;
@@ -129,6 +142,14 @@ public class Primitive3d extends AbstractVisual3d
 			c = Color.DARK_GRAY;
 		setColor(c);
 		setTexturePath(texturePath);
+		if(shadowtype.equals(SHADOW_CAST)||shadowtype.equals(SHADOW_RECEIVE)||shadowtype.equals(SHADOW_OFF))
+		{
+			setShadowtype(shadowtype);
+		}
+		else
+		{
+			setShadowtype(SHADOW_OFF);
+		}
 	}
 	
 	
@@ -267,5 +288,23 @@ public class Primitive3d extends AbstractVisual3d
 	public String getTexturePath()
 	{
 		return texturePath_;
+	}
+
+
+	/**
+	 * @return the shadowtype
+	 */
+	public String getShadowtype()
+	{
+		return shadowtype;
+	}
+
+
+	/**
+	 * @param shadowtype the shadowtype to set
+	 */
+	public void setShadowtype(String shadowtype)
+	{
+		this.shadowtype = shadowtype;
 	}
 }
