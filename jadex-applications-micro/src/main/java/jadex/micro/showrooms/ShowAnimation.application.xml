@@ -62,10 +62,16 @@
 
 			<env:perspectives>
 				<env:perspective name="Complex3D" class="Perspective3D">
+				
+								<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+				<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					<env:box  width="10" height="0.01" depth="10" x="-1" y="-0.75" z="1" color="#D2B48CFF" shadowtype="Receive"/>
+
+				</env:drawable3d>
 
 					<env:drawable3d objecttype="character" width="1" height="1" depth="1" rotation3d="true">
 					<env:property name="rotate45y" dynamic="false">new Vector3Double(0, (Math.PI/180)*45, 0)</env:property>
-						<env:object3d height="0.3" width="0.3" depth="0.3" rotation="rotate45y" modelpath="jadex3d/models/characters/jmonkey/sinbad/sinbad.j3o" hasLightMaterials="true">
+						<env:object3d height="0.3" width="0.3" depth="0.3" rotation="rotate45y" modelpath="jadex3d/models/characters/jmonkey/sinbad/sinbad.j3o" hasLightMaterials="true" shadowtype="Cast">
 							<env:animation name="RunBase" channel="base" loop="false">
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
 							</env:animation>
