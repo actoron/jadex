@@ -88,12 +88,14 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private HashMap<String, AnimChannel> _animChannels; 
 	
 	private PssmShadowRenderer pssmRenderer;
+	
+	private boolean _isGrid;
 
-	public MonkeyApp(float dim, float spaceSize)
+	public MonkeyApp(float dim, float spaceSize, boolean isGrid)
 	{
 		
 		_appDimension = dim;
-
+		_isGrid = isGrid;
 		_spaceSize = spaceSize;
 		_geometryNode = new Node("geometryNode");
 		_staticNode = new Node("staticNode");
@@ -138,7 +140,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	    rootNode.setShadowMode(ShadowMode.Off);
 
 		//TODO faulheit, ist nie grid:!
-		_gridHandler = new monkeyApp_Grid(_appDimension, _spaceSize, assetManager, false);
+		_gridHandler = new monkeyApp_Grid(_appDimension, _spaceSize, assetManager, _isGrid);
 		_gridNode = _gridHandler.getGrid();
 		this.rootNode.attachChild(_geometryNode);
 
@@ -358,11 +360,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	public void setGeometry(Node geometry)
 	{
 		_geometryNode = geometry;
-		
-		
-		
-
-
 		this.rootNode.attachChild(_geometryNode);
 
 	}
@@ -382,6 +379,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		if(terra != null)
 		{
 			terra.removeFromParent();
+			ShadowMode mode = terra.getShadowMode();
 			_terrain = (TerrainQuad)terra;
 			_terrain.setLocalTranslation(_appDimension / 2, 0, _appDimension / 2);
 			/** 5. The LOD (level of detail) depends on were the camera is: */
@@ -444,7 +442,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			_terrain.setLocalTranslation(trans);
 			_terrain.setLocalScale(scale);
 			_terrain.setMaterial(mat);
-			_terrain.setShadowMode(ShadowMode.Receive);
 			rootNode.attachChild(_terrain);
 		}
 	}

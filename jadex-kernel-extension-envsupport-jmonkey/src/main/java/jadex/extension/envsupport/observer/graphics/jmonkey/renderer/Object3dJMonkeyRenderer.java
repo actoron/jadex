@@ -90,11 +90,6 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		    
 		    
 		}
-		
-
-
-		object.setShadowMode(ShadowMode.Cast);
-
 		return object;
 
 

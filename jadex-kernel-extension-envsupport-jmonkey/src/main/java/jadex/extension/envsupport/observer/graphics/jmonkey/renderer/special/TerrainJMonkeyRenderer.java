@@ -12,6 +12,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 import com.jme3.material.Material;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
@@ -113,6 +114,18 @@ public class TerrainJMonkeyRenderer extends AbstractJMonkeyRenderer
 	 
 	    /** 4. We give the terrain its material */
 //	    mat_terrain.getAdditionalRenderState().setWireframe(true);
+	    
+	    
+		String shadow = primitive.getShadowtype();
+		
+		if(shadow.equals(Primitive3d.SHADOW_CAST))
+		{
+			terrain.setShadowMode(ShadowMode.Cast);
+		}
+		else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
+		{
+			terrain.setShadowMode(ShadowMode.Receive);
+		}
 
 	    terrain.setMaterial(mat_terrain);
 	    

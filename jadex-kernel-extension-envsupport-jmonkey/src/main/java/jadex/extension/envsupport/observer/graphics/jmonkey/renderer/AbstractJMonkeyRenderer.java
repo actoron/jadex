@@ -81,8 +81,10 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 		
 		if(draw)
 		{	
-
+				//first create the Spatial
+				spatial = draw(dc, primitive, obj, vp);
 			
+				
 				Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj, primitive.getRotation(), vp));
 				rotation = new Vector3f(rotationD.getXAsFloat(), rotationD.getYAsFloat(), rotationD.getZAsFloat());	
 				
@@ -92,7 +94,20 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(obj, primitive.getPosition(), vp));	
 				positionlocal =   new Vector3f(positionlocalD.getXAsFloat(), positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());	
 				
-				spatial = draw(dc, primitive, obj, vp);
+				//Shadow, by default off
+				spatial.setShadowMode(ShadowMode.Off);
+				
+				String shadow = primitive.getShadowtype();
+				
+				if(shadow.equals(Primitive3d.SHADOW_CAST))
+				{
+					spatial.setShadowMode(ShadowMode.Cast);
+				}
+				else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
+				{
+					spatial.setShadowMode(ShadowMode.Receive);
+				}
+
 
 				float[] angles = {rotation.x, rotation.y, rotation.z};
 				quatation = spatial.getLocalRotation().fromAngles(angles);
@@ -111,7 +126,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				// Set the Material
 				if((spatial instanceof Geometry) && primitive.getType()!=6  && primitive.getType()!=8 &&  primitive.getType()!=9) // And not a Node -> Object3D
 				{   
-					spatial.setShadowMode(ShadowMode.Cast);
+					
 					Material mat_tt = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");				
 					Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
 					float alpha= ((float)c.getAlpha())/255;

@@ -105,7 +105,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/** The overal scale for the Application */
 	private final static int				_scaleApp		= 500;
 
-	private boolean							_isGrid			= false;
+
 	
 	/**
 	 *  Animation Stuff
@@ -134,9 +134,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 	 * @param perspective the selected Perspective
 	 * @param ClassLoader the Classloader
 	 */
-	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize)
+	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid)
 	{
-		super(perspective, spacesize);
+		super(perspective, spacesize, isGrid);
 
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
@@ -148,7 +148,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		//TODO: scaling komplett 
 		_scale = _scaleApp / areaSize_.getXAsFloat();
 		
-		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat());
+		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid);
 		AppSettings settings = new AppSettings(true);
 
 		
@@ -615,12 +615,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 
-	@Override
-	public void isGridSpace(boolean isGrid)
-	{
-		_isGrid = isGrid;
 
-	}
 
 
 	/**
