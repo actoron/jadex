@@ -32,9 +32,6 @@ public abstract class AbstractViewport3d implements IViewport3d
 	
 	/** Maximum displayable area */
 	protected IVector3		areaSize_;
-	
-	/**  */
-	protected double		areaXDim_;
 
 	/** Real size of the viewport including padding. */
 	protected Vector2Double		paddedSize_;
@@ -67,14 +64,14 @@ public abstract class AbstractViewport3d implements IViewport3d
 	private double				zoomLimit_;
 	
 	
-	public AbstractViewport3d(IPerspective perspective)
+	public AbstractViewport3d(IPerspective perspective, IVector3 areasize)
 	{
 		rendering = false;
 		this.perspective = perspective;
 		size_ = new Vector3Double(1.0);
 		position_ = Vector3Double.ZERO.copy();
 		preserveAR_ = true;
-		areaSize_ = new Vector3Double(1.0);
+		areaSize_ = areasize;
 		paddedSize_ = new Vector2Double(1.0);
 		drawObjects_ = Collections.synchronizedSet(new HashSet<Object>());
 		objectList_ = Collections.synchronizedList(new ArrayList<Object>());
@@ -166,8 +163,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 		{
 			public void run()
 			{
-				areaSize_ = areaSize;
-				areaXDim_ = areaSize.getXAsDouble();
+				areaSize_ = new Vector3Double(areaSize);
 			}
 		});
 		

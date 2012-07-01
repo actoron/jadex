@@ -251,19 +251,21 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 			}
 
 			ClassLoader cl = obscenter.getClassLoader();
-			viewport3d = createViewport(this, cl);
+			
 
 			// TODO alles ok hier?
 			AbstractEnvironmentSpace space = obscenter.getSpace();
 			if(space instanceof Space2D)
 			{
 				IVector2 tmpsize = ((Space2D)space).getAreaSize();
+				
 				IVector3 tmp3dsize = new Vector3Double(tmpsize.getXAsDouble(),(tmpsize.getXAsDouble()+tmpsize.getYAsDouble())/2,tmpsize.getYAsDouble());
-				viewport3d.setAreaSize(tmp3dsize);
+				viewport3d = createViewport(this, cl, tmp3dsize);
 			}
 			else if(space instanceof Space3D)
 			{
-				viewport3d.setAreaSize(((Space3D)space).getAreaSize());
+				IVector3 tmp3dsize = ((Space3D)space).getAreaSize();
+				viewport3d = createViewport(this, cl, tmp3dsize);
 			}
 			
 			boolean isGrid = obscenter.getSpace().getClass().getSimpleName().startsWith("Grid");
@@ -387,7 +389,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 							}
 
 						}
-						System.out.println("staticvisuals after: " + staticvisuals.size() + " " + staticvisuals.toString());
+//						System.out.println("staticvisuals after: " + staticvisuals.size() + " " + staticvisuals.toString());
 					}
 					firsttime = false;
 
@@ -438,15 +440,15 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		}
 	}
 
-	private IViewport3d createViewport(IPerspective persp, ClassLoader cl)
+	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize)
 	{
 		System.out.println("Perspective3D - > Create new Viewport!");
 		try
 		{
 			Constructor con = Class.forName("jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey", true,
-					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class});
+					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class});
 
-			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl});
+			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize});
 
 			viewport3d = vp;
 			vp.startApp();
