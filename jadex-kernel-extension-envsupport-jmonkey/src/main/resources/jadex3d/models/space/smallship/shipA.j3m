@@ -1,8 +1,0 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
-    MaterialParameters {
-        DiffuseMap : Flip jadex3d/models/space/smallship/s_1024_C.jpg
-
-    }
-    AdditionalRenderState {
-    }
-}

@@ -1,12 +1,15 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        DiffuseMap : Flip jadex3d/models/vehicles/tank/gold.jpg
+        DiffuseMap : jadex3d/models/space/smallship/s_1024_C.jpg
+        NormalMap : jadex3d/models/space/smallship/s_1024_N.jpg
+        SpecularMap : jadex3d/models/space/smallship/s_1024_S.jpg
+        GlowMap : jadex3d/models/space/smallship/s_1024_I.jpg
+        GlowColor : 1.0 0.0 0.0 1.0
         UseMaterialColors : true
-        Diffuse : 0.6 1.0 0.6 1.0
-        Ambient : 1.0 0.2 0.2 1.0
         Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 1.0 1.0
         Shininess : 0.0
-        LowQuality : true
     }
     AdditionalRenderState {
       FaceCull Back

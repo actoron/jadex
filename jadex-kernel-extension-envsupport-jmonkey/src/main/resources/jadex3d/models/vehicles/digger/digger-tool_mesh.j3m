@@ -1,7 +1,6 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         Diffuse : 0.6 0.6 0.6 1.0
-        GlowColor : 1.0 1.0 1.0 1.0
         UseMaterialColors : true
         Shininess : 0.0
         Specular : 1.0 1.0 1.0 1.0

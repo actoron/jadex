@@ -1,7 +1,0 @@
-Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
-     MaterialParameters {
-        ColorMap : Flip jadex3d/models/vehicles/buggy/buggydifff3.png
-     }
-    AdditionalRenderState {
-    }
-}

@@ -1,7 +1,6 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         DiffuseMap : Repeat jadex3d/models/characters/medieval/knight/Knight.png
-        GlowColor : 0.8 0.8 0.8 1.0
         Specular : 0.5 0.5 0.5 1.0
         Diffuse : 0.94000005 0.94000005 0.94000005 1.0
         UseMaterialColors : true

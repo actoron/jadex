@@ -1,7 +1,6 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         DiffuseMap : Repeat jadex3d/models/characters/medieval/mage/Mage.png
-        GlowColor : 0.0 0.0 0.0 1.0
         Specular : 0.0 0.0 0.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0
         UseMaterialColors : true
