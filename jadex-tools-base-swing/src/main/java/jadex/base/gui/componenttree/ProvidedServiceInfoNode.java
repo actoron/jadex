@@ -56,7 +56,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 		this.ea = ea;
 //		if(service==null || service.getType().getTypeName()==null)
 //			System.out.println("service node: "+this);
-		model.registerNode(this);
+//		model.registerNode(this);
 	}
 	
 	//-------- methods --------

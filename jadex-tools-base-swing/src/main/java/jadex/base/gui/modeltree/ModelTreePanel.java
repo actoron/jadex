@@ -6,7 +6,7 @@ import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
-import jadex.base.gui.filetree.RIDJarNode;
+import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RootNode;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -273,51 +273,47 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
-			if(node instanceof RIDJarNode)
+			if(node instanceof RIDNode)
 			{
-				final IResourceIdentifier rid = ((RIDJarNode)node).getResourceIdentifier();
+				final IResourceIdentifier rid = ((RIDNode)node).getResourceIdentifier();
 				
-				exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
+				exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
 				{
 					@Classname("addrid")
-					public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
+					public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 					{
-						final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
+						final Future<IResourceIdentifier>	ret	= new Future<IResourceIdentifier>();
 						IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-						libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+						libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 						{
 							public void customResultAvailable(final ILibraryService ls)
 							{
-								ls.addResourceIdentifier(rid).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
-								{
-									public void customResultAvailable(IResourceIdentifier rid)
-									{
-										ret.setResult(new Tuple2<URL, IResourceIdentifier>(null, rid));
-									}
-								});
+								// todo: workspace=false?
+								ls.addResourceIdentifier(rid, true).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 							}
 						});
 						
 						return ret;
 					}
-				}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
+				}).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
 				{
-					public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
+					public void customResultAvailable(IResourceIdentifier rid) 
 					{
 						// Todo: remove entries on remove.
 						try
 						{
-							System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
-							File f = new File(tup.getSecondEntity().getLocalIdentifier().getUrl().toURI());
-							rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
-							rootpathentries.put(f.getAbsolutePath(), tup.getSecondEntity());
+							System.out.println("adding root: "+rid);
+							File f = new File(rid.getLocalIdentifier().getUrl().toURI());
+//							addRootEntry(f.toURI().toURL(), f.getAbsolutePath(), rid);
+							RIDNode rn = (RIDNode)node;
+							rn.setFile(f);
+							addRootEntry(f.toURI().toURL(), rn.getFilePath() , rid);
 							
-							((RIDJarNode)node).setFile(f);
 							ModelTreePanel.super.addNode(node);
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+//							e.printStackTrace();
 							customExceptionOccurred(e);
 						}
 					}
@@ -356,11 +352,17 @@ public class ModelTreePanel extends FileTreePanel
 						{
 							public void customResultAvailable(final ILibraryService ls)
 							{
+								// todo: workspace=true?
 								ls.addURL(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
 								{
 									public void customResultAvailable(IResourceIdentifier rid)
 									{
 										ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										exception.printStackTrace();
+										super.exceptionOccurred(exception);
 									}
 								});
 							}
@@ -374,11 +376,10 @@ public class ModelTreePanel extends FileTreePanel
 					{
 						// Todo: remove entries on remove.
 	//					System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
-						rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
-						rootpathentries.put(filepath, tup.getSecondEntity());
-						
+						addRootEntry(tup.getFirstEntity(), filepath, tup.getSecondEntity());
 						ModelTreePanel.super.addNode(node);
 					}
+					
 					public void customExceptionOccurred(final Exception exception)
 					{
 						localexta.scheduleStep(new IComponentStep<Void>()
@@ -462,6 +463,7 @@ public class ModelTreePanel extends FileTreePanel
 	 */
 	public void addRootEntry(URL url, String path, IResourceIdentifier rid)
 	{
+//		System.out.println("putting: "+url+" "+path+" "+rid);
 		rootentries.put(url, rid);
 		rootpathentries.put(path, rid);
 	}

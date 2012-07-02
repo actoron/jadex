@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -159,12 +160,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  @param rid The resource identifier.
 	 *  @return The possibly completed rid (may contain an additional local rid when global was given):
 	 */
-	public IFuture<IResourceIdentifier> addResourceIdentifier(IResourceIdentifier rid)
+	public IFuture<IResourceIdentifier> addResourceIdentifier(IResourceIdentifier rid, final boolean workspace)
 	{
 		System.out.println("add "+rid);
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		getDependencies(rid).addResultListener(new ExceptionDelegationResultListener
+		getDependencies(rid, workspace).addResultListener(new ExceptionDelegationResultListener
 			<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
@@ -172,7 +173,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final IResourceIdentifier rid = result.getFirstEntity();
 				System.out.println("add end "+rid);
 				
-				getClassLoader(rid, null, rid).addResultListener(
+				getClassLoader(rid, null, rid, workspace).addResultListener(
 					new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
 				{
 					public void customResultAvailable(DelegationURLClassLoader result)
@@ -199,7 +200,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		getClassLoader(rid, null, null).addResultListener(
+		// todo: workspace=true?
+		getClassLoader(rid, null, null, true).addResultListener(
 			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
 		{
 			public void customResultAvailable(DelegationURLClassLoader result)
@@ -253,7 +255,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		getClassLoader(rid, null, null).addResultListener(
+		// todo: workspace=true?
+		getClassLoader(rid, null, null, true).addResultListener(
 			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
 		{
 			public void customResultAvailable(DelegationURLClassLoader result)
@@ -340,6 +343,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Add a new url.
 	 *  @param url The resource identifier.
 	 */
+//	public IFuture<IResourceIdentifier> addURL(final URL url, final boolean workspace)
 	public IFuture<IResourceIdentifier> addURL(final URL url)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
@@ -353,7 +357,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				{
 					public void customResultAvailable(final IResourceIdentifier rid)
 					{
-						addResourceIdentifier(rid).addResultListener(
+						// todo: should be true?
+						addResourceIdentifier(rid, true).addResultListener(
 							new ExceptionDelegationResultListener<IResourceIdentifier, IResourceIdentifier>(ret)
 						{
 							public void customResultAvailable(IResourceIdentifier result)
@@ -470,11 +475,22 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 	/** 
 	 *  Returns the current ClassLoader.
+	 *  @return the current ClassLoader
+	 */
+	@Excluded
+	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid)
+	{
+		return getClassLoader(rid, true);
+	}
+	
+	
+	/** 
+	 *  Returns the current ClassLoader.
 	 *  @param rid The resource identifier (null for current global loader).
 	 *  @return the current ClassLoader
 	 */
 	@Excluded()
-	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid)
+	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid, boolean workspace)
 	{
 		final Future<ClassLoader> ret = new Future<ClassLoader>();
 		
@@ -496,7 +512,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			// Resolve global rid or local rid from same platform.
 			if(rid.getGlobalIdentifier()!=null || isLocal(rid))
 			{
-				getClassLoader(rid, null, null).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
+				getClassLoader(rid, null, null, workspace).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
 				{
 					public void customResultAvailable(DelegationURLClassLoader result)
 					{
@@ -565,7 +581,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Get or create a classloader for a rid.
 	 */
 	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, 
-		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
+		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		final Future<DelegationURLClassLoader> ret;
 		
@@ -598,12 +614,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				if(alldeps==null)
 				{
 //					System.out.println("getdeps in getcl: "+rid);
-					getDependencies(rid).addResultListener(
+					getDependencies(rid, workspace).addResultListener(
 						new ExceptionDelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>, DelegationURLClassLoader>(ret)
 					{
 						public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 						{
-							createClassLoader(rid, deps.getSecondEntity(), support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
+							createClassLoader(rid, deps.getSecondEntity(), support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 							{
 								public void customResultAvailable(DelegationURLClassLoader result)
 								{
@@ -628,7 +644,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				}
 				else
 				{
-					createClassLoader(rid, alldeps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
+					createClassLoader(rid, alldeps, support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 					{
 						public void customResultAvailable(DelegationURLClassLoader result)
 						{
@@ -652,7 +668,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Create a new classloader.
 	 */
-	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
+	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
 		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl());
@@ -706,7 +722,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			IResourceIdentifier mydep = (IResourceIdentifier)deps.get(i);
 //			IComponentIdentifier platcid = ((IComponentIdentifier)getServiceIdentifier().getProviderId()).getRoot();
 //			IResourceIdentifier myrid = new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(platcid, mydep), null);
-			getClassLoader(mydep, alldeps, support).addResultListener(lis);
+			getClassLoader(mydep, alldeps, support, workspace).addResultListener(lis);
 		}
 		return ret;
 	}
@@ -714,7 +730,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Get the dependent urls.
 	 */
-	protected IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> getDependencies(final IResourceIdentifier rid)
+	protected IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> 
+		getDependencies(final IResourceIdentifier rid, final boolean workspace)
 	{
 		final Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>();
 		
@@ -723,22 +740,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(IDependencyService drs)
 			{
-				// todo!!!
-				drs.loadDependencies(rid, true).addResultListener(new DelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(ret));
+				drs.loadDependencies(rid, workspace).addResultListener(new DelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(ret));
 			}
 		});
 		
 		return ret;
 	}
 	
-	/**
-	 *  Add a path.
-	 *  @param path The path.
-	 */
-	protected void addPath(String path)
-	{
-		addURL(SUtil.toURL(path));
-	}
+//	/**
+//	 *  Add a path.
+//	 *  @param path The path.
+//	 */
+//	protected void addPath(String path)
+//	{
+//		addURL(SUtil.toURL(path));
+//	}
 	
 	/**
 	 *  Add support for a rid.

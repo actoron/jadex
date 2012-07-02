@@ -24,7 +24,7 @@ public interface ILibraryService
 	 *  Add a new resource identifier.
 	 *  @param rid The resource identifier.
 	 */
-	public IFuture<IResourceIdentifier> addResourceIdentifier(@CheckNotNull IResourceIdentifier rid);
+	public IFuture<IResourceIdentifier> addResourceIdentifier(@CheckNotNull IResourceIdentifier rid, boolean workspace);
 	
 	/**
 	 *  Remove a resource identifier.
@@ -61,6 +61,7 @@ public interface ILibraryService
 	 *  @param url The url.
 	 */
 	public IFuture<IResourceIdentifier> addURL(@CheckNotNull URL url);
+//	public IFuture<IResourceIdentifier> addURL(@CheckNotNull URL url, boolean workspace);
 	
 	/**
 	 *  Remove a url.
@@ -86,6 +87,13 @@ public interface ILibraryService
 	 */
 	@Excluded
 	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
+	
+	/** 
+	 *  Returns the current ClassLoader.
+	 *  @return the current ClassLoader
+	 */
+	@Excluded
+	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid, boolean workspace);
 	
 //	/**
 //	 *  Load a class given a class identifier.

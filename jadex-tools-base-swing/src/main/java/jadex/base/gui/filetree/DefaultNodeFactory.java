@@ -61,7 +61,7 @@ public abstract class DefaultNodeFactory implements INodeFactory
 		// todo: remote
 		else if(value instanceof IResourceIdentifier)
 		{
-			ret = new RIDJarNode(parent, model, tree, (IResourceIdentifier)value, iconcache, factory);
+			ret = new RIDNode(parent, model, tree, (IResourceIdentifier)value, iconcache, factory);
 		}
 		
 		if(ret==null)

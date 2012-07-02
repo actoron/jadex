@@ -48,7 +48,7 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	{
 		super(parent, model, tree);
 		this.container = container;
-		model.registerNode(this);
+//		model.registerNode(this);
 	}
 	
 	//-------- methods --------

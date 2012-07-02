@@ -310,6 +310,10 @@ public class MavenDependencyResolverService	implements IDependencyService
 						{
 	//						logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
 						}
+						finally
+						{
+							session.setWorkspaceReader(null);
+						}
 					}
 					
 					if(!fin)
@@ -520,10 +524,10 @@ public class MavenDependencyResolverService	implements IDependencyService
 		try
 		{
 			ret	= file.getCanonicalFile().toURI().toURL();
-			if(file.getName().endsWith(".jar"))
-			{
-				ret	= new URL("jar:"+ret.toString()+"!/");
-			}
+//			if(file.getName().endsWith(".jar"))
+//			{
+//				ret	= new URL("jar:"+ret.toString()+"!/");
+//			}
 		}
 		catch(Exception e)
 		{

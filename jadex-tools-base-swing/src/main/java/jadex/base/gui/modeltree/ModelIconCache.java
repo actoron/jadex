@@ -6,6 +6,7 @@ import jadex.base.gui.filetree.DirNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.IIconCache;
 import jadex.base.gui.filetree.JarNode;
+import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RemoteDirNode;
 import jadex.base.gui.filetree.RemoteJarNode;
 import jadex.base.gui.filetree.RootNode;
@@ -81,11 +82,11 @@ public class ModelIconCache implements IIconCache
 		if(ret==null)
 		{
 			String type = null;
-			if(node instanceof JarNode || node instanceof RemoteJarNode)
+			if(node instanceof JarNode || node instanceof RemoteJarNode || (node instanceof RIDNode && ((RIDNode)node).isJar()))
 			{
 				type = "src_jar";
 			}
-			else if(node instanceof DirNode || node instanceof RemoteDirNode)
+			else if(node instanceof DirNode || node instanceof RemoteDirNode || node instanceof RIDNode)
 			{
 				if(node.getParent() instanceof RootNode)
 				{

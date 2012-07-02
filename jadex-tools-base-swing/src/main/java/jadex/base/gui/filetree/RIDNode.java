@@ -25,7 +25,7 @@ import javax.swing.JTree;
 /**
  * 
  */
-public class RIDJarNode extends AbstractTreeNode implements IFileNode
+public class RIDNode extends AbstractTreeNode implements IFileNode
 {
 	//-------- attributes --------
 	
@@ -36,7 +36,7 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 	protected final IIconCache	iconcache;
 	
 	/** The relative file name. */
-	protected String relative;
+//	protected String relative;
 	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
@@ -51,16 +51,16 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RIDJarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IResourceIdentifier rid, IIconCache iconcache, INodeFactory factory)
+	public RIDNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IResourceIdentifier rid, IIconCache iconcache, INodeFactory factory)
 	{
 		super(parent, model, tree);
 		this.rid = rid;
 		
 		this.iconcache = iconcache;
-		this.relative = FileNode.convertPathToRelative(file);
+//		this.relative = FileNode.convertPathToRelative(file);
 		this.factory = factory;
 		
-		model.registerNode(this);
+//		model.registerNode(this);
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	
@@ -97,6 +97,7 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 	public String	getFilePath()
 	{
 		return file!=null? file.getAbsolutePath(): rid.toString();
+//		return rid.getGlobalIdentifier();
 	}
 	
 	/**
@@ -132,6 +133,14 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 	}
 	
 	/**
+	 *  Test if jar.
+	 */
+	public boolean isJar()
+	{
+		return file!=null && file.getAbsolutePath().endsWith(".jar");
+	}
+	
+	/**
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
@@ -139,7 +148,10 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 	{
 		if(file!=null)
 		{
-			((JarAsDirectory)file).refresh();
+			if(file instanceof JarAsDirectory)
+			{
+				((JarAsDirectory)file).refresh();
+			}
 			
 			listFiles().addResultListener(new SwingDefaultResultListener()
 			{
@@ -155,13 +167,13 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 						ITreeNode node = getModel().getNode(file);//.getAbsolutePath());
 						if(node!=null)
 						{
-//								lis.resultAvailable(node);
+//							lis.resultAvailable(node);
 							nodes.add(node);
 						}
 						else
 						{
 //								lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
-							nodes.add(factory.createNode(RIDJarNode.this, model, tree, file, iconcache, null, factory));
+							nodes.add(factory.createNode(RIDNode.this, model, tree, file, iconcache, null, factory));
 						}
 					}
 
@@ -219,4 +231,13 @@ public class RIDJarNode extends AbstractTreeNode implements IFileNode
 		}
 		return ret;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return rid.getGlobalIdentifier().toString();
+	}
+	
 }

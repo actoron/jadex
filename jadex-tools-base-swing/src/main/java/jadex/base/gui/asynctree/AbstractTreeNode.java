@@ -460,6 +460,8 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 
+		model.registerNode(node);
+		
 		addChild(getCachedChildren().size(), node);
 	}
 	
