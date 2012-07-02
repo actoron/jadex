@@ -216,7 +216,7 @@
 					
 				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
 				<env:property name="turn90" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
-					<env:object3d width="0.20" height="0.2" depth="0.2" x="0" y="0.13" z="0.0"  rotation="turn90" modelpath="jadex3d/models/vehicles/digger/digger.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
+					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
 						
 					</env:drawable3d>	
 				</env:perspective>	
