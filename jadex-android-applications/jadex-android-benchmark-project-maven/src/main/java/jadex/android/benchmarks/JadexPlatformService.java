@@ -113,8 +113,8 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 						"-gui", "false",
 						"-autoshutdown", "false",
 						"-binarymessages", "true",
-						"-android", "true"
-	//					"-awamechanisms", "new String[]{\"Relay\"}",
+						"-android", "true",
+//						"-awamechanisms", "new String[]{\"Message\", \"Broadcast\"}",
 	//					"-awareness", "false",
 	//					"-usepass", "false",
 					}).addResultListener(new DelegationResultListener<IExternalAccess>(platform));
