@@ -31,6 +31,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl.ControlDirection;
+import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -76,6 +77,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	
 	private PssmShadowRenderer pssmRenderer;
 	
+	private BasicShadowRenderer bsr;
+	
 	private boolean _isGrid;
 
 	public MonkeyApp(float dim, float spaceSize, boolean isGrid)
@@ -120,10 +123,16 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 //		  fpp.addFilter(bf);
 //		  viewPort.addProcessor(fpp);
 		
-	    pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-	    pssmRenderer.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
-	    pssmRenderer.setShadowIntensity(0.6f);
-	    viewPort.addProcessor(pssmRenderer);
+		
+	    bsr = new BasicShadowRenderer(assetManager, 256);
+	    bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
+	    viewPort.addProcessor(bsr);
+	    
+	    
+//	    pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
+//	    pssmRenderer.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
+//	    pssmRenderer.setShadowIntensity(0.6f);
+//	    viewPort.addProcessor(pssmRenderer);
 	    
 
 
