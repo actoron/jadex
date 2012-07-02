@@ -626,11 +626,13 @@
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
-
+				
+				<module>jadex-platform-extension-maven</module>
+				<module>jadex-platform-extension-natmtp</module>
 			</modules>
 		</profile>
 
-		<profile>
+		<!-- <profile>
 			<id>jadex-pro-artifacts</id>
 			<build>
 				<plugins>
@@ -648,11 +650,11 @@
 				<module>jadex-platform-extension-maven</module>
 				<module>jadex-platform-extension-natmtp</module>
 			</modules>
-		</profile>
+		</profile> -->
 		
 		<!-- JADE -->
 
-		<profile>
+		<!-- <profile>
 			<id>jadex-jade-dist</id>
 			<build>
 				<finalName>jadex-jade-${project.version}</finalName>
@@ -698,11 +700,11 @@
 				<module>jadex-platform-jade-launch</module>
 				<module>jadex-platform-jade</module>
 			</modules>
-		</profile>
+		</profile> -->
 
 		<!-- WebApps -->
 
-		<profile>
+		<!-- <profile>
 			<id>jadex-applications-web-package</id>
 			<modules>
 				<module>jadex-commons</module>
@@ -717,11 +719,11 @@
 				<module>jadex-applications-web</module>
 				<module>jadex-tools-base</module>
 			</modules>
-		</profile>
+		</profile> -->
 		
 		<!-- WfMS -->
 
-		<profile>
+		<!-- <profile>
 			<id>jadex-wfms-dist</id>
 			<build>
 				<finalName>jadex-wfms-${project.version}</finalName>
@@ -772,7 +774,7 @@
 				<module>jadex-platform-wfms</module>
 				<module>jadex-tools-base</module>
 			</modules>
-		</profile>
+		</profile> -->
 		
 		<!-- eclipse -->
 
