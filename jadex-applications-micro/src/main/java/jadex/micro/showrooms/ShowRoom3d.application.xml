@@ -43,7 +43,8 @@
 			"jadex3d/models/space/misc/box/ammo.j3o",
 			"jadex3d/models/space/misc/station/konostationobj.j3o",
 			"jadex3d/models/vehicles/tank/apc.j3o",
-			"jadex3d/models/vehicles/disaster/hospital.j3o"}
+			"jadex3d/models/vehicles/disaster/hospital.j3o",
+			"jadex3d/models/vehicles/tractor/tractor.j3o"}
 		</argument>
 
 		<argument name="size" class="Vector3Double[]">
@@ -58,7 +59,8 @@
 			new Vector3Double(0.01),
 			new Vector3Double(0.005),
 			new Vector3Double(2),
-			new Vector3Double(1)}
+			new Vector3Double(1),
+			new Vector3Double(0.4)}
 		</argument>
 		<argument name="posloc" class="Vector3Double[]">
 			new Vector3Double[]{new
@@ -71,6 +73,7 @@
 			new Vector3Double(0.0,0.2,0.0),
 			new Vector3Double(0.0,0.0,0.0),
 			new Vector3Double(0.0,0.6,0.0),
+			new Vector3Double(0.0,0.0,0.0),
 			new Vector3Double(0.0,0.0,0.0),
 			new Vector3Double(0.0,0.0,0.0)}
 		</argument>
@@ -213,6 +216,12 @@
 							<env:property name="type">$args.types[10]</env:property>
 							<env:property name="posloc">$args.posloc[10]</env:property>
 							<env:property name="size">$args.size[10]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[11]</env:property>
+							<env:property name="posloc">$args.posloc[11]</env:property>
+							<env:property name="size">$args.size[11]</env:property>
 							<env:task type="rotation" />
 						</env:object>
 					</env:objects>
