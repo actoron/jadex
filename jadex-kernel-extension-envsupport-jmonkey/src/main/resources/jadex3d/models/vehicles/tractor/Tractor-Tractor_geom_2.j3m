@@ -1,0 +1,5 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : jadex3d/models/vehicles/tractor/tractortextur.jpg
+    }
+}

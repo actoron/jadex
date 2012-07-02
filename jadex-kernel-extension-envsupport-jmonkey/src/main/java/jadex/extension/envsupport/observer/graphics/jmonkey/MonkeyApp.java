@@ -25,6 +25,8 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
@@ -198,11 +200,11 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 				else if(name.equals("ZoomIn"))
 				{
-					moveCamera(1, false);
+					moveCamera(6, false);
 				}
 				else if(name.equals("ZoomOut"))
 				{
-					moveCamera(-1, false);
+					moveCamera(-6, false);
 				}
 				else if(keyPressed && name.equals("ChangeCam"))
 				{
@@ -284,22 +286,22 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		flyCam.setEnabled(true);
 		flyCam.setMoveSpeed(_appDimension);
 		
-		
+//		
 //		Camera cam_n    = cam.clone();
 //		cam.setViewPort( 0.0f , 1.0f   ,   0.0f , 1.0f );
 //		cam_n.setViewPort( 0.8f , 1.0f   ,   0.8f , 1.0f );
-//		cam_n.setLocation(new Vector3f(_areaSize/2, _areaSize*1.5f, _areaSize/2));
-//		cam_n.lookAt(new Vector3f(_areaSize/2, 0, _areaSize/2), Vector3f.UNIT_Y);
-//		 
-//		
+//		cam_n.setLocation(new Vector3f(_appDimension/2, _appDimension*1.5f, _appDimension/2));
+//		cam_n.lookAt(new Vector3f(_appDimension/2, 0, _appDimension/2), Vector3f.UNIT_Y);
+		 
+		
 //		ViewPort view = renderManager.createMainView("View of camera #1", cam);
-////		view.setEnabled(true);
+//		view.setEnabled(true);
 //		view.setClearFlags(true, true, true);
 //		view.attachScene(rootNode);
 //		view.setBackgroundColor(ColorRGBA.Black);
 //		
 //		ViewPort view_n = renderManager.createMainView("View of camera #2", cam_n);
-////		view_n.setEnabled(true);
+//		view_n.setEnabled(true);
 //		view_n.setClearFlags(true, true, true);
 //		view_n.attachScene(rootNode);
 //		view_n.setBackgroundColor(ColorRGBA.Black);

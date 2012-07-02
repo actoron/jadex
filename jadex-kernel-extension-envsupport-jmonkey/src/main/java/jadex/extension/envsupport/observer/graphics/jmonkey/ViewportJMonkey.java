@@ -585,7 +585,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		_app.stop();
 
-		System.out.println("ViewportJmonkey: STOP STOP STOP");
+//		System.out.println("ViewportJmonkey: STOP STOP STOP");
 
 	}
 
