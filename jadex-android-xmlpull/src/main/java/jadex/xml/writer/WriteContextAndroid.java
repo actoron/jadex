@@ -7,8 +7,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamWriter;
-
 import org.xmlpull.v1.XmlSerializer;
 
 /**

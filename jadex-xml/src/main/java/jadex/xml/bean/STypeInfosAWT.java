@@ -41,11 +41,7 @@ public class STypeInfosAWT
 		{
 			public String convertObject(Object val, IContext context)
 			{
-				/* if_not[android] */
 				return "" + ((Color) val).getRGB();
-				/*
-				 * else[android] return ""; end[android]
-				 */
 			}
 		};
 		TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(Color.class), new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String) null,
@@ -59,12 +55,8 @@ public class STypeInfosAWT
 			{
 				try
 				{
-					/* if_not[android] */
 					byte[] buf = SGUI.imageToStandardBytes((Image) val, "image/png");
 					return new String(Base64.encode(buf));
-					/*
-					 * else[android] return ""; end[android]
-					 */
 				} catch (Exception e)
 				{
 					// todo: use context report
@@ -124,7 +116,6 @@ public class STypeInfosAWT
 		{
 			public Object createObject(IContext context, Map rawattributes) throws Exception
 			{
-				/* if_not[android] */
 				Image ret = null;
 				String encdata = (String) rawattributes.get("imgdata");
 				byte[] data = Base64.decode(encdata.getBytes());
@@ -142,9 +133,6 @@ public class STypeInfosAWT
 				// ret = ImageIO.read(new ByteArrayInputStream(data));
 				// }
 				return ret;
-				/*
-				 * else[android] return null; end[android]
-				 */
 			}
 		}), new MappingInfo(null, new AttributeInfo[]
 		{ new AttributeInfo(new AccessInfo("imgdata", null, AccessInfo.IGNORE_READWRITE)),

@@ -19,15 +19,6 @@ public abstract class AWriter
 	 */
 	public static final String XML_INCLUDE_FIELDS = "XML_INCLUDE_FIELDS";
 
-	static
-	{
-		if (SReflect.isAndroid())
-		{
-			System.setProperty("javax.xml.stream.XMLOutputFactory", "jadex.android.xmlpullparser.XMLPullOutputFactory");
-			System.setProperty("javax.xml.stream.XMLInputFactory", "jadex.android.xmlpullparser.XMLPullInputFactory");
-		}
-	}
-
 	/**
 	 * Write the properties to an xml.
 	 * 
