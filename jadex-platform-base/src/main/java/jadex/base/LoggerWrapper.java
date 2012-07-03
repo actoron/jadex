@@ -1,6 +1,8 @@
 package jadex.base;
 
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.SNonAndroid;
+import jadex.commons.SReflect;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -922,42 +924,12 @@ public class LoggerWrapper extends Logger
 			// ClassLoader. Drop through.
 		}
 
-
-		// Fall back to searching up the call stack and trying each
-		// calling ClassLoader.
-		for(int ix = 0;; ix++)
-		{
-			/* if_not[android] */
-			Class clz = sun.reflect.Reflection.getCallerClass(ix);
-			/* else[android]
-			Class clz = this.getClass();
-			end[android]*/
-			if(clz == null)
-			{
-				break;
-			}
-			ClassLoader cl2 = clz.getClassLoader();
-			if(cl2 == null)
-			{
-				cl2 = ClassLoader.getSystemClassLoader();
-			}
-			if(cl == cl2)
-			{
-				// We've already checked this classloader.
-				continue;
-			}
-			cl = cl2;
-			try
-			{
-				catalog = ResourceBundle.getBundle(name, currentLocale, cl);
+		if (!SReflect.isAndroid()) {
+			ResourceBundle cat = SNonAndroid.findResourceBundle(name, currentLocale, cl);
+			if (cat != null) {
+				catalog = cat;
 				catalogName = name;
 				catalogLocale = currentLocale;
-				return catalog;
-			}
-			catch(MissingResourceException ex)
-			{
-				// Ok, this one didn't work either.
-				// Drop through, and try the next one.
 			}
 		}
 

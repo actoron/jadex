@@ -6,6 +6,9 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -61,5 +64,49 @@ public class SNonAndroid
 	public static String getDisplayName(File file)
 	{
 		return FileSystemView.getFileSystemView().getSystemDisplayName(file);
+	}
+
+	/**
+	 * Try to find a {@link ResourceBundle} by trying Classloaders 
+	 * from all calling Classes.
+	 * @param name Name of the ResourceBundle to find
+	 * @param currentLocale Name of the locale
+	 * @param cl the default classloader
+	 * @return The found {@link ResourceBundle} or <code>null</code>.
+	 */
+	public static ResourceBundle findResourceBundle(String name, Locale currentLocale, ClassLoader cl)
+	{
+		// Fall back to searching up the call stack and trying each
+		// calling ClassLoader.
+		for(int ix = 0;; ix++)
+		{
+			Class clz = sun.reflect.Reflection.getCallerClass(ix);
+			if(clz == null)
+			{
+				break;
+			}
+			ClassLoader cl2 = clz.getClassLoader();
+			if(cl2 == null)
+			{
+				cl2 = ClassLoader.getSystemClassLoader();
+			}
+			if(cl == cl2)
+			{
+				// We've already checked this classloader.
+				continue;
+			}
+			cl = cl2;
+			try
+			{
+				return ResourceBundle.getBundle(name, currentLocale, cl);
+			}
+			catch(MissingResourceException ex)
+			{
+				// Ok, this one didn't work either.
+				// Drop through, and try the next one.
+			}
+		}
+		
+		return null;
 	}
 }

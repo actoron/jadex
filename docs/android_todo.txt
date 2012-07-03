@@ -1,4 +1,4 @@
-06-26 15:02:14.214: I/dalvikvm(327): Could not find method sun.reflect.Reflection.getCallerClass, referenced from method jadex.base.LoggerWrapper.findResourceBundle
+done: 06-26 15:02:14.214: I/dalvikvm(327): Could not find method sun.reflect.Reflection.getCallerClass, referenced from method jadex.base.LoggerWrapper.findResourceBundle
 
 06-26 15:02:42.154: I/dalvikvm(327): Could not find method java.net.NetworkInterface.getInterfaceAddresses, referenced from method jadex.base.service.security.SecurityService.getNetworkIps
 
