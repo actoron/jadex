@@ -4,23 +4,19 @@ import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
 import jadex.xml.StackElement;
 import jadex.xml.TypeInfoPathManager;
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XMLReporter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jadex.xml.stax.ILocation;
-import jadex.xml.stax.QName;
-import jadex.xml.stax.StaxLocationWrapper;
-import jadex.xml.stax.XMLReporter;
-
-import javax.xml.stream.XMLStreamReader;
-
 /**
  *  Context for reader that stores all relevant information of the read process.
  */
-public class ReadContext implements IContext
+public abstract class AReadContext<T> implements IContext
 {
 	//-------- attributes --------
 	
@@ -31,7 +27,7 @@ public class ReadContext implements IContext
 	protected IObjectReaderHandler defaulthandler;
 	
 	/** The parser. */
-	protected XMLStreamReader parser;
+	protected T parser;
 	
 	/** The parser. */
 	protected XMLReporter reporter;
@@ -71,7 +67,7 @@ public class ReadContext implements IContext
 	/**
 	 * @param parser
 	 */
-	public ReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, XMLStreamReader parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
+	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, T parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
 	{
 		this(pathmanager, handler, parser, reporter, callcontext, classloader, null, new ArrayList(), 
 			null, null, new HashMap(), 0, new MultiCollection());
@@ -86,7 +82,7 @@ public class ReadContext implements IContext
 	 * @param comment
 	 * @param readobjects
 	 */
-	public ReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, XMLStreamReader parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
+	public AReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, T parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
 		StackElement topse, String comment, Map readobjects, int readignore, MultiCollection postprocessors)
 	{
 		this.pathmanager = pathmanager;
@@ -110,7 +106,7 @@ public class ReadContext implements IContext
 	 *  Get the parser.
 	 *  @return The parser.
 	 */
-	public XMLStreamReader getParser()
+	public T getParser()
 	{
 		return parser;
 	}
@@ -262,9 +258,7 @@ public class ReadContext implements IContext
 	 * Returns the current parser location.
 	 * @return Location
 	 */
-	public ILocation getLocation() {
-		return StaxLocationWrapper.fromLocation(parser.getLocation());
-	}
+	public abstract ILocation getLocation();
 	
 	/**
 	 *  Get the comment.

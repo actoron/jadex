@@ -915,7 +915,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						}
 					
 						final Object val = tmp;
-						if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
+						if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val != null ? val.getClass() : null))
 						{
 	//						System.out.println("Future property: "+unexp.getName()+", "+val);
 							if(val instanceof IFuture)

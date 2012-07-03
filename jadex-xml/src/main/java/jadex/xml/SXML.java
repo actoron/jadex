@@ -30,6 +30,12 @@ public class SXML
 	
 	/** Constant for anonymous inner classes. */
 	public static final String XML_CLASSNAME = "XML_CLASSNAME";
+	
+	/** The linefeed separator. */
+	public static final String lf = (String) System.getProperty("line.separator");
+
+	/** The default encoding. */
+	public static String DEFAULT_ENCODING = "utf-8";
 
 	/**
 	 *  Get the xmlclassname annotation.

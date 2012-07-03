@@ -22,7 +22,7 @@ import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
-import jadex.xml.reader.ReadContext;
+import jadex.xml.reader.AReadContext;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.StaxLocationWrapper;
 import jadex.xml.stax.StaxXMLReporterWrapper;
@@ -95,7 +95,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public synchronized TypeInfo getTypeInfo(Object object, QName[] fullpath, ReadContext context)
+	public synchronized TypeInfo getTypeInfo(Object object, QName[] fullpath, AReadContext context)
 	{
 		TypeInfo	ret	= null;
 		if(titmanager!=null)
@@ -175,7 +175,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, ReadContext context, Map rawattributes) throws Exception
+	public Object createObject(Object type, boolean root, AReadContext context, Map rawattributes) throws Exception
 	{
 		Object ret = null;
 		
@@ -388,7 +388,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, ReadContext context)
+	public Object getObjectType(Object object, AReadContext context)
 	{
 		return object.getClass();
 	}
@@ -396,7 +396,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(String value, QName tag, ReadContext context) throws Exception
+	public Object convertContentObject(String value, QName tag, AReadContext context) throws Exception
 	{
 		Object ret = value;
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
@@ -429,7 +429,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, ReadContext context) throws Exception
+		Object attrinfo, AReadContext context) throws Exception
 	{
 		// Hack!
 		Object converter = attrinfo instanceof AttributeInfo? ((AttributeInfo)attrinfo).getConverter(): null;
@@ -466,7 +466,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		QName[] pathname, ReadContext context) throws Exception
+		QName[] pathname, AReadContext context) throws Exception
 	{
 		QName tag = pathname[pathname.length-1];
 		
@@ -543,7 +543,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void bulkLinkObjects(List childs, Object parent, Object linkinfo, 
-		QName[] pathname, ReadContext context) throws Exception
+		QName[] pathname, AReadContext context) throws Exception
 	{
 		QName tag = pathname[pathname.length-1];
 		
@@ -709,7 +709,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, ReadContext context) throws Exception
+	public void bulkLinkObjects(Object parent, List children, AReadContext context) throws Exception
 	{
 //		System.out.println("bulk link for: "+parent+" "+children);
 		
@@ -745,7 +745,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Initiate the bulk link calls.
 	 */
-	protected void handleBulkLinking(List childs, Object parent, ReadContext context, QName[] pathname, List linkdatas, int startidx) throws Exception
+	protected void handleBulkLinking(List childs, Object parent, AReadContext context, QName[] pathname, List linkdatas, int startidx) throws Exception
 	{
 		if(childs.size()>1)
 		{
@@ -782,7 +782,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected boolean setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, ReadContext context) throws Exception
+	protected boolean setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, AReadContext context) throws Exception
 	{
 		boolean	set	= false;
 		
@@ -1148,7 +1148,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected boolean	setBulkAttributeValues(Object accessinfo, QName xmlattrname, Object object, 
-		List vals, Object converter, String id, ReadContext context) throws Exception
+		List vals, Object converter, String id, AReadContext context) throws Exception
 	{
 		boolean set = false;
 		
@@ -1316,7 +1316,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param converter The converter.
 	 */
 	protected boolean invokeSetMethod(String[] prefixes, String postfix, Object value, Object object, 
-		ReadContext context, Object converter, String idref) throws Exception
+		AReadContext context, Object converter, String idref) throws Exception
 	{
 		boolean set = false;
 				
@@ -1368,7 +1368,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param converter The converter.
 	 */
 	protected boolean invokeBulkSetMethod(String[] prefixes, String postfix, List vals, Object object, 
-		ReadContext context, Object converter, String idref) throws Exception
+		AReadContext context, Object converter, String idref) throws Exception
 	{
 		boolean set = false;
 				
@@ -1411,7 +1411,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Directly access a field for setting/(adding) the object.
 	 */
 	protected boolean setField(String fieldname, Object parent, Object object, Object converter, 
-		ReadContext context, String idref) throws Exception
+		AReadContext context, String idref) throws Exception
 	{
 		boolean set = false;
 		try
@@ -1440,7 +1440,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Directly access a field for setting the objects.
 	 */
 	protected boolean setBulkField(String fieldname, Object parent, List objects, Object converter,
-		ReadContext context, String idref) throws Exception
+		AReadContext context, String idref) throws Exception
 	{
 		boolean set = false;
 		try
@@ -1587,7 +1587,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected Object convertValue(Object val, Class targetclass, Object converter, 
-		ReadContext context, String id) throws Exception
+		AReadContext context, String id) throws Exception
 	{
 		Object ret = val;
 
@@ -1622,7 +1622,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Convert a list of values into the target format (list, set, collection, array).
 	 */
 	protected Object convertBulkValues(List vals, Class targetclass, Object converter, 
-		ReadContext context, String id) throws Exception
+		AReadContext context, String id) throws Exception
 	{
 		// todo: use converter?!
 		

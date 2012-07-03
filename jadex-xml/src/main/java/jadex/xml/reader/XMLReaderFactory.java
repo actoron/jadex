@@ -29,7 +29,24 @@ public abstract class XMLReaderFactory
 		if (INSTANCE == null) {
 			if (SReflect.isAndroid())
 			{
-				//INSTANCE = new XMLReaderFactoryAndroid();
+				Class<?> clz;
+				try
+				{
+					clz = SReflect.classForName("jadex.xml.reader.XMLReaderFactoryAndroid", null);
+					if (clz != null) {
+						INSTANCE = (XMLReaderFactory) clz.newInstance();
+					}
+				} catch (ClassNotFoundException e)
+				{
+					// No XML Reader available
+					e.printStackTrace();
+				} catch (InstantiationException e)
+				{
+					e.printStackTrace();
+				} catch (IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
 			} else
 			{
 				INSTANCE = new XMLReaderFactoryDesktop();

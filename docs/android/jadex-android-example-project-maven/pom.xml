@@ -11,34 +11,46 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-platform-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-platform-standalone</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-kernel-component</artifactId>
+			<artifactId>jadex-platform-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-kernel-bpmn</artifactId>
+			<artifactId>jadex-platform-standalone</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-xmlpull</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-misc</artifactId>
+			<artifactId>jadex-android-antlr</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
@@ -86,12 +98,12 @@
 						<noLocals>false</noLocals>
 						<optimize>true</optimize>
 					</dex>
-					
+
 					<manifest>
-							<versionName>${project.version}</versionName>
-							<debuggable>true</debuggable>
-							<versionCodeAutoIncrement>true</versionCodeAutoIncrement>
-						</manifest>
+						<versionName>${project.version}</versionName>
+						<debuggable>true</debuggable>
+						<versionCodeAutoIncrement>true</versionCodeAutoIncrement>
+					</manifest>
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>

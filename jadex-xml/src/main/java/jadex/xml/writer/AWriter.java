@@ -1,6 +1,7 @@
 package jadex.xml.writer;
 
 import jadex.commons.SReflect;
+import jadex.xml.SXML;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -17,12 +18,6 @@ public abstract class AWriter
 	 * fields should be included.
 	 */
 	public static final String XML_INCLUDE_FIELDS = "XML_INCLUDE_FIELDS";
-
-	/** The linefeed separator. */
-	public static final String lf = (String) System.getProperty("line.separator");
-
-	/** The default encoding. */
-	public static String DEFAULT_ENCODING = "utf-8";
 
 	static
 	{
@@ -44,7 +39,7 @@ public abstract class AWriter
 	 *            The context.
 	 */
 	public void write(IObjectWriterHandler handler, Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception {
-		write(handler, object, DEFAULT_ENCODING, out, classloader, context);
+		write(handler, object, SXML.DEFAULT_ENCODING, out, classloader, context);
 	}
 
 	/**

@@ -10,12 +10,10 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamWriter;
-
 /**
  *  Context for writing an xml.
  */
-public class WriteContext implements IContext
+public abstract class AWriteContext<T> implements IContext
 {
 	//-------- attributes --------
 	
@@ -23,7 +21,7 @@ public class WriteContext implements IContext
 	protected IObjectWriterHandler handler;
 	
 	/** The writer. */
-	protected XMLStreamWriter writer;
+	protected T writer;
 	
 	/** The classloader. */
 	protected ClassLoader classloader;
@@ -58,15 +56,15 @@ public class WriteContext implements IContext
 	/**
 	 *  Create a new write context.
 	 */
-	public WriteContext(IObjectWriterHandler handler, XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader)
+	public AWriteContext(IObjectWriterHandler handler, T writer, Object usercontext, Object rootobject, ClassLoader classloader)
 	{
 		this(handler, writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection());
 	}
 		
 	/**
-	 *  Create a new read context.
+	 *  Create a new write context.
 	 */
-	public WriteContext(IObjectWriterHandler handler, XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader, 
+	public AWriteContext(IObjectWriterHandler handler, T writer, Object usercontext, Object rootobject, ClassLoader classloader, 
 		Map writtenobs, List stack, MultiCollection preprocessors)
 	{
 		this.handler = handler;
@@ -103,7 +101,7 @@ public class WriteContext implements IContext
 	 *  Get the writer.
 	 *  @return The writer.
 	 */
-	public XMLStreamWriter getWriter()
+	public T getWriter()
 	{
 		return this.writer;
 	}
@@ -112,7 +110,7 @@ public class WriteContext implements IContext
 	 *  Set the writer.
 	 *  @param writer The writer to set.
 	 */
-	public void setWriter(XMLStreamWriter writer)
+	public void setWriter(T writer)
 	{
 		this.writer = writer;
 	}

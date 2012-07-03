@@ -35,7 +35,7 @@ import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectLinker;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
-import jadex.xml.reader.ReadContext;
+import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
@@ -188,7 +188,7 @@ public class OAVBDIXMLReader
 
 		IObjectLinker	capalinker	= new IObjectLinker()
 		{
-			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, ReadContext context) throws Exception
+			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
 				// Exchange parent for OAV children of root object.
 				Map	user	= (Map)context.getUserContext();
@@ -207,7 +207,7 @@ public class OAVBDIXMLReader
 			{
 				Map	user	= (Map)context.getUserContext();
 				IOAVState	state	= (IOAVState)user.get(OAVObjectReaderHandler.CONTEXT_STATE);
-				getOAVRoot(uri, (ReadContext)context, user, state);
+				getOAVRoot(uri, (AReadContext)context, user, state);
 				return object;
 			}
 			
@@ -219,7 +219,7 @@ public class OAVBDIXMLReader
 
 		IObjectLinker	configlinker	= new IObjectLinker()
 		{
-			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, ReadContext context) throws Exception
+			public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 			{
 				// Exchange parent for OAV children of configuration object.
 				Map	user	= (Map)context.getUserContext();
@@ -239,7 +239,7 @@ public class OAVBDIXMLReader
 			{
 				Map	user	= (Map)context.getUserContext();
 				IOAVState	state	= (IOAVState)user.get(OAVObjectReaderHandler.CONTEXT_STATE);
-				getOAVConfiguration(uri, object, (ReadContext)context, user, state);
+				getOAVConfiguration(uri, object, (AReadContext)context, user, state);
 				return object;
 			}
 			
@@ -617,7 +617,7 @@ public class OAVBDIXMLReader
 		Map	ouc	= (Map)context.getUserContext();
 		MultiCollection	report	= (MultiCollection)ouc.get(ComponentXMLReader.CONTEXT_ENTRIES);
 		String	pos;
-		Tuple	stack	= new Tuple(((ReadContext)context).getStack());
+		Tuple	stack	= new Tuple(((AReadContext)context).getStack());
 		if(stack.getEntities().length>0)
 		{
 			StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
@@ -630,7 +630,7 @@ public class OAVBDIXMLReader
 		report.put(stack, error+pos);
 	}
 	
-	protected static Object getOAVRoot(String uri, ReadContext context, Map user, IOAVState state)
+	protected static Object getOAVRoot(String uri, AReadContext context, Map user, IOAVState state)
 	{
 		Object parent	= user.get(OAVBDIModelLoader.CONTEXT_OAVROOT);
 		if(parent==null)
@@ -645,7 +645,7 @@ public class OAVBDIXMLReader
 		return parent;
 	}
 
-	protected static Object getOAVConfiguration(final String uri, Object parent, ReadContext context, Map user, IOAVState state)
+	protected static Object getOAVConfiguration(final String uri, Object parent, AReadContext context, Map user, IOAVState state)
 	{
 		ConfigurationInfo	config	= (ConfigurationInfo)parent;
 		parent	= user.get(config);

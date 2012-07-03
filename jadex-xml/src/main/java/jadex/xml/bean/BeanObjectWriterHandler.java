@@ -21,7 +21,7 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.stax.QName;
 import jadex.xml.writer.AbstractObjectWriterHandler;
-import jadex.xml.writer.WriteContext;
+import jadex.xml.writer.AWriteContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -223,7 +223,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			tag = "null";
 		}
 		
-		WriteContext wc = (WriteContext)context;
+		AWriteContext wc = (AWriteContext)context;
 		Namespace ns = wc.getNamespace(pck);
 		return new QName(ns.getURI(), tag, ns.getPrefix());
 		
@@ -240,7 +240,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public QName getTagWithPrefix(QName tag, IContext context)
 	{
-		WriteContext wc = (WriteContext)context;
+		AWriteContext wc = (AWriteContext)context;
 		Namespace ns = wc.getNamespace(tag.getNamespaceURI());
 		return new QName(ns.getURI(), tag.getLocalPart(), ns.getPrefix());
 	}

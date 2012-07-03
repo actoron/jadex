@@ -23,7 +23,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object typeinfo, boolean root, ReadContext context, Map rawattributes) throws Exception;
+	public Object createObject(Object typeinfo, boolean root, AReadContext context, Map rawattributes) throws Exception;
 	
 //	/**
 //	 *  Get the object type
@@ -35,7 +35,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	/**
 	 *  Convert a content string object to another type of object.
 	 */
-	public Object convertContentObject(String object, QName tag, ReadContext context) throws Exception;
+	public Object convertContentObject(String object, QName tag, AReadContext context) throws Exception;
 	
 	/**
 	 *  Handle the attribute of an object.
@@ -46,7 +46,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, ReadContext context) throws Exception;
+		Object attrinfo, AReadContext context) throws Exception;
 	
 //	/**
 //	 *  Get the most specific mapping info.
@@ -62,7 +62,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object type, QName[] fullpath, ReadContext context);
+	public TypeInfo getTypeInfo(Object type, QName[] fullpath, AReadContext context);
 	
 	/**
 	 *  Get the post-processor.

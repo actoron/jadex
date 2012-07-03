@@ -16,7 +16,7 @@ import jadex.xml.TypeInfo;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
-import jadex.xml.reader.ReadContext;
+import jadex.xml.reader.AReadContext;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo	getTypeInfo(Object object, QName[] fullpath, ReadContext context)
+	public TypeInfo	getTypeInfo(Object object, QName[] fullpath, AReadContext context)
 	{
 		return null;
 	}
@@ -63,7 +63,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, ReadContext context, Map rawattributes) throws Exception
+	public Object createObject(Object type, boolean root, AReadContext context, Map rawattributes) throws Exception
 	{
 		Object ret = null;
 		IOAVState state = (IOAVState)((Map)context.getUserContext()).get(CONTEXT_STATE);
@@ -107,7 +107,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, ReadContext context)
+	public Object getObjectType(Object object, AReadContext context)
 	{
 		return ((IOAVState)context).getType(object);
 	}
@@ -115,7 +115,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(String object, QName tag, ReadContext context) throws Exception
+	public Object convertContentObject(String object, QName tag, AReadContext context) throws Exception
 	{
 		Object ret = object;
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
@@ -154,7 +154,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, ReadContext context) throws Exception
+		Object attrinfo, AReadContext context) throws Exception
 	{
 		// todo: implement idref!
 		
@@ -259,7 +259,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, ReadContext context) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, AReadContext context) throws Exception
 	{
 		IOAVState state = (IOAVState)((Map)context.getUserContext()).get(CONTEXT_STATE);
 	
@@ -326,7 +326,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 *  @param rootobject The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, ReadContext context) throws Exception
+	public void bulkLinkObjects(Object parent, List children, AReadContext context) throws Exception
 	{
 //		System.out.println("bulk link for: "+parent+" "+children);
 		for(int i=0; i<children.size(); i++)

@@ -58,7 +58,7 @@ import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
-import jadex.xml.reader.ReadContext;
+import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.Reader;
 import jadex.xml.reader.XMLReaderFactory;
 
@@ -137,7 +137,7 @@ public class BpmnXMLReader
 				}
 				catch(RuntimeException e)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
+					Object	se	= new Tuple(((AReadContext)context).getStack());
 					MultiCollection	report	= (MultiCollection)context.getUserContext();
 					report.put(se, e.toString());
 				}
@@ -164,7 +164,7 @@ public class BpmnXMLReader
 //				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 //				Thread.dumpStack();
 				IContext	context	= (IContext)(info instanceof IContext ? info : AReader.READ_CONTEXT.get());
-				Tuple	stack	= new Tuple(info instanceof StackElement[] ? (StackElement[])info : ((ReadContext)context).getStack());
+				Tuple	stack	= new Tuple(info instanceof StackElement[] ? (StackElement[])info : ((AReadContext)context).getStack());
 				
 				Map	user	= (Map)context.getUserContext();
 				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
@@ -1572,7 +1572,7 @@ public class BpmnXMLReader
 							{
 								try
 								{
-									((ReadContext)context).getReporter().report("Type not found: "+typename, null, null, null);
+									((AReadContext)context).getReporter().report("Type not found: "+typename, null, null, null);
 								}
 								catch(Exception e)
 								{

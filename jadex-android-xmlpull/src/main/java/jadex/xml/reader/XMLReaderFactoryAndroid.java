@@ -7,13 +7,10 @@ import jadex.xml.stax.XMLReporter;
  */
 public class XMLReaderFactoryAndroid extends XMLReaderFactory
 {
-
-	private boolean bulklink;
-
 	@Override
 	public AReader createReader()
 	{
-		return new PullParserReader();
+		return createReader(false);
 	}
 
 	@Override
@@ -31,8 +28,7 @@ public class XMLReaderFactoryAndroid extends XMLReaderFactory
 	@Override
 	public AReader createReader(boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter)
 	{
-		this.bulklink = bulklink;
-		return new PullParserReader(validate, coalescing, reporter);
+		return new PullParserReader(validate, coalescing, reporter, bulklink);
 	}
 
 }

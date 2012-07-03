@@ -12,7 +12,7 @@ import jadex.xml.Namespace;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.writer.AbstractObjectWriterHandler;
-import jadex.xml.writer.WriteContext;
+import jadex.xml.writer.AWriteContext;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -93,7 +93,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 			String pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
 			String tag = clazzname.substring(idx+1);
 			
-			WriteContext wc = (WriteContext)context;
+			AWriteContext wc = (AWriteContext)context;
 			ns = wc.getNamespace(pck);
 			ret = new QName(ns.getURI(), tag, ns.getPrefix());
 		}
@@ -106,7 +106,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public QName getTagWithPrefix(QName tag, IContext context)
 	{
-		WriteContext wc = (WriteContext)context;
+		AWriteContext wc = (AWriteContext)context;
 		Namespace ns = wc.getNamespace(tag.getNamespaceURI());
 		return new QName(ns.getURI(), tag.getLocalPart(), ns.getPrefix());
 	}

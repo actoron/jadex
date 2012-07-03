@@ -20,13 +20,14 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-xml-stax-api</artifactId>
+			<artifactId>jadex-xml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-xml</artifactId>
+			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

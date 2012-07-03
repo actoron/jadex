@@ -77,7 +77,7 @@ public class Writer extends AWriter
  	 */
 	public void write(IObjectWriterHandler handler, Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
-		write(handler, object, DEFAULT_ENCODING, out, classloader, context);
+		write(handler, object, SXML.DEFAULT_ENCODING, out, classloader, context);
 	}
 		
 	/**
@@ -95,9 +95,9 @@ public class Writer extends AWriter
 		}
 		
 		writer.writeStartDocument(encoding, "1.0"); 
-		writer.writeCharacters(lf);
+		writer.writeCharacters(SXML.lf);
 		
-		WriteContext wc = new WriteContext(handler, writer, context, object, classloader);
+		WriteContextDesktop wc = new WriteContextDesktop(handler, writer, context, object, classloader);
 		writeObject(wc, object, null);
 		writer.writeEndDocument();
 		writer.close();
@@ -110,7 +110,7 @@ public class Writer extends AWriter
 	 *  Must have tag parameter to support writing an object using an arbitrary tag.
 	 *  Cannot write tag in beforehand, because it must be written in one pass. 
 	 */
-	protected void writeObject(WriteContext wc, Object object, QName tag) throws Exception
+	protected void writeObject(WriteContextDesktop wc, Object object, QName tag) throws Exception
 	{
 		XMLStreamWriter writer = wc.getWriter();
 		List stack = wc.getStack();
@@ -157,7 +157,7 @@ public class Writer extends AWriter
 				{
 					writeStartObject(writer, path[i], stack.size());
 					stack.add(new StackElement(path[i], object));
-					writer.writeCharacters(lf);
+					writer.writeCharacters(SXML.lf);
 				}
 			}
 		}
@@ -199,7 +199,7 @@ public class Writer extends AWriter
 			{
 				writeIndentation(writer, stack.size());
 				writer.writeComment(comment);
-				writer.writeCharacters(lf);
+				writer.writeCharacters(SXML.lf);
 			}
 			
 			writeStartObject(writer, tag, stack.size());
@@ -286,7 +286,7 @@ public class Writer extends AWriter
 			if(subs)
 			{
 				Tree subobs = wi.getSubobjects();
-				writer.writeCharacters(lf);
+				writer.writeCharacters(SXML.lf);
 				
 				writeSubobjects(wc, subobs.getRootNode(), typeinfo);
 			}
@@ -306,7 +306,7 @@ public class Writer extends AWriter
 	/**
 	 *  Write the subobjects of an object.
 	 */
-	protected void writeSubobjects(WriteContext wc, TreeNode node, TypeInfo typeinfo) throws Exception
+	protected void writeSubobjects(WriteContextDesktop wc, TreeNode node, TypeInfo typeinfo) throws Exception
 	{
 		XMLStreamWriter writer = wc.getWriter();
 		List stack = wc.getStack();
@@ -321,7 +321,7 @@ public class Writer extends AWriter
 				QName subtag = (QName)tmp; 
 				
 				writeStartObject(writer, subtag, stack.size());
-				writer.writeCharacters(lf);
+				writer.writeCharacters(SXML.lf);
 				stack.add(new StackElement(subtag, null));
  
 				writeSubobjects(wc, subnode, typeinfo);
@@ -426,7 +426,7 @@ public class Writer extends AWriter
 	{
 		writeIndentation(writer, level);
 		writer.writeEndElement();
-		writer.writeCharacters(lf);
+		writer.writeCharacters(SXML.lf);
 	}
 		
 	/**

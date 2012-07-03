@@ -43,7 +43,7 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
-import jadex.xml.reader.ReadContext;
+import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.Reader;
 import jadex.xml.reader.XMLReaderFactory;
 
@@ -169,7 +169,7 @@ public class ComponentXMLReader
 				Map	user	= (Map)context.getUserContext();
 				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 				String	pos;
-				Tuple	stack	= new Tuple(((ReadContext)context).getStack());
+				Tuple	stack	= new Tuple(((AReadContext)context).getStack());
 				if(stack.getEntities().length>0)
 				{
 					StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);

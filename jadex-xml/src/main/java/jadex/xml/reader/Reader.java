@@ -10,9 +10,7 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -169,7 +167,7 @@ public class Reader extends AReader
  	 */
 	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
-		ReadContext readcontext = new ReadContext(tipmanager, handler, parser, StaxXMLReporterWrapper.fromXMLReporter(factory.getXMLReporter()), callcontext, classloader);
+		ReadContextDesktop readcontext = new ReadContextDesktop(tipmanager, handler, parser, StaxXMLReporterWrapper.fromXMLReporter(factory.getXMLReporter()), callcontext, classloader);
 		READ_CONTEXT.set(readcontext);
 		try
 		{
@@ -228,7 +226,7 @@ public class Reader extends AReader
 	 *  Handle the comment.
 	 *  @param readcontext The context for reading with all necessary information.
 	 */
-	protected void handleComment(ReadContext readcontext) throws Exception
+	protected void handleComment(ReadContextDesktop readcontext) throws Exception
 	{
 		if(readcontext.getReadIgnore()==0)
 			readcontext.setComment(readcontext.getParser().getText());
@@ -241,7 +239,7 @@ public class Reader extends AReader
 	 *  Handle the content.
 	 *  @param readcontext The context for reading with all necessary information.
 	 */
-	protected void handleContent(ReadContext readcontext) throws Exception
+	protected void handleContent(ReadContextDesktop readcontext) throws Exception
 	{
 		if(readcontext.getReadIgnore()==0)
 			readcontext.getTopStackElement().addContent(readcontext.getParser().getText()); 
@@ -257,7 +255,7 @@ public class Reader extends AReader
 	 *  Handle the start element.
 	 *  @param readcontext The context for reading with all necessary information.
 	 */
-	protected void handleStartElement(ReadContext readcontext) throws Exception
+	protected void handleStartElement(ReadContextDesktop readcontext) throws Exception
 	{
 		XMLStreamReader parser = readcontext.getParser();
 		
@@ -498,7 +496,7 @@ public class Reader extends AReader
 	 *  Handle the end element.
 	 *  @param readcontext The context for reading with all necessary information.
 	 */
-	protected void handleEndElement(final ReadContext readcontext) throws Exception
+	protected void handleEndElement(final ReadContextDesktop readcontext) throws Exception
 	{
 		if(readcontext.getReadIgnore()==0)
 		{

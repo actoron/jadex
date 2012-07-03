@@ -16,5 +16,5 @@ public interface IObjectLinker
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		QName[] pathname, ReadContext context) throws Exception;
+		QName[] pathname, AReadContext context) throws Exception;
 }

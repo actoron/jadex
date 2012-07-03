@@ -171,6 +171,9 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 		for(int i=codec_ids.length-1; i>-1; i--)
 		{
 			ICodec dec = codecs.get(new Byte(codec_ids[i]));
+			if (dec == null) {
+				throw new RuntimeException("Codec " + codec_ids[i] + " not available!");
+			}
 			tmp = dec.decode(tmp, cl);
 		}
 		
