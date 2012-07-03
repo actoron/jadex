@@ -1,6 +1,6 @@
 package jadex.android;
 
-import jadex.bridge.service.types.android.IJadexAndroidEvent;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
 
 /**
  * Event receiver to receive Messages sent from Jadex Agents and Components.

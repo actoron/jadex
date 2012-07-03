@@ -1,8 +1,8 @@
 package jadex.standalone;
 
-import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -149,7 +149,7 @@ import java.util.logging.Level;
 
 @ProvidedServices({
 	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IAndroidContextService.class, implementation=@Implementation(expression="SReflect.isAndroid() ? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): null")),
+	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="SReflect.isAndroid() ? jadex.base.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): jadex.base.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})")),
 	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(expression="new SettingsService($component, $args.saveonexit)")),
 	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new AsyncExecutionService($component.getServiceProvider()): new SyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),

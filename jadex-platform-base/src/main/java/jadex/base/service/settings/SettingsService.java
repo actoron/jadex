@@ -2,10 +2,13 @@ package jadex.base.service.settings;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -48,6 +51,9 @@ public class SettingsService extends BasicService implements ISettingsService
 	/** Save settings on exit?. */
 	protected boolean	saveonexit;
 	
+	/** The context service. */
+	protected IContextService contextService;
+	
 	//-------- constructors --------
 	
 	/**
@@ -74,13 +80,25 @@ public class SettingsService extends BasicService implements ISettingsService
 	public IFuture<Void>	startService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		super.startService().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+		IFuture<IContextService> service = SServiceProvider.getService(access.getServiceContainer(), IContextService.class);
+		service.addResultListener(new DefaultResultListener<IContextService>()
 		{
-			public void customResultAvailable(Object result)
+			@Override
+			public void resultAvailable(IContextService result)
 			{
-				loadProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+				contextService = result;
+				SettingsService.super.startService().addResultListener(access.createResultListener(new DelegationResultListener<Void>(ret)
+				{
+					@Override
+					public void customResultAvailable(Void result)
+					{
+						loadProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+					}
+					
+				}));
 			}
-		}));
+		});
+		
 		return ret;
 	}
 	
@@ -361,6 +379,6 @@ public class SettingsService extends BasicService implements ISettingsService
 	 * @return The File Object for the given path.
 	 */
 	protected File getFile(String path) {
-		return new File(path);
+		return contextService.getFile(path);
 	}
 }

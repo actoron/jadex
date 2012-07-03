@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.android;
+package jadex.bridge.service.types.context;
 
 public interface IJadexAndroidEvent {
 	String getType();

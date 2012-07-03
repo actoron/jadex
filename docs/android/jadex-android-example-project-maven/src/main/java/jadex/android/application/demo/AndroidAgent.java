@@ -2,7 +2,7 @@ package jadex.android.application.demo;
 
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.android.IAndroidContextService;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -23,7 +23,7 @@ import android.util.Log;
  */
 @Description("Sample Android Agent.")
 @RequiredServices({
-		@RequiredService(name="androidcontext", type=IAndroidContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+		@RequiredService(name="androidcontext", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 })
 public class AndroidAgent extends MicroAgent
 {
@@ -73,7 +73,7 @@ public class AndroidAgent extends MicroAgent
 
 			@Override
 			public void resultAvailable(Object result) {
-				IAndroidContextService contextService = (IAndroidContextService) result;
+				IContextService contextService = (IContextService) result;
 				boolean dispatchUiEvent = contextService.dispatchUiEvent(event);
 				Log.d("Agent", "dispatched: " + dispatchUiEvent);
 			}

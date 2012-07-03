@@ -18,10 +18,10 @@ import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
-import jadex.bridge.service.types.android.IAndroidContextService;
-import jadex.bridge.service.types.android.IJadexAndroidEvent;
-import jadex.bridge.service.types.android.IPreferences;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.context.IContextService;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
+import jadex.bridge.service.types.context.IPreferences;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -191,19 +192,8 @@ public class AndroidSettingsServiceTest extends TestCase {
 	private AndroidSettingsService createAndroidSettingsService(boolean preferFileProperties) {
 		AndroidSettingsService ass = new AndroidSettingsService(
 				new internalAccess(), true, preferFileProperties);
-		ass.contextService = new IAndroidContextService() {
+		ass.contextService = new IContextService() {
 
-			@Override
-			public FileOutputStream openFileOutputStream(String name)
-					throws FileNotFoundException {
-				return null;
-			}
-
-			@Override
-			public FileInputStream openFileInputStream(String name)
-					throws FileNotFoundException {
-				return null;
-			}
 
 			@Override
 			public IPreferences getSharedPreferences(String preferenceFileName) {
@@ -273,14 +263,18 @@ public class AndroidSettingsServiceTest extends TestCase {
 			}
 
 			@Override
-			public int getDhcpNetmask() {
-				return -1;
+			public List<InetAddress> getNetworkIps()
+			{
+				return null;
 			}
 
 			@Override
-			public int getDhcpInetAdress() {
-				return -1;
+			public void openFile(String path) throws IOException
+			{
+				// TODO Auto-generated method stub
+				
 			}
+
 		};
 
 		return ass;

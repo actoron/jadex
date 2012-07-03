@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.android;
+package jadex.bridge.service.types.context;
 
 import java.util.Map;
 

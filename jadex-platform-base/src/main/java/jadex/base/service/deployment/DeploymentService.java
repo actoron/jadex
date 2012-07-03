@@ -4,8 +4,13 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.commons.SReflect;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -14,6 +19,7 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  *  Service for deployment files on file system.
@@ -113,24 +119,30 @@ public class DeploymentService implements IDeploymentService
 	 *  Execute a file.
 	 *  @param path The filename to execute.
 	 */
-	public IFuture<Void> openFile(String path)
+	public IFuture<Void> openFile(final String path)
 	{
-		Future<Void> ret = new Future<Void>();
-		try
-		{
-			File file = new File(path);
-			/* if_not[android] */
-			Desktop.getDesktop().open(file);
-			/* end[android] */
-			// exec produces strange exceptions?!
-//			Runtime.getRuntime().exec(path);
-			ret.setResult(null);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			ret.setException(e);
-		}
+		final Future<Void> ret = new Future<Void>();
+		SServiceProvider.getService(agent.getServiceProvider(), IContextService.class).addResultListener(
+				new DefaultResultListener<IContextService>()
+				{
+					@Override
+					public void resultAvailable(IContextService cs)
+					{
+						try
+						{
+							cs.openFile(path);
+						}
+						catch (IOException e)
+						{
+							e.printStackTrace();
+							ret.setException(e);
+						}
+					}
+				});
+
+		// exec produces strange exceptions?!
+		// Runtime.getRuntime().exec(path);
+		ret.setResult(null);
 		return ret;
 	}
 	

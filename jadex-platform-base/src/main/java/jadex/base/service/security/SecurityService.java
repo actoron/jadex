@@ -13,6 +13,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -20,7 +21,6 @@ import jadex.commons.Base64;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -31,13 +31,10 @@ import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -94,6 +91,9 @@ public class SecurityService implements ISecurityService
 	/** The key password. */
 	protected String keypass;
 	
+	/** The ContextService. */
+	protected IContextService contextService;
+	
 	/** The currently valid digests. */
 	protected Map<String, Tuple2<Long, byte[]>> digests;
 
@@ -128,7 +128,7 @@ public class SecurityService implements ISecurityService
 		this.usepass = usepass!=null? usepass.booleanValue(): true;
 		this.argsusepass = usepass != null;
 		this.printpass = printpass;
-		setTrustedLanMode(trustedlan!=null? trustedlan.booleanValue(): false);
+		this.trustedlan = trustedlan!=null? trustedlan.booleanValue(): false;
 		this.argstrustedlan = trustedlan != null;
 		this.storepath = "./keystore";
 		this.storepass = "keystore";
@@ -144,149 +144,160 @@ public class SecurityService implements ISecurityService
 		final Future<Void>	ret	= new Future<Void>();
 //		this.trustednets = new ArrayList<String>();
 		
-		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
-		{
-			public void customResultAvailable(final ISettingsService settings)
-			{
-				settings.getProperties(PROEPRTIES_ID)
-					.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
+		component.getServiceContainer().searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IContextService, Void>(ret)
 				{
-					public void customResultAvailable(final Properties props)
+					@Override
+					public void customResultAvailable(IContextService result)
 					{
-						// generate new password, if no security settings exist, yet.
-						final boolean	genpass	= props==null || props.getProperty("password")==null; 
-						if(genpass)
+						contextService = result;
+						setTrustedLanMode(trustedlan);
+					
+						component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 						{
-							password	= UUID.randomUUID().toString().substring(0, 12);
-//							usepass	= true;
-						}
-						
-						final IExternalAccess	access	= component.getExternalAccess();
-						
-						settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
-						{
-							public IFuture<Void> setProperties(final Properties props)
+							public void customResultAvailable(final ISettingsService settings)
 							{
-								return access.scheduleImmediate(new IComponentStep<Void>()
+								settings.getProperties(PROEPRTIES_ID)
+									.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
 								{
-									public IFuture<Void> execute(IInternalAccess ia)
+									public void customResultAvailable(final Properties props)
 									{
-										String spa = props.getStringProperty("storepath");
-										if(spa!=null && spa.length()>0)
-											storepath = spa;
-										String sps = props.getStringProperty("storepass");
-										if(sps!=null && spa.length()>0)
-											storepass = sps;
-										String kp = props.getStringProperty("keypass");
-										if(kp!=null && kp.length()>0)
-											keypass = kp;
-										
-										if(!argsusepass)
+										// generate new password, if no security settings exist, yet.
+										final boolean	genpass	= props==null || props.getProperty("password")==null; 
+										if(genpass)
 										{
-											usepass = props.getBooleanProperty("usepass");
-//											System.out.println("usepass: "+usepass);
-										}
-										password	= props.getStringProperty("password");
-										
-										if(!argstrustedlan)
-										{
-											setTrustedLanMode(props.getBooleanProperty("trustedlan"));
+											password	= UUID.randomUUID().toString().substring(0, 12);
+				//							usepass	= true;
 										}
 										
-										Property[]	passes	= props.getProperties("passwords");
-//										platformpasses	= new LinkedHashMap<String, String>();
-										for(int i=0; i<passes.length; i++)
-										{
-											String val = passes[i].getValue();
-											platformpasses.put(passes[i].getName(), val==null? "": val);
-										}
+										final IExternalAccess	access	= component.getExternalAccess();
 										
-										// Not allowed to add internal trusted platforms if flag is false
-										List<InetAddress> addrs = getNetworkIps();
-										Set<String> trs = new HashSet<String>();
-										for(InetAddress addr: addrs)
+										settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
 										{
-											trs.add(addr.getHostAddress());
-										}
+											public IFuture<Void> setProperties(final Properties props)
+											{
+												return access.scheduleImmediate(new IComponentStep<Void>()
+												{
+													public IFuture<Void> execute(IInternalAccess ia)
+													{
+														String spa = props.getStringProperty("storepath");
+														if(spa!=null && spa.length()>0)
+															storepath = spa;
+														String sps = props.getStringProperty("storepass");
+														if(sps!=null && spa.length()>0)
+															storepass = sps;
+														String kp = props.getStringProperty("keypass");
+														if(kp!=null && kp.length()>0)
+															keypass = kp;
+														
+														if(!argsusepass)
+														{
+															usepass = props.getBooleanProperty("usepass");
+				//											System.out.println("usepass: "+usepass);
+														}
+														password	= props.getStringProperty("password");
+														
+														if(!argstrustedlan)
+														{
+															setTrustedLanMode(props.getBooleanProperty("trustedlan"));
+														}
+														
+														Property[]	passes	= props.getProperties("passwords");
+				//										platformpasses	= new LinkedHashMap<String, String>();
+														for(int i=0; i<passes.length; i++)
+														{
+															String val = passes[i].getValue();
+															platformpasses.put(passes[i].getName(), val==null? "": val);
+														}
+														
+														// Not allowed to add internal trusted platforms if flag is false
+														List<InetAddress> addrs = contextService.getNetworkIps();
+														Set<String> trs = new HashSet<String>();
+														for(InetAddress addr: addrs)
+														{
+															trs.add(addr.getHostAddress());
+														}
+															
+														Property[]	networks	= props.getProperties("networks");
+				//										networkpasses	= new LinkedHashMap<String, String>();
+														for(int i=0; i<networks.length; i++)
+														{
+				//											System.out.println("value:"+networks[i].getValue()+".");
+															String val = networks[i].getValue();
+															if(trustedlan || !trs.contains(networks[i].getName()))
+															{
+																networkpasses.put(networks[i].getName(), val==null? "": val);
+															}
+														}
+														
+														return IFuture.DONE;
+													}
+												});
+											}
 											
-										Property[]	networks	= props.getProperties("networks");
-//										networkpasses	= new LinkedHashMap<String, String>();
-										for(int i=0; i<networks.length; i++)
-										{
-//											System.out.println("value:"+networks[i].getValue()+".");
-											String val = networks[i].getValue();
-											if(trustedlan || !trs.contains(networks[i].getName()))
+											public IFuture<Properties> getProperties()
 											{
-												networkpasses.put(networks[i].getName(), val==null? "": val);
+												return access.scheduleImmediate(new IComponentStep<Properties>()
+												{
+													public IFuture<Properties> execute(IInternalAccess ia)
+													{
+														Properties	ret	= new Properties();
+														ret.addProperty(new Property("usepass", ""+usepass));
+														ret.addProperty(new Property("password", password));
+														if(platformpasses!=null)
+														{
+															for(String platform: platformpasses.keySet())
+															{
+																ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
+															}
+														}
+														if(networkpasses!=null)
+														{
+															for(String network: networkpasses.keySet())
+															{
+																ret.addProperty(new Property(network, "networks", platformpasses.get(network)));
+															}
+														}
+														ret.addProperty(new Property("trustedlan", ""+trustedlan));
+														
+														ret.addProperty(new Property("storepath", storepath));
+														ret.addProperty(new Property("storepass", storepass));
+														ret.addProperty(new Property("keypass", keypass));
+														
+														return new Future<Properties>(ret);
+													}
+												});
 											}
-										}
-										
-										return IFuture.DONE;
+										}).addResultListener(new DelegationResultListener<Void>(ret)
+										{
+											public void customResultAvailable(Void result)
+											{
+												// If new password was generated, save settings such that new platform instances use it.
+												if(genpass)
+												{
+													if(printpass && usepass)
+													{
+														System.out.println("Generated platform password: "+password);
+													}
+													settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
+												}
+												else
+												{
+													if(printpass && usepass)
+													{
+														System.out.println("Using stored platform password: "+password);
+													}
+													super.customResultAvailable(result);
+												}
+											}
+										});
 									}
 								});
-							}
-							
-							public IFuture<Properties> getProperties()
-							{
-								return access.scheduleImmediate(new IComponentStep<Properties>()
-								{
-									public IFuture<Properties> execute(IInternalAccess ia)
-									{
-										Properties	ret	= new Properties();
-										ret.addProperty(new Property("usepass", ""+usepass));
-										ret.addProperty(new Property("password", password));
-										if(platformpasses!=null)
-										{
-											for(String platform: platformpasses.keySet())
-											{
-												ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
-											}
-										}
-										if(networkpasses!=null)
-										{
-											for(String network: networkpasses.keySet())
-											{
-												ret.addProperty(new Property(network, "networks", platformpasses.get(network)));
-											}
-										}
-										ret.addProperty(new Property("trustedlan", ""+trustedlan));
-										
-										ret.addProperty(new Property("storepath", storepath));
-										ret.addProperty(new Property("storepass", storepass));
-										ret.addProperty(new Property("keypass", keypass));
-										
-										return new Future<Properties>(ret);
-									}
-								});
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void customResultAvailable(Void result)
-							{
-								// If new password was generated, save settings such that new platform instances use it.
-								if(genpass)
-								{
-									if(printpass && usepass)
-									{
-										System.out.println("Generated platform password: "+password);
-									}
-									settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
-								}
-								else
-								{
-									if(printpass && usepass)
-									{
-										System.out.println("Using stored platform password: "+password);
-									}
-									super.customResultAvailable(result);
-								}
 							}
 						});
 					}
 				});
-			}
-		});
 		
 		return ret;
 	}
@@ -505,7 +516,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Void> setTrustedLanMode(boolean allowed)
 	{
-		List<InetAddress> addrs = getNetworkIps();
+		List<InetAddress> addrs = contextService.getNetworkIps();
 		
 		if(allowed)
 		{
@@ -658,60 +669,6 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
-	 *  Get the network ip.
-	 */
-	protected List<InetAddress> getNetworkIps()
-	{
-		List<InetAddress> ret = new ArrayList<InetAddress>();
-		if(!SReflect.isAndroid()) // Todo: alternative to NetworkInterface.getInterfaceAddresses()?
-		{
-			try
-			{
-				// Generate network identifiers
-				for(NetworkInterface ni: SUtil.getNetworkInterfaces())
-				{
-					for(InterfaceAddress ifa: ni.getInterfaceAddresses())
-					{
-						if(ifa!=null)	// Yes, there may be a null in the list. grrr.
-						{
-							InetAddress addr = ifa.getAddress();
-			//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
-							
-							if(addr.isLoopbackAddress())
-							{
-								// ignore
-							}
-							else if(addr.isLinkLocalAddress())
-							{
-								// ignore
-							}
-							else // if(addr.isSiteLocalAddress()) or other
-							{
-								// Hack!!! Use sensible default prefix when -1 due to jdk on windows bug
-								// http://bugs.sun.com/view_bug.do?bug_id=6707289
-								short	prefix	= ifa.getNetworkPrefixLength();
-								InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), prefix!=-1 ? prefix : 24);
-								ret.add(ad);
-							}
-						}
-					}
-				}
-			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		
-		return ret;
-	}
-	
-	
-	/**
 	 *  Preprocess a request.
 	 *  Adds authentication data to the request, if required by the intended target.
 	 *  @param request	The request to be preprocessed.
@@ -748,7 +705,7 @@ public class SecurityService implements ISecurityService
 		// Add trusted authentications (in case other has turned on lan trusted and this one not)
 		if(!trustedlan)
 		{
-			for(InetAddress addr: getNetworkIps())
+			for(InetAddress addr: contextService.getNetworkIps())
 			{
 				authdata.add(getDigest(timestamp, addr.getHostAddress()));
 			}

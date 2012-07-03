@@ -1,6 +1,6 @@
 package jadex.android.application.demo;
 
-import jadex.bridge.service.types.android.IJadexAndroidEvent;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
 
 public class ShowToastEvent implements IJadexAndroidEvent {
 

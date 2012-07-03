@@ -1,5 +1,6 @@
 package jadex.android.benchmarks;
 
+import jadex.android.JadexAndroidActivity;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -63,7 +63,7 @@ import android.widget.TextView;
  *  Activity (screen) for the jadex android benchmark app.
  *  Starts the platform and allows launching the different benchmarks.
  */
-public class JadexAndroidBenchmarkAgentActivity extends Activity
+public class JadexAndroidBenchmarkAgentActivity extends JadexAndroidActivity
 {
 	//-------- attributes --------
 	

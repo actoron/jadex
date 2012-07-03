@@ -218,11 +218,11 @@
 				new jadex.base.service.marshal.MarshalService($component.getExternalAccess())
 			</implementation>
 		</providedservice>
-		<providedservice class="jadex.bridge.service.types.android.IAndroidContextService">
+		<providedservice class="jadex.bridge.service.types.context.IContextService">
 			<implementation>
 				jadex.commons.SReflect.isAndroid()
-				? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
-				: null
+				? jadex.base.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
+				: jadex.base.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
