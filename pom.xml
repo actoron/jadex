@@ -864,30 +864,25 @@
 				<finalName>jadex-android-${project.version}</finalName>
 			</build>
 			<modules>
-			<!-- Android specific modules -->
-				<module>jadex-android-parent</module>
-				<module>jadex-android-misc</module>
-				<module>jadex-android-antlr</module>
-				<module>jadex-android-stax-api</module>
-				<module>jadex-android-xmlpull</module>
-<!-- 				<module>jadex-android-woodstox</module> -->
-				<module>jadex-android-beans</module>
-				<!-- Ported jadex modules -->
-				<module>jadex-commons/android</module>
-				<module>jadex-bridge/android</module>
-				<module>jadex-javaparser/android</module>
-				<module>jadex-xml/android</module>
-				<module>jadex-platform-base/android</module>
-				<module>jadex-rules/android</module>
-				<module>jadex-kernel-base/android</module>
-				<module>jadex-kernel-micro/android</module>
-				<module>jadex-kernel-bpmn/android</module>
-				<module>jadex-kernel-component/android</module>
-				<module>jadex-kernel-bdi/android</module>
-				<module>jadex-kernel-bdibpmn/android</module>
-				<module>jadex-platform-standalone/android</module>
-				
+				<!-- Jadex modules -->
+				<module>jadex-commons</module>
+				<module>jadex-bridge</module>
+				<module>jadex-javaparser</module>
+				<module>jadex-xml</module>
 				<module>jadex-tools-base</module>
+				<module>jadex-rules</module>
+				<module>jadex-kernel-base</module>
+				<module>jadex-kernel-micro</module>
+				<module>jadex-kernel-component</module>
+				<module>jadex-kernel-bdi</module>
+				<module>jadex-kernel-bpmn</module>
+				<module>jadex-platform-base</module>
+				<module>jadex-platform-standalone</module>
+				
+				<!-- Android specific modules -->
+				<module>jadex-android-parent</module>
+				<module>jadex-android-xmlpull</module>
+				<module>jadex-android-antlr</module>
 				<module>jadex-runtimetools-android</module>
 			</modules>
 		</profile>
@@ -951,32 +946,26 @@
 				</plugins>
 			</build>
 			<modules>
+				<!-- Jadex modules -->
+				<module>jadex-commons</module>
+				<module>jadex-bridge</module>
+				<module>jadex-javaparser</module>
+				<module>jadex-xml</module>
+				<module>jadex-tools-base</module>
+				<module>jadex-rules</module>
+				<module>jadex-kernel-base</module>
+				<module>jadex-kernel-micro</module>
+				<module>jadex-kernel-component</module>
+				<module>jadex-kernel-bdi</module>
+				<module>jadex-kernel-bpmn</module>
+				<module>jadex-platform-base</module>
+				<module>jadex-platform-standalone</module>
+				
 				<!-- Android specific modules -->
 				<module>jadex-android-parent</module>
-				<module>jadex-android-misc</module>
-				<module>jadex-android-antlr</module>
-				<module>jadex-android-stax-api</module>
 				<module>jadex-android-xmlpull</module>
-<!-- 				<module>jadex-android-woodstox</module> -->
-				<module>jadex-android-beans</module>
-				<!-- Ported jadex modules -->
-				<module>jadex-commons/android</module>
-				<module>jadex-bridge/android</module>
-				<module>jadex-javaparser/android</module>
-				<module>jadex-xml/android</module>
-				<module>jadex-platform-base/android</module>
-				<module>jadex-rules/android</module>
-				<module>jadex-kernel-base/android</module>
-				<module>jadex-kernel-micro/android</module>
-				<module>jadex-kernel-bpmn/android</module>
-				<module>jadex-kernel-component/android</module>
-				<module>jadex-kernel-bdi/android</module>
-				<module>jadex-kernel-bdibpmn/android</module>
-				<module>jadex-platform-standalone/android</module>
-				
-				<module>jadex-tools-base</module>
+				<module>jadex-android-antlr</module>
 				<module>jadex-runtimetools-android</module>
-<!-- 				<module>docs/android/jadex-android-example-project-maven</module> -->
 			</modules>
 		</profile>
 	</profiles>

@@ -16,6 +16,9 @@
 		<moduleSet>
 			<!-- Selected by profile. <includes> <include>jadex:*</include> </includes> -->
 			<binaries>
+			<includes> 
+				<include>jadex:*</include> 
+			</includes>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
 				<!-- <outputFileNameMapping>${module.artifactId}-${module.version}${dashClassifier?}.${module.extension}</outputFileNameMapping> -->
 				<!-- <outputFileNameMapping>${artifactId}-${version}${dashClassifier?}.${extension}</outputFileNameMapping> -->

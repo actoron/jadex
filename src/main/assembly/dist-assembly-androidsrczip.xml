@@ -14,61 +14,7 @@
 	<moduleSets>
 		<moduleSet>
 			<excludes>
-				<exclude>
-					net.sourceforge.jadex:jadex-android-parent
-				</exclude>
-				<exclude>
-					net.sourceforge.jadex:jadex-android-antlr
-				</exclude>
-				<exclude>
-					net.sourceforge.jadex:jadex-android-beans
-				</exclude>
-				<exclude>
-					net.sourceforge.jadex:jadex-android-misc
-				</exclude>
-				<exclude>
-					net.sourceforge.jadex:jadex-android-stax-api
-				</exclude>
-				<exclude>
-					net.sourceforge.jadex:jadex-android-xmlpull
-				</exclude>
 			</excludes>
-			<sources>
-				<includeModuleDirectory>false</includeModuleDirectory>
-				<fileSets>
-					<fileSet>
-						<outputDirectory>sources/modules/${module.artifactId}</outputDirectory>
-						<includes>
-							<include>src/**</include>
-							<include>lib/**</include>
-							<include>docs/**</include>
-							<include>**/pom.xml</include>
-						</includes>
-					</fileSet>
-				</fileSets>
-			</sources>
-		</moduleSet>
-		<moduleSet>
-			<includes>
-				<include>
-					net.sourceforge.jadex:jadex-android-parent
-				</include>
-				<include>
-					net.sourceforge.jadex:jadex-android-antlr
-				</include>
-				<include>
-					net.sourceforge.jadex:jadex-android-beans
-				</include>
-				<include>
-					net.sourceforge.jadex:jadex-android-misc
-				</include>
-				<include>
-					net.sourceforge.jadex:jadex-android-stax-api
-				</include>
-				<include>
-					net.sourceforge.jadex:jadex-android-xmlpull
-				</include>
-			</includes>
 			<sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
 				<fileSets>
@@ -91,13 +37,82 @@
 			<directory>docs/android/</directory>
 			<outputDirectory>sources/docs/android/</outputDirectory>
 		</fileSet>
+		<fileSet>
+			<directory>docs/android/</directory>
+			<outputDirectory>sources/docs/android/</outputDirectory>
+		</fileSet>
 	</fileSets>
-
+	
 	<files>
+<!-- 		<file> -->
+<!-- 			<source>docs/android/jadex-android-standalone-project-pom.xml</source> -->
+<!-- 			<outputDirectory>sources/</outputDirectory> -->
+<!-- 			<destName>pom.xml</destName> -->
+<!-- 		</file> -->
+
 		<file>
-			<source>docs/android/jadex-android-standalone-project-pom.xml</source>
+			<source>pom.xml</source>
 			<outputDirectory>sources/</outputDirectory>
 			<destName>pom.xml</destName>
+		</file>
+		
+		<file>
+			<source>docs/readme-building.txt</source>
+			<outputDirectory>sources</outputDirectory>
+		</file>
+				
+		<!-- Copy files required for distribution build -->
+		<file>
+			<source>docs/junit-3.8.1.jar</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/readme.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/license.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/api-changes.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jcc.settings.xml</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/default.settings.xml</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jadex.bat</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jadex_no_awareness.bat</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jadex.sh</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/jadex_no_awareness.sh</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/howtostart.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/xs3p.xsl</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/readme-building.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 
 		<file>
