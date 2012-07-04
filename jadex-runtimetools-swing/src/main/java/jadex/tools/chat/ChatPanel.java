@@ -281,17 +281,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				};
 				
-				DefaultTableCellRenderer filecellrend = new DefaultTableCellRenderer()
+				DefaultTableCellRenderer stringrend = new DefaultTableCellRenderer()
 				{
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 					{
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-						File f = new File((String)value);
-						this.setText(f.getName());
-						this.setToolTipText(f.getAbsolutePath());
+						if(value!=null)
+							this.setToolTipText(value.toString());
 						return this;
 					}
 				};
+				
 				DefaultTableCellRenderer progressrend = new DefaultTableCellRenderer()
 				{
 					JProgressBar bar = new JProgressBar(0,100);
@@ -772,19 +772,21 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //				udpane.setOneTouchExpandable(true);
 //				udpane.setDividerLocation(0.5);
 				
-				dtable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
-				dtable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
-				dtable.getColumnModel().getColumn(2).setCellRenderer(byterend);
+				dtable.getColumnModel().getColumn(0).setCellRenderer(stringrend);
+				dtable.getColumnModel().getColumn(1).setCellRenderer(stringrend);
+				dtable.getColumnModel().getColumn(2).setCellRenderer(cidrend);
 				dtable.getColumnModel().getColumn(3).setCellRenderer(byterend);
-				dtable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
-				dtable.getColumnModel().getColumn(6).setCellRenderer(speedrend);
+				dtable.getColumnModel().getColumn(4).setCellRenderer(byterend);
+				dtable.getColumnModel().getColumn(5).setCellRenderer(progressrend);
+				dtable.getColumnModel().getColumn(7).setCellRenderer(speedrend);
 				
-				utable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
-				utable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
-				utable.getColumnModel().getColumn(2).setCellRenderer(byterend);
+				utable.getColumnModel().getColumn(0).setCellRenderer(stringrend);
+				utable.getColumnModel().getColumn(1).setCellRenderer(stringrend);
+				utable.getColumnModel().getColumn(2).setCellRenderer(cidrend);
 				utable.getColumnModel().getColumn(3).setCellRenderer(byterend);
-				utable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
-				utable.getColumnModel().getColumn(6).setCellRenderer(speedrend);
+				utable.getColumnModel().getColumn(4).setCellRenderer(byterend);
+				utable.getColumnModel().getColumn(5).setCellRenderer(progressrend);
+				utable.getColumnModel().getColumn(7).setCellRenderer(speedrend);
 				
 				FileTransferMouseAdapter dlis = new FileTransferMouseAdapter(dtable);
 				FileTransferMouseAdapter ulis = new FileTransferMouseAdapter(utable);
@@ -826,7 +828,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								
 								if(panel.isShowing())
 								{
-									acceptFile(new File(ti.getFile()).getName(), ti.getSize(), ti.getOther())
+									acceptFile(ti.getFileName(), ti.getSize(), ti.getOther())
 										.addResultListener(new IResultListener<File>()
 									{
 										public void resultAvailable(File result)
@@ -1324,19 +1326,19 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			}
 			else if(NOTIFICATION_NEW_FILE.equals(type))
 			{
-				text	= "New file upload request from "+source+": "+new File(((TransferInfo)value).getFile()).getName();
+				text	= "New file upload request from "+source+": "+((TransferInfo)value).getFileName();
 			}
 			else if(NOTIFICATION_FILE_COMPLETE.equals(type))
 			{
 				text	= ((TransferInfo)value).isDownload()
-					? "Completed downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
-					: "Completed uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source;
+					? "Completed downloading '"+((TransferInfo)value).getFileName()+"' from "+source
+					: "Completed uploading '"+((TransferInfo)value).getFileName()+"' to "+source;
 			}
 			else if(NOTIFICATION_FILE_ABORT.equals(type))
 			{
 				text	= ((TransferInfo)value).isDownload()
-					? "Problem while downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
-					: "Problem while uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source;
+					? "Problem while downloading '"+((TransferInfo)value).getFileName()+"' from "+source
+					: "Problem while uploading '"+((TransferInfo)value).getFileName()+"' to "+source;
 			}
 			
 			if(text!=null)
@@ -1559,7 +1561,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							acceptFile(new File(fi.getFile()).getName(), fi.getSize(), fi.getOther())
+							acceptFile(fi.getFileName(), fi.getSize(), fi.getOther())
 								.addResultListener(new IResultListener<File>()
 							{
 								public void resultAvailable(File result)
@@ -1612,44 +1614,47 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			
 			if(fi.isFinished())
 			{
-				// Todo: check if remote
-				
-				JMenuItem mi = new JMenuItem("Open");
-				mi.addActionListener(new ActionListener()
+				// Open (folder) only allowed in local GUI.
+				if(((IService)getService()).getServiceIdentifier().getProviderId().getRoot()
+					.equals(jcc.getJCCAccess().getComponentIdentifier().getRoot()))
 				{
-					public void actionPerformed(ActionEvent e)
+					JMenuItem	mi = new JMenuItem("Open");
+					mi.addActionListener(new ActionListener()
 					{
-						try
+						public void actionPerformed(ActionEvent e)
 						{
-							Desktop.getDesktop().open(new File(fi.getFile()).getCanonicalFile());
+							try
+							{
+								Desktop.getDesktop().open(new File(fi.getFilePath()).getCanonicalFile());
+							}
+							catch(IOException ex)
+							{
+								// Doesn't work for PDf on windows :-(  http://bugs.sun.com/view_bug.do?bug_id=6764271
+								SGUI.showError(table, "Error Opening File", "File '"+new File(fi.getFilePath()).getName()+"' could not be opened.", ex);
+							}
 						}
-						catch(IOException ex)
-						{
-							// Doesn't work for PDf on windows :-(  http://bugs.sun.com/view_bug.do?bug_id=6764271
-							SGUI.showError(table, "Error Opening File", "File '"+new File(fi.getFile()).getName()+"' could not be opened.", ex);
-						}
-					}
-				});
-				menu.add(mi);
-
-				mi = new JMenuItem("Open folder");
-				mi.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
+					});
+					menu.add(mi);
+	
+					mi = new JMenuItem("Open folder");
+					mi.addActionListener(new ActionListener()
 					{
-						try
+						public void actionPerformed(ActionEvent e)
 						{
-							Desktop.getDesktop().open(new File(fi.getFile()).getParentFile().getCanonicalFile());
+							try
+							{
+								Desktop.getDesktop().open(new File(fi.getFilePath()).getParentFile().getCanonicalFile());
+							}
+							catch(IOException ex)
+							{
+								SGUI.showError(table, "Error Opening Folder", "Folder '"+new File(fi.getFilePath()).getParentFile().getName()+"'could not be opened.", ex);
+							}
 						}
-						catch(IOException ex)
-						{
-							SGUI.showError(table, "Error Opening Folder", "Folder '"+new File(fi.getFile()).getParentFile().getName()+"'could not be opened.", ex);
-						}
-					}
-				});
-				menu.add(mi);
+					});
+					menu.add(mi);
+				}
 
-				mi = new JMenuItem("Remove");
+				JMenuItem	mi = new JMenuItem("Remove");
 				mi.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -1747,7 +1752,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		public FileTableModel(boolean down)
 		{
 			this.down = down;
-			this.columns = new String[]{"Name", down? "Sender": "Receiver", "Size", "Done", "%", "State", "Speed", "Remaining Time"};
+			this.columns = new String[]{"Name", "Path", down? "Sender": "Receiver", "Size", "Done", "%", "State", "Speed", "Remaining Time"};
 			this.data	= new LinkedHashMap<String, TransferInfo>();
 		}
 
@@ -1782,33 +1787,37 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			TransferInfo[] files = getDataMap().values().toArray(new TransferInfo[getDataMap().size()]);
 			if(column==0)
 			{
-				ret = files[row].getFile();
+				ret = files[row].getFileName();
 			}
 			else if(column==1)
 			{
-				ret = files[row].getOther();
+				ret = files[row].getFilePath()!=null ? files[row].getFilePath() : "n/a";
 			}
 			else if(column==2)
 			{
-				ret = files[row].getSize();
+				ret = files[row].getOther();
 			}
 			else if(column==3)
 			{
-				ret = files[row].getDone();
+				ret = files[row].getSize();
 			}
 			else if(column==4)
 			{
-				ret = new Double(((double)files[row].getDone())/files[row].getSize());
+				ret = files[row].getDone();
 			}
 			else if(column==5)
 			{
-				ret = files[row].getState();
+				ret = new Double(((double)files[row].getDone())/files[row].getSize());
 			}
 			else if(column==6)
 			{
-				ret = files[row];
+				ret = files[row].getState();
 			}
 			else if(column==7)
+			{
+				ret = files[row];
+			}
+			else if(column==8)
 			{
 				if(TransferInfo.STATE_TRANSFERRING.equals(files[row].getState()))
 				{

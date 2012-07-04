@@ -11,6 +11,12 @@ import java.lang.reflect.Method;
  *  can be transferred to remote address spaces.
  *  Does only transfer file information, not the
  *  binary data itself.
+ *  
+ *  This class is necessary, because java.io.File
+ *  makes too many assumptions about the underlying OS
+ *  (slashed, root directories), such that File objects
+ *  are not portable. I.e. a Windows path produces a
+ *  corrupted File, when instantiated under Linux and vice versa.
  */
 public class FileData
 {

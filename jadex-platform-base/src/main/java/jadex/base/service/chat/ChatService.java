@@ -255,7 +255,7 @@ public class ChatService implements IChatService, IChatGuiService
 		TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
 		IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
 		
-		TransferInfo	ti	= new TransferInfo(true, id, filename, sender, size);
+		TransferInfo	ti	= new TransferInfo(true, id, filename, null, sender, size);
 		ti.setState(TransferInfo.STATE_WAITING);
 		
 		transfers.put(ti.getId(), new Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>(ti, ret, con));
@@ -280,7 +280,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
 		
-		final TransferInfo	ti	= new TransferInfo(true, id, filename, sender, size);
+		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, sender, size);
 		ti.setState(TransferInfo.STATE_WAITING);
 		
 		// Todo: automatically decouple termination commands
@@ -597,9 +597,9 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Accept a waiting file transfer.
 	 *  @param id	The transfer id. 
-	 *  @param file	The location of the file (possibly changed by user). 
+	 *  @param filepath	The location of the file (possibly changed by user). 
 	 */
-	public IFuture<Void>	acceptFile(String id, String file)
+	public IFuture<Void>	acceptFile(String id, String filepath)
 	{
 		IFuture<Void>	ret;
 		Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>	tup	= transfers.get(id);
@@ -609,7 +609,8 @@ public class ChatService implements IChatService, IChatGuiService
 			TransferInfo	ti	= tup.getFirstEntity();
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
-				ti.setFile(file);
+				ti.setFileName(new File(filepath).getName());
+				ti.setFilePath(filepath);
 				doDownload(ti, tup.getSecondEntity(), tup.getThirdEntity());
 				ret	= IFuture.DONE;
 			}
@@ -629,8 +630,9 @@ public class ChatService implements IChatService, IChatGuiService
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
 				ServiceInputConnection	sic	= new ServiceInputConnection();
-				((Future<IOutputConnection>) tup2.getSecondEntity()).setResultIfUndone(sic.getOutputConnection());
-				ti.setFile(file);
+				((Future<IOutputConnection>)tup2.getSecondEntity()).setResultIfUndone(sic.getOutputConnection());
+				ti.setFileName(new File(filepath).getName());
+				ti.setFilePath(filepath);
 				doDownload(ti, null, sic);
 				ret	= IFuture.DONE;
 			}
@@ -689,7 +691,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				ti.setState(TransferInfo.STATE_REJECTED);
 				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-				((Future<IOutputConnection>) tup2.getSecondEntity()).setException(new RuntimeException(TransferInfo.STATE_REJECTED));
+				((Future<?>)tup2.getSecondEntity()).setException(new RuntimeException(TransferInfo.STATE_REJECTED));
 				transfers2.remove(id);
 				ret	= IFuture.DONE;
 			}
@@ -777,10 +779,10 @@ public class ChatService implements IChatService, IChatGuiService
 
 	/**
 	 *  Send a local file to the target component.
-	 *  @param filename	The file.
-	 *  @param cid	The id of a rmote chat component.
+	 *  @param filepath	The file path, local to the chat component.
+	 *  @param cid	The id of a remote chat component.
 	 */
-	public IFuture<Void>	sendFile(final String filename, final IComponentIdentifier cid)
+	public IFuture<Void>	sendFile(final String filepath, final IComponentIdentifier cid)
 	{
 		final Future<Void> ret = new Future<Void>();
 
@@ -789,7 +791,7 @@ public class ChatService implements IChatService, IChatGuiService
 		{
 			public void customResultAvailable(IChatService cs)
 			{
-				final File file = new File(filename);
+				final File file = new File(filepath);
 				final long size = file.length();
 				
 //				// Call chat service of receiver 
@@ -845,7 +847,7 @@ public class ChatService implements IChatService, IChatGuiService
 //				});
 				
 				// Call chat service of receiver (alternative interface)
-				final TransferInfo fi = new TransferInfo(false, null, filename, cid, new File(filename).length());
+				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length());
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
@@ -951,7 +953,7 @@ public class ChatService implements IChatService, IChatGuiService
 				ret.addIntermediateResult(new Long(0));
 			}
 			
-			final FileOutputStream fos = new FileOutputStream(ti.getFile());
+			final FileOutputStream fos = new FileOutputStream(ti.getFilePath());
 			final ITerminableIntermediateFuture<Long> fut = con.writeToOutputStream(fos, agent.getExternalAccess());
 			
 			fut.addResultListener(new IIntermediateResultListener<Long>()
@@ -1036,7 +1038,7 @@ public class ChatService implements IChatService, IChatGuiService
 		
 		try
 		{
-			final FileInputStream fis = new FileInputStream(new File(ti.getFile()));
+			final FileInputStream fis = new FileInputStream(new File(ti.getFilePath()));
 			final ITerminableIntermediateFuture<Long> fut = ocon.writeFromInputStream(fis, agent.getExternalAccess());
 
 			fut.addResultListener(new IIntermediateResultListener<Long>()

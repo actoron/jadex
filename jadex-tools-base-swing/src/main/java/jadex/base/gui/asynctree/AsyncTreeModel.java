@@ -1,6 +1,5 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.Starter;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;

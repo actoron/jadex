@@ -40,8 +40,11 @@ public class TransferInfo
 	/** The id. */
 	protected String	id;
 	
-	/** The local file. */
-	protected String	file;
+	/** The name of the local file (without path). */
+	protected String	filename;
+	
+	/** The full path of the local file (including filename). */
+	protected String	filepath;
 	
 	/** The ID of the component at the other side of the transfer (i.e. sender for downloads, receiver for uploads). */
 	protected IComponentIdentifier other;
@@ -77,11 +80,12 @@ public class TransferInfo
 	/**
 	 *  Create a new file transfer info.
 	 */
-	public TransferInfo(boolean download, String id, String file, IComponentIdentifier other, long size)
+	public TransferInfo(boolean download, String id, String filename, String filepath, IComponentIdentifier other, long size)
 	{
 		this.download	= download;
 		this.id = id!=null ? id : UUID.randomUUID().toString();
-		this.file = file;
+		this.filename = filename;
+		this.filepath = filepath;
 		this.other = other;
 		this.size = size;
 	}
@@ -89,21 +93,39 @@ public class TransferInfo
 	//-------- accessors --------
 
 	/**
-	 *  Get the file.
-	 *  @return the file.
+	 *  Get the name of the local file (without path).
+	 *  @return the file name.
 	 */
-	public String getFile()
+	public String getFileName()
 	{
-		return file;
+		return filename;
 	}
 
 	/**
-	 *  Set the file.
-	 *  @param file The file to set.
+	 *  Set the name of the local file (without path).
+	 *  @param filename The file name to set.
 	 */
-	public void setFile(String file)
+	public void setFileName(String filename)
 	{
-		this.file = file;
+		this.filename = filename;
+	}
+
+	/**
+	 *  Get the full path of the local file (including filename). 
+	 *  @return the file path.
+	 */
+	public String getFilePath()
+	{
+		return filepath;
+	}
+
+	/**
+	 *  Set the full path of the local file (including filename). 
+	 *  @param filepath The file pathto set.
+	 */
+	public void setFilePath(String filepath)
+	{
+		this.filepath = filepath;
 	}
 
 	/**

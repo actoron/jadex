@@ -90,10 +90,13 @@ public class PlatformInfo
 		Date connect_time, Date disconnect_time, int msg_cnt, double bytes_received, double total_transmission_time)
 	{
 		this.dbid	= dbid;
-		this.id	= id;
-		this.hostip	= hostip;
-		this.hostname	= hostname;
-		this.scheme	= protocol;
+		
+		// Escape HTML code in strings to avoid cross-site scripting.
+		this.id	= id!=null ? SUtil.makeConform(id) : null;
+		this.hostip	= hostip!=null ? SUtil.makeConform(hostip) : null;
+		this.hostname	= hostname!=null ? SUtil.makeConform(hostname) : null;
+		this.scheme	= scheme!=null ? SUtil.makeConform(protocol) : null;
+		
 		this.connect_time	= connect_time;
 		this.disconnect_time	= disconnect_time;
 		this.msg_cnt	= msg_cnt;
