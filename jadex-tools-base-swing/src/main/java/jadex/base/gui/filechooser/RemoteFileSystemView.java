@@ -4,11 +4,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -68,7 +66,7 @@ public class RemoteFileSystemView extends FileSystemView
 	
 	/**
 	 *  Initialize the remote file system view such that
-	 *  home, default and current directorty as well as roots
+	 *  home, default and current directory as well as roots
 	 *  are available.
 	 */
 	public IFuture<Void>	init()
@@ -458,7 +456,7 @@ public class RemoteFileSystemView extends FileSystemView
 					if(chooser!=null)
 						chooser.rescanCurrentDirectory();
 					
-					System.out.println("Found roots: "+SUtil.arrayToString(files));
+//					System.out.println("Found roots: "+SUtil.arrayToString(files));
 				}
 			});
 		}

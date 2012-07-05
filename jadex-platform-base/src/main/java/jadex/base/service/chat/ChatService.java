@@ -1029,7 +1029,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
-		assert TransferInfo.STATE_WAITING.equals(ti.getState());
+		assert TransferInfo.STATE_WAITING.equals(ti.getState()) : ti.getState();
 		ti.setState(TransferInfo.STATE_TRANSFERRING);
 		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(ti.getId());
 		if(tup2!=null)

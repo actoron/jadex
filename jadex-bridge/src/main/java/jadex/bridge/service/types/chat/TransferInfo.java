@@ -3,6 +3,7 @@ package jadex.bridge.service.types.chat;
 import java.util.UUID;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 
 /**
  *  Information about a requested, ongoing or completed file transfer.
@@ -313,6 +314,6 @@ public class TransferInfo
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof TransferInfo && ((TransferInfo)obj).getId()==getId();
+		return obj instanceof TransferInfo && SUtil.equals(((TransferInfo)obj).getId(), getId());
 	}
 }

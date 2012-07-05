@@ -213,6 +213,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 	/** The remote file chooser (created on demand, if remote). */
 	protected RemoteFileChooser	rfilechooser;
+	
+	/** Map for panels of open accept dialogs to close when transfer has been accepted/rejected/timeouted in background. */
+	protected Map<TransferInfo, JComponent>	dialogs;
 
 	//-------- constructors --------
 	
@@ -227,6 +230,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		this.sound = true;
 		this.autorefresh = true;
 		this.notificationsounds = new HashMap<String, String>();
+		this.dialogs	= new HashMap<TransferInfo, JComponent>();
 		final Future<Void>	ret	= new Future<Void>();
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -387,13 +391,37 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public boolean	canImport(TransferHandler.TransferSupport support)
 					{
-						// Todo: check if chat component is local.
+						boolean	ret = false;
 						
-						boolean	ret	= support.isDrop() && support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-							&& (support.getSourceDropActions()&TransferHandler.COPY)!=0;
-						
-						if(ret)
-							support.setDropAction(TransferHandler.COPY);
+						if(support.isDrop() && support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+							&& (support.getSourceDropActions()&TransferHandler.COPY)!=0 && isLocal())
+						{
+							JTable.DropLocation	droploc	= (JTable.DropLocation)support.getDropLocation();
+							ChatUser cu	= (ChatUser)usertable.getModel().getValueAt(droploc.getRow(), 0);
+							if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
+							{
+								try
+								{
+									boolean	nodirs	= true;
+									List<?>	files	= (List<?>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+	//								System.out.println("importData: "+files);
+									for(int i=0; nodirs && i<files.size(); i++)
+									{
+										nodirs	= !((File)files.get(i)).isDirectory();
+									}
+									
+									if(nodirs)
+									{
+										ret	= true;
+										support.setDropAction(TransferHandler.COPY);
+									}
+								}
+								catch(Exception e)
+								{
+									System.err.println("Drop error: "+e);
+								}
+							}
+						}
 
 						return ret;
 					}
@@ -423,7 +451,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}  
 				});
 
-				final JFileChooser chooser = new JFileChooser(".");
 				MouseListener lis = new MouseAdapter()
 				{
 					public void mousePressed(MouseEvent e) 
@@ -443,24 +470,74 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							int row = usertable.rowAtPoint(e.getPoint());
 							usertable.setRowSelectionInterval(row, row);
 							ChatUser cu = (ChatUser)((UserTableModel)usertable.getModel()).getValueAt(row, 0);
-							createMenu(cu.getComponentIdentifier()).show(e.getComponent(), e.getX(), e.getY());
+							if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
+							{
+								createMenu(cu.getComponentIdentifier()).show(e.getComponent(), e.getX(), e.getY());
+							}
 						}
 					}
 					
 					protected JPopupMenu createMenu(final IComponentIdentifier cid)
 					{
-						// Todo: check if is local, otherwise use remote file chooser.
-						
 						final JPopupMenu menu = new JPopupMenu();
 						JMenuItem mi = new JMenuItem("Send file ...");
 						mi.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
 							{
-								if(JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(panel))
+								if(isLocal())
 								{
-									File file = chooser.getSelectedFile();
-									getService().sendFile(file.getAbsolutePath(), cid);
+									if(filechooser==null)
+									{
+										filechooser = new JFileChooser(".");
+										filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+									}
+									
+									if(JFileChooser.APPROVE_OPTION==filechooser.showOpenDialog(panel))
+									{
+										File file = filechooser.getSelectedFile();
+										if(file!=null)
+										{
+											getService().sendFile(file.getAbsolutePath(), cid);
+										}
+									}									
+								}
+								else
+								{
+									getServiceAccess().addResultListener(new SwingResultListener<IExternalAccess>()
+									{
+										public void customResultAvailable(IExternalAccess ea)
+										{
+											if(rfilechooser==null)
+											{
+												rfilechooser	= new RemoteFileChooser(ea);
+											}
+											
+											// Hack!!! remote file chooser has hack that assumes files without '.' are directories and vice versa
+											// -> accept both (assumed) files and directories and hope that the user only selects actual files. 
+											rfilechooser.chooseFile(null, ".", panel, JFileChooser.FILES_AND_DIRECTORIES, null)
+												.addResultListener(new SwingResultListener<FileData>()
+											{							
+												public void customResultAvailable(FileData file)
+												{
+													if(file!=null)
+													{
+														getService().sendFile(file.getPath(), cid);
+													}
+												}
+												
+												public void customExceptionOccurred(Exception exception)
+												{
+													// ignore...
+												}
+											});							
+										}
+										
+										public void customExceptionOccurred(Exception exception)
+										{
+											// ignore...
+										}
+									});
 								}
 							}
 						});
@@ -842,8 +919,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								
 								if(panel.isShowing())
 								{
-									acceptFile(ti.getFileName(), ti.getSize(), ti.getOther())
-										.addResultListener(new IResultListener<String>()
+									acceptFile(ti).addResultListener(new IResultListener<String>()
 									{
 										public void resultAvailable(String filepath)
 										{
@@ -1270,7 +1346,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 *  Open dialog and check if user wants to receive the file.
 	 *  @return The path name to store the file, if accepted.
 	 */
-	public IFuture<String> acceptFile(final String filename, final long size, final IComponentIdentifier sender)
+	public IFuture<String> acceptFile(final TransferInfo ti)
 	{
 		final Future<String> ret = new Future<String>();
 		
@@ -1279,7 +1355,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		
 		if(isLocal())
 		{
-			File file	= new File(".", filename);
+			File file	= new File(".", ti.getFileName());
 			initial.setResult(new Tuple2<String, Boolean>(file.getAbsolutePath(), file.exists() ? Boolean.TRUE : Boolean.FALSE));
 		}
 		else
@@ -1288,7 +1364,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				public void customResultAvailable(IExternalAccess ea)
 				{
-					SRemoteGui.getFileData(ea, filename)
+					SRemoteGui.getFileData(ea, ti.getFileName())
 						.addResultListener(new SwingExceptionDelegationResultListener<FileData, Tuple2<String, Boolean>>(initial)
 					{
 						public void customResultAvailable(FileData file)
@@ -1304,7 +1380,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		
 		final PropertiesPanel pp = new PropertiesPanel();
 		JPanel fnp = new JPanel(new GridBagLayout());
-		final JTextField tfpath = new JTextField(filename, 15);
+		final JTextField tfpath = new JTextField(ti.getFileName(), 15);
 		JButton bupath = new JButton("...");
 		bupath.addActionListener(new ActionListener()
 		{
@@ -1315,10 +1391,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					if(filechooser==null)
 					{
 						filechooser = new JFileChooser();
-						filechooser.setSelectedFile(new File(tfpath.getText()));
 						filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					}
-					filechooser.setSelectedFile(new File(filechooser.getCurrentDirectory(), filename));
+					filechooser.setSelectedFile(new File(tfpath.getText()));
 					
 					if(JFileChooser.APPROVE_OPTION==filechooser.showDialog(panel, "Save file"))
 					{
@@ -1336,7 +1411,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void customResultAvailable(IExternalAccess ea)
 						{
-							if(rfilechooser!=null)
+							if(rfilechooser==null)
 							{
 								rfilechooser	= new RemoteFileChooser(ea);
 							}
@@ -1379,8 +1454,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //				fnp.add(tfname, new GridBagConstraints(2,0,1,1,1,1,GridBagConstraints.WEST, 
 //					GridBagConstraints.BOTH, new Insets(0,2,0,2),0,0));
 		pp.addComponent("File path: ", fnp);
-		pp.createTextField("Size: ", SUtil.bytesToString(size));
-		pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
+		pp.createTextField("Size: ", SUtil.bytesToString(ti.getSize()));
+		pp.createTextField("Sender: ", ""+(ti.getOther()==null? ti.getOther(): ti.getOther().getName()));
 		
 		initial.addResultListener(new ExceptionDelegationResultListener<Tuple2<String, Boolean>, String>(ret)
 		{
@@ -1389,14 +1464,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				tfpath.setText(result.getFirstEntity());
 				exists[0]	= result.getSecondEntity().booleanValue();
 				
+				dialogs.put(ti, pp);
 				int res	= JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject", "Cancel"}, "Accept");
+				dialogs.remove(ti);
 				if(JOptionPane.YES_OPTION==res)
 				{
 					if(exists[0] && JOptionPane.NO_OPTION==
 						JOptionPane.showConfirmDialog(panel, "File already exists. Are you sure you want to overwrite it?"))
 					{
-						acceptFile(filename, size, sender).addResultListener(new SwingDelegationResultListener<String>(ret));
+						acceptFile(ti).addResultListener(new SwingDelegationResultListener<String>(ret));
 					}
 					else
 					{
@@ -1569,6 +1646,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void updateTransfer(final TransferInfo fi)
 	{
+		// Close open dialogs, if any.
+		if(dialogs.containsKey(fi))
+		{
+			SGUI.getWindowParent(dialogs.get(fi)).dispose();
+		}
+		
 		if(TransferInfo.STATE_COMPLETED.equals(fi.getState()))
 		{
 			notifyChatEvent(NOTIFICATION_FILE_COMPLETE, fi.getOther(), fi, false);
@@ -1672,7 +1755,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							acceptFile(fi.getFileName(), fi.getSize(), fi.getOther())
+							acceptFile(fi)
 								.addResultListener(new IResultListener<String>()
 							{
 								public void resultAvailable(String filepath)
