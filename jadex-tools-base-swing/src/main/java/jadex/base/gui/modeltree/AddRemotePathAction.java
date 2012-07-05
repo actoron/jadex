@@ -81,7 +81,7 @@ public class AddRemotePathAction extends ToolTipAction
 			filechooser	= new RemoteFileChooser(treepanel.getExternalAccess());
 		}
 	
-		IFuture<FileData>	file	= filechooser.chooseFile("Add Remote Path", treepanel, JFileChooser.FILES_AND_DIRECTORIES, new FileFilter()
+		IFuture<FileData>	file	= filechooser.chooseFile("Add Remote Path", null, treepanel, JFileChooser.FILES_AND_DIRECTORIES, new FileFilter()
 		{
 			public String getDescription()
 			{

@@ -55,19 +55,24 @@ public class RemoteFileChooser
 	/**
 	 *  Choose a remote file.
 	 *  @param title	The file chooser title.
+	 *  @param def The default file (if any).
 	 *  @param filename	A file name (without path) to use as default (if any).
 	 *  @param parent	The parent component.
 	 *  @param mode	The file selection mode.
 	 *  @param filter	A file filter to use (if any).
 	 *  @return The absolute path of the file from the remote file system or null if no file was selected.
 	 */
-	public IFuture<FileData>	chooseFile(final String title, final JComponent parent, final int mode, final FileFilter filter)
+	public IFuture<FileData>	chooseFile(final String title, final String def, final JComponent parent, final int mode, final FileFilter filter)
 	{
 		final Future<FileData>	ret	= new Future<FileData>();
 		getFileChooser().addResultListener(new SwingExceptionDelegationResultListener<JFileChooser, FileData>(ret)
 		{
 			public void customResultAvailable(JFileChooser filechooser)
 			{
+				if(def!=null)
+				{
+					filechooser.setSelectedFile(new File(def));
+				}
 				filechooser.setFileSelectionMode(mode);
 				if(filter!=null)
 				{

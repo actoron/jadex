@@ -5,6 +5,7 @@ import jadex.base.gui.RemoteFileChooser;
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -1278,23 +1279,23 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		
 		if(isLocal())
 		{
-			if(filechooser==null)
-			{
-				filechooser = new JFileChooser(".");
-				filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			}
-			filechooser.setSelectedFile(new File(filechooser.getCurrentDirectory(), filename));
-			File file	= filechooser.getSelectedFile();
+			File file	= new File(".", filename);
 			initial.setResult(new Tuple2<String, Boolean>(file.getAbsolutePath(), file.exists() ? Boolean.TRUE : Boolean.FALSE));
 		}
 		else
 		{
-			SRemoteGui.getFileData(getJCC().getPlatformAccess(), filename)
-				.addResultListener(new SwingExceptionDelegationResultListener<FileData, Tuple2<String, Boolean>>(initial)
+			getServiceAccess().addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Tuple2<String, Boolean>>(initial)
 			{
-				public void customResultAvailable(FileData file)
+				public void customResultAvailable(IExternalAccess ea)
 				{
-					initial.setResult(new Tuple2<String, Boolean>(file.getPath(), file.isExists() ? Boolean.TRUE : Boolean.FALSE));
+					SRemoteGui.getFileData(ea, filename)
+						.addResultListener(new SwingExceptionDelegationResultListener<FileData, Tuple2<String, Boolean>>(initial)
+					{
+						public void customResultAvailable(FileData file)
+						{
+							initial.setResult(new Tuple2<String, Boolean>(file.getPath(), file.isExists() ? Boolean.TRUE : Boolean.FALSE));
+						}
+					});					
 				}
 			});
 		}
@@ -1311,6 +1312,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				if(isLocal())
 				{
+					if(filechooser==null)
+					{
+						filechooser = new JFileChooser();
+						filechooser.setSelectedFile(new File(tfpath.getText()));
+						filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					}
+					filechooser.setSelectedFile(new File(filechooser.getCurrentDirectory(), filename));
+					
 					if(JFileChooser.APPROVE_OPTION==filechooser.showDialog(panel, "Save file"))
 					{
 						File file	= filechooser.getSelectedFile();
@@ -1323,17 +1332,34 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				}
 				else
 				{
-					RemoteFileChooser	ch	= new RemoteFileChooser(getJCC().getPlatformAccess());
-					ch.chooseFile("Save file", panel, JFileChooser.FILES_ONLY, null)
-						.addResultListener(new SwingResultListener<FileData>()
-					{							
-						public void customResultAvailable(FileData file)
+					getServiceAccess().addResultListener(new SwingResultListener<IExternalAccess>()
+					{
+						public void customResultAvailable(IExternalAccess ea)
 						{
-							if(file!=null)
+							if(rfilechooser!=null)
 							{
-								tfpath.setText(file.getPath());
-								exists[0]	= file.isExists();
+								rfilechooser	= new RemoteFileChooser(ea);
 							}
+							
+							// Hack!!! remote file chooser has hack that assumes files without '.' are directories and vice versa
+							// -> accept both (assumed) files and directories and hope that the user only selects actual files. 
+							rfilechooser.chooseFile("Save file", tfpath.getText(), panel, JFileChooser.FILES_AND_DIRECTORIES, null)
+								.addResultListener(new SwingResultListener<FileData>()
+							{							
+								public void customResultAvailable(FileData file)
+								{
+									if(file!=null)
+									{
+										tfpath.setText(file.getPath());
+										exists[0]	= file.isExists();
+									}
+								}
+								
+								public void customExceptionOccurred(Exception exception)
+								{
+									// ignore...
+								}
+							});							
 						}
 						
 						public void customExceptionOccurred(Exception exception)

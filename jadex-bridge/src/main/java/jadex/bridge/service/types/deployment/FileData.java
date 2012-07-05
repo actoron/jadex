@@ -80,7 +80,7 @@ public class FileData
 		boolean	floppy	= SUtil.isFloppyDrive(file);
 		
 		this.filename = file.getName();
-		this.path = file.getAbsolutePath();
+		this.path = file.getPath();
 		this.directory = floppy || file.isDirectory();	// Hack to avoid access to floppy disk.
 		this.exists	= floppy || file.exists();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
