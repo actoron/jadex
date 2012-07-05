@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -265,7 +266,7 @@ public class MavenArtifactSearch
             final BooleanQuery query = new BooleanQuery();
             query.add(groupid, Occur.MUST);
             query.add(artid, Occur.MUST);
-
+            
             // we want "jar" artifacts only
             query.add(indexer.constructQuery(MAVEN.PACKAGING, "jar", SearchType.EXACT), Occur.MUST);
             // we want main artifacts only (no classifier)

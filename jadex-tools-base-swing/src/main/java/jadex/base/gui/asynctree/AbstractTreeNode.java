@@ -492,6 +492,28 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	}
 	
 	/**
+	 *  Remove all children.
+	 */
+	public void removeAllChildren()
+	{
+		if(children!=null && children.size()>0)
+		{
+			int[] indices = new int[children.size()];
+			for(int i=0; i<children.size(); i++)
+			{
+				indices[i] = i;
+			}
+			
+			children.clear();
+			
+			model.fireNodesRemoved(this, children.toArray(new ITreeNode[children.size()]), indices);
+			
+			if(searching)
+				dirty	= true;
+		}
+	}
+	
+	/**
 	 *  Test if two nodes are equal.
 	 */
 	public boolean equals(Object obj)

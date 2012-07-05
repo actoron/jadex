@@ -288,6 +288,23 @@ public class AsyncTreeModel implements TreeModel
 			((TreeModelListener)listeners.get(i)).treeNodesRemoved(new TreeModelEvent(this, path.toArray(), new int[]{index}, new Object[]{child}));
 		}
 	}
+	
+	/**
+     *  Inform listeners that a node has been removed
+     */
+	public void fireNodesRemoved(ITreeNode parent, ITreeNode[] childs, int[] indices)
+	{
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
+		
+		List path = buildTreePath(parent);
+		
+//		System.err.println(""+hashCode()+" Node removed: "+child+", "+index+", "+path);
+		
+		for(int i=0; i<listeners.size(); i++)
+		{
+			((TreeModelListener)listeners.get(i)).treeNodesRemoved(new TreeModelEvent(this, path.toArray(), indices, childs));
+		}
+	}
 
     /**
      *  Inform listeners that a node has been added
