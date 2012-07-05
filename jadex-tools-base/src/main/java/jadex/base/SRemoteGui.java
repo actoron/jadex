@@ -14,6 +14,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
@@ -25,6 +26,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
@@ -236,5 +238,20 @@ public class SRemoteGui
 				return ret;
 			}
 		});
+	}
+	
+	/**
+	 *  Get the file info of a remote path.
+	 */
+	public static IFuture<FileData>	getFileData(IExternalAccess platformaccess, final String path)
+	{
+		return platformaccess.scheduleStep(new IComponentStep<FileData>()
+		{
+			@Classname("getRemoteFile")
+			public IFuture<FileData> execute(IInternalAccess ia)
+			{
+				return new Future<FileData>(new FileData(new File(SUtil.convertPathToRelative(path))));
+			}
+		});		
 	}
 }

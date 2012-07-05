@@ -9,6 +9,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
@@ -70,9 +71,9 @@ public class RemoteFileSystemView extends FileSystemView
 	 *  home, default and current directorty as well as roots
 	 *  are available.
 	 */
-	public IFuture	init()
+	public IFuture<Void>	init()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		exta.scheduleStep(new IComponentStep<Object[]>()
 		{
@@ -94,7 +95,7 @@ public class RemoteFileSystemView extends FileSystemView
 				
 				return new Future<Object[]>(ret);
 			}
-		}).addResultListener(new SwingDelegationResultListener<Object[]>(ret)
+		}).addResultListener(new SwingExceptionDelegationResultListener<Object[], Void>(ret)
 		{
 			public void customResultAvailable(Object[] res)
 			{
@@ -498,7 +499,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar, 3)): homedir;
+		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3)): homedir;
 	}
 
 	/**
@@ -532,7 +533,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar, 3)): currentdir;
+		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3)): currentdir;
 	}
 	
 	/**
@@ -570,7 +571,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, "unknown", 0, File.separatorChar, 3)): defaultdir;
+		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3)): defaultdir;
 	}
 
 	/**
@@ -598,8 +599,9 @@ public class RemoteFileSystemView extends FileSystemView
 			RemoteFile rdir = (RemoteFile)dir;
 			FileData fd = rdir.getFiledata();
 			String path = fd.getPath()+fd.getSeparatorChar()+filename;
-			boolean isdir = filename.indexOf(".")==-1; // directory if no point in name
-			ret = new RemoteFile(new FileData(filename, path, isdir, null, fd.getLastModified(), fd.getSeparatorChar(), fd.getPrefixLength()));
+			boolean isdir = filename.indexOf(".")==-1; // Hack!!! directory if no point in name
+			ret = new RemoteFile(new FileData(filename, path, isdir, true,	// Hack!!! assume existence.
+				null, fd.getLastModified(), fd.getSeparatorChar(), fd.getPrefixLength()));
 		}
 		else if(ret==null)
 		{

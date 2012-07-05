@@ -2569,7 +2569,7 @@ public class SUtil
 		}
 	}
 
-	//-------- FileSystemView abstraction for Android --------
+	//-------- abstractions for Android --------
 	
 	/**
 	 *  Check if a file represents a floppy.
@@ -2587,5 +2587,15 @@ public class SUtil
 	public static String getDisplayName(File file)
 	{
 		return SReflect.isAndroid() ? null : SNonAndroid.getDisplayName(file);
+	}
+
+	/**
+	 *  Test if a call is running on a gui (e.g. Swing or Android UI) thread.
+	 *  Currently returns false on android.
+	 */
+	public static boolean isGuiThread()
+	{
+		// Todo: ask android helper for android UI thread.
+		return SReflect.isAndroid() ? false : SNonAndroid.isGuiThread();
 	}
 }

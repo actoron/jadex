@@ -1,32 +1,21 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.RemoteFileChooser;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filechooser.RemoteFileSystemView;
 import jadex.base.gui.filetree.FileTreePanel;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 
@@ -49,7 +38,7 @@ public class AddRemotePathAction extends ToolTipAction
 	protected FileTreePanel treepanel;
 	
 	/** The file chooser. */
-	protected JFileChooser filechooser;
+	protected RemoteFileChooser filechooser;
 	
 	//-------- constructors --------
 	
@@ -87,95 +76,39 @@ public class AddRemotePathAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-//		final String filename = JOptionPane.showInputDialog("Enter remote path");
-		
-		// todo: move to constructor, currently produces nullpointer
-		IFuture	chooseravailable;
 		if(filechooser==null)
 		{
-			final Future	fut	= new Future();
-			chooseravailable	= fut;
-			final RemoteFileSystemView view = new RemoteFileSystemView(treepanel.getExternalAccess());
-			view.init().addResultListener(new SwingDelegationResultListener(fut)
-			{
-				public void customResultAvailable(Object result)
-				{
-					filechooser = new JFileChooser(view.getCurrentDirectory(), view);
-					view.setFileChooser(filechooser);
-					filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-					filechooser.addChoosableFileFilter(new FileFilter()
-					{
-						public String getDescription()
-						{
-							return "Paths or .jar files";
-						}
-			
-						public boolean accept(File f)
-						{
-							String name = f.getName().toLowerCase();
-							return f.isDirectory() || name.endsWith(".jar");
-						}
-					});
-					JPanel pan = new JPanel(new GridBagLayout());
-					JButton refresh = new JButton("Refresh");
-					pan.add(refresh, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST,
-						GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
-					filechooser.setAccessory(pan);
-					refresh.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							view.clearCache();
-							filechooser.rescanCurrentDirectory();
-						}
-					});
-					fut.setResult(null);
-				}
-			});
+			filechooser	= new RemoteFileChooser(treepanel.getExternalAccess());
 		}
-		else
+	
+		IFuture<FileData>	file	= filechooser.chooseFile("Add Remote Path", treepanel, JFileChooser.FILES_AND_DIRECTORIES, new FileFilter()
 		{
-			chooseravailable	= IFuture.DONE;
-		}
+			public String getDescription()
+			{
+				return "Paths or .jar files";
+			}
+
+			public boolean accept(File f)
+			{
+				String name = f.getName().toLowerCase();
+				return f.isDirectory() || name.endsWith(".jar");
+			}
+		});
 		
-		chooseravailable.addResultListener(new SwingDefaultResultListener()
+		file.addResultListener(new SwingDefaultResultListener<FileData>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(FileData result)
 			{
-				if(filechooser.showDialog(SGUI.getWindowParent(treepanel), 
-					"Add Remote Path")==JFileChooser.APPROVE_OPTION)
+				if(treepanel.getModel().getNode(result.toString())==null)
 				{
-					File file = filechooser.getSelectedFile();
-					if(file!=null)
-					{
-//						final String	path	= file.getAbsolutePath();
-						final String	path	= file.getPath();
-						
-						treepanel.getExternalAccess().scheduleStep(new IComponentStep<FileData>()
-						{
-							@Classname("getRemoteFile")
-							public IFuture<FileData> execute(IInternalAccess ia)
-							{
-								return new Future<FileData>(new FileData(new File(SUtil.convertPathToRelative(path))));
-							}
-						}).addResultListener(new SwingDefaultResultListener<FileData>()
-						{
-							public void customResultAvailable(FileData result)
-							{
-								if(treepanel.getModel().getNode(result.toString())==null)
-								{
-									treepanel.addTopLevelNode(result);
-								}
-								else
-								{
-									// Todo: already added to library service (remove?)
-									String	msg	= SUtil.wrapText("Path can not be added twice:\n"+((FileData)result).getPath());
-									JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
-										msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
-								}
-							}
-						});
-					}
+					treepanel.addTopLevelNode(result);
+				}
+				else
+				{
+					// Todo: already added to library service (remove?)
+					String	msg	= SUtil.wrapText("Path can not be added twice:\n"+((FileData)result).getPath());
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
+						msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});

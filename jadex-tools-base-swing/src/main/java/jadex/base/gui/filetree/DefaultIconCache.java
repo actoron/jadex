@@ -70,7 +70,7 @@ public class DefaultIconCache implements IIconCache
 					// Case dir in Jar
 					if(file instanceof JarAsDirectory && suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
 					{
-						tmp = new RemoteFile(new FileData(file.getName(), "", true, FileData.getDisplayName(file), 
+						tmp = new RemoteFile(new FileData(file.getName(), "", true, true, FileData.getDisplayName(file), 
 							file.lastModified(), File.separatorChar, FileData.getPrefixLength(file)));
 						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 					}
@@ -142,7 +142,7 @@ public class DefaultIconCache implements IIconCache
 						if(ret==null)
 						{
 							tmp = new RemoteFile(new FileData(file.getFilename(), "", 
-								true, file.getDisplayName(), file.getLastModified(), File.separatorChar, file.getPrefixLength()));
+								true, true, file.getDisplayName(), file.getLastModified(), File.separatorChar, file.getPrefixLength()));
 							ret = FileSystemView.getFileSystemView().getSystemIcon(tmp); 
 						}
 					}

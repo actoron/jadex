@@ -83,7 +83,7 @@ public class RemoteFile extends File
 	 */
 	public boolean exists()
 	{
-		return true;	// hack???
+		return filedata.isExists();
 	}
 	
 	/**
@@ -169,7 +169,7 @@ public class RemoteFile extends File
     		{
     			name = pa.substring(lindex+1);
     		}
-    		ret = new RemoteFile(new FileData(name, path, true, name, filedata.getLastModified(), 
+    		ret = new RemoteFile(new FileData(name, path, true, true, name, filedata.getLastModified(), 
     			filedata.getSeparatorChar(), filedata.getPrefixLength()));
     	}
 //    	System.out.println("getPaF: "+getPath()+" "+pa);

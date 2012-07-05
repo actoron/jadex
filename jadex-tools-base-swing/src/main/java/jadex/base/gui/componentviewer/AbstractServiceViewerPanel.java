@@ -98,6 +98,15 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	}
 	
 	/**
+	 *  Test if the service is a local service.
+	 */
+	public boolean	isLocal()
+	{
+		return ((IService)getService()).getServiceIdentifier().getProviderId().getRoot()
+			.equals(getJCC().getJCCAccess().getComponentIdentifier().getRoot());
+	}
+	
+	/**
 	 *  Get the service.
 	 */
 	public T getService()

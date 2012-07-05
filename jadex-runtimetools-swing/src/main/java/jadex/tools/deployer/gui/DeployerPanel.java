@@ -6,16 +6,13 @@ import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.service.types.deployment.FileContent;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
@@ -33,7 +30,6 @@ import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 /**
@@ -101,23 +97,23 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		// Only save properties of local panels.
 		DeploymentServiceViewerPanel	dsvp1	= (DeploymentServiceViewerPanel)p1.getCurrentPanel();
 		DeploymentServiceViewerPanel	dsvp2	= (DeploymentServiceViewerPanel)p2.getCurrentPanel();
-		IFuture	p1props	= dsvp1!=null && !dsvp1.getFileTreePanel().isRemote()
-			? p1.getProperties() : IFuture.DONE;		
-		final IFuture	p2props	= dsvp2!=null && !dsvp2.getFileTreePanel().isRemote()
-			? p2.getProperties() : IFuture.DONE;
+		IFuture<Properties>	p1props	= dsvp1!=null && !dsvp1.getFileTreePanel().isRemote()
+			? p1.getProperties() : new Future<Properties>((Properties)null);
+		final IFuture<Properties>	p2props	= dsvp2!=null && !dsvp2.getFileTreePanel().isRemote()
+			? p2.getProperties() : new Future<Properties>((Properties)null);
 		
-		p1props.addResultListener(new SwingDelegationResultListener(ret)
+		p1props.addResultListener(new SwingDelegationResultListener<Properties>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Properties result)
 			{
 				if(result!=null)
-					props.addSubproperties("first", (Properties)result);
-				p2props.addResultListener(new SwingDelegationResultListener(ret)
+					props.addSubproperties("first", result);
+				p2props.addResultListener(new SwingDelegationResultListener<Properties>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Properties result)
 					{
 						if(result!=null)
-							props.addSubproperties("second", (Properties)result);
+							props.addSubproperties("second", result);
 						ret.setResult(props);
 					}
 				});
@@ -229,9 +225,9 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					if(sel!=null)
 					{
 						IDeploymentService ds = first.getDeploymentService();
-						ds.deleteFile(sel).addResultListener(new SwingDefaultResultListener()
+						ds.deleteFile(sel).addResultListener(new SwingDefaultResultListener<Void>()
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Void result)
 							{
 								first.refreshTreePaths(new TreePath[]{tp.getParentPath()});
 								jcc.setStatusText("Deleted: "+sel);
@@ -284,9 +280,9 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 						else
 						{
 							IDeploymentService ds = first.getDeploymentService();
-							ds.renameFile(sel, name).addResultListener(new SwingDefaultResultListener()
+							ds.renameFile(sel, name).addResultListener(new SwingDefaultResultListener<String>()
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(String result)
 								{
 									first.refreshTreePaths(new TreePath[]{tp.getParentPath()});
 									jcc.setStatusText("Renamed: "+sel);
@@ -319,9 +315,9 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					if(sel!=null)
 					{
 						IDeploymentService ds = first.getDeploymentService();
-						ds.openFile(sel).addResultListener(new SwingDefaultResultListener()
+						ds.openFile(sel).addResultListener(new SwingDefaultResultListener<Void>()
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Void result)
 							{
 								first.refreshTreePaths(new TreePath[]{tp.getParentPath()});
 								jcc.setStatusText("Opened: "+sel);

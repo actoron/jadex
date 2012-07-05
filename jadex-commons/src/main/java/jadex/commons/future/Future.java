@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 
@@ -458,7 +459,7 @@ public class Future<E> implements IFuture<E>
 //			}
 //		}
     	
-    	if(NO_STACK_COMPACTION || STACK.get()==null)
+    	if(NO_STACK_COMPACTION || STACK.get()==null || SUtil.isGuiThread())
     	{
     		List<Tuple2<Future<?>, IResultListener<?>>>	list	= new LinkedList<Tuple2<Future<?>, IResultListener<?>>>();
     		STACK.set(list);

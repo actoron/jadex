@@ -1,7 +1,6 @@
 package jadex.tools.starter.gui;
 
 import jadex.base.SRemoteGui;
-import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.plugin.IControlCenter;
@@ -10,8 +9,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -65,7 +62,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;

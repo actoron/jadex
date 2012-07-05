@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -174,5 +175,14 @@ public class SNonAndroid
 	public static void openFile(String path) throws IOException
 	{
 		Desktop.getDesktop().open(new File(path));
+	}
+
+
+	/**
+	 *  Test if a call is running on the swing thread.
+	 */
+	public static boolean isGuiThread()
+	{
+		return SwingUtilities.isEventDispatchThread();
 	}
 }

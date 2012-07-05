@@ -31,6 +31,9 @@ public class FileData
 	/** The boolean for directory. */
 	protected boolean directory;
 	
+	/** The boolean for existance. */
+	protected boolean exists;
+	
 	/** The display name. */
 	protected String displayname;
 
@@ -56,12 +59,13 @@ public class FileData
 	/**
 	 *  Create a new remote file.
 	 */
-	public FileData(String filename, String path, boolean directory, 
+	public FileData(String filename, String path, boolean directory, boolean exists,
 		String displayname, long lastmodified, char separator, int prefix)
 	{
 		this.filename = filename;
 		this.path = path;
 		this.directory = directory;
+		this.exists	= exists;
 		this.displayname = displayname;
 		this.lastmodified = lastmodified;
 		this.separator = separator;
@@ -73,11 +77,14 @@ public class FileData
 	 */
 	public FileData(File file)
 	{
+		boolean	floppy	= SUtil.isFloppyDrive(file);
+		
 		this.filename = file.getName();
-		this.path = file.getPath();
-		this.directory = SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory();	// Hack to avoid access to floppy disk.
+		this.path = file.getAbsolutePath();
+		this.directory = floppy || file.isDirectory();	// Hack to avoid access to floppy disk.
+		this.exists	= floppy || file.exists();	// Hack to avoid access to floppy disk.
 		this.displayname = getDisplayName(file);
-		this.lastmodified = SUtil.isFloppyDrive(file) ? 0 : file.lastModified();	// Hack to avoid access to floppy disk.
+		this.lastmodified = floppy ? 0 : file.lastModified();	// Hack to avoid access to floppy disk.
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 		this.separator = File.separatorChar;
 		this.prefix = getPrefixLength(file);
@@ -137,6 +144,25 @@ public class FileData
 	public void setDirectory(boolean directory)
 	{
 		this.directory = directory;
+	}
+
+	/**
+	 *  Get the exists flag.
+	 *  @return the exists flag.
+	 */
+	// Hack!!! Strange method name to conform to bean spec.
+	public boolean isExists()
+	{
+		return exists;
+	}
+
+	/**
+	 *  Set the exists flag.
+	 *  @param exists The exists flag to set.
+	 */
+	public void setExists(boolean exists)
+	{
+		this.exists = exists;
 	}
 
 	/**
