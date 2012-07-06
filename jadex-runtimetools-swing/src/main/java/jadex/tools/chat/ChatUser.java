@@ -1,19 +1,22 @@
 package jadex.tools.chat;
 
-import java.awt.Image;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.commons.future.IResultListener;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
+import java.awt.image.BufferedImage;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
 
 /**
- *  Struct to hold the user state.
+ *  Struct to hold the user state in the chat GUI.
  */
 public class ChatUser
 {
@@ -22,13 +25,9 @@ public class ChatUser
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"yellow",	SGUI.makeIcon(ChatPanel.class, "images/user_yellow.png"),
-		"yellow_typing",	SGUI.makeIcon(ChatPanel.class, "images/user_yellow_typing.png"),
-		"red",		SGUI.makeIcon(ChatPanel.class, "images/user_red.png"),
-		IChatService.STATE_IDLE,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
-		IChatService.STATE_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_green_typing.png"),
-		IChatService.STATE_DEAD, SGUI.makeIcon(ChatPanel.class, "images/user_gray.png"),
-		"image",	SGUI.makeIcon(ChatPanel.class, "images/user_anon.png")
+		"overlay_typing",	SGUI.makeIcon(ChatPanel.class, "images/overlay_typing.png"),
+		"overlay_sending",	SGUI.makeIcon(ChatPanel.class, "images/overlay_sending.png"),
+		"default_avatar",	SGUI.makeIcon(ChatPanel.class, "images/user_anon.png")
 	});
 	
 	//-------- attributes --------
@@ -39,55 +38,33 @@ public class ChatUser
 	/** The chat service (if already found). */
 	protected IChatService	chat;
 	
-	/** The user state (idle, typing, ...). */
-	protected String	state;
+	/** The typing flag. */
+	protected boolean	typing;
 	
-	/** The receiving state (id). */
-	protected int receiving;
+	/** The open message ids. */
+	protected Set<Integer>	messages;
 	
 	/** The cached nickname. */
-	protected String nick;
+	protected String	nick;
 	
-	/** The image. */
-	protected byte[] image;
+	/** The avatar image. */
+	protected Icon	avatar;
+	
+	/** The offline detection counter. */
+	protected int	offline;
 	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new chat user.
+	 *  Create a new chat user object.
 	 */
 	public ChatUser(IComponentIdentifier cid)
 	{
 		this.cid	= cid;
-		this.state	= IChatService.STATE_IDLE;
-		this.receiving	= -1;
 		this.nick = "unknown";
+		this.messages	= new HashSet<Integer>();
 	}
 
-	/**
-	 *  Create a new chat user.
-	 */
-	public ChatUser(IChatService chat)
-	{
-		this(((IService)chat).getServiceIdentifier().getProviderId());
-		this.chat	= chat;
-		
-//		if(chat!=null)
-//		{
-			chat.getNickName().addResultListener(new IResultListener<String>()
-			{
-				public void resultAvailable(String result)
-				{
-					nick = result;
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-//		}
-	}
-	
 	//-------- methods --------
 	
 	/**
@@ -95,62 +72,45 @@ public class ChatUser
 	 */
 	public Icon	getIcon()
 	{
-		Icon	ret;
-		if(receiving==-1 || IChatService.STATE_DEAD.equals(state))
+		Icon	ret	= avatar!=null ? avatar : icons.getIcon("default_avatar");
+		
+		if(offline>0)
 		{
-			ret	= icons.getIcon(state);
+			BufferedImage image = new BufferedImage(ret.getIconWidth(), ret.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+	        ret.paintIcon(null, image.getGraphics(), 0, 0);
+			ret	= new ImageIcon(GrayFilter.createDisabledImage(image));
 		}
-		else if(receiving==-2)
+		
+		if(typing && !messages.isEmpty())
 		{
-			ret	= icons.getIcon("red");
+			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_typing"), icons.getIcon("overlay_sending")});
 		}
-		else if(IChatService.STATE_TYPING.equals(state))
+		else if(typing)
 		{
-			ret	= icons.getIcon("yellow_typing");
+			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_typing")});
 		}
-		else //if(IChatService.STATE_IDLE.equals(state))
+		else if(!messages.isEmpty())
 		{
-			ret	= icons.getIcon("yellow");
+			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_sending")});
 		}
+		
 		return ret;
 	}
 	
 	/**
-	 *  Set the state
+	 *  Set the typing state.
 	 */
-	public void	setState(String state)
+	public void	setTyping(boolean typing)
 	{
-		this.state	= state;
-		if(receiving==-2)
-			receiving	= -1;
+		this.typing	= typing;
 	}
 	
 	/**
-	 *  Set the state
+	 *  Get the typing state.
 	 */
-	public void	setReceiving(int id, boolean rec)
+	public boolean isTyping()
 	{
-		if(IChatService.STATE_DEAD.equals(state))
-		{
-			state	= IChatService.STATE_IDLE;
-		}
-		
-		if(rec)
-		{
-			this.receiving	= id;
-		}
-		else if(id==receiving)
-		{
-			this.receiving	= -1;
-		}
-	}
-
-	/**
-	 *  Get the state.
-	 */
-	public String getState()
-	{
-		return state;
+		return typing;
 	}
 
 	/**
@@ -178,59 +138,12 @@ public class ChatUser
 	{
 		return "unknown".equals(nick);
 	}
-
-	/**
-	 *  Get the image.
-	 *  @return the image.
-	 */
-	public byte[] getImage()
-	{
-		byte[] ret = image;
-		if(image==null)
-		{
-			try
-			{
-				Image img = ((ImageIcon)icons.get("image")).getImage();
-				ret = SGUI.imageToStandardBytes(img, "image/png");
-			}
-			catch(Exception e)
-			{
-			}
-		}	
-		return ret;
-	}
-
-	/**
-	 *  Test if image is unknown.
-	 */
-	public boolean isImageUnknown()
-	{
-		return image==null;
-	}
 	
-	/**
-	 *  Set the image.
-	 *  @param image The image to set.
-	 */
-	public void setImage(byte[] image)
-	{
-		this.image = image;
-	}
-
-	/**
-	 *  Get the cid.
-	 *  @return the cid.
-	 */
-	public IComponentIdentifier getComponentIdentifier()
-	{
-		return cid;
-	}
-
 	/**
 	 *  Get the chat.
 	 *  @return the chat.
 	 */
-	public IChatService getChat()
+	public IChatService getChatService()
 	{
 		return chat;
 	}
@@ -244,6 +157,63 @@ public class ChatUser
 	{
 		this.chat = chat;
 	}
+
+	/**
+	 *  Test if image is unknown.
+	 */
+	public boolean isAvatarUnknown()
+	{
+		return avatar==null;
+	}
 	
+	/**
+	 *  Set the image.
+	 *  @param image The image to set.
+	 */
+	public void setAvatar(Icon avatar)
+	{
+		this.avatar = avatar;
+	}
+
+	/**
+	 *  Get the cid.
+	 *  @return the cid.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return cid;
+	}
 	
+	/**
+	 *  Add a message that is currently being sent.
+	 */
+	public void	addMessage(int id)
+	{
+		this.messages.add(new Integer(id));
+	}
+	
+	/**
+	 *  Remove a message when sending is finished.
+	 */
+	public void	removeMessage(int id)
+	{
+		this.messages.remove(new Integer(id));
+	}
+	
+	/**
+	 *  Called when the user has been detected offline or online
+	 *  @return True, when to much offline detections appeared and the user should be removed.
+	 */
+	public boolean	setOffline(boolean offline)
+	{
+		if(!offline)
+		{
+			this.offline	= 0;
+		}
+		else
+		{
+			this.offline++;
+		}
+		return this.offline>=3;
+	}
 }

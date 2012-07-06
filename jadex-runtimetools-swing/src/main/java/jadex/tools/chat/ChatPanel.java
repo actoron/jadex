@@ -132,6 +132,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** The notification sound for a new message. */
 	public static final String	NOTIFICATION_NEW_MSG	= "new msg";
 	
+	/** The notification sound for a failed message. */
+	public static final String	NOTIFICATION_MSG_FAILED	= "msg failed";
+	
 	/** The notification sound for an incoming file request. */
 	public static final String	NOTIFICATION_NEW_FILE	= "new file";
 	
@@ -151,6 +154,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_MSG, "sounds/ping.wav");
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_FILE, "sounds/cuckoo_clock.wav");
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_COMPLETE, "sounds/music_box.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_MSG_FAILED, "sounds/blurps.wav");
 		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_ABORT, "sounds/blurps.wav");
 	}
 	
@@ -172,12 +176,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** The typing state. */
 	protected boolean	typing;
 
-	/** The request counter for coordinating gui updates. */
-	protected int	reqcnt;
-	
-	/** The dead users determined during a request. */
-	protected Set<IComponentIdentifier>	deadusers;
-	
 	/** The download table. */
 	protected JTable dtable;
 	
@@ -216,6 +214,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** Map for panels of open accept dialogs to close when transfer has been accepted/rejected/timeouted in background. */
 	protected Map<TransferInfo, JComponent>	dialogs;
+	
+	/** The message counter to differentiate sent messages. */
+	protected int	reqcnt;
 
 	//-------- constructors --------
 	
@@ -243,37 +244,40 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
 						ChatUser cu = (ChatUser)value;
 						this.setText(cu.getNick()+" ["+cu.getComponentIdentifier()+"]");
-						this.setToolTipText("State: "+cu);
+						if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
+						{
+							this.setToolTipText("Select to send private message.\nRight-click to send file.");
+						}
 						Icon	icon	= cu.getIcon();
 						this.setIcon(icon);
 						return this;
 					}
 				};
 				
-				DefaultTableCellRenderer usericonrend = new DefaultTableCellRenderer()
-				{
-					{
-						this.setHorizontalAlignment(JLabel.CENTER);
-					}
-					
-					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
-					{
-						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-						ChatUser cu = (ChatUser)value;
-//						System.out.println("cu: "+cu.getNick()+" "+cu.getImage());
-						this.setText("");
-						byte[] imgdata	= cu.getImage();
-						if(imgdata!=null)
-						{
-							this.setIcon(new ImageIcon(imgdata));
-						}
-						else
-						{
-							this.setIcon(null);
-						}
-						return this;
-					}
-				};
+//				DefaultTableCellRenderer usericonrend = new DefaultTableCellRenderer()
+//				{
+//					{
+//						this.setHorizontalAlignment(JLabel.CENTER);
+//					}
+//					
+//					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+//					{
+//						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+//						ChatUser cu = (ChatUser)value;
+////						System.out.println("cu: "+cu.getNick()+" "+cu.getImage());
+//						this.setText("");
+//						byte[] imgdata	= cu.getImage();
+//						if(imgdata!=null)
+//						{
+//							this.setIcon(new ImageIcon(imgdata));
+//						}
+//						else
+//						{
+//							this.setIcon(null);
+//						}
+//						return this;
+//					}
+//				};
 				
 				DefaultTableCellRenderer cidrend = new DefaultTableCellRenderer()
 				{
@@ -385,8 +389,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 				
 				JScrollPane userpan = new JScrollPane(usertable);
-				usertable.getColumnModel().getColumn(0).setCellRenderer(usericonrend);
-				usertable.getColumnModel().getColumn(1).setCellRenderer(userrend);
+				usertable.getColumnModel().getColumn(0).setCellRenderer(userrend);
+//				usertable.getColumnModel().getColumn(1).setCellRenderer(userrend);
 				usertable.setTransferHandler(new TransferHandler()
 				{
 					public boolean	canImport(TransferHandler.TransferSupport support)
@@ -548,9 +552,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				usertable.addMouseListener(lis);
 				usertable.getTableHeader().addMouseListener(lis);
 //				usertable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-				usertable.getColumnModel().getColumn(0).setMinWidth(32);
-				usertable.getColumnModel().getColumn(0).setPreferredWidth(64);
-				usertable.getColumnModel().getColumn(0).setMaxWidth(64);
+//				usertable.getColumnModel().getColumn(0).setMinWidth(32);
+//				usertable.getColumnModel().getColumn(0).setPreferredWidth(64);
+//				usertable.getColumnModel().getColumn(0).setMaxWidth(64);
 				
 				Insets	binsets	= new Insets(1, 3, 1, 3);
 				PropertiesPanel pp = new PropertiesPanel("Settings");
@@ -647,8 +651,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				});
 				
-				final JComboBox jcom = new JComboBox(new String[]{NOTIFICATION_FILE_ABORT, 
-					NOTIFICATION_FILE_COMPLETE, NOTIFICATION_NEW_FILE, NOTIFICATION_NEW_MSG, NOTIFICATION_NEW_USER});
+				final JComboBox jcom = new JComboBox(new String[]{NOTIFICATION_NEW_MSG, NOTIFICATION_NEW_USER,
+					NOTIFICATION_MSG_FAILED, NOTIFICATION_NEW_FILE, NOTIFICATION_FILE_ABORT, NOTIFICATION_FILE_COMPLETE});
 				final JTextField jtxt = new JTextField();
 				jtxt.setEditable(false);
 				jtxt.setText(getNotificationSound((String)jcom.getSelectedItem()));
@@ -821,19 +825,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						final String	msg	= tf.getText();
 						tf.setText("");
 						typing	= false;
-						final int	request	= startRequest();
-						tell(msg, request).addResultListener(new SwingResultListener<Void>()
-						{
-							public void customResultAvailable(Void result)
-							{
-								endRequest(request);
-							}
-							
-							public void customExceptionOccurred(Exception exception)
-							{
-								endRequest(request);
-							}
-						});
+						tell(msg);
 					}
 				};
 				tf.addActionListener(al);
@@ -901,12 +893,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						if(ChatEvent.TYPE_MESSAGE.equals(ce.getType()))
 						{
-							addMessage(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick(), ce.isPrivateMessage());
+							addMessage(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick(), ce.isPrivateMessage(), false);
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
 //							System.out.println("state change: "+ce.getComponentIdentifier()+" "+ce.getNick()+" "+ce.getImage());
-							setUserState(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick(), ce.getImage());
+							setUserState(ce.getComponentIdentifier(),
+								!IChatService.STATE_DEAD.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
+								IChatService.STATE_TYPING.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
+								ce.getNick(), ce.getImage());
 						}
 						else if(ChatEvent.TYPE_FILE.equals(ce.getType()))
 						{
@@ -976,16 +971,36 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				if(autorefresh)
 				{
 //					System.out.println("refresh");
+					final Set<ChatUser>	known	= new HashSet<ChatUser>(users.values());
 					
 					getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
 					{
 						public void customIntermediateResultAvailable(final IChatService chat)
 						{
 							final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
+							if(users.containsKey(cid))
+							{
+								known.remove(users.get(cid));
+							}
 							updateChatUser(cid, chat);
 						}
+						
+						public void customFinished()
+						{
+							updateOfflineUsers();
+						}
+						
 						public void customExceptionOccurred(Exception exception)
 						{
+							updateOfflineUsers();
+						}
+						
+						protected void	updateOfflineUsers()
+						{
+							for(ChatUser cu: known)
+							{
+								setUserState(cu.getComponentIdentifier(), Boolean.FALSE, null, null, null);
+							}
 						}
 					});
 				}
@@ -1017,6 +1032,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void createChatUser(final IComponentIdentifier cid, final IChatService chat)
 	{
+		setUserState(cid, null, null, null, null);
+		
 		chat.getNickName().addResultListener(new SwingResultListener<String>()
 		{
 			public void customResultAvailable(final String nick)
@@ -1025,19 +1042,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void customResultAvailable(byte[] img)
 					{
-						setUserState(cid, null, nick, img);
+						setUserState(cid, null, null, nick, img);
 					}
 					
 					public void customExceptionOccurred(Exception exception)
 					{
-						setUserState(cid, null, nick, null);
 					}
 				});
 			}
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				setUserState(cid, null, null, null);
 			}
 		});
 	}
@@ -1057,7 +1072,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void customResultAvailable(final String nick)
 						{
-							setUserState(cu.getComponentIdentifier(), null, nick, null);
+							setUserState(cu.getComponentIdentifier(), null, null, nick, null);
 						}
 						
 						public void customExceptionOccurred(Exception exception)
@@ -1072,7 +1087,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			});
 		}
 		
-		if(cu.isImageUnknown())
+		if(cu.isAvatarUnknown())
 		{
 			getChatService(cu).addResultListener(new IResultListener<IChatService>()
 			{
@@ -1082,7 +1097,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void customResultAvailable(final byte[] img)
 						{
-							setUserState(cu.getComponentIdentifier(), null, null, img);
+							setUserState(cu.getComponentIdentifier(), null, null, null, img);
 						}
 						
 						public void customExceptionOccurred(Exception exception)
@@ -1103,9 +1118,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected IFuture<IChatService> getChatService(final ChatUser cu)
 	{
-		if(cu.getChat()!=null)
+		if(cu.getChatService()!=null)
 		{
-			return new Future<IChatService>(cu.getChat());
+			return new Future<IChatService>(cu.getChatService());
 		}
 		else
 		{
@@ -1154,30 +1169,79 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 *  Send a message.
 	 *  @param text The text.
 	 */
-	public IFuture<Void>	tell(String text, final int request)
+	public IFuture<Void>	tell(final String text)
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		
+		// Remember known/target users to determine send failures.
+		final Set<ChatUser>	sendusers	= new HashSet<ChatUser>();
+		final int id	= ++reqcnt;
+		
 		int[] sels = usertable.getSelectedRows();
 		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
-		for(int i=0; i<sels.length; i++)
+		if(sels.length>0)
 		{
-			recs[i] = ((ChatUser)usertable.getModel().getValueAt(sels[i], 0)).getComponentIdentifier();
-		}
-		getService().message(text, recs, true).addResultListener(new IntermediateDefaultResultListener<IChatService>()
-		{
-			public void intermediateResultAvailable(final IChatService chat)
+			for(int i=0; i<sels.length; i++)
 			{
-				setReceiving(chat, request, false);
+				ChatUser	cu	= (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
+				cu.addMessage(id);
+				sendusers.add(cu);
+				recs[i] = cu.getComponentIdentifier();
+			}
+		}
+		else
+		{
+			for(ChatUser cu: users.values())
+			{
+				cu.addMessage(id);
+				sendusers.add(cu);				
+			}
+		}
+		
+		usertable.repaint();
+
+		getService().message(text, recs, true).addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
+		{
+			public void customIntermediateResultAvailable(final IChatService chat)
+			{
+				ChatUser	cu	= users.get(((IService)chat).getServiceIdentifier().getProviderId());
+				if(cu!=null)
+				{
+					sendusers.remove(cu);
+					cu.removeMessage(id);
+					usertable.repaint();
+				}
 			}
 			
-			public void finished()
+			public void customFinished()
 			{
 				ret.setResult(null);
+				printFailures();
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
+				printFailures();
+			}
+			
+			protected void	printFailures()
+			{
+				if(!sendusers.isEmpty())
+				{
+					StringBuffer	nick	= new StringBuffer();
+					nick.append("failed to deliver message to");
+					for(ChatUser cu: sendusers)
+					{
+						nick.append(" ");
+						nick.append(cu.getNick());
+						nick.append(",");
+						cu.removeMessage(id);
+					}
+					usertable.repaint();
+					addMessage(((IService)getService()).getServiceIdentifier().getProviderId(),
+						text, nick.substring(0, nick.length()-1), false, true); // Strip last comma.
+				}
 			}
 		});
 		
@@ -1190,11 +1254,22 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void>	postStatus(String status, byte[] image)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		getService().status(status, image).addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		
+		int[] sels = usertable.getSelectedRows();
+		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
+		if(sels.length>0)
+		{
+			for(int i=0; i<sels.length; i++)
+			{
+				ChatUser	cu	= (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
+				recs[i] = cu.getComponentIdentifier();
+			}
+		}
+
+		getService().status(status, image, recs).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
 			public void intermediateResultAvailable(final IChatService chat)
 			{
-				setReceiving(chat, -1, false);
 			}
 			
 			public void finished()
@@ -1211,57 +1286,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		return ret;
 	}
 	
-	//-------- helper methods --------
-
-	/**
-	 *  Start an asynchronous request.
-	 *  Used to collect dead users.
-	 */
-	protected int	startRequest()
-	{
-		assert SwingUtilities.isEventDispatchThread();
-		// Remember known users to determine dead ones.
-		deadusers	= new HashSet<IComponentIdentifier>(users.keySet());
-		return ++reqcnt;	// Keep track of parallel sendings and update gui only for last.		
-	}
-	
-	/**
-	 *  Called on request end
-	 *  Used to collect dead users.
-	 */
-	protected void	endRequest(int request)
-	{
-		assert SwingUtilities.isEventDispatchThread();
-		// Set states of unavailable users to dead
-		if(request==reqcnt)
-		{
-			for(IComponentIdentifier cid: deadusers)
-			{
-				if(users.containsKey(cid))
-					users.get(cid).setState(IChatService.STATE_DEAD);
-			}
-			((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
-			usertable.getParent().invalidate();
-			usertable.getParent().doLayout();
-			usertable.repaint();
-		}
-	}
-	
-	/**
-	 *  Add a user or change its state.
-	 */
-	public void	setReceiving(final IChatService chat, final int receiving, final boolean b)
-	{
-		IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
-		setUserState(cid, null, null, null, receiving, b);
-	}
-
-	//-------- methods called from service --------
+	//-------- methods called on updates from service --------
 	
 	/**
 	 *  Add a message to the text area.
 	 */
-	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage)
+	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage, final boolean sendfailure)
 	{
 		SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingResultListener<IClockService>()
@@ -1272,12 +1302,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
 					.append(nick).append("]: ").append(text).append(lf);
 //							.append(cid.getName()).append("]: ").append(text).append(lf);
-				append(privatemessage? Color.RED: Color.BLACK, buf.toString(), chatarea);
+				append(sendfailure ? Color.GRAY : privatemessage? Color.RED: Color.BLACK, buf.toString(), chatarea);
 //						chatarea.append(Color.BLACK, buf.toString());
 				
-				notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
+				notifyChatEvent(sendfailure ? NOTIFICATION_MSG_FAILED : NOTIFICATION_NEW_MSG, cid, text, false);
 				
-				setUserState(cid, null, null, null);
+				setUserState(cid, Boolean.TRUE, null, null, null);
 			}
 			
 			public void customExceptionOccurred(Exception exception)
@@ -1290,16 +1320,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier cid, final String newstate, final String nickname, final byte[] image)
-	{
-		this.setUserState(cid, newstate, nickname, image, -1, false);
-	}
-	
-	/**
-	 *  Add a user or change its state.
-	 */
-	public void	setUserState(final IComponentIdentifier cid, final String newstate, final String nickname, 
-		final byte[] image, final int id, final boolean rec)
+	public void	setUserState(final IComponentIdentifier cid, final Boolean online, final Boolean typing, final String nickname, final byte[] image)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -1307,8 +1328,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			public void run()
 			{
 				boolean	isnew	= false;
-				if(deadusers!=null)
-					deadusers.remove(cid);
+				boolean	isdead	= false;
 				ChatUser	cu	= users.get(cid);
 				if(cu==null)
 				{
@@ -1316,27 +1336,41 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					users.put(cid, cu);
 					isnew	= true;
 				}
-				else if(IChatService.STATE_DEAD.equals(cu.getState()))
+				
+				if(online!=null)
 				{
-					isnew	= true;
+					isdead	= cu.setOffline(!online.booleanValue());
 				}
-				if(newstate!=null)
-					cu.setState(newstate);
-				if(nickname!=null)
-					cu.setNick(nickname);
-				if(image!=null)
-					cu.setImage(image);
-				if(id!=-1)
-					cu.setReceiving(id, rec);
+				
+				if(isdead)
+				{
+					users.remove(cid);
+				}
+				else
+				{
+					if(typing!=null)
+					{
+						cu.setTyping(typing.booleanValue());
+					}
+					if(nickname!=null)
+					{
+						cu.setNick(nickname);
+					}
+					if(image!=null)
+					{
+						cu.setAvatar(new ImageIcon(image));
+					}
+					
+					if(isnew)
+					{
+						notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, false);
+					}
+				}
+				
 				((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
 				usertable.getParent().invalidate();
 				usertable.getParent().doLayout();
 				usertable.repaint();
-				
-				if(isnew)
-				{
-					notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, false);
-				}
 			}
 		});
 	}
@@ -1501,12 +1535,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected void	notifyChatEvent(String type, IComponentIdentifier source, Object value, boolean quiet)
 	{
 		// Ignore own messages and own online/offline state changes
-		if(!((IService)getService()).getServiceIdentifier().getProviderId().equals(source))
+		if(!((IService)getService()).getServiceIdentifier().getProviderId().equals(source)
+			|| NOTIFICATION_MSG_FAILED.equals(type))
 		{
 			String	text	= null;
 			if(NOTIFICATION_NEW_MSG.equals(type))
 			{
 				text	= "New chat message from "+source+": "+value;
+			}
+			else if(NOTIFICATION_MSG_FAILED.equals(type))
+			{
+				text	= "Chat message failed: "+value;
 			}
 			else if(NOTIFICATION_NEW_USER.equals(type))
 			{
@@ -1631,7 +1670,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //				Thread.yield();
 //			}
 		}
-		catch(Exception e)
+		catch(Throwable e)	// AssertionError in org.classpath.icedtea.pulseaudio.Stream.disconnect(Stream.java:557) grrr...
 		{
 			if(verbose)
 			{
@@ -1887,7 +1926,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public class UserTableModel	extends DefaultTableModel
 	{
-		protected String[]	columns	= new String[]{"Avatar", "Users"};
+		protected String[]	columns	= new String[]{"Users"};
 		
 		public int getColumnCount()
 		{
@@ -1913,7 +1952,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
 			ChatUser cu = users.get(cids[row]);
-			return cu;//cu.getNick()+" ["+cids[row].getName()+"]";
+			return cu;
 		}
 		
 		public boolean isCellEditable(int row, int column)

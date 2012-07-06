@@ -320,7 +320,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		this.nick	= nick;
 		// Publish new nickname
-		status(null, null);
+		status(null, null, new IComponentIdentifier[0]);
 		return IFuture.DONE;
 	}
 	
@@ -339,7 +339,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		this.image = image;
 		// Publish new image
-		status(null, image);
+		status(null, image, new IComponentIdentifier[0]);
 		return IFuture.DONE;
 	}
 	
@@ -468,7 +468,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 						public void resultAvailable(Void result)
 						{
-							ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
+							ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
 							
 							if(--cnt==0 && finished)
 							{
@@ -501,7 +501,7 @@ public class ChatService implements IChatService, IChatGuiService
 	}
 	
 	/**
-	 * 
+	 *  Helper method for sending message to cid.
 	 */
 	protected IFuture<IChatService> sendTo(final String text, IComponentIdentifier rec, final boolean privatemessage)
 	{
@@ -527,54 +527,148 @@ public class ChatService implements IChatService, IChatGuiService
 	}
 	
 	/**
-	 *  Post a status change from gui.
-	 *  @param status The new status.
-	 *  @param image The new image (only transfer if changed!).
+	 *  Post a status change.
+	 *  @param status The new status or null for no change.
+	 *  @param image The new avatar iamge or null for no change.
 	 */
-	public IIntermediateFuture<IChatService> status(final String status, final byte[] image)
+	public IIntermediateFuture<IChatService> status(final String status, final byte[] image, IComponentIdentifier[] receivers)
 	{
 		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
-		final IIntermediateFuture<IChatService> ifut = agent.getServiceContainer().getRequiredServices("chatservices");
-		ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
+		
+		if(receivers.length>0)
 		{
-			boolean	finished;
-			int cnt	= 0;
-			public void intermediateResultAvailable(final IChatService chat)
+			boolean foundself = false;
+			
+			for(int i=0; i<receivers.length; i++)
 			{
-				cnt++;
-				chat.status(nick, status, image).addResultListener(new IResultListener<Void>()
+				if(agent.getComponentIdentifier().equals(receivers[i]))
 				{
-					public void resultAvailable(Void result)
+					foundself = true;
+				}
+			}
+			
+			final int cnt = (!foundself)? receivers.length+1: receivers.length;
+			
+			final CollectionResultListener<IChatService> lis = new CollectionResultListener<IChatService>(
+				cnt, true, new IResultListener<Collection<IChatService>>()
+			{
+				public void resultAvailable(Collection<IChatService> result) 
+				{
+					ret.setFinished();
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setFinished();
+				}
+			});
+			
+			for(int i=0; i<receivers.length; i++)
+			{
+				statusTo(nick, status, image, receivers[i]).addResultListener(new IResultListener<IChatService>()
+				{
+					public void resultAvailable(IChatService result)
 					{
-						ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
-						
-						if(--cnt==0 && finished)
-						{
-							ret.setFinished();
-						}
+						ret.addIntermediateResultIfUndone(result); // Might return after later exception in service search!?
+						lis.resultAvailable(result);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(--cnt==0 && finished)
-						{
-							ret.setFinished();
-						}
+						lis.exceptionOccurred(exception);
 					}
 				});
 			}
-			public void finished()
+			
+			if(!foundself)
 			{
-				finished	= true;
-				if(finished && cnt==0)
+				statusTo(nick, status, image, agent.getComponentIdentifier()).addResultListener(new IResultListener<IChatService>()
 				{
-					ret.setFinished();
+					public void resultAvailable(IChatService result)
+					{
+						ret.addIntermediateResultIfUndone(result); // Might return after later exception in service search!?
+						lis.resultAvailable(result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						lis.exceptionOccurred(exception);
+					}
+				});
+			}
+		}
+		else //if(receivers.length==0)
+		{
+			final IIntermediateFuture<IChatService> ifut = agent.getServiceContainer().getRequiredServices("chatservices");
+			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
+			{
+				boolean	finished;
+				int cnt	= 0;
+				public void intermediateResultAvailable(final IChatService chat)
+				{
+					cnt++;
+					chat.status(nick, status, image).addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							ret.addIntermediateResultIfUndone(chat);	// Might be called after concurrent exception in service search!
+							
+							if(--cnt==0 && finished)
+							{
+								ret.setFinished();
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(--cnt==0 && finished)
+							{
+								ret.setFinished();
+							}
+						}
+					});
 				}
+				public void finished()
+				{
+					finished	= true;
+					if(finished && cnt==0)
+					{
+						ret.setFinished();
+					}
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Helper method for posting status to cid.
+	 */
+	protected IFuture<IChatService> statusTo(final String nick, final String status, final byte[] image, IComponentIdentifier rec)
+	{
+		final Future<IChatService> ret = new Future<IChatService>();
+		
+		agent.getServiceContainer().getService(IChatService.class, rec)
+			.addResultListener(new DelegationResultListener<IChatService>(ret)
+		{
+			public void customResultAvailable(final IChatService chat)
+			{
+//				ret.setResult(chat);
+				chat.status(nick, status, image).addResultListener(new ExceptionDelegationResultListener<Void, IChatService>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						ret.setResult(chat);
+					}
+				});
 			}
 		});
 		
 		return ret;
 	}
+	
+
 	
 	/**
 	 *  Get a snapshot of the currently managed file transfers.

@@ -48,8 +48,8 @@ public interface IChatService
 	/**
 	 *  Post a status or nick name, or image change.
 	 *  @param nick The (possibly changed) nick name.
-	 *  @param status The new status.
-	 *  @param image The new image.
+	 *  @param status The new status or null for no change.
+	 *  @param image The new image or null for no change.
 	 */
 	public IFuture<Void> status(String nick, String status, byte[] image);
 	

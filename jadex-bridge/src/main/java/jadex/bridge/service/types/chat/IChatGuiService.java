@@ -25,12 +25,12 @@ public interface IChatGuiService
 	public IFuture<String>	getNickName();
 	
 	/**
-	 *  Set the image.
+	 *  Set the avatar image.
 	 */
 	public IFuture<Void>	setImage(byte[] image);
 	
 	/**
-	 *  Get the image.
+	 *  Get the avatar image.
 	 */
 	public IFuture<byte[]>	getImage();
 	
@@ -65,9 +65,10 @@ public interface IChatGuiService
 	
 	/**
 	 *  Post a status change.
-	 *  @param status The new status.
+	 *  @param status The new status or null for no change.
+	 *  @param image The new avatar iamge or null for no change.
 	 */
-	public IIntermediateFuture<IChatService> status(String status, byte[] image);
+	public IIntermediateFuture<IChatService> status(String status, byte[] image, IComponentIdentifier[] receivers);
 
 	//-------- file handling --------
 	
