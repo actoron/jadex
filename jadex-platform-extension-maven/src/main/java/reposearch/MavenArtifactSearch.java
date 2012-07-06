@@ -440,7 +440,7 @@ public class MavenArtifactSearch
 	        NexusIndexer indexer = plexus.lookup(NexusIndexer.class);
 	
 	        // Create context for central repository index
-	        IndexingContext context = indexer.addIndexingContextForced("central-context", 
+	        IndexingContext context = indexer.addIndexingContextForced("central-context", // is context id
 	        	"central", cachedir, indexdir, "http://repo1.maven.org/maven2", null, indexers);
 	        
 	        return context;
