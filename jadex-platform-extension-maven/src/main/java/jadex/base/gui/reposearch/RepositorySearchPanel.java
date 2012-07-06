@@ -271,24 +271,24 @@ public class RepositorySearchPanel extends JPanel
 		
 		performSearch(null);
 		
-		tp.execute(new Runnable()
-		{
-			public void run()
-			{
-				while(true)
-				{
-					try
-					{
-						Thread.sleep(1000);
-						getSelectedArtifactInfo();
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+//		tp.execute(new Runnable()
+//		{
+//			public void run()
+//			{
+//				while(true)
+//				{
+//					try
+//					{
+//						Thread.sleep(1000);
+//						getSelectedArtifactInfo();
+//					}
+//					catch(Exception e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		});
 	}
 	
 	//-------- methods --------
@@ -743,7 +743,8 @@ public class RepositorySearchPanel extends JPanel
 		if(sel!=null)
 		{
 			IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
-			System.out.println("selected: "+node.getArtifactInfo());
+//			System.out.println("selected: "+node.getArtifactInfo());
+			ret = node.getArtifactInfo();
 		}
 		return ret;
 	}
