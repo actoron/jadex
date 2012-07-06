@@ -48,6 +48,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -199,7 +200,7 @@ public class RepositorySearchPanel extends JPanel
 		});
 		
 		tm = new IdTreeModel();
-		tm.setRoot(new IdTreeNode("root", null, tm));
+		tm.setRoot(new IdTreeNode("root", null, tm, false, null, null, null));
 		tree = new JTree(tm);
 		tree.setRootVisible(false);
 		tree.setCellRenderer(new DefaultTreeCellRenderer() 
@@ -269,6 +270,25 @@ public class RepositorySearchPanel extends JPanel
 			2,1,1,0,GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(2,2,2,2),0,0));
 		
 		performSearch(null);
+		
+		tp.execute(new Runnable()
+		{
+			public void run()
+			{
+				while(true)
+				{
+					try
+					{
+						Thread.sleep(1000);
+						getSelectedArtifactInfo();
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 	
 	//-------- methods --------
@@ -355,8 +375,6 @@ public class RepositorySearchPanel extends JPanel
 	            }
 			});
             
-//            for(RepositoryInfo repo: repos.values())
-//            {
             RepositoryInfo repo = (RepositoryInfo)cbrepos.getSelectedItem();
         	getIndexingContext(plexus, repo).addResultListener(new IResultListener<IndexingContext>()
 			{
@@ -373,7 +391,7 @@ public class RepositorySearchPanel extends JPanel
 							{
 								NexusIndexer indexer = plexus.lookup(NexusIndexer.class);
 
-//							        Query q = new QueryParser("title", context.getAnalyzer()).parse("(groupId:jadex OR artifactId:jad) AND packaging:jar");
+//							    Query q = new QueryParser("title", context.getAnalyzer()).parse("(groupId:jadex OR artifactId:jad) AND packaging:jar");
 					            final BooleanQuery query = new BooleanQuery();
 					            BooleanQuery subquery = new BooleanQuery();
 					            subquery.add(indexer.constructQuery(MAVEN.GROUP_ID, exp, SearchType.SCORED), Occur.SHOULD);
@@ -381,13 +399,13 @@ public class RepositorySearchPanel extends JPanel
 					            query.add(subquery, Occur.MUST);
 					            query.add(indexer.constructQuery(MAVEN.PACKAGING, "jar", SearchType.EXACT), Occur.MUST);
 								
-//							            FlatSearchResponse response = indexer.searchFlat(new FlatSearchRequest(query));
-//							            int i=0;
-//										for(ArtifactInfo ai: response.getResults())
-//										{
-//											addArtifactInfo(ai);
-//											status.setText("searching '"+exp+"' ("+(i++)+")");
-//										}
+//							    FlatSearchResponse response = indexer.searchFlat(new FlatSearchRequest(query));
+//							    int i=0;
+//								for(ArtifactInfo ai: response.getResults())
+//								{
+//									addArtifactInfo(ai);
+//									status.setText("searching '"+exp+"' ("+(i++)+")");
+//								}
 					            
 								final IndexReader reader = context.getIndexReader();
 								final IndexSearcher searcher = new IndexSearcher(reader);
@@ -429,8 +447,8 @@ public class RepositorySearchPanel extends JPanel
 							}
 							catch(Exception e)
 							{
-//										e.printStackTrace();
-//										lis.resultAvailable(null);
+//								e.printStackTrace();
+//								lis.resultAvailable(null);
 								lis.exceptionOccurred(e);
 							}
 						}
@@ -485,14 +503,14 @@ public class RepositorySearchPanel extends JPanel
 			IdTreeNode groupn = tm.getNode(groupkey);
 			if(groupn==null)
 			{
-				groupn = new IdTreeNode(groupkey, null, tm, false, icons.getIcon("folder"), null);
+				groupn = new IdTreeNode(groupkey, null, tm, false, icons.getIcon("folder"), null, null);
 				insertNode((IdTreeNode)tm.getRoot(), groupn, true);
 			}
 			final String artkey = groupkey+":"+ai.artifactId;
 			IdTreeNode artn = tm.getNode(artkey);
 			if(artn==null)
 			{
-				artn = new IdTreeNode(artkey, ai.artifactId, tm, false, icons.getIcon("folder"), null);
+				artn = new IdTreeNode(artkey, ai.artifactId, tm, false, icons.getIcon("folder"), null, null);
 //				System.out.println("add artn: "+artn);
 				insertNode(groupn, artn, true);
 			}
@@ -500,7 +518,7 @@ public class RepositorySearchPanel extends JPanel
 			IdTreeNode vn = tm.getNode(vkey);
 			if(vn==null)
 			{
-				vn = new IdTreeNode(vkey, ai.version+" ["+ai.packaging+"]", tm, true, icons.getIcon("jar"), null);
+				vn = new IdTreeNode(vkey, ai.version+" ["+ai.packaging+"]", tm, true, icons.getIcon("jar"), null, ai);
 //				System.out.println("add vn: "+vn);
 				insertNode(artn, vn, false);
 			}
@@ -716,9 +734,24 @@ public class RepositorySearchPanel extends JPanel
 	}
 	
 	/**
+	 *  Get the selected artifact info.
+	 */
+	public ArtifactInfo getSelectedArtifactInfo()
+	{
+		ArtifactInfo ret = null;
+		TreePath sel = tree.getSelectionPath();
+		if(sel!=null)
+		{
+			IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
+			System.out.println("selected: "+node.getArtifactInfo());
+		}
+		return ret;
+	}
+	
+	/**
      * 
      */
-    public static PlexusContainer createPlexus()
+    protected static PlexusContainer createPlexus()
     {
     	try
     	{
@@ -1138,29 +1171,16 @@ public class RepositorySearchPanel extends JPanel
 		/** The tooltip text. */
 		protected String tooltip;
 		
+		/** The artifact info. */
+		protected ArtifactInfo ai;
+		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a new node.
 		 */
-		public IdTreeNode(String key, String name, IdTreeModel tm)
-		{
-			this(key, name, tm, false);
-		}
-		
-		/**
-		 *  Create a new node.
-		 */
-		public IdTreeNode(String key, String name, IdTreeModel tm, boolean leaf)
-		{
-			this(key, name, tm, leaf, null, null);
-		}
-		
-		/**
-		 *  Create a new node.
-		 */
 		public IdTreeNode(String key, String name, IdTreeModel tm, boolean leaf,
-			Icon icon, String tooltip)
+			Icon icon, String tooltip, ArtifactInfo ai)
 		{
 			this.key = key;
 			this.name = name!=null? name: key;
@@ -1168,6 +1188,7 @@ public class RepositorySearchPanel extends JPanel
 			this.leaf = leaf;
 			this.icon = icon;
 			this.tooltip = tooltip;
+			this.ai = ai;
 		}
 		
 		/**
@@ -1246,6 +1267,15 @@ public class RepositorySearchPanel extends JPanel
 			return tooltip;
 		}
 		
+		/**
+		 *  Get the artifact info.
+		 *  @return The artifact info.
+		 */
+		public ArtifactInfo getArtifactInfo()
+		{
+			return ai;
+		}
+
 		/**
 		 *  Get the string representation.
 		 *  @return The string representation.
