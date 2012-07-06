@@ -43,6 +43,7 @@ public class EdgeReconnectController implements mxIEventListener
 		if (evt.getProperty("edge") instanceof VVirtualActivationEdge)
 		{
 			reconnectVirtualActivationEdge(evt);
+			modelcontainer.setDirty(true);
 		}
 		else if (evt.getProperty("edge") instanceof VEdge)
 		{
@@ -83,6 +84,7 @@ public class EdgeReconnectController implements mxIEventListener
 					}
 				}
 			}
+			modelcontainer.setDirty(true);
 		}
 	}
 	

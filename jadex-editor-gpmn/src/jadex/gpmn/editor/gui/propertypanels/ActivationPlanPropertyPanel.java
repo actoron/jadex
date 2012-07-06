@@ -49,7 +49,7 @@ public class ActivationPlanPropertyPanel extends BasePropertyPanel
 		add(column);
 		
 		JLabel label = new JLabel("Name");
-		JTextArea textarea = new NameArea(getGraph().getModel(), plan);
+		JTextArea textarea = new NameArea(modelcontainer, plan);
 		configureAndAddInputLine(column, label, textarea, y++);
 		
 		label = new JLabel("Activation Plan Semantics");
@@ -73,6 +73,8 @@ public class ActivationPlanPropertyPanel extends BasePropertyPanel
 				}
 				
 				SGuiHelper.refreshCellView(getGraph(), plan);
+				
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(column,label, cbox, y++);

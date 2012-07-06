@@ -49,6 +49,7 @@ public class FoldController implements mxIEventListener
 				if (cells[i] instanceof VPlan && ((VPlan) cells[i]).getPlan() instanceof IActivationPlan)
 				{
 					foldActivationPlan((VPlan) cells[i]);
+					modelcontainer.setDirty(true);
 				}
 			}
 		}

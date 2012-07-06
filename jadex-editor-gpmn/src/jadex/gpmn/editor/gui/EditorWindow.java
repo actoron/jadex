@@ -12,45 +12,51 @@ import jadex.gpmn.editor.gui.propertypanels.BasePropertyPanel;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetColor;
 import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
+import jadex.gpmn.editor.model.gpmn.IModelCodec;
 import jadex.gpmn.editor.model.visual.VNode;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.xmlgraphics.java2d.GraphicContext;
+import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxKeyboardHandler;
 import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 
 public class EditorWindow extends JFrame implements IControllerAccess, IViewAccess
@@ -92,7 +98,7 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 	
 	public EditorWindow()
 	{
-		super("Jadex GPMN Editor " + VERSION);
+		super("Jadex GPMN Editor");// + VERSION);
 		
 		// TODO: Pick and choose factory.
 		mfactory = new GpmnIntermediateModelFactory();
@@ -110,7 +116,10 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				{
 					public void windowClosing(WindowEvent e)
 					{
-						System.exit(0);
+						if (checkUnsaved())
+						{
+							System.exit(0);
+						}
 					}
 				});
 				
@@ -202,11 +211,16 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				JMenu filemenu = new JMenu("File");
 				JMenuItem newitem = new JMenuItem("");
 				JMenuItem openitem = new JMenuItem();
+				JMenuItem saveitem = new JMenuItem();
 				JMenuItem saveasitem = new JMenuItem();
-				JMenuItem exititem = new JMenuItem("Exit");
+				JMenuItem exportitem = new JMenuItem();
+				JMenuItem exititem = new JMenuItem();
 				filemenu.add(newitem);
 				filemenu.add(openitem);
+				filemenu.addSeparator();
+				filemenu.add(saveitem);
 				filemenu.add(saveasitem);
+				filemenu.add(exportitem);
 				filemenu.addSeparator();
 				filemenu.add(exititem);
 				menubar.add(filemenu);
@@ -230,13 +244,17 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						// TODO: Pick right sheet.
-						GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
-						IGpmnModel gpmnmodel = mfactory.createModel();
-						stylegroup.setSelected(colorview.getModel(), true);
-						modelcontainer.setGpmnModel(gpmnmodel);
-						modelcontainer.setGraph(graph);
-						modelcontainer.getGraphComponent().refresh();
+						if (checkUnsaved())
+						{
+							// TODO: Pick right sheet.
+							GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
+							IGpmnModel gpmnmodel = mfactory.createModel();
+							stylegroup.setSelected(colorview.getModel(), true);
+							modelcontainer.setGpmnModel(gpmnmodel);
+							modelcontainer.setGraph(graph);
+							modelcontainer.getGraphComponent().refresh();
+							modelcontainer.setDirty(false);
+						}
 					}
 				});
 				
@@ -244,7 +262,7 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						JFileChooser fc = new JFileChooser();
+						BetterFileChooser fc = new BetterFileChooser();
 						FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
 						fc.addChoosableFileFilter(filter);
 						fc.setFileFilter(filter);
@@ -259,16 +277,33 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 								{
 									file = new File(file.getAbsolutePath() + ".gpmn");
 								}
-								mxIGraphModel graphmodel = gpmnmodel.getModelCodec().readModel(file);
+								mxIGraphModel graphmodel = gpmnmodel.getModelCodec(IModelCodec.CODEC_TYPE_GPMN).readModel(file);
 								
-								// Funny, we need a new graph or we get quirky graphics... Bug?
+								// Funny, we need a new graph or we get quirky graphics (stuck selection marker)... Bug?
 								GpmnGraph graph = new GpmnGraph(EditorWindow.this, new GpmnStylesheetColor());
-								graph.setModel(graphmodel);
+								
+								if (graphmodel == null)
+								{
+									graphmodel = gpmnmodel.generateGraphModel();
+									graph.setModel(graphmodel);
+									mxCompactTreeLayout layout = new mxCompactTreeLayout(graph);
+									layout.setEdgeRouting(false);
+									layout.setHorizontal(false);
+									layout.setNodeDistance(GuiConstants.DEFAULT_GOAL_WIDTH);
+									layout.execute(graph.getDefaultParent());
+								}
+								else
+								{
+									graph.setModel(graphmodel);
+								}
+								
 								stylegroup.setSelected(colorview.getModel(), true);
 								modelcontainer.setGpmnModel(gpmnmodel);
 								modelcontainer.setGraph(graph);
 								modelcontainer.getGraphComponent().refresh();
 								setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
+								
+								modelcontainer.setFile(file);
 							}
 							catch (Exception e1)
 							{
@@ -278,12 +313,92 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 					}
 				});
 				
+				saveitem.setAction(new AbstractAction("Save")
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						File file = modelcontainer.getFile();
+						if (file == null)
+						{
+							BetterFileChooser fc = new BetterFileChooser();
+							FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
+							fc.addChoosableFileFilter(filter);
+							fc.setFileFilter(filter);
+							int result = fc.showSaveDialog(EditorWindow.this);
+							if (JFileChooser.APPROVE_OPTION == result)
+							{
+								file = fc.getSelectedFile();
+								if (!file.getName().endsWith(".gpmn"))
+								{
+									file = new File(file.getAbsolutePath() + ".gpmn");
+								}
+							}
+						}
+						
+						try
+						{
+							modelcontainer.getGpmnModel().getModelCodec(IModelCodec.CODEC_TYPE_GPMN).writeModel(file, modelcontainer.getGraph());
+							modelcontainer.setDirty(false);
+							modelcontainer.setFile(file);
+						}
+						catch (IOException e1)
+						{
+							e1.printStackTrace();
+						}
+					}
+				});
+				
 				saveasitem.setAction(new AbstractAction("Save as...")
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						JFileChooser fc = new JFileChooser();
-						FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
+						BetterFileChooser fc = new BetterFileChooser();
+						FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file (*.gpmn)", "gpmn");
+						fc.addChoosableFileFilter(filter);
+						fc.setFileFilter(filter);
+						filter = new FileNameExtensionFilter("Jadex BDI agent model file (*.agent.xml)", "agent.xml");
+						fc.addChoosableFileFilter(filter);
+						fc.setAcceptAllFileFilterUsed(false);
+						int result = fc.showSaveDialog(EditorWindow.this);
+						if (JFileChooser.APPROVE_OPTION == result)
+						{
+							try
+							{
+								FileNameExtensionFilter ef = (FileNameExtensionFilter) fc.getFileFilter();
+								String ext = "." + ef.getExtensions()[0];
+								File file = fc.getSelectedFile();
+								if (!file.getName().endsWith(ext))
+								{
+									file = new File(file.getAbsolutePath() + ext);
+								}
+								IModelCodec codec = null;
+								if (".gpmn".equals(ext))
+								{
+									codec = modelcontainer.getGpmnModel().getModelCodec(IModelCodec.CODEC_TYPE_GPMN);
+								}
+								else if (".agent.xml".equals(ext))
+								{
+									codec = modelcontainer.getGpmnModel().getModelCodec(IModelCodec.CODEC_TYPE_BDI);
+								}
+								codec.writeModel(file, modelcontainer.getGraph());
+								modelcontainer.setDirty(false);
+								modelcontainer.setFile(file);
+							}
+							catch (IOException e1)
+							{
+								e1.printStackTrace();
+							}
+						}
+					}
+				});
+				
+			    exportitem.setAction(new AbstractAction("Export...")
+			    {
+			        public void actionPerformed(ActionEvent e)
+			        {
+
+						BetterFileChooser fc = new BetterFileChooser();
+						FileFilter filter = new FileNameExtensionFilter("EPS file", "eps");
 						fc.addChoosableFileFilter(filter);
 						fc.setFileFilter(filter);
 						int result = fc.showSaveDialog(EditorWindow.this);
@@ -291,17 +406,70 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 						{
 							try
 							{
-								File file = fc.getSelectedFile();
-								if (!file.getName().endsWith(".gpmn"))
+								EPSDocumentGraphics2D g2d = new EPSDocumentGraphics2D(false);
+								g2d.setGraphicContext(new GraphicContext());
+								
+								GpmnGraph graph = modelcontainer.getGraph();
+								
+								int x = Integer.MAX_VALUE;
+								int y = Integer.MAX_VALUE;
+								int w = 0;
+								int h = 0;
+								
+								for (int i = 0; i < graph.getModel().getChildCount(graph.getDefaultParent()); ++i)
 								{
-									file = new File(file.getAbsolutePath() + ".gpmn");
+									mxICell cell = (mxICell) graph.getModel().getChildAt(graph.getDefaultParent(), i);
+									mxRectangle geo = graph.getCellBounds(cell);
+									//mxGeometry geo = cell.getGeometry();
+									if (geo.getX() < x)
+									{
+										x = (int) geo.getX();
+									}
+									if (geo.getY() < y)
+									{
+										y = (int) geo.getY();
+									}
+									if (geo.getX() + geo.getWidth() - x > w)
+									{
+										w = (int) Math.ceil(geo.getX() + geo.getWidth() - x);
+									}
+									if (geo.getY() + geo.getHeight() - y > h)
+									{
+										h = (int) Math.ceil(geo.getY() + geo.getHeight() - y);
+									}
 								}
-								modelcontainer.getGpmnModel().getModelCodec().writeModel(file, modelcontainer.getGraph());
+								
+								// Avoid cutting off shadows.
+								w += 4;
+								h += 4;
+								
+								File tmpfile = File.createTempFile("export", ".eps");
+								//modelcontainer.getGraphComponent().paint(g)
+								FileOutputStream fos = new FileOutputStream(tmpfile);
+								g2d.setupDocument(fos, w, h);
+								g2d.setClip(0, 0, w, h);
+								g2d.translate(-x, -y);
+								System.out.println(g2d.getClipBounds());
+					        	modelcontainer.getGraphComponent().paint(g2d);
+					        	g2d.finish();
+					        	fos.close();
+					        	tmpfile.renameTo(fc.getSelectedFile());
 							}
 							catch (IOException e1)
 							{
 								e1.printStackTrace();
 							}
+						}
+			        }
+			    });
+				
+				exititem.setAction(new AbstractAction("Exit")
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if (checkUnsaved())
+						{
+							System.exit(0);
 						}
 					}
 				});
@@ -434,65 +602,73 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 	protected void addTools(JToolBar editingtools)
 	{
 		// Selections
-		selecttool = createTool(IViewAccess.SELECT_MODE, "select_on.png", "select_off.png", "Select");
+		selecttool = SGuiHelper.createTool(IViewAccess.SELECT_MODE, "select", "Select");
 		toolgroup.add(selecttool);
 		editingtools.add(selecttool);
 		
 		toolgroup.setSelected(selecttool.getModel(), true);
 		
-		JToggleButton tool = createTool(IViewAccess.CONTROL_POINT_MODE, "cpadd_on.png", "cpadd_off.png", "Add Control Point");
+		JToggleButton tool = SGuiHelper.createTool(IViewAccess.CONTROL_POINT_MODE, "cpadd", "Add Control Point");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Goal Tools
-		tool = createTool(IViewAccess.ACHIEVE_GOAL_MODE, "agoal_on.png", "agoal_off.png", "Add Achieve Goal");
+		tool = SGuiHelper.createTool(IViewAccess.ACHIEVE_GOAL_MODE, "agoal", "Add Achieve Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = createTool(IViewAccess.PERFORM_GOAL_MODE, "pgoal_on.png", "pgoal_off.png", "Add Perform Goal");
+		tool = SGuiHelper.createTool(IViewAccess.PERFORM_GOAL_MODE, "pgoal", "Add Perform Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = createTool(IViewAccess.MAINTAIN_GOAL_MODE, "mgoal_on.png", "mgoal_off.png", "Add Maintain Goal");
+		tool = SGuiHelper.createTool(IViewAccess.MAINTAIN_GOAL_MODE, "mgoal", "Add Maintain Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = createTool(IViewAccess.QUERY_GOAL_MODE, "qgoal_on.png", "qgoal_off.png", "Add Query Goal");
+		tool = SGuiHelper.createTool(IViewAccess.QUERY_GOAL_MODE, "qgoal", "Add Query Goal");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Plan Tools
-		tool = createTool(IViewAccess.BPMN_PLAN_MODE, "bpmnplan_on.png", "bpmnplan_off.png", "Add BPMN Plan");
+		tool = SGuiHelper.createTool(IViewAccess.REF_PLAN_MODE, "plan", "Add Plan");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = createTool(IViewAccess.ACTIVATION_PLAN_MODE, "actplan_on.png", "actplan_off.png", "Add Activation Plan");
+		tool = SGuiHelper.createTool(IViewAccess.ACTIVATION_PLAN_MODE, "actplan", "Add Activation Plan");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Edge Tools
-		tool = createTool(IViewAccess.SUPPRESSION_EDGE_MODE, "suppedge_on.png", "suppedge_off.png", "Draw Suppression Edge");
+		tool = SGuiHelper.createTool(IViewAccess.SUPPRESSION_EDGE_MODE, "suppedge", "Draw Suppression Edge");
 		toolgroup.add(tool);
 		editingtools.add(tool);
 	}
 	
-	protected JToggleButton createTool(String mode, String onimage, String offimage, String tooltip)
+	/**
+	 *  Handles unsaved model deletions.
+	 */
+	protected boolean checkUnsaved()
 	{
-		JToggleButton tool = new JToggleButton();
-		tool.getModel().setActionCommand(mode);
-		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/" + onimage)));
-		tool.setSelectedIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/" + onimage)));
-		tool.setIcon(new ImageIcon(getClass().getResource("/" + getClass().getPackage().getName().replaceAll("\\.", "/") + "/images/" + offimage)));
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText("Add Suppression Edge");
-		return tool;
+		boolean ret = true;
+		if (modelcontainer.isDirty())
+		{
+			int result = JOptionPane.showConfirmDialog(EditorWindow.this, "The model contains unsaved changes, proceed anyway?", "Unsaved Changes",JOptionPane.YES_NO_OPTION);
+	        switch(result)
+	        {
+	            case JOptionPane.NO_OPTION:
+	                ret = false;
+	            case JOptionPane.CLOSED_OPTION:
+	                ret = false;
+	            case JOptionPane.YES_OPTION:
+	            default:
+	        }
+		}
+		return ret;
 	}
 }

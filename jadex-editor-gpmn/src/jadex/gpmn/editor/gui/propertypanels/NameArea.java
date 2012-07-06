@@ -1,6 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.DocumentAdapter;
+import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.model.visual.VElement;
 
 import java.awt.Color;
@@ -12,28 +13,26 @@ import java.awt.event.KeyEvent;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 
-import com.mxgraph.model.mxIGraphModel;
-
 /**
  *  Class representing a text area for name changes on elements.
  *
  */
 public class NameArea extends JTextArea
 {
-	/** The graph model. */
-	protected mxIGraphModel model;
+	/** The model container. */
+	protected IModelContainer modelcontainer;
 	
 	/** The element. */
 	protected VElement velement;
 	
 	/**
 	 *  Creates a new text area.
-	 *  @param gmodel The graph model.
+	 *  @param container The model container.
 	 *  @param visualelement The element.
 	 */
-	public NameArea(mxIGraphModel gmodel, VElement visualelement)
+	public NameArea(IModelContainer container, VElement visualelement)
 	{
-		this.model = gmodel;
+		this.modelcontainer = container;
 		this.velement = visualelement;
 		
 		setText(velement.getElement().getName());
@@ -73,9 +72,10 @@ public class NameArea extends JTextArea
 			public void update(DocumentEvent e)
 			{
 				String newname = getText();
-				model.beginUpdate();
-				model.setValue(velement, newname);
-				model.endUpdate();
+				modelcontainer.getGraph().getModel().beginUpdate();
+				modelcontainer.getGraph().getModel().setValue(velement, newname);
+				modelcontainer.getGraph().getModel().endUpdate();
+				modelcontainer.setDirty(true);
 				if (newname.equals(velement.getElement().getName()))
 				{
 					setBackground(Color.WHITE);

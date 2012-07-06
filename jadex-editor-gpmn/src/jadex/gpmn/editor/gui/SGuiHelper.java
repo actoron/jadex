@@ -1,5 +1,16 @@
 package jadex.gpmn.editor.gui;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JToggleButton;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -10,6 +21,43 @@ import com.mxgraph.view.mxGraph;
 /** Helper methods for the GUI. */
 public class SGuiHelper
 {
+	public static final int ICON_SIZE = 24;
+	
+	public static final JToggleButton createTool(String mode, String imagebasename, String tooltip)
+	{
+		JToggleButton tool = new JToggleButton();
+		tool.getModel().setActionCommand(mode);
+		tool.setContentAreaFilled(false);
+		tool.setPressedIcon(getImageIcon(imagebasename + "_on.png"));
+		tool.setSelectedIcon(getImageIcon(imagebasename + "_on.png"));
+		tool.setIcon(getImageIcon(imagebasename + "_off.png"));
+		tool.setRolloverIcon(getImageIcon(imagebasename + "_high.png"));
+		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
+		tool.setMargin(new Insets(0, 0, 0, 0));
+		tool.setToolTipText(tooltip);
+		return tool;
+	}
+	
+	public static final ImageIcon getImageIcon(String filename)
+	{
+		BufferedImage ret = null;
+		try
+		{
+			Image orig = ImageIO.read(SGuiHelper.class.getResource("/" + SGuiHelper.class.getPackage().getName().replaceAll("\\.", "/") + "/images/" + filename));
+			orig = orig.getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_AREA_AVERAGING);
+			ret = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ret.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(orig, 0, 0, ICON_SIZE, ICON_SIZE, null);
+			g.dispose();
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		return new ImageIcon(ret);
+	}
+	
 	/**
 	 *  Text extraction from the Java "Document" class is braindead,
 	 *  throws non-RuntimeException: Bloat, bloat, bloat.
@@ -44,7 +92,6 @@ public class SGuiHelper
 	 */
 	public static final void refreshCellView(mxGraph graph, mxCell cell)
 	{
-		//graph.getView().removeState(cell);
 		graph.getView().clear(cell, true, false);
 		graph.getView().invalidate(cell);
 		Object[] selcells = graph.getSelectionModel().getCells();

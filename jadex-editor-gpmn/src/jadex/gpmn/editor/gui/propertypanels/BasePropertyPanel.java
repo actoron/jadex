@@ -113,7 +113,7 @@ public class BasePropertyPanel extends JPanel
 		gbc.weighty = 0.0;
 		if (insets)
 		{
-			gbc.insets = new Insets(2, 0, 2, 5);
+			gbc.insets = new Insets(2, 5, 2, 5);
 		}
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.NONE;

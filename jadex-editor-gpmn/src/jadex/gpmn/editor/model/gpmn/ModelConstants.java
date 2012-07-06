@@ -44,7 +44,7 @@ public class ModelConstants
 												   EXCLUDE_WHEN_SUCCEEDED };
 	
 	/** Default exclude mode. */
-	public static final int DEFAULT_EXCLUDE = 1;
+	public static final String DEFAULT_EXCLUDE = EXCLUDE_WHEN_TRIED;
 	
 	/* Condition Languages */
 	/** Java Language */
@@ -57,7 +57,7 @@ public class ModelConstants
 	public String[] LANGUAGES = { LANG_JAVA, LANG_JCL };
 	
 	/** Default language. */
-	public int DEFAULT_LANGUAGE = 0;
+	public String DEFAULT_LANGUAGE = LANG_JAVA;
 	
 	/** Parallel activation mode. */
 	public static final String ACTIVATION_MODE_PARALLEL = "Parallel";
@@ -71,4 +71,10 @@ public class ModelConstants
 	
 	/** Default activation mode. */
 	public static final String ACTIVATION_MODE_DEFAULT = ACTIVATION_MODE_PARALLEL;
+	
+	/** The sequential activation plan class */
+	public static final String ACTIVATION_PLAN_CLASS_SEQUENTIAL = "jadex.gpmn.plan.SequentialActivationPlan";
+	
+	/** The parallel activation plan class */
+	public static final String ACTIVATION_PLAN_CLASS_PARALLEL = "jadex.gpmn.plan.ParallelActivationPlan";
 }

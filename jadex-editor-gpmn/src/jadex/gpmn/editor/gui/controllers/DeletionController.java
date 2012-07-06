@@ -33,12 +33,14 @@ public class DeletionController implements mxIEventListener
 				//System.out.println("Deleting Node: " + cells[i]);
 				INode node = ((VNode) cells[i]).getNode();
 				modelcontainer.getGpmnModel().removeNode(node);
+				modelcontainer.setDirty(true);
 			}
 			else if(cells[i] instanceof VEdge)
 			{
 				//System.out.println("Deleting Edge: " + cells[i]);
 				IEdge edge = ((VEdge) cells[i]).getEdge();
 				modelcontainer.getGpmnModel().removeEdge(edge);
+				modelcontainer.setDirty(true);
 				
 				if (edge instanceof IPlanEdge)
 				{

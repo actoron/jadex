@@ -36,7 +36,7 @@ public class GpmnStylesheetGrayscale extends mxStylesheet
 		style.put(mxConstants.STYLE_FILLCOLOR, "#dadada");
 		
 		// Plan Styles
-		style = (Map<String, Object>) defaultstyles.get(GuiConstants.BPMN_PLAN_STYLE);
+		style = (Map<String, Object>) defaultstyles.get(GuiConstants.REF_PLAN_STYLE);
 		style.put(mxConstants.STYLE_FILLCOLOR, "#dadada");
 		
 		style = (Map<String, Object>) defaultstyles.get(GuiConstants.ACTIVATION_PLAN_STYLE);

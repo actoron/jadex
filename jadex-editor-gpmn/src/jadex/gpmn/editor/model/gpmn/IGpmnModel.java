@@ -1,7 +1,50 @@
 package jadex.gpmn.editor.model.gpmn;
 
+import com.mxgraph.model.mxIGraphModel;
+
 public interface IGpmnModel
 {
+	/**
+	 *  Gets the name.
+	 *  
+	 *  @return The name.
+	 */
+	public String getName();
+	
+	/**
+	 *  Sets the name.
+	 *  
+	 *  @param name The name.
+	 */
+	public void setName(String name);
+	
+	/**
+	 *  Gets the description.
+	 *  
+	 *  @return The description.
+	 */
+	public String getDescription();
+	
+	/**
+	 *  Sets the name.
+	 *  
+	 *  @param description The description.
+	 */
+	public void setDescription(String description);
+	
+	/**
+	 *  Gets the package.
+	 *  
+	 *  @return The package.
+	 */
+	public String getPackage();
+	
+	/**
+	 *  Sets the package.
+	 *  
+	 *  @param pkg The package.
+	 */
+	public void setPackage(String pkg);
 	
 	/**
 	 *  Gets the context.
@@ -60,9 +103,17 @@ public interface IGpmnModel
 	/**
 	 *  Returns the codec for loading and saving models.
 	 *  
+	 *  @param type The type of the codec.
 	 *  @return The codec.
 	 */
-	public IModelCodec getModelCodec();
+	public IModelCodec getModelCodec(String type);
+	
+	/**
+	 *  Generates a visual model for a GPMN model.
+	 *  
+	 *  @return A visual model.
+	 */
+	public mxIGraphModel generateGraphModel();
 	
 	/**
 	 *  Clears the model.

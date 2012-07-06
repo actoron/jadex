@@ -2,7 +2,7 @@ package jadex.gpmn.editor.model.visual;
 
 import jadex.gpmn.editor.gui.GuiConstants;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IBpmnPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.gpmn.INode;
 import jadex.gpmn.editor.model.gpmn.IPlan;
 
@@ -41,9 +41,9 @@ public class VPlan extends VNode implements IPlanModeProvider
 				 GuiConstants.DEFAULT_PLAN_HEIGHT),
 				 null);
 		
-		if (plan instanceof IBpmnPlan)
+		if (plan instanceof IRefPlan)
 		{
-			setStyle(GuiConstants.BPMN_PLAN_STYLE);
+			setStyle(GuiConstants.REF_PLAN_STYLE);
 		}
 		else if (plan instanceof IActivationPlan)
 		{
@@ -171,10 +171,10 @@ public class VPlan extends VNode implements IPlanModeProvider
 				val = "Activate";
 				width = GuiConstants.PLAN_ACTIVATION_MARKER_WIDTH;
 			}
-			else if (getPlan() instanceof IBpmnPlan)
+			else if (getPlan() instanceof IRefPlan)
 			{
-				val = "BPMN";
-				width = GuiConstants.PLAN_BPMN_MARKER_WIDTH;
+				val = "Java";
+				width = GuiConstants.PLAN_REF_MARKER_WIDTH;
 			}
 			
 			setValue(val);

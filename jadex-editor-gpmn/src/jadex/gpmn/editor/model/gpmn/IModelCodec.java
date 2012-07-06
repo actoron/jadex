@@ -13,6 +13,12 @@ import com.mxgraph.view.mxGraph;
  */
 public interface IModelCodec
 {
+	/** GPMN intermediate model codec. */
+	public static final String CODEC_TYPE_GPMN = "gpmn";
+	
+	/** BDI agent model codec. */
+	public static final String CODEC_TYPE_BDI = "bdi";
+	
 	/**
 	 *  Writes the model to a file.
 	 * 

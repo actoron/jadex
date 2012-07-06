@@ -1,21 +1,21 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.model.gpmn.IContext;
+import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.model.gpmn.IParameter;
 
 import javax.swing.table.AbstractTableModel;
 
 public class ContextTableModel extends AbstractTableModel
 {
-	/** The context. */
-	protected IContext context;
+	/** The model container */
+	protected IModelContainer modelcontainer;
 	
 	/**
 	 *  Creates the table model.
 	 */
-	public ContextTableModel(IContext context)
+	public ContextTableModel(IModelContainer modelcontainer)
 	{
-		this.context = context;
+		this.modelcontainer = modelcontainer;
 	}
 	
 	/**
@@ -24,7 +24,8 @@ public class ContextTableModel extends AbstractTableModel
 	public void addParameter()
 	{
 		int newindex = getRowCount();
-		context.addParameter();
+		modelcontainer.getGpmnModel().getContext().addParameter();
+		modelcontainer.setDirty(true);
 		fireTableRowsInserted(newindex, newindex);
 	}
 	
@@ -35,7 +36,8 @@ public class ContextTableModel extends AbstractTableModel
 	 */
 	public void removeParameter(int index)
 	{
-		context.removeParameter(index);
+		modelcontainer.getGpmnModel().getContext().removeParameter(index);
+		modelcontainer.setDirty(true);
 		fireTableRowsDeleted(index, index);
 	}
 	
@@ -46,7 +48,8 @@ public class ContextTableModel extends AbstractTableModel
 	 */
 	public void removeParameters(int[] indexes)
 	{
-		context.removeParameters(indexes);
+		modelcontainer.getGpmnModel().getContext().removeParameters(indexes);
+		modelcontainer.setDirty(true);
 		fireTableStructureChanged();
 	}
 	
@@ -55,7 +58,7 @@ public class ContextTableModel extends AbstractTableModel
 	 */
 	public int getRowCount()
 	{
-		return context.getParameters().size();
+		return modelcontainer.getGpmnModel().getContext().getParameters().size();
 	}
 	
 	/**
@@ -71,7 +74,7 @@ public class ContextTableModel extends AbstractTableModel
 	 */
 	public Object getValueAt(int rowIndex, int columnIndex)
 	{
-		IParameter param = context.getParameters().get(rowIndex);
+		IParameter param = modelcontainer.getGpmnModel().getContext().getParameters().get(rowIndex);
 		Object ret = null;
 		if (columnIndex == 0)
 		{
@@ -97,10 +100,10 @@ public class ContextTableModel extends AbstractTableModel
 	 */
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
 	{
-		IParameter param = context.getParameters().get(rowIndex);
+		IParameter param = modelcontainer.getGpmnModel().getContext().getParameters().get(rowIndex);
 		if (columnIndex == 0)
 		{
-			context.renameParameter(param.getName(), (String) aValue);
+			modelcontainer.getGpmnModel().getContext().renameParameter(param.getName(), (String) aValue);
 		}
 		else if (columnIndex == 1)
 		{
@@ -114,6 +117,7 @@ public class ContextTableModel extends AbstractTableModel
 		{
 			param.setSet((Boolean) aValue);
 		}
+		modelcontainer.setDirty(true);
 		fireTableCellUpdated(rowIndex, columnIndex);
 	}
 	

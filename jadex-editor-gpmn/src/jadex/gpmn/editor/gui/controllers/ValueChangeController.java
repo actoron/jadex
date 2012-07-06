@@ -39,6 +39,7 @@ public class ValueChangeController implements mxIEventListener
 				if (vedge.getEdge() instanceof IActivationEdge)
 				{
 					updateActivationEdgeOrder(vc, vedge);
+					modelcontainer.setDirty(true);
 				}
 				else if (vedge instanceof VVirtualActivationEdge)
 				{
@@ -49,6 +50,7 @@ public class ValueChangeController implements mxIEventListener
 					{
 						SGuiHelper.refreshCellView(modelcontainer.getGraph(), virtedge);
 					}
+					modelcontainer.setDirty(true);
 				}
 			}
 		}

@@ -2,12 +2,12 @@ package jadex.gpmn.editor.gui;
 
 import jadex.gpmn.editor.gui.propertypanels.ActivationPlanPropertyPanel;
 import jadex.gpmn.editor.gui.propertypanels.BasePropertyPanel;
-import jadex.gpmn.editor.gui.propertypanels.BpmnPlanPropertyPanel;
-import jadex.gpmn.editor.gui.propertypanels.ContextPropertyPanel;
+import jadex.gpmn.editor.gui.propertypanels.RefPlanPropertyPanel;
+import jadex.gpmn.editor.gui.propertypanels.GpmnPropertyPanel;
 import jadex.gpmn.editor.gui.propertypanels.GoalPropertyPanel;
 import jadex.gpmn.editor.gui.propertypanels.VirtualActivationEdgePropertyPanel;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IBpmnPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.gpmn.IGoal;
 import jadex.gpmn.editor.model.visual.VElement;
 import jadex.gpmn.editor.model.visual.VGoal;
@@ -40,9 +40,9 @@ public class SPropertyPanelFactory
 			{
 				ret = new GoalPropertyPanel(container, (VGoal) velement);
 			}
-			else if (velement.getElement() instanceof IBpmnPlan)
+			else if (velement.getElement() instanceof IRefPlan)
 			{
-				ret = new BpmnPlanPropertyPanel(container, (VPlan) velement);
+				ret = new RefPlanPropertyPanel(container, (VPlan) velement);
 			}
 			else if (velement.getElement() instanceof IActivationPlan)
 			{
@@ -55,7 +55,7 @@ public class SPropertyPanelFactory
 		}
 		else if (selection == null)
 		{
-			ret = new ContextPropertyPanel(container);
+			ret = new GpmnPropertyPanel(container);
 		}
 		
 		return ret;

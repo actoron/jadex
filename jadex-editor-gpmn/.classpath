@@ -3,6 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/jgraphx.jar" sourcepath="/home/jander/dev/jgraph/jgraphx/src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jadex-commons"/>
+	<classpathentry kind="lib" path="lib/commons-io-1.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/xmlgraphics-commons-1.4.jar" sourcepath="/home/jander/.m2/repository/org/apache/xmlgraphics/xmlgraphics-commons/1.4/xmlgraphics-commons-1.4-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-bdi"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

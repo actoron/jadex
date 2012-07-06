@@ -10,8 +10,8 @@ public class GuiConstants
 	/** Goal type marker style. */
 	public static final String GOAL_TYPE_STYLE = "Goal Type Style";
 	
-	/** BPMN plan style. */
-	public static final String BPMN_PLAN_STYLE = "BPMN Plan Style";
+	/** Referred plan style. */
+	public static final String REF_PLAN_STYLE = "Ref Plan Style";
 	
 	/** Activation plan style. */
 	public static final String ACTIVATION_PLAN_STYLE = "Activation Plan Style";
@@ -89,8 +89,8 @@ public class GuiConstants
 	/** Width of activation plan markers. */
 	public static final int PLAN_ACTIVATION_MARKER_WIDTH = 64;
 	
-	/** Width of BPMN plan markers. */
-	public static final int PLAN_BPMN_MARKER_WIDTH = 48;
+	/** Width of ref plan markers. */
+	public static final int PLAN_REF_MARKER_WIDTH = 48;
 	
 	/** Height of plan markers. */
 	public static final int PLAN_MARKER_HEIGHT = 16;

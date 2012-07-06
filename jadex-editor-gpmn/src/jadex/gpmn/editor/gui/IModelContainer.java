@@ -2,6 +2,8 @@ package jadex.gpmn.editor.gui;
 
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 
+import java.io.File;
+
 import com.mxgraph.swing.mxGraphComponent;
 
 /**
@@ -45,4 +47,53 @@ public interface IModelContainer
 	 *  @param model The model.
 	 */
 	public void setGpmnModel(IGpmnModel model);
+	
+	/** 
+	 *  Sets the dirty model state.
+	 *  
+	 *  @param dirty The dirty state.
+	 */
+	public void setDirty(boolean dirty);
+	
+	/**
+	 *  Tests if the state is dirty.
+	 *  
+	 *  @return True, if dirty.
+	 */
+	public boolean isDirty();
+	
+	/**
+	 *  Gets the project root.
+	 *  
+	 *  @return The project root.
+	 */
+	public File getProjectRoot();
+	
+	/**
+	 *  Sets the project root.
+	 *  
+	 *  @param root The project root.
+	 */
+	public void setProjectRoot(File root);
+	
+	/**
+	 *  Gets the model file.
+	 *  
+	 *  @return The model file.
+	 */
+	public File getFile();
+	
+	/**
+	 *  Sets the model file.
+	 *  
+	 *  @param file The model file.
+	 */
+	public void setFile(File file);
+	
+	/**
+	 *  Returns all available Java classes in the project.
+	 *  
+	 *  @return Array of class names, null if unknown.
+	 */
+	public String[] getProjectClasses();
 }

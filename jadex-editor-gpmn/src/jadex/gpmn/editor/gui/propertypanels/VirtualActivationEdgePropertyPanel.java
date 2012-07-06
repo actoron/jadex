@@ -73,7 +73,7 @@ public class VirtualActivationEdgePropertyPanel extends BasePropertyPanel
 					virtedge.setStyle();
 					SGuiHelper.refreshCellView(getGraph(), virtedge);
 				}
-				
+				modelcontainer.setDirty(true);
 				SGuiHelper.refreshCellView(getGraph(), edge.getPlan());
 			}
 		});

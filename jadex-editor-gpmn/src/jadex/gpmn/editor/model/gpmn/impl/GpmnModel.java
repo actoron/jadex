@@ -2,7 +2,7 @@ package jadex.gpmn.editor.model.gpmn.impl;
 
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IBpmnPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.gpmn.IContext;
 import jadex.gpmn.editor.model.gpmn.IEdge;
 import jadex.gpmn.editor.model.gpmn.IElement;
@@ -12,12 +12,19 @@ import jadex.gpmn.editor.model.gpmn.IModelCodec;
 import jadex.gpmn.editor.model.gpmn.INode;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
 import jadex.gpmn.editor.model.gpmn.ISuppressionEdge;
+import jadex.gpmn.editor.model.visual.VEdge;
+import jadex.gpmn.editor.model.visual.VGoal;
+import jadex.gpmn.editor.model.visual.VPlan;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.mxgraph.model.mxGraphModel;
+import com.mxgraph.model.mxIGraphModel;
+import com.mxgraph.util.mxPoint;
 
 /**
  *  The GPMN model.
@@ -30,24 +37,47 @@ public class GpmnModel implements IGpmnModel
 	static
 	{
 		IMPL_TO_INTERFACE.put(Goal.class, IGoal.class);
-		IMPL_TO_INTERFACE.put(BpmnPlan.class, IBpmnPlan.class);
+		IMPL_TO_INTERFACE.put(RefPlan.class, IRefPlan.class);
 		IMPL_TO_INTERFACE.put(PlanEdge.class, IPlanEdge.class);
 		IMPL_TO_INTERFACE.put(ActivationEdge.class, IActivationEdge.class);
 		IMPL_TO_INTERFACE.put(ActivationPlan.class, IActivationPlan.class);
 		IMPL_TO_INTERFACE.put(SuppressionEdge.class, ISuppressionEdge.class);
 	}
 	
+	/** The name. */
+	protected String name;
+	
+	/** The description. */
+	protected String description;
+	
+	/** The package. */
+	protected String pkg;
+	
 	/** The name repository. */
-	protected NameRepository namerepository = new NameRepository();
+	protected NameRepository namerepository;
 	
 	/** Model nodes. */
-	protected Map<Class, Set<INode>> nodes = new HashMap<Class, Set<INode>>();
+	protected Map<Class, Set<INode>> nodes;
 	
 	/** Model edges. */
-	protected Map<Class, Set<IEdge>> edges = new HashMap<Class, Set<IEdge>>();
+	protected Map<Class, Set<IEdge>> edges;
 	
 	/** The context. */
-	protected IContext context = new Context();
+	protected IContext context;
+	
+	/**
+	 *  Creates a new model.
+	 */
+	public GpmnModel()
+	{
+		name = "Unnamed Model";
+		description = "";
+		pkg = "";
+		namerepository = new NameRepository();
+		nodes = new HashMap<Class, Set<INode>>();
+		edges = new HashMap<Class, Set<IEdge>>();
+		context = new Context();
+	}
 	
 	/**
 	 *  Gets the name repository.
@@ -57,6 +87,66 @@ public class GpmnModel implements IGpmnModel
 	public NameRepository getNameRepository()
 	{
 		return namerepository;
+	}
+	
+	/**
+	 *  Gets the name.
+	 *  
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+	
+	/**
+	 *  Sets the name.
+	 *  
+	 *  @param name The name.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	/**
+	 *  Gets the description.
+	 *  
+	 *  @return The description.
+	 */
+	public String getDescription()
+	{
+		return this.description;
+	}
+	
+	/**
+	 *  Sets the name.
+	 *  
+	 *  @param description The description.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
+	/**
+	 *  Gets the package.
+	 *  
+	 *  @return The package.
+	 */
+	public String getPackage()
+	{
+		return pkg;
+	}
+	
+	/**
+	 *  Sets the package.
+	 *  
+	 *  @param pkg The package.
+	 */
+	public void setPackage(String pkg)
+	{
+		this.pkg = pkg;
 	}
 	
 	/**
@@ -100,9 +190,9 @@ public class GpmnModel implements IGpmnModel
 			p.setName("Unnamed Plan");
 			node = p;
 		}
-		else if (IBpmnPlan.class.equals(nodetype))
+		else if (IRefPlan.class.equals(nodetype))
 		{
-			BpmnPlan p = new BpmnPlan(this);
+			RefPlan p = new RefPlan(this);
 			p.setName("Unnamed Plan");
 			node = p;
 		}
@@ -232,11 +322,98 @@ public class GpmnModel implements IGpmnModel
 	/**
 	 *  Returns the codec for loading and saving models.
 	 *  
+	 *  @param type The type of the codec.
 	 *  @return The codec.
 	 */
-	public IModelCodec getModelCodec()
+	public IModelCodec getModelCodec(String type)
 	{
-		return new ModelCodec(this);
+		IModelCodec ret = null;
+		if (IModelCodec.CODEC_TYPE_GPMN.equals(type))
+		{
+			ret = new GpmnModelCodec(this);
+		}
+		else if (IModelCodec.CODEC_TYPE_BDI.equals(type))
+		{
+			ret = new BdiModelCodec(this);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Generates a visual model for a GPMN model.
+	 *  
+	 *  @return A visual model.
+	 */
+	public mxIGraphModel generateGraphModel()
+	{
+		mxGraphModel graphmodel = new mxGraphModel();
+		Object root = graphmodel.getRoot();
+		Object parent = graphmodel.getChildAt(root, 0);
+		
+		graphmodel.beginUpdate();
+		
+		Map<String, VGoal> goals = new HashMap<String, VGoal>();
+		Set<INode> nodes = getNodeSet(IGoal.class);
+		for (INode node : nodes)
+		{
+			Goal goal = (Goal) node;
+			VGoal vgoal = new VGoal(goal, new mxPoint());
+			goals.put(goal.getName(), vgoal);
+			graphmodel.add(parent, vgoal, graphmodel.getChildCount(parent));
+		}
+		
+		Map<String, VPlan> plans = new HashMap<String, VPlan>();
+		nodes = getNodeSet(IActivationPlan.class);
+		for (INode node : nodes)
+		{
+			ActivationPlan actplan = (ActivationPlan) node;
+			VPlan vplan = new VPlan(actplan, new mxPoint());
+			plans.put(actplan.getName(), vplan);
+			graphmodel.add(parent, vplan, graphmodel.getChildCount(parent));
+		}
+		
+		nodes = getNodeSet(IRefPlan.class);
+		for (INode node : nodes)
+		{
+			RefPlan refplan = (RefPlan) node;
+			VPlan vplan = new VPlan(refplan, new mxPoint());
+			plans.put(refplan.getName(), vplan);
+			graphmodel.add(parent, vplan, graphmodel.getChildCount(parent));
+		}
+		
+		Set<IEdge> edges = getEdgeSet(IPlanEdge.class);
+		for (IEdge iedge : edges)
+		{
+			PlanEdge edge = (PlanEdge) iedge;
+			VGoal source = goals.get(edge.getSource().getName());
+			VPlan target = plans.get(edge.getTarget().getName());
+			VEdge vedge = new VEdge(source, target, edge);
+			graphmodel.add(parent, vedge, graphmodel.getChildCount(parent));
+		}
+		
+		edges = getEdgeSet(IActivationEdge.class);
+		for (IEdge iedge : edges)
+		{
+			ActivationEdge edge = (ActivationEdge) iedge;
+			VPlan source = plans.get(edge.getSource().getName());
+			VGoal target = goals.get(edge.getTarget().getName());
+			VEdge vedge = new VEdge(source, target, edge);
+			graphmodel.add(parent, vedge, graphmodel.getChildCount(parent));
+		}
+		
+		edges = getEdgeSet(ISuppressionEdge.class);
+		for (IEdge iedge : edges)
+		{
+			SuppressionEdge edge = (SuppressionEdge) iedge;
+			VGoal source = goals.get(edge.getSource().getName());
+			VGoal target = goals.get(edge.getTarget().getName());
+			VEdge vedge = new VEdge(source, target, edge);
+			graphmodel.add(parent, vedge, graphmodel.getChildCount(parent));
+		}
+		
+		graphmodel.endUpdate();
+		
+		return graphmodel;
 	}
 	
 	/**

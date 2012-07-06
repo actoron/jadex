@@ -109,7 +109,7 @@ public class GpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_FONTSIZE, 10);
-		putCellStyle(GuiConstants.BPMN_PLAN_STYLE, style);
+		putCellStyle(GuiConstants.REF_PLAN_STYLE, style);
 		
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, "#e3a49c");

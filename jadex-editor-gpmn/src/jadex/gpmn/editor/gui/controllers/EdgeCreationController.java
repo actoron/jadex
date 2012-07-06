@@ -55,6 +55,7 @@ public class EdgeCreationController implements mxIEventListener
 			modelcontainer.getGraph().addCell(vedge);
 			modelcontainer.getGraph().getModel().endUpdate();
 			SGuiHelper.refreshCellView(modelcontainer.getGraph(), (VGoal) source);
+			modelcontainer.setDirty(true);
 		}
 		else if (!(cell instanceof VEdge) && (source instanceof VPlan) &&
 				(((VPlan) source).getPlan() instanceof IActivationPlan) &&
@@ -82,6 +83,7 @@ public class EdgeCreationController implements mxIEventListener
 				modelcontainer.getGraph().addCell(vedge);
 			}
 			modelcontainer.getGraph().getModel().endUpdate();
+			modelcontainer.setDirty(true);
 		}
 		else if (!(cell instanceof VEdge) && (source instanceof VGoal) && (target instanceof VGoal))
 		{
@@ -98,6 +100,7 @@ public class EdgeCreationController implements mxIEventListener
 				modelcontainer.getGraph().removeCells(new Object[] {cell});
 				modelcontainer.getGraph().addCell(vedge);
 				modelcontainer.getGraph().getModel().endUpdate();
+				modelcontainer.setDirty(true);
 			}
 			else
 			{
@@ -157,6 +160,7 @@ public class EdgeCreationController implements mxIEventListener
 						}
 						modelcontainer.getGraph().getModel().endUpdate();
 						modelcontainer.getGraph().refresh();
+						modelcontainer.setDirty(true);
 					}
 					else
 					{
@@ -167,6 +171,7 @@ public class EdgeCreationController implements mxIEventListener
 						}
 						modelcontainer.getGraph().getModel().endUpdate();
 						modelcontainer.getGraph().refresh();
+						modelcontainer.setDirty(true);
 					}
 				}
 				else
@@ -177,8 +182,6 @@ public class EdgeCreationController implements mxIEventListener
 					double x = (sp.getX() + tp.getX()) * 0.5;
 					double y = (sp.getY() + tp.getY()) * 0.5;
 					actplan = new VPlan(plan, x, y);
-								//new Point2D.Double(x - (GpmnStylesheet.DEFAULT_PLAN_WIDTH >>> 1),
-								//	   		   	   y - (GpmnStylesheet.DEFAULT_PLAN_HEIGHT >>> 1)));
 					
 					IEdge pedge = modelcontainer.getGpmnModel().createEdge(vsource.getGoal(), plan, IPlanEdge.class);
 					VEdge pvedge = new VEdge(vsource, actplan, pedge);
@@ -195,9 +198,19 @@ public class EdgeCreationController implements mxIEventListener
 					modelcontainer.getGraph().addCell(avedge);
 					modelcontainer.getGraph().getModel().endUpdate();
 					modelcontainer.getGraph().refresh();
+					modelcontainer.setDirty(true);
 				}
 			}
 			
+		}
+		else
+		{
+			modelcontainer.getGraph().getModel().beginUpdate();
+			if (cell != null)
+			{
+				modelcontainer.getGraph().removeCells(new Object[] {cell});
+			}
+			modelcontainer.getGraph().getModel().endUpdate();
 		}
 	}
 }

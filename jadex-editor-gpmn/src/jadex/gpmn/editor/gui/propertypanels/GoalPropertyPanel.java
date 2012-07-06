@@ -57,7 +57,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 		JPanel column = createColumn(colnum++);
 		
 		JLabel label = new JLabel("Name");
-		JTextArea textarea = new NameArea(getGraph().getModel(), goal);
+		JTextArea textarea = new NameArea(modelcontainer, goal);
 		configureAndAddInputLine(column, label, textarea, y++);
 		
 		label = new JLabel("Type");
@@ -70,6 +70,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			{
 				goal.setGoalType((String) ((JComboBox)e.getSource()).getSelectedItem());
 				SGuiHelper.refreshCellView(getGraph(), goal);
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(column, label, cbox, y++);
@@ -81,6 +82,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			public void update(DocumentEvent e)
 			{
 				goal.getGoal().setContextCondition(SGuiHelper.getText(e.getDocument()));
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(column, label, textarea, y++);
@@ -94,6 +96,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 				public void update(DocumentEvent e)
 				{
 					goal.getGoal().setTargetCondition(SGuiHelper.getText(e.getDocument()));
+					modelcontainer.setDirty(true);
 				}
 			});
 			configureAndAddInputLine(column, label, textarea, y++);
@@ -108,6 +111,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 				public void update(DocumentEvent e)
 				{
 					goal.getGoal().setMaintainCondition(SGuiHelper.getText(e.getDocument()));
+					modelcontainer.setDirty(true);
 				}
 			});
 			configureAndAddInputLine(column, label, textarea, y++);
@@ -120,6 +124,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			public void update(DocumentEvent e)
 			{
 				goal.getGoal().setCreationCondition(SGuiHelper.getText(e.getDocument()));
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(column, label, textarea, y++);
@@ -131,6 +136,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			public void update(DocumentEvent e)
 			{
 				goal.getGoal().setDropCondition(SGuiHelper.getText(e.getDocument()));
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(column, label, textarea, y++);
@@ -166,6 +172,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 								SGuiHelper.refreshCellView(getGraph(), (mxCell) aplanedge.getSource());
 							}
 						}
+						modelcontainer.setDirty(true);
 					}
 				}
 			}
@@ -181,6 +188,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				goal.getGoal().setRandomSelection(((JCheckBox)e.getSource()).isSelected());
+				modelcontainer.setDirty(true);
 			}
 		});
 		
@@ -193,6 +201,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				goal.getGoal().setPostToAll(((JCheckBox)e.getSource()).isSelected());
+				modelcontainer.setDirty(true);
 			}
 		});
 		
@@ -211,6 +220,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 					int delay = Integer.parseInt(SGuiHelper.getText(e.getDocument()));
 					retrydelayarea.setBackground(Color.WHITE);
 					goal.getGoal().setRetryDelay(delay);
+					modelcontainer.setDirty(true);
 				}
 				catch (NumberFormatException e1)
 				{
@@ -224,6 +234,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			{
 				retrydelayarea.setText(String.valueOf(goal.getGoal().getRetryDelay()));
 				retrydelayarea.setBackground(Color.WHITE);
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(retrydelaypanel, delaylabel, retrydelayarea, 0, false);
@@ -239,6 +250,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 				boolean retry = ((JCheckBox)e.getSource()).isSelected();
 				goal.getGoal().setRetry(retry);
 				retrydelaypanel.setVisible(retry);
+				modelcontainer.setDirty(true);
 			}
 		});
 		
@@ -257,6 +269,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 					int delay = Integer.parseInt(SGuiHelper.getText(e.getDocument()));
 					recurdelayarea.setBackground(Color.WHITE);
 					goal.getGoal().setRecurDelay(delay);
+					modelcontainer.setDirty(true);
 				}
 				catch (NumberFormatException e1)
 				{
@@ -270,6 +283,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 			{
 				recurdelayarea.setText(String.valueOf(goal.getGoal().getRecurDelay()));
 				recurdelayarea.setBackground(Color.WHITE);
+				modelcontainer.setDirty(true);
 			}
 		});
 		configureAndAddInputLine(recurdelaypanel, delaylabel, recurdelayarea, 0, false);
@@ -285,6 +299,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 				boolean recur = ((JCheckBox)e.getSource()).isSelected();
 				goal.getGoal().setRecur(recur);
 				recurdelaypanel.setVisible(recur);
+				modelcontainer.setDirty(true);
 			}
 		});
 		

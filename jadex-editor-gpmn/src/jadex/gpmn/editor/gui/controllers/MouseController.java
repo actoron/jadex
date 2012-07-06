@@ -6,7 +6,7 @@ import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.IViewAccess;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IBpmnPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.gpmn.IGoal;
 import jadex.gpmn.editor.model.gpmn.IPlan;
 import jadex.gpmn.editor.model.gpmn.ModelConstants;
@@ -105,6 +105,7 @@ public class MouseController extends MouseAdapter
 					points.add(i, p);
 					
 					SGuiHelper.refreshCellView(modelcontainer.getGraph(), (VEdge) cell);
+					modelcontainer.setDirty(true);
 					
 					viewaccess.getToolGroup().setSelected(viewaccess.getSelectTool().getModel(), true);
 				}
@@ -133,6 +134,7 @@ public class MouseController extends MouseAdapter
 				modelcontainer.getGraph().getModel().beginUpdate();
 				modelcontainer.getGraph().addCell(node);
 				modelcontainer.getGraph().getModel().endUpdate();
+				modelcontainer.setDirty(true);
 			}
 			else if (cell instanceof VVEdgeMarker)
 			{
@@ -175,6 +177,8 @@ public class MouseController extends MouseAdapter
 						{
 							points.remove(index);
 						}
+						
+						modelcontainer.setDirty(true);
 						
 						SGuiHelper.refreshCellView(modelcontainer.getGraph(), (VEdge) cell);
 					}
@@ -288,8 +292,8 @@ public class MouseController extends MouseAdapter
 		{
 			IPlan mplan = null;
 			
-			if (IViewAccess.BPMN_PLAN_MODE.equals(editmode))
-				mplan = (IBpmnPlan) modelcontainer.getGpmnModel().createNode(IBpmnPlan.class);
+			if (IViewAccess.REF_PLAN_MODE.equals(editmode))
+				mplan = (IRefPlan) modelcontainer.getGpmnModel().createNode(IRefPlan.class);
 			else if (IViewAccess.ACTIVATION_PLAN_MODE.equals(editmode))
 				mplan = (IActivationPlan) modelcontainer.getGpmnModel().createNode(IActivationPlan.class);
 			

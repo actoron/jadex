@@ -29,8 +29,8 @@ public interface IViewAccess
 	/** Query Goal Edit Mode */
 	public static final String QUERY_GOAL_MODE		= "Goal_Query";
 	
-	/** BPMN Plan Edit Mode */
-	public static final String BPMN_PLAN_MODE		= "Plan_BPMN";
+	/** Ref Plan Edit Mode */
+	public static final String REF_PLAN_MODE		= "Plan_Ref";
 	
 	/** Activation Plan Edit Mode */
 	public static final String ACTIVATION_PLAN_MODE = "Plan_Activation";
@@ -45,7 +45,7 @@ public interface IViewAccess
 		PERFORM_GOAL_MODE,
 		MAINTAIN_GOAL_MODE,
 		QUERY_GOAL_MODE,
-		BPMN_PLAN_MODE,
+		REF_PLAN_MODE,
 		ACTIVATION_PLAN_MODE
 	}));
 	
