@@ -9,8 +9,12 @@ import jadex.gpmn.editor.model.visual.VPlan.VPlanType;
 
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
@@ -47,7 +51,10 @@ public class RefPlanPropertyPanel extends BasePropertyPanel
 		configureAndAddInputLine(column, label, textarea, y++);
 		
 		label = new JLabel("Plan Reference");
-		textarea = new JTextArea(getRefPlan().getPlanref());
+		JPanel refarea = createTextButtonPanel();
+		
+		textarea = (JTextArea) refarea.getComponent(0);
+		textarea.setText(getRefPlan().getPlanref());
 		textarea.getDocument().addDocumentListener(new DocumentAdapter()
 		{
 			public void update(DocumentEvent e)
@@ -66,7 +73,32 @@ public class RefPlanPropertyPanel extends BasePropertyPanel
 				}
 			}
 		});
-		configureAndAddInputLine(column, label, textarea, y++);
+		JButton button = (JButton) refarea.getComponent(1);
+		button.setAction(new AbstractAction("Find Class...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String[] classes = modelcontainer.getProjectClasses();
+				if (classes != null && classes.length > 0)
+				{
+					String planname = (String) JOptionPane.showInputDialog(
+					                     RefPlanPropertyPanel.this,
+					                     "Select a plan implementation...",
+					                     "Select Plan",
+					                     JOptionPane.PLAIN_MESSAGE,
+					                     null,
+					                     classes,
+					                     null);
+					if ((planname != null) && (planname.length() > 0))
+					{
+						((IRefPlan) plan.getPlan()).setPlanref(planname);
+						((JTextArea) ((JButton) e.getSource()).getParent().getComponent(0)).setText(planname);
+					}
+				}
+			}
+		});
+		
+		configureAndAddInputLine(column, label, refarea, y++);
 		
 		label = new JLabel("Context Condition");
 		textarea = new JTextArea(getRefPlan().getContextCondition());

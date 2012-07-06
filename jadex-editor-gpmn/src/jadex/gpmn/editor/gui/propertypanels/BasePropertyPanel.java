@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -184,5 +185,35 @@ public class BasePropertyPanel extends JPanel
 		add(column, gbc);
 		
 		return column;
+	}
+	
+	/**
+	 *  Helper method for creating a text area/button combination.
+	 *  
+	 *  @return The combined panel.
+	 */
+	protected JPanel createTextButtonPanel()
+	{
+		JPanel ret = new JPanel(new GridBagLayout());
+		
+		JTextArea area = new JTextArea();
+		area.setLineWrap(true);
+		area.setWrapStyleWord(true);
+		area.setBorder(DEFAULT_TEXT_BORDER);
+		
+		//FIXME: Hack for Icedtea...
+		area.setMinimumSize(new Dimension(0, 20));
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.weightx = 1.0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		ret.add(area, gbc);
+		
+		JButton button = new JButton();
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.fill = GridBagConstraints.NONE;
+		ret.add(button, gbc);
+		
+		return ret;
 	}
 }

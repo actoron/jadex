@@ -48,7 +48,7 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 		column.setLayout(new GridBagLayout());
 		tabpane.addTab("Model", column);
 		
-		JLabel label = new JLabel("Name");
+		/*JLabel label = new JLabel("Name");
 		JTextArea textarea = new JTextArea(container.getGpmnModel().getName());
 		textarea.getDocument().addDocumentListener(new DocumentAdapter()
 		{
@@ -58,10 +58,10 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		});
-		configureAndAddInputLine(column, label, textarea, y++);
+		configureAndAddInputLine(column, label, textarea, y++);*/
 		
-		label = new JLabel("Description");
-		textarea = new JTextArea(container.getGpmnModel().getDescription());
+		JLabel label = new JLabel("Description");
+		JTextArea textarea = new JTextArea(container.getGpmnModel().getDescription());
 		textarea.getDocument().addDocumentListener(new DocumentAdapter()
 		{
 			public void update(DocumentEvent e)
@@ -155,7 +155,7 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 		tabpane.addTab("Settings", column);
 		
 		label = new JLabel("Project Root");
-		textarea = new JTextArea(container.getGpmnModel().getDescription());
+		textarea = new JTextArea(container.getProjectRoot() != null? container.getProjectRoot().getAbsolutePath() : "");
 		textarea.setEditable(false);
 		textarea.addMouseListener(new MouseAdapter()
 		{

@@ -5,20 +5,6 @@ import com.mxgraph.model.mxIGraphModel;
 public interface IGpmnModel
 {
 	/**
-	 *  Gets the name.
-	 *  
-	 *  @return The name.
-	 */
-	public String getName();
-	
-	/**
-	 *  Sets the name.
-	 *  
-	 *  @param name The name.
-	 */
-	public void setName(String name);
-	
-	/**
 	 *  Gets the description.
 	 *  
 	 *  @return The description.

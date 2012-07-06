@@ -4,6 +4,8 @@ import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -162,7 +164,13 @@ public class ModelContainer implements IModelContainer
 	 */
 	public String[] getProjectClasses()
 	{
-		return null;
+		String[] ret = null;
+		if (projectroot != null)
+		{
+			List<String> list = searchForClasses(projectroot);
+			ret = list.toArray(new String[list.size()]);
+		}
+		return ret;
 	}
 	
 	/**
@@ -176,9 +184,22 @@ public class ModelContainer implements IModelContainer
 		
 		for (int i = 0; i < files.length; ++i)
 		{
-			if (files[i].isDirectory())
+			File file = files[i];
+			if (file.isDirectory() && !file.getName().equals(".") && !file.getName().equals(".."))
 			{
-				//ret.addAll(c)
+				ret.addAll(searchForClasses(file));
+			}
+			else if (file.getAbsolutePath().endsWith(".java") ||
+					 file.getAbsolutePath().endsWith(".class"))
+			{
+				String classname = file.getAbsolutePath().substring(projectroot.getAbsolutePath().length());
+				while (classname.startsWith(File.separator))
+				{
+					classname = classname.substring(1);
+				}
+				classname = classname.substring(0, classname.lastIndexOf('.'));
+				classname = classname.replaceAll(File.separator, ".");
+				ret.add(classname);
 			}
 		}
 		
@@ -191,14 +212,20 @@ public class ModelContainer implements IModelContainer
 		String pkg = model.getPackage();
 		String filepath = file.getAbsolutePath();
 		int ind = filepath.lastIndexOf(File.separator);
-		boolean correctpath = false;
 		if (ind >= 0)
 		{
 			filepath = filepath.substring(0, ind);
 			StringTokenizer tok = new StringTokenizer(pkg, ".");
-			while (!correctpath)
+			
+			LinkedList<String> tokenstack = new LinkedList<String>();
+			while (tok.hasMoreTokens())
 			{
-				String pkgfrag = tok.nextToken();
+				tokenstack.add(tok.nextToken());
+			}
+			
+			while (!tokenstack.isEmpty())
+			{
+				String pkgfrag = tokenstack.removeLast();
 				ind = filepath.lastIndexOf(File.separator);
 				if (ind >= 0 && filepath.length() > 1)
 				{
@@ -206,22 +233,19 @@ public class ModelContainer implements IModelContainer
 					
 					if (!pathfrag.equals(pkgfrag))
 					{
-						break;
+						// Package/Directory mismatch
+						return;
 					}
 					
 					filepath = filepath.substring(0, ind);
 				}
-				
-				if (!tok.hasMoreElements())
+				else
 				{
-					correctpath = true;
+					return;
 				}
 			}
 		}
 		
-		if (correctpath)
-		{
-			setProjectRoot(new File(filepath));
-		}
+		setProjectRoot(new File(filepath));
 	}
 }

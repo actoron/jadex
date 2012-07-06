@@ -71,10 +71,6 @@ public class GpmnModelCodec extends AbstractModelCodec
 		
 		printlnIndent(ps, ind++, "<gpmn:gpmnmodel>");
 		
-		printIndent(ps, ind, "<gpmn:modelname>");
-		ps.print(gm.getName());
-		ps.println("</gpmn:modelname>");
-		
 		printIndent(ps, ind, "<gpmn:modeldescription>");
 		ps.print(gm.getDescription());
 		ps.println("</gpmn:modeldescription>");
@@ -753,11 +749,7 @@ public class GpmnModelCodec extends AbstractModelCodec
 		    }
 		    else if (reader.getEventType() == XMLStreamReader.CHARACTERS)
 		    {
-		    	if ("modelname".equals(localname))
-		    	{
-		    		model.setName(reader.getText());
-		    	}
-		    	else if ("modeldescription".equals(localname))
+		    	if ("modeldescription".equals(localname))
 		    	{
 		    		model.setDescription(reader.getText());
 		    	}

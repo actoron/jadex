@@ -77,4 +77,7 @@ public class ModelConstants
 	
 	/** The parallel activation plan class */
 	public static final String ACTIVATION_PLAN_CLASS_PARALLEL = "jadex.gpmn.plan.ParallelActivationPlan";
+	
+	/** Initial plan */
+	public static final String INITAL_PLAN_CLASS = "jadex.gpmn.plan.StartAndMonitorProcessPlan";
 }

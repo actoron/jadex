@@ -44,9 +44,6 @@ public class GpmnModel implements IGpmnModel
 		IMPL_TO_INTERFACE.put(SuppressionEdge.class, ISuppressionEdge.class);
 	}
 	
-	/** The name. */
-	protected String name;
-	
 	/** The description. */
 	protected String description;
 	
@@ -70,7 +67,6 @@ public class GpmnModel implements IGpmnModel
 	 */
 	public GpmnModel()
 	{
-		name = "Unnamed Model";
 		description = "";
 		pkg = "";
 		namerepository = new NameRepository();
@@ -87,26 +83,6 @@ public class GpmnModel implements IGpmnModel
 	public NameRepository getNameRepository()
 	{
 		return namerepository;
-	}
-	
-	/**
-	 *  Gets the name.
-	 *  
-	 *  @return The name.
-	 */
-	public String getName()
-	{
-		return name;
-	}
-	
-	/**
-	 *  Sets the name.
-	 *  
-	 *  @param name The name.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
 	}
 	
 	/**

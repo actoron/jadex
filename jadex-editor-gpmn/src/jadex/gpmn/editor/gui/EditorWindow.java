@@ -301,9 +301,9 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 								modelcontainer.setGpmnModel(gpmnmodel);
 								modelcontainer.setGraph(graph);
 								modelcontainer.getGraphComponent().refresh();
-								setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
-								
 								modelcontainer.setFile(file);
+								
+								setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 							}
 							catch (Exception e1)
 							{
@@ -359,6 +359,12 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 						filter = new FileNameExtensionFilter("Jadex BDI agent model file (*.agent.xml)", "agent.xml");
 						fc.addChoosableFileFilter(filter);
 						fc.setAcceptAllFileFilterUsed(false);
+						
+						if (modelcontainer.getFile() != null)
+						{
+							fc.setSelectedFile(modelcontainer.getFile());
+						}
+						
 						int result = fc.showSaveDialog(EditorWindow.this);
 						if (JFileChooser.APPROVE_OPTION == result)
 						{

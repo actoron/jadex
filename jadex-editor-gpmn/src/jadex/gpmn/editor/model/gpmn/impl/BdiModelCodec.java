@@ -72,7 +72,9 @@ public class BdiModelCodec extends AbstractModelCodec
 				ind,
 				"xsi:schemaLocation=\"http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-bdi-2.0.xsd\"");
 		printIndent(ps, ind, "name=\"");
-		ps.print(gm.getName() == null ? "" : gm.getName());
+		String modelname = file.getName();
+		modelname = modelname.substring(0, modelname.lastIndexOf(".agent.xml"));
+		ps.print(modelname);
 		ps.println("\"");
 		printIndent(ps, ind, "package=\"");
 		ps.print(gm.getPackage() == null ? "" : gm.getPackage());
@@ -130,6 +132,9 @@ public class BdiModelCodec extends AbstractModelCodec
 			targets.add(edge.getTarget().getName());
 		}
 		
+		List<String> initialgoals = new ArrayList<String>();
+		List<String> initialmgoals = new ArrayList<String>();
+		
 		printlnIndent(ps, ind++, "<goals>");
 		
 		Set<INode> nodes = gm.getNodeSet(IGoal.class);
@@ -137,20 +142,42 @@ public class BdiModelCodec extends AbstractModelCodec
 		{
 			Goal goal = (Goal) node;
 			
+			boolean initial = true;
+			for (IEdge tedge : goal.getTargetEdges())
+			{
+				if (tedge instanceof IActivationEdge)
+				{
+					initial = false;
+					break;
+				}
+			}
+			
 			String goaltypename = null;
 			if (ModelConstants.ACHIEVE_GOAL_TYPE.equals(goal.getGoalType()))
 			{
 				goaltypename = "achievegoal";
+				if (initial)
+				{
+					initialgoals.add(goal.getName());
+				}
 			}
 			else if (ModelConstants.PERFORM_GOAL_TYPE
 					.equals(goal.getGoalType()))
 			{
 				goaltypename = "performgoal";
+				if (initial)
+				{
+					initialgoals.add(goal.getName());
+				}
 			}
 			else if (ModelConstants.MAINTAIN_GOAL_TYPE.equals(goal
 					.getGoalType()))
 			{
 				goaltypename = "maintaingoal";
+				if (initial)
+				{
+					initialmgoals.add(goal.getName());
+				}
 			}
 			else if (ModelConstants.QUERY_GOAL_TYPE.equals(goal.getGoalType()))
 			{
@@ -397,7 +424,49 @@ public class BdiModelCodec extends AbstractModelCodec
 			printlnIndent(ps, --ind, "</plan>");
 		}
 		
+		ps.println();
+		
+		printlnIndent(ps, ind++, "<plan name=\"GPMNStartAndMonitorPlan\">" );
+		
+		printlnIndent(ps, ind++, "<parameterset name=\"goals\" class=\"String\">");
+		
+		for (int i = 0; i < initialgoals.size(); ++i)
+		{
+			printIndent(ps, ind, "<value>\"");
+			ps.print(initialgoals.get(i));
+			ps.println("\"</value>");
+		}
+		
+		printlnIndent(ps, --ind, "</parameterset>");
+		
+		printlnIndent(ps, ind++, "<parameterset name=\"maintain_goals\" class=\"String\">");
+		
+		for (int i = 0; i < initialmgoals.size(); ++i)
+		{
+			printIndent(ps, ind, "<value>\"");
+			ps.print(initialmgoals.get(i));
+			ps.println("\"</value>");
+		}
+		
+		printlnIndent(ps, --ind, "</parameterset>");
+		
+		printIndent(ps, ind, "<body class=\"");
+		ps.print(ModelConstants.INITAL_PLAN_CLASS);
+		ps.println("\" />");
+		
+		printlnIndent(ps, --ind, "</plan>");
+		
 		printlnIndent(ps, --ind, "</plans>");
+		
+		printlnIndent(ps, ind++, "<configurations>");
+		
+		printlnIndent(ps, ind++, "<configuration name=\"default\">");
+		printlnIndent(ps, ind++, "<plans>");
+		printlnIndent(ps, ind, "<initialplan ref=\"GPMNStartAndMonitorPlan\" />");
+		printlnIndent(ps, --ind, "</plans>");
+		printlnIndent(ps, --ind, "</configuration>");
+		
+		printlnIndent(ps, --ind, "</configurations>");
 		
 		printlnIndent(ps, --ind, "</agent>");
 		
