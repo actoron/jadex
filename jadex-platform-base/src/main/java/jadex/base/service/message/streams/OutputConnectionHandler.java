@@ -284,7 +284,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(multipackets)
+				{
 					sendAcknowledgedMultiPacket();
+				}
 				sendStored();
 				checkWaitForReady();
 				return IFuture.DONE;
@@ -480,6 +482,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				start += tmp.length;
 			}
 			
+//			System.out.println("sending stream bytes: "+target.length);
 			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, getNextSequenceNumber(), nonfunc);
 			ret	= doSendData(task);
 			
