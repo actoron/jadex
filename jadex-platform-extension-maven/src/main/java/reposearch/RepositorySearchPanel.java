@@ -1,5 +1,6 @@
 package reposearch;
 
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -67,10 +68,12 @@ import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.codehaus.plexus.PlexusContainer;
 
 /**
- * 
+ *  Panel that allows for searching artifacts from maven repositories.
  */
 public class RepositorySearchPanel extends JPanel
 {
+	//-------- attributes --------
+	
 	/** The container. */
 	protected PlexusContainer plexus;
 	
@@ -89,8 +92,13 @@ public class RepositorySearchPanel extends JPanel
 	/** The thread pool. */
 	protected ThreadPool tp;
 	
+	/** The current search query text. */
+	protected String curquery;
+	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new search panel.
 	 */
 	public RepositorySearchPanel(final PlexusContainer plexus, ThreadPool tp)
 	{
@@ -171,8 +179,12 @@ public class RepositorySearchPanel extends JPanel
 		performSearch(null);
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Add a new repository.
+	 *  @param name The repo name.
+	 *  @param url The repo url.
 	 */
 	protected void addRepository(String name, String url)
 	{
@@ -181,22 +193,14 @@ public class RepositorySearchPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Get a repository per url.
+	 *  @param url The url.
+	 *  @return The repo.
 	 */
 	protected RepositoryInfo getRepository(String url)
 	{
-		try
-		{
-			return repos.get(new URL(url));
-		}
-		catch(MalformedURLException e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		return repos.get(url);
 	}
-	
-	
 	
 	/**
 	 *  Get the thread pool.
@@ -208,12 +212,32 @@ public class RepositorySearchPanel extends JPanel
 	}
 
 	/**
-	 * 
+	 *  Set the current query string.
+	 *  Used to abort old searches.
+	 *  @param curquery The current query.
+	 */
+	protected synchronized void setCurrentQuery(String curquery)
+	{
+		this.curquery = curquery;
+	}
+	
+	/**
+	 *  Test if the search is still the current one.
+	 *  @param curquery The current search text.
+	 */
+	protected synchronized boolean isCurrentQuery(String curquery)
+	{
+		return SUtil.equals(this.curquery, curquery);
+	}
+	
+	/**
+	 *  Perform a search using a search expression.
 	 */
 	public void performSearch(final String exp)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
+		setCurrentQuery(exp);
 		System.out.println("perform search: "+exp);
 		
 		try
@@ -272,6 +296,8 @@ public class RepositorySearchPanel extends JPanel
 										{
 											public void collect(int doc, float score)
 											{
+												if(!isCurrentQuery(exp))
+													throw new RuntimeException("Search aborted: "+exp);
 												try
 												{
 													Document d = reader.document(doc);
@@ -302,7 +328,7 @@ public class RepositorySearchPanel extends JPanel
 									}
 									catch(Exception e)
 									{
-										e.printStackTrace();
+//										e.printStackTrace();
 										lis.resultAvailable(null);
 									}
 								}
@@ -344,7 +370,8 @@ public class RepositorySearchPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Add an artifact info to the tree.
+	 *  @param ai The artifact info.
 	 */
 	protected void addArtifactInfo(ArtifactInfo ai)
 	{
@@ -358,7 +385,7 @@ public class RepositorySearchPanel extends JPanel
 			if(groupn==null)
 			{
 				groupn = new IdTreeNode(groupkey, null, tm);
-				insertNode((IdTreeNode)tm.getRoot(), groupn);
+				insertNode((IdTreeNode)tm.getRoot(), groupn, true);
 			}
 			final String artkey = groupkey+":"+ai.artifactId;
 			IdTreeNode artn = tm.getNode(artkey);
@@ -366,7 +393,7 @@ public class RepositorySearchPanel extends JPanel
 			{
 				artn = new IdTreeNode(artkey, ai.artifactId, tm);
 //				System.out.println("add artn: "+artn);
-				insertNode(groupn, artn);
+				insertNode(groupn, artn, true);
 			}
 			final String vkey = artkey+":"+ai.version;
 			IdTreeNode vn = tm.getNode(vkey);
@@ -374,15 +401,15 @@ public class RepositorySearchPanel extends JPanel
 			{
 				vn = new IdTreeNode(vkey, ai.version+" ["+ai.packaging+"]", tm, true);
 //				System.out.println("add vn: "+vn);
-				insertNode(artn, vn);
+				insertNode(artn, vn, false);
 			}
 		}
 	}
 	
 	/**
-	 * 
+	 *  Insert a node at alphabetical order in the tree.
 	 */
-	protected void insertNode(IdTreeNode parent, IdTreeNode child)
+	protected void insertNode(IdTreeNode parent, IdTreeNode child, boolean up)
 	{
 		int cnt = parent.getChildCount();
 		boolean done = false;
@@ -391,7 +418,8 @@ public class RepositorySearchPanel extends JPanel
 			for(int i=0; i<cnt && !done; i++)
 			{
 				IdTreeNode tmp = (IdTreeNode)parent.getChildAt(i);
-				if(tmp.toString().compareTo(child.toString())>=0)
+				if((up && tmp.toString().compareTo(child.toString())>=0) 
+					|| tmp.toString().compareTo(child.toString())<=0)
 				{
 					parent.insert(child, i);
 					done = true;
@@ -405,10 +433,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 	}
 	
-	
-	
 	/**
-	 * 
+	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
@@ -426,10 +452,12 @@ public class RepositorySearchPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Repository info class.
 	 */
 	public static class RepositoryInfo
 	{
+		//-------- attributes --------
+		
 		/** The name (and id). */
 		protected String name;
 		
@@ -444,6 +472,8 @@ public class RepositorySearchPanel extends JPanel
 		
 		/** The indexing context. */
 		protected IndexingContext context;
+		
+		//-------- constructors --------
 
 		/**
 		 *  Create a new repository info.
@@ -464,6 +494,8 @@ public class RepositorySearchPanel extends JPanel
 			this.indexdir = indexdir;
 		}
 
+		//-------- methods --------
+		
 		/**
 		 *  Get the name.
 		 *  @return The name.
@@ -537,7 +569,9 @@ public class RepositorySearchPanel extends JPanel
 		}
 
 		/**
-		 * 
+		 *  Get the indexing context.
+		 *  Creates it the first time called.
+		 *  Checks if an index update is needed.
 		 */
 		public IFuture<IndexingContext> getIndexingContext(PlexusContainer plexus, RepositoryInfo repo, ThreadPool tp)
 		{
@@ -603,7 +637,7 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-	     * 
+	     *  Updates the index.
 	     */
 		public IFuture<Void> updateIndex(final PlexusContainer plexus, ThreadPool tp)
 		{
@@ -674,14 +708,19 @@ public class RepositorySearchPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Tree model that allows looking up nodes per id.
 	 */
 	public static class IdTreeModel extends DefaultTreeModel
 	{
+		//-------- attributes --------
+		
+		/** The id map (id -> node). */
 		protected Map<String, IdTreeNode> nodes;
 		
+		//-------- constructors --------
+		
 		/**
-		 * 
+		 *  Create a new tree model.
 		 */
 		public IdTreeModel()
 		{
@@ -692,8 +731,11 @@ public class RepositorySearchPanel extends JPanel
 			this.nodes = new HashMap<String, RepositorySearchPanel.IdTreeNode>();
 		}
 		
+		//-------- methods --------
+		
 		/**
-		 * 
+		 *  Add a new node.
+		 *  @param node The node.
 		 */
 		public void addNode(IdTreeNode node)
 		{
@@ -703,7 +745,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Remove a node.
+		 *  @param node The node.
 		 */
 		public void removeNode(IdTreeNode node)
 		{
@@ -713,7 +756,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Deregister a node and all its children.
+		 *  @param node The node.
 		 */
 		protected void deregisterAll(IdTreeNode node)
 		{
@@ -726,7 +770,9 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Get a node per id.
+		 *  @param id The node id.
+		 *  @return The node.
 		 */
 		public IdTreeNode getNode(String id)
 		{
@@ -738,17 +784,28 @@ public class RepositorySearchPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Id tree node.
 	 */
 	public static class IdTreeNode extends DefaultMutableTreeNode
 	{
+		//-------- attributes --------
+
+		/** The node id. */
 		protected String key;
+		
+		/** The node name. */
 		protected String name;
+		
+		/** The tree model. */
 		protected IdTreeModel tm;
+		
+		/** Flag if is leaf. */
 		protected boolean leaf;
 		
+		//-------- constructors --------
+		
 		/**
-		 * 
+		 *  Create a new node.
 		 */
 		public IdTreeNode(String key, String name, IdTreeModel tm)
 		{
@@ -756,7 +813,7 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Create a new node.
 		 */
 		public IdTreeNode(String key, String name, IdTreeModel tm, boolean leaf)
 		{
@@ -767,7 +824,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Add a new child.
+		 *  @param child The child.
 		 */
 		public void add(MutableTreeNode child)
 		{
@@ -780,7 +838,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Insert a new child.
+		 *  @param child The child.
 		 */
 		public void insert(MutableTreeNode child, int index)
 		{
@@ -793,7 +852,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 
 		/**
-		 * 
+		 *  Remove a child.
+		 *  @param idx The index.
 		 */
 		public void remove(int idx)
 		{
@@ -806,7 +866,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 		
 		/**
-		 * 
+		 *  Get the id.
+		 *  @return The id.
 		 */
 		public String getId()
 		{
@@ -814,7 +875,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 
 		/**
-		 * 
+		 *  Test if node is leaf.
+		 *  @return True, if is leaf.
 		 */
 		public boolean isLeaf()
 		{
@@ -822,7 +884,8 @@ public class RepositorySearchPanel extends JPanel
 		}
 
 		/**
-		 * 
+		 *  Get the string representation.
+		 *  @return The string representation.
 		 */
 		public String toString()
 		{
