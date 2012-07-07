@@ -2,6 +2,7 @@ package jadex.extension.envsupport;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -122,7 +123,7 @@ public abstract class AbstractEnvironmentService
 	protected IFuture<IComponentDescription>	getCallingComponent()
 	{
 		final Future<IComponentDescription>	ret	= new Future<IComponentDescription>();
-		final IComponentIdentifier	caller	= IComponentIdentifier.CALLER.get();
+		final IComponentIdentifier	caller	= ServiceCall.getInstance().getCaller();
 		
 		// Hack!!! Space cannot be looked up in service start as service is initialized before envsupport extension.
 		final Future<Void>	spacedone	= new Future<Void>();

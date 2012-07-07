@@ -1,7 +1,5 @@
 package jadex.bridge.service.annotation;
 
-import jadex.bridge.service.BasicService;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,20 +24,18 @@ public @interface Timeout
 	public static final long UNSET = -2;
 
 	/**
-	 *  The timeout period after which the remote invocation
-	 *  is aborted when no result is received.
+	 *  The timeout period after which local or remote invocations
+	 *  are aborted when no result is received.
 	 */
 	public long value() default UNSET;
 	
 	/**
-	 *  The timeout period after which the remote invocation
-	 *  is aborted when no result is received.
+	 *  The local timeout period for specifying different values for local and remote.
 	 */
 	public long local() default UNSET;
 	
 	/**
-	 *  The timeout period after which the remote invocation
-	 *  is aborted when no result is received.
+	 *  The remote timeout period for specifying different values for local and remote.
 	 */
 	public long remote() default UNSET;
 }

@@ -62,9 +62,6 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The static set of no decoupling methods. */
 	protected static final Set<Method> NO_DECOUPLING;
 	
-	/** The call stack. */
-	protected static final ThreadLocal<List<IComponentIdentifier>>	CALLSTACK	= new ThreadLocal<List<IComponentIdentifier>>();
-	
 	static
 	{
 		NO_DECOUPLING = new HashSet<Method>();
@@ -242,17 +239,21 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
-			pushToCallStack(IComponentIdentifier.LOCAL.get());
+			long to = BasicServiceContainer.getMethodTimeout(
+				sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
+			CallStack.push(IComponentIdentifier.LOCAL.get(), to, realtime);
 //			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 
 //				new CopyReturnValueResultListener(ret, sic)));
 			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
-			popFromCallStack();
+			CallStack.pop();
 		}
 		else
 		{
 //			if(sic.getMethod().getName().equals("getServiceProxies"))
 //				System.out.println("decouple: "+Thread.currentThread());
-			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get()))
+			long to = BasicServiceContainer.getMethodTimeout(
+					sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
+			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, realtime))
 				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		
@@ -351,42 +352,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Push a service call to the call stack.
-	 *  @param caller	The calling component. 
-	 */
-	protected static void	pushToCallStack(IComponentIdentifier caller)
-	{
-		IComponentIdentifier	previous	= IComponentIdentifier.CALLER.get();
-		if(previous!=null)
-		{
-			List<IComponentIdentifier>	stack	= CALLSTACK.get();
-			if(stack==null)
-			{
-				stack	= new ArrayList<IComponentIdentifier>();
-				CALLSTACK.set(stack);
-			}
-			stack.add(previous);
-		}
-		IComponentIdentifier.CALLER.set(caller);
-	}
-	
-	/**
-	 *  Pop a service call from the call stack.
-	 *  @param caller	The calling component. 
-	 */
-	protected static void	popFromCallStack()
-	{
-		IComponentIdentifier	caller	= null;
-		List<IComponentIdentifier>	stack	= CALLSTACK.get();
-		if(stack!=null && !stack.isEmpty())
-		{
-			caller	= stack.remove(stack.size()-1);
-		}
-		IComponentIdentifier.CALLER.set(caller);
-	}
+	}	
 	
 	//-------- helper classes --------
 	
@@ -613,14 +579,18 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	{
 		protected ServiceInvocationContext sic;
 		protected IComponentIdentifier caller;
+		protected long timeout;
+		protected boolean realtime;
 
 		/**
 		 *  Create an invoke method step.
 		 */
-		public InvokeMethodStep(ServiceInvocationContext sic, IComponentIdentifier caller)
+		public InvokeMethodStep(ServiceInvocationContext sic, IComponentIdentifier caller, long timeout, boolean realtime)
 		{
 			this.sic = sic;
 			this.caller = caller;
+			this.timeout	= timeout;
+			this.realtime	= realtime;
 		}
 
 		/**
@@ -630,7 +600,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{					
 			IFuture<Void> ret;
 			
-			pushToCallStack(caller);
+			CallStack.push(caller, timeout, realtime);
 			
 			try
 			{
@@ -643,7 +613,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				ret	= new Future<Void>(e);
 			}
 			
-			popFromCallStack();
+			CallStack.pop();
 			
 			return ret;
 		}

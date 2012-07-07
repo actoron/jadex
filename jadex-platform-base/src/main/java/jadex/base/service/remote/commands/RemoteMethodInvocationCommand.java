@@ -52,6 +52,13 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	/** The parameter values. */
 	protected Object[] parametervalues;
 	
+	// todo: gets overwritten by decoupling interceptor
+//	/** The declared or remote default timeout value. */
+//	protected long	timeout;
+//	
+//	/** The real time timeout flag. */
+//	protected boolean	realtime;
+	
 	/** The declared reference flag for the return value. */
 	protected boolean returnisref;
 	

@@ -1,6 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -13,6 +15,24 @@ import java.lang.reflect.Proxy;
  */
 public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 {
+	//-------- attributes --------
+	
+	/** The realtime timeout flag. */
+	protected boolean	realtime;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a method invocation interceptor.
+	 */
+	public MethodInvocationInterceptor()
+	{
+		// Todo real time!?
+		this.realtime	= false;
+	}
+	
+	//-------- methods --------
+	
 	/**
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
@@ -22,17 +42,19 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 		try
 		{
 			boolean	setcaller	= false;
-			if(!Proxy.isProxyClass(sic.getObject().getClass()) && IComponentIdentifier.CALLER.get()==null)
+			if(!Proxy.isProxyClass(sic.getObject().getClass()) && ServiceCall.getInstance()==null)
 				// && sic.getMethod().getName().indexOf("Area")!=-1)
 			{
-//				if(IComponentIdentifier.LOCAL.get()==null)
-//					System.out.println("No caller information: "+sic.getMethod());
-				IComponentIdentifier.CALLER.set(IComponentIdentifier.LOCAL.get());
+				long to = BasicServiceContainer.getMethodTimeout(
+					sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
+				CallStack.push(IComponentIdentifier.LOCAL.get(), to, realtime);
 				setcaller	= true;
 			}			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
 			if(setcaller)
-				IComponentIdentifier.CALLER.set(null);
+			{
+				CallStack.pop();
+			}
 			sic.setResult(res);
 		}
 		catch(Exception e)
@@ -42,7 +64,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			
 			if(sic.getMethod().getReturnType().equals(IFuture.class))
 			{
-				Future fut = new Future();
+				Future<?> fut = new Future();
 				Throwable	t	= e instanceof InvocationTargetException
 					? ((InvocationTargetException)e).getTargetException() : e;
 				fut.setException(t instanceof Exception ? (Exception)t : e);

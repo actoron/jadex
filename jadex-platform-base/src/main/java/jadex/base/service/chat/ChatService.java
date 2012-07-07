@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -224,7 +225,8 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IFuture<Void>	message(String nick, String text, boolean privatemessage)
 	{
-		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, IComponentIdentifier.CALLER.get(), text, privatemessage, null);
+//		System.out.println("Timeout: "+ServiceCall.getInstance().getTimeout()+", "+ServiceCall.getInstance().isRealtime());
+		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getInstance().getCaller(), text, privatemessage, null);
 		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
 	}
 
@@ -234,7 +236,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IFuture<Void>	status(String nick, String status, byte[] image)
 	{
-		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, IComponentIdentifier.CALLER.get(), status, false, image);
+		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, ServiceCall.getInstance().getCaller(), status, false, image);
 		return IFuture.DONE;
 	}
 	
@@ -253,7 +255,7 @@ public class ChatService implements IChatService, IChatGuiService
 	public ITerminableIntermediateFuture<Long> sendFile(String nick, String filename, long size, String id, IInputConnection con)
 	{
 		TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
-		IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
+		IComponentIdentifier sender = ServiceCall.getInstance().getCaller();
 		
 		TransferInfo	ti	= new TransferInfo(true, id, filename, null, sender, size);
 		ti.setState(TransferInfo.STATE_WAITING);
@@ -278,7 +280,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public ITerminableFuture<IOutputConnection> startUpload(final String nick, String filename, long size, String id)
 	{
-		final IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
+		final IComponentIdentifier sender = ServiceCall.getInstance().getCaller();
 		
 		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, sender, size);
 		ti.setState(TransferInfo.STATE_WAITING);

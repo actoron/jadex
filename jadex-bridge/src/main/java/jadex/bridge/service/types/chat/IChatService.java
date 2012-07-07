@@ -43,6 +43,7 @@ public interface IChatService
 	 *  @param nick The sender's nick name.
 	 *  @param text The text message.
 	 */
+//	@Timeout(local=12345, remote=54321) // for testing.
 	public IFuture<Void> message(String nick, String text, boolean privatemessage);
 	
 	/**

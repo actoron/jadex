@@ -7,7 +7,6 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
