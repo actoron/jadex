@@ -11,6 +11,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,6 +34,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,12 +45,15 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -129,6 +134,11 @@ public class RepositorySearchPanel extends JPanel
 		this.repos = new LinkedHashMap<String, RepositoryInfo>();
 		addRepository("Maven Central", "http://repo1.maven.org/maven2");
 		
+		PropertiesPanel pn = new PropertiesPanel();
+		final JTextField tfgi = pn.createTextField("Group Id:", null, true);
+		final JTextField tfai = pn.createTextField("Artifact Id:", null, true);
+		final JTextField tfv = pn.createTextField("Version: ", null, true);
+		
 		final RepoComboModel cbrm = new RepoComboModel();
 		cbrepos = new JComboBox(cbrm);
 		cbrepos.setEditable(false);
@@ -203,6 +213,7 @@ public class RepositorySearchPanel extends JPanel
 		tm.setRoot(new IdTreeNode("root", null, tm, false, null, null, null));
 		tree = new JTree(tm);
 		tree.setRootVisible(false);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setCellRenderer(new DefaultTreeCellRenderer() 
 		{
 			public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -240,12 +251,38 @@ public class RepositorySearchPanel extends JPanel
 				return comp;
 			}
         });
+		tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
+		{
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				if(e.getNewLeadSelectionPath()!=null)
+				{
+					ArtifactInfo ai = getSelectedArtifactInfo();
+					if(ai!=null)
+					{
+						tfgi.setText(ai.groupId);
+						tfai.setText(ai.artifactId);
+						tfv.setText(ai.version);
+					}
+					else
+					{
+						tfgi.setText(null);
+						tfai.setText(null);
+						tfv.setText(null);
+					}
+				}
+			}
+		});
 
 		status = new JLabel("idle");
 		
 		setLayout(new GridBagLayout());
 		
 		int y=0;
+		
+		add(pn, new GridBagConstraints(0,y++,
+			2,1,0,0,GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(2,2,2,2),0,0));
+		
 		add(new JLabel("Select or enter repository url:"), new GridBagConstraints(0,y++,
 			2,1,0,0,GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, new Insets(2,2,2,2),0,0));
 			
@@ -829,13 +866,68 @@ public class RepositorySearchPanel extends JPanel
 		{
 			public void run()
 			{
-				JFrame f = new JFrame();
-				f.add(new RepositorySearchPanel(createPlexus(), new ThreadPool()));
-				f.pack();
-				f.setLocation(SGUI.calculateMiddlePosition(f));
-				f.setVisible(true);
+				ArtifactInfo ai = showDialog(null);
+				System.out.println("artifact: "+ai);
+//				JFrame f = new JFrame();
+//				f.add(new RepositorySearchPanel(createPlexus(), new ThreadPool()));
+//				f.pack();
+//				f.setLocation(SGUI.calculateMiddlePosition(f));
+//				f.setVisible(true);
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	public static ArtifactInfo showDialog(ThreadPool tp)
+	{		
+		ArtifactInfo ret = null;
+		RepositorySearchPanel pan = new RepositorySearchPanel(createPlexus(), tp!=null? tp: new ThreadPool());		
+		
+		final JDialog dia = new JDialog((JFrame)null, true);
+		
+		JButton bok = new JButton("OK");
+		JButton bcancel = new JButton("Cancel");
+		bok.setMinimumSize(bcancel.getMinimumSize());
+		bok.setPreferredSize(bcancel.getPreferredSize());
+		JPanel ps = new JPanel(new GridBagLayout());
+		ps.add(bok, new GridBagConstraints(0,0,1,1,1,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.VERTICAL, new Insets(2,2,2,2), 0, 0));
+		ps.add(bcancel, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+
+		dia.getContentPane().add(pan, BorderLayout.CENTER);
+		dia.getContentPane().add(ps, BorderLayout.SOUTH);
+		final boolean[] ok = new boolean[1];
+		bok.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ok[0] = true;
+				dia.dispose();
+			}
+		});
+		bcancel.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				dia.dispose();
+			}
+		});
+		dia.pack();
+		dia.setLocation(SGUI.calculateMiddlePosition(dia));
+		dia.setVisible(true);
+		if(ok[0])
+		{
+			ret = pan.getSelectedArtifactInfo();
+		}
+		
+//		int res	= JOptionPane.showOptionDialog(null, pan, "Repository Location", JOptionPane.YES_NO_CANCEL_OPTION,
+//			JOptionPane.PLAIN_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
+//		if(JOptionPane.YES_OPTION==res)
+//		{
+//			ret = pan.getSelectedArtifactInfo();
+//		}
+		return ret;
 	}
 	
 	/**
