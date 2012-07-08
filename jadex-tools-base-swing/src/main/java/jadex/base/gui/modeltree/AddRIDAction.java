@@ -26,7 +26,7 @@ public class AddRIDAction extends ToolTipAction
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"addrid",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_addfolder.png"),
+		"addrid",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/add_jar.png"),
 	});
 	
 	//-------- attributes --------
@@ -80,16 +80,19 @@ public class AddRIDAction extends ToolTipAction
 			{
 				Method m = cl.getMethod("showDialog", new Class[]{ThreadPool.class});
 				Object o = m.invoke(null, new Object[]{null});
-				System.out.println("sel ai: "+o);
-				String grid = (String)o.getClass().getField("groupId").get(o);
-				String arid = (String)o.getClass().getField("artifactId").get(o);
-				String ver = (String)o.getClass().getField("version").get(o);
-				gid = grid+":"+arid+":"+ver;
-				System.out.println("adding: "+gid);
-
-//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
-				IResourceIdentifier rid = new ResourceIdentifier(null, gid);
-				treepanel.addTopLevelNode(rid);
+//				System.out.println("sel ai: "+o);
+				if(o!=null)
+				{
+					String grid = (String)o.getClass().getField("groupId").get(o);
+					String arid = (String)o.getClass().getField("artifactId").get(o);
+					String ver = (String)o.getClass().getField("version").get(o);
+					gid = grid+":"+arid+":"+ver;
+	//				System.out.println("adding: "+gid);
+	
+	//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
+					IResourceIdentifier rid = new ResourceIdentifier(null, gid);
+					treepanel.addTopLevelNode(rid);
+				}
 			}			
 		}
 		catch(Exception ex)

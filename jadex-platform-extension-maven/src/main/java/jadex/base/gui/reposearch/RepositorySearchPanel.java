@@ -137,6 +137,7 @@ public class RepositorySearchPanel extends JPanel
 		this.tp = tp;
 		this.repos = new LinkedHashMap<String, RepositoryInfo>();
 		addRepository("Maven Central", "http://repo1.maven.org/maven2");
+		addRepository("Maven Central Snapshots", "http://oss.sonatype.org/content/repositories/snapshots/");
 		
 		PropertiesPanel pn = new PropertiesPanel();
 		tfgi = pn.createTextField("Group Id:", null, true);
@@ -893,6 +894,7 @@ public class RepositorySearchPanel extends JPanel
 		{
 			public void run()
 			{
+				// todo: use thread pool
 				ArtifactInfo ai = showDialog(null);
 				System.out.println("artifact: "+ai);
 //				JFrame f = new JFrame();
@@ -914,7 +916,7 @@ public class RepositorySearchPanel extends JPanel
 		ArtifactInfo ret = null;
 		RepositorySearchPanel pan = new RepositorySearchPanel(createPlexus(), tp!=null? tp: new ThreadPool());		
 		
-		final JDialog dia = new JDialog((JFrame)null, true);
+		final JDialog dia = new JDialog((JFrame)null, "Repository and Artifact Selection", true);
 		
 		JButton bok = new JButton("OK");
 		JButton bcancel = new JButton("Cancel");

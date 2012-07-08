@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -111,11 +112,13 @@ public class StarterPlugin extends AbstractJCCPlugin
 		b.setEnabled(true);
 		ret.add(b);
 		
-		b = new JButton(((StarterPluginPanel)getView()).getModelTreePanel().getAction(AddRIDAction.getName()));
+		Action a = ((StarterPluginPanel)getView()).getModelTreePanel().getAction(AddRIDAction.getName());
+		b = new JButton(a);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
-//		b.setEnabled(true);
+		b.setEnabled(a.isEnabled());
+//		b.setEnabled(false);
 		ret.add(b);
 		
 		b = new JButton(((StarterPluginPanel)getView()).getModelTreePanel().getAction(RemovePathAction.getName()));

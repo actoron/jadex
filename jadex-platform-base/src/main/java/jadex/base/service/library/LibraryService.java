@@ -183,6 +183,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					}
 				});
 			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
+			}
 		});
 		
 		
