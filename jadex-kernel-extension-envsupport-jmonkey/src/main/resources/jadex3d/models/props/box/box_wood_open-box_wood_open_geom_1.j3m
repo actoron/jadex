@@ -1,0 +1,25 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        GlowColor : 1.0 1.0 1.0 1.0
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        UseMaterialColors : true
+        ParallaxHeight : 0.05
+        Ambient : 1.0 1.0 1.0 1.0
+        Shininess : 0.1
+        DiffuseMap : jadex3d/models/props/box/box_wood_open_dif.jpg
+        NormalMap : jadex3d/models/props/box/box_wood_open_norm.jpg
+        SpecularMap : jadex3d/models/props/box/box_wood_open_spec.jpg
+    }
+    AdditionalRenderState {
+      FaceCull Off
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
+    }
+}

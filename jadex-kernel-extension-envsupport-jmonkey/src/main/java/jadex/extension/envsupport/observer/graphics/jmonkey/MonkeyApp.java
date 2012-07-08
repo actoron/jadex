@@ -146,7 +146,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		this.rootNode.attachChild(_geometryNode);
 
 		initKeys();
-
+		
 
 	}
 
