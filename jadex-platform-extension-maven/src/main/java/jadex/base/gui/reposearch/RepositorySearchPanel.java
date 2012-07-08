@@ -122,6 +122,10 @@ public class RepositorySearchPanel extends JPanel
 	/** The repository infos. */
 	protected Map<String, RepositoryInfo> repos;
 	
+	protected JTextField tfgi;
+	protected JTextField tfai;
+	protected JTextField tfv;
+	
 	//-------- constructors --------
 	
 	/**
@@ -135,9 +139,9 @@ public class RepositorySearchPanel extends JPanel
 		addRepository("Maven Central", "http://repo1.maven.org/maven2");
 		
 		PropertiesPanel pn = new PropertiesPanel();
-		final JTextField tfgi = pn.createTextField("Group Id:", null, true);
-		final JTextField tfai = pn.createTextField("Artifact Id:", null, true);
-		final JTextField tfv = pn.createTextField("Version: ", null, true);
+		tfgi = pn.createTextField("Group Id:", null, true);
+		tfai = pn.createTextField("Artifact Id:", null, true);
+		tfv = pn.createTextField("Version: ", null, true);
 		
 		final RepoComboModel cbrm = new RepoComboModel();
 		cbrepos = new JComboBox(cbrm);
@@ -257,7 +261,15 @@ public class RepositorySearchPanel extends JPanel
 			{
 				if(e.getNewLeadSelectionPath()!=null)
 				{
-					ArtifactInfo ai = getSelectedArtifactInfo();
+					ArtifactInfo ai = null;
+					ArtifactInfo ret = null;
+					TreePath sel = tree.getSelectionPath();
+					if(sel!=null)
+					{
+						IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
+//						System.out.println("selected: "+node.getArtifactInfo());
+						ai = node.getArtifactInfo();
+					}
 					if(ai!=null)
 					{
 						tfgi.setText(ai.groupId);
@@ -776,12 +788,27 @@ public class RepositorySearchPanel extends JPanel
 	public ArtifactInfo getSelectedArtifactInfo()
 	{
 		ArtifactInfo ret = null;
-		TreePath sel = tree.getSelectionPath();
-		if(sel!=null)
+		String grid = tfgi.getText();
+		String arid = tfai.getText();
+		String ver = tfv.getText();
+		
+		if(grid!=null && grid.length()>0 && arid!=null && arid.length()>0)
 		{
-			IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
-//			System.out.println("selected: "+node.getArtifactInfo());
-			ret = node.getArtifactInfo();
+			ret = new ArtifactInfo();
+			ret.groupId = grid;
+			ret.artifactId = arid;
+			ret.version = ver;
+			ret.remoteUrl = ((RepositoryInfo)cbrepos.getSelectedItem()).getUrl();
+		}
+		else
+		{
+			TreePath sel = tree.getSelectionPath();
+			if(sel!=null)
+			{
+				IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
+	//			System.out.println("selected: "+node.getArtifactInfo());
+				ret = node.getArtifactInfo();
+			}
 		}
 		return ret;
 	}
@@ -882,6 +909,8 @@ public class RepositorySearchPanel extends JPanel
 	 */
 	public static ArtifactInfo showDialog(ThreadPool tp)
 	{		
+		assert SwingUtilities.isEventDispatchThread();
+
 		ArtifactInfo ret = null;
 		RepositorySearchPanel pan = new RepositorySearchPanel(createPlexus(), tp!=null? tp: new ThreadPool());		
 		

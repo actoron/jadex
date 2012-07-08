@@ -5,10 +5,12 @@ import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 
 import java.awt.event.ActionEvent;
+import java.lang.reflect.Method;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
@@ -69,10 +71,31 @@ public class AddRIDAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		String gid = JOptionPane.showInputDialog(treepanel, "Enter Artifact Id:");
-		gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
-		IResourceIdentifier rid = new ResourceIdentifier(null, gid);
-		treepanel.addTopLevelNode(rid);
+		try
+		{
+			String gid = null;
+//			String gid = JOptionPane.showInputDialog(treepanel, "Enter Artifact Id:");
+			Class cl = SReflect.findClass0("jadex.base.gui.reposearch.RepositorySearchPanel", null, null);
+			if(cl!=null)
+			{
+				Method m = cl.getMethod("showDialog", new Class[]{ThreadPool.class});
+				Object o = m.invoke(null, new Object[]{null});
+				System.out.println("sel ai: "+o);
+				String grid = (String)o.getClass().getField("groupId").get(o);
+				String arid = (String)o.getClass().getField("artifactId").get(o);
+				String ver = (String)o.getClass().getField("version").get(o);
+				gid = grid+":"+arid+":"+ver;
+				System.out.println("adding: "+gid);
+
+//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
+				IResourceIdentifier rid = new ResourceIdentifier(null, gid);
+				treepanel.addTopLevelNode(rid);
+			}			
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 	
 	/**
