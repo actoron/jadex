@@ -39,14 +39,27 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/** Uses 3d Rotation? */
 	public boolean _rotation3d;
 	
-	/** Constant for 90 degree. */
-	public static IVector3 DEG90X = new Vector3Double((Math.PI/180)*90, 0, 0);
+	/** Constant for 45 degree. In all three Dimensions (x,y,z) */
+	public static IVector3 DEG45X = new Vector3Double((Math.PI/180)*45, 0, 0);
+	public static IVector3 DEG45Y = new Vector3Double(0, (Math.PI/180)*45, 0);
+	public static IVector3 DEG45Z = new Vector3Double(0, 0, (Math.PI/180)*45);
 	
-	/** Constant for 90 degree. */
+	/** Constant for 90 degree. In all three Dimensions (x,y,z) */
+	public static IVector3 DEG90X = new Vector3Double((Math.PI/180)*90, 0, 0);
 	public static IVector3 DEG90Y = new Vector3Double(0, (Math.PI/180)*90, 0);
-
-	/** Constant for 90 degree. */
 	public static IVector3 DEG90Z = new Vector3Double(0, 0, (Math.PI/180)*90);
+	
+	/** Constant for 180 degree. In all three Dimensions (x,y,z) */
+	public static IVector3 DEG180X = new Vector3Double((Math.PI/180)*180, 0, 0);
+	public static IVector3 DEG180Y = new Vector3Double(0, (Math.PI/180)*180, 0);
+	public static IVector3 DEG180Z = new Vector3Double(0, 0, (Math.PI/180)*180);
+	
+	/** Constant for 270 degree. In all three Dimensions (x,y,z) */
+	public static IVector3 DEG270X = new Vector3Double((Math.PI/180)*270, 0, 0);
+	public static IVector3 DEG270Y = new Vector3Double(0, (Math.PI/180)*270, 0);
+	public static IVector3 DEG270Z = new Vector3Double(0, 0, (Math.PI/180)*270);
+	
+
 
 	//-------- constructors --------
 	
@@ -70,9 +83,21 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 		_rotation3d = rotation3d;
 		primitives3d = new ArrayList<Primitive3d>();
 		
+		setProperty("$deg45x", DEG45X);
+		setProperty("$deg45y", DEG45Y);
+		setProperty("$deg45z", DEG45Z);
+		
 		setProperty("$deg90x", DEG90X);
 		setProperty("$deg90y", DEG90Y);
 		setProperty("$deg90z", DEG90Z);
+		
+		setProperty("$deg180x", DEG180X);
+		setProperty("$deg180y", DEG180Y);
+		setProperty("$deg180z", DEG180Z);
+		
+		setProperty("$deg270x", DEG270X);
+		setProperty("$deg270y", DEG270Y);
+		setProperty("$deg270z", DEG270Z);
 	}
 
 	/**
