@@ -5,7 +5,9 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.IVector2;
 
 /**
@@ -74,6 +76,8 @@ public class ProduceOreTask extends AbstractTask
 		time	= (time + progress)%TIME;
 		target.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
 		target.setProperty(PROPERTY_CAPACITY, new Integer(capacity));
+
+		obj.setProperty("status", "ore");
 		
 		if(ore==0)
 		{

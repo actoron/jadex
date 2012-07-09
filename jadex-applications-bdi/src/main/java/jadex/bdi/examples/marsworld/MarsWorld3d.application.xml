@@ -73,6 +73,7 @@
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
+					<env:property name="status" class="String">"Walk"</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
@@ -185,7 +186,12 @@
 				</env:drawable3d>
 					
 				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
-					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
+					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"> 
+					<env:animation name="Dig" channel="chan01" loop="true">
+					
+					<env:animationcondition>$object.getProperty("status").equals("ore")</env:animationcondition>
+					</env:animation>
+					</env:object3d>
 					</env:drawable3d>	
 				</env:perspective>	
 
