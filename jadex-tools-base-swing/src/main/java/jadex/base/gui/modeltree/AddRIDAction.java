@@ -1,6 +1,8 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.GlobalResourceIdentifier;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
@@ -17,6 +19,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
+import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -88,7 +91,6 @@ public class AddRIDAction extends ToolTipAction
 				{
 					try
 					{
-						String gid = null;
 //						String gid = JOptionPane.showInputDialog(treepanel, "Enter Artifact Id:");
 						Method m = cl.getMethod("showDialog", new Class[]{IThreadPool.class, Component.class});
 						Object o = m.invoke(null, new Object[]{tp, treepanel});
@@ -98,8 +100,10 @@ public class AddRIDAction extends ToolTipAction
 							String grid = (String)o.getClass().getField("groupId").get(o);
 							String arid = (String)o.getClass().getField("artifactId").get(o);
 							String ver = (String)o.getClass().getField("version").get(o);
-							gid = grid+":"+arid+":"+ver;
-			//				System.out.println("adding: "+gid);
+							String url = (String)o.getClass().getField("remoteUrl").get(o);
+							String id = grid+":"+arid+":"+ver;
+							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, new URL(url));
+							System.out.println("adding: "+gid);
 			
 			//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
 							IResourceIdentifier rid = new ResourceIdentifier(null, gid);

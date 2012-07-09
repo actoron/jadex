@@ -88,8 +88,7 @@ public class BasicDependencyService implements IDependencyService
 	{
 		// Does not use global identifiers.
 		ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
-		String gid	= null;
-		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
+		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
 		return new Future<IResourceIdentifier>(rid);
 	}
 }

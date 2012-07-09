@@ -54,7 +54,7 @@ public class ComponentProperties	extends	PropertiesPanel
 		getTextField("Model name").setText(desc.getModelName());
 		getTextField("Ownership").setText(desc.getOwnership());
 		getTextField("State").setText(desc.getState());
-		String gid = desc.getResourceIdentifier().getGlobalIdentifier();
+		String gid = desc.getResourceIdentifier().getGlobalIdentifier().getResourceId();
 		ILocalResourceIdentifier lid = desc.getResourceIdentifier().getLocalIdentifier();
 		getTextField("Resource Identifier").setText(gid==null? "n/a": gid);
 		getTextField("(global / local)").setText(lid==null? "n/a": lid.toString());

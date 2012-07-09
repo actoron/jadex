@@ -17,7 +17,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	protected ILocalResourceIdentifier	lid;
 	
 	/** The global identifier. */
-	protected String gid;
+	protected IGlobalResourceIdentifier gid;
 	
 	//-------- constructors --------
 
@@ -34,10 +34,8 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  @param lid The local identifier.
 	 *  @param gid The global idenfifier.
 	 */
-	public ResourceIdentifier(ILocalResourceIdentifier lid, String gid)
+	public ResourceIdentifier(ILocalResourceIdentifier lid, IGlobalResourceIdentifier gid)
 	{
-//		if(gid==null)
-//			System.out.println("googsdl");
 		this.lid = lid;
 		this.gid = gid;
 	}
@@ -59,7 +57,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  Get the global identifier.
 	 *  @return The global identifier.
 	 */
-	public String getGlobalIdentifier()
+	public IGlobalResourceIdentifier getGlobalIdentifier()
 	{
 		return gid;
 	}
@@ -77,7 +75,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  Set the global identifier.
 	 *  @param gid The gid to set.
 	 */
-	public void setGlobalIdentifier(String gid)
+	public void setGlobalIdentifier(IGlobalResourceIdentifier gid)
 	{
 		this.gid = gid;
 	}

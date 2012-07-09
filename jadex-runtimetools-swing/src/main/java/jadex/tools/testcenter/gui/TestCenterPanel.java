@@ -587,7 +587,8 @@ public class TestCenterPanel extends JSplitPanel
 					Properties	entry	= new Properties();
 					entry.addProperty(new Property("model", local.getFirstEntity()));
 					entry.addProperty(new Property("ridurl", local.getSecondEntity()));
-					entry.addProperty(new Property("globalrid", tests.get(i).getSecondEntity().getGlobalIdentifier()));
+					// todo: save also repo info of gid
+					entry.addProperty(new Property("globalrid", tests.get(i).getSecondEntity().getGlobalIdentifier().getResourceId()));
 					props.addSubproperties("entry", entry);
 				}
 				props.addProperty(new Property("timeout", tfto.getText()));

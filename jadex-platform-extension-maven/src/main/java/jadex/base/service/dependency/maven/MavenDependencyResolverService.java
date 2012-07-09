@@ -1,6 +1,8 @@
 package jadex.base.service.dependency.maven;
 
+import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -250,12 +252,13 @@ public class MavenDependencyResolverService	implements IDependencyService
 	{
 		// todo: get stored rid for url?!
 		ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
-		String gid	= null;
+		IGlobalResourceIdentifier gid	= null;
 		ModelSource	pom	= findModelSource(url);
 		if(pom!=null)
 		{
 			Model	model	= loadPom(pom);
-			gid = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
+			String id = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
+			gid = new GlobalResourceIdentifier(id, null); // todo: repo url
 		}
 		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
 		logger.info("Resource identifier for "+url+" is: "+rid);
@@ -300,8 +303,9 @@ public class MavenDependencyResolverService	implements IDependencyService
 							ArtifactRequest	ar	= new ArtifactRequest(SMaven.convertDependency(deps.get(i)), repositories, null);
 							ArtifactResult res = system.resolveArtifact(session, ar);
 							Artifact	art	= res.getArtifact();
-							ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())),
-								getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));
+							String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
+							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null); // repo url?
+							ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())), gid);
 							deprids.add(deprid);
 							ret = loadDependencies(deprid, rids, workspace);
 							fin = true;
@@ -319,8 +323,9 @@ public class MavenDependencyResolverService	implements IDependencyService
 					if(!fin)
 					{
 						Artifact	art	= SMaven.convertDependency(deps.get(i));
-						IResourceIdentifier	deprid	= new ResourceIdentifier(null,
-							getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));	
+						String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
+						IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null); // todo: repo url
+						IResourceIdentifier	deprid	= new ResourceIdentifier(null, gid);	
 						deprid	= loadDependenciesWithAether(deprid, rids);
 						ret = deprid;
 						deprids.add(deprid);
@@ -355,7 +360,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected IResourceIdentifier	loadDependenciesWithAether(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids)	throws Exception
 	{
-		Artifact	art	= new DefaultArtifact(rid.getGlobalIdentifier());
+		Artifact	art	= new DefaultArtifact(rid.getGlobalIdentifier().getResourceId());
 		// Todo: use remote repositories from settings.
 		CollectRequest	crequest	= new CollectRequest(new Dependency(art, null), repositories);
 		DependencyRequest	request	= new DependencyRequest(crequest, null);
@@ -381,8 +386,16 @@ public class MavenDependencyResolverService	implements IDependencyService
 		{
 			DependencyNode	depnode	= children.get(i);
 			Artifact	art	= depnode.getDependency().getArtifact();
-			ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())),
-				getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));
+			String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
+			// todo: more than one url?
+			URL repourl = null;
+			List<RemoteRepository> repos = depnode.getRepositories();
+			if(repos!=null && repos.size()>0)
+			{
+				repourl = new URL(repos.get(0).getUrl());
+			}
+			IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, repourl); 
+			ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())), gid);
 			processAetherDependencies(deprid, rids, depnode);
 			deps.add(deprid);
 		}

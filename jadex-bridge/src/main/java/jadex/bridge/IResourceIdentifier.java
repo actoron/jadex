@@ -20,5 +20,6 @@ public interface IResourceIdentifier
 	 *  Get the global identifier.
 	 *  @return The global identifier.
 	 */
-	public String getGlobalIdentifier();
+//	public String getGlobalIdentifier();
+	public IGlobalResourceIdentifier getGlobalIdentifier();
 }

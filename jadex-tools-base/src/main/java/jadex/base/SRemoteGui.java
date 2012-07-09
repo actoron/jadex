@@ -1,5 +1,6 @@
 package jadex.base;
 
+import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -232,7 +233,7 @@ public class SRemoteGui
 				{
 					URL	url	= SUtil.toURL(ridurl);
 					LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url);
-					ret.setResult(new ResourceIdentifier(lid, globalrid));
+					ret.setResult(new ResourceIdentifier(lid, new GlobalResourceIdentifier(globalrid, null)));
 				}
 				
 				return ret;
