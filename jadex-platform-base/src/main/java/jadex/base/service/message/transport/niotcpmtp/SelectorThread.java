@@ -152,6 +152,8 @@ public class SelectorThread implements Runnable
 				((NIOTCPOutputConnection)con).getCleaner().remove();
 			}
 		}
+		
+//		System.out.println("nio selector end");
 	}
 	
 	//-------- methods to be called from external --------

@@ -725,7 +725,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		}
 	
 		// If no perspective selected use first plugin.
-		if(currentperspective==null)
+		if(currentperspective==null && controlcenter.getPlugins().length>0)
 		{
 			currentperspective	= controlcenter.getPlugins()[0];
 		}

@@ -23,7 +23,7 @@ import javax.swing.Icon;
 import javax.swing.JTree;
 
 /**
- * 
+ *  Node for rid based jar or local artifact directory.
  */
 public class RIDNode extends AbstractTreeNode implements IFileNode
 {
