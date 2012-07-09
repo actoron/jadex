@@ -34,7 +34,7 @@ public class RemovePathAction extends ToolTipAction
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_removefolder.png"),
+		"removepath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/remove_folder424.png"),
 	});
 
 	//-------- attributes --------	

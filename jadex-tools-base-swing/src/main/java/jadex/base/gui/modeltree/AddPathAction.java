@@ -25,7 +25,7 @@ public class AddPathAction extends ToolTipAction
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"addpath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/new_addfolder.png"),
+		"addpath",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/add_folder424.png"),
 	});
 	
 	//-------- attributes --------
