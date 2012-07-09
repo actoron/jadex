@@ -1,6 +1,7 @@
 package jadex.base.gui.reposearch;
 
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
@@ -114,7 +115,7 @@ public class RepositorySearchPanel extends JPanel
 	protected JComboBox cbrepos;
 	
 	/** The thread pool. */
-	protected ThreadPool tp;
+	protected IThreadPool tp;
 	
 	/** The current search query text. */
 	protected String curquery;
@@ -131,7 +132,7 @@ public class RepositorySearchPanel extends JPanel
 	/**
 	 *  Create a new search panel.
 	 */
-	public RepositorySearchPanel(final PlexusContainer plexus, ThreadPool tp)
+	public RepositorySearchPanel(final PlexusContainer plexus, IThreadPool tp)
 	{
 		this.plexus = plexus;
 		this.tp = tp;
@@ -369,7 +370,7 @@ public class RepositorySearchPanel extends JPanel
 	 *  Get the thread pool.
 	 *  @return The thread pool.
 	 */
-	public ThreadPool getThreadPool()
+	public IThreadPool getThreadPool()
 	{
 		return tp;
 	}
@@ -895,7 +896,7 @@ public class RepositorySearchPanel extends JPanel
 			public void run()
 			{
 				// todo: use thread pool
-				ArtifactInfo ai = showDialog(null);
+				ArtifactInfo ai = showDialog(null, null);
 				System.out.println("artifact: "+ai);
 //				JFrame f = new JFrame();
 //				f.add(new RepositorySearchPanel(createPlexus(), new ThreadPool()));
@@ -909,7 +910,7 @@ public class RepositorySearchPanel extends JPanel
 	/**
 	 *  Show a repository and artifact dialog.
 	 */
-	public static ArtifactInfo showDialog(ThreadPool tp)
+	public static ArtifactInfo showDialog(IThreadPool tp, Component parent)
 	{		
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -945,7 +946,7 @@ public class RepositorySearchPanel extends JPanel
 			}
 		});
 		dia.pack();
-		dia.setLocation(SGUI.calculateMiddlePosition(dia));
+		dia.setLocation(SGUI.calculateMiddlePosition(parent!=null? SGUI.getWindowParent(parent): null, dia));
 		dia.setVisible(true);
 		if(ok[0])
 		{

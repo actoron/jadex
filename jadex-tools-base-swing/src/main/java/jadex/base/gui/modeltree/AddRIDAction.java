@@ -1,19 +1,24 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 
 import javax.swing.Icon;
-import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 
 /**
@@ -32,14 +37,17 @@ public class AddRIDAction extends ToolTipAction
 	//-------- attributes --------
 	
 	/** The tree. */
-	protected FileTreePanel treepanel;
+	protected ModelTreePanel treepanel;
+	
+	/** The thread pool. */
+	protected IThreadPool tp;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new action
 	 */
-	public AddRIDAction(FileTreePanel treepanel)
+	public AddRIDAction(ModelTreePanel treepanel)
 	{
 		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
@@ -47,7 +55,7 @@ public class AddRIDAction extends ToolTipAction
 	/**
 	 *  Create a new action 
 	 */
-	public AddRIDAction(String name, Icon icon, String desc, FileTreePanel treepanel)
+	public AddRIDAction(String name, Icon icon, String desc, ModelTreePanel treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
@@ -71,34 +79,67 @@ public class AddRIDAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		try
+		final Class<?> cl = SReflect.findClass0("jadex.base.gui.reposearch.RepositorySearchPanel", null, null);
+		if(cl!=null)
 		{
-			String gid = null;
-//			String gid = JOptionPane.showInputDialog(treepanel, "Enter Artifact Id:");
-			Class cl = SReflect.findClass0("jadex.base.gui.reposearch.RepositorySearchPanel", null, null);
-			if(cl!=null)
+			getThreadPool().addResultListener(new SwingDefaultResultListener<IThreadPool>()
 			{
-				Method m = cl.getMethod("showDialog", new Class[]{ThreadPool.class});
-				Object o = m.invoke(null, new Object[]{null});
-//				System.out.println("sel ai: "+o);
-				if(o!=null)
+				public void customResultAvailable(IThreadPool result)
 				{
-					String grid = (String)o.getClass().getField("groupId").get(o);
-					String arid = (String)o.getClass().getField("artifactId").get(o);
-					String ver = (String)o.getClass().getField("version").get(o);
-					gid = grid+":"+arid+":"+ver;
-	//				System.out.println("adding: "+gid);
-	
-	//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
-					IResourceIdentifier rid = new ResourceIdentifier(null, gid);
-					treepanel.addTopLevelNode(rid);
+					try
+					{
+						String gid = null;
+//						String gid = JOptionPane.showInputDialog(treepanel, "Enter Artifact Id:");
+						Method m = cl.getMethod("showDialog", new Class[]{IThreadPool.class, Component.class});
+						Object o = m.invoke(null, new Object[]{tp, treepanel});
+//						System.out.println("sel ai: "+o);
+						if(o!=null)
+						{
+							String grid = (String)o.getClass().getField("groupId").get(o);
+							String arid = (String)o.getClass().getField("artifactId").get(o);
+							String ver = (String)o.getClass().getField("version").get(o);
+							gid = grid+":"+arid+":"+ver;
+			//				System.out.println("adding: "+gid);
+			
+			//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";
+							IResourceIdentifier rid = new ResourceIdentifier(null, gid);
+							treepanel.addTopLevelNode(rid);
+						}
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+					}
 				}
-			}			
-		}
-		catch(Exception ex)
+			});
+		}			
+	}
+	
+	/**
+	 *  Get the thread pool.
+	 */
+	protected IFuture<IThreadPool> getThreadPool()
+	{
+		final Future<IThreadPool> ret = new  Future<IThreadPool>();
+		
+		if(tp==null)
 		{
-			ex.printStackTrace();
+			SServiceProvider.getServiceUpwards(treepanel.localexta.getServiceProvider(), IThreadPoolService.class)
+				.addResultListener(new SwingDefaultResultListener<IThreadPoolService>()
+			{
+				public void customResultAvailable(IThreadPoolService result)
+				{
+					tp = result;
+					ret.setResult(tp);
+				}
+			});
 		}
+		else
+		{
+			ret.setResult(tp);
+		}
+		
+		return ret;
 	}
 	
 	/**
