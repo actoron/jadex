@@ -41,8 +41,8 @@ public class ModelIconCache implements IIconCache
 	{
 //		"scanning_on",	SGUI.makeIcon(DefaultNodeFunctionality.class, "/jadex/base/gui/images/new_refresh_anim.gif"),
 //		"src_folder", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/new_src_folder.png"),
-		"src_folder", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/folder3.png"),
-		"src_jar", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/new_src_jar.png"),
+		"src_folder", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/folder416.png"),
+		"src_jar", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/jar16.png"),
 //		"package", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/new_package.png")
 		"package", SGUI.makeIcon(ModelIconCache.class, "/jadex/base/gui/images/package2.png")
 	});

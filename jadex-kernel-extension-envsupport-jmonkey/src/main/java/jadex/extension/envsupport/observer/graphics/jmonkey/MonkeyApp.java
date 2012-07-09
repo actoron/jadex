@@ -128,15 +128,15 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 //		  viewPort.addProcessor(fpp);
 		
 		
-	    bsr = new BasicShadowRenderer(assetManager, 256);
-	    bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
-	    viewPort.addProcessor(bsr);
+//	    bsr = new BasicShadowRenderer(assetManager, 256);
+//	    bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
+//	    viewPort.addProcessor(bsr);
 	    
 	    
-//	    pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-//	    pssmRenderer.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
-//	    pssmRenderer.setShadowIntensity(0.6f);
-//	    viewPort.addProcessor(pssmRenderer);
+	    pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
+	    pssmRenderer.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); // light direction
+	    pssmRenderer.setShadowIntensity(0.6f);
+	    viewPort.addProcessor(pssmRenderer);
 	    
 
 
