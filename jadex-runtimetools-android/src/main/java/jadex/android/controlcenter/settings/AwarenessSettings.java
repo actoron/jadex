@@ -220,13 +220,21 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		helper.getActiveDiscoveryMechanisms().addResultListener(new DefaultResultListener<Set<String>>()
 		{
 			@Override
-			public void resultAvailable(Set<String> localtypes)
+			public void resultAvailable(final Set<String> localtypes)
 			{
-				for (int i = 0; i < cbmechanisms.length; i++)
+				uiHandler.post(new Runnable()
 				{
-					cbmechanisms[i].setChecked(localtypes.contains(cbmechanisms[i].getTitle()));
-					cbmechanisms[i].setEnabled(true);
-				}
+					
+					@Override
+					public void run()
+					{
+						for (int i = 0; i < cbmechanisms.length; i++)
+						{
+							cbmechanisms[i].setChecked(localtypes.contains(cbmechanisms[i].getTitle()));
+							cbmechanisms[i].setEnabled(true);
+						}
+					}
+				});
 			}
 		});
 	}
@@ -304,7 +312,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 								{
 									// setting changed -> create or
 									// delete proxy
-									helper.createOrDeleteProxy(proxy, create).addResultListener(new DefaultResultListener<Void>()
+									helper.createOrDeleteProxy(info.getComponentIdentifier(), create).addResultListener(new DefaultResultListener<Void>()
 									{
 										public void exceptionOccurred(Exception exception)
 										{
@@ -334,9 +342,9 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						newDisPrefs.add(disPref);
 					}
 				}
+				infoCat.removeAll();
 				for (Preference disPref : newDisPrefs)
 				{
-					infoCat.removeAll();
 					infoCat.addPreference(disPref);
 				}
 			}
