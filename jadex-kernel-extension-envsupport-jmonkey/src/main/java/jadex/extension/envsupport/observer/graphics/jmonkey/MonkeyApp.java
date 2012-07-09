@@ -108,6 +108,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 		// this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
+		
+		
 
 
 		

@@ -181,6 +181,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 				if(_firstrun)
 				{
 					_capabilities = _app.getCaps();
+					System.out.println("capabilities: \n" + _capabilities);
 					_staticNode = createStatics(_staticvisuals);
 					_app.setStaticGeometry(_staticNode);
 					_app.setChannels(_animChannels);
