@@ -93,7 +93,7 @@ public class RepositorySearchPanel extends JPanel
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"jar", SGUI.makeIcon(RepositorySearchPanel.class, "/jadex/base/gui/images/jar.png"),
-		"folder", SGUI.makeIcon(RepositorySearchPanel.class, "/jadex/base/gui/images/folder2.png")
+		"folder", SGUI.makeIcon(RepositorySearchPanel.class, "/jadex/base/gui/images/folder4.png")
 	});
 	
 	//-------- attributes --------

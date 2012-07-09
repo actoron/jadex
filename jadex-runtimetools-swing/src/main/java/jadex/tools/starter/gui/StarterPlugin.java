@@ -146,72 +146,72 @@ public class StarterPlugin extends AbstractJCCPlugin
 		b.setEnabled(true);
 		ret.add(b);
 
-		b = new JButton(KILL_PLATFORM);
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.KILL_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.SUSPEND_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.RESUME_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.STEP_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		separator	= new JToolBar.Separator();
-		separator.setOrientation(JSeparator.VERTICAL);
-		ret.add(separator);
-
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.SHOWPROPERTIES_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.SHOWDETAILS_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.REFRESH_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
-		
-		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.REFRESHSUBTREE_ACTION));
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret.add(b);
+//		b = new JButton(KILL_PLATFORM);
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.KILL_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.SUSPEND_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.RESUME_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.STEP_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		separator	= new JToolBar.Separator();
+//		separator.setOrientation(JSeparator.VERTICAL);
+//		ret.add(separator);
+//
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.SHOWPROPERTIES_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.SHOWDETAILS_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.REFRESH_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
+//		
+//		b = new JButton(((StarterPluginPanel)getView()).getComponentTreePanel().getAction(ComponentTreePanel.REFRESHSUBTREE_ACTION));
+//		b.setBorder(null);
+//		b.setToolTipText(b.getText());
+//		b.setText(null);
+//		b.setEnabled(true);
+//		ret.add(b);
 
 		return (JComponent[])ret.toArray(new JComponent[ret.size()]);
 	}
