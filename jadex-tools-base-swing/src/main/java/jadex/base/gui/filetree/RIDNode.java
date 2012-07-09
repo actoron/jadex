@@ -121,7 +121,10 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 	 */
 	public String getTooltipText()
 	{
-		return rid.toString();
+		String ret = rid.toString();
+		if(file!=null)
+			ret += "file: "+file.getAbsolutePath();
+		return ret;
 	}
 	
 	/**
@@ -137,7 +140,8 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 	 */
 	public boolean isJar()
 	{
-		return file!=null && file.getAbsolutePath().endsWith(".jar");
+		return file!=null && file instanceof JarAsDirectory;
+		// file.getAbsolutePath().endsWith(".jar")
 	}
 	
 	/**

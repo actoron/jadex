@@ -82,6 +82,7 @@ public class ModelIconCache implements IIconCache
 		if(ret==null)
 		{
 			String type = null;
+			
 			if(node instanceof JarNode || node instanceof RemoteJarNode || (node instanceof RIDNode && ((RIDNode)node).isJar()))
 			{
 				type = "src_jar";

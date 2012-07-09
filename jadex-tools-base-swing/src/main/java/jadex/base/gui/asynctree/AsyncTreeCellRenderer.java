@@ -19,15 +19,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 {
-	// -------- constructors --------
-
-	/**
-	 * Create a new component tree cell renderer.
-	 */
-	public AsyncTreeCellRenderer()
-	{
-	}
-
 	// -------- TreeCellRenderer interface --------
 
 	/**
