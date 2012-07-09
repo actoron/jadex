@@ -58,6 +58,8 @@ public abstract class AbstractTreeNode	implements ITreeNode
 		this.parent	= parent;
 		this.model	= model;
 		this.tree	= tree;
+		
+//		model.registerNode(this);
 	}
 	
 	//-------- IComponentTreeNode interface --------
@@ -460,7 +462,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 
-		model.registerNode(node);
+//		model.registerNode(node);
 		
 		addChild(getCachedChildren().size(), node);
 	}

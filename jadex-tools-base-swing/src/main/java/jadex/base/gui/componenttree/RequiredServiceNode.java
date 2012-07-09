@@ -50,7 +50,7 @@ public class RequiredServiceNode extends AbstractTreeNode
 		this.nid = nid;
 //		if(service==null || service.getServiceIdentifier()==null)
 //			System.out.println("service node: "+this);
-//		model.registerNode(this);
+		model.registerNode(this);
 	}
 	
 	//-------- methods --------

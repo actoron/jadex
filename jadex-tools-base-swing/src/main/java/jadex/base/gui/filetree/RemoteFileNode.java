@@ -53,7 +53,7 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 		this.exta = exta;
 //		this.relative = convertPathToRelative(file);
 		
-//		model.registerNode(this);
+		model.registerNode(this);
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------

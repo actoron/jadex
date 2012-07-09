@@ -97,7 +97,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		this.iconcache	= iconcache;
 		this.access	= access;
 		
-//		model.registerNode(this);
+		model.registerNode(this);
 		
 		// Add CMS listener for platform node.
 		if(parent==null)

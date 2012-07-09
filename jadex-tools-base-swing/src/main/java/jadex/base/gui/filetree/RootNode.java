@@ -38,7 +38,7 @@ public class RootNode extends AbstractTreeNode
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 		this.children = new ArrayList();
 		
-//		model.registerNode(this);
+		model.registerNode(this);
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------

@@ -60,7 +60,7 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 //		this.relative = FileNode.convertPathToRelative(file);
 		this.factory = factory;
 		
-//		model.registerNode(this);
+		model.registerNode(this);
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	

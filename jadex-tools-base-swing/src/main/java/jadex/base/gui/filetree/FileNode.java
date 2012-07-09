@@ -50,7 +50,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 		this.file = file;
 		this.relative = convertPathToRelative(file);
 		
-//		model.registerNode(this);
+		model.registerNode(this);
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
