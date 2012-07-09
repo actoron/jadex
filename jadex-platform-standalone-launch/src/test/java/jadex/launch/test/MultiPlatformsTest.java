@@ -19,7 +19,7 @@ public class MultiPlatformsTest extends TestCase
 	public void	testMultiplePlatforms()
 	{
 		int number	= 30;	// larger numbers lead to out of mem on hudson 32bit.
-		long timeout	= 30000;
+		long timeout	= 60000;
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)

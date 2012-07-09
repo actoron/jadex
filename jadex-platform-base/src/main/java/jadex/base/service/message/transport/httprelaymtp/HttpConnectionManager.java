@@ -62,7 +62,14 @@ public class HttpConnectionManager
 					Field	f	= acon[i].getClass().getDeclaredField("http");
 					f.setAccessible(true);
 					Object	client	= f.get(acon[i]);
-					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+					if(client!=null)
+					{
+						client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+					}
+					else
+					{
+						acon[i].disconnect();	// Connection not open?			
+					}
 				}
 				catch(Exception e)
 				{

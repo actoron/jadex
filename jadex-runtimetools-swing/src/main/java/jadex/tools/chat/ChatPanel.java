@@ -217,6 +217,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The message counter to differentiate sent messages. */
 	protected int	reqcnt;
+	
+	/** The timer for the flashing chat icon. */
+	protected Timer	icontimer;
 
 	//-------- constructors --------
 	
@@ -1153,6 +1156,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		Future<Void>	ret	= new Future<Void>();
 		timer.stop();
+		if(icontimer!=null)
+		{
+			icontimer.stop();
+			icontimer	= null;
+		}
 		super.shutdown().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -1578,7 +1586,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						final JButton but	= new JButton(ChatPlugin.getStatusIcon(false));
 						scomp	= but;
-						final Timer	timer	= new Timer(500, new ActionListener()
+						assert icontimer==null;
+						icontimer	= new Timer(500, new ActionListener()
 						{
 							boolean	star;
 							public void actionPerformed(ActionEvent e)
@@ -1587,8 +1596,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								but.setIcon(ChatPlugin.getStatusIcon(star));
 							}
 						});
-						timer.setRepeats(true);
-						timer.start();
+						icontimer.setRepeats(true);
+						icontimer.start();
 						but.setMargin(new Insets(0, 0, 0, 0));
 						but.addActionListener(new ActionListener()
 						{
@@ -1596,7 +1605,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							{
 								getJCC().showPlugin(ChatPlugin.PLUGIN_NAME);
 								getJCC().removeStatusComponent("chat-status-comp");
-								timer.stop();
+								icontimer.stop();
+								icontimer	= null;
 							}
 						});
 						getJCC().addStatusComponent("chat-status-comp", scomp);
