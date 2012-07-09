@@ -251,41 +251,35 @@ public class JadexAndroidContext extends AndroidContext
 	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId)
 	{
 		return startJadexPlatform(kernels, platformId, "");
-
 	}
 
 	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
 	{
-		// if (isJadexRunning()){
-		// throw new JadexAndroidError("Platform was already started!");
-		// }
-
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-
-		final StringBuffer kernelString = new StringBuffer("\"");
-		String sep = "";
-		for (int i = 0; i < kernels.length; i++)
-		{
-			kernelString.append(sep);
-			kernelString.append(kernels[i]);
-			sep = ",";
-		}
-		kernelString.append("\"");
-
-		final String defOptions = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -wspublish false" + " -android true" + " -kernels "
-				+ kernelString.toString() + " -binarymessages true" +
-				// " -tcptransport false" +
-				// " -niotcptransport false" +
-				// " -relaytransport true" +
-				// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
-				// +
-				// " -saveonexit false -gui false" +
-				" -autoshutdown false" + " -platformname " + platformId + " -saveonexit true -gui false" + " ";
-
 		new Thread(new Runnable()
 		{
 			public void run()
 			{
+				final StringBuffer kernelString = new StringBuffer("\"");
+				String sep = "";
+				for (int i = 0; i < kernels.length; i++)
+				{
+					kernelString.append(sep);
+					kernelString.append(kernels[i]);
+					sep = ",";
+				}
+				kernelString.append("\"");
+				
+				final String defOptions = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -wspublish false" + " -rspublish false" + " -android true" + " -kernels "
+						+ kernelString.toString() + " -binarymessages true" +
+						// " -tcptransport false" +
+						// " -niotcptransport false" +
+						// " -relaytransport true" +
+						// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
+						// +
+						// " -saveonexit false -gui false" +
+						" -autoshutdown false" + " -platformname " + (platformId != null ? platformId : getRandomPlatformID()) + " -saveonexit true -gui false" + " ";
+				
 				IFuture<IExternalAccess> future = Starter.createPlatform((defOptions + options).split("\\s+"));
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{

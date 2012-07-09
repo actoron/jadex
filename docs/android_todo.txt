@@ -7,3 +7,5 @@ done: 06-26 15:03:39.715: I/dalvikvm(327): Could not find method java.awt.Deskto
 done: 06-26 15:03:39.715: D/dalvikvm(327): VFY: dead code 0x000d-0014 in Ljadex/base/service/deployment/DeploymentService;.openFile (Ljava/lang/String;)Ljadex/commons/future/IFuture;
 
 07-03 15:05:01.792: W/null(931): Could not initialize transport: jadex.base.service.message.transport.ssltcpmtp.SSLTCPTransport@4501a548 reason: java.lang.RuntimeException: Transport initialization error: java.security.NoSuchAlgorithmException: KeyManagerFactory SunX509 implementation not found
+
+jadex-tools-base enthält junit compile abhängigkeit..

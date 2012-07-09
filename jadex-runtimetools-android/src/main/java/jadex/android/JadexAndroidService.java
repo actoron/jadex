@@ -1,5 +1,6 @@
 package jadex.android;
 
+import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -20,35 +21,38 @@ import jadex.commons.transformation.annotations.Classname;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * This is an Android Activity Class which provides needed Functionality and
- * comfort Features for Jadex Android Activities. It MUST be extended by every
- * Jadex-Android Activity.
- * 
- * @author Julian Kalinowski
- */
-public class JadexAndroidActivity extends ContextProvidingActivity
-{
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
 
+public class JadexAndroidService extends Service implements AndroidContextChangeListener
+{
+	
 	private JadexAndroidContext jadexAndroidContext;
 
-	public JadexAndroidActivity()
+	@Override
+	public IBinder onBind(Intent intent)
 	{
-		super();
-		jadexAndroidContext = JadexAndroidContext.getInstance();
+		return null;
 	}
-
-//	/**
-//	 * Returns the External Access Object of the Jadex Platform.
-//	 * 
-//	 * @return {@link IExternalAccess}
-//	 */
-//	public IExternalAccess getExternalPlatformAccess() throws JadexAndroidPlatformNotStartedError
-//	{
-//		checkIfJadexIsRunning("getExternalPlatformAccess()");
-//		return jadexAndroidContext.getExternalPlattformAccess();
-//	}
-
+	
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		jadexAndroidContext = JadexAndroidContext.getInstance();
+		jadexAndroidContext.setAndroidContext(this);
+		jadexAndroidContext.addContextChangeListener(this);
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		jadexAndroidContext.removeContextChangeListener(this);
+	}
+	
 	protected boolean isJadexPlatformRunning()
 	{
 		return jadexAndroidContext.isPlatformRunning();
@@ -93,7 +97,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
-				args.put("androidContext", JadexAndroidActivity.this);
+				args.put("androidContext", JadexAndroidService.this);
 				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
@@ -154,31 +158,6 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 		return ret;
 	}
 
-//	protected IFuture<IExternalAccess> startJadexPlatform()
-//	{
-//		return jadexAndroidContext.startJadexPlatform();
-//	}
-//
-//	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels)
-//	{
-//		return jadexAndroidContext.startJadexPlatform(kernels);
-//	}
-//
-//	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId)
-//	{
-//		return jadexAndroidContext.startJadexPlatform(kernels, platformId);
-//	}
-//
-//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
-//	{
-//		return jadexAndroidContext.startJadexPlatform(kernels, platformId, options);
-//	}
-//
-//	public void shutdownJadexPlatform(IComponentIdentifier platformId)
-//	{
-//		jadexAndroidContext.shutdownJadexPlatform(platformId);
-//	}
-
 	private void checkIfJadexIsRunning(String caller)
 	{
 		if (!jadexAndroidContext.isPlatformRunning())
@@ -201,6 +180,20 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 				return ret;
 			}
 		});
+	}
+
+	@Override
+	public void onContextDestroy(Context ctx)
+	{
+		// if context is destroyed
+		System.out.println("service sets context");
+		jadexAndroidContext.setAndroidContext(this);
+	}
+
+	@Override
+	public void onContextCreate(Context ctx)
+	{
+		// dont care
 	}
 
 }

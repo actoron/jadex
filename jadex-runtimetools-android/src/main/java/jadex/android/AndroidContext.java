@@ -48,14 +48,16 @@ public class AndroidContext
 	 * 
 	 * @param contextProvidingActivity
 	 */
-	public void setAndroidContext(Context contextProvidingActivity)
+	public synchronized void setAndroidContext(Context contextProvidingActivity)
 	{
 		if (contextProvidingActivity == null)
 		{
 			informContextDestroy(lastContext);
+			System.out.println("Context destroy");
 		} else
 		{
 			informContextCreate(lastContext);
+			System.out.println("Context create");
 		}
 		lastContext = contextProvidingActivity;
 	}

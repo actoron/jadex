@@ -1,5 +1,8 @@
 package jadex.xml.reader;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jadex.commons.SReflect;
 import jadex.xml.stax.XMLReporter;
 
@@ -38,8 +41,7 @@ public abstract class XMLReaderFactory
 					}
 				} catch (ClassNotFoundException e)
 				{
-					// No XML Reader available
-					e.printStackTrace();
+					Logger.getLogger("jadex").log(Level.WARNING, "XMLReader not available.");
 				} catch (InstantiationException e)
 				{
 					e.printStackTrace();

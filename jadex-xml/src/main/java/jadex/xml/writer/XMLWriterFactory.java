@@ -1,5 +1,6 @@
 package jadex.xml.writer;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jadex.commons.SReflect;
@@ -44,7 +45,7 @@ public abstract class XMLWriterFactory
 					}
 				} catch (ClassNotFoundException e)
 				{
-					e.printStackTrace();
+					Logger.getLogger("jadex").log(Level.WARNING, "XMLWriter not available.");
 				} catch (InstantiationException e)
 				{
 					e.printStackTrace();

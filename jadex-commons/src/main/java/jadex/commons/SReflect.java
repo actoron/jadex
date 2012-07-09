@@ -1220,6 +1220,34 @@ public class SReflect
 		}
 		return androidVersion.intValue();
 	}
+	
+	/** Cached flag for xml support */
+	protected static Boolean hasXmlSupport;
+	
+	/**
+	 * Checks wether the Platform has the necessary classes to provide XML
+	 * encoding and decoding support.
+	 * @return true, if platform supports xml
+	 */
+	public static boolean hasXmlSupport() {
+		if (hasXmlSupport == null)
+		{
+			try
+			{
+				classForName("jadex.xml.reader.XMLReaderFactoryAndroid", null);
+				classForName("jadex.xml.writer.XMLWriterFactoryAndroid", null);
+				hasXmlSupport = true;
+			} catch (ClassNotFoundException e)
+			{
+				hasXmlSupport = false;
+			} finally {
+				return hasXmlSupport.booleanValue();
+			}
+		} else
+		{
+			return hasXmlSupport.booleanValue();
+		}
+	}
 }
 
 

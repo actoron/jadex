@@ -67,13 +67,11 @@ public class CodecFactory
 		if(codecs==null)
 		{
 			// dynamically decide if JadexXMLCodec is available
-			Class jadexXMLCodec = SReflect.classForName0("jadex.base.service.message.transport.codecs.JadexXMLCodec", null);
-
 			codecs = !SReflect.isAndroid()
-				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, jadexXMLCodec, GZIPCodec.class, JadexBinaryCodec.class}
-				: jadexXMLCodec == null 
-						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
-						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, jadexXMLCodec};
+				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
+				: SReflect.hasXmlSupport()
+						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexXMLCodec.class}
+						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 		}
 		for(int i=0; i<codecs.length; i++)
 		{

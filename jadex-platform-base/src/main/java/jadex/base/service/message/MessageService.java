@@ -92,34 +92,23 @@ public class MessageService extends BasicService implements IMessageService
 	//-------- constants --------
 	
 	/** The default codecs. */
-    public static IContentCodec[] CODECS;
-        
-    static {
-    	List<IContentCodec> codecList = new ArrayList<IContentCodec>(5);
-    	
-    	if (!SReflect.isAndroid()) {
-    		codecList.add(new jadex.base.contentcodecs.JavaXMLContentCodec());
-    		codecList.add(new jadex.base.contentcodecs.NuggetsXMLContentCodec());
-    		codecList.add(new jadex.base.contentcodecs.JadexBinaryContentCodec());
-    	} 
-    	else
-    	{
-    		codecList.add(new jadex.base.contentcodecs.JadexBinaryContentCodec());
-		}
-    	
-        //dynamically decide if JadexXMLContentCodec is available
-    	Class xmlContentCodec = SReflect.classForName0("jadex.base.contentcodecs.JadexXMLContentCodec", null);
-    	if (xmlContentCodec != null) {
-    		try
-			{
-    			codecList.add((IContentCodec) xmlContentCodec.newInstance());
-			} catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-    	}
-    	CODECS = codecList.toArray(new IContentCodec[codecList.size()]);
+    public static IContentCodec[] CODECS = !SReflect.isAndroid() ? new IContentCodec[]
+    {
+        new jadex.base.contentcodecs.JavaXMLContentCodec(),
+        new jadex.base.contentcodecs.JadexXMLContentCodec(),
+        new jadex.base.contentcodecs.NuggetsXMLContentCodec(),
+		new jadex.base.contentcodecs.JadexBinaryContentCodec()
     }
+    : SReflect.hasXmlSupport()
+	    ? new IContentCodec[]
+	    {
+	    		new jadex.base.contentcodecs.JadexBinaryContentCodec()
+	    }
+        :new IContentCodec[]
+        {
+        	new jadex.base.contentcodecs.JadexBinaryContentCodec(),
+        	new jadex.base.contentcodecs.JadexXMLContentCodec()
+        };
 
 	//-------- attributes --------
 
