@@ -18,7 +18,7 @@ import java.util.Set;
 
 
 /**
- * This drawable combines multiple drawables into a single drawable object.
+ * This drawable combines multiple 3ddrawables into a single drawable object.
  */
 public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObject
 {
