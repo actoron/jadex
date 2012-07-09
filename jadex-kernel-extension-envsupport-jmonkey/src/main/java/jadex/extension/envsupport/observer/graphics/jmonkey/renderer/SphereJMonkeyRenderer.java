@@ -25,7 +25,7 @@ public class SphereJMonkeyRenderer extends AbstractJMonkeyRenderer
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			Object obj, ViewportJMonkey vp) {
 			
-			sphere = new Sphere(30, 30, 1);
+			sphere = new Sphere(16, 16, 1);
 		
 			geo = new Geometry(identifier, sphere);
 			
