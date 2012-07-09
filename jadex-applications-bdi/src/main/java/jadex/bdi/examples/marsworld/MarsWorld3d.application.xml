@@ -172,7 +172,7 @@
 							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
 						</env:box>
 						
-						<env:object3d width=".5" height=".5" depth=".5"  rotation="rotate90" modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true" shadowtype="Cast">
+						<env:object3d width=".5" height=".5" depth=".5"  rotation="$deg90x" modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true" shadowtype="Cast">
 							<env:animation name="Wave" channel="chan" loop="true">
 							</env:animation>
 							<env:drawcondition>

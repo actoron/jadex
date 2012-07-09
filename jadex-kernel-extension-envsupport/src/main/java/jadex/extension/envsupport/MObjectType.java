@@ -7,37 +7,51 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MObjectType implements IPropertyMetaDataSet {
 
-	private String name;
-	private boolean kdtree;
-	private Map properties = new HashMap();
+/**
+ *  todo: comment me
+ */
+public class MObjectType implements IPropertyMetaDataSet
+{
 
-	public String getName() {
+	private String	name;
+
+	private boolean	kdtree;
+
+	private Map		properties	= new HashMap();
+
+	public String getName()
+	{
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
-	
-	public boolean isKdTree() {
+
+	public boolean isKdTree()
+	{
 		return kdtree;
 	}
 
-	public void setKdTree(boolean kdtree) {
+	public void setKdTree(boolean kdtree)
+	{
 		this.kdtree = kdtree;
 	}
 
-	public void addProperty(MObjectTypeProperty property) {
+	public void addProperty(MObjectTypeProperty property)
+	{
 		properties.put(property.getName(), property);
 	}
-	
-	public IPropertyMetaData getProperty(String name) {
+
+	public IPropertyMetaData getProperty(String name)
+	{
 		return (MObjectTypeProperty)properties.get(name);
 	}
-	
-	public Iterator iterator() {
+
+	public Iterator iterator()
+	{
 		return properties.values().iterator();
 	}
 }

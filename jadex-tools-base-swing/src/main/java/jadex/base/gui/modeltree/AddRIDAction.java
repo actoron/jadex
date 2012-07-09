@@ -26,7 +26,7 @@ public class AddRIDAction extends ToolTipAction
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"addrid",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/add_jar.png"),
+		"addrid",	SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/folder24.png"),
 	});
 	
 	//-------- attributes --------

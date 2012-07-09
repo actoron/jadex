@@ -1,7 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
 import jadex.commons.IPropertyObject;
-import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
@@ -38,6 +39,15 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/** Uses 3d Rotation? */
 	public boolean _rotation3d;
 	
+	/** Constant for 90 degree. */
+	public static IVector3 DEG90X = new Vector3Double((Math.PI/180)*90, 0, 0);
+	
+	/** Constant for 90 degree. */
+	public static IVector3 DEG90Y = new Vector3Double(0, (Math.PI/180)*90, 0);
+
+	/** Constant for 90 degree. */
+	public static IVector3 DEG90Z = new Vector3Double(0, 0, (Math.PI/180)*90);
+
 	//-------- constructors --------
 	
 	/**
@@ -60,6 +70,9 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 		_rotation3d = rotation3d;
 		primitives3d = new ArrayList<Primitive3d>();
 		
+		setProperty("$deg90x", DEG90X);
+		setProperty("$deg90y", DEG90Y);
+		setProperty("$deg90z", DEG90Z);
 	}
 
 	/**

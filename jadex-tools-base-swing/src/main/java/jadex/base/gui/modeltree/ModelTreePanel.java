@@ -55,7 +55,7 @@ public class ModelTreePanel extends FileTreePanel
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"gid", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png")
+		"gid", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_global.png")
 	});
 	
 	protected static int LISTENER_COUNTER = 0;
