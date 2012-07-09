@@ -2,6 +2,7 @@ package jadex.base.service.threadpool;
 
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.IFuture;
@@ -9,7 +10,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Service wrapper for a threadpool.
  */
-public class ThreadPoolService extends BasicService implements IThreadPoolService
+public class ThreadPoolService extends BasicService implements IThreadPoolService, IDaemonThreadPoolService
 {
 	//-------- attributes --------
 	

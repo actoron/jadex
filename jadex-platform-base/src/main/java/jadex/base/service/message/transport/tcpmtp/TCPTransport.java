@@ -8,7 +8,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
@@ -96,7 +96,7 @@ public class TCPTransport implements ITransport
 	protected Timer	timer;
 	
 	/** The thread pool. */
-	protected IThreadPoolService threadpool;
+	protected IDaemonThreadPoolService threadpool;
 	
 	//-------- constructors --------
 	
@@ -164,10 +164,10 @@ public class TCPTransport implements ITransport
 			}
 			
 			// Start the receiver thread.
-			SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
+			SServiceProvider.getService(container, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 			{
-				public void customResultAvailable(final IThreadPoolService tp)
+				public void customResultAvailable(final IDaemonThreadPoolService tp)
 				{
 					threadpool = tp;
 					

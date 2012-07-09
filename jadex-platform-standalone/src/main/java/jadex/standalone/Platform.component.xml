@@ -237,6 +237,13 @@
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
+		<providedservice class="jadex.bridge.service.types.threadpool.IDaemonThreadPoolService">
+			<implementation proxytype="raw">
+				new jadex.base.service.threadpool.ThreadPoolService(
+					new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
+			</implementation>
+		</providedservice>
 		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">
 				$args.simulation==null || !$args.simulation.booleanValue()

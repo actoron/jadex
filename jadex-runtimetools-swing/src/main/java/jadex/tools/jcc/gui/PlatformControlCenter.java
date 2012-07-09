@@ -112,7 +112,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	protected IControlCenterPlugin addPlugin(final String clname, ClassLoader cl)
 	{
 		assert SwingUtilities.isEventDispatchThread();
-		System.out.println("add plugin: "+clname);
+//		System.out.println("add plugin: "+clname);
 		
 //		libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
 //			.addResultListener(new DefaultResultListener<ClassLoader>()

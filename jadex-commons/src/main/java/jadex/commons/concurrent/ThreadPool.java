@@ -5,9 +5,7 @@ import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  A thread pool manages pool and saves resources
@@ -42,6 +40,9 @@ public class ThreadPool implements IThreadPool
 	/** The running flag. */
 	protected boolean	running;
 
+	/** The daemon flag. */
+	protected boolean daemon;
+	
 //	/** The task - thread mapping. */
 //	protected Map	threads;
 
@@ -59,7 +60,16 @@ public class ThreadPool implements IThreadPool
 	 *  Create a new thread pool.
 	 */
 	public ThreadPool(IThreadPoolStrategy strategy)
+	{
+		this(false, strategy);
+	}
+	
+	/**
+	 *  Create a new thread pool.
+	 */
+	public ThreadPool(boolean daemon, IThreadPoolStrategy strategy)
 	{		
+		this.daemon = daemon;
 		this.strategy = strategy;
 		this.group = new ThreadGroup("strategy_thread_pool_"+poolcnt++);
 		this.running = true;
@@ -144,7 +154,8 @@ public class ThreadPool implements IThreadPool
 			Thread thread = new ServiceThread();
 			// Thread gets daemon state of parent, i.e. thread daemon state would
 			// depend on called thread, which is not desired.
-			thread.setDaemon(false);
+			thread.setDaemon(daemon);
+//			thread.setDaemon(false);
 			pool.add(thread);
 			thread.start();
 //			System.out.println("poola: "+pool.size());

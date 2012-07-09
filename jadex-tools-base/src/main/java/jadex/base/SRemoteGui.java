@@ -233,7 +233,7 @@ public class SRemoteGui
 				{
 					URL	url	= SUtil.toURL(ridurl);
 					LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url);
-					ret.setResult(new ResourceIdentifier(lid, new GlobalResourceIdentifier(globalrid, null)));
+					ret.setResult(new ResourceIdentifier(lid, globalrid!=null? new GlobalResourceIdentifier(globalrid, null): null));
 				}
 				
 				return ret;

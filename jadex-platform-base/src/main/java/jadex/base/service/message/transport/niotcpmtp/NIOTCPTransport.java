@@ -2,14 +2,12 @@ package jadex.base.service.message.transport.niotcpmtp;
 
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.remote.RemoteServiceManagementService;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -23,9 +21,7 @@ import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -135,10 +131,10 @@ public class NIOTCPTransport implements ITransport
 			{
 				public void customResultAvailable(final IMessageService ms)
 				{
-					SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
+					SServiceProvider.getService(container, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 					{
-						public void customResultAvailable(IThreadPoolService tp)
+						public void customResultAvailable(IDaemonThreadPoolService tp)
 						{
 							selectorthread	= new SelectorThread(selector, ms, logger, container);
 							tp.execute(selectorthread);

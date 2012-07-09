@@ -8,7 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -113,7 +113,7 @@ public class HttpRelayTransport implements ITransport
 	protected IInternalAccess component;
 	
 	/** The thread pool. */
-	protected IThreadPoolService	threadpool;
+	protected IDaemonThreadPoolService	threadpool;
 	
 	/** The default relay server lookup addresses. */
 	protected String	defaddresses;
@@ -179,7 +179,7 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Get the thread pool.
 	 */
-	public IThreadPoolService	getThreadPool()
+	public IDaemonThreadPoolService	getThreadPool()
 	{
 		return threadpool;
 	}
@@ -200,10 +200,10 @@ public class HttpRelayTransport implements ITransport
 	public IFuture<Void> start()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		component.getServiceContainer().searchService(IThreadPoolService.class, Binding.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
+		component.getServiceContainer().searchService(IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 		{
-			public void customResultAvailable(IThreadPoolService tps)
+			public void customResultAvailable(IDaemonThreadPoolService tps)
 			{
 				threadpool	= tps;
 				conman	= new HttpConnectionManager();
