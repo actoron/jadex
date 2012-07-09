@@ -32,7 +32,9 @@ public class CodecFactory
 	
 	/** The default codecs. */
 	protected ICodec[] default_codecs; 
-
+	
+	/** The codec names, array index equals CODEC_ID. */
+	public static String[] CODEC_NAMES = {"No Codec","SerialCodec","NuggetsCodec", "XMLCodec", "JadexXMLCodec", "GZIPCodec", "JadexBinaryCodec"};
 	
 	//-------- constructors --------
 
@@ -64,10 +66,14 @@ public class CodecFactory
 		codeccache = SCollection.createHashMap();
 		if(codecs==null)
 		{
+			// dynamically decide if JadexXMLCodec is available
+			Class jadexXMLCodec = SReflect.classForName0("jadex.base.service.message.transport.codecs.JadexXMLCodec", null);
+
 			codecs = !SReflect.isAndroid()
-				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
-				: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
-			//codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, JadexXMLCodec.class, GZIPCodec.class};
+				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, jadexXMLCodec, GZIPCodec.class, JadexBinaryCodec.class}
+				: jadexXMLCodec == null 
+						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
+						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, jadexXMLCodec};
 		}
 		for(int i=0; i<codecs.length; i++)
 		{
