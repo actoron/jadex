@@ -1,5 +1,9 @@
 package jadex.android.controlcenter.settings;
 
+import jadex.bridge.IComponentIdentifier;
+
+import java.io.Serializable;
+
 import android.preference.PreferenceScreen;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,5 +46,11 @@ public interface ISettings {
 	 *            The selected {@link MenuItem}
 	 * @return true if menu should be closed
 	 */
-	public boolean onOptionsItemSelected(MenuItem item);
+	boolean onOptionsItemSelected(MenuItem item);
+
+	/**
+	 * Sets the platformId of the platform to be configured.
+	 * @param platformId
+	 */
+	void setPlatformId(IComponentIdentifier platformId);
 }

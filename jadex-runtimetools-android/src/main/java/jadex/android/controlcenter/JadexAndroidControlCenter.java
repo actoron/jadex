@@ -5,6 +5,7 @@ import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
 import jadex.android.controlcenter.settings.ISettings;
 import jadex.base.service.settings.AndroidSettingsService;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -20,6 +21,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Binding;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.provider.Contacts.Settings;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,16 +59,23 @@ import android.widget.ListView;
  * http://stackoverflow.com/questions/5032141/adding-menus-to-child-preference
  * -screens)
  * 
+ * Can be instanciated by creating an Intent an passing the ComponentIdentifier
+ * of the Platform to be configured as Extra with the Key: 
+ * JadexAndroidControlCenter.EXTRA_PLATFORMID
  */
 public class JadexAndroidControlCenter extends PreferenceActivity
 {
 
+	private static final String EXTRA_PLATFORMID = "platformId";
 	private static final String EXTRA_SHOWCHILDPREFSCREEN = "showChildPrefScreen";
 	private static final String EXTRA_SETTINGSKEY = "settingsKey";
 	private SharedPreferences sharedPreferences;
 	private PreferenceCategory servicesCat;
 	private PreferenceCategory componentsCat;
 	private ISettings displayedChildSettings;
+	
+	/** The platformID to display preferences for */
+	private IComponentIdentifier platformId;
 
 	static private Map<String, ISettings> childSettings;
 
@@ -78,7 +88,15 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
+		
+		Serializable platformId = getIntent().getSerializableExtra(EXTRA_PLATFORMID);
+		if (platformId == null) {
+			Log.d("jadex-android", "ControlCenter: No platformId passed, using a random started platform...");
+			this.platformId = JadexAndroidContext.getInstance().getExternalPlatformAccess().getComponentIdentifier();
+		} else {
+			this.platformId = (IComponentIdentifier) platformId;
+		}
+		
 		// Are we displaying Preferences for a child Prefscreen?
 		if (getIntent().getBooleanExtra(EXTRA_SHOWCHILDPREFSCREEN, false))
 		{
@@ -120,7 +138,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 			}
 		});
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -184,10 +202,10 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 		childSettings.clear();
 		addDummyPrefs();
 
-		if (JadexAndroidContext.getInstance().isJadexRunning())
+		if (JadexAndroidContext.getInstance().isPlatformRunning(platformId))
 		{
 			// get all viewable services
-			IExternalAccess extAcc = JadexAndroidContext.getInstance().getExternalPlattformAccess();
+			IExternalAccess extAcc = JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId);
 
 			IServiceProvider sp = extAcc.getServiceProvider();
 			ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
@@ -357,9 +375,11 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 
 	protected void addSettings(PreferenceGroup root, ISettings settings)
 	{
+		settings.setPlatformId(this.platformId);
 		PreferenceScreen screen = this.getPreferenceManager().createPreferenceScreen(this);
 		root.addPreference(screen);
 		Intent i = new Intent(this, JadexAndroidControlCenter.class);
+		i.putExtra(EXTRA_PLATFORMID, (Serializable) platformId);
 		i.putExtra(EXTRA_SHOWCHILDPREFSCREEN, true);
 		i.putExtra(EXTRA_SETTINGSKEY, settings.getTitle());
 		childSettings.put(settings.getTitle(), settings);

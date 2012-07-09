@@ -33,6 +33,8 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 
 	private Button startPlatformButton;
 	protected IComponentIdentifier lastComponentIdentifier;
+	
+	private IComponentIdentifier platformID;
 
 	private TextView textView;
 
@@ -96,6 +98,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == 0) {
 			Intent i = new Intent(this, JadexAndroidControlCenter.class);
+			i.putExtra("platformId", (ComponentIdentifier) platformID);
 			startActivity(i);
 		}
 		return true;
@@ -121,13 +124,29 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		public void onClick(View view) {
 			if (view == startPlatformButton) {
 				if (isJadexPlatformRunning()) {
-					shutdownJadexPlatform();
-					textView.setText("Platform stopped.");
-					refreshButtons();
+					new Thread(new Runnable()
+					{
+						
+						@Override
+						public void run()
+						{
+							getJadexContext().shutdownJadexPlatform(platformID);
+							runOnUiThread(new Runnable()
+							{
+								
+								@Override
+								public void run()
+								{
+									textView.setText("Platform stopped.");
+									refreshButtons();
+								}
+							});
+						}
+					});
 				} else {
 					startPlatformButton.setEnabled(false);
 					textView.setText("Starting Jadex Platform...");
-					startJadexPlatform().addResultListener(
+					getJadexContext().startJadexPlatform().addResultListener(
 							platformResultListener);
 				}
 			} else if (view == startAgentButton) {
@@ -164,9 +183,10 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
 
 		public void resultAvailable(IExternalAccess result) {
+			platformID = result.getComponentIdentifier();
 			runOnUiThread(new Runnable() {
 				public void run() {
-					textView.setText("Platform started");
+					textView.setText("Platform started: " + platformID);
 					refreshButtons();
 				}
 			});

@@ -34,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -56,7 +55,12 @@ public class SecuritySettings extends AServiceSettings
 
 	/** Remote Platform passwords */
 	private Map<String, String> platformPasswords;
+	
+	/** Id of the platform to be configured. */
+	private IComponentIdentifier platformId;
 
+	private Map<String, String> networkPasswords;
+	
 	// UI members
 	private JadexBooleanPreference usePw;
 	private JadexStringPreference password;
@@ -64,7 +68,6 @@ public class SecuritySettings extends AServiceSettings
 	private PreferenceCategory platformPasswordsCat;
 	private PreferenceCategory networkPasswordsCat;
 
-	private Map<String, String> networkPasswords;
 
 	public SecuritySettings(IService secservice)
 	{
@@ -85,7 +88,7 @@ public class SecuritySettings extends AServiceSettings
 	{
 		final AlertDialog.Builder builder = new AlertDialog.Builder(platformPasswordsCat.getContext());
 
-		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlattformAccess().getServiceProvider(),
+		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
 				IAwarenessManagementService.class).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
 		{
 
@@ -479,6 +482,7 @@ public class SecuritySettings extends AServiceSettings
 		}
 	};
 
+
 	// --- inner classes ---
 
 	/**
@@ -583,5 +587,11 @@ public class SecuritySettings extends AServiceSettings
 				}
 			});
 		}
+	}
+
+	@Override
+	public void setPlatformId(IComponentIdentifier platformId)
+	{
+		this.platformId = platformId;
 	}
 }

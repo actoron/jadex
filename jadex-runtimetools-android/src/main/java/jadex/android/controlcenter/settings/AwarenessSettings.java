@@ -35,6 +35,9 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 	/** Handler to change UI objects from non-ui threads. */
 	private Handler uiHandler;
+	
+	/** Id of the platform to be configured. */
+	private IComponentIdentifier platformId;
 
 	// UI members
 	private JadexBooleanPreference cbautoCreate;
@@ -372,6 +375,12 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 		helper.setSettings(settings);
 		return true;
+	}
+
+	@Override
+	public void setPlatformId(IComponentIdentifier platformId)
+	{
+		this.platformId = platformId;
 	}
 
 }

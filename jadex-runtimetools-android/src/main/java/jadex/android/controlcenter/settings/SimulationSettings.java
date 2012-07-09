@@ -72,6 +72,9 @@ public class SimulationSettings extends AServiceSettings {
 
 	/** The last clocktype. */
 	private String lastclocktype;
+	
+	/** Id of the platform to be configured. */
+	private IComponentIdentifier platformId;
 
 	// UI members
 	private PreferenceCategory clockCat;
@@ -325,7 +328,7 @@ public class SimulationSettings extends AServiceSettings {
 	public IFuture<IExternalAccess> getComponentForService() {
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 
-		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlattformAccess().getServiceProvider(),
+		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
 				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret) {
 					public void customResultAvailable(IComponentManagementService cms) {
@@ -355,6 +358,12 @@ public class SimulationSettings extends AServiceSettings {
 			ret = dateformat.format(new Date(time));
 
 		return ret;
+	}
+	
+	@Override
+	public void setPlatformId(IComponentIdentifier platformId)
+	{
+		this.platformId = platformId;
 	}
 
 	/**
