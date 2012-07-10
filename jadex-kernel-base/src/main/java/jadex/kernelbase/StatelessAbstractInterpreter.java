@@ -176,9 +176,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public IFuture<Void> cleanupComponent()
 	{
 //		System.out.println("cleanup: "+getComponentIdentifier());
-		try
-		{
-		
 		assert !getComponentAdapter().isExternalThread();
 		
 		final Future<Void> ret = new Future<Void>();
@@ -241,12 +238,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		return ret;
 		
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
 	}
 	
