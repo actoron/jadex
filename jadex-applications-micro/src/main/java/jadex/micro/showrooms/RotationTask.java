@@ -40,19 +40,22 @@ public class RotationTask extends AbstractTask
 		double x=(double)(Math.cos(clock*Math.PI/180)*radius+xcenter);
 		double y=(double)(Math.sin(clock*Math.PI/180)*radius+ycenter);
 		
-		if(cl.getTick()%150==50)
+		if(cl.getTick()%200==50)
 		{
 			me.setProperty("status", "Idle");
 		}
-		if(cl.getTick()%150==100)
+		if(cl.getTick()%200==100)
 		{
 			me.setProperty("status", "Walk");
 		}
-		if(cl.getTick()%150==0)
+		if(cl.getTick()%200==0)
 		{
 			me.setProperty("status", "Attack");
 		}
-		
+		if(cl.getTick()%200==150)
+		{
+			me.setProperty("status", "Nix");
+		}
 		me.setProperty("position", new Vector3Double(x, (Math.sin(clock*Math.PI/360))/2, y));
 	}
 }

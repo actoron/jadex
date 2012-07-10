@@ -106,10 +106,10 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 			<env:perspective name="Complex3D" class="Perspective3D">
 				<env:drawable3d objecttype="rotationplattform" width="0.2" height="0.2" depth="0.2" rotation3d="false">
 					<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true"> 
-						<env:animation name="Walk" channel="chanA" loop="false">
+						<env:animation name="Walk" channel="chanA" loop="true">
 						<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
 						</env:animation>
-						<env:animation name="Idle" channel="chanA" loop="false">
+						<env:animation name="Idle" channel="chanA" loop="true">
 						<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
 						</env:animation>
 						<env:animation name="Attack" channel="chanA" loop="false">
