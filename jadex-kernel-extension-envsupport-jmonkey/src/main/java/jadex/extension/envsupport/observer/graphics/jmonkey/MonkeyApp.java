@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
+import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
@@ -541,7 +542,10 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	@Override
 	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName)
 	{
-		// TODO Auto-generated method stub
+		if(channel.getLoopMode()==LoopMode.DontLoop)
+		{
+			channel.reset(true);
+		}
 		
 	}
 

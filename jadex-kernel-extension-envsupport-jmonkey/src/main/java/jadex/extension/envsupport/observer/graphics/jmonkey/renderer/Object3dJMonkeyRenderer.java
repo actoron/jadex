@@ -82,7 +82,8 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		    	animChannels = new HashMap<String, AnimChannel>();
 		    	for(String c : channels)
 		    	{
-		    		vp.getAnimChannels().put(c+" "+ obj.hashCode(), control.createChannel());
+		    		AnimChannel tmp = control.createChannel();
+		    		vp.getAnimChannels().put(c+" "+ obj.hashCode(), tmp);
 		    		
 		    	}
 		    	

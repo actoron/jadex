@@ -17,6 +17,7 @@ import java.util.HashMap;
 
 
 import com.jme3.animation.AnimChannel;
+import com.jme3.animation.LoopMode;
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
@@ -257,7 +258,16 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 							AnimChannel chan = anichannels.get(a.getChannel()+" "+ obj.hashCode());
 							if(!a.getName().equals(chan.getAnimationName()))
 							{
-								chan.setAnim(a.getName());
+								
+								try
+								{
+									chan.setAnim(a.getName());
+								}
+								catch(Exception e)
+								{
+									System.out.println("Animation Existiert nicht");
+								}
+								
 //								System.out.println("animation! " + a.getName());
 							}
 							
