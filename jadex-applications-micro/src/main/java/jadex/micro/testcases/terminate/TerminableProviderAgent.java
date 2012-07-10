@@ -7,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
@@ -88,9 +89,9 @@ public class TerminableProviderAgent implements ITerminableService
 	public ITerminableIntermediateFuture<String> getResults(final long delay, final int max)
 	{
 //		System.out.println("getResults");
-		final TerminableIntermediateFuture<String> ret = new TerminableIntermediateFuture<String>(new Runnable()
+		final TerminableIntermediateFuture<String> ret = new TerminableIntermediateFuture<String>(new ITerminationCommand()
 		{
-			public void run()
+			public void terminated(Exception reason)
 			{
 //				System.out.println("termination command called2: "+termfut);
 				if(termfut!=null)
@@ -105,6 +106,11 @@ public class TerminableProviderAgent implements ITerminableService
 					}
 					termfut	= null;
 				}
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
 			}
 		});
 		final int[] cnt = new int[1];

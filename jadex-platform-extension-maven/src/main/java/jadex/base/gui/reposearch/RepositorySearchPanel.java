@@ -752,7 +752,7 @@ public class RepositorySearchPanel extends JPanel
 				catch(Exception e)
 		    	{
 					setStatus("updating index: "+context.getIndexUpdateUrl()+" failed");
-//		    		e.printStackTrace();
+		    		e.printStackTrace();
 		    		ret.setException(e);
 //		    		throw new RuntimeException(e);
 		    	}

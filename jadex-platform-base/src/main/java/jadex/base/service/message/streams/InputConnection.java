@@ -10,6 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
@@ -188,11 +189,16 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		{
 			if(ifuture!=null || ofuture!=null)
 				return new SubscriptionIntermediateFuture<byte[]>(new RuntimeException("Stream has reader"));
-			ifuture = new SubscriptionIntermediateFuture<byte[]>(new Runnable()
+			ifuture = new SubscriptionIntermediateFuture<byte[]>(new ITerminationCommand()
 			{
-				public void run()
+				public void terminated(Exception reason)
 				{
 					close();
+				}
+				
+				public boolean checkTermination(Exception reason)
+				{
+					return true;
 				}
 			});
 			cl = closed;

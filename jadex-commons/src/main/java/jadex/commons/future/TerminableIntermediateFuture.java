@@ -14,8 +14,8 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	//-------- attributes --------
 	
 	/** The termination code. */
-	protected Runnable terminate;
-	
+	protected ITerminationCommand terminate;
+		
 	//-------- constructors --------
 
 	/**
@@ -38,7 +38,7 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	 *  Create a new future.
 	 *  @param terminate The runnable to be executed in case of termination.
 	 */
-	public TerminableIntermediateFuture(Runnable terminate)
+	public TerminableIntermediateFuture(ITerminationCommand terminate)
 	{
 		this.terminate = terminate;
 	}
@@ -59,10 +59,12 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	 */
 	public void terminate(Exception reason)
 	{
-		if(setExceptionIfUndone(reason))
+		boolean	term = terminate==null || terminate.checkTermination(reason);
+		
+		if(term && setExceptionIfUndone(reason))
 		{
 			if(terminate!=null)
-				terminate.run();
+				terminate.terminated(reason);
 		}
 	}
 	

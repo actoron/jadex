@@ -47,6 +47,10 @@ public class MicroTest	extends ComponentTestSuite
 //			"Generate",
 //			"Calculate",
 			
+			// 3D apps (vm crash on termination)
+			"3d",
+			"showrooms",
+			
 			// Non-tests that don't stop until finished (why?)
 			"AgentCreationAgent",	
 			"PojoAgentCreationAgent"

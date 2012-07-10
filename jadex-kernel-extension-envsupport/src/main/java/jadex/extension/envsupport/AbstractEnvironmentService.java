@@ -13,6 +13,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -62,12 +63,17 @@ public abstract class AbstractEnvironmentService
 	public ISubscriptionIntermediateFuture<Object>	register(final String objecttype)
 	{
 		final SubscriptionIntermediateFuture<Object>	ret	=
-			new SubscriptionIntermediateFuture<Object>(new Runnable()
+			new SubscriptionIntermediateFuture<Object>(new ITerminationCommand()
 		{
-			public void run()
+			public void terminated(Exception reason)
 			{
 				// Todo: destroy avatar on termination.
 				System.out.println("Terminated...");
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
 			}
 		});
 		

@@ -56,6 +56,12 @@ public class TransferInfo
 	/** The state. */
 	protected String state;
 	
+	/** The absolute timeout value. */
+	protected long timeout;
+	
+//	/** The flag for a real time timeout. */
+//	protected boolean realtime;
+	
 	/** The done size. */
 	protected long done;
 	
@@ -81,7 +87,7 @@ public class TransferInfo
 	/**
 	 *  Create a new file transfer info.
 	 */
-	public TransferInfo(boolean download, String id, String filename, String filepath, IComponentIdentifier other, long size)
+	public TransferInfo(boolean download, String id, String filename, String filepath, IComponentIdentifier other, long size, long timeout)//, boolean realtime)
 	{
 		this.download	= download;
 		this.id = id!=null ? id : UUID.randomUUID().toString();
@@ -89,6 +95,8 @@ public class TransferInfo
 		this.filepath = filepath;
 		this.other = other;
 		this.size = size;
+		this.timeout	= timeout;
+//		this.realtime	= realtime;
 	}
 	
 	//-------- accessors --------
@@ -165,6 +173,42 @@ public class TransferInfo
 		this.size = size;
 	}
 
+	/**
+	 *  Get the timeout.
+	 *  @return the absolute timeout value.
+	 */
+	public long getTimeout()
+	{
+		return timeout;
+	}
+
+	/**
+	 *  Set the timeout.
+	 *  @param timeout The absolute timeout value to set.
+	 */
+	public void setTimeout(long timeout)
+	{
+		this.timeout = timeout;
+	}
+
+//	/**
+//	 *  Get the realtime flag.
+//	 *  @return the realtime timeout flag.
+//	 */
+//	public boolean	isRealtime()
+//	{
+//		return realtime;
+//	}
+//
+//	/**
+//	 *  Set the realtime flag
+//	 *  @param realtime The realtime timeout to set.
+//	 */
+//	public void setRealtime(boolean realtime)
+//	{
+//		this.realtime = realtime;
+//	}
+//	
 	/**
 	 *  Get the done.
 	 *  @return the done.

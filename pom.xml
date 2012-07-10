@@ -627,6 +627,7 @@
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
 				
+				<module>jadex-platform-relay-web</module>
 				<module>jadex-platform-extension-maven</module>
 				<module>jadex-platform-extension-natmtp</module>
 			</modules>

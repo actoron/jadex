@@ -22,7 +22,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	 */
 	public SubscriptionIntermediateFuture()
 	{
-		this((Runnable)null);
+		this((ITerminationCommand)null);
 	}
 	
 	/**
@@ -36,9 +36,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	
 	/**
 	 *  Create a new future.
-	 *  @param terminate The runnable to be executed in case of termination.
+	 *  @param terminate The code to be executed in case of termination.
 	 */
-	public SubscriptionIntermediateFuture(Runnable terminate)
+	public SubscriptionIntermediateFuture(ITerminationCommand terminate)
 	{
 		super(terminate);
 		this.storeforfirst = true;

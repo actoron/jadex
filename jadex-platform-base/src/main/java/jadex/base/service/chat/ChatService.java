@@ -1,13 +1,12 @@
 package jadex.base.service.chat;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -252,17 +251,26 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @return The returned future publishes updates about the total number of bytes received.
 	 *    Exception messages of the returned future correspond to file transfer states (aborted vs. error vs. rejected).
 	 */
-	public ITerminableIntermediateFuture<Long> sendFile(String nick, String filename, long size, String id, IInputConnection con)
+	public ITerminableIntermediateFuture<Long> sendFile(final String nick, String filename, long size, String id, final IInputConnection con)
 	{
-		TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
-		IComponentIdentifier sender = ServiceCall.getInstance().getCaller();
+		final ServiceCall call = ServiceCall.getInstance();
 		
-		TransferInfo	ti	= new TransferInfo(true, id, filename, null, sender, size);
+		// Hack!!! always assume real time for chat interaction.
+		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, call.getCaller(), size, System.currentTimeMillis() + call.getTimeout());
 		ti.setState(TransferInfo.STATE_WAITING);
 		
-		transfers.put(ti.getId(), new Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>(ti, ret, con));
+		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				ti.setState(TransferInfo.STATE_ABORTED);
+				publishEvent(ChatEvent.TYPE_FILE, nick, call.getCaller(), ti);
+				transfers2.remove(ti.getId());
+			}
+		});
 		
-		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
+		transfers.put(ti.getId(), new Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>(ti, ret, con));
+		publishEvent(ChatEvent.TYPE_FILE, nick, call.getCaller(), ti);
 		
 		return ret;
 	}
@@ -280,34 +288,24 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public ITerminableFuture<IOutputConnection> startUpload(final String nick, String filename, long size, String id)
 	{
-		final IComponentIdentifier sender = ServiceCall.getInstance().getCaller();
+		final ServiceCall call = ServiceCall.getInstance();
 		
-		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, sender, size);
+		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, call.getCaller(), size, System.currentTimeMillis() + call.getTimeout());
 		ti.setState(TransferInfo.STATE_WAITING);
 		
-		// Todo: automatically decouple termination commands
-		final IExternalAccess	exta	= agent.getExternalAccess();
 		TerminableFuture<IOutputConnection> ret = new TerminableFuture<IOutputConnection>(new TerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
-				// Called when request is externally terminated.
-				exta.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ti.setState(TransferInfo.STATE_REJECTED);
-						publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
-						transfers2.remove(ti.getId());
-						return IFuture.DONE;
-					}
-				});
+				ti.setState(TransferInfo.STATE_ABORTED);
+				publishEvent(ChatEvent.TYPE_FILE, nick, call.getCaller(), ti);
+				transfers2.remove(ti.getId());
 			}
 		});
 		
 		transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, ret, null));
 		
-		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
+		publishEvent(ChatEvent.TYPE_FILE, nick, call.getCaller(), ti);
 
 		return ret;
 	}
@@ -943,7 +941,8 @@ public class ChatService implements IChatService, IChatGuiService
 //				});
 				
 				// Call chat service of receiver (alternative interface)
-				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length());
+				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length(), System.currentTimeMillis() + // Hack!!! assume real time timeout.
+					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? BasicService.DEFAULT_LOCAL : BasicService.DEFAULT_REMOTE));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));

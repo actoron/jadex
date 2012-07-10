@@ -240,8 +240,12 @@ public class RelayServlet extends HttpServlet
 				}
 				map.put(id, queue);
 				
+				// Set cache header to avoid interference of proxies (e.g. vodafone umts)
+				response.setHeader("Cache-Control", "no-cache, no-transform");
+				response.setHeader("Pragma", "no-cache");
+				
 				// Ping to let client know that it is connected.
-				response.getOutputStream().write(SRelay.MSGTYPE_PING);  
+				response.getOutputStream().write(SRelay.MSGTYPE_PING);
 				response.flushBuffer();
 				
 		//		System.out.println("Added to map. New size: "+map.size());
