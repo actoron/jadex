@@ -26,7 +26,7 @@ public class LoadOreTask extends AbstractTask
 	public static final String PROPERTY_LOAD = "load";
 	
 	/** The time required for loading one unit of ore (in millis). */
-	public static final int	TIME	= 10;
+	public static final int	TIME	= 50;
 	
 	//-------- attributes --------
 	
@@ -82,17 +82,23 @@ public class LoadOreTask extends AbstractTask
 		boolean	finished;
 		if(load)
 		{
+			obj.setProperty("status", "loading");
 			long	units	= Math.min(mycap-ore, Math.min(capacity, (time + progress)/TIME));
 			ore	+= units;
 			capacity	-= units;
 			finished	= ore==mycap || capacity==0;
+			if(finished)
+				obj.setProperty("status", "drive");
 		}
 		else
 		{
+			obj.setProperty("status", "unloading");
 			long	units	= Math.min(ore, (time + progress)/TIME);
 			ore	-= units;
 			capacity	+= units;
 			finished	= ore==0;
+			if(finished)
+				obj.setProperty("status", "drive");
 		}
 		time	= (time + progress)%TIME;
 		obj.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
