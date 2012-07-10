@@ -75,6 +75,6 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		thread.setCanceled(true);
 		ITask task = thread.getTask();
 		if (task != null)
-			task.compensate(instance);
+			task.cancel(instance);
 	}
 }

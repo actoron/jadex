@@ -37,7 +37,7 @@ public class CompensationTestTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(BpmnInterpreter instance)
+	public IFuture cancel(BpmnInterpreter instance)
 	{
 		instance.setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
 		executionFuture.setResult(null);

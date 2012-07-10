@@ -35,10 +35,10 @@ public abstract class AbstractTask implements ITask
 	}
 	
 	/**
-	 *  Compensate in case the task is canceled.
-	 *  @return	To be notified, when the compensation has completed.
+	 *  Cleanup in case the task is cancelled.
+	 *  @return	A future to indicate when cancellation has completed.
 	 */
-	public IFuture<Void> compensate(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final BpmnInterpreter instance)
 	{
 		return IFuture.DONE;
 	}

@@ -20,60 +20,73 @@ import javax.swing.SwingUtilities;
  */
 public class AsynchronousOKTask	 implements ITask
 {
-	protected JDialog	dialog = new JDialog((JDialog)null, false);
+	protected JDialog	dialog;
+	protected boolean	cancelled;
 	
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture<Void> execute(ITaskContext context, BpmnInterpreter process)
+	public IFuture<Void> execute(final ITaskContext context, BpmnInterpreter process)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		String	message	= (String)context.getParameterValue("message");
-		String	title	= (String)context.getParameterValue("title");
-		int	offset	= context.hasParameterValue("y_offset")
-			? ((Integer)context.getParameterValue("y_offset")).intValue() : 0;
-		
-		JOptionPane	pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
-		dialog.setTitle(title);
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		dialog.setContentPane(pane);
-		dialog.pack();
-		Point	loc	= SGUI.calculateMiddlePosition(dialog);
-		dialog.setLocation(loc.x, loc.y+offset);
-		
-		pane.addPropertyChangeListener(new PropertyChangeListener()
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void propertyChange(PropertyChangeEvent e)
+			public void run()
 			{
-				String	prop	= e.getPropertyName();
-				if(prop.equals(JOptionPane.VALUE_PROPERTY))
+				if(!cancelled)
 				{
-	                dialog.setVisible(false);
-//	                listener.resultAvailable(this, null);
-	                ret.setResult(null);
+					String	message	= (String)context.getParameterValue("message");
+					String	title	= (String)context.getParameterValue("title");
+					int	offset	= context.hasParameterValue("y_offset")
+						? ((Integer)context.getParameterValue("y_offset")).intValue() : 0;
+					
+					JOptionPane	pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
+					dialog = new JDialog((JDialog)null, false);
+					dialog.setTitle(title);
+					dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+					dialog.setContentPane(pane);
+					dialog.pack();
+					Point	loc	= SGUI.calculateMiddlePosition(dialog);
+					dialog.setLocation(loc.x, loc.y+offset);
+					
+					pane.addPropertyChangeListener(new PropertyChangeListener()
+					{
+						public void propertyChange(PropertyChangeEvent e)
+						{
+							String	prop	= e.getPropertyName();
+							if(prop.equals(JOptionPane.VALUE_PROPERTY))
+							{
+				                dialog.dispose();
+				                ret.setResult(null);
+							}
+						}
+				    });
+					
+					dialog.setVisible(true);
 				}
 			}
-	    });
-
-		
-		dialog.setVisible(true);
+		});
 	
 		return ret;
 	}
 	
 	/**
-	 *  Compensate in case the task is canceled.
-	 *  @return	To be notified, when the compensation has completed.
+	 *  Cleanup in case the task is cancelled.
+	 *  @return	A future to indicate when cancellation has completed.
 	 */
-	public IFuture<Void> compensate(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final BpmnInterpreter instance)
 	{
+		cancelled	= true;
 		final Future<Void> ret = new Future<Void>();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				dialog.setVisible(false);
+				if(dialog!=null)
+				{
+					dialog.dispose();
+				}
 				ret.setResult(null);
 			}
 		});

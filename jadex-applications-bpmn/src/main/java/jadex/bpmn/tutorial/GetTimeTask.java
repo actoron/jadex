@@ -47,7 +47,7 @@ public class GetTimeTask	 implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture<Void> compensate(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final BpmnInterpreter instance)
 	{
 		return IFuture.DONE;
 	}

@@ -170,7 +170,7 @@ public class ServiceCallTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(BpmnInterpreter instance)
+	public IFuture cancel(BpmnInterpreter instance)
 	{
 		// Todo: how to compensate service call!?
 		return IFuture.DONE;

@@ -100,7 +100,7 @@ public class ChoosePlatformTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture<Void> compensate(BpmnInterpreter instance)
+	public IFuture<Void> cancel(BpmnInterpreter instance)
 	{
 		return IFuture.DONE;
 	}

@@ -29,7 +29,7 @@ public class WaitForSubprocessTask	implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(final BpmnInterpreter instance)
+	public IFuture cancel(final BpmnInterpreter instance)
 	{
 		return IFuture.DONE;
 	}

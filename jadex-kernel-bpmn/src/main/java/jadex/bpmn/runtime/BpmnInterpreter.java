@@ -731,13 +731,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			public void run()
 			{	
-				// Call cancel on all threads with started activities (i.e. thread is waiting for end of activity).
-				for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+				// Remove all threads (calls cancel on running activities)
+				if(getThreadContext().getThreads()!=null)
 				{
-					ProcessThread pt = (ProcessThread)it.next();
-					if(pt.isWaiting())
+					ProcessThread[]	threads	= getThreadContext().getThreads().toArray(new ProcessThread[0]);
+					for(ProcessThread pt: threads)
 					{
-						getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+						pt.getThreadContext().removeThread(pt);
 					}
 				}
 				
