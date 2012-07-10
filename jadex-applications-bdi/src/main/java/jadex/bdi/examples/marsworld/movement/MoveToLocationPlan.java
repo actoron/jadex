@@ -30,11 +30,15 @@ public class MoveToLocationPlan extends Plan
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
-		Object taskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
-//		move	= new MoveTask(dest, res, getExternalAccess());
-//		myself.addTask(move);
+		
+		Object rtaskid = space.createObjectTask(RotationTask.PROPERTY_TYPENAME, props, myself.getId());
 		SyncResultListener	res	= new SyncResultListener();
-		space.addTaskListener(taskid, myself.getId(), res);
+		space.addTaskListener(rtaskid, myself.getId(), res);
+		res.waitForResult();
+		
+		Object mtaskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
+		res	= new SyncResultListener();
+		space.addTaskListener(mtaskid, myself.getId(), res);
 		res.waitForResult();
 	}
 }

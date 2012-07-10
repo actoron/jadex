@@ -1,6 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
@@ -412,10 +414,15 @@ public class ViewportJMonkey extends AbstractViewport3d
 				_tmpNode = (Node)node;
 
 				// Calculate the Direction
-				Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d);
+				Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d, sobj);
 
 				if(quat != null)
+				{
 					_tmpNode.setLocalRotation(quat);
+				}
+		
+					
+				
 
 				_tmpNode.setLocalScale(sizeDrawable);
 
@@ -541,7 +548,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * Calculate the current Rotation of the Object in Up/Down and Left/Right
 	 */
-	private Quaternion calculateRotation(Vector3f newp, Vector3f oldp, boolean rotation3d)
+	private Quaternion calculateRotation(Vector3f newp, Vector3f oldp, boolean rotation3d, ISpaceObject sobj)
 	{
 
 		Vector3f newpos;
@@ -561,12 +568,23 @@ public class ViewportJMonkey extends AbstractViewport3d
 		if(!direction.equals(Vector3f.ZERO))
 		{
 			Quaternion quat = new Quaternion();
-			quat.lookAt(direction, Vector3f.UNIT_Y);
+			if(sobj.hasProperty("rotation"))
+			{
+				IVector2 vector2 = (IVector2)sobj.getProperty("rotation");
+				Vector3f vector3 = new Vector3f(vector2.getXAsFloat(), 0, vector2.getYAsFloat());
+				quat.lookAt(vector3, Vector3f.UNIT_Y);
+				if(sobj.getType().equals("sentry"))
+					System.out.println("look at: "+vector2+" "+vector3);
+			}
+			else
+			{
+				quat.lookAt(direction, Vector3f.UNIT_Y);
+			}
+
 			return quat;
 		}
 
 		return null;
-
 	}
 
 

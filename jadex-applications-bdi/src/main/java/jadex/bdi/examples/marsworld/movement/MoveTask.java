@@ -38,6 +38,10 @@ public class MoveTask extends AbstractTask
 	
 	/** The vision property of the moving object (radius in units). */
 	public static final String	PROPERTY_VISION	= "vision";
+	
+	/** The target radius. */
+	public static final String	PROPERTY_TARGETRADIUS	= "targetradius";
+
 		
 	//-------- IObjectTask methods --------
 	
@@ -54,14 +58,28 @@ public class MoveTask extends AbstractTask
 		final IBDIExternalAccess agent = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
 
 		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
+		
 		double	maxdist	= progress*speed*0.001;
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		// Todo: how to handle border conditions!?
-		IVector2	newloc	= ((Space2D)space).getDistance(loc, destination).getAsDouble()<=maxdist
-			? destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
-
-		((Space2D)space).setPosition(obj.getId(), newloc);
-
+		
+		double r = (Double)space.getProperty(PROPERTY_TARGETRADIUS);
+		double dist = ((Space2D)space).getDistance(loc, destination).getAsDouble();
+		IVector2	newloc;
+		boolean fin = false;
+		if(dist>r)
+		{
+			// Todo: how to handle border conditions!?
+			newloc	= dist<=maxdist? destination 
+				: destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
+	
+			((Space2D)space).setPosition(obj.getId(), newloc);
+		}
+		else
+		{
+			fin = true;
+			newloc = loc; 
+		}
+		
 		// Process vision at new location.
 		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
 		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
@@ -126,7 +144,7 @@ public class MoveTask extends AbstractTask
 //			});
 		}
 		
-		if(newloc==destination)
+		if(newloc==destination || fin)
 			setFinished(space, obj, true);
 	}
 }

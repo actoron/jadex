@@ -75,7 +75,9 @@ public class AnalyzeTargetTask extends AbstractTask
 
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
-		if(!loc.equals(tloc))
+		
+		double r = 0.05;
+		if(loc.getDistance(tloc).getAsDouble()>r)
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
 		if(!target.getProperty(PROPERTY_STATE).equals(STATE_UNKNOWN))
@@ -95,7 +97,8 @@ public class AnalyzeTargetTask extends AbstractTask
 	{
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
-		if(!loc.equals(tloc))
+		double r = 0.05;
+		if(loc.getDistance(tloc).getAsDouble()>r)
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
 		time	-= progress;

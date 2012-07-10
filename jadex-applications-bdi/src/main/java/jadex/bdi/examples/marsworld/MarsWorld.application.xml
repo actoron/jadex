@@ -57,33 +57,30 @@
 		</agr:agrspacetype>
 
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
+			<env:property name="targetradius" class="double">0.05</env:property>
+		
 			<env:objecttypes>
 				<env:objecttype name="target">
-					<env:property name="tick360" class="double" dynamic="true">$properties.clock.getTick()%360
-					</env:property>	
-					<env:property name="abbau" class="boolean" dynamic="true">								
-						$object.getProperty("state").equals("analyzed")
-						&amp;&amp; ($object.getProperty("ore")!=0 &amp;&amp; $object.getProperty("capacity")!=0)
-					</env:property>
 					<env:property name="ore" class="int">0</env:property>
 					<env:property name="capacity" class="int">0</env:property>
 					<env:property name="state" class="String">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
-				<env:property name="tick360" class="double" dynamic="true">$properties.clock.getTick()%360
-					</env:property>	
 					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*(($properties.clock.getTick())%10),0.01,0.1*(($properties.clock.getTick())%10))
 					</env:property>	
+					<env:property name="rotation" class="IVector2"/>
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
+					<env:property name="rotation" class="IVector2"/>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
+					<env:property name="rotation" class="IVector2"/>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.15</env:property>
 					<env:property name="ore" class="int">0</env:property>
@@ -102,6 +99,7 @@
 						
 			<env:tasktypes>
 				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="rotate" class="RotationTask" />
 				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
 				<env:tasktype name="produce" class="ProduceOreTask" />
 				<env:tasktype name="load" class="LoadOreTask" />
@@ -116,8 +114,6 @@
 				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
 				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
 			</env:avatarmappings>
-			
-			
 			
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D">
@@ -189,9 +185,7 @@
 						<env:tiledlayer width="0.6" height="0.6" imagepath="jadex/bdi/examples/marsworld/images/mars.png" />
 					</env:prelayers>
 				</env:perspective>		
-				
 			</env:perspectives>
-				
 
 			<!-- executor -->
 			<env:spaceexecutor class="DeltaTimeExecutor">

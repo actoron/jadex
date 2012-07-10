@@ -57,6 +57,8 @@
 		</agr:agrspacetype>
 
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
+			<env:property name="targetradius" class="double">0.05</env:property>
+		
 			<env:objecttypes>
 				<env:objecttype name="target">
 					<env:property name="abbau" class="boolean" dynamic="true">								
@@ -68,18 +70,21 @@
 					<env:property name="state" class="String">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
+					<env:property name="rotation" class="IVector2"/>
 					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
+					<env:property name="rotation" class="IVector2"/>
 					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
+					<env:property name="rotation" class="IVector2"/>
 					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.15</env:property>
@@ -99,6 +104,7 @@
 						
 			<env:tasktypes>
 				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="rotate" class="RotationTask" />
 				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
 				<env:tasktype name="produce" class="ProduceOreTask" />
 				<env:tasktype name="load" class="LoadOreTask" />
@@ -113,8 +119,6 @@
 				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
 				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
 			</env:avatarmappings>
-			
-			
 			
 			<env:perspectives>
 			<env:perspective name="Complex3D" class="Perspective3D">
@@ -198,7 +202,7 @@
 			</env:drawable3d>
 				
 
-				<env:drawable3d objecttype="sentry" width="0.16" height="0.16" depth="0.16">
+				<env:drawable3d objecttype="sentry" width="0.16" height="0.16" depth="0.16"> <!-- rotation="$object.getProperty(\"rotation\")">  -->
 					<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
 					<env:object3d width="0.8" height="0.8" depth="0.8" x="0" y="0.0" z="0.0" rotation="$deg180y" modelpath="jadex3d/models/vehicles/tank/apc.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
 				</env:drawable3d>
