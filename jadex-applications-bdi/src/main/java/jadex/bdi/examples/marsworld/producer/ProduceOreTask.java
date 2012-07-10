@@ -77,11 +77,13 @@ public class ProduceOreTask extends AbstractTask
 		target.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
 		target.setProperty(PROPERTY_CAPACITY, new Integer(capacity));
 
+		if(ore!=0)
 		obj.setProperty("status", "ore");
 		
 		if(ore==0)
-		{
+		{	
 			setFinished(space, obj, true);
+			obj.setProperty("status", "drive");
 		}
 	}
 }

@@ -73,7 +73,7 @@
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
-					<env:property name="status" class="String">"Walk"</env:property>
+					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
@@ -148,20 +148,20 @@
 				</env:drawable3d>
 				
 				<!--ERZVORKOMMEN  -->
-				<env:drawable3d objecttype="target" width="0.1" height="0.1" depth="0.1">
+				<env:drawable3d objecttype="target" width="0.1" height="0.1" depth="0.1" rotation3d="false">
 				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.2,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.2)</env:property>
-				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/500.0))</env:property>
-				  	<env:property name="capapos" dynamic="true">new Vector3Double(-0.9,-0.5,0.9)</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/300.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/1000.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/300.0))</env:property>
+				  	<env:property name="capapos" dynamic="true">new Vector3Double(0,0,0)</env:property>
 
 						<!-- Nullpunkt  -->
 						<env:sphere width="0.02" height="0.02" depth="0.02" x="0" y="0" z="0" color="#FFB90FFF" />
 						
 						<!--Abgebautes erz  -->
-						<env:box size="capa"  position="capapos" color="#FFFFFFFF" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
+						<env:box size="capa" position="capapos" color="#FFFFFFFF" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
 							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
 						</env:box>
 						
-						<env:object3d width=".5" height=".5" depth=".5"  rotation="$deg90x" modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true" shadowtype="Cast">
+						<env:object3d width=".5" height=".5" depth=".5"  modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true" shadowtype="Cast">
 							<env:animation name="Wave" channel="chan" loop="true">
 							</env:animation>
 							<env:drawcondition>
@@ -187,9 +187,11 @@
 					
 				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
 					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"> 
-					<env:animation name="Dig" channel="chan01" loop="true">
-					
-					<env:animationcondition>$object.getProperty("status").equals("ore")</env:animationcondition>
+					<env:animation name="DigAll" channel="chan01" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("ore")</env:animationcondition>
+					</env:animation>
+					<env:animation name="Idle" channel="chan01" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("drive")</env:animationcondition>
 					</env:animation>
 					</env:object3d>
 					</env:drawable3d>	
