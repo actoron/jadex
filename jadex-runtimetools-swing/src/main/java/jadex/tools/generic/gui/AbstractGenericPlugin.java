@@ -46,6 +46,7 @@ public abstract class AbstractGenericPlugin<E> extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{		
+		assert selectorpanel==null;
 		this.selectorpanel = createSelectorPanel();
 		selectorpanel.refreshCombo();
 		return selectorpanel;

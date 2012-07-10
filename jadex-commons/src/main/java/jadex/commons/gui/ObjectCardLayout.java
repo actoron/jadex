@@ -86,7 +86,7 @@ public class ObjectCardLayout implements LayoutManager2
 		}
 
 		// Show new component (if any).
-		if(comp!=null)
+		if(comp!=null && comp.getParent()!=null)
 		{
 			comp.setVisible(true);
 			comp.getParent().validate();

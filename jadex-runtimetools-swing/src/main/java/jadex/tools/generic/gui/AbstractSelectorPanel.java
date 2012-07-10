@@ -87,7 +87,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		ocl = new ObjectCardLayout();
 		centerp = new JPanel(ocl);
 		
-		JLabel emptylabel = new JLabel("Select instance that should be viewed",
+		final JLabel emptylabel = new JLabel("Select instance that should be viewed",
 		icons.getIcon("viewer_empty"), JLabel.CENTER);
 		emptylabel.setVerticalAlignment(JLabel.CENTER);
 		emptylabel.setHorizontalTextPosition(JLabel.CENTER);
@@ -156,8 +156,8 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-//				System.out.println("Selected item: "+selcb.getSelectedItem()+" index: "+selcb.getSelectedIndex());
 				final Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;// selcb.getSelectedItem();
+//				System.out.println("Selected item: "+sel+", "+selcb.getSelectedItem()+" index: "+selcb.getSelectedIndex());
 				
 				if(sel==null || ocl.isAvailable(sel))
 				{

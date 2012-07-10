@@ -22,6 +22,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,11 +94,12 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
+						CounterResultListener<IControlCenterPlugin>	crl	= new CounterResultListener<IControlCenterPlugin>(plugin_classes.length,
+							new SwingDelegationResultListener<Void>(ret));
 						for(int i=0; i<plugin_classes.length; i++)
 						{
-							addPlugin(plugin_classes[i], cl);
+							addPlugin(plugin_classes[i], cl).addResultListener(crl);
 						}
-						ret.setResult(null);
 					}
 				});
 			}
@@ -109,7 +111,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * 
 	 */
-	protected IControlCenterPlugin addPlugin(final String clname, ClassLoader cl)
+	protected IFuture<IControlCenterPlugin> addPlugin(final String clname, ClassLoader cl)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 //		System.out.println("add plugin: "+clname);
@@ -128,9 +130,10 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * 
 	 */
-	protected IControlCenterPlugin addPlugin(final Class<?> plclass)
+	protected IFuture<IControlCenterPlugin> addPlugin(final Class<?> plclass)
 	{
 		assert SwingUtilities.isEventDispatchThread();
+		final Future<IControlCenterPlugin>	ret	= new Future<IControlCenterPlugin>();
 		
 		try
 		{
@@ -139,38 +142,44 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				if(tup.getFirstEntity().getClass().equals(plclass))
 				{
 					setStatusText("Plugin already loaded: "+plclass);
-					return null;
+					ret.setResult(null);
 				}
 			}
 			
 			final IControlCenterPlugin p = (IControlCenterPlugin)plclass.newInstance();
-//			plugins.put(p, null);
 			addPluginComponent(p, null);
 			
 			if(p.isLazy())
 			{
 				setStatusText("Plugin loaded successfully: "+ p.getName());									
+				ret.setResult(p);
 			}
 			else
 			{
-				initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
+				initPlugin(p).addResultListener(new SwingResultListener<Void>()
 				{
 					public void customResultAvailable(Void result)
 					{
 						setStatusText("Plugin loaded successfully: "+ p.getName());
+						ret.setResult(p);
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						setStatusText("Plugin error: "+plclass);
+						ret.setResult(null);
 					}
 				});
 			}
 			pccpanel.updateToolBar(null);
-			
-			return p;
 		}
 		catch(Exception e)
 		{
 			setStatusText("Plugin error: "+plclass);
+			ret.setResult(null);
 		}
 		
-		return null;
+		return ret;
 	}
 	
 	/**
@@ -579,6 +588,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		final Future<Void> ret	= new Future<Void>();
 		try
 		{
+//			System.out.println("init: "+plugin);
 			plugin.init(this).addResultListener(new SwingDelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
@@ -619,6 +629,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		
 		this.props	= props;
 		
+		final Future<Void>	plugfut	= new Future<Void>();
 		Properties[] vis = props.getSubproperties("vis");
 		if(vis!=null && vis.length>0)
 		{
@@ -626,75 +637,118 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			if(ps!=null)
 			{
 				libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-					.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+					.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(plugfut)
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
-						List<Object[]> create = new ArrayList<Object[]>();
-						for(int i=0; i<ps.length; i++)
+						final List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
+						loadPlugins(ps, 0, newpls, cl)
+							.addResultListener(new SwingDelegationResultListener<Void>(plugfut)
 						{
-							IControlCenterPlugin plg = getPluginForName(ps[i].getType());
-							if(plg!=null)
+							public void customResultAvailable(Void result)
 							{
-		//						System.out.println("vis: "+ps[i].getType()+" "+ps[i].getValue());
-								toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
-								newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
+								plugins = newpls;
+								pccpanel.updateToolBar(null);
+								super.customResultAvailable(result);
 							}
-							else
-							{
-								// Load plugin
-								if(ps[i].getName()!=null)
-								{
-									plg = addPlugin(ps[i].getName(), cl);
-									if(plg!=null)
-									{
-										newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
-										toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
-									}
-									create.add(new Object[]{ps[i].getName(), i});
-								}
-							}
-						}
-						plugins = newpls;
-						
-						pccpanel.updateToolBar(null);
+						});
 					}
 				});
 			}
 		}
-			
-		Properties	ccprops	= props.getSubproperty("controlcenter");
-		if(ccprops==null)
+		
+		plugfut.addResultListener(new SwingDelegationResultListener<Void>(ret)
 		{
-			// Use empty properties for initialization
-			ccprops	= new Properties();
-		}
-		pccpanel.setProperties(ccprops).addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				// Consider only settings of plugins, which have a panel associated.
-				List<IControlCenterPlugin>	plugs	= new ArrayList();
-				for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
+				Properties	ccprops	= props.getSubproperty("controlcenter");
+				if(ccprops==null)
 				{
-					final IControlCenterPlugin	plugin	= it.next().getFirstEntity();
-					if(getPluginComponent(plugin)!=null && props.getSubproperty(plugin.getName())!=null)
+					// Use empty properties for initialization
+					ccprops	= new Properties();
+				}
+				pccpanel.setProperties(ccprops).addResultListener(new SwingDelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
 					{
-						plugs.add(plugin);
+						// Consider only settings of plugins, which have a panel associated.
+						List<IControlCenterPlugin>	plugs	= new ArrayList<IControlCenterPlugin>();
+						for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
+						{
+							final IControlCenterPlugin	plugin	= it.next().getFirstEntity();
+							if(getPluginComponent(plugin)!=null && props.getSubproperty(plugin.getName())!=null)
+							{
+								plugs.add(plugin);
+							}
+						}
+						
+						CounterResultListener<Void>	crl	= new CounterResultListener<Void>(plugs.size(),
+							new SwingDelegationResultListener<Void>(ret));
+						for(int i=0; i<plugs.size(); i++)
+						{
+							IControlCenterPlugin	plugin	= (IControlCenterPlugin)plugs.get(i);
+							plugin.setProperties(props.getSubproperty(plugin.getName())).addResultListener(crl);
+						}
 					}
-				}
-				
-				CounterResultListener	crl	= new CounterResultListener(plugs.size(),
-					new SwingDelegationResultListener(ret));
-				for(int i=0; i<plugs.size(); i++)
-				{
-					IControlCenterPlugin	plugin	= (IControlCenterPlugin)plugs.get(i);
-					plugin.setProperties(props.getSubproperty(plugin.getName())).addResultListener(crl);
-				}
+				});
 			}
 		});
 		
+		return ret;
+	}
+	
+	/**
+	 *  Load plugins iteratively.
+	 */
+	protected IFuture<Void>	loadPlugins(final Property[] ps, final int i, final List<Tuple2<IControlCenterPlugin, JComponent>> newpls, final ClassLoader cl)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		IControlCenterPlugin plg = getPluginForName(ps[i].getType());
+		
+		// Load plugin
+		if(plg==null && ps[i].getName()!=null)
+		{
+			addPlugin(ps[i].getName(), cl)
+				.addResultListener(new SwingExceptionDelegationResultListener<IControlCenterPlugin, Void>(ret)
+			{
+				public void customResultAvailable(IControlCenterPlugin plg)
+				{
+					if(plg!=null)
+					{
+						newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
+						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+					}
+					
+					if(i+1<ps.length)
+					{
+						loadPlugins(ps, i+1, newpls, cl).addResultListener(new SwingDelegationResultListener<Void>(ret));
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
+			});
+		}
+		else
+		{
+			if(plg!=null)
+			{
+				newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
+				toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+			}
+			
+			if(i+1<ps.length)
+			{
+				loadPlugins(ps, i+1, newpls, cl).addResultListener(new SwingDelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		
+
 		return ret;
 	}
 	
