@@ -11,7 +11,7 @@ import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -55,7 +55,7 @@ import java.util.TimerTask;
 @RequiredServices(
 {
 	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="threadpool", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 public abstract class DiscoveryAgent

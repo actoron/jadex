@@ -5,7 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -56,10 +56,10 @@ public abstract class ReceiveHandler
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Start the receiver thread.
-		IFuture<IThreadPoolService>	tpfut	= agent.getMicroAgent().getServiceContainer().getRequiredService("threadpool");
-		tpfut.addResultListener(new IResultListener<IThreadPoolService>()
+		IFuture<IDaemonThreadPoolService>	tpfut	= agent.getMicroAgent().getServiceContainer().getRequiredService("threadpool");
+		tpfut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
-			public void resultAvailable(final IThreadPoolService tp)
+			public void resultAvailable(final IDaemonThreadPoolService tp)
 			{
 				tp.execute(new Runnable()
 				{
