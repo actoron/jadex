@@ -54,18 +54,52 @@ public class RotationTask extends AbstractTask
 		else
 		{
 			IVector2 targetdir = destination.copy().subtract(loc).normalize();
-			IVector2 diff = targetdir.copy().subtract(rot);
-			double rx = rot.getXAsDouble();
-			double ry = rot.getYAsDouble();
-			double dx = diff.getX().getAsDouble();
-			double dy = diff.getY().getAsDouble();
-			double d = 0.05;
-			double nrx = dx>0? rx+d: dx<0? rx-d: rx;
-			double nry = dy>0? ry+d: dy<0? ry-d: ry;
-			obj.setProperty(PROPERTY_ROTATION, new Vector2Double(nrx, nry).normalize());
-			
-			if(dx<=0.05 && dy<=0.05)
+
+			double rangle = rot.getDirectionAsDouble();
+			double tangle = targetdir.getDirectionAsDouble();
+			if(Math.abs(rangle-tangle)>0.1)
+			{
+				double f = rangle>tangle? -1: 1;
+				double d = Math.abs(rangle-tangle);
+				rangle = d<Math.PI? rangle+0.1*f: rangle-0.1*f;
+				
+				double x = Math.cos(rangle);
+				double y = Math.sin(rangle);
+				obj.setProperty(PROPERTY_ROTATION, new Vector2Double(x,y));
+			}
+			else
+			{
 				setFinished(space, obj, true);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static void main(String[] args)
+	{
+		IVector2 rot = new Vector2Double(0,0);
+		IVector2 targetdir = new Vector2Double(10,10);
+
+		while(true)
+		{
+			double rangle = rot.getDirectionAsDouble();
+			double tangle = targetdir.getDirectionAsDouble();
+			
+			System.out.println("dir: "+Math.toDegrees(rangle)+" "+Math.toDegrees(tangle));
+			
+			if(Math.abs(rangle-tangle)>0.05)
+			{
+				double f = rangle>tangle? -1: +1;
+				double d = Math.abs(rangle-tangle);
+				rangle = d<Math.PI? rangle+0.1*f: rangle-0.1*f;
+				
+				double x = Math.cos(rangle);
+				double y = Math.sin(rangle);
+				
+				rot = new Vector2Double(x,y);
+			}
 		}
 	}
 }
