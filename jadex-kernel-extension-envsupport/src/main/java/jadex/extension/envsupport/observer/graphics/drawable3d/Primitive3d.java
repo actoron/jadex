@@ -19,6 +19,7 @@ public class Primitive3d extends AbstractVisual3d
 	public static final int PRIMITIVE_TYPE_TEXT3D			 = 7;
 	public static final int PRIMITIVE_TYPE_SKY	 			= 8;
 	public static final int PRIMITIVE_TYPE_TERRAIN	 		= 9;
+	public static final int PRIMITIVE_TYPE_SOUND	 		= 10;
 	
 	public static final String SHADOW_OFF = "Off";
 	public static final String SHADOW_CAST = "Cast";
@@ -55,6 +56,18 @@ public class Primitive3d extends AbstractVisual3d
 	{
 		super();
 		type = PRIMITIVE_TYPE_SPHERE;
+		shadowtype = "Off";
+		enableDCPos = false;
+		enableDCSize = false;
+		enableDCRot = false;
+		setColor(Color.MAGENTA);
+		texturePath_ = "";
+	}
+	
+	public Primitive3d(int type)
+	{
+		super();
+		this.type = type;
 		shadowtype = "Off";
 		enableDCPos = false;
 		enableDCSize = false;

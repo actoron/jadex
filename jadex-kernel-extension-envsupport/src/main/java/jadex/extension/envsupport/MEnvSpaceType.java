@@ -29,6 +29,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Torus3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
@@ -600,7 +601,8 @@ public class MEnvSpaceType
 				new SubobjectInfo(new AccessInfo(new QName(uri, "text3d"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "sky"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "terrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
-				new SubobjectInfo(new AccessInfo(new QName(uri, "rndterrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),		
+				new SubobjectInfo(new AccessInfo(new QName(uri, "rndterrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),	
+				new SubobjectInfo(new AccessInfo(new QName(uri, "sound3d"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1120,6 +1122,52 @@ public class MEnvSpaceType
 				}, 
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "animationcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "sound3d")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("soundfile", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("loop", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("continuosly", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("positional", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("volume", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						String soundfile = (String)getProperty(args, "soundfile");
+						if(soundfile==null)
+						{
+							soundfile = "";
+						}
+						Boolean loop = (Boolean)getProperty(args, "loop");
+						if(loop==null)
+						{
+							loop = false;
+						}		
+						Boolean continuosly = (Boolean)getProperty(args, "continuosly");
+						if(continuosly==null)
+						{
+							continuosly = false;
+						}		
+						Boolean positional = (Boolean)getProperty(args, "positional");
+						if(loop==null)
+						{
+							positional = false;
+						}	
+						Double volume = (Double)getProperty(args, "volume");
+						if(volume==null)
+						{
+							volume = 1.0;
+						}	
+
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "soundcondition");
+						return new Sound3d(soundfile, loop, volume, continuosly, positional, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "soundcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "arrow")}), new ObjectInfo(MultiCollection.class),
