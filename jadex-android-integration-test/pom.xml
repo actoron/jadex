@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.sourceforge.jadex</groupId>
+	<artifactId>jadex-android-integration-test</artifactId>
+	<version>2.1-SNAPSHOT</version>
+	<packaging>apk</packaging>
+	<name>jadex-android-integration-test</name>
+
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-android-parent</artifactId>
+		<version>2.1-SNAPSHOT</version>
+		<relativePath>../jadex-android-parent/</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android-test</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.12.1.GA</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-base</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-standalone</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools-android</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-xmlpull</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-antlr</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-example-project-maven</artifactId>
+			<version>2.1-SNAPSHOT</version>
+			<type>apk</type>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-example-project-maven</artifactId>
+			<version>2.1-SNAPSHOT</version>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+<!-- 		<sourceDirectory>src/main/java</sourceDirectory> -->
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<emulator>
+						<avd>22</avd>
+						<!-- name of the avd to deploy to and run the instrumentation on -->
+						<wait>150000</wait> <!-- wait time for the emulator to start -->
+						<options>-partition-size 128 -wipe-data</options>
+						<!-- additional options to run the emulator with -->
+					</emulator>
+					<undeployBeforeDeploy>true</undeployBeforeDeploy>
+					<sdk>
+						<path>${env.ANDROID_HOME}</path>
+						<platform>2.2</platform>
+					</sdk>
+					<extensions>true</extensions>
+					<test>
+						<instrumentationPackage>jadex.android.application.demo.test
+						</instrumentationPackage>
+						<instrumentationRunner>android.test.InstrumentationTestRunner
+						</instrumentationRunner>
+						<debug>true</debug>
+					</test>
+					<manifest>
+						<versionName></versionName>
+						<versionCodeAutoIncrement>true</versionCodeAutoIncrement>
+						<!-- <versionCodeUpdateFromVersion>true</versionCodeUpdateFromVersion> -->
+						<!-- <sharedUserId>anId</sharedUserId> -->
+						<debuggable>true</debuggable>
+
+						<!-- <skip>false</skip> -->
+						<!-- <coverage>false</coverage> -->
+						<!-- <logOnly>true|false</logOnly> -->
+						<!-- <testSize>small|medium|large</testSize> -->
+						<!-- <createReport>true</createReport> -->
+
+						<!-- <packages> -->
+						<!-- <package>jadex.android.application.demo</package> -->
+						<!-- </packages> -->
+					</manifest>
+				</configuration>
+
+				<executions>
+					<!-- android plugin execution that starts the emulator. -->
+					<execution>
+						<id>startemulator</id>
+						<!-- bound to the 'initialize' phase -->
+						<phase>initialize</phase>
+						<goals>
+							<goal>emulator-start</goal>
+						</goals>
+					</execution>
+
+<!-- 					<execution> -->
+<!-- 						android plugin execution that starts the emulator. -->
+<!-- 						<id>stopemulator</id> -->
+<!-- 						bound to the 'install' phase -->
+<!-- 						<phase>install</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>emulator-stop</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+				</executions>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.jayway.maven.plugins.android.generation2
+										</groupId>
+										<artifactId>
+											android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[3.1.1,)
+										</versionRange>
+										<goals>
+											<goal>emulator-start</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
