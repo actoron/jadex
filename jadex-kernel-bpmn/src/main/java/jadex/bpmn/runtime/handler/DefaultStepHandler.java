@@ -10,6 +10,7 @@ import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
 
 import java.util.Iterator;
@@ -159,10 +160,22 @@ public class DefaultStepHandler implements IStepHandler
 
 		if(ex!=null && next==null)
 		{
-			if(ex instanceof RuntimeException)
-				throw (RuntimeException)ex;
+			// Hack! Special case of terminated exception of itself e.g. during killing.
+			if(ex instanceof ComponentTerminatedException && instance.getComponentIdentifier().equals(((ComponentTerminatedException)ex).getComponentIdentifier()))
+			{
+				instance.getLogger().warning("Component terminated exception: "+ex);
+			}
 			else
-				throw new RuntimeException("Unhandled exception in process: "+activity, ex);
+			{
+				if(ex instanceof RuntimeException)
+				{
+					throw (RuntimeException)ex;
+				}
+				else
+				{
+					throw new RuntimeException("Unhandled exception in process: "+activity, ex);
+				}
+			}
 		}
 		
 		// Perform step settings, i.e. set next edge/activity or remove thread.
