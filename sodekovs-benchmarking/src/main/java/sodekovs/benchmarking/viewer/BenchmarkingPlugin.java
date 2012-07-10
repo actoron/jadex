@@ -42,7 +42,7 @@ public class BenchmarkingPlugin extends AbstractServicePlugin
 	 */
 	public IFuture<IAbstractViewerPanel> createServicePanel(IService service)
 	{
-		System.out.println("Starting Plugin?");
+//		System.out.println("Starting Benchmarking-Plugin?");
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		final BenchmarkingPanel brp = new BenchmarkingPanel();
 		brp.init(getJCC(), service).addResultListener(new ExceptionDelegationResultListener<Void, IAbstractViewerPanel>(ret)
@@ -54,7 +54,7 @@ public class BenchmarkingPlugin extends AbstractServicePlugin
 		});
 		return ret;
 	}
-	
+
 	/**
 	 *  Get the icon.
 	 */
