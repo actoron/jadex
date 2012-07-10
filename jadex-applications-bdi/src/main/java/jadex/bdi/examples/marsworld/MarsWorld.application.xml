@@ -68,19 +68,19 @@
 				<env:objecttype name="sentry">
 					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*(($properties.clock.getTick())%10),0.01,0.1*(($properties.clock.getTick())%10))
 					</env:property>	
-					<env:property name="rotation" class="IVector2"/>
+					<env:property name="rotation" class="IVector2">new Vector2Double(0, 0)</env:property>
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
-					<env:property name="rotation" class="IVector2"/>
+					<env:property name="rotation" class="IVector2">new Vector2Double(0, 0)</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
-					<env:property name="rotation" class="IVector2"/>
+					<env:property name="rotation" class="IVector2">new Vector2Double(0, 0)</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.15</env:property>
 					<env:property name="ore" class="int">0</env:property>
@@ -157,7 +157,9 @@
 
 					<!-- Sentry -->
 					<env:drawable objecttype="sentry" width="0.07" height="0.07">
+						<env:property name="rot" dynamic="true" class="double">new Vector3Double($object.getProperty("rotation").getXAsDouble(), $object.getProperty("rotation").getYAsDouble(), 0)</env:property>
 						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:triangle color="#FFFFFF" rotation="rot" abssize="0.1"></env:triangle>
 						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld/images/sentry.png" />
 					</env:drawable>
