@@ -44,81 +44,89 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 	/**
 	 *  Agent startup.
 	 */
-	public IFuture agentCreated()
+	public IFuture<Void> agentCreated()
 	{
-		this.watchdogs	= new LinkedHashMap();
-		final long	delay	= ((Number)getArgument("delay")).longValue();
-		
-		scheduleStep(new IComponentStep<Void>()
+		try
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			this.watchdogs	= new LinkedHashMap();
+			final long	delay	= ((Number)getArgument("delay")).longValue();
+			
+			scheduleStep(new IComponentStep<Void>()
 			{
-				final IComponentStep	step	= this;
-				Object[]	keys	= watchdogs.keySet().toArray();
-				final IResultListener	crl	= new CounterResultListener(keys.length, new IResultListener()
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					public void resultAvailable(Object result)
-					{
-						// Pinging finished: Search for new watchdogs.
-						getRequiredServices("watchdogs").addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-//								System.out.println("Found: "+result);
-								if(result instanceof Collection)
-								{
-									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-									{
-										IWatchdogService	watchdog	= (IWatchdogService)it.next();
-										if(!watchdog.getInfo().equals(getInfo()))
-										{
-											watchdogs.put(watchdog.getInfo(), watchdog);
-										}
-									}
-								}
-								
-								waitFor(delay, step);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
-					}
-				});
-
-				// Ping known watchdogs
-//				System.out.println("Pinging: "+SUtil.arrayToString(keys));
-				for(int i=0; i<keys.length; i++)
-				{
-					final Object	key	= keys[i];
-					IWatchdogService	watchdog	= (IWatchdogService)watchdogs.get(key);
-					watchdog.ping().addResultListener(new IResultListener()
+					final IComponentStep	step	= this;
+					Object[]	keys	= watchdogs.keySet().toArray();
+					final IResultListener	crl	= new CounterResultListener(keys.length, new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							crl.resultAvailable(null);
+							// Pinging finished: Search for new watchdogs.
+							getRequiredServices("watchdogs").addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+	//								System.out.println("Found: "+result);
+									if(result instanceof Collection)
+									{
+										for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+										{
+											IWatchdogService	watchdog	= (IWatchdogService)it.next();
+											if(!watchdog.getInfo().equals(getInfo()))
+											{
+												watchdogs.put(watchdog.getInfo(), watchdog);
+											}
+										}
+									}
+									
+									waitFor(delay, step);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+//									throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
+									getLogger().warning("Exception occurred: "+exception);
+								}
+							});
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("Watchdog triggered: "+key);
-							watchdogs.remove(key);
-							crl.resultAvailable(null);
+//							throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
+							getLogger().warning("Exception occurred: "+exception);
 						}
 					});
+	
+					// Ping known watchdogs
+	//				System.out.println("Pinging: "+SUtil.arrayToString(keys));
+					for(int i=0; i<keys.length; i++)
+					{
+						final Object	key	= keys[i];
+						IWatchdogService	watchdog	= (IWatchdogService)watchdogs.get(key);
+						watchdog.ping().addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								crl.resultAvailable(null);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								System.out.println("Watchdog triggered: "+key);
+								watchdogs.remove(key);
+								crl.resultAvailable(null);
+							}
+						});
+					}
+					
+					return IFuture.DONE;
 				}
-				
-				return IFuture.DONE;
-			}
-		});
-		
+			});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		return IFuture.DONE;
 	}
 	

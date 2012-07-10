@@ -362,6 +362,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+//				System.out.println("sb start: "+getComponentIdentifier());
+				
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
 				
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
@@ -370,6 +372,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 
 				rulesystem.init();
+				
+//				System.out.println("sb end: "+getComponentIdentifier());
 				return IFuture.DONE;
 			}
 		});
@@ -593,7 +597,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		try
 		{
-			if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)!=null)
+			// check st!=null is not enough as agent could be terminated during init.
+			// In this case the rulesystem may never has been inited.
+//			String st = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+			if(rulesystem.isInited())
 			{
 				// Hack!!! platform should inform about ext entries to update agenda.
 				Activation	act	= rulesystem.getAgenda().getLastActivation();
@@ -704,7 +711,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			// Killed after init (behavior not started)
 			// -> Call cleanup directly as rule engine is not running and end state is not executed.
 			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
-			state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killfuture, ret);
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killfuture, ret);
 			AgentRules.cleanupAgent(state, ragent);						
 		}
 		else

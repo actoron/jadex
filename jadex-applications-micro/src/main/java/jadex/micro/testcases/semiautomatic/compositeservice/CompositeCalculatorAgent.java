@@ -74,7 +74,7 @@ public class CompositeCalculatorAgent extends MicroAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				System.out.println("Could not get required add service: "+exception);
 			}
 		});
