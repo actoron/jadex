@@ -300,6 +300,39 @@ public class ThreadPool implements IThreadPool
 	 */
 	public static void main(String[] args)
 	{
+//		Thread t = new Thread(new Runnable()
+//		{
+//			public void run()
+//			{
+//				while(true)
+//				{
+//					System.out.println("alive");
+//					try
+//					{
+//						Thread.sleep(1000);
+//						Thread.currentThread().setDaemon(false);
+//					}
+//					catch(InterruptedException e)
+//					{
+//					}
+//				}
+//			}
+//		});
+//		t.setDaemon(true);
+//		t.start();
+//		
+//		while(true)
+//		{
+//			System.out.println("main");
+//			try
+//			{
+//				Thread.sleep(10000);
+//			}
+//			catch(InterruptedException e)
+//			{
+//			}
+//		}
+		
 		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(10, 100, 10000, 4));
 		int max = 10000;
 		todo = max;

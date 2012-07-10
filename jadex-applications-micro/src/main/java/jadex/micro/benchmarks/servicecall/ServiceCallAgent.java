@@ -67,7 +67,17 @@ public class ServiceCallAgent
 			}
 		});
 		
-		return ret;
+		Future<Void> del = new Future<Void>();
+		ret.addResultListener(new DelegationResultListener<Void>(del)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getLogger().warning("Exception during run: "+exception);
+				customResultAvailable(null);
+			}
+		});
+		
+		return del;
 	}
 
 	/**

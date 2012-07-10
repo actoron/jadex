@@ -894,6 +894,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	protected void exitState()
 	{
+		try
+		{
+		
 //		System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
 		ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 		while(steps!=null && !steps.isEmpty())
@@ -912,6 +915,12 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				timer.cancel();
 			}
 			microagent.timers.clear();
+		}
+		
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 

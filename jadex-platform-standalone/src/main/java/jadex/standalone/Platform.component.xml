@@ -246,9 +246,10 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">
-				$args.simulation==null || !$args.simulation.booleanValue()
-				? new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
-				: new jadex.base.service.execution.SyncExecutionService($component.getServiceProvider())
+				new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
+				//$args.simulation==null || !$args.simulation.booleanValue()
+				//? new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
+				//: new jadex.base.service.execution.SyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
 			<providedservice class="jadex.bridge.service.types.library.IDependencyService">

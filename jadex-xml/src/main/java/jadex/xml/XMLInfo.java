@@ -220,4 +220,18 @@ public class XMLInfo
 	{
 		return preprocessor;
 	}
+	
+//	public static void main(String[] args)
+//	{
+//		RuntimeException e = new RuntimeException();
+//		try
+//		{
+//			e.fillInStackTrace();
+//			throw e;
+//		}
+//		catch(Exception ex)
+//		{
+//			ex.printStackTrace();
+//		}
+//	}
 }

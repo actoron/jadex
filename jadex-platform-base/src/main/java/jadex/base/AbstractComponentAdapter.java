@@ -584,6 +584,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					{
 //						if("Application".equals(desc.getType()))
 //							System.out.println("killComponent2: "+getComponentIdentifier());
+						try
+						{
 						component.cleanupComponent()
 							.addResultListener(new IResultListener<Void>()
 						{
@@ -648,6 +650,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //								shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
 							}
 						});
+						
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				});
 			}
