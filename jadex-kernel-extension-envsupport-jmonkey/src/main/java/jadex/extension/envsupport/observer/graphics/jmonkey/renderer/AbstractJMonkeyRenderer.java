@@ -5,6 +5,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.LoopMode;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioNode;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
@@ -174,7 +176,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 	}
 
 	public Spatial prepareAndExecuteUpdate(DrawableCombiner3d dc, Primitive3d primitive, Object obj, ViewportJMonkey vp, Spatial sp)
-	{
+	{	
 		IParsedExpression drawcondition = primitive.getDrawCondition();
 		boolean draw = drawcondition==null;
 		if(!draw)
@@ -230,6 +232,44 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					
 			}
 			
+//			 Special Case 03: Sound
+			if(primitive.getType() == 10)
+			{
+//				System.out.println("spatial" + sp.toString());
+				if(sp instanceof AudioNode)
+				{
+//					System.out.println("AUDIONODE!");
+					AudioNode audionode = (AudioNode)sp;
+					
+					Sound3d sound = (Sound3d)primitive;
+					
+					
+					IParsedExpression soundcondition = sound.getCond();
+					boolean soundActive = soundcondition==null;
+					if(!soundActive)
+					{
+						_fetcher.setValue("$object", obj);
+						_fetcher.setValue("$perspective", vp.getPerspective());
+						soundActive = ((Boolean)soundcondition.getValue(_fetcher)).booleanValue();
+					}
+					
+					if(soundActive)
+					{
+						audionode.play();
+//						System.out.println("PLAY!");
+					}
+					else
+					{
+						audionode.stop();
+					}
+					
+					
+
+
+				}
+					
+			}
+			
 			// Special Case 02: Animation Updates
 			if(primitive.getType()==6)
 			{
@@ -278,6 +318,8 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				
 			
 			}
+			
+
 		}
 		else
 		{

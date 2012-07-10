@@ -11,6 +11,7 @@ import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioNode;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
@@ -83,6 +84,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private BasicShadowRenderer bsr;
 	
 	private boolean _isGrid;
+	
+	private AudioNode audio_nature;
 
 	public MonkeyApp(float dim, float spaceSize, boolean isGrid)
 	{
@@ -102,6 +105,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	public void simpleInitApp()
 	{
 		
+		initAudio();
 		// Create the Cam
 		setCam("Default");
 		Logger.getLogger("").setLevel(Level.SEVERE);
@@ -153,6 +157,14 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	}
 
+	
+	private void initAudio()
+	{
+
+	    
+	}
+	
+	
 	/** Custom Keybinding: Map named actions to inputs. */
 	private void initKeys()
 	{
@@ -354,6 +366,9 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			loc.setY(getHeightAt(loc.x, loc.z));
 			cam.setLocation(loc);
 		}
+		
+	    listener.setLocation(cam.getLocation());
+	    listener.setRotation(cam.getRotation());
 
 	}
 
@@ -560,5 +575,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		return this._animChannels;
 		
 	}
+	
+
 
 }

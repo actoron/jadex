@@ -1,26 +1,20 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
-
-import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 
+import java.util.HashMap;
+import java.util.TreeSet;
+
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.Spatial.CullHint;
-import com.jme3.scene.debug.SkeletonDebugger;
-import com.jme3.texture.Texture;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.debug.SkeletonDebugger;
 
 
 public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer

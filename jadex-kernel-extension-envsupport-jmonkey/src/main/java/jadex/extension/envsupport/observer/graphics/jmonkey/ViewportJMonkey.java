@@ -13,6 +13,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.CylinderJMo
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.DomeJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Object3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SoundJMonkeyPlayer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SphereJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Text3dJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.TorusJMonkeyRenderer;
@@ -35,6 +36,7 @@ import java.util.concurrent.Callable;
 import com.jme3.animation.AnimChannel;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioNode;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -113,7 +115,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	private HashMap<String, AnimChannel> _animChannels; 
 
 	/** The 3d renderers. */
-	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[10];
+	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[11];
 	static
 	{
 		RENDERERS[0] = new SphereJMonkeyRenderer();
@@ -126,6 +128,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		RENDERERS[7] = new Text3dJMonkeyRenderer();
 		RENDERERS[8] = new SkyJMonkeyRenderer();
 		RENDERERS[9] = new TerrainJMonkeyRenderer();
+		RENDERERS[10] = new SoundJMonkeyPlayer();
 	}
 
 	/**
@@ -429,6 +432,23 @@ public class ViewportJMonkey extends AbstractViewport3d
 						identifier = "Type: " + p.getType() + " HCode " + p.hashCode();
 
 						Spatial sp = _tmpNode.getChild((String)identifier);
+						
+						
+						//TODO HACK for Soundfile
+						if(p.getType() == 10)
+						{
+							if(sp instanceof Node)
+							{
+								Node n = (Node)sp;
+								Spatial x = n.getChild(0);
+								if(x instanceof AudioNode)
+								{
+									sp = x;
+								}
+							}
+						}
+
+						
 
 						if(!(sp == null))
 						{
@@ -584,7 +604,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 
 
-		_app.stop();
+		_app.stop(true);
 
 //		System.out.println("ViewportJmonkey: STOP STOP STOP");
 
