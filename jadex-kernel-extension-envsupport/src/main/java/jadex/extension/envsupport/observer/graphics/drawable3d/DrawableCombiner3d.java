@@ -39,6 +39,9 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/** Uses 3d Rotation? */
 	public boolean _rotation3d;
 	
+	/** Calculate the Rotation ? */
+	public boolean _autoRotation;
+	
 	/** Constant for 45 degree. In all three Dimensions (x,y,z) */
 	public static IVector3 DEG45X = new Vector3Double((Math.PI/180)*45, 0, 0);
 	public static IVector3 DEG45Y = new Vector3Double(0, (Math.PI/180)*45, 0);
@@ -68,7 +71,7 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	 */
 	public DrawableCombiner3d()
 	{
-		this(null, null, null, true, false);
+		this(null, null, null, true, false, true);
 	}
 
 	//-------- methods --------
@@ -76,11 +79,12 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/**
 	 * Creates a new DrawableCombiner3d
 	 */
-	public DrawableCombiner3d(Object position, Object rotation, Object size, boolean hasSpaceobject, boolean rotation3d)
+	public DrawableCombiner3d(Object position, Object rotation, Object size, boolean hasSpaceobject, boolean rotation3d, boolean autoRotation)
 	{
 		super(position==null? "position": position, rotation, size);
 		_hasSpaceobject = hasSpaceobject;
 		_rotation3d = rotation3d;
+		_autoRotation = autoRotation;
 		primitives3d = new ArrayList<Primitive3d>();
 		
 		setProperty("$deg45x", DEG45X);
@@ -191,13 +195,9 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 		return properties != null && properties.containsKey(name);
 	}
 
-	public void flushRenderInfo() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	/**
-	 * @return //TODO
+	 * @return 
 	 */
 	public boolean hasSpaceobject()
 	{
@@ -205,7 +205,7 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	}
 
 	/**
-	 * @param //TODO
+	 * @param 
 	 */
 	public void setHasSpaceobject(boolean hasSpaceobject)
 	{
@@ -242,6 +242,22 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	public void setRotation3d(boolean _rotation3d)
 	{
 		this._rotation3d = _rotation3d;
+	}
+
+	/**
+	 * @return the _autoRotation
+	 */
+	public boolean isAutoRotation()
+	{
+		return _autoRotation;
+	}
+
+	/**
+	 * @param _autoRotation the _autoRotation to set
+	 */
+	public void setAutoRotation(boolean _autoRotation)
+	{
+		this._autoRotation = _autoRotation;
 	}
 
 }
