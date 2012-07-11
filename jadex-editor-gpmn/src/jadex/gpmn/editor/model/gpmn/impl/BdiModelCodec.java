@@ -83,41 +83,44 @@ public class BdiModelCodec extends AbstractModelCodec
 		ps.println();
 		
 		// Beliefs/Context
-		printlnIndent(ps, ind++, "<beliefs>");
 		List<IParameter> params = gm.getContext().getParameters();
-		for (IParameter param : params)
+		if (params.size() > 0)
 		{
-			if (param.isSet())
+			printlnIndent(ps, ind++, "<beliefs>");
+			for (IParameter param : params)
 			{
-				printIndent(ps, ind++, "<beliefset name=\"");
-			}
-			else
-			{
-				printIndent(ps, ind++, "<belief name=\"");
+				if (param.isSet())
+				{
+					printIndent(ps, ind++, "<beliefset name=\"");
+				}
+				else
+				{
+					printIndent(ps, ind++, "<belief name=\"");
+				}
+				
+				ps.print(param.getName());
+				ps.print("\" class=\"");
+				ps.print(param.getType());
+				ps.println("\">");
+				
+				printIndent(ps, ind, "<fact>");
+				ps.print(param.getValue());
+				ps.println("</fact>");
+				
+				if (param.isSet())
+				{
+					printlnIndent(ps, --ind, "</beliefset>");
+				}
+				else
+				{
+					printlnIndent(ps, --ind, "</belief>");
+				}
 			}
 			
-			ps.print(param.getName());
-			ps.print("\" class=\"");
-			ps.print(param.getType());
-			ps.println("\">");
-			
-			printIndent(ps, ind, "<fact>");
-			ps.print(param.getValue());
-			ps.println("</fact>");
-			
-			if (param.isSet())
-			{
-				printlnIndent(ps, --ind, "</beliefset>");
-			}
-			else
-			{
-				printlnIndent(ps, --ind, "</belief>");
-			}
+			printlnIndent(ps, --ind, "</beliefs>");
+		
+			ps.println();
 		}
-		
-		printlnIndent(ps, --ind, "</beliefs>");
-		
-		ps.println();
 		
 		Map<String, List<String>> inhibitions = new HashMap<String, List<String>>();
 		Set<IEdge> edges = gm.getEdgeSet(ISuppressionEdge.class);

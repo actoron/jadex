@@ -4,7 +4,6 @@ import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -28,11 +27,15 @@ public class ModelContainer implements IModelContainer
 	/** The project root. */
 	protected File projectroot;
 	
+	/** The model factory. */
+	protected IGpmnModelFactory modelfactory;
+	
 	/**
 	 *  Creates a new container.
 	 */
-	public ModelContainer(mxGraphComponent graphcomponent, IGpmnModel model)
+	public ModelContainer(IGpmnModelFactory modelfactory, mxGraphComponent graphcomponent, IGpmnModel model)
 	{
+		this.modelfactory = modelfactory;
 		this.graphcomponent = graphcomponent;
 		this.model = model;
 	}
@@ -92,6 +95,26 @@ public class ModelContainer implements IModelContainer
 		
 	}
 	
+	/**
+	 *  Gets the model factory.
+	 *
+	 *  @return The model factory.
+	 */
+	public IGpmnModelFactory getModelFactory()
+	{
+		return modelfactory;
+	}
+
+	/**
+	 *  Sets the model factory.
+	 *
+	 *  @param modelfactory The model factory.
+	 */
+	public void setModelFactory(IGpmnModelFactory modelfactory)
+	{
+		this.modelfactory = modelfactory;
+	}
+
 	/** 
 	 *  Sets the dirty model state.
 	 *  

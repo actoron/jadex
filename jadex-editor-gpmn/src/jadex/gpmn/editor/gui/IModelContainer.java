@@ -48,6 +48,13 @@ public interface IModelContainer
 	 */
 	public void setGpmnModel(IGpmnModel model);
 	
+	/**
+	 *  Gets the model factory.
+	 *
+	 *  @return The model factory.
+	 */
+	public IGpmnModelFactory getModelFactory();
+	
 	/** 
 	 *  Sets the dirty model state.
 	 *  

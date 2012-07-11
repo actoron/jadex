@@ -69,13 +69,13 @@ public class SelectionController implements mxIEventListener
 		else if (evt.getProperty(removed) != null && modelcontainer.getGraph().getSelectionCount() == 0)
 		{
 			//TODO: Correct?.
-			viewaccess.setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
+			viewaccess.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 			//viewaccess.setPropertPanel(SPropertyPanelFactory.EMPTY_PANEL);
 		}
 		
 		if (modelcontainer.getGraph().getSelectionCount() == 1)
 		{
-			viewaccess.setPropertPanel(SPropertyPanelFactory.createPanel(modelcontainer));
+			viewaccess.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 		}
 	}
 }

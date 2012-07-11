@@ -55,7 +55,7 @@ public class GpmnStylesheetColor extends mxStylesheet
 		// Goal Styles
 		Map<String, Object> style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#a6c198");
+		style.put(mxConstants.STYLE_FILLCOLOR, GuiConstants.ACHIEVE_GOAL_COLOR);
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
@@ -69,15 +69,15 @@ public class GpmnStylesheetColor extends mxStylesheet
 		putCellStyle(ModelConstants.ACHIEVE_GOAL_TYPE, style);
 		
 		style = new HashMap<String, Object>(style);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#9bc7cc");
+		style.put(mxConstants.STYLE_FILLCOLOR, GuiConstants.PERFORM_GOAL_COLOR);
 		putCellStyle(ModelConstants.PERFORM_GOAL_TYPE, style);
 		
 		style = new HashMap<String, Object>(style);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#e1e187");
+		style.put(mxConstants.STYLE_FILLCOLOR, GuiConstants.MAINTAIN_GOAL_COLOR);
 		putCellStyle(ModelConstants.MAINTAIN_GOAL_TYPE, style);
 		
 		style = new HashMap<String, Object>(style);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#c19898");
+		style.put(mxConstants.STYLE_FILLCOLOR, GuiConstants.QUERY_GOAL_COLOR);
 		putCellStyle(ModelConstants.QUERY_GOAL_TYPE, style);
 		
 		// Goal Markers
@@ -101,7 +101,7 @@ public class GpmnStylesheetColor extends mxStylesheet
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#b897c0");
+		style.put(mxConstants.STYLE_FILLCOLOR, GuiConstants.REF_PLAN_COLOR);
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
@@ -112,7 +112,7 @@ public class GpmnStylesheetColor extends mxStylesheet
 		putCellStyle(GuiConstants.REF_PLAN_STYLE, style);
 		
 		style = new HashMap<String, Object>(style);
-		style.put(mxConstants.STYLE_FILLCOLOR, "#e3a49c");
+		style.put(mxConstants.STYLE_FILLCOLOR, GuiConstants.ACTIVATION_PLAN_COLOR);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.TRUE);
 		putCellStyle(GuiConstants.ACTIVATION_PLAN_STYLE, style);
 		

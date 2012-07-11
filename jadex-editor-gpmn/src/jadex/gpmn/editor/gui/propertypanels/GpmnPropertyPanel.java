@@ -3,6 +3,7 @@ package jadex.gpmn.editor.gui.propertypanels;
 import jadex.gpmn.editor.gui.BetterFileChooser;
 import jadex.gpmn.editor.gui.DocumentAdapter;
 import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ImageLoader;
 import jadex.gpmn.editor.gui.SGuiHelper;
 
 import java.awt.BorderLayout;
@@ -40,6 +41,8 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 		super(container);
 		setLayout(new BorderLayout());
 		
+		ImageLoader loader = new ImageLoader();
+		
 		JTabbedPane tabpane = new JTabbedPane();
 		add(tabpane);
 		
@@ -47,18 +50,6 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 		JPanel column = new JPanel();
 		column.setLayout(new GridBagLayout());
 		tabpane.addTab("Model", column);
-		
-		/*JLabel label = new JLabel("Name");
-		JTextArea textarea = new JTextArea(container.getGpmnModel().getName());
-		textarea.getDocument().addDocumentListener(new DocumentAdapter()
-		{
-			public void update(DocumentEvent e)
-			{
-				getModel().setName(SGuiHelper.getText(e.getDocument()));
-				modelcontainer.setDirty(true);
-			}
-		});
-		configureAndAddInputLine(column, label, textarea, y++);*/
 		
 		JLabel label = new JLabel("Description");
 		JTextArea textarea = new JTextArea(container.getGpmnModel().getDescription());
@@ -98,9 +89,9 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 				model.addParameter();
 			}
 		});
-		addbutton.setIcon(SGuiHelper.getImageIcon("plus_unpressed.png"));
-		addbutton.setPressedIcon(SGuiHelper.getImageIcon("plus_pressed.png"));
-		addbutton.setRolloverIcon(SGuiHelper.getImageIcon("plus_high.png"));
+		addbutton.setIcon(loader.getImageIcon("plus_unpressed.png"));
+		addbutton.setPressedIcon(loader.getImageIcon("plus_pressed.png"));
+		addbutton.setRolloverIcon(loader.getImageIcon("plus_high.png"));
 		addbutton.setContentAreaFilled(false);
 		addbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		addbutton.setMargin(new Insets(0, 0, 0, 0));
@@ -121,9 +112,9 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		});
-		removebutton.setIcon(SGuiHelper.getImageIcon("minus_unpressed.png"));
-		removebutton.setPressedIcon(SGuiHelper.getImageIcon("minus_pressed.png"));
-		removebutton.setRolloverIcon(SGuiHelper.getImageIcon("minus_high.png"));
+		removebutton.setIcon(loader.getImageIcon("minus_unpressed.png"));
+		removebutton.setPressedIcon(loader.getImageIcon("minus_pressed.png"));
+		removebutton.setRolloverIcon(loader.getImageIcon("minus_high.png"));
 		removebutton.setContentAreaFilled(false);
 		removebutton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		removebutton.setMargin(new Insets(0, 0, 0, 0));

@@ -1,6 +1,8 @@
 package jadex.gpmn.editor.gui;
 
 import jadex.gpmn.editor.gui.propertypanels.BasePropertyPanel;
+import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetColor;
+import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetGrayscale;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,8 +11,16 @@ import java.util.Set;
 import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
 
+import com.mxgraph.view.mxStylesheet;
+
 public interface IViewAccess
 {
+	/** Color Style Sheet */
+	public static final GpmnStylesheetColor		COLOR_STYLESHEET = new GpmnStylesheetColor();
+	
+	/** Grayscale Style Sheet */
+	public static final GpmnStylesheetGrayscale GS_STYLESHEET 	 = new GpmnStylesheetGrayscale();
+	
 	/** Select Edit Mode */
 	public static final String SELECT_MODE			= "Select";
 	
@@ -61,7 +71,7 @@ public interface IViewAccess
 	 *  
 	 *  @param panel The panel.
 	 */
-	public void setPropertPanel(BasePropertyPanel panel);
+	public void setPropertyPanel(BasePropertyPanel panel);
 	
 	/**
 	 *  Returns the select tool.
@@ -76,4 +86,9 @@ public interface IViewAccess
 	 * @return the edit mode.
 	 */
 	public String getEditMode();
+	
+	/**
+	 *  Gets the selected style sheet.
+	 */
+	public mxStylesheet getSelectedSheet();
 }

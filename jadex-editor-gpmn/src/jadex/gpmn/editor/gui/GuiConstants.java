@@ -37,6 +37,45 @@ public class GuiConstants
 	/** Virtual activation edge marker style. */
 	public static final String VIRTUAL_ACTIVATION_EDGE_MARKER_STYLE = "Virtual Activation Edge Marker Style";
 	
+	/** Colors and Icons*/
+	
+	/** The base icon size. */
+	public static final int BASE_ICON_SIZE = 256;
+	
+	/** The icon size used. */
+	public static final int ICON_SIZE = 24;
+	
+	/** Amplification factor for highlighted icons */
+	public static final float HIGHLIGHT_AMP = 1.15f;
+	
+	/** Achieve Goal Color */
+	public static final String ACHIEVE_GOAL_COLOR  = "#a6c198";
+	
+	/** Perform Goal Color */
+	public static final String PERFORM_GOAL_COLOR  = "#9bc7cc";
+	
+	/** Maintain Goal Color */
+	public static final String MAINTAIN_GOAL_COLOR = "#e1e187";
+	
+	/** Query Goal Color */
+	public static final String QUERY_GOAL_COLOR    = "#c19898";
+	
+	/** Activation Plan Color */
+	public static final String ACTIVATION_PLAN_COLOR  = "#e3a49c";
+	
+	/** Plan Color */
+	public static final String REF_PLAN_COLOR  = "#b897c0";
+	
+	/** Suppression Edge Color */
+	public static final String SUPPRESSION_EDGE_COLOR  = "bd5eea";
+	
+	/** Select Color */
+	public static final String SELECT_COLOR  = "88cfc0";
+	
+	/** Control Point Color */
+	public static final String CONTROL_POINT_COLOR  = "cfc688";
+	//public static final String CONTROL_POINT_COLOR  = "dfff88";
+	
 	/* GUI Configuration */
 	/** Ratio between graph and property view. */
 	public static final double GRAPH_PROPERTY_RATIO = 0.7;

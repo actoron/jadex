@@ -1,13 +1,22 @@
 package jadex.gpmn.editor.gui;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.CompositeContext;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.awt.image.ColorModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.util.Enumeration;
 
-import javax.imageio.ImageIO;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
@@ -21,40 +30,113 @@ import com.mxgraph.view.mxGraph;
 /** Helper methods for the GUI. */
 public class SGuiHelper
 {
-	public static final int ICON_SIZE = 24;
-	
-	public static final JToggleButton createTool(String mode, String imagebasename, String tooltip)
+	public static final JToggleButton createTool(ImageLoader loader, String mode, Color color, String imagebasename, String tooltip, boolean goal)
 	{
 		JToggleButton tool = new JToggleButton();
 		tool.getModel().setActionCommand(mode);
 		tool.setContentAreaFilled(false);
-		tool.setPressedIcon(getImageIcon(imagebasename + "_on.png"));
-		tool.setSelectedIcon(getImageIcon(imagebasename + "_on.png"));
-		tool.setIcon(getImageIcon(imagebasename + "_off.png"));
-		tool.setRolloverIcon(getImageIcon(imagebasename + "_high.png"));
+		
+		ImageIcon onicon = null;
+		if (goal)
+		{
+			onicon = generateGoalImageIcon(loader, imagebasename, color, true, true);
+			tool.setIcon(generateGoalImageIcon(loader, imagebasename, color, false, false));
+			tool.setRolloverIcon(generateGoalImageIcon(loader, imagebasename, color, true, false));
+		}
+		else
+		{
+			onicon = generateImageIcon(loader, imagebasename, color, true, true);
+			tool.setIcon(generateImageIcon(loader, imagebasename, color, false, false));
+			tool.setRolloverIcon(generateImageIcon(loader, imagebasename, color, true, false));
+		}
+		tool.setPressedIcon(onicon);
+		tool.setSelectedIcon(onicon);
+		
 		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
 		tool.setMargin(new Insets(0, 0, 0, 0));
 		tool.setToolTipText(tooltip);
 		return tool;
 	}
 	
-	public static final ImageIcon getImageIcon(String filename)
+	public static final ImageIcon generateGoalImageIcon(ImageLoader loader, String text, Color bgcolor, boolean high, boolean shift)
+	{
+		//Image textimg = loader.loadImage(text + ".png");
+		Image textimg = loader.generateOrLoadImage("tooltext_" + text);
+		Image frame = loader.generateOrLoadImage("circle");
+		Image glass = loader.generateOrLoadImage("circleglass");
+		Image bgshape = loader.generateOrLoadImage("bgcircle");
+		Image shadow = null;
+		if (!shift)
+		{
+			shadow = loader.generateOrLoadImage("circleshadow");
+		}
+		
+		return generateImageIcon(textimg, bgshape, frame, glass, shadow, bgcolor, high);
+	}
+	
+	public static final ImageIcon generateImageIcon(ImageLoader loader, String text, Color bgcolor, boolean high, boolean shift)
+	{
+		Image symimg = null;
+		if (text.endsWith("sym"))
+		{
+			symimg = loader.generateOrLoadImage(text);
+		}
+		else
+		{
+			symimg = loader.generateOrLoadImage("tooltext_" + text);
+		}
+		Image frame = loader.generateOrLoadImage("rrect");
+		Image glass = loader.generateOrLoadImage("rrectglass");
+		Image bgshape = loader.generateOrLoadImage("bgrrect");
+		Image shadow = null;
+		if (!shift)
+		{
+			shadow = loader.generateOrLoadImage("rrectshadow");
+		}
+		
+		return generateImageIcon(symimg, bgshape, frame, glass, shadow, bgcolor, high);
+	}
+	
+	public static final ImageIcon generateImageIcon(Image textimg, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high)
 	{
 		BufferedImage ret = null;
-		try
+		BufferedImage tmpimg = new BufferedImage(GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = tmpimg.createGraphics();
+		g.setComposite(new ModulateComposite(bgcolor, high));
+		g.drawImage(bgshape, 0, 0, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
+		g.dispose();
+		bgshape = tmpimg;
+		
+		Image full = new BufferedImage(GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		g = ((BufferedImage) full).createGraphics();
+		g.setComposite(AlphaComposite.SrcOver);
+		
+		int x = 0;
+		int y = 0;
+		if (shadow == null)
 		{
-			Image orig = ImageIO.read(SGuiHelper.class.getResource("/" + SGuiHelper.class.getPackage().getName().replaceAll("\\.", "/") + "/images/" + filename));
-			orig = orig.getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_AREA_AVERAGING);
-			ret = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-			Graphics2D g = ret.createGraphics();
-			g.setComposite(AlphaComposite.Src);
-			g.drawImage(orig, 0, 0, ICON_SIZE, ICON_SIZE, null);
-			g.dispose();
+			x = 16;
+			y = 16;
 		}
-		catch (IOException e)
+		else
 		{
-			throw new RuntimeException(e);
+			g.drawImage(shadow, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
 		}
+		
+		g.drawImage(bgshape, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
+		g.setComposite(AlphaComposite.SrcOver);
+		g.drawImage(frame, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
+		g.drawImage(glass, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
+		g.drawImage(textimg, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
+		g.dispose();
+		bgshape = null;
+		
+		full = full.getScaledInstance(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, Image.SCALE_AREA_AVERAGING);
+		ret = new BufferedImage(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		g = ret.createGraphics();
+		g.setComposite(AlphaComposite.Src);
+		g.drawImage(full, 0, 0, GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, null);
+		g.dispose();
 		return new ImageIcon(ret);
 	}
 	
@@ -100,6 +182,12 @@ public class SGuiHelper
 		graph.setSelectionCells(selcells);
 	}
 	
+	/**
+	 *  Gets the center of the rectangle described by the two points.
+	 *  
+	 *  @param points Points to be included in the calculation.
+	 *  @return The center.
+	 */
 	public static final mxPoint getCenter(mxPoint[] points)
 	{
 		return getCenter(new mxPoint(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), new mxPoint(0.0, 0.0), points);
@@ -132,5 +220,200 @@ public class SGuiHelper
 				 		  tmpmin.getY() + (ret.getY() - tmpmin.getY()) * 0.5);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Gets the selected button in a button group.
+	 *  
+	 *  @param group The button group.
+	 *  @return The selected button.
+	 */
+	public static final AbstractButton getSelectedButton(ButtonGroup group)
+	{
+		AbstractButton ret = null;
+		ButtonModel model = group.getSelection();
+		Enumeration<AbstractButton> buttons = group.getElements();
+		while (ret == null && buttons.hasMoreElements())
+		{
+			AbstractButton b = buttons.nextElement();
+			if (b.getModel().equals(model))
+			{
+				ret = b;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Composite for modulation.
+	 *
+	 */
+	protected static class ModulateComposite implements Composite
+	{
+		/** Modulation color */
+		protected Color modcolor;
+		
+		/** Highlight amplification*/
+		protected boolean high;
+		
+		/**
+		 *  Creates a new Composite.
+		 *  
+		 *  @param modcolor The modulation color.
+		 *  @param high Highlight amplification flag.
+		 */
+		public ModulateComposite(Color modcolor, boolean high)
+		{
+			this.modcolor = modcolor;
+			this.high = high;
+		}
+		
+		/**
+		 *  Create the context.
+		 */
+		public CompositeContext createContext(ColorModel srcColorModel,
+				ColorModel dstColorModel, RenderingHints hints)
+		{
+			return new ModulationContextAccel(srcColorModel, dstColorModel);
+		}
+		
+		/**
+		 *  Regular "correct" modulation context.
+		 *
+		 */
+		protected class ModulationContext implements CompositeContext
+		{
+			/** Source color model. */
+			protected ColorModel srcColorModel;
+			
+			/** Destination color model. */
+			protected ColorModel dstColorModel;
+			
+			/**
+			 *  Creates the context.
+			 *  
+			 *  @param srcColorModel Source color model.
+			 *  @param dstColorModel Destination color model.
+			 */
+			public ModulationContext(ColorModel srcColorModel, ColorModel dstColorModel)
+			{
+				this.srcColorModel = srcColorModel;
+				this.dstColorModel = dstColorModel;
+			}
+			
+			/**
+			 *  Composes the image.
+			 */
+			public void compose(Raster src, Raster dstIn, WritableRaster dstOut)
+			{
+				float[] clrPx = modcolor.getComponents(null);
+				
+				int maxX = Math.min(src.getWidth(), dstIn.getWidth());
+				int maxY = Math.min(src.getHeight(), dstIn.getHeight());
+				float[] tmpPx = new float[4];
+				for (int y = 0; y < maxY; ++y)
+				{
+					for (int x = 0; x < maxX; ++x)
+					{
+						Object inPixel = src.getDataElements(x, y, null);
+						tmpPx = srcColorModel.getNormalizedComponents(inPixel, tmpPx, 0);
+						
+						tmpPx[0] *= clrPx[0];
+						tmpPx[1] *= clrPx[1];
+						tmpPx[2] *= clrPx[2];
+						tmpPx[3] *= clrPx[3];
+						
+						if (high)
+						{
+							for (int i = 0; i < 4; ++i)
+							{
+								tmpPx[i] *= GuiConstants.HIGHLIGHT_AMP;
+								tmpPx[i] = Math.min(tmpPx[i], 1.0f);
+							}
+						}
+						
+						Object outPixel = dstColorModel.getDataElements(tmpPx, 0, null);
+						dstOut.setDataElements(x, y, outPixel);
+					}
+				}
+			}
+			
+			/**
+			 *  Disposes context.
+			 */
+			public void dispose()
+			{
+				srcColorModel = null;
+				dstColorModel = null;
+			}
+		}
+		
+		/**
+		 *  Accelerated modulation context, based on some assumptions
+		 *  (4 color components, each 8 bits, etc.).
+		 *
+		 */
+		protected class ModulationContextAccel implements CompositeContext
+		{
+			/** Source color model. */
+			protected ColorModel srcColorModel;
+			
+			/** Destination color model. */
+			protected ColorModel dstColorModel;
+			
+			/**
+			 *  Creates the context.
+			 *  
+			 *  @param srcColorModel Source color model.
+			 *  @param dstColorModel Destination color model.
+			 */
+			public ModulationContextAccel(ColorModel srcColorModel, ColorModel dstColorModel)
+			{
+				this.srcColorModel = srcColorModel;
+				this.dstColorModel = dstColorModel;
+			}
+			
+			/**
+			 *  Composes the image.
+			 */
+			public void compose(Raster src, Raster dstIn, WritableRaster dstOut)
+			{
+				float[] clrPx = modcolor.getComponents(null);
+				
+				int maxX = Math.min(src.getWidth(), dstIn.getWidth());
+				int maxY = Math.min(src.getHeight(), dstIn.getHeight());
+				
+				float amp = 1.0f;
+				if (high)
+				{
+					amp = GuiConstants.HIGHLIGHT_AMP;
+				}
+				
+				for (int y = 0; y < maxY; ++y)
+				{
+					for (int x = 0; x < maxX; ++x)
+					{
+						//System.out.println(dstOut.getDataBuffer().getClass());
+						Object inPixel = src.getDataElements(x, y, null);
+						byte[] bPixel = (byte[]) inPixel;
+						bPixel[0] = (byte) (Math.min(((bPixel[0] & 0xFF) / 255.0f) * clrPx[0] * amp, 1.0f) * 255.0f);
+						bPixel[1] = (byte) (Math.min(((bPixel[1] & 0xFF) / 255.0f) * clrPx[1] * amp, 1.0f) * 255.0f);
+						bPixel[2] = (byte) (Math.min(((bPixel[2] & 0xFF) / 255.0f) * clrPx[2] * amp, 1.0f) * 255.0f);
+						bPixel[3] = (byte) (Math.min(((bPixel[3] & 0xFF) / 255.0f) * clrPx[3] * amp, 1.0f) * 255.0f);
+						dstOut.setDataElements(x, y, bPixel);
+					}
+				}
+			}
+			
+			/**
+			 *  Disposes context.
+			 */
+			public void dispose()
+			{
+				srcColorModel = null;
+				dstColorModel = null;
+			}
+		}
 	}
 }
