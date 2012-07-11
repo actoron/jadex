@@ -333,18 +333,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		System.out.println("reset!?");
 	}
 
-	/**
-	 * Flushes the render information.
-	 */
-	public void flushRenderInfo()
-	{
-		synchronized(visuals)
-		{
-			for(Iterator it = visuals.values().iterator(); it.hasNext();)
-				((DrawableCombiner3d)it.next()).flushRenderInfo();
-		}
-	}
-
 	boolean	firsttime	= true;
 
 	/**
