@@ -64,6 +64,7 @@ public class ComponentTestSuite extends TestSuite
 			"-platformname", "testcases_*",
 			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 			"-simulation", "true",
+			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //			"-logging", "true",
 //			"-debugfutures", "true",

@@ -109,6 +109,8 @@
 		<argument name="logging_level" class="java.util.logging.Level">java.util.logging.Level.SEVERE</argument>
 		<!-- Use simulation execution mode? -->
 		<argument name="simulation" class="Boolean"/>
+		<!-- Use asynchronous execution mode? -->
+		<argument name="asyncexecution" class="Boolean"/>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
@@ -249,10 +251,11 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">
-				new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
-				//$args.simulation==null || !$args.simulation.booleanValue()
-				//? new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
-				//: new jadex.base.service.execution.SyncExecutionService($component.getServiceProvider())
+				//new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
+				($args.asyncexecution!=null &amp;&amp; !$args.asyncexecution.booleanValue()) || 
+				($args.asyncexecution==null &amp;&amp; $args.simulation!=null &amp;&amp; $args.simulation.booleanValue())
+				? new jadex.base.service.execution.SyncExecutionService($component.getServiceProvider())
+				: new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
 			<providedservice class="jadex.bridge.service.types.library.IDependencyService">
