@@ -202,16 +202,16 @@
 			</env:drawable3d>
 				
 
-				<env:drawable3d objecttype="sentry" width="0.16" height="0.16" depth="0.16"> <!-- rotation="$object.getProperty(\"rotation\")">  -->
-					<env:box width="0.01" height="0.01" depth="0.5" x="0" y="0.5" z="0.5" color="#FFB90FFF" />
+				<env:drawable3d objecttype="sentry" width="0.16" height="0.16" depth="0.16" autoRotation="false"> 
+
 							
 						
 					<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
 					<env:object3d width="0.8" height="0.8" depth="0.8" x="0" y="0.0" z="0.0" rotation="$deg180y" modelpath="jadex3d/models/vehicles/tank/apc.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
 				</env:drawable3d>
 					
-				<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15">
-					<env:box width="0.01" height="0.01" depth="0.5" x="0" y="0.5" z="0.5" color="#FFB90FFF" />
+				<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15" autoRotation="false">
+
 					
 					<env:object3d width="1.5" height="1.5" depth="1.5" rotation="$deg270y" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
 					<env:object3d width="0.8" height="0.8" depth="0.8" x="0.0" y="0.1" z="0.4" rotation="$deg90y" modelpath="jadex3d/models/props/box/woodbox.j3o" hasLightMaterials="true" shadowtype="Cast">
@@ -225,8 +225,8 @@
 					</env:sound3d>
 				</env:drawable3d>
 					
-				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15">
-					<env:box width="0.01" height="0.01" depth="0.5" x="0" y="0.5" z="0.5" color="#FFB90FFF" />
+				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15" autoRotation="false">
+
 					
 					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"> 
 					<env:animation name="DigAll" channel="chan01" loop="false">
