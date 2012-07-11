@@ -49,7 +49,7 @@ public class AnswerPlan	extends Plan
 			IMessageEvent	answer	= getEventbase().createReply(event, "inform");
 			answer.getParameter(SFipa.CONTENT).setValue(""+i);
 			getLogger().info("Sending answer "+i+".");
-			sendMessage(answer);
+			sendMessage(answer).get(this);
 			if(delay>0)
 			{
 				waitFor(delay);

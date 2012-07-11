@@ -1035,7 +1035,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void createChatUser(final IComponentIdentifier cid, final IChatService chat)
 	{
-		setUserState(cid, null, null, null, null);
+		setUserState(cid, Boolean.TRUE, null, null, null);
 		
 		chat.getNickName().addResultListener(new SwingResultListener<String>()
 		{
@@ -1045,7 +1045,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void customResultAvailable(byte[] img)
 					{
-						setUserState(cid, null, null, nick, img);
+						setUserState(cid, Boolean.TRUE, null, nick, img);
 					}
 					
 					public void customExceptionOccurred(Exception exception)
@@ -1065,6 +1065,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void updateExistingChatUser(final ChatUser cu)
 	{
+		setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, null, null);
 		if(cu.isNickUnknown())
 		{
 			getChatService(cu).addResultListener(new IResultListener<IChatService>()
@@ -1075,7 +1076,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void customResultAvailable(final String nick)
 						{
-							setUserState(cu.getComponentIdentifier(), null, null, nick, null);
+							setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, nick, null);
 						}
 						
 						public void customExceptionOccurred(Exception exception)
@@ -1100,7 +1101,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						public void customResultAvailable(final byte[] img)
 						{
-							setUserState(cu.getComponentIdentifier(), null, null, null, img);
+							setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, null, img);
 						}
 						
 						public void customExceptionOccurred(Exception exception)
