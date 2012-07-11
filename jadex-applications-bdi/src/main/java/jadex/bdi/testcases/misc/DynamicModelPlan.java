@@ -7,7 +7,9 @@ import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
@@ -42,12 +44,12 @@ public class DynamicModelPlan extends Plan
 		conf.createInitialPlan("hello");
 			
 		fac.registerAgentModel(agent, "helloagent.agent.xml");
-			
+
 		IComponentManagementService cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
 
 		Future	finished	= new Future();
-		cms.createComponent("hw1", "helloagent.agent.xml", null, new DelegationResultListener(finished));
-		
+		IComponentIdentifier hwc = cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener(finished)).get(this);
+
 		finished.get(this);
 		
 		tr.setSucceeded(true);
@@ -59,6 +61,7 @@ public class DynamicModelPlan extends Plan
 	 */
 	public void failed()
 	{
+		getException().printStackTrace();
 		tr.setFailed(""+getException());
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}

@@ -128,6 +128,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 */
 	public OAVAgentModel	loadAgentModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
+		if(name.equals("helloagent.agent.xml"))
+			System.out.println("klapp");
+		
 		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports, classloader, context);
 	}
 

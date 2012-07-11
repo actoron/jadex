@@ -229,7 +229,7 @@ public abstract class AbstractModelLoader
 			cached	= getCachedModel(keytuple);
 //			System.out.println("hit: "+name+" "+cached);
 			// If model is in cache, check at most every second if file on disc is newer.
-			if(cached!=null && cached.getLastChecked()+1000<System.currentTimeMillis())
+			if(cached!=null && cached.getLastChecked()+3000<System.currentTimeMillis())
 			{
 				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
 				if(cached.getLastModified()<info.getLastModified())
@@ -273,8 +273,12 @@ public abstract class AbstractModelLoader
 		{
 			try
 			{
-				cached	= doLoadModel(name, imports, info, classloader, context);
-	
+				cached = (ICacheableModel)registered.get(name);
+				if(cached==null)
+				{
+					cached	= doLoadModel(name, imports, info, classloader, context);
+				}
+				
 				// Store by filename also, to avoid reloading with different imports.
 //				modelcache.put(info.getFilename(), cached);
 				modelcache.put(cached.getFilename(), cached);
