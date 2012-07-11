@@ -415,7 +415,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 				_tmpNode = (Node)node;
 
 				// Calculate the Direction
-				Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d, sobj);
+				Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d, sobj, combiner3d.isAutoRotation());
 
 				if(quat != null)
 				{
@@ -549,7 +549,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * Calculate the current Rotation of the Object in Up/Down and Left/Right
 	 */
-	private Quaternion calculateRotation(Vector3f newp, Vector3f oldp, boolean rotation3d, ISpaceObject sobj)
+	private Quaternion calculateRotation(Vector3f newp, Vector3f oldp, boolean rotation3d, ISpaceObject sobj, boolean calculateRotation)
 	{
 
 		Vector3f newpos;
@@ -575,12 +575,18 @@ public class ViewportJMonkey extends AbstractViewport3d
 		}
 		else
 		{
-			if(sobj.hasProperty("rotation"))
+			if(!calculateRotation && sobj.hasProperty("rotation"))
 			{
 				quat = new Quaternion();
-				IVector2 vector2 = (IVector2)sobj.getProperty("rotation");
-				Vector3f vector3 = new Vector3f(vector2.getXAsFloat(), 0, vector2.getYAsFloat());
-				quat.lookAt(vector3, Vector3f.UNIT_Y);
+				Object rot = sobj.getProperty("rotation");
+				if(rot instanceof IVector2)
+				{
+					IVector2 vector2 = (IVector2)rot;
+					Vector3f vector3 = new Vector3f(vector2.getXAsFloat(), 0, vector2.getYAsFloat());
+					quat.lookAt(vector3, Vector3f.UNIT_Y);
+				}
+
+				
 				
 //				quat.fromAngleAxis((float)(vector2.getDirectionAsFloat()), Vector3f.UNIT_Y);
 			}
@@ -624,8 +630,15 @@ public class ViewportJMonkey extends AbstractViewport3d
 	public void stopApp()
 	{
 
-
-		_app.stop(true);
+		try
+		{
+			_app.stop(true);
+		}
+		catch(Exception e)
+		{
+			System.out.println("exception on stop");
+		}
+		
 
 //		System.out.println("ViewportJmonkey: STOP STOP STOP");
 
