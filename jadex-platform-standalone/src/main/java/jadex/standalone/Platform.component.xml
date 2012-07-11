@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Bootstrap platform properties.
+  The platform provides the basic services for running components.
+  In addition, the platform exposes several configuration options as arguments.
+  Further platform start parameters, e.g. for custom initial components, are defined in the 
+  <a href="http://jadex.informatik.uni-hamburg.de/docs/jadex-2.1-SNAPSHOT/index.html?jadex/base/Starter.html">jadex.base.Starter class</a>.
 -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

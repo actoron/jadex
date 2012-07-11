@@ -19,7 +19,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
@@ -104,7 +104,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				});
 			}
 		});
-		
+
 		return ret;
 	}
 	
@@ -655,6 +655,14 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					}
 				});
 			}
+			else
+			{
+				plugfut.setResult(null);
+			}
+		}
+		else
+		{
+			plugfut.setResult(null);
 		}
 		
 		plugfut.addResultListener(new SwingDelegationResultListener<Void>(ret)
@@ -702,6 +710,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	protected IFuture<Void>	loadPlugins(final Property[] ps, final int i, final List<Tuple2<IControlCenterPlugin, JComponent>> newpls, final ClassLoader cl)
 	{
+//		System.out.println("load plugins "+(i+1)+" of "+ps.length+": "+ps[i].getType()+", "+ps[i].getValue());
+
 		final Future<Void>	ret	= new Future<Void>();
 		IControlCenterPlugin plg = getPluginForName(ps[i].getType());
 		
