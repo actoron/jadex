@@ -162,7 +162,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_app.setSettings(settings);
 		_app.createCanvas();
 		_app.startCanvas();
-
+	
 
 		_context = (JmeCanvasContext)_app.getContext();
 		canvas_ = _context.getCanvas();
@@ -180,6 +180,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		{
 			public Object call()
 			{
+
 				_geometryNode = updateMonkey(objectList_);
 				
 
@@ -563,28 +564,30 @@ public class ViewportJMonkey extends AbstractViewport3d
 			newpos = newp.clone().setY(0);
 			oldpos = oldp.clone().setY(0);
 		}
-
+		
+		Quaternion quat = null;
 		Vector3f direction = newpos.subtract(oldpos);
 		if(!direction.equals(Vector3f.ZERO))
 		{
-			Quaternion quat = new Quaternion();
+			quat = new Quaternion();
+			quat.lookAt(direction, Vector3f.UNIT_Y);
+			
+		}
+		else
+		{
 			if(sobj.hasProperty("rotation"))
 			{
+				quat = new Quaternion();
 				IVector2 vector2 = (IVector2)sobj.getProperty("rotation");
 				Vector3f vector3 = new Vector3f(vector2.getXAsFloat(), 0, vector2.getYAsFloat());
 				quat.lookAt(vector3, Vector3f.UNIT_Y);
-				if(sobj.getType().equals("sentry"))
-					System.out.println("look at: "+vector2+" "+vector3);
+				
+//				quat.fromAngleAxis((float)(vector2.getDirectionAsFloat()), Vector3f.UNIT_Y);
 			}
-			else
-			{
-				quat.lookAt(direction, Vector3f.UNIT_Y);
-			}
-
-			return quat;
 		}
+		return quat;
 
-		return null;
+
 	}
 
 
