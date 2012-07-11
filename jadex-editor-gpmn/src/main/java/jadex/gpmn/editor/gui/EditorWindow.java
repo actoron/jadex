@@ -455,37 +455,37 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 	
 	protected void addTools(JToolBar editingtools)
 	{
-		ImageLoader loader = new ImageLoader();
+		ImageProvider imgprovider = new ImageProvider();
 		//long time = System.currentTimeMillis();
 		// Selections
 		//selecttool = SGuiHelper.createTool(IViewAccess.SELECT_MODE, "select", "Select");
-		selecttool = SGuiHelper.createTool(loader, IViewAccess.SELECT_MODE, mxUtils.parseColor(GuiConstants.SELECT_COLOR), "selectsym", "Select", false, true);
+		selecttool = SGuiHelper.createTool(imgprovider, IViewAccess.SELECT_MODE, mxUtils.parseColor(GuiConstants.SELECT_COLOR), "selectsym", "Select", false, true);
 		toolgroup.add(selecttool);
 		editingtools.add(selecttool);
 		
 		toolgroup.setSelected(selecttool.getModel(), true);
 		
 		//JToggleButton tool = SGuiHelper.createTool(IViewAccess.CONTROL_POINT_MODE, "cpadd", "Add Control Point");
-		JToggleButton tool = SGuiHelper.createTool(loader, IViewAccess.SELECT_MODE, mxUtils.parseColor(GuiConstants.CONTROL_POINT_COLOR), "cpsym", "Add Control Point", false, true);
+		JToggleButton tool = SGuiHelper.createTool(imgprovider, IViewAccess.SELECT_MODE, mxUtils.parseColor(GuiConstants.CONTROL_POINT_COLOR), "cpsym", "Add Control Point", false, true);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Goal Tools
-		tool = SGuiHelper.createTool(loader, IViewAccess.ACHIEVE_GOAL_MODE, mxUtils.parseColor(GuiConstants.ACHIEVE_GOAL_COLOR), "A", "Add Achieve Goal", true, false);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.ACHIEVE_GOAL_MODE, mxUtils.parseColor(GuiConstants.ACHIEVE_GOAL_COLOR), "A", "Add Achieve Goal", true, false);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = SGuiHelper.createTool(loader, IViewAccess.PERFORM_GOAL_MODE,  mxUtils.parseColor(GuiConstants.PERFORM_GOAL_COLOR), "P", "Add Perform Goal", true, false);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.PERFORM_GOAL_MODE,  mxUtils.parseColor(GuiConstants.PERFORM_GOAL_COLOR), "P", "Add Perform Goal", true, false);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = SGuiHelper.createTool(loader, IViewAccess.MAINTAIN_GOAL_MODE,  mxUtils.parseColor(GuiConstants.MAINTAIN_GOAL_COLOR), "M", "Add Maintain Goal", true, false);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.MAINTAIN_GOAL_MODE,  mxUtils.parseColor(GuiConstants.MAINTAIN_GOAL_COLOR), "M", "Add Maintain Goal", true, false);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
-		tool = SGuiHelper.createTool(loader, IViewAccess.QUERY_GOAL_MODE,  mxUtils.parseColor(GuiConstants.QUERY_GOAL_COLOR), "Q", "Add Query Goal", true, false);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.QUERY_GOAL_MODE,  mxUtils.parseColor(GuiConstants.QUERY_GOAL_COLOR), "Q", "Add Query Goal", true, false);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
@@ -493,19 +493,19 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 		
 		// Plan Tools
 		//tool = SGuiHelper.createTool(IViewAccess.REF_PLAN_MODE, "plan", "Add Plan");
-		tool = SGuiHelper.createTool(loader, IViewAccess.REF_PLAN_MODE, mxUtils.parseColor(GuiConstants.REF_PLAN_COLOR), "P", "Add Plan", false, false);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.REF_PLAN_MODE, mxUtils.parseColor(GuiConstants.REF_PLAN_COLOR), "P", "Add Plan", false, false);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		//tool = SGuiHelper.createTool(IViewAccess.ACTIVATION_PLAN_MODE, "actplan", "Add Activation Plan");
-		tool = SGuiHelper.createTool(loader, IViewAccess.ACTIVATION_PLAN_MODE, mxUtils.parseColor(GuiConstants.ACTIVATION_PLAN_COLOR), "A", "Add Activation Plan", false, false);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.ACTIVATION_PLAN_MODE, mxUtils.parseColor(GuiConstants.ACTIVATION_PLAN_COLOR), "A", "Add Activation Plan", false, false);
 		toolgroup.add(tool);
 		editingtools.add(tool);
 		
 		editingtools.addSeparator();
 		
 		// Edge Tools
-		tool = SGuiHelper.createTool(loader, IViewAccess.SUPPRESSION_EDGE_MODE, mxUtils.parseColor(GuiConstants.SUPPRESSION_EDGE_COLOR), "suppsym", "Draw Suppression Edge", false, true);
+		tool = SGuiHelper.createTool(imgprovider, IViewAccess.SUPPRESSION_EDGE_MODE, mxUtils.parseColor(GuiConstants.SUPPRESSION_EDGE_COLOR), "suppsym", "Draw Suppression Edge", false, true);
 		//tool = SGuiHelper.createTool(IViewAccess.SUPPRESSION_EDGE_MODE, "suppedge", "Draw Suppression Edge");
 		toolgroup.add(tool);
 		editingtools.add(tool);

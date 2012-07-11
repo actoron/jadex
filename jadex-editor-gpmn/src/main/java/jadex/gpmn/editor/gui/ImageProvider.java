@@ -24,13 +24,13 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 /**
- *  Loader class for images with a cache.
+ *  Class for providing images, either stored or generated, with a cache.
  *
  */
-public class ImageLoader
+public class ImageProvider
 {
 	/** The image directory */
-	protected static final String IMAGE_DIR = "/" + ImageLoader.class.getPackage().getName().replaceAll("\\.", "/") + "/images/";
+	protected static final String IMAGE_DIR = "/" + ImageProvider.class.getPackage().getName().replaceAll("\\.", "/") + "/images/";
 	
 	/** The image cache. */
 	protected Map<String, Image> imagecache = new HashMap<String, Image>();
@@ -44,7 +44,7 @@ public class ImageLoader
 	/** The icon font used. */
 	protected Font iconfont;
 	
-	public ImageLoader()
+	public ImageProvider()
 	{
 		try
 		{

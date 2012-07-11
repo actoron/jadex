@@ -26,7 +26,7 @@ import com.mxgraph.view.mxGraph;
 /** Helper methods for the GUI. */
 public class SGuiHelper
 {
-	public static final JToggleButton createTool(ImageLoader loader, String mode, Color color, String imagebasename, String tooltip, boolean circular, boolean symbolic)
+	public static final JToggleButton createTool(ImageProvider imgprovider, String mode, Color color, String imagebasename, String tooltip, boolean circular, boolean symbolic)
 	{
 		JToggleButton tool = new JToggleButton();
 		tool.getModel().setActionCommand(mode);
@@ -35,15 +35,15 @@ public class SGuiHelper
 		ImageIcon onicon = null;
 		if (circular)
 		{
-			onicon = loader.generateCircularImageIcon(imagebasename, color, symbolic, true, true);
-			tool.setIcon(loader.generateCircularImageIcon(imagebasename, color, symbolic, false, false));
-			tool.setRolloverIcon(loader.generateCircularImageIcon(imagebasename, color, symbolic, true, false));
+			onicon = imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, true, true);
+			tool.setIcon(imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, false, false));
+			tool.setRolloverIcon(imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, true, false));
 		}
 		else
 		{
-			onicon = loader.generateRectangularImageIcon(imagebasename, color, symbolic, true, true);
-			tool.setIcon(loader.generateRectangularImageIcon(imagebasename, color, symbolic, false, false));
-			tool.setRolloverIcon(loader.generateRectangularImageIcon(imagebasename, color, symbolic, true, false));
+			onicon = imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, true, true);
+			tool.setIcon(imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, false, false));
+			tool.setRolloverIcon(imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, true, false));
 		}
 		tool.setPressedIcon(onicon);
 		tool.setSelectedIcon(onicon);
