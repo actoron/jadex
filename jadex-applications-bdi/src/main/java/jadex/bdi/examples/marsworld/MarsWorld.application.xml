@@ -68,7 +68,7 @@
 				<env:objecttype name="sentry">
 					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*(($properties.clock.getTick())%10),0.01,0.1*(($properties.clock.getTick())%10))
 					</env:property>	
-					<env:property name="rotation" class="IVector2">new Vector2Double(0, 0)</env:property>
+					<env:property name="rotation" class="IVector2">new Vector2Double(-1.111, -1.111)</env:property>
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
@@ -158,9 +158,9 @@
 					<!-- Sentry -->
 					<env:drawable objecttype="sentry" width="0.07" height="0.07">
 						<!-- <env:property name="rot" dynamic="true" class="double">new Vector3Double($object.getProperty("rotation").getXAsDouble(), 0, $object.getProperty("rotation").getYAsDouble())</env:property>  -->
-						<env:property name="rot" dynamic="true" class="double">new Vector3Double(0,0,$object.getProperty("rotation").getDirectionAsDouble())</env:property>
+						<env:property name="rot" dynamic="true" class="double">new Vector3Double(0,0,$object.getProperty("rotation").getDirectionAsDouble()-Math.PI/2)</env:property>
 						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
-						<env:triangle color="#FFFFFF" rotation="rot" abssize="0.1"></env:triangle>
+						<env:triangle color="#FFFFFF" rotation="rot" layer="1" height="0.2" width="0.04" abssize="true"></env:triangle>
 						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
 						<env:texturedrectangle layer="2" imagepath="jadex/bdi/examples/marsworld/images/sentry.png" />
 					</env:drawable>
