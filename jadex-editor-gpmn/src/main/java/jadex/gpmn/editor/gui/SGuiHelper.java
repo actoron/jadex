@@ -1,14 +1,10 @@
 package jadex.gpmn.editor.gui;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.CompositeContext;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
@@ -30,24 +26,24 @@ import com.mxgraph.view.mxGraph;
 /** Helper methods for the GUI. */
 public class SGuiHelper
 {
-	public static final JToggleButton createTool(ImageLoader loader, String mode, Color color, String imagebasename, String tooltip, boolean goal)
+	public static final JToggleButton createTool(ImageLoader loader, String mode, Color color, String imagebasename, String tooltip, boolean circular, boolean symbolic)
 	{
 		JToggleButton tool = new JToggleButton();
 		tool.getModel().setActionCommand(mode);
 		tool.setContentAreaFilled(false);
 		
 		ImageIcon onicon = null;
-		if (goal)
+		if (circular)
 		{
-			onicon = generateGoalImageIcon(loader, imagebasename, color, true, true);
-			tool.setIcon(generateGoalImageIcon(loader, imagebasename, color, false, false));
-			tool.setRolloverIcon(generateGoalImageIcon(loader, imagebasename, color, true, false));
+			onicon = loader.generateCircularImageIcon(imagebasename, color, symbolic, true, true);
+			tool.setIcon(loader.generateCircularImageIcon(imagebasename, color, symbolic, false, false));
+			tool.setRolloverIcon(loader.generateCircularImageIcon(imagebasename, color, symbolic, true, false));
 		}
 		else
 		{
-			onicon = generateImageIcon(loader, imagebasename, color, true, true);
-			tool.setIcon(generateImageIcon(loader, imagebasename, color, false, false));
-			tool.setRolloverIcon(generateImageIcon(loader, imagebasename, color, true, false));
+			onicon = loader.generateRectangularImageIcon(imagebasename, color, symbolic, true, true);
+			tool.setIcon(loader.generateRectangularImageIcon(imagebasename, color, symbolic, false, false));
+			tool.setRolloverIcon(loader.generateRectangularImageIcon(imagebasename, color, symbolic, true, false));
 		}
 		tool.setPressedIcon(onicon);
 		tool.setSelectedIcon(onicon);
@@ -56,88 +52,6 @@ public class SGuiHelper
 		tool.setMargin(new Insets(0, 0, 0, 0));
 		tool.setToolTipText(tooltip);
 		return tool;
-	}
-	
-	public static final ImageIcon generateGoalImageIcon(ImageLoader loader, String text, Color bgcolor, boolean high, boolean shift)
-	{
-		//Image textimg = loader.loadImage(text + ".png");
-		Image textimg = loader.generateOrLoadImage("tooltext_" + text);
-		Image frame = loader.generateOrLoadImage("circle");
-		Image glass = loader.generateOrLoadImage("circleglass");
-		Image bgshape = loader.generateOrLoadImage("bgcircle");
-		Image shadow = null;
-		if (!shift)
-		{
-			shadow = loader.generateOrLoadImage("circleshadow");
-		}
-		
-		return generateImageIcon(textimg, bgshape, frame, glass, shadow, bgcolor, high);
-	}
-	
-	public static final ImageIcon generateImageIcon(ImageLoader loader, String text, Color bgcolor, boolean high, boolean shift)
-	{
-		Image symimg = null;
-		if (text.endsWith("sym"))
-		{
-			symimg = loader.generateOrLoadImage(text);
-		}
-		else
-		{
-			symimg = loader.generateOrLoadImage("tooltext_" + text);
-		}
-		Image frame = loader.generateOrLoadImage("rrect");
-		Image glass = loader.generateOrLoadImage("rrectglass");
-		Image bgshape = loader.generateOrLoadImage("bgrrect");
-		Image shadow = null;
-		if (!shift)
-		{
-			shadow = loader.generateOrLoadImage("rrectshadow");
-		}
-		
-		return generateImageIcon(symimg, bgshape, frame, glass, shadow, bgcolor, high);
-	}
-	
-	public static final ImageIcon generateImageIcon(Image textimg, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high)
-	{
-		BufferedImage ret = null;
-		BufferedImage tmpimg = new BufferedImage(GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		Graphics2D g = tmpimg.createGraphics();
-		g.setComposite(new ModulateComposite(bgcolor, high));
-		g.drawImage(bgshape, 0, 0, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
-		g.dispose();
-		bgshape = tmpimg;
-		
-		Image full = new BufferedImage(GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		g = ((BufferedImage) full).createGraphics();
-		g.setComposite(AlphaComposite.SrcOver);
-		
-		int x = 0;
-		int y = 0;
-		if (shadow == null)
-		{
-			x = 16;
-			y = 16;
-		}
-		else
-		{
-			g.drawImage(shadow, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
-		}
-		
-		g.drawImage(bgshape, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
-		g.setComposite(AlphaComposite.SrcOver);
-		g.drawImage(frame, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
-		g.drawImage(glass, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
-		g.drawImage(textimg, x, y, GuiConstants.BASE_ICON_SIZE, GuiConstants.BASE_ICON_SIZE, null);
-		g.dispose();
-		bgshape = null;
-		
-		full = full.getScaledInstance(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, Image.SCALE_AREA_AVERAGING);
-		ret = new BufferedImage(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		g = ret.createGraphics();
-		g.setComposite(AlphaComposite.Src);
-		g.drawImage(full, 0, 0, GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, null);
-		g.dispose();
-		return new ImageIcon(ret);
 	}
 	
 	/**
