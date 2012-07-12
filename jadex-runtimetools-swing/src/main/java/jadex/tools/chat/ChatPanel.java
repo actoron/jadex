@@ -850,7 +850,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public void actionPerformed(ActionEvent e)
 					{
 						final String[] smiley = new String[1];
-						final JDialog dia = new JDialog((JFrame)null, "Smiley Selection", true);
+						final JDialog dia = new JDialog((JFrame)null, "Smiley Selection", false);
 						
 						JPanel pan = new JPanel(new FlowLayout());
 						for(final String key: smileys)
@@ -863,6 +863,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								{
 									smiley[0] = key;
 									dia.dispose();
+									if(smiley[0]!=null)
+									{
+										tf.setText(tf.getText()+smiley[0]);
+									}
 								}
 							});
 							pan.add(but);
@@ -883,10 +887,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						Point loc = dia.getLocation();
 						dia.setLocation(new Point((int)loc.getX(), (int)(loc.getY()-30)));
 						dia.setVisible(true);
-						if(smiley[0]!=null)
-						{
-							tf.setText(tf.getText()+smiley[0]);
-						}
+//						if(smiley[0]!=null)
+//						{
+//							tf.setText(tf.getText()+smiley[0]);
+//						}
 					}
 				});
 				smi.setMargin(new Insets(0,0,0,0));
