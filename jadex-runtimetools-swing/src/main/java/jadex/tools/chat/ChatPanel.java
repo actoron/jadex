@@ -38,6 +38,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -51,6 +52,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -103,9 +105,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 /**
  *  Panel for displaying the chat.
@@ -117,8 +122,25 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"play", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/common/images/arrowright.png")
+		"play", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/common/images/arrowright.png"),
+		":-)", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/smile.png"),
+		":D", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/happy.png"),
+		":-(", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/unhappy.png"),
+//		":'(", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/cry.png"),
+		";-)", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/wink.png"),
+		":-p", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/tongue.png"),
+		":o", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/surprised.png"),
+		">-)", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/evilgrin.png"),
+		">)", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/grin.png"),
+		":>", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/waii.png"),
+//		":@", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/angry.png")
+//		"+o(", SGUI.makeIcon(ChatPanel.class, "/jadex/tools/chat/images/smi/green.png")
+
 	});
+	
+	protected static List<String> smileys = SUtil.createArrayList(new String[]{
+		":-)", ":D", ":-(", ";-)", ":-p", ":o", ">-)", ">)", ":>"});
+
 	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
@@ -361,6 +383,30 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //						this.setCaretPosition(getText().length());
 //					}
 				};
+//				StyledDocument doc = chatarea.getStyledDocument();
+//				Style base = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+//				Style st = doc.addStyle("sm", base);
+//				SimpleAttributeSet as = new SimpleAttributeSet();
+//				StyleConstants.setIcon(as, icon);
+				
+//				StyledDocument doc = (StyledDocument) p.getDocument();
+//                String text = doc.getText(0, p.getDocument().getLength());
+//                int index = text.indexOf(":)");
+//                int start = 0;
+//                while (index > -1) {
+//                    Element el = doc.getCharacterElement(index);
+//                    if (StyleConstants.getIcon(el.getAttributes()) == null) {
+//                        doc.remove(index, 2);
+//                        SimpleAttributeSet attrs = new SimpleAttributeSet();
+//                        StyleConstants.setIcon(attrs, getImage());
+//                        doc.insertString(index, ":)", attrs);
+//                    }
+//                    start = index + 2;
+//                    index = text.indexOf(":)", start);
+//                }
+
+				
+				
 				chatarea.setEditable(false);
 				JScrollPane main = new JScrollPane(chatarea);
 
@@ -1714,6 +1760,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		((FileTableModel)(fi.isDownload()?dtable:utable).getModel()).updateFile(fi);
 	}
 	
+	
 	/**
 	 * 
 	 * @param c
@@ -1721,13 +1768,55 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public static void append(Color c, String s, JTextPane p) 
 	{ 
+		String found = null;
+		for(String key: smileys)
+		{
+			if(s.startsWith(key))
+			{
+				found = key;
+				break;
+			}
+			
+		}
+		if(found!=null)
+		{
+			doAppend(c, found, p);
+			if(s.length()>found.length())
+			{
+				String next = s.substring(found.length(), s.length());
+				append(c, next, p);
+			}
+		}
+		else
+		{
+			String next = s.substring(0, 1);
+			doAppend(c, next, p);
+			if(s.length()>1)
+			{
+				next = s.substring(1, s.length());
+				append(c, next, p);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static void doAppend(Color c, String s, JTextPane p) 
+	{ 
 		p.setEditable(true);
 		
+		SimpleAttributeSet aset = new SimpleAttributeSet();
+	    StyleConstants.setForeground(aset, c);
+	    if(smileys.contains(s))
+	    	StyleConstants.setIcon(aset, icons.getIcon(s));
+		
 		// better implementation--uses
-	                      // StyleContext
-	    StyleContext sc = StyleContext.getDefaultStyleContext();
-	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
-	        StyleConstants.Foreground, c);
+	    // StyleContext
+//	    StyleContext sc = StyleContext.getDefaultStyleContext();
+//	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
+//	        StyleConstants.Foreground, c);
+//        StyleConstants.setIcon((MutableAttributeSet)aset, getImage());
 
 	    int len = p.getDocument().getLength(); // same value as
 	                       // getText().length();
@@ -2225,4 +2314,20 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		
 		return new Future<Properties>(props);
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected static ImageIcon getImage() 
+//	{
+//        BufferedImage bi = new BufferedImage(15, 15, BufferedImage.TYPE_INT_ARGB);
+//        Graphics g = bi.getGraphics();
+//        g.setColor(Color.red);
+//        g.drawOval(0, 0, 14, 14);
+//        g.drawLine(4, 9, 9, 9);
+//        g.drawOval(4, 4, 1, 1);
+//        g.drawOval(10, 4, 1, 1);
+//        return new ImageIcon(bi);
+//    }
+
 }
