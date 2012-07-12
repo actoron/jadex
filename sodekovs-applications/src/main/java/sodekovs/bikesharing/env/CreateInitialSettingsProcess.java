@@ -67,7 +67,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	public void start(IClockService clock, final IEnvironmentSpace space) {
 
 		try {
-			createPedestrians(pedestriansdataOLD, space);
+//			createPedestrians(pedestriansdataOLD, space);
 			// createBikeStationsOld(bikestationdataOLD, space);
 //			createBikeStations(simulationSetup, space);
 			createBikeStations((String)getProperty("simDataSetupFilePath"), space);
@@ -301,8 +301,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 				// capacity, stock, name);
 
 				space.createSpaceObject("bikestation", props, null);
-				// verleihStationen.add(f);
-				// System.out.println("Erstelle Station: " + position);
+				// verleihStationen.add(f);				 
 			}
 		}
 		// FahrradVerleihStationen.erstellInstanz(verleihStationen);
@@ -324,7 +323,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 * @throws SAXException
 	 */
 	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
-		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
+		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);		
 
 		for (Station station : scenario.getStations().getStation()) {
 
@@ -337,8 +336,11 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			props.put("stock", station.getNumberOfBikes());
 
 			space.createSpaceObject("bikestation", props, null);
-			// System.out.println("Erstelle Station: " + position);
+			System.out.println("Erstelle Station: " + x + "," + y);
 		}
+		
+		//put it here, so it can be reused within the application without the need to parse again
+		space.setProperty("SimulationDescription", scenario);
 		// }
 		// FahrradVerleihStationen.erstellInstanz(verleihStationen);
 

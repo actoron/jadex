@@ -37,6 +37,11 @@
 			<concrete ref="move.drives_bike"/>
 		</beliefref>
 		
+		<!-- The position of the destination station -->
+		<beliefref name="destination_station_pos">
+			<concrete ref="move.destination_station_pos"/>
+		</beliefref>
+		
 		
 		<!-- <beliefset name="wege" class="VerkehrsteilnehmerWeg"/>
 		<belief name="weganzahl" class="Integer"><fact>new Integer(0)</fact></belief>

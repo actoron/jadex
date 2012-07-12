@@ -33,7 +33,7 @@
         </ProbabilitiesForStation>
       </ProbabilitiesForStations>
     </TimeSlice> 
-    <TimeSlice offset="300" startTime="75">
+    <TimeSlice offset="300" startTime="20">
       <ProbabilitiesForStations>
         <ProbabilitiesForStation departureProbability="0.32" stationID="Osterstrasse">
         	<DestinationProbabilities>
