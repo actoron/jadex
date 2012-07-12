@@ -38,10 +38,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +54,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,13 +76,16 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -95,6 +102,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.UIDefaults;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -833,12 +841,61 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //				listpan.add(userpan, BorderLayout.CENTER);
 //				listpan.add(pp, BorderLayout.SOUTH);
 
-				JPanel south = new JPanel(new BorderLayout());
+				JPanel south = new JPanel(new BorderLayout(2,0));
 				final JTextField tf = new JTextField();
 				final JButton send = new JButton("Send");
+				final JButton smi = new JButton(icons.getIcon(":-)"));
+				smi.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						final String[] smiley = new String[1];
+						final JDialog dia = new JDialog((JFrame)null, "Smiley Selection", true);
+						
+						JPanel pan = new JPanel(new FlowLayout());
+						for(final String key: smileys)
+						{
+							JButton but = new JButton(icons.getIcon(key));
+							but.setMargin(new Insets(0,0,0,0));
+							but.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									smiley[0] = key;
+									dia.dispose();
+								}
+							});
+							pan.add(but);
+						}
+						
+						dia.getContentPane().add(pan, BorderLayout.CENTER);
+//						dia.setLocation(SGUI.calculateMiddlePosition(SGUI.getWindowParent(panel), dia));
+						dia.setUndecorated(true);
+						Border bl = BorderFactory.createLineBorder(Color.black);
+//						((JComponent)dia).setBorder(bl);
+						dia.addWindowFocusListener(new WindowFocusListener()
+						{
+							public void windowLostFocus(WindowEvent e) {dia.dispose();}
+							public void windowGainedFocus(WindowEvent e) {/*NOP*/}
+						});
+						dia.pack();
+						dia.setLocationRelativeTo(smi);
+						Point loc = dia.getLocation();
+						dia.setLocation(new Point((int)loc.getX(), (int)(loc.getY()-30)));
+						dia.setVisible(true);
+						if(smiley[0]!=null)
+						{
+							tf.setText(tf.getText()+smiley[0]);
+						}
+					}
+				});
+				smi.setMargin(new Insets(0,0,0,0));
+				JPanel bp = new JPanel(new BorderLayout(2,0));
+				bp.add(smi, BorderLayout.WEST);
+				bp.add(send, BorderLayout.EAST);
 				south.add(lto, BorderLayout.WEST);
 				south.add(tf, BorderLayout.CENTER);
-				south.add(send, BorderLayout.EAST);
+				south.add(bp, BorderLayout.EAST);
 				tf.getDocument().addDocumentListener(new DocumentListener()
 				{
 					public void removeUpdate(DocumentEvent e)

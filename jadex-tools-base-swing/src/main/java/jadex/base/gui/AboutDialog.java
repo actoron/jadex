@@ -31,7 +31,7 @@ public class AboutDialog extends JAutoPositionDialog
 
 	/** The image icons. */
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]{"logo",
-			SGUI.makeIcon(AboutDialog.class, "/jadex/base/gui/images/jadex_logo.png"),});
+		SGUI.makeIcon(AboutDialog.class, "/jadex/base/gui/images/jadex_logo.png"),});
 
 	/** The text to display. */
 	public String infotext;
