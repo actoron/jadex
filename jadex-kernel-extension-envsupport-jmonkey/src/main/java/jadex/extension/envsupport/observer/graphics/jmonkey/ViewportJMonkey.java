@@ -25,6 +25,7 @@ import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.extension.envsupport.observer.perspective.Perspective3D;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,6 +101,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 	private int								_lastselect		= -1;
 
+	/** Action that renders the frame. */
+	private Runnable						renderFrame;
 
 	private Callable<Object>				renderFrameAction_;
 
@@ -110,11 +113,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 	private final static int				_scaleApp		= 500;
 
 
-	
 	/**
-	 *  Animation Stuff
+	 * Animation Stuff
 	 */
-	private HashMap<String, AnimChannel> _animChannels; 
+	private HashMap<String, AnimChannel>	_animChannels;
 
 	/** The 3d renderers. */
 	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[11];
@@ -146,29 +148,40 @@ public class ViewportJMonkey extends AbstractViewport3d
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
 		_classloader = classloader;
-		
+
 		// Animation Channels
 		_animChannels = new HashMap<String, AnimChannel>();
 
-		//TODO: scaling komplett 
+		// TODO: scaling komplett
 		_scale = _scaleApp / areaSize_.getXAsFloat();
-		
+
 		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid);
 		AppSettings settings = new AppSettings(true);
 
-		
-		
+
 		_app.setPauseOnLostFocus(false);
 		_app.setSettings(settings);
 		_app.createCanvas();
+		try
+		{
+			Thread.sleep(500);
+		}
+		catch(InterruptedException ex)
+		{
+		}
 		_app.startCanvas();
-	
+		try
+		{
+			Thread.sleep(500);
+		}
+		catch(InterruptedException ex)
+		{
+		}
+
 
 		_context = (JmeCanvasContext)_app.getContext();
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
-
-
 
 
 		// Drawstuff
@@ -176,13 +189,22 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_drawObjectsRefresh = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsLast = Collections.synchronizedSet(new HashSet<Object>());
 
+		renderFrame = new Runnable()
+		{
+			public void run()
+			{
+				_app.enqueue(renderFrameAction_);
+				rendering = false;
+			}
+		};
+
 		renderFrameAction_ = new Callable<Object>()
 		{
 			public Object call()
 			{
 
 				_geometryNode = updateMonkey(objectList_);
-				
+
 
 				if(_firstrun)
 				{
@@ -191,9 +213,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 					_staticNode = createStatics(_staticvisuals);
 					_app.setStaticGeometry(_staticNode);
 					_app.setChannels(_animChannels);
-					_firstrun = false;
 					_staticNode.setLocalScale(_scale);
 					_geometryNode.setLocalScale(_scale);
+					_firstrun = false;
 				}
 				_app.setGeometry(_geometryNode);
 
@@ -234,7 +256,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 		if(!rendering)
 		{
 			rendering = true;
-			_app.enqueue(renderFrameAction_);
+			// TODO: fix this
+			// _app.enqueue(renderFrameAction_);
+			EventQueue.invokeLater(renderFrame);
 		}
 	}
 
@@ -377,25 +401,27 @@ public class ViewportJMonkey extends AbstractViewport3d
 			{
 				_selectedObj = sobj;
 			}
-			
+
 			Object posObj = SObjectInspector.getProperty(sobj, "position");
 			Vector3f position = handleHeightValue(posObj);
-			
+
 			Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
 			Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
-			//TODO: good solution?
+			// TODO: good solution?
 			sizeDrawable = sizeDrawable.divide(2);
 
 			if(!_drawObjects.contains(identifier))
 			{
 				_drawObjects.add(identifier);
 				Node objectNode = new Node(identifier.toString());
+
 				// Use this distance Vector to calculate the Rotation of the
 				// Object
-//				Quaternion quat = calculateRotation(position, objectNode.getLocalTranslation(), rotation3d);
-//
-//				if(quat != null)
-//					objectNode.setLocalRotation(quat);
+				// Quaternion quat = calculateRotation(position,
+				// objectNode.getLocalTranslation(), rotation3d);
+				//
+				// if(quat != null)
+				// objectNode.setLocalRotation(quat);
 				objectNode.setLocalScale(sizeDrawable);
 				objectNode.setLocalTranslation(position);
 
@@ -414,6 +440,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 				Spatial node = _geometryNode.getChild(identifier.toString());
 				_tmpNode = (Node)node;
 
+
 				// Calculate the Direction
 				Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d, sobj, combiner3d.isAutoRotation());
 
@@ -421,9 +448,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 				{
 					_tmpNode.setLocalRotation(quat);
 				}
-		
-					
-				
 
 				_tmpNode.setLocalScale(sizeDrawable);
 
@@ -440,9 +464,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 						identifier = "Type: " + p.getType() + " HCode " + p.hashCode();
 
 						Spatial sp = _tmpNode.getChild((String)identifier);
-						
-						
-						//TODO HACK for Soundfile
+
+
+						// TODO HACK for Soundfile
 						if(p.getType() == 10)
 						{
 							if(sp instanceof Node)
@@ -456,7 +480,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 							}
 						}
 
-						
 
 						if(!(sp == null))
 						{
@@ -551,7 +574,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 	 */
 	private Quaternion calculateRotation(Vector3f newp, Vector3f oldp, boolean rotation3d, ISpaceObject sobj, boolean calculateRotation)
 	{
-
 		Vector3f newpos;
 		Vector3f oldpos;
 		if(rotation3d)
@@ -564,32 +586,49 @@ public class ViewportJMonkey extends AbstractViewport3d
 			newpos = newp.clone().setY(0);
 			oldpos = oldp.clone().setY(0);
 		}
-		
+
 		Quaternion quat = null;
 		Vector3f direction = newpos.subtract(oldpos);
-		if(!direction.equals(Vector3f.ZERO))
+		if(calculateRotation && !direction.equals(Vector3f.ZERO))
 		{
 			quat = new Quaternion();
 			quat.lookAt(direction, Vector3f.UNIT_Y);
-			
+
 		}
-		else
+		else if(!calculateRotation && sobj.hasProperty("rotation"))
 		{
-			if(!calculateRotation && sobj.hasProperty("rotation"))
+
+			float height = 0f;
+			Object ob = _tmpNode.getUserData("height");
+			if(ob == null)
 			{
-				quat = new Quaternion();
-				Object rot = sobj.getProperty("rotation");
-				if(rot instanceof IVector2)
+				_tmpNode.setUserData("height", height);
+			}
+
+
+			Object rot = sobj.getProperty("rotation");
+
+			if(rot instanceof IVector2)
+			{
+				if(!direction.equals(Vector3f.ZERO))
 				{
-					IVector2 vector2 = (IVector2)rot;
-					Vector3f vector3 = new Vector3f(vector2.getXAsFloat(), 0, vector2.getYAsFloat());
-					quat.lookAt(vector3, Vector3f.UNIT_Y);
+					height = direction.clone().getY() * 100;
+					_tmpNode.setUserData("height", height);
 				}
 
-				
-				
-//				quat.fromAngleAxis((float)(vector2.getDirectionAsFloat()), Vector3f.UNIT_Y);
+				IVector2 vector2 = (IVector2)rot;
+
+				Vector3f vector3 = new Vector3f(vector2.getXAsFloat(), (Float)_tmpNode.getUserData("height"), vector2.getYAsFloat());
+
+				quat = new Quaternion();
+				quat.lookAt(vector3, Vector3f.UNIT_Y);
 			}
+			
+			else if(rot instanceof IVector3)
+			{
+				//TODO: calc rot for 3d
+			}
+			
 		}
 		return quat;
 
@@ -638,9 +677,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 		{
 			System.out.println("exception on stop");
 		}
-		
 
-//		System.out.println("ViewportJmonkey: STOP STOP STOP");
+
+		// System.out.println("ViewportJmonkey: STOP STOP STOP");
 
 	}
 
@@ -670,9 +709,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 
-
-
-
 	/**
 	 * @return the _animChannels
 	 */
@@ -689,8 +725,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 		this._animChannels = _animChannels;
 	}
-
-
 
 
 }

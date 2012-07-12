@@ -369,6 +369,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		
 	    listener.setLocation(cam.getLocation());
 	    listener.setRotation(cam.getRotation());
+	    
 
 	}
 
@@ -379,10 +380,14 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	public void setGeometry(Node geometry)
 	{
+		
 		_geometryNode = geometry;
 		this.rootNode.attachChild(_geometryNode);
 
 	}
+	
+	
+	
 
 	public void setStaticGeometry(Node staticNode)
 	{
