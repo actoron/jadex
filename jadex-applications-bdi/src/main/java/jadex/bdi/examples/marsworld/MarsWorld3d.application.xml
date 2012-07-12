@@ -124,7 +124,7 @@
 			<env:perspective name="Complex3D" class="Perspective3D">
 				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
 					<env:sky skypath="jadex3d/textures/sky/sky01/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
-					<env:rndterrain width="2" height="0.2" depth="2"  
+					<env:rndterrain width="2" height="0.1" depth="2"  
 		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
 					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
 					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" shadowtype="Receive"/>
