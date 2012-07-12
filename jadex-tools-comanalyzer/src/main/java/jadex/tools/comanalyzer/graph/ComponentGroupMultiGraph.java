@@ -29,10 +29,10 @@ import edu.uci.ics.jung.graph.util.Pair;
  * to either the elements and (per delegate) to the vertex and edges of the
  * graph.
  * 
- * @param <VE> The vertex element type.
- * @param <EE> The edge element type.
- * @param <V> The vertex type.
- * @param <E> The edge type.
+ * <VE> The vertex element type.
+ * <EE> The edge element type.
+ * <V> The vertex type.
+ * <E> The edge type.
  */
 public class ComponentGroupMultiGraph implements Graph 
 {

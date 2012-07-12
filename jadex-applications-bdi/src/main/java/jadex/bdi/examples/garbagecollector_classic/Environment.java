@@ -432,7 +432,7 @@ public class Environment
 
 
 	/**
-	 *  Get the agent infos.
+	 *  Get the world objects.
 	 *  @return Get all world objects (except pickuped garbage).
 	 */
 	public WorldObject[] getWorldObjects()
@@ -441,8 +441,7 @@ public class Environment
 	}
 
 	/**
-	 *  Get the agent infos.
-	 *  @return Get all world objects (except pickuped garbage).
+	 *  Set the world objects.
 	 */
 	// Hack!!! Method required for property change (otherwise no bean property exists)
 	public void setWorldObjects(WorldObject[] objects)

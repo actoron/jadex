@@ -70,7 +70,6 @@ public class MProcessableElementFlyweight extends MParameterElementFlyweight imp
 	
 	/**
 	 *  Test if is posttoall.
-	 *  @return True, if posttoaall.
 	 */
 	public void setPostToAll(final boolean posttoall)
 	{
@@ -92,7 +91,6 @@ public class MProcessableElementFlyweight extends MParameterElementFlyweight imp
 	
 	/**
 	 *  Test if is random selection.
-	 *  @return True, if is random selection.
 	 */
 	public void setRandomSelection(final boolean random)
 	{

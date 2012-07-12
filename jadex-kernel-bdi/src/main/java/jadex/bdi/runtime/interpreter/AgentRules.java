@@ -984,7 +984,6 @@ public class AgentRules
 	 *  @param state The state.
 	 *  @param rcapa The reference to the capability instance.
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
-	 *  @return A list of futures to wait for the evaluation to finish.
 	 */
 	protected static void	createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
 	{

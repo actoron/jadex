@@ -1,20 +1,36 @@
 package jadex.bridge;
 
+/**
+ *  Type for component events.
+ */
 public interface IComponentChangeEvent
 {
+	/** Event denoting creation of an element. */
 	public static final String EVENT_TYPE_CREATION		= "created";
+	/** Event denoting disposal of an element. */
 	public static final String EVENT_TYPE_DISPOSAL		= "disposed";
+	/** Event denoting modification of an element. */
 	public static final String EVENT_TYPE_MODIFICATION 	= "modified";
+	/** Event denoting a single occurrence without temporal extension. */
 	public static final String EVENT_TYPE_OCCURRENCE	= "noticed";
+	/** Bulk event composed of sub events. */
 	public static final String EVENT_TYPE_BULK = "bulk";
 	
+	/** Events regarding the execution of a step. */
 	public static final String SOURCE_CATEGORY_EXECUTION = "Execution";
+	/** Events regarding a component. */
 	public static final String SOURCE_CATEGORY_COMPONENT = "Component";
+	/** Events regarding a BDI plan. */
 	public static final String SOURCE_CATEGORY_PLAN	   = "Plan";
+	/** Events regarding a BDI goal. */
 	public static final String SOURCE_CATEGORY_GOAL	   = "Goal";
+	/** Events regarding a BDI fact. */
 	public static final String SOURCE_CATEGORY_FACT	   = "Fact";
-	public static final String SOURCE_CATEGORY_MESSAGE   = "Message";
+	/** Events regarding a BDI internal event. */
 	public static final String SOURCE_CATEGORY_IEVENT	   = "Internal Event";
+	/** Events regarding a message. */
+	public static final String SOURCE_CATEGORY_MESSAGE   = "Message";
+	/** Events regarding a BPMN activity. */
 	public static final String SOURCE_CATEGORY_ACTIVITY	   = "Activity";
 	
 	/**

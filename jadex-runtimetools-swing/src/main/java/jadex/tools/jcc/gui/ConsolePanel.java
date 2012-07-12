@@ -194,7 +194,7 @@ public class ConsolePanel extends JPanel
 	
 	/**
 	 *  Enable console.
-	 *  @param True, for enabling console.
+	 *  @param enable True, for enabling console.
 	 */
 	public void setConsoleEnabled(boolean enable)
 	{

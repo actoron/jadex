@@ -68,7 +68,6 @@ public class Testcase
 	
 	/**
 	 *  Get the test duration.
-	 *  @return The test duration.
 	 */
 	public void setDuration(long duration)
 	{

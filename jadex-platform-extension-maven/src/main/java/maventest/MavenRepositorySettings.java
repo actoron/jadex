@@ -31,11 +31,11 @@ import org.sonatype.aether.repository.RepositoryPolicy;
  * Maven can be configured externally, using following properties:
  * 
  * <ul>
- * <li>{@see MavenRepositorySettings.ALT_USER_SETTINGS_XML_LOCATION} - a path to
+ * <li>@see MavenRepositorySettings.ALT_USER_SETTINGS_XML_LOCATION - a path to
  * local settings.xml file</li>
- * <li>{@see MavenRepositorySettings.ALT_GLOBAL_SETTINGS_XML_LOCATION} - a path
+ * <li>@see MavenRepositorySettings.ALT_GLOBAL_SETTINGS_XML_LOCATION - a path
  * to global settings.xml file</li>
- * <li>{@see MavenRepositorySettings.ALT_LOCAL_REPOSITORY_LOCATION} - a path to
+ * <li>@see MavenRepositorySettings.ALT_LOCAL_REPOSITORY_LOCATION - a path to
  * local repository</li>
  * </ul>
  * 

@@ -33,8 +33,6 @@ public class FutureFunctionality
 	
 	/**
 	 * 
-	 * @param result
-	 * @return
 	 */
 	public Object addIntermediateResult(Object result)
 	{
@@ -43,8 +41,6 @@ public class FutureFunctionality
 	
 	/**
 	 * 
-	 * @param result
-	 * @return
 	 */
 	public Object addIntermediateResultIfUndone(Object result)
 	{
@@ -75,8 +71,6 @@ public class FutureFunctionality
 	
 	/**
 	 * 
-	 * @param result
-	 * @return
 	 */
 	public Object setResult(Object result)
 	{
@@ -85,8 +79,6 @@ public class FutureFunctionality
 	
 	/**
 	 * 
-	 * @param result
-	 * @return
 	 */
 	public Object setResultIfUndone(Object result)
 	{
@@ -95,8 +87,6 @@ public class FutureFunctionality
 	
 	/**
 	 * 
-	 * @param exception
-	 * @return
 	 */
 	public Exception setException(Exception exception)
 	{
@@ -105,8 +95,6 @@ public class FutureFunctionality
 	
 	/**
 	 * 
-	 * @param exception
-	 * @return
 	 */
 	public Exception setExceptionIfUndone(Exception exception)
 	{

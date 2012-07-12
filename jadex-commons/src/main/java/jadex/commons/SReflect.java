@@ -1036,7 +1036,7 @@ public class SReflect
 	
 	/**
 	 *  Test if class is some kind of collection.
-	 *  @param class The class.
+	 *  @param clazz The class.
 	 *  @return True if is iterable.
 	 */
 	public static boolean isIterableClass(Class clazz)

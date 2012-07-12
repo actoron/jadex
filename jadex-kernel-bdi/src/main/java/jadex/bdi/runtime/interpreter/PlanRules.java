@@ -2050,7 +2050,6 @@ public class PlanRules
 
 	/**
 	 *  Wait for a wait abstraction.
-	 *  @param waitabstraction.
 	 *  @return The dispatched element.
 	 */
 	public static Object waitForWaitAbstraction(Object wa, long timeout, IOAVState state, Object rcapa, Object rplan)

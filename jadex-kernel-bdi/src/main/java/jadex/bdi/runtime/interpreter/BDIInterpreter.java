@@ -1496,7 +1496,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	
 	/**
 	 *  Get the event reificator for generating change events.
-	 * @return
 	 */
 	public EventReificator	getEventReificator()
 	{

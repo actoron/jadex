@@ -93,7 +93,6 @@ public class Property
 	
 	/**
 	 *  Set the value.
-	 *  @return The value.
 	 */
 	public void setValue(String value)
 	{

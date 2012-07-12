@@ -22,9 +22,6 @@ public class XMLReaderFactoryDesktop extends XMLReaderFactory
 
 	/**
 	 * Creates a new XML Reader.
-	 * 
-	 * @param bulklink
-	 * @return
 	 */
 	public AReader createReader(boolean bulklink)
 	{
@@ -33,11 +30,6 @@ public class XMLReaderFactoryDesktop extends XMLReaderFactory
 
 	/**
 	 * Creates a new XML Reader.
-	 * 
-	 * @param bulklink
-	 * @param validate
-	 * @param reporter
-	 * @return
 	 */
 	public AReader createReader(boolean bulklink, boolean validate, XMLReporter reporter)
 	{
@@ -46,12 +38,6 @@ public class XMLReaderFactoryDesktop extends XMLReaderFactory
 
 	/**
 	 * Creates a new XML Reader.
-	 * 
-	 * @param bulklink
-	 * @param validate
-	 * @param coalescing
-	 * @param reporter
-	 * @return
 	 */
 	public AReader createReader(boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter)
 	{

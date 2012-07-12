@@ -127,7 +127,6 @@ public class MavenRepositorySystem
 
    /**
     * 
-    * @return
     */
    public List<RemoteRepository> getRemoteRepositories()
    {

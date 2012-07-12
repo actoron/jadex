@@ -66,7 +66,6 @@ public class Dome3d extends Primitive3d
 	}
 
 	/**
-	 * @return
 	 */
 	public double getRadius()
 	{
@@ -74,7 +73,6 @@ public class Dome3d extends Primitive3d
 	}
 
 	/**
-	 * @return
 	 */
 	public int getPlanes()
 	{
@@ -90,7 +88,6 @@ public class Dome3d extends Primitive3d
 	}
 
 	/**
-	 * @return
 	 */
 	public int getSamples()
 	{

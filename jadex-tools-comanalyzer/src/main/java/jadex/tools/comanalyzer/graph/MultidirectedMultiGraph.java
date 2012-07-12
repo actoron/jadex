@@ -29,8 +29,8 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	/**
 	 * Returns the factory for the graph.
 	 * 
-	 * @param <V> The vertex type.
-	 * @param <E> The edge type.
+	 * <V> The vertex type.
+	 * <E> The edge type.
 	 * @return The Factory for the graph..
 	 */
 	public static Factory getFactory()
@@ -46,8 +46,8 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 
 	/**
 	 * Returns a new MultidirectedMultiGraph.
-	 * @param <V> The vertex type.
-	 * @param <E> The edge type.
+	 * <V> The vertex type.
+	 * <E> The edge type.
 	 * @return The MultidirectedMultiGraph.
 	 */
 	public static Graph create()

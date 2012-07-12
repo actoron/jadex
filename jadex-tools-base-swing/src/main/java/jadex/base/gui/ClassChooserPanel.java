@@ -76,7 +76,6 @@ public class ClassChooserPanel	extends JPanel
 	
 	/**
 	 * 
-	 * @return
 	 */
 	public Class<?>[] scanForClasses()
 	{
@@ -105,8 +104,6 @@ public class ClassChooserPanel	extends JPanel
 
 	/**
 	 * 
-	 * @param extensions
-	 * @return
 	 */
 	public String[] scanForFiles(IFilter filter)
 	{
@@ -191,7 +188,6 @@ public class ClassChooserPanel	extends JPanel
 	
 	/**
 	 * 
-	 * @return
 	 */
 	public ClassLoader getClassLoader()
 	{

@@ -75,8 +75,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	
 	/**
 	 *  Set the properties
-	 *  @param props
-	 *  @return
 	 */
 	public IFuture<Void> setProperties(Properties props)
 	{
@@ -85,7 +83,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	
 	/**
 	 *  Get the properties.
-	 *  @return
 	 */
 	public IFuture<Properties> getProperties()
 	{

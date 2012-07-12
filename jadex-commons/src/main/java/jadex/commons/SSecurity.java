@@ -115,7 +115,6 @@ public class SSecurity
 	 *  @param pair
 	 *  @param days
 	 *  @param algorithm
-	 *  @return
 	 *  @throws GeneralSecurityException
 	 *  @throws IOException
 	 */

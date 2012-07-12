@@ -86,11 +86,6 @@ public class SFlyweightFunctionality
 	}
 	
 	/**
-	 * 
-	 * @param state
-	 * @param handle
-	 * @param name
-	 * @return
 	 */
 	public static ElementFlyweight getBeliefSet(IOAVState state, Object handle, Object scope, String name)
 	{
@@ -126,10 +121,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param name
-	 * @return
 	 */
 	public static boolean containsBelief(IOAVState state, Object handle, Object scope, String name)
 	{
@@ -141,11 +132,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param scope
-	 * @param name
-	 * @return
 	 */
 	public static boolean containsBeliefSet(IOAVState state, Object handle, Object scope, String name)
 	{
@@ -157,9 +143,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @return
 	 */
 	public static String[] getBeliefNames(IOAVState state, Object handle, Object scope)
 	{
@@ -185,10 +168,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param scope
-	 * @return
 	 */
 	public static String[] getBeliefSetNames(IOAVState state, Object handle, Object scope)
 	{
@@ -216,9 +195,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param fact
 	 */
 	public static void setFact(IOAVState state, Object handle, Object fact, Object scope)
 	{
@@ -234,10 +210,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param fact
-	 * @return
 	 * /
 	public static Object getFact(IOAVState state, Object handle, Object scope)
 	{
@@ -258,9 +230,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @return
 	 */
 	public static Class getClazz(IOAVState state, Object handle)
 	{
@@ -327,10 +296,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param fact
-	 * @return
 	 */
 	public static Object getFact(IOAVState state, Object handle, Object scope, Object oldval)
 	{
@@ -361,10 +326,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @param fact
-	 * @return
 	 */
 	public static boolean containsFact(IOAVState state, Object handle, Object fact)
 	{
@@ -379,9 +340,6 @@ public class SFlyweightFunctionality
 
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @return
 	 */
 	public static Object[] getFacts(IOAVState state, Object handle)
 	{
@@ -584,13 +542,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param exptxt
-	 * @param scope
-	 * @param ea
-	 * @param names
-	 * @param values
-	 * @return
 	 */
 	public static Object execute(IOAVState state, IParsedExpression exp, Object scope, String[] names, Object[] values)
 	{
@@ -678,9 +629,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @return
 	 */
 	public static boolean isAdopted(IOAVState state, Object handle)
 	{
@@ -693,9 +641,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @return
 	 */
 	public static boolean isSucceeded(IOAVState state, Object handle)
 	{
@@ -711,9 +656,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param handle
-	 * @return
 	 */
 	public static boolean isFinished(IOAVState state, Object handle)
 	{
@@ -758,11 +700,6 @@ public class SFlyweightFunctionality
 	
 	/**
 	 * 
-	 * @param state
-	 * @param scope
-	 * @param handle
-	 * @param ea
-	 * @return
 	 */
 	public static Object[] getParameterSets(IOAVState state, Object scope, Object handle)
 	{

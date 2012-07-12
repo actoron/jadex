@@ -17,7 +17,6 @@ public interface IPreferences {
 	 * Retrieve a boolean value from the preferences.
 	 * @param key
 	 * @param defValue
-	 * @return
 	 */
 	public boolean getBoolean(String key, boolean defValue);
 	
@@ -25,7 +24,6 @@ public interface IPreferences {
 	 * Retrieve a String value from the preferences.
 	 * @param key
 	 * @param defValue
-	 * @return
 	 */
 	public String getString(String key, String defValue);
 	

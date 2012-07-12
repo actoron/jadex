@@ -130,6 +130,7 @@
 					</execution>
 				</executions>
 				<configuration>
+        			<show>public</show>
 					<excludePackageNames>*.dungeonkeeper.*</excludePackageNames>
 				</configuration>
 			</plugin>

@@ -60,8 +60,6 @@ public class JadexLogoButton extends JButton
 
 
 	/**
-	 * @return
-	 * @see java.awt.Component#getPreferredSize()
 	 */
 	public Dimension getPreferredSize()
 	{

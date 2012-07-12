@@ -527,7 +527,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 
 	/**
 	 *  Get provided (declared) service.
-	 *  @param class The interface.
 	 *  @return The service.
 	 */
 	public IService getProvidedService(String name)
@@ -554,7 +553,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	/**
 	 *  Get provided (declared) service.
-	 *  @param class The interface.
+	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
 	public IService[] getProvidedServices(Class<?> clazz)

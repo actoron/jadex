@@ -146,7 +146,6 @@ public class ProcessThread	implements ITaskContext
 	/**
 	 *  Set the next activity. Sets the last edge to null.
 	 *  Should only be used, when no edge available (e.g. start events or event handlers of subprocesses).
-	 *  @return The activity.
 	 */
 	public void	setActivity(MActivity activity)
 	{
@@ -230,7 +229,6 @@ public class ProcessThread	implements ITaskContext
 	
 	/**
 	 *  Set to non waiting.
-	 *  @return The waiting flag.
 	 */
 	public void	setNonWaiting()
 	{
@@ -806,7 +804,6 @@ public class ProcessThread	implements ITaskContext
 
 	/**
 	 *  Remove the split info.
-	 *  @return The split info.
 	 */
 	public void	removeSplitInfo(SplitInfo spi)
 	{

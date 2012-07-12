@@ -20,7 +20,6 @@ public interface IPerspective extends ITypedPropertyObject
 	/**
 	 *  If there is a Complex Application in the Background
 	 *  this helps to Stop it
-	 *  @return name of the perspective
 	 */
 	public void shutdown();
 	

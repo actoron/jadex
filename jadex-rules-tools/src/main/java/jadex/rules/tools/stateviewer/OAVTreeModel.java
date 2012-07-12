@@ -653,7 +653,7 @@ public class OAVTreeModel implements TreeModel
 	
 	/**
 	 * Get the index for a child in children list, beginning with index=0
-	 * @see getIndexForChild(List children, Object child, int start)
+	 * @see #getIndexForChild(List children, Object child, int start)
 	 */
 	protected int getIndexForChild(List children, Object child)
 	{

@@ -203,8 +203,6 @@ public class EncodingContext
 	
 	/**
 	 * 
-	 * @param name
-	 * @return
 	 */
 	public int writeClassname(String name)
 	{

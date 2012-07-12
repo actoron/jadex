@@ -144,7 +144,8 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
+        		<configuration>
+        			<show>public</show>
 					<excludePackageNames>*.dungeonkeeper.*</excludePackageNames>
 					<!-- <excludePackageNames>*.tutorial.*</excludePackageNames> -->
 				</configuration>

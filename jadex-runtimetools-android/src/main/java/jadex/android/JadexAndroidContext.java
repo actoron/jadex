@@ -82,7 +82,6 @@ public class JadexAndroidContext extends AndroidContext
 	/**
 	 * Returns the Instance of this JadexAndroidContext
 	 * 
-	 * @return
 	 */
 	public static JadexAndroidContext getInstance()
 	{
@@ -125,7 +124,6 @@ public class JadexAndroidContext extends AndroidContext
 	/**
 	 * Returns true if ANY jadex platform is running.
 	 * 
-	 * @return
 	 */
 	public boolean isPlatformRunning()
 	{
@@ -135,8 +133,6 @@ public class JadexAndroidContext extends AndroidContext
 	/**
 	 * Returns true if given jadex platform is running.
 	 * 
-	 * @param platformID
-	 * @return
 	 */
 	public boolean isPlatformRunning(IComponentIdentifier platformID)
 	{
@@ -210,8 +206,6 @@ public class JadexAndroidContext extends AndroidContext
 	
 	/**
 	 * Retrieves the CMS of a random running platform.
-	 * @param platformID
-	 * @return
 	 */
 	public IFuture<IComponentManagementService> getCMS() {
 		return getCMS(getFirstRunningPlatformId());
@@ -219,8 +213,6 @@ public class JadexAndroidContext extends AndroidContext
 
 	/**
 	 * Retrieves the CMS of the Platform with the given ID.
-	 * @param platformID
-	 * @return
 	 */
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
 	{

@@ -454,7 +454,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Remove a processing call.
 	 *  @param callid The callid.
-	 *  @return The future.
 	 */
 	public void removeProcessingCall(final String callid)
 	{

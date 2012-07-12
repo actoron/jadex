@@ -165,7 +165,6 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 *  Uses: data
 	 *  
 	 *  @param data The new data.
-	 *  @return
 	 */
 	public void addData(final int seqnumber, final byte[] dat)
 	{

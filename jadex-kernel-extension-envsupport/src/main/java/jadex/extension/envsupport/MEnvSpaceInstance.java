@@ -140,7 +140,6 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 
 	/**
 	 *  Set the type of this element.
-	 *  @return The structure type.
 	 */
 	public void	setType(MEnvSpaceType spacetype)
 	{

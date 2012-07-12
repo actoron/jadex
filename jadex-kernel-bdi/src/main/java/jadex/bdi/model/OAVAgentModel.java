@@ -71,8 +71,7 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	}
 		
 	/**
-	 *  Get the matcherfunc.
-	 *  @return The matcherfunc.
+	 *  Set the matcherfunc.
 	 */
 	public void setMatcherFunctionality(IPatternMatcherFunctionality matcherfunc)
 	{

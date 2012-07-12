@@ -27,7 +27,8 @@ public class BDITest	extends	ComponentTestSuite
 				"MultiplePlanTriggers",
 				"MessagingTest",	// wrong email configuration?
 				
-				// Non-test agents not to be started in isolation
+				// Agents not to be started in isolation
+				"Worker",
 				"GarbageBurner",
 				"GarbageCollector",
 				"Cleaner",

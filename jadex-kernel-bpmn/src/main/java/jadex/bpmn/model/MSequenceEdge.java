@@ -45,7 +45,6 @@ public class MSequenceEdge extends MAssociationTarget
 	
 	/**
 	 *  Set the source.
-	 *  @return The source.
 	 */
 	public void setSource(MActivity source)
 	{

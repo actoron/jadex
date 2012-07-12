@@ -309,7 +309,6 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	/**
 	 *  Dispatch a new subgoal.
 	 *  @param subgoal The new subgoal.
-	 *  @return The eventfilter for identifying the result event.
 	 *  Note: plan step is interrupted after call.
 	 */
 	public void dispatchSubgoal(IGoal subgoal)

@@ -1286,13 +1286,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //		}
 //	}
 	
+	protected int cnt;
+	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	protected int cnt;
 	public  <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
 		final Future<T> ret = new Future<T>();

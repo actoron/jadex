@@ -9,6 +9,9 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+/**
+ *  Schedule future executions on component thread. 
+ */
 public class ComponentFutureFunctionality extends FutureFunctionality
 {
 	//-------- attributes --------

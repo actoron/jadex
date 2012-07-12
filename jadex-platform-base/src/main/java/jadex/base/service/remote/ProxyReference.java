@@ -97,7 +97,6 @@ public class ProxyReference
 	
 	/**
 	 *  Get the cached values.
-	 *  @return The cached values. 
 	 */
 	public void putCache(Object key, Object value)
 	{

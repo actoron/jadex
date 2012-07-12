@@ -394,8 +394,6 @@ public class GroupedCategoryDataset extends AbstractDataset implements CategoryD
 	/**
 	 * Returns the original rowkey from a group rowkey
 	 * 
-	 * @param rowKey
-	 * @return
 	 */
 	public Comparable getOriginalRowKey(Comparable rowKey)
 	{

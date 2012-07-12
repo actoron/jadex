@@ -696,7 +696,6 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Get a matching content codec.
 	 *  @param props The properties.
-	 *  @return The content codec.
 	 */
 	public void setContentCodecInfo(IComponentIdentifier cid, Map<Class<?>, Object[]> info)
 	{

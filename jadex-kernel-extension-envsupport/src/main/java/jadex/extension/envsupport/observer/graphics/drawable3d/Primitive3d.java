@@ -288,7 +288,6 @@ public class Primitive3d extends AbstractVisual3d
 	
 	/**
 	 *  Set the texture path.
-	 *  @return The texture path.
 	 */
 	public void setTexturePath(String texturepath)
 	{

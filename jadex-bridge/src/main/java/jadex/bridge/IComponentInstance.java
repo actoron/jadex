@@ -53,7 +53,9 @@ public interface IComponentInstance
 	 *  Called when a component has been created as a subcomponent of this component.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The newly created component.
+	 *  @param desc	The newly created component.
+	 *  @param model	The model of the newly created component.
+	 *  @return A future to indicate when the event has been processed.
 	 */
 	// todo: Use parent->child creation config information instead of model (e.g. role in AGR!?)
 	public IFuture<Void>	componentCreated(IComponentDescription desc, IModelInfo model);
@@ -62,7 +64,8 @@ public interface IComponentInstance
 	 *  Called when a subcomponent of this component has been destroyed.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
-	 *  @param comp	The destroyed component.
+	 *  @param desc	The destroyed component.
+	 *  @return A future to indicate when the event has been processed.
 	 */
 	public IFuture<Void>	componentDestroyed(IComponentDescription desc);
 
@@ -132,7 +135,6 @@ public interface IComponentInstance
 	/**
 	 *  Start the behavior of a component.
 	 *  Called from external thread that needs to be decoupled.
-	 *  @return Future when behavior is started.
 	 */
 	public void startBehavior();
 	

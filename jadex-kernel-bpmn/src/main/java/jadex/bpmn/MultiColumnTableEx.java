@@ -214,10 +214,6 @@ public class MultiColumnTableEx extends MultiColumnTable
 	
 	/**
 	 * Get annotation detail
-	 * @param element
-	 * @param annotationIdentifier
-	 * @param cellDimensionIdentifier
-	 * @return
 	 */
 	public static MultiColumnTableEx parseEAnnotationTable(List details, List annos)
 	{

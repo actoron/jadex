@@ -1578,7 +1578,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 * @param initproperties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
 	 * @param listeners initial listeners (may be null)
-	 * @return the object's ID
 	 */
 	public void	initSpaceObject(final ISpaceObject ret)
 	{

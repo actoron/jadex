@@ -49,7 +49,6 @@ public class ObjectCondition extends ConstrainableCondition
 	
 	/**
 	 *  Get the object type.
-	 *  @return The object type.
 	 */
 	public void setObjectType(OAVObjectType type)
 	{

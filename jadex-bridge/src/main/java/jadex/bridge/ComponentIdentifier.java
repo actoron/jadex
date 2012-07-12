@@ -57,9 +57,9 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	
 	/**
 	 *  Create component identifier.
-	 *  @param name The name.
+	 *  @param name The local name.
+	 *  @param parent The parent.
 	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
 	 */
 	public ComponentIdentifier(String name, IComponentIdentifier parent)
 	{
@@ -68,9 +68,9 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	
 	/**
 	 *  Create component identifier.
-	 *  @param name The name.
+	 *  @param name The local name.
+	 *  @param parent The parent.
 	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
 	 */
 	public ComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses)
 	{
@@ -78,7 +78,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	}
 	
 	/**
-	 *  Create component identifier. 
+	 *  Copy a component identifier.
+	 *  @param cid	The id to copy from. 
 	 */
 	public ComponentIdentifier(IComponentIdentifier cid)
 	{
@@ -394,6 +395,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	
 	/**
 	 *  Get the stripped platform name.
+	 *  @param name	The platform name.
+	 *  @return the stripped platform name.
 	 */
 	public static String	getPlatformPrefix(String name)
 	{

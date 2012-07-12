@@ -72,7 +72,7 @@ public class RetePatternMatcherState implements IPatternMatcherState, IOAVStateL
 	/**
 	 *  Get the agenda.
 	 *  The agenda can only be accessed, after the rule system
-	 *  has been initialized with {@link#init()}.
+	 *  has been initialized with {@link #init()}.
 	 *  @return The agenda.
 	 */
 	public IAgenda getAgenda()

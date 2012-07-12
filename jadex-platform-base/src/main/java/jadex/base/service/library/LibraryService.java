@@ -850,7 +850,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/**
 	 *  Remove primary management for a rid.
-	 *  @return True, if entry has to be removed.
 	 */
 	protected void removeManagedCompletely(IResourceIdentifier rid)
 	{

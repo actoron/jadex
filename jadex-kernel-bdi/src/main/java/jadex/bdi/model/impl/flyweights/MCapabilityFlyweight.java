@@ -493,7 +493,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	
 	/**
 	 *  Set if is abstract.
-	 *  @param True, if is abstract.
+	 *  @param abs True, if is abstract.
 	 */
 	public void setAbstract(final boolean abs)
 	{
@@ -515,7 +515,6 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	
 	/**
 	 *  Get the capability references.
-	 *  @return The capability references.
 	 */
 	public void createCapabilityReference(final String name, final String file)
 	{

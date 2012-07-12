@@ -65,27 +65,16 @@ public abstract class XMLReaderFactory
 	
 	/**
 	 * Creates a new XML Reader
-	 * @param bulklink
-	 * @return
 	 */
 	public abstract AReader createReader(boolean bulklink);
 	
 	/**
 	 * Creates a new XML Reader
-	 * @param bulklink
-	 * @param validate
-	 * @param reporter
-	 * @return
 	 */
 	public abstract AReader createReader(boolean bulklink, boolean validate, XMLReporter reporter);
 	
 	/**
 	 * Creates a new XML Reader
-	 * @param bulklink
-	 * @param validate
-	 * @param coalescing
-	 * @param reporter
-	 * @return
 	 */
 	public abstract AReader createReader(boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter);
 }

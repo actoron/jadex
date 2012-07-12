@@ -17,7 +17,7 @@ public class SJavaParser
 
 	/**
 	 *  Evaluates a java expression. 
-	 *  @return fetcher	Expression parameters can be supplied as value fetcher. 
+	 *  @param fetcher	Expression parameters can be supplied as value fetcher. 
 	 *  @return The evaluated object.
 	 */
 	public static Object evaluateExpression(String exptxt, IValueFetcher fetcher)
@@ -27,7 +27,7 @@ public class SJavaParser
 
 	/**
 	 *  Evaluates a java expression. 
-	 *  @return fetcher	Expression parameters can be supplied as value fetcher. 
+	 *  @param fetcher	Expression parameters can be supplied as value fetcher. 
 	 *  @return The evaluated object.
 	 */
 	public static Object evaluateExpression(String exptxt, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
@@ -38,7 +38,6 @@ public class SJavaParser
 
 	/**
 	 *  Evaluates a java expression. 
-	 *  @return fetcher	Expression parameters can be supplied as value fetcher. 
 	 *  @return The evaluated object.
 	 */
 	public static IParsedExpression	parseExpression(String exptxt, String[] imports, ClassLoader classloader)

@@ -95,7 +95,7 @@ public class TreeTableNodeType
 	
 	/**
 	 *  Add an icon.
-	 *  @return The icon for the node.
+	 *  @param icon The icon for the node.
 	 */
 	public void	addIcon(Icon icon)
 	{

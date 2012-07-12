@@ -203,7 +203,6 @@ public class BeanCruncher implements ICruncher
 	
 	/**
 	 * @param o
-	 * @return the id of this object
 	 */
 	protected void persist_recursive(int id, Object o, ClassLoader classloader)
 	{

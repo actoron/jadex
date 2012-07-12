@@ -263,7 +263,6 @@ public class EventReificator implements IOAVStateListener
 	 *  @param element The element source.
 	 *  @param type The event type.
 	 *  @param value The optional value.
-	 *  @return The event.
 	 */
 	protected void	createChangeEvent(Object element, Object scope, String type, Object value)
 	{

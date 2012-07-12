@@ -136,7 +136,6 @@ public class ClasspathPanel	extends JPanel
 
 	/**
 	 * 
-	 * @return
 	 */
 	public Class<?>[] scanForFactories()
 	{
@@ -166,7 +165,6 @@ public class ClasspathPanel	extends JPanel
 
 	/**
 	 * 
-	 * @return
 	 */
 	public ClassLoader getClassLoader()
 	{
@@ -184,8 +182,6 @@ public class ClasspathPanel	extends JPanel
 
 	/**
 	 * 
-	 * @param extensions
-	 * @return
 	 */
 	public String[] scanForFiles(String[] extensions)
 	{

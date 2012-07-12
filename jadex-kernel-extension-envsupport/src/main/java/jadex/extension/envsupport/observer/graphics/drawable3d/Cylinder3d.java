@@ -73,7 +73,6 @@ public class Cylinder3d extends Primitive3d
 	}
 
 	/**
-	 * @return
 	 */
 	public double getRadius()
 	{
@@ -82,7 +81,6 @@ public class Cylinder3d extends Primitive3d
 
 
 	/**
-	 * @return
 	 */
 	public double getHeight()
 	{

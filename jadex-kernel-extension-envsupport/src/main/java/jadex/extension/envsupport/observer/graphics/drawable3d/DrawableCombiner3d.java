@@ -197,7 +197,6 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 
 
 	/**
-	 * @return 
 	 */
 	public boolean hasSpaceobject()
 	{

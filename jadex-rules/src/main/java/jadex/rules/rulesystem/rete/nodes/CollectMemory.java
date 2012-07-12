@@ -69,7 +69,6 @@ public class CollectMemory
 	/**
 	 *  Add a tuple to the result.
 	 *  @param tuple The result node. 
-	 *  @return True, if could be added.
 	 */
 	public void	putWorkingTuple(Tuple key, Tuple result)
 	{
@@ -92,7 +91,6 @@ public class CollectMemory
 	/**
 	 *  Remove from the result. 
 	 *  @param tuple The tuple.
-	 *  @return True, if could be removed.
 	 */
 	public void	removeWorkingTuple(Tuple key)
 	{

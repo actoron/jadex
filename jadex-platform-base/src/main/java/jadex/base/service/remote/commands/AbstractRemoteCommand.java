@@ -134,7 +134,6 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	
 	/**
 	 *  Get the non-functional properties of the call.
-	 *  @return The non-functional properties of the call.
 	 */
 	public void setNonFunctionalProperties(Map<String, Object> nonfunc)
 	{

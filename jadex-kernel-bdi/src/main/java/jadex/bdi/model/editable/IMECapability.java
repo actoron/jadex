@@ -22,13 +22,12 @@ public interface IMECapability extends IMCapability, IMEElement
 	
 	/**
 	 *  Set if is abstract.
-	 *  @param True, if is abstract.
+	 *  @param abs True, if is abstract.
 	 */
 	public void setAbstract(boolean abs);
 	
 	/**
 	 *  Get the capability references.
-	 *  @return The capability references.
 	 */
 	public void createCapabilityReference(String name, String file);
 	

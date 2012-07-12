@@ -75,7 +75,6 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	
 	/**
 	 *  Wait for a wait abstraction.
-	 *  @param waitabstraction.
 	 */
 	public void waitForWaitAbstraction(IWaitAbstraction waitabs)
 	{
@@ -518,7 +517,6 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	
 	/**
 	 *  Wait for a wait abstraction.
-	 *  @param waitabstraction.
 	 *  @return The dispatched element.
 	 */
 	public Object waitForWaitAbstraction(IWaitAbstraction waitabs, long timeout)

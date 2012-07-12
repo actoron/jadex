@@ -109,7 +109,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	
 	/**
 	 *  Get provided (declared) service.
-	 *  @param class The interface.
+	 *  @param clazz The interface.
 	 *  @return The service.
 	 */
 	public IService[] getProvidedServices(Class clazz)

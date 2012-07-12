@@ -342,7 +342,6 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	
 	/**
 	 *  Set the last modified date.
-	 *  @return The last modified date.
 	 */
 	public void	setLastChecked(long lastcheck)
 	{

@@ -567,7 +567,6 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	/**
 	 *  Dispatch a new subgoal.
 	 *  @param subgoal The new subgoal.
-	 *  @return The eventfilter for identifying the result event.
 	 *  Note: plan step is interrupted after call.
 	 */
 	public void dispatchSubgoal(IGoal subgoal)

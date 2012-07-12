@@ -313,7 +313,6 @@ public class ControlCenter
 
 	/**
 	 * Informs the window if it should dispose its resources.
-	 * @return true if the agent has been killed.
 	 */
 	public void	exit()
 	{

@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * SIMPLIFIED and ADAPTED Copy of editor commen table!
+ * SIMPLIFIED and ADAPTED Copy of editor common table!
  * @author Claas
  *
  */
@@ -96,8 +96,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param o
-	 * @return
 	 * @see java.util.List#contains(java.lang.Object)
 	 */
 	public boolean contains(Object o)
@@ -106,8 +104,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param o
-	 * @return
 	 * @see java.util.List#equals(java.lang.Object)
 	 */
 	public boolean equals(Object o)
@@ -117,8 +113,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param index
-	 * @return
 	 * @see java.util.List#get(int)
 	 */
 	public MultiColumnTableRow get(int index)
@@ -127,7 +121,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @return
 	 * @see java.util.List#hashCode()
 	 */
 	public int hashCode()
@@ -137,8 +130,6 @@ public class MultiColumnTable
 
 
 	/**
-	 * @param o
-	 * @return
 	 * @see java.util.List#indexOf(java.lang.Object)
 	 */
 	public int indexOf(Object o)
@@ -147,7 +138,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @return
 	 * @see java.util.List#isEmpty()
 	 */
 	public boolean isEmpty()
@@ -156,7 +146,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @return
 	 * @see java.util.List#iterator()
 	 */
 	public Iterator<MultiColumnTableRow> iterator()
@@ -165,8 +154,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param o
-	 * @return
 	 * @see java.util.List#lastIndexOf(java.lang.Object)
 	 */
 	public int lastIndexOf(Object o)
@@ -175,8 +162,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param index
-	 * @return
 	 * @see java.util.List#remove(int)
 	 */
 	public MultiColumnTableRow remove(int index)
@@ -188,8 +173,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param o
-	 * @return
 	 * @see java.util.List#remove(java.lang.Object)
 	 */
 	public boolean remove(Object o)
@@ -208,9 +191,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param index
-	 * @param row
-	 * @return
 	 * @see java.util.List#set(int, java.lang.Object)
 	 */
 	public MultiColumnTableRow set(int index, MultiColumnTableRow row)
@@ -222,7 +202,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @return
 	 * @see java.util.List#size()
 	 */
 	public int size()
@@ -231,9 +210,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param fromIndex
-	 * @param toIndex
-	 * @return
 	 * @see java.util.List#subList(int, int)
 	 */
 	public List<MultiColumnTableRow> subList(int fromIndex, int toIndex)
@@ -242,7 +218,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @return
 	 * @see java.util.List#toArray()
 	 */
 	public Object[] toArray()
@@ -251,9 +226,6 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @param <T>
-	 * @param a
-	 * @return
 	 * @see java.util.List#toArray(T[])
 	 */
 	public <T> T[] toArray(T[] a)

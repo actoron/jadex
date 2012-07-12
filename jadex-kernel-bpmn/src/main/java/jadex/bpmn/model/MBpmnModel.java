@@ -807,7 +807,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/**
 	 *  Add an import.
-	 *  @param import The import statement.
+	 *  @param imp The import statement.
 	 */
 	public void addImport(String imp)
 	{
