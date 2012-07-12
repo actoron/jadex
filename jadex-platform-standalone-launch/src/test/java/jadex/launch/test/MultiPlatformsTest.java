@@ -16,6 +16,9 @@ import junit.framework.TestCase;
  */
 public class MultiPlatformsTest extends TestCase
 {
+	/**
+	 *  Perform the test.
+	 */
 	public void	testMultiplePlatforms()
 	{
 		int number	= 30;	// larger numbers lead to out of mem on hudson 32bit.

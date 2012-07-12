@@ -105,7 +105,7 @@ import java.util.logging.Level;
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
 	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),
 
-	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="usepass", clazz=Boolean.class),
 	@Argument(name="printpass", clazz=boolean.class, defaultvalue="true"),
