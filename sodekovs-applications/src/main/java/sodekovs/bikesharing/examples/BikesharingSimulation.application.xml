@@ -1,0 +1,340 @@
+<!-- The simulation startup -->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
+	name="BikesharingSimulation" package="sodekovs.bikesharing.examples">
+
+	<imports>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.math.Vector2Int</import>
+		<import>jadex.extension.envsupport.math.IVector3</import>
+		<import>jadex.extension.envsupport.math.Vector2Double</import>		
+		<import>jadex.extension.envsupport.evaluation.CSVFileDataConsumer</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.dataview.GeneralDataView2D</import>
+		<import>jadex.extension.envsupport.dataview.*</import>						
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.search.*</import>		
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>sodekovs.bikesharing.bilder.*</import>
+		<import>sodekovs.bikesharing.container.Weg</import>
+		<import>sodekovs.bikesharing.fahrrad.FahrradVerleihStation</import>
+		<import>sodekovs.bikesharing.pedestrian.*</import>
+		<import>sodekovs.bikesharing.pedestrian.movement.*</import>
+		<import>sodekovs.bikesharing.env.*</import>
+	</imports>
+
+	<extensiontypes>
+		<env:envspacetype name="MySimulation" width="100" height="100" class="ContinuousSpace2D">
+
+			<env:processtypes>
+				<env:processtype name="init" class="CreateInitialSettingsProcess">
+					<env:property name="simDataSetupFilePath">null</env:property>
+				</env:processtype>
+				<env:processtype name="manageTimeSlices" class="ManageTimeSlicesProcess">
+					<!-- <env:property name="simDataSetupFilePath">null</env:property> -->
+				</env:processtype>
+			</env:processtypes>
+
+			<!-- Entwurfsentscheidung: Verkehrsmittel haben die Eigenschaft, ob sie 
+				gerade offen sind, und ihre Linie. Alle anderen Eigenschaften (naechstes 
+				Ziel, ..) sind nicht öffentlich und somit nicht für andere einsehbar -->
+			<env:objecttypes>
+			
+			<env:objecttype name="pedestrian">
+					<env:property name="vision">0.15</env:property>
+					<env:property name="vision_range">0.3</env:property>
+					<env:property name="speed">2.5</env:property>
+					<env:property name="drives_bike">false</env:property>
+					<!-- check the movement.capability.xml for an explanation of possible strategies -->
+					<env:property name="behaviour_strategy">1</env:property>					
+				</env:objecttype>
+				<env:objecttype name="bikestation">
+					<env:property name="name" class="String" />
+					<env:property name="stock" class="Integer" />
+					<env:property name="capacity" class="Integer" />
+				</env:objecttype>				
+			
+			<!-- 
+			
+				<env:objecttype name="endstationsagent">
+					<env:property name="linie" class="String" />
+				</env:objecttype>
+				<env:objecttype name="dispositionEngpassagent">
+					<env:property name="fahrradanzahl" class="Integer" />
+				</env:objecttype>
+				<env:objecttype name="dispositionSchwellwertagent">
+					<env:property name="fahrradanzahl" class="Integer" />
+				</env:objecttype>
+				<env:objecttype name="dispositionVergangenheitsagent">
+					<env:property name="fahrradanzahl" class="Integer" />
+				</env:objecttype>
+				<env:objecttype name="fahrradverleihstation">
+					<env:property name="station" class="FahrradVerleihStation" />
+					<env:property name="stationsname" class="String" />
+					<env:property name="fahrradanzahl" class="Integer" />
+				</env:objecttype>
+				<env:objecttype name="zeitagent" />
+				<env:objecttype name="station">
+					<env:property name="stationsname" class="String" />
+					<env:property name="typ" class="String" />
+				</env:objecttype>
+				<env:objecttype name="linie">
+					<env:property name="winkel" class="IVector3" />
+					<env:property name="laenge" class="Vector2Double" />
+				</env:objecttype>
+				<env:objecttype name="sbahn">
+					<env:property name="offen" class="Boolean" />
+					<env:property name="linie" class="Weg" />
+					<env:property name="linienname" class="String" />
+					<env:property name="richtung" class="boolean" />
+					<env:property name="mitfahrer" class="Integer" />
+					<env:property name="station" class="Integer" />-->
+					<!-- damit man von außen setzen kann, welche Station die nächste ist -->
+					<!-- geht davon aus, dass eine Linie hin und zurück, und nicht im Kreis 
+						fährt sollte aber ok sein, selbst die U3 und die Berliner Ringbahn fahren 
+						ja eigentlich von vom Start zum Zielort, und nicht ewig im Kreis.. -->
+				<!-- </env:objecttype>
+				<env:objecttype name="verkehrsteilnehmer">
+					<env:property name="wohnort" class="Vector2Double" />
+					<env:property name="arbeitsort" class="Vector2Double" />
+					<env:property name="trinkort" class="Vector2Double" />
+					<env:property name="essort" class="Vector2Double" />
+					<env:property name="fahrradpraeferenz" class="java.lang.Double" />
+					<env:property name="morgensstart" class="Integer" />
+					<env:property name="abendsende" class="Integer" />
+				</env:objecttype>
+				<env:objecttype name="SimInfo">
+					<env:property name="text" dynamic="false">" "</env:property>
+					<env:property name="duration" dynamic="true">$properties.clock.getTime()</env:property>-->
+					<!-- <env:property name="duration" dynamic="true">$zeitagent.max</env:property>-->
+					<!-- <env:property name="start_time">$args.tmp_start_time</env:property>-->					
+					<!-- <env:property name="duration" dynamic="true">$properties.clock.getTime()-$object.getProperty("start_time")</env:property> -->
+					<!--<env:property name="text" dynamic="true">"Collected ore:"+$object.getProperty("ore")+" \n"+ "Experiment duration: "+new	SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("duration"))))</env:property> -->
+					<!-- <env:property name="text" dynamic="false">"Only test showing argument: 
+						" + $args.tmp_mission_time</env:property> -->
+				<!-- </env:objecttype>-->
+			</env:objecttypes>
+
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Pedestrian"
+					objecttype="pedestrian" />		
+			
+			<!-- 
+				<env:avatarmapping componenttype="Sbahn"
+					objecttype="sbahn"  createcomponent="false"/>
+				<env:avatarmapping componenttype="Verkehrsteilnehmer"
+					objecttype="verkehrsteilnehmer" createcomponent="true" createavatar="false"/>
+				<env:avatarmapping componenttype="ZeitAgent"
+					objecttype="zeitagent"  createcomponent="false"/>
+				<env:avatarmapping componenttype="EndstationsAgent"
+					objecttype="endstationsagent"  createcomponent="false"/>
+				<env:avatarmapping componenttype="DispositionEngpassagent"
+					objecttype="dispositionEngpassagent"  createcomponent="false"/>
+				<env:avatarmapping componenttype="DispositionSchwellwertagent"
+					objecttype="dispositionSchwellwertagent"  createcomponent="false"/>
+				<env:avatarmapping componenttype="DispositionVergangenheitsagent"
+					objecttype="dispositionVergangenheitsagent"  createcomponent="false"/>
+				<env:avatarmapping componenttype="TimeAgent"
+					objecttype="SimInfo"  createcomponent="true"/> -->
+			</env:avatarmappings>
+			
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />											
+				<env:tasktype name="rent" class="RentBikeTask" />
+				<env:tasktype name="return" class="ReturnBikeTask" />				
+			</env:tasktypes>
+
+			<env:perspectives>
+				<env:perspective name="main" class="Perspective2D"	opengl="true" objectplacement="center">
+				
+				
+				<!-- Pedestrian -->
+					<env:drawable objecttype="pedestrian" width="2.0" height="2.0">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:ellipse layer="1" size="visionsize" abssize="true"
+							color="#FAFA1E32" />
+						<env:texturedrectangle layer="2" imagepath="sodekovs/bikesharing/bilder/pedestrian.jpg" />
+							<env:texturedrectangle layer="3" imagepath="sodekovs/bikesharing/bilder/bike.gif">
+								<env:drawcondition>$object.drives_bike</env:drawcondition>
+							</env:texturedrectangle>
+					</env:drawable>							
+				<!-- Bike station -->
+					<env:drawable objecttype="bikestation" width="1.0" height="1.0">												
+						<env:texturedrectangle layer="2"
+							imagepath="sodekovs/bikesharing/bilder/rectangle.png" />
+					</env:drawable>				
+				<!-- 
+				
+				
+				
+				
+					<env:drawable objecttype="station" height="1.0" width="1.0">
+						<env:texturedrectangle imagepath="sodekovs/bikesharing/bilder/ubahn.png">
+							<env:drawcondition>StartSimulationProzess.UBAHN.equals($object.typ)
+							</env:drawcondition>
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="sodekovs/bikesharing/bilder/sbahn.png">
+							<env:drawcondition>StartSimulationProzess.SBAHN.equals($object.typ)
+							</env:drawcondition>
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="sodekovs/bikesharing/bilder/subahn.png">
+							<env:drawcondition>StartSimulationProzess.SUBAHN.equals($object.typ)
+							</env:drawcondition>
+						</env:texturedrectangle>-->
+						<!--<env:ellipse color="green" width="1.0" height="1.0"/> -->
+					<!-- </env:drawable> -->
+
+<!-- 					<env:drawable objecttype="linie" height="1.0" width="1.0">
+						<env:rectangle rotation="winkel" size="laenge" />
+					</env:drawable>
+					<env:drawable objecttype="sbahn" height="0.9" width="0.9">
+						<env:ellipse color="yellow" width="0.9" height="0.9" />
+					</env:drawable>
+					<env:drawable objecttype="verkehrsteilnehmer" height="0.8"
+						width="0.8">
+						<env:ellipse color="red" width="0.8" height="0.8" />
+					</env:drawable>
+					<env:drawable objecttype="fahrradverleihstation"
+						height="0.8" width="0.8">
+						<env:ellipse color="green" width="0.8" height="0.8" />
+					</env:drawable>
+					<env:drawable objecttype="dispositionEngpassagent" height="1.0"
+						width="1.0">
+						<env:ellipse color="blue" width="0.9" height="0.9" />
+					</env:drawable>
+					<env:drawable objecttype="dispositionSchwellwertagent" height="1.0"
+						width="1.0">
+						<env:ellipse color="blue" width="0.9" height="0.9" />
+					</env:drawable>
+					<env:drawable objecttype="dispositionVergangenheitsagent" height="1.0"
+						width="1.0">
+						<env:ellipse color="blue" width="0.9" height="0.9" />
+					</env:drawable> -->
+					<!-- SimInfo -->
+					<env:drawable objecttype="SimInfo" width="1.0"
+						height="1.0">
+						<env:texturedrectangle layer="2" width="15" height="4" imagepath="sodekovs/bikesharing/bilder/WhiteSpace.png"/>						
+						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
+						<env:text layer="2" size="8" font="Arial"
+							abssize="true" text="$text$" align="left" color="black" />							
+							<env:text layer="2" size="8" font="Arial"
+							abssize="true" text="$duration$" align="left" color="black" />
+					</env:drawable>
+					
+					<env:prelayers>
+						<env:tiledlayer width="1" height="1" imagepath="sodekovs/bikesharing/bilder/map.png" />
+					</env:prelayers>
+				</env:perspective>
+			</env:perspectives>
+
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
+
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+	
+	<componenttype name="Pedestrian"
+			filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />
+			
+			<!-- 
+			
+		<componenttype name="Sbahn"
+			filename="sodekovs/bikesharing/standard/VerkehrsmittelAgent.class" />
+		<componenttype name="Verkehrsteilnehmer"
+			filename="sodekovs/bikesharing/verkehrsteilnehmer/Verkehrsteilnehmer.agent.xml" />
+		<componenttype name="ZeitAgent" filename="sodekovs/bikesharing/zeit/ZeitAgent.class" />
+		<componenttype name="EndstationsAgent"
+			filename="sodekovs/bikesharing/standard/EndstationsAgent.class" />
+		<componenttype name="DispositionEngpassagent"
+			filename="sodekovs/bikesharing/disposition/DispositionEngpassAgent.class" />
+		<componenttype name="DispositionSchwellwertagent"
+			filename="sodekovs/bikesharing/disposition/DispositionSchwellwertAgent.class" />
+		<componenttype name="DispositionVergangenheitsagent"
+			filename="sodekovs/bikesharing/disposition/DispositionVergangenheitAgent.class" />
+			<componenttype name="TimeAgent"
+			filename="sodekovs/bikesharing/simulation/manager/TimeAgent.class" />
+			 -->
+	</componenttypes>
+
+	<properties>
+		<property name="clock" class="IFuture">SServiceProvider.getService($component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
+	</properties>
+	
+	<configurations>
+		<configuration name="HamburgStandard">
+			<extension>
+				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
+				 	<env:processes>
+						<env:process type="init">
+							<env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property>
+						</env:process>								
+						<env:process type="manageTimeSlices">
+							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+						</env:process>
+					</env:processes> 
+
+					<env:objects>
+					<!-- 	<env:object type="SimInfo">
+						<env:property name="position">new Vector2Double(2.0, 4.0)</env:property>							
+						</env:object>
+						<env:object type="pedestrian">
+							<env:property name="position">new Vector2Double(0.8, 0.5)</env:property>							
+						</env:object>-->						
+					</env:objects>
+					 
+  					<env:observers> 
+  						<env:observer name="world" dataview="view_all"
+  							perspective="main" /> 
+  					</env:observers> 
+				</env:envspace>
+			</extension>				
+		</configuration>
+		<configuration name="Washington-100">
+			<extension>
+				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
+				 	<env:processes>
+						<env:process type="init">
+							<env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_100.xml"</env:property>
+						</env:process>								
+						<env:process type="manageTimeSlices">
+							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+						</env:process>
+					</env:processes> 
+
+					<env:objects>
+					<!-- 	<env:object type="SimInfo">
+						<env:property name="position">new Vector2Double(2.0, 4.0)</env:property>							
+						</env:object>
+						<env:object type="pedestrian">
+							<env:property name="position">new Vector2Double(0.8, 0.5)</env:property>							
+						</env:object>-->						
+					</env:objects>
+					 
+  					<env:observers> 
+  						<env:observer name="world" dataview="view_all"
+  							perspective="main" /> 
+  					</env:observers> 
+				</env:envspace>
+			</extension>				
+		</configuration>
+	</configurations>
+
+
+</applicationtype>
+
+
