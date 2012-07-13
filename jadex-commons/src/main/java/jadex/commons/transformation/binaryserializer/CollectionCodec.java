@@ -107,7 +107,6 @@ public class CollectionCodec extends AbstractCodec
 		
 		Collection col = (Collection)object;
 
-		traversed.put(object, object);
 		try
 		{
 			for(Iterator<Object> it=col.iterator(); it.hasNext(); )

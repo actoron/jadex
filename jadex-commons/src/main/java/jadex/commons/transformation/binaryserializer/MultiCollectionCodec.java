@@ -41,8 +41,8 @@ public class MultiCollectionCodec extends AbstractCodec
 			else
 			{
 				// use reflection due to subclasses
-				Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
-				ret = (MultiCollection) c.newInstance();
+				Constructor c = clazz.getConstructor(new Class[]{Map.class, Class.class});
+				ret = (MultiCollection)c.newInstance();
 			}
 		}
 		catch (Exception e)
