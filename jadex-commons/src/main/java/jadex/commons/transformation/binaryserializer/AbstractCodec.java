@@ -18,7 +18,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	{
 		EncodingContext ec = (EncodingContext) context;
 		
-		if (canReference(object, clazz, ec))
+		if(canReference(object, clazz, ec))
 			traversed.put(object, traversed.size());
 		
 		object = runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);

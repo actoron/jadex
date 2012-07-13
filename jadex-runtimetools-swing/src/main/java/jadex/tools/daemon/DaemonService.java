@@ -1,60 +1,51 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.IRemoteChangeListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.IMicroExternalAccess;
+import jadex.micro.IPojoMicroAgent;
+
+import java.util.Set;
 
 /**
  *  The daemon service.
  */
-public class DaemonService extends BasicService implements IDaemonService
+@Service
+public class DaemonService implements IDaemonService
 {
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected IMicroExternalAccess agent;
+	@ServiceComponent
+	protected IInternalAccess agent;
 		
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new helpline service.
-	 */
-	public DaemonService(IExternalAccess agent)
-	{
-		super(agent.getServiceProvider().getId(), IDaemonService.class, null);
-		this.agent = (IMicroExternalAccess)agent;
-	}
+	/** The daemon agent. */
+	protected DaemonAgent da;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the daemon agent.
+	 */
+	protected DaemonAgent getDaemonAgent()
+	{
+		if(da==null)
+		{
+			da = (DaemonAgent)((IPojoMicroAgent)agent).getPojoAgent();
+		}
+		return da;
+	}
 	
 	/**
 	 *  Start a platform using a configuration.
 	 *  @param args The arguments.
 	 */
-	public IFuture<Void> startPlatform(final StartOptions opt)
+	public IFuture<IComponentIdentifier> startPlatform(final StartOptions opt)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("startPlatform")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IPlatformController agent = (IPlatformController)ia;
-				agent.startPlatform(opt).addResultListener(new DelegationResultListener(ret));
-				return IFuture.DONE;
-			}
-		});
-		
-		return ret;
+		return getDaemonAgent().startPlatform(opt);
 	}
 	
 	/**
@@ -63,77 +54,33 @@ public class DaemonService extends BasicService implements IDaemonService
 	 */
 	public IFuture<Void> shutdownPlatform(final IComponentIdentifier cid)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("shutdownPlatform")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IPlatformController agent = (IPlatformController)ia;
-				agent.shutdownPlatform(cid).addResultListener(new DelegationResultListener(ret));
-				return IFuture.DONE;
-			}
-		});
-		
-		return ret;
+		return getDaemonAgent().shutdownPlatform(cid);
 	}
 	
 	/**
 	 *  Get the component identifiers of all (managed) platforms.
 	 *  @return Collection of platform ids.
 	 */
-	public IFuture getPlatforms()
+	public IFuture<Set<IComponentIdentifier>>  getPlatforms()
 	{
-		final Future ret = new Future();
-		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("getPlatforms")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IPlatformController agent = (IPlatformController)ia;
-				agent.getPlatforms().addResultListener(new DelegationResultListener(ret));
-				return IFuture.DONE;
-			}
-		});
-		
-		return ret;
+		return getDaemonAgent().getPlatforms();
 	}
 	
 	/**
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(final IRemoteChangeListener listener)
+	public IFuture<Void> addChangeListener(final IRemoteChangeListener<IComponentIdentifier> listener)
 	{
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("addChangeListener")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IPlatformController agent = (IPlatformController)ia;
-				agent.addChangeListener(listener);
-				return IFuture.DONE;
-			}
-		});
+		return getDaemonAgent().addChangeListener(listener);
 	}
 	
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(final IRemoteChangeListener listener)
+	public IFuture<Void> removeChangeListener(final IRemoteChangeListener<IComponentIdentifier> listener)
 	{
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("removeChangeListener")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IPlatformController agent = (IPlatformController)ia;
-				agent.removeChangeListener(listener);
-				return IFuture.DONE;
-			}
-		});
+		return getDaemonAgent().removeChangeListener(listener);
 	}
 }

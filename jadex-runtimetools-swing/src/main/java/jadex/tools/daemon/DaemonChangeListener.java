@@ -1,17 +1,17 @@
-package jadex.tools.daemon.gui;
+package jadex.tools.daemon;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.jtable.ObjectTableModel;
-import jadex.tools.daemon.IDaemonService;
 
 import javax.swing.JTable;
 
 /**
  * 
  */
-public class DaemonChangeListener implements IRemoteChangeListener
+public class DaemonChangeListener implements IRemoteChangeListener<IComponentIdentifier>
 {
 	/** The platform table. */
 	protected JTable platformt;
@@ -27,7 +27,7 @@ public class DaemonChangeListener implements IRemoteChangeListener
 	/**
 	 *  Invoked when a change occurs.
 	 */
-	public IFuture changeOccurred(ChangeEvent event)
+	public IFuture<Void> changeOccurred(ChangeEvent<IComponentIdentifier> event)
 	{
 		if(IDaemonService.ADDED.equals(event.getType()))
 		{

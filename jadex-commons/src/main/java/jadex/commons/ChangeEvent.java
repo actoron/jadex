@@ -3,7 +3,7 @@ package jadex.commons;
 /**
  *  The basic change event.
  */
-public class ChangeEvent <T> //extends EventObject
+public class ChangeEvent<T> //extends EventObject
 {
 	//-------- attributes --------
 	

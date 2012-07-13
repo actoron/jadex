@@ -1,4 +1,4 @@
-package jadex.tools.daemon.gui;
+package jadex.tools.daemon;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;

@@ -1,6 +1,7 @@
-package jadex.tools.daemon.gui;
+package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -10,9 +11,6 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
-import jadex.micro.IMicroExternalAccess;
-import jadex.tools.daemon.IDaemonService;
-import jadex.tools.daemon.StartOptions;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -35,7 +33,7 @@ public class DaemonPanel extends JPanel
 	//-------- attributes --------
 	
 	/** The external access of the agent. */
-	protected IMicroExternalAccess agent;
+	protected IExternalAccess agent;
 	
 	/** The change listener. */
 	protected DaemonChangeListener listener;
@@ -45,7 +43,7 @@ public class DaemonPanel extends JPanel
 	/**
 	 *  Create a new gui.
 	 */
-	public DaemonPanel(final IMicroExternalAccess agent)
+	public DaemonPanel(final IExternalAccess agent)
 	{
 		this.agent = agent;
 		
@@ -68,9 +66,9 @@ public class DaemonPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IDaemonService result)
 					{
 						IDaemonService ds = (IDaemonService)result;
 						StartOptions so = new StartOptions();
@@ -108,9 +106,9 @@ public class DaemonPanel extends JPanel
 		this.listener = new DaemonChangeListener(platformt);
 		
 		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener()
+			.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IDaemonService result)
 			{
 				IDaemonService ds = (IDaemonService)result;
 				ds.addChangeListener(listener);
@@ -126,9 +124,9 @@ public class DaemonPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IDaemonService result)
 					{
 						IDaemonService ds = (IDaemonService)result;
 						int[] rows = (int[])platformt.getSelectedRows();
@@ -184,7 +182,7 @@ public class DaemonPanel extends JPanel
 	/**
 	 *  Create a gui frame.
 	 */
-	public static void createGui(final IMicroExternalAccess agent)
+	public static void createGui(final IExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
 		f.add(new DaemonPanel(agent));
