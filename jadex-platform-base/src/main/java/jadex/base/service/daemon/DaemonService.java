@@ -1,4 +1,4 @@
-package jadex.tools.daemon;
+package jadex.base.service.daemon;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -6,6 +6,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.daemon.IDaemonService;
+import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
@@ -16,7 +18,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
 
 import java.io.File;
 import java.io.FilterOutputStream;
@@ -62,13 +63,13 @@ public class DaemonService implements IDaemonService
 		// DaemonService(getExternalAccess()),
 		// BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 
-		SGUI.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				DaemonPanel.createGui(agent.getExternalAccess());
-			}
-		});
+//		SGUI.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				DaemonPanel.createGui(agent.getExternalAccess());
+//			}
+//		});
 	}
 	
 	/**

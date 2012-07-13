@@ -1,4 +1,4 @@
-package jadex.tools.daemon;
+package jadex.bridge.service.types.daemon;
 
 
 /**

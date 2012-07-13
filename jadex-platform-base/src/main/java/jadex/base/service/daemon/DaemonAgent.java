@@ -1,7 +1,8 @@
-package jadex.tools.daemon;
+package jadex.base.service.daemon;
 
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
  * Daemon agent provides functionalities for managing platforms.
  */
 @Description("This agent offers the daemon service.")
-@GuiClass(DaemonViewerPanel.class)
+@GuiClassName("jadex.tools.daemon.DaemonViewerPanel")
 @RequiredServices(@RequiredService(name = "libservice", type = ILibraryService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)))
 @ProvidedServices(@ProvidedService(type = IDaemonService.class, implementation = @Implementation(DaemonService.class)))
 @Agent
