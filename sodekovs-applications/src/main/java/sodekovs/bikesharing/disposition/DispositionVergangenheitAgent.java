@@ -6,9 +6,9 @@ import jadex.extension.envsupport.math.Vector2Double;
 import java.util.LinkedList;
 import java.util.List;
 
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
+import sodekovs.old.bikesharing.fahrrad.FahrradVerleihStation;
+import sodekovs.old.bikesharing.fahrrad.FahrradVerleihStationen;
+import sodekovs.old.bikesharing.zeit.Zeitverwaltung;
 
 
 public class DispositionVergangenheitAgent extends DispositionsAgent

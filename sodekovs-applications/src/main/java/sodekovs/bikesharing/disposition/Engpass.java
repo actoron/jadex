@@ -1,6 +1,6 @@
 package sodekovs.bikesharing.disposition;
 
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
+import sodekovs.old.bikesharing.fahrrad.FahrradVerleihStation;
 
 public class Engpass
 {

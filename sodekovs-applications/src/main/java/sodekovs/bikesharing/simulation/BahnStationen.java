@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import sodekovs.bikesharing.bahnverwaltung.BahnStation;
-import sodekovs.bikesharing.bahnverwaltung.WegZustand;
-import sodekovs.bikesharing.container.Weg;
+import sodekovs.old.bikesharing.bahnverwaltung.BahnStation;
+import sodekovs.old.bikesharing.bahnverwaltung.WegZustand;
+import sodekovs.old.bikesharing.container.Weg;
 
 
 /**

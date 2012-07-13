@@ -31,8 +31,8 @@ import sodekovs.bikesharing.model.SimulationDescription;
 import sodekovs.bikesharing.model.Station;
 import sodekovs.bikesharing.simulation.Bereich;
 import sodekovs.bikesharing.simulation.Ort;
-import sodekovs.bikesharing.verkehrsteilnehmer.SucheNeuenWegPlan;
-import sodekovs.bikesharing.verkehrsteilnehmer.ZielWaehlPlan;
+import sodekovs.old.bikesharing.verkehrsteilnehmer.SucheNeuenWegPlan;
+import sodekovs.old.bikesharing.verkehrsteilnehmer.ZielWaehlPlan;
 import sodekovs.util.math.GetRandom;
 import sodekovs.util.misc.XMLHandler;
 

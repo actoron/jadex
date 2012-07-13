@@ -1,7 +1,7 @@
 package sodekovs.bikesharing.disposition;
 
 import jadex.extension.envsupport.math.Vector2Double;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
+import sodekovs.old.bikesharing.fahrrad.FahrradVerleihStationen;
 
 public class DispositionEngpassAgent extends DispositionsAgent
 {

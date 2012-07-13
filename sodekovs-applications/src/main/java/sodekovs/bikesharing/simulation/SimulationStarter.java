@@ -2,7 +2,7 @@ package sodekovs.bikesharing.simulation;
 
 import jadex.base.Starter;
 import sodekovs.bikesharing.disposition.DispositionsAgent;
-import sodekovs.bikesharing.verkehrsteilnehmer.FahreRad;
+import sodekovs.old.bikesharing.verkehrsteilnehmer.FahreRad;
 
 /**
  * Startet die Simulation

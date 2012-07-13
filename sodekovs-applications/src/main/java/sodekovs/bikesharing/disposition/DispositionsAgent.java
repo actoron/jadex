@@ -15,10 +15,10 @@ import jadex.micro.MicroAgent;
 import java.util.LinkedList;
 import java.util.List;
 
-import sodekovs.bikesharing.datenkonvertierung.Datensammler;
-import sodekovs.bikesharing.fahrrad.Fahrrad;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
+import sodekovs.old.bikesharing.datenkonvertierung.Datensammler;
+import sodekovs.old.bikesharing.fahrrad.Fahrrad;
+import sodekovs.old.bikesharing.fahrrad.FahrradVerleihStation;
+import sodekovs.old.bikesharing.zeit.Zeitverwaltung;
 
 /**
  * Agent für das Hin- und herfahren von Rädern
