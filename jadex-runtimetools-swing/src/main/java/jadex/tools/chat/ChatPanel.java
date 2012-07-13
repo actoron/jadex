@@ -2220,6 +2220,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					long	sec	= time % 60;
 					ret	= hrs + ":" + (min<10 ? "0"+min : min) + ":" + (sec<10 ? "0"+sec : sec);
 				}
+				else if(files[row].getTimeout()>0)
+				{
+					long	time	= (files[row].getTimeout()-System.currentTimeMillis())/1000;
+					ret	= time>0 ? Long.toString(time) : "0";
+				}
 				else
 				{
 					ret	= "";

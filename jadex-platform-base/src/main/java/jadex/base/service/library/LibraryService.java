@@ -162,7 +162,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<IResourceIdentifier> addResourceIdentifier(IResourceIdentifier rid, final boolean workspace)
 	{
-		System.out.println("add "+rid);
+//		System.out.println("add "+rid);
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
 		getDependencies(rid, workspace).addResultListener(new ExceptionDelegationResultListener
@@ -171,7 +171,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
 			{
 				final IResourceIdentifier rid = result.getFirstEntity();
-				System.out.println("add end "+rid);
+//				System.out.println("add end "+rid);
 				
 				getClassLoader(rid, null, rid, workspace).addResultListener(
 					new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
