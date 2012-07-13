@@ -43,7 +43,7 @@ public class DynamicModelPlan extends Plan
 		IMEConfiguration conf = agent.createConfiguration("default");
 		conf.createInitialPlan("hello");
 			
-		fac.registerAgentModel(agent, "helloagent.agent.xml");
+		fac.registerAgentModel(agent, "helloagent.agent.xml").get(this);
 
 		IComponentManagementService cms	= (IComponentManagementService)getServiceContainer().getRequiredService("cms").get(this);
 

@@ -144,11 +144,15 @@ public class SNonAndroid
 						else
 						// if(addr.isSiteLocalAddress()) or other
 						{
-							// Hack!!! Use sensible default prefix when -1
-							// due to jdk on windows bug
+							// Hack!!! Use sensible default prefix when -1 or 128
+							// due to JDK bug on windows
 							// http://bugs.sun.com/view_bug.do?bug_id=6707289
 							short prefix = ifa.getNetworkPrefixLength();
-							InetAddress ad = SUtil.getNetworkIp(ifa.getAddress(), prefix != -1 ? prefix : 24);
+							if(prefix==-1 || prefix==128 && addr instanceof Inet4Address)
+							{
+								prefix	= 24;
+							}
+							InetAddress ad = SUtil.getNetworkIp(addr, prefix);
 							ret.add(ad);
 						}
 					}
