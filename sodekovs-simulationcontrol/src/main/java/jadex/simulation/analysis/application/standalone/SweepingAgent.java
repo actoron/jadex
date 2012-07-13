@@ -34,9 +34,9 @@ public class SweepingAgent extends MicroAgent
 		AParameterEnsemble ensConf = new AParameterEnsemble("config");
 		
 		AParameterEnsemble ensSol = new AParameterEnsemble("solution");
-		ensSol.addParameter(new ABasicParameter("diffusion-rate", Double.class, 36.0));
-		ensSol.addParameter(new ABasicParameter("evaporation-rate", Double.class, 85.0));
-		ensSol.addParameter(new ABasicParameter("population", Double.class, 10.0));
+		ensSol.addParameter(new ABasicParameter("diffusion-rate", Double.class, 52.0));
+		ensSol.addParameter(new ABasicParameter("evaporation-rate", Double.class, 38.0));
+		ensSol.addParameter(new ABasicParameter("population", Double.class, 1.0));
 		
 		AParameterEnsemble ensRes = new AParameterEnsemble("result");
 		ensRes.addParameter(new ABasicParameter("ticks", Double.class, Double.NaN));
@@ -53,7 +53,7 @@ public class SweepingAgent extends MicroAgent
 		
 		IAExecuteExperimentsService eservice = SServiceProvider.getService(getServiceProvider(), IAExecuteExperimentsService.class).get(new ThreadSuspendable(this));
 		
-		for (int i = 20; i <= 200; i = i+1) {
+		for (int i = 28; i <= 200; i = i+1) {
 			AExperiment exp = (AExperiment) base.clonen(); 
 			exp.getConfigParameter("population").setValue(i);
 			exp = (AExperiment) eservice.executeExperiment(null, exp).get(new ThreadSuspendable(this));

@@ -35,13 +35,6 @@ public class ATask extends AObservable implements IATask
 	}
 
 	@Override
-	public IFuture compensate(BpmnInterpreter instance)
-	{
-		notify(new ATaskEvent(this, null, instance, AConstants.TASK_ABBRUCH));
-		return new Future();
-	}
-
-	@Override
 	public String getID()
 	{
 		return id;
@@ -78,5 +71,11 @@ public class ATask extends AObservable implements IATask
 	public IATaskView getView()
 	{	
 		return view;
+	}
+
+	@Override
+	public IFuture<Void> cancel(BpmnInterpreter instance) {
+		notify(new ATaskEvent(this, null, instance, AConstants.TASK_ABBRUCH));
+		return new Future();
 	}
 }
