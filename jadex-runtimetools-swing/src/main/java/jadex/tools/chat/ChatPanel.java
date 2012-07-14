@@ -39,7 +39,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -56,7 +55,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -112,12 +110,13 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 /**
@@ -391,11 +390,31 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //						this.setCaretPosition(getText().length());
 //					}
 				};
-//				StyledDocument doc = chatarea.getStyledDocument();
+				StyledDocument doc = chatarea.getStyledDocument();
+//				((AbstractDocument)doc).setDocumentFilter(new DocumentFilter()
+//				{
+//					public void insertString(FilterBypass fb, int offset,
+//							String string, AttributeSet attr)
+//							throws BadLocationException
+//					{
+//						super.insertString(fb, offset, string.replaceAll("\n", "\n\r"), attr);
+//					}
+//					public void replace(FilterBypass fb, int offs, int length, String str, AttributeSet a)
+//					        throws BadLocationException
+//					   {
+//					        super.replace(fb, offs, length, str.replaceAll("\n", "\n\r"), a); // works
+//					    }
+//				});
+
+
+//				doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
 //				Style base = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-//				Style st = doc.addStyle("sm", base);
+//				Style style = doc.addStyle("smileys", base);
 //				SimpleAttributeSet as = new SimpleAttributeSet();
-//				StyleConstants.setIcon(as, icon);
+//				for(String sm: smileys)
+//				{
+//					StyleConstants.setIcon(as, icons.get(sm));
+//				}
 				
 //				StyledDocument doc = (StyledDocument) p.getDocument();
 //                String text = doc.getText(0, p.getDocument().getLength());
@@ -1823,9 +1842,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	
 	/**
-	 * 
-	 * @param c
-	 * @param s
+	 *  Append text.
 	 */
 	public static void append(Color c, String s, JTextPane p) 
 	{ 
@@ -1848,6 +1865,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				append(c, next, p);
 			}
 		}
+//		else if(s.startsWith("\r\n"))
+//		{
+//			doAppend(c, "\n\r", p);
+//			if(s.length()>2)
+//			{
+//				String next = s.substring(2, s.length());
+//				append(c, next, p);
+//			}
+//		}
 		else
 		{
 			String next = s.substring(0, 1);
@@ -1868,22 +1894,37 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		p.setEditable(true);
 		
 		SimpleAttributeSet aset = new SimpleAttributeSet();
-	    StyleConstants.setForeground(aset, c);
 	    if(smileys.contains(s))
+	    {
 	    	StyleConstants.setIcon(aset, icons.getIcon(s));
-		
+	    }
+	    else
+	    {
+	    	StyleConstants.setForeground(aset, c);
+	    }
+	    
 		// better implementation--uses
 	    // StyleContext
 //	    StyleContext sc = StyleContext.getDefaultStyleContext();
-//	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
-//	        StyleConstants.Foreground, c);
-//        StyleConstants.setIcon((MutableAttributeSet)aset, getImage());
-
-	    int len = p.getDocument().getLength(); // same value as
-	                       // getText().length();
-	    p.setCaretPosition(len); // place caret at the end (with no selection)
+//	    SimpleAttributeSet aset = new SimpleAttributeSet(sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c));
+//	    if(smileys.contains(s))
+//	    	StyleConstants.setIcon(aset, icons.getIcon(s));
+		
+	    StyledDocument doc = p.getStyledDocument();
+	    aset.addAttribute("dummy", new Integer(doc.getLength()));
+	    
+//	    int len = p.getDocument().getLength(); // same value as// getText().length();
+	    p.setCaretPosition(doc.getLength()); // place caret at the end (with no selection)
 	    p.setCharacterAttributes(aset, false);
 	    p.replaceSelection(s); // there is no selection, so inserts at caret
+//	    try
+//	    {
+//	    	doc.insertString(doc.getLength(), s, aset);
+//	    }
+//	    catch(Exception e)
+//	    {
+//	    	e.printStackTrace();
+//	    }
 	
 	    p.setEditable(false);
 	}
