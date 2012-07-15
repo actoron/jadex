@@ -72,7 +72,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	
 	private CameraNode _camNode;
 
-	// Helper Classes
+	// Helper Classes jop
 	private monkeyApp_Grid	_gridHandler;
 
 	private int				_selectedTarget;
