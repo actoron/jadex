@@ -104,7 +104,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/** Action that renders the frame. */
 	private Runnable						renderFrame;
 
-	private Callable<Object>				renderFrameAction_;
+//	private Callable<Object>				renderFrameAction_;
 
 	private float							_scale			= 1;
 
@@ -158,74 +158,54 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid);
 		AppSettings settings = new AppSettings(true);
 
-
 		_app.setPauseOnLostFocus(false);
 		_app.setSettings(settings);
 		_app.createCanvas();
-		try
-		{
-			Thread.sleep(500);
-		}
-		catch(InterruptedException ex)
-		{
-		}
 		_app.startCanvas();
-		try
-		{
-			Thread.sleep(500);
-		}
-		catch(InterruptedException ex)
-		{
-		}
-
 
 		_context = (JmeCanvasContext)_app.getContext();
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
-
 
 		// Drawstuff
 		_drawObjects = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsRefresh = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsLast = Collections.synchronizedSet(new HashSet<Object>());
 
-		renderFrame = new Runnable()
-		{
-			public void run()
-			{
-				_app.enqueue(renderFrameAction_);
-				rendering = false;
-			}
-		};
+//		renderFrame = new Runnable()
+//		{
+//			public void run()
+//			{
+//				_app.enqueue(renderFrameAction_);
+//				rendering = false;
+//			}
+//		};
 
-		renderFrameAction_ = new Callable<Object>()
-		{
-			public Object call()
-			{
-
-				_geometryNode = updateMonkey(objectList_);
-
-
-				if(_firstrun)
-				{
-					_capabilities = _app.getCaps();
-					System.out.println("capabilities: \n" + _capabilities);
-					_staticNode = createStatics(_staticvisuals);
-					_app.setStaticGeometry(_staticNode);
-					_app.setChannels(_animChannels);
-					_staticNode.setLocalScale(_scale);
-					_geometryNode.setLocalScale(_scale);
-					_firstrun = false;
-				}
-				_app.setGeometry(_geometryNode);
-
-				rendering = false;
-				return null;
-			};
-		};
-
+//		renderFrameAction_ = new Callable<Object>()
+//		{
+//			public Object call()
+//			{
+//				_geometryNode = updateMonkey(objectList_);
+//
+//				if(_firstrun)
+//				{
+//					_capabilities = _app.getCaps();
+//					System.out.println("capabilities: \n" + _capabilities);
+//					_staticNode = createStatics(_staticvisuals);
+//					_app.setStaticGeometry(_staticNode);
+//					_app.setChannels(_animChannels);
+//					_staticNode.setLocalScale(_scale);
+//					_geometryNode.setLocalScale(_scale);
+//					_firstrun = false;
+//				}
+//				_app.setGeometry(_geometryNode);
+//
+//				rendering = false;
+//				
+//				return null;
+//			};
+//		};
 	}
-
 
 	/**
 	 * set the Selected Visual by intId
@@ -251,14 +231,13 @@ public class ViewportJMonkey extends AbstractViewport3d
 		return _marker;
 	}
 
-	public void refresh()
+	public void refresh(List<Object[]>  objectList, Collection<DrawableCombiner3d> staticvisuals)
 	{
 		if(!rendering)
 		{
 			rendering = true;
-			// TODO: fix this
-			// _app.enqueue(renderFrameAction_);
-			EventQueue.invokeLater(renderFrame);
+			_app.enqueue(new MyCallAction(objectList, staticvisuals));
+//			EventQueue.invokeLater(renderFrame);
 		}
 	}
 
@@ -317,9 +296,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * the Static visuals are created here
 	 */
-	private Node createStatics(ArrayList<DrawableCombiner3d> staticvisuals)
+	private Node createStatics(Collection<DrawableCombiner3d> staticvisuals)
 	{
-		for(DrawableCombiner3d combiner3d : _staticvisuals)
+		for(DrawableCombiner3d combiner3d : staticvisuals)
 		{
 			Node objectNode = new Node("one static");
 			Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
@@ -339,36 +318,33 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * the Dynamic Visuals are created and updated here
 	 */
-	private Node updateMonkey(List<Object> objectList)
+	private Node updateMonkey(List<Object[]> objectList)
 	{
-		synchronized(objectList)
+		// Clear the Refresh "listener"
+		// This List hold큦 every object that has been drawn in the last
+		// Draw-"round". The List is necessary to make it possible to check
+		// for Object큦 that has to be removed from the 3d Szene
+		_drawObjectsRefresh = new HashSet<Object>();
+
+		// Step 2 : Create and/or update all visible Visuals
+		createAndUpdateVisuals(objectList);
+
+		// Step 3 : Set and Create the Visualiszation of the Selected Object
+		int selected = getSelected();
+		createAndUpdateVisualSelection(selected);
+
+		// Step 4 : Update deleted Objects (Remove them from gemetryNode)
+		for(Iterator<Object> itr = _drawObjectsLast.iterator(); itr.hasNext();)
 		{
-			// Clear the Refresh "listener"
-			// This List hold큦 every object that has been drawn in the last
-			// Draw-"round". The List is necessary to make it possible to check
-			// for Object큦 that has to be removed from the 3d Szene
-			_drawObjectsRefresh = new HashSet<Object>();
-
-			// Step 2 : Create and/or update all visible Visuals
-			createAndUpdateVisuals(objectList);
-
-			// Step 3 : Set and Create the Visualiszation of the Selected Object
-			int selected = getSelected();
-			createAndUpdateVisualSelection(selected);
-
-			// Step 4 : Update deleted Objects (Remove them from gemetryNode)
-			for(Iterator<Object> itr = _drawObjectsLast.iterator(); itr.hasNext();)
+			Object id = itr.next();
+			if(!_drawObjectsRefresh.contains(id))
 			{
-				Object id = itr.next();
-				if(!_drawObjectsRefresh.contains(id))
-				{
-					_geometryNode.getChild(id.toString()).removeFromParent();
-				}
-
+				_geometryNode.getChild(id.toString()).removeFromParent();
 			}
-			_drawObjectsLast = new HashSet<Object>(_drawObjectsRefresh);
 
 		}
+		_drawObjectsLast = new HashSet<Object>(_drawObjectsRefresh);
+		
 		// Step 5 Return the freshest Version of the geometryNode
 		return _geometryNode;
 
@@ -378,12 +354,11 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * the Visuals for each Object are created and updated here
 	 */
-	private void createAndUpdateVisuals(List<Object> objectList)
+	private void createAndUpdateVisuals(List<Object[]> objectList)
 	{
-		for(Iterator<Object> it = objectList.iterator(); it.hasNext();)
+		for(Iterator<Object[]> it = objectList.iterator(); it.hasNext();)
 		{
-
-			Object[] o = (Object[])it.next();
+			Object[] o = it.next();
 			DrawableCombiner3d combiner3d = (DrawableCombiner3d)o[1];
 			SpaceObject sobj = (SpaceObject)o[0];
 			Object identifier = SObjectInspector.getId(sobj);
@@ -391,7 +366,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 			boolean rotation3d = combiner3d.isRotation3d();
 
 			_drawObjectsRefresh.add(identifier);
-
 
 			// Handle Selection
 			_selectedObj = null;
@@ -666,21 +640,25 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 
+	boolean first = true;
 	public void stopApp()
 	{
-
-		try
+		_app.enqueue(new Callable<Void>()
 		{
-			_app.stop(true);
-		}
-		catch(Exception e)
-		{
-			System.out.println("exception on stop");
-		}
-
-
-		// System.out.println("ViewportJmonkey: STOP STOP STOP");
-
+			public Void call() throws Exception
+			{
+				// todo: do not call multiple times!
+				
+				if(!first)
+					return null;
+				if(first)
+					first = false;
+				
+				_app.stop(false);
+				System.out.println("ViewportJmonkey: STOP STOP STOP");
+				return null;
+			}
+		});
 	}
 
 
@@ -726,5 +704,38 @@ public class ViewportJMonkey extends AbstractViewport3d
 		this._animChannels = _animChannels;
 	}
 
+	public class MyCallAction implements Callable<Void>
+	{
+		List<Object[]>  objectList;
+		Collection<DrawableCombiner3d> staticvisuals;
+		
+		public MyCallAction(List<Object[]>  objectList, Collection<DrawableCombiner3d> staticvisuals)
+		{
+			this.objectList = objectList;
+			this.staticvisuals = staticvisuals;
+		}
+		
+		public Void call()
+		{
+			_geometryNode = updateMonkey(objectList);
+
+			if(_firstrun)
+			{
+				_capabilities = _app.getCaps();
+				System.out.println("capabilities: \n" + _capabilities);
+				_staticNode = createStatics(staticvisuals);
+				_app.setStaticGeometry(_staticNode);
+				_app.setChannels(_animChannels);
+				_staticNode.setLocalScale(_scale);
+				_geometryNode.setLocalScale(_scale);
+				_firstrun = false;
+			}
+			_app.setGeometry(_geometryNode);
+
+			rendering = false;
+			
+			return null;
+		}
+	}
 
 }

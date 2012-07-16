@@ -58,6 +58,7 @@
 
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:property name="targetradius" class="double">0.05</env:property>
+			<env:property name="border">Space2D.BORDER_STRICT</env:property>
 		
 			<env:objecttypes>
 				<env:objecttype name="target">

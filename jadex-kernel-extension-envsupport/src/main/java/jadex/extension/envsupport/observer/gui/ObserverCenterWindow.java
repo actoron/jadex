@@ -5,7 +5,15 @@ import jadex.commons.gui.SGUI;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,26 +32,25 @@ import javax.swing.JToolBar;
 public class ObserverCenterWindow extends JFrame
 {
 	
-	/** The menubar
-	 */
+	/** The menubar. */
 	private JMenuBar menubar;
 	
-	/** The toolbar
-	 */
+	/** The toolbar. */
 	private JToolBar toolbar;
 	
-	/** The main pane.
-	 */
-	private JSplitPane mainpane;
+	/** The main pane. */
+	protected JPanel mainpanel;
 	
-	/** Known plugin views
-	 */
+	/** The split pane. */
+	private JSplitPane splitpane;
+	
+	/** Known plugin views. */
 	protected Set knownpluginviews;
 	
 	protected boolean disposed;
 	
-	/** Creates the main window.
-	 * 
+	/** 
+	 *  Creates the main window.
 	 *  @param title title of the window
 	 *  @param simView view of the simulation
 	 */
@@ -63,31 +70,72 @@ public class ObserverCenterWindow extends JFrame
 	//				menubar.add(new JMenu("Test"));
 					setJMenuBar(menubar);
 	
+					mainpanel = new JPanel(new BorderLayout());
+					
 					toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-					getContentPane().add(toolbar, BorderLayout.NORTH);
+					mainpanel.add(toolbar, BorderLayout.NORTH);
 	
-					mainpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-					mainpane.setOneTouchExpandable(true);
-					getContentPane().add(mainpane, BorderLayout.CENTER);
+					splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+					splitpane.setOneTouchExpandable(true);
 	
 					JPanel pluginpanel = new JPanel(new CardLayout());
-					mainpane.setLeftComponent(pluginpanel);
+					splitpane.setLeftComponent(pluginpanel);
 					
 					JPanel perspectivepanel = new JPanel(new CardLayout());
-					mainpane.setRightComponent(perspectivepanel);
-	
+					splitpane.setRightComponent(perspectivepanel);
+					
+					mainpanel.add(splitpane, BorderLayout.CENTER);
+					getContentPane().add(mainpanel, BorderLayout.CENTER);
+					
 					setResizable(true);
 					setBackground(null);
 					pack();
 					setSize(800, 600);
 					setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 					setVisible(true);
-					mainpane.setDividerLocation(250);
+					splitpane.setDividerLocation(250);
+					
+//					addMouseListener(new MouseAdapter()
+//					{
+//						public void mouseClicked(MouseEvent e)
+//						{
+//							System.out.println("mouse: "+e);
+//    						
+//    						menubar.setVisible(false);
+//    						splitpane.setVisible(false);
+//    						toolbar.setVisible(false);
+//    						mainpanel.remove(splitpane);
+////    						mainpanel.remove(toolbar);
+//    						Component right = splitpane.getRightComponent();
+//    						splitpane.remove(right);
+//    						
+//    						mainpanel.add(right, BorderLayout.CENTER);
+//    						
+////    						dispose();
+////    						setUndecorated(true);
+////    						setVisible(true);
+//    						
+//    						setLocation(0,0);
+//    						setSize(Toolkit.getDefaultToolkit().getScreenSize());
+//						}
+//					});
+					
+//					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+//			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
+//	        		{
+//	        			public boolean dispatchKeyEvent(KeyEvent e)
+//	        			{
+//	        				if(e.getID() == KeyEvent.KEY_PRESSED)
+//	        				{
+//	        				}
+//	        				return false;
+//	        			}
+//	        		});
 				}
 			}
 		};
 		
-		if (EventQueue.isDispatchThread())
+		if(EventQueue.isDispatchThread())
 		{
 			runnable.run();
 		}
@@ -163,10 +211,10 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void setPluginView(String pluginname, Component view)
 	{
-		JPanel pluginpanel = (JPanel) mainpane.getLeftComponent();
+		JPanel pluginpanel = (JPanel) splitpane.getLeftComponent();
 		CardLayout cl = (CardLayout)(pluginpanel.getLayout());
 		
-		if (!knownpluginviews.contains(pluginname))
+		if(!knownpluginviews.contains(pluginname))
 		{
 			knownpluginviews.add(pluginname);
 			pluginpanel.add(view, pluginname);
@@ -181,8 +229,9 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void setPerspectiveView(Component view)
 	{
-		int loc = mainpane.getDividerLocation();
-		mainpane.setRightComponent(view);
-		mainpane.setDividerLocation(loc);
+		int loc = splitpane.getDividerLocation();
+		splitpane.setRightComponent(view);
+		splitpane.setDividerLocation(loc);
 	}
+	
 }

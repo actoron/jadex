@@ -36,8 +36,8 @@ public abstract class AbstractViewport3d implements IViewport3d
 	/** Real size of the viewport including padding. */
 	protected Vector2Double		paddedSize_;
 
-	/** Visuals that are handled as static´s */
-	protected ArrayList<DrawableCombiner3d> _staticvisuals = new ArrayList<DrawableCombiner3d>();
+//	/** Visuals that are handled as static´s */
+//	protected ArrayList<DrawableCombiner3d> _staticvisuals = new ArrayList<DrawableCombiner3d>();
 	
 	/** Known drawable Objects. */
 	protected Set<Object>				drawObjects_;
@@ -49,7 +49,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 	protected IVector2			pixPosition_;
 
 	/** List of objects that should be drawn. */
-	protected List<Object>				objectList_;
+//	protected List<Object>				objectList_;
 	
 	/** IPropertyObject holding properties for layers. */
 	protected IPerspective perspective;
@@ -77,41 +77,35 @@ public abstract class AbstractViewport3d implements IViewport3d
 		preserveAR_ = true;
 		areaSize_ = areasize;
 		paddedSize_ = new Vector2Double(1.0);
-		drawObjects_ = Collections.synchronizedSet(new HashSet<Object>());
-		objectList_ = Collections.synchronizedList(new ArrayList<Object>());
-		listeners_ = Collections.synchronizedSet(new HashSet<Object>());
+		drawObjects_ = new HashSet<Object>();
+//		objectList_ = new ArrayList<Object>();
+		listeners_ = new HashSet<Object>();
 		zoomLimit_ = 20.0;
 	}
 	
-	/**
-	 * Sets the current objects to draw.
-	 * 
-	 * @param objectList objects that should be drawn
-	 * 
-	 */
-	//TODO: no Array of Objects someday
-	public void setObjectList(List<Object[]> objectList)
-	{
-		synchronized(objectList_)
-		{
-			objectList_.clear();
-			objectList_.addAll(objectList);
-		}
-	}
-	
-	/**
-	 * Sets the current staticobjects to draw.
-	 * 
-	 * @param staticvisuals staticobjects that should be drawn
-	 */
-	public void setStaticList(Collection<DrawableCombiner3d> staticvisuals)
-	{
-		synchronized(_staticvisuals)
-		{
-			_staticvisuals.clear();
-			_staticvisuals.addAll(staticvisuals);
-		}
-	}
+//	/**
+//	 * Sets the current objects to draw.
+//	 * 
+//	 * @param objectList objects that should be drawn
+//	 * 
+//	 */
+//	//TODO: no Array of Objects someday
+//	public void setObjectList(List<Object[]> objectList)
+//	{
+//		objectList_.clear();
+//		objectList_.addAll(objectList);
+//	}
+//	
+//	/**
+//	 * Sets the current staticobjects to draw.
+//	 * 
+//	 * @param staticvisuals staticobjects that should be drawn
+//	 */
+//	public void setStaticList(Collection<DrawableCombiner3d> staticvisuals)
+//	{
+//		_staticvisuals.clear();
+//		_staticvisuals.addAll(staticvisuals);
+//	}
 	
 
 	/**

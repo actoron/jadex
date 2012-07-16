@@ -168,7 +168,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	/** Custom Keybinding: Map named actions to inputs. */
 	private void initKeys()
 	{
-
+		
+		
 		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 		// You can map one or several inputs to one named action
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
@@ -290,7 +291,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		 
 		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
 		_chaseCam.setSmoothMotion(true);
-		_chaseCam.setDefaultDistance(100f);
+		_chaseCam.setDefaultDistance(500f);
 		_chaseCam.setEnabled(false);
 
 		/** Configure cam to look at scene */

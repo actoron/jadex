@@ -220,33 +220,32 @@ public class ObserverCenter
 				});
 				plugintimer.start();
 								
-				//TODO: find a better solution for closing app큦 in the Background
-				mainwindow.addWindowListener(new WindowAdapter() {
-		            
-		            public void windowClosing(WindowEvent e) {
-//						System.out.println("window closing!");
-						IPerspective p = getSelectedPerspective();
-						if (p instanceof Perspective3D)
-						{
-
-							((Perspective3D) p).getViewport().stopApp();
-							perspectives.remove(p);
-						}
-						
-						// Close all the App큦 in the Background
-						Set<String> keys = perspectives.keySet();
-						
-						for(String key : keys)
-						{
-							IPerspective pp = perspectives.get(key);
-							if (pp instanceof Perspective3D)
-							{
-								((Perspective3D) pp).getViewport().stopApp();
-							}
-							
-						}
-		            }
-		        });
+//				//TODO: find a better solution for closing app큦 in the Background
+//				mainwindow.addWindowListener(new WindowAdapter() {
+//		            
+//		            public void windowClosing(WindowEvent e) {
+////						System.out.println("window closing!");
+//						IPerspective p = getSelectedPerspective();
+//						if(p instanceof Perspective3D)
+//						{
+//							((Perspective3D) p).getViewport().stopApp();
+//							perspectives.remove(p);
+//						}
+//						
+//						// Close all the App큦 in the Background
+//						Set<String> keys = perspectives.keySet();
+//						
+//						for(String key : keys)
+//						{
+//							IPerspective pp = perspectives.get(key);
+//							if (pp instanceof Perspective3D)
+//							{
+//								((Perspective3D) pp).getViewport().stopApp();
+//							}
+//							
+//						}
+//		            }
+//		        });
 				mainwindow.addWindowListener(new ObserverWindowController());
 				
 				mainwindow.addWindowStateListener(new WindowStateListener()

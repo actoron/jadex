@@ -49,6 +49,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	
 	/** KD-Trees. */
 	protected Map<String, KdTree> kdTrees;	
+	
 	//-------- constructors --------
 	
 	/**

@@ -41,9 +41,10 @@ public class RotationTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
+		double	speed	= ((Number)obj.getProperty(MoveTask.PROPERTY_SPEED)).doubleValue();
+		
 		IVector2 destination = (IVector2)getProperty(MoveTask.PROPERTY_DESTINATION);
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		
 		IVector2 rot = (IVector2)obj.getProperty(PROPERTY_ROTATION);
 		
 		if(rot==null)
@@ -65,7 +66,11 @@ public class RotationTask extends AbstractTask
 				
 				double x = Math.cos(rangle);
 				double y = Math.sin(rangle);
-				obj.setProperty(PROPERTY_ROTATION, new Vector2Double(x,y));
+				IVector2 newdir = new Vector2Double(x,y);
+				obj.setProperty(PROPERTY_ROTATION, newdir);
+				
+				IVector2 newloc	= newdir.copy().normalize().multiply(speed*0.05).add(loc);
+				((Space2D)space).setPosition(obj.getId(), newloc);
 			}
 			else
 			{

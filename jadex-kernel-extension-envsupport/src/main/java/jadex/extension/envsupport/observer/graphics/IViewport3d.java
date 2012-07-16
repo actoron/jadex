@@ -31,18 +31,18 @@ public interface IViewport3d
 	 */
 	public Canvas getCanvas();
 	
-	/**
-	 * Sets the current objects to draw.
-	 * 
-	 * @param objectList objects that should be drawn
-	 */
-	public void setObjectList(List<Object[]>  objectList);
+//	/**
+//	 * Sets the current objects to draw.
+//	 * 
+//	 * @param objectList objects that should be drawn
+//	 */
+//	public void setObjectList(List<Object[]>  objectList);
 	
 	
 	/**
 	 * Refreshes the viewport.
 	 */
-	public void refresh();
+	public void refresh(List<Object[]>  objectList, Collection<DrawableCombiner3d> staticvisuals);
 	
 	
 	/**
@@ -83,12 +83,12 @@ public interface IViewport3d
 	 */
 	public void setAreaSize(IVector3 vector);
 
-	/** 
-	 * Visuals that are handled as static´s
-	 * 
-	 * @param staticvisuals the Visuals
-	 */
-	public void setStaticList(Collection<DrawableCombiner3d> staticvisuals);
+//	/** 
+//	 * Visuals that are handled as static´s
+//	 * 
+//	 * @param staticvisuals the Visuals
+//	 */
+//	public void setStaticList(Collection<DrawableCombiner3d> staticvisuals);
 
 	public void isGridSpace(boolean isGrid);
 	

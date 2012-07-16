@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.SwingUtilities;
+
 
 /**
  * Perspective for viewing in 3D.
@@ -87,7 +89,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	protected SimpleValueFetcher				fetcher;
 
 	/** Flag to indicate that rendering has been called but not yet started. */
-	private boolean								rendering;
+//	private boolean								rendering;
 
 	private Primitive3d							_markerPrimitive;
 
@@ -340,89 +342,80 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	 */
 	public void refresh()
 	{
-		if(viewport3d!=null && !rendering)
+		assert SwingUtilities.isEventDispatchThread();
+		
+		if(viewport3d!=null)
 		{
-			rendering = true;
-			EventQueue.invokeLater(new Runnable()
+			IDataView dataview = obscenter.getSelectedDataView();
+			if(dataview == null)
 			{
-				public void run()
+				return;
+			}
+
+			Object[] objects = dataview.getObjects();
+
+			if(firsttime)
+			{
+				Collection<Object> tmp = Collections.synchronizedList(new ArrayList<Object>());
+
+				tmp = (Collection<Object>)visuals.values();
+
+				for(Object ob : tmp)
 				{
-					rendering = false;
-
-					IDataView dataview = obscenter.getSelectedDataView();
-					if(dataview == null)
+					if(ob instanceof DrawableCombiner3d)
 					{
-						return;
-					}
-
-					Object[] objects = dataview.getObjects();
-
-					if(firsttime)
-					{
-						Collection<Object> tmp = Collections.synchronizedList(new ArrayList<Object>());
-
-						tmp = (Collection<Object>)visuals.values();
-
-						for(Object ob : tmp)
+						DrawableCombiner3d combi = (DrawableCombiner3d)ob;
+						if(!combi.hasSpaceobject())
 						{
-							if(ob instanceof DrawableCombiner3d)
-							{
-								DrawableCombiner3d combi = (DrawableCombiner3d)ob;
-								if(!combi.hasSpaceobject())
-								{
-									staticvisuals.add(combi);
-								}
-							}
-
+							staticvisuals.add(combi);
 						}
-//						System.out.println("staticvisuals after: " + staticvisuals.size() + " " + staticvisuals.toString());
-					}
-					firsttime = false;
-
-
-					List<Object[]> objectList = null;
-
-
-					objectList = new ArrayList<Object[]>(objects.length + 1);
-					for(int j = 0; j < objects.length; ++j)
-					{
-						Object obj = objects[j];
-
-
-						DrawableCombiner3d d = (DrawableCombiner3d)visuals.get(SObjectInspector.getType(obj));
-
-						if(d == null)
-						{
-							continue;
-						}
-
-						Object[] viewObj = new Object[2];
-						viewObj[0] = obj;
-						viewObj[1] = d;
-						objectList.add(viewObj);
 					}
 
-					// SELECTION
-
-					if(selectedobject != null)
-					{
-						int selected = ((Long)((SpaceObject)selectedobject).getId()).intValue();
-						DrawableCombiner3d dc = (DrawableCombiner3d)visuals.get(SObjectInspector.getType(selectedobject));
-						IVector3 size = (IVector3)dc.getBoundValue(selectedobject, dc.getSize(), viewport3d);
-
-						marker.setSize((IVector3)size);
-						viewport3d.setSelected(selected, marker);
-					}
-					else
-					{
-						viewport3d.setSelected(-1, marker);
-					}
-
-					viewport3d.setObjectList(objectList);
-					viewport3d.setStaticList(staticvisuals);
-					viewport3d.refresh();
 				}
-			});
+//				System.out.println("staticvisuals after: " + staticvisuals.size() + " " + staticvisuals.toString());
+			}
+			firsttime = false;
+
+			List<Object[]> objectList = null;
+
+			objectList = new ArrayList<Object[]>(objects.length + 1);
+			for(int j = 0; j < objects.length; ++j)
+			{
+				Object obj = objects[j];
+
+
+				DrawableCombiner3d d = (DrawableCombiner3d)visuals.get(SObjectInspector.getType(obj));
+
+				if(d == null)
+				{
+					continue;
+				}
+
+				Object[] viewObj = new Object[2];
+				viewObj[0] = obj;
+				viewObj[1] = d;
+				objectList.add(viewObj);
+			}
+
+			// SELECTION
+
+			if(selectedobject != null)
+			{
+				int selected = ((Long)((SpaceObject)selectedobject).getId()).intValue();
+				DrawableCombiner3d dc = (DrawableCombiner3d)visuals.get(SObjectInspector.getType(selectedobject));
+				IVector3 size = (IVector3)dc.getBoundValue(selectedobject, dc.getSize(), viewport3d);
+
+				marker.setSize((IVector3)size);
+				viewport3d.setSelected(selected, marker);
+			}
+			else
+			{
+				viewport3d.setSelected(-1, marker);
+			}
+
+//			viewport3d.setObjectList(objectList);
+//			viewport3d.setStaticList(staticvisuals);
+			viewport3d.refresh(objectList, staticvisuals);
 		}
 	}
 
