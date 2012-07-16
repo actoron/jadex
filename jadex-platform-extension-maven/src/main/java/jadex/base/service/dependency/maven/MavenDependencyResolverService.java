@@ -62,6 +62,8 @@ import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResult;
+import org.sonatype.aether.resolution.VersionRequest;
+import org.sonatype.aether.resolution.VersionResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 /**
@@ -207,6 +209,16 @@ public class MavenDependencyResolverService	implements IDependencyService
 		repo.setSnapshots(snapshots);
 		repositories.add(SMaven.convertRepository(repo));
 		
+		Repository	repo2	= new Repository();
+		repo2.setId("Snapshots");
+		repo2.setName("Maven Repository Snapshots");
+		repo2.setLayout("default");
+		repo2.setUrl("http://oss.sonatype.org/content/repositories/snapshots/");
+		RepositoryPolicy	snapshots2	= new RepositoryPolicy();
+		snapshots2.setEnabled(true);
+		repo2.setSnapshots(snapshots2);
+		repositories.add(SMaven.convertRepository(repo2));
+		
 		// Setup session.
         this.session	= new MavenRepositorySystemSession();
         LocalRepository	localRepo	= new LocalRepository(local);
@@ -258,7 +270,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		{
 			Model	model	= loadPom(pom);
 			String id = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
-			gid = new GlobalResourceIdentifier(id, null); // todo: repo url
+			gid = new GlobalResourceIdentifier(id, null, null); // todo: repo url
 		}
 		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
 		logger.info("Resource identifier for "+url+" is: "+rid);
@@ -302,9 +314,11 @@ public class MavenDependencyResolverService	implements IDependencyService
 							session.setWorkspaceReader(new MavenWorkspaceReader(model, this));
 							ArtifactRequest	ar	= new ArtifactRequest(SMaven.convertDependency(deps.get(i)), repositories, null);
 							ArtifactResult res = system.resolveArtifact(session, ar);
+//							VersionRequest vr = new VersionRequest(res.getArtifact(), repositories, null);
+//							VersionResult vres = system.resolveVersion(session, vr);
 							Artifact	art	= res.getArtifact();
 							String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
-							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null); // repo url?
+							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null, art.getVersion()); // repo url?
 							ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())), gid);
 							deprids.add(deprid);
 							ret = loadDependencies(deprid, rids, workspace);
@@ -324,7 +338,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 					{
 						Artifact	art	= SMaven.convertDependency(deps.get(i));
 						String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
-						IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null); // todo: repo url
+						IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null, null); // todo: repo url
 						IResourceIdentifier	deprid	= new ResourceIdentifier(null, gid);	
 						deprid	= loadDependenciesWithAether(deprid, rids);
 						ret = deprid;
@@ -365,8 +379,14 @@ public class MavenDependencyResolverService	implements IDependencyService
 		CollectRequest	crequest	= new CollectRequest(new Dependency(art, null), repositories);
 		DependencyRequest	request	= new DependencyRequest(crequest, null);
 		DependencyResult result = system.resolveDependencies(session, request);
-		File	file	= result.getRoot().getDependency().getArtifact().getFile();
-		rid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(file)), rid.getGlobalIdentifier());
+		
+		ArtifactResult ares = system.resolveArtifact(session, new ArtifactRequest(result.getRoot()));
+		VersionRequest vr = new VersionRequest(ares.getArtifact(), repositories, null);
+		VersionResult vres = system.resolveVersion(session, vr);
+		
+		IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(rid.getGlobalIdentifier().getResourceId(), rid.getGlobalIdentifier().getRepositoryInfo(), vres.getVersion());
+		File file = result.getRoot().getDependency().getArtifact().getFile();
+		rid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(file)), gid);
 		processAetherDependencies(rid, rids, result.getRoot());
 		return rid;
 	}
@@ -394,7 +414,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			{
 				repourl = new URL(repos.get(0).getUrl());
 			}
-			IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, repourl); 
+			IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, repourl, null); 
 			ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())), gid);
 			processAetherDependencies(deprid, rids, depnode);
 			deps.add(deprid);

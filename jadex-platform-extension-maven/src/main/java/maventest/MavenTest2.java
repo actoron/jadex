@@ -53,7 +53,7 @@ public class MavenTest2
 			try
 			{
 				System.out.println("\nDependencies for: "+gids[i]);
-				IResourceIdentifier	rid	= new ResourceIdentifier(null, new GlobalResourceIdentifier(gids[i], null));
+				IResourceIdentifier	rid	= new ResourceIdentifier(null, new GlobalResourceIdentifier(gids[i], null, null));
 				Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>	dependencies	= mh.loadDependencies(rid, true).get(null);
 				printDependencies(rid, dependencies.getSecondEntity(), 0, new ArrayList<Boolean>());
 			}

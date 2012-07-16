@@ -26,4 +26,12 @@ public interface IGlobalResourceIdentifier
 	 */
 	public URL getRepositoryInfo();
 	
+	/**
+	 *  Get the version info. Important in case
+	 *  of snapshot versions, here the concrete
+	 *  timestamp of the version is included.
+	 *  @return The version info.
+	 */
+	public String getVersionInfo();
+	
 }

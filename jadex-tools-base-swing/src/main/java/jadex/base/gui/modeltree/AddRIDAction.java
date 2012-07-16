@@ -101,8 +101,9 @@ public class AddRIDAction extends ToolTipAction
 							String arid = (String)o.getClass().getField("artifactId").get(o);
 							String ver = (String)o.getClass().getField("version").get(o);
 							String url = (String)o.getClass().getField("remoteUrl").get(o);
+							Long lmod = (Long)o.getClass().getField("lastModified").get(o);
 							String id = grid+":"+arid+":"+ver;
-							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, new URL(url));
+							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, new URL(url), lmod!=null? lmod.toString(): null);
 							System.out.println("adding: "+gid);
 			
 			//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1-SNAPSHOT";

@@ -21,6 +21,9 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	/** The URL. */
 	protected URL url;
 	
+	/** The version info. */
+	protected String versioninfo;
+	
 	//-------- constructors --------
 
 	/**
@@ -36,13 +39,14 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	 *  @param cid The platform identifier.
 	 *  @param url The local URL.
 	 */
-	public GlobalResourceIdentifier(String id, URL url)
+	public GlobalResourceIdentifier(String id, URL url, String versioninfo)
 	{
 		if(id==null)
 			throw new IllegalArgumentException("Id must not null.");
 		
 		this.id = id;
 		this.url = url;
+		this.versioninfo = versioninfo;
 	}
 	
 	//-------- methods --------
@@ -86,6 +90,25 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 	}
 	
 	/**
+	 *  Get the version info. Important in case
+	 *  of snapshot versions, here the concrete
+	 *  timestamp of the version is included.
+	 *  @return The version info.
+	 */
+	public String getVersionInfo()
+	{
+		return versioninfo;
+	}
+	
+	/**
+	 *  Set the version info.
+	 */
+	public void setVersionInfo(String versioninfo)
+	{
+		this.versioninfo = versioninfo;
+	}
+	
+	/**
 	 *  Get the hashcode.
 	 */
 	public int hashCode()
@@ -95,7 +118,6 @@ public class GlobalResourceIdentifier implements IGlobalResourceIdentifier
 
 	/**
 	 *  Test if equals.
-
 	 */
 	public boolean equals(Object obj)
 	{

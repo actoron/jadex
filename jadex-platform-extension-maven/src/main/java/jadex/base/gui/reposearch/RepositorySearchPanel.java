@@ -790,28 +790,32 @@ public class RepositorySearchPanel extends JPanel
 	public ArtifactInfo getSelectedArtifactInfo()
 	{
 		ArtifactInfo ret = null;
-		String grid = tfgi.getText();
-		String arid = tfai.getText();
-		String ver = tfv.getText();
 		
-		if(grid!=null && grid.length()>0 && arid!=null && arid.length()>0)
+		TreePath sel = tree.getSelectionPath();
+		if(sel!=null)
 		{
-			ret = new ArtifactInfo();
-			ret.groupId = grid;
-			ret.artifactId = arid;
-			ret.version = ver;
-			ret.remoteUrl = ((RepositoryInfo)cbrepos.getSelectedItem()).getUrl();
-		}
-		else
-		{
-			TreePath sel = tree.getSelectionPath();
-			if(sel!=null)
+			IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
+//			System.out.println("selected: "+node.getArtifactInfo());
+			ret = node.getArtifactInfo();
+			
+			String grid = tfgi.getText();
+			String arid = tfai.getText();
+			String ver = tfv.getText();
+			
+			if(!SUtil.equals(grid, ret.groupId) || !SUtil.equals(arid, ret.artifactId) || !SUtil.equals(ver, ret.version))
 			{
-				IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
-	//			System.out.println("selected: "+node.getArtifactInfo());
-				ret = node.getArtifactInfo();
+				if(grid!=null && grid.length()>0 && arid!=null && arid.length()>0)
+				{
+					ret = new ArtifactInfo();
+					ret.groupId = grid;
+					ret.artifactId = arid;
+					ret.version = ver;
+					ret.remoteUrl = ((RepositoryInfo)cbrepos.getSelectedItem()).getUrl();
+				}
 			}
+			
 		}
+		
 		return ret;
 	}
 	
