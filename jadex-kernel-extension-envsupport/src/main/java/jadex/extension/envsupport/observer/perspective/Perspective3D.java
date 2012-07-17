@@ -510,13 +510,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 
 	}
 
-	@Override
-	public void shutdown()
-	{
-		if(viewport3d!=null)
-			viewport3d.stopApp();
-	}
-
 	/**
 	 * @return the wireframe
 	 */

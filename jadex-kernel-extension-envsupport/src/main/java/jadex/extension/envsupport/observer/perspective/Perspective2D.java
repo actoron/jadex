@@ -788,11 +788,4 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 			}
 		}
 	}
-
-	@Override
-	public void shutdown()
-	{
-		// TODO Auto-generated method stub
-		
-	}
 }

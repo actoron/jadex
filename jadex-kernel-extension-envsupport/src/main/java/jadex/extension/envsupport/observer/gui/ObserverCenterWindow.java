@@ -51,6 +51,8 @@ public class ObserverCenterWindow extends JFrame
 	
 	protected boolean disposed;
 	
+	protected boolean fullscreen = false;
+	
 	protected Dimension olddim;
 	protected Point oldpos;
 	protected Component oldcomp;
@@ -102,6 +104,7 @@ public class ObserverCenterWindow extends JFrame
 					setVisible(true);
 					splitpane.setDividerLocation(250);
 					
+					
 					addMouseListener(new MouseAdapter()
 					{
 
@@ -112,11 +115,12 @@ public class ObserverCenterWindow extends JFrame
 						}
 						public void mousePressed(MouseEvent e) {
 							
-							makeFullscreen();
-							System.out.println("mousefullscreen");
+//							makeFullscreen();
+							
 						}
 					});
-					
+
+
 					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
 	        		{
@@ -158,6 +162,7 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void makeFullscreen()
 	{
+		
 		boolean fs = oldcomp==null;
 		
 		menubar.setVisible(!fs);
@@ -165,6 +170,8 @@ public class ObserverCenterWindow extends JFrame
 		toolbar.setVisible(!fs);
 //		mainpanel.remove(splitpane);
 //		mainpanel.remove(toolbar);
+		
+		
 		
 		WindowListener[] wls = getWindowListeners();
 		for(WindowListener wl: wls)
@@ -211,16 +218,28 @@ public class ObserverCenterWindow extends JFrame
 		{
 			addWindowListener(wl);
 		}
+		
+		
 	}
-	
 	/**
 	 *  Dispose the frame.
 	 */
 	public void dispose()
 	{
 		disposed	= true;
+		this.dispose(false);
+	}
+	
+	/**
+	 *  Dispose the frame for Fullscreen
+	 */
+	public void dispose(boolean fullscreen)
+	{
+		disposed	= true;
 		super.dispose();
 	}
+	
+
 	
 	/** 
 	 *  Adds a menu
@@ -293,6 +312,20 @@ public class ObserverCenterWindow extends JFrame
 		int loc = splitpane.getDividerLocation();
 		splitpane.setRightComponent(view);
 		splitpane.setDividerLocation(loc);
+	}
+
+	/**
+	 * @return the fullscreen
+	 */
+	public boolean isFullscreen() {
+		return fullscreen;
+	}
+
+	/**
+	 * @param fullscreen the fullscreen to set
+	 */
+	public void setFullscreen(boolean fullscreen) {
+		this.fullscreen = fullscreen;
 	}
 	
 }

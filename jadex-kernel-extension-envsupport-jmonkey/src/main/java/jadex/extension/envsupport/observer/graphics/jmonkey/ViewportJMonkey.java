@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.naming.Context;
+
 import com.jme3.animation.AnimChannel;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
@@ -157,7 +159,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid);
 		AppSettings settings = new AppSettings(true);
-
 		_app.setPauseOnLostFocus(false);
 		_app.setSettings(settings);
 		_app.createCanvas();
@@ -172,39 +173,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_drawObjectsRefresh = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsLast = Collections.synchronizedSet(new HashSet<Object>());
 
-//		renderFrame = new Runnable()
-//		{
-//			public void run()
-//			{
-//				_app.enqueue(renderFrameAction_);
-//				rendering = false;
-//			}
-//		};
 
-//		renderFrameAction_ = new Callable<Object>()
-//		{
-//			public Object call()
-//			{
-//				_geometryNode = updateMonkey(objectList_);
-//
-//				if(_firstrun)
-//				{
-//					_capabilities = _app.getCaps();
-//					System.out.println("capabilities: \n" + _capabilities);
-//					_staticNode = createStatics(_staticvisuals);
-//					_app.setStaticGeometry(_staticNode);
-//					_app.setChannels(_animChannels);
-//					_staticNode.setLocalScale(_scale);
-//					_geometryNode.setLocalScale(_scale);
-//					_firstrun = false;
-//				}
-//				_app.setGeometry(_geometryNode);
-//
-//				rendering = false;
-//				
-//				return null;
-//			};
-//		};
 	}
 
 	/**
@@ -646,16 +615,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_app.enqueue(new Callable<Void>()
 		{
 			public Void call() throws Exception
-			{
-				// todo: do not call multiple times!
-				
-				if(!first)
-					return null;
-				if(first)
-					first = false;
-				
+			{	
 				_app.stop(false);
-				System.out.println("ViewportJmonkey: STOP STOP STOP");
+				System.out.println("ViewportJmonkey: STOP!");
 				return null;
 			}
 		});

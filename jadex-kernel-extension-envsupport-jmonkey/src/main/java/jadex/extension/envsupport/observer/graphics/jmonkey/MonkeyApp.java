@@ -27,8 +27,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
@@ -89,7 +87,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	public MonkeyApp(float dim, float spaceSize, boolean isGrid)
 	{
-		
 		_appDimension = dim;
 		_isGrid = isGrid;
 		_spaceSize = spaceSize;
@@ -370,7 +367,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		
 	    listener.setLocation(cam.getLocation());
 	    listener.setRotation(cam.getRotation());
-	    
 
 	}
 
@@ -381,10 +377,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	public void setGeometry(Node geometry)
 	{
-		
 		_geometryNode = geometry;
 		this.rootNode.attachChild(_geometryNode);
-
 	}
 	
 	

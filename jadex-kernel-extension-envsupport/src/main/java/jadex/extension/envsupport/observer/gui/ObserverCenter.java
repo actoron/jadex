@@ -858,7 +858,7 @@ public class ObserverCenter
 		
 		public void windowClosed(WindowEvent e)
 		{
-			getSelectedPerspective().shutdown();
+//			getSelectedPerspective().shutdown(mainwindow.isFullscreen());
 		}
 		
 		public void windowClosing(WindowEvent e)
@@ -916,6 +916,8 @@ public class ObserverCenter
 			IPerspective persp = (IPerspective) it.next();
 			if (persp instanceof Perspective2D)
 				((Perspective2D) persp).getViewport().dispose();
+			else if (persp instanceof Perspective3D)
+				((Perspective3D) persp).getViewport().stopApp();
 		}
 		
 		if(clocklistener!=null)

@@ -16,13 +16,6 @@ public interface IPerspective extends ITypedPropertyObject
 	 */
 	public String getName();
 	
-	
-	/**
-	 *  If there is a Complex Application in the Background
-	 *  this helps to Stop it
-	 */
-	public void shutdown();
-	
 	/**
 	 *  Sets the name of the perspective
 	 *  @param name name of the perspective
