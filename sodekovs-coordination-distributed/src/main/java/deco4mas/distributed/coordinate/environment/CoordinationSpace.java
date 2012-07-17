@@ -6,11 +6,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IValueFetcher;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.MObjectType;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.EnvironmentEvent;
@@ -48,9 +46,6 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	/** Contains the mapping of an agent's name and it's {@link IComponentDescription} */
 	private Map<String, IComponentDescription> descriptionMapping = new HashMap<String, IComponentDescription>();
 
-	/** The Applications Internal Access */
-	private IInternalAccess applicationInternalAccess;
-
 	// -------- constructors --------
 
 	/**
@@ -73,21 +68,18 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	public Map<String, IComponentDescription> getDescriptionMapping() {
 		return descriptionMapping;
 	}
-
-//	@Override
-	public void initSpace(IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher fetcher) {
-		super.setInitData(ia, config, fetcher);
+	
+	@Override
+	public IFuture<Void> initSpace() {
 		super.initSpace();
 		
-		
-		this.applicationInternalAccess = ia;
-
 		initSpaces();
 		initDeco4mas();
 		for (CoordinationMechanism icord : activeCoordinationMechanisms) {
 			icord.start();
 		}
-
+		
+		return IFuture.DONE;
 	}
 
 	/**
@@ -264,6 +256,6 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 * @return the applicatioInternalAccess
 	 */
 	public IInternalAccess getApplicationInternalAccess() {
-		return applicationInternalAccess;
+		return ia;
 	}
 }
