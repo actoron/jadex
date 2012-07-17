@@ -37,6 +37,9 @@ public class Writer extends AWriter
 	/** Control flag for generating indention. */
 	protected boolean indent;
 	
+	/** Control flag for generating newlines. */
+	protected boolean newline;
+	
 	//-------- constructors --------
 
 	/**
@@ -54,17 +57,18 @@ public class Writer extends AWriter
 	 */
 	public Writer(boolean genids)
 	{
-		this(genids, true);
+		this(genids, true, true);
 	}
 	
 	/**
 	 *  Create a new reader.
 	 *  @param readerhandler The handler.
 	 */
-	public Writer(boolean genids, boolean indent)
+	public Writer(boolean genids, boolean indent, boolean newline)
 	{
 		this.genids = genids;
 		this.indent = indent;
+		this.newline = newline;
 	}
 	
 	//-------- methods --------
@@ -95,7 +99,7 @@ public class Writer extends AWriter
 		}
 		
 		writer.writeStartDocument(encoding, "1.0"); 
-		writer.writeCharacters(SXML.lf);
+		writeNewline(writer);
 		
 		WriteContextDesktop wc = new WriteContextDesktop(handler, writer, context, object, classloader);
 		writeObject(wc, object, null);
@@ -157,7 +161,7 @@ public class Writer extends AWriter
 				{
 					writeStartObject(writer, path[i], stack.size());
 					stack.add(new StackElement(path[i], object));
-					writer.writeCharacters(SXML.lf);
+					writeNewline(writer);
 				}
 			}
 		}
@@ -199,7 +203,7 @@ public class Writer extends AWriter
 			{
 				writeIndentation(writer, stack.size());
 				writer.writeComment(comment);
-				writer.writeCharacters(SXML.lf);
+				writeNewline(writer);
 			}
 			
 			writeStartObject(writer, tag, stack.size());
@@ -286,7 +290,7 @@ public class Writer extends AWriter
 			if(subs)
 			{
 				Tree subobs = wi.getSubobjects();
-				writer.writeCharacters(SXML.lf);
+				writeNewline(writer);
 				
 				writeSubobjects(wc, subobs.getRootNode(), typeinfo);
 			}
@@ -321,7 +325,7 @@ public class Writer extends AWriter
 				QName subtag = (QName)tmp; 
 				
 				writeStartObject(writer, subtag, stack.size());
-				writer.writeCharacters(SXML.lf);
+				writeNewline(writer);
 				stack.add(new StackElement(subtag, null));
  
 				writeSubobjects(wc, subnode, typeinfo);
@@ -426,7 +430,7 @@ public class Writer extends AWriter
 	{
 		writeIndentation(writer, level);
 		writer.writeEndElement();
-		writer.writeCharacters(SXML.lf);
+		writeNewline(writer);
 	}
 		
 	/**
@@ -437,7 +441,20 @@ public class Writer extends AWriter
 		if(indent)
 		{
 			for(int i=0; i<level; i++)
+			{
 				writer.writeCharacters("\t");
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void writeNewline(XMLStreamWriter writer) throws Exception
+	{
+		if(newline)
+		{
+			writer.writeCharacters(SXML.lf);
 		}
 	}
 	

@@ -71,7 +71,7 @@ public class Main
 		})));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(false, true);
+		Writer xmlwriter = new Writer(false, true, true);
 		OutputStream os = new FileOutputStream("out.xml");
 		xmlwriter.write(new BeanObjectWriterHandler(typeinfos), object, os, null, null);
 		os.close();

@@ -19,8 +19,6 @@ public class XMLWriterFactoryDesktop extends XMLWriterFactory
 	 * Creates a new XML Reader.
 	 * 
 	 * @param genids
-	 *            flag for generating ids
-	 * 
 	 * @return reader
 	 */
 	public AWriter createWriter(boolean genids)
@@ -32,14 +30,23 @@ public class XMLWriterFactoryDesktop extends XMLWriterFactory
 	 * Creates a new default XML Reader.
 	 * 
 	 * @param genids
-	 *            flag for generating ids
 	 * @param indents
-	 * 
 	 * @return reader
 	 */
 	public AWriter createWriter(boolean genids, boolean indents)
 	{
-		return new Writer(genids, indents);
+		return new Writer(genids, indents, true);
 	}
 
+	/**
+	 * Creates a new default XML Reader.
+	 * 
+	 * @param genids
+	 * @param indents
+	 * @return reader
+	 */
+	public AWriter createWriter(boolean genids, boolean indents, boolean newline)
+	{
+		return new Writer(genids, indents, newline);
+	}
 }

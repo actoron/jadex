@@ -58,10 +58,16 @@ import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
+import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResult;
+import org.sonatype.aether.resolution.MetadataRequest;
+import org.sonatype.aether.resolution.MetadataResult;
+import org.sonatype.aether.resolution.VersionRangeRequest;
+import org.sonatype.aether.resolution.VersionRangeResult;
 import org.sonatype.aether.resolution.VersionRequest;
 import org.sonatype.aether.resolution.VersionResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -379,12 +385,30 @@ public class MavenDependencyResolverService	implements IDependencyService
 		CollectRequest	crequest	= new CollectRequest(new Dependency(art, null), repositories);
 		DependencyRequest	request	= new DependencyRequest(crequest, null);
 		DependencyResult result = system.resolveDependencies(session, request);
-		
 		ArtifactResult ares = system.resolveArtifact(session, new ArtifactRequest(result.getRoot()));
-		VersionRequest vr = new VersionRequest(ares.getArtifact(), repositories, null);
-		VersionResult vres = system.resolveVersion(session, vr);
 		
-		IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(rid.getGlobalIdentifier().getResourceId(), rid.getGlobalIdentifier().getRepositoryInfo(), vres.getVersion());
+//		try
+//		{
+//		List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>(repositories.size());
+//	    for(RemoteRepository repository: repositories)
+//	    {
+//	        MetadataRequest metadataRequest = new MetadataRequest(null, repository, null);
+////	        metadataRequest.setDeleteLocalCopyIfMissing(true);
+////	        metadataRequest.setFavorLocalRepository(true);
+//	        metadataRequests.add(metadataRequest);
+//	    }
+//	    List<MetadataResult> metadataResults = system.resolveMetadata(session, metadataRequests);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+		
+//		VersionRequest vr = new VersionRequest(ares.getArtifact(), repositories, null);
+//		VersionResult vres = system.resolveVersion(session, vr);
+//		ArtifactDescriptorResult res = system.readArtifactDescriptor(session, new ArtifactDescriptorRequest(ares.getArtifact(), repositories, null));
+		
+		IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(rid.getGlobalIdentifier().getResourceId(), rid.getGlobalIdentifier().getRepositoryInfo(), ares.getArtifact().getVersion());
 		File file = result.getRoot().getDependency().getArtifact().getFile();
 		rid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(file)), gid);
 		processAetherDependencies(rid, rids, result.getRoot());

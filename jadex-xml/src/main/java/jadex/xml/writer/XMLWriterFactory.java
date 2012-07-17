@@ -32,28 +32,33 @@ public abstract class XMLWriterFactory
 	 */
 	public static XMLWriterFactory getInstance()
 	{
-		if (INSTANCE == null)
+		if(INSTANCE == null)
 		{
-			if (SReflect.isAndroid())
+			if(SReflect.isAndroid())
 			{
-				Class<?> clz;
+				Class< ? > clz;
 				try
 				{
 					clz = SReflect.classForName("jadex.xml.writer.XMLWriterFactoryAndroid", null);
-					if (clz != null) {
-						INSTANCE = (XMLWriterFactory) clz.newInstance();
+					if(clz != null)
+					{
+						INSTANCE = (XMLWriterFactory)clz.newInstance();
 					}
-				} catch (ClassNotFoundException e)
+				}
+				catch(ClassNotFoundException e)
 				{
 					Logger.getLogger("jadex").log(Level.WARNING, "XMLWriter not available.");
-				} catch (InstantiationException e)
-				{
-					e.printStackTrace();
-				} catch (IllegalAccessException e)
+				}
+				catch(InstantiationException e)
 				{
 					e.printStackTrace();
 				}
-			} else
+				catch(IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
 			{
 				INSTANCE = new XMLWriterFactoryDesktop();
 			}
@@ -78,11 +83,18 @@ public abstract class XMLWriterFactory
 	 * Creates a new default XML Reader.
 	 * 
 	 * @param genids
-	 *            flag for generating ids
 	 * @param indents
-	 * 
 	 * @return reader
 	 */
 	public abstract AWriter createWriter(boolean genids, boolean indents);
+	
+	/**
+	 * Creates a new default XML Reader.
+	 * 
+	 * @param genids
+	 * @param indents
+	 * @return reader
+	 */
+	public abstract AWriter createWriter(boolean genids, boolean indents, boolean newline);
 
 }

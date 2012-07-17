@@ -20,6 +20,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -139,6 +140,16 @@ public class Starter
 	 */
 	public static void main(String[] args)
 	{
+//		String exp = "jadex.xml.bean.JavaReader.objectFromXML(\"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><p0:HashMap xmlns:p0=\\\"typeinfo:java.util\\\" __ID=\\\"0\\\"><entries><entry __ID=\\\"1\\\"><key><p1:String xmlns:p1=\\\"typeinfo:java.lang\\\" __ID=\\\"2\\\">creator</p1:String></key><value><p2:ComponentIdentifier xmlns:p2=\\\"typeinfo:jadex.bridge\\\" __ID=\\\"3\\\"><name><p1:String xmlns:p1=\\\"typeinfo:java.lang\\\" __ID=\\\"4\\\">Update@Lars-PC_096</p1:String></name><addresses><p1:String__1 xmlns:p1=\\\"typeinfo:java.lang\\\" __ID=\\\"5\\\" __len=\\\"6\\\"><entries><p1:String __ID=\\\"6\\\">local-mtp://Lars-PC_096</p1:String><p1:String __ID=\\\"7\\\">tcp-mtp://134.100.11.233:56274</p1:String><p1:String __ID=\\\"8\\\">tcp-mtp://0:0:0:0:0:0:0:1:56274</p1:String><p1:String __ID=\\\"9\\\">ssltcp-mtp://134.100.11.233:56279</p1:String><p1:String __ID=\\\"10\\\">ssltcp-mtp://0:0:0:0:0:0:0:1:56279</p1:String><p1:String __ID=\\\"11\\\">relay-http://jadex.informatik.uni-hamburg.de/relay/</p1:String></entries></p1:String__1></addresses></p2:ComponentIdentifier></value></entry></entries></p0:HashMap>\",null)";
+//
+//		try
+//		{
+//			SJavaParser.evaluateExpression(exp, null);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 //		try
 //		{
 //			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -221,6 +232,8 @@ public class Starter
 //		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 //		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 
+		System.out.println(args.length+" "+SUtil.arrayToString(args));
+		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		try
@@ -585,9 +598,12 @@ public class Starter
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{
-					String	name	= null;
-					String	config	= null;
-					String	comp	= (String)components.get(i);
+					String name	= null;
+					String config	= null;
+					String args = null;
+					String comp	= (String)components.get(i);
+					Map<String, Object> oargs = null;
+					
 					int	i1	= comp.indexOf(':');
 					if(i1!=-1)
 					{
@@ -597,18 +613,59 @@ public class Starter
 					int	i2	= comp.indexOf('(');
 					if(i2!=-1)
 					{
-						if(comp.endsWith(")"))
+//						if(comp.endsWith(")"))
+						int i3 = comp.indexOf(")");
+						if(i3!=-1)
 						{
-							config	= comp.substring(i2+1, comp.length()-1);
-							comp	= comp.substring(0, i2);
+							if(comp.length()-i3>1)
+								args = comp.substring(i3+2, comp.length());
+							if(i3-i2>1)
+								config	= comp.substring(i2+1, i3-1);
+							comp	= comp.substring(0, i2);	
 						}
 						else
 						{
-							throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)] : "+components.get(i));
+							throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)][:<args>] : "+components.get(i));
+						}
+						
+						System.out.println("comp: "+comp);
+						System.out.println("args: "+args);
+						System.out.println("i: "+i3);
+					}
+//					else if(comp.indexOf(":")!=-1)
+//					{
+//						int i3 = comp.indexOf(":");
+//						if(i3!=-1)
+//						{
+//							if(i3<comp.length())
+//								args = comp.substring(i3, comp.length());
+//						}
+//						System.out.println("comp: "+comp);
+//						System.out.println("args: "+args);
+//						System.out.println("i: "+i3);
+//					}
+					
+					if(args!=null)
+					{
+						try
+						{
+//							args = args.replace("\\\"", "\"");
+							Object o = SJavaParser.evaluateExpression(args, null);
+							if(!(o instanceof Map))
+							{
+								throw new RuntimeException("Arguments must evaluate to Map<String, Object>"+args);
+							}
+							oargs = (Map<String, Object>)o;
+						}
+						catch(Exception e)
+						{
+							System.out.println("args: "+args);
+							e.printStackTrace();
+							throw new RuntimeException("Arguments evaluation error: "+e);
 						}
 					}
 					
-					cms.createComponent(name, comp, new CreationInfo(config, null), null)
+					cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)

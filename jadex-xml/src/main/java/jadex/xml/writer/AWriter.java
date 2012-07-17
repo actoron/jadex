@@ -54,7 +54,8 @@ public abstract class AWriter
 		try
 		{
 			return new String(objectToByteArray(writer, val, classloader, handler), "UTF-8");
-		} catch (UnsupportedEncodingException e)
+		} 
+		catch (UnsupportedEncodingException e)
 		{
 			System.err.println("Warning: no UTF-8 available");
 			return new String(objectToByteArray(writer, val, classloader, handler));
@@ -69,7 +70,8 @@ public abstract class AWriter
 		try
 		{
 			return new String(objectToByteArray(writer, val, classloader, context, handler), "UTF-8");
-		} catch (UnsupportedEncodingException e)
+		} 
+		catch (UnsupportedEncodingException e)
 		{
 			System.err.println("Warning: no UTF-8 available");
 			return new String(objectToByteArray(writer, val, classloader, context, handler));
