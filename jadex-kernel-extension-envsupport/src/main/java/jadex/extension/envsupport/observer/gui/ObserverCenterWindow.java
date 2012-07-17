@@ -9,11 +9,13 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,6 +50,11 @@ public class ObserverCenterWindow extends JFrame
 	protected Set knownpluginviews;
 	
 	protected boolean disposed;
+	
+	protected Dimension olddim;
+	protected Point oldpos;
+	protected Component oldcomp;
+	protected int olddivider;
 	
 	/** 
 	 *  Creates the main window.
@@ -99,38 +106,22 @@ public class ObserverCenterWindow extends JFrame
 //					{
 //						public void mouseClicked(MouseEvent e)
 //						{
-//							System.out.println("mouse: "+e);
-//    						
-//    						menubar.setVisible(false);
-//    						splitpane.setVisible(false);
-//    						toolbar.setVisible(false);
-//    						mainpanel.remove(splitpane);
-////    						mainpanel.remove(toolbar);
-//    						Component right = splitpane.getRightComponent();
-//    						splitpane.remove(right);
-//    						
-//    						mainpanel.add(right, BorderLayout.CENTER);
-//    						
-////    						dispose();
-////    						setUndecorated(true);
-////    						setVisible(true);
-//    						
-//    						setLocation(0,0);
-//    						setSize(Toolkit.getDefaultToolkit().getScreenSize());
+//							
 //						}
 //					});
 					
-//					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-//			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
-//	        		{
-//	        			public boolean dispatchKeyEvent(KeyEvent e)
-//	        			{
-//	        				if(e.getID() == KeyEvent.KEY_PRESSED)
-//	        				{
-//	        				}
-//	        				return false;
-//	        			}
-//	        		});
+					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
+	        		{
+	        			public boolean dispatchKeyEvent(KeyEvent e)
+	        			{
+	        				if(e.getID() == KeyEvent.KEY_PRESSED)
+	        				{
+	        					makeFullscreen();
+	        				}
+	        				return false;
+	        			}
+	        		});
 				}
 			}
 		};
@@ -155,14 +146,77 @@ public class ObserverCenterWindow extends JFrame
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	public void makeFullscreen()
+	{
+		boolean fs = oldcomp==null;
+		
+		menubar.setVisible(!fs);
+		splitpane.setVisible(!fs);
+		toolbar.setVisible(!fs);
+//		mainpanel.remove(splitpane);
+//		mainpanel.remove(toolbar);
+		
+		WindowListener[] wls = getWindowListeners();
+		for(WindowListener wl: wls)
+		{
+			removeWindowListener(wl);
+		}
+		
+		if(fs)
+		{
+			oldpos = getLocation();
+			olddim = getSize();
+			oldcomp = splitpane.getRightComponent();
+			olddivider = splitpane.getDividerLocation();
+			
+			splitpane.remove(oldcomp);
+			mainpanel.add(oldcomp, BorderLayout.CENTER);
+
+			dispose();
+			disposed = false;
+			setUndecorated(true);
+			setVisible(true);
+			
+			setLocation(0,0);
+			setSize(Toolkit.getDefaultToolkit().getScreenSize());
+		}
+		else
+		{
+			splitpane.setRightComponent(oldcomp);
+			mainpanel.remove(oldcomp);
+			mainpanel.add(splitpane, BorderLayout.CENTER);
+
+			dispose();
+			disposed = false;
+			setUndecorated(false);
+			setVisible(true);
+			
+			setLocation(oldpos);
+			setSize(olddim);
+			splitpane.setDividerLocation(olddivider);
+			oldcomp = null;
+		}
+		
+		for(WindowListener wl: wls)
+		{
+			addWindowListener(wl);
+		}
+	}
+	
+	/**
+	 *  Dispose the frame.
+	 */
 	public void dispose()
 	{
 		disposed	= true;
 		super.dispose();
 	}
 	
-	/** Adds a menu
-	 *  
+	/** 
+	 *  Adds a menu
 	 *  @param menu the menu
 	 */
 	public void addMenu(JMenu menu)
