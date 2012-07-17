@@ -106,7 +106,7 @@ public class ObserverCenterWindow extends JFrame
 //					{
 //						public void mouseClicked(MouseEvent e)
 //						{
-//							
+//							makeFullscreen();
 //						}
 //					});
 					
@@ -147,7 +147,7 @@ public class ObserverCenterWindow extends JFrame
 	}
 	
 	/**
-	 * 
+	 *  Display window in fullscreen.
 	 */
 	public void makeFullscreen()
 	{
