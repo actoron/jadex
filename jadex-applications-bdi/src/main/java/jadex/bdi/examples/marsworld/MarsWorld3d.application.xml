@@ -131,7 +131,7 @@
 					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" shadowtype="Receive"/>
 					
 					  
-					<env:sound3d soundfile="jadex3d/sounds/misc/windboe.ogg" loop="true" volume="0.1" continuosly="true" positional="false" />
+					<env:sound3d soundfile="jadex3d/sounds/misc/windboe.ogg" loop="true" volume="0.2" continuosly="true" positional="false" />
 				
 				</env:drawable3d>
 				
@@ -186,14 +186,14 @@
 							</env:drawcondition>
 						</env:object3d>
 						
-					<env:sound3d soundfile="jadex3d/sounds/misc/dadum.wav" loop="false" volume="0.1" continuosly="false" positional="true" >
+					<env:sound3d soundfile="jadex3d/sounds/misc/dadum.wav" loop="false" volume="0.4" continuosly="false" positional="true" >
 						<env:soundcondition>
 							$object.getProperty("state").equals("analyzing")
 								&amp;&amp; ($object.getProperty("ore")!=0 )
 						</env:soundcondition>
 					</env:sound3d>
 					
-					<env:sound3d soundfile="jadex3d/sounds/misc/binglow.wav" loop="false" volume="0.1" continuosly="false" positional="true" >
+					<env:sound3d soundfile="jadex3d/sounds/misc/binglow.wav" loop="false" volume="0.4" continuosly="false" positional="true" >
 						<env:soundcondition>
 							$object.getProperty("state").equals("analyzing")
 								&amp;&amp; ($object.getProperty("ore")==0 )
@@ -218,10 +218,10 @@
 					<env:object3d width="0.8" height="0.8" depth="0.8" x="0.0" y="0.1" z="0.4" rotation="$deg90y" modelpath="jadex3d/models/props/box/woodbox.j3o" hasLightMaterials="true" shadowtype="Cast">
 						<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 					</env:object3d> 
-					<env:sound3d soundfile="jadex3d/sounds/misc/drop1.wav" loop="true" volume="5" continuosly="false" positional="true" >
+					<env:sound3d soundfile="jadex3d/sounds/misc/drop1.wav" loop="true" volume="10" continuosly="false" positional="true" >
 						<env:soundcondition>$object.getProperty("status").equals("unloading")</env:soundcondition>
 					</env:sound3d>
-					<env:sound3d soundfile="jadex3d/sounds/misc/cratesmash.wav" loop="false" volume="5" continuosly="false" positional="true" >
+					<env:sound3d soundfile="jadex3d/sounds/misc/cratesmash.wav" loop="false" volume="10" continuosly="false" positional="true" >
 						<env:soundcondition>$object.getProperty("status").equals("loading")</env:soundcondition>
 					</env:sound3d>
 				</env:drawable3d>
@@ -238,7 +238,7 @@
 					</env:animation>
 					</env:object3d>
 					
-					<env:sound3d soundfile="jadex3d/sounds/misc/digging.wav" loop="false" volume="0.1" continuosly="false" positional="true" >
+					<env:sound3d soundfile="jadex3d/sounds/misc/digging.wav" loop="false" volume="0.4" continuosly="false" positional="true" >
 						<env:soundcondition>$object.getProperty("status").equals("ore")</env:soundcondition>
 					</env:sound3d>
 					</env:drawable3d>	

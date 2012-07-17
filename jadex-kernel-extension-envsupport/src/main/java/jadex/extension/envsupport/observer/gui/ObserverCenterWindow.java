@@ -102,13 +102,20 @@ public class ObserverCenterWindow extends JFrame
 					setVisible(true);
 					splitpane.setDividerLocation(250);
 					
-//					addMouseListener(new MouseAdapter()
-//					{
-//						public void mouseClicked(MouseEvent e)
-//						{
+					addMouseListener(new MouseAdapter()
+					{
+
+						public void mouseClicked(MouseEvent e)
+						{
 //							makeFullscreen();
-//						}
-//					});
+							
+						}
+						public void mousePressed(MouseEvent e) {
+							
+							makeFullscreen();
+							System.out.println("mousefullscreen");
+						}
+					});
 					
 					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
