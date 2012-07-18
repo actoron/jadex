@@ -13,6 +13,7 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -66,6 +67,8 @@ public class ObserverCenterWindow extends JFrame
 
 	protected int		olddivider;
 	
+	protected KeyListener fullscreenlistener;
+	
 	
 	
 
@@ -116,24 +119,39 @@ public class ObserverCenterWindow extends JFrame
 					setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 					setVisible(true);
 					splitpane.setDividerLocation(250);
-
-					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-					manager.addKeyEventDispatcher(new KeyEventDispatcher()
+					
+					
+					fullscreenlistener = new KeyAdapter()
 					{
-						public boolean dispatchKeyEvent(KeyEvent e)
+					
+						public void keyPressed(KeyEvent e)
 						{
-							if(e.getKeyCode() == KeyEvent.VK_F11 && e.getID() == KeyEvent.KEY_PRESSED)
+							if(e.getKeyCode() == KeyEvent.VK_F11)
 							{
-								Object source = e.getSource();
-								System.out.println("window " + source.toString());
-				
-									makeFullscreen();
-
+								makeFullscreen();
 							}
-
-							return false;
+						
 						}
-					});
+					};
+					
+
+//					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+//					manager.addKeyEventDispatcher(new KeyEventDispatcher()
+//					{
+//						public boolean dispatchKeyEvent(KeyEvent e)
+//						{
+//							if(e.getKeyCode() == KeyEvent.VK_F11 && e.getID() == KeyEvent.KEY_PRESSED)
+//							{
+//								Object source = e.getSource();
+//								System.out.println("window " + source.toString());
+//				
+//									makeFullscreen();
+//
+//							}
+//
+//							return false;
+//						}
+//					});
 
 				}
 				
@@ -316,7 +334,17 @@ public class ObserverCenterWindow extends JFrame
 	public void setPerspectiveView(Component view)
 	{
 		int loc = splitpane.getDividerLocation();
+		
+		Component oldview = splitpane.getRightComponent();
+		if(oldview != null)
+		{
+			oldview.removeKeyListener(fullscreenlistener);
+		}
+		
 		splitpane.setRightComponent(view);
+		
+		view.addKeyListener(fullscreenlistener);
+		
 		splitpane.setDividerLocation(loc);
 	}
 
