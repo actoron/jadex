@@ -1,9 +1,16 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.observer.gui.ObserverCenterWindow;
+
+import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JPanel;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
@@ -84,6 +91,11 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private boolean _isGrid;
 	
 	private AudioNode audio_nature;
+	
+	private JPanel panel;
+	
+	private KeyEvent event;
+	
 
 	public MonkeyApp(float dim, float spaceSize, boolean isGrid)
 	{
@@ -96,6 +108,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		_walkCam = false;
 		_selectedTarget = -1;
 		_selectedSpatial = null;
+		panel = new JPanel();
 	}
 
 	@Override
@@ -111,9 +124,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		// this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
 		
-		
-
-
 		
 		DirectionalLight sun = new DirectionalLight();
 		sun.setColor(ColorRGBA.White);
@@ -175,6 +185,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
 		inputManager.addMapping("ChangeCam", new KeyTrigger(KeyInput.KEY_F6));
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
+		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
 		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
 		// Add the names to the action listener.
@@ -184,6 +195,15 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		{
 			public void onAction(String name, boolean keyPressed, float tpf)
 			{
+				if(keyPressed && name.equals("Fullscreen"))
+				{
+					System.out.println("fullscreen jmonkey");
+					
+					event = new KeyEvent(panel, KeyEvent.KEY_PRESSED,  EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
+					
+					Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent( event );
+
+				}
 
 				if(keyPressed && name.equals("Random"))
 				{
@@ -271,6 +291,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
 		inputManager.addListener(actionListener, new String[]{"Select"});
 		inputManager.addListener(actionListener, new String[]{"FollowCam"});
+		inputManager.addListener(actionListener, new String[]{"Fullscreen"});
 		
 
 
