@@ -42,6 +42,7 @@ import com.jme3.animation.AnimChannel;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
+import com.jme3.input.InputManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -695,6 +696,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 			_app.setGeometry(_geometryNode);
 
 			rendering = false;
+			
+			InputManager test = _app.getInputManager();
+			test.toString();
 			
 			return null;
 		}

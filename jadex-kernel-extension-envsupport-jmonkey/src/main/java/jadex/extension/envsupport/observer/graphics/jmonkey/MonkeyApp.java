@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
 
 import java.awt.EventQueue;
@@ -14,10 +15,13 @@ import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
+import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
+import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -87,7 +91,11 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	
 	private boolean _isGrid;
 	
-	private KeyEvent event;
+	private NiftyJmeDisplay niftyDisplay;
+	
+	protected FlyCamera flyCamera;
+	
+
 	
 
 	public MonkeyApp(float dim, float spaceSize, boolean isGrid)
@@ -109,8 +117,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	{
 		//Base Setup
 		Logger.getLogger("").setLevel(Level.SEVERE);
-		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); 
-		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE); 
+//		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); 
+//		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE); 
 		viewPort.setBackgroundColor(ColorRGBA.LightGray);
 
 		//Init Methods
@@ -119,12 +127,14 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		initRoot();
 		initRenderer();
 		initKeys();
-//		initNifty();
+		initNifty();
+		
+		stateManager.getState(StatsAppState.class).toggleStats();
 	}
 
 	
 	private void initNifty() {
-        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+        niftyDisplay = new NiftyJmeDisplay(
                 assetManager, inputManager, audioRenderer, guiViewPort);
         /** Create a new NiftyGUI object */
         Nifty nifty = niftyDisplay.getNifty();
@@ -133,7 +143,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
         guiViewPort.addProcessor(niftyDisplay);
 
-        flyCam.setDragToRotate(true);
+//        flyCam.setDragToRotate(true);
 		
 	}
 
@@ -201,22 +211,20 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
 		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-		// Add the names to the action listener.
+
+
 
 
 		ActionListener actionListener = new ActionListener()
 		{
 			public void onAction(String name, boolean keyPressed, float tpf)
 			{
+				
+
 				if(keyPressed && name.equals("Fullscreen"))
 				{
-					System.out.println("fullscreen command aus JMonkey");
-					
-					JmeCanvasContext context = (JmeCanvasContext)getContext();
-				
-					event = new KeyEvent(context.getCanvas(), KeyEvent.KEY_PRESSED,  EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
+					fireFullscreen();
 
-					Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent( event );
 
 				}
 
@@ -272,13 +280,13 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 							
 							 _chaseCam.setSpatial(_selectedSpatial);
 							 _chaseCam.setEnabled(true);	
-							 flyCam.setEnabled(false);
+							 flyCamera.setEnabled(false);
 						 }
 						 else
 						 {
 							 
 							 _chaseCam.setEnabled(false);
-							 flyCam.setEnabled(true);
+							 flyCamera.setEnabled(true);
 						 }
 						 
 					}
@@ -286,11 +294,13 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 					{
 						
 						_chaseCam.setEnabled(false);
-						flyCam.setEnabled(true);
+						flyCamera.setEnabled(true);
 					}
 
 				}
 			}
+
+
 
 		};
 
@@ -308,11 +318,25 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	}
 
+	public void fireFullscreen() {
+		System.out.println("fullscreen command aus JMonkey");
+		
+		JmeCanvasContext context = (JmeCanvasContext)getContext();
+	
+		KeyEvent event = new KeyEvent(context.getCanvas(), KeyEvent.KEY_PRESSED,  EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
+
+		Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent( event );
+		
+	}
+	
 	public void initCam()
 	{
 		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
 		_chaseCam.setSmoothMotion(true);
+		_chaseCam.setDragToRotate(false);
 		_chaseCam.setDefaultDistance(500f);
+		_chaseCam.setMaxDistance(1000f);
+		_chaseCam.setMinDistance(1f);
 		_chaseCam.setEnabled(false);
 
 		/** Configure cam to look at scene */
@@ -320,8 +344,23 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		cam.lookAt(new Vector3f(_appDimension/2, 0, _appDimension/2), Vector3f.UNIT_Y);
 		cam.setFrustumNear(1f);
 		cam.setFrustumFar(_appDimension*5);
-		flyCam.setEnabled(true);
-		flyCam.setMoveSpeed(_appDimension);
+		flyCam.setEnabled(false);
+		
+		flyCamera = new FlyCamera(cam);
+		flyCamera.setUpVector(Vector3f.UNIT_Y);
+		flyCamera.registerWithInput(inputManager);
+		flyCamera.setDragToRotate(true);
+		
+		flyCamera.setEnabled(true);
+		flyCamera.setMoveSpeed(_appDimension);
+
+	     // Change the mappings we don't want
+
+ 
+
+        
+	
+
 		
 //		
 //		Camera cam_n    = cam.clone();

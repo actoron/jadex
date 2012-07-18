@@ -1,30 +1,40 @@
 
 <nifty>
-    <useControls filename="nifty-default-controls.xml" />
-    <useStyles filename="nifty-default-styles.xml" />
-   
-  
-        <screen id="hud" controller="jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController">
-            <layer id="background" childLayout="center">
-                <image filename="jadex3d/interface/frame.png" imageMode="resize:40,490,110,170,40,560,40,270,40,560,40,40" width="100%" height="100%"></image>
-            </layer>
-            <layer id="foreground" childLayout="horizontal">
+	<useControls filename="nifty-default-controls.xml" />
+	<useStyles filename="nifty-default-styles.xml" />
 
-                <panel id="panel_left" width="80%" height="100%" childLayout="vertical" 
-            >  
-        <!-- spacer -->
-                </panel>
-                <panel id="panel_right" width="20%" height="100%" childLayout="vertical" >  
-                    <panel id="panel_top_right1" width="100%" height="15%" childLayout="center" >  
-                        <control name="label" color="#000" text="123" width="100%" height="100%" />
-        
-                    
-                    </panel>
-                    <panel id="panel_top_right2" width="100%" height="15%" childLayout="center" >  
-                    </panel>
-                    <panel id="panel_bot_right" width="100%" height="70%" valign="center">  
-                    </panel>
-                </panel>
-            </layer>
-        </screen>
-    </nifty>
+
+	<screen id="hud"
+		controller="jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController">
+		<layer id="background" childLayout="center">
+
+		</layer>
+		<layer id="foreground" childLayout="horizontal">
+
+
+			<panel id="panel_left" width="5%" height="100%" childLayout="vertical">
+
+
+				<panel id="panel_top_left" width="100%" height="99%" valign="top" />
+
+				<panel id="panel_bottom_left" width="100%" height="1%"
+					valign="bottom" childLayout="horizontal">
+					<control name="button" label="Fullscreen" id="FireButton"
+						align="center" valign="bottom" visibleToMouse="true">
+						<interact onClick="fireFullscreen()" />
+					</control>
+					<control name="button" label="Options" id="OptionsButton"
+						align="center" valign="bottom" visibleToMouse="true">
+						<interact onClick="options()" />
+					</control>
+				</panel>
+
+			</panel>
+
+
+
+			<panel id="panel_right" width="95%" height="100%" />
+
+		</layer>
+	</screen>
+</nifty>

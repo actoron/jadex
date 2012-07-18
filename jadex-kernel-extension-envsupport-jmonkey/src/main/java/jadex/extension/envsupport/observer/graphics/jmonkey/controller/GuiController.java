@@ -8,6 +8,8 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 
+import jadex.extension.envsupport.observer.graphics.jmonkey.*;
+
 public class GuiController extends AbstractAppState implements ScreenController {
 
     private Nifty nifty;
@@ -28,14 +30,23 @@ public class GuiController extends AbstractAppState implements ScreenController 
         this.screen = screen;
     }
 
-    public void startGame(String nextScreen) {
-        nifty.gotoScreen(nextScreen);  // switch to another screen
-        // start the game and do some more stuff...
+    
+    public void fireFullscreen() {
+    	System.out.println("firefullscreen");
+    	 ((MonkeyApp)app).fireFullscreen();
     }
+    
+    public void options() {
+        System.out.println("options");
+    }
+    
+    
 
     public void quitGame() {
         app.stop();
     }
+    
+    
 
     public void onStartScreen() {
     }
