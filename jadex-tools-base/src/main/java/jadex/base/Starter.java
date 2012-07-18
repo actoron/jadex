@@ -174,14 +174,14 @@ public class Starter
 	 */
 	public static void main(String[] args)
 	{
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		try
+//		{
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		
 		createPlatform(args).addResultListener(new IResultListener<IExternalAccess>()
 		{
@@ -256,7 +256,7 @@ public class Starter
 //		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 //		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 
-		System.out.println(args.length+" "+SUtil.arrayToString(args));
+		System.out.println("Arguments: "+args.length/2+" "+SUtil.arrayToString(args));
 		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		

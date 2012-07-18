@@ -28,6 +28,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 /** Default GUI main window.
  */
@@ -104,22 +105,17 @@ public class ObserverCenterWindow extends JFrame
 					setVisible(true);
 					splitpane.setDividerLocation(250);
 					
-					
 					addMouseListener(new MouseAdapter()
 					{
-
 						public void mouseClicked(MouseEvent e)
 						{
-//							makeFullscreen();
-							
+							makeFullscreen();
 						}
 						public void mousePressed(MouseEvent e) {
 							
 //							makeFullscreen();
-							
 						}
 					});
-
 
 					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
@@ -162,7 +158,6 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void makeFullscreen()
 	{
-		
 		boolean fs = oldcomp==null;
 		
 		menubar.setVisible(!fs);
@@ -171,9 +166,7 @@ public class ObserverCenterWindow extends JFrame
 //		mainpanel.remove(splitpane);
 //		mainpanel.remove(toolbar);
 		
-		
-		
-		WindowListener[] wls = getWindowListeners();
+		final WindowListener[] wls = getWindowListeners();
 		for(WindowListener wl: wls)
 		{
 			removeWindowListener(wl);
@@ -214,12 +207,16 @@ public class ObserverCenterWindow extends JFrame
 			oldcomp = null;
 		}
 		
-		for(WindowListener wl: wls)
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			addWindowListener(wl);
-		}
-		
-		
+			public void run()
+			{
+				for(WindowListener wl: wls)
+				{
+					addWindowListener(wl);
+				}
+			}
+		});
 	}
 	/**
 	 *  Dispose the frame.
