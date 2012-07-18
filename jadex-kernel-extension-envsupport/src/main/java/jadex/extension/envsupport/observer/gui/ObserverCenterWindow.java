@@ -218,19 +218,12 @@ public class ObserverCenterWindow extends JFrame
 			}
 		});
 	}
-	/**
-	 *  Dispose the frame.
-	 */
-	public void dispose()
-	{
-		disposed	= true;
-		this.dispose(false);
-	}
+
 	
 	/**
-	 *  Dispose the frame for Fullscreen
+	 *  Dispose the frame
 	 */
-	public void dispose(boolean fullscreen)
+	public void dispose()
 	{
 		disposed	= true;
 		super.dispose();
