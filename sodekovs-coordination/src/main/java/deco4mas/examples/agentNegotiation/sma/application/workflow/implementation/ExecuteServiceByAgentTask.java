@@ -65,7 +65,7 @@ public class ExecuteServiceByAgentTask implements ITask {
 	}
 
 	@Override
-	public IFuture compensate(BpmnInterpreter instance) {
+	public IFuture<Void> cancel(BpmnInterpreter instance) {
 		// TODO Auto-generated method stub
 		return null;
 	}
