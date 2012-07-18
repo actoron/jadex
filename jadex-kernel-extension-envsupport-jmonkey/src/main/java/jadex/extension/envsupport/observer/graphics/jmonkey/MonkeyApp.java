@@ -1,16 +1,14 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import jadex.extension.envsupport.observer.gui.ObserverCenterWindow;
-
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.JPanel;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
@@ -42,6 +40,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl.ControlDirection;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
+import com.jme3.system.JmeCanvasContext;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.HillHeightMap;
@@ -91,8 +90,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private boolean _isGrid;
 	
 	private AudioNode audio_nature;
-	
-	private JPanel panel;
+
 	
 	private KeyEvent event;
 	
@@ -108,7 +106,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		_walkCam = false;
 		_selectedTarget = -1;
 		_selectedSpatial = null;
-		panel = new JPanel();
+
 	}
 
 	@Override
@@ -197,10 +195,10 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			{
 				if(keyPressed && name.equals("Fullscreen"))
 				{
-					System.out.println("fullscreen jmonkey");
-					
-					event = new KeyEvent(panel, KeyEvent.KEY_PRESSED,  EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
-					
+					JmeCanvasContext context = (JmeCanvasContext)getContext();
+				
+					event = new KeyEvent(context.getCanvas(), KeyEvent.KEY_PRESSED,  EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
+
 					Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent( event );
 
 				}
