@@ -184,6 +184,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		inputManager.addMapping("ChangeCam", new KeyTrigger(KeyInput.KEY_F6));
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
 		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11));
+		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
 		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
 		// Add the names to the action listener.
