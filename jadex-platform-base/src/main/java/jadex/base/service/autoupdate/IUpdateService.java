@@ -12,8 +12,8 @@ public interface IUpdateService
 	 */
 	public IFuture<Void> performUpdate();
 
-	/**
-	 * 
-	 */
-	public IFuture<Void> acknowledgeUpdate();
+//	/**
+//	 * 
+//	 */
+//	public IFuture<Void> acknowledgeUpdate();
 }

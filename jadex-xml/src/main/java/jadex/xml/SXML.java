@@ -1,5 +1,6 @@
 package jadex.xml;
 
+import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.stax.QName;
 
@@ -58,5 +59,13 @@ public class SXML
 			}
 		}
 		return xmlc;
+	}
+	
+	/**
+	 *  For testing.
+	 */
+	public static void main(String[] args)
+	{
+		System.out.println("args: "+SUtil.arrayToString(args));
 	}
 }

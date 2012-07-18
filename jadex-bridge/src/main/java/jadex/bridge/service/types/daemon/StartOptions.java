@@ -168,6 +168,8 @@ public class StartOptions
 		if(getProgramArguments()!=null)
 			cmd.append(" ").append(getProgramArguments());
 		
+		System.out.println("starting with: "+cmd.toString());
+		
 		return cmd.toString();
 	}
 	

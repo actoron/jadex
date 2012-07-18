@@ -8,25 +8,24 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.ServiceCall;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.IDependencyService;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -35,19 +34,17 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.XMLWriterFactory;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 /**
- * Daemon agent provides functionalities for managing platforms.
+ *  The update agent can be used to restart the platform with a newer version.
  */
 @Agent
 @RequiredServices(
@@ -58,7 +55,7 @@ import java.util.Map;
 })
 @Arguments(
 {
-	@Argument(name="interval", clazz=long.class, defaultvalue="1000"),
+	@Argument(name="interval", clazz=long.class, defaultvalue="5000"),
 	@Argument(name="creator", clazz=IComponentIdentifier.class),
 })
 @ComponentTypes(
@@ -67,6 +64,8 @@ import java.util.Map;
 })
 public class UpdateAgent implements IUpdateService
 {
+	//-------- attributes --------
+	
 	/** The resource to update. */
 	protected IResourceIdentifier rid = new ResourceIdentifier(null, new GlobalResourceIdentifier("net.sourceforge.jadex:jadex-platform-standalone:2.1-SNAPSHOT", null, null));
 
@@ -89,22 +88,44 @@ public class UpdateAgent implements IUpdateService
 	/** The new cid (need to be acknowledge by create and via call ack). */
 	protected IComponentIdentifier newcomp;
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Called on component startup.
 	 */
 	@AgentCreated
-	public void start()
+	public IFuture<Void> start()
 	{
-		ackCreator(creator, 0).addResultListener(new DefaultResultListener<Void>()
+		final Future<Void> ret = new Future<Void>();
+		
+		if(creator!=null)
 		{
-			public void resultAvailable(Void result)
-			{
-			}
-		});
+//			System.out.println("ack creator: "+creator);
+			
+			Map<String, Object> msg = new HashMap<String, Object>();
+			msg.put(SFipa.RECEIVERS, creator);
+			agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new DelegationResultListener<Void>(ret));
+			
+			// difficult with service as no proxy to the other platform may exist
+	//		agent.getServiceContainer().getService(IUpdateService.class, cid)
+	//			.addResultListener(new ExceptionDelegationResultListener<IUpdateService, Void>(ret)
+	//		{
+	//			public void customResultAvailable(IUpdateService us)
+	//			{
+	//				us.acknowledgeUpdate().addResultListener(new DelegationResultListener<Void>(ret));
+	//			}
+	//		});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public IFuture<Void> body()
@@ -125,30 +146,52 @@ public class UpdateAgent implements IUpdateService
 	//-------- interface methods --------
 	
 	/**
-	 * 
+	 *  Called when message arrived.
 	 */
-	public IFuture<Void> acknowledgeUpdate()
+	// hack?: done with message as awareness must not be used so there
+	// is no gauarantee that a proxy to the other platform exists (or would have to be created).
+	@AgentMessageArrived
+	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
-		IComponentIdentifier caller = ServiceCall.getInstance().getCaller();
-		if(caller.getRoot().equals(newcomp))
+		if(mt.getName().equals(SFipa.MESSAGE_TYPE_NAME_FIPA))
 		{
-			System.out.println("update acknowledged, shutting down old");
+			IComponentIdentifier sender = (IComponentIdentifier)msg.get(SFipa.SENDER);
+			acknowledgeUpdate(sender.getRoot());
+		}
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	public IFuture<Void> acknowledgeUpdate()
+//	{
+//		IComponentIdentifier caller = ServiceCall.getInstance().getCaller();
+//		acknowledgeUpdate(caller);
+//		return IFuture.DONE;
+//	}
+	
+	/**
+	 *  Called by new platform after correct startup.
+	 */
+	public void acknowledgeUpdate(IComponentIdentifier caller)
+	{
+		if(caller.equals(newcomp))
+		{
+			System.out.println("Update acknowledged, shutting down old platform: "+agent.getComponentIdentifier());
 			cms.destroyComponent(agent.getComponentIdentifier().getRoot());
 		}
 		else if(newcomp==null)
 		{
 			newcomp = caller;
 		}
-		
-		return IFuture.DONE;
 	}
 	
 	/**
-	 * 
+	 *  Perform the update.
 	 */
 	public IFuture<Void> performUpdate()
 	{
-		System.out.println("perform update");
+//		System.out.println("perform update");
 		
 		return performUpdate(rid);
 	}
@@ -159,7 +202,6 @@ public class UpdateAgent implements IUpdateService
 	protected IFuture<Void> performUpdate(IResourceIdentifier rid)
 	{
 		final Future<Void> ret = new Future<Void>();
-		
 		
 		IFuture<IDaemonService> fut = agent.getRequiredService("daeser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IDaemonService, Void>(ret)
@@ -172,31 +214,44 @@ public class UpdateAgent implements IUpdateService
 				args.put("creator", agent.getComponentIdentifier());
 				String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 //				String argsstr = JavaWriter.objectToXML(args, null);
-				argsstr = argsstr.replaceAll("\"", "\\\\\"");
-				String deser = "jadex.xml.bean.JavaReader.objectFromXML(\""+argsstr+"\""+",null)";
-				String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class:():"+deser;
-				System.out.println("generated: "+comstr);
+//				argsstr = argsstr.replaceAll("\"", "\\\\\"");
+				argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
+				String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)";
+//				
+				// todo: find out original configuration and parameters to replay on new
+				// todo for major release: make checkpoint and let new use checkpoint
+				
+				String comstr = "-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+//				String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+//				System.out.println("generated: "+comstr);
 				
 				StartOptions so = new StartOptions();
 				so.setMain("jadex.base.Starter");
 				so.setProgramArguments(comstr);
 				
-				Starter.createPlatform(new String[]{"-component", "jadex.base.service.autoupdate.UpdateAgent.class:():"+deser});
+//				Starter.createPlatform(new String[]{"-maven_dependencies", "true", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+////				Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+//					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//				{
+//					public void customResultAvailable(IExternalAccess result)
+//					{
+//						IComponentIdentifier cid = result.getComponentIdentifier();
+//						acknowledgeUpdate(cid.getRoot());
+//					}
+//				});
+
+//				deser = deser.replaceAll("\"", "\\\\\"");
+				comstr = "-maven_dependencies true -component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
+
+//				String comstr = "\"-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+				System.out.println("generated: "+comstr);
+				so.setProgramArguments(comstr);
 				
 				daeser.startPlatform(so).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret) 
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						if(newcomp==null)
-						{
-							newcomp = cid;
-						}
-						else if(newcomp.equals(cid))
-						{
-							System.out.println("update acknowledged, shutting down old");
-							cms.destroyComponent(agent.getComponentIdentifier().getRoot());
-							ret.setResult(null);
-						}
+						acknowledgeUpdate(cid);
 					}
 				});
 			}
@@ -207,56 +262,8 @@ public class UpdateAgent implements IUpdateService
 
 	//-------- helper methods --------
 	
-	
 	/**
-	 * 
-	 */
-	protected IFuture<Void> ackCreator(final IComponentIdentifier cid, final int cnt)
-	{
-		if(cid==null)
-			return IFuture.DONE;
-		
-		final Future<Void> ret = new Future<Void>();
-		
-		cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(IExternalAccess exta)
-			{
-				IFuture<IUpdateService> fut = SServiceProvider.getService(exta.getServiceProvider(), IUpdateService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				fut.addResultListener(new ExceptionDelegationResultListener<IUpdateService, Void>(ret)
-				{
-					public void customResultAvailable(IUpdateService us)
-					{
-						us.acknowledgeUpdate().addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				agent.waitFor(5000, new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						if(cnt<3)
-						{
-							ackCreator(cid, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						else
-						{
-							ret.setException(new RuntimeException("Could not acknowledge at creator."));
-						}
-						return IFuture.DONE;
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 * 
+	 *  Start the update check.
 	 */
 	protected IFuture<Void> startUpdating(final IResourceIdentifier rid)
 	{
@@ -270,28 +277,30 @@ public class UpdateAgent implements IUpdateService
 				{
 					public void customResultAvailable(IResourceIdentifier newrid)
 					{
-						String d1s = rid.getGlobalIdentifier().getVersionInfo();
-						String d2s = rid.getGlobalIdentifier().getVersionInfo();
-						if(d1s!=null && d2s!=null)
-						{
-							try
-							{
-								Date d1 = new Date(new Long(d1s).longValue());
-								Date d2 = new Date(new Long(d2s).longValue());
-								if(d2.after(d1))
-								{
-									performUpdate().addResultListener(new DelegationResultListener<Void>(ret));
-								}
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-								
-								// todo: hack
-								performUpdate().addResultListener(new DelegationResultListener<Void>(ret));
-							}
-						}
-						ret.setResult(null);
+						performUpdate().addResultListener(new DelegationResultListener<Void>(ret));
+						
+//						String d1s = rid.getGlobalIdentifier().getVersionInfo();
+//						String d2s = rid.getGlobalIdentifier().getVersionInfo();
+//						if(d1s!=null && d2s!=null)
+//						{
+//							try
+//							{
+//								Date d1 = new Date(new Long(d1s).longValue());
+//								Date d2 = new Date(new Long(d2s).longValue());
+//								if(d2.after(d1))
+//								{
+//									performUpdate().addResultListener(new DelegationResultListener<Void>(ret));
+//								}
+//							}
+//							catch(Exception e)
+//							{
+//								e.printStackTrace();
+//							}
+//						}
+//						else
+//						{
+//							ret.setResult(null);
+//						}
 					}
 				});
 				return IFuture.DONE;
@@ -302,7 +311,7 @@ public class UpdateAgent implements IUpdateService
 	}
 	
 	/**
-	 * 
+	 *  Check if an update is available.
 	 */
 	protected IFuture<IResourceIdentifier> checkForUpdate(final IResourceIdentifier rid)
 	{
@@ -310,7 +319,7 @@ public class UpdateAgent implements IUpdateService
 	}
 	
 	/**
-	 * 
+	 *  Get the version for a resource.
 	 */
 	protected IFuture<IResourceIdentifier> getVersion(final IResourceIdentifier rid)
 	{

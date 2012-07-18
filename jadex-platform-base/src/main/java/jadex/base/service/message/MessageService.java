@@ -444,7 +444,13 @@ public class MessageService extends BasicService implements IMessageService
 							{
 //								System.out.println("msgservice calling doSendMessage()");
 //								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+								
 								doSendMessage(msg, type, exta, cl, ret, codecids);
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+								super.exceptionOccurred(exception);
 							}
 						});
 //					}

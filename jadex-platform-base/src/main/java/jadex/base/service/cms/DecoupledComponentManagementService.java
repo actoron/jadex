@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -1786,7 +1787,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				InitInfo ii = getInitInfo(cid);
 				if(ii!=null)
 				{
-					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread()))
+//					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
+					if(!internal && (ii.getAdapter()==null || !ServiceCall.getInstance().getCaller().equals(cid)))
 					{
 //							System.out.println("getExternalAccess: delayed");
 						delayed = true;

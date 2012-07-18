@@ -628,46 +628,42 @@ public class Starter
 					String comp	= (String)components.get(i);
 					Map<String, Object> oargs = null;
 					
+					// check if name:type are both present (to not find last : check that no ( before)
 					int	i1	= comp.indexOf(':');
-					if(i1!=-1)
+					int i11 = comp.indexOf('(');
+					if(i1!=-1 && (i11==-1 || i11>i1))
 					{
 						name	= comp.substring(0, i1);
 						comp	= comp.substring(i1+1);
 					}
+					
+					// check if (config:args) part is present
 					int	i2	= comp.indexOf('(');
 					if(i2!=-1)
 					{
-//						if(comp.endsWith(")"))
-						int i3 = comp.indexOf(")");
+						// must end with )
+						// must have : if both are presents otherwise all is configname
+						if(!comp.endsWith(")"))
+						{
+							throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)[:<args>]) : "+components.get(i));
+						}
+
+						int i3 = comp.indexOf(":");
 						if(i3!=-1)
 						{
 							if(comp.length()-i3>1)
-								args = comp.substring(i3+2, comp.length());
+								args = comp.substring(i3+1, comp.length()-1);
 							if(i3-i2>1)
 								config	= comp.substring(i2+1, i3-1);
-							comp	= comp.substring(0, i2);	
 						}
 						else
 						{
-							throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)][:<args>] : "+components.get(i));
+							config = comp.substring(i2+1, comp.length()-1);
 						}
 						
-						System.out.println("comp: "+comp);
-						System.out.println("args: "+args);
-						System.out.println("i: "+i3);
+						comp = comp.substring(0, i2);	
 					}
-//					else if(comp.indexOf(":")!=-1)
-//					{
-//						int i3 = comp.indexOf(":");
-//						if(i3!=-1)
-//						{
-//							if(i3<comp.length())
-//								args = comp.substring(i3, comp.length());
-//						}
-//						System.out.println("comp: "+comp);
-//						System.out.println("args: "+args);
-//						System.out.println("i: "+i3);
-//					}
+					System.out.println("comp: "+comp+" config: "+config+" args: "+args);
 					
 					if(args!=null)
 					{

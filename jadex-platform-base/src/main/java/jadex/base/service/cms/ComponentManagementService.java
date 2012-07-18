@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.BasicService;
@@ -1859,7 +1860,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param listener The result listener.
 	 */
 	protected IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal)
-	{
+	{		
 //		System.out.println("getExternalAccess: "+this+", "+cid);
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
