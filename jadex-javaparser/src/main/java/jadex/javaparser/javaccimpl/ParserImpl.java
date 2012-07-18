@@ -156,7 +156,7 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
                 else if(buf.charAt(idx+1)=='\\')
                         buf.replace(idx, idx+2, "\\");
 
-                idx     = str.indexOf('\\', idx+1);
+                idx     = buf.indexOf("\\", idx+1);
         }
 
        // Todo: escape octal codes.

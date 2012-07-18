@@ -1911,7 +1911,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //	    	StyleConstants.setIcon(aset, icons.getIcon(s));
 		
 	    StyledDocument doc = p.getStyledDocument();
-	    aset.addAttribute("dummy", new Integer(doc.getLength()));
+	    aset.addAttribute("dummy", new Integer(doc.getLength())); // Java bug: https://forums.oracle.com/forums/thread.jspa?threadID=1355974
 	    
 //	    int len = p.getDocument().getLength(); // same value as// getText().length();
 	    p.setCaretPosition(doc.getLength()); // place caret at the end (with no selection)

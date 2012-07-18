@@ -32,6 +32,7 @@ import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -134,30 +135,53 @@ public class Starter
 //	}
 	
 	/**
+	 *  Unescape a string.
+	 */
+   	protected static String        unescape(String str)
+    {
+    	StringBuffer	buf	= new StringBuffer(str);
+    	int	idx	= buf.indexOf("\\");
+    	while(idx!=-1 && buf.length()>idx+1)
+    	{
+    		if(buf.charAt(idx+1)=='b')
+    			buf.replace(idx, idx+2, "\b");
+    		else if(buf.charAt(idx+1)=='t')
+    			buf.replace(idx, idx+2, "\t");
+    		else if(buf.charAt(idx+1)=='n')
+    			buf.replace(idx, idx+2, "\n");
+    		else if(buf.charAt(idx+1)=='f')
+    			buf.replace(idx, idx+2, "\f");
+    		else if(buf.charAt(idx+1)=='r')
+    			buf.replace(idx, idx+2, "\r");
+    		else if(buf.charAt(idx+1)=='"')
+    			buf.replace(idx, idx+2, "\"");
+    		else if(buf.charAt(idx+1)=='\'')
+    			buf.replace(idx, idx+2, "'");
+    		else if(buf.charAt(idx+1)=='\\')
+    			buf.replace(idx, idx+2, "\\");
+    		
+        	idx	= buf.indexOf("\\", idx+1);
+    	}
+
+       // Todo: escape octal codes.
+       return buf.toString();
+    }
+	
+	/**
 	 *  Main for starting the platform (with meaningful fallbacks)
 	 *  @param args The arguments.
 	 *  @throws Exception
 	 */
 	public static void main(String[] args)
 	{
-//		String exp = "jadex.xml.bean.JavaReader.objectFromXML(\"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><p0:HashMap xmlns:p0=\\\"typeinfo:java.util\\\" __ID=\\\"0\\\"><entries><entry __ID=\\\"1\\\"><key><p1:String xmlns:p1=\\\"typeinfo:java.lang\\\" __ID=\\\"2\\\">creator</p1:String></key><value><p2:ComponentIdentifier xmlns:p2=\\\"typeinfo:jadex.bridge\\\" __ID=\\\"3\\\"><name><p1:String xmlns:p1=\\\"typeinfo:java.lang\\\" __ID=\\\"4\\\">Update@Lars-PC_096</p1:String></name><addresses><p1:String__1 xmlns:p1=\\\"typeinfo:java.lang\\\" __ID=\\\"5\\\" __len=\\\"6\\\"><entries><p1:String __ID=\\\"6\\\">local-mtp://Lars-PC_096</p1:String><p1:String __ID=\\\"7\\\">tcp-mtp://134.100.11.233:56274</p1:String><p1:String __ID=\\\"8\\\">tcp-mtp://0:0:0:0:0:0:0:1:56274</p1:String><p1:String __ID=\\\"9\\\">ssltcp-mtp://134.100.11.233:56279</p1:String><p1:String __ID=\\\"10\\\">ssltcp-mtp://0:0:0:0:0:0:0:1:56279</p1:String><p1:String __ID=\\\"11\\\">relay-http://jadex.informatik.uni-hamburg.de/relay/</p1:String></entries></p1:String__1></addresses></p2:ComponentIdentifier></value></entry></entries></p0:HashMap>\",null)";
-//
-//		try
-//		{
-//			SJavaParser.evaluateExpression(exp, null);
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//		try
-//		{
-//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
+		try
+		{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 		createPlatform(args).addResultListener(new IResultListener<IExternalAccess>()
 		{
