@@ -162,9 +162,8 @@ public class DaemonService implements IDaemonService
 			File newcurdir = new File(options.getStartDirectory());
 			newcurdir.mkdirs();
 
-			String cmd = options.getStartCommand();
-
-			System.out.println("Starting process: " + cmd);
+//			String cmd = options.getStartCommand();
+//			System.out.println("Starting process: " + cmd);
 
 			final Process proc = Runtime.getRuntime().exec(options.getStartCommand(), null, newcurdir);
 
@@ -178,18 +177,7 @@ public class DaemonService implements IDaemonService
 					if(!fin)
 					{
 						buf.append(new String(b));
-						for(int i = 0; i < b.length; i++)
-						{
-							if(' ' == b[i])
-							{
-								fin = true;
-								IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
-								platforms.put(cid, proc);
-								notifyListeners(new ChangeEvent<IComponentIdentifier>(null,IDaemonService.ADDED, cid));
-								ret.setResult(cid);
-								break;
-							}
-						}
+						fin = checkPlatformIdentifier(buf, proc, ret);
 					}
 					super.write(b);
 				}
@@ -201,16 +189,8 @@ public class DaemonService implements IDaemonService
 						for(int i = 0; i < len; i++)
 						{
 							buf.append((char)b[i]);
-							if(' ' == b[i])
-							{
-								fin = true;
-								IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
-								platforms.put(cid, proc);
-								notifyListeners(new ChangeEvent<IComponentIdentifier>(null, IDaemonService.ADDED, cid));
-								ret.setResult(cid);
-								break;
-							}
 						}
+						fin = checkPlatformIdentifier(buf, proc, ret);
 					}
 					super.write(b, off, len);
 				}
@@ -220,14 +200,7 @@ public class DaemonService implements IDaemonService
 					if(!fin)
 					{
 						buf.append((char)b);
-						if(' ' == b)
-						{
-							fin = true;
-							IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
-							platforms.put(cid, proc);
-							notifyListeners(new ChangeEvent<IComponentIdentifier>(null, IDaemonService.ADDED, cid));
-							ret.setResult(cid);
-						}
+						fin = checkPlatformIdentifier(buf, proc, ret);
 					}
 					super.write(b);
 				}
@@ -274,6 +247,59 @@ public class DaemonService implements IDaemonService
 		}
 
 		return ret;
+	}
+	
+	/**
+	 *  Check the platform identifier.
+	 */
+	protected boolean checkPlatformIdentifier(StringBuffer buf, Process proc, Future<IComponentIdentifier> fut)
+	{
+		boolean ret = false;
+		
+		IComponentIdentifier cid = getPlatformIdentifier(buf);
+		if(cid!=null)
+		{
+			ret = true;
+			platforms.put(cid, proc);
+			notifyListeners(new ChangeEvent<IComponentIdentifier>(null,IDaemonService.ADDED, cid));
+			fut.setResult(cid);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the platform identifier.
+	 */
+	protected static IComponentIdentifier getPlatformIdentifier(StringBuffer buf)
+	{
+		IComponentIdentifier ret = null;
+		
+		String str = buf.toString();
+		int idx = str.indexOf("platform startup time"); // hack?! better way to identify platform cid?
+		if(idx!=-1)
+		{
+			str = str.substring(0, idx);
+			idx = str.lastIndexOf(SUtil.LF);
+			if(idx!=-1)
+			{
+				str = str.substring(idx+SUtil.LF.length());
+			}
+			
+//			System.out.println("platform id: "+str);
+			ret = new ComponentIdentifier(str.trim());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		String s = "Using stored platform password: a6e73638-094+\n\rLars-PC_a71 platform startup time: 7542 ms.";
+		System.out.println(getPlatformIdentifier(new StringBuffer().append(s)));
 	}
 
 	/**

@@ -132,13 +132,16 @@ public class UpdateAgent implements IUpdateService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		getVersion(rid).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+//		if(creator==null)
 		{
-			public void customResultAvailable(IResourceIdentifier newrid)
+			getVersion(rid).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
 			{
-				startUpdating(newrid);
-			}
-		});
+				public void customResultAvailable(IResourceIdentifier newrid)
+				{
+					startUpdating(newrid);
+				}
+			});
+		}
 		
 		return ret;
 	}
@@ -153,6 +156,7 @@ public class UpdateAgent implements IUpdateService
 	@AgentMessageArrived
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
+//		System.out.println("rec: "+msg);
 		if(mt.getName().equals(SFipa.MESSAGE_TYPE_NAME_FIPA))
 		{
 			IComponentIdentifier sender = (IComponentIdentifier)msg.get(SFipa.SENDER);
@@ -175,9 +179,11 @@ public class UpdateAgent implements IUpdateService
 	 */
 	public void acknowledgeUpdate(IComponentIdentifier caller)
 	{
+//		System.out.println("ack: "+caller);
+		
 		if(caller.equals(newcomp))
 		{
-			System.out.println("Update acknowledged, shutting down old platform: "+agent.getComponentIdentifier());
+//			System.out.println("Update acknowledged, shutting down old platform: "+agent.getComponentIdentifier());
 			cms.destroyComponent(agent.getComponentIdentifier().getRoot());
 		}
 		else if(newcomp==null)
@@ -221,7 +227,8 @@ public class UpdateAgent implements IUpdateService
 				// todo: find out original configuration and parameters to replay on new
 				// todo for major release: make checkpoint and let new use checkpoint
 				
-				String comstr = "-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+				String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+//				String comstr = "-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
 //				String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
 //				System.out.println("generated: "+comstr);
 				
@@ -240,11 +247,8 @@ public class UpdateAgent implements IUpdateService
 //					}
 //				});
 
-//				deser = deser.replaceAll("\"", "\\\\\"");
 				comstr = "-maven_dependencies true -component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
-
-//				String comstr = "\"-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
-				System.out.println("generated: "+comstr);
+//				System.out.println("generated: "+comstr);
 				so.setProgramArguments(comstr);
 				
 				daeser.startPlatform(so).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret) 
@@ -334,7 +338,7 @@ public class UpdateAgent implements IUpdateService
 					public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
 					{
 						IResourceIdentifier newrid = result.getFirstEntity();
-						System.out.println("versions: "+rid.getGlobalIdentifier().getVersionInfo()+" "+newrid.getGlobalIdentifier().getVersionInfo());
+//						System.out.println("versions: "+rid.getGlobalIdentifier().getVersionInfo()+" "+newrid.getGlobalIdentifier().getVersionInfo());
 						ret.setResult(newrid);
 					}
 				});

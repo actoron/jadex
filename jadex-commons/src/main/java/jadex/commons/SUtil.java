@@ -49,6 +49,9 @@ import java.util.jar.JarFile;
  */
 public class SUtil
 {
+	/** Line separator. */
+	public static final String LF = System.getProperty("line.separator");
+	
 	/** Units for representing byte values. */
 	public static final String[]	BYTE_UNITS	= new String[]{"B", "KB", "MB", "GB", "TB", "PB", "EB"};	// captures up to Long.MAX_VALUE (= 7.99 EB)
 	
