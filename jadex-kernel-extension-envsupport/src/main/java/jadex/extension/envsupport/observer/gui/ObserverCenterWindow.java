@@ -10,7 +10,9 @@ import java.awt.EventQueue;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -30,73 +32,83 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-/** Default GUI main window.
+
+/**
+ * Default GUI main window.
  */
 public class ObserverCenterWindow extends JFrame
 {
-	
+
 	/** The menubar. */
-	private JMenuBar menubar;
-	
+	private JMenuBar	menubar;
+
 	/** The toolbar. */
-	private JToolBar toolbar;
-	
+	private JToolBar	toolbar;
+
 	/** The main pane. */
-	protected JPanel mainpanel;
-	
+	protected JPanel	mainpanel;
+
 	/** The split pane. */
-	private JSplitPane splitpane;
-	
+	private JSplitPane	splitpane;
+
 	/** Known plugin views. */
-	protected Set knownpluginviews;
+	protected Set		knownpluginviews;
+
+	protected boolean	disposed;
+
+	protected boolean	fullscreen	= false;
+
+	protected Dimension	olddim;
+
+	protected Point		oldpos;
+
+	protected Component	oldcomp;
+
+	protected int		olddivider;
 	
-	protected boolean disposed;
 	
-	protected boolean fullscreen = false;
 	
-	protected Dimension olddim;
-	protected Point oldpos;
-	protected Component oldcomp;
-	protected int olddivider;
-	
-	/** 
-	 *  Creates the main window.
-	 *  @param title title of the window
-	 *  @param simView view of the simulation
+
+	/**
+	 * Creates the main window.
+	 * 
+	 * @param title title of the window
+	 * @param simView view of the simulation
 	 */
 	public ObserverCenterWindow(String title)
 	{
 		super(title);
-		
+
 		this.knownpluginviews = new HashSet();
-		
+
 		Runnable runnable = new Runnable()
 		{
 			public void run()
 			{
 				if(!disposed)
 				{
-					menubar = new JMenuBar();
-	//				menubar.add(new JMenu("Test"));
-					setJMenuBar(menubar);
-	
-					mainpanel = new JPanel(new BorderLayout());
 					
+					menubar = new JMenuBar();
+					// menubar.add(new JMenu("Test"));
+					setJMenuBar(menubar);
+
+					mainpanel = new JPanel(new BorderLayout());
+
 					toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
 					mainpanel.add(toolbar, BorderLayout.NORTH);
-	
+
 					splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 					splitpane.setOneTouchExpandable(true);
-	
+
 					JPanel pluginpanel = new JPanel(new CardLayout());
 					splitpane.setLeftComponent(pluginpanel);
-					
+
 					JPanel perspectivepanel = new JPanel(new CardLayout());
 					splitpane.setRightComponent(perspectivepanel);
-					
+
 					mainpanel.add(splitpane, BorderLayout.CENTER);
 					getContentPane().add(mainpanel, BorderLayout.CENTER);
-					
+
 					setResizable(true);
 					setBackground(null);
 					pack();
@@ -104,81 +116,80 @@ public class ObserverCenterWindow extends JFrame
 					setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 					setVisible(true);
 					splitpane.setDividerLocation(250);
-					
-					addMouseListener(new MouseAdapter()
+
+					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+					manager.addKeyEventDispatcher(new KeyEventDispatcher()
 					{
-						public void mouseClicked(MouseEvent e)
+						public boolean dispatchKeyEvent(KeyEvent e)
 						{
-							makeFullscreen();
-						}
-						public void mousePressed(MouseEvent e) {
-							
-//							makeFullscreen();
+							if(e.getKeyCode() == KeyEvent.VK_F11 && e.getID() == KeyEvent.KEY_PRESSED)
+							{
+								Object source = e.getSource();
+								System.out.println("window " + source.toString());
+				
+									makeFullscreen();
+
+							}
+
+							return false;
 						}
 					});
 
-					KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-			        manager.addKeyEventDispatcher(new KeyEventDispatcher()
-	        		{
-	        			public boolean dispatchKeyEvent(KeyEvent e)
-	        			{
-	        				if(e.getID() == KeyEvent.KEY_PRESSED)
-	        				{
-	        					makeFullscreen();
-	        				}
-	        				return false;
-	        			}
-	        		});
 				}
+				
+
 			}
 		};
-		
+
+
 		if(EventQueue.isDispatchThread())
 		{
+			
 			runnable.run();
+
 		}
 		else
 		{
-//			try
+			// try
 			{
-//				EventQueue.invokeAndWait(runnable);
+				// EventQueue.invokeAndWait(runnable);
 				EventQueue.invokeLater(runnable);
 			}
-//			catch (InterruptedException e)
-//			{
-//			}
-//			catch (InvocationTargetException e)
-//			{
-//			}
+			// catch (InterruptedException e)
+			// {
+			// }
+			// catch (InvocationTargetException e)
+			// {
+			// }
 		}
 	}
-	
+
 	/**
-	 *  Display window in fullscreen.
+	 * Display window in fullscreen.
 	 */
 	public void makeFullscreen()
 	{
-		boolean fs = oldcomp==null;
-		
+		boolean fs = oldcomp == null;
+
 		menubar.setVisible(!fs);
 		splitpane.setVisible(!fs);
 		toolbar.setVisible(!fs);
-//		mainpanel.remove(splitpane);
-//		mainpanel.remove(toolbar);
-		
+		// mainpanel.remove(splitpane);
+		// mainpanel.remove(toolbar);
+
 		final WindowListener[] wls = getWindowListeners();
-		for(WindowListener wl: wls)
+		for(WindowListener wl : wls)
 		{
 			removeWindowListener(wl);
 		}
-		
+
 		if(fs)
 		{
 			oldpos = getLocation();
 			olddim = getSize();
 			oldcomp = splitpane.getRightComponent();
 			olddivider = splitpane.getDividerLocation();
-			
+
 			splitpane.remove(oldcomp);
 			mainpanel.add(oldcomp, BorderLayout.CENTER);
 
@@ -186,8 +197,8 @@ public class ObserverCenterWindow extends JFrame
 			disposed = false;
 			setUndecorated(true);
 			setVisible(true);
-			
-			setLocation(0,0);
+
+			setLocation(0, 0);
 			setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		}
 		else
@@ -200,18 +211,18 @@ public class ObserverCenterWindow extends JFrame
 			disposed = false;
 			setUndecorated(false);
 			setVisible(true);
-			
+
 			setLocation(oldpos);
 			setSize(olddim);
 			splitpane.setDividerLocation(olddivider);
 			oldcomp = null;
 		}
-		
+
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				for(WindowListener wl: wls)
+				for(WindowListener wl : wls)
 				{
 					addWindowListener(wl);
 				}
@@ -219,40 +230,42 @@ public class ObserverCenterWindow extends JFrame
 		});
 	}
 
-	
+
 	/**
-	 *  Dispose the frame
+	 * Dispose the frame
 	 */
 	public void dispose()
 	{
-		disposed	= true;
+		disposed = true;
 		super.dispose();
 	}
-	
 
-	
-	/** 
-	 *  Adds a menu
-	 *  @param menu the menu
+
+	/**
+	 * Adds a menu
+	 * 
+	 * @param menu the menu
 	 */
 	public void addMenu(JMenu menu)
 	{
 		menubar.add(menu);
 	}
-	
-	/** Removes a menu
-	 *  
-	 *  @param menu the menu
+
+	/**
+	 * Removes a menu
+	 * 
+	 * @param menu the menu
 	 */
 	public void removeMenu(JMenu menu)
 	{
 		menubar.remove(menu);
 	}
-	
-	/** Adds a toolbar item
-	 *  
-	 *  @param name name of the toolbar item
-	 *  @param action toolbar item action
+
+	/**
+	 * Adds a toolbar item
+	 * 
+	 * @param name name of the toolbar item
+	 * @param action toolbar item action
 	 */
 	public void addToolbarItem(String name, Action action)
 	{
@@ -260,12 +273,13 @@ public class ObserverCenterWindow extends JFrame
 		button.setText(name);
 		toolbar.add(button);
 	}
-	
-	/** Adds a toolbar item with icon.
-	 *  
-	 *  @param name name of the toolbar item
-	 *  @param icon the icon of the item
-	 *  @param action toolbar item action
+
+	/**
+	 * Adds a toolbar item with icon.
+	 * 
+	 * @param name name of the toolbar item
+	 * @param icon the icon of the item
+	 * @param action toolbar item action
 	 */
 	public void addToolbarItem(String name, Icon icon, Action action)
 	{
@@ -274,28 +288,30 @@ public class ObserverCenterWindow extends JFrame
 		button.setToolTipText(name);
 		toolbar.add(button);
 	}
-	
-	/** Sets the plugin view.
-	 *  
-	 *  @param view the view
+
+	/**
+	 * Sets the plugin view.
+	 * 
+	 * @param view the view
 	 */
 	public void setPluginView(String pluginname, Component view)
 	{
-		JPanel pluginpanel = (JPanel) splitpane.getLeftComponent();
+		JPanel pluginpanel = (JPanel)splitpane.getLeftComponent();
 		CardLayout cl = (CardLayout)(pluginpanel.getLayout());
-		
+
 		if(!knownpluginviews.contains(pluginname))
 		{
 			knownpluginviews.add(pluginname);
 			pluginpanel.add(view, pluginname);
 		}
-		
+
 		cl.show(pluginpanel, pluginname);
 	}
-	
-	/** Sets the perspective view.
-	 *  
-	 *  @param view the view
+
+	/**
+	 * Sets the perspective view.
+	 * 
+	 * @param view the view
 	 */
 	public void setPerspectiveView(Component view)
 	{
@@ -307,15 +323,17 @@ public class ObserverCenterWindow extends JFrame
 	/**
 	 * @return the fullscreen
 	 */
-	public boolean isFullscreen() {
+	public boolean isFullscreen()
+	{
 		return fullscreen;
 	}
 
 	/**
 	 * @param fullscreen the fullscreen to set
 	 */
-	public void setFullscreen(boolean fullscreen) {
+	public void setFullscreen(boolean fullscreen)
+	{
 		this.fullscreen = fullscreen;
 	}
-	
+
 }
