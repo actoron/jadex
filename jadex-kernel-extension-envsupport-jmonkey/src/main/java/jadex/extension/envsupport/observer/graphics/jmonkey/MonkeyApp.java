@@ -195,6 +195,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			{
 				if(keyPressed && name.equals("Fullscreen"))
 				{
+					System.out.println("fullscreen command aus JMonkey");
+					
 					JmeCanvasContext context = (JmeCanvasContext)getContext();
 				
 					event = new KeyEvent(context.getCanvas(), KeyEvent.KEY_PRESSED,  EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
