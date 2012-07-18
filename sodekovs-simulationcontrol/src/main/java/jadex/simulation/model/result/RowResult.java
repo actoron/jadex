@@ -1,7 +1,5 @@
 package jadex.simulation.model.result;
 
-import jadex.simulation.model.ObservedEvent;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

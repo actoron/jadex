@@ -1,8 +1,6 @@
 package jadex.simulation.evaluation;
 
 import jadex.simulation.model.ObservedEvent;
-import jadex.simulation.model.Observer;
-import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
 
