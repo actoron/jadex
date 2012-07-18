@@ -15,9 +15,10 @@ import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
 public class SenderAgent extends MicroAgent {
 
 	@Override
-	public IFuture<Void> executeBody() {
+	public IFuture<Void> agentCreated() {
 		// wait 7s then start the first step
 		waitFor(7000, new CounterIncrementStep(0));
+
 		return IFuture.DONE;
 	}
 

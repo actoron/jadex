@@ -24,15 +24,11 @@ public class GraphAgent extends MicroAgent {
 	public IFuture<Void> agentCreated() {
 		name = getComponentDescription().getName().getLocalName();
 
-		return IFuture.DONE;
-	}
-
-	@Override
-	public IFuture<Void> executeBody() {
 		if (name.equals("Graph1")) {
 			System.out.println("GraphAgent " + name + " is going to send a coordination information containing his id.");
 			waitFor(7000, new SendStep(name));
 		}
+
 		return IFuture.DONE;
 	}
 

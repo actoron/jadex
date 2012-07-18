@@ -26,14 +26,6 @@ public class ExampleMicroAgent extends MicroAgent {
 		return IFuture.DONE;
 	}
 
-	@Override
-	public IFuture<Void> executeBody() {
-		return IFuture.DONE;
-//		System.out.println("ExampleMicroAgent executeBody() called.");
-//		waitFor(2300 , new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!"));
-//		new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!").execute(this);
-	}
-
 	@CoordinationStep
 	public class SayHelloStep extends CoordinationComponentStep {
 
@@ -52,7 +44,7 @@ public class ExampleMicroAgent extends MicroAgent {
 		}
 	}
 
-	@CoordinationParameter
+	@CoordinationStep
 	public class ReceiveHelloStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
@@ -60,7 +52,7 @@ public class ExampleMicroAgent extends MicroAgent {
 
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			System.out.println("ExampleMicroAgent" + ExampleMicroAgent.this.getAgentName() +" execute() in ReceiveHelloStep called with message:");
+			System.out.println("ExampleMicroAgent" + ExampleMicroAgent.this.getAgentName() + " execute() in ReceiveHelloStep called with message:");
 			System.out.println("\t" + message);
 			return IFuture.DONE;
 		}
