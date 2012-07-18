@@ -1,10 +1,10 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import java.awt.Component;
+import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
+
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -16,7 +16,6 @@ import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
-import com.jme3.audio.AudioNode;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
@@ -32,18 +31,19 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.control.CameraControl.ControlDirection;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.system.JmeCanvasContext;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.HillHeightMap;
+
+import de.lessvoid.nifty.Nifty;
 
 
 /**
@@ -73,8 +73,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private Spatial			_selectedSpatial;
 
 	private ChaseCamera		_chaseCam;
-	
-	private CameraNode _camNode;
 
 	// Helper Classes jop
 	private monkeyApp_Grid	_gridHandler;
@@ -88,9 +86,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	private BasicShadowRenderer bsr;
 	
 	private boolean _isGrid;
-	
-	private AudioNode audio_nature;
-
 	
 	private KeyEvent event;
 	
@@ -112,26 +107,37 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	@Override
 	public void simpleInitApp()
 	{
-		
-		initAudio();
-		// Create the Cam
-		setCam("Default");
+		//Base Setup
 		Logger.getLogger("").setLevel(Level.SEVERE);
+		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); 
+		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE); 
 		viewPort.setBackgroundColor(ColorRGBA.LightGray);
 
-		// this.rootNode.attachChild(_gridNode);
-		this.rootNode.attachChild(_staticNode);
-		
-		
-		DirectionalLight sun = new DirectionalLight();
-		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal());
-		rootNode.addLight(sun);
+		//Init Methods
+		initAudio();
+		initCam();
+		initRoot();
+		initRenderer();
+		initKeys();
+//		initNifty();
+	}
 
-		AmbientLight al = new AmbientLight();
-		al.setColor(ColorRGBA.White.mult(0.5f));
-		rootNode.addLight(al);
+	
+	private void initNifty() {
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+                assetManager, inputManager, audioRenderer, guiViewPort);
+        /** Create a new NiftyGUI object */
+        Nifty nifty = niftyDisplay.getNifty();
+        /** Read your XML and initialize your custom ScreenController */
+        nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new GuiController(this));
+
+        guiViewPort.addProcessor(niftyDisplay);
+
+        flyCam.setDragToRotate(true);
 		
+	}
+
+	private void initRenderer() {
 //		  FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
 //		  BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
 //		  fpp.addFilter(bf);
@@ -151,18 +157,26 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 
 	    rootNode.setShadowMode(ShadowMode.Off);
+		
+	}
 
-		//TODO faulheit, ist nie grid:!
+	private void initRoot() {
+		this.rootNode.attachChild(_staticNode);
+		DirectionalLight sun = new DirectionalLight();
+		sun.setColor(ColorRGBA.White);
+		sun.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal());
+		rootNode.addLight(sun);
+
+		AmbientLight al = new AmbientLight();
+		al.setColor(ColorRGBA.White.mult(0.5f));
+		rootNode.addLight(al);
+		
 		_gridHandler = new monkeyApp_Grid(_appDimension, _spaceSize, assetManager, _isGrid);
 		_gridNode = _gridHandler.getGrid();
 		this.rootNode.attachChild(_geometryNode);
-
-		initKeys();
 		
-
 	}
 
-	
 	private void initAudio()
 	{
 
@@ -257,11 +271,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 						 {
 							
 							 _chaseCam.setSpatial(_selectedSpatial);
-							 _chaseCam.setEnabled(true);
-							 
-							_camNode.removeFromParent();
-							_camNode.setEnabled(false);
-								
+							 _chaseCam.setEnabled(true);	
 							 flyCam.setEnabled(false);
 						 }
 						 else
@@ -298,16 +308,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 
 	}
 
-	public void setCam(String modus)
+	public void initCam()
 	{
-		
-//		 create the camera Node
-		_camNode = new CameraNode("CameraNode", cam);
-		 _camNode.setControlDir(ControlDirection.SpatialToCamera);
-		_camNode.setEnabled(false);
-		 //This mode means that camera copies the movements of the target:
-		 
-		 
 		_chaseCam = new ChaseCamera(cam, rootNode, inputManager);
 		_chaseCam.setSmoothMotion(true);
 		_chaseCam.setDefaultDistance(500f);
@@ -341,13 +343,10 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 //		view_n.attachScene(rootNode);
 //		view_n.setBackgroundColor(ColorRGBA.Black);
 
-		
-
-
 
 	}
 
-	protected void moveCamera(float value, boolean sideways)
+	private void moveCamera(float value, boolean sideways)
 	{
 		Vector3f vel = new Vector3f();
 		Vector3f pos = cam.getLocation().clone();
@@ -383,7 +382,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		if(_walkCam)
 		{
 			Vector3f loc = cam.getLocation();
-			loc.setY(getHeightAt(loc.x, loc.z));
+			loc.setY(getHeightForCam(loc.x, loc.z));
 			cam.setLocation(loc);
 		}
 		
@@ -402,9 +401,6 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		_geometryNode = geometry;
 		this.rootNode.attachChild(_geometryNode);
 	}
-	
-	
-	
 
 	public void setStaticGeometry(Node staticNode)
 	{
@@ -425,7 +421,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 			_terrain = (TerrainQuad)terra;
 			_terrain.setLocalTranslation(_appDimension / 2, 0, _appDimension / 2);
 			/** 5. The LOD (level of detail) depends on were the camera is: */
-			TerrainLodControl control = new TerrainLodControl(_terrain, getCamera());
+			TerrainLodControl control = new TerrainLodControl(_terrain, cam);
 			_terrain.addControl(control);
 			_terrain.setShadowMode(ShadowMode.Receive);
 
@@ -438,27 +434,28 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 	/*
 	 * Use only for Camera
 	 */
-	public float getHeightAt(float x, float z)
+	private float getHeightForCam(float x, float z)
 	{
+		float height = 0;
 		if(_terrain != null)
 		{
 			Vector2f vec = new Vector2f(x, z);
-			float height = _terrain.getHeight(vec);
-			return height + 3;
+			height = _terrain.getHeight(vec) +3;
 		}
 
-		return 0;
+		return height;
 	}
 
 	public float getHeightAt(Vector2f vec)
 	{
+		float height = 0;
 		if(_terrain != null)
 		{
 			vec = vec.mult(_appDimension/_spaceSize);
-			return _terrain.getHeight(vec) / _appDimension  *_spaceSize;
+			height = _terrain.getHeight(vec) / _appDimension  *_spaceSize;
 		}
 
-		return 0;
+		return height;
 
 	}
 
@@ -489,7 +486,8 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		}
 	}
 
-	private void fireSelection()
+	
+	private CollisionResults fireRaytrace()
 	{
 		_selectedSpatial = null;
 		// Reset results list.
@@ -509,6 +507,15 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		// list.
 		// rootNode.collideWith(ray, results);
 		_geometryNode.collideWith(ray, results);
+		
+		return results;
+	}
+
+
+
+	private void fireSelection()
+	{
+		CollisionResults results = fireRaytrace();
 
 		int selection = -1;
 		Spatial selectedspatial = null;
@@ -534,7 +541,32 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		setSelectedTarget(selection);
 		setSelectedSpatial(selectedspatial);
 
-	} // else if ...
+	} 
+	
+	
+	public void onAnimChange(AnimControl control, AnimChannel channel, String animName)
+	{
+		// unused?
+		
+	}
+
+	
+	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName)
+	{
+		if(channel.getLoopMode()==LoopMode.DontLoop)
+		{
+			channel.reset(true);
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	// GETTER AND SETTER
 
 
 	/**
@@ -569,22 +601,7 @@ public class MonkeyApp extends SimpleApplication implements AnimEventListener
 		this._selectedTarget = selectedTarget;
 	}
 
-	@Override
-	public void onAnimChange(AnimControl control, AnimChannel channel, String animName)
-	{
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName)
-	{
-		if(channel.getLoopMode()==LoopMode.DontLoop)
-		{
-			channel.reset(true);
-		}
-		
-	}
 
 	public void setChannels(HashMap<String, AnimChannel> animChannels)
 	{

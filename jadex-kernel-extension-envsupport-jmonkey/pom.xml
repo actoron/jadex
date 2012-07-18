@@ -79,7 +79,7 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	
+
 	<build>
 		<resources>
 			<resource>
@@ -124,9 +124,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.8.1</version>
-        		<configuration>
-        			<show>public</show>
-        		</configuration>
+				<configuration>
+					<show>public</show>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -162,7 +162,7 @@
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</repository>
 	</repositories>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.jme3</groupId>
@@ -176,12 +176,12 @@
 			<artifactId>jME3-core</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
-			
+
 		<dependency>
-            <groupId>com.jme3</groupId>
-            <artifactId>jME3-terrain</artifactId>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-terrain</artifactId>
 			<version>${jmonkey.version}</version>
-        </dependency> 
+		</dependency>
 
 		<dependency>
 			<groupId>com.jme3</groupId>
@@ -203,59 +203,86 @@
 			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
-        <dependency>
-            <groupId>com.jme3</groupId>
-            <artifactId>jME3-blender</artifactId>
-			<version>${jmonkey.version}</version>
-            <scope>runtime</scope>
-        </dependency>    
-               
-        <dependency>
-           	<groupId>com.jme3</groupId>
-           	<artifactId>jME3-desktop</artifactId>
-			<version>${jmonkey.version}</version>
-        </dependency>  
-                 
-        <dependency>
-            <groupId>com.jme3</groupId>
-            <artifactId>jME3-plugins</artifactId>
-			<version>${jmonkey.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        
-        <!-- todo: remove!? -->
-       <dependency>
-            <groupId>com.jme3</groupId>
-            <artifactId>jME3-testdata</artifactId>
-			<version>${jmonkey.version}</version>
-            <scope>runtime</scope>
-       </dependency>
-       
-       <dependency>
-             <groupId>com.jme3</groupId>
-             <artifactId>jME3-jogg</artifactId>
-			<version>${jmonkey.version}</version>
-             <scope>runtime</scope>
-       </dependency>      
-            
-       <dependency>
-            <groupId>com.jme3</groupId>
-            <artifactId>j-ogg-oggd</artifactId>
-			<version>${jmonkey.version}</version>
-            <scope>runtime</scope>
-       </dependency>  
-                
-       <dependency>
-            <groupId>com.jme3</groupId>
-            <artifactId>j-ogg-vorbisd</artifactId>
-			<version>${jmonkey.version}</version>
-            <scope>runtime</scope>
-      </dependency> 
 
-		<!-- Provided scope for jadex dependencies to exclude them from addon.zip.  -->
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-blender</artifactId>
+			<version>${jmonkey.version}</version>
+			<scope>runtime</scope>
+		</dependency>
 
-       <dependency>
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-desktop</artifactId>
+			<version>${jmonkey.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-plugins</artifactId>
+			<version>${jmonkey.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- todo: remove!? -->
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-testdata</artifactId>
+			<version>${jmonkey.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-jogg</artifactId>
+			<version>${jmonkey.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>j-ogg-oggd</artifactId>
+			<version>${jmonkey.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>j-ogg-vorbisd</artifactId>
+			<version>${jmonkey.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-niftygui</artifactId>
+			<version>${jmonkey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>nifty</artifactId>
+			<version>${jmonkey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>nifty-default-controls</artifactId>
+			<version>${jmonkey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>nifty-style-black</artifactId>
+			<version>${jmonkey.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bushe</groupId>
+			<artifactId>eventbus</artifactId>
+			<version>1.3</version>
+		</dependency>
+
+		<!-- Provided scope for jadex dependencies to exclude them from addon.zip. -->
+
+		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-javaparser</artifactId>
 			<version>2.1-SNAPSHOT</version>
@@ -269,7 +296,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-	    <dependency>
+		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
 			<version>2.1-SNAPSHOT</version>
@@ -277,5 +304,5 @@
 		</dependency>
 
 	</dependencies>
-	
+
 </project>

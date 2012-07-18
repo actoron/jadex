@@ -1,0 +1,30 @@
+
+<nifty>
+    <useControls filename="nifty-default-controls.xml" />
+    <useStyles filename="nifty-default-styles.xml" />
+   
+  
+        <screen id="hud" controller="jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController">
+            <layer id="background" childLayout="center">
+                <image filename="jadex3d/interface/frame.png" imageMode="resize:40,490,110,170,40,560,40,270,40,560,40,40" width="100%" height="100%"></image>
+            </layer>
+            <layer id="foreground" childLayout="horizontal">
+
+                <panel id="panel_left" width="80%" height="100%" childLayout="vertical" 
+            >  
+        <!-- spacer -->
+                </panel>
+                <panel id="panel_right" width="20%" height="100%" childLayout="vertical" >  
+                    <panel id="panel_top_right1" width="100%" height="15%" childLayout="center" >  
+                        <control name="label" color="#000" text="123" width="100%" height="100%" />
+        
+                    
+                    </panel>
+                    <panel id="panel_top_right2" width="100%" height="15%" childLayout="center" >  
+                    </panel>
+                    <panel id="panel_bot_right" width="100%" height="70%" valign="center">  
+                    </panel>
+                </panel>
+            </layer>
+        </screen>
+    </nifty>
