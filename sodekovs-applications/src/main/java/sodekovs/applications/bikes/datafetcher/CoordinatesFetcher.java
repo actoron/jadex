@@ -14,10 +14,10 @@ import java.sql.SQLException;
 
 import javax.xml.bind.JAXBException;
 
+import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
 import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
 import sodekovs.applications.bikes.datafetcher.xml.stations.Station;
 import sodekovs.applications.bikes.datafetcher.xml.stations.Stations;
-import sodekovs.graphanalysis.database.DatabaseConnection;
 
 /**
  * @author thomas
