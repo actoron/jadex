@@ -57,6 +57,7 @@ import java.util.Map;
 {
 	@Argument(name="interval", clazz=long.class, defaultvalue="5000"),
 	@Argument(name="creator", clazz=IComponentIdentifier.class),
+	@Argument(name="separatevm", clazz=boolean.class, defaultvalue="true")
 })
 @ComponentTypes(
 {
@@ -73,13 +74,17 @@ public class UpdateAgent implements IUpdateService
 	@AgentArgument
 	protected IComponentIdentifier creator;
 	
-	/** The agent. */
-	@Agent
-	protected MicroAgent agent;
-	
 	/** The check for update interval. */
 	@AgentArgument
 	protected long interval;
+
+	/** Flag if new vm should be used. */
+	@AgentArgument
+	protected boolean separatevm;
+	
+	/** The agent. */
+	@Agent
+	protected MicroAgent agent;
 	
 	/** The cms. */
 	@AgentService
@@ -176,6 +181,12 @@ public class UpdateAgent implements IUpdateService
 	
 	/**
 	 *  Called by new platform after correct startup.
+	 *  
+	 *  Acknowledgement is complete when called twice:
+	 *  a) after creation with cid of new platform
+	 *  b) after new update agent has send ack to this agent (handshake)
+	 *  
+	 *  After ack is complete platform shutdown will be initiated.
 	 */
 	public void acknowledgeUpdate(IComponentIdentifier caller)
 	{
@@ -203,61 +214,116 @@ public class UpdateAgent implements IUpdateService
 	}
 	
 	/**
-	 * 
+	 *  Perform the update.
 	 */
 	protected IFuture<Void> performUpdate(IResourceIdentifier rid)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		if(separatevm)
+		{
+			startPlatformInSeparateVM().addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			{
+				public void customResultAvailable(IComponentIdentifier result) 
+				{
+					acknowledgeUpdate(result);
+				}
+			});
+		}
+		else
+		{
+			startPlatformInSameVM().addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			{
+				public void customResultAvailable(IComponentIdentifier result) 
+				{
+					acknowledgeUpdate(result);
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<IComponentIdentifier> startPlatformInSameVM()
+	{
+		System.out.println("Starting platform in same vm");
+		
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		// todo: create new classpath for new version 
+		
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("creator", agent.getComponentIdentifier());
+		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
+//		String argsstr = JavaWriter.objectToXML(args, null);
+		argsstr = argsstr.replaceAll("\"", "\\\\\"");
+		String deser = "jadex.xml.bean.JavaReader.objectFromXML(\""+argsstr+"\""+",null)";
+//		
+		// todo: find out original configuration and parameters to replay on new
+		// todo for major release: make checkpoint and let new use checkpoint
+		
+		String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+//		String comstr = "-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+//		System.out.println("generated: "+comstr);
+		
+		StartOptions so = new StartOptions();
+		so.setMain("jadex.base.Starter");
+		so.setProgramArguments(comstr);
+		
+//		Starter.createPlatform(new String[]{"-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+//		Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+		Starter.createPlatform(new String[]{"-maven_dependencies", "true", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(IExternalAccess result)
+			{
+				IComponentIdentifier cid = result.getComponentIdentifier();
+				ret.setResult(cid);
+//				acknowledgeUpdate(cid.getRoot());
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<IComponentIdentifier> startPlatformInSeparateVM()
+	{
+		System.out.println("Starting platform in separate vm");
+		
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		// todo: create new classpath for new version? 
+		
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("creator", agent.getComponentIdentifier());
+		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
+//		String argsstr = JavaWriter.objectToXML(args, null);
+		argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
+		String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)";
+//		
+		// todo: find out original configuration and parameters to replay on new
+		// todo for major release: make checkpoint and let new use checkpoint
+
+//		String comstr = "-maven_dependencies true -component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
+		String comstr = "-component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
+		System.out.println("generated: "+comstr);
+
+		final StartOptions so = new StartOptions();
+		so.setMain("jadex.base.Starter");
+		so.setProgramArguments(comstr);
+		
 		IFuture<IDaemonService> fut = agent.getRequiredService("daeser");
-		fut.addResultListener(new ExceptionDelegationResultListener<IDaemonService, Void>(ret)
+		fut.addResultListener(new ExceptionDelegationResultListener<IDaemonService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IDaemonService daeser)
 			{
-				// todo: create new classpath for new version? 
-				
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("creator", agent.getComponentIdentifier());
-				String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
-//				String argsstr = JavaWriter.objectToXML(args, null);
-//				argsstr = argsstr.replaceAll("\"", "\\\\\"");
-				argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
-				String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)";
-//				
-				// todo: find out original configuration and parameters to replay on new
-				// todo for major release: make checkpoint and let new use checkpoint
-				
-				String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
-//				String comstr = "-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
-//				String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
-//				System.out.println("generated: "+comstr);
-				
-				StartOptions so = new StartOptions();
-				so.setMain("jadex.base.Starter");
-				so.setProgramArguments(comstr);
-				
-//				Starter.createPlatform(new String[]{"-maven_dependencies", "true", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
-////				Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
-//					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-//				{
-//					public void customResultAvailable(IExternalAccess result)
-//					{
-//						IComponentIdentifier cid = result.getComponentIdentifier();
-//						acknowledgeUpdate(cid.getRoot());
-//					}
-//				});
-
-				comstr = "-maven_dependencies true -component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
-//				System.out.println("generated: "+comstr);
-				so.setProgramArguments(comstr);
-				
-				daeser.startPlatform(so).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret) 
-				{
-					public void customResultAvailable(IComponentIdentifier cid) 
-					{
-						acknowledgeUpdate(cid);
-					}
-				});
+				daeser.startPlatform(so).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)); 
 			}
 		});
 		
