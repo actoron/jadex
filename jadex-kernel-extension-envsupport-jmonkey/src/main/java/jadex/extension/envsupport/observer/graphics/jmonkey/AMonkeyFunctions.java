@@ -47,120 +47,13 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 	public void simpleUpdateAbstract(float tpf) {
 		super.simpleUpdateAbstract(tpf);
 		if (walkCam) {
-			Vector3f loc = cam.getLocation();
-			loc.setY(getHeightForCam(loc.x, loc.z));
-			cam.setLocation(loc);
+
 		}
 		
 	}
+
 	
-	
-	/** Custom Keybinding: Map named actions to inputs. */
-	private void initKeys() {
-
-		inputManager.addMapping("Select", new MouseButtonTrigger(
-				MouseInput.BUTTON_RIGHT));
-		// You can map one or several inputs to one named action
-		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
-
-		inputManager.addMapping("Hud", new KeyTrigger(KeyInput.KEY_F1));
-		inputManager.addMapping("ChaseCam", new KeyTrigger(KeyInput.KEY_F3));
-		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
-		inputManager.addMapping("ChangeCam", new KeyTrigger(KeyInput.KEY_F6));
-		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
-		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11),new KeyTrigger(KeyInput.KEY_F));
-		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-
-		ActionListener actionListener = new ActionListener() {
-			public void onAction(String name, boolean keyPressed, float tpf) {
-
-				if (keyPressed && name.equals("Hud")) {
-					if (hudactive) {
-						niftyDisplay.getNifty().gotoScreen("hud");
-					} else {
-						niftyDisplay.getNifty().gotoScreen("default");
-					}
-
-					hudactive = !hudactive;
-				}
-
-				if (keyPressed && name.equals("Fullscreen")) {
-					fireFullscreen();
-
-				}
-
-				if (keyPressed && name.equals("Random")) {
-					setHeight();
-
-				}
-				if (keyPressed && name.equals("Grid")) {
-
-					if (rootNode.getChild("gridNode") != null) {
-						rootNode.detachChild(gridNode);
-
-					} else {
-						rootNode.attachChild(gridNode);
-					}
-
-				}
-
-				if (name.equals("Select") && keyPressed) {
-					fireSelection();
-				}
-
-				else if (!focusCamActive&&name.equals("ZoomIn")) {
-					moveCamera(6, false);
-				} else if (!focusCamActive &&name.equals("ZoomOut")) {
-					moveCamera(-6, false);
-				} else if (!focusCamActive && keyPressed && name.equals("ChangeCam")) {
-					walkCam = !walkCam;
-
-				}
-
-				else if (keyPressed && name.equals("ChaseCam")) {
-
-					focusCamActive = !focusCamActive;
-					
-					if (focusCamActive) {
-						if (selectedSpatial != null)
-						{
-							focusCam.setSpatial(selectedSpatial);
-						}
-						else
-						{
-							focusCam.setSpatial(staticNode);
-						}
-						focusCam.setEnabled(true);
-
-
-					} else 
-					{
-						focusCam.setEnabled(false);
-						flyCamera.setEnabled(true);
-					}
-
-
-
-				}
-			}
-
-		};
-
-		inputManager.addListener(actionListener, new String[] { "Hud" });
-		inputManager.addListener(actionListener, new String[] { "Random" });
-		inputManager.addListener(actionListener, new String[] { "Grid" });
-		inputManager.addListener(actionListener, new String[] { "ChaseCam" });
-		inputManager.addListener(actionListener, new String[] { "ChangeCam" });
-		inputManager.addListener(actionListener, new String[] { "ZoomIn" });
-		inputManager.addListener(actionListener, new String[] { "ZoomOut" });
-		inputManager.addListener(actionListener, new String[] { "Select" });
-		inputManager.addListener(actionListener, new String[] { "FollowCam" });
-		inputManager.addListener(actionListener, new String[] { "Fullscreen" });
-
-	}
-	
-	/*
+	/**
 	 * This Functions fires a F11 Command to the Canvas.
 	 */
 	public void fireFullscreen() {
@@ -177,7 +70,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 	}
 	
 	
-	/*
+	/**
 	 * This Functions moves the Camera for the WalkCamera
 	 */
 	private void moveCamera(float value, boolean sideways) {
@@ -192,6 +85,9 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 		vel.multLocal(value * 10);
 
 		pos.addLocal(vel);
+		
+		if(walkCam)
+		pos.setY(getHeightForCam(pos.x, pos.z));
 
 		cam.setLocation(pos);
 	}
@@ -284,12 +180,121 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 	 * Use only for Camera
 	 */
 	private float getHeightForCam(float x, float z) {
-		float height = 0;
+		Float height = 0f;
 		if (terrain != null) {
 			Vector2f vec = new Vector2f(x, z);
 			height = terrain.getHeight(vec) + 3;
+			
 		}
 
-		return height;
+		return (height.isNaN()?3:height);
+	}
+	
+	/** Custom Keybinding: Map named actions to inputs. */
+	private void initKeys() {
+
+		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
+		inputManager.addMapping("Hud", new KeyTrigger(KeyInput.KEY_F1));
+		inputManager.addMapping("ChaseCam", new KeyTrigger(KeyInput.KEY_F3));
+		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
+		inputManager.addMapping("WalkCam", new KeyTrigger(KeyInput.KEY_F6));
+		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
+		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11),new KeyTrigger(KeyInput.KEY_F));
+		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
+		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
+
+		ActionListener actionListener = new ActionListener() {
+			public void onAction(String name, boolean keyPressed, float tpf) {
+
+				if (keyPressed && name.equals("Hud")) {
+					if (hudactive) {
+						niftyDisplay.getNifty().gotoScreen("hud");
+					} else {
+						niftyDisplay.getNifty().gotoScreen("default");
+					}
+
+					hudactive = !hudactive;
+				}
+
+				if (keyPressed && name.equals("Fullscreen")) {
+					fireFullscreen();
+
+				}
+
+				if (keyPressed && name.equals("Random")) {
+					setHeight();
+
+				}
+				if (keyPressed && name.equals("Grid")) {
+
+					if (rootNode.getChild("gridNode") != null) {
+						rootNode.detachChild(gridNode);
+
+					} else {
+						rootNode.attachChild(gridNode);
+					}
+
+				}
+
+				if (name.equals("Select") && keyPressed) {
+					fireSelection();
+				}
+
+				if (!focusCamActive&&name.equals("ZoomIn")) {
+					moveCamera(6, false);
+				} 
+				
+				if (!focusCamActive &&name.equals("ZoomOut")) {
+					moveCamera(-6, false);
+				}
+				
+				if (!focusCamActive && keyPressed && name.equals("WalkCam")) {
+					walkCam = !walkCam;
+					System.out.println("walkcam!");
+				}
+
+				if (keyPressed && name.equals("ChaseCam")) {
+
+					focusCamActive = !focusCamActive;
+					
+					if (focusCamActive) {
+						if (selectedSpatial != null)
+						{
+							focusCam.setSpatial(selectedSpatial);
+						}
+						else
+						{
+							focusCam.setSpatial(staticNode);
+						}
+						focusCam.setEnabled(true);
+						flyCamera.setEnabled(false);
+						walkCam = false;
+
+
+					} else 
+					{
+						focusCam.setEnabled(false);
+						flyCamera.setEnabled(true);
+					}
+
+
+
+				}
+			}
+
+		};
+
+		inputManager.addListener(actionListener, new String[] { "Hud" });
+		inputManager.addListener(actionListener, new String[] { "Random" });
+		inputManager.addListener(actionListener, new String[] { "Grid" });
+		inputManager.addListener(actionListener, new String[] { "ChaseCam" });
+		inputManager.addListener(actionListener, new String[] { "WalkCam" });
+		inputManager.addListener(actionListener, new String[] { "ZoomIn" });
+		inputManager.addListener(actionListener, new String[] { "ZoomOut" });
+		inputManager.addListener(actionListener, new String[] { "Select" });
+		inputManager.addListener(actionListener, new String[] { "FollowCam" });
+		inputManager.addListener(actionListener, new String[] { "Fullscreen" });
+
 	}
 }

@@ -78,9 +78,6 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	public AMonkeyInit(float dim, float spaceSize, boolean isGrid)
 	{
-
-
-		
 		//Set the Variables
 		this.appDimension = dim;
 		this.isGrid = isGrid;
