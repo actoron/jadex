@@ -92,7 +92,7 @@ import java.util.logging.Level;
 
 	@Argument(name="parametercopy", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="realtimetimeout", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="uniqueids", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="uniqueids", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="libpath", clazz=String.class),
 	@Argument(name="baseclassloader", clazz=ClassLoader.class),
