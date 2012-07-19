@@ -22,6 +22,13 @@ import com.jme3.system.JmeCanvasContext;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.HillHeightMap;
 
+/**
+ * The Abstract Application for the renders the 3d output for Jadex in the Jmonkey Engine
+ * 
+ * This Class holds most of the Functions and KeyCommands for better structure
+ * 
+ * @author 7willuwe
+ */
 public abstract class AMonkeyFunctions extends AMonkeyInit{
 
 	public AMonkeyFunctions(float dim, float spaceSize, boolean isGrid) {

@@ -31,7 +31,7 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import de.lessvoid.nifty.Nifty;
 
 /**
- * The Abstract Application for the renders the 3d output for Jadex in the Jmonkey Engine
+ * The Second Abstract Application for the renders the 3d output for Jadex in the Jmonkey Engine
  * 
  * This Class has most of the Getter and Setter and init Methods from the MonkeyApp for better structure
  * 
@@ -78,12 +78,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	public AMonkeyInit(float dim, float spaceSize, boolean isGrid)
 	{
-		// Base Setup
-		Logger.getLogger("").setLevel(Level.SEVERE);
-		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
-		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
-		viewPort.setBackgroundColor(ColorRGBA.LightGray);
-		stateManager.getState(StatsAppState.class).toggleStats();
+
+
 		
 		//Set the Variables
 		this.appDimension = dim;
@@ -99,6 +95,13 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	}
 	
 	protected void simpleInit() {
+		// Base Setup
+		Logger.getLogger("").setLevel(Level.SEVERE);
+		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
+		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+		viewPort.setBackgroundColor(ColorRGBA.LightGray);
+		stateManager.getState(StatsAppState.class).toggleStats();
+		
 		initRoot();
 		initCam();
 		initRenderer(complexShadows);
