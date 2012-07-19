@@ -37,4 +37,14 @@
 
 		</layer>
 	</screen>
+	
+		<screen id="default"
+		controller="jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController">
+		<layer id="background" childLayout="center">
+
+		</layer>
+		<layer id="foreground" childLayout="horizontal">
+
+		</layer>
+	</screen>
 </nifty>
