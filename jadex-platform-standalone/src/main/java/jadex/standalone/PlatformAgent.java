@@ -76,7 +76,8 @@ import java.util.logging.Level;
 })
 
 
-@Arguments({
+@Arguments(
+{
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
 	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
 	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
@@ -181,7 +182,8 @@ import java.util.logging.Level;
 	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
 })
 
-@Configurations({
+@Configurations(
+{
 	@Configuration(name="auto", arguments={
 		@NameValue(name="tcpport", value="0"),
 		@NameValue(name="niotcpport", value="0"),
