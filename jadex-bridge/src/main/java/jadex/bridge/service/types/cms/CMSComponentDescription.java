@@ -59,6 +59,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The creation time. */
 	protected long creationtime;
 	
+	/** The creator. */
+	protected IComponentIdentifier creator;
+	
 	//-------- constructors --------
 
 	/**
@@ -74,7 +77,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
 		Boolean daemon, Boolean autoshutdown, String modelname, String localtype, IResourceIdentifier rid,
-		long creationtime)
+		long creationtime, IComponentIdentifier creator)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
@@ -89,6 +92,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setLocalType(localtype);
 		setResourceIdentifier(rid);
 		setCreationTime(creationtime);
+		
 	}
 
 	//-------- accessor methods --------
@@ -367,6 +371,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public void setCreationTime(long creationtime)
 	{
 		this.creationtime = creationtime;
+	}
+	
+	/**
+	 *  Get the creator.
+	 *  @return The creator.
+	 */
+	public IComponentIdentifier getCreator()
+	{
+		return creator;
+	}
+
+	/**
+	 *  Set the creator.
+	 *  @param creator The creator to set.
+	 */
+	public void setCreator(IComponentIdentifier creator)
+	{
+		this.creator = creator;
 	}
 
 	/**

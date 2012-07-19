@@ -5,7 +5,7 @@ import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.tools.deployer.gui.DeployerPlugin;
+import jadex.tools.deployer.DeployerPlugin;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

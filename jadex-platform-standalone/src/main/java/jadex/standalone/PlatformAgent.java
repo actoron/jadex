@@ -147,7 +147,7 @@ import java.util.logging.Level;
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/base/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class"),
-	@ComponentType(name="jcc", filename="jadex/tools/jcc/gui/JCCAgent.class")
+	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class")
 })
 
 @ProvidedServices({
@@ -170,7 +170,8 @@ import java.util.logging.Level;
 	@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null"))
 })
 
-@RequiredServices({
+@RequiredServices(
+{
 	@RequiredService(name="factoryservices", type=IComponentFactory.class, multiple=true, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 

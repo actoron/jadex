@@ -337,7 +337,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINiv4kEeCPEIwlbR2FIA" key="3:4" value="jadex_subcomponents_table_Arguments_2d982fac-3cbb-48a3-90e3-fb376302026a_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINi_4kEeCPEIwlbR2FIA" key="3:5" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINjP4kEeCPEIwlbR2FIA" key="4:0" value="jcc"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINjf4kEeCPEIwlbR2FIA" key="4:1" value="jadex/tools/jcc/gui/JCCAgent.class"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINjf4kEeCPEIwlbR2FIA" key="4:1" value="jadex/tools/jcc/JCCAgent.class"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINjv4kEeCPEIwlbR2FIA" key="4:2" value="jadex_subcomponents_table_Instance-Name_0b6be977-f481-47d1-b831-05747a304853_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINkP4kEeCPEIwlbR2FIA" key="4:3" value="jadex_subcomponents_table_Number_73275e10-a691-41cb-8a1a-9eb94e68cb05_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YVINkv4kEeCPEIwlbR2FIA" key="4:4" value="jadex_subcomponents_table_Arguments_e68b034e-f82c-4351-ad41-fef8edd0e521_complex"/>

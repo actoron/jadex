@@ -14,9 +14,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.tools.jcc.gui.ControlCenter;
-import jadex.tools.jcc.gui.JCCAgent;
-import jadex.tools.jcc.gui.PlatformControlCenter;
+import jadex.tools.jcc.ControlCenter;
+import jadex.tools.jcc.JCCAgent;
+import jadex.tools.jcc.PlatformControlCenter;
 
 import javax.swing.SwingUtilities;
 

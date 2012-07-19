@@ -298,6 +298,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
+			final IComponentIdentifier creator = ServiceCall.getInstance().getCaller();
+			
 //			if(modelname.indexOf("RemoteServiceManagementAgent")!=-1 || modelname.indexOf("rms")!=-1)
 //				System.out.println("cache miss: "+modelname);
 			
@@ -450,7 +452,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																				Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																				Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 																				final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, 
-																					lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime());
+																					lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator);
 																				
 																				logger.info("Starting component: "+cid.getName());
 										//										System.err.println("Pre-Init: "+cid);

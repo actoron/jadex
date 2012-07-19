@@ -72,12 +72,6 @@ public interface IComponentDescription
 	 *  @return The state.
 	 */
 	public String getState();
-
-	/**
-	 *  Get the creation time.
-	 *  @return The creation time.
-	 */
-	public long getCreationTime();
 	
 //	/**
 //	 *  Get the processing state of the component.
@@ -87,6 +81,18 @@ public interface IComponentDescription
 //	public String getProcessingState();
 
 	//-------- internal properties not used for search --------
+	
+	/**
+	 *  Get the creation time.
+	 *  @return The creation time.
+	 */
+	public long getCreationTime();
+
+	/**
+	 *  Get the creator of this component 
+	 *  (parent in case of child or external in case of top-level component).
+	 */
+	public IComponentIdentifier getCreator();
 	
 	/**
 	 *  Get the enabled breakpoints (if any).
@@ -120,4 +126,5 @@ public interface IComponentDescription
 	 *  @return The local type.
 	 */
 	public String getLocalType();
+	
 }
