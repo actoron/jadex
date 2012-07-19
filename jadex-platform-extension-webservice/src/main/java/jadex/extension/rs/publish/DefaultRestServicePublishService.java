@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -208,7 +209,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 			
 			HttpServer server = uriservers==null? null: uriservers.get(baseuri);
-			HttpHandler handler;
+			HttpHandler handler = null;
 			if(server==null)
 			{
 				System.out.println("Starting new server: "+uri.getPath());
@@ -218,7 +219,20 @@ public class DefaultRestServicePublishService implements IPublishService
 //					pub += "/";
 				server = GrizzlyServerFactory.createHttpServer(pub, config);
 				server.start();
-				handler = server.getHttpHandler();
+//				handler = server.getHttpHandler();
+				Map<HttpHandler, String[]> handlers = server.getServerConfiguration().getHttpHandlers();
+				for(HttpHandler hand: handlers.keySet())
+				{
+					Set<String> set = SUtil.arrayToSet(handlers.get(hand));
+					if(set.contains(uri.getPath()))
+					{
+						handler = hand;
+					}
+				}
+				if(handler==null)
+				{
+					ret.setException(new RuntimeException("Publication error, failed to get http handler: "+uri.getPath()));
+				}
 				
 				if(uriservers==null)
 					uriservers = new HashMap<URI, HttpServer>();
@@ -233,6 +247,8 @@ public class DefaultRestServicePublishService implements IPublishService
 //				Map h = sc.getHttpHandlers();
 //				System.out.println("handlers: "+h);
 			}
+			
+//			System.out.println("handler: "+handler+" "+server.getServerConfiguration().getHttpHandlers());
 			
 			if(sidservers==null)
 				sidservers = new HashMap<IServiceIdentifier, Tuple2<HttpServer, HttpHandler>>();

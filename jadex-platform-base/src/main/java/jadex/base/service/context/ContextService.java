@@ -17,7 +17,9 @@ import java.util.List;
  */
 public class ContextService extends BasicService implements jadex.bridge.service.types.context.IContextService
 {
-
+	/**
+	 *  Create a new ContextService.
+	 */
 	public ContextService(IServiceProvider provider)
 	{
 		super(provider.getId(), IContextService.class, null);
@@ -27,9 +29,7 @@ public class ContextService extends BasicService implements jadex.bridge.service
 
 	/**
 	 * Returns a File
-	 * 
-	 * @param name
-	 *            File name
+	 * @param name File name
 	 * @return {@link File}
 	 */
 	public File getFile(String name)
@@ -39,7 +39,6 @@ public class ContextService extends BasicService implements jadex.bridge.service
 
 	/**
 	 * Gets a Shared Preference Container. Returns null on Desktop Systems.
-	 * 
 	 * @param preferenceFileName
 	 */
 	public IPreferences getSharedPreferences(String preferenceFileName)

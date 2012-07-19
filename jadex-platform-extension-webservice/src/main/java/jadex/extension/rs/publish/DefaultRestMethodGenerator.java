@@ -54,9 +54,23 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			((Boolean)mapprops.get(DefaultRestServicePublishService.GENERATE)).booleanValue(): true;
 		boolean geninfo = mapprops.get(DefaultRestServicePublishService.GENERATE_INFO)!=null? 
 			((Boolean)mapprops.get(DefaultRestServicePublishService.GENERATE_INFO)).booleanValue(): true;
-		MediaType[] formats = mapprops.get(DefaultRestServicePublishService.FORMATS)==null? 
-			DefaultRestServicePublishService.DEFAULT_FORMATS: (MediaType[])mapprops.get(DefaultRestServicePublishService.FORMATS);
 		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+		
+		MediaType[] formats = DefaultRestServicePublishService.DEFAULT_FORMATS;
+		Object tmp = mapprops.get(DefaultRestServicePublishService.FORMATS);
+		if(tmp instanceof String[])
+		{
+			String[] fms = (String[])tmp;
+			formats = new MediaType[fms.length];
+			for(int i=0; i<fms.length; i++)
+			{
+				formats[i] = MediaType.valueOf(fms[i]);
+			}
+		}
+		else if(tmp instanceof MediaType[])
+		{
+			formats = (MediaType[])tmp;
+		}
 
 		// Generation can be either
 		// a) on basis of original interface

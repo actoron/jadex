@@ -148,7 +148,9 @@ import java.util.logging.Level;
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/base/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class"),
-	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class")
+	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
+	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/RSPublishAgent.class"),
+	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class")
 })
 
 @ProvidedServices({
@@ -166,9 +168,9 @@ import java.util.logging.Level;
 	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new DecoupledComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)")),
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
-	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()")),
-	@ProvidedService(type=IPublishService.class, name="publish_ws", implementation=@Implementation(expression="Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null")),
-	@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null"))
+	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()"))
+	//@ProvidedService(type=IPublishService.class, name="publish_ws", implementation=@Implementation(expression="Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null")),
+	//@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null"))
 })
 
 @RequiredServices(
@@ -206,7 +208,9 @@ import java.util.logging.Level;
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
-		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit"))
+		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit")),
+		@Component(name="rspub", type="rspublish", number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
+		@Component(name="wspub", type="wspublish", number="Boolean.TRUE.equals($args.wspublish)? 1: 0")
 	}),
 	@Configuration(name="fixed", arguments={
 		@NameValue(name="tcpport", value="0"),
@@ -229,7 +233,9 @@ import java.util.logging.Level;
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
-		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit"))
+		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit")),
+		@Component(name="rspub", type="rspublish", number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
+		@Component(name="wspub", type="wspublish", number="Boolean.TRUE.equals($args.wspublish)? 1: 0")
 	})
 })
 public class PlatformAgent extends MicroAgent

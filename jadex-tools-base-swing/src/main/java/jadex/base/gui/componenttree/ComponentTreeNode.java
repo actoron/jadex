@@ -14,6 +14,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -22,6 +23,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -310,6 +312,15 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren queued2: "+ComponentTreeNode.this);
 //				final IComponentDescription[] achildren = (IComponentDescription[])result;
+				
+				Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()
+				{
+					public int compare(IComponentDescription o1, IComponentDescription o2)
+					{
+						return o1.getName().getName().compareTo(o2.getName().getName());
+					}
+				});
+				
 				for(int i=0; i<achildren.length; i++)
 				{
 					ITreeNode	node	= createComponentNode(achildren[i]);
@@ -365,6 +376,15 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	//										System.out.println("gotacha: "+sis[0].getProviderId().getName());
 										if((pros!=null && pros.length>0 || (reqs!=null && reqs.length>0)))
 										{
+											Arrays.sort(pros, new java.util.Comparator<ProvidedServiceInfo>()
+											{
+												public int compare(ProvidedServiceInfo o1, ProvidedServiceInfo o2)
+												{
+													return SReflect.getUnqualifiedTypeName(o1.getType().getTypeName())
+														.compareTo(SReflect.getUnqualifiedTypeName(o2.getType().getTypeName()));
+												}
+											});
+											
 											ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 											if(scn==null)
 												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
@@ -393,6 +413,15 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 											
 											if(reqs!=null)
 											{
+												Arrays.sort(reqs, new java.util.Comparator<RequiredServiceInfo>()
+												{
+													public int compare(RequiredServiceInfo o1, RequiredServiceInfo o2)
+													{
+														return SReflect.getUnqualifiedTypeName(o1.getType().getTypeName())
+															.compareTo(SReflect.getUnqualifiedTypeName(o2.getType().getTypeName()));
+													}
+												});
+												
 												for(int i=0; i<reqs.length; i++)
 												{
 													String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
@@ -542,7 +571,22 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //									if(desc.getName().toString().startsWith("ANDTest@"))
 //										System.out.println("Component added: "+desc.getName().getName());
 //									System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-									parentnode.addChild(node);
+									boolean ins = false;
+									for(int i=0; i<parentnode.getChildCount() && !ins; i++)
+									{
+										ITreeNode child = parentnode.getChild(i);
+										if(child instanceof ServiceContainerNode)
+											continue;
+										if(child.toString().toLowerCase().compareTo(node.toString().toLowerCase())>=0)
+										{
+											parentnode.addChild(i, node);
+											ins = true;
+										}
+									}
+									if(!ins)
+									{
+										parentnode.addChild(node);
+									}
 								}
 //								else
 //								{

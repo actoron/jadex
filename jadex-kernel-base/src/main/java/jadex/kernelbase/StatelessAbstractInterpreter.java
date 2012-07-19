@@ -787,7 +787,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
 					getServiceContainer().addRequiredServiceInfos(rservices);
 					
-					
 					// Start service container.
 					startServiceContainer().addResultListener(createResultListener(new DelegationResultListener(ret)));
 				}
@@ -1307,55 +1306,55 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		return ret;
 	}
 	
-	/**
-	 *  Get the publish service for a publish type (e.g. web service).
-	 *  @param type The type.
-	 *  @param services The iterator of publish services (can be null).
-	 *  @return The publish service.
-	 */
-	protected IFuture<IPublishService> getPublishService(final String type, final Iterator<IPublishService> services)
-	{
-		final Future<IPublishService> ret = new Future<IPublishService>();
-		
-		if(services==null)
-		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(getServiceProvider(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
-			{
-				public void customResultAvailable(Collection<IPublishService> result)
-				{
-					getPublishService(type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
-				}
-			}));
-		}
-		else
-		{
-			if(services.hasNext())
-			{
-				final IPublishService ps = (IPublishService)services.next();
-				ps.isSupported(type).addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
-				{
-					public void customResultAvailable(Boolean supported)
-					{
-						if(supported.booleanValue())
-						{
-							ret.setResult(ps);
-						}
-						else
-						{
-							getPublishService(type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
-						}
-					}
-				}));
-			}
-			else
-			{
-				ret.setException(new ServiceNotFoundException("IPublishService"));
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the publish service for a publish type (e.g. web service).
+//	 *  @param type The type.
+//	 *  @param services The iterator of publish services (can be null).
+//	 *  @return The publish service.
+//	 */
+//	protected IFuture<IPublishService> getPublishService(final String type, final Iterator<IPublishService> services)
+//	{
+//		final Future<IPublishService> ret = new Future<IPublishService>();
+//		
+//		if(services==null)
+//		{
+//			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(getServiceProvider(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
+//			{
+//				public void customResultAvailable(Collection<IPublishService> result)
+//				{
+//					getPublishService(type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
+//				}
+//			}));
+//		}
+//		else
+//		{
+//			if(services.hasNext())
+//			{
+//				final IPublishService ps = (IPublishService)services.next();
+//				ps.isSupported(type).addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
+//				{
+//					public void customResultAvailable(Boolean supported)
+//					{
+//						if(supported.booleanValue())
+//						{
+//							ret.setResult(ps);
+//						}
+//						else
+//						{
+//							getPublishService(type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
+//						}
+//					}
+//				}));
+//			}
+//			else
+//			{
+//				ret.setException(new ServiceNotFoundException("IPublishService"));
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	//-------- methods to be called by adapter --------
 	

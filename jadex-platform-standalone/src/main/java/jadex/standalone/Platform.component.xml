@@ -209,8 +209,11 @@
 		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
+		
 		<componenttype filename="jadex/base/service/chat/Chat.component.xml" name="chat"/>
 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
+		<componenttype filename="jadex/extension/rs/publish/RSPublishAgent.class" name="rspublish"/>
+		<componenttype filename="jadex/extension/ws/publish/WSPublishAgent.class" name="wspublish"/>
 		
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 	</componenttypes>
@@ -307,11 +310,11 @@
 					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)
 			</implementation>
 		</providedservice>
-		<providedservice class="jadex.bridge.service.types.df.IDF">
+		<!-- <providedservice class="jadex.bridge.service.types.df.IDF">
 			<implementation proxytype="raw">
 				new jadex.standalone.service.DirectoryFacilitatorService($component.getServiceProvider())
 			</implementation>
-		</providedservice>
+		</providedservice> -->
 		<providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
 			<implementation>
 				new jadex.base.service.simulation.SimulationService($component)
@@ -322,16 +325,16 @@
 				new jadex.base.service.deployment.DeploymentService()
 			</implementation>		
 		</providedservice>
-		<providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
+		<!-- <providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null
 			</implementation>
-		</providedservice>
+		</providedservice> 
 		<providedservice name="publish_rs" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>
-		</providedservice>
+		</providedservice> -->
 		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">
 			<binding scope="platform"/>
 		</requiredservice>
@@ -385,6 +388,8 @@
 						<argument name="saveonexit">$args.saveonexit</argument>
 					</arguments>
 				</component>
+				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
+				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
 			</components>
 		</configuration>
 		
@@ -418,8 +423,10 @@
 						<argument name="saveonexit">$args.saveonexit</argument>
 					</arguments>
 				</component>
+				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
+				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
 			</components>
 		</configuration>
-	
+		
 	</configurations>
 </componenttype>

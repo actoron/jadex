@@ -350,7 +350,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 			}
 			else
 			{
-				msgservice.getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], IComponentIdentifier>(inited)
+				getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], IComponentIdentifier>(inited)
 				{
 					public void customResultAvailable(final String[] addresses)
 					{
@@ -2075,39 +2075,71 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		}
 		else
 		{
-			msgservice.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
+			if(msgservice==null)
 			{
-				public void customResultAvailable(IComponentIdentifier rcid)
+				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+				
+				// Hack, to retrieve description from component itself in init phase
+				if(desc==null)
 				{
-//					System.out.println("desc: "+SUtil.arrayToString(rcid.getAddresses()));
-					CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
-
-					// Hack, to retrieve description from component itself in init phase
-					if(desc==null)
-					{
-						InitInfo ii= getInitInfo(cid);
-						if(ii!=null)
-							desc = (CMSComponentDescription)ii.getDescription();
-					}
-					
-					if(desc!=null)
-					{
-						// addresses required for communication across platforms.
-						// ret.setName(refreshComponentIdentifier(aid));
-						desc.setName(rcid);
-						desc = (CMSComponentDescription)((CMSComponentDescription)desc).clone();
-					}
-					
-					if(desc!=null)
-					{
-						ret.setResult(desc);
-					}
-					else
-					{
-						ret.setException(new RuntimeException("No description available for: "+cid));
-					}
+					InitInfo ii= getInitInfo(cid);
+					if(ii!=null)
+						desc = (CMSComponentDescription)ii.getDescription();
 				}
-			});
+				
+				if(desc!=null)
+				{
+					// addresses required for communication across platforms.
+					// ret.setName(refreshComponentIdentifier(aid));
+//					desc.setName(rcid);
+					desc = (CMSComponentDescription)((CMSComponentDescription)desc).clone();
+				}
+				
+				if(desc!=null)
+				{
+					ret.setResult(desc);
+				}
+				else
+				{
+					ret.setException(new RuntimeException("No description available for: "+cid));
+				}
+			}
+			else
+			{
+				msgservice.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier rcid)
+					{
+	//					System.out.println("desc: "+SUtil.arrayToString(rcid.getAddresses()));
+						CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+	
+						// Hack, to retrieve description from component itself in init phase
+						if(desc==null)
+						{
+							InitInfo ii= getInitInfo(cid);
+							if(ii!=null)
+								desc = (CMSComponentDescription)ii.getDescription();
+						}
+						
+						if(desc!=null)
+						{
+							// addresses required for communication across platforms.
+							// ret.setName(refreshComponentIdentifier(aid));
+							desc.setName(rcid);
+							desc = (CMSComponentDescription)((CMSComponentDescription)desc).clone();
+						}
+						
+						if(desc!=null)
+						{
+							ret.setResult(desc);
+						}
+						else
+						{
+							ret.setException(new RuntimeException("No description available for: "+cid));
+						}
+					}
+				});
+			}
 		}			
 		
 		return ret;
@@ -2142,7 +2174,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	{
 		final Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
 		
-		msgservice.getAddresses().addResultListener(createResultListener(
+		getAddresses().addResultListener(createResultListener(
 			new ExceptionDelegationResultListener<String[], IComponentIdentifier[]>(fut)
 		{
 			public void customResultAvailable(String[] addresses)
@@ -2387,12 +2419,21 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 //								marshalservice	= result;
 						
 								SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+									.addResultListener(createResultListener(new IResultListener<IMessageService>()
 								{
-									public void customResultAvailable(IMessageService result)
+									public void resultAvailable(IMessageService result)
 									{
 										msgservice	= result;
-										
+										cont();
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										cont();
+									}
+									
+									protected void cont()
+									{
 										SServiceProvider.getService(agent.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 											.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 										{
@@ -2403,7 +2444,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 												// add root adapter and register root component
 												if(root!=null)
 												{
-													msgservice.getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+													getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
 													{
 														public void customResultAvailable(String[] addresses)
 														{
@@ -2537,14 +2578,14 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		return suspend;
 	}
 
-	/**
-	 *  Get the msgservice.
-	 *  @return the msgservice.
-	 */
-	public IMessageService getMessageService()
-	{
-		return msgservice;
-	}
+//	/**
+//	 *  Get the msgservice.
+//	 *  @return the msgservice.
+//	 */
+//	public IMessageService getMessageService()
+//	{
+//		return msgservice;
+//	}
 
 	/**
 	 *  Get the exeservice.
@@ -2745,6 +2786,21 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 			}
 		}));
 		return ret;
+	}
+	
+	/**
+	 *  Get the addresses.
+	 */
+	protected IFuture<String[]> getAddresses()
+	{
+		if(msgservice!=null)
+		{
+			return msgservice.getAddresses();
+		}
+		else
+		{
+			return new Future<String[]>((String[])null);
+		}
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 package jadex.base.service.security;
 
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
+import jadex.base.service.settings.SettingsService;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -92,7 +93,7 @@ public class SecurityService implements ISecurityService
 	protected String keypass;
 	
 	/** The ContextService. */
-	protected IContextService contextService;
+	protected IContextService contextser;
 	
 	/** The currently valid digests. */
 	protected Map<String, Tuple2<Long, byte[]>> digests;
@@ -145,163 +146,188 @@ public class SecurityService implements ISecurityService
 //		this.trustednets = new ArrayList<String>();
 		
 		component.getServiceContainer().searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IContextService, Void>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IContextService, Void>(ret)
+		{
+			public void customResultAvailable(IContextService result)
+			{
+				contextser = result;
+				setTrustedLanMode(trustedlan);
+			
+				getSettingsService().addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 				{
-					@Override
-					public void customResultAvailable(IContextService result)
+					public void customResultAvailable(final ISettingsService settings)
 					{
-						contextService = result;
-						setTrustedLanMode(trustedlan);
-					
-						component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
+						if(settings==null)
 						{
-							public void customResultAvailable(final ISettingsService settings)
+							// generate new password, if no security settings exist, yet.
+							password	= UUID.randomUUID().toString().substring(0, 12);
+	//						usepass	= true;
+							ret.setResult(null);
+						}
+						else
+						{
+							settings.getProperties(PROEPRTIES_ID)
+								.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
 							{
-								settings.getProperties(PROEPRTIES_ID)
-									.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
+								public void customResultAvailable(final Properties props)
 								{
-									public void customResultAvailable(final Properties props)
+									// generate new password, if no security settings exist, yet.
+									final boolean	genpass	= props==null || props.getProperty("password")==null; 
+									if(genpass)
 									{
-										// generate new password, if no security settings exist, yet.
-										final boolean	genpass	= props==null || props.getProperty("password")==null; 
-										if(genpass)
+										password	= UUID.randomUUID().toString().substring(0, 12);
+			//							usepass	= true;
+									}
+									
+									final IExternalAccess	access	= component.getExternalAccess();
+									
+									settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
+									{
+										public IFuture<Void> setProperties(final Properties props)
 										{
-											password	= UUID.randomUUID().toString().substring(0, 12);
-				//							usepass	= true;
+											return access.scheduleImmediate(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													String spa = props.getStringProperty("storepath");
+													if(spa!=null && spa.length()>0)
+														storepath = spa;
+													String sps = props.getStringProperty("storepass");
+													if(sps!=null && spa.length()>0)
+														storepass = sps;
+													String kp = props.getStringProperty("keypass");
+													if(kp!=null && kp.length()>0)
+														keypass = kp;
+													
+													if(!argsusepass)
+													{
+														usepass = props.getBooleanProperty("usepass");
+			//											System.out.println("usepass: "+usepass);
+													}
+													password	= props.getStringProperty("password");
+													
+													if(!argstrustedlan)
+													{
+														setTrustedLanMode(props.getBooleanProperty("trustedlan"));
+													}
+													
+													Property[]	passes	= props.getProperties("passwords");
+			//										platformpasses	= new LinkedHashMap<String, String>();
+													for(int i=0; i<passes.length; i++)
+													{
+														String val = passes[i].getValue();
+														platformpasses.put(passes[i].getName(), val==null? "": val);
+													}
+													
+													// Not allowed to add internal trusted platforms if flag is false
+													List<InetAddress> addrs = contextser.getNetworkIps();
+													Set<String> trs = new HashSet<String>();
+													for(InetAddress addr: addrs)
+													{
+														trs.add(addr.getHostAddress());
+													}
+														
+													Property[]	networks	= props.getProperties("networks");
+			//										networkpasses	= new LinkedHashMap<String, String>();
+													for(int i=0; i<networks.length; i++)
+													{
+			//											System.out.println("value:"+networks[i].getValue()+".");
+														String val = networks[i].getValue();
+														if(trustedlan || !trs.contains(networks[i].getName()))
+														{
+															networkpasses.put(networks[i].getName(), val==null? "": val);
+														}
+													}
+													
+													return IFuture.DONE;
+												}
+											});
 										}
 										
-										final IExternalAccess	access	= component.getExternalAccess();
-										
-										settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
+										public IFuture<Properties> getProperties()
 										{
-											public IFuture<Void> setProperties(final Properties props)
+											return access.scheduleImmediate(new IComponentStep<Properties>()
 											{
-												return access.scheduleImmediate(new IComponentStep<Void>()
+												public IFuture<Properties> execute(IInternalAccess ia)
 												{
-													public IFuture<Void> execute(IInternalAccess ia)
+													Properties	ret	= new Properties();
+													ret.addProperty(new Property("usepass", ""+usepass));
+													ret.addProperty(new Property("password", password));
+													if(platformpasses!=null)
 													{
-														String spa = props.getStringProperty("storepath");
-														if(spa!=null && spa.length()>0)
-															storepath = spa;
-														String sps = props.getStringProperty("storepass");
-														if(sps!=null && spa.length()>0)
-															storepass = sps;
-														String kp = props.getStringProperty("keypass");
-														if(kp!=null && kp.length()>0)
-															keypass = kp;
-														
-														if(!argsusepass)
+														for(String platform: platformpasses.keySet())
 														{
-															usepass = props.getBooleanProperty("usepass");
-				//											System.out.println("usepass: "+usepass);
+															ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
 														}
-														password	= props.getStringProperty("password");
-														
-														if(!argstrustedlan)
-														{
-															setTrustedLanMode(props.getBooleanProperty("trustedlan"));
-														}
-														
-														Property[]	passes	= props.getProperties("passwords");
-				//										platformpasses	= new LinkedHashMap<String, String>();
-														for(int i=0; i<passes.length; i++)
-														{
-															String val = passes[i].getValue();
-															platformpasses.put(passes[i].getName(), val==null? "": val);
-														}
-														
-														// Not allowed to add internal trusted platforms if flag is false
-														List<InetAddress> addrs = contextService.getNetworkIps();
-														Set<String> trs = new HashSet<String>();
-														for(InetAddress addr: addrs)
-														{
-															trs.add(addr.getHostAddress());
-														}
-															
-														Property[]	networks	= props.getProperties("networks");
-				//										networkpasses	= new LinkedHashMap<String, String>();
-														for(int i=0; i<networks.length; i++)
-														{
-				//											System.out.println("value:"+networks[i].getValue()+".");
-															String val = networks[i].getValue();
-															if(trustedlan || !trs.contains(networks[i].getName()))
-															{
-																networkpasses.put(networks[i].getName(), val==null? "": val);
-															}
-														}
-														
-														return IFuture.DONE;
 													}
-												});
-											}
-											
-											public IFuture<Properties> getProperties()
-											{
-												return access.scheduleImmediate(new IComponentStep<Properties>()
-												{
-													public IFuture<Properties> execute(IInternalAccess ia)
+													if(networkpasses!=null)
 													{
-														Properties	ret	= new Properties();
-														ret.addProperty(new Property("usepass", ""+usepass));
-														ret.addProperty(new Property("password", password));
-														if(platformpasses!=null)
+														for(String network: networkpasses.keySet())
 														{
-															for(String platform: platformpasses.keySet())
-															{
-																ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
-															}
+															ret.addProperty(new Property(network, "networks", platformpasses.get(network)));
 														}
-														if(networkpasses!=null)
-														{
-															for(String network: networkpasses.keySet())
-															{
-																ret.addProperty(new Property(network, "networks", platformpasses.get(network)));
-															}
-														}
-														ret.addProperty(new Property("trustedlan", ""+trustedlan));
-														
-														ret.addProperty(new Property("storepath", storepath));
-														ret.addProperty(new Property("storepass", storepass));
-														ret.addProperty(new Property("keypass", keypass));
-														
-														return new Future<Properties>(ret);
 													}
-												});
-											}
-										}).addResultListener(new DelegationResultListener<Void>(ret)
+													ret.addProperty(new Property("trustedlan", ""+trustedlan));
+													
+													ret.addProperty(new Property("storepath", storepath));
+													ret.addProperty(new Property("storepass", storepass));
+													ret.addProperty(new Property("keypass", keypass));
+													
+													return new Future<Properties>(ret);
+												}
+											});
+										}
+									}).addResultListener(new DelegationResultListener<Void>(ret)
+									{
+										public void customResultAvailable(Void result)
 										{
-											public void customResultAvailable(Void result)
+											// If new password was generated, save settings such that new platform instances use it.
+											if(genpass)
 											{
-												// If new password was generated, save settings such that new platform instances use it.
-												if(genpass)
+												if(printpass && usepass)
 												{
-													if(printpass && usepass)
-													{
-														System.out.println("Generated platform password: "+password);
-													}
-													settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
+													System.out.println("Generated platform password: "+password);
 												}
-												else
-												{
-													if(printpass && usepass)
-													{
-														System.out.println("Using stored platform password: "+password);
-													}
-													super.customResultAvailable(result);
-												}
+												settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
 											}
-										});
-									}
-								});
-							}
-						});
+											else
+											{
+												if(printpass && usepass)
+												{
+													System.out.println("Using stored platform password: "+password);
+												}
+												super.customResultAvailable(result);
+											}
+										}
+									});
+								}
+							});
+						}
 					}
 				});
+			}
+		});
 		
 		return ret;
 	}
 
+	/**
+	 *  Get the settings service.
+	 */
+	public IFuture<ISettingsService> getSettingsService()
+	{
+		final Future<ISettingsService> ret = new Future<ISettingsService>();
+		IFuture<ISettingsService> fut = component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		fut.addResultListener(new DelegationResultListener<ISettingsService>(ret)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
+	
 	/**
 	 *  Shutdown the service.
 	 */
@@ -516,7 +542,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Void> setTrustedLanMode(boolean allowed)
 	{
-		List<InetAddress> addrs = contextService.getNetworkIps();
+		List<InetAddress> addrs = contextser.getNetworkIps();
 		
 		if(allowed)
 		{
@@ -705,7 +731,7 @@ public class SecurityService implements ISecurityService
 		// Add trusted authentications (in case other has turned on lan trusted and this one not)
 		if(!trustedlan)
 		{
-			for(InetAddress addr: contextService.getNetworkIps())
+			for(InetAddress addr: contextser.getNetworkIps())
 			{
 				authdata.add(getDigest(timestamp, addr.getHostAddress()));
 			}
