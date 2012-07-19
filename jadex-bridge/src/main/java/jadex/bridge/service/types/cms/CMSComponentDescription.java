@@ -92,7 +92,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setLocalType(localtype);
 		setResourceIdentifier(rid);
 		setCreationTime(creationtime);
-		
+		setCreator(creator);
 	}
 
 	//-------- accessor methods --------
