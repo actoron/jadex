@@ -56,6 +56,7 @@ import jadex.kernelbase.IBootstrapFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -71,8 +72,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 {
 	//-------- constants --------
 
-	/** The component counter. Used for generating unique component ids. */
-	public static int compcnt = 0;
+//	/** The component counter. Used for generating unique component ids. */
+//	public static int compcnt = 0;
 
 	//-------- attributes --------
 
@@ -144,6 +145,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	/** Flag to enable unique id generation. */
 	protected boolean uniqueids;
 	
+	/** The cid count. */
+	protected Map<String, Integer> cidcounts;
+	
     //-------- constructors --------
 
     /**
@@ -170,21 +174,16 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		
 		// Todo: why some collections synchronized? single thread access!?
 		this.adapters = SCollection.createHashMap();
-//		this.adapters = Collections.synchronizedMap(adapters);
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
-//		this.children	= SCollection.createMultiCollection();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.resultlisteners = SCollection.createHashMap();
-//		this.resultlisteners = Collections.synchronizedMap(resultlisteners);
-//		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
 		this.initinfos = SCollection.createHashMap();
-//		this.initinfos = Collections.synchronizedMap(initinfos);
 		this.childcounts = SCollection.createHashMap();
 		this.localtypes	= new LRU<Tuple, String>(100);
 		this.lockentries = SCollection.createHashMap();
-//		this.classloadercache = Collections.synchronizedMap(new LRU(1000));
+		this.cidcounts = new HashMap<String, Integer>();
    }
     
 	/**
@@ -401,25 +400,29 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 					
 																	IComponentIdentifier pacid = parent.getComponentIdentifier();
 																	String paname = pacid.getName().replace('@', '.');
-																	if(name!=null)
-																	{
-																		cid = new ComponentIdentifier(name+"@"+paname, addresses);
-																		if(adapters.containsKey(cid) || initinfos.containsKey(cid))
-																		{
-		//																	de.printStackTrace();
-																			inited.setException(new ComponentCreationException("Component "+cid+" already exists.", ComponentCreationException.REASON_COMPONENT_EXISTS, cid));
-																			return;
-		//																	throw new RuntimeException("Component "+cid+" already exists.");
-																		}
-//																		if(msgservice!=null)
+																	
+																	cid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname, addresses);
+																	
+//																	if(name!=null)
+//																	{
+//																		cid = new ComponentIdentifier(name+"@"+paname, addresses);
+//																		if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 //																		{
-//																			cid.setAddresses(msgservice.getAddresses());
+//		//																	de.printStackTrace();
+//																			inited.setException(new ComponentCreationException("Component "+cid+" already exists.", ComponentCreationException.REASON_COMPONENT_EXISTS, cid));
+//																			return;
+//		//																	throw new RuntimeException("Component "+cid+" already exists.");
 //																		}
-																	}
-																	else
-																	{
-																		cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname, addresses);
-																	}
+////																		if(msgservice!=null)
+////																		{
+////																			cid.setAddresses(msgservice.getAddresses());
+////																		}
+//																	}
+//																	else
+//																	{
+//																		cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname, addresses, lmodel.getName());
+//																	}
+																	
 																	initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut, null));
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
@@ -2312,11 +2315,24 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		if(platformname==null)
 			platformname = ((IComponentIdentifier)agent.getServiceContainer().getId()).getName();
 		ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
+		
 		if(uniqueids || adapters.containsKey(ret) || initinfos.containsKey(ret))
 		{
+			String key = localname+"@"+platformname;
+			
 			do
 			{
-				ret = new ComponentIdentifier(localname+(compcnt++)+"@"+platformname); // Hack?!
+				Integer cnt = cidcounts.get(key);
+				if(cnt==null)
+				{
+					cidcounts.put(key, new Integer(new Integer(1)));
+					ret = new ComponentIdentifier(localname+"@"+platformname);
+				}
+				else
+				{
+					cidcounts.put(key, new Integer(cnt.intValue()+1));
+					ret = new ComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
+				}
 			}
 			while(adapters.containsKey(ret) || initinfos.containsKey(ret));
 		}

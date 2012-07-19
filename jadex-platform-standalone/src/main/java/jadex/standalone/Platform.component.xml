@@ -116,7 +116,7 @@
 		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
 		<argument name="realtimetimeout" class="boolean">true</argument>
 		<!-- Flag if CIDs may be reused (true for not). -->
-		<argument name="uniqueids" class="boolean">false</argument>
+		<argument name="uniqueids" class="boolean">true</argument>
 		
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
