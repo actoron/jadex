@@ -1,7 +1,6 @@
 package jadex.base.service.message.transport.ssltcpmtp;
 
 import jadex.base.service.message.transport.tcpmtp.TCPTransport;
-import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -12,7 +11,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;

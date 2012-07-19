@@ -13,7 +13,7 @@ import jadex.commons.future.IFuture;
  *  Interface for the time simulation service.
  */
 @GuiClassNames({
-	@GuiClassName("jadex.tools.simcenter.gui.SimServiceViewerPanel"),
+	@GuiClassName("jadex.tools.simcenter.SimServiceViewerPanel"),
 	@GuiClassName("jadex.android.controlcenter.settings.SimulationSettings")
 })
 public interface ISimulationService	extends IService

@@ -6,17 +6,14 @@ import java.net.InetAddress;
 import java.util.List;
 
 /**
- * Provides Access to the Application Context specific objects and Android
- * Resources such as Files and Preferences.
+ *  Provides access to the application Context specific objects and Android
+ *  Resources such as files and preferences.
  */
 public interface IContextService
 {
-
 	/**
 	 * Returns a File
-	 * 
-	 * @param name
-	 *            File name
+	 * @param name File name
 	 * @return {@link File}
 	 */
 	public File getFile(String name);
@@ -39,15 +36,14 @@ public interface IContextService
 	 * Dispatches an Event to the Android UI / Activity.
 	 * Does nothing on Desktop Systems.
 	 * 
-	 * @param event
-	 *            {@link IJadexAndroidEvent}
-	 * @return true, if at least one receiver was registered for this event and
-	 *         delivery was successful, else false.
+	 * @param event {@link IJadexAndroidEvent}
+	 * @return true, if at least one receiver was registered for this event and delivery was successful, else false.
 	 */
+	// todo: IJadexAndroidEvent?! generic?
 	public boolean dispatchUiEvent(IJadexAndroidEvent event);
 
 	/**
-	 * Get the network ips
+	 * Get the network ips.
 	 */
 	public List<InetAddress> getNetworkIps();
 }
