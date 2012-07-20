@@ -132,7 +132,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResult.setOptimizationConfiguration(simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 		// rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
 		// rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
-		rowResult.setFinalStatsMap(((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact()).getIntermediateStats());
+		//HACK 19-7-12
+//		rowResult.setFinalStatsMap(((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact()).getIntermediateStats());
 
 		rowResults.put(rowResult.getId(), rowResult);
 

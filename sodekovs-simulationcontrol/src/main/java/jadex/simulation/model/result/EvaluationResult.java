@@ -84,7 +84,7 @@ public class EvaluationResult {
 
 		sortRowlist();
 		for (RowResult row : getRowResults()) {
-			buffer.append(row.toStringShort());
+//			buffer.append(row.toStringShortOLD());
 			buffer.append("\n");
 		}
 

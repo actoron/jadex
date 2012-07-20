@@ -160,12 +160,12 @@ public class Main {
 		exRes.setName("NameExRes");
 
 		ObservedEvent event = new ObservedEvent();
-		event.setValue("123");
+//		event.setValue("123");
 		event.setApplicationName("EventId1");
 //		event.setDataReference(new Data());
 
 		ObservedEvent event2 = new ObservedEvent();
-		event2.setValue("12345");
+//		event2.setValue("12345");
 		event2.setApplicationName("EventId2");
 //		event2.setDataReference(new Data());
 

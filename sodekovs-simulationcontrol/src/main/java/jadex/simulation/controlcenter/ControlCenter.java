@@ -373,31 +373,32 @@ public class ControlCenter extends JFrame {
 			ensembleResultsDm.removeRow(0);
 		}
 
-		HashMap<String, HashMap<String, String>> intermediateStats = interRes
-				.getIntermediateStats();
-		for (Iterator it = intermediateStats.keySet().iterator(); it.hasNext();) {
-			Object key = it.next();
-			HashMap<String, String> values = intermediateStats.get(key);
-			ensembleResultsDm.addRow(new Object[] { key,
-					values.get("MeanValue"), values.get("MedianValue"),
-					values.get("sampleVarianceValue") });
-		}
-
-		// update table that contains results of the single experiments
-		HashMap<String, ArrayList<String>> latestResults = interRes
-				.getLatestObserverResults();
-		for (Iterator it = latestResults.keySet().iterator(); it.hasNext();) {
-			Object key = it.next();
-			ArrayList<String> values = latestResults.get(key);
-
-			String tmpRes = new String();
-			// Hack: Transform into a single string
-			for (String string : values) {
-				tmpRes += string + ";";
-			}
-			singleExperimentsDm.addRow(new Object[] {
-					nrOfConductedExperiments - 1, key, tmpRes });
-		}
+		//Hack 19-7-12
+////		HashMap<String, HashMap<String, String>> intermediateStats = interRes
+////				.getIntermediateStats();
+//		for (Iterator it = intermediateStats.keySet().iterator(); it.hasNext();) {
+//			Object key = it.next();
+//			HashMap<String, String> values = intermediateStats.get(key);
+//			ensembleResultsDm.addRow(new Object[] { key,
+//					values.get("MeanValue"), values.get("MedianValue"),
+//					values.get("sampleVarianceValue") });
+//		}
+//
+//		// update table that contains results of the single experiments
+//		HashMap<String, ArrayList<String>> latestResults = interRes
+//				.getLatestObserverResults();
+//		for (Iterator it = latestResults.keySet().iterator(); it.hasNext();) {
+//			Object key = it.next();
+//			ArrayList<String> values = latestResults.get(key);
+//
+//			String tmpRes = new String();
+//			// Hack: Transform into a single string
+//			for (String string : values) {
+//				tmpRes += string + ";";
+//			}
+//			singleExperimentsDm.addRow(new Object[] {
+//					nrOfConductedExperiments - 1, key, tmpRes });
+//		}
 
 		// update also static part of control center
 //		updateStaticTable(nrOfEnsemble, nrOfConductedExperiments+1);

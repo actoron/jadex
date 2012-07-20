@@ -57,7 +57,7 @@ public class ComputeSingleResultPlan extends Plan {
 
 		ExperimentResult experimentRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()), simConf);
 
-		System.out.println("\n#Master#************************* Received message:\n " + experimentRes.toString() + "\n\n");
+		System.out.println("\n#Master# ************************* Received message:\n " + experimentRes.toString() + "\n\n");
 
 		// Sorted output of results
 //		for (Object key : sortedResultList) {
@@ -96,8 +96,8 @@ public class ComputeSingleResultPlan extends Plan {
 		// HACK! - 26-5-10
 		// experimentRes.setEvents(new ArrayList<ObservedEvent> ());
 
-		IntermediateResult interRes = IntermediateEvaluation.updateIntermediateResults((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact(), experimentRes);
-		getBeliefbase().getBelief("intermediateResults").setFact(interRes);
+//		IntermediateResult interRes = IntermediateEvaluation.updateIntermediateResults((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact(), experimentRes);
+//		getBeliefbase().getBelief("intermediateResults").setFact(interRes);
 
 		// ControlCenter gui = (ControlCenter)
 		// getBeliefbase().getBelief("tmpGUI").getFact();
@@ -115,8 +115,7 @@ public class ComputeSingleResultPlan extends Plan {
 		long endTime = ((Long) content.get(Constants.EXPERIMENT_END_TIME)).longValue();
 		String experimentId = (String) content.get(GlobalConstants.EXPERIMENT_ID);
 
-		// init buckets, in order to filter events, that belong to observers
-		// which only need the last "observedValue".
+		// init buckets, in order to filter events, that belong to observers which only need the last "observedValue".
 		HashMap<String, ArrayList<ObservedEvent>> eventsToFilter = getBuckets(simConf);
 
 		// transform events list, little hack...

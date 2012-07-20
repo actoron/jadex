@@ -87,4 +87,23 @@ public class Constants {
 	public static final String SIMULATION_DATA_CONSUMER = "SimulationDataConsumer";	
 	//The name of the element
 	public static final String DATAPROVIDER = "dataprovider";
+	
+	//If there is more than one instance of this object that should be observed, than this String denotes the ID of the object to be distinguished.
+	public static final String MULTIPLE_INSTANCE_Id = "multipleInstanceId";
+	//Complex Event: the observed event contains several properties, not just one
+	public static final String IS_COMPLEX_EVENT  = "isComplexEvent";
+	
+//	List that contains mean values
+	public static final String MEAN_VALUE_LIST  = "meanValueList";
+	
+//	List that contains median values
+	public static final String MEDIAN_VALUE_LIST  = "medianValueList";
+	
+//	List that contains sample variance values
+	public static final String SAMPLE_VARIANCE_VALUE_LIST  = "sampleVarianceValueList";
+
+//	List that contains the single values of the observed object
+	public static final String SINGLE_OBSERVED_VALUES_LIST  = "singleObservedValuesList";
+		
 }
+

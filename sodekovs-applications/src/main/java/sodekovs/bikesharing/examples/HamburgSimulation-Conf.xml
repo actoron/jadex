@@ -14,13 +14,15 @@
 	<Imports>
 		<Import>jadex.extension.envsupport.evaluation.*</Import>
 		<Import>jadex.simulation.evaluation.*</Import>		
+		<Import>java.lang.String</Import>
 	</Imports>
 
 	<Dataproviders>
-		<Dataprovider name="homebaselogger2">
-			<Source name="$nest" sourcetype="ISpaceObject" objecttype="bikestation"/> 						
-			<Data name="ore_amount">$nest.stock</Data>
-			<Data name="ore_capacity">$nest.capacity</Data>
+		<Dataprovider name="BikestationsLogger">
+			<Source name="$bikestation" sourcetype="ISpaceObject" objecttype="bikestation"/> 						
+			<Data name="stock">$bikestation.stock</Data>
+			<Data name="capacity">$bikestation.capacity</Data>			
+			<Data name="stationID">$bikestation.stationID</Data>
 			<Data name="time">$tick</Data>							
 		</Dataprovider>
 		
@@ -33,7 +35,7 @@
 	</Dataproviders>
 
 	<Dataconsumers>
-		<Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
+		<!-- <Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
 				<Property name="dataprovider">"homebaselogger2"</Property>
 				<Property name="title">"One random station"</Property>
 				<Property name="labelx">"Time"</Property>
@@ -50,7 +52,7 @@
 				<Property name="seriesname_0">"Collected Food"</Property>				
 				<Property name="valuex_0">"ore_amount"</Property>
 				<Property name="valuey_0">"time"</Property>
-		</Dataconsumer>
+		</Dataconsumer> -->
 		
 		<!-- New Consumer! Test! -->
 		<!-- <Dataconsumer name="bikestationConsumer" clazz="XYChartDataConsumer">
@@ -63,7 +65,11 @@
 				<Property name="valuey_0">"time"</Property>
 		</Dataconsumer> -->
 		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
-				<Property name="dataprovider">"homebaselogger2"</Property>
+				<Property name="dataprovider">"BikestationsLogger"</Property>
+				<!-- If there is more than one instance of this object that should be observed, than this String denotes the ID of the object to be distinguished. -->
+				<Property name="multipleInstanceId">"stationID"</Property>
+				<!-- Complex Event: the observed event contains several properties, not just one -->
+				<Property name="isComplexEvent">"stationID"</Property>				
 				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
 		</Dataconsumer>
 	</Dataconsumers>
@@ -98,9 +104,9 @@
 				<Time value="17000" type="absolute" />
 			</TerminateCondition> -->
 		</General>
-		<Rows experiments="4">
+		<Rows experiments="5">
 			<TerminateCondition>
-				 <Time value="30000" type="relative" />
+				 <Time value="10000" type="relative" />
 				
 					<!-- <TargetFunction function="$object.getProperty(&quot;stock&quot;) >=
 					30">	<ObjectSource type="ISpaceObject" name="bikestation" /> </TargetFunction> -->

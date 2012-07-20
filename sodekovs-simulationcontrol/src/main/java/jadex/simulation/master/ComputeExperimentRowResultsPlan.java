@@ -2,21 +2,20 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.simulation.evaluation.EvaluateExperiment;
+import jadex.simulation.evaluation.EvaluateRow;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.EvaluationResult;
+import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 import jadex.simulation.model.result.SimulationResult;
-import jadex.simulation.persist.LogWriter;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import sodekovs.util.misc.XMLHandler;
 
@@ -31,56 +30,171 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	public void body() {
 		// TODO Auto-generated method stub
 		System.out.println("#ComputeExperimentRowResultsPlan# Compute Row Results");
-		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
-		int rowCounter = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
-		int rowsDoTo = ((Integer) facts.get(Constants.ROWS_TO_DO)).intValue();
-		IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
-		// check terminate condition: time or counter or semantic
+		HashMap simulationFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
+		int rowCounter = ((Integer) simulationFacts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
+		int rowsDoTo = ((Integer) simulationFacts.get(Constants.ROWS_TO_DO)).intValue();
+		// IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
+		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
+
+		// 1. Evaluate Rows and their Experiments
+		evaluate(rowResults);
+
+		// 2. Store results
+		storeResults(rowResults, simulationFacts, rowCounter, rowsDoTo);
+
+		// 3. Print current state of results
+		print(rowResults);
+		// if (rowCounter == rowsDoTo) {
+		//
+		// // store result as XML-File
+		//
+		// SimulationResult result = new SimulationResult();
+		// result.setStarttime(((Long) simulationFacts.get(Constants.SIMULATION_START_TIME)).longValue());
+		// result.setEndtime(getClock().getTime());
+		// result.setName("missing");
+		// result.setRowsResults(new ArrayList(rowResults.values()));
+		//
+		// System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Res of Simulation to XML!");
+		// XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
+		//
+		// try {
+		// doShortEvaluation(rowResults, "Final");
+		// } catch (UnsupportedEncodingException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		//
+		// } else {
+		//
+		// // Print and persist intermediateResults
+		// System.out.println("#ComputeExperimentRowResultsPlan# Printing intermediate results!");
+		// try {
+		// doShortEvaluation(rowResults, "Intermediate");
+		// } catch (UnsupportedEncodingException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		//
+		// optimize --> put new parameters
+		// Start new Row
+		
+		// Simulation has not finished. Start next row
+		if (rowCounter < rowsDoTo) {
+
+		simulationFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(0));
+		getBeliefbase().getBelief("generalSimulationFacts").setFact(simulationFacts);
+
+		// re-init intermediate results since of the start of a new row
+		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact()));
+
+		IGoal goal = createGoal("StartSimulationExperiments");
+		System.out.println("#InitSim# Starting " + rowCounter + ". round of Simulation Experiments.");
+		dispatchTopLevelGoal(goal);
+		}
+
+	}
+
+	// /**
+	// * Do short evaluation to see the most important results of the simulation
+	// *
+	// * @param rowResults
+	// * @throws UnsupportedEncodingException
+	// */
+	// private void doShortEvaluation(HashMap rowResults, String fileAppendix) throws UnsupportedEncodingException {
+	//
+	// SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
+	// HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
+	//
+	// for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
+	//
+	// ArrayList<HashMap<String, HashMap<String, ArrayList<Object>>>> preparedExperimentResList = new ArrayList<HashMap<String, HashMap<String, ArrayList<Object>>>>();
+	//
+	// RowResult rowRes = (RowResult) rowResults.get(it.next());
+	// ArrayList<ExperimentResult> experimentResultsList = rowRes.getExperimentsResults();
+	//
+	// for (ExperimentResult experimentResult : experimentResultsList) {
+	// // Separate/transform observed events into a new data structure which enables their statistical evaluation
+	// experimentResult.setSortedObserveEventsMap(EvaluateExperiment.separateData(experimentResult));
+	// preparedExperimentResList.add(experimentResult.getSortedObserveEventsMap());
+	// System.out.println(experimentResult.toStringShort());
+	// }
+	//
+	// // Separate/transform the data again. Required in order to access the properties of the object instances in ALL experiments of this row. Till now they are separated by Experiment, now they
+	// // will be separated by objectInstance.
+	// HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> preparedRowData = EvaluateRow.separateData(preparedExperimentResList);
+	// rowRes.setEvaluatedRowData(EvaluateRow.evaluateRowData(preparedRowData));
+	//
+	// System.out.println(rowRes.toStringShortNew());
+	// }
+	// }
+
+	private void evaluate(HashMap rowResults) {
+
+		for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
+
+			ArrayList<HashMap<String, HashMap<String, ArrayList<Object>>>> preparedExperimentResList = new ArrayList<HashMap<String, HashMap<String, ArrayList<Object>>>>();
+
+			RowResult rowRes = (RowResult) rowResults.get(it.next());
+
+			// Check whether this row has already been evaluated, avoid therefore unnecessary work.
+			if (rowRes.getEvaluatedRowData() == null) {
+				ArrayList<ExperimentResult> experimentResultsList = rowRes.getExperimentsResults();
+
+				for (ExperimentResult experimentResult : experimentResultsList) {
+					// Separate/transform observed events into a new data structure which enables their statistical evaluation
+					experimentResult.setSortedObserveEventsMap(EvaluateExperiment.separateData(experimentResult));
+					preparedExperimentResList.add(experimentResult.getSortedObserveEventsMap());
+					// System.out.println(experimentResult.toStringShort());
+				}
+
+				// Separate/transform the data again. Required in order to access the properties of the object instances in ALL experiments of this row. Till now they are separated by Experiment, now
+				// they will be separated by objectInstance.
+				HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> preparedRowData = EvaluateRow.separateData(preparedExperimentResList);
+				rowRes.setEvaluatedRowData(EvaluateRow.evaluateRowData(preparedRowData));
+
+				// System.out.println(rowRes.toStringShortNew());
+			}
+		}
+	}
+
+	private void storeResults(HashMap rowResults, HashMap simFacts, int rowCounter, int rowsDoTo) {
+
+		// Simulation has finished. Store final result
 		if (rowCounter == rowsDoTo) {
 
 			// store result as XML-File
-			HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
-
 			SimulationResult result = new SimulationResult();
-			result.setStarttime(((Long) facts.get(Constants.SIMULATION_START_TIME)).longValue());
+			result.setStarttime(((Long) simFacts.get(Constants.SIMULATION_START_TIME)).longValue());
 			result.setEndtime(getClock().getTime());
 			result.setName("missing");
 			result.setRowsResults(new ArrayList(rowResults.values()));
 
-			System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Res of Simulation to XML!");
+			System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Results of Simulation to XML!");
 			XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
-			
-			
-			try {
-				doShortEvaluation(rowResults, interRes,  "Final");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
 		} else {
-			
-			//Print and persist intermediateResults
-			System.out.println("#ComputeExperimentRowResultsPlan# Printing intermediate results!");
-			try {
-				doShortEvaluation((HashMap) getBeliefbase().getBelief("rowResults").getFact(), interRes, "Intermediate");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			// Store intermediate results
 
-			// optimize --> put new parameters
-			// Start new Row
+			// EvaluationResult evalRes = new EvaluationResult();
+			// evalRes.setNumberOfRows(simConf.getRunConfiguration().getGeneral().getRows());
+			// evalRes.setExperimentsPerRow(simConf.getRunConfiguration().getRows().getExperiments());
+			// evalRes.setSimulationDuration(getClock().getTime() - ((Long) facts.get(Constants.SIMULATION_START_TIME)).longValue());
+			// evalRes.setSimulationStartime(((Long) facts.get(Constants.SIMULATION_START_TIME)).longValue());
+			// evalRes.setRowResults(new ArrayList<RowResult>(rowResults.values()));
+			//
+			// System.out.println(evalRes.toString());
+			// LogWriter logWriter = new LogWriter();
+			// logWriter.log(evalRes.toString());
 
-			facts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(0));
-			getBeliefbase().getBelief("generalSimulationFacts").setFact(facts);
-			
-			//re-init intermediate results since of the start of a new row
-			getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact()));
-			
-			IGoal goal = createGoal("StartSimulationExperiments");
-			System.out.println("#InitSim# Starting " + rowCounter + ". round of Simulation Experiments.");
-			dispatchTopLevelGoal(goal);
+			// try {
+			// BufferedWriter out = new BufferedWriter(new FileWriter("SimRes" + evalRes.getSimulationStartime() + "-" + fileAppendix + ".txt"));
+			// out.write(evalRes.toString());
+			// out.close();
+			// } catch (IOException e) {
+			// }
+			/*
+			 * try { System.out.println("******Fetching from DB*****"); logWriter.logReader(); } catch (SQLException e) { // TODO Auto-generated catch block e.printStackTrace(); } catch (IOException
+			 * e) { // TODO Auto-generated catch block e.printStackTrace(); }
+			 */
 		}
 	}
 
@@ -88,42 +202,39 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	 * Do short evaluation to see the most important results of the simulation
 	 * 
 	 * @param rowResults
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
-	private void doShortEvaluation(HashMap rowResults, IntermediateResult interRes, String fileAppendix) throws UnsupportedEncodingException {
+	private void print(HashMap rowResults) {
 
-		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
-		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
+//		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
+//		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 
-		EvaluationResult evalRes = new EvaluationResult();
-		evalRes.setNumberOfRows(simConf.getRunConfiguration().getGeneral().getRows());
-		evalRes.setExperimentsPerRow(simConf.getRunConfiguration().getRows().getExperiments());
-		evalRes.setSimulationDuration(getClock().getTime() - ((Long) facts.get(Constants.SIMULATION_START_TIME)).longValue());
-		evalRes.setSimulationStartime(((Long) facts.get(Constants.SIMULATION_START_TIME)).longValue());
-		evalRes.setRowResults(new ArrayList<RowResult>(rowResults.values()));
+		for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
 
-		System.out.println(evalRes.toString());
-//		LogWriter logWriter = new LogWriter();
-//		logWriter.log(evalRes.toString());
-	
-		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("SimRes"  + evalRes.getSimulationStartime() + "-" + fileAppendix + ".txt"));
-			out.write(evalRes.toString());
-			out.close();
-		} catch (IOException e) {
+			ArrayList<HashMap<String, HashMap<String, ArrayList<Object>>>> preparedExperimentResList = new ArrayList<HashMap<String, HashMap<String, ArrayList<Object>>>>();
+
+			RowResult rowRes = (RowResult) rowResults.get(it.next());
+			
+			//Print evaluation results for the row
+			System.out.println(rowRes.toStringShortNew());
+			
+			ArrayList<ExperimentResult> experimentResultsList = rowRes.getExperimentsResults();
+
+			//Print evaluation results for the experiments of this row
+			for (ExperimentResult experimentResult : experimentResultsList) {
+				// Separate/transform observed events into a new data structure which enables their statistical evaluation
+//				experimentResult.setSortedObserveEventsMap(EvaluateExperiment.separateData(experimentResult));
+//				preparedExperimentResList.add(experimentResult.getSortedObserveEventsMap());
+				System.out.println("Values of the single experiments, conducted within this row: ");
+				System.out.println(experimentResult.toStringShort());
+			}
+
+			// Separate/transform the data again. Required in order to access the properties of the object instances in ALL experiments of this row. Till now they are separated by Experiment, now they
+			// will be separated by objectInstance.
+//			HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> preparedRowData = EvaluateRow.separateData(preparedExperimentResList);
+//			rowRes.setEvaluatedRowData(EvaluateRow.evaluateRowData(preparedRowData));
+
+//			System.out.println(rowRes.toStringShortNew());
 		}
-		/*
-		try {
-			System.out.println("******Fetching from DB*****");
-			logWriter.logReader();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-
 	}
 }

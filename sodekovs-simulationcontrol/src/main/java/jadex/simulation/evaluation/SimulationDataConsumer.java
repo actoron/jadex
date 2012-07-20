@@ -5,17 +5,18 @@ import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.evaluation.DataTable;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.extension.envsupport.evaluation.ITableDataProvider;
+import jadex.simulation.helper.Constants;
 import jadex.simulation.model.ObservedEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import sodekovs.util.misc.GlobalConstants;
 
 /**
- * Simple consumer that consumes events as "observed events" for processing
- * within the master simulation agent.
+ * Simple consumer that consumes events as "observed events" for processing within the master simulation agent.
  */
 public class SimulationDataConsumer extends SimplePropertyObject implements ITableDataConsumer {
 	// -------- constants --------
@@ -41,18 +42,19 @@ public class SimulationDataConsumer extends SimplePropertyObject implements ITab
 	public void consumeData(long timestamp, double tick) {
 
 		// Things needed for the simulation
-								
+
 		String experimentId = (String) getSpace().getProperty(GlobalConstants.EXPERIMENT_ID);
-		
-//		String experimentId = (String) getSpace().getContext().getArguments().get(Constants.EXPERIMENT_ID);
-//		String appName = getSpace().getContext().getComponentIdentifier().getLocalName();		
+
+		// String experimentId = (String) getSpace().getContext().getArguments().get(Constants.EXPERIMENT_ID);
+		// String appName = getSpace().getContext().getComponentIdentifier().getLocalName();
 		String appName = getSpace().getExternalAccess().getComponentIdentifier().getLocalName();
-		
-		
+
 		ArrayList<ObservedEvent> observedEvents = new ArrayList<ObservedEvent>();
-//		IServiceContainer container = getSpace().getContext().getServiceContainer();
-//		IClockService clockservice = (IClockService) container.getService(IClockService.class);
-//		long timestamp = clockservice.getTime();
+		// IServiceContainer container = getSpace().getContext().getServiceContainer();
+		// IClockService clockservice = (IClockService) container.getService(IClockService.class);
+		// long timestamp = clockservice.getTime();
+
+		
 		// -----
 
 		ITableDataProvider provider = getTableDataProvider();
@@ -63,11 +65,17 @@ public class SimulationDataConsumer extends SimplePropertyObject implements ITab
 		if (rows != null) {
 			for (int i = 0; i < rows.size(); i++) {
 				Object[] row = (Object[]) rows.get(i);
+				HashMap<String, Object> objectProp = new HashMap<String, Object>();
 				for (int j = 0; j < row.length; j++) {
-
-					// writer.write(""+row[j]);
-					observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, colnames[j], String.valueOf(row[j]), tick));
+					objectProp.put(colnames[j], String.valueOf(row[j]));
 				}
+				//read the multipleInstanceId from the Simulation.configuation.xml and get the value
+				String  multipleInstanceId = (String)objectProp.get((String)getProperties().get("multipleInstanceId"));
+				//remove multipleInstanceId from property list of object instance. The multipleInstanceId might be a string value and lead therefore to errors when compting later statistical data of the experiments
+				objectProp.remove((String)getProperties().get("multipleInstanceId"));
+				ObservedEvent event = new ObservedEvent(appName, experimentId, timestamp,  multipleInstanceId, objectProp, tick);
+				observedEvents.add(event);
+
 
 				// Observe elements: ISpaceObjects, BDI-Agents,
 				// MicroAgents
@@ -151,6 +159,7 @@ public class SimulationDataConsumer extends SimplePropertyObject implements ITab
 
 	/**
 	 * Return HashMap that contains all observedEvents, according to the specification within the simulation-configuration file
+	 * 
 	 * @return
 	 */
 	public ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResults() {

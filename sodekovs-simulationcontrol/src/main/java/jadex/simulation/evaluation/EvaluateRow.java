@@ -66,32 +66,32 @@ public class EvaluateRow {
 	 */
 	public static HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> evaluateRowData(HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> input) {
 
-		//contains the stats for each object instance: key =object instance id
+		// contains the stats for each object instance: key =object instance id
 		HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> statsForObjectInstances = new HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>>();
-						
+
 		// get object instances
 		for (Iterator<String> it1 = input.keySet().iterator(); it1.hasNext();) {
 			String objectInstanceKey = it1.next();
 			HashMap<String, ArrayList<ArrayList<Object>>> objectInstanceMap = input.get(objectInstanceKey);
-			
-			//contains the stats for the properties of this object instance
-			HashMap<String, HashMap<String, ArrayList<String>>> propertyStatsForObjectInstance = new HashMap<String, HashMap<String, ArrayList<String>>> ();
-			
+
+			// contains the stats for the properties of this object instance
+			HashMap<String, HashMap<String, ArrayList<String>>> propertyStatsForObjectInstance = new HashMap<String, HashMap<String, ArrayList<String>>>();
+
 			// get list of properties for this object instance
 			for (Iterator<String> it2 = objectInstanceMap.keySet().iterator(); it2.hasNext();) {
 				String objectInstancePropertiesKey = it2.next();
 				// contains for each property a list, which contains again a list of observed vlaues for each experiment run.
 				ArrayList<ArrayList<Object>> propertiesList = objectInstanceMap.get(objectInstancePropertiesKey);
 
-				System.out.println();
-				
-				//Key; mean, median etc. values; value: list (every position is a tick)
+//				System.out.println();
+
+				// Key; mean, median etc. values; value: list (every position is a tick)
 				propertyStatsForObjectInstance.put(objectInstancePropertiesKey, doStatistics(propertiesList));
 			}
-		
+
 			statsForObjectInstances.put(objectInstanceKey, propertyStatsForObjectInstance);
 		}
-		System.out.println();
+//		System.out.println();
 		return statsForObjectInstances;
 
 	}
@@ -123,12 +123,18 @@ public class EvaluateRow {
 
 		for (ArrayList<Object> singleExperiment : input) {
 			for (int j = 0; j < singleExperiment.size(); j++) {
-				//ToDo: Avoid index out of Bounds Exception -> may happen if one experiment has observed more/less values because of delays at ticks
-				transformedList.get(j).add(singleExperiment.get(j));
+
+				// ToDo: Avoid index out of Bounds Exception -> may happen if one experiment has observed more/less values because of delays at ticks
+				// HACK:
+				try {
+					transformedList.get(j).add(singleExperiment.get(j));
+				} catch (IndexOutOfBoundsException e) {
+//					System.out.println("\n\n\n\n HELLO ERROR!");
+				}
 			}
 		}
 
-		System.out.println();
+//		System.out.println();
 		// do statistics: compute stats for each list
 		for (ArrayList<Object> list : transformedList) {
 
@@ -153,7 +159,7 @@ public class EvaluateRow {
 			sampleVarianceValueList.add(String.valueOf(sampleVarianceValue));
 			singleObservedValuesList.add(singleValues);
 
-			System.out.println("Eval : " + meanValue + " , " + medianValue + ", " + sampleVarianceValue + ", single val: " + singleValues);
+//			System.out.println("Eval : " + meanValue + " , " + medianValue + ", " + sampleVarianceValue + ", single val: " + singleValues);
 		}
 
 		resultsMap.put(Constants.MEAN_VALUE_LIST, meanValueList);

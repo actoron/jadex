@@ -57,9 +57,10 @@
 					<env:property name="behaviour_strategy">1</env:property>					
 				</env:objecttype>
 				<env:objecttype name="bikestation">
-					<env:property name="name" class="String" />
+					<env:property name="stationID" class="String" />
 					<env:property name="stock" class="int" />
-					<env:property name="capacity" class="Integer" />
+					<env:property name="capacity" class="int" />
+					<env:property name="position" class="Vector2Double" />					
 				</env:objecttype>				
 						
 			</env:objecttypes>
