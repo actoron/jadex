@@ -1,5 +1,6 @@
 package jadex.base.gui.asynctree;
 
+import jadex.base.gui.componenttree.ServiceContainerNode;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -287,19 +288,49 @@ public abstract class AbstractTreeNode	implements ITreeNode
 					changed	= true;
 				}
 			}
+			
 			// Traverse through target list and add missing nodes
+			List<ITreeNode> toadd = new ArrayList<ITreeNode>();
 			for(int i=0; newcs!=null && i<newcs.size(); i++)
 			{
 				ITreeNode	node	= (ITreeNode)newcs.get(i);
 				if(i>=children.size() || !node.equals(children.get(i)))
 				{
-					// Add missing or moved node.
-					children.add(i, node);
-					model.addNode(node);
-					model.fireNodeAdded(AbstractTreeNode.this, node, i);
-					changed	= true;
+					toadd.add(node);
 				}
 			}
+			
+			// Add missing or moved node.
+			if(toadd.size()>0)
+			{
+				for(ITreeNode node: toadd)
+				{
+					boolean ins = false;
+					for(int i=0; i<children.size() && !ins; i++)
+					{
+						ITreeNode child = children.get(i);
+						if(child instanceof ServiceContainerNode)
+							continue;
+						if(child.toString().toLowerCase().compareTo(node.toString().toLowerCase())>=0)
+						{
+//							System.out.println("adding: "+node.toString());
+							children.add(i, node);
+							model.addNode(node);
+							model.fireNodeAdded(AbstractTreeNode.this, node, i);
+							ins = true;
+							changed = true;
+						}
+					}
+					if(!ins)
+					{
+						children.add(node);
+						model.addNode(node);
+						model.fireNodeAdded(AbstractTreeNode.this, node, children.size()-1);
+						changed = true;
+					}
+				}
+			}
+			
 			if(changed)
 				model.fireNodeChanged(AbstractTreeNode.this);
 			
@@ -347,9 +378,9 @@ public abstract class AbstractTreeNode	implements ITreeNode
 //				model.fireNodeChanged(AbstractTreeNode.this);
 //			}
 				
-			assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs
-//				+"\nadded="+added+"\nremoved="+removed
-				+"\nresult="+children;
+//			assert SUtil.equals(children, newcs) : "Node inconsistency:\noldcs="+oldcs+"\nnewcs="+newcs
+////				+"\nadded="+added+"\nremoved="+removed
+//				+"\nresult="+children;
 			
 			if(childrenfuture!=null)
 			{

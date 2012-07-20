@@ -131,7 +131,6 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 								{
 									if(addresses[i].startsWith(SRelay.ADDRESS_SCHEMES[j]))
 									{
-										
 										receivers.add(new ComponentIdentifier("__relay"+i,
 											new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
 									}

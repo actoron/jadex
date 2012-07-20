@@ -257,7 +257,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			ret	= new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(e);			
 		}
 
-		System.out.println("loaded dep: "+rid+" "+workspace);
+//		System.out.println("loaded dep: "+rid+" "+workspace);
 		return ret;
 	}
 	
