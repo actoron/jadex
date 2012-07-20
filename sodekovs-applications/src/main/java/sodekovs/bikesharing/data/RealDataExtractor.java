@@ -72,7 +72,7 @@ public class RealDataExtractor {
 		rde.setConnection(conn);
 
 		System.out.println("Fetching rentals.");
-		List<Rental> rentals = rde.getRentals(new int[] { MONDAY }, WASHINGTON, BY_BIKE, null, null);
+		List<Rental> rentals = rde.getRentals(new int[] { MONDAY }, WASHINGTON, BY_BIKE, null, null, 100);
 		if (!rentals.isEmpty()) {
 			System.out.println("Fetched rentals.");
 
@@ -91,9 +91,13 @@ public class RealDataExtractor {
 				sd = rde.addGPSCoordinates(sd, stations);
 				System.out.println("Added GPS Coordinates.");
 
+				System.out.println("Postprocess Station IDs.");
+				rde.postProcessStatioNames(sd);
+				System.out.println("Postprocessed Station IDs.");
+
 				try {
 					System.out.println("Writing XML File.");
-					String xmlFile = "monday_test2.xml";
+					String xmlFile = "WashingtonSimulation_Monday_100.xml";
 					XmlUtil.saveAsXML(sd, xmlFile);
 					System.out.println(xmlFile + " written.");
 				} catch (FileNotFoundException e) {
@@ -127,7 +131,7 @@ public class RealDataExtractor {
 	 *            the given {@link List} of {@link Rental}s
 	 * @return {@link Set} of {@link Rental}
 	 */
-	private Set<String> getStations(List<Rental> rentals) {
+	public Set<String> getStations(List<Rental> rentals) {
 		Set<String> stations = new HashSet<String>();
 
 		for (Rental rental : rentals) {
@@ -151,9 +155,11 @@ public class RealDataExtractor {
 	 *            {@link Timestamp} of the oldest data that should be fetched
 	 * @param to
 	 *            {@link Timestamp} of the youngest data that should be fetched
+	 * @param limit
+	 *            Limit the result data
 	 * @return
 	 */
-	public List<Rental> getRentals(int[] weekdays, String city, String link, Timestamp from, Timestamp to) {
+	public List<Rental> getRentals(int[] weekdays, String city, String link, Timestamp from, Timestamp to, Integer limit) {
 		List<Rental> rentals = new ArrayList<Rental>();
 
 		try {
@@ -176,6 +182,9 @@ public class RealDataExtractor {
 			}
 			if (to != null) {
 				sql += " AND to <= ?";
+			}
+			if (limit != null) {
+				sql += " LIMIT ?";
 			}
 
 			PreparedStatement stmt = getConnection().prepareStatement(sql);
@@ -200,6 +209,10 @@ public class RealDataExtractor {
 			}
 			if (to != null) {
 				stmt.setTimestamp(index, to);
+				index++;
+			}
+			if (limit != null) {
+				stmt.setInt(index, limit);
 			}
 
 			ResultSet rs = stmt.executeQuery();
@@ -356,7 +369,7 @@ public class RealDataExtractor {
 	 * @param stationSet
 	 * @return {@link SimulationDescription} enriched which the GPS coordinates of the stations
 	 */
-	private SimulationDescription addGPSCoordinates(SimulationDescription sd, Set<String> stationSet) {
+	public SimulationDescription addGPSCoordinates(SimulationDescription sd, Set<String> stationSet) {
 		ObjectFactory of = new ObjectFactory();
 		Stations stations = of.createSimulationDescriptionStations();
 
@@ -390,5 +403,34 @@ public class RealDataExtractor {
 
 		sd.setStations(stations);
 		return sd;
+	}
+
+	/**
+	 * Postprocesses the given {@link SimulationDescription} by replacing all "&" in the station ids by the actual word "and".
+	 * 
+	 * @param sd
+	 *            the given {@link SimulationDescription}
+	 */
+	public void postProcessStatioNames(SimulationDescription sd) {
+		List<Station> stations = sd.getStations().getStation();
+		for (Station station : stations) {
+			String stationId = station.getStationID();
+			station.setStationID(stationId.replace("&", "and"));
+		}
+
+		List<TimeSlice> timeSlices = sd.getTimeSlices().getTimeSlice();
+		for (TimeSlice timeSlice : timeSlices) {
+			List<ProbabilitiesForStation> probabilitiesForStations = timeSlice.getProbabilitiesForStations().getProbabilitiesForStation();
+			for (ProbabilitiesForStation probabilitiesForStation : probabilitiesForStations) {
+				String stationId = probabilitiesForStation.getStationID();
+				probabilitiesForStation.setStationID(stationId.replace("&", "and"));
+
+				List<DestinationProbability> destinationProbabilities = probabilitiesForStation.getDestinationProbabilities().getDestinationProbability();
+				for (DestinationProbability destinationProbability : destinationProbabilities) {
+					String destination = destinationProbability.getDestination();
+					destinationProbability.setDestination(destination.replace("&", "and"));
+				}
+			}
+		}
 	}
 }

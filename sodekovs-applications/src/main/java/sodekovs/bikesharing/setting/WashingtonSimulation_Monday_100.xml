@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<SimulationDescription>
+    <TimeSlices>
+        <TimeSlice offset="60" startTime="1020">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="20th and E St NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Adams Mill and Columbia Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and Rhode Island Ave NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Convention Center / 7th and M St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="19th St and Constitution Ave NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="4th and M St SW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and K St NW [formerly 17th and L St NW]" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and Rhode Island Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="North Capitol St and F St NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="5th and F St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="McPherson Square - 14th and H St NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="17th and K St NW [formerly 17th and L St NW]"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="4th and M St SW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="4th and M St SW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="USDA / 12th and Independence Ave SW" departureProbability="0.11764705882352941">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Georgetown Harbor / 30th St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="27th and Crystal Dr" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="18th and Bell St"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="4th and East Capitol St NE" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Lincoln Park / 13th and East Capitol St NE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="21st and I St NW" departureProbability="0.11764705882352941">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.5" destination="16th and U St NW"/>
+                        <DestinationProbability probability="0.5" destination="Florida Ave and R St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="18th and M St NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="7th and Water St SW / SW Waterfront"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and G St NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="25th St and Pennsylvania Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="5th and F St NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="5th St and K St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="20th St and Florida Ave NW" departureProbability="0.058823529411764705">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and P St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice offset="60" startTime="1080">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="19th St and Constitution Ave NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="17th and K St NW [formerly 17th and L St NW]"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="US Dept of State / Virginia Ave and 21st St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="8th and H St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Georgia Ave and Fairmont St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="7th and T St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Massachusetts Ave and Dupont Circle NW" departureProbability="0.10344827586206896">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.3333333333333333" destination="15th and P St NW"/>
+                        <DestinationProbability probability="0.3333333333333333" destination="14th and Harvard St NW"/>
+                        <DestinationProbability probability="0.3333333333333333" destination="14th and V St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="23rd and Crystal Dr" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and Crystal Dr"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Lincoln Park / 13th and East Capitol St NE" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and D St SE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and R St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and G St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="16th and Harvard St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Lamont and Mt Pleasant NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="15th and P St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="17th and Corcoran St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and D St SE" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Lincoln Park / 13th and East Capitol St NE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="21st and M St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="19th St and Pennsylvania Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="USDA / 12th and Independence Ave SW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Massachusetts Ave and Dupont Circle NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and Corcoran St NW" departureProbability="0.06896551724137931">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.5" destination="15th and P St NW"/>
+                        <DestinationProbability probability="0.5" destination="14th and V St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="18th and M St NW" departureProbability="0.10344827586206896">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.3333333333333333" destination="15th and P St NW"/>
+                        <DestinationProbability probability="0.3333333333333333" destination="17th and Corcoran St NW"/>
+                        <DestinationProbability probability="0.3333333333333333" destination="Georgetown Harbor / 30th St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="3rd and H St NE" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="5th and F St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and Harvard St NW" departureProbability="0.06896551724137931">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="10th and U St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and G St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and Rhode Island Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="5th and F St NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="5th St and K St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Adams Mill and Columbia Rd NW" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and V St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Calvert St and Woodley Pl NW" departureProbability="0.06896551724137931">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Adams Mill and Columbia Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="18th and Bell St" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="23rd and Crystal Dr"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Eastern Market Metro / Pennsylvania Ave and 7th St SE" departureProbability="0.034482758620689655">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="13th and D St NE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice offset="60" startTime="1140">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="Park Rd and Holmead Pl NW" departureProbability="0.13333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.5" destination="Park Rd and Holmead Pl NW"/>
+                        <DestinationProbability probability="0.5" destination="Lamont and Mt Pleasant NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and Rhode Island Ave NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="17th and Corcoran St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and K St NW [formerly 17th and L St NW]" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and P St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Massachusetts Ave and Dupont Circle NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and V St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Bladensburg Rd and Benning Rd NE" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Columbus Circle / Union Station"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and V St NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="17th and Corcoran St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="New York Ave and 15th St NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="17th and Corcoran St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th St and Spring Rd NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Adams Mill and Columbia Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and Corcoran St NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and P St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="21st and I St NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="16th and Harvard St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="13th St and New York Ave NW" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Georgia Ave and Fairmont St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Eastern Market Metro / Pennsylvania Ave and 7th St SE" departureProbability="0.06666666666666667">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="3rd and D St SE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Potomac and Pennsylvania Ave SE" departureProbability="0.13333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.5" destination="8th and Eye St SE / Barracks Row"/>
+                        <DestinationProbability probability="0.5" destination="Potomac and Pennsylvania Ave SE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice offset="60" startTime="1200">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="15th and P St NW" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="10th and U St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and Rhode Island Ave NW" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="8th and H St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="27th and Crystal Dr" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="23rd and Crystal Dr"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and K St NW [formerly 17th and L St NW]" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and Rhode Island Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and Harvard St NW" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and P St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and G St NW" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and R St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Calvert St and Woodley Pl NW" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Harvard St and Adams Mill Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Adams Mill and Columbia Rd NW" departureProbability="0.16666666666666666">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.5" destination="14th St and Spring Rd NW"/>
+                        <DestinationProbability probability="0.5" destination="Adams Mill and Columbia Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Lincoln Park / 13th and East Capitol St NE" departureProbability="0.16666666666666666">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Eastern Market Metro / Pennsylvania Ave and 7th St SE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="20th St and Florida Ave NW" departureProbability="0.08333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and Rhode Island Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice offset="60" startTime="1260">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="15th and P St NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="16th and U St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and Rhode Island Ave NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="20th St and Florida Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="4th and M St SW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="7th and Water St SW / SW Waterfront"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="4th and East Capitol St NE" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Lincoln Park / 13th and East Capitol St NE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="21st and I St NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Massachusetts Ave and Dupont Circle NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Massachusetts Ave and Dupont Circle NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="16th and U St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="3rd and H St NE" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="13th and H St NE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="23rd and Crystal Dr" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="27th and Crystal Dr"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Florida Ave and R St NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="10th and U St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Eastern Market Metro / Pennsylvania Ave and 7th St SE" departureProbability="0.21428571428571427">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Lincoln Park / 13th and East Capitol St NE"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="8th and H St NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th and Rhode Island Ave NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="14th and R St NW" departureProbability="0.07142857142857142">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="16th and U St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice offset="60" startTime="1320">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="Lamont and Mt Pleasant NW" departureProbability="0.2857142857142857">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Park Rd and Holmead Pl NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and Corcoran St NW" departureProbability="0.14285714285714285">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Adams Mill and Columbia Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Van Ness Metro / UDC" departureProbability="0.14285714285714285">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and P St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Calvert St and Woodley Pl NW" departureProbability="0.14285714285714285">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="14th St and Spring Rd NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="Adams Mill and Columbia Rd NW" departureProbability="0.14285714285714285">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Calvert St and Woodley Pl NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="20th St and Florida Ave NW" departureProbability="0.14285714285714285">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="15th and P St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice offset="60" startTime="1380">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="Park Rd and Holmead Pl NW" departureProbability="0.16666666666666666">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="Lamont and Mt Pleasant NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="17th and Corcoran St NW" departureProbability="0.5">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="0.3333333333333333" destination="Massachusetts Ave and Dupont Circle NW"/>
+                        <DestinationProbability probability="0.3333333333333333" destination="14th and Harvard St NW"/>
+                        <DestinationProbability probability="0.3333333333333333" destination="14th and R St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+                <ProbabilitiesForStation stationID="8th and H St NW" departureProbability="0.3333333333333333">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="8th and H St NW"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>
+            </ProbabilitiesForStations>
+        </TimeSlice>
+    </TimeSlices>
+    <Stations>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.045" latitude="38.8963" stationID="20th and E St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0436" latitude="38.8923" stationID="19th St and Constitution Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0222" latitude="38.9249" stationID="Georgia Ave and Fairmont St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.050276" latitude="38.860244" stationID="15th and Crystal Dr"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.009888" latitude="38.897446" stationID="North Capitol St and F St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0135" latitude="38.9126" stationID="Florida Ave and R St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.982872" latitude="38.900413" stationID="Bladensburg Rd and Benning Rd NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.036536" latitude="38.926088" stationID="16th and Harvard St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0321" latitude="38.9176" stationID="14th and V St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.032005" latitude="38.899641" stationID="McPherson Square - 14th and H St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0328" latitude="38.9375" stationID="14th St and Spring Rd NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.004962" latitude="38.896999" stationID="Columbus Circle / Union Station"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0471" latitude="38.9054" stationID="21st and M St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0387" latitude="38.9121" stationID="17th and Corcoran St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.047" latitude="38.9008" stationID="21st and I St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.000349" latitude="38.889955" stationID="4th and East Capitol St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.041798" latitude="38.9055" stationID="18th and M St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.029822" latitude="38.900283" stationID="13th St and New York Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0501" latitude="38.9236" stationID="Calvert St and Woodley Pl NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0511" latitude="38.8573" stationID="18th and Bell St"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0323" latitude="38.9086" stationID="14th and Rhode Island Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.046587" latitude="38.894919" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.059219" latitude="38.9022212" stationID="Georgetown Harbor / 30th St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.031681" latitude="38.912682" stationID="14th and R St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0178" latitude="38.8767" stationID="4th and M St SW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.022264" latitude="38.90572" stationID="Convention Center / 7th and M St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.028226" latitude="38.887237" stationID="USDA / 12th and Independence Ave SW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.042581" latitude="38.922925" stationID="Adams Mill and Columbia Rd NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9862" latitude="38.8803" stationID="Potomac and Pennsylvania Ave SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0023" latitude="38.8851" stationID="3rd and D St SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0222" latitude="38.9155" stationID="7th and T St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0315" latitude="38.9308" stationID="Park Rd and Holmead Pl NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0444" latitude="38.9101" stationID="Massachusetts Ave and Dupont Circle NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.03863" latitude="38.90276" stationID="17th and K St NW [formerly 17th and L St NW]"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.036841" latitude="38.916656" stationID="16th and U St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0259" latitude="38.9172" stationID="10th and U St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0498" latitude="38.8533" stationID="23rd and Crystal Dr"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.987633" latitude="38.894832" stationID="13th and D St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9882" latitude="38.9003" stationID="13th and H St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.988355" latitude="38.890461" stationID="Lincoln Park / 13th and East Capitol St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0429" latitude="38.9003" stationID="19th St and Pennsylvania Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0388" latitude="38.9319" stationID="Lamont and Mt Pleasant NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9861" latitude="38.884" stationID="14th and D St SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.024016" latitude="38.878925" stationID="7th and Water St SW / SW Waterfront"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0322" latitude="38.9268" stationID="14th and Harvard St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.053485" latitude="38.903827" stationID="25th St and Pennsylvania Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.031823" latitude="38.898069" stationID="14th and G St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.995397" latitude="38.884" stationID="Eastern Market Metro / Pennsylvania Ave and 7th St SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0446" latitude="38.9154" stationID="20th St and Florida Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.043358" latitude="38.927872" stationID="Harvard St and Adams Mill Rd NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.019027" latitude="38.90304" stationID="5th St and K St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.023086" latitude="38.8997" stationID="8th and H St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.034438" latitude="38.90985" stationID="15th and P St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9953" latitude="38.8792" stationID="8th and Eye St SE / Barracks Row"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0337" latitude="38.8991" stationID="New York Ave and 15th St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0513" latitude="38.8489" stationID="27th and Crystal Dr"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.063896" latitude="38.944551" stationID="Van Ness Metro / UDC"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.001967" latitude="38.900017" stationID="3rd and H St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.019347" latitude="38.897222" stationID="5th and F St NW"/>
+    </Stations>
+</SimulationDescription>

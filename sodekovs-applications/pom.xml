@@ -138,5 +138,10 @@
 			<artifactId>sodekovs-coordination-distributed</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>sodekovs-simulationcontrol</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
