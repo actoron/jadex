@@ -1,7 +1,6 @@
 package jadex.base.service.security;
 
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
-import jadex.base.service.settings.SettingsService;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;

@@ -69,8 +69,13 @@ public class RotationTask extends AbstractTask
 				IVector2 newdir = new Vector2Double(x,y);
 				obj.setProperty(PROPERTY_ROTATION, newdir);
 				
-				IVector2 newloc	= newdir.copy().normalize().multiply(speed*0.05).add(loc);
-				((Space2D)space).setPosition(obj.getId(), newloc);
+				double	maxdist	= progress*speed*0.001;
+				double dist = ((Space2D)space).getDistance(loc, destination).getAsDouble();
+				if(dist>maxdist)
+				{
+					IVector2 newloc	= newdir.copy().normalize().multiply(speed*0.05).add(loc);
+					((Space2D)space).setPosition(obj.getId(), newloc);
+				}
 			}
 			else
 			{

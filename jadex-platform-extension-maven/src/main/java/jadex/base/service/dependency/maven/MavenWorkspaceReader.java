@@ -23,7 +23,7 @@ public class MavenWorkspaceReader implements WorkspaceReader
 	protected Model	model;
 	
 	/** The maven service. */
-	MavenDependencyResolverService	service;
+	protected MavenDependencyResolverService	service;
 
 	// -------- constructors --------
 

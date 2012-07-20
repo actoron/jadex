@@ -32,10 +32,11 @@ import javax.net.ssl.X509TrustManager;
 /**
  *  The ssl based transport.
  *  
- *  It requires a keystore being present in the start directory.
+ *  (It requires a keystore being present in the start directory.
  *  This keystore can be generated manually with:
  *  
- *  keytool -genkey -keystore keystore -keyalg RSA
+ *  keytool -genkey -keystore keystore -keyalg RSA)
+ *  Added support for automatic generation.
  *  
  *  Currently the transport does not check the certificates as this
  *  would require to install all trusted platforms (servers) in all
