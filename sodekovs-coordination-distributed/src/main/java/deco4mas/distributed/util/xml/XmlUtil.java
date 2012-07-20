@@ -28,14 +28,14 @@ public class XmlUtil {
 	 * 
 	 * @param obj
 	 *            what to save
-	 * @param outpout_name
+	 * @param output_name
 	 *            where to save
 	 * @throws JAXBException
 	 *             may happen
 	 * @throws FileNotFoundException
 	 *             may happen
 	 */
-	public static void saveAsXML(Object obj, String outpout_name) throws JAXBException, FileNotFoundException {
+	public static void saveAsXML(Object obj, String output_name) throws JAXBException, FileNotFoundException {
 
 		// setup the context of the classes to serialize:
 		JAXBContext ctx = JAXBContext.newInstance(obj.getClass());
@@ -45,7 +45,7 @@ public class XmlUtil {
 		m.setProperty("jaxb.formatted.output", true);
 
 		// output:
-		m.marshal(obj, new FileOutputStream(outpout_name));
+		m.marshal(obj, new FileOutputStream(output_name));
 	}
 
 	/**
