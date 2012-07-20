@@ -9,16 +9,16 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.tools.awareness.gui.AwarenessComponentPlugin;
-import jadex.tools.convcenter.gui.ConversationPlugin;
+import jadex.tools.awareness.AwarenessComponentPlugin;
+import jadex.tools.convcenter.ConversationPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
-import jadex.tools.deployer.gui.DeployerPlugin;
-import jadex.tools.dfbrowser.gui.DFServicePlugin;
-import jadex.tools.jcc.gui.ControlCenter;
-import jadex.tools.libtool.gui.LibraryServicePlugin;
-import jadex.tools.simcenter.gui.SimulationServicePlugin;
-import jadex.tools.starter.gui.StarterPlugin;
-import jadex.tools.testcenter.gui.TestCenterPlugin;
+import jadex.tools.deployer.DeployerPlugin;
+import jadex.tools.dfbrowser.DFServicePlugin;
+import jadex.tools.jcc.ControlCenter;
+import jadex.tools.libtool.LibraryServicePlugin;
+import jadex.tools.simcenter.SimulationServicePlugin;
+import jadex.tools.starter.StarterPlugin;
+import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
  * Micro component for opening the JCC gui.

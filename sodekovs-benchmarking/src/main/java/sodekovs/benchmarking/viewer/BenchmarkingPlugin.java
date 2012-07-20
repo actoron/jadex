@@ -6,7 +6,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.tools.generic.gui.AbstractServicePlugin;
+import jadex.tools.generic.AbstractServicePlugin;
 
 import javax.swing.Icon;
 
