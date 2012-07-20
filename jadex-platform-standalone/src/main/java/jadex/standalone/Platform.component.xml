@@ -310,11 +310,11 @@
 					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)
 			</implementation>
 		</providedservice>
-		<!-- <providedservice class="jadex.bridge.service.types.df.IDF">
+		<providedservice class="jadex.bridge.service.types.df.IDF">
 			<implementation proxytype="raw">
 				new jadex.standalone.service.DirectoryFacilitatorService($component.getServiceProvider())
 			</implementation>
-		</providedservice> -->
+		</providedservice>
 		<providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
 			<implementation>
 				new jadex.base.service.simulation.SimulationService($component)
