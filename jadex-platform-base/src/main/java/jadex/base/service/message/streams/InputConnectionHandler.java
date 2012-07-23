@@ -1,7 +1,6 @@
 package jadex.base.service.message.streams;
 
 import jadex.base.service.message.MessageService;
-import jadex.base.service.message.streams.OutputConnectionHandler.OutputConnectionPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Tuple2;
@@ -50,7 +49,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected Map<Integer, Tuple2<byte[], Boolean>> data;
 	
 	
-	/** The last sequence number acknowledged. */
+	/** The last in order sequence number acknowledged. */
 	protected int lastack;
 	
 	/** The number of received elements after which an ack is sent. */
@@ -75,7 +74,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		
 		this.rseqno = 0;
 		this.maxseqno = 0;
-		this.maxbuf = 1000;
+		this.maxbuf = 10000;
 		this.maxstored = 10000; 
 		this.data = new HashMap<Integer, Tuple2<byte[], Boolean>>();
 	
@@ -208,9 +207,9 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 					}
 					else
 					{
-//						System.out.println("storing: "+seqnumber+", size="+data.size());
+//						System.out.println("storing: "+seqnumber+", size="+data.size()+", lastack="+lastack);
 						// ack msg may be lost, repeat ack msg
-						if(data.containsKey(new Integer(seqnumber)))
+						if(lastack>=seqnumber || data.containsKey(new Integer(seqnumber)))
 						{
 							// todo: ack also more than one packet?
 							sendDataAck(seqnumber, seqnumber, false);
@@ -222,7 +221,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 							{
 								System.out.println("Closing connection due to package loss: "+seqnumber+" :"+data.size());
 								con.close();
-								data.clear();
+//								data.clear();
 							}
 						}
 					}

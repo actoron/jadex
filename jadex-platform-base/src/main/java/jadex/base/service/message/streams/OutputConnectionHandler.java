@@ -106,7 +106,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
-		this.maxsend = 25;
+		this.maxsend = 250;
 		this.maxqueued = 4;
 		this.ackcnt = 10;
 		
