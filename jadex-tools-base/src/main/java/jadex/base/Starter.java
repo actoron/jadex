@@ -663,7 +663,7 @@ public class Starter
 						
 						comp = comp.substring(0, i2);	
 					}
-					System.out.println("comp: "+comp+" config: "+config+" args: "+args);
+//					System.out.println("comp: "+comp+" config: "+config+" args: "+args);
 					
 					if(args!=null)
 					{
@@ -679,8 +679,8 @@ public class Starter
 						}
 						catch(Exception e)
 						{
-							System.out.println("args: "+args);
-							e.printStackTrace();
+//							System.out.println("args: "+args);
+//							e.printStackTrace();
 							throw new RuntimeException("Arguments evaluation error: "+e);
 						}
 					}
