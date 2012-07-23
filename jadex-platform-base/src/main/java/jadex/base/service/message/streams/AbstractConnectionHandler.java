@@ -12,10 +12,20 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
 
 /**
  *  Abstract base class for connection handlers.
@@ -76,6 +86,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 
 		this.alivetime = System.currentTimeMillis();
 		this.unacked = new HashMap<Object, SendInfo>();
+		
+		createGui();
 	}
 	
 	/**
@@ -662,6 +674,63 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 			this.result = result;
 		}
 		
+	}
+	
+	/**
+	 * 
+	 */
+	public void createGui()
+	{
+		JFrame f = new JFrame();
+		f.setLayout(new BorderLayout());
+		
+		f.add(createPanel(), BorderLayout.CENTER);
+		f.setLocation(SGUI.calculateMiddlePosition(f));
+		f.pack();
+		f.setVisible(true);
+	}
+	
+	/**
+	 * 
+	 */
+	protected JPanel createPanel()
+	{
+		return new ConnectionPanel();
+	}
+	
+	/**
+	 * 
+	 */
+	public class ConnectionPanel extends JPanel
+	{
+		/**
+		 * 
+		 */
+		public ConnectionPanel()
+		{
+			PropertiesPanel pp = new PropertiesPanel("Connection properties");
+			final JTextField tfalivetime = pp.createTextField("alivetime");
+			final JTextField tfleasetime = pp.createTextField("leasetime");
+			final JTextField tfunacked = pp.createTextField("unacked");
+			final JTextField tfmaxresends = pp.createTextField("maxresends");
+			final JTextField tfacktimeout = pp.createTextField("acktimeout");
+			
+			Timer t = new Timer(1000, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					tfalivetime.setText(""+alivetime);
+					tfleasetime.setText(""+leasetime);
+					tfunacked.setText(""+unacked);
+					tfmaxresends.setText(""+maxresends);
+					tfacktimeout.setText(""+acktimeout);
+				}
+			});
+			t.start();
+			
+			setLayout(new BorderLayout());
+			add(pp, BorderLayout.CENTER);
+		}
 	}
 	
 }

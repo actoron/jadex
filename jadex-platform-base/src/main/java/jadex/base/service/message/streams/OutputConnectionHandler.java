@@ -1,6 +1,7 @@
 package jadex.base.service.message.streams;
 
 import jadex.base.service.message.MessageService;
+import jadex.base.service.message.streams.AbstractConnectionHandler.ConnectionPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -10,7 +11,11 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.PropertiesPanel;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -18,6 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
 
 /**
  *  The output connection handler. 
@@ -844,4 +853,57 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	protected JPanel createPanel()
+	{
+		JPanel ret = new JPanel(new BorderLayout());
+		JPanel p1 = super.createPanel();
+		JPanel p2 = new OutputConnectionPanel();
+		ret.add(p1, BorderLayout.NORTH);
+		ret.add(p2, BorderLayout.CENTER);
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public class OutputConnectionPanel extends JPanel
+	{
+		/**
+		 * 
+		 */
+		public OutputConnectionPanel()
+		{
+			PropertiesPanel pp = new PropertiesPanel("Output properties");
+			final JTextField tfsent = pp.createTextField("sent");
+			final JTextField tftosend = pp.createTextField("tosend");
+			final JTextField tfseq = pp.createTextField("seqnumber");
+			final JTextField tfqueuecnt = pp.createTextField("queuecnt");
+			final JTextField tfmpmaxsize = pp.createTextField("mpmaxsize");
+			final JTextField tfmpsize = pp.createTextField("mpsize");
+			final JTextField tfstop = pp.createTextField("stop");
+			
+			Timer t = new Timer(1000, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					tfsent.setText(""+sent.size());
+					tftosend.setText(""+tosend.size());
+					tfseq.setText(""+seqnumber);
+					tfqueuecnt.setText(""+queuecnt);
+					tfmpmaxsize.setText(""+mpmaxsize);
+					tfmpsize.setText(""+mpsize);
+					tfstop.setText(""+stopflag);
+				}
+			});
+			t.start();
+			
+			setLayout(new BorderLayout());
+			add(pp, BorderLayout.CENTER);
+		}
+	}
+	
 }

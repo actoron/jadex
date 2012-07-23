@@ -1,16 +1,25 @@
 package jadex.base.service.message.streams;
 
 import jadex.base.service.message.MessageService;
+import jadex.base.service.message.streams.OutputConnectionHandler.OutputConnectionPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.PropertiesPanel;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
+
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
 
 /**
  *  Handler that sits between connection and message service.
@@ -359,6 +368,60 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected boolean isStop()
 	{
 		return getInputConnection().getStoredDataSize()>=maxstored;
+	}
+	
+	/**
+	 * 
+	 */
+	protected JPanel createPanel()
+	{
+		JPanel ret = new JPanel(new BorderLayout());
+		JPanel p1 = super.createPanel();
+		JPanel p2 = new InputConnectionPanel();
+		ret.add(p1, BorderLayout.NORTH);
+		ret.add(p2, BorderLayout.CENTER);
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public class InputConnectionPanel extends JPanel
+	{
+		/**
+		 * 
+		 */
+		public InputConnectionPanel()
+		{
+			PropertiesPanel pp = new PropertiesPanel("Input properties");
+			final JTextField tfrseqno = pp.createTextField("rseqno");
+			final JTextField tfmaxseqno = pp.createTextField("maxseqno");
+			final JTextField tfmaxbuf = pp.createTextField("maxbuf");
+			final JTextField tfmaxstored = pp.createTextField("maxstored");
+			final JTextField tfdata= pp.createTextField("data");
+			final JTextField tflastack = pp.createTextField("lastack");
+			final JTextField tfackcnt = pp.createTextField("ackcnt");
+			final JTextField tflastseqno = pp.createTextField("lastseqno");
+			
+			Timer t = new Timer(1000, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					tfrseqno.setText(""+rseqno);
+					tfmaxseqno.setText(""+maxseqno);
+					tfmaxbuf.setText(""+maxbuf);
+					tfmaxstored.setText(""+maxstored);
+					tfdata.setText(""+data.size());
+					tflastack.setText(""+lastack);
+					tfackcnt.setText(""+ackcnt);
+					tflastseqno.setText(""+lastseqno);
+				}
+			});
+			t.start();
+			
+			setLayout(new BorderLayout());
+			add(pp, BorderLayout.CENTER);
+		}
 	}
 	
 }
