@@ -105,12 +105,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
-		this.maxsend = 250;
+		this.maxsend = 50;
 		this.maxqueued = 4;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 10000;
+		this.mpmaxsize = 50000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;
@@ -346,7 +346,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 //				System.out.println("readyfuture fired");
 				Future<Integer> ret = readyfuture;
 				readyfuture = null;
-				ret.setResult(new Integer(mpmaxsize));	// todo: packet size*allowed messages?
+//				ret.setResult(new Integer(mpmaxsize));	// todo: packet size*allowed messages?
+				int pa = sent.size()-maxsend;
+				ret.setResult(new Integer(pa>0? pa*mpmaxsize: mpmaxsize));	
 			}
 			else if(isClosed())
 			{
