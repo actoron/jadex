@@ -1255,7 +1255,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 								}
 							}
 							
-							final Class type = info.getType().getType(getClassLoader());
+							final Class<?> type = info.getType().getType(getClassLoader());
 							addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info)
 								.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 							{

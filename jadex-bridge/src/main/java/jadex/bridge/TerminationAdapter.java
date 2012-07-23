@@ -3,7 +3,10 @@ package jadex.bridge;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 
-
+/**
+ *  Adapter for component listener that makes it easy to get notified
+ *  when termination occurs.
+ */
 public abstract class TerminationAdapter implements IComponentListener 
 {
 	/**
@@ -20,11 +23,11 @@ public abstract class TerminationAdapter implements IComponentListener
 	 *  get passed to the eventOccured() method.
 	 *  @return The event filter.
 	 */
-	public IFilter getFilter()
+	public IFilter<IComponentChangeEvent> getFilter()
 	{
-		return new IFilter()
+		return new IFilter<IComponentChangeEvent>()
 		{
-			public boolean filter(Object obj)
+			public boolean filter(IComponentChangeEvent obj)
 			{
 				IComponentChangeEvent cce = (IComponentChangeEvent)obj;
 				return IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT.equals(cce.getSourceCategory()) &&

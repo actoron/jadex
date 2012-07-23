@@ -19,6 +19,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -140,6 +141,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{
+							Collections.sort(result, new Comparator<ITreeNode>()
+							{
+								public int compare(ITreeNode o1, ITreeNode o2) 
+								{
+									return o1.toString().compareTo(o2.toString());
+								}
+							});
+					
 							busy	= false;
 							state	= STATE_CONNECTED;
 							setChildren(result);

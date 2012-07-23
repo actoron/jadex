@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -20,7 +21,6 @@ public class DynamicServiceAgent extends MicroAgent
 	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
-		
 		IComponentStep<Void> addservice = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -48,6 +48,11 @@ public class DynamicServiceAgent extends MicroAgent
 			return getServiceIdentifier().getServiceName();
 		}
 	}
+	
+//	@Service
+//	public class DummyService2	implements IDummyService
+//	{
+//	}
 	
 	public interface IDummyService
 	{

@@ -182,6 +182,7 @@ public class DirNode extends FileNode
 			else
 				ret	= name1.compareTo(name2);
 			
+//			System.out.println("comp: "+ret+" "+name1+" "+name2);
 			return ret;
 		}
 	};

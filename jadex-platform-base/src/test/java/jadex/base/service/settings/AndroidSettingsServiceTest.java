@@ -48,41 +48,45 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-public class AndroidSettingsServiceTest extends TestCase {
 
-	private Map<String, Object> _prefs;
-	protected boolean done;
+public class AndroidSettingsServiceTest extends TestCase
+{
+
+	private Map<String, Object>	_prefs;
+
+	protected boolean			done;
 
 	@Override
-	protected void setUp() throws Exception {
+	protected void setUp() throws Exception
+	{
 		_prefs = new HashMap<String, Object>();
 		done = false;
 	}
-	
-	public void testShouldReadFromFile() {
+
+	public void testShouldReadFromFile()
+	{
 		AndroidSettingsService ass = createAndroidSettingsService(false);
 		ass.loadProperties();
 		IFuture<Properties> properties = ass.getProperties("clockservice");
-		properties.addResultListener(new DefaultResultListener<Properties>() {
+		properties.addResultListener(new DefaultResultListener<Properties>()
+		{
 			@Override
-			public void resultAvailable(Properties result) {
-				assertEquals("type",
-						result.getProperties()[0].getType());
-				assertEquals("other",
-						result.getProperties()[0].getValue());
-				assertEquals("delta",
-						result.getProperties()[1].getType());
-				assertEquals("0",
-						result.getProperties()[1].getValue());
+			public void resultAvailable(Properties result)
+			{
+				assertEquals("type", result.getProperties()[0].getType());
+				assertEquals("other", result.getProperties()[0].getValue());
+				assertEquals("delta", result.getProperties()[1].getType());
+				assertEquals("0", result.getProperties()[1].getValue());
 			}
 		});
 	}
 
-	public void testShouldSaveAndReadPreferences() throws InterruptedException {
+	public void testShouldSaveAndReadPreferences() throws InterruptedException
+	{
 		AndroidSettingsService ass = createAndroidSettingsService(false);
 		ass.loadProperties();
 		// setup
-		setSampleProperties(ass );
+		setSampleProperties(ass);
 		IFuture<Properties> properties = ass.getProperties("clockservice");
 
 		// execute
@@ -93,9 +97,11 @@ public class AndroidSettingsServiceTest extends TestCase {
 
 		// verify
 		ass.getProperties("clockservice").addResultListener(
-				new DefaultResultListener<Properties>() {
+				new DefaultResultListener<Properties>()
+				{
 					@Override
-					public void resultAvailable(Properties result) {
+					public void resultAvailable(Properties result)
+					{
 						assertEquals("type",
 								result.getProperties()[0].getType());
 						assertEquals("system",
@@ -108,9 +114,11 @@ public class AndroidSettingsServiceTest extends TestCase {
 				});
 
 		ass.getProperties("simulationservice").addResultListener(
-				new DefaultResultListener<Properties>() {
+				new DefaultResultListener<Properties>()
+				{
 					@Override
-					public void resultAvailable(Properties result) {
+					public void resultAvailable(Properties result)
+					{
 						assertEquals("executing",
 								result.getProperties()[0].getType());
 						assertEquals("false",
@@ -119,9 +127,11 @@ public class AndroidSettingsServiceTest extends TestCase {
 				});
 
 		ass.getProperties("securityservice").addResultListener(
-				new DefaultResultListener<Properties>() {
+				new DefaultResultListener<Properties>()
+				{
 					@Override
-					public void resultAvailable(Properties result) {
+					public void resultAvailable(Properties result)
+					{
 						assertEquals("usepass",
 								result.getProperties()[0].getType());
 						assertEquals("true",
@@ -134,12 +144,14 @@ public class AndroidSettingsServiceTest extends TestCase {
 					}
 				});
 
-		if (!done) {
+		if(!done)
+		{
 			fail();
 		}
 	}
-	
-	public void testShouldPreferFileProperties() throws InterruptedException {
+
+	public void testShouldPreferFileProperties() throws InterruptedException
+	{
 		// setup
 		AndroidSettingsService ass = createAndroidSettingsService(true);
 		ass.loadProperties();
@@ -154,22 +166,24 @@ public class AndroidSettingsServiceTest extends TestCase {
 
 		// verify
 		ass.getProperties("clockservice").addResultListener(
-				new DefaultResultListener<Properties>() {
+				new DefaultResultListener<Properties>()
+				{
 					@Override
-					public void resultAvailable(Properties result) {
+					public void resultAvailable(Properties result)
+					{
 						assertEquals("type",
 								result.getProperties()[0].getType());
 						assertEquals("other",
 								result.getProperties()[0].getValue());
 						assertEquals("delta",
 								result.getProperties()[1].getType());
-						assertEquals("0",
-								result.getProperties()[1].getValue());
+						assertEquals("0", result.getProperties()[1].getValue());
 					}
 				});
 	}
 
-	private void setSampleProperties(AndroidSettingsService ass) {
+	private void setSampleProperties(AndroidSettingsService ass)
+	{
 		Properties clockProperties = new Properties(null, "clockservice", null);
 		Properties simulationProperties = new Properties(null,
 				"simulationservice", null);
@@ -189,56 +203,67 @@ public class AndroidSettingsServiceTest extends TestCase {
 		ass.setProperties(securityProperties.getType(), securityProperties);
 	}
 
-	private AndroidSettingsService createAndroidSettingsService(boolean preferFileProperties) {
+	private AndroidSettingsService createAndroidSettingsService(
+			boolean preferFileProperties)
+	{
 		AndroidSettingsService ass = new AndroidSettingsService(
 				new internalAccess(), true, preferFileProperties);
-		ass.contextService = new IContextService() {
+		ass.contextService = new IContextService()
+		{
 
 
-			@Override
-			public IPreferences getSharedPreferences(String preferenceFileName) {
-				return new IPreferences() {
+			public IPreferences getSharedPreferences(String preferenceFileName)
+			{
+				return new IPreferences()
+				{
 
-					@Override
-					public void setString(String key, String value) {
+					public void setString(String key, String value)
+					{
 						_prefs.put(key, value);
 					}
 
-					@Override
-					public String getString(String key, String defValue) {
+					public String getString(String key, String defValue)
+					{
 						Object ret = _prefs.get(key);
-						if (ret != null && ret instanceof String) {
-							return (String) ret;
-						} else {
+						if(ret != null && ret instanceof String)
+						{
+							return (String)ret;
+						}
+						else
+						{
 							return defValue;
 						}
 					}
 
-					@Override
-					public boolean getBoolean(String key, boolean defValue) {
+					public boolean getBoolean(String key, boolean defValue)
+					{
 						Object ret = _prefs.get(key);
-						if (ret != null && ret instanceof Boolean) {
-							return (Boolean) ret;
-						} else {
+						if(ret != null && ret instanceof Boolean)
+						{
+							return (Boolean)ret;
+						}
+						else
+						{
 							return defValue;
 						}
 					}
 
-					@Override
-					public Map<String, ?> getAll() {
+					public Map<String, ? > getAll()
+					{
 						return _prefs;
 					}
 
-					@Override
-					public boolean commit() {
+					public boolean commit()
+					{
 						return true;
 					}
 				};
 			}
 
-			@Override
-			public File getFile(String name) {
-				try {
+			public File getFile(String name)
+			{
+				try
+				{
 					File createTempFile = File.createTempFile(this.getClass()
 							.getName(), "1");
 					FileWriter fw = new FileWriter(createTempFile);
@@ -251,28 +276,26 @@ public class AndroidSettingsServiceTest extends TestCase {
 							+ "</p0:properties>" + "</p0:properties>");
 					fw.close();
 					return createTempFile;
-				} catch (IOException e) {
+				}
+				catch(IOException e)
+				{
 					e.printStackTrace();
 					return null;
 				}
 			}
 
-			@Override
-			public boolean dispatchUiEvent(IJadexAndroidEvent event) {
+			public boolean dispatchUiEvent(IJadexAndroidEvent event)
+			{
 				return false;
 			}
 
-			@Override
 			public List<InetAddress> getNetworkIps()
 			{
 				return null;
 			}
 
-			@Override
 			public void openFile(String path) throws IOException
 			{
-				// TODO Auto-generated method stub
-				
 			}
 
 		};
@@ -280,297 +303,303 @@ public class AndroidSettingsServiceTest extends TestCase {
 		return ass;
 	}
 
-	static class internalAccess implements IInternalAccess {
+	static class internalAccess implements IInternalAccess
+	{
 
-		private IComponentIdentifier componentIdentifier = new ComponentIdentifier(
-				"containerId");
+		private IComponentIdentifier	componentIdentifier	= new ComponentIdentifier(
+																	"containerId");
 
-		@Override
-		public IModelInfo getModel() {
+		public IModelInfo getModel()
+		{
 			return null;
 		}
 
-		@Override
-		public String getConfiguration() {
+		public String getConfiguration()
+		{
 			return null;
 		}
 
-		@Override
-		public IExternalAccess getParentAccess() {
+		public IExternalAccess getParentAccess()
+		{
 			return null;
 		}
 
-		@Override
-		public IFuture<Collection<IExternalAccess>> getChildrenAccesses() {
+		public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
+		{
 			return null;
 		}
 
-		@Override
-		public IFuture<IComponentIdentifier[]> getChildrenIdentifiers() {
+		public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
+		{
 			return null;
 		}
 
-		@Override
-		public IComponentIdentifier getComponentIdentifier() {
+		public IComponentIdentifier getComponentIdentifier()
+		{
 			return componentIdentifier;
 		}
 
-		@Override
-		public IComponentDescription getComponentDescription() {
+		public IComponentDescription getComponentDescription()
+		{
 			return null;
 		}
 
-		@Override
-		public IServiceContainer getServiceContainer() {
-			return new IServiceContainer() {
+		public IServiceContainer getServiceContainer()
+		{
+			return new IServiceContainer()
+			{
 
-				@Override
-				public String getType() {
+				public String getType()
+				{
 					return null;
 				}
 
-				@Override
 				public IIntermediateFuture<IService> getServices(
 						ISearchManager manager, IVisitDecider decider,
-						IResultSelector selector) {
+						IResultSelector selector)
+				{
 					List<IService> list = new ArrayList<IService>();
 
-					list.add(new IService() {
+					list.add(new IService()
+					{
 
-						@Override
-						public IFuture<Boolean> isValid() {
+						public IFuture<Boolean> isValid()
+						{
 							return null;
 						}
 
-						@Override
-						public IServiceIdentifier getServiceIdentifier() {
+						public IServiceIdentifier getServiceIdentifier()
+						{
 							return null;
 						}
 
-						@Override
-						public Map<String, Object> getPropertyMap() {
+						public Map<String, Object> getPropertyMap()
+						{
 							return null;
 						}
 					});
 					return new IntermediateFuture<IService>(list);
 				}
 
-				@Override
-				public IFuture<IServiceProvider> getParent() {
+				public IFuture<IServiceProvider> getParent()
+				{
 					return null;
 				}
 
-				@Override
-				public IComponentIdentifier getId() {
+				public IComponentIdentifier getId()
+				{
 					return componentIdentifier;
 				}
 
-				@Override
-				public IFuture<Collection<IServiceProvider>> getChildren() {
+				public IFuture<Collection<IServiceProvider>> getChildren()
+				{
 					return null;
 				}
 
-				@Override
-				public IFuture<Void> start() {
+				public IFuture<Void> start()
+				{
 					return null;
 				}
 
-				@Override
-				public IFuture<Void> shutdown() {
+				public IFuture<Void> shutdown()
+				{
 					return null;
 				}
 
-				@Override
 				public void setRequiredServiceInfos(
-						RequiredServiceInfo[] requiredservices) {
+						RequiredServiceInfo[] requiredservices)
+				{
 				}
 
-				@Override
 				public <T> IIntermediateFuture<T> searchServices(Class<T> type,
-						String scope) {
+						String scope)
+				{
 					return null;
 				}
 
-				@Override
-				public <T> IIntermediateFuture<T> searchServices(Class<T> type) {
+				public <T> IIntermediateFuture<T> searchServices(Class<T> type)
+				{
 					return null;
 				}
 
-				@Override
-				public <T> IFuture<T> searchServiceUpwards(Class<T> type) {
+				public <T> IFuture<T> searchServiceUpwards(Class<T> type)
+				{
 					return null;
 				}
 
-				@Override
-				public <T> IFuture<T> searchService(Class<T> type, String scope) {
+				public <T> IFuture<T> searchService(Class<T> type, String scope)
+				{
 					return null;
 				}
 
-				@Override
-				public <T> IFuture<T> searchService(Class<T> type) {
+				public <T> IFuture<T> searchService(Class<T> type)
+				{
 					return null;
 				}
 
-				@Override
-				public IFuture<Void> removeService(IServiceIdentifier sid) {
+				public IFuture<Void> removeService(IServiceIdentifier sid)
+				{
 					return null;
 				}
 
-				@Override
 				public void removeInterceptor(
 						IServiceInvocationInterceptor interceptor,
-						Object service) {
+						Object service)
+				{
 
 				}
 
-				@Override
 				public <T> IFuture<T> getService(Class<T> type,
-						IComponentIdentifier cid) {
+						IComponentIdentifier cid)
+				{
 					return null;
 				}
 
-				@Override
 				public <T> IIntermediateFuture<T> getRequiredServices(
-						String name, boolean rebind) {
+						String name, boolean rebind)
+				{
 					return null;
 				}
 
-				@Override
 				public <T> IIntermediateFuture<T> getRequiredServices(
-						String name) {
+						String name)
+				{
 					return null;
 				}
 
-				@Override
-				public RequiredServiceInfo[] getRequiredServiceInfos() {
+				public RequiredServiceInfo[] getRequiredServiceInfos()
+				{
 					return null;
 				}
 
-				@Override
-				public RequiredServiceInfo getRequiredServiceInfo(String name) {
+				public RequiredServiceInfo getRequiredServiceInfo(String name)
+				{
 					return null;
 				}
 
-				@Override
 				public <T> IFuture<T> getRequiredService(String name,
-						boolean rebind) {
+						boolean rebind)
+				{
 					return null;
 				}
 
-				@Override
-				public <T> IFuture<T> getRequiredService(String name) {
+				public <T> IFuture<T> getRequiredService(String name)
+				{
 					return null;
 				}
 
-				@Override
-				public IService[] getProvidedServices(Class<?> clazz) {
+				public IService[] getProvidedServices(Class< ? > clazz)
+				{
 					return null;
 				}
 
-				@Override
-				public IService getProvidedService(String name) {
+				public IService getProvidedService(String name)
+				{
 					return null;
 				}
 
-				@Override
 				public IServiceInvocationInterceptor[] getInterceptors(
-						Object service) {
+						Object service)
+				{
 					return null;
 				}
 
-				@Override
 				public IFuture<Void> addService(IInternalService service,
-						ProvidedServiceInfo info) {
+						ProvidedServiceInfo info)
+				{
 					return null;
 				}
 
-				@Override
 				public void addRequiredServiceInfos(
-						RequiredServiceInfo[] requiredservices) {
+						RequiredServiceInfo[] requiredservices)
+				{
 
 				}
 
-				@Override
 				public void addInterceptor(
 						IServiceInvocationInterceptor interceptor,
-						Object service, int pos) {
+						Object service, int pos)
+				{
 				}
 			};
 		}
 
-		@Override
-		public IFuture<Map<String, Object>> killComponent() {
+		public IFuture<Map<String, Object>> killComponent()
+		{
 			return null;
 		}
 
-		@Override
 		public <T> IResultListener<T> createResultListener(
-				final IResultListener<T> listener) {
-			return new DefaultResultListener<T>() {
+				final IResultListener<T> listener)
+		{
+			return new DefaultResultListener<T>()
+			{
 
 				@Override
-				public void resultAvailable(T result) {
+				public void resultAvailable(T result)
+				{
 					listener.resultAvailable(result);
 				}
 			};
 		}
 
-		@Override
 		public <T> IIntermediateResultListener<T> createResultListener(
-				IIntermediateResultListener<T> listener) {
+				IIntermediateResultListener<T> listener)
+		{
 			return null;
 		}
 
-		@Override
-		public IExternalAccess getExternalAccess() {
+		public IExternalAccess getExternalAccess()
+		{
 			return null;
 		}
 
-		@Override
-		public Logger getLogger() {
+		public Logger getLogger()
+		{
 			return null;
 		}
 
-		@Override
-		public IValueFetcher getFetcher() {
+		public IValueFetcher getFetcher()
+		{
 			return null;
 		}
 
-		@Override
-		public IFuture<Void> addComponentListener(IComponentListener listener) {
+		public IFuture<Void> addComponentListener(IComponentListener listener)
+		{
 			return null;
 		}
 
-		@Override
-		public IFuture<Void> removeComponentListener(IComponentListener listener) {
+		public IFuture<Void> removeComponentListener(IComponentListener listener)
+		{
 			return null;
 		}
 
-		@Override
-		public Map<String, Object> getArguments() {
+		public Map<String, Object> getArguments()
+		{
 			return null;
 		}
 
-		@Override
-		public Map<String, Object> getResults() {
+		public Map<String, Object> getResults()
+		{
 			return null;
 		}
 
-		@Override
-		public void setResultValue(String name, Object value) {
+		public void setResultValue(String name, Object value)
+		{
 		}
 
-		@Override
-		public ClassLoader getClassLoader() {
+		public ClassLoader getClassLoader()
+		{
 			return null;
 		}
 
-		@Override
-		public <T> IFuture<T> waitForDelay(long delay, IComponentStep<T> step) {
+		public <T> IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
+		{
 			return null;
 		}
 
-		public boolean isComponentThread() {
+		public boolean isComponentThread()
+		{
 			return true;
 		}
 	}

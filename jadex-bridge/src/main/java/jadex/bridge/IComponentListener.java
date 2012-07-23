@@ -16,7 +16,7 @@ public interface IComponentListener //extends IRemotable
 	 *  get passed to the eventOccured() method.
 	 *  @return The event filter.
 	 */
-	public IFilter getFilter();
+	public IFilter<IComponentChangeEvent> getFilter();
 	
 	/**
 	 *  Invoked when a change occurs with the component.
