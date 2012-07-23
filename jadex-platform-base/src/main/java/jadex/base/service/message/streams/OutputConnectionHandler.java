@@ -1,7 +1,6 @@
 package jadex.base.service.message.streams;
 
 import jadex.base.service.message.MessageService;
-import jadex.base.service.message.streams.AbstractConnectionHandler.ConnectionPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -745,7 +744,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		// Iterate in insertion order -> oldest first
 		for(DataSendInfo tup: sent.values().toArray(new DataSendInfo[0]))
 		{
-			if(tup.getSequenceNumber()<getSequenceNumber()-60)
+			if(tup.getSequenceNumber()<getSequenceNumber()-(2*maxsend+ackcnt))
 			{
 				tup.checkResend();
 			}
@@ -852,7 +851,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		 */
 		public void	checkResend()
 		{
-			if(lastsend<OutputConnectionHandler.this.getSequenceNumber()-60)
+			// Resend earlier as time permits when many packets are sent
+			if(lastsend<OutputConnectionHandler.this.getSequenceNumber()-(2*maxsend+ackcnt))
 			{
 				doResend();
 			}
