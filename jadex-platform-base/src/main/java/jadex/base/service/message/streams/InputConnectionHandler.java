@@ -116,47 +116,50 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public IFuture<Void> doClose()
 	{
-		final Future<Void> ret = new Future<Void>();
-
-		scheduleStep(new IComponentStep<Void>()
+		return scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				final Future<Void> ret = new Future<Void>();
 				// Send a close request
 //				System.out.println("do close input side");
-				
-				// Needs nothing to do with ack response.
-				sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null, nonfunc), StreamSendTask.CLOSEREQ)
-					.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				try
 				{
-					public void customResultAvailable(Object result)
+					// Needs nothing to do with ack response.
+					sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null, nonfunc), StreamSendTask.CLOSEREQ)
+						.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 					{
-//						System.out.println("close ack");
-						ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-//						System.out.println("no close ack: "+exception);
-						// Todo: what about already received data!?
-						scheduleStep(new IComponentStep<Void>()
+						public void customResultAvailable(Object result)
 						{
-							public IFuture<Void> execute(IInternalAccess ia)
+	//						System.out.println("close ack");
+							ret.setResult(null);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+	//						System.out.println("no close ack: "+exception);
+							// Todo: what about already received data!?
+							scheduleStep(new IComponentStep<Void>()
 							{
-								if(!con.isClosed())
-									con.setClosed();
-								return IFuture.DONE;
-							}
-						});
-						super.exceptionOccurred(exception);
-					}
-				});
-				
-				return IFuture.DONE;
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									if(!con.isClosed())
+										con.setClosed();
+									return IFuture.DONE;
+								}
+							});
+							super.exceptionOccurred(exception);
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+								
+				return ret;
 			}
 		});
-		
-		return ret;
 	}
 	
 	/**

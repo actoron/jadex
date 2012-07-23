@@ -279,8 +279,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 
 		final IComponentIdentifier creator = ServiceCall.getInstance().getCaller();
 
-//		if(modelname.indexOf("RemoteServiceManagementAgent")!=-1 || modelname.indexOf("rms")!=-1)
-//			System.out.println("cache miss: "+modelname);
+//		if(modelname.indexOf("jadex/micro/testcases/securetrans/ProviderAgent.class")!=-1)
+//			System.out.println("create: "+modelname);
 		
 //		final DebugException	de	= new DebugException();
 	
@@ -2358,12 +2358,12 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				if(cnt==null)
 				{
 					cidcounts.put(key, new Integer(new Integer(1)));
-					ret = new ComponentIdentifier(localname+"@"+platformname);
+					ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
 				}
 				else
 				{
 					cidcounts.put(key, new Integer(cnt.intValue()+1));
-					ret = new ComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
+					ret = new ComponentIdentifier(localname+cnt+"@"+platformname, addresses); // Hack?!
 				}
 			}
 			while(adapters.containsKey(ret) || initinfos.containsKey(ret));

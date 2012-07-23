@@ -50,7 +50,9 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	{
 //		this(name, addresses, null);
 		if(name!=null && (name.indexOf("@")!=name.lastIndexOf("@")))
-			throw new IllegalArgumentException("Invalid component identifier: "+name);
+		{
+			throw new IllegalArgumentException("Invalid component identifier: "+name);			
+		}
 		this.name = name;
 		this.addresses	= addresses;
 	}

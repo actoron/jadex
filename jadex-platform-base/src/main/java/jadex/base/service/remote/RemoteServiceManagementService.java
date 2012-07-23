@@ -218,9 +218,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public IFuture<Object> getServiceProxies(final IComponentIdentifier cid, 
 		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
-		Future<Object> ret = new Future<Object>();
-		
-		component.scheduleStep(new IComponentStep<Object>()
+		return component.scheduleStep(new IComponentStep<Object>()
 		{
 			@Classname("getServiceProxies")
 			public IFuture<Object> execute(IInternalAccess ia)
@@ -243,9 +241,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				
 				return fut;
 			}
-		}).addResultListener(new DelegationResultListener<Object>(ret));
-		
-		return ret;
+		});
 	}
 	
 	/**

@@ -232,24 +232,30 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	public IFuture<Void> sendInit()
 	{
-		final Future<Void> ret = new Future<Void>();
-		scheduleStep(new IComponentStep<Void>()
+		return scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				InitInfo ii = new InitInfo(getConnection().getInitiator(), getConnection().getParticipant(), nonfunc);
-				AbstractSendTask task = createTask(StreamSendTask.INIT, ii, true, null, nonfunc);
-				sendAcknowledgedMessage(task, StreamSendTask.INIT).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				final Future<Void> ret = new Future<Void>();
+				try
 				{
-					public void customResultAvailable(Object result)
+					InitInfo ii = new InitInfo(getConnection().getInitiator(), getConnection().getParticipant(), nonfunc);
+					AbstractSendTask task = createTask(StreamSendTask.INIT, ii, true, null, nonfunc);
+					sendAcknowledgedMessage(task, StreamSendTask.INIT).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 					{
-						ret.setResult(null);
-					}
-				});
-				return IFuture.DONE;
+						public void customResultAvailable(Object result)
+						{
+							ret.setResult(null);
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+				return ret;
 			}
 		});
-		return ret;
 	}
 	
 	/**
@@ -257,18 +263,24 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	public IFuture<Void> sendAlive()
 	{
-		final Future<Void> ret = new Future<Void>();
-		scheduleStep(new IComponentStep<Void>()
+		return scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AbstractSendTask task = createTask(StreamSendTask.ALIVE, null, null, null);
-				sendTask(task);
-				task.getFuture().addResultListener(new DelegationResultListener<Void>(ret));
-				return IFuture.DONE;
+				final Future<Void> ret = new Future<Void>();
+				try
+				{
+					AbstractSendTask task = createTask(StreamSendTask.ALIVE, null, null, null);
+					sendTask(task);
+					task.getFuture().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+				return ret;
 			}
 		});
-		return ret;
 	}
 	
 	/**
