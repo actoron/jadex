@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimulationDescription>
     <TimeSlices>
         <TimeSlice offset="60" startTime="1020">
@@ -447,64 +447,64 @@
         </TimeSlice>
     </TimeSlices>
     <Stations>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.045" latitude="38.8963" stationID="20th and E St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0436" latitude="38.8923" stationID="19th St and Constitution Ave NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0222" latitude="38.9249" stationID="Georgia Ave and Fairmont St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.050276" latitude="38.860244" stationID="15th and Crystal Dr"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.009888" latitude="38.897446" stationID="North Capitol St and F St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0135" latitude="38.9126" stationID="Florida Ave and R St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.982872" latitude="38.900413" stationID="Bladensburg Rd and Benning Rd NE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.036536" latitude="38.926088" stationID="16th and Harvard St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0321" latitude="38.9176" stationID="14th and V St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.032005" latitude="38.899641" stationID="McPherson Square - 14th and H St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0328" latitude="38.9375" stationID="14th St and Spring Rd NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.004962" latitude="38.896999" stationID="Columbus Circle / Union Station"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0471" latitude="38.9054" stationID="21st and M St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0387" latitude="38.9121" stationID="17th and Corcoran St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.047" latitude="38.9008" stationID="21st and I St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.000349" latitude="38.889955" stationID="4th and East Capitol St NE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.041798" latitude="38.9055" stationID="18th and M St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.029822" latitude="38.900283" stationID="13th St and New York Ave NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0501" latitude="38.9236" stationID="Calvert St and Woodley Pl NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0511" latitude="38.8573" stationID="18th and Bell St"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0323" latitude="38.9086" stationID="14th and Rhode Island Ave NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.046587" latitude="38.894919" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.059219" latitude="38.9022212" stationID="Georgetown Harbor / 30th St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.031681" latitude="38.912682" stationID="14th and R St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0178" latitude="38.8767" stationID="4th and M St SW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.022264" latitude="38.90572" stationID="Convention Center / 7th and M St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.028226" latitude="38.887237" stationID="USDA / 12th and Independence Ave SW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.042581" latitude="38.922925" stationID="Adams Mill and Columbia Rd NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9862" latitude="38.8803" stationID="Potomac and Pennsylvania Ave SE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0023" latitude="38.8851" stationID="3rd and D St SE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0222" latitude="38.9155" stationID="7th and T St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0315" latitude="38.9308" stationID="Park Rd and Holmead Pl NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0444" latitude="38.9101" stationID="Massachusetts Ave and Dupont Circle NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.03863" latitude="38.90276" stationID="17th and K St NW [formerly 17th and L St NW]"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.036841" latitude="38.916656" stationID="16th and U St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0259" latitude="38.9172" stationID="10th and U St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0498" latitude="38.8533" stationID="23rd and Crystal Dr"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.987633" latitude="38.894832" stationID="13th and D St NE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9882" latitude="38.9003" stationID="13th and H St NE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.988355" latitude="38.890461" stationID="Lincoln Park / 13th and East Capitol St NE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0429" latitude="38.9003" stationID="19th St and Pennsylvania Ave NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0388" latitude="38.9319" stationID="Lamont and Mt Pleasant NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9861" latitude="38.884" stationID="14th and D St SE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.024016" latitude="38.878925" stationID="7th and Water St SW / SW Waterfront"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0322" latitude="38.9268" stationID="14th and Harvard St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.053485" latitude="38.903827" stationID="25th St and Pennsylvania Ave NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.031823" latitude="38.898069" stationID="14th and G St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.995397" latitude="38.884" stationID="Eastern Market Metro / Pennsylvania Ave and 7th St SE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0446" latitude="38.9154" stationID="20th St and Florida Ave NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.043358" latitude="38.927872" stationID="Harvard St and Adams Mill Rd NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.019027" latitude="38.90304" stationID="5th St and K St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.023086" latitude="38.8997" stationID="8th and H St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.034438" latitude="38.90985" stationID="15th and P St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-76.9953" latitude="38.8792" stationID="8th and Eye St SE / Barracks Row"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0337" latitude="38.8991" stationID="New York Ave and 15th St NW"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.0513" latitude="38.8489" stationID="27th and Crystal Dr"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.063896" latitude="38.944551" stationID="Van Ness Metro / UDC"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.001967" latitude="38.900017" stationID="3rd and H St NE"/>
-        <Station numberOfDocks="20" numberOfBikes="10" longitude="-77.019347" latitude="38.897222" stationID="5th and F St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.955" latitude="38.8963" stationID="20th and E St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.956400000000002" latitude="38.8923" stationID="19th St and Constitution Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.977800000000002" latitude="38.9249" stationID="Georgia Ave and Fairmont St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.949724000000003" latitude="38.860244" stationID="15th and Crystal Dr"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.990111999999996" latitude="38.897446" stationID="North Capitol St and F St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.986500000000007" latitude="38.9126" stationID="Florida Ave and R St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.017128" latitude="38.900413" stationID="Bladensburg Rd and Benning Rd NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.963464000000002" latitude="38.926088" stationID="16th and Harvard St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.9679" latitude="38.9176" stationID="14th and V St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.967995000000002" latitude="38.899641" stationID="McPherson Square - 14th and H St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.967200000000005" latitude="38.9375" stationID="14th St and Spring Rd NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.995037999999994" latitude="38.896999" stationID="Columbus Circle / Union Station"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.9529" latitude="38.9054" stationID="21st and M St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.961299999999994" latitude="38.9121" stationID="17th and Corcoran St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.953000000000003" latitude="38.9008" stationID="21st and I St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.999651" latitude="38.889955" stationID="4th and East Capitol St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.958202" latitude="38.9055" stationID="18th and M St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.970178000000004" latitude="38.900283" stationID="13th St and New York Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.9499" latitude="38.9236" stationID="Calvert St and Woodley Pl NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.948899999999995" latitude="38.8573" stationID="18th and Bell St"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.967699999999994" latitude="38.9086" stationID="14th and Rhode Island Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.953412999999998" latitude="38.894919" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.940781" latitude="38.9022212" stationID="Georgetown Harbor / 30th St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.968318999999994" latitude="38.912682" stationID="14th and R St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.982200000000006" latitude="38.8767" stationID="4th and M St SW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.977735999999993" latitude="38.90572" stationID="Convention Center / 7th and M St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.971773999999996" latitude="38.887237" stationID="USDA / 12th and Independence Ave SW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.957419" latitude="38.922925" stationID="Adams Mill and Columbia Rd NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.013800000000003" latitude="38.8803" stationID="Potomac and Pennsylvania Ave SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.997699999999995" latitude="38.8851" stationID="3rd and D St SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.977800000000002" latitude="38.9155" stationID="7th and T St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.968500000000006" latitude="38.9308" stationID="Park Rd and Holmead Pl NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.955600000000004" latitude="38.9101" stationID="Massachusetts Ave and Dupont Circle NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.961370000000002" latitude="38.90276" stationID="17th and K St NW [formerly 17th and L St NW]"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.963159000000005" latitude="38.916656" stationID="16th and U St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.974100000000007" latitude="38.9172" stationID="10th and U St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.950199999999995" latitude="38.8533" stationID="23rd and Crystal Dr"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.012366999999998" latitude="38.894832" stationID="13th and D St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.011799999999994" latitude="38.9003" stationID="13th and H St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.011645" latitude="38.890461" stationID="Lincoln Park / 13th and East Capitol St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.957099999999997" latitude="38.9003" stationID="19th St and Pennsylvania Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.961200000000005" latitude="38.9319" stationID="Lamont and Mt Pleasant NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.013900000000007" latitude="38.884" stationID="14th and D St SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.975983999999997" latitude="38.878925" stationID="7th and Water St SW / SW Waterfront"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.967799999999997" latitude="38.9268" stationID="14th and Harvard St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.946515000000005" latitude="38.903827" stationID="25th St and Pennsylvania Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.968176999999997" latitude="38.898069" stationID="14th and G St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.004603000000003" latitude="38.884" stationID="Eastern Market Metro / Pennsylvania Ave and 7th St SE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.955399999999997" latitude="38.9154" stationID="20th St and Florida Ave NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.956642000000002" latitude="38.927872" stationID="Harvard St and Adams Mill Rd NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.980973000000006" latitude="38.90304" stationID="5th St and K St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.976913999999994" latitude="38.8997" stationID="8th and H St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.965562000000006" latitude="38.90985" stationID="15th and P St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="23.0047" latitude="38.8792" stationID="8th and Eye St SE / Barracks Row"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.966300000000004" latitude="38.8991" stationID="New York Ave and 15th St NW"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.948700000000002" latitude="38.8489" stationID="27th and Crystal Dr"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.936104" latitude="38.944551" stationID="Van Ness Metro / UDC"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.998033000000007" latitude="38.900017" stationID="3rd and H St NE"/>
+        <Station numberOfDocks="20" numberOfBikes="10" longitude="22.980653000000004" latitude="38.897222" stationID="5th and F St NW"/>
     </Stations>
 </SimulationDescription>

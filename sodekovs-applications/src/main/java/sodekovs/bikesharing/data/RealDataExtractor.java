@@ -391,6 +391,8 @@ public class RealDataExtractor {
 				station.setLatitude(lat);
 				station.setLongitude(lon);
 
+				transformGeoPosition(station);
+
 				// TODO Vernünftige Werte überlegen oder aus den Realdaten auswerten
 				station.setNumberOfBikes(10);
 				station.setNumberOfDocks(20);
@@ -403,6 +405,22 @@ public class RealDataExtractor {
 
 		sd.setStations(stations);
 		return sd;
+	}
+
+	/**
+	 * Transforms the GeoPositions (Latitude and Longitude) into a Jadex Space compatible format.
+	 * 
+	 * @param station
+	 *            - the given {@link Station}
+	 */
+	private void transformGeoPosition(Station station) {
+		// In der ersten Version werden nue negative Werte transformiert indem 100 + der Wert gerechnet wird
+		if (station.getLatitude() < 0) {
+			station.setLatitude(100 + station.getLatitude());
+		}
+		if (station.getLongitude() < 0) {
+			station.setLongitude(100 + station.getLongitude());
+		}
 	}
 
 	/**
