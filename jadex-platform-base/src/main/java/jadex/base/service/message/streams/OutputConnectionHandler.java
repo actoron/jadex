@@ -690,6 +690,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected void checkClose()
 	{
+//		System.out.println("checkclose0: "+isCloseRequested()+", "+isDataSendFinished()+", "+con.isInited()+", "+!con.isClosed()+", "+con.isClosing()+", "+isDataAckFinished()+", "+closesent);
+		
 		// Try to close if close is requested.
 		if(isCloseRequested() && isDataSendFinished() && con.isInited() && !con.isClosed())
 		{
@@ -711,13 +713,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 					public void exceptionOccurred(Exception exception)
 					{
 //						System.out.println("no ack from close output side: "+exception);
-						closesent = true;
-						checkClose();
+						// Set connection as closed.
+						con.setClosed();
+//						closesent = true;
+//						checkClose();
 					}
 				});
 			}
 			else
 			{
+//				System.out.println("start closing output side");
 				close();
 			}
 			closereqflag = false; // ensure that close is executed only once
@@ -738,7 +743,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	public void	checkResend()
 	{
 		// Iterate in insertion order -> oldest first
-		for(DataSendInfo tup: sent.values())
+		for(DataSendInfo tup: sent.values().toArray(new DataSendInfo[0]))
 		{
 			if(tup.getSequenceNumber()<getSequenceNumber()-60)
 			{
