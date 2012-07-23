@@ -40,6 +40,10 @@ public class TCPOutputConnection
 	public TCPOutputConnection(Cleaner cleaner, Socket sock) throws IOException
 	{
 		this.sock = sock;
+		
+		// Wait for handshake byte.
+		sock.getInputStream().read();
+		
 //		try
 //		{
 //			System.out.println("TCP Connection: "+iaddr+":"+iport);

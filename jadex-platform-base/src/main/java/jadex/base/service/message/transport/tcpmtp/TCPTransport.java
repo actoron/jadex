@@ -323,7 +323,7 @@ public class TCPTransport implements ITransport
 	 */
 	public void	sendMessage(final String address, final ISendTask task)
 	{
-		final IResultCommand<IFuture<Void>, Void>	send = new IResultCommand<IFuture<Void>, Void>()
+		final IResultCommand<IFuture<Void>, Void>	send_failure = new IResultCommand<IFuture<Void>, Void>()
 		{
 			public IFuture<Void> execute(Void args)
 			{
@@ -333,7 +333,7 @@ public class TCPTransport implements ITransport
 		
 		if(connections==null)
 		{
-			task.ready(send);
+			task.ready(send_failure);
 		}
 		else
 		{
@@ -362,7 +362,7 @@ public class TCPTransport implements ITransport
 					}
 					else
 					{
-						task.ready(send);
+						task.ready(send_failure);
 					}
 				}
 			});

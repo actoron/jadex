@@ -29,6 +29,10 @@ public class TCPInputConnection
 	public TCPInputConnection(Socket sock) throws IOException
 	{
 		this.sock = sock;
+		
+		// Send handshake byte.
+		sock.getOutputStream().write(new byte[1]);
+		
 		this.is = new BufferedInputStream(sock.getInputStream());
 	}
 	
