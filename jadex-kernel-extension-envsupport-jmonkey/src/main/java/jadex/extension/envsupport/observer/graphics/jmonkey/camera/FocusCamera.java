@@ -490,7 +490,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * Sets the min zoom distance of the camera (default is 1)
-     * @return minDistance
      */
     public void setMinDistance(float minDistance) {
         this.minDistance = minDistance;
@@ -499,7 +498,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
     /**
      * clone this camera for a spatial
      * @param spatial
-     * @return
      */
     public Control cloneForSpatial(Spatial spatial) {
         FocusCamera cc = new FocusCamera(cam, spatial, inputManager);
@@ -609,7 +607,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns the chasing sensitivity
-     * @return
      */
     public float getChasingSensitivity() {
         return chasingSensitivity;
@@ -628,7 +625,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * Returns the rotation sensitivity
-     * @return
      */
     public float getRotationSensitivity() {
         return rotationSensitivity;
@@ -647,7 +643,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns true if the trailing is enabled
-     * @return
      */
     public boolean isTrailingEnabled() {
         return trailingEnabled;
@@ -665,7 +660,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
     /**
      * 
      * returns the trailing rotation inertia
-     * @return
      */
     public float getTrailingRotationInertia() {
         return trailingRotationInertia;
@@ -683,7 +677,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns the trailing sensitivity
-     * @return
      */
     public float getTrailingSensitivity() {
         return trailingSensitivity;
@@ -701,7 +694,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns the zoom sensitivity
-     * @return
      */
     public float getZoomSensitivity() {
         return zoomSensitivity;
@@ -787,7 +779,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * return the current distance from the camera to the target
-     * @return
      */
     public float getDistanceToTarget() {
         return distance;
@@ -795,7 +786,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns the current horizontal rotation around the target in radians
-     * @return
      */
     public float getHorizontalRotation() {
         return rotation;
@@ -803,7 +793,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns the current vertical rotation around the target in radians.
-     * @return
      */
     public float getVerticalRotation() {
         return vRotation;
@@ -811,7 +800,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
 
     /**
      * returns the offset from the target's position where the camera looks at
-     * @return
      */
     public Vector3f getLookAtOffset() {
         return lookAtOffset;
@@ -835,7 +823,6 @@ public class FocusCamera implements ActionListener, AnalogListener, Control {
     
     /**
      * Returns the up vector of the camera used for the lookAt on the target
-     * @return 
      */
     public Vector3f getUpVector(){
         return initialUpVec;

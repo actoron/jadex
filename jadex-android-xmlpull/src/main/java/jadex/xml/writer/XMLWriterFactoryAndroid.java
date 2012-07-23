@@ -14,15 +14,21 @@ public class XMLWriterFactoryAndroid extends XMLWriterFactory
 	}
 
 	@Override
-	public AWriter createWriter(boolean genIds)
+	public AWriter createWriter(boolean genids)
 	{
-		return createWriter(genIds, true);
+		return createWriter(genids, true);
 	}
 
 	@Override
-	public AWriter createWriter(boolean genIds, boolean indent)
+	public AWriter createWriter(boolean genids, boolean indent)
 	{
-		return new PullParserWriter(genIds, indent);
+		return new PullParserWriter(genids, indent);
 	}
-
+	
+	@Override
+	public AWriter createWriter(boolean genids, boolean indent, boolean newline)
+	{
+		// Todo: support disabling generation of newline characters.
+		return new PullParserWriter(genids, indent);		
+	}
 }
