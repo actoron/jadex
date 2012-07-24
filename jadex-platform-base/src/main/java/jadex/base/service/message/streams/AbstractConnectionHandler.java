@@ -12,6 +12,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 
@@ -411,19 +412,23 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		SendManager sm = ms.getSendManager(recs[0]);
 		
 		sm.addMessage(task);
-//		ret.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-////				System.out.println("sent: "+SUtil.arrayToString(task.getProlog()));
-//				// nop if could be sent
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				// close connection in case of send error.
+		task.getFuture().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				if(task instanceof StreamSendTask)
+				{
+					System.out.println("ack send fini: "+((StreamSendTask)task).getSequenceNumber()+" "+System.currentTimeMillis());
+				}
+//				System.out.println("sent: "+SUtil.arrayToString(task.getProlog()));
+				// nop if could be sent
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				// close connection in case of send error.
 //				getConnection().setClosed();
-//			}
-//		});
+			}
+		});
 	}
 	
 	/**

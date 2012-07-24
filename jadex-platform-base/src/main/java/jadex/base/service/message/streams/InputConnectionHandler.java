@@ -187,6 +187,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 				{
 					maxseqno	= Math.max(maxseqno, seqnumber);
 					
+					System.out.println("received: "+seqnumber+" "+System.currentTimeMillis());
+					
 					// If packet is the next one deliver to stream
 					// else store in map till the next one arrives
 					int expseqno = getSequenceNumber()+1;
@@ -337,7 +339,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			
 			if(start<end)	// found at least one message?
 			{
-//				System.out.println("send ack: start="+start+" end="+end+" cur="+rseqno+" last="+lastack);
+				System.out.println("send ack: start="+start+" end="+end+" cur="+rseqno+" last="+lastack+" "+System.currentTimeMillis());
 				sendDataAck(start, end, isStop());
 			}
 		}

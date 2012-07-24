@@ -81,7 +81,7 @@ public class TCPOutputConnection
 			sos.write(data);
 			sos.flush();
 			ret = true;
-			cleaner.refresh();
+//			cleaner.refresh();
 		}
 		catch(IOException e)
 		{

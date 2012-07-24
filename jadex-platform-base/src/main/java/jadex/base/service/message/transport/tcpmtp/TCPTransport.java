@@ -14,6 +14,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -97,6 +98,9 @@ public class TCPTransport implements ITransport
 	
 	/** The thread pool. */
 	protected IDaemonThreadPoolService threadpool;
+	
+	/** The message service . */
+	protected IMessageService msgservice;
 	
 	//-------- constructors --------
 	
@@ -560,8 +564,7 @@ public class TCPTransport implements ITransport
 	protected IFuture<Void> deliverMessages(final TCPInputConnection con)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		getMessageService().addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(IMessageService ms)
 			{
@@ -584,6 +587,33 @@ public class TCPTransport implements ITransport
 			}
 		});
 		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IMessageService> getMessageService()
+	{
+		final Future<IMessageService> ret = new Future<IMessageService>();
+		
+		if(msgservice==null)
+		{
+			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DelegationResultListener<IMessageService>(ret)
+			{
+				public void customResultAvailable(IMessageService result)
+				{
+					msgservice = result;
+					super.customResultAvailable(result);
+				}	
+			});
+		}
+		else
+		{
+			ret.setResult(msgservice);
+		}
+			
 		return ret;
 	}
 	
