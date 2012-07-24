@@ -68,7 +68,7 @@ public class DumbHunterPlan extends Plan
 					}
 				}
 				
-				// When no prey, turn 90° with probability 0.25, otherwise continue moving in same direction.
+				// When no prey, turn 90 degrees with probability 0.25, otherwise continue moving in same direction.
 				else if(lastdir==null || Math.random()>0.75)
 				{
 					if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
@@ -93,7 +93,7 @@ public class DumbHunterPlan extends Plan
 				}
 				catch(RuntimeException e)
 				{
-					// Move failed, forget about prey and turn 90°.
+					// Move failed, forget about prey and turn 90 degrees.
 					getBeliefbase().getBelief("nearest_prey").setFact(null);
 					
 //					System.out.println("Move failed: "+e);

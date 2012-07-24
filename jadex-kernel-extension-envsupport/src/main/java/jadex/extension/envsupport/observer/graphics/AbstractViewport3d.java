@@ -36,7 +36,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 	/** Real size of the viewport including padding. */
 	protected Vector2Double		paddedSize_;
 
-//	/** Visuals that are handled as static´s */
+//	/** Visuals that are handled as statics */
 //	protected ArrayList<DrawableCombiner3d> _staticvisuals = new ArrayList<DrawableCombiner3d>();
 	
 	/** Known drawable Objects. */

@@ -220,7 +220,7 @@ public class ObserverCenter
 				});
 				plugintimer.start();
 								
-//				//TODO: find a better solution for closing app´s in the Background
+//				//TODO: find a better solution for closing apps in the Background
 //				mainwindow.addWindowListener(new WindowAdapter() {
 //		            
 //		            public void windowClosing(WindowEvent e) {
@@ -232,7 +232,7 @@ public class ObserverCenter
 //							perspectives.remove(p);
 //						}
 //						
-//						// Close all the App´s in the Background
+//						// Close all the Apps in the Background
 //						Set<String> keys = perspectives.keySet();
 //						
 //						for(String key : keys)

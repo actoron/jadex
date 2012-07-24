@@ -1,6 +1,7 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
 import jadex.base.service.message.ISendTask;
+import jadex.base.service.message.streams.StreamSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;

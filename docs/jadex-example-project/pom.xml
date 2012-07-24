@@ -7,6 +7,19 @@
 	<artifactId>jadex-example-project</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	
+	<properties>
+		<!-- Specify desired Jadex version here. -->
+		<jadex.version>2.1-SNAPSHOT</jadex.version>
+	</properties>
+	
+	<!-- Snapshot repository (only required when using snapshot version of Jadex) -->
+	<repositories>
+		<repository>
+			<id>snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+	
 	<build>
 		<resources>
 			<!-- Allow ADF files (.xml, .bpmn, ...) be placed in source folder -->
@@ -21,35 +34,32 @@
 	</build>
 
 	<dependencies>
+		<!-- Platform for execution -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-standalone</artifactId>
-			<version>[2.1-SNAPSHOT,)</version>
+			<version>${jadex.version}</version>
 		</dependency>
+		
+		<!-- Component kernel required for basic platform components -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-extension-agr</artifactId>
-			<version>[2.1-SNAPSHOT,)</version>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${jadex.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-runtimetools</artifactId>
-			<version>[2.1-SNAPSHOT,)</version>
-		</dependency>
+		
+		<!-- Micro kernel for hello world agent -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
-			<version>[2.1-SNAPSHOT,)</version>
+			<version>${jadex.version}</version>
 		</dependency>
+		
+		<!-- Platform administration tools (JCC) -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-bdibpmn</artifactId>
-			<version>[2.1-SNAPSHOT,)</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-webservice</artifactId>
-			<version>[2.1-SNAPSHOT,)</version>
+			<artifactId>jadex-runtimetools-swing</artifactId>
+			<version>${jadex.version}</version>
 		</dependency>
 	</dependencies>
 </project>

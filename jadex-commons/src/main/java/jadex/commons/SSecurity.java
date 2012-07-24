@@ -177,7 +177,7 @@ public class SSecurity
 		gen.setPublicKey(pair.getPublic());
 		gen.setSignatureAlgorithm(algorithm);
 
-		Certificate cert = gen.generate(pair.getPrivate(), "BC");
+		Certificate cert = gen.generate(pair.getPrivate());
 		
 		return cert;
 	}   

@@ -69,7 +69,7 @@ public class MicroPreyAgent extends MicroAgent
 								@Classname("act")
 								public IFuture<Void> execute(IInternalAccess agent)
 								{
-									// If move failed, forget about food and turn 90°.
+									// If move failed, forget about food and turn 90 degrees.
 									food	= null;
 									
 		//							System.out.println("Move failed: "+e);
@@ -162,7 +162,7 @@ public class MicroPreyAgent extends MicroAgent
 				}
 			}
 			
-			// When no food, turn 90° with probability 0.25, otherwise continue moving in same direction.
+			// When no food, turn 90 degrees with probability 0.25, otherwise continue moving in same direction.
 			else if(lastdir==null || Math.random()>0.75)
 			{
 				if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))

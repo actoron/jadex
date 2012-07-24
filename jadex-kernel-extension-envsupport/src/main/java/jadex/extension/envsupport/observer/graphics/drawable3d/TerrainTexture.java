@@ -1,12 +1,13 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+/**
+ *  Helper class for terrain
+ */
 public class TerrainTexture
 {
 	String _name;
 	String _texture;
 	float _scale;
-	
-	// Helfer Klasse für Terrain
 	
 	public TerrainTexture(String name, String texture, float scale)
 	{

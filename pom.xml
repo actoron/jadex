@@ -8,56 +8,29 @@
 	<packaging>pom</packaging>
 	<version>2.1-SNAPSHOT</version>
 	<name>jadex</name>
-
-	<!--
-		<distributionManagement> <snapshotRepository>
-		<id>sonatype-nexus-snapshots</id> <name>Sonatype Nexus
-		Snapshots</name>
-		<url>http://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository> </distributionManagement>
-	-->
-
-	<distributionManagement>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Nexus Snapshot Repository</name>
-			<url>http://oss.sonatype.org/content/repositories/snapshots/</url>
-			<uniqueVersion>false</uniqueVersion>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk
-		</developerConnection>
-	</scm>
 	
-<!--  uncomment to enable UTF-8 source Encoding for all subprojects.
-		DOES NOT affect eclipse source encoding setting, see
-		https://issues.sonatype.org/browse/MNGECLIPSE-1782
-		 -->
-<!-- 	<properties> -->
-<!-- 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> -->
-<!--   	</properties> -->
+	<!-- ======== common plugin configurations ======== -->
 	
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
+
 	<profiles>
 	
-		<profile>
-			<id>jadex-android-commons</id>
-			<modules>
-				<module>jadex-commons</module>
-			</modules>
-		</profile>
-	
-
-		<!-- Javadocs -->
+		<!-- ======== Javadocs ======== -->
+		
 		<profile>
 			<id>jadex-javadocs-artifacts</id>
 			<modules>
+				<module>jadex-parent</module>
 				<module>jadex-javadocs</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
@@ -78,22 +51,12 @@
 			</modules>
 		</profile>
 		
-		<!-- XML -->
+		<!-- ======== XML ======== -->
 		
 		<profile>
 			<id>jadex-xml-artifacts</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<version>2.5</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 			<modules>
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 			</modules>
@@ -149,27 +112,18 @@
 				</plugins>
 			</build>
 			<modules>
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 			</modules>
 		</profile>
 
-		<!-- Rules -->
+		<!-- ======== Rules ======== -->
 		
 		<profile>
 			<id>jadex-rules-artifacts</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<version>2.5</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 			<modules>
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 				<module>jadex-rules</module>
@@ -229,6 +183,7 @@
 				</plugins>
 			</build>
 			<modules>
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 				<module>jadex-rules</module>
@@ -237,7 +192,7 @@
 			</modules>
 		</profile>
 
-		<!-- Jadex -->
+		<!-- ======== Full ======== -->
 
 		<profile>
 			<id>jadex-full-dist</id>
@@ -418,6 +373,8 @@
 				</plugins>
 			</build>
 			<modules>
+				<module>jadex-parent</module>
+				<module>jadex-parent-pro</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 				<module>jadex-javaparser</module>
@@ -468,125 +425,10 @@
 		</profile>
 		
 		<profile>
-			<id>jadex-dist</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-						</configuration>
-						<executions>
-							<execution>
-								<id>jadex-example-project</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<!-- .zip is appended automatically to the final name. -->
-									<finalName>jadex-example-project</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-exampleprojectzip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<!-- .zip is appended automatically to the final name. -->
-									<finalName>sources</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-srczip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<modules>
-				<module>jadex-commons</module>
-				<module>jadex-xml</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-bridge</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-nuggets</module>
-
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-kernel-bdibpmn</module>
-				<module>jadex-kernel-gpmn</module>
-				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-extension-envsupport-opengl</module>
-				<module>jadex-kernel-extension-agr</module>
-
-				<module>jadex-applib-bdi</module>
-				<module>jadex-applications-bdi</module>
-				<module>jadex-applications-micro</module>
-				<module>jadex-applications-bpmn</module>
-				<module>jadex-applications-bdibpmn</module>
-				<module>jadex-applications-gpmn</module>
-				<module>jadex-applications-web</module>
-				<module>jadex-applications-webservice</module>
-
-				<module>jadex-rules</module>
-				<module>jadex-rules-applications</module>
-				<module>jadex-rules-tools</module>
-
-				<module>jadex-tools-base</module>
-				<module>jadex-tools-base-swing</module>
-				<module>jadex-runtimetools-swing</module>
-				<module>jadex-tools-bdi</module>
-				<module>jadex-tools-bpmn</module>
-				<module>jadex-tools-comanalyzer</module>
-				<module>jadex-platform-standalone</module>
-				<module>jadex-platform-standalone-launch</module>
-				<module>jadex-platform-relay-web</module>
-				<module>jadex-platform-extension-webservice</module>
-			</modules>
-		</profile>
-		
-		<profile>
 			<id>jadex-full-artifacts</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<version>2.5</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-			
 			<modules>
+				<module>jadex-parent</module>
+				<module>jadex-parent-pro</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 				<module>jadex-javaparser</module>
@@ -633,96 +475,7 @@
 			</modules>
 		</profile>
 
-		<!-- <profile>
-			<id>jadex-pro-artifacts</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<version>2.5</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-			
-			<modules>
-				<module>jadex-platform-extension-maven</module>
-				<module>jadex-platform-extension-natmtp</module>
-			</modules>
-		</profile> -->
-		
-		<!-- JADE -->
-
-		<!-- <profile>
-			<id>jadex-jade-dist</id>
-			<build>
-				<finalName>jadex-jade-${project.version}</finalName>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-							<descriptors>
-								<descriptor>src/main/assembly/dist-assembly-jade.xml
-								</descriptor>
-							</descriptors>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-			<modules>
-				<module>jadex-commons</module>
-				<module>jadex-xml</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-bridge</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-nuggets</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-applib-bdi</module>
-				<module>jadex-applications-bdi</module>
-				<module>jadex-runtimetools-swing</module>
-				<module>jadex-tools-bdi</module>
-				<module>jadex-tools-bpmn</module>
-				<module>jadex-tools-comanalyzer</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-applications-micro</module>
-				<module>jadex-rules</module>
-				<module>jadex-rules-applications</module>
-				<module>jadex-rules-tools</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-platform-jade-launch</module>
-				<module>jadex-platform-jade</module>
-			</modules>
-		</profile> -->
-
-		<!-- WebApps -->
-
-		<!-- <profile>
-			<id>jadex-applications-web-package</id>
-			<modules>
-				<module>jadex-commons</module>
-				<module>jadex-bridge</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-platform-standalone</module>
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-xml</module>
-				<module>jadex-applications-web</module>
-				<module>jadex-tools-base</module>
-			</modules>
-		</profile> -->
-		
-		<!-- WfMS -->
+		<!-- ======== WfMS ======== -->
 
 		<!-- <profile>
 			<id>jadex-wfms-dist</id>
@@ -756,6 +509,7 @@
 				</plugins>
 			</build>
 			<modules>
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
@@ -777,7 +531,7 @@
 			</modules>
 		</profile> -->
 		
-		<!-- eclipse -->
+		<!-- ======== eclipse (all modules) ======== -->
 
 		<profile>
 			<id>jadex-eclipse-projects</id>
@@ -785,6 +539,8 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
+				<module>jadex-parent</module>
+				<module>jadex-parent-pro</module>
 				<!-- <module>jadex-kernel-bdi-continuations</module> -->
 				<module>jadex-javadocs</module>
 				<module>jadex-commons</module>
@@ -859,6 +615,9 @@
 				
 			</modules>
 		</profile>
+		
+		<!-- ======== Android ======== -->
+
 		<profile>
 			<id>jadex-android-artifacts</id>
 			<build>
@@ -866,6 +625,7 @@
 			</build>
 			<modules>
 				<!-- Jadex modules -->
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
@@ -948,6 +708,7 @@
 			</build>
 			<modules>
 				<!-- Jadex modules -->
+				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
@@ -970,81 +731,4 @@
 			</modules>
 		</profile>
 	</profiles>
-
-	<!-- <url>http://jadex.sourceforge.net</url> -->
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<aggregate>true</aggregate>
-					<minmemory>128m</minmemory>
-					<maxmemory>1g</maxmemory>
-        			<show>public</show>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
-	
-	<dependencies>
-		<!-- Dependencies required for that jadex assembly doesn't get started before modules are built. -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-nuggets</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-bdi</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-micro</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-bpmn</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-bdibpmn</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-gpmn</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-web</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-webservice</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-rules-applications</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-relay-web</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-standalone-launch</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
 </project>

@@ -84,7 +84,7 @@ public interface IViewport3d
 	public void setAreaSize(IVector3 vector);
 
 //	/** 
-//	 * Visuals that are handled as static´s
+//	 * Visuals that are handled as statics
 //	 * 
 //	 * @param staticvisuals the Visuals
 //	 */

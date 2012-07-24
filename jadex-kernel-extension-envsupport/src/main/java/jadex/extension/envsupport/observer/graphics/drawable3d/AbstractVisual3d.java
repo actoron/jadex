@@ -19,7 +19,7 @@ public class AbstractVisual3d
 	/** The position of the visual or a bound property to the position. */
 	private Object	position;
 	
-	/** save if it´s already created in the scene or not */
+	/** save if its already created in the scene or not */
 	private boolean created;
 	
 	//-------- constructors --------

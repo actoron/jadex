@@ -1,12 +1,13 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
+import jadex.base.service.message.ISendTask;
+import jadex.base.service.message.streams.StreamSendTask;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

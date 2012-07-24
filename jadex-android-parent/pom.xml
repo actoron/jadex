@@ -2,19 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-android-parent</artifactId>
-	<version>2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>jadex-android-parent</name>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-parent</artifactId>
+		<version>2.1-SNAPSHOT</version>
+		<relativePath>../jadex-parent/pom.xml</relativePath>
+	</parent>
 
 	<properties>
-		<maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
-		<java-version>1.6</java-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.1.1</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
 		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes>
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
@@ -68,33 +69,9 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>1.1</version>
-					<executions>
-						<execution>
-							<id>sign-artifacts</id>
-							<phase>install</phase>
-							<configuration>
-								<skip>true</skip>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-
-				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>1.7</version>
-				</plugin>
-
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven-compiler-plugin-version}</version>
-					<configuration>
-						<source>${java-version}</source>
-						<target>${java-version}</target>
-					</configuration>
 				</plugin>
 
 				<plugin>

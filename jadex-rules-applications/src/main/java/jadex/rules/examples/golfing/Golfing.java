@@ -37,10 +37,10 @@ import jadex.rules.tools.reteviewer.RuleEnginePanel;
  *  <ul>
  *  	<li>A foursome of golfers is standing at a tee, in a line from left to right.</li>
  *  	<li>Each golfer wears different colored pants; one is wearing red pants.</li>
- *  	<li>The golfer to Fred’s immediate right is wearing blue pants.</li>
+ *  	<li>The golfer to Fred's immediate right is wearing blue pants.</li>
  *  	<li>Joe is second in line.</li>
  *  	<li>Bob is wearing plaid pants.</li>
- *  	<li>Tom isn’t in position one or four, and he isn’t wearing the hideous orange pants.</li>
+ *  	<li>Tom isn't in position one or four, and he isn't wearing the hideous orange pants.</li>
  *  </ul>
  */
 public class Golfing
@@ -195,7 +195,7 @@ public class Golfing
 			"$joe.golfer_has_color!=$tom.golfer_has_color &&"+
 			"$bob.golfer_has_color!=$tom.golfer_has_color &&"+
 
-			// - The golfer to Fred’s immediate right is wearing blue pants.
+			// - The golfer to Fred's immediate right is wearing blue pants.
 			"golfer $tmp && $tmp.golfer_has_position==$fred.golfer_has_position+1 && $tmp.golfer_has_color==\"blue\" &&"+
 			"($tmp==$joe || $tmp==$bob || $tmp==$tom) &&"+
 
@@ -205,7 +205,7 @@ public class Golfing
 			// - Bob is wearing plaid pants.
 			"$bob.golfer_has_color==\"plaid\" &&"+
 			
-			// - Tom isn’t in position one or four, and he isn’t wearing the hideous orange pants.
+			// - Tom isn't in position one or four, and he isn't wearing the hideous orange pants.
 			"$tom.golfer_has_position!=1 && $tom.golfer_has_position!=4 && $tom.golfer_has_color!=\"orange\"",
 
 			golfing_type_model);

@@ -7,12 +7,11 @@ This project can be imported into IDEs like eclipse.
 
 * The 'pom.xml' is used by Maven to e.g. find
   project dependencies like the Jadex libraries.
-
-* The 'snapshotpom.xml' is an alternative to 'pom.xml'.
-  It tells maven to use the latest Jadex libraries from the snapshot repository
-  instead of the (possibly older) release libraries from the maven central
-  repository. To use the snapshot libraries rename 'pom.xml' to something else
-  and rename 'snapshotpom.xml' to 'pom.xml' before importing the maven project.
+  It tells maven to use the release libraries from the maven central
+  repository or the latest Jadex libraries from the snapshot repository
+  instead of the (possibly newer). The desired Jadex version can be
+  specified in the POM before importing, but can also be changed later
+  causing a reload of the dependencies in the IDE.
 
 * The 'src/main/java' folder contains a simple "Hello world!" agent.
   As a default, compiled classes are placed by Maven in the

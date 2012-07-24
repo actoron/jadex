@@ -6,8 +6,10 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -271,5 +273,23 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Print sending of message for debugging.
+	 */
+	public void doSendMessage()
+	{
+		System.out.println("doSendMessage "+System.currentTimeMillis()+": "+getSequenceNumber());
+		super.doSendMessage();
+	}
+	
+	/**
+	 *  Print sending of message for debugging.
+	 */
+	public void ready(IResultCommand<IFuture<Void>, Void> send)
+	{
+		System.out.println("ready "+System.currentTimeMillis()+": "+getSequenceNumber()+", "+send);
+		super.ready(send);
 	}
 }

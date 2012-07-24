@@ -24,7 +24,7 @@ public class WanderPlan extends Plan
 		
 		while(true)
 		{
-			// Turn 90° with probability 0.25, otherwise continue moving in same direction.
+			// Turn 90 degrees with probability 0.25, otherwise continue moving in same direction.
 			if(lastdir==null || failed || Math.random()>0.75)
 			{
 				if(MoveAction.DIRECTION_LEFT.equals(lastdir) || MoveAction.DIRECTION_RIGHT.equals(lastdir))
@@ -52,7 +52,7 @@ public class WanderPlan extends Plan
 			catch(RuntimeException e)
 			{
 //				System.err.println("Wander plan failed: "+e);
-				// Move failed, turn 90° on next move.
+				// Move failed, turn 90 degrees on next move.
 				failed	= true;
 			}
 		}

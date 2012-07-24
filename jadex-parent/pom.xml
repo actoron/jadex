@@ -2,22 +2,32 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-platform-standalone-maven-launch</artifactId>
-	<packaging>jar</packaging>
-	<name>jadex-platform-standalone-maven-launch</name>
+	<artifactId>jadex-parent</artifactId>
+	<packaging>pom</packaging>
 	<version>2.1-SNAPSHOT</version>
+	<name>jadex-parent</name>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
-		The Jadex launch package facilitates
-		executing the Jadex standalone platform.
+		Jadex parent ist the parent POM for all jadex modules
+		and contains common maven build information.
 	</description>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.6</java.version>
+		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+		<maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
+		<maven-gpg-plugin.version>1.1</maven-gpg-plugin.version>
+	</properties>
+	
 
 	<licenses>
 		<license>
 			<name>LGPL License</name>
-			<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Download/License
-			</url>
+			<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Download/License</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -37,7 +47,6 @@
 				<role>developer</role>
 			</roles>
 		</developer>
-
 		<developer>
 			<id>lars</id>
 			<name>Lars</name>
@@ -73,52 +82,79 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<!--
-		<parent> <groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-settings</artifactId>
-		<version>${jadexVersion}</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
-
-	<properties>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
-
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.svn/*</exclude>
+					<exclude>**/dungeonkeeper/</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/java</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource><!-- 
-			<resource>
-				<directory>src/test/java</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-					<exclude>**/.svn/*</exclude>
-				</excludes> 
-			</resource>-->
-		</resources>
+			</testResource>
+		</testResources>
 
 		<plugins>
-			<!-- 1.5 for annotations in testcases. -->
+			<!-- todo: required for maven import? -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<sourceExcludes>
+						<sourceExclude>**/.svn/**</sourceExclude>
+					</sourceExcludes>
+					<sourceIncludes>
+						<sourceInclude>**/*.xml</sourceInclude>
+					</sourceIncludes>
+				</configuration>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-        		<version>2.3.2</version>
+        		<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<excludes>
+						<exclude>**/dungeonkeeper/</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-        		<version>2.1.2</version>
+        		<version>${maven-source-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -128,12 +164,26 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<excludes>
+						<exclude>**/dungeonkeeper/</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			
 			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
         		<artifactId>maven-javadoc-plugin</artifactId>
-        		<version>2.8.1</version>
+        		<version>${maven-javadoc-plugin.version}</version>
+        		<configuration>
+        			<show>public</show>
+					<excludePackageNames>*.dungeonkeeper.*</excludePackageNames>
+        			<!-- 
+        			<aggregate>true</aggregate>
+					<minmemory>128m</minmemory>
+					<maxmemory>1g</maxmemory>
+        			 -->
+        		</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -144,53 +194,11 @@
 					</execution>
 				</executions>
         	</plugin>
-
-			<!--
-				Make jar executable (cannot do this in standalone, because maven
-				claims cyclic reference)
-			-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-        		<version>2.3.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<useUniqueVersions>false</useUniqueVersions>
-							<mainClass>jadex.base.Starter</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-
-			<!--
-				copy all dependencies (including transitive dependencies) to lib
-				directory, ease starting jadex without eclipse
-			- ->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy</id>
-						<phase>install</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
-
-			<plugin>
+        	
+        	<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.1</version>
+				<version>${maven-gpg-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -201,9 +209,40 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+        		<version>1.0</version>
+				<executions>
+					<execution>
+						<id>generate-schemadoc</id>
+						<phase>package</phase>
+						<goals>
+							<goal>transform</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<transformationSets>
+						<transformationSet>
+							<dir>src/main/config</dir>
+							<includes>
+								<include>*.xsd</include>
+							</includes>
+							<stylesheet>../docs/xs3p.xsl</stylesheet>
+							<fileMappers>
+								<fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.html</targetExtension>
+								</fileMapper>
+							</fileMappers>
+						</transformationSet>
+					</transformationSets>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -211,32 +250,6 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-tools-base</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-component</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-standalone</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-runtimetools-swing</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-maven</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-				
 	</dependencies>
+	
 </project>

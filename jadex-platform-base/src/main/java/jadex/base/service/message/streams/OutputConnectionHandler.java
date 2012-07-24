@@ -96,7 +96,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	//-------- constructors --------
 	
 	/**
-	 *  Creat a new handler.
+	 *  Create a new handler.
 	 */
 	public OutputConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
 	{
@@ -105,7 +105,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
-		this.maxsend = 500;
+		this.maxsend = 25;
 		this.maxqueued = 4;
 		this.ackcnt = 10;
 		
@@ -163,7 +163,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 					}
 				}
 					
-//				System.out.println("ack "+System.currentTimeMillis()+": seq="+seqnumber+" stop="+ackinfo.isStop()+" startack="+ackinfo.getStartSequenceNumber()+" endack="+ackinfo.getEndSequenceNumber()+" sent="+sent.size());
+				System.out.println("ack "+System.currentTimeMillis()+": seq="+seqnumber+" stop="+ackinfo.isStop()+" startack="+ackinfo.getStartSequenceNumber()+" endack="+ackinfo.getEndSequenceNumber()+" sent="+sent.size());
 //				System.out.println(sent);
 				
 				// Trigger resend of unacknowledged messages, if necessary.
@@ -523,16 +523,17 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			task	= tup.retry();
 		}
 		
+		System.out.println("send "+System.currentTimeMillis()+": "+task.getSequenceNumber());
 		sendTask(task);
 		
 		queuecnt++;
 //		System.out.println("queue: "+queuecnt);
-//		final int	seqno	= task.getSequenceNumber();
+		final int	seqno	= task.getSequenceNumber();
 		task.getFuture().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-//				System.out.println("Sent "+System.currentTimeMillis()+": seq="+seqno);
+				System.out.println("Sent "+System.currentTimeMillis()+": seq="+seqno);
 				sendDone();
 			}
 			
