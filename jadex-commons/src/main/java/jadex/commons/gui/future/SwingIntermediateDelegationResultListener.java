@@ -1,7 +1,7 @@
 package jadex.commons.gui.future;
 
-import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
 
 import java.util.Collection;
@@ -11,19 +11,19 @@ import javax.swing.SwingUtilities;
 /**
  *  Exception delegation listener for intermediate results called back on swing thread.
  */
-public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>
+public class SwingIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
-	protected Future<T> future;
+	protected IntermediateFuture<E> future;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new listener.
 	 */
-	public SwingIntermediateExceptionDelegationResultListener(Future<T> future)
+	public SwingIntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
 		this.future = future;
 //		this.ex	= new DebugException();
@@ -136,29 +136,37 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
     }
 	
 	/**
-	 *  Called when the result is available.
-	 *  @param result The result.
-	 */
-	public abstract void customResultAvailable(Collection<E> result);
-
+     *  Declare that the future is finished.
+     */
+    public void customFinished()
+    {
+    	future.setFinished();
+    }
+	
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public abstract void customIntermediateResultAvailable(E result);
+	public void customResultAvailable(Collection<E> result)
+	{
+		future.setResult(result);
+	}
 
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
-//		System.err.println("Problem: "+exception);
 		future.setException(exception);
 	}
 	
 	/**
-	 *  Called when finished.
+	 *  Called when an intermediate result is available.
+	 * @param result The result.
 	 */
-	public abstract void customFinished();
+	public void customIntermediateResultAvailable(E result)
+	{
+		future.addIntermediateResult(result);
+	}
 }

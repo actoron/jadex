@@ -11,10 +11,11 @@ import jadex.bridge.service.types.appstore.IAppProviderService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -146,9 +147,9 @@ public class AppStorePanel extends JPanel
 			public void customIntermediateResultAvailable(final IAppProviderService ser)
 			{
 				cnt++;
-				ser.getAppMetaInfo().addResultListener(new SwingResultListener<AppMetaInfo>()
+				ser.getAppMetaInfo().addResultListener(new SwingResultListener<AppMetaInfo>(new IResultListener<AppMetaInfo>()
 				{
-					public void customResultAvailable(AppMetaInfo ami)
+					public void resultAvailable(AppMetaInfo ami)
 					{
 //						System.out.println("found: "+ami);
 						if(!apps.containsKey(ser))
@@ -162,12 +163,12 @@ public class AppStorePanel extends JPanel
 							ret.setResult(null);
 					}
 					
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						if(--cnt==0 && fin)
 							ret.setResult(null);
 					}
-				});
+				}));
 			}
 			
 			public void customFinished()

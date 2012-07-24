@@ -14,6 +14,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 
@@ -112,14 +113,14 @@ public class ModelIconCache implements IIconCache
 	//			System.out.println("getIcon: "+type);
 				final String file = ((IFileNode)node).getFilePath(); 
 				
-				createResourceIdentifier(node).addResultListener(new SwingResultListener<IResourceIdentifier>()
+				createResourceIdentifier(node).addResultListener(new SwingResultListener<IResourceIdentifier>(new IResultListener<IResourceIdentifier>()
 				{
-					public void customResultAvailable(IResourceIdentifier rid)
+					public void resultAvailable(IResourceIdentifier rid)
 					{
 						SComponentFactory.getFileType(exta, file, rid)
-							.addResultListener(new SwingResultListener<String>()
+							.addResultListener(new SwingResultListener<String>(new IResultListener<String>()
 						{
-							public void customResultAvailable(final String type)
+							public void resultAvailable(final String type)
 							{
 								if(type!=null)
 								{
@@ -128,9 +129,9 @@ public class ModelIconCache implements IIconCache
 									{
 	//									System.out.println("deep: "+type+" "+file);
 										SComponentFactory.getFileTypeIcon(exta, type)
-											.addResultListener(new SwingResultListener<byte[]>()
+											.addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
 										{
-											public void customResultAvailable(byte[] result)
+											public void resultAvailable(byte[] result)
 											{
 												Icon	icon	= new ImageIcon(result); 
 												myicons.put(node, icon);
@@ -138,11 +139,11 @@ public class ModelIconCache implements IIconCache
 												refresh(node);
 											}
 											
-											public void customExceptionOccurred(Exception exception)
+											public void exceptionOccurred(Exception exception)
 											{
 												// ignore...
 											}
-										});
+										}));
 									}
 									else
 									{
@@ -152,18 +153,18 @@ public class ModelIconCache implements IIconCache
 								}					
 							}
 							
-							public void customExceptionOccurred(Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								// ignore...
 							}
-						});
+						}));
 					}
 					
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						// ignore...
 					}
-				});
+				}));
 			}
 		}
 		

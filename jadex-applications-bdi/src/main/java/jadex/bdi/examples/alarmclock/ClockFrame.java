@@ -9,8 +9,8 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.AWTException;
@@ -324,9 +324,9 @@ public class ClockFrame extends JFrame
 		timer.start();
 		
 		// Dispose frame on exception.
-		final IResultListener<Void>	dislis	= new SwingResultListener<Void>()
+		final IResultListener<Void>	dislis	= new SwingResultListener<Void>(new IResultListener<Void>()
 		{
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				shutdown	= true;
 				if(alarms_gui!=null)
@@ -337,10 +337,10 @@ public class ClockFrame extends JFrame
 					timer.stop();
 				dispose();
 			}
-			public void customResultAvailable(Void result)
+			public void resultAvailable(Void result)
 			{
 			}
-		};
+		});
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{

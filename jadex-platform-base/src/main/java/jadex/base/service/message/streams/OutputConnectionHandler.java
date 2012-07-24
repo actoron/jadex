@@ -105,12 +105,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
-		this.maxsend = 50;
+		this.maxsend = 500;
 		this.maxqueued = 4;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 50000;
+		this.mpmaxsize = 10000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;

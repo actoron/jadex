@@ -154,9 +154,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 		
 		cms.getComponentDescription(desc.getName())
-			.addResultListener(new SwingResultListener<IComponentDescription>()
+			.addResultListener(new SwingResultListener<IComponentDescription>(new IResultListener<IComponentDescription>()
 		{
-			public void customResultAvailable(IComponentDescription result)
+			public void resultAvailable(IComponentDescription result)
 			{
 				ComponentTreeNode.this.desc	= (IComponentDescription)result;
 				broken	= false;
@@ -165,13 +165,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				
 				ComponentTreeNode.super.refresh(recurse);
 			}
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				broken	= true;
 				busy	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -305,9 +305,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 
 //		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //			System.err.println("searchChildren queued: "+this);
-		cms.getChildrenDescriptions(cid).addResultListener(new SwingResultListener<IComponentDescription[]>()
+		cms.getChildrenDescriptions(cid).addResultListener(new SwingResultListener<IComponentDescription[]>(new IResultListener<IComponentDescription[]>()
 		{
-			public void customResultAvailable(final IComponentDescription[] achildren)
+			public void resultAvailable(final IComponentDescription[] achildren)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren queued2: "+ComponentTreeNode.this);
@@ -333,7 +333,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				}
 			}
 			
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren done2e: "+ComponentTreeNode.this);
@@ -343,31 +343,31 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					ret.setExceptionIfUndone(exception);
 				}
 			}
-		});
+		}));
 		
 		// Search services and only add container node when services are found.
 //		System.out.println("name: "+desc.getName());
 		
-		cms.getRootIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>()
+		cms.getRootIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 		{
-			public void customResultAvailable(IComponentIdentifier root) 
+			public void resultAvailable(IComponentIdentifier root) 
 			{
 				cms.getExternalAccess(root)
-					.addResultListener(new SwingResultListener<IExternalAccess>()
+					.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 				{
-					public void customResultAvailable(final IExternalAccess rootea)
+					public void resultAvailable(final IExternalAccess rootea)
 					{
 						cms.getExternalAccess(cid)
-							.addResultListener(new SwingResultListener<IExternalAccess>()
+							.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 						{
-							public void customResultAvailable(final IExternalAccess ea)
+							public void resultAvailable(final IExternalAccess ea)
 							{
 	//							System.out.println("search childs: "+ea);
 								
 								SRemoteGui.getServiceInfos(ea)
-									.addResultListener(new SwingResultListener<Object[]>()
+									.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
 								{
-									public void customResultAvailable(final Object[] res)
+									public void resultAvailable(final Object[] res)
 									{
 										final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
 										final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res[1];
@@ -433,17 +433,17 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 											}
 											
 											final ServiceContainerNode	node	= scn;
-											ret.addResultListener(new SwingResultListener<List<ITreeNode>>()
+											ret.addResultListener(new SwingResultListener<List<ITreeNode>>(new IResultListener<List<ITreeNode>>()
 											{
-												public void customResultAvailable(List<ITreeNode> result)
+												public void resultAvailable(List<ITreeNode> result)
 												{
 													node.setChildren(subchildren);
 												}
-												public void customExceptionOccurred(Exception exception)
+												public void exceptionOccurred(Exception exception)
 												{
 													// Children not found -> don't add services.
 												}
-											});
+											}));
 										}
 										
 										ready[1]	= true;
@@ -453,7 +453,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 										}
 									}
 									
-									public void customExceptionOccurred(Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										ready[1]	= true;
 										if(ready[0] &&  ready[1])
@@ -461,10 +461,10 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 											ret.setExceptionIfUndone(exception);
 										}
 									}
-								});
+								}));
 							}
 							
-							public void customExceptionOccurred(Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								ready[1]	= true;
 								if(ready[0] &&  ready[1])
@@ -472,9 +472,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 									ret.setExceptionIfUndone(exception);
 								}
 							}
-						});
+						}));
 					}
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
@@ -482,9 +482,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							ret.setExceptionIfUndone(exception);
 						}
 					}
-				});
+				}));
 			}
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ready[1]	= true;
 				if(ready[0] &&  ready[1])
@@ -492,7 +492,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					ret.setExceptionIfUndone(exception);
 				}
 			}
-		});
+		}));
 		
 		return ret;
 	}

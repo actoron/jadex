@@ -1,6 +1,8 @@
+/**
+ * 
+ */
 package jadex.commons.gui.future;
 
-import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 
@@ -9,24 +11,23 @@ import java.util.Collection;
 import javax.swing.SwingUtilities;
 
 /**
- *  Exception delegation listener for intermediate results called back on swing thread.
+ *
  */
-public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>
+public class SwingIntermediateResultListener<E> implements IIntermediateResultListener<E>
 {
 	//-------- attributes --------
-	
-	/** The future to which calls are delegated. */
-	protected Future<T> future;
+
+	/** The delegation listener. */
+	protected IIntermediateResultListener<E> listener;
 	
 	//-------- constructors --------
-	
+
 	/**
 	 *  Create a new listener.
 	 */
-	public SwingIntermediateExceptionDelegationResultListener(Future<T> future)
+	public SwingIntermediateResultListener(final IIntermediateResultListener<E> listener)
 	{
-		this.future = future;
-//		this.ex	= new DebugException();
+		this.listener = listener;
 	}
 	
 	//-------- methods --------
@@ -38,13 +39,14 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	 *  intermediateResultAvailable method has not been called.
 	 *  @param result The final result.
 	 */
-	public final void resultAvailable(final Collection<E> result)
+	public void resultAvailable(final Collection<E> result)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
 		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//					if(SwingUtilities.isEventDispatchThread())
 		{
-			customResultAvailable(result);			
+			customResultAvailable(result);
 		}
 		else
 		{
@@ -62,18 +64,19 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	 *  Called when an exception occurred.
 	 *  @param exception The exception.
 	 */
-	public final void exceptionOccurred(final Exception exception)
+	public void exceptionOccurred(final Exception exception)
 	{
-//		exception.printStackTrace();
+		// exception.printStackTrace();
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
 		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+	//		if(SwingUtilities.isEventDispatchThread())
 		{
 			customExceptionOccurred(exception);			
 		}
 		else
 		{
+	//			Thread.dumpStack();
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
@@ -88,13 +91,14 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public final void intermediateResultAvailable(final E result)
+	public void intermediateResultAvailable(final E result)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
 		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//			if(SwingUtilities.isEventDispatchThread())
 		{
-			customIntermediateResultAvailable(result);			
+			customIntermediateResultAvailable(result);
 		}
 		else
 		{
@@ -115,11 +119,12 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	 *  intermediateResultAvailable method was called for all
 	 *  intermediate results before.
      */
-    public final void finished()
+    public void finished()
     {
     	// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
 		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//    		if(SwingUtilities.isEventDispatchThread())
 		{
 			customFinished();
 		}
@@ -135,30 +140,38 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 		}
     }
 	
+    /**
+     *  Declare that the future is finished.
+     */
+    public void customFinished()
+    {
+    	listener.finished();
+    }
+	
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public abstract void customResultAvailable(Collection<E> result);
-
-	/**
-	 *  Called when the result is available.
-	 *  @param result The result.
-	 */
-	public abstract void customIntermediateResultAvailable(E result);
+	public void customResultAvailable(Collection<E> result)
+	{
+		listener.resultAvailable(result);
+	}
 
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
-//		System.err.println("Problem: "+exception);
-		future.setException(exception);
+		listener.exceptionOccurred(exception);
 	}
 	
 	/**
-	 *  Called when finished.
+	 *  Called when an intermediate result is available.
+	 * @param result The result.
 	 */
-	public abstract void customFinished();
+	public void customIntermediateResultAvailable(E result)
+	{
+		listener.intermediateResultAvailable(result);
+	}
 }

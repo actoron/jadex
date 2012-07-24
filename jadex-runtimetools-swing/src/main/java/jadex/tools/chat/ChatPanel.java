@@ -29,10 +29,10 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -110,11 +110,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.DocumentFilter;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -584,9 +579,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								}
 								else
 								{
-									getServiceAccess().addResultListener(new SwingResultListener<IExternalAccess>()
+									getServiceAccess().addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 									{
-										public void customResultAvailable(IExternalAccess ea)
+										public void resultAvailable(IExternalAccess ea)
 										{
 											if(rfilechooser==null)
 											{
@@ -596,9 +591,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 											// Hack!!! remote file chooser has hack that assumes files without '.' are directories and vice versa
 											// -> accept both (assumed) files and directories and hope that the user only selects actual files. 
 											rfilechooser.chooseFile(null, ".", panel, JFileChooser.FILES_AND_DIRECTORIES, null)
-												.addResultListener(new SwingResultListener<FileData>()
+												.addResultListener(new SwingResultListener<FileData>(new IResultListener<FileData>()
 											{							
-												public void customResultAvailable(FileData file)
+												public void resultAvailable(FileData file)
 												{
 													if(file!=null)
 													{
@@ -606,18 +601,18 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 													}
 												}
 												
-												public void customExceptionOccurred(Exception exception)
+												public void exceptionOccurred(Exception exception)
 												{
 													// ignore...
 												}
-											});							
+											}));							
 										}
 										
-										public void customExceptionOccurred(Exception exception)
+										public void exceptionOccurred(Exception exception)
 										{
 											// ignore...
 										}
-									});
+									}));
 								}
 							}
 						});
@@ -659,18 +654,18 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				});
 				
-				getService().getNickName().addResultListener(new SwingResultListener<String>()
+				getService().getNickName().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
 				{
-					public void customResultAvailable(String result)
+					public void resultAvailable(String result)
 					{
 						tfnick.setText(result);
 					}
 					
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						// Ignore...
 					}
-				});
+				}));
 				
 				
 				final JTextField tfava = new JTextField();
@@ -1163,27 +1158,27 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		setUserState(cid, Boolean.TRUE, null, null, null);
 		
-		chat.getNickName().addResultListener(new SwingResultListener<String>()
+		chat.getNickName().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
 		{
-			public void customResultAvailable(final String nick)
+			public void resultAvailable(final String nick)
 			{
-				chat.getImage().addResultListener(new SwingResultListener<byte[]>()
+				chat.getImage().addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
 				{
-					public void customResultAvailable(byte[] img)
+					public void resultAvailable(byte[] img)
 					{
 						setUserState(cid, Boolean.TRUE, null, nick, img);
 					}
 					
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 					}
-				});
+				}));
 			}
 			
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -1198,17 +1193,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				public void resultAvailable(IChatService cs)
 				{
-					cs.getNickName().addResultListener(new SwingResultListener<String>()
+					cs.getNickName().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
 					{
-						public void customResultAvailable(final String nick)
+						public void resultAvailable(final String nick)
 						{
 							setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, nick, null);
 						}
 						
-						public void customExceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 						}
-					});
+					}));
 				}
 
 				public void exceptionOccurred(Exception exception)
@@ -1223,17 +1218,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				public void resultAvailable(IChatService cs)
 				{
-					cs.getImage().addResultListener(new SwingResultListener<byte[]>()
+					cs.getImage().addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
 					{
-						public void customResultAvailable(final byte[] img)
+						public void resultAvailable(final byte[] img)
 						{
 							setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, null, img);
 						}
 						
-						public void customExceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 						}
-					});
+					}));
 				}
 
 				public void exceptionOccurred(Exception exception)
@@ -1429,9 +1424,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage, final boolean sendfailure)
 	{
 		SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingResultListener<IClockService>()
+			.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 		{
-			public void customResultAvailable(final IClockService clock)
+			public void resultAvailable(final IClockService clock)
 			{
 				StringBuffer buf = new StringBuffer();
 				buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
@@ -1445,11 +1440,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				setUserState(cid, Boolean.TRUE, null, null, null);
 			}
 			
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				// Ignore...
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -1576,9 +1571,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				}
 				else
 				{
-					getServiceAccess().addResultListener(new SwingResultListener<IExternalAccess>()
+					getServiceAccess().addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 					{
-						public void customResultAvailable(IExternalAccess ea)
+						public void resultAvailable(IExternalAccess ea)
 						{
 							if(rfilechooser==null)
 							{
@@ -1588,9 +1583,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							// Hack!!! remote file chooser has hack that assumes files without '.' are directories and vice versa
 							// -> accept both (assumed) files and directories and hope that the user only selects actual files. 
 							rfilechooser.chooseFile("Save file", tfpath.getText(), panel, JFileChooser.FILES_AND_DIRECTORIES, null)
-								.addResultListener(new SwingResultListener<FileData>()
+								.addResultListener(new SwingResultListener<FileData>(new IResultListener<FileData>()
 							{							
-								public void customResultAvailable(FileData file)
+								public void resultAvailable(FileData file)
 								{
 									if(file!=null)
 									{
@@ -1599,18 +1594,18 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 									}
 								}
 								
-								public void customExceptionOccurred(Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 									// ignore...
 								}
-							});							
+							}));							
 						}
 						
-						public void customExceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							// ignore...
 						}
-					});
+					}));
 				}
 			}
 		});

@@ -7,9 +7,10 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -390,9 +391,9 @@ public class DisplayPanel extends JComponent
 										// do not depend on hosting component!
 //										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
 										IFuture<IComponentManagementService>	fut	= SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IComponentManagementService.class);
-										fut.addResultListener(new SwingResultListener<IComponentManagementService>()
+										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
 										{
-											public void customResultAvailable(IComponentManagementService cms)
+											public void resultAvailable(IComponentManagementService cms)
 											{
 												if(progressdata!=null)
 												{
@@ -403,23 +404,23 @@ public class DisplayPanel extends JComponent
 														if(!progress.isFinished())
 														{
 															cms.getExternalAccess(progress.getProviderId())
-																.addResultListener(new SwingResultListener<IExternalAccess>()
+																.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 															{
-																public void customResultAvailable(IExternalAccess	ea)
+																public void resultAvailable(IExternalAccess	ea)
 																{
 																	// It is not really possible to define the progress services as required service.
 																	// Needs component specific progress service.
 																	SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
-																		.addResultListener(new SwingResultListener<IProgressService>()
+																		.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
 																	{
-																		public void customResultAvailable(IProgressService	ps)
+																		public void resultAvailable(IProgressService	ps)
 																		{
 																			if(ps!=null)
 																			{
 																				ps.getProgress(progress.getTaskId())
-																					.addResultListener(new SwingResultListener<Integer>()
+																					.addResultListener(new SwingResultListener<Integer>(new IResultListener<Integer>()
 																				{
-																					public void customResultAvailable(Integer current)
+																					public void resultAvailable(Integer current)
 																					{
 																						if(progressdata!=null && progressdata.containsKey(progress))
 																						{
@@ -432,7 +433,7 @@ public class DisplayPanel extends JComponent
 																						}
 																					}
 					
-																					public void customExceptionOccurred(Exception exception)
+																					public void exceptionOccurred(Exception exception)
 																					{
 																						// Component removed.
 																						if(progressdata!=null)
@@ -445,11 +446,11 @@ public class DisplayPanel extends JComponent
 																							progressupdate	= null;
 																						}
 																					}
-																				});
+																				}));
 																			}
 																		}
 					
-																		public void customExceptionOccurred(Exception exception)
+																		public void exceptionOccurred(Exception exception)
 																		{
 																			// Component removed.
 																			if(progressdata!=null)
@@ -462,10 +463,10 @@ public class DisplayPanel extends JComponent
 																				progressupdate	= null;
 																			}
 																		}
-																	});
+																	}));
 																}
 					
-																public void customExceptionOccurred(Exception exception)
+																public void exceptionOccurred(Exception exception)
 																{
 																	// Component removed.
 																	if(progressdata!=null)
@@ -478,18 +479,18 @@ public class DisplayPanel extends JComponent
 																		progressupdate	= null;
 																	}
 																}
-															});
+															}));
 														}
 													}
 												}
 											}
 		
-											public void customExceptionOccurred(Exception exception)
+											public void exceptionOccurred(Exception exception)
 											{
 												// ignore
 												exception.printStackTrace();
 											}
-										});
+										}));
 										return IFuture.DONE;
 									}
 								});
@@ -979,9 +980,9 @@ public class DisplayPanel extends JComponent
 		if(manservice!=null)
 		{
 			manservice.getGenerateService()
-				.addResultListener(new SwingResultListener<IGenerateService>()
+				.addResultListener(new SwingResultListener<IGenerateService>(new IResultListener<IGenerateService>()
 			{
-				public void customResultAvailable(IGenerateService gs)
+				public void resultAvailable(IGenerateService gs)
 				{
 	//				IGenerateService	gs	= (IGenerateService)result;
 					gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
@@ -999,13 +1000,13 @@ public class DisplayPanel extends JComponent
 					});
 				}
 				
-				public void customExceptionOccurred(Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					// Service not found -> ignore
 					calculating	= false;
 					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
 				}
-			});
+			}));
 		}
 		else
 		{
@@ -1014,9 +1015,9 @@ public class DisplayPanel extends JComponent
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ia.getServiceContainer().getRequiredService("generateservice")
-						.addResultListener(new SwingResultListener<Object>()
+						.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 					{
-						public void customResultAvailable(Object result)
+						public void resultAvailable(Object result)
 						{
 							IGenerateService	gs	= (IGenerateService)result;
 							gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
@@ -1034,13 +1035,13 @@ public class DisplayPanel extends JComponent
 							});
 						}
 						
-						public void customExceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							// Service not found -> ignore
 							calculating	= false;
 							DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
 						}
-					});
+					}));
 					return IFuture.DONE;
 				}
 			});

@@ -73,9 +73,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		this.state = STATE_UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
-		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void resultAvailable(IComponentIdentifier result)
 			{
 				if(result!=null)
 				{
@@ -88,14 +88,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				}
 			}
 			
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("ex: "+exception);
 				state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
 					? STATE_LOCKED : STATE_UNCONNECTED;
 				getModel().fireNodeChanged(ProxyComponentTreeNode.this);
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -131,9 +131,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	{
 		busy	= true;
 		// Get remote component identifier before calling searchChildren
-		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void resultAvailable(IComponentIdentifier result)
 			{
 				if(result!=null)
 				{
@@ -175,7 +175,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				}
 			}
 			
-			public void customExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("ex: "+exception);
 				state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
@@ -185,7 +185,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
 //				exception.printStackTrace();
 			}
-		});				
+		}));				
 	}
 
 	/**

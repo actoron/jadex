@@ -11,9 +11,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
 
@@ -777,11 +778,10 @@ public class GuiPanel extends JPanel
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
-						.addResultListener(new SwingResultListener()
+						.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
-						public void customResultAvailable(Object result)
+						public void resultAvailable(IClockService clock)
 						{
-							IClockService clock = (IClockService)result;
 							if(buy)
 							{
 								orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
@@ -884,11 +884,11 @@ public class GuiPanel extends JPanel
 							});
 						}
 						
-						public void customExceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							e	= exception;
 						}
-					});
+					}));
 					return IFuture.DONE;
 				}
 			});

@@ -20,9 +20,9 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -156,20 +156,20 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			}
 			else
 			{
-				initPlugin(p).addResultListener(new SwingResultListener<Void>()
+				initPlugin(p).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 				{
-					public void customResultAvailable(Void result)
+					public void resultAvailable(Void result)
 					{
 						setStatusText("Plugin loaded successfully: "+ p.getName());
 						ret.setResult(p);
 					}
 					
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						setStatusText("Plugin error: "+plclass);
 						ret.setResult(null);
 					}
-				});
+				}));
 			}
 			pccpanel.updateToolBar(null);
 		}

@@ -5,11 +5,30 @@ import jadex.commons.gui.SGUI;
 
 import javax.swing.SwingUtilities;
 
+
 /**
- *  Result listener that redirects callbacks on the swing thread.
+ *  Listener that allows to automatically trigger a timeout when
+ *  no result (or exception) was received after some timeout interval.
  */
-public abstract class SwingResultListener<E> implements IResultListener<E>
+public class SwingResultListener<E> implements IResultListener<E>
 {
+	//-------- attributes --------
+	
+	/** The delegation listener. */
+	protected IResultListener<E> listener;
+	
+	//-------- constructors --------
+
+	/**
+	 *  Create a new listener.
+	 */
+	public SwingResultListener(final IResultListener<E> listener)
+	{
+		this.listener = listener;
+	}
+	
+	//-------- methods --------
+	
 	/**
 	 *  Called when the result is available.
 	 * @param result The result.
@@ -64,13 +83,19 @@ public abstract class SwingResultListener<E> implements IResultListener<E>
 	
 	/**
 	 *  Called when the result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
-	public abstract void	customResultAvailable(E result);
+	public void	customResultAvailable(E result)
+	{
+		listener.resultAvailable(result);
+	}
 	
 	/**
 	 *  Called when an exception occurred.
-	 * @param exception The exception.
+	 *  @param exception The exception.
 	 */
-	public abstract void	customExceptionOccurred(Exception exception);
+	public void	customExceptionOccurred(Exception exception)
+	{
+		listener.exceptionOccurred(exception);
+	}
 }

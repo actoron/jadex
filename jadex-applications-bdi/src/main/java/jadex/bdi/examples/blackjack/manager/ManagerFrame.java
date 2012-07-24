@@ -21,8 +21,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
@@ -137,18 +137,18 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
 //					Thread.dumpStack();
-				cms.addResultListener(new SwingResultListener<IComponentManagementService>()
+				cms.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
 				{
-					public void customResultAvailable(final IComponentManagementService ces)
+					public void resultAvailable(final IComponentManagementService ces)
 					{
 //						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
 						dealeraid = new ComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
 						dealertf.setText(dealeraid.getName());
 					}
-					public void customExceptionOccurred(Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 					}
-				});
+				}));
 				return IFuture.DONE;
 			}
 		});
