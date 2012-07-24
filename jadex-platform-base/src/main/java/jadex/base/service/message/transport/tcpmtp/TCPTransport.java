@@ -2,6 +2,7 @@ package jadex.base.service.message.transport.tcpmtp;
 
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.ISendTask;
+import jadex.base.service.message.streams.StreamSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -352,9 +353,18 @@ public class TCPTransport implements ITransport
 						{
 							public IFuture<Void> execute(Void args)
 							{
-								if(con.send(task.getProlog(), task.getData()))
+								if(task instanceof StreamSendTask)
+								{
+									System.out.println("transport.send "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+								}
+								
+								if(con.send(task.getProlog(), task.getData(), task))
 								{
 	//								System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
+									if(task instanceof StreamSendTask)
+									{
+										System.out.println("transport.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+									}
 									return IFuture.DONE;
 								}
 								else

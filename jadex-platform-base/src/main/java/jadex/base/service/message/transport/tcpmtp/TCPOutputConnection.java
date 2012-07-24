@@ -1,13 +1,13 @@
 package jadex.base.service.message.transport.tcpmtp;
 
+import jadex.base.service.message.ISendTask;
+import jadex.base.service.message.streams.StreamSendTask;
 import jadex.base.service.message.transport.tcpmtp.TCPTransport.Cleaner;
 import jadex.commons.SUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -70,16 +70,36 @@ public class TCPOutputConnection
 	 *  (todo: relax synchronization by performing sends 
 	 *  on extra sender thread of transport)
 	 */
-	public synchronized boolean send(byte[] prolog, byte[] data)
+	public synchronized boolean send(byte[] prolog, byte[] data, ISendTask task)
 	{
 		boolean ret = false;
 		
 		try
 		{
+			if(task instanceof StreamSendTask)
+			{
+				System.out.println("connection.send0 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+			}
 			sos.write(SUtil.intToBytes(prolog.length+data.length));
+			if(task instanceof StreamSendTask)
+			{
+				System.out.println("connection.send1 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+			}
 			sos.write(prolog);
+			if(task instanceof StreamSendTask)
+			{
+				System.out.println("connection.send2 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+			}
 			sos.write(data);
+			if(task instanceof StreamSendTask)
+			{
+				System.out.println("connection.send3 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+			}
 			sos.flush();
+			if(task instanceof StreamSendTask)
+			{
+				System.out.println("connection.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+			}
 			ret = true;
 //			cleaner.refresh();
 		}
