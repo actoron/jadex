@@ -83,9 +83,6 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		 -->
-		<!--<file> <source>docs/changes.txt</source> <outputDirectory>/</outputDirectory> 
-			<filtered>true</filtered> </file> <file> <source>docs/howtostart.txt</source> 
-			<outputDirectory>/</outputDirectory> </file> -->
 			
 		<!-- ======== files required for building the distribution ======== -->
 		
@@ -112,8 +109,7 @@
 		<file>
 			<source>docs/readme-building.txt</source>
 			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-						
+		</file>						
 	</files>
 
 </assembly>
