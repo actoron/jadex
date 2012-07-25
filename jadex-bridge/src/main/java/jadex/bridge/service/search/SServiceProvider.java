@@ -255,8 +255,6 @@ public class SServiceProvider
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					if(type.getName().indexOf("IRepositoryAccess")!=-1)
-						System.out.println("ex: "+exception);
 //					if(type.toString().indexOf("IFile")!=-1)
 //						System.out.println("Ex result: "+exception);
 					ret.setException(exception);

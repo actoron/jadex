@@ -349,7 +349,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public void customResultAvailable(Object result)
 			{
-				ret.setResult((IExternalAccess) result);
+				ret.setResult((IExternalAccess)result);
 			}
 		});
 		

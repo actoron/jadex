@@ -99,7 +99,18 @@ public class ParallelSearchManager implements ISearchManager
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				// The search is considered as success if at least
+				// one service could be found.
+				// Otherwise search in a disconnected platform could
+				// raise a timeout exception which is propagated here.
+				if(ret.getIntermediateResults().size()>0)
+				{
+					ret.setFinished();
+				}
+				else
+				{
+					ret.setException(exception);
+				}
 			}
 		});
 		return ret;
