@@ -243,7 +243,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 	/**
-	 * This start´s the jMonkey Application
+	 * This starts the jMonkey Application
 	 */
 	public void startApp()
 	{
@@ -291,9 +291,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 	private Node updateMonkey(List<Object[]> objectList)
 	{
 		// Clear the Refresh "listener"
-		// This List hold´s every object that has been drawn in the last
-		// Draw-"round". The List is necessary to make it possible to check
-		// for Object´s that has to be removed from the 3d Szene
+		// This list holds every object that has been drawn in the last
+		// Draw-"round". The list is necessary to make it possible to check
+		// for objects that has to be removed from the 3d Szene
 		_drawObjectsRefresh = new HashSet<Object>();
 
 		// Step 2 : Create and/or update all visible Visuals
@@ -370,7 +370,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 				objectNode.setLocalTranslation(position);
 
 				// The visuals for each DrawableCombiner3d (stored in a the
-				// objectNode, influenced by it´s holder the SpaceObject
+				// objectNode, influenced by its holder the SpaceObject
 				// (sobj)...
 				createObjects(objectNode, combiner3d, sobj);
 
@@ -445,7 +445,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 	/**
-	 * the Dynamic Visuals für the Visualization of the Selection are created
+	 * the Dynamic Visuals for the Visualization of the Selection are created
 	 * and updated here
 	 */
 	private void createAndUpdateVisualSelection(int selected)
@@ -492,7 +492,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 	/**
-	 * Handle the Height Value. Check if it´s set or not
+	 * Handle the Height Value. Check if its set or not
 	 */
 	private Vector3f handleHeightValue(Object posObj)
 	{
