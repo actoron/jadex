@@ -35,36 +35,58 @@
 		</plugins>
 	</build>	
 
-	<profiles>
+	<!-- ======== Base modules without add-ons ======== -->
 	
-		<!-- ======== Javadocs ======== -->
-		
-		<profile>
-			<id>jadex-javadocs-artifacts</id>
-			<modules>
-				<module>jadex-parent</module>
-				<module>jadex-javadocs</module>
-				<module>jadex-commons</module>
-				<module>jadex-xml</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-bridge</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-kernel-bdibpmn</module>
-				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-extension-agr</module>
-				<module>jadex-applib-bdi</module>
-				<module>jadex-tools-base</module>
-				<module>jadex-tools-base-swing</module>
-				<module>jadex-platform-extension-webservice</module>
-			</modules>
-		</profile>		
+	<modules>
+		<module>jadex-parent</module>
+		<module>jadex-commons</module>
+		<module>jadex-xml</module>
+		<module>jadex-javaparser</module>
+		<module>jadex-bridge</module>
+		<module>jadex-platform-base</module>
+		<module>jadex-nuggets</module>
 
-		<!-- ======== Full ======== -->
+		<module>jadex-kernel-base</module>
+		<module>jadex-kernel-component</module>
+		<module>jadex-kernel-application</module>
+		<module>jadex-kernel-bdi</module>
+		<module>jadex-kernel-micro</module>
+		<module>jadex-kernel-bpmn</module>
+		<module>jadex-kernel-bdibpmn</module>
+		<module>jadex-kernel-gpmn</module>
+		<module>jadex-kernel-extension-envsupport</module>
+		<module>jadex-kernel-extension-envsupport-opengl</module>
+		<module>jadex-kernel-extension-agr</module>
 
+		<module>jadex-applib-bdi</module>
+		<module>jadex-applications-bdi</module>
+		<module>jadex-applications-micro</module>
+		<module>jadex-applications-bpmn</module>
+		<module>jadex-applications-bdibpmn</module>
+		<module>jadex-applications-gpmn</module>
+		<module>jadex-applications-web</module>
+		<module>jadex-applications-webservice</module>
+
+		<module>jadex-rules</module>
+		<module>jadex-rules-applications</module>
+		<module>jadex-rules-tools</module>
+
+		<module>jadex-tools-base</module>
+		<module>jadex-tools-base-swing</module>
+		<module>jadex-runtimetools-swing</module>
+		<module>jadex-tools-bdi</module>
+		<module>jadex-tools-bpmn</module>
+		<module>jadex-tools-comanalyzer</module>
+		<module>jadex-platform-standalone</module>
+		<module>jadex-platform-standalone-launch</module>
+		<module>jadex-platform-relay-web</module>
+		<module>jadex-platform-extension-webservice</module>
+	</modules>
+			
+	<profiles>	    
+		<!-- ======== Profile for dist assembly ======== -->
 		<profile>
-			<id>jadex-full-dist</id>
+			<id>dist</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -207,108 +229,9 @@
 					</plugin> -->
 				</plugins>
 			</build>
-			<modules>
-				<module>jadex-parent</module>
-				<module>jadex-parent-pro</module>
-				<module>jadex-commons</module>
-				<module>jadex-xml</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-bridge</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-nuggets</module>
-
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-kernel-bdibpmn</module>
-				<module>jadex-kernel-gpmn</module>
-				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-extension-envsupport-opengl</module>
-				<module>jadex-kernel-extension-agr</module>
-
-				<module>jadex-applib-bdi</module>
-				<module>jadex-applications-bdi</module>
-				<module>jadex-applications-micro</module>
-				<module>jadex-applications-bpmn</module>
-				<module>jadex-applications-bdibpmn</module>
-				<module>jadex-applications-gpmn</module>
-				<module>jadex-applications-web</module>
-				<module>jadex-applications-webservice</module>
-
-				<module>jadex-rules</module>
-				<module>jadex-rules-applications</module>
-				<module>jadex-rules-tools</module>
-
-				<module>jadex-tools-base</module>
-				<module>jadex-tools-base-swing</module>
-				<module>jadex-runtimetools-swing</module>
-				<module>jadex-tools-bdi</module>
-				<module>jadex-tools-bpmn</module>
-				<module>jadex-tools-comanalyzer</module>
-				<module>jadex-platform-standalone</module>
-				<module>jadex-platform-standalone-launch</module>
-				<module>jadex-platform-relay-web</module>
-				<module>jadex-platform-extension-webservice</module>
-				<module>jadex-platform-extension-maven</module>
-				
-				<!-- <module>jadex-apleis</module> -->
-			</modules>
 		</profile>
 		
-		<profile>
-			<id>jadex-full-artifacts</id>
-			<modules>
-				<module>jadex-parent</module>
-				<module>jadex-parent-pro</module>
-				<module>jadex-commons</module>
-				<module>jadex-xml</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-bridge</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-platform-standalone</module>
-				<module>jadex-nuggets</module>
-
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-kernel-bdibpmn</module>
-				<module>jadex-kernel-gpmn</module>
-				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-extension-agr</module>
-				<module>jadex-platform-extension-webservice</module>
-
-				<module>jadex-applib-bdi</module>
-				<module>jadex-applications-bdi</module>
-				<module>jadex-applications-micro</module>
-				<module>jadex-applications-bpmn</module>
-				<module>jadex-applications-bdibpmn</module>
-				<module>jadex-applications-gpmn</module>
-				<module>jadex-applications-webservice</module>
-
-				<module>jadex-rules</module>
-				<module>jadex-rules-applications</module>
-				<module>jadex-rules-tools</module>
-
-				<module>jadex-tools-base</module>
-				<module>jadex-tools-base-swing</module>
-				<module>jadex-runtimetools-swing</module>
-				<module>jadex-tools-bdi</module>
-				<module>jadex-tools-bpmn</module>
-				<module>jadex-tools-comanalyzer</module>
-				
-				<module>jadex-platform-relay-web</module>
-				<module>jadex-platform-extension-maven</module>
-				<module>jadex-platform-extension-natmtp</module>
-			</modules>
-		</profile>
-
-		<!-- ======== 3D ======== -->
+		<!-- ======== 3D modules and assembly ======== -->
 		
 		<profile>
 		    <id>jadex-3d</id>
@@ -316,10 +239,6 @@
 	            <file>
 	                <exists>jadex-kernel-extension-envsupport-jmonkey</exists>
 	            </file>
-	            <property>
-	                <name>hugo</name>
-	                <value>huhu</value>
-	            </property>
 	        </activation>
 			<build>
 				<plugins>
@@ -365,63 +284,64 @@
 		    </modules>
 		</profile>
 
-		<!-- ======== WfMS ======== -->
-
-		<!-- <profile>
-			<id>jadex-wfms-dist</id>
+		
+		<!-- ======== Maven dependency extension modules and assembly ======== -->
+		
+		<profile>
+		    <id>jadex-extension-maven-dependencies</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-platform-extension-maven</exists>
+	            </file>
+	        </activation>
+	        <!-- 
 			<build>
-				<finalName>jadex-wfms-${project.version}</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-							<descriptors>
-								<descriptor>src/main/assembly/dist-assembly-wfms.xml
-								</descriptor>
-							</descriptors>
-						</configuration>
 						<executions>
 							<execution>
-								<id>make-assembly</id>
+								<id>sources-3d</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
+								<configuration>
+									<!- - .zip is appended automatically to the final name. - ->
+									<finalName>sources-3d</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-3d</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!- - .zip is appended automatically to the final name. - ->
+									<finalName>jadex-3d-addon-${project.version}</finalName>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3d.xml</descriptor>
+									</descriptors>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
 				</plugins>
 			</build>
-			<modules>
-				<module>jadex-parent</module>
-				<module>jadex-commons</module>
-				<module>jadex-bridge</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-bdibpmn</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-gpmn</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-rules</module>
-				<module>jadex-xml</module>
-				<module>jadex-applications-wfms</module>
-				<module>jadex-platform-wfms</module>
-				<module>jadex-tools-base</module>
-			</modules>
-		</profile> -->
+ -->
+ 	        <modules>
+				<module>jadex-parent-pro</module>
+				<module>jadex-platform-extension-maven</module>
+		    </modules>
+		</profile>
 		
-		<!-- ======== eclipse (all modules) ======== -->
+		<!-- ======== eclipse (all modules) ======== - ->
 
 		<profile>
 			<id>jadex-eclipse-projects</id>
@@ -431,7 +351,6 @@
 			<modules>
 				<module>jadex-parent</module>
 				<module>jadex-parent-pro</module>
-				<!-- <module>jadex-kernel-bdi-continuations</module> -->
 				<module>jadex-javadocs</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
@@ -454,7 +373,7 @@
 				<module>jadex-kernel-extension-agr</module>
 				<module>jadex-kernel-bdiv3</module>
 
-				<!--<module>jadex-kernel-bdi-continuations</module>-->
+				<!- -<module>jadex-kernel-bdi-continuations</module>- ->
 
 				<module>jadex-applib-bdi</module>
 				<module>jadex-applications-bdi</module>
@@ -487,7 +406,7 @@
 				<module>jadex-rules-eca</module>
 
 				<module>jadex-platform-wfms</module>
-				<!-- <module>jadex-wfms-launch</module> -->
+				<!- - <module>jadex-wfms-launch</module> - ->
 				<module>jadex-applications-wfms</module>
 
 				<module>jadex-platform-jade</module>
@@ -500,12 +419,11 @@
 				<module>sodekovs-util</module>
 				<module>sodekovs-productionline</module>
 				<module>sodekovs-applications</module>
-				<!-- <module>jadex-distributed</module> -->
 				<module>jadex-xwiki</module>
 				
 			</modules>
 		</profile>
-		
+		-->
 		<!-- ======== Android ======== -->
 
 		<profile>
