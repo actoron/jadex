@@ -14,10 +14,22 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-deploy-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
 					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<archiverConfig>
+						<duplicateBehavior>skip</duplicateBehavior>
+					</archiverConfig>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -41,8 +53,6 @@
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-extension-envsupport-opengl</module>
-				<module>jadex-kernel-extension-envsupport-jmonkey</module>
 				<module>jadex-kernel-extension-agr</module>
 				<module>jadex-applib-bdi</module>
 				<module>jadex-tools-base</module>
@@ -71,15 +81,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-							<descriptors>
-								<descriptor>src/main/assembly/dist-assembly-xml.xml</descriptor>
-							</descriptors>
-						</configuration>
 						<executions>
 							<execution>
 								<id>make-assembly</id>
@@ -87,6 +88,11 @@
 								<goals>
 									<goal>single</goal>
 								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-xml.xml</descriptor>
+									</descriptors>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -141,16 +147,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-							<descriptors>
-								<descriptor>src/main/assembly/dist-assembly-rules.xml
-								</descriptor>
-							</descriptors>
-						</configuration>
 						<executions>
 							<execution>
 								<id>make-assembly</id>
@@ -158,6 +154,12 @@
 								<goals>
 									<goal>single</goal>
 								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-rules.xml
+										</descriptor>
+									</descriptors>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -202,12 +204,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-						</configuration>
 						<executions>
 							<execution>
 								<id>jadex-example-project</id>
@@ -246,34 +242,6 @@
 								<configuration>
 									<descriptors>
 										<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>sources-3d</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<!-- .zip is appended automatically to the final name. -->
-									<finalName>sources-3d</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>make-assembly-3d</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<!-- .zip is appended automatically to the final name. -->
-									<finalName>jadex-3d-addon-${project.version}</finalName>
-								    <descriptors>
-										<descriptor>src/main/assembly/dist-assembly-3d.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
@@ -392,7 +360,6 @@
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-kernel-extension-envsupport</module>
 				<module>jadex-kernel-extension-envsupport-opengl</module>
-				<module>jadex-kernel-extension-envsupport-jmonkey</module>
 				<module>jadex-kernel-extension-agr</module>
 
 				<module>jadex-applib-bdi</module>
@@ -446,7 +413,6 @@
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-kernel-extension-envsupport</module>
-				<!-- <module>jadex-kernel-extension-envsupport-opengl</module> -->
 				<module>jadex-kernel-extension-agr</module>
 				<module>jadex-platform-extension-webservice</module>
 
@@ -473,6 +439,63 @@
 				<module>jadex-platform-extension-maven</module>
 				<module>jadex-platform-extension-natmtp</module>
 			</modules>
+		</profile>
+
+		<!-- ======== 3D ======== -->
+		
+		<profile>
+		    <id>jadex-3d</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-kernel-extension-envsupport-jmonkey</exists>
+	            </file>
+	            <property>
+	                <name>hugo</name>
+	                <value>huhu</value>
+	            </property>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>sources-3d</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-3d</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-3d</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-3d-addon-${project.version}</finalName>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3d.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+	        <modules>
+		        <module>jadex-kernel-extension-envsupport-jmonkey</module>
+		    </modules>
 		</profile>
 
 		<!-- ======== WfMS ======== -->

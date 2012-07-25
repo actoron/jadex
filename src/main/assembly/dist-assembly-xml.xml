@@ -54,14 +54,6 @@
 
 	<files>
 		<file>
-			<source>pom.xml</source>
-			<outputDirectory>sources</outputDirectory>
-		</file>
-		<!-- <file>
-			<source>/src/main/assembly/dist-assembly-xml.xml</source>
-			<outputDirectory>sources/src/main/assembly</outputDirectory>
-		</file>-->
-		<file>
 			<source>docs/readme.txt</source>
 			<outputDirectory>/</outputDirectory>
 			<filtered>true</filtered>
@@ -75,13 +67,53 @@
 			<source>docs/license.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
+		
+		<file>
+			<source>pom-xml-dist.xml</source>
+			<outputDirectory>sources</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>docs/readme-building.txt</source>
+			<outputDirectory>sources</outputDirectory>
+		</file>
+<!-- 
 		<file>
 			<source>target/xml_guide.pdf</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
+		 -->
 		<!--<file> <source>docs/changes.txt</source> <outputDirectory>/</outputDirectory> 
 			<filtered>true</filtered> </file> <file> <source>docs/howtostart.txt</source> 
 			<outputDirectory>/</outputDirectory> </file> -->
+			
+		<!-- ======== files required for building the distribution ======== -->
+		
+		<file>
+		    <source>src/main/assembly/dist-assembly-xml.xml</source>
+		    <outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>pom-xml-dist.xml</source>
+			<outputDirectory>sources</outputDirectory>
+		</file>
+		<file>
+			<source>docs/readme.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/xml-readme.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/license.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/readme-building.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+						
 	</files>
 
 </assembly>
