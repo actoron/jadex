@@ -6,6 +6,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
@@ -24,16 +25,23 @@ public class RemoteReference2Test extends TestCase
 		long timeout	= 3000000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
-		// Start platform1 used for remote access. (underscore in name assures both platforms use same password)
-		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
+		// Underscore in platform name assures both platforms use same password.
+		String	pid	= SUtil.createUniqueId(getName(), 3)+"-*";
+		
+		// Start platform1 used for remote access.
+		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", pid,
 //			"-relaytransport", "false",
+			"-deftimeout", Long.toString(timeout),
+//			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			}).get(sus, timeout);
 		
-		// Start platform2 with services. (underscore in name assures both platforms use same password)
-		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
+		// Start platform2 with services.
+		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", pid,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 //			"-relaytransport", "false",
+			"-deftimeout", Long.toString(timeout),
+//			"-logging", "true",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
 		
@@ -50,10 +58,12 @@ public class RemoteReference2Test extends TestCase
 		cms2.createComponent(null, "jadex/base/service/remote/ProxyAgent.class", new CreationInfo(args2), null).get(sus, timeout);
 		
 		// Find local service with direct remote search.
+//		System.out.println("searching local");
 		ILocalService	service1	= SServiceProvider
 			.getService(platform1.getServiceProvider(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(sus, timeout);
 		
 		// Search for remote search service from local platform
+//		System.out.println("searching global");
 		ISearchService	search	= SServiceProvider
 			.getService(platform1.getServiceProvider(), ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(sus, timeout);
 		// Invoke service to obtain reference to local service.

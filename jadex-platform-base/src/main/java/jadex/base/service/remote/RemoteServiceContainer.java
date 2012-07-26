@@ -9,6 +9,8 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.TypeResultSelector;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -105,6 +107,15 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 								if(!ret.getIntermediateResults().contains(res))
 									ret.addIntermediateResult((IService)res);
 							}
+							
+							if(res==null || res instanceof Collection && ((Collection)res).isEmpty())
+							{
+//								if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().toString().indexOf("ILocalService")!=-1)
+//								{
+//									System.out.println("remote search has no result: "+componentid+", "+res);
+//								}
+							}
+
 //							ret.setResult(selector.getResult(results));
 //							ret.setResult(results);
 							ret.setFinished();
@@ -112,7 +123,10 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 						
 						public void exceptionOccurred(Exception exception)
 						{
-//							System.out.println("remote search failed: "+componentid+", "+exception);
+//							if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().toString().indexOf("ILocalService")!=-1)
+//							{
+//								System.out.println("remote search failed: "+componentid+", "+exception);
+//							}
 //							ret.setFinished();
 							// todo: notify exception?
 							ret.setException(exception);
@@ -123,6 +137,10 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 			
 			public void exceptionOccurred(Exception exception)
 			{
+//				if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().toString().indexOf("ILocalService")!=-1)
+//				{
+//					System.out.println("remote search failed locally: "+componentid+", "+exception);
+//				}
 				ret.setException(exception);
 			}
 		});

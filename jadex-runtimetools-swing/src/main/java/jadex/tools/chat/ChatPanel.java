@@ -29,10 +29,10 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -44,6 +44,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -478,12 +479,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								try
 								{
 									boolean	nodirs	= true;
-									List<?>	files	= (List<?>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-	//								System.out.println("importData: "+files);
-									for(int i=0; nodirs && i<files.size(); i++)
-									{
-										nodirs	= !((File)files.get(i)).isDirectory();
-									}
+									
+									// Cannot check due to java bug on windows, grrr
+									// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6759788
+//									List<?>	files	= (List<?>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+//	//								System.out.println("importData: "+files);
+//									for(int i=0; nodirs && i<files.size(); i++)
+//									{
+//										nodirs	= !((File)files.get(i)).isDirectory();
+//									}
 									
 									if(nodirs)
 									{
