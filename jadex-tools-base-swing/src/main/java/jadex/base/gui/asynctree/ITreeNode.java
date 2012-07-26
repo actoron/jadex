@@ -1,7 +1,6 @@
 package jadex.base.gui.asynctree;
 
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 
 import java.util.List;
 

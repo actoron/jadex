@@ -58,4 +58,10 @@ public interface ISettingsService extends IService
 	 *  @return A future indicating when properties have been saved.
 	 */
 	public IFuture<Void>	saveProperties();
+	
+	/**
+	 *  Set the save on exit policy.
+	 *  @param saveonexit The saveonexit flag.
+	 */
+	public IFuture<Void> setSaveOnExit(boolean saveonexit);
 }

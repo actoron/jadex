@@ -55,7 +55,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 		this.rid = rid;
 		this.basecl	= basecl;
 		this.delegates = delegates.clone();
-//		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));
+//		System.out.println("d1 : "+rid+" "+SUtil.arrayToString(delegates));
 	}
 
 	//-------- methods --------

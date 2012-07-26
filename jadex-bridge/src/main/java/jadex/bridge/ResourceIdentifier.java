@@ -36,6 +36,9 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 */
 	public ResourceIdentifier(ILocalResourceIdentifier lid, IGlobalResourceIdentifier gid)
 	{
+		if(lid.getUrl()!=null && lid.getUrl().toString().indexOf("jar:")!=-1)
+			System.out.println("hjere");
+		
 		this.lid = lid;
 		this.gid = gid;
 	}

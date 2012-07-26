@@ -401,6 +401,17 @@ public class ModelTreePanel extends FileTreePanel
 	}
 	
 	/**
+	 *  Add a top level node.
+	 */
+	public void addTopLevelNode(IResourceIdentifier rid)
+	{
+		final RootNode root = (RootNode)getModel().getRoot();
+		ITreeNode node = factory.createNode(root, model, tree, rid, 
+			iconcache, exta, factory);
+		addNode(node);
+	}
+	
+	/**
 	 *  Get the action.
 	 *  @param name The action name.
 	 *  @return The action.
@@ -489,6 +500,9 @@ public class ModelTreePanel extends FileTreePanel
 	 */
 	public static IFuture<IResourceIdentifier> createResourceIdentifier(IExternalAccess exta, final String filename)
 	{
+		if(filename.indexOf("jar:")!=-1)
+			System.out.println("hhhhhhh");
+		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
 //		ret.addResultListener(new IResultListener<IResourceIdentifier>()

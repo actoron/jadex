@@ -3,8 +3,12 @@ package jadex.tools.jcc;
 import jadex.base.gui.AboutDialog;
 import jadex.base.gui.StatusBar;
 import jadex.bridge.IVersionInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
@@ -170,7 +174,21 @@ public class ControlCenterWindow extends JFrame
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				controlcenter.setSaveOnExit(soe.isSelected());
+				final boolean sel = soe.isSelected();
+				controlcenter.setSaveOnExit(sel);
+				SServiceProvider.getService(controlcenter.getPCC().getPlatformAccess().getServiceProvider(),ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<ISettingsService>()
+				{
+					public void resultAvailable(ISettingsService setser)
+					{
+						setser.setSaveOnExit(sel);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// no problem if settings service is not available
+					}
+				});
 			}
 		});
 		

@@ -9,7 +9,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;

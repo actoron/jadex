@@ -2,7 +2,6 @@ package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.commons.IRemoteFilter;
 
 import java.io.File;
 

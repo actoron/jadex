@@ -216,9 +216,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								if (affectedkernels != null)
 								{
 									String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
-									for (int i = 0; i < keys.length; ++i)
-										for (Iterator it = affectedkernels.iterator(); it.hasNext(); )
+									for(int i = 0; i < keys.length; ++i)
+									{
+										for(Iterator it = affectedkernels.iterator(); it.hasNext(); )
+										{
 											kernellocationcache.remove(keys[i], it.next());
+										}
+									}
 								}
 								potentialurls.remove(url);
 								validurls.remove(url);
@@ -834,8 +838,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 		else
 		{
-			if (potentialurls.isEmpty() || isrecur)
+			if(potentialurls.isEmpty() || isrecur)
+			{
 				ret.setResult(null);
+			}
 			else
 			{
 				multiplexer.doCall(new IResultCommand()
@@ -1042,7 +1048,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				}
 				else
 				{
-					final URL url = (URL) potentialurls.iterator().next();
+					final URL url = (URL)potentialurls.iterator().next();
 //					if(url.toString().indexOf("bdi")!=-1)
 //						System.out.println("searchPotentialURLs2: "+url);
 					quickKernelSearch(url, rid).addResultListener(ia.createResultListener(new IResultListener()

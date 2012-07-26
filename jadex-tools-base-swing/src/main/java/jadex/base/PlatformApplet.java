@@ -1,6 +1,7 @@
 package jadex.base;
 
 import jadex.commons.BrowserLauncher2;
+
 import java.applet.Applet;
 import java.util.StringTokenizer;
 

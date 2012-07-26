@@ -2,7 +2,6 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileTreePanel;
-import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;

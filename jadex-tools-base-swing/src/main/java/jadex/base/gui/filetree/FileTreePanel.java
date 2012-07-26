@@ -8,7 +8,6 @@ import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.IRemoteFilter;
@@ -331,17 +330,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		final RootNode root = (RootNode)getModel().getRoot();
 		ITreeNode node = factory.createNode(root, model, tree, file, 
-			iconcache, exta, factory);
-		addNode(node);
-	}
-	
-	/**
-	 *  Add a top level node.
-	 */
-	public void addTopLevelNode(IResourceIdentifier rid)
-	{
-		final RootNode root = (RootNode)getModel().getRoot();
-		ITreeNode node = factory.createNode(root, model, tree, rid, 
 			iconcache, exta, factory);
 		addNode(node);
 	}

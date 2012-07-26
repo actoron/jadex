@@ -559,7 +559,11 @@ public class ControlCenter
 		window.getStatusBar().setText("Saving platform settings for: "+pcc.getPlatformAccess().getComponentIdentifier().getPlatformName());
 		window.closePlatformPanel(pcc);
 		
-		IFuture	saved	= isSaveOnExit() ? pcc.savePlatformProperties() : IFuture.DONE;
+		// Do not save settings when closing remote platform window
+		boolean allowed = pcc.getPlatformAccess().getComponentIdentifier().getRoot().equals(jccaccess.getComponentIdentifier().getRoot());
+//		System.out.println("allowed: "+allowed);
+		
+		IFuture	saved	= isSaveOnExit() && allowed? pcc.savePlatformProperties() : IFuture.DONE;
 		saved.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)

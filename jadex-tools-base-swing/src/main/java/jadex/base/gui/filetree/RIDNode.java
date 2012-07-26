@@ -24,6 +24,8 @@ import javax.swing.JTree;
 
 /**
  *  Node for rid based jar or local artifact directory.
+ *  
+ *  todo: move to modeltree?!
  */
 public class RIDNode extends AbstractTreeNode implements IFileNode
 {

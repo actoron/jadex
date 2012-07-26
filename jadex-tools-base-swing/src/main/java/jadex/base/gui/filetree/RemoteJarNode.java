@@ -125,12 +125,13 @@ public class RemoteJarNode extends RemoteDirNode
 		return ret;
 	}
 
-	/**
-	 *  Get the file path.
-	 */
-	public String getFilePath()
-	{
-		// Add jar:file: protocol for comparability (e.g. in ModelTreePanel)
-		return "jar:file:"+super.getFilePath().replace('\\', '/')+"!/";
-	}
+//	/**
+//	 *  Get the file path.
+//	 */
+//	public String getFilePath()
+//	{
+//		// Add jar:file: protocol for comparability (e.g. in ModelTreePanel)
+//		// Must not! add jar:file: as this is no valid url (from filename).
+////		return "jar:file:"+super.getFilePath().replace('\\', '/')+"!/";
+//	}
 }

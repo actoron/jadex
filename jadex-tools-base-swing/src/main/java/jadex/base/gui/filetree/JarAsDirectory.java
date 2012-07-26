@@ -162,6 +162,7 @@ public class JarAsDirectory	extends File
 		{
 			jarurl	= "file:"+jarpath.replace('\\', '/');
 		}
+		
 		if(entry!=null)
 		{
 //			if(jarpath.startsWith("/"))
@@ -171,9 +172,13 @@ public class JarAsDirectory	extends File
 		}
 		else
 		{
-//			ret	= jarpath;
-			ret = "jar:"+jarurl+"!/";
+			ret	= jarpath;
+			
+			// The variant below delivers a jar path for the jar file itself which is not correct
+			// as the jar notation should be used for files inside of the jar.
+//			ret = "jar:"+jarurl+"!/";
 		}
+		
 		return ret;
 	}
 	

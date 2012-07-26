@@ -1,6 +1,5 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.gui.componenttree.ServiceContainerNode;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

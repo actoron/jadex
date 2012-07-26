@@ -13,8 +13,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.IMenuItemConstructor;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

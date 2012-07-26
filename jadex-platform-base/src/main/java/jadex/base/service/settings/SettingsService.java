@@ -353,6 +353,17 @@ public class SettingsService extends BasicService implements ISettingsService
 		return ret;
 	}
 	
+	/**
+	 *  Set the save on exit policy.
+	 *  @param saveonexit The saveonexit flag.
+	 */
+	public IFuture<Void> setSaveOnExit(boolean saveonexit)
+	{
+		this.saveonexit = saveonexit;
+		return IFuture.DONE;
+	}
+	
+	//-------- Helper methods --------
 
 	/**
 	 * Writes the given properties into a Store, usually a file.
@@ -370,8 +381,6 @@ public class SettingsService extends BasicService implements ISettingsService
 		PropertiesXMLHelper.write(props, os, getClass().getClassLoader());
 		os.close();
 	}
-	
-	//-------- Helper methods --------
 	
 	/**
 	 * Returns the File object for a path to a file.
