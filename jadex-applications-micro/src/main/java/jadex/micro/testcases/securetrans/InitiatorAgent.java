@@ -21,8 +21,8 @@ import jadex.micro.testcases.TestAgent;
 import java.util.Collection;
 
 /**
- *  Test if the @SecureTransmission accnotation works.
- *  Uses a service with two method signaures, one unsecured / one secured.
+ *  Test if the @SecureTransmission annotation works.
+ *  Uses a service with two method signatures, one unsecured / one secured.
  *  Uses a cross platform setting with / without secure transport.
  *  (Assumes that the host platform has a secure transport).
  *  

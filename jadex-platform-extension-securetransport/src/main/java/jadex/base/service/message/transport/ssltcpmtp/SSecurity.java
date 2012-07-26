@@ -1,4 +1,4 @@
-package jadex.commons;
+package jadex.base.service.message.transport.ssltcpmtp;
 
 import java.io.File;
 import java.io.FileInputStream;

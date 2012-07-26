@@ -121,7 +121,7 @@ public class ClassChooserPanel	extends JPanel
 					for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
 					{
 						JarEntry	je	= e.nextElement();
-						if(filter.filter(f))	
+						if(filter.filter(je))	
 						{
 							ret.add(je.getName());
 						}

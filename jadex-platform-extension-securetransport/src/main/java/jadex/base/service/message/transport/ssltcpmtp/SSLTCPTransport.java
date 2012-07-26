@@ -5,7 +5,6 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.SSecurity;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -60,13 +59,21 @@ public class SSLTCPTransport extends TCPTransport
 	protected String keypass;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Static method for reflective creation to allow platform start without add-on.
+	 */
+	public static SSLTCPTransport	create(IServiceProvider container, int port)
+	{
+		return new SSLTCPTransport(container, port);
+	}
 
 	/**
 	 *  Init the transport.
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public SSLTCPTransport(final IServiceProvider container, int port)
+	public SSLTCPTransport(IServiceProvider container, int port)
 	{
 		this(container, port, true);
 	}
@@ -98,7 +105,6 @@ public class SSLTCPTransport extends TCPTransport
 					public void customResultAvailable(String[] info)
 					{
 						setKeystoreInfo(info[0], info[1], info[2]);
-						
 						SSLTCPTransport.super.start().addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});

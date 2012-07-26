@@ -19,8 +19,14 @@
 				<exclude>*:*-maven</exclude>
 			    <!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
+				<!-- Exclude all jadex pro modules -->
+				<exclude>*:*-pro</exclude>
 				<!-- Exclude all maven distribution modules -->
-				<exclude>*:*-distribution</exclude>
+				<exclude>*:*-distribution-*</exclude>
+				<!-- Exclude all webservice modules -->
+				<exclude>*:*-webservice</exclude>
+				<!-- Exclude all secure transport modules -->
+				<exclude>*:*-securetransport</exclude>
 			</excludes>
 		    <sources>
 				<includeModuleDirectory>false</includeModuleDirectory>

@@ -340,7 +340,7 @@
 		    </modules>
 		</profile>
 	
-		<!-- ======== Maven dependency extension modules and assembly ======== -->
+		<!-- ======== Web service extension modules and assembly ======== -->
 		
 		<profile>
 		    <id>jadex-webservices</id>
@@ -366,7 +366,7 @@
 									<!-- .zip is appended automatically to the final name. -->
 									<finalName>sources-ws</finalName>
 									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-wsscrzip.xml</descriptor>
+										<descriptor>src/main/assembly/dist-assembly-wssrczip.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
@@ -391,6 +391,61 @@
 	        <modules>
 	        	<module>jadex-applications-webservice</module>
 				<module>jadex-platform-extension-webservice</module>
+		    </modules>
+		</profile>
+	
+		<!-- ======== Secure transport extension modules and assembly ======== -->
+		
+		<profile>
+		    <id>jadex-securetransport</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-platform-extension-securetransport</exists>
+	            </file>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>sources-sectrans</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-sectrans</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-sectranssrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-sectrans</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-securetransport-addon-${project.version}</finalName>
+									<outputDirectory>target/pro-addons</outputDirectory>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-sectrans.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+	        <modules>
+	        	<module>jadex-parent-pro</module>
+				<module>jadex-platform-extension-securetransport</module>
 		    </modules>
 		</profile>
 		

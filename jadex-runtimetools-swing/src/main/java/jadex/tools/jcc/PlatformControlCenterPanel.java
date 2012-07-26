@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -193,8 +194,17 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 												{
 													public boolean filter(Object obj)
 													{
-														File f = (File)obj;
-														String fn = f.getName();
+														String	fn	= "";
+														if(obj instanceof File)
+														{
+															File	f	= (File)obj;
+															fn	= f.getName();
+														}
+														else if(obj instanceof JarEntry)
+														{
+															JarEntry	je	= (JarEntry)obj;
+															fn	= je.getName();
+														}
 														return fn.indexOf("Plugin")!=-1 && 
 															fn.indexOf("$")==-1 && fn.indexOf("Panel")==-1;
 													}

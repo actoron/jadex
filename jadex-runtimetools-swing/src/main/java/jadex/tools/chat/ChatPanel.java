@@ -1040,7 +1040,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							{
 								notifyChatEvent(NOTIFICATION_NEW_FILE, ti.getOther(), ti, false);
 								
-								if(panel.isShowing())
+//								if(panel.isShowing())
 								{
 									acceptFile(ti).addResultListener(new IResultListener<String>()
 									{
