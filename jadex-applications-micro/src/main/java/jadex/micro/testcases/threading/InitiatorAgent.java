@@ -27,7 +27,7 @@ import java.util.Collection;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
+	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
 public class InitiatorAgent extends TestAgent
 {

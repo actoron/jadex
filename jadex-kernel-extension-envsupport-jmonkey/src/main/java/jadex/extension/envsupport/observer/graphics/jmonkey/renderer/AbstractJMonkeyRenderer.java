@@ -38,10 +38,8 @@ import com.jme3.texture.Texture;
 
 
 /**
- * @author 7willuwe
  *
  */
-
 public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 {
 	protected AssetManager assetManager;
@@ -52,8 +50,6 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 	protected Vector3f positionlocal;
 	protected Vector3f sizelocal;
 	protected SimpleValueFetcher _fetcher;
-	
-
 	
 	public AbstractJMonkeyRenderer()
 	{
@@ -161,16 +157,10 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						mat_tt.setColor("Ambient", color );
 						mat_tt.setBoolean("UseMaterialColors",true);
 					}
-					
-					
-
-
 				
 					spatial.setMaterial(mat_tt);
 				}
-			
 		}
-
 		
 		return spatial;
 	}
@@ -243,7 +233,6 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					
 					Sound3d sound = (Sound3d)primitive;
 					
-					
 					IParsedExpression soundcondition = sound.getCond();
 					boolean soundActive = soundcondition==null;
 					if(!soundActive)
@@ -262,28 +251,21 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					{
 						audionode.stop();
 					}
-					
-					
-
-
 				}
-					
 			}
 			
 			// Special Case 02: Animation Updates
 			if(primitive.getType()==6)
 			{
-				boolean animation = sp.getUserData("Animation");
-				if(animation)
+				Object animation = sp.getUserData("Animation");
+				if(animation instanceof Boolean && ((Boolean)animation).booleanValue())
 				{
-
 					HashMap<String, AnimChannel> anichannels = vp.getAnimChannels();
 					
-					ArrayList<Animation> animations = ((Object3d) primitive).getAnimations();
+					ArrayList<Animation> animations = ((Object3d)primitive).getAnimations();
 					
 					for(Animation a : animations)
 					{
-						
 						IParsedExpression animationcondition = a.getAnimationCondition();
 						boolean animActive = animationcondition==null;
 						if(!animActive)
@@ -310,22 +292,15 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 								
 //								System.out.println("animation! " + a.getName());
 							}
-							
-							
 						}
 					}
 				}
-				
-			
 			}
-			
-
 		}
 		else
 		{
 			sp.removeFromParent();
 		}
-		
 
 		return sp;
 	}
