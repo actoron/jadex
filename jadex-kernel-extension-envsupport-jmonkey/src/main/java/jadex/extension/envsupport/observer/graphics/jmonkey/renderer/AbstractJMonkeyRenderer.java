@@ -42,6 +42,8 @@ import com.jme3.texture.Texture;
  */
 public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 {
+	// todo: comment me
+	
 	protected AssetManager assetManager;
 	protected Geometry geo;
 	protected String identifier;
@@ -51,6 +53,9 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 	protected Vector3f sizelocal;
 	protected SimpleValueFetcher _fetcher;
 	
+	/**
+	 *  Create a new AbstractJMonkeyRenderer.
+	 */
 	public AbstractJMonkeyRenderer()
 	{
 		_fetcher = null;
@@ -58,7 +63,6 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 	
 	/**
 	 * Returns null if Drawcondition == null
-	 *
 	 */
 	public Spatial prepareAndExecuteDraw(DrawableCombiner3d dc, Primitive3d primitive, Object obj, ViewportJMonkey vp)
 	{
@@ -80,86 +84,100 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 		
 		if(draw)
 		{	
-				//first create the Spatial
-				spatial = draw(dc, primitive, obj, vp);
-			
-				
-				Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj, primitive.getRotation(), vp));
-				rotation = new Vector3f(rotationD.getXAsFloat(), rotationD.getYAsFloat(), rotationD.getZAsFloat());	
-				
-				Vector3Double  sizelocalD = ((Vector3Double)dc.getBoundValue(obj, primitive.getSize(), vp));	
-				sizelocal =   new Vector3f(sizelocalD.getXAsFloat(), sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());	
-				
-				Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(obj, primitive.getPosition(), vp));	
-				positionlocal =   new Vector3f(positionlocalD.getXAsFloat(), positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());	
-				
-				//Shadow, by default off
-				spatial.setShadowMode(ShadowMode.Off);
-				
-				String shadow = primitive.getShadowtype();
-				
-				if(shadow.equals(Primitive3d.SHADOW_CAST))
+			// first create the Spatial
+			spatial = draw(dc, primitive, obj, vp);
+
+			Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj,
+					primitive.getRotation(), vp));
+			rotation = new Vector3f(rotationD.getXAsFloat(),
+					rotationD.getYAsFloat(), rotationD.getZAsFloat());
+
+			Vector3Double sizelocalD = ((Vector3Double)dc.getBoundValue(obj,
+					primitive.getSize(), vp));
+			sizelocal = new Vector3f(sizelocalD.getXAsFloat(),
+					sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());
+
+			Vector3Double positionlocalD = ((Vector3Double)dc.getBoundValue(
+					obj, primitive.getPosition(), vp));
+			positionlocal = new Vector3f(positionlocalD.getXAsFloat(),
+					positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());
+
+			// Shadow, by default off
+			spatial.setShadowMode(ShadowMode.Off);
+
+			String shadow = primitive.getShadowtype();
+
+			if(shadow.equals(Primitive3d.SHADOW_CAST))
+			{
+				spatial.setShadowMode(ShadowMode.Cast);
+			}
+			else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
+			{
+				spatial.setShadowMode(ShadowMode.Receive);
+			}
+
+
+			float[] angles = {rotation.x, rotation.y, rotation.z};
+			quatation = spatial.getLocalRotation().fromAngles(angles);
+
+			// Set the local size
+			spatial.setLocalScale(sizelocal);
+
+			// Set the local Translation
+			spatial.setLocalTranslation(positionlocal);
+
+			// Set the local Rotation
+			spatial.setLocalRotation(quatation);
+
+
+			// Set the Material
+			if((spatial instanceof Geometry) && primitive.getType() != 6
+					&& primitive.getType() != 8 && primitive.getType() != 9) // And
+																				// not
+																				// a
+																				// Node
+																				// ->
+																				// Object3D
+			{
+
+				Material mat_tt = new Material(assetManager,
+						"Common/MatDefs/Light/Lighting.j3md");
+				Color c = (Color)dc
+						.getBoundValue(obj, primitive.getColor(), vp);
+				float alpha = ((float)c.getAlpha()) / 255;
+				ColorRGBA color = new ColorRGBA(((float)c.getRed()) / 255,
+						((float)c.getGreen()) / 255,
+						((float)c.getBlue()) / 255, alpha);
+
+				if(alpha < 1)
 				{
-					spatial.setShadowMode(ShadowMode.Cast);
+					mat_tt.getAdditionalRenderState().setBlendMode(
+							BlendMode.Alpha); // activate transparency
+					spatial.setQueueBucket(Bucket.Translucent);
+					spatial.setQueueBucket(Bucket.Transparent);
 				}
-				else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
+				String texturepath = primitive.getTexturePath();
+
+				if(!texturepath.equals(""))
 				{
-					spatial.setShadowMode(ShadowMode.Receive);
+					mat_tt = new Material(assetManager,
+							"Common/MatDefs/Misc/Unshaded.j3md");
+
+					Texture tex_ml = assetManager.loadTexture(texturepath);
+					mat_tt.setColor("Color", color);
+					mat_tt.setTexture("ColorMap", tex_ml);
+
+
+				}
+				else
+				{
+					mat_tt.setColor("Diffuse", color);
+					mat_tt.setColor("Ambient", color);
+					mat_tt.setBoolean("UseMaterialColors", true);
 				}
 
-
-				float[] angles = {rotation.x, rotation.y, rotation.z};
-				quatation = spatial.getLocalRotation().fromAngles(angles);
-				
-				// Set the local size
-				spatial.setLocalScale(sizelocal);
-				
-				// Set the local Translation
-				spatial.setLocalTranslation(positionlocal);
-				
-				// Set the local Rotation
-				spatial.setLocalRotation(quatation);
-				
-				
-				
-				// Set the Material
-				if((spatial instanceof Geometry) && primitive.getType()!=6  && primitive.getType()!=8 &&  primitive.getType()!=9) // And not a Node -> Object3D
-				{   
-					
-					Material mat_tt = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");				
-					Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
-					float alpha= ((float)c.getAlpha())/255;
-					ColorRGBA color = new ColorRGBA(((float)c.getRed())/255,((float)c.getGreen())/255,((float)c.getBlue())/255, alpha);
-
-			        
-					if(alpha < 1)
-					{
-						 mat_tt.getAdditionalRenderState().setBlendMode(BlendMode.Alpha); // activate transparency
-						 spatial.setQueueBucket(Bucket.Translucent);
-						 spatial.setQueueBucket(Bucket.Transparent);
-					}
-					String texturepath = primitive.getTexturePath();
-					
-					if(!texturepath.equals(""))
-					{
-						mat_tt = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-					
-						Texture tex_ml = assetManager.loadTexture(texturepath);
-						mat_tt.setColor("Color",color);
-						mat_tt.setTexture("ColorMap", tex_ml);
-						
-						
-
-					}
-					else
-					{
-						mat_tt.setColor("Diffuse", color);
-						mat_tt.setColor("Ambient", color );
-						mat_tt.setBoolean("UseMaterialColors",true);
-					}
-				
-					spatial.setMaterial(mat_tt);
-				}
+				spatial.setMaterial(mat_tt);
+			}
 		}
 		
 		return spatial;
@@ -217,9 +235,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						
 						txt.setText(text);
 					}
-
 				}
-					
 			}
 			
 //			 Special Case 03: Sound

@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
@@ -225,6 +226,7 @@ public class ConsolePanel extends JPanel
 				final static String	OUT_OCCURRED	= "out" + RemoteChangeListenerHandler.EVENT_OCCURRED;
 				final static String	ERR_OCCURRED	= "err" + RemoteChangeListenerHandler.EVENT_OCCURRED;
 				
+				@Security(Security.UNRESTRICTED)
 				public IFuture changeOccurred(ChangeEvent event)
 				{
 					IFuture	ret;
