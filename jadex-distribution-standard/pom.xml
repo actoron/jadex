@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jadex-commons</artifactId>
+	<packaging>jar</packaging>
+	<name>jadex-distribution-standard</name>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-parent</artifactId>
+		<version>2.1-SNAPSHOT</version>
+		<relativePath>../jadex-parent/pom.xml</relativePath>
+	</parent>
+
+	<description>
+		The standard distribution of the Jadex middleware including
+		all typical modules such as all standard kernels and tools.
+	</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-distribution-minimal</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency> 
+		
+		<!-- Kernels -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-gpmn</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>	
+		
+		<!-- BDI kernel -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdibpmn</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applib-bdi</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdi</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		
+		<!-- Platforms -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-base</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-standalone</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Tools -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools-swing</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-tools-bdi</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-tools-bpmn</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-tools-comanalyzer</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-rules-tools</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Extensions -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-extension-agr</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-extension-envsupport</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+			
+	</dependencies>
+</project>

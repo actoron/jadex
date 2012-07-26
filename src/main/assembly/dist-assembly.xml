@@ -24,6 +24,8 @@
 				<exclude>*:*-launch</exclude>
 				<!-- Don't place .war files in distro. Can be downloaded separately -->
 				<exclude>*:*-web</exclude>
+				<!-- Exclude all maven distribution modules -->
+				<exclude>*:*-distribution</exclude>
 			</excludes>
 			<binaries>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>

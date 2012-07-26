@@ -65,7 +65,7 @@
 		<module>jadex-applications-bdibpmn</module>
 		<module>jadex-applications-gpmn</module>
 		<module>jadex-applications-web</module>
-		<module>jadex-applications-webservice</module>
+		
 
 		<module>jadex-rules</module>
 		<module>jadex-rules-applications</module>
@@ -80,7 +80,6 @@
 		<module>jadex-platform-standalone</module>
 		<module>jadex-platform-standalone-launch</module>
 		<module>jadex-platform-relay-web</module>
-		<module>jadex-platform-extension-webservice</module>
 	</modules>
 			
 	<profiles>	    
@@ -338,6 +337,103 @@
  	        <modules>
 				<module>jadex-parent-pro</module>
 				<module>jadex-platform-extension-maven</module>
+		    </modules>
+		</profile>
+	
+		<!-- ======== Maven dependency extension modules and assembly ======== -->
+		
+		<profile>
+		    <id>jadex-webservices</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-platform-extension-webservice</exists>
+	            </file>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>sources-ws</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-ws</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-wsscrzip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-ws</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-webservice-addon-${project.version}</finalName>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-ws.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+	        <modules>
+	        	<module>jadex-applications-webservice</module>
+				<module>jadex-platform-extension-webservice</module>
+		    </modules>
+		</profile>
+		
+		<!-- ======== Minimal distribution ======== -->
+		
+		<profile>
+		    <id>jadex-distribution-minimal</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-distribution-minimal</exists>
+	            </file>
+	        </activation>
+ 	        <modules>
+				<module>jadex-distribution-minimal</module>
+		    </modules>
+		</profile>
+		
+		<!-- ======== Standard distribution ======== -->
+		
+		<profile>
+		    <id>jadex-distribution-standard</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-distribution-standard</exists>
+	            </file>
+	        </activation>
+ 	        <modules>
+				<module>jadex-distribution-standard</module>
+		    </modules>
+		</profile>
+		
+		<!-- ======== Pro distribution ======== -->
+		
+		<profile>
+		    <id>jadex-distribution-pro</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-distribution-pro</exists>
+	            </file>
+	        </activation>
+ 	        <modules>
+ 	        	<module>jadex-parent-pro</module>
+				<module>jadex-distribution-pro</module>
 		    </modules>
 		</profile>
 		
