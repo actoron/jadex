@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,9 @@ import sodekovs.bikesharing.model.SimulationDescription.TimeSlices;
 import sodekovs.bikesharing.model.Station;
 import sodekovs.bikesharing.model.TimeSlice;
 import sodekovs.bikesharing.model.TimeSlice.ProbabilitiesForStations;
+import de.jollyday.Holiday;
+import de.jollyday.HolidayCalendar;
+import de.jollyday.HolidayManager;
 import deco4mas.distributed.util.xml.XmlUtil;
 
 /**
@@ -56,6 +60,20 @@ public class RealDataExtractor {
 	 */
 	public static final String BY_BIKE = "BY_BIKE";
 	public static final String BY_TRUCK = "BY_TRUCK";
+
+	/*
+	 * Space height and width in pixel
+	 */
+	public static final double SPACE_HEIGHT = 100.0;
+	public static final double SPACE_WIDTH = 100.0;
+
+	/*
+	 * Geo coordinates
+	 */
+	public static final double NORTH = 38.9713;
+	public static final double SOUTH = 38.8113;
+	public static final double WEST = -77.1191;
+	public static final double EAST = -76.9135;
 
 	/**
 	 * Database Connection
@@ -90,6 +108,10 @@ public class RealDataExtractor {
 				System.out.println("Adding GPS Coordinates.");
 				sd = rde.addGPSCoordinates(sd, stations);
 				System.out.println("Added GPS Coordinates.");
+
+				System.out.println("Initializing Allocations.");
+				rde.initializeAllocation(sd, MONDAY, WASHINGTON, 1000000);
+				System.out.println("Initialized Allocations.");
 
 				System.out.println("Postprocess Station IDs.");
 				rde.postProcessStatioNames(sd);
@@ -376,7 +398,7 @@ public class RealDataExtractor {
 		for (String stationId : stationSet) {
 			PreparedStatement stmt;
 			try {
-				stmt = getConnection().prepareStatement("SELECT lat, lon FROM stations WHERE name LIKE ?");
+				stmt = getConnection().prepareStatement("SELECT lat, lon FROM station_coordinates WHERE name LIKE ?");
 				stmt.setString(1, stationId);
 				ResultSet rs = stmt.executeQuery();
 				Double lat = 0.0;
@@ -393,10 +415,6 @@ public class RealDataExtractor {
 
 				transformGeoPosition(station);
 
-				// TODO Vernünftige Werte überlegen oder aus den Realdaten auswerten
-				station.setNumberOfBikes(10);
-				station.setNumberOfDocks(20);
-
 				stations.getStation().add(station);
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -408,19 +426,193 @@ public class RealDataExtractor {
 	}
 
 	/**
+	 * Fetches the average initial allocation of number of bikes and number of docks from the live feed data in the database for the given weekday and city.
+	 * 
+	 * @param sd
+	 *            the given {@link SimulationDescription}
+	 * @param weekday
+	 *            the given weekday
+	 * @param city
+	 *            the given city
+	 */
+	public void initializeAllocation(SimulationDescription sd, Integer weekday, String city, Integer limit) {
+		HolidayManager hm = HolidayManager.getInstance(HolidayCalendar.UNITED_STATES);
+		Set<Holiday> holidays = hm.getHolidays(2011);
+		holidays.addAll(hm.getHolidays(2012));
+
+		String sql = "SELECT s.name, s.nbBikes, s.nbEmptyDocks, FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10)) as date, WEEKDAY(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10)))"
+				+ " as weekday FROM station s JOIN stations ss ON s.stationsId = ss.id WHERE ss.city LIKE ? AND s.installed = 1 AND s.locked = 0 AND"
+				+ " WEEKDAY(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10))) = ?";
+		if (limit != null) {
+			sql += " LIMIT " + limit;
+		}
+		try {
+			PreparedStatement stmt = getConnection().prepareStatement(sql);
+			stmt.setString(1, city);
+			stmt.setInt(2, weekday - 1);
+
+			Map<String, List<Object[]>> stationData = new HashMap<String, List<Object[]>>();
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				String stationId = rs.getString("name");
+				int nbBikes = rs.getInt("nbBikes");
+				int nbEmptyDocks = rs.getInt("nbEmptyDocks");
+				Date date = rs.getDate("date");
+
+				Object[] data = new Object[3];
+				data[0] = nbBikes;
+				data[1] = nbEmptyDocks;
+				data[2] = date;
+
+				List<Object[]> dataList;
+				if (!stationData.containsKey(stationId)) {
+					dataList = new ArrayList<Object[]>();
+					dataList.add(data);
+					stationData.put(stationId, dataList);
+				} else {
+					dataList = stationData.get(stationId);
+					dataList.add(data);
+				}
+			}
+
+			for (Station station : sd.getStations().getStation()) {
+				int bikes = 0;
+				int docks = 0;
+
+				List<Object[]> dataList = stationData.get(station.getStationID());
+				if (dataList != null) {
+					for (Object[] data : dataList) {
+						int nbBikes = (Integer) data[0];
+						int nbEmptyDocks = (Integer) data[1];
+						Date date = (Date) data[2];
+
+						if (!isHoliday(holidays, date)) {
+							bikes += nbBikes;
+							docks += nbBikes + nbEmptyDocks;
+						}
+					}
+
+					bikes = (int) Math.round((double) bikes / (double) dataList.size());
+					docks = (int) Math.round((double) docks / (double) dataList.size());
+				}
+
+				if (bikes == 0)
+					bikes = 10;
+
+				if (docks < bikes)
+					docks = bikes;
+
+				station.setNumberOfBikes(bikes);
+				station.setNumberOfDocks(docks);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Fetches the average initial allocation of number of bikes and number of docks from the live feed data in the database for the given weekday and city.
+	 * 
+	 * @param sd
+	 *            the given {@link SimulationDescription}
+	 * @param weekday
+	 *            the given weekday
+	 * @param city
+	 *            the given city
+	 */
+	@Deprecated
+	public void initializeAllocationOLD(SimulationDescription sd, int weekday, String city) {
+		HolidayManager hm = HolidayManager.getInstance(HolidayCalendar.UNITED_STATES);
+		Set<Holiday> holidays = hm.getHolidays(2011);
+		holidays.addAll(hm.getHolidays(2012));
+
+		for (Station station : sd.getStations().getStation()) {
+			try {
+				String sql = "SELECT s.nbBikes, s.nbEmptyDocks, FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10)) as date, WEEKDAY(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10)))"
+						+ " as weekday FROM station s JOIN stations ss ON s.stationsId = ss.id WHERE ss.city LIKE ? AND s.installed = 1 AND s.locked = 0 AND"
+						+ " WEEKDAY(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10))) = ? AND s.name LIKE ? LIMIT 10000";
+				PreparedStatement stmt = getConnection().prepareStatement(sql);
+				stmt.setString(1, city);
+				stmt.setInt(2, weekday - 1);
+				stmt.setString(3, station.getStationID());
+
+				ResultSet rs = stmt.executeQuery();
+				int bikes = 0;
+				int docks = 0;
+				int size = 0;
+
+				while (rs.next()) {
+					int nbBikes = rs.getInt("nbBikes");
+					int nbEmptyDocks = rs.getInt("nbEmptyDocks");
+					Date date = rs.getDate("date");
+
+					if (!isHoliday(holidays, date)) {
+						bikes += nbBikes;
+						docks += nbBikes + nbEmptyDocks;
+
+						++size;
+					}
+				}
+
+				bikes = (int) Math.round((double) bikes / (double) size);
+				docks = (int) Math.round((double) docks / (double) size);
+
+				if (bikes == 0)
+					bikes = 10;
+
+				if (docks < bikes)
+					docks = bikes;
+
+				station.setNumberOfBikes(bikes);
+				station.setNumberOfDocks(docks);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Checks if the given {@link Date} is contained in the given {@link Set} of {@link Holiday}s and thereby is a Holiday.
+	 * 
+	 * @param holidays
+	 *            the given {@link Set} of {@link Holiday}s
+	 * @param date
+	 *            the given {@link Date}
+	 * @return <code>true</code> if the given {@link Date} is a {@link Holiday}, else <code>false</code>
+	 */
+	private boolean isHoliday(Set<Holiday> holidays, Date date) {
+		for (Holiday holiday : holidays) {
+			Date holidayDate = holiday.getDate().toDate();
+
+			if (holidayDate.equals(date)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Transforms the GeoPositions (Latitude and Longitude) into a Jadex Space compatible format.
 	 * 
 	 * @param station
 	 *            - the given {@link Station}
 	 */
 	private void transformGeoPosition(Station station) {
-		// In der ersten Version werden nue negative Werte transformiert indem 100 + der Wert gerechnet wird
-		if (station.getLatitude() < 0) {
-			station.setLatitude(100 + station.getLatitude());
-		}
-		if (station.getLongitude() < 0) {
-			station.setLongitude(100 + station.getLongitude());
-		}
+		double xDistance = EAST - WEST;
+		double yDistance = NORTH - SOUTH;
+
+		double xFactor = 100.0 / xDistance;
+		double yFactor = 100.0 / yDistance;
+
+		double xPercentage = (station.getLongitude() - WEST) * xFactor;
+		double yPercentage = (station.getLatitude() - NORTH) * yFactor;
+
+		double x = SPACE_WIDTH * (xPercentage / 100.0);
+		double y = Math.abs(SPACE_HEIGHT * (yPercentage / 100.0));
+
+		station.setLatitude(y);
+		station.setLongitude(x);
 	}
 
 	/**
