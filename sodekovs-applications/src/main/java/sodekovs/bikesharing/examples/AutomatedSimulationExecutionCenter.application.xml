@@ -22,7 +22,7 @@
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/HamburgSimulation-Conf.xml"</argument>			
+						<argument name="simulationDescriptionFile">"/Users/thomas/Documents/workspaces/sodekovs/jadexv2/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_100.xml"</argument>
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>

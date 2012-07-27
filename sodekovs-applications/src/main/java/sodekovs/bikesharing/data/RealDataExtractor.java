@@ -90,7 +90,7 @@ public class RealDataExtractor {
 		rde.setConnection(conn);
 
 		System.out.println("Fetching rentals.");
-		List<Rental> rentals = rde.getRentals(new int[] { MONDAY }, WASHINGTON, BY_BIKE, null, null, 100);
+		List<Rental> rentals = rde.getRentals(new int[] { MONDAY }, WASHINGTON, BY_BIKE, null, null, null);
 		if (!rentals.isEmpty()) {
 			System.out.println("Fetched rentals.");
 
@@ -110,7 +110,7 @@ public class RealDataExtractor {
 				System.out.println("Added GPS Coordinates.");
 
 				System.out.println("Initializing Allocations.");
-				rde.initializeAllocation(sd, MONDAY, WASHINGTON, 1000000);
+				rde.initializeAllocation(sd, MONDAY, WASHINGTON, null);
 				System.out.println("Initialized Allocations.");
 
 				System.out.println("Postprocess Station IDs.");
@@ -119,7 +119,7 @@ public class RealDataExtractor {
 
 				try {
 					System.out.println("Writing XML File.");
-					String xmlFile = "WashingtonSimulation_Monday_100.xml";
+					String xmlFile = "WashingtonSimulation_Monday.xml";
 					XmlUtil.saveAsXML(sd, xmlFile);
 					System.out.println(xmlFile + " written.");
 				} catch (FileNotFoundException e) {
@@ -242,8 +242,8 @@ public class RealDataExtractor {
 				String bikeId = rs.getString("bikeId");
 				Timestamp start = rs.getTimestamp("start");
 				Timestamp end = rs.getTimestamp("end");
-				String startStation = rs.getString("startStation");
-				String endStation = rs.getString("endStation");
+				String startStation = rs.getString("startStation").trim();
+				String endStation = rs.getString("endStation").trim();
 				int weekday = rs.getInt("weekday");
 
 				Rental rental = new Rental(bikeId, start, end, startStation, endStation, weekday, link, city);
