@@ -81,25 +81,25 @@ public class TCPOutputConnection
 				System.out.println("connection.send0 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
 			}
 			sos.write(SUtil.intToBytes(prolog.length+data.length));
-			if(task instanceof StreamSendTask)
-			{
-				System.out.println("connection.send1 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-			}
+//			if(task instanceof StreamSendTask)
+//			{
+//				System.out.println("connection.send1 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//			}
 			sos.write(prolog);
-			if(task instanceof StreamSendTask)
-			{
-				System.out.println("connection.send2 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-			}
+//			if(task instanceof StreamSendTask)
+//			{
+//				System.out.println("connection.send2 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//			}
 			sos.write(data);
-			if(task instanceof StreamSendTask)
-			{
-				System.out.println("connection.send3 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-			}
+//			if(task instanceof StreamSendTask)
+//			{
+//				System.out.println("connection.send3 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//			}
 			sos.flush();
-			if(task instanceof StreamSendTask)
-			{
-				System.out.println("connection.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-			}
+//			if(task instanceof StreamSendTask)
+//			{
+//				System.out.println("connection.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//			}
 			ret = true;
 //			cleaner.refresh();
 		}

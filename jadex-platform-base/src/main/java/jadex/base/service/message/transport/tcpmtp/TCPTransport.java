@@ -353,18 +353,18 @@ public class TCPTransport implements ITransport
 						{
 							public IFuture<Void> execute(Void args)
 							{
-								if(task instanceof StreamSendTask)
-								{
-									System.out.println("transport.send "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-								}
+//								if(task instanceof StreamSendTask)
+//								{
+//									System.out.println("transport.send "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//								}
 								
 								if(con.send(task.getProlog(), task.getData(), task))
 								{
 	//								System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
-									if(task instanceof StreamSendTask)
-									{
-										System.out.println("transport.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-									}
+//									if(task instanceof StreamSendTask)
+//									{
+//										System.out.println("transport.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//									}
 									return IFuture.DONE;
 								}
 								else
