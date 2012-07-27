@@ -62,6 +62,8 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 import java.io.ByteArrayInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2366,6 +2368,26 @@ public class MessageService extends BasicService implements IMessageService
 		
 		return con;
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public static void main(String[] args)
+//	{
+//		int len = 10000;
+//		byte[] data = new byte[len];
+//		
+//		try
+//		{
+//			ServerSocket s = new ServerSocket(44444);
+//			Socket con = s.accept();
+//			con.
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//	}
 }
 
 

@@ -31,7 +31,7 @@ public class TCPInputConnection
 		this.sock = sock;
 		
 		// Send handshake byte.
-		sock.getOutputStream().write(new byte[1]);
+//		sock.getOutputStream().write(new byte[1]);
 		
 		this.is = new BufferedInputStream(sock.getInputStream());
 	}

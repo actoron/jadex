@@ -42,7 +42,7 @@ public class TCPOutputConnection
 		this.sock = sock;
 		
 		// Wait for handshake byte.
-		sock.getInputStream().read();
+//		sock.getInputStream().read();
 		
 //		try
 //		{
