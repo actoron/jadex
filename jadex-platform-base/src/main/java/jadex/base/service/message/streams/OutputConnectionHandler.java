@@ -523,7 +523,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			task	= tup.retry();
 		}
 		
-		System.out.println("send "+System.currentTimeMillis()+": "+task.getSequenceNumber());
+//		System.out.println("send "+System.currentTimeMillis()+": "+task.getSequenceNumber());
 		sendTask(task);
 		
 		queuecnt++;
@@ -533,7 +533,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("Sent "+System.currentTimeMillis()+": seq="+seqno);
+//				System.out.println("Sent "+System.currentTimeMillis()+": seq="+seqno);
 				sendDone();
 			}
 			

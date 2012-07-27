@@ -275,21 +275,21 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		}
 	}
 	
-	/**
-	 *  Print sending of message for debugging.
-	 */
-	public void doSendMessage()
-	{
-		System.out.println("doSendMessage "+System.currentTimeMillis()+": "+getSequenceNumber());
-		super.doSendMessage();
-	}
-	
-	/**
-	 *  Print sending of message for debugging.
-	 */
-	public void ready(IResultCommand<IFuture<Void>, Void> send)
-	{
-		System.out.println("ready "+System.currentTimeMillis()+": "+getSequenceNumber()+", "+send);
-		super.ready(send);
-	}
+//	/**
+//	 *  Print sending of message for debugging.
+//	 */
+//	public void doSendMessage()
+//	{
+//		System.out.println("doSendMessage "+System.currentTimeMillis()+": "+getSequenceNumber());
+//		super.doSendMessage();
+//	}
+//	
+//	/**
+//	 *  Print sending of message for debugging.
+//	 */
+//	public void ready(IResultCommand<IFuture<Void>, Void> send)
+//	{
+//		System.out.println("ready "+System.currentTimeMillis()+": "+getSequenceNumber()+", "+send);
+//		super.ready(send);
+//	}
 }
