@@ -74,7 +74,7 @@ public class TCPOutputConnection
 	{
 		boolean ret = false;
 		
-		long start = System.currentTimeMillis();
+//		long start = System.currentTimeMillis();
 		
 		try
 		{
@@ -111,8 +111,8 @@ public class TCPOutputConnection
 			close();
 		}
 		
-		if(System.currentTimeMillis()-start>150)
-			System.out.println("laaaaaaaangsam");
+//		if(System.currentTimeMillis()-start>150)
+//			System.out.println("laaaaaaaangsam");
 		
 		return ret;
 	}
