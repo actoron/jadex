@@ -2400,10 +2400,10 @@ public class MessageService extends BasicService implements IMessageService
 				InputStream is = new BufferedInputStream(s.getInputStream());
 				
 				byte[] read = new byte[len];
-				int cnt = 0;
 				int packcnt = 0;
 				for(; packcnt<max; packcnt++)
 				{
+					int cnt = 0;
 					while(cnt<len) 
 					{
 						int bytes_read = is.read(read, cnt, len-cnt);
@@ -2453,6 +2453,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					os.write(write);
 					os.flush();
+					System.out.println("wrote packet: "+i);
 				}
 				
 				os.close();
