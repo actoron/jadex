@@ -88,7 +88,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		this.alivetime = System.currentTimeMillis();
 		this.unacked = new HashMap<Object, SendInfo>();
 		
-		createGui();
+//		createGui();
 	}
 	
 	/**
