@@ -288,7 +288,7 @@ public class TCPTransport implements ITransport
 		Socket ret = new Socket(host, port);
 //		ret.setTcpNoDelay(true);
 //		System.out.println("buffer size: "+ret.getSendBufferSize());
-		ret.setSendBufferSize(ret.getSendBufferSize() << 2);
+		ret.setSendBufferSize(ret.getSendBufferSize() << 1);
 		return ret;
 	}
 	

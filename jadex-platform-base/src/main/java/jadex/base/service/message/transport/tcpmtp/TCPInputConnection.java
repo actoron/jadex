@@ -29,6 +29,7 @@ public class TCPInputConnection
 	public TCPInputConnection(Socket sock) throws IOException
 	{
 		this.sock = sock;
+//		sock.setReceiveBufferSize(sock.getReceiveBufferSize()<<2);
 		
 		// Send handshake byte.
 		sock.getOutputStream().write(new byte[1]);
