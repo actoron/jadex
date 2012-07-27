@@ -4,6 +4,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -19,9 +21,12 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.examples.ping.IEchoService;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *  Test message performance. 
@@ -30,8 +35,10 @@ import java.util.Map;
 @Arguments(
 {
 	@Argument(name="max", clazz=int.class, defaultvalue="100", description="Maximum number of messages to send."),
+	@Argument(name="size", clazz=int.class, defaultvalue="100", description="Size in bytes of each message (when not using codec)."),
 	@Argument(name="codec", clazz=boolean.class, defaultvalue="false", description="Use content codec for message content."),
-	@Argument(name="echo", clazz=IComponentIdentifier.class, description="Address of an echo agent.")
+	@Argument(name="echo", clazz=IComponentIdentifier.class, description="Address of an echo agent."),
+	@Argument(name="auto", clazz=boolean.class, defaultvalue="false", description="Automatically find address of an echo agent.")
 })
 @Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
 @Configurations(
@@ -75,7 +82,9 @@ public class MessagePerformanceAgent extends MicroAgent
 				starttime = result.longValue();
 				
 				final int msgcnt = ((Integer)getArgument("max")).intValue();
-				final IComponentIdentifier receiver = getArgument("echo")!=null
+				final int msgsize = ((Integer)getArgument("size")).intValue();
+				boolean auto = ((Boolean)getArgument("auto")).booleanValue();
+				IComponentIdentifier receiver = getArgument("echo")!=null
 					? (IComponentIdentifier)getArgument("echo") : getComponentIdentifier();
 				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
 				
@@ -95,76 +104,132 @@ public class MessagePerformanceAgent extends MicroAgent
 					}
 				});
 				
-				IComponentStep<Void> send = new IComponentStep<Void>()
+				getTarget(auto, receiver).addResultListener(new IResultListener<IComponentIdentifier>()
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
+					public void resultAvailable(final IComponentIdentifier receiver)
 					{
-						if(current==1)
+						IComponentStep<Void> send = new IComponentStep<Void>()
 						{
-							System.out.println("Now sending " + msgcnt + " messages to " + receiver);
-							System.out.println("Codec is: "+usecodec);
-						}
-						
-						// Send messages.
-						int i = current;
-						for(; i<=msgcnt; i++)
-						{
-							Map<String, Object> request = new HashMap<String, Object>();
-							request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-							request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-							request.put(SFipa.REPLY_WITH, "some reply id");
-							
-							if(!usecodec)
-							{	
-								request.put(SFipa.CONTENT, "message: "+i);
-							}
-							else
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-								request.put(SFipa.CONTENT, new BenchmarkMessage("message: "+i, true));
-							}
-							
-							IFuture<Void>	fut	= sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-							fut.addResultListener(crl);
-							fut.addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
+								if(current==1)
 								{
-//									System.out.println("message sent");
+									System.out.println("Now sending " + msgcnt + " messages to " + receiver);
+									System.out.println("Codec is: "+usecodec);
 								}
 								
-								public void exceptionOccurred(Exception exception)
+								byte[]	content	= new byte[msgsize];	
+								new Random().nextBytes(content);
+								String scontent	= "";
+								try
 								{
-									System.out.println("message not sent: "+exception);
-									exception.printStackTrace();
+									scontent = new String(content, "UTF-8");
 								}
-							});
-							if(i%100==0)
-							{
-								break;
+								catch(UnsupportedEncodingException e)
+								{
+									e.printStackTrace();
+								}
+
+								
+								// Send messages.
+								int i = current;
+								for(; i<=msgcnt; i++)
+								{
+									Map<String, Object> request = new HashMap<String, Object>();
+									request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+									request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
+									request.put(SFipa.REPLY_WITH, "some reply id");
+									
+									if(!usecodec)
+									{
+//												request.put(SFipa.CONTENT, "message: "+i);
+										request.put(SFipa.CONTENT, scontent);
+									}
+									else
+									{
+										request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+//												request.put(SFipa.CONTENT, new BenchmarkMessage("message: "+i, true));
+										request.put(SFipa.CONTENT, new BenchmarkMessage(scontent, true));
+									}
+									
+									IFuture<Void>	fut	= sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+									fut.addResultListener(crl);
+									fut.addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+//													System.out.println("message sent");
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											System.out.println("message not sent: "+exception);
+											exception.printStackTrace();
+										}
+									});
+									if(i%100==0)
+									{
+										break;
+									}
+								}
+								
+								current = i+1;
+								if(current<=msgcnt)
+								{
+									waitFor(0, this);
+								}
+								else
+								{
+									System.out.println("all messages queued for sending");
+								}
+								
+								return IFuture.DONE;
 							}
-						}
-						
-						current = i+1;
-						if(current<=msgcnt)
-						{
-							waitFor(0, this);
-						}
-						else
-						{
-							System.out.println("all messages queued for sending");
-						}
-						
-						return IFuture.DONE;
+						};
+												
+						send.execute(MessagePerformanceAgent.this);
 					}
-				};
-				
-				send.execute(MessagePerformanceAgent.this);
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						throw (exception instanceof RuntimeException) ? (RuntimeException) exception : new RuntimeException(exception);
+					}
+				});
 			}
 		});
 		
 		return new Future<Void>(); // never kill?!
 	}
+	
+	/**
+	 *  Get the component identifier for sending.
+	 */
+	protected IFuture<IComponentIdentifier>	getTarget(boolean auto, final IComponentIdentifier def)
+	{
+		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
+		if(auto)
+		{
+			getServiceContainer().searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(new IResultListener<IEchoService>()
+			{
+				public void resultAvailable(IEchoService result)
+				{
+					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(def);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(def);
+		}
+		return ret;
+	}
+	
 	
 	/**
 	 *  Called on message arrival.
