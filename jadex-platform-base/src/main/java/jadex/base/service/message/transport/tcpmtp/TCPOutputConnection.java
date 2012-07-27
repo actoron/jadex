@@ -74,6 +74,8 @@ public class TCPOutputConnection
 	{
 		boolean ret = false;
 		
+		long start = System.currentTimeMillis();
+		
 		try
 		{
 //			if(task instanceof StreamSendTask)
@@ -108,6 +110,9 @@ public class TCPOutputConnection
 //			e.printStackTrace();
 			close();
 		}
+		
+		if(System.currentTimeMillis()-start>150)
+			System.out.println("laaaaaaaangsam");
 		
 		return ret;
 	}

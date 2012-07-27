@@ -285,7 +285,11 @@ public class TCPTransport implements ITransport
 	 */
 	public Socket createClientSocket(String host, int port) throws Exception
 	{
-		return new Socket(host, port);
+		Socket ret = new Socket(host, port);
+//		ret.setTcpNoDelay(true);
+//		System.out.println("buffer size: "+ret.getSendBufferSize());
+		ret.setSendBufferSize(ret.getSendBufferSize() << 2);
+		return ret;
 	}
 	
 	/**
@@ -533,6 +537,8 @@ public class TCPTransport implements ITransport
 						iport = DEFAULT_PORT;
 					}
 	
+//					System.out.println("created output con: "+hostname+" "+iport);
+					
 					// todo: which resource identifier to use for outgoing connections?
 //					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address), createClientSocket());
 					ret = new TCPOutputConnection(new Cleaner(address), createClientSocket(hostname, iport));

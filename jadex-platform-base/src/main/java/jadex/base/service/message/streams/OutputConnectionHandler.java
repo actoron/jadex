@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
@@ -105,7 +106,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
-		this.maxsend = 25;
+		this.maxsend = 50;
 		this.maxqueued = 4;
 		this.ackcnt = 10;
 		
@@ -163,7 +164,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 					}
 				}
 					
-				System.out.println("ack "+System.currentTimeMillis()+": seq="+seqnumber+" stop="+ackinfo.isStop()+" startack="+ackinfo.getStartSequenceNumber()+" endack="+ackinfo.getEndSequenceNumber()+" sent="+sent.size());
+//				System.out.println("ack "+System.currentTimeMillis()+": seq="+seqnumber+" stop="+ackinfo.isStop()+" startack="+ackinfo.getStartSequenceNumber()+" endack="+ackinfo.getEndSequenceNumber()+" sent="+sent.size());
 //				System.out.println(sent);
 				
 				// Trigger resend of unacknowledged messages, if necessary.
@@ -894,7 +895,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			final JTextField tfmpsize = pp.createTextField("mpsize");
 			final JTextField tfstop = pp.createTextField("stop");
 			
-			Timer t = new Timer(1000, new ActionListener()
+			final int[] cnt = new int[3];
+			final JTextField tfwaiting = pp.createTextField("waiting");
+			
+			Timer t = new Timer(100, new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
@@ -905,6 +909,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 					tfmpmaxsize.setText(""+mpmaxsize);
 					tfmpsize.setText(""+mpsize);
 					tfstop.setText(""+stopflag);
+					if(!isSendAllowed())
+						cnt[0]++;
+					if(sent.size()>=maxsend)
+						cnt[1]++;
+					if(queuecnt>=maxqueued)
+						cnt[2]++;
+					tfwaiting.setText(""+cnt[0]+" "+cnt[1]+" "+cnt[2]);
 				}
 			});
 			t.start();

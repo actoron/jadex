@@ -416,10 +416,10 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		{
 			public void resultAvailable(Void result)
 			{
-				if(task instanceof StreamSendTask)
-				{
-					System.out.println("ack send fini: "+((StreamSendTask)task).getSequenceNumber()+" "+System.currentTimeMillis());
-				}
+//				if(task instanceof StreamSendTask)
+//				{
+//					System.out.println("ack send fini: "+((StreamSendTask)task).getSequenceNumber()+" "+System.currentTimeMillis());
+//				}
 //				System.out.println("sent: "+SUtil.arrayToString(task.getProlog()));
 				// nop if could be sent
 			}
