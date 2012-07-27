@@ -2381,7 +2381,7 @@ public class MessageService extends BasicService implements IMessageService
 	public static void main(String[] args)
 	{
 		boolean doread = false;
-		int max = 10000;
+		int max = 100000;
 		
 		if(args.length>0)
 			doread = args[0].equals("read");
@@ -2449,7 +2449,7 @@ public class MessageService extends BasicService implements IMessageService
 				Socket s = new Socket(InetAddress.getByName("134.100.11.230"), 44444);
 				OutputStream os = new BufferedOutputStream(s.getOutputStream());
 				
-				for(int i=0; i<10000; i++)
+				for(int i=0; i<max; i++)
 				{
 					os.write(write);
 					os.flush();
