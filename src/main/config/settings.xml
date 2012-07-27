@@ -15,7 +15,12 @@
 			<username>deployment</username>
 			<password>lax</password>
 		</server>
-	</servers>
+		<server>
+			<id>private-releases</id>
+			<username>deployment</username>
+			<password>lax</password>
+		</server>
+			</servers>
 
 	<!-- <profiles>
 		<profile>
