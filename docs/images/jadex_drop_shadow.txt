@@ -1,6 +1,13 @@
+- duplicate vector layer
+- convert copy to raster layer
+- hide other layers
+- apply drop shadow to raster layer
+
+
+
 Image Size:
-Width: 300
-Height: 118
+Width: 310
+Height: 98
 
 Effect Settings:
 Offset: 7 / 7
