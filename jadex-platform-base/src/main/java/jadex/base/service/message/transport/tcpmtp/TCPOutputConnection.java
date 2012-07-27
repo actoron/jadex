@@ -76,10 +76,10 @@ public class TCPOutputConnection
 		
 		try
 		{
-			if(task instanceof StreamSendTask)
-			{
-				System.out.println("connection.send0 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-			}
+//			if(task instanceof StreamSendTask)
+//			{
+//				System.out.println("connection.send0 "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
+//			}
 			sos.write(SUtil.intToBytes(prolog.length+data.length));
 //			if(task instanceof StreamSendTask)
 //			{

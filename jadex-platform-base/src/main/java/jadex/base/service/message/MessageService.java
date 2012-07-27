@@ -61,7 +61,13 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -2369,25 +2375,98 @@ public class MessageService extends BasicService implements IMessageService
 		return con;
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public static void main(String[] args)
-//	{
-//		int len = 10000;
-//		byte[] data = new byte[len];
-//		
-//		try
-//		{
-//			ServerSocket s = new ServerSocket(44444);
-//			Socket con = s.accept();
-//			con.
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//	}
+	/**
+	 * 
+	 */
+	public static void main(String[] args)
+	{
+		boolean doread = false;
+		int max = 10000;
+		
+		if(args.length>0)
+			doread = args[0].equals("read");
+		
+		int len = 10000;
+		
+		long start = System.currentTimeMillis();
+		
+		if(doread)
+		{
+			ServerSocket ss = null;
+			try
+			{
+				ss = new ServerSocket(44444);
+				Socket s = ss.accept();
+				InputStream is = new BufferedInputStream(s.getInputStream());
+				
+				byte[] read = new byte[len];
+				int cnt = 0;
+				int packcnt = 0;
+				for(; packcnt<max; packcnt++)
+				{
+					while(cnt<len) 
+					{
+						int bytes_read = is.read(read, cnt, len-cnt);
+						if(bytes_read==-1) 
+							throw new IOException("Stream closed");
+						cnt += bytes_read;
+					}
+					System.out.println("read packet: "+packcnt);
+				}
+				
+				is.close();
+				s.close();
+				
+				long end = System.currentTimeMillis();
+				System.out.println("Needed: "+(end-start));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					ss.close();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		else
+		{
+			try
+			{
+				byte[] write = new byte[len];
+				for(int i=0; i<write.length; i++)
+				{
+					write[i] = (byte)(i%10);
+				}
+				
+				Socket s = new Socket(InetAddress.getByName("134.100.11.230"), 44444);
+				OutputStream os = new BufferedOutputStream(s.getOutputStream());
+				
+				for(int i=0; i<10000; i++)
+				{
+					os.write(write);
+					os.flush();
+				}
+				
+				os.close();
+				s.close();
+				
+				long end = System.currentTimeMillis();
+				System.out.println("Needed: "+(end-start));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 }
 
 
