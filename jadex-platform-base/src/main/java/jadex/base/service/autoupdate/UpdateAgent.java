@@ -68,7 +68,7 @@ public class UpdateAgent implements IUpdateService
 	//-------- attributes --------
 	
 	/** The resource to update. */
-	protected IResourceIdentifier rid = new ResourceIdentifier(null, new GlobalResourceIdentifier("net.sourceforge.jadex:jadex-platform-standalone:2.1-SNAPSHOT", null, null));
+	protected IResourceIdentifier rid = new ResourceIdentifier(null, new GlobalResourceIdentifier("net.sourceforge.jadex:jadex-platform-standalone:2.1", null, null));
 
 	/** The creator. */
 	@AgentArgument

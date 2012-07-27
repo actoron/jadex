@@ -150,7 +150,7 @@ public class HttpConnectionManager
 		URL	url	= new URL(address+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
 		con	= (HttpURLConnection)url.openConnection();
 		con.setUseCaches(false);
-//		con.setRequestProperty("User-Agent", "Jadex4Android 2.1-SNAPSHOT");
+//		con.setRequestProperty("User-Agent", "Jadex4Android2.1");
 //		con.setRequestProperty("Cache-Control", "no-cache, no-transform");
 //		con.setRequestProperty("Pragma", "no-cache");
 		connections.add(con);

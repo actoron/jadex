@@ -1,5 +1,15 @@
 Jadex Releases Overview
 
+Release 2.1 (Global Connectivity release 07/2012)
+	- Relay transport and awareness for global connectivity
+	- Security features for protecting platforms from malicious access
+	- Chat plugin for JCC including smiley icons, private messages and file transfers
+	- Streams for exchanging large amount of data
+	- Transparent usage of multiple services
+	- Web services integration
+	- 3D visualization for EnvSupport
+	- Many improvements and fixes
+	
 Release 2.0 (V2 final release 09/2011)
 	- Annotation inheritance for micro agents
 	- Task annotations for BPMN custom tasks

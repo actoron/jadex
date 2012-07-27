@@ -23,7 +23,7 @@
 <stringAttribute key="org.eclipse.hyades.trace.ui.ATTR_PROFILING_SET" value="tptp-dummy-profiling-set-Jadex Standalone"/>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-awareness true&#13;&#10;-relaytransport true&#13;&#10;-logging false&#13;&#10;-binarymessages true&#13;&#10;-deftimeout 30000&#13;&#10;-rspublish false&#13;&#10;-wspublish false"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-awareness true&#13;&#10;-relaytransport true&#13;&#10;-tcptransport true&#13;&#10;-niotcptransport false&#13;&#10;-logging false&#13;&#10;-binarymessages true&#13;&#10;-deftimeout 30000&#13;&#10;-rspublish false&#13;&#10;-wspublish false"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-platform-standalone-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.motif.MotifLookAndFeel&#13;&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#13;&#10;-DXbootclasspath/a:C:\Programme\jprofiler5\bin\agent.jar&#13;&#13;&#10;-Dagentlib:jprofilerti"/>

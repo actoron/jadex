@@ -22,7 +22,7 @@ public class MavenTest2
 			new File("../jadex-applications-bdi/target/classes"),
 			new File("../jadex-bridge/target/classes"),
 			new File("testproject/testmodule2/target/classes"),
-//			new File("C:\\Users\\Alex\\.m2\\repository\\net\\sourceforge\\jadex\\jadex-bridge\\2.1-SNAPSHOT\\jadex-bridge-2.1-SNAPSHOT.jar"),
+//			new File("C:\\Users\\Alex\\.m2\\repository\\net\\sourceforge\\jadex\\jadex-bridge\\2.1\\jadex-bridge-2.1.jar"),
 			new File("C:\\Users\\Alex\\.m2\\repository\\net\\sourceforge\\jadex\\jadex-bridge\\2.0-rc10\\jadex-bridge-2.0-rc10.jar")
 		};
 		String[]	gids	= new String[]{

@@ -335,7 +335,7 @@ public class Starter
 			
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
-//				"net.sourceforge.jadex:jadex-standalone-launch:2.1-SNAPSHOT");
+//				"net.sourceforge.jadex:jadex-standalone-launch:2.1");
 			
 //			System.out.println("Using config file: "+configfile);
 			
