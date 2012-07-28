@@ -25,62 +25,42 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-javaparser</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-nuggets</artifactId>
-			<version>${project.version}</version>
-		</dependency> -->
-		
-		<!-- hack -> remove (because of remote micro agent) - ->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>-->
-		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.12.1.GA</version>
-			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 			<version>1.1</version>
-			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
@@ -125,4 +105,61 @@
 		</dependency>
             
 	</dependencies>
+	
+	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
+	<profiles>
+		<profile>
+			<id>dist</id>
+			<dependencies>
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-commons</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+		
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-xml</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+		
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-javaparser</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+		
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-bridge</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+		
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-micro</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+					<groupId>javassist</groupId>
+					<artifactId>javassist</artifactId>
+					<version>3.12.1.GA</version>
+					<scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+					<groupId>javax.activation</groupId>
+					<artifactId>activation</artifactId>
+					<version>1.1</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

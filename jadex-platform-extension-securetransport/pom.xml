@@ -20,7 +20,6 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-base</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>            
 		<dependency>
 			<groupId>bouncycastle</groupId>
@@ -28,4 +27,20 @@
 			<version>140</version>
 		</dependency>            
 	</dependencies>
+
+	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
+	<profiles>
+		<profile>
+			<id>dist</id>
+			<dependencies>
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-base</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>            
+			</dependencies>
+		</profile>
+	</profiles>
+
 </project>

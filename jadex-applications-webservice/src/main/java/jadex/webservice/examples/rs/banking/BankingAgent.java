@@ -2,6 +2,7 @@ package jadex.webservice.examples.rs.banking;
 
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
@@ -41,6 +42,14 @@ import jadex.micro.annotation.Publish;
 //		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking4", mapping=IRSBankingService.class,
 //		properties=@NameValue(name="generate", value="true")))
 })
+@Description("<H3>Banking agent that offers a banking service.</H3>" +
+		"This example shows how a Jadex service can be automatically published" +
+		"as web service with a synchronous interfaces." +
+		"The @Publish annotation requires the publishing type" +
+		"(e.g. web service), the id (e.g. a web service url) and the service type," +
+		"i.e. interface to be specified." +
+		"The service is published at:" +
+		"<a href=\"http://localhost:8080/banking1/\">http://localhost:8080/banking1/</a>")
 public class BankingAgent
 {
 }
