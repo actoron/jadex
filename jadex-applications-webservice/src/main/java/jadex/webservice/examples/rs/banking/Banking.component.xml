@@ -10,7 +10,7 @@
     be specified.
     
     The service is published at:
-	<a href="http://localhost:8080/wanking1/banking1">http://localhost:8080/wanking1/banking1</a>
+	<a href="http://localhost:8080/wanking1/">http://localhost:8080/wanking1/</a>
 -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
