@@ -103,7 +103,7 @@ public class TCPOutputConnection
 //				System.out.println("connection.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
 //			}
 			ret = true;
-//			cleaner.refresh();
+			cleaner.refresh();
 		}
 		catch(IOException e)
 		{
