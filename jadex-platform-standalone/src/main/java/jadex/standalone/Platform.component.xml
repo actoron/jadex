@@ -341,7 +341,11 @@
 	</services>
 
 	<properties>
-		<property name="componentviewer.viewerclass">jadex.commons.SReflect.isAndroid() ? null : jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class</property>
+		<property name="componentviewer.viewerclass">
+		    // Todo: baseclassloader? but evaluated without args?
+		    jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
+		    	jadex.base.service.library.LibraryService.class.getClassLoader())
+		</property>
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->

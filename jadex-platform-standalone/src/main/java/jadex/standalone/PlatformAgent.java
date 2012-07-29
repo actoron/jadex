@@ -171,8 +171,6 @@ import java.util.logging.Level;
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()"))
-	//@ProvidedService(type=IPublishService.class, name="publish_ws", implementation=@Implementation(expression="Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null")),
-	//@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null"))
 })
 
 @RequiredServices(
@@ -182,7 +180,7 @@ import java.util.logging.Level;
 
 @Properties(
 {
-	@NameValue(name="componentviewer.viewerclass", value="SReflect.isAndroid() ? null : jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
+	@NameValue(name="componentviewer.viewerclass", value="jadex.commons.SReflect.classForName0(\"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel\", jadex.base.service.library.LibraryService.class.getClassLoader())"),
 	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
 })
 

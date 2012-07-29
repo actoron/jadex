@@ -56,17 +56,20 @@ public class PlatformsTest extends TestCase
 		"extensions"	// different because of component.xml vs. Agent.class
 	}));
 
-//	/** Platforms to exclude from comparison. */
-//	protected static final Set<String>	EXCLUDEPLATFORMS	= new HashSet<String>(Arrays.asList(new String[]
-//	{
-//		"jadex.standalone.Platform.bpmn"	// BPMN platform is just proof of concept. 
-//	}));
+	/** Platforms to exclude from comparison. */
+	protected static final Set<String>	EXCLUDEPLATFORMS	= new HashSet<String>(Arrays.asList(new String[]
+	{
+		"jadex.standalone.Platform.bpmn"	// BPMN platform is just proof of concept. 
+	}));
 
 	/**
 	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
+		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
+		    	jadex.base.service.library.LibraryService.class.getClassLoader()));
+		
 		PlatformsTest test = new PlatformsTest();
 		for(int i=0; i<10000; i++)
 		{
@@ -107,7 +110,7 @@ public class PlatformsTest extends TestCase
 			{
 				defmodel	= platform.getModel();
 			}
-			else //if(!EXCLUDEPLATFORMS.contains(PLATFORMS[(i-1)*2+1]))
+			else if(!EXCLUDEPLATFORMS.contains(PLATFORMS[(i-1)*2+1]))
 			{
 				compareModels(defmodel, platform.getModel());
 			}
@@ -279,6 +282,8 @@ public class PlatformsTest extends TestCase
 			assertNull(type+" '"+name+"' should have no default value: "+model.getFilename(), val);
 		}
 	}
+	
+	//-------- uncomment below to switch from test failure to print out --------
 	
 	public static void assertNotNull(String message, Object val)
 	{

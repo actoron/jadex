@@ -236,16 +236,16 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture isStartable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
+	public static IFuture<Boolean> isStartable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
-		Future ret = new Future();
+		Future<Boolean> ret = new Future<Boolean>();
 		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@Classname("isStartable")
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<Boolean> ret = new Future<Boolean>();
 //				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
@@ -279,7 +279,7 @@ public class SComponentFactory
 //				}));
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<Boolean>(ret));
 
 		return ret;
 	}

@@ -36,25 +36,39 @@ public class STestCenter
 					{
 						if(result.booleanValue())
 						{
-							SComponentFactory.loadModel(access, model, rid)
-								.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
+							SComponentFactory.isStartable(access, model, rid)
+								.addResultListener(new DelegationResultListener<Boolean>(ret)
 							{
-								public void customResultAvailable(final IModelInfo model)
+								public void customResultAvailable(Boolean result)
 								{
-									if(model!=null && model.getReport()==null)
+									if(result.booleanValue())
 									{
-										IArgument[]	results	= model.getResults();
-										boolean	istest	= false;
-										for(int i=0; !istest && i<results.length; i++)
+										SComponentFactory.loadModel(access, model, rid)
+											.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
 										{
-											if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
-												&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
-//												&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
-											{	
-												istest	= true;
+											public void customResultAvailable(final IModelInfo model)
+											{
+												if(model!=null && model.getReport()==null)
+												{
+													IArgument[]	results	= model.getResults();
+													boolean	istest	= false;
+													for(int i=0; !istest && i<results.length; i++)
+													{
+														if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
+															&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
+			//												&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
+														{	
+															istest	= true;
+														}
+													}
+													ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+												}
+												else
+												{
+													ret.setResult(Boolean.FALSE);
+												}
 											}
-										}
-										ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+										});
 									}
 									else
 									{

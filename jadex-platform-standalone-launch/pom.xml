@@ -182,16 +182,6 @@
 			<artifactId>jadex-kernel-extension-envsupport-opengl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-webservice</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- <dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-libservice-maven</artifactId>
-			<version>${project.version}</version>
-		</dependency> -->
 			
 		<!-- <dependency>
 		    <groupId>log4j</groupId>
@@ -200,7 +190,7 @@
 		</dependency> -->
 	</dependencies>
 	
-	<!-- Only include depedency when jmonkey extension present to allow dist build without 3d addon sources. -->
+	<!-- Only include addon depedencies when present to allow dist build without addon sources. -->
 	<profiles>
 	    <profile>
 	        <id>jmonkey</id>

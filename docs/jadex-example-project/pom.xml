@@ -34,32 +34,35 @@
 	</build>
 
 	<dependencies>
-		<!-- Platform for execution -->
+	    
+	    <!-- For simplicity, several default Jadex distributions
+	         are provided as Maven artifacts as shown below.
+	         
+	         Advanced developers might prefer, to include direct dependencies
+	         to single Jadex artifacts instead (e.g. jadex-kernel-bdi),
+	         for more fine-grained control over the dependencies. -->
+	    
+		<!-- Platform for execution
+			 Minimal: only component and micro kernel, no gui
+			 Standard: Minimal + all kernels and gui tools, envsupport and AGR extension
+			 Pro: Standard + all commercial add-ons (requires access to pro-repository)
+		 -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-standalone</artifactId>
+			<artifactId>jadex-distribution-standard</artifactId>
+			<!-- <artifactId>jadex-distribution-minimal</artifactId> -->
+			<!-- <artifactId>jadex-distribution-pro</artifactId> -->
 			<version>${jadex.version}</version>
 		</dependency>
 		
-		<!-- Component kernel required for basic platform components -->
+		<!-- Webservice extension (enable if needed) -->
+		<!--
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-component</artifactId>
+			<artifactId>jadex-platform-extension-webservice</artifactId>
 			<version>${jadex.version}</version>
 		</dependency>
-		
-		<!-- Micro kernel for hello world agent -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-micro</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
-		
-		<!-- Platform administration tools (JCC) -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-runtimetools-swing</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
+		-->
 	</dependencies>
+
 </project>

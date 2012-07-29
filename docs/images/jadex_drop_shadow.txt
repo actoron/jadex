@@ -6,7 +6,7 @@
 
 
 Image Size:
-Width: 310
+Width: 318
 Height: 98
 
 Effect Settings:
