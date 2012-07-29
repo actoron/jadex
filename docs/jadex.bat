@@ -1,3 +1,3 @@
 cd lib
-java -jar jadex-platform-standalone-launch-2.1.jar
+java -jar jadex-platform-standalone-launch-2.2-SNAPSHOT.jar
 cd ..

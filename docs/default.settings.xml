@@ -75,10 +75,10 @@
 	<rootPathEntries>
 		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="29" __len="4">
 			<entries>
-				<p1:String __ID="30">jadex-applications-bdi-2.1.jar</p1:String>
-				<p1:String __ID="31">jadex-applications-bdibpmn-2.1.jar</p1:String>
-				<p1:String __ID="32">jadex-applications-bpmn-2.1.jar</p1:String>
-				<p1:String __ID="34">jadex-applications-micro-2.1.jar</p1:String>
+				<p1:String __ID="30">jadex-applications-bdi-2.2-SNAPSHOT.jar</p1:String>
+				<p1:String __ID="31">jadex-applications-bdibpmn-2.2-SNAPSHOT.jar</p1:String>
+				<p1:String __ID="32">jadex-applications-bpmn-2.2-SNAPSHOT.jar</p1:String>
+				<p1:String __ID="34">jadex-applications-micro-2.2-SNAPSHOT.jar</p1:String>
 			</entries>
 		</p1:String__1>
 	</rootPathEntries>

@@ -6,7 +6,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-xml-dist</artifactId>
 	<packaging>pom</packaging>
-	<version>2.1</version>
+	<version>2.2-SNAPSHOT</version>
 	<name>jadex-xml-dist</name>
 	
 	<!-- ======== common plugin configurations ======== -->

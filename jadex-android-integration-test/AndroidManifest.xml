@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="3" android:versionName="2.1" package="jadex.android.application.demo.test">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="3" android:versionName="2.2-SNAPSHOT" package="jadex.android.application.demo.test">
 	<uses-sdk android:minSdkVersion="8"/>
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
