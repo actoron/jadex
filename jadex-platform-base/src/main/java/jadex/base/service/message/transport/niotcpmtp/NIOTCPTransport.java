@@ -105,13 +105,13 @@ public class NIOTCPTransport implements ITransport
 			// ANDROID: Selector.open() causes an exception in a 2.2
 			// emulator due to IPv6 addresses, see:
 			// http://code.google.com/p/android/issues/detail?id=9431
-			if (SReflect.isAndroid() && SReflect.getAndroidVersion() <= 8) {
-				java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-				java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-			}
-			
+//			if (SReflect.isAndroid() && SReflect.getAndroidVersion() <= 8) ...
+
 			// Causes problem with maven too (only with Win firewall?)
 			// http://www.thatsjava.com/java-core-apis/28232/
+			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+			java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
+			
 			final Selector selector = Selector.open();
 			
 			ssc.register(selector, SelectionKey.OP_ACCEPT);
