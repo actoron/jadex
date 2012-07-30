@@ -6,7 +6,6 @@
 	<id>androiddist</id>
 
 	<formats>
-		<!-- <format>dir</format> -->
 		<format>zip</format>
 	</formats>
 
@@ -14,6 +13,10 @@
 
 	<moduleSets>
 		<moduleSet>
+		<excludes>
+			<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
+			<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
+		</excludes>
 			<!-- Selected by profile. <includes> <include>jadex:*</include> </includes> -->
 			<binaries>
 			<includes> 
@@ -25,25 +28,6 @@
 				<outputDirectory>lib</outputDirectory>
 				<unpack>false</unpack>
 			</binaries>
-			
-<!-- 			<sources> -->
-<!-- 				<includeModuleDirectory>false</includeModuleDirectory> -->
-<!-- 				<fileSets> -->
-<!-- 					<fileSet> -->
-<!-- 						<outputDirectory>sources/${module.artifactId}</outputDirectory> -->
-<!-- 						<includes> -->
-<!-- 							<include>src/**</include> -->
-<!-- 							<include>pom.xml</include> -->
-<!-- 						</includes> -->
-<!-- 					</fileSet> -->
-<!-- 					<fileSet> -->
-<!-- 						<outputDirectory>sources/${module.artifactId}</outputDirectory> -->
-<!-- 						<includes> -->
-<!-- 							<include>lib/**</include> -->
-<!-- 						</includes> -->
-<!-- 					</fileSet> -->
-<!-- 				</fileSets> -->
-<!-- 			</sources> -->
 		</moduleSet>
 	</moduleSets>
 

@@ -578,92 +578,9 @@
 		<!-- ======== Android ======== -->
 
 		<profile>
-			<id>jadex-android-artifacts</id>
+			<id>jadex-android</id>
 			<build>
 				<finalName>jadex-android-${project.version}</finalName>
-			</build>
-			<modules>
-				<!-- Jadex modules -->
-				<module>jadex-parent</module>
-				<module>jadex-commons</module>
-				<module>jadex-bridge</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-xml</module>
-				<module>jadex-tools-base</module>
-				<module>jadex-rules</module>
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-platform-standalone</module>
-				
-				<!-- Android specific modules -->
-				<module>jadex-android-parent</module>
-				<module>jadex-android-xmlpull</module>
-				<module>jadex-android-antlr</module>
-				<module>jadex-runtimetools-android</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>jadex-android-dist</id>
-			<build>
-				<finalName>jadex-android-${project.version}</finalName>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archiverConfig>
-								<duplicateBehavior>skip</duplicateBehavior>
-							</archiverConfig>
-						</configuration>
-						<executions>
-							<execution>
-								<id>jadex-android-example-project</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>jadex-android-example-projects</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>sources</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-androidsrczip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-android.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
 			</build>
 			<modules>
 				<!-- Jadex modules -->

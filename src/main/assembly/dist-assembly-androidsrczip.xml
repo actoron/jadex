@@ -10,11 +10,13 @@
 	</formats>
 
 	<includeBaseDirectory>false</includeBaseDirectory>
-
+	
 	<moduleSets>
 		<moduleSet>
-			<excludes>
-			</excludes>
+		<excludes>
+			<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
+<!-- 			<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude> -->
+		</excludes>
 			<sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
 				<fileSets>
@@ -25,7 +27,13 @@
 							<include>lib/**</include>
 							<include>docs/**</include>
 							<include>**/pom.xml</include>
+							<include>project.properties</include>
+							<include>AndroidManifest.xml</include>
 						</includes>
+						<excludes>
+							<exclude>**/bin/**</exclude>
+							<exclude>**/target/**</exclude>
+						</excludes>
 					</fileSet>
 				</fileSets>
 			</sources>
@@ -36,11 +44,15 @@
 		<fileSet>
 			<directory>docs/android/</directory>
 			<outputDirectory>sources/docs/android/</outputDirectory>
+			<excludes>
+				<exclude>**/bin/**</exclude>
+				<exclude>**/target/**</exclude>
+			</excludes>
 		</fileSet>
-		<fileSet>
-			<directory>docs/android/</directory>
-			<outputDirectory>sources/docs/android/</outputDirectory>
-		</fileSet>
+<!-- 		<fileSet> -->
+<!-- 			<directory>docs/android/</directory> -->
+<!-- 			<outputDirectory>sources/docs/android/</outputDirectory> -->
+<!-- 		</fileSet> -->
 	</fileSets>
 	
 	<files>
@@ -126,6 +138,10 @@
 		<file>
 			<source>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>pom-android-dist.xml</source>
+			<outputDirectory>sources</outputDirectory>
 		</file>
 	</files>
 

@@ -19,6 +19,10 @@
 		</fileSet>
 		<!-- Include android maven example project -->
 		<fileSet>
+			<excludes>
+				<exclude>bin/**/*</exclude>
+				<exclude>target/**/*</exclude>
+			</excludes>
 			<directory>docs/android/jadex-android-example-project-maven</directory>
 			<outputDirectory>jadex-android-example-project-maven</outputDirectory>
 		</fileSet>

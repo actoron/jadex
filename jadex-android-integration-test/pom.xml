@@ -102,18 +102,18 @@
 	</dependencies>
 
 	<build>
-<!-- 		<sourceDirectory>src/main/java</sourceDirectory> -->
 		<plugins>
-		    <plugin>
+			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<configuration>
 					<emulator>
-						<avd>22</avd>
 						<!-- name of the avd to deploy to and run the instrumentation on -->
-						<wait>150000</wait> <!-- wait time for the emulator to start -->
-						<options>-partition-size 128 -wipe-data</options>
+						<avd>22</avd>
+						<!-- wait time for the emulator to start -->
+						<wait>150000</wait>
 						<!-- additional options to run the emulator with -->
+						<options>-partition-size 128 -wipe-data</options>
 					</emulator>
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					<sdk>
