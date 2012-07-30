@@ -6,6 +6,7 @@ import jadex.android.application.demo.JadexAndroidHelloWorldActivity;
 import jadex.android.application.demo.R;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -39,17 +40,29 @@ public class StartPlatformTest extends ActivityInstrumentationTestCase2<JadexAnd
 		
 		solo.waitForView(solo.getView(R.id.startPlatformButton));
 		
-//		solo.sleep(1500);
 		
 
 		solo.waitForText("Starting Jadex platform...");
-		assertFalse(solo.getView(R.id.startPlatformButton).isClickable());
-		solo.waitForText("Platform started:");
 		
-		assertTrue(solo.getText(0).getText().toString().contains("Platform started"));
+		solo.sleep(1500);
+//		assertFalse(solo.getView(R.id.startPlatformButton).isEnabled());
+		
+		solo.waitForText("Platform started:",1,3000);
+		
+		TextView view = (TextView) solo.getView(R.id.infoTextView);
+		assertTrue(view.getText().toString().contains("Platform started"));
 		
 		solo.clickOnView(solo.getView(R.id.startAgentButton));
 		solo.waitForText("This is Agent");
+		
+		assertTrue(view.getText().toString().contains("Agents started: 1"));
+		solo.sleep(2000);
+		
+		solo.clickOnView(solo.getView(R.id.pingButton));
+		solo.waitForText("HelloWorldAgent1: pong");
+		
+		solo.clickOnView(solo.getView(R.id.startPlatformButton));
+		solo.waitForText("Platform stopped.");
 		
 	}
 
