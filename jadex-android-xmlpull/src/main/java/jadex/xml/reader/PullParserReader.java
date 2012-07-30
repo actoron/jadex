@@ -12,6 +12,8 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -73,6 +75,15 @@ public class PullParserReader extends AReader
 			Object callcontext) throws Exception
 	{
 		XmlPullParser parser = factory.newPullParser();
+//		BufferedReader bufferedReader = new BufferedReader(input);
+//		String line;
+//		while (bufferedReader.ready()) {
+//			 line = bufferedReader.readLine();
+//			 System.out.println(line);
+//		}
+//		
+//		input.reset();
+		
 		parser.setInput(input);
 		ReadContextAndroid readcontext = new ReadContextAndroid(tipmanager, handler, parser, reporter, callcontext, classloader);
 		READ_CONTEXT.set(readcontext);
@@ -107,6 +118,11 @@ public class PullParserReader extends AReader
 						// StaX: DTD
 					case XmlPullParser.ENTITY_REF :
 						// StaX: ENTITY_REFERENCE
+						// workaround: Android Pull Parser handles %amp; as reference.
+						char[] textCharacters = readcontext.getParser().getTextCharacters(new int[2]);
+						if ("amp".equals(readcontext.getParser().getName())) {
+							handleContent(readcontext);
+						}
 					case XmlPullParser.IGNORABLE_WHITESPACE :
 						// StaX: SPACE
 					case XmlPullParser.PROCESSING_INSTRUCTION :

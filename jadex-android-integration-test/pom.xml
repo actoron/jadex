@@ -99,6 +99,13 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.jayway.android.robotium</groupId>
+			<artifactId>robotium-solo</artifactId>
+			<version>3.3</version>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -158,15 +165,15 @@
 						</goals>
 					</execution>
 
-<!-- 					<execution> -->
-<!-- 						android plugin execution that starts the emulator. -->
-<!-- 						<id>stopemulator</id> -->
-<!-- 						bound to the 'install' phase -->
-<!-- 						<phase>install</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>emulator-stop</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
+					<!-- <execution> -->
+					<!-- android plugin execution that starts the emulator. -->
+					<!-- <id>stopemulator</id> -->
+					<!-- bound to the 'install' phase -->
+					<!-- <phase>install</phase> -->
+					<!-- <goals> -->
+					<!-- <goal>emulator-stop</goal> -->
+					<!-- </goals> -->
+					<!-- </execution> -->
 				</executions>
 			</plugin>
 		</plugins>

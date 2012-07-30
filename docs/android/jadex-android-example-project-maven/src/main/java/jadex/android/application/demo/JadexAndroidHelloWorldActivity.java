@@ -142,7 +142,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 								}
 							});
 						}
-					});
+					}).start();
 				} else {
 					startPlatformButton.setEnabled(false);
 					textView.setText("Starting Jadex Platform...");

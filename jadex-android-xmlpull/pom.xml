@@ -23,11 +23,13 @@
 			<artifactId>jadex-xml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-commons</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-commons</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+     		<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

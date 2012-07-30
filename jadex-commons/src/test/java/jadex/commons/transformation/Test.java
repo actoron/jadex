@@ -129,11 +129,9 @@ public abstract class Test extends TestCase
 				testAnonymousInnerClassWithSimpleTypes();
 				testSelfReferenceBean();
 			
-				/* if_not[android]*/
 				testColor();
 				testImage();
 				testRectangle();
-				/* end[android]*/
 			}
 			long dur = System.currentTimeMillis()-start;
 			
