@@ -5,7 +5,7 @@
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+						http://jadex.sourceforge.net/jadex-component-2.1.xsd"
 	name="ChatE3" package="jadex.micro.tutorial">
 	
 	<componenttypes>

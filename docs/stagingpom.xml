@@ -16,22 +16,22 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-standalone</artifactId>
-			<version>2.2-SNAPSHOT</version>
+			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools</artifactId>
-			<version>2.2-SNAPSHOT</version>
+			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
-			<version>2.2-SNAPSHOT</version>
+			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdibpmn</artifactId>
-			<version>2.2-SNAPSHOT</version>
+			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

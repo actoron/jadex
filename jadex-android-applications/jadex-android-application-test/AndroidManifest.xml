@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="de.unihamburg.vsis.jadexAndroid_test" android:versionCode="1" android:versionName="2.2-SNAPSHOT">
+  package="de.unihamburg.vsis.jadexAndroid_test" android:versionCode="1" android:versionName="2.1.1-SNAPSHOT">
     <uses-sdk android:minSdkVersion="8"></uses-sdk>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_LOGS"/>
