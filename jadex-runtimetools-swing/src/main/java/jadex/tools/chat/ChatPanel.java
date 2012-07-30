@@ -75,6 +75,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -1800,6 +1802,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			DataLine.Info	info	= new DataLine.Info(Clip.class, format);
 			Clip	clip	= (Clip)AudioSystem.getLine(info);
 			clip.open(ais);
+			clip.addLineListener(new LineListener()
+			{
+				public void update(LineEvent event)
+				{
+					if(event.getType()==LineEvent.Type.STOP)
+					{
+						// Close the clip after it finished playing.
+						event.getLine().close();
+					}
+				}
+			});
 			clip.start();
 //			while(clip.isRunning())
 //			{

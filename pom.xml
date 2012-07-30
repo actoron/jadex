@@ -610,7 +610,7 @@
 		<profile>
 			<id>jadex-android-dist</id>
 			<build>
-			<finalName>jadex-android-${project.version}</finalName>
+				<finalName>jadex-android-${project.version}</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>

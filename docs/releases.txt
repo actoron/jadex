@@ -1,5 +1,8 @@
 Jadex Releases Overview
 
+Release 2.1.1 (Bugfix release 08/2012)
+	- Fixed memory leak in chat sound
+
 Release 2.1 (Global Connectivity release 07/2012)
 	- Relay transport and awareness for global connectivity
 	- Security features for protecting platforms from malicious access
