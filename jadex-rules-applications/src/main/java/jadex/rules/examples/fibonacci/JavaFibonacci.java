@@ -44,7 +44,6 @@ public class JavaFibonacci
 		
 		IOAVState state = OAVStateFactory.createOAVState(fibonacci_type_model); // Create the production memory.
 		Rulebase rb	= new Rulebase();
-		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new PriorityAgenda());
 			
 		// Add rules to rulebase.
 		
@@ -52,7 +51,7 @@ public class JavaFibonacci
 		ObjectCondition fncon = new ObjectCondition(fibo_type);
 		fncon.addConstraint(new BoundConstraint(null, fn));
 		fncon.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
-		rete.getRulebase().addRule(new Rule("recurse", fncon, new IAction()
+		rb.addRule(new Rule("recurse", fncon, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
@@ -67,7 +66,7 @@ public class JavaFibonacci
 		f1con.addConstraint(new BoundConstraint(null, f1));
 		f1con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
 		f1con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("sequence"), new Integer(1)));
-		rete.getRulebase().addRule(new Rule("bootstrap1", f1con, new IAction()
+		rb.addRule(new Rule("bootstrap1", f1con, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
@@ -82,7 +81,7 @@ public class JavaFibonacci
 		f2con.addConstraint(new BoundConstraint(null, f2));
 		f2con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
 		f2con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("sequence"), new Integer(2)));
-		rete.getRulebase().addRule(new Rule("bootstrap2", f2con, new IAction()
+		rb.addRule(new Rule("bootstrap2", f2con, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
@@ -118,7 +117,7 @@ public class JavaFibonacci
 		f22con.addConstraint(new PredicateConstraint(new FunctionCall(new OperatorFunction(IOperator.EQUAL), 
 			new Object[]{f1cnt, new FunctionCall(new Sub(), new Object[]{f2cnt, new Integer(1)})})));
 		
-		rete.getRulebase().addRule(new Rule("calc", new AndCondition(new ICondition[]{f00con, f11con, f22con}), new IAction()
+		rb.addRule(new Rule("calc", new AndCondition(new ICondition[]{f00con, f11con, f22con}), new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
@@ -134,6 +133,7 @@ public class JavaFibonacci
 		state.addJavaRootObject(f50);
 		
 		// Initialize rule system.
+		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new PriorityAgenda());
 		rete.init();
 		
 //		long start = System.currentTimeMillis();

@@ -254,6 +254,7 @@ public class Blocksworld
 		IRule rule = new Rule("block", cond, action);
 		Rulebase rb = new Rulebase();
 		IPatternMatcherFunctionality pf = new RetePatternMatcherFunctionality(rb);
+		
 		RuleSystem system = new RuleSystem(OAVStateFactory.createOAVState(blocksworld_type_model), rb,  pf);
 		system.init();
 //		ReteNode node = system.getReteNode();

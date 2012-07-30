@@ -621,9 +621,6 @@ public class Hanoi
 		oc2c.addConstraint(new BoundConstraint(null, new Variable("agent", agent_type)));
 
 		Rulebase rb = new Rulebase();
-		RetePatternMatcherFunctionality pf = new RetePatternMatcherFunctionality(rb);
-		RuleSystem rete = new RuleSystem(state, rb, pf);
-		rete.init();
 		
 		IAction action = new IAction()
 		{
@@ -646,7 +643,11 @@ public class Hanoi
 //		IRule rule = new Rule("Hanoi", new AndCondition(new ICondition[]{oc2c, oc1b, nc1}), action);
 
 //		System.out.println("Rule: "+rule);
-		rete.getRulebase().addRule(rule);
+		rb.addRule(rule);
+		
+		RetePatternMatcherFunctionality pf = new RetePatternMatcherFunctionality(rb);
+		RuleSystem rete = new RuleSystem(state, rb, pf);
+		rete.init();
 
 //		if(showrete)
 //			RetePanel.createReteFrame("Hanoi Rete Structure", ((RetePatternMatcher)rete.getMatcher()).getReteNode());

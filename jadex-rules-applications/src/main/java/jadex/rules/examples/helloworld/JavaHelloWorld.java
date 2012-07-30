@@ -36,7 +36,6 @@ public class JavaHelloWorld
 		// Create rete system.
 		IOAVState state = OAVStateFactory.createOAVState(helloworld_type_model); // Create the production memory.
 		Rulebase rb	= new Rulebase();
-		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new LIFOAgenda());
 		
 		// The following five code fragments represent alternatives for condition creation
 		
@@ -58,7 +57,7 @@ public class JavaHelloWorld
 //		ICondition	msgcon	= ParserHelper.parseJavaCondition("jadex.rules.examples.helloworld.Message $message", helloworld_type_model);
 
 		// Add rule to rulebase.
-		rete.getRulebase().addRule(new Rule("new_message", msgcon, new IAction()
+		rb.addRule(new Rule("new_message", msgcon, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
@@ -70,7 +69,9 @@ public class JavaHelloWorld
 		
 		// Add fact.
 		state.addJavaRootObject(new Message("Hello Java World!"));
-		
+
+		RuleSystem rete = new RuleSystem(state, rb, new RetePatternMatcherFunctionality(rb), new LIFOAgenda());
+
 		// Initialize rule system.
 		rete.init();
 //		rete.getAgenda().setHistoryEnabled(true);
