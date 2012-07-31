@@ -74,8 +74,14 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 					{
 						public void notifyListener(final IResultListener<Void> listener)
 						{
+							// Don't reschedule if already on correct thread.
+							if(caller!=null && caller.equals(IComponentIdentifier.LOCAL.get()))
+							{
+								listener.resultAvailable(null);
+							}
+
 							// Do not reschedule remotely
-							if(adapter!=null || caller!=null && caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
+							else if(adapter!=null || caller!=null && caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
 							{
 								getAdapter(caller, sic).addResultListener(new IResultListener<IComponentAdapter>()
 								{
@@ -242,11 +248,24 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					public void customResultAvailable(IComponentManagementService cms)
 					{
-//						if(sic.getMethod().getName().indexOf("createComponent")!=-1)
+//						if(sic.getMethod().getName().indexOf("getComponentAdapter")!=-1)
 //							System.out.println("back to: "+caller+" for: "+sic.getMethod()+" "+sic.getArguments());
 						
 						cms.getComponentAdapter(caller)
-							.addResultListener(new DelegationResultListener<IComponentAdapter>(ret));
+							.addResultListener(new DelegationResultListener<IComponentAdapter>(ret)
+						{
+							public void customResultAvailable(IComponentAdapter result)
+							{
+								if(result!=null)
+								{
+									super.customResultAvailable(result);
+								}
+								else
+								{
+									ret.setException(new RuntimeException("No adapter"));									
+								}
+							}
+						});
 					}
 				});
 			}

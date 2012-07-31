@@ -3,6 +3,7 @@ package jadex.bridge.service.types.factory;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
 
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
  *  These are the methods a kernel components needs to call on its host component.
  *  Implementations of this interface should be thread safe.
  */
+@Reference(local=true, remote=false)	// Hack!!! required because of local getComponentAdapter method of CMS.
 public interface IComponentAdapter
 {
 	/**
