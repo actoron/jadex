@@ -13,7 +13,7 @@
 
 	<description>
 		The Jadex webservice platform extension package contains
-		functionality for WSDL web services and REST web services.
+		basic functionality for WSDL web services and REST web services.
 	</description>
 	
 	<dependencies>
