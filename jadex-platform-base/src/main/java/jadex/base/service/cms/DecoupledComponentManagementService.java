@@ -15,6 +15,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -1803,7 +1804,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 							{
 								try
 								{
-									ret.setResult(getComponentInstance(getComponentAdapter(cid)).getExternalAccess());
+									ret.setResult(getComponentInstance(internalGetComponentAdapter(cid)).getExternalAccess());
 								}
 								catch(Exception e)
 								{
@@ -1887,14 +1888,26 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		return ret;
 	}
 
+	/**
+	 *  Get the component adapter for a component identifier.
+	 *  @param aid The component identifier.
+	 *  @param listener The result listener.
+	 */
+    // Todo: Hack!!! remove
+	@Excluded
+	public IFuture<IComponentAdapter> getComponentAdapter(IComponentIdentifier cid)
+	{
+		return new Future<IComponentAdapter>(internalGetComponentAdapter(cid));
+	}
 	
 	/**
 	 *  Get the component adapter for a component identifier.
 	 *  @param aid The component identifier.
 	 *  @param listener The result listener.
 	 */
-    // Todo: Hack!!! remove?
-	public IComponentAdapter getComponentAdapter(IComponentIdentifier cid)
+    // Todo: Hack!!! remove
+	@Excluded
+	public IComponentAdapter internalGetComponentAdapter(IComponentIdentifier cid)
 	{
 		IComponentAdapter ret;
 		ret = (IComponentAdapter)adapters.get(cid);

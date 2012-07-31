@@ -203,7 +203,6 @@ public class Vector1Double implements IVector1
 		return new Vector2Double(this.getAsDouble(), sec.getAsDouble());
 	}
 
-	@Override
 	public IVector1 cbrt() {
 		// TODO Auto-generated method stub
 		return null;

@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -247,5 +248,6 @@ public interface IComponentManagementService //extends IService
 	 *  @param listener The result listener.
 	 */
     // Todo: Hack!!! remove
-	public IComponentAdapter getComponentAdapter(IComponentIdentifier cid);
+	@Excluded
+	public IFuture<IComponentAdapter> getComponentAdapter(IComponentIdentifier cid);
 }

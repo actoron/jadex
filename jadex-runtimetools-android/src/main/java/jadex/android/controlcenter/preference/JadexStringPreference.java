@@ -77,7 +77,6 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 		setText(text);
 	}
 	
-	@Override
 	public void onClick(View v) {
 		showDialog();
 	}

@@ -125,7 +125,6 @@ public class DeploymentService implements IDeploymentService
 		SServiceProvider.getService(agent.getServiceProvider(), IContextService.class).addResultListener(
 				new DefaultResultListener<IContextService>()
 				{
-					@Override
 					public void resultAvailable(IContextService cs)
 					{
 						try

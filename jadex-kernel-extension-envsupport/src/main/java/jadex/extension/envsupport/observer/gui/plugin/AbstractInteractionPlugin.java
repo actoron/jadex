@@ -92,7 +92,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 		return "jadex/application/space/envsupport/observer/images/introspector_icon.png";
 	}
 
-	@Override
 	public final void shutdown()
 	{
 		// TODO Auto-generated method stub
@@ -103,7 +102,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 		cleanUp(obsCenter);
 	}
 
-	@Override
 	public final void start(ObserverCenter main)
 	{
 		if (!initialized)
@@ -112,8 +110,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 			obsCenter = main;
 			clickListener = new MouseListener()
 			{
-				
-				@Override
 				public void mouseReleased(MouseEvent e)
 				{
 					e.setSource(AbstractInteractionPlugin.this);
@@ -122,7 +118,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 							((MouseListener) it.next()).mouseReleased(e);
 				}
 				
-				@Override
 				public void mousePressed(MouseEvent e)
 				{
 					e.setSource(AbstractInteractionPlugin.this);
@@ -131,7 +126,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 							((MouseListener) it.next()).mousePressed(e);
 				}
 				
-				@Override
 				public void mouseExited(MouseEvent e)
 				{
 					e.setSource(AbstractInteractionPlugin.this);
@@ -140,7 +134,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 							((MouseListener) it.next()).mouseExited(e);
 				}
 				
-				@Override
 				public void mouseEntered(MouseEvent e)
 				{
 					e.setSource(AbstractInteractionPlugin.this);
@@ -160,7 +153,6 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 			
 			objectListener = new ChangeListener()
 			{
-				@Override
 				public void stateChanged(ChangeEvent e)
 				{
 					if (obsCenter.getSelectedPerspective().getSelectedObject() != null)

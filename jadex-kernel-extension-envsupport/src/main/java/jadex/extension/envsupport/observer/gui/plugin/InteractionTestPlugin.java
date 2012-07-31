@@ -30,13 +30,11 @@ public class InteractionTestPlugin extends AbstractInteractionPlugin
 		});
 	}
 
-	@Override
 	public String getName()
 	{
 		return "Test Interaction";
 	}
-
-	@Override
+	
 	public Component getView()
 	{
 		return new JPanel();

@@ -123,7 +123,6 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 		// allow long clicks on items
 		getListView().setOnItemLongClickListener(new OnItemLongClickListener()
 		{
-			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				ListView listView = (ListView) parent;
@@ -243,19 +242,16 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 			SServiceProvider.getServiceUpwards(extAcc.getServiceProvider(), IComponentManagementService.class).addResultListener(
 					new DefaultResultListener<IComponentManagementService>()
 					{
-						@Override
 						public void resultAvailable(final IComponentManagementService cms)
 						{
 							cms.getComponentIdentifiers().addResultListener(new DefaultResultListener<IComponentIdentifier[]>()
 							{
-								@Override
 								public void resultAvailable(IComponentIdentifier[] result)
 								{
 									for (IComponentIdentifier cid : result)
 									{
 										cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 										{
-											@Override
 											public void resultAvailable(final IExternalAccess acc)
 											{
 												Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
@@ -267,7 +263,6 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 												{
 													runOnUiThread(new Runnable()
 													{
-														@Override
 														public void run()
 														{
 															if (addComponentSettings(componentsCat, acc, clazz))

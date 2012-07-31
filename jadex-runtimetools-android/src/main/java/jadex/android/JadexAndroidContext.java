@@ -275,15 +275,12 @@ public class JadexAndroidContext extends AndroidContext
 				IFuture<IExternalAccess> future = Starter.createPlatform((defOptions + options).split("\\s+"));
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{
-
-					@Override
 					public void resultAvailable(IExternalAccess result)
 					{
 						setExternalPlattformAccess(result.getComponentIdentifier(), result);
 						ret.setResult(result);
 					}
 
-					@Override
 					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);

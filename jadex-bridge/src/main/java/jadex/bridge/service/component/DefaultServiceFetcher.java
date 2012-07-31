@@ -759,16 +759,22 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 					public void customResultAvailable(final IThreadPoolService tp)
 					{
-						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
-						IFuture<IService>	fut	= access.scheduleStep(new IComponentStep<IService>()
+						cms.getComponentAdapter((IComponentIdentifier)provider.getId())
+							.addResultListener(new DelegationResultListener(ret)
 						{
-							public IFuture<IService> execute(IInternalAccess ia)
+							public void customResultAvailable(final Object adapter)
 							{
-		//						System.out.println("createProxy 2:"+service);
-								return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, adapter, service, DefaultServiceFetcher.this, info, binding, tp));
+								IFuture<IService>	fut	= access.scheduleStep(new IComponentStep<IService>()
+								{
+									public IFuture<IService> execute(IInternalAccess ia)
+									{
+				//						System.out.println("createProxy 2:"+service);
+										return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, (IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, tp));
+									}
+								});
+								fut.addResultListener(new DelegationResultListener(ret));
 							}
 						});
-						fut.addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}

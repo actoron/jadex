@@ -12,7 +12,6 @@ public class ViewableFilter implements IRemoteFilter {
 	/** Static proxy filter instance. */
 	public static IRemoteFilter VIEWABLE_FILTER = new ViewableFilter();
 
-	@Override
 	public IFuture<Boolean> filter(Object obj) {
 		Future<Boolean> ret = new Future<Boolean>();
 		if (obj instanceof IService) {

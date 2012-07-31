@@ -444,15 +444,12 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		return viewport3d;
 	}
 
-
-	@Override
 	public boolean getOpenGl()
 	{
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public boolean setOpenGl(boolean opengl)
 	{
 		// TODO Auto-generated method stub
@@ -503,7 +500,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 
 	}
 
-	@Override
 	public void resetZoomAndPosition()
 	{
 		// TODO Auto-generated method stub

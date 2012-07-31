@@ -70,7 +70,6 @@ public class AndroidSettingsServiceTest extends TestCase
 		IFuture<Properties> properties = ass.getProperties("clockservice");
 		properties.addResultListener(new DefaultResultListener<Properties>()
 		{
-			@Override
 			public void resultAvailable(Properties result)
 			{
 				assertEquals("type", result.getProperties()[0].getType());
@@ -99,7 +98,6 @@ public class AndroidSettingsServiceTest extends TestCase
 		ass.getProperties("clockservice").addResultListener(
 				new DefaultResultListener<Properties>()
 				{
-					@Override
 					public void resultAvailable(Properties result)
 					{
 						assertEquals("type",
@@ -116,7 +114,6 @@ public class AndroidSettingsServiceTest extends TestCase
 		ass.getProperties("simulationservice").addResultListener(
 				new DefaultResultListener<Properties>()
 				{
-					@Override
 					public void resultAvailable(Properties result)
 					{
 						assertEquals("executing",
@@ -129,7 +126,6 @@ public class AndroidSettingsServiceTest extends TestCase
 		ass.getProperties("securityservice").addResultListener(
 				new DefaultResultListener<Properties>()
 				{
-					@Override
 					public void resultAvailable(Properties result)
 					{
 						assertEquals("usepass",
@@ -168,7 +164,6 @@ public class AndroidSettingsServiceTest extends TestCase
 		ass.getProperties("clockservice").addResultListener(
 				new DefaultResultListener<Properties>()
 				{
-					@Override
 					public void resultAvailable(Properties result)
 					{
 						assertEquals("type",
@@ -534,8 +529,6 @@ public class AndroidSettingsServiceTest extends TestCase
 		{
 			return new DefaultResultListener<T>()
 			{
-
-				@Override
 				public void resultAvailable(T result)
 				{
 					listener.resultAvailable(result);

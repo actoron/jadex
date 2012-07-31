@@ -66,14 +66,12 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		helper = new AwarenessManagementAgentHelper(extAcc);
 	}
 
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add("Refresh");
 		return true;
 	}
 
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		refreshSettings();
@@ -146,7 +144,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			disMechanism.setOnPreferenceClickListener(new OnPreferenceClickListener()
 			{
 
-				@Override
 				public boolean onPreferenceClick(Preference preference)
 				{
 					disMechanism.setEnabled(false);
@@ -155,18 +152,15 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			});
 			disMechanism.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 			{
-				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue)
 				{
 					final boolean on = (Boolean) newValue;
 					helper.setDiscoveryMechanismState(disType, on).addResultListener(new DefaultResultListener<Void>()
 					{
-						@Override
 						public void resultAvailable(Void result)
 						{
 							uiHandler.post(new Runnable()
 							{
-								@Override
 								public void run()
 								{
 									disMechanism.setEnabled(true);
@@ -179,7 +173,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						{
 							uiHandler.post(new Runnable()
 							{
-								@Override
 								public void run()
 								{
 									disMechanism.setEnabled(true);
@@ -219,13 +212,10 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		}
 		helper.getActiveDiscoveryMechanisms().addResultListener(new DefaultResultListener<Set<String>>()
 		{
-			@Override
 			public void resultAvailable(final Set<String> localtypes)
 			{
 				uiHandler.post(new Runnable()
 				{
-					
-					@Override
 					public void run()
 					{
 						for (int i = 0; i < cbmechanisms.length; i++)
@@ -285,7 +275,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 				// sprefresh.setValue(new Integer(0));
 			}
 
-			@Override
 			public void resultAvailable(final DiscoveryInfo[] ds)
 			{
 				List<Preference> newDisPrefs = new ArrayList<Preference>();
@@ -302,7 +291,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						DiscoveryPreference disPref = new DiscoveryPreference(infoCat.getContext(), info);
 						disPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 						{
-							@Override
 							public boolean onPreferenceChange(Preference preference, Object value)
 							{
 								final Boolean create = (Boolean) value;
@@ -319,7 +307,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 											exception.printStackTrace();
 											uiHandler.post(new Runnable()
 											{
-												@Override
 												public void run()
 												{
 													Toast.makeText(screen.getContext(),
@@ -329,7 +316,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 											});
 										};
 
-										@Override
 										public void resultAvailable(Void result)
 										{
 											refreshDiscoveryInfos();
@@ -351,7 +337,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		});
 	}
 
-	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue)
 	{
 		// local variable for XML transfer
@@ -385,7 +370,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		return true;
 	}
 
-	@Override
 	public void setPlatformId(IComponentIdentifier platformId)
 	{
 		this.platformId = platformId;

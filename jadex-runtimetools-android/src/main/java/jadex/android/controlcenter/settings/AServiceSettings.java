@@ -25,13 +25,11 @@ public abstract class AServiceSettings implements ISettings {
 	 */
 	protected abstract void createPreferenceHierarchy(PreferenceScreen screen);
 
-	@Override
 	public void setPreferenceScreen(PreferenceScreen screen) {
 		screen.setTitle(title);
 		createPreferenceHierarchy(screen);
 	}
 
-	@Override
 	public String getTitle() {
 		return title;
 	}

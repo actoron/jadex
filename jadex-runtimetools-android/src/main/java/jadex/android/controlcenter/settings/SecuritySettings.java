@@ -76,14 +76,12 @@ public class SecuritySettings extends AServiceSettings
 		this.platformPasswords = new HashMap<String, String>();
 	}
 
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add("Add remote platform password");
 		return true;
 	}
 
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		final AlertDialog.Builder builder = new AlertDialog.Builder(platformPasswordsCat.getContext());
@@ -91,13 +89,10 @@ public class SecuritySettings extends AServiceSettings
 		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
 				IAwarenessManagementService.class).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
 		{
-
-			@Override
 			public void resultAvailable(IAwarenessManagementService result)
 			{
 				result.getKnownPlatforms().addResultListener(new DefaultResultListener<Collection<DiscoveryInfo>>()
 				{
-					@Override
 					public void resultAvailable(Collection<DiscoveryInfo> platforms)
 					{
 						final ArrayList<DiscoveryInfo> platformList = new ArrayList<DiscoveryInfo>(platforms.size());
@@ -114,8 +109,6 @@ public class SecuritySettings extends AServiceSettings
 						if (items.isEmpty()) {
 							uiHandler.post(new Runnable()
 							{
-
-								@Override
 								public void run()
 								{
 									Toast.makeText(platformPasswordsCat.getContext(), "No further platforms found!", Toast.LENGTH_LONG)
@@ -135,7 +128,6 @@ public class SecuritySettings extends AServiceSettings
 									pwDialog.show();
 									pwDialog.setOnApplyListener(new OnClickListener()
 									{
-										@Override
 										public void onClick(View v)
 										{
 											String password = pwDialog.getPassword();
@@ -148,8 +140,6 @@ public class SecuritySettings extends AServiceSettings
 							});
 							uiHandler.post(new Runnable()
 							{
-
-								@Override
 								public void run()
 								{
 									AlertDialog alert = builder.create();
@@ -206,7 +196,6 @@ public class SecuritySettings extends AServiceSettings
 
 		usePw.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 		{
-			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue)
 			{
 				secService.setUsePassword((Boolean) newValue);
@@ -216,7 +205,6 @@ public class SecuritySettings extends AServiceSettings
 
 		password.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 		{
-			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue)
 			{
 				secService.setLocalPassword((String) newValue);
@@ -226,8 +214,6 @@ public class SecuritySettings extends AServiceSettings
 
 		trulan.setOnPreferenceClickListener(new OnPreferenceClickListener()
 		{
-
-			@Override
 			public boolean onPreferenceClick(Preference preference)
 			{
 
@@ -237,8 +223,6 @@ public class SecuritySettings extends AServiceSettings
 
 		trulan.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 		{
-
-			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue)
 			{
 				final Boolean newState = (Boolean) newValue;
@@ -248,8 +232,6 @@ public class SecuritySettings extends AServiceSettings
 							"Access from trusted Platforms is not password protected by default!\n You can add a password below.")
 							.setPositiveButton("Ok", new DialogInterface.OnClickListener()
 							{
-
-								@Override
 								public void onClick(DialogInterface dialog, int which)
 								{
 									secService.setTrustedLanMode(newState);
@@ -258,8 +240,6 @@ public class SecuritySettings extends AServiceSettings
 
 							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
 							{
-								
-								@Override
 								public void onClick(DialogInterface dialog, int which)
 								{
 									trulan.setChecked(false);
@@ -280,12 +260,10 @@ public class SecuritySettings extends AServiceSettings
 	{
 		secService.isUsePassword().addResultListener(new DefaultResultListener<Boolean>()
 		{
-			@Override
 			public void resultAvailable(final Boolean result)
 			{
 				uiHandler.post(new Runnable()
 				{
-					@Override
 					public void run()
 					{
 						usePw.setValue(result);
@@ -297,13 +275,10 @@ public class SecuritySettings extends AServiceSettings
 
 		secService.getLocalPassword().addResultListener(new DefaultResultListener<String>()
 		{
-			@Override
 			public void resultAvailable(final String result)
 			{
 				uiHandler.post(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						password.setValue(result);
@@ -315,8 +290,6 @@ public class SecuritySettings extends AServiceSettings
 
 		secService.getPlatformPasswords().addResultListener(new DefaultResultListener<Map<String, String>>()
 		{
-
-			@Override
 			public void resultAvailable(Map<String, String> result)
 			{
 				setPlatformPasswords(result);
@@ -325,8 +298,6 @@ public class SecuritySettings extends AServiceSettings
 
 		secService.getNetworkPasswords().addResultListener(new DefaultResultListener<Map<String, String>>()
 		{
-
-			@Override
 			public void resultAvailable(Map<String, String> result)
 			{
 				setNetworkPasswords(result);
@@ -335,8 +306,6 @@ public class SecuritySettings extends AServiceSettings
 
 		secService.isTrustedLanMode().addResultListener(new DefaultResultListener<Boolean>()
 		{
-
-			@Override
 			public void resultAvailable(Boolean result)
 			{
 				trulan.setChecked(result);
@@ -391,7 +360,6 @@ public class SecuritySettings extends AServiceSettings
 	 */
 	protected OnPreferenceClickListener onPlatformPasswordClickListener = new OnPreferenceClickListener()
 	{
-		@Override
 		public boolean onPreferenceClick(Preference preference)
 		{
 			final CharSequence platformPrefix = preference.getTitle();
@@ -404,8 +372,6 @@ public class SecuritySettings extends AServiceSettings
 			}
 			pwDialog.setOnApplyListener(new OnClickListener()
 			{
-
-				@Override
 				public void onClick(View v)
 				{
 					ComponentIdentifier cid = new ComponentIdentifier(platformPrefix.toString());
@@ -420,8 +386,6 @@ public class SecuritySettings extends AServiceSettings
 
 	protected OnPreferenceClickListener onPlatformPasswordLongClickListener = new OnPreferenceClickListener()
 	{
-
-		@Override
 		public boolean onPreferenceClick(Preference p)
 		{
 			Builder builder = new AlertDialog.Builder(p.getContext());
@@ -455,7 +419,6 @@ public class SecuritySettings extends AServiceSettings
 	 */
 	protected OnPreferenceClickListener onNetworkPasswordClickListener = new OnPreferenceClickListener()
 	{
-		@Override
 		public boolean onPreferenceClick(Preference preference)
 		{
 			final CharSequence network = preference.getTitle();
@@ -469,8 +432,6 @@ public class SecuritySettings extends AServiceSettings
 
 			pwDialog.setOnApplyListener(new OnClickListener()
 			{
-
-				@Override
 				public void onClick(View v)
 				{
 					secService.setNetworkPassword(network.toString(), pwDialog.getPassword());
@@ -537,7 +498,6 @@ public class SecuritySettings extends AServiceSettings
 
 			cancelButton.setOnClickListener(new View.OnClickListener()
 			{
-				@Override
 				public void onClick(View v)
 				{
 					dismiss();
@@ -578,8 +538,6 @@ public class SecuritySettings extends AServiceSettings
 		{
 			okButton.setOnClickListener(new View.OnClickListener()
 			{
-
-				@Override
 				public void onClick(View v)
 				{
 					l.onClick(v);
@@ -589,7 +547,6 @@ public class SecuritySettings extends AServiceSettings
 		}
 	}
 
-	@Override
 	public void setPlatformId(IComponentIdentifier platformId)
 	{
 		this.platformId = platformId;

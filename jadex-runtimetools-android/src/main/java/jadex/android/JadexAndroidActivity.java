@@ -142,8 +142,6 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 
 		getMS().addResultListener(new DefaultResultListener<IMessageService>()
 		{
-
-			@Override
 			public void resultAvailable(IMessageService ms)
 			{
 				ms.sendMessage(message, type, jadexAndroidContext.getExternalPlatformAccess().getComponentIdentifier(), null, receiver, null).addResultListener(

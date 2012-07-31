@@ -415,7 +415,6 @@ public class Vector2Double implements IVector2, Cloneable
 
 
 
-	@Override
 	public double getInnerProductAsDouble(IVector2 vector) {
 		
 		double bx = vector.getXAsDouble();
@@ -424,13 +423,11 @@ public class Vector2Double implements IVector2, Cloneable
 		return (x_*bx)+(y_*by);
 	}
 
-	@Override
 	public IVector1 getDirection(IVector2 vector) {
 		
 		return null;
 	}
 
-	@Override
 	public double getDirectionAsDouble(IVector2 vector) {
 		double qa = Math.sqrt(x_*x_ + y_*y_);
 		double qb = Math.sqrt(vector.getXAsDouble()*vector.getXAsDouble() + vector.getYAsDouble()*vector.getYAsDouble());
@@ -438,7 +435,6 @@ public class Vector2Double implements IVector2, Cloneable
 		return Math.cos(getInnerProductAsDouble(vector)/(qa*qb));
 	}
 
-	@Override
 	public float getDirectionAsFloat(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;

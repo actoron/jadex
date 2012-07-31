@@ -146,8 +146,6 @@ public class JadexAndroidService extends Service implements AndroidContextChange
 
 		getMS().addResultListener(new DefaultResultListener<IMessageService>()
 		{
-
-			@Override
 			public void resultAvailable(IMessageService ms)
 			{
 				ms.sendMessage(message, type, jadexAndroidContext.getExternalPlatformAccess().getComponentIdentifier(), null, receiver, null).addResultListener(
@@ -182,7 +180,6 @@ public class JadexAndroidService extends Service implements AndroidContextChange
 		});
 	}
 
-	@Override
 	public void onContextDestroy(Context ctx)
 	{
 		// if context is destroyed
@@ -190,7 +187,6 @@ public class JadexAndroidService extends Service implements AndroidContextChange
 		jadexAndroidContext.setAndroidContext(this);
 	}
 
-	@Override
 	public void onContextCreate(Context ctx)
 	{
 		// dont care

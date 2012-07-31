@@ -24,22 +24,18 @@ public class AndroidSharedPreferencesWrapper implements IPreferences{
 		return new AndroidSharedPreferencesWrapper(prefs);
 	}
 
-	@Override
 	public Map<String, ?> getAll() {
 		return prefs.getAll();
 	}
 
-	@Override
 	public boolean getBoolean(String key, boolean defValue) {
 		return prefs.getBoolean(key, defValue);
 	}
 
-	@Override
 	public String getString(String key, String defValue) {
 		return prefs.getString(key, defValue);
 	}
 
-	@Override
 	public void setString(String key, String value) {
 		if (prefEditor == null) {
 			prefEditor = prefs.edit();
@@ -47,7 +43,6 @@ public class AndroidSharedPreferencesWrapper implements IPreferences{
 		prefEditor.putString(key, value);
 	}
 
-	@Override
 	public boolean commit() {
 		boolean result = false;
 		if (prefEditor != null) {

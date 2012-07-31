@@ -18,7 +18,6 @@ public class LongClickablePreference extends Preference implements OnLongClickLi
 		super(context);
 	}
 
-	@Override
 	public boolean onLongClick(View v)
 	{
 		// delegate this call

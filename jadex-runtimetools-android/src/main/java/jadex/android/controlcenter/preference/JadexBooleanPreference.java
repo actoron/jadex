@@ -35,7 +35,6 @@ public class JadexBooleanPreference extends CheckBoxPreference implements OnClic
 		return view;
 	}
 
-	@Override
 	public void onClick(View v) {
 		super.onClick();
 		getView(v, parent);

@@ -97,13 +97,11 @@ public class SimulationSettings extends AServiceSettings {
 		timemode = 2;
 	}
 
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add("Refresh");
 		return false;
 	}
 
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// refreshClockSettings();
 		return true;
@@ -179,7 +177,6 @@ public class SimulationSettings extends AServiceSettings {
 	
 	private OnPreferenceClickListener pauseClickListener = new OnPreferenceClickListener() {
 		
-		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			
 			return true;
@@ -188,7 +185,6 @@ public class SimulationSettings extends AServiceSettings {
 	
 	private OnPreferenceClickListener playClickListener = new OnPreferenceClickListener() {
 		
-		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			
 			return true;
@@ -212,7 +208,6 @@ public class SimulationSettings extends AServiceSettings {
 
 		uiHandler.post(new Runnable() {
 
-			@Override
 			public void run() {
 				executionMode.setEnabled(state.changeallowed);
 				startTime.setSummary(formatTime(state.starttime));
@@ -248,12 +243,10 @@ public class SimulationSettings extends AServiceSettings {
 		// TODO: get timeMode preference from settings service
 		getComponentForService().addResultListener(new DefaultResultListener<IExternalAccess>() {
 
-			@Override
 			public void resultAvailable(IExternalAccess result) {
 
 				result.scheduleStep(new IComponentStep<Void>() {
 
-					@Override
 					public IFuture<Void> execute(IInternalAccess ia) {
 						Future<Void> ret = new Future<Void>();
 						// @Override
@@ -300,12 +293,10 @@ public class SimulationSettings extends AServiceSettings {
 
 		getComponentForService().addResultListener(new DefaultResultListener<IExternalAccess>() {
 
-			@Override
 			public void resultAvailable(IExternalAccess result) {
 
 				result.scheduleStep(new IComponentStep<Void>() {
 
-					@Override
 					public IFuture<Void> execute(IInternalAccess ia) {
 						RemoteClockChangeListener rccl = new RemoteClockChangeListener(id, ia, rcl, simService);
 						Future<Void> ret = new Future<Void>();
@@ -360,7 +351,6 @@ public class SimulationSettings extends AServiceSettings {
 		return ret;
 	}
 	
-	@Override
 	public void setPlatformId(IComponentIdentifier platformId)
 	{
 		this.platformId = platformId;

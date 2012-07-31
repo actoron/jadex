@@ -431,25 +431,21 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return vector_.toString();
 	}
 
-	@Override
 	public double getInnerProductAsDouble(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public IVector1 getDirection(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public float getDirectionAsFloat(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public double getDirectionAsDouble(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;

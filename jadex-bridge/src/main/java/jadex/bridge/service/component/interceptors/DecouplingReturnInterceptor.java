@@ -245,15 +245,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //						if(sic.getMethod().getName().indexOf("createComponent")!=-1)
 //							System.out.println("back to: "+caller+" for: "+sic.getMethod()+" "+sic.getArguments());
 						
-						IComponentAdapter adap = cms.getComponentAdapter(caller);
-						if(adap!=null)
-						{
-							ret.setResult(adap);
-						}
-						else
-						{
-							ret.setException(new RuntimeException("No adapter"));
-						}
+						cms.getComponentAdapter(caller)
+							.addResultListener(new DelegationResultListener<IComponentAdapter>(ret));
 					}
 				});
 			}

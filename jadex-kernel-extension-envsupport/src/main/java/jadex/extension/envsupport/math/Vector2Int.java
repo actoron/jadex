@@ -543,25 +543,21 @@ public class Vector2Int implements IVector2
 		return ret;
 	}
 
-	@Override
 	public double getInnerProductAsDouble(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public IVector1 getDirection(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public double getDirectionAsDouble(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public float getDirectionAsFloat(IVector2 vector) {
 		// TODO Auto-generated method stub
 		return 0;

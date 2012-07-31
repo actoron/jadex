@@ -83,7 +83,6 @@ public class SettingsService extends BasicService implements ISettingsService
 		IFuture<IContextService> service = SServiceProvider.getService(access.getServiceContainer(), IContextService.class);
 		service.addResultListener(new DefaultResultListener<IContextService>()
 		{
-			@Override
 			public void resultAvailable(IContextService result)
 			{
 				contextService = result;
