@@ -15,6 +15,7 @@
 		<moduleSet>
 			<includes>
 				<include>*:*-webservice</include>
+				<include>*:*-webservice-desktop</include>
 			</includes>
 		    <sources>
 				<includeModuleDirectory>false</includeModuleDirectory>

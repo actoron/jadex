@@ -2,6 +2,7 @@ package jadex.extension.rs.invoke;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.extension.rs.RSFactory;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
@@ -37,6 +38,6 @@ public class RestServiceAgent
 	public Object createServiceImplementation(Class<?> type, Class<?> impl)
 	{
 		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
-			new RestServiceWrapperInvocationHandler(agent, impl));
+			RSFactory.getInstance().createRSWrapperInvocationHandler(agent, impl));
 	}
 }

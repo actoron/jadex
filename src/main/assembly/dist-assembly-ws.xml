@@ -16,6 +16,7 @@
 		<moduleSet>
 			<includes>
 				<include>*:*-webservice</include>
+				<include>*:*-webservice-desktop</include>
 			</includes>
 			<binaries>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>

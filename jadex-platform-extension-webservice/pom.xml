@@ -16,10 +16,6 @@
 		functionality for WSDL web services and REST web services.
 	</description>
 	
-	<properties>
-		<jersey.version>1.11</jersey.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -51,59 +47,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-grizzly2</artifactId>
-			<version>${jersey.version}</version>
-		</dependency> 
-		<dependency>
-			<groupId>org.glassfish.grizzly</groupId>
-			<artifactId>grizzly-http-server</artifactId>
-			<version>2.1.2</version>
-		</dependency> 
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>jsr311-api</artifactId>
-			<version>1.1.1</version>
-		</dependency> 
-		
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-bundle</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		-->
-	 
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.sun.jersey.contribs</groupId>
-			<artifactId>jersey-multipart</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-            
 	</dependencies>
 	
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
@@ -143,20 +86,6 @@
 					<groupId>net.sourceforge.jadex</groupId>
 					<artifactId>jadex-kernel-micro</artifactId>
 					<version>${project.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>javassist</groupId>
-					<artifactId>javassist</artifactId>
-					<version>3.12.1.GA</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>javax.activation</groupId>
-					<artifactId>activation</artifactId>
-					<version>1.1</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>

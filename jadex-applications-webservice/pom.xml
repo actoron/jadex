@@ -57,10 +57,17 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		 
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		 
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
