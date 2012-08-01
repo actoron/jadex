@@ -38,6 +38,7 @@
 	<!-- ======== Base modules without add-ons ======== -->
 	
 	<modules>
+		<module>../sodekovs-util</module>
 		<module>jadex-parent</module>
 		<module>jadex-commons</module>
 		<module>jadex-xml</module>
@@ -79,7 +80,7 @@
 		<module>jadex-tools-comanalyzer</module>
 		<module>jadex-platform-standalone</module>
 		<module>jadex-platform-standalone-launch</module>
-		<module>../jadex-platform-relay-web</module>
+		<module>jadex-platform-relay-web</module>
 	</modules>
 			
 	<profiles>	    
