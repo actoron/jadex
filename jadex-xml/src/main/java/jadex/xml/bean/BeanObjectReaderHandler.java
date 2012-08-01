@@ -436,22 +436,43 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		String id = attrinfo instanceof AttributeInfo? ((AttributeInfo)attrinfo).getId(): null;
 		Object accessinfo = attrinfo instanceof AttributeInfo? ((AttributeInfo)attrinfo).getAccessInfo(): attrinfo;
 		
-		if(attrval!=null)
+		// Try to convert strings before trying setter variations to obtain useful error message if conversion not possible.
+		Object val	= attrval;
+		boolean	done	= false;
+		if(val!=null && converter instanceof IStringObjectConverter)
 		{
-			boolean	set	= setElementValue(accessinfo, xmlattrname, object, attrval, converter, id, context);
-			if(!set)
+			try
 			{
-				context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
-					"attribute error", context, context.getLocation());
+				val = ((IStringObjectConverter)converter).convertString((String)val, context);
 			}
-		}
-		else if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getDefaultValue()!=null)
-		{
-			boolean	set	= setElementValue(accessinfo, xmlattrname, object, ((AccessInfo)accessinfo).getDefaultValue(), converter, id, context);
-			if(!set)
+			catch(Exception e)
 			{
-				context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
-					"attribute error", context, context.getLocation());
+				done	= true;
+				context.getReporter().report("Failure in parsing attribute: "+xmlattrname+" of object "+object+": "+e,
+					"attribute error", context, context.getLocation());				
+			}
+			converter	= null;
+		}
+		
+		if(!done)
+		{
+			if(attrval!=null)	// allow 'null' as actual value.
+			{
+				boolean	set	= setElementValue(accessinfo, xmlattrname, object, val, converter, id, context);
+				if(!set)
+				{
+					context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+						"attribute error", context, context.getLocation());
+				}
+			}
+			else if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getDefaultValue()!=null)
+			{
+				boolean	set	= setElementValue(accessinfo, xmlattrname, object, ((AccessInfo)accessinfo).getDefaultValue(), converter, id, context);
+				if(!set)
+				{
+					context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+						"attribute error", context, context.getLocation());
+				}
 			}
 		}
 	}
@@ -1607,7 +1628,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			{
 				ret = ((IStringObjectConverter)converter).convertString((String)val, context);
 			}
-			else if(!String.class.isAssignableFrom(targetclass))
+			else if(targetclass!=null && !String.class.isAssignableFrom(targetclass))
 			{
 				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclass);
 				if(conv!=null)
