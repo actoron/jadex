@@ -79,7 +79,7 @@
 		<module>jadex-tools-comanalyzer</module>
 		<module>jadex-platform-standalone</module>
 		<module>jadex-platform-standalone-launch</module>
-		<module>jadex-platform-relay-web</module>
+		<module>../jadex-platform-relay-web</module>
 	</modules>
 			
 	<profiles>	    
