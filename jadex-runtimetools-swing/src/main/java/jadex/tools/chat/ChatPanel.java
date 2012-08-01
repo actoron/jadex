@@ -62,13 +62,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -193,12 +197,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** The text area. */
 //	protected JTextArea chatarea;
 	protected JTextPane chatarea;
-	
-	/** The known chat users (cid->user state). */
-	protected Map<IComponentIdentifier, ChatUser>	users;
-	
+		
 	/** The user table. */
 	protected JTable	usertable;
+	protected UserTableModel usermodel;
 	
 	/** The typing state. */
 	protected boolean	typing;
@@ -262,7 +264,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		this.autorefresh = true;
 		this.notificationsounds = new HashMap<String, String>();
 		this.dialogs	= new HashMap<TransferInfo, JComponent>();
+		usermodel = new UserTableModel();
+
 		final Future<Void>	ret	= new Future<Void>();
+		
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -378,7 +383,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 				};
 
-				users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
+//				users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
 
 				chatarea = new JTextPane()
 				{
@@ -429,15 +434,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //                    start = index + 2;
 //                    index = text.indexOf(":)", start);
 //                }
-
-				
 				
 				chatarea.setEditable(false);
 				JScrollPane main = new JScrollPane(chatarea);
 
 				final JLabel lto = new JLabel("To: all");
 				
-				usertable	= new JTable(new UserTableModel());
+				usertable	= new JTable(usermodel);
 //				usertable.setTableHeader(new ResizeableTableHeader(usertable.getColumnModel()));
 				usertable.setRowHeight(40);
 				usertable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
@@ -854,7 +857,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 				
 				
-				listpan	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, userpan, pp);
+				listpan	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, userpan, new JScrollPane(pp));
 				listpan.setDividerLocation(0.5);
 				listpan.setOneTouchExpandable(true);
 				listpan.setResizeWeight(1);
@@ -1101,16 +1104,16 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				if(autorefresh)
 				{
 //					System.out.println("refresh");
-					final Set<ChatUser>	known	= new HashSet<ChatUser>(users.values());
+					final Set<ChatUser>	known	= new HashSet<ChatUser>(usermodel.getUsers());
 					
 					getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
 					{
 						public void customIntermediateResultAvailable(final IChatService chat)
 						{
 							final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
-							if(users.containsKey(cid))
+							if(usermodel.getUser(cid)!=null)
 							{
-								known.remove(users.get(cid));
+								known.remove(usermodel.getUser(cid));
 							}
 							updateChatUser(cid, chat);
 						}
@@ -1146,7 +1149,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void updateChatUser(IComponentIdentifier cid, IChatService cs)
 	{
-		ChatUser	cu	= users.get(cid);
+		ChatUser	cu	= usermodel.getUser(cid);
 		if(cu==null)
 		{
 			createChatUser(cid, cs);
@@ -1327,7 +1330,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		}
 		else
 		{
-			for(ChatUser cu: users.values())
+			for(ChatUser cu: usermodel.getUsers())
 			{
 				cu.addMessage(id);
 				sendusers.add(cu);				
@@ -1340,7 +1343,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			public void customIntermediateResultAvailable(final IChatService chat)
 			{
-				ChatUser	cu	= users.get(((IService)chat).getServiceIdentifier().getProviderId());
+				ChatUser	cu	= usermodel.getUser(((IService)chat).getServiceIdentifier().getProviderId());
 				if(cu!=null)
 				{
 					sendusers.remove(cu);
@@ -1465,11 +1468,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				boolean	isnew	= false;
 				boolean	isdead	= false;
-				ChatUser	cu	= users.get(cid);
+				ChatUser	cu	= usermodel.getUser(cid);
 				if(cu==null)
 				{
 					cu	= new ChatUser(cid);
-					users.put(cid, cu);
+					usermodel.addUser(cid, cu);
 					isnew	= true;
 				}
 				
@@ -1480,7 +1483,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				if(isdead)
 				{
-					users.remove(cid);
+					usermodel.removeUser(cid);
 				}
 				else
 				{
@@ -2140,7 +2143,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public class UserTableModel	extends DefaultTableModel
 	{
+		/** The known chat users (cid->user state). */
+		protected Map<IComponentIdentifier, ChatUser>	users = new LinkedHashMap<IComponentIdentifier, ChatUser>();
+
+		/** The column names. */
 		protected String[]	columns	= new String[]{"Users"};
+		
+		/** The selected users. */
+		protected List<ChatUser> sels;
 		
 		public int getColumnCount()
 		{
@@ -2159,7 +2169,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		
 		public int getRowCount()
 		{
-			return users.size();
+			return users==null? 0: users.size();
 		}
 		
 		public Object getValueAt(int row, int column)
@@ -2174,6 +2184,49 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			return false;
 		}
 		
+		public ChatUser getUser(IComponentIdentifier cid)
+		{
+			return users.get(cid);
+		}
+		
+		public Collection<ChatUser> getUsers()
+		{
+			return users.values();
+		}
+		
+		public void addUser(IComponentIdentifier cid, ChatUser user)
+		{
+			saveUserSelection();
+			
+			users.put(cid, user);
+			fireTableRowsInserted(users.size()-1, users.size()-1);
+		
+			restoreUserSelection();
+		}
+		
+		public void removeUser(IComponentIdentifier cid)
+		{
+			saveUserSelection();
+			
+			Iterator<IComponentIdentifier> it = users.keySet().iterator();
+			int row = -1;
+			for(int i=0; it.hasNext(); i++)
+			{
+				IComponentIdentifier key = it.next();
+				if(key.equals(cid))
+				{
+					row = i;
+				}
+			}
+			if(row!=-1)
+			{
+				users.remove(cid);
+				fireTableRowsDeleted(row, row);
+			}
+			
+			restoreUserSelection();
+		}
+		
 		public void setValueAt(Object val, int row, int column)
 		{
 		}
@@ -2181,8 +2234,47 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		public void addTableModelListener(TableModelListener l)
 		{
 		}
+		
 		public void removeTableModelListener(TableModelListener l)
 		{
+		}
+				
+		/**
+		 *  Save the current user selection 
+		 */
+		protected void saveUserSelection()
+		{
+			int[] rows = usertable.getSelectedRows();
+			ChatUser[] users = usermodel.getUsers().toArray(new ChatUser[0]);
+			
+			sels = new ArrayList<ChatUser>();
+			for(int i=0; i<rows.length; i++)
+			{
+				sels.add(users[rows[i]]);
+			}
+		}
+		
+		/**
+		 *  Restore the current user selection.
+		 */
+		protected void restoreUserSelection()
+		{
+			usertable.clearSelection();
+			
+			if(sels!=null && !sels.isEmpty())
+			{
+				List<ChatUser> users = new ArrayList<ChatUser>();
+				users.addAll(usermodel.getUsers());
+
+				for(ChatUser cu: sels)
+				{
+					int idx = users.indexOf(cu);
+					if(idx>=0)
+					{
+						usertable.addRowSelectionInterval(idx, idx);
+					}
+				}
+			}
 		}
 	}
 	
