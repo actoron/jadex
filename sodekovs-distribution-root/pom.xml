@@ -80,6 +80,15 @@
 		<module>../jadex-platform-standalone</module>
 		<module>../jadex-platform-standalone-launch</module>
 		<module>../jadex-platform-relay-web</module>
+		
+		<!-- SodekoVS-->
+		<module>../sodekovs-applications</module>
+		<module>../sodekovs-benchmarking</module>
+		<module>../sodekovs-coordination</module>
+		<module>../sodekovs-coordination-distributed</module>
+		<module>../sodekovs-productionline</module>
+		<module>../sodekovs-simulationcontrol</module>
+		<module>../sodekovs-util</module>
 	</modules>
 			
 	<profiles>	    
@@ -472,14 +481,14 @@
 				<module>jadex-platform-jade</module>
 				<module>jadex-platform-jade-launch</module>
 
-				<module>sodekovs-simulationcontrol</module>
-				<module>sodekovs-coordination</module>
-				<module>sodekovs-coordination-distributed</module>
-				<module>sodekovs-benchmarking</module>
+				<module>../sodekovs-applications</module>
+				<module>../sodekovs-benchmarking</module>
+				<module>../sodekovs-coordination</module>
+				<module>../sodekovs-coordination-distributed</module>
+				<module>../sodekovs-productionline</module>
+				<module>../sodekovs-simulationcontrol</module>
 				<module>../sodekovs-util</module>
-				<module>sodekovs-productionline</module>
-				<module>sodekovs-applications</module>
-				<module>jadex-xwiki</module>
+				
 				
 			</modules>
 		</profile>
