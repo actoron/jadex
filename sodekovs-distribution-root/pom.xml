@@ -4,10 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex</artifactId>
+	<artifactId>jadex-sodekovs</artifactId>
 	<packaging>pom</packaging>
 	<version>2.1.1-SNAPSHOT</version>
-	<name>jadex</name>
+	<name>jadex-sodekovs</name>
 	
 	<!-- ======== common plugin configurations ======== -->
 	
