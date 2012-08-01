@@ -45,7 +45,7 @@ public abstract class ReceiveHandler
 	/**
 	 *  Receive a packet.
 	 */
-	public abstract Object[] receive();
+	public abstract Object[] receive()	throws Exception;
 	
 	/**
 	 *  Start receiving awareness infos.

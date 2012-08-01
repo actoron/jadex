@@ -6,6 +6,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -192,26 +193,26 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			}
 			
+			final Future<Void> done	= new Future<Void>();
 			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
 				public void intermediateResultAvailable(IChatService chat)
 				{
-					// Hack!!! change local id from rms to chat agent.
-					IComponentIdentifier id	= IComponentIdentifier.LOCAL.get();
-					IComponentIdentifier.LOCAL.set(agent.getComponentIdentifier());
 					chat.status(nick, STATE_DEAD, null);
-					IComponentIdentifier.LOCAL.set(id);
 				}
 				public void finished()
 				{
-					ret.setResult(null);
+					done.setResult(null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setResult(null);
+					done.setResult(null);
 				}
 			});
+			
+			// Only wait 2 secs before terminating the agent.
+			done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(), new DelegationResultListener<Void>(ret)));
 			return ret;
 		}
 	}

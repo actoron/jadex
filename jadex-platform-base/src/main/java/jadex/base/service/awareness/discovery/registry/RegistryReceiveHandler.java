@@ -23,11 +23,11 @@ public class RegistryReceiveHandler extends MasterSlaveReceiveHandler
 	/**
 	 *  Receive a packet.
 	 */
-	public Object[] receive()
+	public Object[] receive()	throws Exception
 	{
 		Object[] ret = null;
-		try
-		{
+//		try
+//		{
 			if(buffer==null)
 			{
 				// todo: max ip datagram length (is there a better way to determine length?)
@@ -39,11 +39,11 @@ public class RegistryReceiveHandler extends MasterSlaveReceiveHandler
 			byte[] data = new byte[pack.getLength()];
 			System.arraycopy(buffer, 0, data, 0, pack.getLength());
 			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
-		}
-		catch(Exception e)
-		{
-//			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
-		}
+//		}
+//		catch(Exception e)
+//		{
+////			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+//		}
 		
 		return ret;
 	}

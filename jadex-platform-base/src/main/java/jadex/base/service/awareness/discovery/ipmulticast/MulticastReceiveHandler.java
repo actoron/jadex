@@ -25,11 +25,11 @@ public class MulticastReceiveHandler extends ReceiveHandler
 	/**
 	 *  Receive a packet.
 	 */
-	public Object[] receive()
+	public Object[] receive()	throws Exception
 	{
 		Object[] ret = null;
-		try
-		{
+//		try
+//		{
 
 			if(buffer==null)
 			{
@@ -42,11 +42,11 @@ public class MulticastReceiveHandler extends ReceiveHandler
 			byte[] data = new byte[pack.getLength()];
 			System.arraycopy(buffer, 0, data, 0, pack.getLength());
 			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
-		}
-		catch(IOException e)
-		{
-//			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
-		}
+//		}
+//		catch(IOException e)
+//		{
+////			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+//		}
 		
 		return ret;
 	}

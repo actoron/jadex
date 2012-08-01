@@ -24,12 +24,12 @@ public class ScannerReceiveHandler extends MasterSlaveReceiveHandler
 	/**
 	 *  Receive a packet.
 	 */
-	public Object[] receive()
+	public Object[] receive()	throws Exception
 	{
 		Object[] ret = null;
 		
-		try
-		{
+//		try
+//		{
 			if(buffer==null)
 			{
 				buffer = ByteBuffer.allocate(8192);
@@ -46,13 +46,13 @@ public class ScannerReceiveHandler extends MasterSlaveReceiveHandler
 				buffer.get(data);
 				ret = new Object[]{address.getAddress(), address.getPort(), data};
 			}
-		}
-		catch(Exception e)
-		{
-//			getAgent().getMicroAgent().getLogger().warning("Receive message failed: "+e);
-//			e.printStackTrace();
-//			System.out.println("ex: "+address);
-		}
+//		}
+//		catch(Exception e)
+//		{
+////			getAgent().getMicroAgent().getLogger().warning("Receive message failed: "+e);
+////			e.printStackTrace();
+////			System.out.println("ex: "+address);
+//		}
 		
 		return ret;
 	}

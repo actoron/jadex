@@ -23,11 +23,11 @@ public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 	/**
 	 *  Receive a packet.
 	 */
-	public Object[] receive()
+	public Object[] receive()	throws Exception
 	{
 		Object[] ret = null;
-		try
-		{
+//		try
+//		{
 			if(buffer==null)
 			{
 				// todo: max ip datagram length (is there a better way to determine length?)
@@ -40,13 +40,13 @@ public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 			System.arraycopy(buffer, 0, data, 0, pack.getLength());
 			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
 //			System.out.println("received packet: "+pack.getAddress());
-		}
-		catch(Exception e)
-		{
-//			System.out.println("Message receival error: "+e);
-			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
-//			e.printStackTrace();
-		}
+//		}
+//		catch(Exception e)
+//		{
+////			System.out.println("Message receival error: "+e);
+//			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+////			e.printStackTrace();
+//		}
 		
 		return ret;
 	}

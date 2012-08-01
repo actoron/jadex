@@ -22,16 +22,19 @@ public class MultiPlatformsTest extends TestCase
 	public void	testMultiplePlatforms()
 	{
 		int number	= 30;	// larger numbers lead to out of mem on hudson 32bit.
-		long timeout	= 300000;
+		long timeout	= 60000;
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
+			{
 				System.out.println("Starting platform "+i);
+			}
 			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i,
 				"-gui", "false", "-printpass", "false",
-//				"-logging", "true",
+				"-deftimeout", ""+timeout,
+				"-logging", "true",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
