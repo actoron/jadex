@@ -82,7 +82,7 @@
 		<module>jadex-platform-relay-web</module>
 		
 		<!-- ======== SodekoVS Modules ======== -->
-		<module>sodekovs-util</module>
+		<module>../sodekovs-util/pom.xml</module>
 	</modules>
 			
 	<profiles>	    
