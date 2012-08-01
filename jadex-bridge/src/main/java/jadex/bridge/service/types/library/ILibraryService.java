@@ -68,6 +68,22 @@ public interface ILibraryService
 	 *  @param url The url.
 	 */
 	public IFuture<Void> removeURL(@CheckNotNull URL url);
+
+	/**
+	 *  Add a new toplevel url. A top level url is treated as
+	 *  url added to the parent class loader of all other delegate
+	 *  loaders. Using this method allows to add a resource to
+	 *  all loaders.
+	 *  @param url The url.
+	 */
+	public IFuture<Void> addToplevelURL(@CheckNotNull URL url);
+	
+	// Not necessary, can be removed via remove url
+//	/**
+//	 *  Remove a toplevel url.
+//	 *  @param url The url.
+//	 */
+//	public IFuture<Void> removeToplevelURL(@CheckNotNull URL url);
 	
 	/**
 	 *  Remove a url completely (all references).

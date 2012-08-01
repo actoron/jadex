@@ -4,6 +4,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -86,13 +87,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/** The global class loader (cached for speed). */
 	// todo: remove!?
-	protected ClassLoader	globalcl;
+	protected ClassLoader globalcl;
 	
 	/** The base classloader. */
-	protected ClassLoader baseloader;
+	protected ChangeableURLClassLoader baseloader;
 	
 	/** The non-managed urls (cached for speed). */
 	protected Set<URL>	nonmanaged;
+	
+	
+	
 	
 	//-------- constructors --------
 	
@@ -149,7 +153,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.ridsupport = new LinkedHashMap<IResourceIdentifier, Set<IResourceIdentifier>>();
 		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
 		this.initurls = urls!=null? urls.clone(): urls;
-		this.baseloader = baseloader!=null? baseloader: getClass().getClassLoader();
+		this.baseloader = new ChangeableURLClassLoader(baseloader!=null? baseloader: getClass().getClassLoader());
 	}
 	
 	
@@ -310,7 +314,36 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers()
 	{
-		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(managedrids.keySet()));
+		final Future<List<IResourceIdentifier>> ret = new Future<List<IResourceIdentifier>>();
+		
+		Set<IResourceIdentifier> man = managedrids.keySet();
+		
+		URL[] urls = baseloader.getURLs();
+		
+		if(urls.length>0)
+		{
+			CollectionResultListener<IResourceIdentifier> lis = new CollectionResultListener<IResourceIdentifier>(urls.length, false, 
+				new ExceptionDelegationResultListener<Collection<IResourceIdentifier>, List<IResourceIdentifier>>(ret)
+			{
+				public void customResultAvailable(Collection<IResourceIdentifier> result)
+				{
+					ArrayList<IResourceIdentifier> res = new ArrayList<IResourceIdentifier>(result);
+					res.addAll(managedrids.keySet());
+					ret.setResult(res);
+				}
+			});
+			
+			for(int i=0; i<urls.length; i++)
+			{
+				internalGetResourceIdentifier(urls[i]).addResultListener(lis);
+			}
+		}
+		else
+		{
+			ret.setResult(new ArrayList<IResourceIdentifier>(managedrids.keySet()));
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -353,25 +386,18 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<IResourceIdentifier> addURL(final URL url)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
+		internalGetResourceIdentifier(url).addResultListener(
+			new DelegationResultListener<IResourceIdentifier>(ret)
 		{
-			public void customResultAvailable(IDependencyService drs)
+			public void customResultAvailable(final IResourceIdentifier rid)
 			{
-				drs.getResourceIdentifier(url).addResultListener(
-					new DelegationResultListener<IResourceIdentifier>(ret)
+				// todo: should be true?
+				addResourceIdentifier(rid, true).addResultListener(
+					new ExceptionDelegationResultListener<IResourceIdentifier, IResourceIdentifier>(ret)
 				{
-					public void customResultAvailable(final IResourceIdentifier rid)
+					public void customResultAvailable(IResourceIdentifier result)
 					{
-						// todo: should be true?
-						addResourceIdentifier(rid, true).addResultListener(
-							new ExceptionDelegationResultListener<IResourceIdentifier, IResourceIdentifier>(ret)
-						{
-							public void customResultAvailable(IResourceIdentifier result)
-							{
-								ret.setResult(rid);
-							}
-						});
+						ret.setResult(rid);
 					}
 				});
 			}
@@ -381,27 +407,63 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
+	 *  Add a new toplevel url.
+	 *  @param url The url.
+	 */
+	public IFuture<Void> addToplevelURL(URL url)
+	{
+		Future<Void> ret = new Future<Void>();
+		if(!SUtil.arrayToSet(baseloader.getURLs()).contains(url))
+		{
+			baseloader.addURL(url);
+			ret.setResult(null);
+		}
+		else
+		{
+			ret.setException(new RuntimeException("URL already contained: "+url));
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Remove a toplevel url.
+	 *  @param url The url.
+	 */
+	public IFuture<Void> removeToplevelURL(URL url)
+	{
+		if(baseloader.removeURL(url))
+		{
+			return IFuture.DONE;
+		}
+		else
+		{
+			return new Future<Void>(new RuntimeException("URL not contained: "+url));
+		}
+	}
+	
+	/**
 	 *  Remove a new url.
 	 *  @param url The resource identifier.
 	 */
 	public IFuture<Void> removeURL(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Void>(ret)
+		
+		if(baseloader.removeURL(url))
 		{
-			public void customResultAvailable(IDependencyService drs)
+			ret.setResult(null);
+		}
+		else
+		{
+			internalGetResourceIdentifier(url).addResultListener(
+				new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
 			{
-				drs.getResourceIdentifier(url).addResultListener(
-					new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+				public void customResultAvailable(IResourceIdentifier result)
 				{
-					public void customResultAvailable(IResourceIdentifier result)
-					{
-						removeResourceIdentifier(result).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-		});
+					removeResourceIdentifier(result).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
 		
 		return ret;
 	}
@@ -413,21 +475,40 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<Void> removeURLCompletely(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		if(baseloader.removeURL(url))
+		{
+			ret.setResult(null);
+		}
+		else
+		{
+			internalGetResourceIdentifier(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+			{
+				public void customResultAvailable(IResourceIdentifier result)
+				{
+					removeResourceIdentifierCompletely(result).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IResourceIdentifier> internalGetResourceIdentifier(final URL url)
+	{
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+		
 		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Void>(ret)
+			.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
 			{
-				drs.getResourceIdentifier(url).addResultListener(
-					new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
-				{
-					public void customResultAvailable(IResourceIdentifier result)
-					{
-						removeResourceIdentifierCompletely(result).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
+				drs.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -450,7 +531,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(nonmanaged==null)
 		{
 			nonmanaged	= new LinkedHashSet<URL>();
-			collectClasspathURLs(baseloader, nonmanaged);
+			collectClasspathURLs(baseloader.getParent(), nonmanaged);
 		}
 		return nonmanaged;
 	}
@@ -1723,6 +1804,61 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected boolean	isLocal(IResourceIdentifier rid)
 	{
 		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
+	}
+}
+
+/**
+ *  URL class loader that allows to add and remove urls. Remove
+ *  is only a fake implementation (does not really remove the jar).
+ */
+class ChangeableURLClassLoader extends URLClassLoader
+{
+	/** The managed urls. */
+	protected List<URL> urls;
+	
+	/**
+	 *  Create a new class loader.
+	 */
+	public ChangeableURLClassLoader(ClassLoader parent)
+	{
+		this(new URL[0], parent);
+	}
+
+	/**
+	 *  Create a new class loader.
+	 */
+	public ChangeableURLClassLoader(URL[] urls, ClassLoader parent)
+	{
+		super(urls, parent);
+		this.urls = new ArrayList<URL>();
+	}
+
+	/**
+	 *  Add a url.
+	 *  @param url The url.
+	 */
+	public void addURL(URL url)
+	{
+		urls.add(url);
+		super.addURL(url);
+	}
+	
+	/**
+	 *  Removed a url.
+	 *  @param url The url.
+	 */
+	public boolean removeURL(URL url)
+	{
+		return urls.remove(url);
+	}
+
+	/**
+	 *  Get the managed urls.
+	 *  @return The managed urls.
+	 */
+	public URL[] getURLs()
+	{
+		return (URL[])urls.toArray(new URL[urls.size()]);
 	}
 }
 

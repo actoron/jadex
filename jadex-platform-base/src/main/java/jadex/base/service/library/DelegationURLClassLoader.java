@@ -7,11 +7,15 @@ import jadex.commons.SUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessControlContext;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import sun.misc.URLClassPath;
 
 /**
  *  The delegation url classloader is responsible for managing

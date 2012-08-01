@@ -137,11 +137,15 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 						try
 						{
 							URL url = files[i].toURI().toURL();
-							libservice.addURL(url).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+							libservice.addToplevelURL(url).addResultListener(new SwingDefaultResultListener<Void>()
 							{
-								public void customResultAvailable(IResourceIdentifier result)
+								public void customResultAvailable(Void result)
 								{
 									refresh();
+								}
+								public void customExceptionOccurred(Exception exception)
+								{
+									jcc.setStatusText("Adding url failed: "+exception.getMessage());
 								}
 							});
 						}
