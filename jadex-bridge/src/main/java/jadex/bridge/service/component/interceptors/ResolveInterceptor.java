@@ -7,6 +7,8 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,6 +16,7 @@ import jadex.commons.future.IResultListener;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -106,15 +109,39 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Method[] methods = si.getDomainService().getClass().getMethods();
-		boolean found = false;
+		Method[] methods = SReflect.getAllMethods(si.getDomainService().getClass());
+		Method found = null;
 		
-		for(int i=0; i<methods.length && !found; i++)
+		for(int i=0; !ret.isDone() && i<methods.length; i++)
 		{
 			if(methods[i].isAnnotationPresent(annotation))
 			{
+				if(found==null)
+				{
+					if((methods[i].getModifiers()&Modifier.PUBLIC)!=0)
+					{
+						found	= methods[i];
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Annotated method @"+annotation.getSimpleName()+" must be public: "+methods[i]));
+					}
+				}
+				
+				// Fail on duplicate annotation if not from overridden method.
+				else if(!SUtil.equals(methods[i].getParameterTypes(), found.getParameterTypes()))
+				{
+					ret.setException(new RuntimeException("Duplicate annotation @"+annotation.getSimpleName()+" in methods "+methods[i]+" and "+found));
+				}
+			}
+		}
+		
+		if(!ret.isDone())
+		{
+			if(found!=null)
+			{
 				final ServiceInvocationContext	domainsic	= sic.clone();
-				domainsic.setMethod(methods[i]);
+				domainsic.setMethod(found);
 				domainsic.setObject(si.getDomainService());
 				sic.setObject(si.getManagementService());
 				
@@ -183,15 +210,12 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						}
 					});
 				}
-				
-				found = true;
 			}
-		}
-		
-		if(!found)
-		{
-			sic.setObject(si.getManagementService());
-			sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+			else
+			{				
+				sic.setObject(si.getManagementService());
+				sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+			}
 		}
 		
 		return ret;

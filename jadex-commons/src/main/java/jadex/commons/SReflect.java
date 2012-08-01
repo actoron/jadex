@@ -626,8 +626,32 @@ public class SReflect
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get all methods of a class including public, protected
+	 *  and private methods of the class and its superclasses. 
+	 */
+	public static Method[]	getAllMethods(Class clazz)
+	{
+		List<Method>	ret	= new ArrayList<Method>();
+		Class	cls	= clazz;
 
+		while(cls!=null)
+		{
+			try
+			{
+				ret.addAll(Arrays.asList(cls.getDeclaredMethods()));
+			}
+			catch(Exception e)
+			{
+				//e.printStackTrace();
+			}
+			cls	= cls.getSuperclass();
+		}
 
+		return ret.toArray(new Method[ret.size()]);
+	}
+	
 	/**
 	 *  Find a class.
 	 *  When the class name is not fully qualified, the list of
