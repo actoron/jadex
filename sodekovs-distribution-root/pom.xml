@@ -403,7 +403,7 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== eclipse (all modules) ======== - ->
+		<!-- ======== eclipse (all modules) ======== - -->
 
 		<profile>
 			<id>jadex-eclipse-projects</id>
@@ -435,7 +435,6 @@
 				<module>jadex-kernel-extension-agr</module>
 				<module>jadex-kernel-bdiv3</module>
 
-				<!- -<module>jadex-kernel-bdi-continuations</module>- ->
 
 				<module>jadex-applib-bdi</module>
 				<module>jadex-applications-bdi</module>
@@ -468,7 +467,7 @@
 				<module>jadex-rules-eca</module>
 
 				<module>jadex-platform-wfms</module>
-				<!- - <module>jadex-wfms-launch</module> - ->
+			
 				<module>jadex-applications-wfms</module>
 
 				<module>jadex-platform-jade</module>
@@ -485,7 +484,7 @@
 				
 			</modules>
 		</profile>
-		-->
+	
 		<!-- ======== Android ======== -->
 
 		<profile>
