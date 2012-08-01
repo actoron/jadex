@@ -34,7 +34,7 @@ public class MultiPlatformsTest extends TestCase
 			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i,
 				"-gui", "false", "-printpass", "false",
 				"-deftimeout", ""+timeout,
-				"-logging", "true",
+//				"-logging", "true",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
