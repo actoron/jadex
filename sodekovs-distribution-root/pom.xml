@@ -39,7 +39,7 @@
 	
 	<modules>
 		<module>../sodekovs-util</module>
-		<module>jadex-parent</module>
+		<!-- <module>jadex-parent</module>
 		<module>jadex-commons</module>
 		<module>jadex-xml</module>
 		<module>jadex-javaparser</module>
@@ -80,7 +80,7 @@
 		<module>jadex-tools-comanalyzer</module>
 		<module>jadex-platform-standalone</module>
 		<module>jadex-platform-standalone-launch</module>
-		<module>jadex-platform-relay-web</module>
+		<module>jadex-platform-relay-web</module> -->
 	</modules>
 			
 	<profiles>	    
@@ -135,98 +135,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin><!-- 
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<version>1.0-beta-3</version>
-						<executions>
-							<execution>
-								<id>standalone-guide</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>Standalone+Platform+Guide</fromFile>
-									<toFile>${basedir}/target/standalone_platform_guide.pdf</toFile>
-								</configuration>
-							</execution>
-							<execution>
-								<id>application-guide</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>Application+Guide</fromFile>
-									<toFile>${basedir}/target/application_guide.pdf</toFile>
-								</configuration>
-							</execution>
-							<execution>
-								<id>bdi-tutorial</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>BDI+Tutorial</fromFile>
-									<toFile>${basedir}/target/bdi_tutorial.pdf</toFile>
-								</configuration>
-							</execution>
-							<execution>
-								<id>bdi-guide</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>BDI+User+Guide</fromFile>
-									<toFile>${basedir}/target/bdi_user_guide.pdf</toFile>
-								</configuration>
-							</execution>
-							<execution>
-								<id>micro-guide</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>Micro+User+Guide</fromFile>
-									<toFile>${basedir}/target/micro_user_guide.pdf</toFile>
-								</configuration>
-							</execution>
-							<execution>
-								<id>bpmn-tutorial</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-processes.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>BPMN+Tutorial</fromFile>
-									<toFile>${basedir}/target/bpmn_tutorial.pdf</toFile>
-								</configuration>
-							</execution>
-							<execution>
-								<id>environment-guide</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>Environment+User+Guide</fromFile>
-									<toFile>${basedir}/target/environment_user_guide.pdf</toFile>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin> -->
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
