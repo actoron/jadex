@@ -1,48 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>sodekovs-distribution-root</artifactId>
-	<packaging>jar</packaging>
-	<name>sodekovs-distribution-root</name>
-	<parent>
-		<groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-parent</artifactId>
-		<version>2.1.1-SNAPSHOT</version>
-		<relativePath>../jadex-parent/pom.xml</relativePath>
-	</parent>
+	<groupId>net.sourceforge.jadex</groupId>
+	<artifactId>jadex</artifactId>
+	<packaging>pom</packaging>
+	<version>2.1.1-SNAPSHOT</version>
+	<name>jadex</name>
+	
+	<!-- ======== common plugin configurations ======== -->
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<archiverConfig>
+						<duplicateBehavior>skip</duplicateBehavior>
+					</archiverConfig>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
 
-	<description>
-		The standard distribution for the SodekoVS project.
-	</description>
+	<!-- ======== Base modules without add-ons ======== -->
+	
+	<modules>
+		<module>jadex-parent</module>
+		<module>jadex-commons</module>
+		<module>jadex-xml</module>
+		<module>jadex-javaparser</module>
+		<module>jadex-bridge</module>
+		<module>jadex-platform-base</module>
+		<module>jadex-nuggets</module>
 
-	<dependencies>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-distribution-standard</artifactId>
-			<version>${project.version}</version>
-		</dependency> 
+		<module>jadex-kernel-base</module>
+		<module>jadex-kernel-component</module>
+		<module>jadex-kernel-application</module>
+		<module>jadex-kernel-bdi</module>
+		<module>jadex-kernel-micro</module>
+		<module>jadex-kernel-bpmn</module>
+		<module>jadex-kernel-bdibpmn</module>
+		<module>jadex-kernel-gpmn</module>
+		<module>jadex-kernel-extension-envsupport</module>
+		<module>jadex-kernel-extension-envsupport-opengl</module>
+		<module>jadex-kernel-extension-agr</module>
+
+		<module>jadex-applib-bdi</module>
+		<module>jadex-applications-bdi</module>
+		<module>jadex-applications-micro</module>
+		<module>jadex-applications-bpmn</module>
+		<module>jadex-applications-bdibpmn</module>
+		<module>jadex-applications-gpmn</module>
+		<module>jadex-applications-web</module>
 		
-		<!-- SodekoVS modules -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>sodekovs-util</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>sodekovs-applications</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>sodekovs-simulationcontrol</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>sodekovs-benchmarking</artifactId>
-			<version>2.1</version>
-		</dependency>	
+
+		<module>jadex-rules</module>
+		<module>jadex-rules-applications</module>
+		<module>jadex-rules-tools</module>
+
+		<module>jadex-tools-base</module>
+		<module>jadex-tools-base-swing</module>
+		<module>jadex-runtimetools-swing</module>
+		<module>jadex-tools-bdi</module>
+		<module>jadex-tools-bpmn</module>
+		<module>jadex-tools-comanalyzer</module>
+		<module>jadex-platform-standalone</module>
+		<module>jadex-platform-standalone-launch</module>
+		<module>jadex-platform-relay-web</module>
+		
+		<!-- ======== SodekoVS Modules ======== -->
+		<module>sodekovs-util</module>
+	</modules>
 			
-	</dependencies>
+	<profiles>	    
+		<!-- ======== Profile for dist assembly ======== -->
+		<profile>
+			<id>dist</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>jadex-example-project</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-example-project</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-exampleprojectzip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-srczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
