@@ -81,6 +81,7 @@
 		<module>jadex-platform-standalone-launch</module>
 		<module>jadex-platform-relay-web</module>
 		
+		<module>../jadex-parent/pom.xml</module>
 		<!-- ======== SodekoVS Modules ======== -->
 		<module>../sodekovs-util/pom.xml</module>
 	</modules>
