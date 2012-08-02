@@ -1,5 +1,8 @@
 package jadex.standalone;
 
+import jadex.base.service.deployment.DeploymentService;
+import jadex.base.service.settings.SettingsService;
+import jadex.base.service.simulation.SimulationService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IContextService;
@@ -33,6 +36,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.standalone.service.DirectoryFacilitatorService;
 
 import java.util.logging.Level;
 
@@ -40,41 +44,27 @@ import java.util.logging.Level;
  *	Basic standalone platform services provided as a micro agent. 
  */
 @Imports({
-	"jadex.base.service.marshal.*",
-	"jadex.base.service.settings.*",
-	"jadex.base.service.threadpool.*",
-	"jadex.bridge.service.types.clock.*",
-	"jadex.bridge.service.types.message.*",
-	"jadex.commons.concurrent.*",
-	"jadex.base.service.execution.*",
-	"jadex.base.service.library.*",
-	"jadex.commons.*",
-	"jadex.base.service.remote.*",
-	"jadex.base.service.clock.*",
-	"jadex.base.service.message.*",
-	"jadex.base.service.message.transport.*",
-	"jadex.base.service.message.transport.localmtp.*",
-	"jadex.base.service.message.transport.tcpmtp.*",
-	"jadex.base.service.message.transport.ssltcpmtp.*",
-	"jadex.base.service.message.transport.niotcpmtp.*",
-	"jadex.base.service.message.transport.httprelaymtp.*",
-	"jadex.base.service.message.transport.httprelaymtp.nio.*",
-	"jadex.bridge.*",
-	"jadex.bridge.fipa.*",
-	"jadex.base.service.message.transport.codecs.*",
-	"jadex.standalone.service.*",
-	"jadex.base.service.simulation.*",
-	"jadex.component.*",
-	"jadex.base.service.deployment.*",
-	"jadex.micro.*",
-	"jadex.extension.envsupport.*",
-	"jadex.extension.agr.*",
-	"jadex.benchmarking.services.*",
-	"java.util.logging.Level",
-	"java.net.URLClassLoader",
-	"jadex.base.service.security.*",
-	"jadex.extension.ws.publish.*",
-	"jadex.extension.rs.publish.*"
+//	"jadex.base.service.marshal.*",
+//	"jadex.base.service.threadpool.*",
+//	"jadex.bridge.service.types.clock.*",
+//	"jadex.bridge.service.types.message.*",
+//	"jadex.commons.concurrent.*",
+//	"jadex.base.service.execution.*",
+//	"jadex.base.service.library.*",
+//	"jadex.commons.*",
+//	"jadex.base.service.clock.*",
+//	"jadex.base.service.message.*",
+//	"jadex.base.service.message.transport.*",
+//	"jadex.base.service.message.transport.codecs.*",
+//	"jadex.base.service.message.transport.localmtp.*",
+//	"jadex.base.service.message.transport.tcpmtp.*",
+//	"jadex.base.service.message.transport.ssltcpmtp.*",
+//	"jadex.base.service.message.transport.niotcpmtp.*",
+//	"jadex.base.service.message.transport.httprelaymtp.*",
+//	"jadex.base.service.message.transport.httprelaymtp.nio.*",
+//	"jadex.standalone.service.*",
+//	"java.util.logging.Level",
+//	"jadex.base.service.security.*"
 })
 
 
@@ -89,7 +79,7 @@ import java.util.logging.Level;
 	@Argument(name="gui", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="logging", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="logging_level", clazz=Level.class, defaultvalue="Level.SEVERE"),
+	@Argument(name="logging_level", clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name="simulation", clazz=Boolean.class),
 	@Argument(name="asyncexecution", clazz=Boolean.class),
 
@@ -139,7 +129,7 @@ import java.util.logging.Level;
 
 @ComponentTypes({
 	@ComponentType(name="extensions", filename="jadex/base/service/extensions/ExtensionsAgent.class"),
-	@ComponentType(name="kernel_component", filename="jadex/component/KernelComponentAgent.class"),
+	@ComponentType(name="kernel_component", filename="jadex/micro/KernelComponentAgent.class"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
 	@ComponentType(name="kernel_micro", filename="jadex/micro/KernelMicroAgent.class"),
 	@ComponentType(name="kernel_bdi", filename="jadex/bdi/KernelBDI.component.xml"),
@@ -156,21 +146,21 @@ import java.util.logging.Level;
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="SReflect.isAndroid() ? jadex.base.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): jadex.base.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})")),
-	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(expression="new SettingsService($component, $args.saveonexit)")),
-	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IDaemonThreadPoolService.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(true, new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="	($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new SyncExecutionService($component.getServiceProvider()): new AsyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new jadex.base.service.marshal.MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.base.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): jadex.base.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})")),
+	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(SettingsService.class)),
+	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new jadex.base.service.threadpool.ThreadPoolService(new jadex.commons.concurrent.ThreadPool(new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IDaemonThreadPoolService.class, implementation=@Implementation(expression="new jadex.base.service.threadpool.ThreadPoolService(new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="	($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.base.service.execution.SyncExecutionService($component.getServiceProvider()): new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="$args.maven_dependencies ? jadex.base.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.base.service.library.BasicDependencyService()")),
-	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="$args.libpath==null? new LibraryService(): new LibraryService(new URLClassLoader(SUtil.toURLs($args.libpath), $args.baseclassloader==null ? LibraryService.class.getClassLoader() : $args.baseclassloader))")),
-	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation): new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass})")),
+	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="$args.libpath==null? new jadex.base.service.library.LibraryService(): new jadex.base.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.base.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
+	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.base.service.clock.ClockService(new jadex.base.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation): new jadex.base.service.clock.ClockService(new jadex.base.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new jadex.base.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass})")),
 	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.base.service.message.MessageService($component.getExternalAccess(), $component.getLogger(), new jadex.base.service.message.transport.ITransport[]{$args.localtransport? new jadex.base.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null, $args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null, $args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null, $args.ssltcptransport? jadex.base.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component.getServiceProvider(), $args.ssltcpport): null, $args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress): null}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new DecoupledComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)")),
-	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
-	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()"))
+	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)")),
+	@ProvidedService(type=IDF.class, implementation=@Implementation(DirectoryFacilitatorService.class)),
+	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(SimulationService.class)),
+	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class))
 })
 
 @RequiredServices(

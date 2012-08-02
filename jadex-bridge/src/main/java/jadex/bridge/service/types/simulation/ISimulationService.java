@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.simulation;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
@@ -16,7 +15,7 @@ import jadex.commons.future.IFuture;
 	@GuiClassName("jadex.tools.simcenter.SimServiceViewerPanel"),
 	@GuiClassName("jadex.android.controlcenter.settings.SimulationSettings")
 })
-public interface ISimulationService	extends IService
+public interface ISimulationService
 {
 	//-------- constants --------
 	

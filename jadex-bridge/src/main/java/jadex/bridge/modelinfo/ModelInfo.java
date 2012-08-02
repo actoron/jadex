@@ -4,6 +4,7 @@ import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.DebugException;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The imports. */
 	protected List<String> imports;
+	
+	/** All imports (cached for speed). */
+	protected String[]	allimports;
 	
 	/** The report. */
 	protected IErrorReport report;
@@ -169,16 +173,20 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public String[] getAllImports()
 	{
-		String[] ret = getImports();
-		if(packagename!=null && packagename.length()>0)
+		if(allimports==null)
 		{
-			String[] tmp = new String[ret.length+1];
-			if(ret.length>0)
-				System.arraycopy(ret, 0, tmp, 1, ret.length);
-			tmp[0] = getPackage()+".*";
-			ret = tmp;
+			String[] ret = getImports();
+			if(packagename!=null && packagename.length()>0)
+			{
+				String[] tmp = new String[ret.length+1];
+				if(ret.length>0)
+					System.arraycopy(ret, 0, tmp, 1, ret.length);
+				tmp[0] = getPackage()+".*";
+				ret = tmp;
+			}
+			allimports	= ret;
 		}
-		return ret;
+		return allimports;
 	}
 	
 	/**
@@ -186,6 +194,8 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void addImport(String imp)
 	{
+		allimports	= null;	// reset cached imports in case element is not first in xml.
+		
 		if(imports==null)
 			imports = new ArrayList<String>();
 		imports.add(imp);

@@ -8,15 +8,15 @@
 						http://jadex.sourceforge.net/jadex-component-2.1.xsd"
 	name="Extensions" package="jadex.base.service.extensions">
 		
-	<arguments>
-		<!-- The name(s) of extension component(s) to load (separated by comma). -->
-		<argument name="extensions" class="String"/>
-	</arguments>
-	
 	<imports>
 		<import>jadex.bridge.service.types.factory.*</import>
 		<import>jadex.bridge.service.types.cms.*</import>
 	</imports>
+	
+    <arguments>
+		<!-- The name(s) of extension component(s) to load (separated by comma). -->
+		<argument name="extensions" class="String"/>
+	</arguments>
 	
 	<services>
 		<providedservice class="IExtensionLoaderService">

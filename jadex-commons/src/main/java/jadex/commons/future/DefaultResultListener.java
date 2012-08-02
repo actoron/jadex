@@ -85,6 +85,6 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 			this.exception.printStackTrace();
 			exception.printStackTrace();
 		}
-		logger.severe("Exception occurred: "+exception);
+		logger.severe("Exception occurred: "+this+", "+exception);
 	}
 }

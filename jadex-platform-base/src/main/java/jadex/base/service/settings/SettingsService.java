@@ -2,6 +2,10 @@ package jadex.base.service.settings;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -27,7 +31,8 @@ import java.util.Map;
 /**
  *  Default settings service implementation.
  */
-public class SettingsService extends BasicService implements ISettingsService
+@Service
+public class SettingsService implements ISettingsService
 {
 	// -------- constants --------
 
@@ -37,6 +42,7 @@ public class SettingsService extends BasicService implements ISettingsService
 	//-------- attributes --------
 	
 	/** The service provider. */
+	@ServiceComponent
 	protected IInternalAccess	access;
 	
 	/** The properties filename. */
@@ -54,47 +60,28 @@ public class SettingsService extends BasicService implements ISettingsService
 	/** The context service. */
 	protected IContextService contextService;
 	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a settings service.
-	 *  @param prefix The settings file prefix to be used (if any).
-	 *    Uses name from service provider, if no prefix is given.
-	 */
-	public SettingsService(IInternalAccess access, boolean saveonexit)
-	{
-		super(access.getServiceContainer().getId(), ISettingsService.class, null);
-		this.access	= access;
-		this.providers	= new LinkedHashMap();
-		this.saveonexit	= saveonexit;
-		
-		filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
-	}
-	
-	//-------- BasicService overridings --------
+	//-------- Service methods --------
 	
 	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
+	@ServiceStart
 	public IFuture<Void>	startService()
 	{
+		this.providers	= new LinkedHashMap();
+		Object	soe	= access.getArguments().get("saveonexit");
+		this.saveonexit	= soe instanceof Boolean && ((Boolean)soe).booleanValue();
+		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
+		
 		final Future<Void>	ret	= new Future<Void>();
-		IFuture<IContextService> service = SServiceProvider.getService(access.getServiceContainer(), IContextService.class);
-		service.addResultListener(new DefaultResultListener<IContextService>()
+		access.getServiceContainer().searchService(IContextService.class)
+			.addResultListener(new DefaultResultListener<IContextService>()
 		{
 			public void resultAvailable(IContextService result)
 			{
 				contextService = result;
-				SettingsService.super.startService().addResultListener(access.createResultListener(new DelegationResultListener<Void>(ret)
-				{
-					@Override
-					public void customResultAvailable(Void result)
-					{
-						loadProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
-					}
-					
-				}));
+				loadProperties().addResultListener(new DelegationResultListener(ret));
 			}
 		});
 		
@@ -105,23 +92,17 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
+	@ServiceShutdown
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		if(saveonexit)
 		{
-			// Cannot use access.createResultListener() as component is already terminated.
-			saveProperties(true).addResultListener(new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result)
-				{
-					SettingsService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
+			saveProperties(true).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
-			super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
+			ret.setResult(null);
 		}
 		return ret;
 	}

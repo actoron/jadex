@@ -3,6 +3,7 @@ package jadex.tools.simcenter;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -123,7 +124,7 @@ public class SimCenterPanel extends JPanel
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 //				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.getExternalAccess((IComponentIdentifier)simservice.getServiceIdentifier().getProviderId())
+				cms.getExternalAccess((IComponentIdentifier)((IService)simservice).getServiceIdentifier().getProviderId())
 					.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 			}
 		});

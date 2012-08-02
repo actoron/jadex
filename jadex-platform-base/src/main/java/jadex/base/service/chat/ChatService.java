@@ -212,7 +212,14 @@ public class ChatService implements IChatService, IChatGuiService
 			});
 			
 			// Only wait 2 secs before terminating the agent.
-			done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(), new DelegationResultListener<Void>(ret)));
+			done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(),
+				new DelegationResultListener<Void>(ret)
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					super.resultAvailable(null);
+				}
+			}));
 			return ret;
 		}
 	}

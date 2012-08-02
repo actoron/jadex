@@ -24,7 +24,7 @@
 				<!-- Exclude all maven distribution modules -->
 				<exclude>*:*-distribution-*</exclude>
 				<!-- Exclude all webservice modules -->
-				<exclude>*:*-webservice</exclude>
+				<exclude>*:*-webservice*</exclude>
 				<!-- Exclude all secure transport modules -->
 				<exclude>*:*-securetransport</exclude>
 			</excludes>

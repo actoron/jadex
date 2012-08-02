@@ -13,7 +13,7 @@ import java.util.Date;
  *  modifying, deregistering and searching of component resp. service descriptions.
  */
 @GuiClassName("jadex.tools.dfbrowser.DFBrowserPanel")
-public interface IDF	extends IService
+public interface IDF
 {
 	/**
 	 *  Register an component description.

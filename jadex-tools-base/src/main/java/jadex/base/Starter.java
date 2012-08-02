@@ -20,7 +20,6 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -32,7 +31,6 @@ import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,8 +40,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *  Starter class for  
@@ -53,10 +49,12 @@ public class Starter
 	//-------- constants --------
 
 	/** The fallback platform configuration. */
-	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/standalone/Platform.component.xml";
+//	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/standalone/Platform.component.xml";
+	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex.standalone.PlatformAgent";
 
 	/** The component factory to be used for platform component. */
-	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
+//	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
+	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.micro.MicroAgentFactory";
 
 	/** The configuration file. */
 	public static final String CONFIGURATION_FILE = "conf";

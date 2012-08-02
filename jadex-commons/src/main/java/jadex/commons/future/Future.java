@@ -71,8 +71,8 @@ public class Future<E> implements IFuture<E>
 	/** The blocked callers (caller->state). */
 	protected Map<ISuspendable, String> callers;
 	
-//	/** The first listener (for avoiding array creation). */
-//	protected IResultListener<E> listener;
+	/** The first listener (for avoiding array creation). */
+	protected IResultListener<E> listener;
 	
 	/** The listeners. */
 	protected List<IResultListener<E>> listeners;
@@ -391,10 +391,10 @@ public class Future<E> implements IFuture<E>
 			}
 		}
 		
-//		if(listener!=null)
-//		{
-//    		notifyListener(listener);			
-//		}
+		if(listener!=null)
+		{
+    		notifyListener(listener);			
+		}
 		if(listeners!=null)
 		{
 	    	for(int i=0; i<listeners.size(); i++)
@@ -422,11 +422,11 @@ public class Future<E> implements IFuture<E>
 	    	}
 	    	else
 	    	{
-//	    		if(this.listener==null)
-//	    		{
-//	    			this.listener	= listener;
-//	    		}
-//	    		else
+	    		if(this.listener==null)
+	    		{
+	    			this.listener	= listener;
+	    		}
+	    		else
 	    		{
 	    			if(listeners==null)
 	    				listeners	= new ArrayList<IResultListener<E>>();

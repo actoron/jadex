@@ -235,7 +235,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOJsqnEeGMw45mLbta0w" key="2:0" value="name"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOJ8qnEeGMw45mLbta0w" key="2:1" value="ISettingsService"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOKMqnEeGMw45mLbta0w" key="2:2" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOKcqnEeGMw45mLbta0w" key="2:3" value="new SettingsService($component, $args.saveonexit)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOKcqnEeGMw45mLbta0w" key="2:3" value="new SettingsService()"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOKsqnEeGMw45mLbta0w" key="2:4" value="jadex_providedservices_table_Initial-Impl_cc456de9-5d3a-412c-8399-73343899efe9_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOK8qnEeGMw45mLbta0w" key="3:0" value="name1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOLMqnEeGMw45mLbta0w" key="3:1" value="jadex.bridge.service.types.threadpool.IThreadPoolService"/>
@@ -279,13 +279,13 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2IcUsqnEeGMw45mLbta0w" key="10:4" value="jadex_providedservices_table_Initial-Impl_6bbd6928-b04f-4961-9110-1517e1eaf1e3_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDUMqnEeGMw45mLbta0w" key="11:0" value="name7"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDUcqnEeGMw45mLbta0w" key="11:1" value="IDF"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDUsqnEeGMw45mLbta0w" key="11:2" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDU8qnEeGMw45mLbta0w" key="11:3" value="new DirectoryFacilitatorService($component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDUsqnEeGMw45mLbta0w" key="11:2" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDU8qnEeGMw45mLbta0w" key="11:3" value="new DirectoryFacilitatorService()"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDVMqnEeGMw45mLbta0w" key="11:4" value="jadex_providedservices_table_Initial-Impl_2017c95d-0203-4110-ab27-717d25712e4c_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDVcqnEeGMw45mLbta0w" key="12:0" value="name8"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDVsqnEeGMw45mLbta0w" key="12:1" value="ISimulationService"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDV8qnEeGMw45mLbta0w" key="12:2" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDWMqnEeGMw45mLbta0w" key="12:3" value="new SimulationService($component)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDWMqnEeGMw45mLbta0w" key="12:3" value="new SimulationService()"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDWcqnEeGMw45mLbta0w" key="12:4" value="jadex_providedservices_table_Initial-Impl_569ef0ef-8322-454a-95d3-7cdbfc9ee351_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDWsqnEeGMw45mLbta0w" key="13:0" value="name9"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2JDW8qnEeGMw45mLbta0w" key="13:1" value="IDeploymentService"/>

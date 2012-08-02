@@ -645,9 +645,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								getLogger().warning("Exception during component cleanup: "+exception);
+								getLogger().warning("Exception during component cleanup: "+getComponentIdentifier()+", "+exception);
 								killfuture.setException(exception);
-//								shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
 							}
 						});
 						

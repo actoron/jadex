@@ -360,7 +360,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				public void exceptionOccurred(Exception exception)
 				{
 					shutdowned = true;
-					exception.printStackTrace();
 					super.exceptionOccurred(exception);
 				}
 			});

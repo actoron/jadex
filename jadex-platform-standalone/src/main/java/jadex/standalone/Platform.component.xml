@@ -232,9 +232,7 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
-			<implementation>
-				new jadex.base.service.settings.SettingsService($component, $args.saveonexit)
-			</implementation>
+			<implementation class="jadex.base.service.settings.SettingsService"/>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
 			<implementation proxytype="raw">
@@ -311,19 +309,13 @@
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.df.IDF">
-			<implementation proxytype="raw">
-				new jadex.standalone.service.DirectoryFacilitatorService($component.getServiceProvider())
-			</implementation>
+			<implementation class="jadex.standalone.service.DirectoryFacilitatorService"/>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
-			<implementation>
-				new jadex.base.service.simulation.SimulationService($component)
-			</implementation>
+			<implementation class="jadex.base.service.simulation.SimulationService"/>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.deployment.IDeploymentService">
-			<implementation>
-				new jadex.base.service.deployment.DeploymentService()
-			</implementation>		
+			<implementation class="jadex.base.service.deployment.DeploymentService"/>		
 		</providedservice>
 		<!-- <providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>

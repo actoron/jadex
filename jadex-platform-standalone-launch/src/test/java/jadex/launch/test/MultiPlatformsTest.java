@@ -35,6 +35,9 @@ public class MultiPlatformsTest extends TestCase
 				"-gui", "false", "-printpass", "false",
 				"-deftimeout", ""+timeout,
 //				"-logging", "true",
+//				"-awareness", "false",
+//				"-componentfactory", "jadex.micro.MicroAgentFactory",
+//				"-conf", "jadex.standalone.PlatformAgent",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
@@ -43,7 +46,9 @@ public class MultiPlatformsTest extends TestCase
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
+			{
 				System.out.println("Waiting for platform "+i);
+			}
 //			try
 //			{
 				platforms[i]	= futures.get(i).get(sus, timeout);
@@ -66,7 +71,9 @@ public class MultiPlatformsTest extends TestCase
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
+			{
 				System.out.println("Killing platform "+i);
+			}
 			platforms[i].killComponent().get(sus, timeout);
 		}
 	}

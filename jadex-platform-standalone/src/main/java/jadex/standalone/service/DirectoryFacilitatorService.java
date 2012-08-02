@@ -1,14 +1,16 @@
 package jadex.standalone.service;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.fipa.SearchConstraints;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -29,18 +31,19 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DirectoryFacilitatorService extends BasicService implements IDF
+@Service
+public class DirectoryFacilitatorService	implements IDF
 {
 	//-------- attributes --------
 
 	/** The platform. */
-	protected IServiceProvider provider;
+	@ServiceComponent
+	protected IInternalAccess provider;
 	
 	/** The cached component management service. */
 	protected IComponentManagementService cms;
@@ -56,19 +59,8 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Create a standalone df.
 	 */
-	public DirectoryFacilitatorService(IServiceProvider provider)
+	public DirectoryFacilitatorService()
 	{
-		this(provider, null);
-	}
-	
-	/**
-	 *  Create a standalone df.
-	 */
-	public DirectoryFacilitatorService(IServiceProvider provider, Map properties)
-	{
-		super(provider.getId(), IDF.class, properties);
-
-		this.provider = provider;
 		this.components	= new IndexMap();
 	}
 	
@@ -88,14 +80,11 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		// Add description, when valid.
 		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clockservice.getTime())
 		{
-			synchronized(components)
-			{
-				// Automatically throws exception, when key exists.
-				if(components.containsKey(clone.getName()))
-					throw new RuntimeException("Componentomponent already registered: "+cdesc.getName());
-				components.add(clone.getName(), clone);
+			// Automatically throws exception, when key exists.
+			if(components.containsKey(clone.getName()))
+				throw new RuntimeException("Componentomponent already registered: "+cdesc.getName());
+			components.add(clone.getName(), clone);
 //				System.out.println("registered: "+clone.getName());
-			}
 			
 			ret.setResult(clone);
 		}
@@ -116,19 +105,16 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		synchronized(components)
+		if(!components.containsKey(cdesc.getName()))
 		{
-			if(!components.containsKey(cdesc.getName()))
-			{
-				//throw new RuntimeException("Component not registered: "+adesc.getName());
-				ret.setException(new RuntimeException("Component not registered: "+cdesc.getName()));
-			}
-			else
-			{
-				components.removeKey(cdesc.getName());
-				ret.setResult(null);
-				//System.out.println("deregistered: "+adesc.getName());
-			}
+			//throw new RuntimeException("Component not registered: "+adesc.getName());
+			ret.setException(new RuntimeException("Component not registered: "+cdesc.getName()));
+		}
+		else
+		{
+			components.removeKey(cdesc.getName());
+			ret.setResult(null);
+			//System.out.println("deregistered: "+adesc.getName());
 		}
 		
 		return ret;
@@ -149,10 +135,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clockservice.getTime())
 		{
 			// Automatically throws exception, when key does not exist.
-			synchronized(components)
-			{
-				components.replace(clone.getName(), clone);
-			}
+			components.replace(clone.getName(), clone);
 			//System.out.println("modified: "+clone.getName());
 			ret.setResult(clone);
 		}
@@ -190,40 +173,34 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		// If name is supplied, just lookup description.
 		if(adesc.getName()!=null)
 		{
-			synchronized(components)
+			if(components.containsKey(adesc.getName()))
 			{
-				if(components.containsKey(adesc.getName()))
-				{
-					DFComponentDescription ad = (DFComponentDescription)components.get(adesc.getName());
-					// Remove description when invalid.
-					if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clockservice.getTime())
-						components.removeKey(ad.getName());
-					else
-						ret.add(ad);
-				}
+				DFComponentDescription ad = (DFComponentDescription)components.get(adesc.getName());
+				// Remove description when invalid.
+				if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clockservice.getTime())
+					components.removeKey(ad.getName());
+				else
+					ret.add(ad);
 			}
 		}
 
 		// Otherwise search for matching descriptions.
 		else
 		{
-			synchronized(components)
+			DFComponentDescription[]	descs	= (DFComponentDescription[])components.toArray(new DFComponentDescription[components.size()]);
+			for(int i=0; (con==null || con.getMaxResults()==-1 || ret.size()<con.getMaxResults()) && i<descs.length; i++)
 			{
-				DFComponentDescription[]	descs	= (DFComponentDescription[])components.toArray(new DFComponentDescription[components.size()]);
-				for(int i=0; (con==null || con.getMaxResults()==-1 || ret.size()<con.getMaxResults()) && i<descs.length; i++)
+				// Remove description when invalid.
+				if(descs[i].getLeaseTime()!=null && descs[i].getLeaseTime().getTime()<clockservice.getTime())
 				{
-					// Remove description when invalid.
-					if(descs[i].getLeaseTime()!=null && descs[i].getLeaseTime().getTime()<clockservice.getTime())
+					components.removeKey(descs[i].getName());
+				}
+				// Otherwise match against template.
+				else
+				{
+					if(match(descs[i] ,adesc))
 					{
-						components.removeKey(descs[i].getName());
-					}
-					// Otherwise match against template.
-					else
-					{
-						if(match(descs[i] ,adesc))
-						{
-							ret.add(descs[i]);
-						}
+						ret.add(descs[i]);
 					}
 				}
 			}
@@ -233,7 +210,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider, IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
+			SServiceProvider.getServices(provider.getServiceContainer(), IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -426,51 +403,45 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Start the service.
 	 */
-	public synchronized IFuture<Void>	startService()
+	@ServiceStart
+	public IFuture<Void>	startService()
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		final boolean[]	services	= new boolean[2];
+		SServiceProvider.getServiceUpwards(provider.getServiceContainer(), IComponentManagementService.class)
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				final boolean[]	services	= new boolean[2];
-				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
-					.addResultListener(new DelegationResultListener(ret)
+				cms	= (IComponentManagementService)result;
+				boolean	setresult;
+				synchronized(services)
 				{
-					public void customResultAvailable(Object result)
-					{
-						cms	= (IComponentManagementService)result;
-						boolean	setresult;
-						synchronized(services)
-						{
-							services[0]	= true;
-							setresult	= services[0] && services[1];
-						}
-						if(setresult)
-							ret.setResult(null);
+					services[0]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
-					}
-				});
-				
-				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DelegationResultListener(ret)
+			}
+		});
+		
+		SServiceProvider.getService(provider.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				clockservice	= (IClockService)result;
+				boolean	setresult;
+				synchronized(services)
 				{
-					public void customResultAvailable(Object result)
-					{
-						clockservice	= (IClockService)result;
-						boolean	setresult;
-						synchronized(services)
-						{
-							services[1]	= true;
-							setresult	= services[0] && services[1];
-						}
-						if(setresult)
-							ret.setResult(null);
+					services[1]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
-					}
-				});
-				
 			}
 		});
 		

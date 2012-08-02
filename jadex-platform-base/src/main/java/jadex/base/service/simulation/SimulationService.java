@@ -2,8 +2,11 @@ package jadex.base.service.simulation;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -24,18 +27,19 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *  The execution control is the access point for controlling the
  *  execution of one application. It provides basic features for
  *  starting, stopping and stepwise execution.
  */
-public class SimulationService extends BasicService implements ISimulationService, IPropertiesProvider
+@Service
+public class SimulationService	implements ISimulationService, IPropertiesProvider
 {		
 	//-------- attributes --------
 
 	/** The containing component. */
+	@ServiceComponent
 	protected IInternalAccess access;
 	
 	/** The execution mode. */
@@ -70,28 +74,20 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Create a new execution control.
 	 */
-	public SimulationService(IInternalAccess access)
+	public SimulationService()
 	{
-		this(access, null);
-	}
-	
-	/**
-	 *  Create a new execution control.
-	 */
-	public SimulationService(IInternalAccess access, Map properties)
-	{
-		super(access.getServiceContainer().getId(), ISimulationService.class, properties);
-
-		this.access = access;
 		this.mode = MODE_NORMAL;
 		this.startoninit	= true;
 		this.listeners = SCollection.createArrayList();
 	}
 	
+	//-------- service methods --------
+
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
+	@ServiceShutdown
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	deregistered	= new Future<Void>();
@@ -127,14 +123,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 					stopped	= IFuture.DONE;
 				}
 				
-				stopped.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						SimulationService.super.shutdownService().addResultListener(
-							access.createResultListener(new DelegationResultListener(ret)));
-					}
-				}));
+				stopped.addResultListener(access.createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
 		
@@ -146,93 +135,88 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Start (and run) the execution. 
 	 */
+	@ServiceStart
 	public IFuture<Void>	startService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		super.startService().addResultListener(access.createResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(access.createResultListener(new IResultListener()
 		{
-			public void customResultAvailable(Object result)
+			public void resultAvailable(Object result)
 			{
-				SServiceProvider.getService(access.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(access.createResultListener(new IResultListener()
+				ISettingsService	settings	= (ISettingsService)result;
+				settings.registerPropertiesProvider("simulationservice", SimulationService.this)
+					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
-						ISettingsService	settings	= (ISettingsService)result;
-						settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								proceed();
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								super.exceptionOccurred(exception);
-							}
-						}));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// No settings service: ignore.
 						proceed();
 					}
-					
-					public void proceed()
+					public void exceptionOccurred(Exception exception)
 					{
-						final boolean[]	services	= new boolean[2];
-
-						SServiceProvider.getService(access.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								exeservice = (IExecutionService)result;
-								services[0]	= true;
-								if(services[0] && services[1])
-								{
-									if(startoninit)
-									{
-										startoninit	= false;
-										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
-									}
-									else
-									{
-										ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-									}
-								}
-							}
-						}));
-								
-						SServiceProvider.getService(access.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(access.createResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								clockservice = (IClockService)result;
-								services[1]	= true;
-								if(services[0] && services[1])
-								{
-									if(startoninit)
-									{
-										startoninit	= false;
-										start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
-									}
-									else
-									{
-										ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-									}
-								}
-							}
-						}));						
+						super.exceptionOccurred(exception);
 					}
-				}));				
+				}));
 			}
-		}));
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				proceed();
+			}
+			
+			public void proceed()
+			{
+				final boolean[]	services	= new boolean[2];
+
+				SServiceProvider.getService(access.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						exeservice = (IExecutionService)result;
+						services[0]	= true;
+						if(services[0] && services[1])
+						{
+							if(startoninit)
+							{
+								startoninit	= false;
+								start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+							}
+							else
+							{
+								ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
+							}
+						}
+					}
+				}));
+						
+				SServiceProvider.getService(access.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(access.createResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						clockservice = (IClockService)result;
+						services[1]	= true;
+						if(services[0] && services[1])
+						{
+							if(startoninit)
+							{
+								startoninit	= false;
+								start().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
+							}
+							else
+							{
+								ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
+							}
+						}
+					}
+				}));						
+			}
+		}));				
 
 		return ret;
 	}

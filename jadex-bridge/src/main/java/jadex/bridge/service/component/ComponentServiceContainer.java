@@ -151,7 +151,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, null, null, tp));
+					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null, tp));
 			}
 		});
 		

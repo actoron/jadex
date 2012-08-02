@@ -17,8 +17,8 @@
 	</description>
 
 	<properties>
-		<!-- <jmonkey.version>3.0.0.20120512-SNAPSHOT</jmonkey.version> -->
-		<jmonkey.version>[3.0.0-SNAPSHOT,)</jmonkey.version>
+		<jmonkey.version>3.0.0.20120512-SNAPSHOT</jmonkey.version>
+		<!-- <jmonkey.version>[3.0.0-SNAPSHOT,)</jmonkey.version> -->
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 	</properties>
 
