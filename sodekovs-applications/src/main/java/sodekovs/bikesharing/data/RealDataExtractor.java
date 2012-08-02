@@ -75,6 +75,11 @@ public class RealDataExtractor {
 	public static final double WEST = -77.1191;
 	public static final double EAST = -76.9135;
 
+	/*
+	 * The limit
+	 */
+	public static final Integer LIMIT = null;
+
 	/**
 	 * Database Connection
 	 */
@@ -90,7 +95,7 @@ public class RealDataExtractor {
 		rde.setConnection(conn);
 
 		System.out.println("Fetching rentals.");
-		List<Rental> rentals = rde.getRentals(new int[] { MONDAY }, WASHINGTON, BY_BIKE, null, null, null);
+		List<Rental> rentals = rde.getRentals(new int[] { MONDAY }, WASHINGTON, BY_BIKE, null, null, LIMIT);
 		if (!rentals.isEmpty()) {
 			System.out.println("Fetched rentals.");
 
@@ -110,18 +115,28 @@ public class RealDataExtractor {
 				System.out.println("Added GPS Coordinates.");
 
 				System.out.println("Initializing Allocations.");
-				rde.initializeAllocation(sd, MONDAY, WASHINGTON, null);
+				rde.initializeAllocation(sd, MONDAY, WASHINGTON, LIMIT);
 				System.out.println("Initialized Allocations.");
+
+				System.out.println("Fetching Allocations for evalution.");
+				SimulationDescription evalSd = rde.getAllocations(WASHINGTON, 0, 24, MONDAY, LIMIT);
+				System.out.println("Fetched Allocations for evalution.");
 
 				System.out.println("Postprocess Station IDs.");
 				rde.postProcessStatioNames(sd);
+				rde.postProcessStatioNames(evalSd);
 				System.out.println("Postprocessed Station IDs.");
 
 				try {
-					System.out.println("Writing XML File.");
+					System.out.println("Writing XML File for Simulation.");
 					String xmlFile = "WashingtonSimulation_Monday.xml";
 					XmlUtil.saveAsXML(sd, xmlFile);
 					System.out.println(xmlFile + " written.");
+
+					System.out.println("Writing XML File for Evaluation");
+					String xmlEvalFile = "WashingtonEvaluation_Monday.xml";
+					XmlUtil.saveAsXML(evalSd, xmlEvalFile);
+					System.out.println(xmlEvalFile + " written.");
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (JAXBException e) {
@@ -622,25 +637,168 @@ public class RealDataExtractor {
 	 *            the given {@link SimulationDescription}
 	 */
 	public void postProcessStatioNames(SimulationDescription sd) {
-		List<Station> stations = sd.getStations().getStation();
-		for (Station station : stations) {
-			String stationId = station.getStationID();
-			station.setStationID(stationId.replace("&", "and"));
+		if (sd.getStations() != null) {
+			List<Station> stations = sd.getStations().getStation();
+			for (Station station : stations) {
+				String stationId = station.getStationID();
+				station.setStationID(stationId.replace("&", "and"));
+			}
 		}
 
 		List<TimeSlice> timeSlices = sd.getTimeSlices().getTimeSlice();
 		for (TimeSlice timeSlice : timeSlices) {
-			List<ProbabilitiesForStation> probabilitiesForStations = timeSlice.getProbabilitiesForStations().getProbabilitiesForStation();
-			for (ProbabilitiesForStation probabilitiesForStation : probabilitiesForStations) {
-				String stationId = probabilitiesForStation.getStationID();
-				probabilitiesForStation.setStationID(stationId.replace("&", "and"));
+			if (timeSlice.getProbabilitiesForStations() != null) {
+				List<ProbabilitiesForStation> probabilitiesForStations = timeSlice.getProbabilitiesForStations().getProbabilitiesForStation();
+				for (ProbabilitiesForStation probabilitiesForStation : probabilitiesForStations) {
+					String stationId = probabilitiesForStation.getStationID();
+					probabilitiesForStation.setStationID(stationId.replace("&", "and"));
 
-				List<DestinationProbability> destinationProbabilities = probabilitiesForStation.getDestinationProbabilities().getDestinationProbability();
-				for (DestinationProbability destinationProbability : destinationProbabilities) {
-					String destination = destinationProbability.getDestination();
-					destinationProbability.setDestination(destination.replace("&", "and"));
+					List<DestinationProbability> destinationProbabilities = probabilitiesForStation.getDestinationProbabilities().getDestinationProbability();
+					for (DestinationProbability destinationProbability : destinationProbabilities) {
+						String destination = destinationProbability.getDestination();
+						destinationProbability.setDestination(destination.replace("&", "and"));
+					}
+				}
+			}
+
+			if (timeSlice.getStations() != null) {
+				List<Station> stations = timeSlice.getStations().getStation();
+				for (Station station : stations) {
+					String stationId = station.getStationID();
+					station.setStationID(stationId.replace("&", "and"));
 				}
 			}
 		}
+	}
+
+	/**
+	 * Fetches the average allocations for all bike stations in the given time interval for the given city and weekday.
+	 * 
+	 * @param city
+	 *            the given city
+	 * @param startHour
+	 *            the start of the time interval (inclusive)
+	 * @param endHour
+	 *            the end of the time interval (exclusive)
+	 * @param weekday
+	 *            the given weekday
+	 * @return a {@link SimulationDescription} with the average allocations for all bike stations in the given time interval for the given city and weekday or <code>null</code> if an error occurs
+	 */
+	public SimulationDescription getAllocations(String city, Integer startHour, Integer endHour, Integer weekday, Integer limit) {
+		HolidayManager hm = HolidayManager.getInstance(HolidayCalendar.UNITED_STATES);
+		Set<Holiday> holidays = hm.getHolidays(2011);
+		holidays.addAll(hm.getHolidays(2012));
+
+		String sql = "SELECT s.name, s.nbBikes, s.nbEmptyDocks, FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10)) as date, WEEKDAY(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10)))"
+				+ " as weekday, HOUR(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10))) as hour FROM station s JOIN stations ss ON s.stationsId = ss.id WHERE ss.city LIKE ? AND"
+				+ " s.installed = 1 AND s.locked = 0 AND WEEKDAY(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10))) = ? AND HOUR(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10))) >= ?"
+				+ " AND HOUR(FROM_UNIXTIME(SUBSTRING(ss.lastUpdate, 1, 10))) < ?";
+		if (limit != null) {
+			sql += " LIMIT " + limit;
+		}
+		try {
+			PreparedStatement stmt = getConnection().prepareStatement(sql);
+			stmt.setString(1, city);
+			stmt.setInt(2, weekday);
+			stmt.setInt(3, startHour);
+			stmt.setInt(4, endHour);
+
+			// Process the results from the database
+			ResultSet rs = stmt.executeQuery();
+			Map<Integer, List<StationTimeData>> dataByHour = new HashMap<Integer, List<StationTimeData>>();
+			while (rs.next()) {
+				String stationId = rs.getString("name");
+				int nbBikes = rs.getInt("nbBikes");
+				int nbEmptyDocks = rs.getInt("nbEmptyDocks");
+				Date date = rs.getDate("date");
+				int hour = rs.getInt("hour");
+
+				if (!isHoliday(holidays, date)) {
+					StationTimeData std = new StationTimeData();
+					std.setStationId(stationId);
+					std.setNbBikes(nbBikes);
+					std.setNbEmptyDocks(nbEmptyDocks);
+					std.setDate(date);
+					std.setHour(hour);
+
+					if (dataByHour.containsKey(hour)) {
+						dataByHour.get(hour).add(std);
+					} else {
+						List<StationTimeData> data = new ArrayList<StationTimeData>();
+						data.add(std);
+						dataByHour.put(hour, data);
+					}
+				}
+			}
+
+			// Create the SimulationDescription
+			ObjectFactory of = new ObjectFactory();
+			SimulationDescription sd = of.createSimulationDescription();
+			TimeSlices timeSlices = of.createSimulationDescriptionTimeSlices();
+
+			// Average the data...
+			// ...first by hour...
+			for (Integer hour : dataByHour.keySet()) {
+				// ...then by stations
+				Map<String, List<StationTimeData>> dataByHourAndStation = partitionByStation(dataByHour.get(hour));
+				sodekovs.bikesharing.model.TimeSlice.Stations stations = of.createTimeSliceStations();
+
+				for (String stationId : dataByHourAndStation.keySet()) {
+					List<StationTimeData> stationTimeDatas = dataByHourAndStation.get(stationId);
+
+					int bikes = 0;
+					int docks = 0;
+					for (StationTimeData stationTimeData : stationTimeDatas) {
+						bikes += stationTimeData.getNbBikes();
+						docks += stationTimeData.getNbBikes() + stationTimeData.getNbEmptyDocks();
+					}
+
+					bikes = (int) Math.round((double) bikes / (double) stationTimeDatas.size());
+					docks = (int) Math.round((double) docks / (double) stationTimeDatas.size());
+
+					Station station = of.createStation();
+					station.setStationID(stationId);
+					station.setNumberOfBikes(bikes);
+					station.setNumberOfDocks(docks);
+					stations.getStation().add(station);
+				}
+
+				TimeSlice timeSlice = of.createTimeSlice();
+				timeSlice.setStartTime(hour * 60);
+				timeSlice.setOffset(60);
+				timeSlice.setStations(stations);
+				timeSlices.getTimeSlice().add(timeSlice);
+			}
+
+			sd.setTimeSlices(timeSlices);
+			return sd;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Partitions the given {@link List} of {@link StationTimeData} into a {@link Map} by their station ids.
+	 * 
+	 * @param list
+	 *            the given list
+	 * @return the partitioned map
+	 */
+	private Map<String, List<StationTimeData>> partitionByStation(List<StationTimeData> list) {
+		Map<String, List<StationTimeData>> dataByHourAndStation = new HashMap<String, List<StationTimeData>>();
+
+		for (StationTimeData stationTimeData : list) {
+			if (dataByHourAndStation.containsKey(stationTimeData.getStationId())) {
+				dataByHourAndStation.get(stationTimeData.getStationId()).add(stationTimeData);
+			} else {
+				List<StationTimeData> data = new ArrayList<StationTimeData>();
+				data.add(stationTimeData);
+				dataByHourAndStation.put(stationTimeData.getStationId(), data);
+			}
+		}
+
+		return dataByHourAndStation;
 	}
 }
