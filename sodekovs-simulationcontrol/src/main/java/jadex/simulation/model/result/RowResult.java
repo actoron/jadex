@@ -236,6 +236,7 @@ public class RowResult extends IResult {
 		DoubleArrayList durations = new DoubleArrayList();
 
 		StringBuffer buffer = new StringBuffer();
+		buffer.append("\n");
 		buffer.append("Row Number: ");
 		buffer.append(getId());
 		buffer.append("\n");

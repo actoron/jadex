@@ -13,7 +13,7 @@ public class EvaluateRow {
 
 	/**
 	 * Transform the HashMap of observedEvents of all Experiments of this Row into a new structure, that prepares the evaluation of the results: The idea of the structure is roughly:
-	 * ObjectInstance.Propery.List_of_List --> For each ObjectInstance, observed in all experiments, a corresponding HashMap is created, that contains all observed properties of this object. This
+	 * ObjectInstance.Property.List_of_Lists --> For each ObjectInstance, observed in all experiments, a corresponding HashMap is created, that contains all observed properties of this object. This
 	 * HashMap again, contains a List of List, which means it contains a list that holds a list that contains the observed values of the single experiments for this property. By evaluating these
 	 * lists, it is possible to calculate mean etc. values for the properties.
 	 * 
