@@ -99,7 +99,7 @@ public class ComponentTestSuite extends TestSuite
 			{
 				public void run()
 				{
-					System.out.println("Aborting test suite due to excessive run time (>"+timeout+" ms).");
+					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
 					System.exit(1);
 				}
 			}, timeout);

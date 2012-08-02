@@ -810,10 +810,9 @@ public class RepositorySearchPanel extends JPanel
 					ret.groupId = grid;
 					ret.artifactId = arid;
 					ret.version = ver;
-					ret.remoteUrl = ((RepositoryInfo)cbrepos.getSelectedItem()).getUrl();
 				}
 			}
-			
+			ret.remoteUrl = ((RepositoryInfo)cbrepos.getSelectedItem()).getUrl();			
 		}
 		
 		return ret;

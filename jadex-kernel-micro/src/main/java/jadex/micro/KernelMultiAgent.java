@@ -10,17 +10,12 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  Multi kernel.
  */
-@Imports({
-	"jadex.kernelbase.*",
-	"jadex.bridge.service.types.factory.*"
-})
 @Arguments({
 	@Argument(name="defaultkernels", description= "Kernel default locations.", 
 		clazz=String[].class, defaultvalue="null"),
@@ -29,8 +24,8 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="ignoreextensions", description="File extensions that are ignored.",
 		clazz=String[].class, defaultvalue="null")})
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
-	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(IComponentFactory.class)"))
+	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.ignorekernels, $args.ignoreextensions)")),
+	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getRawService(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
 @ComponentTypes({
 	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")
