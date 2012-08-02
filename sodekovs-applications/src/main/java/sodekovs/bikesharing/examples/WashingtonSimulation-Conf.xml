@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		Document : AutomatedSimulation.xml Created on : 17. Dezember 2009,
+		17:25 Updated on: 15-1-10, 19h Author : vilenica Description: Purpose
+		of the document follows.
+	-->
+
+<SimulationConfiguration name="BikeSharingWashington"
+	applicationReference="..\\sodekovs-applications\\target\\classes\\sodekovs\\bikesharing\\examples\\BikesharingSimulation.application.xml"
+	applicationConfiguration="Washington-100"
+	nameOfSpace="my2dspace">
+
+	<Imports>
+		<Import>jadex.extension.envsupport.evaluation.*</Import>
+		<Import>jadex.simulation.evaluation.*</Import>		
+		<Import>java.lang.String</Import>
+	</Imports>
+
+	<Dataproviders>
+		<Dataprovider name="BikestationsLogger">
+			<Source name="$bikestation" sourcetype="ISpaceObject" objecttype="bikestation"/> 						
+			<Data name="stock">$bikestation.stock</Data>				
+			<Data name="stationID">$bikestation.stationID</Data>
+			<Data name="time">$tick</Data>							
+		</Dataprovider>
+		
+		<!-- New Provider! Test -->
+		<!-- <Dataprovider name="bikesharingStatistics">
+			<Source name="$bikestation" objecttype="bikestation" sourcetype="ISpaceObject" aggregate="true"/>
+			<Data name="ore_amount">$bikestation.stock</Data>
+			<Data name="time">$tick</Data>
+		</Dataprovider> -->
+	</Dataproviders>
+
+	<Dataconsumers>
+		<!-- <Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
+				<Property name="dataprovider">"homebaselogger2"</Property>
+				<Property name="title">"One random station"</Property>
+				<Property name="labelx">"Time"</Property>
+				<Property name="labely">"Collected Food"</Property>							
+				<Property name="seriesname_0">"Collected Food"</Property>
+				<Property name="valuex_0">"time"</Property>
+				<Property name="valuey_0">"ore_amount"</Property>
+		</Dataconsumer>
+		<Dataconsumer name="homebaseConsumerReloaded" clazz="XYChartDataConsumer">
+				<Property name="dataprovider">"homebaselogger2"</Property>
+				<Property name="title">"Evaluation of nest"</Property>				
+				<Property name="labelx">"Collected Food"</Property>			
+				<Property name="labely">"Time"</Property>				
+				<Property name="seriesname_0">"Collected Food"</Property>				
+				<Property name="valuex_0">"ore_amount"</Property>
+				<Property name="valuey_0">"time"</Property>
+		</Dataconsumer> -->
+		
+		<!-- New Consumer! Test! -->
+		<!-- <Dataconsumer name="bikestationConsumer" clazz="XYChartDataConsumer">
+				<Property name="dataprovider">"bikesharingStatistics"</Property>
+				<Property name="title">"NEW Evaluation of nest"</Property>				
+				<Property name="labelx">"NEW Collected Food"</Property>			
+				<Property name="labely">"NEW Time"</Property>				
+				<Property name="seriesname_0">"Collected Food"</Property>				
+				<Property name="valuex_0">"ore_amount"</Property>
+				<Property name="valuey_0">"time"</Property>
+		</Dataconsumer> -->
+		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"BikestationsLogger"</Property>
+				<!-- If there is more than one instance of this object that should be observed, than this String denotes the ID of the object to be distinguished. -->
+				<Property name="multipleInstanceId">"stationID"</Property>
+				<!-- Complex Event: the observed event contains several properties, not just one -->
+				<Property name="isComplexEvent">"stationID"</Property>				
+				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
+		</Dataconsumer>
+	</Dataconsumers>
+
+	<DataVisualization>
+		<Input>Reference to a data-field of the observers</Input>
+		<Function name="MeanValue" aggregate="all" />
+		<!-- DiagramType, Aggregation of different data, text on x/y-axis-->
+	</DataVisualization>
+
+	<!-- Optional: -->
+	<Persist>
+		<!-- Options: Wich filenName, Type, DB-Connector etc.-->
+	</Persist>
+	
+	<Optimization/>		
+	
+
+	
+
+	<RunConfiguration>
+		<General rows="2" parallelRuns="1" delta="true"><!-- For all runs.-->
+			<!-- Delay of start time can be defined relatively or absolute.-->
+			<!-- <StartTime value="2010-06-29 10:50:00" type="absolute" /> -->
+			<!--<StartTime value="6500" type="relative" />-->
+
+			<!--
+				delta=um bei paralleler Ausführung zu Verhindern, dass Seeds von
+				Randoms gleich sind.
+			-->
+			<!-- <TerminateCondition>
+				<Time value="17000" type="absolute" />
+			</TerminateCondition> -->
+		</General>
+		<Rows experiments="5">
+			<TerminateCondition>
+				 <Time value="10000" type="relative" />
+				
+					<!-- <TargetFunction function="$object.getProperty(&quot;stock&quot;) >=
+					30">	<ObjectSource type="ISpaceObject" name="bikestation" /> </TargetFunction> -->
+				
+				<!--
+					<TargetFunction function="$beliefbase.tmpCounter>= 13">
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
+				-->
+			</TerminateCondition>
+		</Rows>
+	</RunConfiguration>
+</SimulationConfiguration>
