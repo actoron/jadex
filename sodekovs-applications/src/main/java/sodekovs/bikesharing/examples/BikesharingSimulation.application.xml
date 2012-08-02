@@ -145,7 +145,7 @@
 				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
 				 	<env:processes>
 						<env:process type="init">
-							<env:property name="simDataSetupFilePath">"/Users/thomas/Documents/workspaces/sodekovs/jadexv2/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property>
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property>
 						</env:process>								
 						<env:process type="manageTimeSlices">
 							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
@@ -169,8 +169,8 @@
 			<extension>
 				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
 				 	<env:processes>
-						<env:process type="init">
-							<env:property name="simDataSetupFilePath">"/Users/thomas/Documents/workspaces/sodekovs/jadexv2/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_100.xml"</env:property>
+						<env:process type="init">																																		
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_100.xml"</env:property>
 						</env:process>								
 						<env:process type="manageTimeSlices">
 							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
@@ -187,7 +187,8 @@
   					<env:observers> 
   						<env:observer name="world" dataview="view_all"
   							perspective="main" /> 
-  					</env:observers> 
+  					</env:observers>
+  					  					
 				</env:envspace>
 			</extension>				
 		</configuration>
@@ -196,7 +197,7 @@
 				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
 				 	<env:processes>
 						<env:process type="init">
-							<env:property name="simDataSetupFilePath">"/Users/thomas/Documents/workspaces/sodekovs/jadexv2/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday.xml"</env:property>
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday.xml"</env:property>
 						</env:process>								
 						<env:process type="manageTimeSlices">
 							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
@@ -220,5 +221,3 @@
 	</configurations>
 
 </applicationtype>
-
-

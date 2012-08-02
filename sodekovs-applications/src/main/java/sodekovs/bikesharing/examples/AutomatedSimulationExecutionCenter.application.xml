@@ -22,21 +22,21 @@
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<argument name="simulationDescriptionFile">"/Users/thomas/Documents/workspaces/sodekovs/jadexv2/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_100.xml"</argument>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/HamburgSimulation-Conf.xml"</argument>			
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
 		</configuration>
-	<!-- <configuration name="Washington Standard with included Remote Client - CISIS Conference Snapshot">
+	<configuration name="Washington-100 with included Remote Client">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/antworld/example/cisis/CISIS-Conf.xml"</argument>			
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/WashingtonSimulation-Conf.xml"</argument>			
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
-		</configuration> -->		
+		</configuration>		
 	</configurations>
 </applicationtype>
