@@ -3,6 +3,8 @@ package jadex.bridge.service.types.security;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -43,6 +45,7 @@ public interface ISecurityService
 	 *  @return	The password of the local platform (if set).
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<String>	getLocalPassword();
 
 	/**
@@ -51,6 +54,7 @@ public interface ISecurityService
 	 *  @throws  Exception, when a null password is provided and use password is true.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<Void>	setLocalPassword(String password);
 
 	
@@ -61,6 +65,7 @@ public interface ISecurityService
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<String>	getPlatformPassword(IComponentIdentifier target);
 
 	/**
@@ -73,6 +78,7 @@ public interface ISecurityService
 	 *  @param password	The password or null if no password should be used.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<Void>	setPlatformPassword(IComponentIdentifier target, String password);
 	
 	/**
@@ -82,6 +88,7 @@ public interface ISecurityService
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<String>	getNetworkPassword(String network);
 
 	/**
@@ -90,6 +97,7 @@ public interface ISecurityService
 	 *  @param password	The password or null if no password should be used.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<Void>	setNetworkPassword(String network, String password);
 
 	/**
@@ -97,6 +105,7 @@ public interface ISecurityService
 	 *  @return A map containing the stored passwords as pairs (platform name -> password).
 	 */
 	// Todo: passwords are transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<Map<String, String>>	getPlatformPasswords();
 	
 	/**
@@ -104,6 +113,7 @@ public interface ISecurityService
 	 *  @return A map containing the stored passwords as pairs (network name -> password).
 	 */
 	// Todo: passwords are transferred in plain text unless transport uses encryption.
+	@SecureTransmission
 	public IFuture<Map<String, String>>	getNetworkPasswords();
 
 	/**

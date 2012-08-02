@@ -106,7 +106,7 @@ public class RemovePathAction extends ToolTipAction
 							{
 								try
 								{
-									ls.removeURL(SUtil.toURL(path));
+									ls.removeURL(null, SUtil.toURL(path));
 									ret.setResult(null);
 								}
 								catch(Exception ex)

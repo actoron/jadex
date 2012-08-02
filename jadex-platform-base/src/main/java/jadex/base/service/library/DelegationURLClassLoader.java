@@ -9,10 +9,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessControlContext;
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import sun.misc.URLClassPath;
@@ -32,7 +34,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 	protected ClassLoader basecl;
 	
 	/** The delegation classloader. */
-	protected DelegationURLClassLoader[] delegates;
+	protected List<DelegationURLClassLoader> delegates;
+	
+	/** The parent classloaders (i.e. the support). */
+	protected List<DelegationURLClassLoader> parents;
 	
 	/** The flattened transitive dependencies without duplicates
 	 *  (created lazy from delegates list). */
@@ -58,7 +63,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 			SReflect.isAndroid() ? basecl : null);
 		this.rid = rid;
 		this.basecl	= basecl;
-		this.delegates = delegates.clone();
+		this.delegates = delegates==null? new ArrayList(): SUtil.arrayToList(delegates);
+		this.parents = new ArrayList<DelegationURLClassLoader>();
+	
+//		addParentClassLoader(parent);
 //		System.out.println("d1 : "+rid+" "+SUtil.arrayToString(delegates));
 	}
 
@@ -68,9 +76,89 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 *  Get the delegates.
 	 *  @return The delegates.
 	 */
+	public List<IResourceIdentifier> getDelegateResourceIdentifiers()
+	{
+		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
+		for(int i=0; i<delegates.size(); i++)
+		{
+			ret.add(delegates.get(i).getResourceIdentifier());
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the delegates.
+	 *  @return The delegates.
+	 */
 	public DelegationURLClassLoader[] getDelegateClassLoaders()
 	{
-		return delegates;
+		return delegates.toArray(new DelegationURLClassLoader[delegates.size()]);
+	}
+	
+	/**
+	 *  Add a new delegate loader.
+	 *  @param classloader The delegate classloader.
+	 */
+	public synchronized void addDelegateClassLoader(DelegationURLClassLoader classloader)
+	{
+		if(delegates.contains(classloader))
+			return;
+//			throw new RuntimeException("Already contained: "+classloader);
+		
+		delegates.add(classloader);
+		
+		dependencies = null;
+	}
+	
+	/**
+	 *  Remove a new delegate loader.
+	 *  @param classloader The delegate classloader.
+	 */
+	public synchronized void removeDelegateClassLoader(DelegationURLClassLoader classloader)
+	{
+		delegates.remove(classloader);
+//		if(!delegates.remove(classloader))
+//			throw new RuntimeException("Not contained: "+classloader);
+		
+		dependencies = null;
+	}
+	
+	/**
+	 *  Add a parent loader.
+	 *  @param classloader The parent loader.
+	 */
+	public synchronized boolean addParentClassLoader(DelegationURLClassLoader parent)
+	{
+		if(parent==null || parents.contains(parent))
+			return false;
+//		if(parents.contains(parent))
+//			throw new RuntimeException("Already contained: "+parent);
+		
+		this.parents.add(parent);
+	
+		return parents.size()==1;
+	}
+	
+	/**
+	 *  Remove a parent classloader.
+	 */
+	public synchronized boolean removeParentClassLoader(DelegationURLClassLoader parent)
+	{
+		if(parent==null)
+			return false;
+		
+		if(!parents.remove(parent))
+			throw new RuntimeException("Not contained: "+parent);
+		
+		return parents.size()==0;
+	}
+	
+	/**
+	 *  Get the parent class loaders.
+	 */
+	public synchronized List<DelegationURLClassLoader> getParentClassLoaders()
+	{
+		return (List<DelegationURLClassLoader>)(((ArrayList)parents).clone());
 	}
 	
 	/**
@@ -85,10 +173,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 				if(dependencies==null)
 				{
 					dependencies	= new LinkedHashSet<DelegationURLClassLoader>();
-					for(int i=0; i<delegates.length; i++)
+					for(int i=0; i<delegates.size(); i++)
 					{
-						dependencies.add(delegates[i]);
-						dependencies.addAll(delegates[i].getFlattenedDependencies());
+						dependencies.add(delegates.get(i));
+						dependencies.addAll(delegates.get(i).getFlattenedDependencies());
 					}
 					
 //					System.out.println("Dependencies: "+rid+", "+dependencies.size());
@@ -129,9 +217,9 @@ public class DelegationURLClassLoader extends URLClassLoader
 		Set<IResourceIdentifier> ret = new LinkedHashSet<IResourceIdentifier>();
 		if(delegates!=null)
 		{
-			for(int i=0; i<delegates.length; i++)
+			for(int i=0; i<delegates.size(); i++)
 			{
-				ret.addAll(delegates[i].getAllResourceIdentifiers());
+				ret.addAll(delegates.get(i).getAllResourceIdentifiers());
 			}
 		}
 		if(getResourceIdentifier()!=null)
@@ -155,6 +243,9 @@ public class DelegationURLClassLoader extends URLClassLoader
 	protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
 	{
 		Class<?> ret = null;
+		
+//		if(name.indexOf("RemoteServiceManagementAgent")!=-1)
+//			System.out.println("here");
 		
 		if(basecl!=null)
 		{

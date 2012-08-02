@@ -7,6 +7,8 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.Properties;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.TreeNode;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
@@ -24,7 +26,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -34,15 +38,18 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *  The library plugin.
  */
-public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPanel
+public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 {
 	//-------- constants --------
 
@@ -55,7 +62,8 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	//-------- attributes --------
 	
 	/** The list. */
-	protected EditableList classpaths;
+//	protected EditableList classpaths;
+	protected JTree ridtree;
 	
 	/** The lib service. */
 	protected ILibraryService libservice;
@@ -75,21 +83,25 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
-		this.classpaths = new EditableList("Class Paths", true);
-		libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
-		{
-			public void customResultAvailable(List<IResourceIdentifier> result)
-			{
-//				List entries = (List)result;
-				for(int i=0; i<result.size(); i++)
-				{
-					classpaths.addEntry(result.get(i).getLocalIdentifier().getUrl().toString());
-				}
-			}
-		});			
-	
-		JScrollPane scroll = new JScrollPane(classpaths);
-		classpaths.setPreferredScrollableViewportSize(new Dimension(400, 200));
+		
+		ridtree = new JTree();
+		
+//		this.classpaths = new EditableList("Class Paths", true);
+//		libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
+//		{
+//			public void customResultAvailable(List<IResourceIdentifier> result)
+//			{
+////				List entries = (List)result;
+//				for(int i=0; i<result.size(); i++)
+//				{
+//					classpaths.addEntry(result.get(i).getLocalIdentifier().getUrl().toString());
+//				}
+//			}
+//		});			
+//		JScrollPane scroll = new JScrollPane(classpaths);
+//		classpaths.setPreferredScrollableViewportSize(new Dimension(400, 200));
+		JScrollPane scroll = new JScrollPane(ridtree);
+		
 		JPanel buts = new JPanel(new GridBagLayout());
 		JButton add = new JButton("Add ...");
 		add.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
@@ -137,9 +149,9 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 						try
 						{
 							URL url = files[i].toURI().toURL();
-							libservice.addToplevelURL(url).addResultListener(new SwingDefaultResultListener<Void>()
+							libservice.addURL(null, url).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
 							{
-								public void customResultAvailable(Void result)
+								public void customResultAvailable(IResourceIdentifier result)
 								{
 									refresh();
 								}
@@ -157,35 +169,37 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 				}
 			}
 		});
-		remove.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				final int[] sel = classpaths.getSelectedRows();
-				final String[] entries = classpaths.getEntries();				
-				for(int i=0; i<sel.length; i++)
-				{
-					classpaths.removeEntry(entries[sel[i]]);
-					try
-					{
-						libservice.removeURLCompletely(new URL(entries[sel[i]]))
-							.addResultListener(new SwingDefaultResultListener<Void>()
-						{
-							public void customResultAvailable(Void result)
-							{
-								refresh();
-							}
-						});
-					}
-					catch(Exception ex)
-					{
-						jcc.displayError("Library error", "Could not remove url", ex);
-//						System.out.println(entries[sel[i]]);
-//						ex.printStackTrace();
-					}	
-				}
-			}
-		});
+		
+//		remove.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				final int[] sel = classpaths.getSelectedRows();
+//				final String[] entries = classpaths.getEntries();				
+//				for(int i=0; i<sel.length; i++)
+//				{
+//					classpaths.removeEntry(entries[sel[i]]);
+//					try
+//					{
+//						libservice.removeURLCompletely(new URL(entries[sel[i]]))
+//							.addResultListener(new SwingDefaultResultListener<Void>()
+//						{
+//							public void customResultAvailable(Void result)
+//							{
+//								refresh();
+//							}
+//						});
+//					}
+//					catch(Exception ex)
+//					{
+//						jcc.displayError("Library error", "Could not remove url", ex);
+////						System.out.println(entries[sel[i]]);
+////						ex.printStackTrace();
+//					}	
+//				}
+//			}
+//		});
+		
 		ref.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -193,35 +207,36 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 				refresh();
 			}
 		});
-		classpaths.getModel().addTableModelListener(new TableModelListener()
-		{
-			public void tableChanged(TableModelEvent e)
-			{
-				if(e.getType()== TableModelEvent.DELETE && (e instanceof EditableListEvent))
-				{
-					final EditableListEvent ele = (EditableListEvent)e;
-					final int start = e.getFirstRow();
-					final int end = e.getLastRow();
-
-					for(int i=0; i<=end-start; i++)
-					{
-						if(ele.getData(i)!=null && ((String)ele.getData(i)).length()>0)
-						{
-							try
-							{
-								libservice.removeURLCompletely(new URL(ele.getData(i).toString()));
-							}
-							catch(MalformedURLException ex)
-							{
-								jcc.displayError("Library error", "Could not remove url", ex);
-//								System.out.println(ele.getData(i));
-//								ex.printStackTrace();
-							}	
-						}
-					}
-				}
-			}
-		});
+		
+//		classpaths.getModel().addTableModelListener(new TableModelListener()
+//		{
+//			public void tableChanged(TableModelEvent e)
+//			{
+//				if(e.getType()== TableModelEvent.DELETE && (e instanceof EditableListEvent))
+//				{
+//					final EditableListEvent ele = (EditableListEvent)e;
+//					final int start = e.getFirstRow();
+//					final int end = e.getLastRow();
+//
+//					for(int i=0; i<=end-start; i++)
+//					{
+//						if(ele.getData(i)!=null && ((String)ele.getData(i)).length()>0)
+//						{
+//							try
+//							{
+//								libservice.removeURLCompletely(new URL(ele.getData(i).toString()));
+//							}
+//							catch(MalformedURLException ex)
+//							{
+//								jcc.displayError("Library error", "Could not remove url", ex);
+////								System.out.println(ele.getData(i));
+////								ex.printStackTrace();
+//							}	
+//						}
+//					}
+//				}
+//			}
+//		});
 		
 		classview.add("Center", scroll);
 		classview.add("South", buts);
@@ -266,30 +281,34 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		otherview.add("Center", new JScrollPane(otherlist));
 		otherview.add("South", obuts);
 		
-		this.add("Managed Classpath Entries", classview);
-		this.add("System Classpath Entries", otherview);
+		this.setLayout(new BorderLayout());
+		this.add(classview, BorderLayout.CENTER);
+//		this.add("Managed Classpath Entries", classview);
+//		this.add("System Classpath Entries", otherview);
 
 		// Add a library service listener to be informed about library changes.
-		this.listener	= new ILibraryServiceListener()
-		{
-			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
-			{
-				// todo: make synchronized
-				if(!classpaths.containsEntry(rid.getLocalIdentifier().getUrl().toString()))
-					classpaths.addEntry(rid.getLocalIdentifier().getUrl().toString());
-				return IFuture.DONE;
-			}
-			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
-			{
-				// todo: make synchronized
-				if(classpaths.containsEntry(rid.getLocalIdentifier().getUrl().toString()))
-					classpaths.removeEntry(rid.getLocalIdentifier().getUrl().toString());
-				return IFuture.DONE;
-			}
-		};
-		libservice.addLibraryServiceListener(listener);
+//		this.listener	= new ILibraryServiceListener()
+//		{
+//			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
+//			{
+//				// todo: make synchronized
+//				if(!classpaths.containsEntry(rid.getLocalIdentifier().getUrl().toString()))
+//					classpaths.addEntry(rid.getLocalIdentifier().getUrl().toString());
+//				return IFuture.DONE;
+//			}
+//			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+//			{
+//				// todo: make synchronized
+//				if(classpaths.containsEntry(rid.getLocalIdentifier().getUrl().toString()))
+//					classpaths.removeEntry(rid.getLocalIdentifier().getUrl().toString());
+//				return IFuture.DONE;
+//			}
+//		};
+//		libservice.addLibraryServiceListener(listener);
 		
 		// Todo: remove listener, when tool is closed.
+		
+		refresh();
 		
 		return IFuture.DONE;
 	}
@@ -299,18 +318,53 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 */
 	public void refresh()
 	{
-		libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
+		libservice.getNonManagedURLs().addResultListener(new SwingDefaultResultListener<List<URL>>(LibServiceBrowser.this)
 		{
-			public void customResultAvailable(List<IResourceIdentifier> result)
+			public void customResultAvailable(final List<URL> nonmanurls)
 			{
-				classpaths.removeEntries();
-//						List entries = (List)result;
-				for(int i=0; i<result.size(); i++)
+				libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(LibServiceBrowser.this)
 				{
-					classpaths.addEntry(result.get(i).getLocalIdentifier().getUrl().toString());
-				}
+					public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
+					{
+						ridtree.removeAll();
+						DefaultTreeModel mod = (DefaultTreeModel)ridtree.getModel();
+						Map<IResourceIdentifier, List<IResourceIdentifier>> deps = result.getSecondEntity();
+						
+						Map<IResourceIdentifier, Node> nodes = new HashMap<IResourceIdentifier, Node>();
+						for(IResourceIdentifier rid: deps.keySet())
+						{
+							Node node = new Node(rid);
+							nodes.put(rid, node);
+						}
+						
+						for(Node node: nodes.values())
+						{
+							List<IResourceIdentifier> mydeps = deps.get((IResourceIdentifier)node.getUserObject());
+							for(IResourceIdentifier rid: mydeps)
+							{
+								Node child = nodes.get(rid);
+								node.add(child);
+							}
+						}
+						
+						Node root = nodes.get(result.getFirstEntity());
+						if(nonmanurls!=null && !nonmanurls.isEmpty())
+						{
+							Node cont = new Node("System classpath");
+							for(URL url: nonmanurls)
+							{
+								Node child = new Node(url);
+								cont.add(child);
+							}
+							root.add(cont);
+						}
+						
+						mod.setRoot(root);
+						ridtree.setRootVisible(false);
+					}
+				});
 			}
-		});	
+		});
 	}
 	
 	/**
@@ -362,4 +416,16 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	{
 		return Future.getEmptyFuture();
 	}
+}
+
+class Node extends DefaultMutableTreeNode
+{
+	/**
+	 *  Create a new RidNode.
+	 */
+	public Node(Object o)
+	{
+		super(o);
+	}
+	
 }

@@ -787,7 +787,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
 	{
-//		if(model.toString().indexOf("agent")!=-1)
+//		if(model.toString().indexOf("RemoteServiceManagementAgent")!=-1)
 //			System.out.println("findLoadableKernel: "+model);
 		
 		IFuture	ret;
@@ -811,18 +811,18 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findKernelInCache(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
 	{
-//		if(model.toString().indexOf("agent")!=-1)
+//		if(model.toString().indexOf("RemoteServiceManagementAgent")!=-1)
 //			System.out.println("findKernelInCache0: "+model);
 		final Future ret = new Future();
 		
 		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
 		String cachedresult = null;
-		if (!kernels.isEmpty())
+		if(!kernels.isEmpty())
 			cachedresult = (String) kernels.iterator().next();
 		
-		if (cachedresult != null)
+		if(cachedresult != null)
 		{
-//			if(model.toString().indexOf("agent")!=-1)
+//			if(model.toString().indexOf("RemoteServiceManagementAgent")!=-1)
 //				System.out.println("findKernelInCache1: "+model);
 			final String	kernelmodel	= cachedresult;	
 			startLoadableKernel(model, imports, rid, kernelmodel)
@@ -915,8 +915,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-//														System.out.println("Starting kernel4: " + kernelmodel);
-														for (int i = 0; i < kexts.length; ++i)
+														System.out.println("Starting kernel4: " + kernelmodel);
+														for(int i = 0; i < kexts.length; ++i)
 															factorycache.remove(kexts[i]);
 													}
 													
@@ -1009,7 +1009,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 													public void exceptionOccurred(Exception exception)
 													{
 //														System.out.println("Starting kernel7: " + kernelmodel);
-//														exception.printStackTrace();
+														exception.printStackTrace();
 														ret.setException(exception);
 													}
 												}));

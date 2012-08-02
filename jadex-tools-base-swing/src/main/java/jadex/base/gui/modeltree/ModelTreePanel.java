@@ -289,7 +289,7 @@ public class ModelTreePanel extends FileTreePanel
 							public void customResultAvailable(final ILibraryService ls)
 							{
 								// todo: workspace=false?
-								ls.addResourceIdentifier(rid, true).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+								ls.addResourceIdentifier(null, rid, true).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 							}
 						});
 						
@@ -353,7 +353,7 @@ public class ModelTreePanel extends FileTreePanel
 							public void customResultAvailable(final ILibraryService ls)
 							{
 								// todo: workspace=true?
-								ls.addURL(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+								ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
 								{
 									public void customResultAvailable(IResourceIdentifier rid)
 									{

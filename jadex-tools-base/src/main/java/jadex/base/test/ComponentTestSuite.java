@@ -121,7 +121,7 @@ public class ComponentTestSuite extends TestSuite
 		try
 		{
 			URL url = root.toURI().toURL();
-			rid	= libsrv.addURL(url).get(ts);
+			rid	= libsrv.addURL(null, url).get(ts);
 		}
 		catch(Exception e)
 		{

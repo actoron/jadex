@@ -1,10 +1,8 @@
 package jadex.base.service.library;
 
-import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -14,7 +12,6 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
-import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -29,16 +26,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,23 +72,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The map of managed resources (url (for local case) -> delegate loader). */
 	protected Map<IResourceIdentifier, DelegationURLClassLoader> classloaders;
 	
-	/** Rid support, for a rid all rids are saved that support it. */
-	protected Map<IResourceIdentifier, Set<IResourceIdentifier>> ridsupport;
-	
-	/** The primary managed rids and the number of their support. */
-	protected Map<IResourceIdentifier, Integer> managedrids;
-	
-	/** The global class loader (cached for speed). */
-	// todo: remove!?
-	protected ClassLoader globalcl;
+	/** The dependencies. */
+	protected Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> rids;
 	
 	/** The base classloader. */
-	protected ChangeableURLClassLoader baseloader;
+	protected ClassLoader baseloader;
+	
+	/** The delegation root loader. */
+	protected DelegationURLClassLoader rootloader;
 	
 	/** The non-managed urls (cached for speed). */
 	protected Set<URL>	nonmanaged;
-	
-	
 	
 	
 	//-------- constructors --------
@@ -150,39 +137,36 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.classloaders = new HashMap<IResourceIdentifier, DelegationURLClassLoader>();
 		this.clfuts = new HashMap<IResourceIdentifier, Future<DelegationURLClassLoader>>();
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
-		this.ridsupport = new LinkedHashMap<IResourceIdentifier, Set<IResourceIdentifier>>();
-		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
 		this.initurls = urls!=null? urls.clone(): urls;
-		this.baseloader = new ChangeableURLClassLoader(baseloader!=null? baseloader: getClass().getClassLoader());
+		this.baseloader = baseloader!=null? baseloader: getClass().getClassLoader();
+		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);
 	}
-	
 	
 	//-------- methods --------
 	
 	/**
 	 *  Add a new resource identifier.
+	 *  @param parid The optional parent rid.
 	 *  @param rid The resource identifier.
-	 *  @return The possibly completed rid (may contain an additional local rid when global was given):
 	 */
-	public IFuture<IResourceIdentifier> addResourceIdentifier(IResourceIdentifier rid, final boolean workspace)
+	public IFuture<IResourceIdentifier> addResourceIdentifier(final IResourceIdentifier parid,
+		IResourceIdentifier rid, final boolean workspace)
 	{
-//		System.out.println("add "+rid);
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
 		getDependencies(rid, workspace).addResultListener(new ExceptionDelegationResultListener
 			<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
 		{
-			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
+			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 			{
-				final IResourceIdentifier rid = result.getFirstEntity();
+				final IResourceIdentifier rid = deps.getFirstEntity();
 //				System.out.println("add end "+rid);
 				
-				getClassLoader(rid, null, rid, workspace).addResultListener(
+				getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
 					new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
 				{
-					public void customResultAvailable(DelegationURLClassLoader result)
+					public void customResultAvailable(final DelegationURLClassLoader chil)
 					{
-						addManaged(rid);
 						ret.setResult(rid);
 					}
 				});
@@ -195,62 +179,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		});
 		
-		
-		
-		return ret;
-	}
-	
-	/**
-	 *  Remove a resource identifier.
-	 *  @param url The resource identifier.
-	 */
-	public IFuture<Void> removeResourceIdentifier(final IResourceIdentifier rid)
-	{
-//		System.out.println("remove "+rid);
-		
-		final Future<Void> ret = new Future<Void>();
-		
-		// todo: workspace=true?
-		getClassLoader(rid, null, null, true).addResultListener(
-			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
-		{
-			public void customResultAvailable(DelegationURLClassLoader result)
-			{
-				boolean removed = removeManaged(rid);
-				if(removed)
-				{
-					if(result!=null)
-					{
-						for(Iterator<IResourceIdentifier> it=result.getAllResourceIdentifiers().iterator(); it.hasNext(); )
-						{
-							IResourceIdentifier dep = it.next();
-							removeSupport(dep, rid);
-						}
-					}
-					
-					// Do not notify listeners with lock held!
-					ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-					for(int i=0; i<lis.length; i++)
-					{
-						final ILibraryServiceListener liscopy = lis[i];
-						lis[i].resourceIdentifierRemoved(rid).addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-							}
-							public void exceptionOccurred(Exception exception) 
-							{
-								// todo: how to handle timeouts?! allow manual retry?
-//								exception.printStackTrace();
-								removeLibraryServiceListener(liscopy);
-							};
-						});
-					}
-				}
-				
-				ret.setResult(null);
-			}
-		});
+//		System.out.println("current: "+SUtil.arrayToString(rootloader.getAllResourceIdentifiers()));
 		
 		return ret;
 	}
@@ -259,109 +188,39 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Remove a resource identifier.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<Void> removeResourceIdentifierCompletely(final IResourceIdentifier rid)
+	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
 //		System.out.println("remove "+rid);
-		
-		final Future<Void> ret = new Future<Void>();
-		
-		// todo: workspace=true?
-		getClassLoader(rid, null, null, true).addResultListener(
-			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
-		{
-			public void customResultAvailable(DelegationURLClassLoader result)
-			{
-				removeManagedCompletely(rid);
-				
-				if(result!=null)
-				{
-					for(Iterator<IResourceIdentifier> it=result.getAllResourceIdentifiers().iterator(); it.hasNext(); )
-					{
-						IResourceIdentifier dep = it.next();
-						removeSupport(dep, rid);
-					}
-				}
-
-				// Do not notify listeners with lock held!
-				ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-				for(int i=0; i<lis.length; i++)
-				{
-					final ILibraryServiceListener liscopy = lis[i];
-					lis[i].resourceIdentifierRemoved(rid).addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						public void exceptionOccurred(Exception exception) 
-						{
-							// todo: how to handle timeouts?! allow manual retry?
-//							exception.printStackTrace();
-							removeLibraryServiceListener(liscopy);
-						};
-					});
-				}
-				
-				ret.setResult(null);
-			}
-		});
-		
-		return ret;
+		removeSupport(rid, parid);
+		return IFuture.DONE;
 	}
 	
-	/**
-	 *  Get all managed (directly added i.e. top-level) resource identifiers.
-	 *  @return The list of resource identifiers.
-	 */
-	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers()
-	{
-		final Future<List<IResourceIdentifier>> ret = new Future<List<IResourceIdentifier>>();
-		
-		Set<IResourceIdentifier> man = managedrids.keySet();
-		
-		URL[] urls = baseloader.getURLs();
-		
-		if(urls.length>0)
-		{
-			CollectionResultListener<IResourceIdentifier> lis = new CollectionResultListener<IResourceIdentifier>(urls.length, false, 
-				new ExceptionDelegationResultListener<Collection<IResourceIdentifier>, List<IResourceIdentifier>>(ret)
-			{
-				public void customResultAvailable(Collection<IResourceIdentifier> result)
-				{
-					ArrayList<IResourceIdentifier> res = new ArrayList<IResourceIdentifier>(result);
-					res.addAll(managedrids.keySet());
-					ret.setResult(res);
-				}
-			});
-			
-			for(int i=0; i<urls.length; i++)
-			{
-				internalGetResourceIdentifier(urls[i]).addResultListener(lis);
-			}
-		}
-		else
-		{
-			ret.setResult(new ArrayList<IResourceIdentifier>(managedrids.keySet()));
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get all resource identifiers (also indirectly managed. 
-	 */
-	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers()
-	{
-		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
-		for(Iterator<DelegationURLClassLoader> it=classloaders.values().iterator(); it.hasNext(); )
-		{
-			IResourceIdentifier rid = it.next().getResourceIdentifier();
-			if(!managedrids.containsKey(rid))
-			{
-				ret.add(rid);
-			}
-		}
-		return new Future<List<IResourceIdentifier>>(ret);
-	}
+//	/**
+//	 *  Get all managed (directly added i.e. top-level) resource identifiers.
+//	 *  @return The list of resource identifiers.
+//	 */
+//	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers()
+//	{
+//		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(rootloader.getAllResourceIdentifiers()));
+//	}
+//	
+//	/**
+//	 *  Get all resource identifiers (also indirectly managed). 
+//	 */
+//	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers()
+//	{
+//		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
+//		for(Iterator<DelegationURLClassLoader> it=classloaders.values().iterator(); it.hasNext(); )
+//		{
+//			IResourceIdentifier rid = it.next().getResourceIdentifier();
+//			List<IResourceIdentifier> toprids = rootloader.getDelegateResourceIdentifiers();
+//			if(!toprids.contains(rid))
+//			{
+//				ret.add(rid);
+//			}
+//		}
+//		return new Future<List<IResourceIdentifier>>(ret);
+//	}
 	
 	/**
 	 *  Get all resource identifiers (does not include urls of parent loader).
@@ -369,21 +228,47 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<IResourceIdentifier>> getAllResourceIdentifiers()
 	{
-		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
-		for(Iterator<DelegationURLClassLoader> it=classloaders.values().iterator(); it.hasNext(); )
+		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(rootloader.getAllResourceIdentifiers()));
+	}
+	
+	/**
+	 *  Get the rids.
+	 */
+	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> getResourceIdentifiers()
+	{
+		if(rids==null)
 		{
-			IResourceIdentifier rid = it.next().getResourceIdentifier();
-			ret.add(rid);
+			Map<IResourceIdentifier, List<IResourceIdentifier>> deps = new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
+			
+			List<IResourceIdentifier> todo = new ArrayList<IResourceIdentifier>();
+			todo.add(rootloader.getResourceIdentifier());
+			
+			while(!todo.isEmpty())
+			{
+				IResourceIdentifier clrid = todo.remove(0);
+				DelegationURLClassLoader cl = clrid==null? rootloader: classloaders.get(clrid);
+				List<IResourceIdentifier> mydeps = cl.getDelegateResourceIdentifiers();
+				deps.put(clrid, mydeps);
+				for(IResourceIdentifier rid: mydeps)
+				{
+					if(!deps.containsKey(rid))
+					{
+						todo.add(rid);
+					}
+				}
+			}
+			
+			rids = new Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>(rootloader.getResourceIdentifier(), deps);
 		}
-		return new Future<List<IResourceIdentifier>>(ret);
+		
+		return new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(rids);
 	}
 	
 	/**
 	 *  Add a new url.
 	 *  @param url The resource identifier.
 	 */
-//	public IFuture<IResourceIdentifier> addURL(final URL url, final boolean workspace)
-	public IFuture<IResourceIdentifier> addURL(final URL url)
+	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, final URL url)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		internalGetResourceIdentifier(url).addResultListener(
@@ -392,7 +277,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			public void customResultAvailable(final IResourceIdentifier rid)
 			{
 				// todo: should be true?
-				addResourceIdentifier(rid, true).addResultListener(
+				addResourceIdentifier(parid, rid, true).addResultListener(
 					new ExceptionDelegationResultListener<IResourceIdentifier, IResourceIdentifier>(ret)
 				{
 					public void customResultAvailable(IResourceIdentifier result)
@@ -407,108 +292,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 *  Add a new toplevel url.
-	 *  @param url The url.
-	 */
-	public IFuture<Void> addToplevelURL(URL url)
-	{
-		Future<Void> ret = new Future<Void>();
-		if(!SUtil.arrayToSet(baseloader.getURLs()).contains(url))
-		{
-			baseloader.addURL(url);
-			ret.setResult(null);
-		}
-		else
-		{
-			ret.setException(new RuntimeException("URL already contained: "+url));
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Remove a toplevel url.
-	 *  @param url The url.
-	 */
-	public IFuture<Void> removeToplevelURL(URL url)
-	{
-		if(baseloader.removeURL(url))
-		{
-			return IFuture.DONE;
-		}
-		else
-		{
-			return new Future<Void>(new RuntimeException("URL not contained: "+url));
-		}
-	}
-	
-	/**
 	 *  Remove a new url.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<Void> removeURL(final URL url)
+	public IFuture<Void> removeURL(final IResourceIdentifier parid, final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(baseloader.removeURL(url))
+		internalGetResourceIdentifier(url).addResultListener(
+			new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
 		{
-			ret.setResult(null);
-		}
-		else
-		{
-			internalGetResourceIdentifier(url).addResultListener(
-				new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+			public void customResultAvailable(IResourceIdentifier result)
 			{
-				public void customResultAvailable(IResourceIdentifier result)
-				{
-					removeResourceIdentifier(result).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Remove a new url.
-	 *  @param url The resource identifier.
-	 */
-	public IFuture<Void> removeURLCompletely(final URL url)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(baseloader.removeURL(url))
-		{
-			ret.setResult(null);
-		}
-		else
-		{
-			internalGetResourceIdentifier(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
-			{
-				public void customResultAvailable(IResourceIdentifier result)
-				{
-					removeResourceIdentifierCompletely(result).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	protected IFuture<IResourceIdentifier> internalGetResourceIdentifier(final URL url)
-	{
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		
-		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
-		{
-			public void customResultAvailable(IDependencyService drs)
-			{
-				drs.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+				removeResourceIdentifier(parid, result).addResultListener(new DelegationResultListener<Void>(ret));
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -531,7 +329,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(nonmanaged==null)
 		{
 			nonmanaged	= new LinkedHashSet<URL>();
-			collectClasspathURLs(baseloader.getParent(), nonmanaged);
+			collectClasspathURLs(baseloader, nonmanaged);
 		}
 		return nonmanaged;
 	}
@@ -570,40 +368,37 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return getClassLoader(rid, true);
 	}
 	
-	
 	/** 
 	 *  Returns the current ClassLoader.
 	 *  @param rid The resource identifier (null for current global loader).
 	 *  @return the current ClassLoader
 	 */
 	@Excluded()
-	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid, boolean workspace)
+	public IFuture<ClassLoader> getClassLoader(final IResourceIdentifier rid, boolean workspace)
 	{
 		final Future<ClassLoader> ret = new Future<ClassLoader>();
 		
 		if(rid==null)
 		{
-			if(globalcl==null)
-			{
-				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-				globalcl	= new DelegationURLClassLoader(baseloader, delegates);
-			}
-			ret.setResult(globalcl);
+			ret.setResult(rootloader);
+//			System.out.println("root classloader: "+rid);
 		}
 		else if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
 		{
 			ret.setResult(baseloader);
+//			System.out.println("base classloader: "+rid);
 		}	
 		else
 		{
 			// Resolve global rid or local rid from same platform.
 			if(rid.getGlobalIdentifier()!=null || isLocal(rid))
 			{
-				getClassLoader(rid, null, null, workspace).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
+				getClassLoader(rid, null, rootloader.getResourceIdentifier(), workspace).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
 				{
 					public void customResultAvailable(DelegationURLClassLoader result)
 					{
 						ret.setResult(result);
+//						System.out.println("custom classloader: "+result.hashCode()+" "+rid);
 					}
 				});
 			}
@@ -755,7 +550,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Create a new classloader.
 	 */
-	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
+	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, 
+		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
 		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl());
@@ -780,27 +576,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, delegates);
 				classloaders.put(rid, cl);
 //				System.out.println("createClassLoader() put: "+rid);
-				globalcl	= null;
 				addSupport(rid, support);
 				ret.setResult(cl);
-				
-				ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-				for(int i=0; i<lis.length; i++)
-				{
-					final ILibraryServiceListener liscopy = lis[i];
-					lis[i].resourceIdentifierAdded(rid).addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						public void exceptionOccurred(Exception exception) 
-						{
-							// todo: how to handle timeouts?! allow manual retry?
-//							exception.printStackTrace();
-							removeLibraryServiceListener(liscopy);
-						};
-					});
-				}
 			}
 		});
 		
@@ -834,29 +611,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return ret;
 	}
 	
-//	/**
-//	 *  Add a path.
-//	 *  @param path The path.
-//	 */
-//	protected void addPath(String path)
-//	{
-//		addURL(SUtil.toURL(path));
-//	}
-	
 	/**
 	 *  Add support for a rid.
 	 */
 	protected void addSupport(IResourceIdentifier rid, IResourceIdentifier support)
 	{
-		if(rid!=null && support!=null)
+		if(rid!=null)
 		{
-			Set<IResourceIdentifier> mysup = ridsupport.get(rid);
-			if(mysup==null)
+			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
+			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
+			pacl.addDelegateClassLoader(cl);
+			if(cl.addParentClassLoader(pacl))
 			{
-				mysup = new HashSet<IResourceIdentifier>();
-				ridsupport.put(rid, mysup);
+				rids = null;
+				notifyAdditionListeners(rid);
 			}
-			mysup.add(support);
 		}
 	}
 	
@@ -865,343 +634,140 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected void removeSupport(IResourceIdentifier rid, IResourceIdentifier support)
 	{
-		if(rid!=null && support!=null)
-		{
-			Set<IResourceIdentifier> mysup = ridsupport.get(rid);
-			if(mysup!=null)
-			{
-				mysup.remove(support);
-				if(mysup.size()==0)
-				ridsupport.remove(rid);
-			}
-			else
-			{
-				throw new RuntimeException("No support found: "+ridsupport);
-			}
-		}
-	}
-	
-	/**
-	 *  Add primary management entry for a rid.
-	 */
-	protected void addManaged(IResourceIdentifier rid)
-	{
 		if(rid!=null)
 		{
-			Integer num = managedrids.get(rid);
-			if(num==null)
+			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
+			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
+			pacl.removeDelegateClassLoader(cl);
+			
+			// If last support, delete removeSupport to children.
+			if(cl.removeParentClassLoader(pacl))
 			{
-				managedrids.put(rid, 1);
-			}
-			else
-			{
-				managedrids.put(rid, new Integer(num.intValue()+1));
+				rids = null;
+				notifyRemovalListeners(rid);
+				
+				DelegationURLClassLoader[] dels = cl.getDelegateClassLoaders();
+				for(DelegationURLClassLoader del: dels)
+				{
+					removeSupport(del.getResourceIdentifier(), rid);
+				}
 			}
 		}
 	}
 	
 	/**
-	 *  Remove primary management for a rid.
-	 *  @return True, if entry has to be removed.
+	 * 
 	 */
-	protected boolean removeManaged(IResourceIdentifier rid)
+	protected void notifyAdditionListeners(final IResourceIdentifier rid)
 	{
-		boolean ret = false;
-		
-		if(rid!=null)
+		// Do not notify listeners with lock held!
+		ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+		for(int i=0; i<lis.length; i++)
 		{
-			Integer num = managedrids.get(rid);
-			if(num!=null)
+			final ILibraryServiceListener liscopy = lis[i];
+			lis[i].resourceIdentifierAdded(rid).addResultListener(new IResultListener<Void>()
 			{
-				int now = num.intValue()-1;
-				if(now==0)
+				public void resultAvailable(Void result)
 				{
-					managedrids.remove(rid);
-					ret = true;
 				}
-				else
+				public void exceptionOccurred(Exception exception) 
 				{
-					managedrids.put(rid, managedrids.put(rid, new Integer(num.intValue()-1)));
-				}
-			}
+					// todo: how to handle timeouts?! allow manual retry?
+	//				exception.printStackTrace();
+					removeLibraryServiceListener(liscopy);
+				};
+			});
 		}
-		
-		return ret;
 	}
 	
 	/**
-	 *  Remove primary management for a rid.
+	 * 
 	 */
-	protected void removeManagedCompletely(IResourceIdentifier rid)
+	protected void notifyRemovalListeners(final IResourceIdentifier rid)
 	{
-		if(rid!=null)
+		// Do not notify listeners with lock held!
+		ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+		for(int i=0; i<lis.length; i++)
 		{
-			managedrids.remove(rid);
+			final ILibraryServiceListener liscopy = lis[i];
+			lis[i].resourceIdentifierRemoved(rid).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+				public void exceptionOccurred(Exception exception) 
+				{
+					// todo: how to handle timeouts?! allow manual retry?
+	//				exception.printStackTrace();
+					removeLibraryServiceListener(liscopy);
+				};
+			});
 		}
 	}
-
 	
-	/**
-	 *  Get the jar for a rid. 
-	 *  @param rid The rid.
-	 *  @return The jar.
-	 */
-	public IFuture<IInputConnection> getJar(IResourceIdentifier rid)
-	{
-		final Future<IInputConnection> ret = new Future<IInputConnection>();
-		
-		boolean fin = false;
-		
-		// Has rid a local file desc on this platform?
-		if(isLocal(rid))
-		{
-			URL url = rid.getLocalIdentifier().getUrl();
-			File f = new File(url.getFile());
-			if(url.getFile().endsWith(".jar") && f.exists())
-			{
-				try
-				{
-					FileInputStream fis = new FileInputStream(f);
-					ServiceOutputConnection soc = new ServiceOutputConnection();
-					ret.setResult(soc.getInputConnection());
-					soc.writeFromInputStream(fis, component.getExternalAccess());
-					fin = true;
-				}
-				catch(IOException e)
-				{
-				}
-			}
-		}
-	
-		if(!fin)
-			ret.setException(new RuntimeException("Could not find resource: "+rid));
-		
-//		if(!fin && rid.getGlobalIdentifier()!=null)
+//	/**
+//	 *  Get the jar for a rid. 
+//	 *  @param rid The rid.
+//	 *  @return The jar.
+//	 */
+//	public IFuture<IInputConnection> getJar(IResourceIdentifier rid)
+//	{
+//		final Future<IInputConnection> ret = new Future<IInputConnection>();
+//		
+//		boolean fin = false;
+//		
+//		// Has rid a local file desc on this platform?
+//		if(isLocal(rid))
 //		{
-//			// todo: get local location from dependency service? 
+//			URL url = rid.getLocalIdentifier().getUrl();
+//			File f = new File(url.getFile());
+//			if(url.getFile().endsWith(".jar") && f.exists())
+//			{
+//				try
+//				{
+//					FileInputStream fis = new FileInputStream(f);
+//					ServiceOutputConnection soc = new ServiceOutputConnection();
+//					ret.setResult(soc.getInputConnection());
+//					soc.writeFromInputStream(fis, component.getExternalAccess());
+//					fin = true;
+//				}
+//				catch(IOException e)
+//				{
+//				}
+//			}
 //		}
+//	
+//		if(!fin)
+//			ret.setException(new RuntimeException("Could not find resource: "+rid));
+//		
+////		if(!fin && rid.getGlobalIdentifier()!=null)
+////		{
+////			// todo: get local location from dependency service? 
+////		}
+//		
+//		return ret;
+//	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IResourceIdentifier> internalGetResourceIdentifier(final URL url)
+	{
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+		
+		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
+		{
+			public void customResultAvailable(IDependencyService drs)
+			{
+				drs.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+			}
+		}));
 		
 		return ret;
 	}
 	
 	//-------- methods --------
-
-//	/**
-//	 *  Add a new url.
-//	 *  @param url The url.
-//	 */
-//	public void addURL(final URL url)
-//	{
-////		System.out.println("add "+url);
-//		ILibraryServiceListener[] tmp = null;
-//		
-//		synchronized(this)
-//		{
-//			Integer refcount = (Integer)urlrefcount.get(url);
-//			if(refcount != null)
-//			{
-//				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
-//			}
-//			else
-//			{
-//				urlrefcount.put(url, new Integer(1));
-//				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-//			}
-//		}
-//		
-//		if(tmp != null)
-//		{
-//			final ILibraryServiceListener[] lis = tmp;
-//			
-//			getClassLoader(url).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
-//			{
-//				public void resultAvailable(DelegationURLClassLoader result)
-//				{
-//					// Do not notify listeners with lock held!
-//					
-//					for(int i=0; i<lis.length; i++)
-//					{
-//						final ILibraryServiceListener liscopy = lis[i];
-//						lis[i].urlAdded(url).addResultListener(new IResultListener()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//							}
-//							
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								// todo: how to handle timeouts?! allow manual retry?
-////								exception.printStackTrace();
-//								removeLibraryServiceListener(liscopy);
-//							}
-//						});
-//					}
-//				}
-//			});
-//		}
-//	}
-	
-//	/**
-//	 *  Remove a url.
-//	 *  @param url The url.
-//	 */
-//	public void removeURL(final URL url)
-//	{
-////		System.out.println("remove "+url);
-//		ILibraryServiceListener[] tmp = null;
-//		
-//		synchronized(this)
-//		{
-//			Integer refcount = (Integer)urlrefcount.get(url);
-//			if(refcount == null)
-//				throw new RuntimeException("Unknown URL: "+url);
-//			refcount = new Integer(refcount.intValue() - 1);
-//			urlrefcount.put(url, refcount);
-//			if(refcount.intValue() < 1)
-//			{
-//				classloadersbyname.remove(url);
-//				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-//			}
-//		}
-//		
-//		// Do not notify listeners with lock held!
-//		
-//		if(tmp != null)
-//		{
-//			final ILibraryServiceListener[] lis = tmp;
-//			
-//			getClassLoader(url).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
-//			{
-//				public void resultAvailable(DelegationURLClassLoader result)
-//				{
-////					updateGlobalClassLoader();
-//					
-//					for(int i=0; i<lis.length; i++)
-//					{
-//						final ILibraryServiceListener liscopy = lis[i];
-//						lis[i].urlRemoved(url).addResultListener(new IResultListener()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//							}
-//							
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								// todo: how to handle timeouts?! allow manual retry?
-//		//						exception.printStackTrace();
-//								removeLibraryServiceListener(liscopy);
-//							}
-//						});
-//					}
-//				}
-//			});
-//		}
-//	}
-	
-//	/**
-//	 *  Remove a url completely (all references).
-//	 *  @param url The url.
-//	 */
-//	public void removeURLCompletely(URL url)
-//	{
-////		System.out.println("rem all "+url);
-//		ILibraryServiceListener[] lis = null;
-//		synchronized(this)
-//		{
-//			urlrefcount.remove(url);
-//			classloadersbyname.remove(url);
-////			updateGlobalClassLoader();
-//			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-//		}
-//		
-//		// Do not notify listeners with lock held!
-//		if(lis != null)
-//		{
-//			for(int i=0; i<lis.length; i++)
-//			{
-//				final ILibraryServiceListener liscopy = lis[i];
-//				lis[i].urlRemoved(url).addResultListener(new IResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						// todo: how to handle timeouts?! allow manual retry?
-////						exception.printStackTrace();
-//						removeLibraryServiceListener(liscopy);
-//					}
-//				});
-//			}
-//		}
-//	}
-	
-//	/**
-//	 *  Get all managed entries as URLs.
-//	 *  @return url The urls.
-//	 */
-//	public synchronized IFuture<List<URL>> getURLs()
-//	{
-//		return new Future<List<URL>>(new ArrayList<URL>(libcl.getAllURLs()));
-//	}
-//
-//	/**
-//	 *  Get other contained (but not directly managed) URLs.
-//	 *  @return The list of urls.
-//	 */
-//	public synchronized IFuture<List<URL>> getNonManagedURLs()
-//	{
-//		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
-//	}
-//	
-//	/**
-//	 *  Get all urls (managed and non-managed).
-//	 *  @return The list of urls.
-//	 */
-//	public IFuture<List<URL>> getAllURLs()
-//	{
-//		List<URL> ret = new ArrayList<URL>();
-//		ret.addAll(libcl.getAllURLs());
-//		ret.addAll(SUtil.getClasspathURLs(libcl));
-//		ret.addAll(SUtil.getClasspathURLs(null));
-//		return new Future<List<URL>>(ret);
-//	}
-//	
-//	/** 
-//	 *  Returns the current ClassLoader
-//	 *  @return the current ClassLoader
-//	 */
-//	public ClassLoader getClassLoader()
-//	{
-//		return libcl;
-//	}
-
-//	/**
-//	 *  Load a class given a class identifier.
-//	 *  @param clid The class identifier.
-//	 *  @return The class for the identifier.
-//	 */
-//	public IFuture<Class> loadClass(final IClassIdentifier clid)
-//	{
-//		final Future<Class> ret = new Future<Class>();
-//		IResourceIdentifier rid = clid.getResourceIdentifier();
-//		getClassLoader(rid).addResultListener(component.createResultListener(new ExceptionDelegationResultListener<ClassLoader, Class>(ret)
-//		{
-//			public void customResultAvailable(ClassLoader cl)
-//			{
-//				try
-//				{
-//					ret.setResult(cl.loadClass(clid.getClassname()));
-//				}
-//				catch(Exception e)
-//				{
-//					ret.setException(e);
-//				}
-//			}
-//		}));
-//		return ret;
-//	}
 	
 	/**
 	 *  Start the service.
@@ -1216,7 +782,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				initurls.length, new DelegationResultListener<Void>(urlsdone));
 			for(int i=0; i<initurls.length; i++)
 			{
-				addURL(SUtil.toURL(initurls[i])).addResultListener(lis);
+				addURL(null, SUtil.toURL(initurls[i])).addResultListener(lis);
 			}
 		}
 		else
@@ -1290,302 +856,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return ret;
 	}
 
-	
-
-	/** 
-	 *  Helper method for validating jar-files
-	 *  @param file the jar-file
-	 * /
-	private boolean checkJar(File file)
-	{
-		try
-		{
-			JarFile jarFile = new JarFile(file);
-		}
-		catch(IOException e)
-		{
-			return false;
-		}
-
-		return true;
-	}*/
-
-	/** 
-	 *  Fires the class-path-added event
-	 *  @param path the new class path
-	 * /
-	protected synchronized void fireURLAdded(URL url)
-	{
-//		System.out.println("listeners: "+listeners);
-		for(Iterator it = listeners.iterator(); it.hasNext();)
-		{
-			ILibraryServiceListener listener = (ILibraryServiceListener)it.next();
-			listener.urlAdded(url);
-		}
-	}*/
-
-	/** 
-	 *  Fires the class-path-removed event
-	 *  @param path the removed class path
-	 * /
-	protected synchronized void fireURLRemoved(URL url)
-	{
-		for(Iterator it = listeners.iterator(); it.hasNext();)
-		{
-			ILibraryServiceListener listener = (ILibraryServiceListener)it.next();
-			listener.urlRemoved(url);
-		}
-	}*/
-	
-//	/**
-//	 *  Convert a file/string/url.
-//	 */
-//	public static URL toURL(Object url)
-//	{
-//		URL	ret	= null;
-//		boolean	jar	= false;
-//		if(url instanceof String)
-//		{
-//			String	string	= (String) url;
-//			if(string.startsWith("file:") || string.startsWith("jar:file:"))
-//			{
-//				try
-//				{
-//					string	= URLDecoder.decode(string, "UTF-8");
-//				}
-//				catch(UnsupportedEncodingException e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//			
-//			jar	= string.startsWith("jar:file:");
-//			url	= jar ? new File(string.substring(9))
-//				: string.startsWith("file:") ? new File(string.substring(5)) : null;
-//			
-//			
-//			if(url==null)
-//			{
-//				File file	= new File(string);
-//				if(file.exists())
-//				{
-//					url	= file;
-//				}
-//				else
-//				{
-//					file	= new File(System.getProperty("user.dir"), string);
-//					if(file.exists())
-//					{
-//						url	= file;
-//					}
-//					else
-//					{
-//						try
-//						{
-//							url	= new URL(string);
-//						}
-//						catch (MalformedURLException e)
-//						{
-//							throw new RuntimeException(e);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		if(url instanceof URL)
-//		{
-//			ret	= (URL)url;
-//		}
-//		else if(url instanceof File)
-//		{
-//			try
-//			{
-//				String	abs	= ((File)url).getAbsolutePath();
-//				String	rel	= SUtil.convertPathToRelative(abs);
-//				ret	= abs.equals(rel) ? new File(abs).toURI().toURL()
-//					: new File(System.getProperty("user.dir"), rel).toURI().toURL();
-//				if(jar)
-//				{
-//					if(ret.toString().endsWith("!"))
-//						ret	= new URL("jar:"+ret.toString()+"/");	// Add missing slash in jar url.
-//					else
-//						ret	= new URL("jar:"+ret.toString());						
-//				}
-//			}
-//			catch (MalformedURLException e)
-//			{
-//				throw new RuntimeException(e);
-//			}
-//		}
-//		
-//		return ret;
-//	}
-	
-//	/**
-//	 *  Get the non-managed classpath entries as strings.
-//	 *  @return Classpath entries as a list of strings.
-//	 */
-//	public IFuture<List<String>> getURLStrings()
-//	{
-//		final Future<List<String>> ret = new Future<List<String>>();
-//		
-//		getURLs().addResultListener(new IResultListener<List<URL>>()
-//		{
-//			public void resultAvailable(List<URL> result)
-//			{
-////				List urls = (List)result;
-//				List<String> tmp = new ArrayList<String>();
-//				// todo: hack!!!
-//				
-//				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
-//				{
-//					URL	url	= it.next();
-//					tmp.add(url.toString());
-//					
-////					String file = url.getFile();
-////					File f = new File(file);
-////					
-////					// Hack!!! Above code doesnt handle relative url paths. 
-////					if(!f.exists())
-////					{
-////						File	newfile	= new File(new File("."), file);
-////						if(newfile.exists())
-////						{
-////							f	= newfile;
-////						}
-////					}
-////					ret.add(f.getAbsolutePath());
-//				}
-//				
-//				ret.setResult(tmp);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Get the non-managed classpath entries.
-//	 *  @return Classpath entries as a list of strings.
-//	 */
-//	public IFuture<List<String>> getNonManagedURLStrings()
-//	{
-//		final Future<List<String>> ret = new Future<List<String>>();
-//		
-//		getNonManagedURLs().addResultListener(new IResultListener<List<URL>>()
-//		{
-//			public void resultAvailable(List<URL> result)
-//			{
-////				List urls = (List)result;
-//				List<String> tmp = new ArrayList<String>();
-//				// todo: hack!!!
-//				
-//				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
-//				{
-//					URL	url	= it.next();
-//					tmp.add(url.toString());
-//					
-////					String file = url.getFile();
-////					File f = new File(file);
-////					
-////					// Hack!!! Above code doesnt handle relative url paths. 
-////					if(!f.exists())
-////					{
-////						File	newfile	= new File(new File("."), file);
-////						if(newfile.exists())
-////						{
-////							f	= newfile;
-////						}
-////					}
-////					ret.add(f.getAbsolutePath());
-//				}
-//				
-//				ret.setResult(tmp);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
-//		
-//		return ret;
-//		
-////		java.util.List	ret	= new ArrayList();
-////
-//////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-////		// todo: hack
-//////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
-////		ClassLoader	cl	= ls.getClassLoader();
-////		
-////		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
-////		for(int i=0; i<cps.size(); i++)
-////		{
-////			URL	url	= (URL)cps.get(i);
-////			ret.add(url.toString());
-////			
-//////			String file = url.getFile();
-//////			File f = new File(file);
-//////			
-//////			// Hack!!! Above code doesnt handle relative url paths. 
-//////			if(!f.exists())
-//////			{
-//////				File	newfile	= new File(new File("."), file);
-//////				if(newfile.exists())
-//////				{
-//////					f	= newfile;
-//////				}
-//////			}
-//////			ret.add(f.getAbsolutePath());
-////		}
-////		
-////		return ret;
-//	}
-	
-
-
-	
-//	/**
-//	 *  Get a class definition.
-//	 *  @param name The class name.
-//	 *  @return The class definition as byte array.
-//	 */
-//	public IFuture<byte[]> getClassDefinition(String name)
-//	{
-//		Future<byte[]> ret = new Future<byte[]>();
-//		
-//		Class clazz = SReflect.findClass0(name, null, libcl);
-//		if(clazz!=null)
-//		{
-//			try
-//			{
-//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//				ObjectOutputStream oos = new ObjectOutputStream(bos);
-//				oos.writeObject(clazz);
-//				oos.close();
-//				bos.close();
-//				byte[] data = bos.toByteArray();
-//				ret.setResult(data);
-//			}
-//			catch(Exception e)
-//			{
-//				ret.setResult(null);
-//			}
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//		
-//		return ret;
-//	}
-	
 	//-------- IPropertiesProvider interface --------
 	
 	/**
@@ -1680,35 +950,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return new Future<Properties>(new Properties());
 	}
 	
-//	/**
-//	 *  Update the global class loader.
-//	 *  
-//	 *  hack: should be removed
-//	 */
-//	public void updateGlobalClassLoader()
-//	{
-//		DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-//		
-/* if_not[android] */
-//		this.libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-/* else[android]
-//		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
-//		end[android]*/
-//		
-//		System.out.println("update global: "+delegates.length);
-//	}
-	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture<IResourceIdentifier> createResourceIdentifier(URL url)
-//	{
-//		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
-//		String gid = mh.getArtifactDescription(url);
-//		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
-//		return new Future<IResourceIdentifier>(rid);
-//	}
-
 	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
@@ -1804,61 +1045,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected boolean	isLocal(IResourceIdentifier rid)
 	{
 		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
-	}
-}
-
-/**
- *  URL class loader that allows to add and remove urls. Remove
- *  is only a fake implementation (does not really remove the jar).
- */
-class ChangeableURLClassLoader extends URLClassLoader
-{
-	/** The managed urls. */
-	protected List<URL> urls;
-	
-	/**
-	 *  Create a new class loader.
-	 */
-	public ChangeableURLClassLoader(ClassLoader parent)
-	{
-		this(new URL[0], parent);
-	}
-
-	/**
-	 *  Create a new class loader.
-	 */
-	public ChangeableURLClassLoader(URL[] urls, ClassLoader parent)
-	{
-		super(urls, parent);
-		this.urls = new ArrayList<URL>();
-	}
-
-	/**
-	 *  Add a url.
-	 *  @param url The url.
-	 */
-	public void addURL(URL url)
-	{
-		urls.add(url);
-		super.addURL(url);
-	}
-	
-	/**
-	 *  Removed a url.
-	 *  @param url The url.
-	 */
-	public boolean removeURL(URL url)
-	{
-		return urls.remove(url);
-	}
-
-	/**
-	 *  Get the managed urls.
-	 *  @return The managed urls.
-	 */
-	public URL[] getURLs()
-	{
-		return (URL[])urls.toArray(new URL[urls.size()]);
 	}
 }
 
