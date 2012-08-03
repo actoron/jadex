@@ -20,7 +20,7 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			<implementation proxytype="raw">
+			<implementation>
 				new ApplicationComponentFactory($component.getServiceProvider())	
 			</implementation>
 		</providedservice>

@@ -22,7 +22,7 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			<implementation proxytype="raw">
+			<implementation>
 				new GpmnFactory($component, new java.util.HashMap())
 			</implementation>
 		</providedservice>

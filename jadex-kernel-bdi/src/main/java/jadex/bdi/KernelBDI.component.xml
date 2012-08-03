@@ -29,7 +29,7 @@
 	
 	<services>
 		<providedservice name="component_factory" class="IComponentFactory">
-			<implementation proxytype="direct">
+			<implementation>
 				new BDIAgentFactory(
 					SUtil.createHashMap(
 					new String[]

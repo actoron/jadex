@@ -31,7 +31,7 @@
 	
 	<services>
 		<providedservice name="component_factory" class="IComponentFactory">
-			<implementation proxytype="direct">
+			<implementation>
 				new jadex.bdi.BDIAgentFactory(
 					SUtil.createHashMap(
 					new String[]

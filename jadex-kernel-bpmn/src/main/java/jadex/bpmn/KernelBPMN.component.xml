@@ -22,7 +22,7 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			<implementation proxytype="raw">
+			<implementation>
 				new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(
 					new String[]
 					{

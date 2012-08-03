@@ -915,7 +915,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-														System.out.println("Starting kernel4: " + kernelmodel);
+//														System.out.println("Starting kernel4: " + kernelmodel);
 														for(int i = 0; i < kexts.length; ++i)
 															factorycache.remove(kexts[i]);
 													}

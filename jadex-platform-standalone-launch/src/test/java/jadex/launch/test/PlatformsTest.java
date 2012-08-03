@@ -29,6 +29,9 @@ import junit.framework.TestCase;
  */
 public class PlatformsTest extends TestCase
 {
+	// Timeout for each platform.
+	long	TIMEOUT	= 120000;
+	
 	// The platforms to test as pairs of componentfactory and model.
 	String[]	PLATFORMS	= new String[]
 	{
@@ -47,7 +50,8 @@ public class PlatformsTest extends TestCase
 		"-saveonexit", "false",
 		"-welcome", "false",
 		"-autoshutdown", "false",
-		"-printpass", "false"
+		"-printpass", "false",
+		"-deftimeout", ""+TIMEOUT
 	};
 	
 	/** Arguments to exclude from comparison. */
@@ -83,7 +87,7 @@ public class PlatformsTest extends TestCase
 	 */
 	public void	testPlatforms()
 	{
-		long timeout = 120000;
+		long timeout = TIMEOUT;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];

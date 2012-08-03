@@ -787,12 +787,19 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		
 		if(nofac)
 		{
+//			System.out.println("searching factories");
+			
 			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
 			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 			{
 				public void customResultAvailable(Collection<IComponentFactory> facts)
 				{
 					factories = facts;//(Collection)result;
+					if(!facts.isEmpty())
+					{
+						// Remove fallback factory when first real factory is found.
+						componentfactory	= null;
+					}
 					getComponentFactory(model, cinfo, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 				}
 			}));
@@ -847,6 +854,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	protected IFuture<IComponentFactory> selectComponentFactory(final IComponentFactory[] factories, 
 		final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final int idx)
 	{
+//		System.out.println("select factory: "+model+", "+SUtil.arrayToString(factories));
+		
 		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
 		if(factories!=null && factories.length>0)
@@ -885,6 +894,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	protected IFuture<IComponentFactory> selectFallbackFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
+//		System.out.println("fallback: "+model);
 		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
 		if(componentfactory!=null)

@@ -21,7 +21,7 @@
 	
 	<services>
 		<providedservice class="IComponentFactory">
-			<implementation proxytype="raw">
+			<implementation>
 				new BDIAgentFactory($component.getServiceProvider())
 			</implementation>
 		</providedservice>
