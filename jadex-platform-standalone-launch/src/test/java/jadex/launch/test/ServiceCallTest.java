@@ -28,11 +28,12 @@ public class ServiceCallTest extends TestCase
 	 */
 	public void	testServiceCalls() throws Exception
 	{
-		long timeout	= 300000;
+		long timeout	= 120000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "all",
 //			"-logging_level", "java.util.logging.Level.INFO",
+			"-deftimeout", ""+timeout,
 			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true", 
