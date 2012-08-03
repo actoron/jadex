@@ -1,14 +1,18 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *  Context for service invocations.
@@ -16,6 +20,72 @@ import java.util.List;
  */
 public class ServiceInvocationContext
 {
+	//-------- profiling --------
+	
+	/** Enable call profiling. */
+	public static final boolean	PROFILING	= false;
+	
+	/** Print every 10 seconds. */
+	public static final long	PRINT_DELAY	= 10000;
+	
+	/** Service calls per method, calculated separately per platform. */
+	protected static Map<IComponentIdentifier, Map<Method, Integer>>	calls	= PROFILING ? new HashMap<IComponentIdentifier, Map<Method, Integer>>() : null;
+	
+	static
+	{
+		if(PROFILING)
+		{
+			final Timer	timer	= new Timer(true);
+			final Runnable	run	= new Runnable()
+			{
+				public void run()
+				{
+					IComponentIdentifier[]	platforms;
+					synchronized(calls)
+					{
+						platforms	= calls.keySet().toArray(new IComponentIdentifier[calls.size()]);
+					}
+					for(IComponentIdentifier platform: platforms)
+					{
+						Map<Method, Integer>	pcalls;
+						synchronized(calls)
+						{
+							pcalls	= calls.get(platform);
+						}
+						StringBuffer	out	= new StringBuffer("Calls of platform ").append(platform).append("\n");
+						synchronized(pcalls)
+						{
+							for(Method m: pcalls.keySet())
+							{
+								out.append("\t").append(pcalls.get(m)).append(":\t")
+									.append(m.getDeclaringClass().getSimpleName()).append(".").append(m.getName()).append(SUtil.arrayToString(m.getParameterTypes()))
+									.append("\n");
+							}
+						}
+						System.out.println(out);
+					}
+					
+					final Runnable	run	= this;
+					timer.schedule(new TimerTask()
+					{
+						public void run()
+						{
+							run.run();
+						}
+					}, PRINT_DELAY);
+				}
+			};
+			
+			timer.schedule(new TimerTask()
+			{
+				public void run()
+				{
+					run.run();
+				}
+			}, PRINT_DELAY);
+		}
+	}
+	
 	//-------- attributes --------
 	
 	/** The origin (proxy object). */
@@ -296,6 +366,29 @@ public class ServiceInvocationContext
 	 */
 	protected void push(Object o, Method m, List args, Object res)
 	{
+		// profile on first invoke
+		if(PROFILING && method.isEmpty())
+		{
+			IComponentIdentifier	pf	= IComponentIdentifier.LOCAL.get();
+			pf	= pf!=null ? pf.getRoot() : platform;
+			
+			Map<Method, Integer>	pcalls;
+			synchronized(calls)
+			{
+				pcalls	= calls.get(pf);
+				if(pcalls==null)
+				{
+					pcalls	= new HashMap<Method, Integer>();
+					calls.put(pf, pcalls);
+				}
+			}
+			synchronized(pcalls)
+			{
+				Integer	cnt	= pcalls.get(m);
+				pcalls.put(m, new Integer(cnt==null ? 0 : cnt.intValue()+1));
+			}
+		}
+		
 		object.add(o);
 		method.add(m);
 		arguments.add(args);
