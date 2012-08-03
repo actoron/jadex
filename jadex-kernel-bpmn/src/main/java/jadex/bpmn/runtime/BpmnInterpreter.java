@@ -25,8 +25,6 @@ import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
@@ -38,10 +36,8 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -375,11 +371,18 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 				
 				SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(createResultListener(new DefaultResultListener()
+					.addResultListener(createResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IComponentManagementService cms)
 					{
-						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+						cms.destroyComponent(adapter.getComponentIdentifier());
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						if(!(exception instanceof ComponentTerminatedException))
+						{
+							super.exceptionOccurred(exception);
+						}
 					}
 				}));
 			}
