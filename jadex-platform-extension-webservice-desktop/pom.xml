@@ -80,6 +80,20 @@
 			<artifactId>jersey-multipart</artifactId>
 			<version>${jersey.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-standalone</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
             
 	</dependencies>
 	
@@ -99,6 +113,20 @@
 					<groupId>javax.activation</groupId>
 					<artifactId>activation</artifactId>
 					<version>1.1</version>
+					<scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-standalone</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+		
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-component</artifactId>
+					<version>${project.version}</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
