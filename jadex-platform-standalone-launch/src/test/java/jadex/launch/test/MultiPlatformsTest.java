@@ -21,8 +21,8 @@ public class MultiPlatformsTest extends TestCase
 	 */
 	public void	testMultiplePlatforms()
 	{
-		int number	= 30;	// larger numbers lead to out of mem on hudson 32bit.
-		long timeout	= 60000;
+		int number	= 30;
+		long timeout	= 120000;	// larger time required by toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
@@ -38,6 +38,8 @@ public class MultiPlatformsTest extends TestCase
 //				"-awareness", "false",
 //				"-componentfactory", "jadex.micro.MicroAgentFactory",
 //				"-conf", "jadex.standalone.PlatformAgent",
+//				"-awamechanisms", "new String[]{\"Multicast\"}", 
+//				"-awamechanisms", "new String[]{\"Broadcast\", \"Multicast\", \"Message\"}", 
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		

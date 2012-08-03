@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.awareness;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -13,10 +14,10 @@ public interface IAwarenessManagementService
 {
 	/**
 	 *  Announce an awareness info.
-	 *  @param info The info.
+	 *  @param info The info (passed as local reference).
 	 *  @return True, if was a new awareness info. 
 	 */
-	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info);
+	public IFuture<Boolean> addAwarenessInfo(@Reference(local=true, remote=false) AwarenessInfo info);
 	
 	/**
 	 *  Get the discovery info for a platform, if any.

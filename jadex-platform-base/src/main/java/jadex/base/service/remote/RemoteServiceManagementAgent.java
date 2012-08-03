@@ -313,6 +313,15 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //										System.out.println("reply: "+callid);
 										sendMessage(reply, mt, null);
 									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										// Ignore when terminated in mean time.
+										if(!(exception instanceof ComponentTerminatedException))
+										{
+											super.exceptionOccurred(exception);
+										}
+									}
 								});
 							}
 						}

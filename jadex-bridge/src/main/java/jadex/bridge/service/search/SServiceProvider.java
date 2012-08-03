@@ -226,7 +226,10 @@ public class SServiceProvider
 				{
 //					if(type.getName().indexOf("IRepositoryAccess")!=-1)
 //						System.out.println("fin");
-					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+					if(!ret.isDone())
+					{
+						ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+					}
 				}
 				
 				public void resultAvailable(Collection<IService> result)

@@ -21,6 +21,7 @@ import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -292,6 +293,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
 //			boolean	initial	= false;	// Initial discovery of component.
 		DiscoveryInfo dif;
+		boolean	changedaddrs	= false;	// Should an existing proxy be updated with new addresses?
 		
 		dif = (DiscoveryInfo)discovered.get(sender);
 		if(online)
@@ -306,6 +308,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			}
 			else
 			{
+				changedaddrs	= !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
+				
 				dif.setComponentIdentifier(sender);
 				dif.setTime(getClockTime());
 				dif.setDelay(info.getDelay());
@@ -340,7 +344,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			}
 			
 			// Update proxy to reflect new addresses.
-			else if(dif.getProxy()!=null)
+			else if(changedaddrs && dif.getProxy()!=null)
 			{
 				final IComponentIdentifier	remote	= dif.getComponentIdentifier();
 				dif.getProxy().addResultListener(new IResultListener<IComponentIdentifier>()
