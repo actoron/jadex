@@ -43,6 +43,7 @@ import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -117,41 +118,72 @@ public class ModelTreePanel extends FileTreePanel
 		ModelIconCache ic = new ModelIconCache(exta, getTree());
 		setMenuItemConstructor(mic);
 		actions.put(CollapseAllAction.getName(), new CollapseAllAction(this));
-		ITreeAbstraction ta = new ITreeAbstraction()
+		ITreeAbstraction taa = new ModelTreeAbstraction()
 		{
-			public boolean isRemote()
+			public void action(Object obj)
 			{
-				return ModelTreePanel.this.isRemote();
-			}
-			
-			public JTree getTree()
-			{
-				return ModelTreePanel.this.getTree();
-			}
-			
-			public IExternalAccess getExternalAccess()
-			{
-				return ModelTreePanel.this.getExternalAccess();
-			}
-			
-			public IExternalAccess getGUIExternalAccess()
-			{
-				return localexta;
-			}
-			
-			public boolean containsNode(Object id)
-			{
-				return ModelTreePanel.this.getModel().getNode(id)!=null;
-			}
-			
-			public void add(Object obj)
-			{
-				ModelTreePanel.this.addTopLevelNodeMeta(obj);
+				if(ModelTreePanel.this.getModel().getNode(obj)==null &&
+					ModelTreePanel.this.getModel().getNode(obj.toString())==null)
+				{
+//					treepanel.addTopLevelNode(result);
+					ModelTreePanel.this.addTopLevelNodeMeta(obj);
+				}
+				else
+				{
+					// Todo: already added to library service (remove?)
+					String	msg	= SUtil.wrapText("Path can not be added twice:\n"+obj);
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(getTree()),
+						msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 		};
-		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(ta) : new AddPathAction(ta));
-		actions.put(AddRIDAction.getName(), new AddRIDAction(ta));
-		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
+		ITreeAbstraction tar = new ModelTreeAbstraction()
+		{
+			public void action(Object node) 
+			{
+				ModelTreePanel.this.removeTopLevelNode((ITreeNode)node);
+				
+				if(getExternalAccess()!=null && node instanceof IFileNode)
+				{
+					final String	path	= ((IFileNode)node).getFilePath();
+					getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					{
+						@Classname("removeURL")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							final Future	ret	= new Future();
+							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(new DelegationResultListener<ILibraryService>(ret)
+							{
+								public void customResultAvailable(ILibraryService ls)
+								{
+									try
+									{
+										ls.removeURL(null, SUtil.toURL(path));
+										ret.setResult(null);
+									}
+									catch(Exception ex)
+									{
+										ret.setException(ex);
+									}
+								}
+							});
+							return ret;
+						}
+					});
+				}
+			}
+		};
+		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(taa) : new AddPathAction(taa));
+		actions.put(AddRIDAction.getName(), new AddRIDAction(taa));
+		actions.put(RemovePathAction.getName(), new RemovePathAction(tar)
+		{
+			public boolean isEnabled()
+			{
+				ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
+				return rm!=null && rm.getParent().equals(treepanel.getTree().getModel().getRoot());
+			}
+		});
 		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), actions.get(AddRIDAction.getName()),
 			actions.get(AddRemotePathAction.getName()), mic}));
 		setMenuItemConstructor(mic);
@@ -174,7 +206,7 @@ public class ModelTreePanel extends FileTreePanel
 				return overlay;
 			}
 		};
-		dnh.addAction(new RemovePathAction(this), null);
+		dnh.addAction(new RemovePathAction(tar), null);
 		addNodeHandler(dnh);
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer()
@@ -613,4 +645,29 @@ public class ModelTreePanel extends FileTreePanel
 		
 		return ret;
 	}
+	
+	protected abstract class ModelTreeAbstraction implements ITreeAbstraction
+	{
+		public boolean isRemote()
+		{
+			return ModelTreePanel.this.isRemote();
+		}
+		
+		public JTree getTree()
+		{
+			return ModelTreePanel.this.getTree();
+		}
+		
+		public IExternalAccess getExternalAccess()
+		{
+			return ModelTreePanel.this.getExternalAccess();
+		}
+		
+		public IExternalAccess getGUIExternalAccess()
+		{
+			return localexta;
+		}
+		
+		public abstract void action(Object obj);
+	};
 }

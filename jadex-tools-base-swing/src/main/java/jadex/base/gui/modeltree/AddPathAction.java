@@ -103,17 +103,18 @@ public class AddPathAction extends ToolTipAction
 					// Convert to relative file for comparability with loaded nodes.
 					file	= new File(SUtil.convertPathToRelative(file.getAbsolutePath()));
 //					if(treepanel.getModel().getNode(file)==null)
-					if(!treepanel.containsNode(file))
-					{
-						// Add file/directory to tree.
-						treepanel.add(file);
-					}
-					else
-					{
-						String	msg	= SUtil.wrapText("Path can not be added twice:\n"+file);
-						JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
-							msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
-					}
+					treepanel.action(file);
+//					if(!treepanel.containsNode(file))
+//					{
+//						// Add file/directory to tree.
+//						treepanel.add(file);
+//					}
+//					else
+//					{
+//						String	msg	= SUtil.wrapText("Path can not be added twice:\n"+file);
+//						JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
+//							msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
+//					}
 				}
 				else
 				{

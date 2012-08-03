@@ -101,19 +101,21 @@ public class AddRemotePathAction extends ToolTipAction
 		{
 			public void customResultAvailable(FileData result)
 			{
-//				if(treepanel.getModel().getNode(result.toString())==null)
-				if(!treepanel.containsNode(result.toString()))
-				{
-//					treepanel.addTopLevelNode(result);
-					treepanel.add(result);
-				}
-				else
-				{
-					// Todo: already added to library service (remove?)
-					String	msg	= SUtil.wrapText("Path can not be added twice:\n"+((FileData)result).getPath());
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
-						msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
-				}
+				treepanel.action(result);
+				
+////				if(treepanel.getModel().getNode(result.toString())==null)
+//				if(!treepanel.containsNode(result.toString()))
+//				{
+////					treepanel.addTopLevelNode(result);
+//					treepanel.action(result);
+//				}
+//				else
+//				{
+//					// Todo: already added to library service (remove?)
+//					String	msg	= SUtil.wrapText("Path can not be added twice:\n"+((FileData)result).getPath());
+//					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
+//						msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
+//				}
 			}
 		});
 	}

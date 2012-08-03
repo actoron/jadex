@@ -147,10 +147,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 		if(parent==null)
 			return false;
 		
-		if(!parents.remove(parent))
-			throw new RuntimeException("Not contained: "+parent);
-		
-		return parents.size()==0;
+		return parents.remove(parent) && parents.size()==0;
 	}
 	
 	/**

@@ -32,13 +32,13 @@ public interface ITreeAbstraction
 	 */
 	public IExternalAccess getGUIExternalAccess();
 	
-	/**
-	 * 
-	 */
-	public boolean containsNode(Object id);
+//	/**
+//	 * 
+//	 */
+//	public boolean containsNode(Object id);
 	
 	/**
 	 * 
 	 */
-	public void add(Object obj);
+	public void action(Object obj);
 }

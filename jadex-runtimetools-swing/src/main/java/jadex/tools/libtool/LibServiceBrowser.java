@@ -1,10 +1,14 @@
 package jadex.tools.libtool;
 
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRIDAction;
 import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ITreeAbstraction;
+import jadex.base.gui.modeltree.ModelTreePanel;
+import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -34,6 +38,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
@@ -179,44 +185,19 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	    			int row = ridtree.getRowForLocation(e.getX(), e.getY());
 					if(row != -1)
 					{
-						Object	node = ridtree.getLastSelectedPathComponent();
+						final Object node = ridtree.getLastSelectedPathComponent();
 						if(node instanceof Node)
 						{
 							Object o = ((Node)node).getUserObject();
 							if(o instanceof IResourceIdentifier)
 							{
 								final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
-								final IResourceIdentifier parid = (IResourceIdentifier)o;
+								final IResourceIdentifier selrid = (IResourceIdentifier)o;
 								
 								JPopupMenu popup = new JPopupMenu();
-								ITreeAbstraction ta = new ITreeAbstraction()
+								LibTreeAbstraction taa = new LibTreeAbstraction(rem)
 								{
-									public boolean isRemote()
-									{
-										return rem;
-									}
-									
-									public JTree getTree()
-									{
-										return ridtree;
-									}
-									
-									public IExternalAccess getExternalAccess()
-									{
-										return jcc.getPlatformAccess();
-									}
-									
-									public IExternalAccess getGUIExternalAccess()
-									{
-										return jcc.getJCCAccess();
-									}
-									
-									public boolean containsNode(Object id)
-									{
-										return false;
-									}
-									
-									public void add(Object obj)
+									public void action(Object obj)
 									{
 										try
 										{
@@ -235,7 +216,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											else if(obj instanceof FileData)
 											{
 												final String filename = ((FileData)obj).getPath();
-												addRemoteURL(parid, filename).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+												addRemoteURL(selrid, filename).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
 												{
 													public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
 													{
@@ -253,7 +234,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											{
 												final IResourceIdentifier frid = rid;
 												jcc.setStatusText("Started adding: "+frid);
-												libservice.addResourceIdentifier(parid, rid, true)
+												libservice.addResourceIdentifier(selrid, rid, true)
 													.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
 												{
 													public void customResultAvailable(IResourceIdentifier result)
@@ -273,13 +254,48 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 								};
 								if(!rem)
 								{
-									popup.add(new AddPathAction(ta));
+									popup.add(new AddPathAction(taa));
 								}
 								else
 								{
-									popup.add(new AddRemotePathAction(ta));
+									popup.add(new AddRemotePathAction(taa));
 								}
-								popup.add(new AddRIDAction(ta));
+								popup.add(new AddRIDAction(taa));
+								
+								LibTreeAbstraction tar = new LibTreeAbstraction(rem)
+								{
+									public void action(Object obj)
+									{
+										Node child = (Node)obj;
+										final Object o = child.getUserObject();
+										if(o instanceof IResourceIdentifier)
+										{
+											Node parent = (Node)child.getParent();
+											Object parid = parent.getUserObject();
+											if(!(parid instanceof IResourceIdentifier))
+												parid = null;
+												
+//											parent.remove(child);
+											
+											libservice.removeResourceIdentifier((IResourceIdentifier)parid, (IResourceIdentifier)o)
+												.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+											{
+												public void resultAvailable(Void result)
+												{
+													jcc.setStatusText("Removed resource: "+o);
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+													exception.printStackTrace();
+													jcc.setStatusText("Error removin resource: "+o+" "+exception.getMessage());
+												}
+											}));
+										}
+									}
+								};
+								popup.add(new RemovePathAction(tar));
+								
 								popup.show(e.getComponent(), e.getX(), e.getY());
 							}
 						}
@@ -802,6 +818,38 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			return ret;
 		}
 	}
-
+	
+	/**
+	 * 
+	 */
+	protected abstract class LibTreeAbstraction implements ITreeAbstraction
+	{
+		protected boolean rem;
+		
+		public LibTreeAbstraction(boolean rem)
+		{
+			this.rem = rem;
+		}
+		
+		public boolean isRemote()
+		{
+			return rem;
+		}
+		
+		public JTree getTree()
+		{
+			return ridtree;
+		}
+		
+		public IExternalAccess getExternalAccess()
+		{
+			return jcc.getPlatformAccess();
+		}
+		
+		public IExternalAccess getGUIExternalAccess()
+		{
+			return jcc.getJCCAccess();
+		}
+	}
 }
 

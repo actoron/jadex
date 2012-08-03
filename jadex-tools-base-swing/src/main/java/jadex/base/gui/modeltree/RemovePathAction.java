@@ -39,14 +39,14 @@ public class RemovePathAction extends ToolTipAction
 	//-------- attributes --------	
 
 	/** The tree. */
-	protected FileTreePanel treepanel;
+	protected ITreeAbstraction treepanel;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new action.
 	 */
-	public RemovePathAction(FileTreePanel treepanel)
+	public RemovePathAction(ITreeAbstraction treepanel)
 	{
 		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
@@ -54,7 +54,7 @@ public class RemovePathAction extends ToolTipAction
 	/**
 	 *  Create a new action. 
 	 */
-	public RemovePathAction(String name, Icon icon, String desc, FileTreePanel treepanel)
+	public RemovePathAction(String name, Icon icon, String desc, ITreeAbstraction treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
@@ -68,8 +68,8 @@ public class RemovePathAction extends ToolTipAction
 	 */
 	public boolean isEnabled()
 	{
-		ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
-		return rm!=null && rm.getParent().equals(treepanel.getTree().getModel().getRoot());
+		Object rm = treepanel.getTree().getLastSelectedPathComponent();
+		return rm!=null; //&& rm.getParent().equals(treepanel.getTree().getModel().getRoot());
 	}
 	
 	/**
@@ -80,45 +80,14 @@ public class RemovePathAction extends ToolTipAction
 		// Can be used from toolbar without considering enabled state.
 		if(!isEnabled())
 		{
-			JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel), "Only root folders can be removed.");
+			JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()), "Only root folders can be removed.");
 			return;
 		}
 		
 		TreePath[]	selected	= treepanel.getTree().getSelectionPaths();
 		for(int i=0; selected!=null && i<selected.length; i++)
 		{
-			ITreeNode	node = (ITreeNode)selected[i].getLastPathComponent();
-			treepanel.removeTopLevelNode(node);
-			
-			if(treepanel.getExternalAccess()!=null && node instanceof IFileNode)
-			{
-				final String	path	= ((IFileNode)node).getFilePath();
-				treepanel.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-				{
-					@Classname("removeURL")
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						final Future	ret	= new Future();
-						SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new DelegationResultListener<ILibraryService>(ret)
-						{
-							public void customResultAvailable(ILibraryService ls)
-							{
-								try
-								{
-									ls.removeURL(null, SUtil.toURL(path));
-									ret.setResult(null);
-								}
-								catch(Exception ex)
-								{
-									ret.setException(ex);
-								}
-							}
-						});
-						return ret;
-					}
-				});
-			}
+			treepanel.action(selected[i].getLastPathComponent());
 		}
 	}
 	

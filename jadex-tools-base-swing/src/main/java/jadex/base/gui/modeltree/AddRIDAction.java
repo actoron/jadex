@@ -108,7 +108,7 @@ public class AddRIDAction extends ToolTipAction
 			//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1";
 							IResourceIdentifier rid = new ResourceIdentifier(null, gid);
 //							treepanel.addTopLevelNode(rid);
-							treepanel.add(rid);
+							treepanel.action(rid);
 						}
 					}
 					catch(Exception ex)
