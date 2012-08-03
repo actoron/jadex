@@ -35,6 +35,11 @@ import junit.framework.TestSuite;
  */
 public class ComponentTestSuite extends TestSuite
 {
+	//-------- attributes --------
+	
+	/** Indicate when the suite is aborted due to excessibe run time. */
+	public boolean	aborted;
+	
 	//-------- constructors --------
 
 	/**
@@ -93,16 +98,21 @@ public class ComponentTestSuite extends TestSuite
 	{
 		super(path.toString());
 		
+		final Thread	runner	= Thread.currentThread();
+		
+		TimerTask	timer	= null;
 		if(timeout>0)
 		{
-			new Timer(true).schedule(new TimerTask()
+			timer	= new TimerTask()
 			{
 				public void run()
 				{
-					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-					System.exit(1);
+					aborted	= true;
+//					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
+					runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
 				}
-			}, timeout);
+			};
+			new Timer(true).schedule(timer, timeout);
 		}
 		
 		// Tests must be available after constructor execution.
@@ -174,7 +184,7 @@ public class ComponentTestSuite extends TestSuite
 								}
 								if(istest)
 								{
-									addTest(new ComponentTest(cms, model));
+									addTest(new ComponentTest(cms, model, this));
 								}
 								else if(model.getReport()!=null)
 								{
@@ -187,7 +197,7 @@ public class ComponentTestSuite extends TestSuite
 								{
 									if(start)
 									{
-										addTest(new ComponentStartTest(cms, model));
+										addTest(new ComponentStartTest(cms, model, this));
 									}
 								}
 							}
@@ -217,6 +227,14 @@ public class ComponentTestSuite extends TestSuite
 			}
 		}
 		// Hack!!! Isn't there some tearDown for the test suite?
-		addTest(new Cleanup(rootcomp));
+		addTest(new Cleanup(rootcomp, timer));
+	}
+
+	/**
+	 *  Indicate when the suite is aborted due to excessibe run time.
+	 */
+	public boolean isAborted()
+	{
+		return aborted;
 	}
 }

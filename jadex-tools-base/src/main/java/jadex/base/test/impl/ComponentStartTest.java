@@ -1,6 +1,7 @@
 package jadex.base.test.impl;
 
 
+import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -25,15 +26,19 @@ public class ComponentStartTest implements	Test
 	/** The component. */
 	protected IModelInfo	comp;
 	
+	/** The test suite. */
+	protected ComponentTestSuite	suite;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component test.
 	 */
-	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp)
+	public ComponentStartTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
 		this.cms	= cms;
 		this.comp	= comp;
+		this.suite	= suite;
 	}
 	
 	//-------- methods --------
@@ -51,6 +56,11 @@ public class ComponentStartTest implements	Test
 	 */
 	public void run(TestResult result)
 	{
+		if(suite.isAborted())
+		{
+			return;
+		}
+		
 		result.startTest(this);
 		
 		// Start the component.

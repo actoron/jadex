@@ -1,6 +1,7 @@
 package jadex.base.test.impl;
 
 
+import jadex.base.test.ComponentTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -30,15 +31,19 @@ public class ComponentTest implements	Test
 	/** The component. */
 	protected IModelInfo	comp;
 	
+	/** The test suite. */
+	protected ComponentTestSuite	suite;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component test.
 	 */
-	public ComponentTest(IComponentManagementService cms, IModelInfo comp)
+	public ComponentTest(IComponentManagementService cms, IModelInfo comp, ComponentTestSuite suite)
 	{
 		this.cms	= cms;
 		this.comp	= comp;
+		this.suite	= suite;
 	}
 	
 	//-------- methods --------
@@ -56,6 +61,11 @@ public class ComponentTest implements	Test
 	 */
 	public void run(TestResult result)
 	{
+		if(suite.isAborted())
+		{
+			return;
+		}
+		
 		result.startTest(this);
 		
 		// Start the component.

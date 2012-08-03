@@ -799,7 +799,28 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 					{
 						// Remove fallback factory when first real factory is found.
 						componentfactory	= null;
+						
+						// Reorder factories to assure that delegating multi loaders are last (if present).
+						if(facts.size()>1)
+						{
+							List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
+							List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
+							for(IComponentFactory fac: facts)
+							{
+								if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+								{
+									multies.add(fac);
+								}
+								else
+								{
+									singles.add(fac);
+								}
+							}
+							facts	= singles;
+							facts.addAll(multies);
+						}
 					}
+					factories = facts;//(Collection)result;
 					getComponentFactory(model, cinfo, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 				}
 			}));
@@ -826,11 +847,32 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 						public void customResultAvailable(Collection<IComponentFactory> facts)
 						{	
 							factories = facts;
-							for(Iterator it=factories.iterator(); it.hasNext(); )
-							{
-								Object o = it.next();
+//							for(Iterator it=factories.iterator(); it.hasNext(); )
+//							{
+//								Object o = it.next();
 //								System.out.println("is: "+o+" "+(o instanceof IComponentFactory));
+//							}
+							
+							// Reorder factories to assure that delegating multi loaders are last (if present).
+							if(facts.size()>1)
+							{
+								List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
+								List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
+								for(IComponentFactory fac: facts)
+								{
+									if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+									{
+										multies.add(fac);
+									}
+									else
+									{
+										singles.add(fac);
+									}
+								}
+								facts	= singles;
+								facts.addAll(multies);
 							}
+
 							selectComponentFactory((IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
 								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 						}

@@ -1,6 +1,8 @@
 package jadex.base.test.impl;
 
 
+import java.util.TimerTask;
+
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.ThreadSuspendable;
 import junit.framework.Test;
@@ -17,14 +19,18 @@ public class Cleanup implements	Test
 	/** The platform access. */
 	protected IExternalAccess	platform;
 	
+	/** The timer that stops test suite execution after timeout (needs to be cancelled on cleanup). */
+	protected	TimerTask	timer;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component test.
 	 */
-	public Cleanup(IExternalAccess platform)
+	public Cleanup(IExternalAccess platform, TimerTask timer)
 	{
 		this.platform	= platform;
+		this.timer	= timer;
 	}
 	
 	//-------- methods --------
@@ -42,11 +48,13 @@ public class Cleanup implements	Test
 	 */
 	public void run(TestResult result)
 	{
+		timer.cancel();
+		
 		result.startTest(this);
 
 		try
 		{
-			platform.killComponent().get(new ThreadSuspendable(), 300000);
+			platform.killComponent().get(new ThreadSuspendable(), 30000);
 		}
 		catch(Exception e)
 		{
@@ -62,7 +70,7 @@ public class Cleanup implements	Test
 //		}
 		
 		result.endTest(this);
-}
+	}
 	
 	/**
 	 *  Get a string representation of this test.
