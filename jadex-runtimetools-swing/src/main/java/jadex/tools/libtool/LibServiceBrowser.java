@@ -1,36 +1,40 @@
 package jadex.tools.libtool;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRIDAction;
 import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ITreeAbstraction;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IGlobalResourceIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Properties;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -42,14 +46,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -115,7 +117,8 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
 		
-		ridtree = new JTree(new Node(null));
+		ridtree = new JTree(new Node("Root resource"));
+		
 		ridtree.setCellRenderer(new DefaultTreeCellRenderer() 
 		{
 			public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -203,6 +206,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 										return jcc.getPlatformAccess();
 									}
 									
+									public IExternalAccess getGUIExternalAccess()
+									{
+										return jcc.getJCCAccess();
+									}
+									
 									public boolean containsNode(Object id)
 									{
 										return false;
@@ -220,29 +228,44 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 												rid = new ResourceIdentifier(lid, null);
 											}
-											else if(obj instanceof FileData)
-											{
-												String path = ((FileData)obj).getPath();
-												URL url = new URL(path);
-												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
-												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
-												rid = new ResourceIdentifier(lid, null);
-											}
 											else if(obj instanceof IResourceIdentifier)
 											{
 												rid = (IResourceIdentifier)obj;
 											}
-											
-											final IResourceIdentifier frid = rid;
-											jcc.setStatusText("Started adding: "+frid);
-											libservice.addResourceIdentifier(parid, rid, true)
-												.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+											else if(obj instanceof FileData)
 											{
-												public void customResultAvailable(IResourceIdentifier result)
+												String filename = ((FileData)obj).getPath();
+												addRemoteURL(filename).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
 												{
-													jcc.setStatusText("Finished adding: "+frid);
-												}
-											});
+													public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
+													{
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+													}
+												});
+												
+//												URL url = new URL(path);
+//												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
+//												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
+//												rid = new ResourceIdentifier(lid, null);
+											}
+											
+											if(!rem)
+											{
+												final IResourceIdentifier frid = rid;
+												jcc.setStatusText("Started adding: "+frid);
+												libservice.addResourceIdentifier(parid, rid, true)
+													.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+												{
+													public void customResultAvailable(IResourceIdentifier result)
+													{
+														jcc.setStatusText("Finished adding: "+frid);
+													}
+												});
+											}
+											
 										}
 										catch(Exception e)
 										{
@@ -518,7 +541,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 						Node root = nodes.get(result.getFirstEntity());
 						if(nonmanurls!=null && !nonmanurls.isEmpty())
 						{
-							Node cont = new Node("System classpath");
+							Node cont = new Node("System classpaths");
 							for(URL url: nonmanurls)
 							{
 								Node child = new Node(url);
@@ -527,13 +550,79 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 							root.add(cont);
 						}
 						
+						root.setUserObject("Platform resources");
 						mod.setRoot(root);
-						ridtree.setRootVisible(false);
+//						ridtree.setRootVisible(false);
 					}
 				});
 			}
 		});
 	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final String filename)
+	{
+		final Future<Tuple2<URL, IResourceIdentifier>> ret = new Future<Tuple2<URL, IResourceIdentifier>>();
+		
+		jcc.getPlatformAccess().scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
+		{
+			@Classname("addurl")
+			public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
+			{
+				final URL	url	= SUtil.toURL(filename);
+				final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
+				IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+				{
+					public void customResultAvailable(final ILibraryService ls)
+					{
+						// todo: workspace=true?
+						ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+						{
+							public void customResultAvailable(IResourceIdentifier rid)
+							{
+								ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+								super.exceptionOccurred(exception);
+							}
+						});
+					}
+				});
+				
+				return ret;
+			}
+		}).addResultListener(new DelegationResultListener<Tuple2<URL, IResourceIdentifier>>(ret));
+//		}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
+//		{
+//			public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
+//			{
+//				// Todo: remove entries on remove.
+//	//			System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
+//				addRootEntry(tup.getFirstEntity(), filepath, tup.getSecondEntity());
+//				ModelTreePanel.super.addNode(node);
+//			}
+//			
+//			public void customExceptionOccurred(final Exception exception)
+//			{
+//				jcc.getJCCAccess().scheduleStep(new IComponentStep<Void>()
+//				{
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ia.getLogger().warning(exception.toString());
+//						return IFuture.DONE;
+//					}
+//				});					
+//			}
+//		});
+		
+		return ret;
+	}
+	
 	
 	/**
 	 *  Informs the plugin that it should stop all its computation

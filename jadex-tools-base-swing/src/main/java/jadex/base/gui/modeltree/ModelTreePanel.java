@@ -98,7 +98,7 @@ public class ModelTreePanel extends FileTreePanel
 	/**
 	 *  Create a new model tree panel.
 	 */
-	public ModelTreePanel(final IExternalAccess exta, IExternalAccess localexta, boolean remote)
+	public ModelTreePanel(final IExternalAccess exta, final IExternalAccess localexta, boolean remote)
 	{
 		super(exta, remote, false);
 		this.localexta = localexta;
@@ -132,6 +132,11 @@ public class ModelTreePanel extends FileTreePanel
 			public IExternalAccess getExternalAccess()
 			{
 				return ModelTreePanel.this.getExternalAccess();
+			}
+			
+			public IExternalAccess getGUIExternalAccess()
+			{
+				return localexta;
 			}
 			
 			public boolean containsNode(Object id)

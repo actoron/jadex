@@ -72,7 +72,7 @@ public class AddRIDAction extends ToolTipAction
 	{
 		Class cl = SReflect.findClass0("jadex.base.service.dependency.maven.MavenDependencyResolverService", null, null);
 //		return cl!=null && treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();
-		return cl!=null && !treepanel.isRemote();
+		return cl!=null;
 //		return (ITreeNode)treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();
 	}
 	
@@ -130,7 +130,7 @@ public class AddRIDAction extends ToolTipAction
 		if(tp==null)
 		{
 //			SServiceProvider.getServiceUpwards(treepanel.localexta.getServiceProvider(), IDaemonThreadPoolService.class)
-			SServiceProvider.getServiceUpwards(treepanel.getExternalAccess().getServiceProvider(), IDaemonThreadPoolService.class)
+			SServiceProvider.getServiceUpwards(treepanel.getGUIExternalAccess().getServiceProvider(), IDaemonThreadPoolService.class)
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)
