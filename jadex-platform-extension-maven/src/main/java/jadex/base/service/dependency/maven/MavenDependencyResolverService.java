@@ -254,7 +254,11 @@ public class MavenDependencyResolverService	implements IDependencyService
 		}
 		catch(Exception e)
 		{
-			ret	= new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(e);			
+			Map<IResourceIdentifier, List<IResourceIdentifier>> res = new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
+			res.put(rid, new ArrayList<IResourceIdentifier>());
+			ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(
+				new Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>(rid, res));
+//			ret	= new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier,List<IResourceIdentifier>>>>(e);			
 		}
 
 //		System.out.println("loaded dep: "+rid+" "+workspace);
@@ -295,8 +299,6 @@ public class MavenDependencyResolverService	implements IDependencyService
 		Map<IResourceIdentifier, List<IResourceIdentifier>> rids, boolean workspace) throws Exception
 	{
 		logger.info("Loading dependencies: "+rid);
-
-		IResourceIdentifier ret = rid;
 		
 		// Resolve from local URL.
 		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getComponentIdentifier()))
@@ -308,7 +310,10 @@ public class MavenDependencyResolverService	implements IDependencyService
 				final Model model = loadPom(pom);
 				List<org.apache.maven.model.Dependency>	deps	= model.getDependencies();
 				List<IResourceIdentifier>	deprids	= new ArrayList<IResourceIdentifier>();
+				String id = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
+				rid = new ResourceIdentifier(rid.getLocalIdentifier(), new GlobalResourceIdentifier(id, null, null));
 				rids.put(rid, deprids);
+				
 				for(int i=0; i<deps.size(); i++)
 				{
 					boolean fin = false;
@@ -323,11 +328,11 @@ public class MavenDependencyResolverService	implements IDependencyService
 //							VersionRequest vr = new VersionRequest(res.getArtifact(), repositories, null);
 //							VersionResult vres = system.resolveVersion(session, vr);
 							Artifact	art	= res.getArtifact();
-							String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
+							id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
 							IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null, art.getVersion()); // repo url?
 							ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())), gid);
 							deprids.add(deprid);
-							ret = loadDependencies(deprid, rids, workspace);
+							loadDependencies(deprid, rids, workspace);
 							fin = true;
 						}
 						catch(Exception e)
@@ -343,11 +348,10 @@ public class MavenDependencyResolverService	implements IDependencyService
 					if(!fin)
 					{
 						Artifact	art	= SMaven.convertDependency(deps.get(i));
-						String id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
+						id = getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion());
 						IGlobalResourceIdentifier gid = new GlobalResourceIdentifier(id, null, null); // todo: repo url
 						IResourceIdentifier	deprid	= new ResourceIdentifier(null, gid);	
 						deprid	= loadDependenciesWithAether(deprid, rids);
-						ret = deprid;
 						deprids.add(deprid);
 					}
 				}
@@ -358,7 +362,6 @@ public class MavenDependencyResolverService	implements IDependencyService
 		if(!rids.containsKey(rid) && rid.getGlobalIdentifier()!=null)
 		{
 			rid = loadDependenciesWithAether(rid, rids);
-			ret = rid;
 		}
 		
 		// If no dependency information avaliable, continue with empty dependency list but print warning.
@@ -369,7 +372,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			rids.put(rid, empty);
 		}
 		
-		return ret;
+		return rid;
 	}
 	
 	/**

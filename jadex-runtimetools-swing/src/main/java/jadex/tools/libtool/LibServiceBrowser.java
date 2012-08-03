@@ -1,49 +1,70 @@
 package jadex.tools.libtool;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.filetree.IFileNode;
+import jadex.base.gui.modeltree.AddPathAction;
+import jadex.base.gui.modeltree.AddRIDAction;
+import jadex.base.gui.modeltree.AddRemotePathAction;
+import jadex.base.gui.modeltree.ITreeAbstraction;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.GlobalResourceIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IGlobalResourceIdentifier;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Properties;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.TreeNode;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.EditableList;
-import jadex.commons.gui.EditableListEvent;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
@@ -56,13 +77,19 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"help",	SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/help.gng")
+		"help",	SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/help.gng"),
+		"jar", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/jar.png"),
+		"global", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/global.png"),
+		"oglobal", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/overlay_global.png"),
+		"folder", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/folder4.png")
 	});
-
+	
 	//-------- attributes --------
 	
+	/** The jcc. */
+	protected IControlCenter jcc;
+	
 	/** The list. */
-//	protected EditableList classpaths;
 	protected JTree ridtree;
 	
 	/** The lib service. */
@@ -70,6 +97,9 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	
 	/** The lib service. */
 	protected ILibraryServiceListener listener;
+	
+	/** The thread pool. */
+	protected IThreadPool tp;
 	
 	//-------- methods --------
 	
@@ -79,27 +109,165 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	 */
 	public IFuture<Void> init(final IControlCenter jcc, IService service)
 	{
+		this.jcc = jcc;
 		this.libservice	= (ILibraryService)service;
 		
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
 		
-		ridtree = new JTree();
+		ridtree = new JTree(new Node(null));
+		ridtree.setCellRenderer(new DefaultTreeCellRenderer() 
+		{
+			public Component getTreeCellRendererComponent(JTree tree, Object value,
+				boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus)
+			{
+				assert SwingUtilities.isEventDispatchThread();
+				
+				// Change icons depending on node type.
+				Node node = (Node)value;
+				Icon icon = node.getIcon();
+				String tooltip = node.getTooltipText();
+				
+				if(icon!=null)
+				{
+					setOpenIcon(icon);
+					setClosedIcon(icon);
+					setLeafIcon(icon);
+				}
+				else
+				{
+					setOpenIcon(getDefaultOpenIcon());
+					setClosedIcon(getDefaultClosedIcon());
+					setLeafIcon(getDefaultLeafIcon());
+				}
+				
+				if(tooltip!=null)
+				{
+					setToolTipText(tooltip);
+				}
+				
+				JComponent comp = (JComponent)super.getTreeCellRendererComponent(tree,
+					node.toString(), selected, expanded, leaf, row, hasFocus);
+
+				return comp;
+			}
+        });
+		ridtree.addMouseListener(new MouseAdapter()
+        {
+	    	public void mousePressed(MouseEvent e)
+	        {
+	        	popup(e);
+	        }
+	        
+	    	public void mouseReleased(MouseEvent e)
+	        {
+	        	popup(e);
+	        }
+	        
+	    	public void mouseClicked(MouseEvent e)
+	    	{
+	    		popup(e);
+	    	}
+	    	
+	    	protected void popup(MouseEvent e)
+	    	{
+	    		if(e.isPopupTrigger())
+	            {
+	    			int row = ridtree.getRowForLocation(e.getX(), e.getY());
+					if(row != -1)
+					{
+						Object	node = ridtree.getLastSelectedPathComponent();
+						if(node instanceof Node)
+						{
+							Object o = ((Node)node).getUserObject();
+							if(o instanceof IResourceIdentifier)
+							{
+								final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
+								final IResourceIdentifier parid = (IResourceIdentifier)o;
+								
+								JPopupMenu popup = new JPopupMenu();
+								ITreeAbstraction ta = new ITreeAbstraction()
+								{
+									public boolean isRemote()
+									{
+										return rem;
+									}
+									
+									public JTree getTree()
+									{
+										return ridtree;
+									}
+									
+									public IExternalAccess getExternalAccess()
+									{
+										return jcc.getPlatformAccess();
+									}
+									
+									public boolean containsNode(Object id)
+									{
+										return false;
+									}
+									
+									public void add(Object obj)
+									{
+										try
+										{
+											IResourceIdentifier rid = null;
+											if(obj instanceof File)
+											{
+												URL url = ((File)obj).toURI().toURL();
+												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
+												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
+												rid = new ResourceIdentifier(lid, null);
+											}
+											else if(obj instanceof FileData)
+											{
+												String path = ((FileData)obj).getPath();
+												URL url = new URL(path);
+												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
+												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
+												rid = new ResourceIdentifier(lid, null);
+											}
+											else if(obj instanceof IResourceIdentifier)
+											{
+												rid = (IResourceIdentifier)obj;
+											}
+											
+											final IResourceIdentifier frid = rid;
+											jcc.setStatusText("Started adding: "+frid);
+											libservice.addResourceIdentifier(parid, rid, true)
+												.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+											{
+												public void customResultAvailable(IResourceIdentifier result)
+												{
+													jcc.setStatusText("Finished adding: "+frid);
+												}
+											});
+										}
+										catch(Exception e)
+										{
+											jcc.setStatusText("Error adding: "+obj+" err: "+e.getMessage());
+//											e.printStackTrace();
+										}
+									}
+								};
+								if(!rem)
+								{
+									popup.add(new AddPathAction(ta));
+								}
+								else
+								{
+									popup.add(new AddRemotePathAction(ta));
+								}
+								popup.add(new AddRIDAction(ta));
+								popup.show(e.getComponent(), e.getX(), e.getY());
+							}
+						}
+					}
+	            }
+	    	}
+        });
 		
-//		this.classpaths = new EditableList("Class Paths", true);
-//		libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
-//		{
-//			public void customResultAvailable(List<IResourceIdentifier> result)
-//			{
-////				List entries = (List)result;
-//				for(int i=0; i<result.size(); i++)
-//				{
-//					classpaths.addEntry(result.get(i).getLocalIdentifier().getUrl().toString());
-//				}
-//			}
-//		});			
-//		JScrollPane scroll = new JScrollPane(classpaths);
-//		classpaths.setPreferredScrollableViewportSize(new Dimension(400, 200));
 		JScrollPane scroll = new JScrollPane(ridtree);
 		
 		JPanel buts = new JPanel(new GridBagLayout());
@@ -416,16 +584,138 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	{
 		return Future.getEmptyFuture();
 	}
-}
-
-class Node extends DefaultMutableTreeNode
-{
+	
 	/**
-	 *  Create a new RidNode.
+	 *  Get the thread pool.
 	 */
-	public Node(Object o)
+	protected IFuture<IThreadPool> getThreadPool()
 	{
-		super(o);
+		final Future<IThreadPool> ret = new  Future<IThreadPool>();
+		
+		if(tp==null)
+		{
+			SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IDaemonThreadPoolService.class)
+				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
+			{
+				public void customResultAvailable(IDaemonThreadPoolService result)
+				{
+					tp = result;
+					ret.setResult(tp);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(tp);
+		}
+		
+		return ret;
 	}
 	
+	/**
+	 * 
+	 */
+	class Node extends DefaultMutableTreeNode
+	{
+		/**
+		 *  Create a new RidNode.
+		 */
+		public Node(Object o)
+		{
+			super(o);
+		}
+		
+		/**
+		 *  Get the icon.
+		 */
+		public Icon getIcon()
+		{
+			Icon ret = null;
+			Object o = getUserObject();
+			if(o instanceof URL)
+			{
+				if(((URL)o).getFile().indexOf(".jar")!=-1)
+				{
+					ret = icons.getIcon("jar");
+				}
+				else
+				{
+					ret = icons.getIcon("folder");
+				}
+			}
+			else if(o instanceof IResourceIdentifier)
+			{
+				if(((IResourceIdentifier)o).getGlobalIdentifier()!=null)
+				{
+					ret = icons.getIcon("global");
+				}
+				else
+				{
+					Icon[] ics = new Icon[2];
+					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
+					
+					if(lrid.getUrl().getFile().indexOf(".jar")!=-1)
+					{
+						ics[0] = icons.getIcon("jar");
+					}
+					else
+					{
+						ics[0] = ret = icons.getIcon("folder");
+					}
+					ics[1] = icons.getIcon("oglobal");
+					
+					ret = new CombiIcon(ics);
+				}
+			}
+			else if(o instanceof String)
+			{
+				if(getChildCount()>0)
+				{
+					ret = icons.getIcon("folder");
+				}
+			}
+			
+			return ret;
+		}
+		
+		/**
+		 *  Get the tooltip.
+		 */
+		public String getTooltipText()
+		{
+			return null;
+		}
+		
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			String ret = null;
+			
+			Object o = getUserObject();
+			if(o instanceof IResourceIdentifier)
+			{
+				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
+				if(grid!=null)
+				{
+					ret = grid.getResourceId();
+				}
+				else
+				{
+					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
+					ret = lrid.getUrl().toString();
+					
+				}
+			}
+			else
+			{
+				ret = super.toString();
+			}
+			
+			return ret;
+		}
+	}
+
 }
+

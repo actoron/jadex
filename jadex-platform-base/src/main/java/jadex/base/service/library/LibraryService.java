@@ -147,20 +147,22 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Add a new resource identifier.
 	 *  @param parid The optional parent rid.
-	 *  @param rid The resource identifier.
+	 *  @param orid The resource identifier.
 	 */
 	public IFuture<IResourceIdentifier> addResourceIdentifier(final IResourceIdentifier parid,
-		IResourceIdentifier rid, final boolean workspace)
+		final IResourceIdentifier orid, final boolean workspace)
 	{
+//		System.out.println("adding: "+orid+" on: "+parid);
+		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		getDependencies(rid, workspace).addResultListener(new ExceptionDelegationResultListener
+		getDependencies(orid, workspace).addResultListener(new ExceptionDelegationResultListener
 			<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 			{
 				final IResourceIdentifier rid = deps.getFirstEntity();
-//				System.out.println("add end "+rid);
+//				System.out.println("add end "+rid+" on: "+parid);
 				
 				getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
 					new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)

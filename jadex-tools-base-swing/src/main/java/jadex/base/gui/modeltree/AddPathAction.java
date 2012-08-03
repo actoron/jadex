@@ -31,7 +31,7 @@ public class AddPathAction extends ToolTipAction
 	//-------- attributes --------
 	
 	/** The tree. */
-	protected FileTreePanel treepanel;
+	protected ITreeAbstraction treepanel;
 	
 	/** The file chooser. */
 	protected JFileChooser filechooser;
@@ -41,7 +41,7 @@ public class AddPathAction extends ToolTipAction
 	/**
 	 *  Create a new action
 	 */
-	public AddPathAction(FileTreePanel treepanel)
+	public AddPathAction(ITreeAbstraction treepanel)
 	{
 		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
@@ -49,7 +49,7 @@ public class AddPathAction extends ToolTipAction
 	/**
 	 *  Create a new action 
 	 */
-	public AddPathAction(String name, Icon icon, String desc, FileTreePanel treepanel)
+	public AddPathAction(String name, Icon icon, String desc, ITreeAbstraction treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
@@ -79,8 +79,9 @@ public class AddPathAction extends ToolTipAction
 	 */
 	public boolean isEnabled()
 	{
-		ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
-		return rm==null && !treepanel.isRemote();
+		return !treepanel.isRemote();
+//		ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
+//		return rm==null && !treepanel.isRemote();
 	}
 	
 	/**
@@ -88,7 +89,7 @@ public class AddPathAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		if(filechooser.showDialog(SGUI.getWindowParent(treepanel)
+		if(filechooser.showDialog(SGUI.getWindowParent(treepanel.getTree())
 			, "Add Path")==JFileChooser.APPROVE_OPTION)
 		{
 			File file = filechooser.getSelectedFile();
@@ -101,22 +102,23 @@ public class AddPathAction extends ToolTipAction
 				{
 					// Convert to relative file for comparability with loaded nodes.
 					file	= new File(SUtil.convertPathToRelative(file.getAbsolutePath()));
-					if(treepanel.getModel().getNode(file)==null)
+//					if(treepanel.getModel().getNode(file)==null)
+					if(!treepanel.containsNode(file))
 					{
 						// Add file/directory to tree.
-						treepanel.addTopLevelNode(file);
+						treepanel.add(file);
 					}
 					else
 					{
 						String	msg	= SUtil.wrapText("Path can not be added twice:\n"+file);
-						JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
+						JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
 							msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
 				else
 				{
 					String	msg	= SUtil.wrapText("Cannot find file or directory:\n"+file);
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
 						msg, "Cannot find file or directory", JOptionPane.ERROR_MESSAGE);
 				}
 			}

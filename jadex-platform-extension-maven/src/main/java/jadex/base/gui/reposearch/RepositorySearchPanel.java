@@ -1195,8 +1195,6 @@ public class RepositorySearchPanel extends JPanel
 		{
 			return obj instanceof RepositoryInfo && SUtil.equals(getUrl(), ((RepositoryInfo)obj).getUrl());
 		}
-		
-		
 	}
 	
 	/**

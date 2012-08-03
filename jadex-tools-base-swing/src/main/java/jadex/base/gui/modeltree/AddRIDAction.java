@@ -1,6 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -39,7 +38,7 @@ public class AddRIDAction extends ToolTipAction
 	//-------- attributes --------
 	
 	/** The tree. */
-	protected ModelTreePanel treepanel;
+	protected ITreeAbstraction treepanel;
 	
 	/** The thread pool. */
 	protected IThreadPool tp;
@@ -49,7 +48,7 @@ public class AddRIDAction extends ToolTipAction
 	/**
 	 *  Create a new action
 	 */
-	public AddRIDAction(ModelTreePanel treepanel)
+	public AddRIDAction(ITreeAbstraction treepanel)
 	{
 		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
@@ -57,7 +56,7 @@ public class AddRIDAction extends ToolTipAction
 	/**
 	 *  Create a new action 
 	 */
-	public AddRIDAction(String name, Icon icon, String desc, ModelTreePanel treepanel)
+	public AddRIDAction(String name, Icon icon, String desc, ITreeAbstraction treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
@@ -72,7 +71,8 @@ public class AddRIDAction extends ToolTipAction
 	public boolean isEnabled()
 	{
 		Class cl = SReflect.findClass0("jadex.base.service.dependency.maven.MavenDependencyResolverService", null, null);
-		return cl!=null && (ITreeNode)treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();
+//		return cl!=null && treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();
+		return cl!=null && !treepanel.isRemote();
 //		return (ITreeNode)treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();
 	}
 	
@@ -92,7 +92,7 @@ public class AddRIDAction extends ToolTipAction
 					{
 //						String gid = JOptionPane.showInputDialog(treepanel, "Enter Artifact Id:");
 						Method m = cl.getMethod("showDialog", new Class[]{IThreadPool.class, Component.class});
-						Object o = m.invoke(null, new Object[]{tp, treepanel});
+						Object o = m.invoke(null, new Object[]{tp, treepanel.getTree()});
 //						System.out.println("sel ai: "+o);
 						if(o!=null)
 						{
@@ -107,7 +107,8 @@ public class AddRIDAction extends ToolTipAction
 			
 			//				gid = "net.sourceforge.jadex:jadex-applications-bdi:2.1";
 							IResourceIdentifier rid = new ResourceIdentifier(null, gid);
-							treepanel.addTopLevelNode(rid);
+//							treepanel.addTopLevelNode(rid);
+							treepanel.add(rid);
 						}
 					}
 					catch(Exception ex)
@@ -128,7 +129,8 @@ public class AddRIDAction extends ToolTipAction
 		
 		if(tp==null)
 		{
-			SServiceProvider.getServiceUpwards(treepanel.localexta.getServiceProvider(), IDaemonThreadPoolService.class)
+//			SServiceProvider.getServiceUpwards(treepanel.localexta.getServiceProvider(), IDaemonThreadPoolService.class)
+			SServiceProvider.getServiceUpwards(treepanel.getExternalAccess().getServiceProvider(), IDaemonThreadPoolService.class)
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

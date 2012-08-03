@@ -35,7 +35,8 @@ public class AddRemotePathAction extends ToolTipAction
 	//-------- attributes --------
 	
 	/** The tree. */
-	protected FileTreePanel treepanel;
+//	protected FileTreePanel treepanel;
+	protected ITreeAbstraction treepanel;
 	
 	/** The file chooser. */
 	protected RemoteFileChooser filechooser;
@@ -45,7 +46,7 @@ public class AddRemotePathAction extends ToolTipAction
 	/**
 	 *  Create a new action.
 	 */
-	public AddRemotePathAction(FileTreePanel treepanel)
+	public AddRemotePathAction(ITreeAbstraction treepanel)
 	{
 		this(getName(), getIcon(), getTooltipText(), treepanel);
 	}
@@ -53,7 +54,7 @@ public class AddRemotePathAction extends ToolTipAction
 	/**
 	 *  Create a new action. 
 	 */
-	public AddRemotePathAction(String name, Icon icon, String desc, FileTreePanel treepanel)
+	public AddRemotePathAction(String name, Icon icon, String desc, ITreeAbstraction treepanel)
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
@@ -67,8 +68,9 @@ public class AddRemotePathAction extends ToolTipAction
 	 */
 	public boolean isEnabled()
 	{
-		ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
-		return rm==null && treepanel.isRemote();
+		return treepanel.isRemote();
+//		Object rm = treepanel.getTree().getLastSelectedPathComponent();
+//		return rm==null && treepanel.isRemote();
 	}
 	
 	/**
@@ -81,7 +83,7 @@ public class AddRemotePathAction extends ToolTipAction
 			filechooser	= new RemoteFileChooser(treepanel.getExternalAccess());
 		}
 	
-		IFuture<FileData>	file	= filechooser.chooseFile("Add Remote Path", null, treepanel, JFileChooser.FILES_AND_DIRECTORIES, new FileFilter()
+		IFuture<FileData>	file	= filechooser.chooseFile("Add Remote Path", null, treepanel.getTree(), JFileChooser.FILES_AND_DIRECTORIES, new FileFilter()
 		{
 			public String getDescription()
 			{
@@ -99,15 +101,17 @@ public class AddRemotePathAction extends ToolTipAction
 		{
 			public void customResultAvailable(FileData result)
 			{
-				if(treepanel.getModel().getNode(result.toString())==null)
+//				if(treepanel.getModel().getNode(result.toString())==null)
+				if(!treepanel.containsNode(result.toString()))
 				{
-					treepanel.addTopLevelNode(result);
+//					treepanel.addTopLevelNode(result);
+					treepanel.add(result);
 				}
 				else
 				{
 					// Todo: already added to library service (remove?)
 					String	msg	= SUtil.wrapText("Path can not be added twice:\n"+((FileData)result).getPath());
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel),
+					JOptionPane.showMessageDialog(SGUI.getWindowParent(treepanel.getTree()),
 						msg, "Duplicate path", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}

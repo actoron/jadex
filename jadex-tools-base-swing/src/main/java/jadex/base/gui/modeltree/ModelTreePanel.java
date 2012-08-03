@@ -15,6 +15,7 @@ import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
@@ -42,6 +43,7 @@ import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
@@ -115,8 +117,35 @@ public class ModelTreePanel extends FileTreePanel
 		ModelIconCache ic = new ModelIconCache(exta, getTree());
 		setMenuItemConstructor(mic);
 		actions.put(CollapseAllAction.getName(), new CollapseAllAction(this));
-		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(this) : new AddPathAction(this));
-		actions.put(AddRIDAction.getName(), new AddRIDAction(this));
+		ITreeAbstraction ta = new ITreeAbstraction()
+		{
+			public boolean isRemote()
+			{
+				return ModelTreePanel.this.isRemote();
+			}
+			
+			public JTree getTree()
+			{
+				return ModelTreePanel.this.getTree();
+			}
+			
+			public IExternalAccess getExternalAccess()
+			{
+				return ModelTreePanel.this.getExternalAccess();
+			}
+			
+			public boolean containsNode(Object id)
+			{
+				return ModelTreePanel.this.getModel().getNode(id)!=null;
+			}
+			
+			public void add(Object obj)
+			{
+				ModelTreePanel.this.addTopLevelNodeMeta(obj);
+			}
+		};
+		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(ta) : new AddPathAction(ta));
+		actions.put(AddRIDAction.getName(), new AddRIDAction(ta));
 		actions.put(RemovePathAction.getName(), new RemovePathAction(this));
 		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), actions.get(AddRIDAction.getName()),
 			actions.get(AddRemotePathAction.getName()), mic}));
@@ -262,6 +291,30 @@ public class ModelTreePanel extends FileTreePanel
 				// Ignore, no library service
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 * @param obj
+	 */
+	public void addTopLevelNodeMeta(Object obj)
+	{
+		if(obj instanceof File)
+		{
+			addTopLevelNode((File)obj);
+		}
+		else if(obj instanceof FileData)
+		{
+			addTopLevelNode((FileData)obj);
+		}
+		else if(obj instanceof IResourceIdentifier)
+		{
+			addTopLevelNode((IResourceIdentifier)obj);
+		}
+		else
+		{
+			throw new RuntimeException("Unknown node type: "+obj);
+		}
 	}
 	
 	//-------- methods --------

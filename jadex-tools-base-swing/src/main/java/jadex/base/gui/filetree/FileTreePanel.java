@@ -5,6 +5,7 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
+import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -307,6 +308,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		for(int i=0; i<root.getChildCount(); i++)
 			model.fireNodeChanged((ITreeNode) root.getCachedChildren().get(i));
 	}
+
 	
 	/**
 	 *  Add a top level node.
