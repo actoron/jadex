@@ -234,25 +234,22 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											}
 											else if(obj instanceof FileData)
 											{
-												String filename = ((FileData)obj).getPath();
-												addRemoteURL(filename).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+												final String filename = ((FileData)obj).getPath();
+												addRemoteURL(parid, filename).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
 												{
 													public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
 													{
+														jcc.setStatusText("Finished adding: "+result.getSecondEntity());
 													}
 													
 													public void exceptionOccurred(Exception exception)
 													{
+														jcc.setStatusText("Erro adding: "+filename+" "+exception.getMessage());
 													}
 												});
-												
-//												URL url = new URL(path);
-//												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
-//												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
-//												rid = new ResourceIdentifier(lid, null);
 											}
 											
-											if(!rem)
+											if(rid!=null)
 											{
 												final IResourceIdentifier frid = rid;
 												jcc.setStatusText("Started adding: "+frid);
@@ -562,7 +559,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	/**
 	 * 
 	 */
-	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final String filename)
+	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final IResourceIdentifier parid, final String filename)
 	{
 		final Future<Tuple2<URL, IResourceIdentifier>> ret = new Future<Tuple2<URL, IResourceIdentifier>>();
 		
@@ -579,7 +576,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					public void customResultAvailable(final ILibraryService ls)
 					{
 						// todo: workspace=true?
-						ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+						ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
 						{
 							public void customResultAvailable(IResourceIdentifier rid)
 							{
