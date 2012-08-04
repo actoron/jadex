@@ -3,6 +3,7 @@ package jadex.base.service.library;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -72,14 +73,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The map of managed resources (url (for local case) -> delegate loader). */
 	protected Map<IResourceIdentifier, DelegationURLClassLoader> classloaders;
 	
-	/** The dependencies. */
-	protected Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> rids;
-	
 	/** The base classloader. */
-	protected ClassLoader baseloader;
+	protected ChangeableURLClassLoader baseloader;
 	
 	/** The delegation root loader. */
 	protected DelegationURLClassLoader rootloader;
+
+	// cached results
+	
+	/** The dependencies. */
+	protected Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> rids;
 	
 	/** The non-managed urls (cached for speed). */
 	protected Set<URL>	nonmanaged;
@@ -138,7 +141,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.clfuts = new HashMap<IResourceIdentifier, Future<DelegationURLClassLoader>>();
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
 		this.initurls = urls!=null? urls.clone(): urls;
-		this.baseloader = baseloader!=null? baseloader: getClass().getClassLoader();
+		this.baseloader = baseloader!=null? new ChangeableURLClassLoader(null, baseloader)
+			: new ChangeableURLClassLoader(null, getClass().getClassLoader());
 		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);
 	}
 	
@@ -311,6 +315,33 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a top level url. A top level url will
+	 *  be available for all subordinated resources. 
+	 *  @param url The url.
+	 */
+	public IFuture<Void> addTopLevelURL(@CheckNotNull URL url)
+	{
+		baseloader.addURL(url);
+		nonmanaged = null;
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Remove a top level url. A top level url will
+	 *  be available for all subordinated resources. 
+	 *  @param url The url.
+	 *  
+	 *  note: top level url removal will only take 
+	 *  effect after restart of the platform.
+	 */
+	public IFuture<Void> removeTopLevelURL(@CheckNotNull URL url)
+	{
+		baseloader.removeURL(url);
+		nonmanaged = null;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -641,13 +672,15 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
 			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
 			pacl.removeDelegateClassLoader(cl);
-			
-			// If last support, delete removeSupport to children.
 			if(cl.removeParentClassLoader(pacl))
 			{
 				rids = null;
 				notifyRemovalListeners(rid);
-				
+			}
+			
+			// If last support, delete removeSupport to children.
+			if(!cl.hasParentClassLoader())
+			{
 				DelegationURLClassLoader[] dels = cl.getDelegateClassLoaders();
 				for(DelegationURLClassLoader del: dels)
 				{
@@ -751,7 +784,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //	}
 	
 	/**
-	 * 
+	 *  Get the resource identifier for an url.
 	 */
 	protected IFuture<IResourceIdentifier> internalGetResourceIdentifier(final URL url)
 	{

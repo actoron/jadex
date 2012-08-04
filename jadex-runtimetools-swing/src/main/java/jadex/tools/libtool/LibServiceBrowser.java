@@ -37,6 +37,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
@@ -82,6 +83,9 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 {
 	//-------- constants --------
 
+	protected static final String ROOTTEXT = "Platform resources";
+	protected static final String SYSTEMTEXT = "System classpath";
+	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
@@ -189,7 +193,10 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 						if(node instanceof Node)
 						{
 							Object o = ((Node)node).getUserObject();
-							if(o instanceof IResourceIdentifier)
+							if(ROOTTEXT.equals(o))
+								o = null;
+							
+							if(o instanceof IResourceIdentifier || o==null)
 							{
 								final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
 								final IResourceIdentifier selrid = (IResourceIdentifier)o;
@@ -216,7 +223,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											else if(obj instanceof FileData)
 											{
 												final String filename = ((FileData)obj).getPath();
-												addRemoteURL(selrid, filename).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+												addRemoteURL(selrid, filename, false).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
 												{
 													public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
 													{
@@ -294,7 +301,71 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 										}
 									}
 								};
-								popup.add(new RemovePathAction(tar));
+								
+								if(o!=null)
+								{
+									popup.add(new RemovePathAction(tar));
+								}
+								
+								popup.show(e.getComponent(), e.getX(), e.getY());
+							}
+							else if(SYSTEMTEXT.equals(o))
+							{
+								final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
+								JPopupMenu popup = new JPopupMenu();
+								
+								LibTreeAbstraction taa = new LibTreeAbstraction(rem)
+								{
+									public void action(Object obj)
+									{
+										try
+										{
+											if(obj instanceof File)
+											{
+												final URL url = ((File)obj).toURI().toURL();
+												jcc.setStatusText("Started adding: "+url);
+												libservice.addTopLevelURL(url)
+													.addResultListener(new SwingDefaultResultListener<Void>()
+												{
+													public void customResultAvailable(Void result)
+													{
+														jcc.setStatusText("Finished adding: "+url);
+													}
+												});
+											}
+											else if(obj instanceof FileData)
+											{
+												final String filename = ((FileData)obj).getPath();
+												addRemoteURL(null, filename, true).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+												{
+													public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
+													{
+														jcc.setStatusText("Finished adding: "+result.getSecondEntity());
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														jcc.setStatusText("Erro adding: "+filename+" "+exception.getMessage());
+													}
+												});
+											}
+										}
+										catch(Exception e)
+										{
+											jcc.setStatusText("Error adding: "+obj+" err: "+e.getMessage());
+//											e.printStackTrace();
+										}
+									}
+								};
+								
+								if(!rem)
+								{
+									popup.add(new AddPathAction(taa));
+								}
+								else
+								{
+									popup.add(new AddRemotePathAction(taa));
+								}
 								
 								popup.show(e.getComponent(), e.getX(), e.getY());
 							}
@@ -526,6 +597,8 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		{
 			public void customResultAvailable(final List<URL> nonmanurls)
 			{
+//				System.out.println("nonman: "+nonmanurls);
+				
 				libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(LibServiceBrowser.this)
 				{
 					public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
@@ -534,27 +607,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 						DefaultTreeModel mod = (DefaultTreeModel)ridtree.getModel();
 						Map<IResourceIdentifier, List<IResourceIdentifier>> deps = result.getSecondEntity();
 						
-						Map<IResourceIdentifier, Node> nodes = new HashMap<IResourceIdentifier, Node>();
-						for(IResourceIdentifier rid: deps.keySet())
-						{
-							Node node = new Node(rid);
-							nodes.put(rid, node);
-						}
-						
-						for(Node node: nodes.values())
-						{
-							List<IResourceIdentifier> mydeps = deps.get((IResourceIdentifier)node.getUserObject());
-							for(IResourceIdentifier rid: mydeps)
-							{
-								Node child = nodes.get(rid);
-								node.add(child);
-							}
-						}
-						
-						Node root = nodes.get(result.getFirstEntity());
+						// Add nonmanged urls
+						Node root = createNode(null, null, deps);
 						if(nonmanurls!=null && !nonmanurls.isEmpty())
 						{
-							Node cont = new Node("System classpaths");
+							Node cont = new Node(SYSTEMTEXT);
 							for(URL url: nonmanurls)
 							{
 								Node child = new Node(url);
@@ -563,7 +620,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 							root.add(cont);
 						}
 						
-						root.setUserObject("Platform resources");
+						root.setUserObject(ROOTTEXT);
 						mod.setRoot(root);
 //						ridtree.setRootVisible(false);
 					}
@@ -575,7 +632,25 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	/**
 	 * 
 	 */
-	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final IResourceIdentifier parid, final String filename)
+	protected Node createNode(Node parent, IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
+	{
+		Node node = new Node(rid);
+		
+		List<IResourceIdentifier> mydeps = deps.get((IResourceIdentifier)node.getUserObject());
+		for(IResourceIdentifier chrid: mydeps)
+		{
+			Node child = createNode(node, chrid, deps);
+			node.add(child);
+		}
+		
+		return node;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final IResourceIdentifier parid, 
+		final String filename, final boolean tl)
 	{
 		final Future<Tuple2<URL, IResourceIdentifier>> ret = new Future<Tuple2<URL, IResourceIdentifier>>();
 		
@@ -591,47 +666,43 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 				{
 					public void customResultAvailable(final ILibraryService ls)
 					{
-						// todo: workspace=true?
-						ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+						if(!tl)
 						{
-							public void customResultAvailable(IResourceIdentifier rid)
+							// todo: workspace=true?
+							ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
 							{
-								ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-							}
-							public void exceptionOccurred(Exception exception)
+								public void customResultAvailable(IResourceIdentifier rid)
+								{
+									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									super.exceptionOccurred(exception);
+								}
+							});
+						}
+						else
+						{
+							ls.addTopLevelURL(url).addResultListener(new ExceptionDelegationResultListener<Void, Tuple2<URL, IResourceIdentifier>>(ret)
 							{
-								exception.printStackTrace();
-								super.exceptionOccurred(exception);
-							}
-						});
+								public void customResultAvailable(Void result)
+								{
+									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, null));
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									super.exceptionOccurred(exception);
+								}
+							});
+						}
 					}
 				});
 				
 				return ret;
 			}
 		}).addResultListener(new DelegationResultListener<Tuple2<URL, IResourceIdentifier>>(ret));
-//		}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
-//		{
-//			public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
-//			{
-//				// Todo: remove entries on remove.
-//	//			System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
-//				addRootEntry(tup.getFirstEntity(), filepath, tup.getSecondEntity());
-//				ModelTreePanel.super.addNode(node);
-//			}
-//			
-//			public void customExceptionOccurred(final Exception exception)
-//			{
-//				jcc.getJCCAccess().scheduleStep(new IComponentStep<Void>()
-//				{
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						ia.getLogger().warning(exception.toString());
-//						return IFuture.DONE;
-//					}
-//				});					
-//			}
-//		});
 		
 		return ret;
 	}

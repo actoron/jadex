@@ -40,7 +40,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	protected List<DelegationURLClassLoader> parents;
 	
 	/** The flattened transitive dependencies without duplicates
-	 *  (created lazy from delegates list). */
+	    (created lazy from delegates list). */
 	protected Set<DelegationURLClassLoader>	dependencies;
 	
 	//-------- constructors --------
@@ -99,28 +99,32 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 *  Add a new delegate loader.
 	 *  @param classloader The delegate classloader.
 	 */
-	public synchronized void addDelegateClassLoader(DelegationURLClassLoader classloader)
+	public synchronized boolean addDelegateClassLoader(DelegationURLClassLoader classloader)
 	{
+		if(classloader==null)
+			throw new IllegalArgumentException("Must not null.");
+
 		if(delegates.contains(classloader))
-			return;
-//			throw new RuntimeException("Already contained: "+classloader);
-		
+			return false;
 		delegates.add(classloader);
-		
 		dependencies = null;
+		return true;
 	}
 	
 	/**
 	 *  Remove a new delegate loader.
 	 *  @param classloader The delegate classloader.
+	 *  @return True, if classloader was removed.
 	 */
-	public synchronized void removeDelegateClassLoader(DelegationURLClassLoader classloader)
+	public synchronized boolean removeDelegateClassLoader(DelegationURLClassLoader classloader)
 	{
-		delegates.remove(classloader);
-//		if(!delegates.remove(classloader))
-//			throw new RuntimeException("Not contained: "+classloader);
-		
-		dependencies = null;
+		if(classloader==null)
+			throw new IllegalArgumentException("Must not null.");
+
+		boolean ret = delegates.remove(classloader);
+		if(ret)
+			dependencies = null;
+		return ret;
 	}
 	
 	/**
@@ -129,14 +133,13 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public synchronized boolean addParentClassLoader(DelegationURLClassLoader parent)
 	{
-		if(parent==null || parents.contains(parent))
-			return false;
-//		if(parents.contains(parent))
-//			throw new RuntimeException("Already contained: "+parent);
+		if(parent==null)
+			throw new IllegalArgumentException("Must not null.");
 		
+		if(parents.contains(parent))
+			return false;
 		this.parents.add(parent);
-	
-		return parents.size()==1;
+		return true;
 	}
 	
 	/**
@@ -145,9 +148,17 @@ public class DelegationURLClassLoader extends URLClassLoader
 	public synchronized boolean removeParentClassLoader(DelegationURLClassLoader parent)
 	{
 		if(parent==null)
-			return false;
-		
-		return parents.remove(parent) && parents.size()==0;
+			throw new IllegalArgumentException("Must not null.");
+
+		return parents.remove(parent);
+	}
+	
+	/**
+	 *  Test if has parent classloader.
+	 */
+	public boolean hasParentClassLoader()
+	{
+		return !parents.isEmpty();
 	}
 	
 	/**

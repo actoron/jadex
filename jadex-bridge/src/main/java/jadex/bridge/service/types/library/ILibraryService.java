@@ -36,7 +36,7 @@ public interface ILibraryService
 	 */
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, 
 		@CheckNotNull IResourceIdentifier rid);
-	
+		
 //	/**
 //	 *  Get all managed (directly added i.e. top-level) resource identifiers.
 //	 *  @return The list of resource identifiers.
@@ -93,6 +93,23 @@ public interface ILibraryService
 	 */
 	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url);
 
+	/**
+	 *  Add a top level url. A top level url will
+	 *  be available for all subordinated resources. 
+	 *  @param url The url.
+	 */
+	public IFuture<Void> addTopLevelURL(@CheckNotNull URL url);
+
+	/**
+	 *  Remove a top level url. A top level url will
+	 *  be available for all subordinated resources. 
+	 *  @param url The url.
+	 *  
+	 *  note: top level url removal will only take 
+	 *  effect after restart of the platform.
+	 */
+	public IFuture<Void> removeTopLevelURL(@CheckNotNull URL url);
+	
 	/**
 	 *  Get other contained (but not directly managed) urls from parent classloaders.
 	 *  @return The list of urls.
