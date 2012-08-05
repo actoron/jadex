@@ -32,6 +32,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -79,6 +80,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The delegation root loader. */
 	protected DelegationURLClassLoader rootloader;
 
+	/** The added links. */
+	protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> addedlinks;
+
+	/** The remove links. */
+	protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> removedlinks;
+	
 	// cached results
 	
 	/** The dependencies. */
@@ -144,6 +151,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.baseloader = baseloader!=null? new ChangeableURLClassLoader(null, baseloader)
 			: new ChangeableURLClassLoader(null, getClass().getClassLoader());
 		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);
+		this.addedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
+		this.removedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
 	}
 	
 	//-------- methods --------
@@ -1077,9 +1086,58 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Test if a rid is local to this platform.
 	 */
-	protected boolean	isLocal(IResourceIdentifier rid)
+	protected boolean isLocal(IResourceIdentifier rid)
 	{
 		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addLink(IResourceIdentifier parid, IResourceIdentifier rid)
+	{
+		Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid);
+		if(!removedlinks.remove(link))
+		{
+			addedlinks.add(link);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeLink(IResourceIdentifier parid, IResourceIdentifier rid)
+	{
+		Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid);
+		if(!addedlinks.remove(link))
+		{
+			removedlinks.add(link);
+		}
+	}
+	
+	/**
+	 *  Get the removable links.
+	 */
+	public IFuture<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>> getRemovableLinks()
+	{
+		Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> ret = (Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>)((HashSet)addedlinks).clone();
+		// add first level nodes
+		for(IResourceIdentifier rid: rootloader.getDelegateResourceIdentifiers())
+		{
+			Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(null, rid);
+			ret.add(link);
+		}
+		
+		return new Future<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(ret);
+	}
+	
+	/**
+	 *  Test if a link is removable.
+	 */
+	protected boolean isRemovable(IResourceIdentifier parid, IResourceIdentifier rid)
+	{
+		Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid);
+		return addedlinks.contains(link);
 	}
 }
 
