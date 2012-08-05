@@ -1,13 +1,10 @@
 package jadex.tools.libtool;
 
-import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRIDAction;
 import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ITreeAbstraction;
-import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
@@ -37,9 +34,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -55,9 +50,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -75,6 +71,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 /**
  *  The library plugin.
@@ -93,7 +91,8 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		"jar", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/jar.png"),
 		"global", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/global.png"),
 		"oglobal", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/overlay_global.png"),
-		"folder", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/folder4.png")
+		"folder", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/folder4.png"),
+		"orem", SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/overlay_removable.png")
 	});
 	
 	//-------- attributes --------
@@ -127,7 +126,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
 		
-		ridtree = new JTree(new Node("Root resource"));
+		ridtree = new JTree();
 		
 		ridtree.setCellRenderer(new DefaultTreeCellRenderer() 
 		{
@@ -136,32 +135,35 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			{
 				assert SwingUtilities.isEventDispatchThread();
 				
-				// Change icons depending on node type.
-				Node node = (Node)value;
-				Icon icon = node.getIcon();
-				String tooltip = node.getTooltipText();
-				
-				if(icon!=null)
+				if(value instanceof Node)
 				{
-					setOpenIcon(icon);
-					setClosedIcon(icon);
-					setLeafIcon(icon);
+					// Change icons depending on node type.
+					Node node = (Node)value;
+					Icon icon = node.getIcon();
+					String tooltip = node.getTooltipText();
+					
+					if(icon!=null)
+					{
+						setOpenIcon(icon);
+						setClosedIcon(icon);
+						setLeafIcon(icon);
+					}
+					else
+					{
+						setOpenIcon(getDefaultOpenIcon());
+						setClosedIcon(getDefaultClosedIcon());
+						setLeafIcon(getDefaultLeafIcon());
+					}
+					
+					if(tooltip!=null)
+					{
+						setToolTipText(tooltip);
+					}
 				}
-				else
-				{
-					setOpenIcon(getDefaultOpenIcon());
-					setClosedIcon(getDefaultClosedIcon());
-					setLeafIcon(getDefaultLeafIcon());
-				}
-				
-				if(tooltip!=null)
-				{
-					setToolTipText(tooltip);
-				}
-				
-				JComponent comp = (JComponent)super.getTreeCellRendererComponent(tree,
-					node.toString(), selected, expanded, leaf, row, hasFocus);
 
+				JComponent comp = (JComponent)super.getTreeCellRendererComponent(tree,
+					value, selected, expanded, leaf, row, hasFocus);
+		
 				return comp;
 			}
         });
@@ -302,7 +304,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 									}
 								};
 								
-								if(o!=null)
+								if(o!=null && ((Node)node).isRemovable())
 								{
 									popup.add(new RemovePathAction(tar));
 								}
@@ -558,8 +560,6 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		this.setLayout(new BorderLayout());
 		this.add(classview, BorderLayout.CENTER);
-//		this.add("Managed Classpath Entries", classview);
-//		this.add("System Classpath Entries", otherview);
 
 		// Add a library service listener to be informed about library changes.
 //		this.listener	= new ILibraryServiceListener()
@@ -601,50 +601,59 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 				
 				libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(LibServiceBrowser.this)
 				{
-					public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
+					public void customResultAvailable(final Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 					{
-						ridtree.removeAll();
-						DefaultTreeModel mod = (DefaultTreeModel)ridtree.getModel();
-						Map<IResourceIdentifier, List<IResourceIdentifier>> deps = result.getSecondEntity();
-						
-						// Add nonmanged urls
-						Node root = createNode(null, null, deps);
-						if(nonmanurls!=null && !nonmanurls.isEmpty())
+						libservice.getRemovableLinks().addResultListener(new SwingDefaultResultListener<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(LibServiceBrowser.this)
 						{
-							Node cont = new Node(SYSTEMTEXT);
-							for(URL url: nonmanurls)
+							public void customResultAvailable(Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> reml)
 							{
-								Node child = new Node(url);
-								cont.add(child);
+//								System.out.println("kukuku: "+reml);
+								
+								ridtree.removeAll();
+								DefaultTreeModel mod = (DefaultTreeModel)ridtree.getModel();
+								Map<IResourceIdentifier, List<IResourceIdentifier>> mydeps = deps.getSecondEntity();
+								
+								// Add nonmanged urls
+		//						Node root = createNode(null, null, deps);
+								Node root = new Node(ROOTTEXT, mydeps, reml);
+								if(nonmanurls!=null && !nonmanurls.isEmpty())
+								{
+									Node cont = new Node(SYSTEMTEXT, mydeps, reml);
+									for(URL url: nonmanurls)
+									{
+										Node child = new Node(url, mydeps, reml);
+										cont.add(child);
+									}
+									root.add(cont);
+								}
+								
+//								root.setUserObject(ROOTTEXT);
+								mod.setRoot(root);
+//								ridtree.setRootVisible(false);
 							}
-							root.add(cont);
-						}
-						
-						root.setUserObject(ROOTTEXT);
-						mod.setRoot(root);
-//						ridtree.setRootVisible(false);
+						});
 					}
 				});
 			}
 		});
 	}
 	
-	/**
-	 * 
-	 */
-	protected Node createNode(Node parent, IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
-	{
-		Node node = new Node(rid);
-		
-		List<IResourceIdentifier> mydeps = deps.get((IResourceIdentifier)node.getUserObject());
-		for(IResourceIdentifier chrid: mydeps)
-		{
-			Node child = createNode(node, chrid, deps);
-			node.add(child);
-		}
-		
-		return node;
-	}
+//	/**
+//	 * 
+//	 */
+//	protected Node createNode(Node parent, IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
+//	{
+//		Node node = new Node(rid);
+//		
+//		List<IResourceIdentifier> mydeps = deps.get((IResourceIdentifier)node.getUserObject());
+//		for(IResourceIdentifier chrid: mydeps)
+//		{
+//			Node child = createNode(node, chrid, deps);
+//			node.add(child);
+//		}
+//		
+//		return node;
+//	}
 	
 	/**
 	 * 
@@ -790,12 +799,56 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	 */
 	class Node extends DefaultMutableTreeNode
 	{
+		/** The dependencies. */
+		protected Map<IResourceIdentifier, List<IResourceIdentifier>> deps;
+		
+		/** Flag if children have been created. */
+		protected boolean childrencreated;
+		
+		/** The removable links. */
+		protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> remlinks;
+		
+		/** Flag if is removable. */
+		protected Boolean removable;
+		
 		/**
 		 *  Create a new RidNode.
 		 */
-		public Node(Object o)
+		public Node(Object o, Map<IResourceIdentifier, List<IResourceIdentifier>> deps, 
+			Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> remlinks)
 		{
 			super(o);
+			this.deps = deps;
+			this.remlinks = remlinks;
+		}
+
+		/**
+		 * 
+		 */
+		protected boolean isRemovable()
+		{
+			if(removable==null)
+			{
+				removable = Boolean.FALSE;
+				Node pa = (Node)getParent();
+				if(pa!=null)
+				{
+					Object uo = pa.getUserObject();
+					if(ROOTTEXT.equals(uo))
+						uo = null;
+					if(uo==null || uo instanceof IResourceIdentifier)
+					{
+						Object myo = getUserObject();
+						if(myo instanceof IResourceIdentifier)
+						{
+							boolean rem = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>((IResourceIdentifier)uo, (IResourceIdentifier)myo));
+							if(rem)
+								removable = Boolean.TRUE;
+						}
+					}
+				}
+			}
+			return removable.booleanValue();
 		}
 		
 		/**
@@ -805,48 +858,55 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		{
 			Icon ret = null;
 			Object o = getUserObject();
+			
+			List<Icon> ilist = new ArrayList<Icon>();
 			if(o instanceof URL)
 			{
 				if(((URL)o).getFile().indexOf(".jar")!=-1)
 				{
-					ret = icons.getIcon("jar");
+					ilist.add(icons.getIcon("jar"));
 				}
 				else
 				{
-					ret = icons.getIcon("folder");
+					ilist.add(icons.getIcon("folder"));
 				}
 			}
 			else if(o instanceof IResourceIdentifier)
 			{
 				if(((IResourceIdentifier)o).getGlobalIdentifier()!=null)
 				{
-					ret = icons.getIcon("global");
+					ilist.add(icons.getIcon("global"));
 				}
 				else
 				{
-					Icon[] ics = new Icon[2];
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					
 					if(lrid.getUrl().getFile().indexOf(".jar")!=-1)
 					{
-						ics[0] = icons.getIcon("jar");
+						ilist.add(icons.getIcon("jar"));
 					}
 					else
 					{
-						ics[0] = ret = icons.getIcon("folder");
+						ilist.add(icons.getIcon("folder"));
 					}
-					ics[1] = icons.getIcon("oglobal");
+					ilist.add(icons.getIcon("oglobal"));
 					
-					ret = new CombiIcon(ics);
 				}
 			}
 			else if(o instanceof String)
 			{
 				if(getChildCount()>0)
 				{
-					ret = icons.getIcon("folder");
+					ilist.add(icons.getIcon("folder"));
 				}
 			}
+			
+			if(isRemovable())
+			{
+				ilist.add(icons.getIcon("orem"));
+			}
+			
+			ret = new CombiIcon(ilist.toArray(new Icon[ilist.size()]));
 			
 			return ret;
 		}
@@ -857,6 +917,98 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		public String getTooltipText()
 		{
 			return null;
+		}
+		
+		/**
+		 * 
+		 */
+		public int getChildCount()
+		{
+			int ret = 0;
+			
+			if(childrencreated)
+			{
+				ret = super.getChildCount();
+			}
+			else
+			{
+				Object o = getUserObject();
+				if(ROOTTEXT.equals(o))
+				{
+					o = null;
+					ret++;
+				}
+				
+				if(o==null || o instanceof IResourceIdentifier)
+				{
+					List<IResourceIdentifier> cs = deps.get(o);
+					ret += cs==null? 0: cs.size();
+				}
+				else
+				{
+					return super.getChildCount();
+				}
+			}
+			
+			return ret;
+		}
+		
+		/**
+		 * 
+		 */
+		public TreeNode getChildAt(int index)
+		{
+			createChildren();
+			return super.getChildAt(index);
+		}
+		
+		/**
+		 * 
+		 */
+		public void add(MutableTreeNode child)
+		{
+			createChildren();
+			
+			super.add(child);
+		}
+		
+		/**
+		 * 
+		 */
+		public void insert(MutableTreeNode newChild, int childIndex)
+		{
+			createChildren();
+
+			super.insert(newChild, childIndex);
+		}
+		
+		/**
+		 * 
+		 */
+		protected void createChildren()
+		{
+			if(!childrencreated)
+			{
+				childrencreated = true;
+				
+				Object o = getUserObject();
+				if(ROOTTEXT.equals(o))
+					o = null;
+				
+				if(o==null || o instanceof IResourceIdentifier)
+				{
+					List<IResourceIdentifier> cs = deps.get(o);
+					if(cs!=null)
+					{
+						for(IResourceIdentifier rid: cs)
+						{
+							Node n = new Node(rid, deps, remlinks);
+							add(n);
+						}
+					}
+					childrencreated = true;
+				}
+			}
 		}
 		
 		/**

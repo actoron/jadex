@@ -104,6 +104,9 @@ public class DelegationURLClassLoader extends URLClassLoader
 		if(classloader==null)
 			throw new IllegalArgumentException("Must not null.");
 
+//		if(rid==null)
+//			System.out.println("adding:: "+classloader);
+		
 		if(delegates.contains(classloader))
 			return false;
 		delegates.add(classloader);
@@ -375,6 +378,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public String toString()
 	{
-		return SReflect.getInnerClassName(getClass())+"("+rid+", "+SUtil.arrayToString(delegates)+")";
+//		return SReflect.getInnerClassName(getClass())+"("+rid+", "+SUtil.arrayToString(delegates)+")";
+		return SReflect.getInnerClassName(getClass())+"("+rid+", "+delegates.size()+")";
 	}
 }

@@ -167,6 +167,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 //		System.out.println("adding: "+orid+" on: "+parid);
 		
+		addLink(parid, orid);
+		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
 		getDependencies(orid, workspace).addResultListener(new ExceptionDelegationResultListener
@@ -206,6 +208,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
 //		System.out.println("remove "+rid);
+		removeLink(parid, rid);
 		removeSupport(rid, parid);
 		return IFuture.DONE;
 	}
@@ -601,6 +604,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
 		final List<IResourceIdentifier> deps = alldeps.get(rid);
+
+		final DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, null);
+		classloaders.put(rid, cl);
+//		System.out.println("createClassLoader() put: "+rid);
 		
 		CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
 			(deps.size(), true, new ExceptionDelegationResultListener<Collection<DelegationURLClassLoader>, DelegationURLClassLoader>(ret)
@@ -614,10 +621,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						it.remove();
 				}
 				
-				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
-				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, delegates);
-				classloaders.put(rid, cl);
-//				System.out.println("createClassLoader() put: "+rid);
+//				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
+				for(DelegationURLClassLoader dcl: result)
+				{
+					cl.addDelegateClassLoader(dcl);
+				}
 				addSupport(rid, support);
 				ret.setResult(cl);
 			}
@@ -628,7 +636,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			IResourceIdentifier mydep = (IResourceIdentifier)deps.get(i);
 //			IComponentIdentifier platcid = ((IComponentIdentifier)getServiceIdentifier().getProviderId()).getRoot();
 //			IResourceIdentifier myrid = new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(platcid, mydep), null);
-			getClassLoader(mydep, alldeps, support, workspace).addResultListener(lis);
+			getClassLoader(mydep, alldeps, rid, workspace).addResultListener(lis);
 		}
 		return ret;
 	}
@@ -1121,12 +1129,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>> getRemovableLinks()
 	{
 		Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> ret = (Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>)((HashSet)addedlinks).clone();
-		// add first level nodes
-		for(IResourceIdentifier rid: rootloader.getDelegateResourceIdentifiers())
-		{
-			Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(null, rid);
-			ret.add(link);
-		}
+//		// add first level nodes
+//		for(IResourceIdentifier rid: rootloader.getDelegateResourceIdentifiers())
+//		{
+//			Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(null, rid);
+//			ret.add(link);
+//		}
 		
 		return new Future<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(ret);
 	}

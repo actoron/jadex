@@ -11,6 +11,7 @@ import jadex.commons.future.IFuture;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** 
  *  Interface for the Library Service. It provides a platform service
@@ -47,6 +48,11 @@ public interface ILibraryService
 //	 *  Get all resource identifiers (also indirectly managed. 
 //	 */
 //	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers();
+	
+	/**
+	 *  Get the removable links.
+	 */
+	public IFuture<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>> getRemovableLinks();
 	
 	/**
 	 *   Get all resource identifiers (does not include rids (urls) of parent loader).
