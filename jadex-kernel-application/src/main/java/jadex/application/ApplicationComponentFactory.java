@@ -169,13 +169,13 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 										
 										libservicelistener = new ILibraryServiceListener()
 										{
-											public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+											public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
 											}
 											
-											public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
+											public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean rem)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
@@ -245,7 +245,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					try
 					{
 						ret.setResult(loader.loadApplicationModel(model, imports, cl, 
-								new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
+							new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 					}
 					catch(Exception e)
 					{

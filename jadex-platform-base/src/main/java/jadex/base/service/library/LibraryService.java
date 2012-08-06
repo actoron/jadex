@@ -1,7 +1,10 @@
 package jadex.base.service.library;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
@@ -51,10 +54,24 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 {
 	//-------- constants --------
 	
-	/** 
-	 * The (standard) Library service name.
-	 */
+	/** The (standard) Library service name. */
 	public static final String LIBRARY_SERVICE = "library_service";
+	
+	/** The pseudo system classpath top-level rid. */
+	public static IResourceIdentifier SYSTEMCPRID;
+	
+	static
+	{
+		try
+		{
+			SYSTEMCPRID = new ResourceIdentifier(new LocalResourceIdentifier(new ComponentIdentifier("PSEUDO"), new URL("http://SYSTEMCPRID")), null);
+		}
+		catch(Exception e)
+		{
+			// should not happen
+			e.printStackTrace();
+		}
+	}
 	
 	//-------- attributes --------
 	
@@ -93,7 +110,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/** The non-managed urls (cached for speed). */
 	protected Set<URL>	nonmanaged;
-	
 	
 	//-------- constructors --------
 	
@@ -338,6 +354,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		baseloader.addURL(url);
 		nonmanaged = null;
+		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null);
+		addLink(SYSTEMCPRID, rid);
+		notifyAdditionListeners(SYSTEMCPRID, rid);
 		return IFuture.DONE;
 	}
 
@@ -353,6 +372,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		baseloader.removeURL(url);
 		nonmanaged = null;
+		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null);
+		removeLink(SYSTEMCPRID, rid);
+		notifyRemovalListeners(SYSTEMCPRID, rid);
 		return IFuture.DONE;
 	}
 	
@@ -666,7 +688,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected void addSupport(IResourceIdentifier rid, IResourceIdentifier support)
 	{
-		if(rid!=null)
+		if(rid!=null)// && !SYSTEMCPRID.equals(support))
 		{
 			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
 			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
@@ -674,7 +696,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			if(cl.addParentClassLoader(pacl))
 			{
 				rids = null;
-				notifyAdditionListeners(rid);
+				notifyAdditionListeners(support, rid);
 			}
 		}
 	}
@@ -684,7 +706,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected void removeSupport(IResourceIdentifier rid, IResourceIdentifier support)
 	{
-		if(rid!=null)
+		if(rid!=null)// && !SYSTEMCPRID.equals(support))
 		{
 			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
 			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
@@ -692,7 +714,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			if(cl.removeParentClassLoader(pacl))
 			{
 				rids = null;
-				notifyRemovalListeners(rid);
+				notifyRemovalListeners(support, rid);
 			}
 			
 			// If last support, delete removeSupport to children.
@@ -708,16 +730,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Notify listeners about addition.
 	 */
-	protected void notifyAdditionListeners(final IResourceIdentifier rid)
+	protected void notifyAdditionListeners(final IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
+		boolean rem = addedlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid));
 		// Do not notify listeners with lock held!
 		ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		for(int i=0; i<lis.length; i++)
 		{
 			final ILibraryServiceListener liscopy = lis[i];
-			lis[i].resourceIdentifierAdded(rid).addResultListener(new IResultListener<Void>()
+			lis[i].resourceIdentifierAdded(parid, rid, rem).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
@@ -733,16 +756,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Notify listeners about removal.
 	 */
-	protected void notifyRemovalListeners(final IResourceIdentifier rid)
+	protected void notifyRemovalListeners(final IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
 		// Do not notify listeners with lock held!
 		ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		for(int i=0; i<lis.length; i++)
 		{
 			final ILibraryServiceListener liscopy = lis[i];
-			lis[i].resourceIdentifierRemoved(rid).addResultListener(new IResultListener<Void>()
+			lis[i].resourceIdentifierRemoved(parid, rid).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
@@ -756,49 +779,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			});
 		}
 	}
-	
-//	/**
-//	 *  Get the jar for a rid. 
-//	 *  @param rid The rid.
-//	 *  @return The jar.
-//	 */
-//	public IFuture<IInputConnection> getJar(IResourceIdentifier rid)
-//	{
-//		final Future<IInputConnection> ret = new Future<IInputConnection>();
-//		
-//		boolean fin = false;
-//		
-//		// Has rid a local file desc on this platform?
-//		if(isLocal(rid))
-//		{
-//			URL url = rid.getLocalIdentifier().getUrl();
-//			File f = new File(url.getFile());
-//			if(url.getFile().endsWith(".jar") && f.exists())
-//			{
-//				try
-//				{
-//					FileInputStream fis = new FileInputStream(f);
-//					ServiceOutputConnection soc = new ServiceOutputConnection();
-//					ret.setResult(soc.getInputConnection());
-//					soc.writeFromInputStream(fis, component.getExternalAccess());
-//					fin = true;
-//				}
-//				catch(IOException e)
-//				{
-//				}
-//			}
-//		}
-//	
-//		if(!fin)
-//			ret.setException(new RuntimeException("Could not find resource: "+rid));
-//		
-////		if(!fin && rid.getGlobalIdentifier()!=null)
-////		{
-////			// todo: get local location from dependency service? 
-////		}
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Get the resource identifier for an url.
@@ -1100,7 +1080,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Add a link.
 	 */
 	protected void addLink(IResourceIdentifier parid, IResourceIdentifier rid)
 	{
@@ -1112,7 +1092,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Remove a link.
 	 */
 	protected void removeLink(IResourceIdentifier parid, IResourceIdentifier rid)
 	{
@@ -1129,23 +1109,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>> getRemovableLinks()
 	{
 		Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> ret = (Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>)((HashSet)addedlinks).clone();
-//		// add first level nodes
-//		for(IResourceIdentifier rid: rootloader.getDelegateResourceIdentifiers())
-//		{
-//			Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(null, rid);
-//			ret.add(link);
-//		}
-		
 		return new Future<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(ret);
 	}
 	
-	/**
-	 *  Test if a link is removable.
-	 */
-	protected boolean isRemovable(IResourceIdentifier parid, IResourceIdentifier rid)
-	{
-		Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid);
-		return addedlinks.contains(link);
-	}
+//	/**
+//	 *  Test if a link is removable.
+//	 */
+//	protected boolean isRemovable(IResourceIdentifier parid, IResourceIdentifier rid)
+//	{
+//		Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid);
+//		return addedlinks.contains(link);
+//	}
 }
 

@@ -253,7 +253,7 @@ public class ModelTreePanel extends FileTreePanel
 				ILibraryService ls = (ILibraryService)result;
 				libservicelistener = new ILibraryServiceListener()
 				{
-					public IFuture resourceIdentifierRemoved(final IResourceIdentifier rid)
+					public IFuture resourceIdentifierRemoved(final IResourceIdentifier parid, final IResourceIdentifier rid)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -315,7 +315,7 @@ public class ModelTreePanel extends FileTreePanel
 						return IFuture.DONE;
 					}
 					
-					public IFuture resourceIdentifierAdded(IResourceIdentifier rid)
+					public IFuture resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean rem)
 					{
 						return IFuture.DONE;
 					}

@@ -197,7 +197,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		};
 		
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -205,7 +206,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				final IExternalAccess exta = ia.getExternalAccess();
 				liblistener = new ILibraryServiceListener()
 				{
-					public IFuture resourceIdentifierRemoved(final IResourceIdentifier rid)
+					public IFuture resourceIdentifierRemoved(IResourceIdentifier parid, final IResourceIdentifier rid)
 					{
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
@@ -232,7 +233,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						return IFuture.DONE;
 					}
 					
-					public IFuture resourceIdentifierAdded(final IResourceIdentifier rid)
+					public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 					{
 						final URL url = rid.getLocalIdentifier().getUrl();
 						exta.scheduleStep(new IComponentStep<Void>()

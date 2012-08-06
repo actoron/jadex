@@ -14,12 +14,12 @@ public interface ILibraryServiceListener extends IRemotable
 	 *  Called when a new rid has been added.
 	 *  @param url The rid of the new classpath entry.
 	 */
-	public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid);
+	public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean removable);
 	
 	/** 
 	 *  Called when a rid has been removed.
 	 *  @param url The rid of the removed classpath entry.
 	 */
-	public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid);
+	public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid);
 	
 }
