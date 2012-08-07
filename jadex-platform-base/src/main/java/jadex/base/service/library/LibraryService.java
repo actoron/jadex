@@ -106,6 +106,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The remove links. */
 	protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> removedlinks;
 	
+	/** The delayed add links (could not directly be added because the parent was not there). */
+	protected Map<IResourceIdentifier, IResourceIdentifier> addtodo;
+	
 	// cached results
 	
 	/** The dependencies. */
@@ -172,6 +175,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);
 		this.addedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
 		this.removedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
+		this.addtodo = new HashMap<IResourceIdentifier,IResourceIdentifier>();
 	}
 	
 	//-------- methods --------
@@ -1048,33 +1052,39 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> setProperties(Properties props)
 	{
-		Property[]	links	= props.getProperties("link");
-		
-		Map<IResourceIdentifier, IResourceIdentifier> todo = new HashMap<IResourceIdentifier, IResourceIdentifier>();
-		
-		for(int i=0; i<links.length; i++)
-		{
-			Tuple2<IResourceIdentifier, IResourceIdentifier> link = (Tuple2<IResourceIdentifier, IResourceIdentifier>)
-				JavaReader.objectFromXML(links[i].getValue(), rootloader);
-			
-			if(SYSTEMCPRID.equals(link.getFirstEntity()))
-			{
-				addTopLevelURL(link.getSecondEntity().getLocalIdentifier().getUrl());
-			}
-			else
-			{
-				if(link.getFirstEntity()==null || rootloader.getAllResourceIdentifiers().contains(link.getFirstEntity()))
-				{
-					addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true); // workspace?
-				}
-				else
-				{
-					todo.put(link.getFirstEntity(), link.getSecondEntity());
-				}
-			}
-		}
-		
-		System.out.println("todo: "+todo);
+//		Property[]	links	= props.getProperties("link");
+//		
+//		Map<IResourceIdentifier, IResourceIdentifier> todo = new HashMap<IResourceIdentifier, IResourceIdentifier>();
+//		
+//		addtodo.clear();
+//		for(int i=0; i<links.length; i++)
+//		{
+//			Tuple2<IResourceIdentifier, IResourceIdentifier> link = (Tuple2<IResourceIdentifier, IResourceIdentifier>)
+//				JavaReader.objectFromXML(links[i].getValue(), rootloader);
+//			
+//			if(SYSTEMCPRID.equals(link.getFirstEntity()))
+//			{
+//				addTopLevelURL(link.getSecondEntity().getLocalIdentifier().getUrl());
+//			}
+//			else
+//			{
+//				if(link.getFirstEntity()==null || rootloader.getAllResourceIdentifiers().contains(link.getFirstEntity()))
+//				{
+//					todo.put(link.getFirstEntity(), link.getSecondEntity());
+//				}
+//				else
+//				{
+//					addtodo.put(link.getFirstEntity(), link.getSecondEntity());
+//				}
+//			}
+//		}
+//		
+//		for(IResourceIdentifier key: todo.keySet())
+//		{
+//			addResourceIdentifier(key, todo.get(key), true); // workspace?
+//		}
+//		
+//		System.out.println("addtodo: "+addtodo);
 		
 		return IFuture.DONE;
 	}
@@ -1094,67 +1104,5 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		return new Future<Properties>(props);		
 	}
-	
-//	/**
-//	 *  Write current state into properties.
-//	 */
-//	public IFuture<Properties> getProperties()
-//	{
-//		String[]	entries;
-//		if(libcl != null)
-//		{
-//			synchronized(this)
-//			{
-//				List urls = new ArrayList(libcl.getAllURLs());
-//				entries	= new String[urls.size()];
-//				for(int i=0; i<entries.length; i++)
-//				{
-//					
-//					String	url	= urls.get(i).toString();
-//					File	file	= urlToFile(url.toString());
-//					if(file!=null)
-//					{
-//						String	filename	= SUtil.convertPathToRelative(file.getAbsolutePath());
-//						String fileurl;
-//						try
-//						{
-//							// URI wouldn't allow relative names, so pretend its an absolute path.
-//							fileurl = "file:"+new URI("file", null, "/"+filename.replace('\\', '/'), null).toURL().toString().substring(6);
-//						}
-//						catch(Exception e)
-//						{
-//							fileurl	= "file:"+filename.replace('\\', '/');
-//						}
-//						if(url.startsWith("jar:file:"))
-//						{
-//							entries[i]	= "jar:" + fileurl;
-//						}
-//						else
-//						{
-//							entries[i]	= fileurl;
-//						}
-//						if(url.endsWith("!/") && entries[i].endsWith("!"))
-//							entries[i]	+= "/";	// Stripped by new File(...).
-//					}
-//					else
-//					{
-//						entries[i]	= url;
-//					}
-//				}
-//			}
-//		}
-//		else
-//		{
-//			entries = new String[0];
-//		}
-//		
-//		Properties props	= new Properties();
-//		for(int i=0; i<entries.length; i++)
-//		{
-//			props.addProperty(new Property("entry", entries[i]));
-//		}
-//		return new Future<Properties>(props);		
-//		return new Future<Properties>(new Properties());
-//	}
 }
 
