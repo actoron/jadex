@@ -14,7 +14,7 @@
 
 	<properties>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
-		<android-maven-plugin-version>3.1.1</android-maven-plugin-version>
+		<android-maven-plugin-version>3.3.0</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
 		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
 		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes>

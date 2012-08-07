@@ -133,7 +133,7 @@
 						</instrumentationPackage>
 						<instrumentationRunner>android.test.InstrumentationTestRunner
 						</instrumentationRunner>
-						<debug>true</debug>
+						<debug>false</debug>
 					</test>
 					<manifest>
 						<versionName></versionName>
