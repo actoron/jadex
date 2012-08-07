@@ -118,7 +118,7 @@
 						<!-- name of the avd to deploy to and run the instrumentation on -->
 						<avd>22</avd>
 						<!-- wait time for the emulator to start -->
-						<wait>150000</wait>
+						<wait>50000</wait>
 						<!-- additional options to run the emulator with -->
 						<options>-partition-size 128 -wipe-data</options>
 					</emulator>
@@ -165,15 +165,15 @@
 						</goals>
 					</execution>
 
-					<!-- <execution> -->
-					<!-- android plugin execution that starts the emulator. -->
-					<!-- <id>stopemulator</id> -->
-					<!-- bound to the 'install' phase -->
-					<!-- <phase>install</phase> -->
-					<!-- <goals> -->
-					<!-- <goal>emulator-stop</goal> -->
-					<!-- </goals> -->
-					<!-- </execution> -->
+					<execution>
+					<!-- android plugin execution that stops the emulator. -->
+					    <id>stopemulator</id>
+					    <!-- bound to the 'install' phase -->
+					    <phase>install</phase>
+					    <goals>
+					        <goal>emulator-stop</goal>
+					    </goals>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
