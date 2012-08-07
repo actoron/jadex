@@ -1,5 +1,6 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeFactory;
@@ -8,6 +9,7 @@ import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RootNode;
+import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -82,6 +84,9 @@ public class ModelTreePanel extends FileTreePanel
 	// todo: remove 
 	protected Map<String, IResourceIdentifier>	rootpathentries; 
 	
+	/** Flag if path should be automatically deleted from library service. */
+	protected Boolean autodelete;
+	
 //	/** The jcc. */
 //	protected IControlCenter jcc;
 	
@@ -146,44 +151,80 @@ public class ModelTreePanel extends FileTreePanel
 				if(getExternalAccess()!=null && node instanceof IFileNode)
 				{
 					final String	path	= ((IFileNode)node).getFilePath();
-					getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					
+					int choice;
+					RememberOptionMessage msg = null;
+					if(autodelete==null)
 					{
-						@Classname("removeURL")
-						public IFuture<Void> execute(IInternalAccess ia)
+						msg = new RememberOptionMessage("You deleted a resource from the model tree.\n "
+							+ "Do you also want to remove the resource from the classpath?\n");
+						choice = JOptionPane.showConfirmDialog(SGUI.getWindowParent(ModelTreePanel.this), msg, "Classpath Question",
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+					}
+					else if(!autodelete.booleanValue())
+					{
+						choice = JOptionPane.NO_OPTION;
+					}
+					else // if(jccexit.equals(JCC_EXIT_SHUTDOWN))
+					{
+						choice = JOptionPane.YES_OPTION;
+					}
+			
+					if(JOptionPane.YES_OPTION == choice)
+					{
+						// Save settings if wanted
+						if(msg!=null && msg.isRemember())
+							autodelete = true;
+						
+						getExternalAccess().scheduleStep(new IComponentStep<Void>()
 						{
-							final Future	ret	= new Future();
-							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new DelegationResultListener<ILibraryService>(ret)
+							@Classname("removeURL")
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								public void customResultAvailable(ILibraryService ls)
+								final Future	ret	= new Future();
+								SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new DelegationResultListener<ILibraryService>(ret)
 								{
-									try
+									public void customResultAvailable(ILibraryService ls)
 									{
-										ls.removeURL(null, SUtil.toURL(path));
-										ret.setResult(null);
+										try
+										{
+											ls.removeURL(null, SUtil.toURL(path));
+											ret.setResult(null);
+										}
+										catch(Exception ex)
+										{
+											ret.setException(ex);
+										}
 									}
-									catch(Exception ex)
-									{
-										ret.setException(ex);
-									}
-								}
-							});
-							return ret;
-						}
-					});
+								});
+								return ret;
+							}
+						});
+					}
+					else if(JOptionPane.NO_OPTION == choice)
+					{
+						// Save settings if wanted
+						if(msg!=null && msg.isRemember())
+							autodelete = false;
+					}
+					// else CANCEL
 				}
 			}
 		};
-		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(taa) : new AddPathAction(taa));
-		actions.put(AddRIDAction.getName(), new AddRIDAction(taa));
-		actions.put(RemovePathAction.getName(), new RemovePathAction(tar)
+		
+		Action rpa = new RemovePathAction(tar)
 		{
 			public boolean isEnabled()
 			{
 				ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
 				return rm!=null && rm.getParent().equals(treepanel.getTree().getModel().getRoot());
 			}
-		});
+		};
+		
+		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(taa) : new AddPathAction(taa));
+		actions.put(AddRIDAction.getName(), new AddRIDAction(taa));
+		actions.put(RemovePathAction.getName(), rpa);
 		setPopupBuilder(new PopupBuilder(new Object[]{actions.get(AddPathAction.getName()), actions.get(AddRIDAction.getName()),
 			actions.get(AddRemotePathAction.getName()), mic}));
 		setMenuItemConstructor(mic);
@@ -206,7 +247,8 @@ public class ModelTreePanel extends FileTreePanel
 				return overlay;
 			}
 		};
-		dnh.addAction(new RemovePathAction(tar), null);
+		
+		dnh.addAction(rpa, null);
 		addNodeHandler(dnh);
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer()
@@ -590,9 +632,6 @@ public class ModelTreePanel extends FileTreePanel
 	 */
 	public static IFuture<IResourceIdentifier> createResourceIdentifier(IExternalAccess exta, final String filename)
 	{
-		if(filename.indexOf("jar:")!=-1)
-			System.out.println("hhhhhhh");
-		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
 //		ret.addResultListener(new IResultListener<IResourceIdentifier>()

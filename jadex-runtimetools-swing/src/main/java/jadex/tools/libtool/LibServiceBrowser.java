@@ -137,7 +137,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
 		
-		ridtree = new JTree();
+		ridtree = new JTree(new DefaultTreeModel(null));
 		ridtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		
 		ridtree.setCellRenderer(new DefaultTreeCellRenderer() 
@@ -203,17 +203,109 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	    			int row = ridtree.getRowForLocation(e.getX(), e.getY());
 					if(row != -1)
 					{
-						final Object node = ridtree.getLastSelectedPathComponent();
+						Object node = ridtree.getLastSelectedPathComponent();
 						if(node instanceof LazyNode)
 						{
+							LazyNode ln = (LazyNode)node;
 							Object o = ((LazyNode)node).getMyUserObject();
-							
-							if((o instanceof IResourceIdentifier && !LibraryService.SYSTEMCPRID.equals(o)) || o==null)
+							IResourceIdentifier parid = (IResourceIdentifier)(ln.getParent()!=null? ((LazyNode)ln.getParent()).getMyUserObject(): null);
+							final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
+							JPopupMenu popup = new JPopupMenu();
+						
+							if(LibraryService.SYSTEMCPRID.equals(parid))
 							{
-								final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
+								if(ln.isRemovable())
+								{
+									LibTreeAbstraction tar = new LibTreeAbstraction(rem)
+									{
+										public void action(Object obj)
+										{
+											LazyNode child = (LazyNode)obj;
+											final Object o = child.getUserObject();
+											if(o instanceof IResourceIdentifier)
+											{
+												URL url = ((IResourceIdentifier)o).getLocalIdentifier().getUrl();
+													
+												libservice.removeTopLevelURL(url)
+													.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+												{
+													public void resultAvailable(Void result)
+													{
+														jcc.setStatusText("Removed resource: "+o);
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														exception.printStackTrace();
+														jcc.setStatusText("Error removin resource: "+o+" "+exception.getMessage());
+													}
+												}));
+											}
+										}
+									};
+									
+									popup.add(new RemovePathAction(tar));
+								}
+							}
+							// system classpath
+							else if(LibraryService.SYSTEMCPRID.equals(o))
+							{
+								LibTreeAbstraction taa = new LibTreeAbstraction(rem)
+								{
+									public void action(Object obj)
+									{
+										if(obj instanceof File)
+										{
+											try
+											{
+												final URL url = ((File)obj).toURI().toURL();
+												jcc.setStatusText("Started adding: "+url);
+												libservice.addTopLevelURL(url)
+													.addResultListener(new SwingDefaultResultListener<Void>()
+												{
+													public void customResultAvailable(Void result)
+													{
+														jcc.setStatusText("Finished adding: "+url);
+													}
+												});
+											}
+											catch(Exception e)
+											{
+												jcc.setStatusText("Error adding: "+obj+" "+e.getMessage());
+											}
+										}
+										else if(obj instanceof FileData)
+										{
+											final String filename = ((FileData)obj).getPath();
+											addRemoteURL(null, filename, true).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+											{
+												public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
+												{
+													jcc.setStatusText("Finished adding: "+result.getSecondEntity());
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+													jcc.setStatusText("Erro adding: "+filename+" "+exception.getMessage());
+												}
+											});
+										}
+									}
+								};
+								
+								if(!rem)
+								{
+									popup.add(new AddPathAction(taa));
+								}
+								else
+								{
+									popup.add(new AddRemotePathAction(taa));
+								}
+							}
+							else if(o instanceof IResourceIdentifier || o==null)
+							{
 								final IResourceIdentifier selrid = (IResourceIdentifier)o;
 								
-								JPopupMenu popup = new JPopupMenu();
 								LibTreeAbstraction taa = new LibTreeAbstraction(rem)
 								{
 									public void action(Object obj)
@@ -312,73 +404,14 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 									}
 								};
 								
-								if(o!=null && ((LazyNode)node).isRemovable())
+								if(o!=null && ln.isRemovable())
 								{
 									popup.add(new RemovePathAction(tar));
 								}
-								
-								popup.show(e.getComponent(), e.getX(), e.getY());
 							}
-							// system classpath
-							else if(LibraryService.SYSTEMCPRID.equals(o))
-							{
-								final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
-								JPopupMenu popup = new JPopupMenu();
-								
-								LibTreeAbstraction taa = new LibTreeAbstraction(rem)
-								{
-									public void action(Object obj)
-									{
-										if(obj instanceof File)
-										{
-											try
-											{
-												final URL url = ((File)obj).toURI().toURL();
-												jcc.setStatusText("Started adding: "+url);
-												libservice.addTopLevelURL(url)
-													.addResultListener(new SwingDefaultResultListener<Void>()
-												{
-													public void customResultAvailable(Void result)
-													{
-														jcc.setStatusText("Finished adding: "+url);
-													}
-												});
-											}
-											catch(Exception e)
-											{
-												jcc.setStatusText("Error adding: "+obj+" "+e.getMessage());
-											}
-										}
-										else if(obj instanceof FileData)
-										{
-											final String filename = ((FileData)obj).getPath();
-											addRemoteURL(null, filename, true).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
-											{
-												public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
-												{
-													jcc.setStatusText("Finished adding: "+result.getSecondEntity());
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													jcc.setStatusText("Erro adding: "+filename+" "+exception.getMessage());
-												}
-											});
-										}
-									}
-								};
-								
-								if(!rem)
-								{
-									popup.add(new AddPathAction(taa));
-								}
-								else
-								{
-									popup.add(new AddRemotePathAction(taa));
-								}
-								
+
+							if(popup.getSubElements().length>0)
 								popup.show(e.getComponent(), e.getX(), e.getY());
-							}
 						}
 					}
 	            }
@@ -640,80 +673,48 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	}
 
 	/**
-	 * 
+	 *  Refresh the tree.
 	 */
 	public void refresh(final boolean force)
 	{
-		libservice.getNonManagedURLs().addResultListener(new SwingDefaultResultListener<List<URL>>(LibServiceBrowser.this)
+		jcc.setStatusText("Refreshing resource tree started...");
+		libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(LibServiceBrowser.this)
 		{
-			public void customResultAvailable(final List<URL> nonmanurls)
+			public void customResultAvailable(final Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> mydeps)
 			{
-//				System.out.println("nonman: "+nonmanurls);
-				
-				libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(LibServiceBrowser.this)
+				libservice.getRemovableLinks().addResultListener(new SwingDefaultResultListener<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(LibServiceBrowser.this)
 				{
-					public void customResultAvailable(final Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> mydeps)
+					public void customResultAvailable(Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> reml)
 					{
-						libservice.getRemovableLinks().addResultListener(new SwingDefaultResultListener<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(LibServiceBrowser.this)
+						jcc.setStatusText("Refreshing resource tree finished");
+
+						LibServiceBrowser.this.deps = mydeps.getSecondEntity();
+						LibServiceBrowser.this.remlinks = reml;
+//						System.out.println("kukuku: "+reml);
+						
+						DefaultTreeModel mod = (DefaultTreeModel)ridtree.getModel();
+						
+						// Create new if first time
+						if(!(mod.getRoot() instanceof LazyNode) || force)
 						{
-							public void customResultAvailable(Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> reml)
-							{
-								LibServiceBrowser.this.deps = mydeps.getSecondEntity();
-								LibServiceBrowser.this.remlinks = reml;
-//								System.out.println("kukuku: "+reml);
-								
-								DefaultTreeModel mod = (DefaultTreeModel)ridtree.getModel();
-								
-								// Create new if first time
-								if(!(mod.getRoot() instanceof LazyNode) || force)
-								{
-									// Add nonmanged urls
-									ridtree.removeAll();
-									LazyNode root = new LazyNode(ROOTTEXT);
-									if(nonmanurls!=null && !nonmanurls.isEmpty())
-									{
-										LazyNode cont = new LazyNode(SYSTEMTEXT);
-										for(URL url: nonmanurls)
-										{
-											LazyNode child = new LazyNode(url);
-											cont.insertChild(child);
-										}
-										root.insertChild(cont);
-									}
-									
-									mod.setRoot(root);
-								}
-								else
-								{
-									((LazyNode)mod.getRoot()).refresh();
-								}
-							}
-						});
+							// Add nonmanged urls
+							ridtree.removeAll();
+							LazyNode root = new LazyNode(ROOTTEXT);
+							mod.setRoot(root);
+						}
+						else
+						{
+							((LazyNode)mod.getRoot()).refresh();
+						}
 					}
 				});
 			}
 		});
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	protected Node createNode(Node parent, IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
-//	{
-//		Node node = new Node(rid);
-//		
-//		List<IResourceIdentifier> mydeps = deps.get((IResourceIdentifier)node.getUserObject());
-//		for(IResourceIdentifier chrid: mydeps)
-//		{
-//			Node child = createNode(node, chrid, deps);
-//			node.add(child);
-//		}
-//		
-//		return node;
-//	}
-	
 	/**
-	 * 
+	 *  Add a remote url via the library service.
+	 *  Needs to schedule on target platform to recreate url.
 	 */
 	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final IResourceIdentifier parid, 
 		final String filename, final boolean tl)
@@ -852,26 +853,24 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	}
 	
 	/**
-	 * 
+	 *  Get the tree user object for a tree path.
+	 *  @param path The path.
+	 *  @return The object. 
 	 */
 	protected Object getUserObject(TreePath path)
 	{
 		LazyNode seln = (LazyNode)(path!=null? path.getLastPathComponent(): null);
 		Object uo = seln!=null? seln.getMyUserObject(): null;
 		return uo;
-//		IResourceIdentifier rid = uo instanceof IResourceIdentifier? (IResourceIdentifier)uo: null;
 	}
 	
 	/**
-	 * 
+	 *  Node type for tree.
 	 */
 	class LazyNode extends DefaultMutableTreeNode
 	{
 		/** Flag if children have been created. */
 		protected boolean childrencreated;
-		
-		/** Flag if is removable. */
-//		protected Boolean removable;
 		
 		/**
 		 *  Create a new RidNode.
@@ -882,32 +881,28 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		}
 
 		/**
-		 * 
+		 *  Test if the node is removable.
 		 */
 		protected boolean isRemovable()
 		{
-//			if(removable==null)
-//			{
-				Boolean removable = Boolean.FALSE;
-				LazyNode pa = (LazyNode)getParent();
-				if(pa!=null)
+			Boolean removable = Boolean.FALSE;
+			LazyNode pa = (LazyNode)getParent();
+			if(pa!=null)
+			{
+				Object uo = pa.getMyUserObject();
+				if(uo==null || uo instanceof IResourceIdentifier)
 				{
-					Object uo = pa.getMyUserObject();
-					if(uo==null || uo instanceof IResourceIdentifier)
+					Object myo = getMyUserObject();
+					if(myo instanceof IResourceIdentifier)
 					{
-						Object myo = getMyUserObject();
-						if(myo instanceof IResourceIdentifier)
-						{
-							boolean rem = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>((IResourceIdentifier)uo, (IResourceIdentifier)myo));
-							
-							if(rem)
-								removable = Boolean.TRUE;
-						}
+						boolean rem = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>((IResourceIdentifier)uo, (IResourceIdentifier)myo));
+						
+						if(rem)
+							removable = Boolean.TRUE;
 					}
 				}
-				return removable.booleanValue();
-//			}
-//			return removable.booleanValue();
+			}
+			return removable.booleanValue();
 		}
 		
 		/**
@@ -919,9 +914,14 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			Object o = getUserObject();
 			
 			List<Icon> ilist = new ArrayList<Icon>();
-			if(o instanceof URL)
+			
+			if(LibraryService.SYSTEMCPRID.equals(o))
 			{
-				if(((URL)o).getFile().indexOf(".jar")!=-1)
+				ilist.add(icons.getIcon("folder"));
+			}
+			else if(getParent()!=null && LibraryService.SYSTEMCPRID.equals(((LazyNode)getParent()).getMyUserObject()))
+			{
+				if(((IResourceIdentifier)o).getLocalIdentifier().getUrl().getFile().indexOf(".jar")!=-1)
 				{
 					ilist.add(icons.getIcon("jar"));
 				}
@@ -993,10 +993,6 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			else
 			{
 				Object o = getMyUserObject();
-				if(o==null)
-				{
-					ret++;
-				}
 				
 				if(o==null || o instanceof IResourceIdentifier)
 				{
@@ -1013,7 +1009,9 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		}
 		
 		/**
-		 * 
+		 *  Get a child from an index.
+		 *  @param index The index.
+		 *  @return The child.
 		 */
 		public TreeNode getChildAt(int index)
 		{
@@ -1022,17 +1020,19 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		}
 		
 		/**
-		 * 
+		 *  Add a child.
+		 *  @param child The child.
 		 */
 		public void add(MutableTreeNode child)
 		{
 			createChildren();
-			
 			super.add(child);
 		}
 		
 		/**
-		 * 
+		 *  Insert a child at an index.
+		 *  @param index The index.
+		 *  @return The child.
 		 */
 		public void insert(MutableTreeNode newChild, int childIndex)
 		{
@@ -1075,13 +1075,15 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		{
 			int ret = -1;
 			
+			boolean issyscp = LibraryService.SYSTEMCPRID.equals(getMyUserObject());
+			
 			int cnt = getChildCount();
 			boolean inserted = false;
-			boolean nhasch = n.getChildCount()>0 || (n.getMyUserObject() instanceof URL  && ((URL)n.getMyUserObject()).getFile().indexOf(".jar")==-1);
+			boolean nhasch = n.getChildCount()>0 || (issyscp && ((IResourceIdentifier)n.getMyUserObject()).getLocalIdentifier().getUrl().getFile().indexOf(".jar")==-1);
 			for(int i=0; i<cnt && !inserted; i++)
 			{
 				LazyNode tmp = (LazyNode)getChildAt(i);
-				boolean tmphasch = tmp.getChildCount()>0 || (tmp.getMyUserObject() instanceof URL  && ((URL)tmp.getMyUserObject()).getFile().indexOf(".jar")==-1);
+				boolean tmphasch = tmp.getChildCount()>0 || (issyscp && ((IResourceIdentifier)tmp.getMyUserObject()).getLocalIdentifier().getUrl().getFile().indexOf(".jar")==-1);
 				if((!tmphasch && nhasch) 
 					|| (tmphasch==nhasch && n.toString().compareTo(tmp.toString())<0 )) 
 				{
@@ -1179,15 +1181,9 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			Object ret = getUserObject();
 			if(ROOTTEXT.equals(ret))
 				ret = null;
-			else if(SYSTEMTEXT.equals(ret))
-				ret = LibraryService.SYSTEMCPRID;
-			else if(ret instanceof URL)
-				ret = new ResourceIdentifier(new LocalResourceIdentifier(
-					jcc.getPlatformAccess().getComponentIdentifier().getRoot(), (URL)ret), null);
 			return ret;
 		}
 		
-//		if(getParent()!=null && LibraryService.SYSTEMCPRID.equals(((LazyNode)getParent()).getUserObject()))
 		/**
 		 *  Get the string representation.
 		 */
@@ -1196,7 +1192,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			String ret = null;
 			
 			Object o = getUserObject();
-			if(o instanceof IResourceIdentifier)
+			if(LibraryService.SYSTEMCPRID.equals(o))
+			{
+				ret = SYSTEMTEXT;
+			}
+			else if(o instanceof IResourceIdentifier)
 			{
 				IGlobalResourceIdentifier grid = ((IResourceIdentifier)o).getGlobalIdentifier();
 				if(grid!=null)
@@ -1220,7 +1220,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 	}
 	
 	/**
-	 * 
+	 *  Abstract base class for tree abstraction used in generic add/remove path actions.
 	 */
 	protected abstract class LibTreeAbstraction implements ITreeAbstraction
 	{

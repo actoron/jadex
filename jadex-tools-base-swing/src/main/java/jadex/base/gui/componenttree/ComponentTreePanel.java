@@ -447,8 +447,6 @@ public class ComponentTreePanel extends JSplitPane
 		};
 		actions.put(removeservice.getValue(Action.NAME), removeservice);
 
-		
-		
 		final Action showobject = new AbstractAction(SHOWDETAILS_ACTION, icons.getIcon("show_details"))
 		{
 			public void actionPerformed(ActionEvent e)

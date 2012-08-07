@@ -1,6 +1,7 @@
 package jadex.tools.jcc;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IExternalAccess;

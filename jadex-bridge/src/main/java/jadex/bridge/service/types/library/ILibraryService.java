@@ -1,6 +1,9 @@
 package jadex.bridge.service.types.library;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
@@ -38,43 +41,36 @@ public interface ILibraryService
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, 
 		@CheckNotNull IResourceIdentifier rid);
 		
-//	/**
-//	 *  Get all managed (directly added i.e. top-level) resource identifiers.
-//	 *  @return The list of resource identifiers.
-//	 */
-//	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers();
-//	
-//	/**
-//	 *  Get all resource identifiers (also indirectly managed. 
-//	 */
-//	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers();
-	
 	/**
 	 *  Get the removable links.
 	 */
 	public IFuture<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>> getRemovableLinks();
 	
 	/**
-	 *   Get all resource identifiers (does not include rids (urls) of parent loader).
+	 *  Get all resource identifiers (does not include rids (urls) of parent loader).
 	 *  @return The list of resource identifiers.
 	 */
 	public IFuture<List<IResourceIdentifier>> getAllResourceIdentifiers();
 	
 	/**
-	 *  Get the rids.
+	 *  Get the resource identifier dependencies. Includes also system urls via a pseudo
+	 *  rid defined as constant in LibraryService.SYSTEMCPRID.
 	 */
 	public IFuture<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> getResourceIdentifiers();
 	
 	/** 
-	 *  Returns the current ClassLoader.
-	 *  @return the current ClassLoader
+	 *  Returns the classloader for a resource identifier.
+	 *  @param rid The resource identifier.
+	 *  @return The classloader.
 	 */
 	@Excluded
 	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
 	
 	/** 
-	 *  Returns the current ClassLoader.
-	 *  @return the current ClassLoader
+	 *  Returns the classloader for a resource identifier.
+	 *  @param rid The resource identifier.
+	 *  @param workspace True if workspace resolution is ok.
+	 *  @return The classloader.
 	 */
 	@Excluded
 	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid, boolean workspace);
@@ -82,20 +78,23 @@ public interface ILibraryService
 	//-------- url handling --------
 	
 	/**
-	 *  Add a new url.
+	 *  Add a new url as resource identifier.
+	 *  @param parid The resource identifier (null for root entry).
 	 *  @param url The url.
 	 */
 	public IFuture<IResourceIdentifier> addURL(IResourceIdentifier parid, @CheckNotNull URL url);
 	
 	/**
 	 *  Remove a url.
+	 *  @param parid The resource identifier (null for root entry).
 	 *  @param url The url.
 	 */
 	public IFuture<Void> removeURL(IResourceIdentifier parid, @CheckNotNull URL url);
 
 	/** 
-	 *  Returns the resource identifier.
-	 *  @return The resource identifier.
+	 *  Returns the resource identifier for a url.
+	 *  @param url The url.
+	 *  @return The corresponding resource identifier.
 	 */
 	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url);
 
@@ -123,7 +122,8 @@ public interface ILibraryService
 	public IFuture<List<URL>> getNonManagedURLs();	
 	
 	/**
-	 *  Get all urls (managed and non-managed).
+	 *  Get all urls (managed and non-managed). Uses getAllResourceIdentifiers() 
+	 *  for managed and getNonManagedURLs() for unmanaged.
 	 *  @return The list of urls.
 	 */
 	public IFuture<List<URL>> getAllURLs();

@@ -229,33 +229,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return IFuture.DONE;
 	}
 	
-//	/**
-//	 *  Get all managed (directly added i.e. top-level) resource identifiers.
-//	 *  @return The list of resource identifiers.
-//	 */
-//	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers()
-//	{
-//		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(rootloader.getAllResourceIdentifiers()));
-//	}
-//	
-//	/**
-//	 *  Get all resource identifiers (also indirectly managed). 
-//	 */
-//	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers()
-//	{
-//		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
-//		for(Iterator<DelegationURLClassLoader> it=classloaders.values().iterator(); it.hasNext(); )
-//		{
-//			IResourceIdentifier rid = it.next().getResourceIdentifier();
-//			List<IResourceIdentifier> toprids = rootloader.getDelegateResourceIdentifiers();
-//			if(!toprids.contains(rid))
-//			{
-//				ret.add(rid);
-//			}
-//		}
-//		return new Future<List<IResourceIdentifier>>(ret);
-//	}
-	
 	/**
 	 *  Get all resource identifiers (does not include urls of parent loader).
 	 *  @return The list of resource identifiers.
@@ -275,19 +248,37 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Map<IResourceIdentifier, List<IResourceIdentifier>> deps = new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
 			
 			List<IResourceIdentifier> todo = new ArrayList<IResourceIdentifier>();
-			todo.add(rootloader.getResourceIdentifier());
+//			todo.add(rootloader.getResourceIdentifier());
+			todo.add(null);
 			
 			while(!todo.isEmpty())
 			{
 				IResourceIdentifier clrid = todo.remove(0);
-				DelegationURLClassLoader cl = clrid==null? rootloader: classloaders.get(clrid);
-				List<IResourceIdentifier> mydeps = cl.getDelegateResourceIdentifiers();
-				deps.put(clrid, mydeps);
-				for(IResourceIdentifier rid: mydeps)
+				if(SYSTEMCPRID.equals(clrid))
 				{
-					if(!deps.containsKey(rid))
+					List<IResourceIdentifier> mydeps = new ArrayList<IResourceIdentifier>();
+					Set<URL> nonmans = getInternalNonManagedURLs();
+					for(URL url: nonmans)
 					{
-						todo.add(rid);
+						mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
+					}
+					deps.put(clrid, mydeps);
+				}
+				else
+				{
+					DelegationURLClassLoader cl = clrid==null? rootloader: classloaders.get(clrid);
+					List<IResourceIdentifier> mydeps = cl.getDelegateResourceIdentifiers();
+					deps.put(clrid, mydeps);
+					if(clrid==null)
+					{
+						mydeps.add(SYSTEMCPRID);
+					}
+					for(IResourceIdentifier rid: mydeps)
+					{
+						if(!deps.containsKey(rid))
+						{
+							todo.add(rid);
+						}
 					}
 				}
 			}
@@ -1013,9 +1004,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		File	file	= SUtil.urlToFile(url.toString());
 		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
 		{
+			JarFile jarfile = null;
 	        try 
 	        {
-	            JarFile	jarfile	= new JarFile(file);
+	            jarfile	= new JarFile(file);
 	            Manifest manifest = jarfile.getManifest();
 	            if(manifest!=null)
 	            {
@@ -1068,6 +1060,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		    {
 				component.getLogger().warning("Error collecting manifest URLs for "+url+": "+e);
 		    }
+	        finally
+	        {
+	        	try
+	        	{
+	        		if(jarfile!=null)
+	        			jarfile.close();
+	        	}
+	        	catch(Exception e)
+	        	{
+	        	}
+	        }
 		}
 	}
 	
@@ -1112,13 +1115,5 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return new Future<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(ret);
 	}
 	
-//	/**
-//	 *  Test if a link is removable.
-//	 */
-//	protected boolean isRemovable(IResourceIdentifier parid, IResourceIdentifier rid)
-//	{
-//		Tuple2<IResourceIdentifier, IResourceIdentifier> link = new Tuple2<IResourceIdentifier, IResourceIdentifier>(parid, rid);
-//		return addedlinks.contains(link);
-//	}
 }
 
