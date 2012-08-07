@@ -1,6 +1,7 @@
 package jadex.base.service.library;
 
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -29,7 +30,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.xml.bean.JavaWriter;
 
 import java.io.File;
 import java.net.URL;
@@ -106,7 +106,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> removedlinks;
 	
 	/** The delayed add links (could not directly be added because the parent was not there). */
-	protected Map<IResourceIdentifier, IResourceIdentifier> addtodo;
+	protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> addtodo;
 	
 	// cached results
 	
@@ -174,7 +174,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);
 		this.addedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
 		this.removedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
-		this.addtodo = new HashMap<IResourceIdentifier,IResourceIdentifier>();
+		this.addtodo = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
 	}
 	
 	//-------- methods --------
@@ -196,14 +196,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		else
 		{
-			addLink(parid, orid);
-			
 			getDependencies(orid, workspace).addResultListener(new ExceptionDelegationResultListener
 				<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 				{
 					final IResourceIdentifier rid = deps.getFirstEntity();
+					
+					// Must be added with resolved rid (what about resolving parent)
+					addLink(parid, rid);
+					
 	//				System.out.println("add end "+rid+" on: "+parid);
 					
 					getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
@@ -552,7 +554,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// full=(global, local) calls followed by any other call are ok, because global and local can be cached
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
-		final IResourceIdentifier lrid = getLocalResourceIdentifier(rid);
+		final IResourceIdentifier lrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
 		if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
@@ -662,7 +664,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// Add also local rid to ensure that classloader will be found for these searches as well
 		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
 		{
-			IResourceIdentifier localrid = getLocalResourceIdentifier(rid);
+			IResourceIdentifier localrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
 			if(localrid!=null)
 			{
 				classloaders.put(localrid, cl);
@@ -833,19 +835,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		}));
 		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	protected IResourceIdentifier getLocalResourceIdentifier(IResourceIdentifier rid)
-	{
-		IResourceIdentifier ret = null;
-		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
-		{
-			ret = new ResourceIdentifier(rid.getLocalIdentifier(), null);
-		}
 		return ret;
 	}
 	
@@ -1087,39 +1076,43 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> setProperties(Properties props)
 	{
-//		Property[]	links	= props.getProperties("link");
-//		
-//		Map<IResourceIdentifier, IResourceIdentifier> todo = new HashMap<IResourceIdentifier, IResourceIdentifier>();
-//		
-//		addtodo.clear();
-//		for(int i=0; i<links.length; i++)
-//		{
-//			Tuple2<IResourceIdentifier, IResourceIdentifier> link = (Tuple2<IResourceIdentifier, IResourceIdentifier>)
-//				JavaReader.objectFromXML(links[i].getValue(), rootloader);
-//			
-//			if(SYSTEMCPRID.equals(link.getFirstEntity()))
-//			{
-//				addTopLevelURL(link.getSecondEntity().getLocalIdentifier().getUrl());
-//			}
-//			else
-//			{
-//				if(link.getFirstEntity()==null || rootloader.getAllResourceIdentifiers().contains(link.getFirstEntity()))
-//				{
-//					todo.put(link.getFirstEntity(), link.getSecondEntity());
-//				}
-//				else
-//				{
-//					addtodo.put(link.getFirstEntity(), link.getSecondEntity());
-//				}
-//			}
-//		}
-//		
-//		for(IResourceIdentifier key: todo.keySet())
-//		{
-//			addResourceIdentifier(key, todo.get(key), true); // workspace?
-//		}
-//		
-//		System.out.println("addtodo: "+addtodo);
+		Properties[] links = props.getSubproperties("link");
+		
+		Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> todo = new HashSet<Tuple2<IResourceIdentifier, IResourceIdentifier>>();
+		
+		addtodo.clear();
+		for(int i=0; i<links.length; i++)
+		{
+			Properties pa = links[i].getSubproperty("a");
+			Properties pb = links[i].getSubproperty("b");
+			
+			IResourceIdentifier a = ridFromProperties(pa);
+			IResourceIdentifier b = ridFromProperties(pb);
+			
+			if(SYSTEMCPRID.equals(a))
+			{
+				addTopLevelURL(b.getLocalIdentifier().getUrl());
+			}
+			else
+			{
+				if(a==null || rootloader.getAllResourceIdentifiers().contains(a))
+				{
+					todo.add(new Tuple2<IResourceIdentifier, IResourceIdentifier>(a, b));
+				}
+				else
+				{
+					addtodo.add(new Tuple2<IResourceIdentifier, IResourceIdentifier>(a, b));
+				}
+			}
+		}
+		
+		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: todo)
+		{
+			addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true); // workspace?
+		}
+		
+		System.out.println("todo: "+todo);
+		System.out.println("addtodo: "+addtodo);
 		
 		return IFuture.DONE;
 	}
@@ -1133,11 +1126,70 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
 		{
-			String slink = JavaWriter.objectToXML(link, rootloader);
-			props.addProperty(new Property("link", slink));
+			Properties plink = new Properties();
+			Properties a = ridToProperties(link.getFirstEntity());
+			Properties b = ridToProperties(link.getSecondEntity());
+			plink.addSubproperties("a", a);
+			plink.addSubproperties("b", b);
+			props.addSubproperties("link", plink);
 		}
 		
 		return new Future<Properties>(props);		
+	}
+	
+	/**
+	 * 
+	 */
+	public Properties ridToProperties(IResourceIdentifier rid)
+	{
+		Properties ret = new Properties();
+		
+		if(rid!=null && rid.getGlobalIdentifier()!=null)
+		{
+			ret.addProperty(new Property("gid_ri", rid.getGlobalIdentifier().getResourceId()));
+			ret.addProperty(new Property("gid_vi", rid.getGlobalIdentifier().getVersionInfo()));
+//			ret.addProperty(new Property("url", rid.getGlobalIdentifier().getRepositoryInfo()));
+		}
+		if(rid!=null && rid.getLocalIdentifier()!=null)
+		{
+			ret.addProperty(new Property("lid_url", rid.getLocalIdentifier().getUrl().toString()));
+			// todo: check if own platform cid?
+//			ret.addProperty(new Property("lid_cid", rid.getLocalIdentifier().getComponentIdentifier()));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IResourceIdentifier ridFromProperties(Properties rid)
+	{
+		String gid_ri = rid.getStringProperty("gid_ri");
+		String gid_vi = rid.getStringProperty("gid_vi");
+		
+		String lid_url = rid.getStringProperty("lid_url");
+		
+		GlobalResourceIdentifier gid = null;
+		if(gid_vi!=null)
+		{
+			gid = new GlobalResourceIdentifier(gid_ri, null, gid_vi);
+		}
+		
+		LocalResourceIdentifier lid = null;
+		if(lid_url!=null)
+		{
+			try
+			{
+				lid = new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), new URL(lid_url));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return gid!=null || lid!=null? new ResourceIdentifier(lid, gid): null;
 	}
 }
 

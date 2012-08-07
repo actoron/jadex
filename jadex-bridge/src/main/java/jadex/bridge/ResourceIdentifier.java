@@ -114,6 +114,19 @@ public class ResourceIdentifier implements IResourceIdentifier
 	}
 	
 	/**
+	 * 
+	 */
+	public static IResourceIdentifier getLocalResourceIdentifier(IResourceIdentifier rid)
+	{
+		IResourceIdentifier ret = null;
+		if(rid!=null && rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
+		{
+			ret = new ResourceIdentifier(rid.getLocalIdentifier(), null);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get a string representation of this object.
 	 */
 	public String	toString()

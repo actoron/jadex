@@ -885,7 +885,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		 */
 		protected boolean isRemovable()
 		{
-			Boolean removable = Boolean.FALSE;
+			boolean ret = false;
 			LazyNode pa = (LazyNode)getParent();
 			if(pa!=null)
 			{
@@ -895,14 +895,15 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					Object myo = getMyUserObject();
 					if(myo instanceof IResourceIdentifier)
 					{
-						boolean rem = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>((IResourceIdentifier)uo, (IResourceIdentifier)myo));
-						
-						if(rem)
-							removable = Boolean.TRUE;
+						IResourceIdentifier p = (IResourceIdentifier)uo;
+						IResourceIdentifier ch = (IResourceIdentifier)myo;
+						IResourceIdentifier pl = ResourceIdentifier.getLocalResourceIdentifier(p);
+						ret = remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(p, ch))
+							|| (pl!=null && remlinks.contains(new Tuple2<IResourceIdentifier, IResourceIdentifier>(pl, ch)));
 					}
 				}
 			}
-			return removable.booleanValue();
+			return ret;
 		}
 		
 		/**
