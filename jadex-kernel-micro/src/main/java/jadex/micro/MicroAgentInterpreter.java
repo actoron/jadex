@@ -702,6 +702,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
 					step[0].toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step[0])));
 			}
+			
 		}
 	}
 	

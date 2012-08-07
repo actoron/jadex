@@ -7,7 +7,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -63,7 +62,7 @@ public class InitiatorAgent extends TestAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno)
 	{
-		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno);
+		return performTest(agent.getComponentIdentifier().getRoot(), testno);
 	}
 	
 	/**
@@ -78,7 +77,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno)
+				performTest(platform.getComponentIdentifier(), testno)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -105,7 +104,7 @@ public class InitiatorAgent extends TestAgent
 	 *  - start a receiver agent
 	 *  - create connection
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -124,7 +123,7 @@ public class InitiatorAgent extends TestAgent
 		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
-		createComponent(provider, "jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
+		createComponent("jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
@@ -153,7 +152,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 * 
 	 */
-	public IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
+	protected IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
 	{
 		final long start = System.currentTimeMillis();
 		final long[] filesize = new long[1];

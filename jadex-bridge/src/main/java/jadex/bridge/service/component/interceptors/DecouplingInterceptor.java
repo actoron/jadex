@@ -579,6 +579,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	{
 		protected ServiceInvocationContext sic;
 		protected IComponentIdentifier caller;
+		protected IComponentAdapter adapter;
 		protected long timeout;
 		protected boolean realtime;
 

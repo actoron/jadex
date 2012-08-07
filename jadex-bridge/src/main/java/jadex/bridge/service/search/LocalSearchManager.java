@@ -48,7 +48,12 @@ public class LocalSearchManager implements ISearchManager
 	public IIntermediateFuture<IService>	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
 	{
 		IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
-			
+		
+//		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().toString().indexOf("IIntermediateResultService")!=-1)
+//		{
+//			System.out.println("sefuill ksd");
+//		}
+		
 		// local search is always allowed?!
 		// problem: first gsm searches a node, then lsm searches the same node = double visit
 //		if(!selector.isFinished(results))// && decider.searchNode(null, provider, results))

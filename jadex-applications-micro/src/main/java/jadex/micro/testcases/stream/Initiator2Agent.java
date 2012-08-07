@@ -5,7 +5,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -72,7 +71,7 @@ public class Initiator2Agent extends TestAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno)
 	{
-		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno);
+		return performTest(agent.getComponentIdentifier().getRoot(), testno);
 	}
 	
 	/**
@@ -87,7 +86,7 @@ public class Initiator2Agent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno)
+				performTest(platform.getComponentIdentifier(), testno)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -114,7 +113,7 @@ public class Initiator2Agent extends TestAgent
 	 *  - start a receiver agent
 	 *  - create connection
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -133,7 +132,7 @@ public class Initiator2Agent extends TestAgent
 		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
-		createComponent(provider, "jadex/micro/testcases/stream/Receiver2Agent.class", root, reslis)
+		createComponent("jadex/micro/testcases/stream/Receiver2Agent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
@@ -174,7 +173,7 @@ public class Initiator2Agent extends TestAgent
 	/**
 	 * 
 	 */
-	public IFuture<TestReport> receiveBehavior(int testno, final IInputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
+	protected IFuture<TestReport> receiveBehavior(int testno, final IInputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		

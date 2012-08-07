@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
@@ -41,8 +40,6 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Configuration;
-import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
@@ -153,6 +150,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/** The platforms creation future. */
 	protected Future<IComponentIdentifier> pcreatefut;
 	
+	/** The cms, cached for speed. */
+	protected IComponentManagementService	cms;
+	
 	//-------- methods --------
 	
 	/**
@@ -173,6 +173,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
+				AwarenessManagementAgent.this.cms	= cms;
 				CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(mechas.length, 
 					false, new DelegationResultListener<Void>(ret)
 				{
@@ -198,7 +199,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				
 				CreationInfo info = new CreationInfo(getComponentIdentifier());
 				info.setConfiguration(getConfiguration());
-				Map args = new HashMap();
+				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("delay", getArgument("delay"));
 				info.setArguments(args);
 				for(int i=0; i<mechas.length; i++)
@@ -496,6 +497,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 
 	/**
 	 *  Set the fast startup awareness flag
+	 *  @param fast	The fast awareness flag.
 	 */
 	public void setFastAwareness(final boolean fast)
 	{
@@ -696,42 +698,34 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	
 	/**
 	 *  Check if local proxy is still available.
+	 *  @param dif	The discovery info.
 	 */
 	public void checkProxy(final DiscoveryInfo dif)
 	{
-		getServiceContainer().getRequiredService("cms").addResultListener(new IResultListener<Object>()
+		// Only need to check, when proxy already created
+		if(dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null)
 		{
-			public void resultAvailable(Object result)
+			IComponentIdentifier	proxy	= dif.getProxy().get(null);
+			cms.getComponentDescription(proxy)
+				.addResultListener(new IResultListener<IComponentDescription>()
 			{
-				// Only need to check, when proxy already created
-				if(dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null)
+				public void resultAvailable(IComponentDescription result)
 				{
-					IComponentIdentifier	proxy	= dif.getProxy().get(null);
-					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.getComponentDescription(proxy)
-						.addResultListener(new IResultListener<IComponentDescription>()
-					{
-						public void resultAvailable(IComponentDescription result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							dif.setProxy(null);
-							informListeners(dif);
-						}
-					});
 				}
-			}
-			public void exceptionOccurred(Exception exception) 
-			{
-				getLogger().warning("Could not get cms: "+exception);
-			}
-		});
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					dif.setProxy(null);
+					informListeners(dif);
+				}
+			});
+		}
 	}
 	
 	/**
 	 *  Get a discovery info.
+	 *  @param cid	The component id;
+	 *  @return the discovery info.
 	 */
 	public synchronized DiscoveryInfo getDiscoveryInfo(IComponentIdentifier cid)
 	{
@@ -748,23 +742,16 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		
 		final ComponentIdentifier cid = new ComponentIdentifier("platforms", getComponentIdentifier().getRoot());
 		
-		IFuture<IComponentManagementService> fut = getServiceContainer().getRequiredService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void resultAvailable(IExternalAccess exta)
 			{
-				cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
-				{
-					public void resultAvailable(IExternalAccess exta)
-					{
-						ret.setResult(exta.getComponentIdentifier());
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						createProxyHolder().addResultListener((new DelegationResultListener<IComponentIdentifier>(ret)));
-					}
-				});
+				ret.setResult(exta.getComponentIdentifier());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				createProxyHolder().addResultListener((new DelegationResultListener<IComponentIdentifier>(ret)));
 			}
 		});
 		
@@ -784,16 +771,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		else
 		{
 			pcreatefut = new Future<IComponentIdentifier>();
-		
-			IFuture<IComponentManagementService> fut = getServiceContainer().getRequiredService("cms");
-			fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(pcreatefut)
-			{
-				public void customResultAvailable(IComponentManagementService cms)
-				{
-					cms.createComponent("platforms", "jadex/base/service/awareness/RemotePlatformAgent.class", new CreationInfo(getComponentIdentifier().getRoot()), null)
-						.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
-				}
-			});
+			cms.createComponent("platforms", "jadex/base/service/awareness/RemotePlatformAgent.class", new CreationInfo(getComponentIdentifier().getRoot()), null)
+				.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
 		}
 		
 		return pcreatefut;
@@ -801,6 +780,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	
 	/**
 	 *  Create a proxy using given settings.
+	 *  @param dif	The discovery info
+	 *  @return The id of the created proxy.
 	 */
 	public IFuture<IComponentIdentifier> createProxy(final DiscoveryInfo dif)
 	{
@@ -822,51 +803,46 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			}
 		});
 		
-		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
-		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		if(dif.getComponentIdentifier().equals(root))
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			ret.setException(new RuntimeException("Proxy for local components not allowed"));
+		}
+		else
+		{
+			getProxyHolder().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 			{
-				if(dif.getComponentIdentifier().equals(root))
+				public void customResultAvailable(IComponentIdentifier parent)
 				{
-					ret.setException(new RuntimeException("Proxy for local components not allowed"));
-				}
-				else
-				{
-					getProxyHolder().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+					CreationInfo ci = new CreationInfo(args);
+					ci.setDaemon(true);
+					ci.setParent(parent);
+					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
+						createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
 					{
-						public void customResultAvailable(IComponentIdentifier parent)
+						public void resultAvailable(Collection<Tuple2<String, Object>> result)
 						{
-							CreationInfo ci = new CreationInfo(args);
-							ci.setDaemon(true);
-							ci.setParent(parent);
-							cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
-								createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
-							{
-								public void resultAvailable(Collection<Tuple2<String, Object>> result)
-								{
 //									System.out.println("Proxy killed: "+source);
-									dif.setProxy(null);
-									informListeners(dif);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									if(!(exception instanceof ComponentTerminatedException))
-										super.exceptionOccurred(exception);
-								}
-							})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+							dif.setProxy(null);
+							informListeners(dif);
 						}
-					});
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(!(exception instanceof ComponentTerminatedException))
+								super.exceptionOccurred(exception);
+						}
+					})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 				}
-			}
-		});
+			});
+		}
 		
 		return ret;
 	}
 	
 	/**
 	 *  Delete a proxy.
+	 *  @param dif	The discovery info.
+	 *  @return Future to indicate success.
 	 */
 	public IFuture<Void> deleteProxy(final DiscoveryInfo dif)
 	{
@@ -878,21 +854,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			{
 				public void customResultAvailable(final IComponentIdentifier proxy)
 				{
-					IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
-					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//					System.out.println("awareness destroy: "+proxy);
+					cms.destroyComponent(proxy).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
 					{
-						public void customResultAvailable(IComponentManagementService cms)
+						public void customResultAvailable(Map<String, Object> result)
 						{
-	//						System.out.println("awareness destroy: "+proxy);
-							cms.destroyComponent(proxy).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
-							{
-								public void customResultAvailable(Map<String, Object> result)
-								{
-									dif.setProxy(null);
-									informListeners(dif);
-									ret.setResult(null);
-								}
-							});
+							dif.setProxy(null);
+							informListeners(dif);
+							ret.setResult(null);
 						}
 					});
 				}
@@ -908,6 +877,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	
 	/**
 	 *  Test if a platform is included and/or not excluded.
+	 *  @param cid	The platform id.
+	 *  @param includes	The list of includes.
+	 *  @param excludes	The list of excludes.
+	 *  @return true when a proxy should be created.
 	 */
 	public static boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
 	{

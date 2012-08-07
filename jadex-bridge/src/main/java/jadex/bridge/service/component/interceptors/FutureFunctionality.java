@@ -18,6 +18,7 @@ import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -476,8 +477,9 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! notification in functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when starting scheduled notifications: "+exception);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyListener(listener);
 			}
 		});
     }
@@ -495,8 +497,9 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when terminating future: "+exception);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
 			}
 		});
 	}
@@ -724,8 +727,9 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! notification in functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when starting scheduled notifications: "+exception);
+				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
 			}
 		});
     }
@@ -743,8 +747,9 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when terminating future: "+exception);
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
 			}
 		});
 	}
@@ -862,23 +867,11 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when notifying: "+exception);
+				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
 			}
 		});
-				
-//		).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				// Todo: why set exception on future!?
-//				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
 	}
 	
 	/**
@@ -894,8 +887,9 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when terminating future: "+exception);
+				DelegatingTerminableDelegationFuture.super.terminate(reason);
 			}
 		});
 	}
@@ -1114,8 +1108,9 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when starting scheduled notifications: "+exception);
+				DelegatingIntermediateFuture.super.notifyListener(listener);
 			}
 		});
     }
@@ -1223,24 +1218,11 @@ class DelegatingFuture extends Future<Object>
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Todo: why set exception on future!?
-				DelegatingFuture.super.setExceptionIfUndone(exception);
+				// Hack!!! functionality failed -> should change result of future to failure?
+				Logger.getAnonymousLogger().severe("Exception when notifying: "+exception);
+				DelegatingFuture.super.notifyListener(listener);
 			}
 		});
-		
-//		IFuture<Void>	nlfut	= func.notifyListener(listener);
-//		nlfut.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				DelegatingFuture.super.notifyListener(listener);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				// Todo: why set exception on future!?
-//				DelegatingFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
 	}
 };
 

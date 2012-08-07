@@ -4,7 +4,6 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -75,7 +74,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, true)
+				performTest(platform.getComponentIdentifier(), testno, true)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -109,7 +108,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, false)
+				performTest(platform.getComponentIdentifier(), testno, false)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -136,7 +135,7 @@ public class InitiatorAgent extends TestAgent
 	 *  Create provider agent
 	 *  Call methods on it
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final boolean hassectrans)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final boolean hassectrans)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -155,7 +154,7 @@ public class InitiatorAgent extends TestAgent
 		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
-		createComponent(provider, "jadex/micro/testcases/securetrans/ProviderAgent.class", root, reslis)
+		createComponent("jadex/micro/testcases/securetrans/ProviderAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
@@ -170,7 +169,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	public IFuture<TestReport> callService(IComponentIdentifier cid, final boolean hassectrans, int testno)
+	protected IFuture<TestReport> callService(IComponentIdentifier cid, final boolean hassectrans, int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		

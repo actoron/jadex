@@ -8,7 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -111,7 +111,7 @@ public class InvokerAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, delay, max);
+		return performTest(agent.getComponentIdentifier().getRoot(), testno, delay, max);
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, delay, max)
+				performTest(platform.getComponentIdentifier(), testno, delay, max)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -162,7 +162,7 @@ public class InvokerAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -173,29 +173,29 @@ public class InvokerAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-				tr.setReason(exception.getMessage());
+				tr.setReason(""+exception);
+				exception.printStackTrace();
 				super.resultAvailable(tr);
 			}
 		});
 		
 		// Start service agent
-		IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(
-			provider, IComponentManagementService.class);
-		fut.addResultListener(agent.createResultListener(
-			new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
+		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				IFuture<IClockService> fut = SServiceProvider.getServiceUpwards(
-					provider, IClockService.class);
-				fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
+				agent.getServiceContainer().getService(IClockService.class, root)
+					.addResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
 					public void customResultAvailable(final IClockService clock)
 					{
 						IResourceIdentifier	rid	= new ResourceIdentifier(
 							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
-						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", new CreationInfo(rid), null)
-							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+						final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
+						CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", ci, null)
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 						{	
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
@@ -214,17 +214,19 @@ public class InvokerAgent
 											public void intermediateResultAvailable(String result)
 											{
 												if(start[0]==null)
-													start[0] = clock.getTime();
+												{
+													start[0] = 	local ? clock.getTime() : System.currentTimeMillis();
+												}
 //												System.out.println("intermediateResultAvailable: "+result);
 											}
 											public void finished()
 											{
-												long needed = clock.getTime()-start[0].longValue();
-//												System.out.println("finished: "+needed);
+												long needed = (local ? clock.getTime() : System.currentTimeMillis())-start[0].longValue();
+//														System.out.println("finished: "+needed);
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 												long expected = delay*(max-1);
 												// deviation can happen because receival of results is measured
-//												System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
+//														System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
 												if(needed*1.1>=expected) // 10% deviation allowed
 												{
 													tr.setSucceeded(true);
@@ -256,11 +258,11 @@ public class InvokerAgent
 									}		
 								}));
 							}
-						}));
+						});
 					}
-				}));
+				});
 			}	
-		}));
+		});
 		
 		return res;
 	}

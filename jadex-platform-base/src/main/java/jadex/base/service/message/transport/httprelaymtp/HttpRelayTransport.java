@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
@@ -200,7 +201,7 @@ public class HttpRelayTransport implements ITransport
 	public IFuture<Void> start()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		component.getServiceContainer().searchService(IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM)
+		SServiceProvider.getService(component.getServiceContainer(), IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Void>(ret)
 		{
 			public void customResultAvailable(IDaemonThreadPoolService tps)

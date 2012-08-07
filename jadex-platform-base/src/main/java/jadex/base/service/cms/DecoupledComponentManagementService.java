@@ -387,11 +387,11 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 														}
 														else
 														{
-															factory.getComponentType(model, cinfo.getImports(), rid)
-																.addResultListener(createResultListener(new ExceptionDelegationResultListener<String, IComponentIdentifier>(inited)
-															{
-																public void customResultAvailable(final String type)
-																{
+//															factory.getComponentType(model, cinfo.getImports(), rid)
+//																.addResultListener(createResultListener(new ExceptionDelegationResultListener<String, IComponentIdentifier>(inited)
+//															{
+//																public void customResultAvailable(final String type)
+//																{
 																	// Create id and adapter.
 																	
 																	final ComponentIdentifier cid;
@@ -429,7 +429,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
-																	final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, 
+																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master, daemon, autosd, 
 																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator);
 																	
 																	logger.info("Starting component: "+cid.getName());
@@ -662,8 +662,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 																			}
 																		}
 																	}));
-																}
-															}));
+//																}
+//															}));
 														}
 													}
 												}));

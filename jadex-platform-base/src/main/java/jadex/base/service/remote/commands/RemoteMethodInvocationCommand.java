@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -221,9 +222,12 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
 		// RMS acts as representative of remote caller.
+		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
 		IComponentIdentifier.LOCAL.set(caller);
+		IComponentAdapter.LOCAL.set(null);	// No adapter for remote component.
 		invokeMethod(ret, rsms);
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
+		IComponentAdapter.LOCAL.set(ada);
 		
 		return ret;
 	}

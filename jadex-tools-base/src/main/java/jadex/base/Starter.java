@@ -482,7 +482,17 @@ public class Starter
 										boolean again = true;
 										while(again && !ret.isDone())
 										{
-											again = afac.executeStep(adapter) || FutureHelper.notifyStackedListeners();
+											again = afac.executeStep(adapter);
+											
+											// When adapter not running, process open future notifications as if on platform thread.
+											if(!again)
+											{
+												IComponentAdapter.LOCAL.set(adapter);
+												IComponentIdentifier.LOCAL.set(cid);
+												again	= FutureHelper.notifyStackedListeners();
+												IComponentIdentifier.LOCAL.set(null);
+												IComponentAdapter.LOCAL.set(null);
+											}
 										}
 										
 										// Start normal execution of root component (i.e. platform) unless an error occurred during init.

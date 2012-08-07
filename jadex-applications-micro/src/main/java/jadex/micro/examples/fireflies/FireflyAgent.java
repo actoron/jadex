@@ -4,9 +4,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -45,7 +45,7 @@ public class FireflyAgent extends MicroAgent
 		IExternalAccess	paexta = (IExternalAccess)getParentAccess();
 		
 		paexta.getExtension("mygc2dspace")
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -138,6 +138,11 @@ public class FireflyAgent extends MicroAgent
 				};
 				
 				waitForTick(step);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// ignore...
 			}
 		}));
 		

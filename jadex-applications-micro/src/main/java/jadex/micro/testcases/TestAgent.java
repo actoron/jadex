@@ -146,23 +146,21 @@ public abstract class TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<IComponentIdentifier> createComponent(IServiceProvider provider, final String filename, 
+	protected IFuture<IComponentIdentifier> createComponent(final String filename, 
 		final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		IFuture<IComponentManagementService> cmsfut = SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-//				final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-//				IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
-				
-				// "receiver" cannot use parent due to remote case new CreationInfo(agent.getComponentIdentifier())
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
-				cms.createComponent(null, filename, new CreationInfo(rid), reslis)
+				boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
+				CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+				cms.createComponent(null, filename, ci, reslis)
 					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
@@ -177,8 +175,8 @@ public abstract class TestAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		IFuture<IComponentManagementService> cmsfut = SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
+		agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{

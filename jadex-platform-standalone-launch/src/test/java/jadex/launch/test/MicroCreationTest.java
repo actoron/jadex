@@ -46,6 +46,7 @@ public class MicroCreationTest extends TestCase
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",
 //			"-conf", "jadex.standalone.Platform.component.xml",
+//			"-deftimeout", "-1",
 			"-printpass", "false"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 		
@@ -88,7 +89,7 @@ public class MicroCreationTest extends TestCase
 		{
 			platform.killComponent().get(sus, timeout);
 		}
-		catch(ComponentTerminatedException e)
+		catch(Exception e)
 		{
 			// Platform autoshutdown already finished.			
 		}

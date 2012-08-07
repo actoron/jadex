@@ -1,6 +1,7 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -114,6 +115,9 @@ public class ServiceInvocationContext
 	/** The caller component. */
 	protected IComponentIdentifier caller;
 	
+	/** The caller component adapter. */
+	protected IComponentAdapter calleradapter;
+	
 	/** The platform identifier. */
 	protected IComponentIdentifier platform;
 	
@@ -135,6 +139,7 @@ public class ServiceInvocationContext
 		this.interceptors = interceptors;
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
+		this.calleradapter	= IComponentAdapter.LOCAL.get();
 	}
 	
 	/**
@@ -153,6 +158,7 @@ public class ServiceInvocationContext
 		this.interceptors = context.interceptors;
 		
 		this.caller = context.caller;
+		this.calleradapter = context.calleradapter;
 	}
 	
 	/**
@@ -369,6 +375,8 @@ public class ServiceInvocationContext
 		// profile on first invoke
 		if(PROFILING && method.isEmpty())
 		{
+//			System.out.println("invoke from "+IComponentIdentifier.LOCAL.get()+": "+m);
+			
 			IComponentIdentifier	pf	= IComponentIdentifier.LOCAL.get();
 			pf	= pf!=null ? pf.getRoot() : platform;
 			
@@ -453,6 +461,14 @@ public class ServiceInvocationContext
 //		setResultStack(sic.getResultStack());
 //		
 //	}
+	
+	/**
+	 *  Get the caller adapter.
+	 */
+	public IComponentAdapter	getCallerAdapter()
+	{
+		return this.calleradapter;
+	}
 	
 	/**
 	 *  String representation.

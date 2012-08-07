@@ -768,7 +768,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								{
 									public IFuture<IService> execute(IInternalAccess ia)
 									{
-				//						System.out.println("createProxy 2:"+service);
+//										System.out.println("createProxy 2:"+service);
 										return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, (IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, tp));
 									}
 								});

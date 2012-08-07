@@ -1,16 +1,10 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -24,11 +18,11 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 {
 	//-------- attributes --------
 	
-	/** The external access. */
-	protected IExternalAccess ea;	
-		
-	/** The component adapter. */
-	protected IComponentAdapter adapter;
+//	/** The external access. */
+//	protected IExternalAccess ea;	
+//		
+//	/** The component adapter. */
+//	protected IComponentAdapter adapter;
 	
 	/** The thread pool. */
 	protected IThreadPoolService tp;
@@ -37,18 +31,18 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	
 	/**
 	 *  Create a new invocation handler.
+	 *  @param tp the rescue thread pool (if any).
 	 */
-	public DecouplingReturnInterceptor(IExternalAccess ea, IComponentAdapter adapter, IThreadPoolService tp)
+	public DecouplingReturnInterceptor(/*IExternalAccess ea, IComponentAdapter adapter,*/ IThreadPoolService tp)
 	{
-		assert ea!=null;
-//		assert adapter!=null;
-		this.ea = ea;
-		this.adapter = adapter;
+//		assert ea!=null;
+//		this.ea = ea;
+//		this.adapter = adapter;
 		this.tp = tp;
 	}
 	
 	//-------- methods --------
-	
+
 	/**
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
@@ -60,12 +54,33 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //		final int mycnt=cnt++;
 //		System.out.println("in:"+mycnt+" "+sic.getMethod().getName()+" "+sic.getArguments());
 		
+		final IComponentAdapter	ada	= /*adapter!=null ? adapter :*/ sic.getCallerAdapter();
 		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
 		
+//		// Todo: disallow component methods being called from wrong thread and afterwards remove adapter attribute.
+//		if(adapter!=null &&! adapter.equals(sic.getCallerAdapter()))
+//		{
+//			System.out.println("sdifzgio sd");
+//		}
+//		assert adapter==null || adapter.equals(sic.getCallerAdapter()): adapter+", "+sic.getCallerAdapter();
+		if(ada!=null && caller!=null && !ada.getComponentIdentifier().equals(caller))
+		{
+			System.out.println("klsdj gkl: "+ada+", "+caller);
+		}
+		assert ada==null || caller==null || ada.getComponentIdentifier().equals(caller): ada+", "+caller;
+
+//		if(ada!=null && caller!=null && !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
+//		{
+//			System.out.println("sdilufsgi: "+ada+", "+caller+", "+ea.getComponentIdentifier());
+//		}
+//		assert	ada==null || caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()) : caller+", "+ea.getComponentIdentifier();  
+
 		sic.invoke().addResultListener(new DelegationResultListener<Void>(fut)
 		{
 			public void customResultAvailable(Void result)
 			{
+				final boolean	destroy	= sic.getMethod().getName().toString().indexOf("destroyComponent")!=-1;
+				
 				Object	res	= sic.getResult();
 				
 				if(res instanceof IFuture)
@@ -74,129 +89,67 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 					{
 						public void notifyListener(final IResultListener<Void> listener)
 						{
-							// Don't reschedule if already on correct thread.
-							if(caller!=null && caller.equals(IComponentIdentifier.LOCAL.get()))
+							// Don't reschedule if already on correct thread or called from remote.
+							if(ada==null || !ada.isExternalThread())
+//								|| !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()) )
 							{
 								listener.resultAvailable(null);
-							}
-
-							// Do not reschedule remotely
-							else if(adapter!=null || caller!=null && caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
-							{
-								getAdapter(caller, sic).addResultListener(new IResultListener<IComponentAdapter>()
-								{
-									public void resultAvailable(IComponentAdapter adapter) 
-									{
-										// Hack!!! Notify multiple listeners at once?
-										if(adapter.isExternalThread())
-										{
-											try
-											{
-												adapter.invokeLater(new Runnable()
-												{
-													public void run()
-													{
-//														System.out.println("out re: "+mycnt);
-														listener.resultAvailable(null);
-													}
-												});
-//												getExternalAccess(caller).addResultListener(new IResultListener<IExternalAccess>()
-//												{
-//													public void resultAvailable(IExternalAccess ea)
-//													{
-//														ea.scheduleStep(new IComponentStep<Void>()
-//														{
-//															public IFuture<Void> execute(IInternalAccess ia)
-//															{
-//																System.out.println("out re: "+mycnt);
-//																ret.setResult(null);
-//																return IFuture.DONE;
-//															}
-//														});
-//													}
-//													
-//													public void exceptionOccurred(Exception exception)
-//													{
-//														System.out.println("out ex1: "+mycnt);
-//														ret.setResult(null);
-//													}
-//												});
-												
-											}
-											catch(final Exception e)
-											{
-												// Did not work because component is already terminated
-//												SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IThreadPoolService.class)
-//													.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IExternalAccess>(ret)
-//												{
-//													public void customResultAvailable(IThreadPoolService tp)
-//													{
-														Runnable run = new Runnable()
-														{
-															public void run() 
-															{
-//																System.out.println("Rescheduled to rescue thread: "+e);
-//																System.out.println("out ex2: "+mycnt);
-																listener.exceptionOccurred(e);
-															}
-														};
-														if(tp!=null)
-														{
-															// Hack!!! Thread pool service should be asynchronous.
-															try
-															{
-																tp.execute(run);
-															}
-															catch(RuntimeException re)
-															{
-																// Happens when thread pool already terminated.
-																Thread t = new Thread(run);
-																t.start();																
-															}
-														}
-														else
-														{
-															Thread t = new Thread(run);
-															t.start();
-														}
-//													}
-//													public void exceptionOccurred(Exception exception)
-//													{
-//														listener.exceptionOccurred(e);
-////												}
-//												});	
-											}
-										}
-										else
-										{
-//											System.out.println("out nore: "+mycnt);
-											listener.resultAvailable(null);
-										}
-									};
-									
-									public void exceptionOccurred(Exception exception) 
-									{
-										// Hack !!! If cms not found during platform shutdown forward listener result on platform thread.
-										if(caller.equals(caller.getRoot()) &&
-											(exception instanceof ServiceNotFoundException
-											|| exception instanceof ComponentTerminatedException))
-										{
-											listener.resultAvailable(null);
-										}
-										else
-										{
-	//										System.out.println("out norepos: "+mycnt);
-											// No thread conversion possible
-											listener.exceptionOccurred(exception);
-										}
-									};
-								});
 							}
 							else
 							{
-								listener.resultAvailable(null);
+								try
+								{
+									ada.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											listener.resultAvailable(null);
+										}
+									});
+								}
+								catch(final Exception e)
+								{
+									Runnable run = new Runnable()
+									{
+										public void run() 
+										{
+//											System.out.println("Rescheduled to rescue thread: "+e);
+//											System.out.println("out ex2: "+mycnt);
+											
+											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+											if(sic.getMethod().getName().equals("destroyComponent")
+												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
+											{
+												listener.resultAvailable(null);
+											}
+											else
+											{
+												listener.exceptionOccurred(e);
+											}
+										}
+									};
+									if(tp!=null)
+									{
+										// Hack!!! Thread pool service should be asynchronous.
+										try
+										{
+											tp.execute(run);
+										}
+										catch(RuntimeException re)
+										{
+											// Happens when thread pool already terminated.
+											Thread t = new Thread(run);
+											t.start();																
+										}
+									}
+									else
+									{
+										Thread t = new Thread(run);
+										t.start();
+									}
+								}
 							}
-						};
+						}
 						
 						/**
 						 *  For intermediate results this method is called.
@@ -209,19 +162,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 					
 					Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 					sic.setResult(fut);
-//					if(res instanceof IIntermediateFuture)
-//					{
-//						sic.setResult(new ComponentIntermediateFuture(ea, adapter, (IIntermediateFuture)res));
-//					}
-//					else if(res instanceof IFuture)
-//					{
-//						sic.setResult(new ComponentFuture(ea, adapter, (IFuture)res));
-//					}
 				}
-//				else
-//				{
-//					System.out.println("out nofut: "+mycnt);
-//				}
 				
 				super.customResultAvailable(null);
 			}
@@ -229,58 +170,58 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		return fut; 
 	}
 	
-	/**
-	 *  Get or find the component adapter.
-	 */
-	public IFuture<IComponentAdapter> getAdapter(final IComponentIdentifier caller, final ServiceInvocationContext sic)
-	{
-		final Future<IComponentAdapter> ret = new Future<IComponentAdapter>();
-		
-		if(adapter==null)
-		{
-			if(caller!=null)
-			{
-//				if(caller.toString().indexOf("ServiceCall")!=-1)
-//					System.out.println("sdfkl j");
-				
-				SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentAdapter>(ret)
-				{
-					public void customResultAvailable(IComponentManagementService cms)
-					{
-//						if(sic.getMethod().getName().indexOf("getComponentAdapter")!=-1)
-//							System.out.println("back to: "+caller+" for: "+sic.getMethod()+" "+sic.getArguments());
-						
-						cms.getComponentAdapter(caller)
-							.addResultListener(new DelegationResultListener<IComponentAdapter>(ret)
-						{
-							public void customResultAvailable(IComponentAdapter result)
-							{
-								if(result!=null)
-								{
-									super.customResultAvailable(result);
-								}
-								else
-								{
-									ret.setException(new RuntimeException("No adapter"));									
-								}
-							}
-						});
-					}
-				});
-			}
-			else
-			{
-				ret.setException(new RuntimeException("No adapter"));
-			}
-		}
-		else
-		{
-			ret.setResult(adapter);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get or find the component adapter.
+//	 */
+//	public IFuture<IComponentAdapter> getAdapter(final IComponentIdentifier caller, final ServiceInvocationContext sic)
+//	{
+//		final Future<IComponentAdapter> ret = new Future<IComponentAdapter>();
+//		
+//		if(adapter==null)
+//		{
+//			if(caller!=null)
+//			{
+////				if(caller.toString().indexOf("ServiceCall")!=-1)
+////					System.out.println("sdfkl j");
+//				
+//				SServiceProvider.getServiceUpwards(ea.getServiceProvider(), IComponentManagementService.class)
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentAdapter>(ret)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
+////						if(sic.getMethod().getName().indexOf("getComponentAdapter")!=-1)
+////							System.out.println("back to: "+caller+" from "+IComponentIdentifier.LOCAL.get()+" for: "+sic.getMethod()+" "+sic.getArguments());
+//						
+//						cms.getComponentAdapter(caller)
+//							.addResultListener(new DelegationResultListener<IComponentAdapter>(ret)
+//						{
+//							public void customResultAvailable(IComponentAdapter result)
+//							{
+//								if(result!=null)
+//								{
+//									super.customResultAvailable(result);
+//								}
+//								else
+//								{
+//									ret.setException(new RuntimeException("No adapter"));									
+//								}
+//							}
+//						});
+//					}
+//				});
+//			}
+//			else
+//			{
+//				ret.setException(new RuntimeException("No adapter"));
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(adapter);
+//		}
+//		
+//		return ret;
+//	}
 	
 //	/**
 //	 *  Get or find the external access.

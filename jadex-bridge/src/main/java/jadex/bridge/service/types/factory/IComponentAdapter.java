@@ -19,6 +19,14 @@ import java.util.logging.Logger;
 @Reference(local=true, remote=false)	// Hack!!! required because of local getComponentAdapter method of CMS.
 public interface IComponentAdapter
 {
+	//-------- constants -------- 
+	
+	/** The currently executing component (if any). */
+	// Provided for fast caller/callee context-switching avoiding to use cms.
+	public static final ThreadLocal<IComponentAdapter>	LOCAL	= new ThreadLocal<IComponentAdapter>();
+	
+	//-------- methods --------
+	
 	/**
 	 *  Called by the component when it probably awoke from an idle state.
 	 *  The platform has to make sure that the component will be executed

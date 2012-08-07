@@ -756,6 +756,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// Remember execution thread.
 			this.componentthread	= Thread.currentThread();
 			IComponentIdentifier.LOCAL.set(getComponentIdentifier());
+			IComponentAdapter.LOCAL.set(this);
 			
 			ClassLoader	cl	= componentthread.getContextClassLoader();
 			componentthread.setContextClassLoader(component.getClassLoader());
@@ -862,6 +863,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 			// Reset execution thread.
 			IComponentIdentifier.LOCAL.set(null);
+			IComponentAdapter.LOCAL.set(null);
 			componentthread.setContextClassLoader(cl);
 			this.componentthread = null;		
 
@@ -1055,6 +1057,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				ext_entries.add(action);
 			}
 		}
+
 		wakeup();
 	}
 	

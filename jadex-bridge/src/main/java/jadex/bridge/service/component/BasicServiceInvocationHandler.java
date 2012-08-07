@@ -518,7 +518,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy, realtime));
 			}
-			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ia.getExternalAccess(), null, tp));
+			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ia.getExternalAccess(), null,*/ tp));
 		}
 		
 		if(ics!=null)
@@ -540,7 +540,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid, adapter.getLogger());
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null));
-		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, null, tp));
+		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/ tp));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader)}, handler); //sid.getServiceType()
 	}
@@ -562,7 +562,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
-				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter, tp));
+				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, adapter,*/ tp));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{

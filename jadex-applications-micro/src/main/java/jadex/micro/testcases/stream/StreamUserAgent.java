@@ -8,7 +8,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
@@ -76,7 +75,7 @@ public class StreamUserAgent extends TestAgent
 	 */
 	protected IFuture<Integer> testLocal(int testno, Testcase tc)
 	{
-		return performTests(testno, agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), tc);
+		return performTests(testno, agent.getComponentIdentifier().getRoot(), tc);
 	}
 	
 	/**
@@ -93,7 +92,7 @@ public class StreamUserAgent extends TestAgent
 			{
 				if(!sec)
 				{
-					performTests(testno, platform.getServiceProvider(), platform.getComponentIdentifier(), tc)
+					performTests(testno, platform.getComponentIdentifier(), tc)
 						.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
 					{
 						public void customResultAvailable(final Integer result)
@@ -112,7 +111,7 @@ public class StreamUserAgent extends TestAgent
 				}
 				else
 				{
-					performSecureTests(testno, platform.getServiceProvider(), platform.getComponentIdentifier(), tc)
+					performSecureTests(testno, platform.getComponentIdentifier(), tc)
 						.addResultListener(agent.createResultListener(new DelegationResultListener<Integer>(ret)
 					{
 						public void customResultAvailable(final Integer result)
@@ -138,13 +137,13 @@ public class StreamUserAgent extends TestAgent
 	/**
 	 *  Perform the tests.
 	 */
-	protected IFuture<Integer> performTests(int testcnt,IServiceProvider provider, IComponentIdentifier root, final Testcase tc)
+	protected IFuture<Integer> performTests(int testcnt, IComponentIdentifier root, final Testcase tc)
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
 		final int[] cnt = new int[]{testcnt};
 		
-		createComponent(provider, "jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
+		createComponent("jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Integer>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
@@ -200,13 +199,13 @@ public class StreamUserAgent extends TestAgent
 	/**
 	 *  Perform the secure tests.
 	 */
-	protected IFuture<Integer> performSecureTests(int testcnt,IServiceProvider provider, IComponentIdentifier root, final Testcase tc)
+	protected IFuture<Integer> performSecureTests(int testcnt, IComponentIdentifier root, final Testcase tc)
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
 		final int[] cnt = new int[]{testcnt};
 		
-		createComponent(provider, "jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
+		createComponent("jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Integer>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 

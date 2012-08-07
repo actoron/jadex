@@ -1032,7 +1032,6 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		/**
 		 *  Insert a child at an index.
 		 *  @param index The index.
-		 *  @return The child.
 		 */
 		public void insert(MutableTreeNode newChild, int childIndex)
 		{

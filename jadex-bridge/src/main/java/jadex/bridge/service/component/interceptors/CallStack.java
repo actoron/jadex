@@ -33,7 +33,8 @@ public abstract class CallStack	extends ServiceCall
 	 *  Push a service call to the call stack.
 	 *  @param caller	The calling component. 
 	 *  @param timeout	The timeout value.
-	 *  @param realtime	The flag to indicate real time timeouts. 
+	 *  @param realtime	The flag to indicate real time timeouts.
+	 *  @param adapter	The adapter of the caller (for back-scheduling of result).
 	 */
 	protected static void	push(IComponentIdentifier caller, long timeout, boolean realtime)
 	{
