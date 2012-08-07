@@ -19,7 +19,6 @@ import java.io.IOException;
 /**
  * The camera for the game
  *
- * @author lohnn
  */
 public class DungeonMasterCamera implements Control, AnalogListener, ActionListener
 {
