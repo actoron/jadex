@@ -29,7 +29,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.xml.SXML;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -186,37 +185,43 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		final IResourceIdentifier orid, final boolean workspace)
 	{
 //		System.out.println("adding: "+orid+" on: "+parid);
-		
-		addLink(parid, orid);
-		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		
-		getDependencies(orid, workspace).addResultListener(new ExceptionDelegationResultListener
-			<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
+
+		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
 		{
-			public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
-			{
-				final IResourceIdentifier rid = deps.getFirstEntity();
-//				System.out.println("add end "+rid+" on: "+parid);
-				
-				getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
-					new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
-				{
-					public void customResultAvailable(final DelegationURLClassLoader chil)
-					{
-						ret.setResult(rid);
-					}
-				});
-			}
+			ret.setException(new RuntimeException("Parent rid unknown: "+parid));
+		}
+		else
+		{
+			addLink(parid, orid);
 			
-			public void exceptionOccurred(Exception exception)
+			getDependencies(orid, workspace).addResultListener(new ExceptionDelegationResultListener
+				<Tuple2<IResourceIdentifier,Map<IResourceIdentifier,List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
 			{
-				exception.printStackTrace();
-				super.exceptionOccurred(exception);
-			}
-		});
-		
-//		System.out.println("current: "+SUtil.arrayToString(rootloader.getAllResourceIdentifiers()));
+				public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
+				{
+					final IResourceIdentifier rid = deps.getFirstEntity();
+	//				System.out.println("add end "+rid+" on: "+parid);
+					
+					getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
+						new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
+					{
+						public void customResultAvailable(final DelegationURLClassLoader chil)
+						{
+							ret.setResult(rid);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+					super.exceptionOccurred(exception);
+				}
+			});
+			
+	//		System.out.println("current: "+SUtil.arrayToString(rootloader.getAllResourceIdentifiers()));
+		}
 		
 		return ret;
 	}
@@ -228,9 +233,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier parid, final IResourceIdentifier rid)
 	{
 //		System.out.println("remove "+rid);
-		removeLink(parid, rid);
-		removeSupport(rid, parid);
-		return IFuture.DONE;
+		final Future<Void> ret = new Future<Void>();
+		
+		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
+		{
+			ret.setException(new RuntimeException("Parent rid unknown: "+parid));
+		}
+		else
+		{
+		
+			removeLink(parid, rid);
+			removeSupport(rid, parid);
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -1032,19 +1049,32 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public IFuture<Void> setProperties(Properties props)
 	{
 		Property[]	links	= props.getProperties("link");
+		
+		Map<IResourceIdentifier, IResourceIdentifier> todo = new HashMap<IResourceIdentifier, IResourceIdentifier>();
+		
 		for(int i=0; i<links.length; i++)
 		{
 			Tuple2<IResourceIdentifier, IResourceIdentifier> link = (Tuple2<IResourceIdentifier, IResourceIdentifier>)
 				JavaReader.objectFromXML(links[i].getValue(), rootloader);
+			
 			if(SYSTEMCPRID.equals(link.getFirstEntity()))
 			{
 				addTopLevelURL(link.getSecondEntity().getLocalIdentifier().getUrl());
 			}
 			else
 			{
-				addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true); // workspace?
+				if(link.getFirstEntity()==null || rootloader.getAllResourceIdentifiers().contains(link.getFirstEntity()))
+				{
+					addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true); // workspace?
+				}
+				else
+				{
+					todo.put(link.getFirstEntity(), link.getSecondEntity());
+				}
 			}
 		}
+		
+		System.out.println("todo: "+todo);
 		
 		return IFuture.DONE;
 	}
