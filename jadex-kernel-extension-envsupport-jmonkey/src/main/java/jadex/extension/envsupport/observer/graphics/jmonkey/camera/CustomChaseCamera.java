@@ -28,8 +28,8 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
     protected float maxVerticalRotation = FastMath.PI / 2;
     protected float minDistance = 1.0f;
     protected float maxDistance = 40.0f;
-    protected float distance = 20;
-    protected float zoomSpeed = 2f;
+    protected float distance = 200;
+    protected float zoomSpeed = 20f;
     protected float rotationSpeed = 1.0f;
     protected float rotation = 0;
     protected float trailingRotationInertia = 0.05f;
@@ -66,8 +66,8 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
     protected Vector3f targetLocation = new Vector3f(0, 0, 0);
     protected boolean dragToRotate = true;
     protected Vector3f lookAtOffset = new Vector3f(0, 0, 0);
-    protected boolean leftClickRotate = true;
-    protected boolean rightClickRotate = true;
+    protected boolean leftClickRotate = false;
+    protected boolean rightClickRotate = false;
     protected Vector3f temp = new Vector3f(0, 0, 0);
     protected boolean invertYaxis = false;
     protected boolean invertXaxis = false;

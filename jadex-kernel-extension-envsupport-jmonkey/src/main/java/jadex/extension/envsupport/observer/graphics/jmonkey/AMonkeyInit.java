@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.observer.graphics.jmonkey.camera.DungeonMasterCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
@@ -143,6 +144,11 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		 flyCamera.setMoveSpeed(appDimension);
 		 flyCamera.setDragToRotate(true);
 		 flyCamera.setEnabled(true);
+		 
+		 flyCamera.setEnabled(false);
+		 
+		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, staticNode, rootNode);
+		 dungeonCam.setEnabled(true);
 
 		 
 			/** Configure cam to look at scene */

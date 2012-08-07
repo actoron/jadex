@@ -34,7 +34,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
     {
         this.cam = cam;
         camNode = new Node();
-        camNode.setLocalTranslation(Vector3f.ZERO);
+        camNode.setLocalTranslation(cam.getLocation());
         this.rootNode = rootNode;
         rootNode.attachChild(camNode);
 //        registerInput(inputManager);
@@ -50,7 +50,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         chaseCam.setZoomInTrigger(Triggers.zoomInTrigger);
         chaseCam.setZoomOutTrigger(Triggers.zoomOutTrigger);
         chaseCam.setMinDistance(8);
-        chaseCam.setMaxDistance(100);
+        chaseCam.setMaxDistance(2000);
         chaseCam.setTrailingEnabled(false);
         chaseCam.setRotationSensitivity(rotationSpeed);
         target.addControl(this);
