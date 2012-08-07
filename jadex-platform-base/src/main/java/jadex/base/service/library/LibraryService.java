@@ -29,7 +29,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.File;
@@ -91,7 +90,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The class loader futures for currently loading class loaders. */
 	protected Map<IResourceIdentifier, Future<DelegationURLClassLoader>> clfuts;
 	
-	/** The map of managed resources (url (for local case) -> delegate loader). */
+	/** The map of managed resources 2xrid (local, remote) -> delegate loader). */
 	protected Map<IResourceIdentifier, DelegationURLClassLoader> classloaders;
 	
 	/** The base classloader. */
@@ -550,6 +549,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<DelegationURLClassLoader> ret;
 		
+		// full=(global, local) calls followed by any other call are ok, because global and local can be cached
+		// pure global call followed by pure local call -> would mean rids have not been resolved
+		// pure local call followed by pure global call -> would mean rids have not been resolved
+		final IResourceIdentifier lrid = getLocalResourceIdentifier(rid);
 		if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
@@ -557,6 +560,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		else if(clfuts.containsKey(rid))
 		{
 			ret	= clfuts.get(rid);
+		}
+		else if(lrid!=null && clfuts.containsKey(lrid))
+		{
+			ret	= clfuts.get(lrid);
 		}
 		else
 		{
@@ -573,6 +580,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			else
 			{
 				clfuts.put(rid, ret);
+				if(lrid!=null)
+					clfuts.put(lrid, ret);
 //				if(rid.getGlobalIdentifier()==null)
 //					System.out.println("getClassLoader(): "+rid);
 				
@@ -584,17 +593,19 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					{
 						public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 						{
-							createClassLoader(rid, deps.getSecondEntity(), support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
+							createClassLoader(deps.getFirstEntity(), deps.getSecondEntity(), support, workspace).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
 							{
 								public void customResultAvailable(DelegationURLClassLoader result)
 								{
 									clfuts.remove(rid);
+									clfuts.remove(lrid);
 									super.customResultAvailable(result);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 									clfuts.remove(rid);
+									clfuts.remove(lrid);
 									super.exceptionOccurred(exception);
 								}
 							});
@@ -603,6 +614,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						public void exceptionOccurred(Exception exception)
 						{
 							clfuts.remove(rid);
+							clfuts.remove(lrid);
 							super.exceptionOccurred(exception);
 						}
 					});
@@ -614,12 +626,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						public void customResultAvailable(DelegationURLClassLoader result)
 						{
 							clfuts.remove(rid);
+							clfuts.remove(lrid);
 							super.customResultAvailable(result);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 							clfuts.remove(rid);
+							clfuts.remove(lrid);
 							super.exceptionOccurred(exception);
 						}
 					});
@@ -645,6 +659,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		final DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, null);
 		classloaders.put(rid, cl);
+		// Add also local rid to ensure that classloader will be found for these searches as well
+		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
+		{
+			IResourceIdentifier localrid = getLocalResourceIdentifier(rid);
+			if(localrid!=null)
+			{
+				classloaders.put(localrid, cl);
+			}
+		}
+		
 //		System.out.println("createClassLoader() put: "+rid);
 		
 		CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
@@ -670,10 +694,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		for(int i=0; i<deps.size(); i++)
 		{
-			IResourceIdentifier mydep = (IResourceIdentifier)deps.get(i);
-//			IComponentIdentifier platcid = ((IComponentIdentifier)getServiceIdentifier().getProviderId()).getRoot();
-//			IResourceIdentifier myrid = new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(platcid, mydep), null);
-			getClassLoader(mydep, alldeps, rid, workspace).addResultListener(lis);
+			IResourceIdentifier myrid = (IResourceIdentifier)deps.get(i);
+			getClassLoader(myrid, alldeps, rid, workspace).addResultListener(lis);
 		}
 		return ret;
 	}
@@ -811,6 +833,19 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		}));
 		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IResourceIdentifier getLocalResourceIdentifier(IResourceIdentifier rid)
+	{
+		IResourceIdentifier ret = null;
+		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
+		{
+			ret = new ResourceIdentifier(rid.getLocalIdentifier(), null);
+		}
 		return ret;
 	}
 	
