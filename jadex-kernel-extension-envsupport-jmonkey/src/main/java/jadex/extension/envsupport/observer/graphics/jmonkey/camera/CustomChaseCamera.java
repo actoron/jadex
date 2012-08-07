@@ -29,7 +29,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jadex.extension.envsupport.observer.graphics.jmonkey.camera;
+package custom.camera;
 
 import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
@@ -506,7 +506,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * Sets the min zoom distance of the camera (default is 1)
-     * @return minDistance
      */
     public void setMinDistance(float minDistance) {
         this.minDistance = minDistance;
@@ -515,7 +514,7 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
     /**
      * clone this camera for a spatial
      * @param spatial
-     * @return
+
      */
     public Control cloneForSpatial(Spatial spatial) {
         CustomChaseCamera cc = new CustomChaseCamera(cam, spatial, inputManager);
@@ -579,7 +578,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the maximal vertical rotation angle of the camera around the target
-     * @return
      */
     public float getMaxVerticalRotation() {
         return maxVerticalRotation;
@@ -595,7 +593,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the minimal vertical rotation angle of the camera around the target
-     * @return
      */
     public float getMinVerticalRotation() {
         return minVerticalRotation;
@@ -611,7 +608,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns true is smmoth motion is enabled for this chase camera
-     * @return
      */
     public boolean isSmoothMotion() {
         return smoothMotion;
@@ -627,7 +623,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the chasing sensitivity
-     * @return
      */
     public float getChasingSensitivity() {
         return chasingSensitivity;
@@ -646,7 +641,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * Returns the rotation sensitivity
-     * @return
      */
     public float getRotationSensitivity() {
         return rotationSensitivity;
@@ -665,7 +659,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns true if the trailing is enabled
-     * @return
      */
     public boolean isTrailingEnabled() {
         return trailingEnabled;
@@ -683,7 +676,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
     /**
      * 
      * returns the trailing rotation inertia
-     * @return
      */
     public float getTrailingRotationInertia() {
         return trailingRotationInertia;
@@ -701,7 +693,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the trailing sensitivity
-     * @return
      */
     public float getTrailingSensitivity() {
         return trailingSensitivity;
@@ -719,7 +710,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the zoom sensitivity
-     * @return
      */
     public float getZoomSensitivity() {
         return zoomSensitivity;
@@ -785,7 +775,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * return the current distance from the camera to the target
-     * @return
      */
     public float getDistanceToTarget() {
         return distance;
@@ -793,7 +782,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the current horizontal rotation around the target in radians
-     * @return
      */
     public float getHorizontalRotation() {
         return rotation;
@@ -801,15 +789,12 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
 
     /**
      * returns the current vertical rotation around the target in radians.
-     * @return
      */
     public float getVerticalRotation() {
         return vRotation;
     }
 
     /**
-     * returns the offset from the target's position where the camera looks at
-     * @return
      */
     public Vector3f getLookAtOffset() {
         return lookAtOffset;
@@ -833,7 +818,6 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
     
     /**
      * Returns the up vector of the camera used for the lookAt on the target
-     * @return 
      */
     public Vector3f getUpVector(){
         return initialUpVec;
