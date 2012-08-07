@@ -19,6 +19,7 @@ import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
@@ -28,6 +29,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.xml.SXML;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.io.File;
 import java.net.URL;
@@ -634,7 +638,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 						it.remove();
 				}
 				
-//				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
 				for(DelegationURLClassLoader dcl: result)
 				{
 					cl.addDelegateClassLoader(dcl);
@@ -880,99 +883,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 
 	//-------- IPropertiesProvider interface --------
-	
-	/**
-	 *  Update from given properties.
-	 */
-	public IFuture<Void> setProperties(Properties props)
-	{
-//		// Do not remove existing urls?
-//		// todo: treat arguments and 
-//		// Remove existing urls
-////		libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), initurls);
-//		
-//		// todo: fix me / does not work getClassLoader is async
-//		if(initurls!=null)
-//		{
-//			for(int i=0; i<initurls.length; i++)
-//			{
-//				addURL(toURL(initurls[i]));
-//			}
-//		}
-////		updateGlobalClassLoader();
-//		
-//		// Add new urls.
-//		Property[]	entries	= props.getProperties("entry");
-//		for(int i=0; i<entries.length; i++)
-//		{
-//			addPath(entries[i].getValue());
-//		}
 		
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Write current state into properties.
-	 */
-	public IFuture<Properties> getProperties()
-	{
-//		String[]	entries;
-//		if(libcl != null)
-//		{
-//			synchronized(this)
-//			{
-//				List urls = new ArrayList(libcl.getAllURLs());
-//				entries	= new String[urls.size()];
-//				for(int i=0; i<entries.length; i++)
-//				{
-//					
-//					String	url	= urls.get(i).toString();
-//					File	file	= urlToFile(url.toString());
-//					if(file!=null)
-//					{
-//						String	filename	= SUtil.convertPathToRelative(file.getAbsolutePath());
-//						String fileurl;
-//						try
-//						{
-//							// URI wouldn't allow relative names, so pretend its an absolute path.
-//							fileurl = "file:"+new URI("file", null, "/"+filename.replace('\\', '/'), null).toURL().toString().substring(6);
-//						}
-//						catch(Exception e)
-//						{
-//							fileurl	= "file:"+filename.replace('\\', '/');
-//						}
-//						if(url.startsWith("jar:file:"))
-//						{
-//							entries[i]	= "jar:" + fileurl;
-//						}
-//						else
-//						{
-//							entries[i]	= fileurl;
-//						}
-//						if(url.endsWith("!/") && entries[i].endsWith("!"))
-//							entries[i]	+= "/";	// Stripped by new File(...).
-//					}
-//					else
-//					{
-//						entries[i]	= url;
-//					}
-//				}
-//			}
-//		}
-//		else
-//		{
-//			entries = new String[0];
-//		}
-//		
-//		Properties props	= new Properties();
-//		for(int i=0; i<entries.length; i++)
-//		{
-//			props.addProperty(new Property("entry", entries[i]));
-//		}
-//		return new Future<Properties>(props);		
-		return new Future<Properties>(new Properties());
-	}
-	
 	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
@@ -1114,6 +1025,106 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> ret = (Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>)((HashSet)addedlinks).clone();
 		return new Future<Set<Tuple2<IResourceIdentifier, IResourceIdentifier>>>(ret);
 	}
+
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture<Void> setProperties(Properties props)
+	{
+		Property[]	links	= props.getProperties("link");
+		for(int i=0; i<links.length; i++)
+		{
+			Tuple2<IResourceIdentifier, IResourceIdentifier> link = (Tuple2<IResourceIdentifier, IResourceIdentifier>)
+				JavaReader.objectFromXML(links[i].getValue(), rootloader);
+			if(SYSTEMCPRID.equals(link.getFirstEntity()))
+			{
+				addTopLevelURL(link.getSecondEntity().getLocalIdentifier().getUrl());
+			}
+			else
+			{
+				addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true); // workspace?
+			}
+		}
+		
+		return IFuture.DONE;
+	}
 	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture<Properties> getProperties()
+	{
+		Properties props	= new Properties();
+		
+		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
+		{
+			String slink = JavaWriter.objectToXML(link, rootloader);
+			props.addProperty(new Property("link", slink));
+		}
+		
+		return new Future<Properties>(props);		
+	}
+	
+//	/**
+//	 *  Write current state into properties.
+//	 */
+//	public IFuture<Properties> getProperties()
+//	{
+//		String[]	entries;
+//		if(libcl != null)
+//		{
+//			synchronized(this)
+//			{
+//				List urls = new ArrayList(libcl.getAllURLs());
+//				entries	= new String[urls.size()];
+//				for(int i=0; i<entries.length; i++)
+//				{
+//					
+//					String	url	= urls.get(i).toString();
+//					File	file	= urlToFile(url.toString());
+//					if(file!=null)
+//					{
+//						String	filename	= SUtil.convertPathToRelative(file.getAbsolutePath());
+//						String fileurl;
+//						try
+//						{
+//							// URI wouldn't allow relative names, so pretend its an absolute path.
+//							fileurl = "file:"+new URI("file", null, "/"+filename.replace('\\', '/'), null).toURL().toString().substring(6);
+//						}
+//						catch(Exception e)
+//						{
+//							fileurl	= "file:"+filename.replace('\\', '/');
+//						}
+//						if(url.startsWith("jar:file:"))
+//						{
+//							entries[i]	= "jar:" + fileurl;
+//						}
+//						else
+//						{
+//							entries[i]	= fileurl;
+//						}
+//						if(url.endsWith("!/") && entries[i].endsWith("!"))
+//							entries[i]	+= "/";	// Stripped by new File(...).
+//					}
+//					else
+//					{
+//						entries[i]	= url;
+//					}
+//				}
+//			}
+//		}
+//		else
+//		{
+//			entries = new String[0];
+//		}
+//		
+//		Properties props	= new Properties();
+//		for(int i=0; i<entries.length; i++)
+//		{
+//			props.addProperty(new Property("entry", entries[i]));
+//		}
+//		return new Future<Properties>(props);		
+//		return new Future<Properties>(new Properties());
+//	}
 }
 
