@@ -276,10 +276,9 @@ public class MavenDependencyResolverService	implements IDependencyService
 		// todo: get stored rid for url?!
 		ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 		IGlobalResourceIdentifier gid	= null;
-		ModelSource	pom	= findModelSource(url);
-		if(pom!=null)
+		Model model	= loadModelSource(url);
+		if(model!=null)
 		{
-			Model	model	= loadPom(pom);
 			String id = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
 			gid = new GlobalResourceIdentifier(id, null, null); // todo: repo url
 		}
@@ -304,11 +303,10 @@ public class MavenDependencyResolverService	implements IDependencyService
 		// Resolve from local URL.
 		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getComponentIdentifier()))
 		{
-			ModelSource	pom	= findModelSource(rid.getLocalIdentifier().getUrl());
+			Model model = loadModelSource(rid.getLocalIdentifier().getUrl());
 			
-			if(pom!=null)
+			if(model!=null)
 			{
-				final Model model = loadPom(pom);
 				List<org.apache.maven.model.Dependency>	deps	= model.getDependencies();
 				List<IResourceIdentifier>	deprids	= new ArrayList<IResourceIdentifier>();
 				String id = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
@@ -488,8 +486,9 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 *  Find the model source (i.e. POM location) for a URL.
 	 *  @param url	The url to a maven artifact (e.g. jar or classes directory).
 	 */
-	protected static ModelSource	findModelSource(final URL url)
+	protected Model loadModelSource(final URL url)
 	{
+		Model ret = null;
 		ModelSource	pom = null;
 		
 		// Jar file.
@@ -520,6 +519,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 							}
 						};
 					}
+					ret = loadPom(pom);
 				}
 			}
 			catch(Exception e)
@@ -532,12 +532,25 @@ public class MavenDependencyResolverService	implements IDependencyService
 		// Classes directory
 		else
 		{
-			File	dir = findBasedir(getFile(url));
+			File dir = findBasedir(getFile(url));
 			if(dir!=null)
 			{
 				try
 				{
 					pom	= new FileModelSource(new File(dir, "pom.xml"));
+					ret = loadPom(pom);
+					
+					File dest = new File(url.getFile());
+					File tmp = new File(ret.getBuild().getOutputDirectory());
+					if(!dest.getCanonicalPath().equals(tmp.getCanonicalPath()))
+					{
+						tmp = new File(ret.getBuild().getTestOutputDirectory());
+						if(!dest.getCanonicalPath().equals(tmp.getCanonicalPath()))
+						{
+//							System.out.println("Found wrong pom: "+url);
+							ret = null;
+						}
+					}
 				}
 				catch(Exception e)
 				{
@@ -547,7 +560,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			}
 		}
 
-		return pom;
+		return ret;
 	}
 
 	/**
