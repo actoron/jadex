@@ -164,7 +164,7 @@ public class MessagePerformanceAgent extends MicroAgent
 										public void exceptionOccurred(Exception exception)
 										{
 											System.out.println("message not sent: "+exception);
-											exception.printStackTrace();
+//											exception.printStackTrace();
 										}
 									});
 									if(i%100==0)

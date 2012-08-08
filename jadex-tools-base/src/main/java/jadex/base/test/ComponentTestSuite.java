@@ -198,7 +198,7 @@ public class ComponentTestSuite extends TestSuite
 								{
 									if(start)
 									{
-//										addTest(new ComponentStartTest(cms, model, this));
+										addTest(new ComponentStartTest(cms, model, this));
 									}
 								}
 							}

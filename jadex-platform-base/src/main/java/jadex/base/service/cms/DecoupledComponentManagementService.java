@@ -1192,7 +1192,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 			}			
 			else
 			{
-				ret.setException(new RuntimeException("Cannot kill, no such component: "+cid));
+				ret.setException(new ComponentTerminatedException(cid, "Cannot kill, no such component."));
 			}
 		}
 	}

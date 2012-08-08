@@ -335,7 +335,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 //				System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 				
-				if(loc!=null && !loc.equals(IComponentIdentifier.LOCAL.get()))
+				if(loc!=null && IComponentIdentifier.LOCAL.get()!=null && !loc.equals(IComponentIdentifier.LOCAL.get()))
 				{
 					logger.severe("Component thread backswitch failed. Should be: "+loc+" but is "+IComponentIdentifier.LOCAL.get());
 				}
