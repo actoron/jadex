@@ -895,6 +895,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				public void resultAvailable(Object result)
 				{
 					// If already had exception do nothing.
+					// Cannot cause race conditions as the checker is called only if all tasks have been done.
 					if(future.isDone())
 						return;
 					
