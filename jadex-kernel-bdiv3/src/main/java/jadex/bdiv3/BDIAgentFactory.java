@@ -81,13 +81,13 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		
 		this.libservicelistener = new ILibraryServiceListener()
 		{
-			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean removable)
 			{
 				loader.clearModelCache();
 				return IFuture.DONE;
 			}
 			
-			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
+			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
 			{
 				loader.clearModelCache();
 				return IFuture.DONE;

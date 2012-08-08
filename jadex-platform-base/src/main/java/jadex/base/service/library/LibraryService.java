@@ -202,10 +202,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 				{
 					final IResourceIdentifier rid = deps.getFirstEntity();
-					
-					// Must be added with resolved rid (what about resolving parent)
-					addLink(parid, rid);
-					
 	//				System.out.println("add end "+rid+" on: "+parid);
 					
 					getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
@@ -213,6 +209,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					{
 						public void customResultAvailable(final DelegationURLClassLoader chil)
 						{
+							// Must be added with resolved rid (what about resolving parent)
+							addLink(parid, rid);
 							ret.setResult(rid);
 						}
 					});
@@ -246,7 +244,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		else
 		{
-		
 			removeLink(parid, rid);
 			removeSupport(rid, parid);
 			ret.setResult(null);
@@ -1138,7 +1135,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Create properties from rid.
+	 *  @param The resource identifier.
+	 *  @return rid The resource identifier properties.
 	 */
 	public Properties ridToProperties(IResourceIdentifier rid)
 	{
@@ -1161,7 +1160,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/**
-	 * 
+	 *  Create a rid from properties.
+	 *  @param rid The resource identifier properties.
+	 *  @return The resource identifier.
 	 */
 	public IResourceIdentifier ridFromProperties(Properties rid)
 	{
