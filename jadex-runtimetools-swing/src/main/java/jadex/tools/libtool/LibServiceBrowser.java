@@ -261,13 +261,18 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 												final URL url = ((File)obj).toURI().toURL();
 												jcc.setStatusText("Started adding: "+url);
 												libservice.addTopLevelURL(url)
-													.addResultListener(new SwingDefaultResultListener<Void>()
+													.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 												{
-													public void customResultAvailable(Void result)
+													public void resultAvailable(Void result)
 													{
 														jcc.setStatusText("Finished adding: "+url);
 													}
-												});
+													
+													public void exceptionOccurred(Exception e)
+													{
+														jcc.setStatusText("Error adding: "+url+" "+e.getMessage());
+													}
+												}));
 											}
 											catch(Exception e)
 											{
@@ -346,13 +351,18 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 												final IResourceIdentifier frid = rid;
 												jcc.setStatusText("Started adding: "+frid);
 												libservice.addResourceIdentifier(selrid, rid, true)
-													.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+													.addResultListener(new SwingResultListener<IResourceIdentifier>(new IResultListener<IResourceIdentifier>()
 												{
-													public void customResultAvailable(IResourceIdentifier result)
+													public void resultAvailable(IResourceIdentifier result)
 													{
 														jcc.setStatusText("Finished adding: "+frid);
 													}
-												});
+													
+													public void exceptionOccurred(Exception e)
+													{
+														jcc.setStatusText("Error adding: "+frid+" "+e.getMessage());
+													}
+												}));
 											}
 											
 										}
@@ -522,18 +532,18 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					IResourceIdentifier parid = puo instanceof IResourceIdentifier? (IResourceIdentifier)puo: null;
 					
 					libservice.removeResourceIdentifier(parid, (IResourceIdentifier)uo)
-						.addResultListener(new SwingDefaultResultListener<Void>()
+						.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 					{
-						public void customResultAvailable(Void result)
+						public void resultAvailable(Void result)
 						{
 							refresh(false);
 						}
 						
-						public void customExceptionOccurred(Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							jcc.displayError("Library error", "Could not remove url", exception);
 						}
-					});
+					}));
 				}
 			}
 		});
@@ -548,46 +558,6 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		classview.add("Center", scroll);
 		classview.add("South", buts);
-		
-		final JPanel otherview = new JPanel(new BorderLayout());
-		final DefaultListModel dlm = new DefaultListModel();
-		libservice.getNonManagedURLs().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
-		{
-			public void customResultAvailable(Object result)
-			{
-				List entries = (List)result;
-				for(int i=0; i<entries.size(); i++)
-				{
-					dlm.addElement(entries.get(i));
-				}
-			}
-		});
-		
-		final JList otherlist = new JList(dlm);
-		JPanel obuts = new JPanel(new BorderLayout());
-		JButton refresh = new JButton("Refresh");
-		obuts.add("East", refresh);
-		refresh.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				libservice.getNonManagedURLs().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
-				{
-					public void customResultAvailable(Object result)
-					{
-						List entries = (List)result;
-						DefaultListModel dlm = (DefaultListModel)otherlist.getModel();
-						dlm.removeAllElements();
-						for(int i=0; i<entries.size(); i++)
-						{
-							dlm.addElement((String)entries.get(i));
-						}
-					}
-				});
-			}
-		});
-		otherview.add("Center", new JScrollPane(otherlist));
-		otherview.add("South", obuts);
 		
 		this.setLayout(new BorderLayout());
 		this.add(classview, BorderLayout.CENTER);
@@ -872,12 +842,16 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		/** Flag if children have been created. */
 		protected boolean childrencreated;
 		
+		/** The last child count. */
+		protected int childcnt;
+		
 		/**
 		 *  Create a new RidNode.
 		 */
 		public LazyNode(Object o)
 		{
 			super(o);
+			this.childcnt = getChildCount();
 		}
 
 		/**
@@ -1106,9 +1080,14 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		 */
 		public void refresh()
 		{
-			// Only perform refresh if children have been created
-			if(childrencreated)
-			{
+			if(childrencreated || childcnt!=getChildCount())
+			{				
+				childcnt = getChildCount();
+				if(!childrencreated)
+				{
+					createChildren();
+				}
+				
 				List<IResourceIdentifier> cs = deps.get(getMyUserObject());
 
 				List<IResourceIdentifier> toadd = new ArrayList<IResourceIdentifier>(cs);

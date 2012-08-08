@@ -202,18 +202,28 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> deps)
 				{
 					final IResourceIdentifier rid = deps.getFirstEntity();
-	//				System.out.println("add end "+rid+" on: "+parid);
-					
-					getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
-						new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
+	//				
+					// If could not be resolved to local (or already was local) consider as exception.
+					if(rid.getLocalIdentifier()==null)
 					{
-						public void customResultAvailable(final DelegationURLClassLoader chil)
+						ret.setException(new RuntimeException("Global rid could not be resolved to local: "+rid));
+					}
+					else
+					{
+//						System.out.println("add end "+rid+" on: "+parid);
+	
+						// Must be added with resolved rid (what about resolving parent)
+						addLink(parid, rid);
+	
+						getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
+							new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
 						{
-							// Must be added with resolved rid (what about resolving parent)
-							addLink(parid, rid);
-							ret.setResult(rid);
-						}
-					});
+							public void customResultAvailable(final DelegationURLClassLoader chil)
+							{
+								ret.setResult(rid);
+							}
+						});
+					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -225,6 +235,19 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			
 	//		System.out.println("current: "+SUtil.arrayToString(rootloader.getAllResourceIdentifiers()));
 		}
+		
+//		ret.addResultListener(new IResultListener<IResourceIdentifier>()
+//		{
+//			public void resultAvailable(IResourceIdentifier result)
+//			{
+//				System.out.println("good");
+//			}
+//
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
+//			}
+//		});
 		
 		return ret;
 	}
@@ -722,17 +745,28 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Add support for a rid.
 	 */
-	protected void addSupport(IResourceIdentifier rid, IResourceIdentifier support)
+	protected void addSupport(IResourceIdentifier rid, IResourceIdentifier parid)
 	{
-		if(rid!=null)// && !SYSTEMCPRID.equals(support))
+		if(rid==null)
+			throw new IllegalArgumentException("Must not null: "+rid);
+				
+		DelegationURLClassLoader pacl = parid==null? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
+		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
+		pacl.addDelegateClassLoader(cl);
+		if(cl.addParentClassLoader(pacl))
 		{
-			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
-			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
-			pacl.addDelegateClassLoader(cl);
-			if(cl.addParentClassLoader(pacl))
+			rids = null;
+			notifyAdditionListeners(parid, rid);
+		}
+		
+		// Check if pending user entries can be restored
+		for(Iterator<Tuple2<IResourceIdentifier, IResourceIdentifier>> it=addtodo.iterator(); it.hasNext(); )
+		{
+			Tuple2<IResourceIdentifier, IResourceIdentifier> link = it.next();
+			if(rid.equals(link.getFirstEntity()))
 			{
-				rids = null;
-				notifyAdditionListeners(support, rid);
+				addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true);
+				it.remove();
 			}
 		}
 	}
@@ -740,27 +774,27 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Remove support for a rid.
 	 */
-	protected void removeSupport(IResourceIdentifier rid, IResourceIdentifier support)
+	protected void removeSupport(IResourceIdentifier rid, IResourceIdentifier parid)
 	{
-		if(rid!=null)// && !SYSTEMCPRID.equals(support))
+		if(rid==null)
+			throw new IllegalArgumentException("Must not null: "+rid);
+
+		DelegationURLClassLoader pacl = parid==null? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
+		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
+		pacl.removeDelegateClassLoader(cl);
+		if(cl.removeParentClassLoader(pacl))
 		{
-			DelegationURLClassLoader pacl = support==null? rootloader: (DelegationURLClassLoader)classloaders.get(support);
-			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
-			pacl.removeDelegateClassLoader(cl);
-			if(cl.removeParentClassLoader(pacl))
+			rids = null;
+			notifyRemovalListeners(parid, rid);
+		}
+		
+		// If last support, delete removeSupport to children.
+		if(!cl.hasParentClassLoader())
+		{
+			DelegationURLClassLoader[] dels = cl.getDelegateClassLoaders();
+			for(DelegationURLClassLoader del: dels)
 			{
-				rids = null;
-				notifyRemovalListeners(support, rid);
-			}
-			
-			// If last support, delete removeSupport to children.
-			if(!cl.hasParentClassLoader())
-			{
-				DelegationURLClassLoader[] dels = cl.getDelegateClassLoaders();
-				for(DelegationURLClassLoader del: dels)
-				{
-					removeSupport(del.getResourceIdentifier(), rid);
-				}
+				removeSupport(del.getResourceIdentifier(), rid);
 			}
 		}
 	}
@@ -1108,8 +1142,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			addResourceIdentifier(link.getFirstEntity(), link.getSecondEntity(), true); // workspace?
 		}
 		
-		System.out.println("todo: "+todo);
-		System.out.println("addtodo: "+addtodo);
+//		System.out.println("todo: "+todo);
+//		System.out.println("addtodo: "+addtodo);
 		
 		return IFuture.DONE;
 	}
