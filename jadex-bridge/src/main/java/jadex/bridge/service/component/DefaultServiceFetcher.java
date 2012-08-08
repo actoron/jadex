@@ -894,6 +894,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				public void resultAvailable(Object result)
 				{
+					// If already had exception do nothing.
+					if(future.isDone())
+						return;
+					
 					if(!binding.isDynamic())
 						DefaultServiceFetcher.this.result = future.getIntermediateResults();
 					
@@ -913,7 +917,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		
 		/**
 		 *  Called when an intermediate result is available.
-		 * @param result The result.
+		 *  @param result The result.
 		 */
 		public void customIntermediateResultAvailable(Object result)
 		{
