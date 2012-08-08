@@ -17,6 +17,8 @@ import jadex.micro.annotation.Description;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -35,6 +37,10 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 		
 	/** The socket. */
 	protected DatagramSocket socket;
+	
+	/** The tcp socket used for master detection. */
+	// Hack!!! Required because datagram socket sometimes can be bound twice to same port (on win7/x64 when starting from bat and another platform from eclipse)
+	protected ServerSocket tcpsocket;
 	
 	/** The receive buffer. */
 	protected byte[] buffer;
@@ -122,6 +128,11 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	{
 		try
 		{
+			if(tcpsocket!=null)
+			{
+				tcpsocket.close();
+				tcpsocket = null;
+			}
 			if(socket!=null)
 			{
 				socket.close();
@@ -147,13 +158,29 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 			{
 				try
 				{
-					socket = new DatagramSocket(port);
+					tcpsocket	= new ServerSocket(getPort());
+					socket = new DatagramSocket(getPort());	// (null);
+//					socket.setReuseAddress(false);
+//					socket.bind(new InetSocketAddress(port));
 					socket.setBroadcast(true);
-//					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
+//					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port+"; "+socket.isConnected()+"; "+socket.isClosed());
 					getMicroAgent().getLogger().info("local master at: "+SUtil.getInetAddress()+" "+port);
 				}
 				catch(Exception e)
 				{
+					if(tcpsocket!=null)
+					{
+						try
+						{
+							tcpsocket.close();
+							tcpsocket	= null;
+						}
+						catch(Exception ex)
+						{
+							
+						}
+					}
+					
 					try
 					{
 						// In case the receiversocket cannot be opened

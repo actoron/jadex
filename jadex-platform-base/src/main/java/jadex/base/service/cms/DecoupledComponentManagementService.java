@@ -1084,7 +1084,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		else
 		{
 			InitInfo infos	= getInitInfo(cid);
-			final IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
+			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
 			
 			// Terminate component that is shut down during init.
 			if(infos!=null && !infos.getInitFuture().isDone())
@@ -1105,10 +1105,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 			}
 			
 			// Terminate normally inited component.
-			else 
-			{
-				assert adapter!=null : cid;
-				
+			else if(adapter!=null)
+			{				
 				// Kill subcomponents
 				logger.info("Terminating component structure: "+cid.getName());
 				final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
@@ -1191,6 +1189,10 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 						exitDestroy(cid, desc, exception, null);
 					}
 				}));
+			}			
+			else
+			{
+				ret.setException(new RuntimeException("Cannot kill, no such component: "+cid));
 			}
 		}
 	}
