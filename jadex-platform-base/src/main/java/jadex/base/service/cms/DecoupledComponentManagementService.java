@@ -840,7 +840,12 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 					
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("factory ex: "+exception);
+					// Todo: sometimes nullpointerexception is caused below (because agent is null???).
+					if(!(exception instanceof ComponentCreationException))
+					{
+						System.out.println("factory ex: "+exception+", "+agent);
+					}
+					
 					IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 					{
@@ -1078,21 +1083,16 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		}
 		else
 		{
-			IComponentAdapter ad;
-			InitInfo infos;
-			ad = (IComponentAdapter)adapters.get(cid);
-			infos = getInitInfo(cid);
+			InitInfo infos	= getInitInfo(cid);
+			final IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
+			
 			// Terminate component that is shut down during init.
-//			if(infos!=null && infos.length>0 && !((IFuture)infos[4]).isDone())
 			if(infos!=null && !infos.getInitFuture().isDone())
 			{
 				// Propagate failed component init.
-				ad	= infos.getAdapter();
-				if(ad==null || ad.getException()!=null)
+				if(adapter!=null && adapter.getException()!=null)
 				{
-//					if(cid.toString().indexOf("Mandelbrot")!=-1)
-//						System.out.println("init future exception: "+cid.getName());
-					infos.getInitFuture().setException(ad.getException());
+					infos.getInitFuture().setException(adapter.getException());
 				}
 				
 				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
@@ -1103,108 +1103,94 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 					logger.info("Queued component termination during init: "+cid.getName());
 				}
 			}
+			
 			// Terminate normally inited component.
 			else 
 			{
-				final IComponentAdapter adapter = ad;
+				assert adapter!=null : cid;
 				
 				// Kill subcomponents
-				if(adapter==null)
-				{
-//					if(cid.toString().indexOf("Mandelbrot")!=-1)
-//						System.out.println("Terminating component structure adapter is null: "+cid.getName());
-//					
-					// Todo: need to kill children!? How to reproduce this case!?
-					logger.info("Terminating component structure adapter is null: "+cid.getName());
-					exitDestroy(cid, null, new ComponentTerminatedException(cid, "Component does not exist."), null);
-				}
-				else
-				{
-//					if(cid.toString().indexOf("Mandelbrot")!=-1)
-//						System.out.println("Terminating component structure: "+cid.getName());
-//					
-					logger.info("Terminating component structure: "+cid.getName());
-					final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
-					IComponentIdentifier[] achildren = desc.getChildren();
-					
+				logger.info("Terminating component structure: "+cid.getName());
+				final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
+				IComponentIdentifier[] achildren = desc.getChildren();
+				
 //					System.out.println("kill childs: "+cid+" "+SUtil.arrayToString(achildren));
-					
-					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(createResultListener(new IResultListener<List<Exception>>()
+				
+				destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(createResultListener(new IResultListener<List<Exception>>()
+				{
+					public void resultAvailable(List<Exception> result)
 					{
-						public void resultAvailable(List<Exception> result)
-						{
 //							if(cid.toString().indexOf("Mandelbrot")!=-1)
 //								System.out.println("Terminated component structure: "+cid.getName());
-							
-							logger.info("Terminated component structure: "+cid.getName());
-							CleanupCommand	cc	= null;
-							IFuture<Void>	fut	= null;
-							synchronized(adapters)
+						
+						logger.info("Terminated component structure: "+cid.getName());
+						CleanupCommand	cc	= null;
+						IFuture<Void>	fut	= null;
+						synchronized(adapters)
+						{
+							try
 							{
-								try
+								IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+								// Component may be already killed (e.g. when autoshutdown).
+								if(adapter!=null)
 								{
-									IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-									// Component may be already killed (e.g. when autoshutdown).
-									if(adapter!=null)
-									{
 //										if(cid.toString().indexOf("Mandelbrot")!=-1)
 //											System.out.println("destroy1: "+cid.getName());
 //										
-										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-										// todo: killcomponent should only be called once for each component?
-										if(!ccs.containsKey(cid))
-										{
+									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+									// todo: killcomponent should only be called once for each component?
+									if(!ccs.containsKey(cid))
+									{
 //											if(cid.toString().indexOf("Mandelbrot")!=-1)
 //												System.out.println("killing a: "+cid);
-											
-											cc	= new CleanupCommand(cid);
-											ccs.put(cid, cc);
-											logger.info("Terminating component: "+cid.getName());
-											fut	= killComponent(adapter);
-		//									component.killComponent(cc);	
-										}
-										else
-										{
+										
+										cc	= new CleanupCommand(cid);
+										ccs.put(cid, cc);
+										logger.info("Terminating component: "+cid.getName());
+										fut	= killComponent(adapter);
+	//									component.killComponent(cc);	
+									}
+									else
+									{
 //											if(cid.toString().indexOf("Mandelbrot")!=-1)
 //												System.out.println("killing b: "+cid);
-											
-											cc = (CleanupCommand)ccs.get(cid);
-										}
+										
+										cc = (CleanupCommand)ccs.get(cid);
 									}
 								}
-								catch(Throwable e)
-								{
-									e.printStackTrace();
-								}
 							}
-							
-							// Add listener outside synchronized block to avoid deadlocks
-							if(fut!=null && cc!=null)
+							catch(Throwable e)
 							{
-								// Cannot use invoke later during platform shutdown
-								IResultListener lis = cid.getParent()==null? cc: createResultListener(cc);
-								fut.addResultListener(lis);
-							}
-							
-							if(cc==null)
-							{
-								// Todo: what is this case?
-								exitDestroy(cid, desc, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()), null);
-							}
-							else
-							{
-								// Resume component to be killed in case it is currently suspended.
-								resumeComponent(cid);
+								e.printStackTrace();
 							}
 						}
 						
-						public void exceptionOccurred(Exception exception)
+						// Add listener outside synchronized block to avoid deadlocks
+						if(fut!=null && cc!=null)
 						{
-//							System.out.println("ex: "+exception);
-							exitDestroy(cid, desc, exception, null);
+							// Cannot use invoke later during platform shutdown
+							IResultListener lis = cid.getParent()==null? cc: createResultListener(cc);
+							fut.addResultListener(lis);
 						}
-					}));
-				}
+						
+						if(cc==null)
+						{
+							// Todo: what is this case?
+							exitDestroy(cid, desc, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()), null);
+						}
+						else
+						{
+							// Resume component to be killed in case it is currently suspended.
+							resumeComponent(cid);
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//							System.out.println("ex: "+exception);
+						exitDestroy(cid, desc, exception, null);
+					}
+				}));
 			}
 		}
 	}

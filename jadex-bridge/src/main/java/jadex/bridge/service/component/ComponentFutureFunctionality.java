@@ -29,6 +29,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	 */
 	public ComponentFutureFunctionality(IExternalAccess ea, IComponentAdapter adapter)
 	{
+		super(adapter.getLogger());
 		this.ea	= ea;
 		this.adapter	= adapter;
 	}

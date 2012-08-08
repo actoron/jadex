@@ -139,7 +139,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				ret = FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality());
+				ret = FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality(logger));
 				final Future fret = (Future)ret;
 //				System.out.println("fret: "+fret+" "+method);
 //				fret.addResultListener(new IResultListener()

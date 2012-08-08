@@ -405,7 +405,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 //				final IIntermediateFuture<?> iresfut = res instanceof IIntermediateFuture? (IIntermediateFuture<?>)res: null;
 				
-				FutureFunctionality func = new FutureFunctionality()
+				FutureFunctionality func = new FutureFunctionality(sic.getCallerAdapter()!=null ? sic.getCallerAdapter().getLogger() : null)
 				{
 					List<Object> ires;
 					

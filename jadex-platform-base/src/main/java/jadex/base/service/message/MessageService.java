@@ -458,7 +458,6 @@ public class MessageService extends BasicService implements IMessageService
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								exception.printStackTrace();
 								super.exceptionOccurred(exception);
 							}
 						});

@@ -25,11 +25,23 @@ import java.util.logging.Logger;
  */
 public class FutureFunctionality
 {
+	/** The logger used for notification failure warnings (if any). */
+	protected Logger	logger;
+	
 	/**
 	 * 
 	 */
-	public FutureFunctionality()
+	public FutureFunctionality(Logger logger)
 	{
+		this.logger	= logger;
+	}
+	
+	/**
+	 *  Get the logger.
+	 */
+	protected Logger	getLogger()
+	{
+		return logger!=null ? logger : Logger.getAnonymousLogger();
 	}
 	
 	/**
@@ -478,7 +490,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! notification in functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when starting scheduled notifications: "+exception);
+				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
 				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyListener(listener);
 			}
 		});
@@ -498,7 +510,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when terminating future: "+exception);
+				func.getLogger().warning("Exception when terminating future: "+exception);
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
 			}
 		});
@@ -728,7 +740,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! notification in functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when starting scheduled notifications: "+exception);
+				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
 				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
 			}
 		});
@@ -748,7 +760,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when terminating future: "+exception);
+				Logger.getAnonymousLogger().warning("Exception when terminating future: "+exception);
 				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
 			}
 		});
@@ -868,7 +880,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when notifying: "+exception);
+				func.getLogger().warning("Exception when notifying: "+exception);
 				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
 			}
 		});
@@ -888,7 +900,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! termination in functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when terminating future: "+exception);
+				func.getLogger().warning("Exception when terminating future: "+exception);
 				DelegatingTerminableDelegationFuture.super.terminate(reason);
 			}
 		});
@@ -1109,7 +1121,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when starting scheduled notifications: "+exception);
+				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
 				DelegatingIntermediateFuture.super.notifyListener(listener);
 			}
 		});
@@ -1219,7 +1231,7 @@ class DelegatingFuture extends Future<Object>
 			public void exceptionOccurred(Exception exception)
 			{
 				// Hack!!! functionality failed -> should change result of future to failure?
-				Logger.getAnonymousLogger().severe("Exception when notifying: "+exception);
+				func.getLogger().warning("Exception when notifying: "+exception);
 				DelegatingFuture.super.notifyListener(listener);
 			}
 		});

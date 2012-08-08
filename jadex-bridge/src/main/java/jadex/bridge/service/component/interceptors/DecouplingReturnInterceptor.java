@@ -85,7 +85,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				
 				if(res instanceof IFuture)
 				{
-					FutureFunctionality func = new FutureFunctionality()
+					FutureFunctionality func = new FutureFunctionality(ada!=null ? ada.getLogger() : null)
 					{
 						public void notifyListener(final IResultListener<Void> listener)
 						{
@@ -124,7 +124,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											}
 											else
 											{
-												listener.exceptionOccurred(e);
+												listener.exceptionOccurred(new RuntimeException("Cannot reschedule "+sic+": "+e));
 											}
 										}
 									};

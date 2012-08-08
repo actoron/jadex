@@ -402,7 +402,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 				};
 				
-				FutureFunctionality func = new FutureFunctionality()
+				FutureFunctionality func = new FutureFunctionality(adapter.getLogger())
 				{
 					TimeoutException ex = null;
 					
