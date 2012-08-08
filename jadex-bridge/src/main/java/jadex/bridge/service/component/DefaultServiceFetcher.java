@@ -898,10 +898,13 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						DefaultServiceFetcher.this.result = future.getIntermediateResults();
 					
 					if(future.getIntermediateResults().size()==0)
+					{
 						StoreIntermediateDelegationResultListener.this.exceptionOccurred(new ServiceNotFoundException("no results"));
+					}
 					else
+					{
 						StoreIntermediateDelegationResultListener.super.finished();
-					
+					}
 				}
 			});
 		}
@@ -932,7 +935,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 //					System.out.println("ex: "+exception);
 //					exception.printStackTrace();
-					StoreIntermediateDelegationResultListener.super.exceptionOccurred(exception);
+					if(!future.isDone())
+						StoreIntermediateDelegationResultListener.super.exceptionOccurred(exception);
 					ret.setResult(null);
 				}
 			});
