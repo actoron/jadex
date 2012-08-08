@@ -935,8 +935,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 //					System.out.println("ex: "+exception);
 //					exception.printStackTrace();
-					if(!future.isDone())
-						StoreIntermediateDelegationResultListener.super.exceptionOccurred(exception);
+					// Avoid having multiple exception occurred notifications.
+					future.setExceptionIfUndone(exception);
+//					if(!future.isDone())
+//						StoreIntermediateDelegationResultListener.super.exceptionOccurred(exception);
 					ret.setResult(null);
 				}
 			});
