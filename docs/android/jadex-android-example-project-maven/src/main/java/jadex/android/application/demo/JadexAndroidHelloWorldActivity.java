@@ -39,7 +39,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	private TextView textView;
 
 	/** Called when the activity is first created. */
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -61,7 +60,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		registerEventReceiver(ShowToastEvent.TYPE,
 				new IEventReceiver<ShowToastEvent>() {
 
-					@Override
 					public void receiveEvent(final ShowToastEvent event) {
 						runOnUiThread(new Runnable() {
 
@@ -74,7 +72,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 						});
 					}
 
-					@Override
 					public Class<ShowToastEvent> getEventClass() {
 						return ShowToastEvent.class;
 					}
@@ -82,19 +79,16 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 				});
 	}
 
-	@Override
 	protected void onResume() {
 		super.onResume();
 		refreshButtons();
 	}
 
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, 0, 0, "Control Center");
 		return true;
 	}
 
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == 0) {
 			if (isJadexPlatformRunning()) {
@@ -137,15 +131,11 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 				if (isJadexPlatformRunning()) {
 					new Thread(new Runnable()
 					{
-						
-						@Override
 						public void run()
 						{
 							getJadexContext().shutdownJadexPlatform(platformID);
 							runOnUiThread(new Runnable()
 							{
-								
-								@Override
 								public void run()
 								{
 									textView.setText("Platform stopped.");
@@ -179,7 +169,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 //				msg.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 				
 				sendMessage(msg, lastComponentIdentifier).addResultListener(new DefaultResultListener<Void>() {
-					@Override
 					public void resultAvailable(Void result) {
 					}
 					

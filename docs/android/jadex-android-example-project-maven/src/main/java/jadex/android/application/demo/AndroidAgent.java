@@ -71,14 +71,12 @@ public class AndroidAgent extends MicroAgent
 		event.setMessage(msg);
 		getRequiredService("androidcontext").addResultListener(new DefaultResultListener<Object>() {
 
-			@Override
 			public void resultAvailable(Object result) {
 				IContextService contextService = (IContextService) result;
 				boolean dispatchUiEvent = contextService.dispatchUiEvent(event);
 				Log.d("Agent", "dispatched: " + dispatchUiEvent);
 			}
 			
-			@Override
 			public void exceptionOccurred(Exception exception) {
 				exception.printStackTrace();
 			}

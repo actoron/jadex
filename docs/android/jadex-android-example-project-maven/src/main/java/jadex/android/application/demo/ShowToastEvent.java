@@ -8,7 +8,6 @@ public class ShowToastEvent implements IJadexAndroidEvent {
 	
 	public static final String TYPE = "showToast";
 	
-	@Override
 	public String getType() {
 		return TYPE;
 	}
