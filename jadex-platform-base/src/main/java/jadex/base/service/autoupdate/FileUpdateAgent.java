@@ -178,6 +178,7 @@ public class FileUpdateAgent extends UpdateAgent
 					else
 					{
 						// no newer version found
+						System.out.println("No newer version found.");
 						ret.setResult(null);
 					}
 				}

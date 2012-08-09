@@ -233,7 +233,7 @@ public class DirectoryDownloaderAgent
 						}
 						
 						targetfile.getParentFile().mkdirs();
-						long	length	= con.getContentLengthLong();
+						int	length	= con.getContentLength();
 						long	done	= 0;
 						InputStream	is	= con.getInputStream();
 						OutputStream	os	= new FileOutputStream(targetfile);

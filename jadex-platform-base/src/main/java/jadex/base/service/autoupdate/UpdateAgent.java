@@ -402,7 +402,7 @@ public class UpdateAgent implements IUpdateService
 								// Add -component jadex.base.service.autoupdate.FileUpdateAgent.class with fresh argument
 								Map<String, Object> uaargs = new HashMap<String, Object>();
 								uaargs.put("creator", agent.getComponentIdentifier());
-								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
+								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
 								argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
 								String deser = "\"jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)\"";
 								newargs.add("-component");
