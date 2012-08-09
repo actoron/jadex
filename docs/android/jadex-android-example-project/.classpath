@@ -8,21 +8,5 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="libs/jadex-android-antlr-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-android-xmlpull-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-bridge-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-commons-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-javaparser-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-kernel-base-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-kernel-bdi-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-kernel-bpmn-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-kernel-component-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-kernel-micro-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-platform-base-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-platform-standalone-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-rules-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-runtimetools-android-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-tools-base-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="libs/jadex-xml-2.1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

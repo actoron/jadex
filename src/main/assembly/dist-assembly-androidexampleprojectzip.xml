@@ -37,6 +37,14 @@
 			<directory>docs/android/jadex-android-example-project-maven/res</directory>
 			<outputDirectory>jadex-android-example-project/res</outputDirectory>
 		</fileSet>
+		<!-- Copy Manifest from maven example project to non-maven example project -->
+		<fileSet>
+			<directory>docs/android/jadex-android-example-project-maven/</directory>
+			<outputDirectory>jadex-android-example-project/</outputDirectory>
+			<includes>
+				<include>AndroidManifest.xml</include>
+			</includes>
+		</fileSet>
 
 	</fileSets>
 
