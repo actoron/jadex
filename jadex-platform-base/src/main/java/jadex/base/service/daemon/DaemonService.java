@@ -123,6 +123,8 @@ public class DaemonService implements IDaemonService
 							}
 							options.setClassPath(buf.toString());
 
+							System.out.println("cp: "+options.getClassPath());
+							
 							doStartPlatform(options).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 						}
 					});

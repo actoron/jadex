@@ -6,7 +6,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.modelinfo.Startable;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
@@ -38,6 +37,7 @@ import jadex.xml.writer.XMLWriterFactory;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -58,7 +58,8 @@ import java.util.Map;
 {
 	@Argument(name="interval", clazz=long.class, defaultvalue="5000"),
 	@Argument(name="creator", clazz=IComponentIdentifier.class),
-	@Argument(name="separatevm", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="separatevm", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="updateagent", clazz=String.class, defaultvalue="\"jadex.base.service.autoupdate.UpdateAgent.class\"")
 })
 @ComponentTypes(
 {
@@ -79,6 +80,9 @@ public class UpdateAgent implements IUpdateService
 	/** Flag if new vm should be used. */
 	@AgentArgument
 	protected boolean separatevm;
+	
+	@AgentArgument
+	protected String updateagent;
 	
 	/** The agent. */
 	@Agent
@@ -295,7 +299,7 @@ public class UpdateAgent implements IUpdateService
 		
 //		Starter.createPlatform(new String[]{"-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 //		Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
-		Starter.createPlatform(new String[]{"-maven_dependencies", "true", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
+		Starter.createPlatform(new String[]{"-maven_dependencies", "false", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
@@ -315,29 +319,8 @@ public class UpdateAgent implements IUpdateService
 	public IFuture<IComponentIdentifier> startPlatformInSeparateVM(final StartOptions so)
 	{
 		System.out.println("Starting platform in separate vm");
-		Thread.dumpStack();
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		
-		// todo: create new classpath for new version? 
-		
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("creator", agent.getComponentIdentifier());
-		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
-//		String argsstr = JavaWriter.objectToXML(args, null);
-		argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
-		String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)";
-//		
-		// todo: find out original configuration and parameters to replay on new
-		// todo for major release: make checkpoint and let new use checkpoint
-
-//		String comstr = "-maven_dependencies true -component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
-		String comstr = "-component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
-		System.out.println("generated: "+comstr);
-
-//		final StartOptions so = new StartOptions();
-//		so.setMain("jadex.base.Starter");
-		so.setProgramArguments(comstr);
 		
 		IFuture<IDaemonService> fut = agent.getRequiredService("daeser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IDaemonService, IComponentIdentifier>(ret)
@@ -364,11 +347,19 @@ public class UpdateAgent implements IUpdateService
 		so.setMain("jadex.base.Starter");
 		
 		RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
-		List<String> vmargs = RuntimemxBean.getInputArguments();
+		List<String> vmargs = new ArrayList<String>(RuntimemxBean.getInputArguments());
 
 		if(vmargs!=null && vmargs.size()>0)
 		{
-			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs), " "));
+			for(Iterator<String> it=vmargs.iterator(); it.hasNext(); )
+			{
+				String tst = it.next();
+//				if(tst.indexOf("-DXbootclasspath")!=-1 || tst.indexOf("-Dagentlib")!=-1)
+//				{
+//					it.remove();
+//				}
+			}
+//			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs), " "));
 		}
 		
 //		String cmd = System.getProperty("sun.java.command");
@@ -387,11 +378,41 @@ public class UpdateAgent implements IUpdateService
 						{
 							public void customResultAvailable(Map<String, Object> args)
 							{
-								String[] pargs = (String[])args.get(Starter.PROGRAM_ARGUMENTS);
-								if(pargs!=null)
+								// Set program args
+								
+								String[] oldargs = (String[])args.get(Starter.PROGRAM_ARGUMENTS);
+								List<String> newargs = new ArrayList<String>();
+								
+								if(oldargs!=null)
 								{
-									so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(pargs), " "));
+									for(int i=0; i<oldargs.length; i++)
+									{
+										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.base.service.autoupdate.FileUpdateAgent")!=-1)
+										{
+											i+=2;
+										}
+										else
+										{
+											newargs.add(oldargs[i]);
+										}
+									}
+									
 								}
+								
+								// Add -component jadex.base.service.autoupdate.FileUpdateAgent.class with fresh argument
+								Map<String, Object> uaargs = new HashMap<String, Object>();
+								uaargs.put("creator", agent.getComponentIdentifier());
+								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
+								argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
+								String deser = "\"jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)\"";
+								newargs.add("-component");
+								newargs.add(updateagent+"(:"+deser+")");
+//								newargs.add("\"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"");
+//								newargs.add("jadex.base.service.autoupdate.FileUpdateAgent.class(:"+deser+")");
+								System.out.println("generated: "+newargs);
+
+								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
+								
 								ret.setResult(so);
 							}
 						});

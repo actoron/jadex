@@ -47,7 +47,8 @@ public class JadexXMLReporterWrapper implements javax.xml.stream.XMLReporter
 		try
 		{
 			reporter.report(message, errorType, relatedInformation, StaxLocationWrapper.fromLocation(location));
-		} catch (Exception e)
+		} 
+		catch(Exception e)
 		{
 			throw new XMLStreamException(e);
 		}

@@ -144,7 +144,7 @@ public class StartOptions
 		// -cp
 		if(classpath!=null && classpath.length()>0)
 		{
-			cmd.append(" -cp \"").append(classpath).append("\"");
+			cmd.append(" -classpath \"").append(classpath).append("\"");
 		}
 //		for(int i=0; i<classpath.length; i++)
 //		{
@@ -168,7 +168,7 @@ public class StartOptions
 		if(getProgramArguments()!=null)
 			cmd.append(" ").append(getProgramArguments());
 		
-//		System.out.println("starting with: "+cmd.toString());
+		System.out.println("starting with: "+cmd.toString());
 		
 		return cmd.toString();
 	}
