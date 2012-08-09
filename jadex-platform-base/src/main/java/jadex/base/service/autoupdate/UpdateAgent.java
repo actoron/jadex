@@ -1,13 +1,10 @@
 package jadex.base.service.autoupdate;
 
 import jadex.base.Starter;
-import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -15,7 +12,6 @@ import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -39,7 +35,6 @@ import jadex.xml.writer.AWriter;
 import jadex.xml.writer.XMLWriterFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -67,9 +62,6 @@ public class UpdateAgent implements IUpdateService
 {
 	//-------- attributes --------
 	
-	/** The resource to update. */
-	protected IResourceIdentifier rid = new ResourceIdentifier(null, new GlobalResourceIdentifier("net.sourceforge.jadex:jadex-platform-standalone:2.1", null, null));
-
 	/** The creator. */
 	@AgentArgument
 	protected IComponentIdentifier creator;
@@ -107,6 +99,8 @@ public class UpdateAgent implements IUpdateService
 		{
 //			System.out.println("ack creator: "+creator);
 			
+			// Acknowledge creation if creator is not null
+			
 			Map<String, Object> msg = new HashMap<String, Object>();
 			msg.put(SFipa.RECEIVERS, creator);
 			agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new DelegationResultListener<Void>(ret));
@@ -135,19 +129,41 @@ public class UpdateAgent implements IUpdateService
 	@AgentBody
 	public IFuture<Void> body()
 	{
+		return startUpdating();
+	}
+	
+	/**
+	 *  Start the update check.
+	 */
+	protected IFuture<Void> startUpdating()
+	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		if(creator==null)
+		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
-			getVersion(rid).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				public void customResultAvailable(IResourceIdentifier newrid)
+				final IComponentStep<Void> self = this;
+				checkForUpdate().addResultListener(new ExceptionDelegationResultListener<UpdateInfo, Void>(ret)
 				{
-					startUpdating(newrid);
-				}
-			});
-		}
+					public void customResultAvailable(UpdateInfo ui)
+					{
+						if(ui!=null)
+						{
+							performUpdate(ui).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						else
+						{
+							agent.waitFor(interval, self);
+						}
+					}
+				});
+				return IFuture.DONE;
+			}
+		};
 		
+		agent.waitFor(interval, step);
+
 		return ret;
 	}
 	
@@ -206,23 +222,17 @@ public class UpdateAgent implements IUpdateService
 	/**
 	 *  Perform the update.
 	 */
-	public IFuture<Void> performUpdate()
+	public IFuture<Void> performUpdate(UpdateInfo ui)
 	{
 //		System.out.println("perform update");
 		
-		return performUpdate(rid);
-	}
-	
-	/**
-	 *  Perform the update.
-	 */
-	protected IFuture<Void> performUpdate(IResourceIdentifier rid)
-	{
 		final Future<Void> ret = new Future<Void>();
 		
 		if(separatevm)
 		{
-			startPlatformInSeparateVM().addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			StartOptions so = generateStartOptions(ui);
+			
+			startPlatformInSeparateVM(so).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 			{
 				public void customResultAvailable(IComponentIdentifier result) 
 				{
@@ -245,7 +255,7 @@ public class UpdateAgent implements IUpdateService
 	}
 	
 	/**
-	 * 
+	 *  Start a new platform in the same vm.
 	 */
 	public IFuture<IComponentIdentifier> startPlatformInSameVM()
 	{
@@ -265,13 +275,13 @@ public class UpdateAgent implements IUpdateService
 		// todo: find out original configuration and parameters to replay on new
 		// todo for major release: make checkpoint and let new use checkpoint
 		
-		String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
+//		String comstr = "-component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
 //		String comstr = "-maven_dependencies true -component jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")";
 //		System.out.println("generated: "+comstr);
 		
-		StartOptions so = new StartOptions();
-		so.setMain("jadex.base.Starter");
-		so.setProgramArguments(comstr);
+//		StartOptions so = new StartOptions();
+//		so.setMain("jadex.base.Starter");
+//		so.setProgramArguments(comstr);
 		
 //		Starter.createPlatform(new String[]{"-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 //		Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")"})
@@ -290,9 +300,9 @@ public class UpdateAgent implements IUpdateService
 	}
 	
 	/**
-	 * 
+	 *  Start a new platform in a separate vm.
 	 */
-	public IFuture<IComponentIdentifier> startPlatformInSeparateVM()
+	public IFuture<IComponentIdentifier> startPlatformInSeparateVM(final StartOptions so)
 	{
 		System.out.println("Starting platform in separate vm");
 		
@@ -314,8 +324,8 @@ public class UpdateAgent implements IUpdateService
 		String comstr = "-component \"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"";
 		System.out.println("generated: "+comstr);
 
-		final StartOptions so = new StartOptions();
-		so.setMain("jadex.base.Starter");
+//		final StartOptions so = new StartOptions();
+//		so.setMain("jadex.base.Starter");
 		so.setProgramArguments(comstr);
 		
 		IFuture<IDaemonService> fut = agent.getRequiredService("daeser");
@@ -333,86 +343,27 @@ public class UpdateAgent implements IUpdateService
 	//-------- helper methods --------
 	
 	/**
-	 *  Start the update check.
+	 * 
 	 */
-	protected IFuture<Void> startUpdating(final IResourceIdentifier rid)
+	protected StartOptions generateStartOptions(UpdateInfo ui)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		agent.waitFor(interval, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				checkForUpdate(rid).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
-				{
-					public void customResultAvailable(IResourceIdentifier newrid)
-					{
-						performUpdate().addResultListener(new DelegationResultListener<Void>(ret));
-						
-//						String d1s = rid.getGlobalIdentifier().getVersionInfo();
-//						String d2s = rid.getGlobalIdentifier().getVersionInfo();
-//						if(d1s!=null && d2s!=null)
-//						{
-//							try
-//							{
-//								Date d1 = new Date(new Long(d1s).longValue());
-//								Date d2 = new Date(new Long(d2s).longValue());
-//								if(d2.after(d1))
-//								{
-//									performUpdate().addResultListener(new DelegationResultListener<Void>(ret));
-//								}
-//							}
-//							catch(Exception e)
-//							{
-//								e.printStackTrace();
-//							}
-//						}
-//						else
-//						{
-//							ret.setResult(null);
-//						}
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
-		
+		final StartOptions ret = new StartOptions();
+		ret.setMain("jadex.base.Starter");
 		return ret;
 	}
 	
 	/**
 	 *  Check if an update is available.
 	 */
-	protected IFuture<IResourceIdentifier> checkForUpdate(final IResourceIdentifier rid)
+	protected IFuture<UpdateInfo> checkForUpdate()
 	{
-		return getVersion(rid);
+		return new Future<UpdateInfo>((UpdateInfo)null);
 	}
 	
-	/**
-	 *  Get the version for a resource.
-	 */
-	protected IFuture<IResourceIdentifier> getVersion(final IResourceIdentifier rid)
-	{
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		IFuture<IDependencyService> fut = agent.getServiceContainer().getRequiredService("depser");
-		fut.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
-		{
-			public void customResultAvailable(IDependencyService depser)
-			{
-				depser.loadDependencies(rid, false).addResultListener(new ExceptionDelegationResultListener<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>, IResourceIdentifier>(ret)
-				{
-					public void customResultAvailable(Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> result)
-					{
-						IResourceIdentifier newrid = result.getFirstEntity();
-//						System.out.println("versions: "+rid.getGlobalIdentifier().getVersionInfo()+" "+newrid.getGlobalIdentifier().getVersionInfo());
-						ret.setResult(newrid);
-					}
-				});
-			}
-		});
-		return ret;
-	}
-	
-
-	
+//	/**
+//	 *  Get the version for a resource.
+//	 */
+//	protected IFuture<IResourceIdentifier> getCurrentVersion()
+//	{
+//	}
 }

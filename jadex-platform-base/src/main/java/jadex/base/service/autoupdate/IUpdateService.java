@@ -10,7 +10,7 @@ public interface IUpdateService
 	/**
 	 * 
 	 */
-	public IFuture<Void> performUpdate();
+	public IFuture<Void> performUpdate(UpdateInfo ui);
 
 //	/**
 //	 * 

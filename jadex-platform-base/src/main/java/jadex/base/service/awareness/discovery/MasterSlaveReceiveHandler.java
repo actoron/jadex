@@ -41,10 +41,6 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 				received_self	= true;
 				return;
 			}
-//			else
-//			{
-//				received_self	= true;
-//			}
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 		}	
 

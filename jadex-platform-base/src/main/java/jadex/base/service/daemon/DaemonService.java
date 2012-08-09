@@ -73,8 +73,9 @@ public class DaemonService implements IDaemonService
 	}
 	
 	/**
-	 * Start a platform using a configuration.
-	 * @param args The arguments.
+	 *  Start a platform using a configuration.
+	 *  (automatically sets classpath to current cp if not set).
+	 *  @param args The arguments.
 	 */
 	public IFuture<IComponentIdentifier> startPlatform(StartOptions opt)
 	{
