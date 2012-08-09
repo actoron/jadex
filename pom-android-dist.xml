@@ -97,99 +97,34 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>com.github.goldin</groupId>
-						<artifactId>copy-maven-plugin</artifactId>
-						<version>0.2.5</version>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>groovy-maven-plugin</artifactId>
+						<version>1.4</version>
 						<executions>
 							<execution>
-								<id>copy</id>
 								<phase>process-resources</phase>
 								<goals>
-									<goal>copy</goal>
+									<goal>execute</goal>
 								</goals>
 								<configuration>
-									<resources>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-android-antlr/target/</targetPath>
-											<destFileName>jadex-android-antlr-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-android-xmlpull/target/</targetPath>
-											<destFileName>jadex-android-xmlpull-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-bridge/target/</targetPath>
-											<destFileName>jadex-bridge-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-commons/target/</targetPath>
-											<destFileName>jadex-commons-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-javaparser/target/</targetPath>
-											<destFileName>jadex-javaparser-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-kernel-base/target/</targetPath>
-											<destFileName>jadex-kernel-base-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-kernel-bdi/target/</targetPath>
-											<destFileName>jadex-kernel-bdi-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-kernel-bpmn/target/</targetPath>
-											<destFileName>jadex-kernel-bpmn-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-kernel-component/target/</targetPath>
-											<destFileName>jadex-kernel-component-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-kernel-micro/target/</targetPath>
-											<destFileName>jadex-kernel-micro-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-platform-base/target/</targetPath>
-											<destFileName>jadex-platform-base-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-platform-standalone/target/</targetPath>
-											<destFileName>jadex-javaparser-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-rules/target/</targetPath>
-											<destFileName>jadex-rules-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-runtimetools-android/target/</targetPath>
-											<destFileName>jadex-runtimetools-android-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-tools-base/target/</targetPath>
-											<destFileName>jadex-tools-base-${project.version}.jar.properties</destFileName>
-										</resource>
-										<resource>
-											<file>docs/android/sourceattachment.properties</file>
-											<targetPath>jadex-xml/target/</targetPath>
-											<destFileName>jadex-xml-${project.version}.jar.properties</destFileName>
-										</resource>
-									</resources>
+									<source>
+									println "Generating .jar.properties files ...";
+									def arr = "${project.modules}";
+									def ln = System.getProperty('line.separator')
+									
+									arr = arr[1 .. -2].replaceAll(" ","").replaceFirst(",docs/.*","").tokenize(',');
+									arr.each() {
+										module ->
+										def fileName = "./" + module + "/target/" + module + "-${project.version}.jar.properties";
+										def f = new File(fileName);
+										<![CDATA[
+										if (f.getParentFile().exists() && f.getParentFile().isDirectory()) {
+											f.asWritable().write("src=sources.zip");	
+											println fileName;
+										}
+										]]>
+									};
+									</source>
 								</configuration>
 							</execution>
 						</executions>

@@ -56,12 +56,6 @@
 	</fileSets>
 	
 	<files>
-<!-- 		<file> -->
-<!-- 			<source>docs/android/jadex-android-standalone-project-pom.xml</source> -->
-<!-- 			<outputDirectory>sources/</outputDirectory> -->
-<!-- 			<destName>pom.xml</destName> -->
-<!-- 		</file> -->
-
 		<file>
 			<source>pom.xml</source>
 			<outputDirectory>sources/</outputDirectory>
