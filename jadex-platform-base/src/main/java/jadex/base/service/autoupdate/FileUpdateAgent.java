@@ -3,6 +3,7 @@ package jadex.base.service.autoupdate;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -23,6 +24,7 @@ import java.io.FilenameFilter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipFile;
 
@@ -51,13 +53,13 @@ public class FileUpdateAgent extends UpdateAgent
 	/**
 	 *  Generate the start options.s
 	 */
-	protected IFuture<StartOptions> generateStartOptions(UpdateInfo ui)
+	protected IFuture<StartOptions> generateStartOptions(final UpdateInfo ui)
 	{
-		final IFuture<StartOptions> ret = new Future<StartOptions>();
+		final Future<StartOptions> ret = new Future<StartOptions>();
 		
 		super.generateStartOptions(ui).addResultListener(new DelegationResultListener<StartOptions>(ret)
 		{
-			public void customResultAvailable(StartOptions result)
+			public void customResultAvailable(StartOptions so)
 			{
 				if(ui.getAccess()!=null)
 				{
@@ -70,14 +72,9 @@ public class FileUpdateAgent extends UpdateAgent
 						}
 					});
 					
-					StringBuffer buf = new StringBuffer();
-					for(int i=0; i<jars.length; i++)
-					{
-						buf.append(jars[i]);
-						if(i+1<jars.length)
-							buf.append(File.pathSeparator);
-					}
-					ret.setClassPath(buf.toString());
+					so.setClassPath(flattenStrings((Iterator)SReflect.getIterator(jars), File.pathSeparator));
+					
+					ret.setResult(so);
 				}
 				else
 				{

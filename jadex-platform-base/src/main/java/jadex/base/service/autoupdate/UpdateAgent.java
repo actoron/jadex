@@ -368,7 +368,7 @@ public class UpdateAgent implements IUpdateService
 
 		if(vmargs!=null && vmargs.size()>0)
 		{
-			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs)));
+			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs), " "));
 		}
 		
 //		String cmd = System.getProperty("sun.java.command");
@@ -390,8 +390,9 @@ public class UpdateAgent implements IUpdateService
 								String[] pargs = (String[])args.get(Starter.PROGRAM_ARGUMENTS);
 								if(pargs!=null)
 								{
-									so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(pargs)));
+									so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(pargs), " "));
 								}
+								ret.setResult(so);
 							}
 						});
 					}
@@ -405,14 +406,14 @@ public class UpdateAgent implements IUpdateService
 	/**
 	 * 
 	 */
-	public String flattenStrings(Iterator<String> it)
+	public String flattenStrings(Iterator<String> it, String delim)
 	{
 		StringBuffer buf = new StringBuffer();
 		for(int i=0; it.hasNext(); i++)
 		{
 			buf.append(it.next());
 			if(it.hasNext())
-				buf.append(" ");
+				buf.append(delim);
 		}
 		return buf.toString();
 	}
