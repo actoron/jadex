@@ -27,13 +27,13 @@ import java.util.Scanner;
 @Arguments({
 	
 	@Argument(description="The base server URL to start looking for subdirectories.",
-		name="baseurl", clazz=String.class, defaultvalue="http://jadex.informatik.uni-hamburg.de"),
+		name="baseurl", clazz=String.class, defaultvalue="\"http://jadex.informatik.uni-hamburg.de\""),
 	
 	@Argument(description="The target directory for downloading changed files (defaults to current directory).",
-		name="targetdir", clazz=String.class, defaultvalue="."),
+		name="targetdir", clazz=String.class, defaultvalue="\".\""),
 	
 	@Argument(description="Regular expression to match against path names (defaults to any).",
-		name="pattern", clazz=String.class, defaultvalue=".*"),
+		name="pattern", clazz=String.class, defaultvalue="\".*\""),
 	
 	@Argument(description="The update interval (defaults to 24h).",
 		name="interval", clazz=long.class, defaultvalue=""+1000*60*60*24),
