@@ -66,6 +66,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 //		System.out.println("invoke: "+sic.getMethod());
+		
 		sic.invoke().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
@@ -76,8 +77,13 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 				if(!ResolveInterceptor.SERVICEMETHODS.contains(sic.getMethod()) && res instanceof IFuture)
 				{
 //					((IFuture)res).addResultListener(new TimeoutResultListener(10000, ea, new DelegationResultListener(ret)
-					((IFuture)res).addResultListener(new DelegationResultListener(ret)
+					((IFuture)res).addResultListener(new IResultListener()
 					{
+						public void resultAvailable(Object result)
+						{
+							ret.setResult(null);
+						}
+						
 						public void exceptionOccurred(Exception exception)
 						{
 //							System.out.println("ex: "+exception);
@@ -89,7 +95,8 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 							}
 							else
 							{
-								super.exceptionOccurred(exception);
+								ret.setResult(null);
+//								super.exceptionOccurred(exception);
 							}
 						}
 					});

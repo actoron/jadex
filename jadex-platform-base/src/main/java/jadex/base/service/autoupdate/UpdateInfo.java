@@ -11,6 +11,23 @@ public class UpdateInfo
 	/** The version access. */
 	protected Object access;
 
+
+	/**
+	 *  Create a new UpdateInfo.
+	 */
+	public UpdateInfo()
+	{
+	}
+
+	/**
+	 *  Create a new UpdateInfo.
+	 */
+	public UpdateInfo(long version, Object access)
+	{
+		this.version = version;
+		this.access = access;
+	}
+
 	/**
 	 *  Get the version.
 	 *  @return The version.
@@ -45,5 +62,13 @@ public class UpdateInfo
 	public void setAccess(Object access)
 	{
 		this.access = access;
+	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "UpdateInfo(version=" + version + ", access=" + access + ")";
 	}
 }

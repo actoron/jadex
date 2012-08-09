@@ -6,12 +6,14 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.modelinfo.Startable;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -34,7 +36,11 @@ import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.XMLWriterFactory;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -224,19 +230,23 @@ public class UpdateAgent implements IUpdateService
 	 */
 	public IFuture<Void> performUpdate(UpdateInfo ui)
 	{
-//		System.out.println("perform update");
+		System.out.println("perform update: "+ui);
 		
 		final Future<Void> ret = new Future<Void>();
 		
 		if(separatevm)
 		{
-			StartOptions so = generateStartOptions(ui);
-			
-			startPlatformInSeparateVM(so).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			generateStartOptions(ui).addResultListener(new ExceptionDelegationResultListener<StartOptions, Void>(ret)
 			{
-				public void customResultAvailable(IComponentIdentifier result) 
+				public void customResultAvailable(StartOptions so)
 				{
-					acknowledgeUpdate(result);
+					startPlatformInSeparateVM(so).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier result) 
+						{
+							acknowledgeUpdate(result);
+						}
+					});
 				}
 			});
 		}
@@ -305,6 +315,7 @@ public class UpdateAgent implements IUpdateService
 	public IFuture<IComponentIdentifier> startPlatformInSeparateVM(final StartOptions so)
 	{
 		System.out.println("Starting platform in separate vm");
+		Thread.dumpStack();
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
@@ -343,13 +354,67 @@ public class UpdateAgent implements IUpdateService
 	//-------- helper methods --------
 	
 	/**
+	 *  Generate the vm start options.
+	 */
+	protected IFuture<StartOptions> generateStartOptions(UpdateInfo ui)
+	{
+		final Future<StartOptions> ret = new Future<StartOptions>();
+		final StartOptions so = new StartOptions();
+		
+		so.setMain("jadex.base.Starter");
+		
+		RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
+		List<String> vmargs = RuntimemxBean.getInputArguments();
+
+		if(vmargs!=null && vmargs.size()>0)
+		{
+			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs)));
+		}
+		
+//		String cmd = System.getProperty("sun.java.command");
+		
+		IFuture<IComponentManagementService> fut = agent.getRequiredService("cms");
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, StartOptions>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
+					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
+				{
+					public void customResultAvailable(IExternalAccess plat)
+					{
+						plat.getArguments().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> args)
+							{
+								String[] pargs = (String[])args.get(Starter.PROGRAM_ARGUMENTS);
+								if(pargs!=null)
+								{
+									so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(pargs)));
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 * 
 	 */
-	protected StartOptions generateStartOptions(UpdateInfo ui)
+	public String flattenStrings(Iterator<String> it)
 	{
-		final StartOptions ret = new StartOptions();
-		ret.setMain("jadex.base.Starter");
-		return ret;
+		StringBuffer buf = new StringBuffer();
+		for(int i=0; it.hasNext(); i++)
+		{
+			buf.append(it.next());
+			if(it.hasNext())
+				buf.append(" ");
+		}
+		return buf.toString();
 	}
 	
 	/**
@@ -360,10 +425,4 @@ public class UpdateAgent implements IUpdateService
 		return new Future<UpdateInfo>((UpdateInfo)null);
 	}
 	
-//	/**
-//	 *  Get the version for a resource.
-//	 */
-//	protected IFuture<IResourceIdentifier> getCurrentVersion()
-//	{
-//	}
 }

@@ -98,6 +98,10 @@ public class Starter
 	/** The opengl disable flag. */
 	public static final String OPENGL = "opengl";
 	
+	/** The component factory classname. */
+	public static final String PROGRAM_ARGUMENTS = "programarguments";
+
+	
 	/** The reserved platform parameters. */
 	public static final Set<String> RESERVED;
 	
@@ -243,7 +247,7 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(String[] args)
+	public static IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
 		// Fix below doesn't work. WLAN address is missing :-(
 //		// ANDROID: Selector.open() causes an exception in a 2.2
@@ -330,6 +334,8 @@ public class Starter
 				.newInstance(new Object[]{"rootid"});
 			
 			compargs.put(COMPONENT_FACTORY, cfac);
+			
+			compargs.put(PROGRAM_ARGUMENTS, args);
 			
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 

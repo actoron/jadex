@@ -5,6 +5,7 @@ import jadex.commons.collection.SCollection;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,6 +43,8 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 
 /**
@@ -2549,6 +2552,74 @@ public class SUtil
 		return addresses.toArray(new String[addresses.size()]);		
 	}
 	
+	/**
+	 *  Unzip a file into a specific dir.
+	 *  @param zip The zip file.
+	 *  @param dir The target dir.
+	 */
+	public static void unzip(ZipFile zip, File dir)
+	{
+		Enumeration<? extends ZipEntry> files = zip.entries();
+		FileOutputStream fos = null;
+		InputStream is = null;
+		
+		for(ZipEntry entry=files.nextElement(); files.hasMoreElements(); entry=files.nextElement())
+		{
+			try
+			{
+				is = zip.getInputStream(entry);
+				byte[] buffer = new byte[1024];
+				int bytesRead = 0;
+
+				File f = new File(dir.getAbsolutePath()+ File.separator + entry.getName());
+
+				if(entry.isDirectory())
+				{
+					f.mkdirs();
+					continue;
+				}
+				else
+				{
+					f.getParentFile().mkdirs();
+					f.createNewFile();
+				}
+
+				fos = new FileOutputStream(f);
+
+				while((bytesRead = is.read(buffer))!= -1)
+				{
+					fos.write(buffer, 0, bytesRead);
+				}
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				if(fos!=null)
+				{
+					try
+					{
+						fos.close();
+					}
+					catch(IOException e)
+					{
+					}
+				}
+			}
+		}
+		if(is!=null)
+		{
+			try
+			{
+				is.close();
+			}
+			catch(IOException e)
+			{
+			}
+		}
+	}
 	
 	/**
 	 *  An subclass of print stream to allow accessing the underlying stream.

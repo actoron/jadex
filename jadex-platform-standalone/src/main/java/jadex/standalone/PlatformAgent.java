@@ -75,6 +75,7 @@ import java.util.logging.Level;
 	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="adapterfactory", clazz=Class.class, defaultvalue="ComponentAdapterFactory.class"),
 	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="programarguments", clazz=String[].class),
 	
 	@Argument(name="gui", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),

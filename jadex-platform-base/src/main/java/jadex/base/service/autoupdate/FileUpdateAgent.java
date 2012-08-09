@@ -1,63 +1,90 @@
 package jadex.base.service.autoupdate;
 
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.daemon.StartOptions;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipFile;
 
-@Arguments(
+@Arguments(replace=false, value=
 {
-	@Argument(name="cur", clazz=String.class, defaultvalue="jadex-2.1.zip"),
-	@Argument(name="scandir", clazz=String.class, defaultvalue="."),
+	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
+})
+@RequiredServices(
+{
+	@RequiredService(name="libservice", type=ILibraryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Agent
+/**
+ *  The file update agent is based on a scan directory in which new versions
+ *  are detected. If a new version was found the agent will initiate a platform
+ *  restart.
+ */
 public class FileUpdateAgent extends UpdateAgent
 {
 	@AgentArgument
 	protected String scandir;
-
-	@AgentArgument
-	protected String cur;
+	
+	/** The current version date. */
+	protected long curversion;
 
 	/**
-	 * 
+	 *  Generate the start options.s
 	 */
-	protected StartOptions generateStartOptions(UpdateInfo ui)
+	protected IFuture<StartOptions> generateStartOptions(UpdateInfo ui)
 	{
-		final StartOptions ret = super.generateStartOptions(ui);
+		final IFuture<StartOptions> ret = new Future<StartOptions>();
 		
-		if(ui.getAccess()!=null)
+		super.generateStartOptions(ui).addResultListener(new DelegationResultListener<StartOptions>(ret)
 		{
-			File dir = new File((String)ui.getAccess());
-			File[] jars = dir.listFiles(new FilenameFilter()
+			public void customResultAvailable(StartOptions result)
 			{
-				public boolean accept(File dir, String name)
+				if(ui.getAccess()!=null)
 				{
-					return name.endsWith(".jar");
+					File dir = new File((String)ui.getAccess());
+					File[] jars = dir.listFiles(new FilenameFilter()
+					{
+						public boolean accept(File dir, String name)
+						{
+							return name.endsWith(".jar");
+						}
+					});
+					
+					StringBuffer buf = new StringBuffer();
+					for(int i=0; i<jars.length; i++)
+					{
+						buf.append(jars[i]);
+						if(i+1<jars.length)
+							buf.append(File.pathSeparator);
+					}
+					ret.setClassPath(buf.toString());
 				}
-			});
-			
-			StringBuffer buf = new StringBuffer();
-			for(int i=0; i<jars.length; i++)
-			{
-				buf.append(jars[i]);
-				if(i+1<jars.length)
-					buf.append(File.pathSeparator);
+				else
+				{
+					ret.setResult(null);
+				}
 			}
-			ret.setClassPath(buf.toString());
-		}
+		});
 		
 		return ret;
 	}
@@ -69,108 +96,154 @@ public class FileUpdateAgent extends UpdateAgent
 	{
 		final Future<UpdateInfo> ret = new Future<UpdateInfo>();
 		
-		File distdir = new File(scandir);
-		File curdist = new File(distdir, cur);
-		if(distdir.exists() && curdist.exists())
+		getCurrentVersion().addResultListener(new ExceptionDelegationResultListener<Long, UpdateInfo>(ret)
 		{
-			File[] dists = distdir.listFiles(new FilenameFilter()
+			public void customResultAvailable(Long curversion)
 			{
-				public boolean accept(File dir, String name)
+				SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
+				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curversion)));
+				
+				File distdir = new File(scandir);
+				
+				if(distdir.exists())
 				{
-					return name.toLowerCase().startsWith("jadex") && name.endsWith(".zip");
-				}
-			});
-			
-			long curdate = curdist.lastModified();
-			File newdist = null;
-			for(File dist: dists)
-			{
-				if(dist.lastModified()>curdate)
-				{
-					newdist = dist;
+					File[] dists = distdir.listFiles(new FilenameFilter()
+					{
+						public boolean accept(File dir, String name)
+						{
+							return name.toLowerCase().startsWith("jadex") && name.endsWith(".zip");
+						}
+					});
+					
+					
+					File newdist = null;
+					for(File dist: dists)
+					{
+						if(dist.lastModified()>curversion)
+						{
+							newdist = dist;
+						}
+					}
+					
+					if(newdist!=null)
+					{
+						try
+						{
+							File tdir = new File(""+newdist.lastModified());
+							tdir.mkdir();
+							SUtil.unzip(new ZipFile(newdist), tdir);
+							
+							File[] decoms = tdir.listFiles(new FileFilter()
+							{
+								public boolean accept(File file)
+								{
+									return file.isDirectory();
+								}
+							});
+							if(decoms.length==1)
+							{
+								System.out.println("Updating to version: "+sdf.format(new Date(newdist.lastModified())));
+
+								UpdateInfo ui = new UpdateInfo(newdist.lastModified(), new File(decoms[0], "lib").getCanonicalPath());
+								ret.setResult(ui);
+							}
+							else
+							{
+								ret.setException(new RuntimeException("Unexpectedly found not exactly one directory in decompressed distribution: "+SUtil.arrayToString(decoms)));
+							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							ret.setException(e);
+						}
+					}
+					else
+					{
+						// no newer version found
+						ret.setResult(null);
+					}
 				}
 			}
-			
-			if(newdist!=null)
-			{
-				try
-				{
-					unzip(new ZipFile(newdist), null);
-				}
-				catch(Exception e)
-				{
-				}
-			}
-		}
-		
+		});
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Get the current version.
 	 */
-	public static void unzip(ZipFile zip, File dir)
+	protected IFuture<Long> getCurrentVersion()
 	{
-		Enumeration<? extends ZipEntry> files = zip.entries();
-		FileOutputStream fos = null;
-		InputStream is = null;
+		final Future<Long> ret = new Future<Long>();
 		
-		for(ZipEntry entry=files.nextElement(); files.hasMoreElements(); )
+		if(curversion!=0)
 		{
-			try
-			{
-				is = zip.getInputStream(entry);
-				byte[] buffer = new byte[1024];
-				int bytesRead = 0;
-
-				File f = new File(dir.getAbsolutePath()+ File.separator + entry.getName());
-
-				if(entry.isDirectory())
-				{
-					f.mkdirs();
-					continue;
-				}
-				else
-				{
-					f.getParentFile().mkdirs();
-					f.createNewFile();
-				}
-
-				fos = new FileOutputStream(f);
-
-				while((bytesRead = is.read(buffer))!= -1)
-				{
-					fos.write(buffer, 0, bytesRead);
-				}
-			}
-			catch(IOException e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if(fos!=null)
-				{
-					try
-					{
-						fos.close();
-					}
-					catch(IOException e)
-					{
-					}
-				}
-			}
+			ret.setResult(new Long(curversion));
 		}
-		if(is!=null)
+		else if(curversion!=-1)
 		{
-			try
+			IFuture<ILibraryService> fut = agent.getRequiredService("libservice");
+			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Long>(ret)
 			{
-				is.close();
-			}
-			catch(IOException e)
-			{
-			}
+				public void customResultAvailable(ILibraryService libser)
+				{
+					IFuture<List<URL>> fut = libser.getAllURLs();
+					fut.addResultListener(new ExceptionDelegationResultListener<List<URL>, Long>(ret)
+					{
+						public void customResultAvailable(List<URL> result)
+						{
+							// search for jadex jar file
+							for(URL url: result)
+							{
+								String fileurl = (url.getFile());
+								if(fileurl.endsWith(".jar") && fileurl.indexOf("jadex")!=-1)
+								{
+									File f = new File(fileurl);
+									if(f.exists())
+									{
+										curversion = f.lastModified();
+										ret.setResult(new Long(curversion));
+										break;
+									}
+								}
+							}
+							
+							if(curversion==0)
+							{
+								// search for jadex classes dir
+								for(URL url: result)
+								{
+									String fileurl = (url.getFile());
+									if(fileurl.indexOf("jadex")!=-1)
+									{
+										File f = new File(fileurl);
+										if(f.exists() && f.isDirectory())
+										{
+											curversion = f.lastModified();
+											ret.setResult(new Long(curversion));
+											break;
+										}
+									}
+								}
+								
+								// remember that nothing was found
+								if(curversion==0)
+								{
+									curversion = -1;
+									ret.setException(new RuntimeException("Unable to determine current version."));
+								}
+							}
+						}
+					});
+				}
+			});
 		}
+		else
+		{
+			ret.setException(new RuntimeException("Unable to determine current version."));
+		}
+	
+		return ret;
 	}
 }

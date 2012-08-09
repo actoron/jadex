@@ -96,6 +96,8 @@
 		<argument name="adapterfactory" class="Class">ComponentAdapterFactory.class</argument>
 		<!-- Tell starter to print welcome message. -->
 		<argument name="welcome" class="boolean">true</argument>
+		<!-- The saved program arguments. -->
+		<argument name="programarguments" class="String[]"/>
 		
 		<!-- ======== Arguments used by platform components. ======== -->
 		
