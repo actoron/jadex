@@ -118,7 +118,7 @@
 						<!-- name of the avd to deploy to and run the instrumentation on -->
 						<avd>22</avd>
 						<!-- wait time for the emulator to start -->
-						<wait>50000</wait>
+						<wait>100000</wait>
 						<!-- additional options to run the emulator with -->
 						<options>-partition-size 128 -wipe-data</options>
 					</emulator>
