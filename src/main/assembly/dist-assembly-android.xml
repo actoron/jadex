@@ -13,21 +13,37 @@
 
 	<moduleSets>
 		<moduleSet>
-		<excludes>
-			<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
-			<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
-		</excludes>
+			<excludes>
+				<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
+				<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
+			</excludes>
 			<!-- Selected by profile. <includes> <include>jadex:*</include> </includes> -->
 			<binaries>
-			<includes> 
-				<include>jadex:*</include> 
-			</includes>
+				<includes>
+					<include>jadex:*</include>
+				</includes>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
 				<!-- <outputFileNameMapping>${module.artifactId}-${module.version}${dashClassifier?}.${module.extension}</outputFileNameMapping> -->
 				<!-- <outputFileNameMapping>${artifactId}-${version}${dashClassifier?}.${extension}</outputFileNameMapping> -->
 				<outputDirectory>lib</outputDirectory>
 				<unpack>false</unpack>
 			</binaries>
+			<sources>
+			<!-- Copies library properties to dist -->
+				<excludes>
+					<exclude>**/*</exclude>
+				</excludes>
+				<fileSets>
+					<fileSet>
+						<directory>target</directory>
+						<includes>
+							<include>*.properties</include>
+						</includes>
+					</fileSet>
+				</fileSets>
+				<outputDirectoryMapping>lib/</outputDirectoryMapping>
+			</sources>
+
 		</moduleSet>
 	</moduleSets>
 
@@ -40,87 +56,6 @@
 			<source>target/jadex-android-example-projects.zip</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
-		<!-- Hack!!! Manually copying junit jar (required by jadex.platform.base.ComponentTest)
-		   - due to Maven assembly bug: http://jira.codehaus.org/browse/MASSEMBLY-558 -->
-<!-- 		<file> -->
-<!-- 			<source>docs/junit-3.8.1.jar</source> -->
-<!-- 			<outputDirectory>lib</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>target/jadex-example-project.zip</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>target/sources.zip</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/readme.txt</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 			<filtered>true</filtered> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/license.txt</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/api-changes.txt</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 			<filtered>true</filtered> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/jcc.settings.xml</source> -->
-<!-- 			<outputDirectory>/lib</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/default.settings.xml</source> -->
-<!-- 			<outputDirectory>/lib</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/jadex.bat</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/jadex_no_awareness.bat</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/jadex.sh</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/jadex_no_awareness.sh</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-<!-- 		<file> -->
-<!-- 			<source>docs/howtostart.txt</source> -->
-<!-- 			<outputDirectory>/</outputDirectory> -->
-<!-- 		</file> -->
-		<!-- 
-		<file>
-			<source>target/application_guide.pdf</source>
-			<outputDirectory>/docs</outputDirectory>
-		</file>
-		<file>
-			<source>target/standalone_platform_guide.pdf</source>
-			<outputDirectory>/docs</outputDirectory>
-		</file>
-		<file>
-			<source>target/bdi_tutorial.pdf</source>
-			<outputDirectory>/docs</outputDirectory>
-		</file>
-		<file>
-			<source>target/micro_user_guide.pdf</source>
-			<outputDirectory>/docs</outputDirectory>
-		</file>
-		<file>
-			<source>target/bpmn_tutorial.pdf</source>
-			<outputDirectory>/docs</outputDirectory>
-		</file>
-		<file>
-			<source>target/environment_user_guide.pdf</source>
-			<outputDirectory>/docs</outputDirectory>
-		</file> -->
 	</files>
 
 </assembly>

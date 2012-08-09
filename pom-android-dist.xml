@@ -8,14 +8,14 @@
 	<packaging>pom</packaging>
 	<version>2.1.1-SNAPSHOT</version>
 	<name>jadex-android-dist</name>
-	
+
 	<!-- ======== common plugin configurations ======== -->
-	
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-deploy-plugin</artifactId>
+				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
 					<skip>true</skip>
@@ -33,17 +33,17 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+	</build>
 
 	<!-- ======== Modules to include in deploy/dist ======== -->
-	
+
 	<modules>
 		<module>jadex-android-parent</module>
 		<module>jadex-android-antlr</module>
 		<module>jadex-android-xmlpull</module>
 		<module>jadex-runtimetools-android</module>
 	</modules>
-	
+
 	<profiles>
 		<!-- ======== Profile for dist assembly ======== -->
 		<profile>
@@ -96,6 +96,104 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>com.github.goldin</groupId>
+						<artifactId>copy-maven-plugin</artifactId>
+						<version>0.2.5</version>
+						<executions>
+							<execution>
+								<id>copy</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-android-antlr/target/</targetPath>
+											<destFileName>jadex-android-antlr-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-android-xmlpull/target/</targetPath>
+											<destFileName>jadex-android-xmlpull-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-bridge/target/</targetPath>
+											<destFileName>jadex-bridge-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-commons/target/</targetPath>
+											<destFileName>jadex-commons-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-javaparser/target/</targetPath>
+											<destFileName>jadex-javaparser-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-kernel-base/target/</targetPath>
+											<destFileName>jadex-kernel-base-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-kernel-bdi/target/</targetPath>
+											<destFileName>jadex-kernel-bdi-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-kernel-bpmn/target/</targetPath>
+											<destFileName>jadex-kernel-bpmn-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-kernel-component/target/</targetPath>
+											<destFileName>jadex-kernel-component-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-kernel-micro/target/</targetPath>
+											<destFileName>jadex-kernel-micro-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-platform-base/target/</targetPath>
+											<destFileName>jadex-platform-base-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-platform-standalone/target/</targetPath>
+											<destFileName>jadex-javaparser-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-rules/target/</targetPath>
+											<destFileName>jadex-rules-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-runtimetools-android/target/</targetPath>
+											<destFileName>jadex-runtimetools-android-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-tools-base/target/</targetPath>
+											<destFileName>jadex-tools-base-${project.version}.jar.properties</destFileName>
+										</resource>
+										<resource>
+											<file>docs/android/sourceattachment.properties</file>
+											<targetPath>jadex-xml/target/</targetPath>
+											<destFileName>jadex-xml-${project.version}.jar.properties</destFileName>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 			<modules>
@@ -114,7 +212,7 @@
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-platform-base</module>
 				<module>jadex-platform-standalone</module>
-				
+
 				<!-- Modules required for integration test -->
 				<module>jadex-android-integration-test</module>
 				<module>docs/android/jadex-android-example-project-maven</module>
