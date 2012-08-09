@@ -120,7 +120,7 @@ public class HttpRelayTransport implements ITransport
 	protected String	defaddresses;
 	
 	/** The connection manager. */
-	protected HttpConnectionManager	conman;
+	protected RelayConnectionManager	conman;
 	
 	/** The receiver process. */
 	protected HttpReceiver	receiver;
@@ -154,7 +154,7 @@ public class HttpRelayTransport implements ITransport
 		StringTokenizer	stok	= new StringTokenizer(defaddresses, ",");
 		while(stok.hasMoreTokens())
 		{
-			String	adr	= HttpConnectionManager.relayAddress(stok.nextToken().trim());
+			String	adr	= RelayConnectionManager.relayAddress(stok.nextToken().trim());
 			boolean	found	= false;
 			for(int i=0; !found && i<getServiceSchemas().length; i++)
 			{
@@ -188,7 +188,7 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Get the connection manager.
 	 */
-	public HttpConnectionManager	getConnectionManager()
+	public RelayConnectionManager	getConnectionManager()
 	{
 		return conman;
 	}
@@ -207,7 +207,7 @@ public class HttpRelayTransport implements ITransport
 			public void customResultAvailable(IDaemonThreadPoolService tps)
 			{
 				threadpool	= tps;
-				conman	= new HttpConnectionManager();
+				conman	= new RelayConnectionManager();
 				receiver	= new HttpReceiver(HttpRelayTransport.this, component.getExternalAccess());
 				receiver.start();
 				ret.setResult(null);

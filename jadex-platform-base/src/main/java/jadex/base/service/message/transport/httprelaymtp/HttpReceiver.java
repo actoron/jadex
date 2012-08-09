@@ -416,7 +416,7 @@ public class HttpReceiver
 										HttpReceiver.this.access.getComponentIdentifier());
 									
 									InputStream	in	= con.getInputStream();
-									address	= HttpConnectionManager.relayAddress(adr);
+									address	= RelayConnectionManager.relayAddress(adr);
 									transport.connected(address, false);
 									while(true)
 									{

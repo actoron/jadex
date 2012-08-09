@@ -1,6 +1,6 @@
 package jadex.base.relay;
 
-import jadex.base.service.message.transport.httprelaymtp.HttpConnectionManager;
+import jadex.base.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ public class PeerList
 	protected Timer	timer;
 	
 	/** The connection manager. */
-	protected HttpConnectionManager	conman;
+	protected RelayConnectionManager	conman;
 
 	//-------- constructors --------
 	
@@ -60,7 +60,7 @@ public class PeerList
 	public PeerList()
 	{
 		this.peers	= Collections.synchronizedMap(new HashMap<String, PeerEntry>());
-		this.conman	= new HttpConnectionManager();
+		this.conman	= new RelayConnectionManager();
 		
 		Properties	props	= new Properties();
 		File	propsfile	= new File(RelayServlet.SYSTEMDIR, "peer.properties");
@@ -98,7 +98,7 @@ public class PeerList
 		
 		// Todo: check that specified url is valid and connects to this server.
 		this.url	= "".equals(props.getProperty(PROPERTY_URL)) ? ""
-			: HttpConnectionManager.relayAddress(props.getProperty(PROPERTY_URL));
+			: RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL));
 		
 		StringTokenizer	stok	= new StringTokenizer(props.getProperty(PROPERTY_PEERS), ",");
 		while(stok.hasMoreTokens())
@@ -135,7 +135,7 @@ public class PeerList
 			ret	= request.getRequestURL().toString();
 			if(ret.endsWith("/servers"))
 			{
-				ret	= HttpConnectionManager.relayAddress(ret.substring(0, ret.length()-7));
+				ret	= RelayConnectionManager.relayAddress(ret.substring(0, ret.length()-7));
 			}
 		}
 		
@@ -166,7 +166,7 @@ public class PeerList
 		}
 		else
 		{
-			peerurl	= HttpConnectionManager.relayAddress(peerurl);
+			peerurl	= RelayConnectionManager.relayAddress(peerurl);
 			if(!peers.containsKey(peerurl))
 			{
 				final PeerEntry	peer	= new PeerEntry(peerurl, initial);

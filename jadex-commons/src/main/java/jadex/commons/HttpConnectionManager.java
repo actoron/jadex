@@ -1,0 +1,118 @@
+package jadex.commons;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
+/**
+ *  The connection manager allows asynchronously terminating
+ *  open connections to avoid hanging on e.g. platform shutdown.
+ */
+public class HttpConnectionManager
+{
+	//-------- attributes --------
+	
+	/** The open connections. */
+	private Collection<HttpURLConnection>	connections;
+	
+	/** The flag indicating shutdown. */
+	private boolean	shutdown;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new connection manager.
+	 */
+	public HttpConnectionManager()
+	{
+		this.connections	= Collections.synchronizedSet(new HashSet<HttpURLConnection>());
+	}
+	
+	/**
+	 *  Dispose the connection manager and close all open connections.
+	 */
+	public synchronized void	dispose()
+	{
+		this.shutdown	= true;
+		HttpURLConnection[]	acon	= connections.toArray(new HttpURLConnection[0]);
+		for(int i=0; i<acon.length; i++)
+		{
+			// Use sun.net.www.http.HttpClient.closeServer()
+			// as con.disconnect() just blocks for sun default implementation :-(
+			if(acon[i].getClass().getName().equals("sun.net.www.protocol.http.HttpURLConnection"))
+			{
+				try
+				{
+					Field	f	= acon[i].getClass().getDeclaredField("http");
+					f.setAccessible(true);
+					Object	client	= f.get(acon[i]);
+					if(client!=null)
+					{
+						client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+					}
+					else
+					{
+						acon[i].disconnect();	// Connection not open?			
+					}
+				}
+				catch(Exception e)
+				{
+					acon[i].disconnect();	// Hangs until next ping :-(
+				}
+			}
+			// Special treatment for android impl not needed, because disconnect() works fine. 
+//			else if()
+//			{
+//				// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
+//				// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
+//				// Socket socket	= connection.socket;
+//				Field	f	= con.getClass().getDeclaredField("connection");
+//				f.setAccessible(true);
+//				Object	connection	= f.get(con);
+//				f	= connection.getClass().getDeclaredField("socket");
+//				f.setAccessible(true);
+//				Socket	socket	= (Socket)f.get(connection);
+//				socket.close();				
+//			}
+			else
+			{
+				acon[i].disconnect();
+			}			
+		}
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Open a receiving connection.
+	 *  The connection should be removed when it is closed to avoid memory leaks.
+	 *  @param address	The address to connect to. 
+	 *  @return The connection.
+	 *  @throws IOException on connection failures
+	 */
+	public synchronized HttpURLConnection	openConnection(String address)	throws IOException
+	{
+		if(shutdown)
+			throw new IOException("No new connections allowed after shutdown.");
+		
+		HttpURLConnection	con	= null;
+		URL	url	= new URL(address);
+		con	= (HttpURLConnection)url.openConnection();
+		connections.add(con);
+
+		return con;
+	}
+	
+	/**
+	 *  Remove a connection.
+	 *  @param con	The previously opened connection.
+	 */
+	public synchronized void	remove(HttpURLConnection con)
+	{
+		connections.remove(con);
+	}
+}
