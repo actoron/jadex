@@ -97,9 +97,20 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == 0) {
-			Intent i = new Intent(this, JadexAndroidControlCenter.class);
-			i.putExtra("platformId", (ComponentIdentifier) platformID);
-			startActivity(i);
+			if (isJadexPlatformRunning()) {
+				Intent i = new Intent(this, JadexAndroidControlCenter.class);
+				i.putExtra("platformId", (ComponentIdentifier) platformID);
+				startActivity(i);
+			} else {
+				runOnUiThread(new Runnable() {
+					public void run() {
+						Toast makeText = Toast.makeText(
+								JadexAndroidHelloWorldActivity.this,
+								"No Platform running!", Toast.LENGTH_SHORT);
+						makeText.show();
+					}
+				});
+			}
 		}
 		return true;
 	}
