@@ -72,7 +72,6 @@ public class Test extends jadex.commons.transformation.Test
 				System.out.println("Decoder reports error: " + e.getMessage() + ", skipping...");
 			}
 		});
-		System.out.println("YAY " + out);
 	}
 	
 	/**
