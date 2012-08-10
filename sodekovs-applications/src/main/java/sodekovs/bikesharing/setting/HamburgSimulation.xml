@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SimulationDescription xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BikeDataSchema.xsd">
   <TimeSlices>
-    <TimeSlice offset="300" startTime="100">
+    <TimeSlice offset="300" startTime="10000000">
       <ProbabilitiesForStations>
         <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
         	<DestinationProbabilities>
@@ -35,28 +35,28 @@
     </TimeSlice> 
     <TimeSlice offset="300" startTime="20">
       <ProbabilitiesForStations>
-        <ProbabilitiesForStation departureProbability="0.32" stationID="Osterstrasse">
+        <ProbabilitiesForStation departureProbability="0.12" stationID="Osterstrasse">
         	<DestinationProbabilities>
           		<DestinationProbability destination="Rathaus" probability="0.1"/>
           		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
           		<DestinationProbability destination="Hbf" probability="0.21"/>
           	</DestinationProbabilities>
         </ProbabilitiesForStation>
-        <ProbabilitiesForStation departureProbability="0.63" stationID="Rathaus">
+        <ProbabilitiesForStation departureProbability="0.13" stationID="Rathaus">
         	<DestinationProbabilities>
           		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
           		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
           		<DestinationProbability destination="Hbf" probability="0.21"/>
           	</DestinationProbabilities>
         </ProbabilitiesForStation>
-        <ProbabilitiesForStation departureProbability="0.16" stationID="Hagenbecks">
+        <ProbabilitiesForStation departureProbability="0.10" stationID="Hagenbecks">
         	<DestinationProbabilities>
           		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
           		<DestinationProbability destination="Rathaus" probability="0.05"/>
           		<DestinationProbability destination="Hbf" probability="0.21"/>
           	</DestinationProbabilities>
         </ProbabilitiesForStation>
-        <ProbabilitiesForStation departureProbability="0.75" stationID="Hbf">
+        <ProbabilitiesForStation departureProbability="0.05" stationID="Hbf">
         	<DestinationProbabilities>
           		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
           		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
@@ -65,7 +65,7 @@
         </ProbabilitiesForStation>
       </ProbabilitiesForStations>
     </TimeSlice>
-     <TimeSlice offset="300" startTime="140">
+     <TimeSlice offset="300" startTime="140000000000">
       <ProbabilitiesForStations>
         <ProbabilitiesForStation departureProbability="0.47" stationID="Osterstrasse">
         	<DestinationProbabilities>

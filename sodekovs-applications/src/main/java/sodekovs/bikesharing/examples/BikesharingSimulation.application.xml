@@ -109,7 +109,7 @@
 					</env:drawable>
 					
 					<env:prelayers>
-						<env:tiledlayer width="100" height="100" imagepath="sodekovs/bikesharing/bilder/WashingtonMap.png" />
+						<env:tiledlayer width="1" height="1" imagepath="sodekovs/bikesharing/bilder/WashingtonMap.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>

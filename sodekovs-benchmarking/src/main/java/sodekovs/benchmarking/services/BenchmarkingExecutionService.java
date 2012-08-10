@@ -147,7 +147,6 @@ public class BenchmarkingExecutionService extends BasicService implements IBench
 	public IFuture getWorkload() {
 		Future ret = new Future();
 		ret.setResult(comp.getBeliefbase().getBelief("numberOfRunningBenchmarks").getFact());
-		;
 		return ret;
 	}
 }

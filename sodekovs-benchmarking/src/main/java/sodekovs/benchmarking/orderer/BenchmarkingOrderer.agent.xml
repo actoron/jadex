@@ -7,8 +7,6 @@
 	name="BenchmarkingOrderer" package="sodekovs.benchmarking.orderer">
 
 	<imports>
-		<!-- <import>jadex.base.contextservice.*</import> <import>jadex.base.appdescriptor.*</import> 
-			<import>jadex.extension.envsupport.math.*</import> -->
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>

@@ -90,7 +90,7 @@
 	
 
 	<RunConfiguration>
-		<General rows="2" parallelRuns="1" delta="true"><!-- For all runs.-->
+		<General rows="1" parallelRuns="1" delta="true"><!-- For all runs.-->
 			<!-- Delay of start time can be defined relatively or absolute.-->
 			<!-- <StartTime value="2010-06-29 10:50:00" type="absolute" /> -->
 			<!--<StartTime value="6500" type="relative" />-->
@@ -103,7 +103,7 @@
 				<Time value="17000" type="absolute" />
 			</TerminateCondition> -->
 		</General>
-		<Rows experiments="5">
+		<Rows experiments="2">
 			<TerminateCondition>
 				 <Time value="10000" type="relative" />
 				

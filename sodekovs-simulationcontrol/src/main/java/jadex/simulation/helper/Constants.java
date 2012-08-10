@@ -96,14 +96,28 @@ public class Constants {
 //	List that contains mean values
 	public static final String MEAN_VALUE_LIST  = "meanValueList";
 	
+//	Mean values
+	public static final String MEAN_VALUE  = "meanValue";
+	
+//	Mean difference between real and sim data
+	public static final String MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA  = "meanValueDiffBetweenSimAndRealData";
+	
 //	List that contains median values
 	public static final String MEDIAN_VALUE_LIST  = "medianValueList";
 	
+//	Median values
+	public static final String MEDIAN_VALUE  = "medianValue";
+	
 //	List that contains sample variance values
 	public static final String SAMPLE_VARIANCE_VALUE_LIST  = "sampleVarianceValueList";
+	
+//	Sample variance values
+	public static final String SAMPLE_VARIANCE_VALUE  = "sampleVarianceValue";
 
 //	List that contains the single values of the observed object
 	public static final String SINGLE_OBSERVED_VALUES_LIST  = "singleObservedValuesList";
+	
+	
 		
 }
 

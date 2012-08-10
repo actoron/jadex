@@ -114,6 +114,11 @@
 			<version>2.1</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>sodekovs-applications</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
 			<groupId>analyse</groupId>
 			<artifactId>desmoJ</artifactId>
 			<version>2.2.0</version>
