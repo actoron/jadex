@@ -56,10 +56,11 @@ import java.util.Map;
 })
 @Arguments(
 {
-	@Argument(name="interval", clazz=long.class, defaultvalue="5000"),
+	@Argument(name="interval", clazz=long.class, defaultvalue="10000"),
 	@Argument(name="creator", clazz=IComponentIdentifier.class),
 	@Argument(name="separatevm", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="updateagent", clazz=String.class, defaultvalue="\"jadex.base.service.autoupdate.UpdateAgent.class\"")
+	@Argument(name="updateagent", clazz=String.class, defaultvalue="\"jadex.base.service.autoupdate.FileUpdateAgent.class\""),
+	@Argument(name="forbiddenvmargs", clazz=String[].class, defaultvalue="new String[]{\"-agentlib:jdwp=transport\"}")
 })
 @ComponentTypes(
 {
@@ -94,6 +95,10 @@ public class UpdateAgent implements IUpdateService
 	
 	/** The new cid (need to be acknowledge by create and via call ack). */
 	protected IComponentIdentifier newcomp;
+	
+	/** The vmargs that should not be used. */
+	@AgentArgument()
+	protected String[] forbiddenvmargs;
 	
 	//-------- methods --------
 	
@@ -172,7 +177,8 @@ public class UpdateAgent implements IUpdateService
 			}
 		};
 		
-		agent.waitFor(interval, step);
+		agent.scheduleStep(step);
+//		agent.waitFor(interval, step);
 
 		return ret;
 	}
@@ -234,7 +240,7 @@ public class UpdateAgent implements IUpdateService
 	 */
 	public IFuture<Void> performUpdate(UpdateInfo ui)
 	{
-		System.out.println("perform update: "+ui);
+//		System.out.println("perform update: "+ui);
 		
 		final Future<Void> ret = new Future<Void>();
 		
@@ -256,6 +262,8 @@ public class UpdateAgent implements IUpdateService
 		}
 		else
 		{
+			// todo: generate start options for same vm
+			
 			startPlatformInSameVM().addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 			{
 				public void customResultAvailable(IComponentIdentifier result) 
@@ -338,6 +346,10 @@ public class UpdateAgent implements IUpdateService
 	
 	/**
 	 *  Generate the vm start options.
+	 *  
+	 *  - main class: jadex.base.Starter
+	 *  - vmargs: old vmargs (without debug option)
+	 *  - program args: old program args (with updated argument for update agent to allow handshake)
 	 */
 	protected IFuture<StartOptions> generateStartOptions(UpdateInfo ui)
 	{
@@ -351,15 +363,22 @@ public class UpdateAgent implements IUpdateService
 
 		if(vmargs!=null && vmargs.size()>0)
 		{
-			for(Iterator<String> it=vmargs.iterator(); it.hasNext(); )
+			if(forbiddenvmargs!=null && forbiddenvmargs.length>0)
 			{
-				String tst = it.next();
-//				if(tst.indexOf("-DXbootclasspath")!=-1 || tst.indexOf("-Dagentlib")!=-1)
-//				{
-//					it.remove();
-//				}
+				for(Iterator<String> it=vmargs.iterator(); it.hasNext(); )
+				{
+					String tst = it.next();
+					for(String forbid: forbiddenvmargs)
+					{
+						if(tst.indexOf(forbid)!=-1)
+						{
+							it.remove();
+							break;
+						}
+					}
+				}
 			}
-//			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs), " "));
+			so.setVMArguments(flattenStrings((Iterator)SReflect.getIterator(vmargs), " "));
 		}
 		
 //		String cmd = System.getProperty("sun.java.command");
@@ -378,7 +397,8 @@ public class UpdateAgent implements IUpdateService
 						{
 							public void customResultAvailable(Map<String, Object> args)
 							{
-								// Set program args
+								// Set program args according to the original ones
+								// Will change the argument with the update agent to have the creator cid
 								
 								String[] oldargs = (String[])args.get(Starter.PROGRAM_ARGUMENTS);
 								List<String> newargs = new ArrayList<String>();
@@ -407,9 +427,7 @@ public class UpdateAgent implements IUpdateService
 								String deser = "\"jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)\"";
 								newargs.add("-component");
 								newargs.add(updateagent+"(:"+deser+")");
-//								newargs.add("\"jadex.base.service.autoupdate.UpdateAgent.class(:"+deser+")\"");
-//								newargs.add("jadex.base.service.autoupdate.FileUpdateAgent.class(:"+deser+")");
-								System.out.println("generated: "+newargs);
+//								System.out.println("generated: "+newargs);
 
 								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
 								
@@ -425,12 +443,14 @@ public class UpdateAgent implements IUpdateService
 	}
 	
 	/**
-	 * 
+	 *  Flatten strings to one string.
+	 *  @param it The iterator of strings.
+	 *  @param delim The delimiter used to connect the entries.
 	 */
 	public String flattenStrings(Iterator<String> it, String delim)
 	{
 		StringBuffer buf = new StringBuffer();
-		for(int i=0; it.hasNext(); i++)
+		while(it.hasNext())
 		{
 			buf.append(it.next());
 			if(it.hasNext())

@@ -20,7 +20,6 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -259,7 +258,7 @@ public class Starter
 //		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 //		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 
-		System.out.println("Arguments: "+args.length/2+" "+SUtil.arrayToString(args));
+//		System.out.println("Arguments: "+args.length/2+" "+SUtil.arrayToString(args));
 		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		

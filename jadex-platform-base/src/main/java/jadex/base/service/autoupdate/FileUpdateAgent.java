@@ -33,7 +33,8 @@ import java.util.zip.ZipFile;
 @Arguments(replace=false, value=
 {
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
-	@Argument(name="pattern", clazz=String.class, defaultvalue="\"jadex-[0-9]+\\\\..*.zip\"", description="Only main Jadex distribution jars.")
+	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
+	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-[0-9]+\\\\..*.zip\"", description="Only main Jadex distribution jars.")
 })
 @RequiredServices(
 {
@@ -53,12 +54,18 @@ public class FileUpdateAgent extends UpdateAgent
 	/** The current version date. */
 	protected long curversion;
 	
-	/** The file pattern. */
+	/** The file include pattern. */
 	@AgentArgument
-	protected String pattern;
+	protected String includefiles;
+	
+	/** The dir exclude pattern. */
+	@AgentArgument
+	protected String excludedirs;
 
 	/**
-	 *  Generate the start options.s
+	 *  Generate the start options.
+	 *  
+	 *  - classpath: sets it to all jars of the newest found jadex distribution dir.
 	 */
 	protected IFuture<StartOptions> generateStartOptions(final UpdateInfo ui)
 	{
@@ -68,36 +75,38 @@ public class FileUpdateAgent extends UpdateAgent
 		{
 			public void customResultAvailable(StartOptions so)
 			{
-				if(ui.getAccess()!=null)
+				try
 				{
-					File dir = new File((String)ui.getAccess());
-					File[] jars = dir.listFiles(new FilenameFilter()
+					if(ui.getAccess()!=null)
 					{
-						public boolean accept(File dir, String name)
+						File dir = new File((String)ui.getAccess());
+						File[] jars = dir.listFiles(new FilenameFilter()
 						{
-							return name.endsWith(".jar");
-						}
-					});
-					List<String> jarurls = new ArrayList<String>();
-					for(File jar: jars)
-					{
-						try
+							public boolean accept(File dir, String name)
+							{
+								return name.endsWith(".jar");
+							}
+						});
+						List<String> jarurls = new ArrayList<String>();
+						for(File jar: jars)
 						{
 							jarurls.add(jar.getCanonicalPath());
 						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
+						
+						so.setClassPath(flattenStrings((Iterator)SReflect.getIterator(jarurls), File.pathSeparator));
+						
+						ret.setResult(so);
 					}
-					
-					so.setClassPath(flattenStrings((Iterator)SReflect.getIterator(jarurls), File.pathSeparator));
-					
-					ret.setResult(so);
+					else
+					{
+						ret.setResult(null);
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					ret.setResult(null);
+					System.out.println("Error setting classpath: "+e.getMessage());
+					ret.setException(e);
+//					e.printStackTrace();
 				}
 			}
 		});
@@ -114,20 +123,21 @@ public class FileUpdateAgent extends UpdateAgent
 		
 		getCurrentVersion().addResultListener(new ExceptionDelegationResultListener<Long, UpdateInfo>(ret)
 		{
-			public void customResultAvailable(Long curversion)
+			public void customResultAvailable(Long curver)
 			{
-				SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
-				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curversion)));
+				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hhmmss");
+				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curver)));
 				
 				TreeSet<File> res = new TreeSet<File>(new Comparator<File>()
 				{
 					public int compare(File o1, File o2)
 					{
-						return (int)(o1.lastModified()-o2.lastModified());
+						return (int)(o2.lastModified()-o1.lastModified());
 					}
 				});
 				findDistDirs(new File(scandir), res);
 				
+				long foundver = 0;
 				if(res.size()>0)
 				{
 					File dir = res.iterator().next();
@@ -136,17 +146,18 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						public boolean accept(File dir, String name)
 						{
-							return name.toLowerCase().matches(pattern);
+							return name.toLowerCase().matches(includefiles);
 						}
 					});
 					
 					File dist = dists[0];
-					boolean force = true; // force update
-					if(dist.lastModified()>curversion || force) 
+					foundver = dist.lastModified();
+					boolean force = false; // force update
+					if(foundver>curver || force) 
 					{
 						try
 						{
-							File tdir = new File(""+dist.lastModified());
+							File tdir = new File(sdf.format(new Date(dist.lastModified())));
 							tdir.mkdir();
 							SUtil.unzip(new ZipFile(dist), tdir);
 							
@@ -175,12 +186,13 @@ public class FileUpdateAgent extends UpdateAgent
 							ret.setException(e);
 						}
 					}
-					else
-					{
-						// no newer version found
-						System.out.println("No newer version found.");
-						ret.setResult(null);
-					}
+				}
+				
+				if(!ret.isDone())
+				{
+					// no newer version found
+					System.out.println("No newer version found, latest is: "+sdf.format(foundver));
+					ret.setResult(null);
 				}
 			}
 		});
@@ -189,17 +201,21 @@ public class FileUpdateAgent extends UpdateAgent
 	}
 	
 	/**
-	 * 
+	 *  Recursively scan dirs to find those with a jadex distribution contained.
+	 *  Sorts the found entries according to their date.
 	 */
 	protected void findDistDirs(File dir, TreeSet<File> results)
 	{
 		if(dir.exists() && dir.isDirectory())
 		{
+			if(dir.getName().matches(excludedirs))
+				return;
+			
 			File[] dists = dir.listFiles(new FilenameFilter()
 			{
 				public boolean accept(File dir, String name)
 				{
-					return name.toLowerCase().matches(pattern);
+					return name.toLowerCase().matches(includefiles);
 				}
 			});
 			if(dists.length>0)
@@ -222,6 +238,7 @@ public class FileUpdateAgent extends UpdateAgent
 	
 	/**
 	 *  Get the current version.
+	 *  Uses the timestamp of a jadex jar in the used classpath.
 	 */
 	protected IFuture<Long> getCurrentVersion()
 	{
@@ -298,7 +315,7 @@ public class FileUpdateAgent extends UpdateAgent
 	}
 	
 	/**
-	 * 
+	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{

@@ -21,6 +21,11 @@ public @interface AgentArgument
 	
 	/**
 	 *  The argument conversion expression.
+	 *  
+	 *  The coversion expression can refer to the 
+	 *  originally provided value by using the reserved
+	 *  variable $value.
+	 *  
 	 *  Is optional. 
 	 */
 	public String convert() default "";
