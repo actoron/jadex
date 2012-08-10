@@ -145,10 +145,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		 flyCamera.setDragToRotate(true);
 		 flyCamera.setEnabled(true);
 		 
-		 flyCamera.setEnabled(false);
+//		 flyCamera.setEnabled(false);
 		 
-		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, staticNode, rootNode);
-		 dungeonCam.setEnabled(true);
+//		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, staticNode, rootNode);
+//		 dungeonCam.setEnabled(true);
 
 		 
 			/** Configure cam to look at scene */
