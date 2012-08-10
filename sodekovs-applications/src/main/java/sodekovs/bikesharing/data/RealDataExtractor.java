@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.ValidationException;
 
 import sodekovs.bikesharing.model.DestinationProbability;
 import sodekovs.bikesharing.model.ObjectFactory;
@@ -34,6 +35,8 @@ import de.jollyday.HolidayManager;
 import deco4mas.distributed.util.xml.XmlUtil;
 
 /**
+ * Utility class for the generation of {@link SimulationDescription}s based on database stored live and real data.
+ * 
  * @author Thomas Preisler
  */
 public class RealDataExtractor {
@@ -87,8 +90,9 @@ public class RealDataExtractor {
 
 	/**
 	 * @param args
+	 * @throws ValidationException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ValidationException {
 		RealDataExtractor rde = new RealDataExtractor();
 		System.out.println("RealDataExtractor started.");
 		Connection conn = DatabaseConnection.getConnection();
@@ -122,10 +126,14 @@ public class RealDataExtractor {
 				SimulationDescription evalSd = rde.getAllocations(WASHINGTON, 0, 24, MONDAY, LIMIT);
 				System.out.println("Fetched Allocations for evalution.");
 
-				System.out.println("Postprocess Station IDs.");
+				System.out.println("Postprocessing Station IDs.");
 				rde.postProcessStatioNames(sd);
 				rde.postProcessStatioNames(evalSd);
 				System.out.println("Postprocessed Station IDs.");
+
+				System.out.println("Validating SimulationDescription.");
+				rde.validate(sd);
+				System.out.println("Validated SimulationDescription");
 
 				try {
 					System.out.println("Writing XML File for Simulation.");
@@ -144,6 +152,44 @@ public class RealDataExtractor {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Validates the given {@link SimulationDescription} by checking if the departure and destination probabilities for all stations and {@link TimeSlice}s are 1.0. Also it is checked if the sum of
+	 * all relative run values is 1.0.
+	 * 
+	 * @param sd
+	 *            the given {@link SimulationDescription}
+	 * @throws ValidationException
+	 *             if one the checks is violated
+	 */
+	private void validate(SimulationDescription sd) throws ValidationException {
+		List<TimeSlice> timeSlices = sd.getTimeSlices().getTimeSlice();
+
+		double run = 0.0;
+		for (TimeSlice timeSlice : timeSlices) {
+			run += timeSlice.getRunRelative();
+
+			List<ProbabilitiesForStation> probabilitiesForStations = timeSlice.getProbabilitiesForStations().getProbabilitiesForStation();
+			double departureProbs = 0.0;
+
+			for (ProbabilitiesForStation probabilitiesForStation : probabilitiesForStations) {
+				List<DestinationProbability> destinationProbabilities = probabilitiesForStation.getDestinationProbabilities().getDestinationProbability();
+				double destinationProbs = 0.0;
+
+				for (DestinationProbability destinationProbability : destinationProbabilities) {
+					destinationProbs += destinationProbability.getProbability();
+				}
+				if (destinationProbs < 0.9999)
+					throw new ValidationException("Destination probabilities sum for station " + probabilitiesForStation.getStationID() + " is " + destinationProbs);
+
+				departureProbs += probabilitiesForStation.getDepartureProbability();
+			}
+			if (departureProbs < 0.9999)
+				throw new ValidationException("Departure probabilities sum for TimeSlice " + timeSlice.getStartTime() + " is " + departureProbs);
+		}
+		if (run < 0.9999)
+			throw new ValidationException("Relative run sum for all TimeSlices is " + run);
 	}
 
 	/**
@@ -310,6 +356,11 @@ public class RealDataExtractor {
 		SimulationDescription sd = of.createSimulationDescription();
 		TimeSlices timeSlices = of.createSimulationDescriptionTimeSlices();
 
+		int overallRun = 0;
+		for (List<Rental> rentals : rentalsByHour.values()) {
+			overallRun += rentals.size();
+		}
+
 		for (Integer hour : rentalsByHour.keySet()) {
 			List<Rental> rentals = rentalsByHour.get(hour);
 			Map<String, Double> depatureFrequencies = new HashMap<String, Double>();
@@ -364,6 +415,9 @@ public class RealDataExtractor {
 			TimeSlice timeSlice = of.createTimeSlice();
 			timeSlice.setStartTime(hour * 60);
 			timeSlice.setOffset(60);
+			timeSlice.setRunTotal(rentals.size());
+			double runRelative = (double) rentals.size() / (double) overallRun;
+			timeSlice.setRunRelative(runRelative);
 
 			ProbabilitiesForStations probabilitiesForStations = of.createTimeSliceProbabilitiesForStations();
 			timeSlice.setProbabilitiesForStations(probabilitiesForStations);
