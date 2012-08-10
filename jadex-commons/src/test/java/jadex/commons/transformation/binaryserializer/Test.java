@@ -22,7 +22,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro) 
 	{
-		return BinarySerializer.objectFromByteArray((byte[])ro, null, null, null);
+		return BinarySerializer.objectFromByteArray((byte[])ro, null, null, null, null);
 	}
 	
 	/**

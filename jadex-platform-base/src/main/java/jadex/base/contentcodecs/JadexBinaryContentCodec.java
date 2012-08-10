@@ -58,7 +58,7 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 	{
 		Object[] infos = info==null? null: info.get(getClass());
 		List<IDecoderHandler> postprocessors = (List<IDecoderHandler>)(infos!=null? infos[0]: null);
-		Object ret = BinarySerializer.objectFromByteArray(val, postprocessors, null, classloader);
+		Object ret = BinarySerializer.objectFromByteArray(val, postprocessors, null, classloader, null);
 		if(DEBUG)
 			System.out.println("decode content: "+ret);
 		return ret;

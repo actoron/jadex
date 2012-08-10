@@ -55,8 +55,8 @@ public class JadexBinaryCodec implements ICodec
 	public Object decode(Object bytes, ClassLoader classloader)
 	{
 		Object ret = bytes instanceof byte[]
-			? BinarySerializer.objectFromByteArray((byte[])bytes, null, null, classloader)
-			: BinarySerializer.objectFromByteArrayInputStream((ByteArrayInputStream)bytes, null, null, classloader);
+			? BinarySerializer.objectFromByteArray((byte[])bytes, null, null, classloader, null)
+			: BinarySerializer.objectFromByteArrayInputStream((ByteArrayInputStream)bytes, null, null, classloader, null);
 		if(DEBUG)
 			System.out.println("decode message: "+(new String((byte[])bytes)));
 		return ret;

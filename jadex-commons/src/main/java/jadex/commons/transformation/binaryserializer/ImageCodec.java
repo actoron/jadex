@@ -6,13 +6,9 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 
 /**
  *  Codec for encoding and decoding Image objects.

@@ -130,11 +130,16 @@ public class BinarySerializer
 	 *  @param val The byte array.
 	 *  @param usercontext A user context, may be null.
 	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromByteArray(byte[] val, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader)
+	public static Object objectFromByteArray(byte[] val, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
-		DecodingContext context = new DecodingContext(val, postprocessors, usercontext, classloader);
+		if (errorreporter == null)
+		{
+			errorreporter = new DefaultErrorReporter();
+		}
+		DecodingContext context = new DecodingContext(val, postprocessors, usercontext, classloader, errorreporter);
 		return decodeObject(context);
 	}
 	
@@ -143,10 +148,16 @@ public class BinarySerializer
 	 *  @param val The byte array.
 	 *  @param usercontext A user context, may be null.
 	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromByteArrayInputStream(ByteArrayInputStream bais, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader)
+	public static Object objectFromByteArrayInputStream(ByteArrayInputStream bais, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
+		if (errorreporter == null)
+		{
+			errorreporter = new DefaultErrorReporter();
+		}
+		
 		byte[] buffer = null;
 		int offset = 0;
 		try
@@ -162,6 +173,7 @@ public class BinarySerializer
 		}
 		catch (Exception e)
 		{
+			// Use reporter? Hard error, how would you recover?
 			throw new RuntimeException(e);
 		}
 		
@@ -170,7 +182,7 @@ public class BinarySerializer
 		//if (postprocessors != null)
 			//handlers.addAll(postprocessors);
 		
-		DecodingContext context = new DecodingContext(buffer, postprocessors, usercontext, classloader, offset);
+		DecodingContext context = new DecodingContext(buffer, postprocessors, usercontext, classloader, errorreporter, offset);
 		return decodeObject(context);
 	}
 	

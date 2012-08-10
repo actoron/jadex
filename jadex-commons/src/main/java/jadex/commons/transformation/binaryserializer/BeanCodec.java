@@ -55,32 +55,40 @@ public class BeanCodec extends AbstractCodec
 			
 			Classname cl = getAnonClassName(clazz);
 			if (cl == null || (!correctcl.equals(cl.value())))
+			{
 				clazz = findCorrectInnerClass(0, SReflect.getClassName(clazz), correctcl, context.getClassloader());
-			
-			Constructor	c	= clazz.getDeclaredConstructors()[0];
-			c.setAccessible(true);
-			Class[] paramtypes = c.getParameterTypes();
-			Object[] paramvalues = new Object[paramtypes.length];
-			for(int i=0; i<paramtypes.length; i++)
+			}
+			if (clazz != null)
 			{
-				if(paramtypes[i].equals(boolean.class))
+				Constructor	c	= clazz.getDeclaredConstructors()[0];
+				c.setAccessible(true);
+				Class[] paramtypes = c.getParameterTypes();
+				Object[] paramvalues = new Object[paramtypes.length];
+				for(int i=0; i<paramtypes.length; i++)
 				{
-					paramvalues[i] = Boolean.FALSE;
+					if(paramtypes[i].equals(boolean.class))
+					{
+						paramvalues[i] = Boolean.FALSE;
+					}
+					else if(SReflect.isBasicType(paramtypes[i]))
+					{
+						paramvalues[i] = 0;
+					}
 				}
-				else if(SReflect.isBasicType(paramtypes[i]))
+				
+				try
 				{
-					paramvalues[i] = 0;
+					bean = c.newInstance(paramvalues);
+				}
+				catch (Exception e)
+				{
+					context.getErrorReporter().exceptionOccurred(e);
+					//throw new RuntimeException(e);
 				}
 			}
-			
-			try
+			else
 			{
-				bean = c.newInstance(paramvalues);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Inner Class not found: " + cl));
 			}
 			
 		}
@@ -92,8 +100,8 @@ public class BeanCodec extends AbstractCodec
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				context.getErrorReporter().exceptionOccurred(e);
+				//throw new RuntimeException(e);
 			}
 		}
 		
@@ -118,7 +126,17 @@ public class BeanCodec extends AbstractCodec
 			String name = context.readString();
 			Object val = null;
 			val = BinarySerializer.decodeObject(context);
-			((BeanProperty) props.get(name)).setPropertyValue(object, val);
+			if (object != null)
+			{
+				try
+				{
+					((BeanProperty) props.get(name)).setPropertyValue(object, val);
+				}
+				catch (Exception e)
+				{
+					context.getErrorReporter().exceptionOccurred(e);
+				}
+			}
 		}
 		
 		return object;

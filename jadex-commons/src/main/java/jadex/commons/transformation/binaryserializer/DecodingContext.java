@@ -51,14 +51,17 @@ public class DecodingContext
 	/** Already known objects */
 	protected Map<Integer, Object> knownobjects;
 	
+	/** Error Reporter */
+	protected IErrorReporter errorreporter;
+	
 	/**
 	 * Creates a new DecodingContext.
 	 * @param classloader The classloader.
 	 * @param content The content being decoded.
 	 */
-	public DecodingContext(byte[] content, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader)
+	public DecodingContext(byte[] content, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
-		this(content, postprocessors, usercontext, classloader, 0);
+		this(content, postprocessors, usercontext, classloader, errorreporter, 0);
 	}
 	
 	/**
@@ -66,7 +69,7 @@ public class DecodingContext
 	 * @param content The content being decoded.
 	 * @param offset The offset.
 	 */
-	public DecodingContext(byte[] content, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, int offset)
+	public DecodingContext(byte[] content, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, int offset)
 	{
 		this.content = content;
 		this.postprocessors = postprocessors;
@@ -80,6 +83,7 @@ public class DecodingContext
 		this.knownobjects = new HashMap<Integer, Object>();
 		this.bitfield = 0;
 		this.bitpos = 8;
+		this.errorreporter = errorreporter;
 	}
 	
 	/**
@@ -125,6 +129,15 @@ public class DecodingContext
 	public void setLastObject(Object lastobject)
 	{
 		this.lastobject = lastobject;
+	}
+	
+	/**
+	 *  Gets the error reporter.
+	 *  @return The error reporter.
+	 */
+	public IErrorReporter getErrorReporter()
+	{
+		return errorreporter;
 	}
 
 	/**
