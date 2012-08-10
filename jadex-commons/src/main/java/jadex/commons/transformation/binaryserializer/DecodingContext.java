@@ -51,6 +51,9 @@ public class DecodingContext
 	/** Already known objects */
 	protected Map<Integer, Object> knownobjects;
 	
+	/** The current class name. */
+	protected String currentclassname;
+	
 	/** Error Reporter */
 	protected IErrorReporter errorreporter;
 	
@@ -129,6 +132,15 @@ public class DecodingContext
 	public void setLastObject(Object lastobject)
 	{
 		this.lastobject = lastobject;
+	}
+	
+	/**
+	 *  Gets the current class name.
+	 *  @return The current class name.
+	 */
+	public String getCurrentClassName()
+	{
+		return this.currentclassname;
 	}
 	
 	/**
@@ -271,6 +283,7 @@ public class DecodingContext
 			ret = classnamepool.get(classid);
 		}
 		
+		currentclassname = ret;
 		return ret;
 	}
 	

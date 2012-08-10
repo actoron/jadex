@@ -19,7 +19,7 @@ public class EnumCodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Class clazz)
 	{
-		return clazz.isEnum();
+		return clazz != null && clazz.isEnum();
 	}
 	
 	/**

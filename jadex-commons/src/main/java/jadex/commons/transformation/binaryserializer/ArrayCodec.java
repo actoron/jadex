@@ -22,7 +22,7 @@ public class ArrayCodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Class clazz)
 	{
-		return clazz.isArray();
+		return clazz != null && clazz.isArray();
 	}
 	
 	/**

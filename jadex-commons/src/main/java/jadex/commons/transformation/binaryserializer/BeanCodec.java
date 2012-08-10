@@ -88,20 +88,27 @@ public class BeanCodec extends AbstractCodec
 			}
 			else
 			{
-				context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Inner Class not found: " + cl));
+				context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Inner Class not found: " + context.getCurrentClassName() + " Converted: " + cl));
 			}
 			
 		}
 		else
 		{
-			try
+			if (clazz != null)
 			{
-				bean = clazz.newInstance();
+				try
+				{
+					bean = clazz.newInstance();
+				}
+				catch (Exception e)
+				{
+					context.getErrorReporter().exceptionOccurred(e);
+					//throw new RuntimeException(e);
+				}
 			}
-			catch (Exception e)
+			else
 			{
-				context.getErrorReporter().exceptionOccurred(e);
-				//throw new RuntimeException(e);
+				context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Class not found: " + context.getCurrentClassName()));
 			}
 		}
 		
@@ -118,24 +125,36 @@ public class BeanCodec extends AbstractCodec
 	 */
 	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
 	{
-		
-		Map props = intro.getBeanProperties(clazz, true, false);
-		int size = (int) context.readVarInt();
-		for (int i = 0; i < size; ++i)
+		if (object != null)
 		{
-			String name = context.readString();
-			Object val = null;
-			val = BinarySerializer.decodeObject(context);
-			if (object != null)
+			Map props = intro.getBeanProperties(clazz, true, false);
+			int size = (int) context.readVarInt();
+			for (int i = 0; i < size; ++i)
 			{
-				try
+				String name = context.readString();
+				Object val = null;
+				val = BinarySerializer.decodeObject(context);
+				if (object != null)
 				{
-					((BeanProperty) props.get(name)).setPropertyValue(object, val);
+					try
+					{
+						((BeanProperty) props.get(name)).setPropertyValue(object, val);
+					}
+					catch (Exception e)
+					{
+						context.getErrorReporter().exceptionOccurred(e);
+					}
 				}
-				catch (Exception e)
-				{
-					context.getErrorReporter().exceptionOccurred(e);
-				}
+			}
+		}
+		else
+		{
+			// Object failed to instantiate, skip sub-objects.
+			int size = (int) context.readVarInt();
+			for (int i = 0; i < size; ++i)
+			{
+				context.readString();
+				BinarySerializer.decodeObject(context);
 			}
 		}
 		
