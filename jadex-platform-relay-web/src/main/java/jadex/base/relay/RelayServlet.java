@@ -371,7 +371,7 @@ public class RelayServlet extends HttpServlet
 			}
 			else //if(SFipa.JADEX_BINARY.equals(msg.getMessage().get(SFipa.LANGUAGE)))
 			{
-				info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader());
+				info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 			}
 			sendAwarenessInfos(info, pcodecs);
 		}
