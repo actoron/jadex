@@ -1,22 +1,12 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.commons.future.IFuture;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector2Double;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * 
@@ -71,7 +61,7 @@ public class RotationTask extends AbstractTask
 				
 				double	maxdist	= progress*speed*0.001;
 				double dist = ((Space2D)space).getDistance(loc, destination).getAsDouble();
-				if(dist>maxdist)
+				if(dist>maxdist || Math.random()>0.7)
 				{
 					IVector2 newloc	= newdir.copy().normalize().multiply(speed*0.05).add(loc);
 					((Space2D)space).setPosition(obj.getId(), newloc);
