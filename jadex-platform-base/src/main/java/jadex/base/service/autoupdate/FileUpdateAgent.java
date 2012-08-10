@@ -319,7 +319,7 @@ public class FileUpdateAgent extends UpdateAgent
 	 */
 	public static void main(String[] args)
 	{
-		String pat = "jadex-[0-9]+\\..*.zip";
+		String pat = "jadex-[0-9]+\\..*.zip | jadex-";
 		
 		System.out.println("jadex-2.1.zip".matches(pat));
 	}
