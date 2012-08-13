@@ -34,7 +34,7 @@ import java.util.zip.ZipFile;
 {
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
-	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-[0-9]+\\\\..*.zip\"", description="Only main Jadex distribution jars.")
+	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-[[0-9]+\\..|.*[addon]].*.zip\"", description="Only main Jadex distribution jars.")
 })
 @RequiredServices(
 {
@@ -142,7 +142,7 @@ public class FileUpdateAgent extends UpdateAgent
 				{
 					File dir = res.iterator().next();
 					
-					File[] dists = dir.listFiles(new FilenameFilter()
+					File[] files = dir.listFiles(new FilenameFilter()
 					{
 						public boolean accept(File dir, String name)
 						{
@@ -150,17 +150,24 @@ public class FileUpdateAgent extends UpdateAgent
 						}
 					});
 					
-					File dist = dists[0];
-					foundver = dist.lastModified();
+					foundver = files[0].lastModified();
 					boolean force = false; // force update
 					if(foundver>curver || force) 
 					{
 						try
 						{
-							File tdir = new File(sdf.format(new Date(dist.lastModified())));
+							// create new directory for distribution
+							Date founddate = new Date(foundver);
+							File tdir = new File(sdf.format(founddate));
 							tdir.mkdir();
-							SUtil.unzip(new ZipFile(dist), tdir);
 							
+							// unzip all files
+							for(File file: files)
+							{
+								SUtil.unzip(new ZipFile(file), tdir);
+							}
+							
+							// find distribution directory (must be one)
 							File[] decoms = tdir.listFiles(new FileFilter()
 							{
 								public boolean accept(File file)
@@ -170,9 +177,9 @@ public class FileUpdateAgent extends UpdateAgent
 							});
 							if(decoms.length==1)
 							{
-								System.out.println("Updating to version: "+sdf.format(new Date(dist.lastModified())));
+								System.out.println("Updating to version: "+sdf.format(founddate));
 
-								UpdateInfo ui = new UpdateInfo(dist.lastModified(), new File(decoms[0], "lib").getCanonicalPath());
+								UpdateInfo ui = new UpdateInfo(foundver, new File(decoms[0], "lib").getCanonicalPath());
 								ret.setResult(ui);
 							}
 							else
@@ -319,8 +326,10 @@ public class FileUpdateAgent extends UpdateAgent
 	 */
 	public static void main(String[] args)
 	{
-		String pat = "jadex-[0-9]+\\..*.zip | jadex-";
+//		String pat = "jadex-[0-9]+\\..*.zip";
+		String pat = "jadex-[[0-9]+\\..|.*[addon]].*.zip";
 		
 		System.out.println("jadex-2.1.zip".matches(pat));
+		System.out.println("jadex-3d-addon.zip".matches(pat));
 	}
 }
