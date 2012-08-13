@@ -22,8 +22,9 @@ import deco4mas.distributed.mechanism.CoordinationInfo;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * @author thomas
+ * A coordination mechanism based on Scribe. A group communication platform based on the FreePastry distributed hash table implementation.
  * 
+ * @author Thomas Preisler
  */
 public class ScribeMechanism extends CoordinationMechanism {
 
@@ -31,6 +32,8 @@ public class ScribeMechanism extends CoordinationMechanism {
 	protected StatelessAbstractInterpreter applicationInterpreter = null;
 
 	private ScribeCoordinationClient scribeClient = null;
+
+	private PastryNode node = null;
 
 	public ScribeMechanism(CoordinationSpace space) {
 		super(space);
@@ -63,7 +66,7 @@ public class ScribeMechanism extends CoordinationMechanism {
 			PastryNodeFactory factory = new SocketPastryNodeFactory(nidFactory, bindport, env);
 
 			// construct a new node
-			PastryNode node = factory.newNode();
+			node = factory.newNode();
 
 			this.scribeClient = new ScribeCoordinationClient(node, this.coordinationContextID, this.space);
 
@@ -104,4 +107,9 @@ public class ScribeMechanism extends CoordinationMechanism {
 		this.scribeClient.publish(ci);
 	}
 
+	@Override
+	public void stop() {
+		this.scribeClient.unsubscribe();
+		this.node.destroy();
+	}
 }

@@ -35,6 +35,9 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	/** The list of currently supported / active coordination mechanisms. */
 	private ArrayList<CoordinationMechanism> activeCoordinationMechanisms = new ArrayList<CoordinationMechanism>();
 
+	/** The list of currently unsupported / inactive coordination mechanisms. */
+	private ArrayList<CoordinationMechanism> inactiveCoordinationMechanisms = new ArrayList<CoordinationMechanism>();
+
 	private MASDynamics masDnyModel = null;
 
 	// Contains the "RoleDefinitionsForPerceive" for each agent type.
@@ -68,17 +71,17 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	public Map<String, IComponentDescription> getDescriptionMapping() {
 		return descriptionMapping;
 	}
-	
+
 	@Override
 	public IFuture<Void> initSpace() {
 		super.initSpace();
-		
+
 		initSpaces();
 		initDeco4mas();
 		for (CoordinationMechanism icord : activeCoordinationMechanisms) {
 			icord.start();
 		}
-		
+
 		return IFuture.DONE;
 	}
 
@@ -240,6 +243,13 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		return activeCoordinationMechanisms;
 	}
 
+	/**
+	 * @return the inactiveCoordinationMechanisms
+	 */
+	public ArrayList<CoordinationMechanism> getInactiveCoordinationMechanisms() {
+		return inactiveCoordinationMechanisms;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -257,5 +267,33 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 */
 	public IInternalAccess getApplicationInternalAccess() {
 		return ia;
+	}
+
+	/**
+	 * Activates the given {@link CoordinationMechanism} by removing it from the list of inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms} and adding it to the list of
+	 * active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms}. Also the {@link CoordinationMechanism#start()} method is called to start the mechanism.
+	 * 
+	 * @param mechanism
+	 *            the given {@link CoordinationMechanism} to activate
+	 */
+	public void activateCoordinationMechanism(CoordinationMechanism mechanism) {
+		this.inactiveCoordinationMechanisms.remove(mechanism);
+		this.activeCoordinationMechanisms.add(mechanism);
+
+		mechanism.start();
+	}
+
+	/**
+	 * Deactivates the given {@link CoordinationMechanism} by removing it from the list of active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms} and adding it to the list of
+	 * inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms}. Also the {@link CoordinationMechanism#stop()} method is called to stop the mechanism.
+	 * 
+	 * @param mechanism
+	 *            the given {@link CoordinationMechanism} to deactivate
+	 */
+	public void deactivateCoordinationMechanism(CoordinationMechanism mechanism) {
+		this.activeCoordinationMechanisms.remove(mechanism);
+		this.inactiveCoordinationMechanisms.add(mechanism);
+
+		mechanism.stop();
 	}
 }

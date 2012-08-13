@@ -58,6 +58,13 @@ public class CachedServiceMechanism extends ServiceMechanism {
 	}
 
 	@Override
+	public void stop() {
+		super.stop();
+		perceiveCount = 0;
+		this.services = new ArrayList<ICoordinationService>();
+	}
+
+	@Override
 	public void perceiveCoordinationEvent(Object obj) {
 		CoordinationInfo ci = (CoordinationInfo) obj;
 
@@ -72,7 +79,7 @@ public class CachedServiceMechanism extends ServiceMechanism {
 					services.remove(service);
 				}
 			}
-			
+
 			System.out.println("Updated service cache.");
 		}
 

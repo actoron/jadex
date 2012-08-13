@@ -2,9 +2,12 @@ package deco4mas.distributed.mechanism.subscription;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -32,7 +35,7 @@ public class SubscriptionServiceMechanism extends CoordinationMechanism {
 	protected StatelessAbstractInterpreter applicationInterpreter;
 
 	/** The subscribed services */
-	protected Map<String, List<String>> subscribedServices;
+	protected Map<String, List<SubscribedService>> subscribedServices;
 
 	/** The started service */
 	protected ICoordinationSubscriptionService service;
@@ -42,6 +45,9 @@ public class SubscriptionServiceMechanism extends CoordinationMechanism {
 
 	/** The id of the offered service */
 	protected String serviceId;
+
+	/** The identifier of the offered coordination service */
+	protected IServiceIdentifier serviceIdentifier = null;
 
 	/**
 	 * Default Constructor.
@@ -61,7 +67,7 @@ public class SubscriptionServiceMechanism extends CoordinationMechanism {
 
 		this.serviceId = "CoordinationSubscriptionService@" + this.applicationInterpreter.getComponentIdentifier().getName();
 		this.service = new CoordinationSubscriptionService(serviceId);
-		this.subscribedServices = new HashMap<String, List<String>>();
+		this.subscribedServices = new HashMap<String, List<SubscribedService>>();
 	}
 
 	/*
@@ -84,16 +90,17 @@ public class SubscriptionServiceMechanism extends CoordinationMechanism {
 
 					@Override
 					public void intermediateResultAvailable(ICoordinationSubscriptionService result) {
-						List<String> serviceIds = subscribedServices.get(coordinationContextID);
-						if (serviceIds == null) {
-							serviceIds = new ArrayList<String>();
-							subscribedServices.put(coordinationContextID, serviceIds);
+						List<SubscribedService> services = subscribedServices.get(coordinationContextID);
+						if (services == null) {
+							services = new ArrayList<SubscribedService>();
+							subscribedServices.put(coordinationContextID, services);
 						}
 
 						// only add and subscribe to services you have not found yet
-						if (!serviceIds.contains(result.getServiceId())) {
+						if (!services.contains(result.getServiceId())) {
 							ISubscriptionIntermediateFuture<CoordinationInfo> subscription = result.subscribe(coordinationContextID);
-							serviceIds.add(result.getServiceId());
+							String serviceId = result.getServiceId();
+							services.add(new SubscribedService(serviceId, subscription));
 							subscription.addResultListener(new IntermediateDefaultResultListener<CoordinationInfo>() {
 
 								@Override
@@ -146,6 +153,31 @@ public class SubscriptionServiceMechanism extends CoordinationMechanism {
 	 *            the actual service instance
 	 */
 	private void addService(String name, Class<?> type, Object service) {
-		applicationInterpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+		IFuture<IInternalService> result = applicationInterpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+		result.addResultListener(new DefaultResultListener<IInternalService>() {
+
+			@Override
+			public void resultAvailable(IInternalService is) {
+				serviceIdentifier = is.getServiceIdentifier();
+			}
+		});
+	}
+
+	@Override
+	public void stop() {
+		// remove the offered service
+		if (serviceIdentifier != null)
+			applicationInterpreter.getServiceContainer().removeService(serviceIdentifier);
+
+		// unsubscribe all subscribed services
+		for (String coordinationContextId : subscribedServices.keySet()) {
+			List<SubscribedService> services = subscribedServices.get(coordinationContextId);
+			for (SubscribedService subscribedService : services) {
+				subscribedService.getSubscription().terminate();
+			}
+		}
+
+		this.service = new CoordinationSubscriptionService(serviceId);
+		this.subscribedServices = new HashMap<String, List<SubscribedService>>();
 	}
 }

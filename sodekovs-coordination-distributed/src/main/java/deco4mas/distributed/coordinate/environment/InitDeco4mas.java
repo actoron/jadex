@@ -85,11 +85,15 @@ public class InitDeco4mas {
 				mechanism.setMechanismConfiguration(mechanismConfiguration);
 				mechanism.setRealisationName(dml.getRealization());
 
-				((CoordinationSpace) space).getActiveCoordinationMechanisms().add(mechanism);
+				if (dc.getActive())
+					((CoordinationSpace) space).getActiveCoordinationMechanisms().add(mechanism);
+
+				else if (!dc.getActive())
+					((CoordinationSpace) space).getInactiveCoordinationMechanisms().add(mechanism);
 			}
 		}
 
-		// TODO do the same as above for the direct links, right now the did not seem to be supported...
+		// TODO do the same as above for the direct links, right now this did not seem to be supported...
 		for (DirectLink dml : masDyn.getCausalities().getDirectLinks()) {
 			((CoordinationSpace) space).getActiveCoordinationMechanisms().add(getMechanism(dml.getRealization(), (CoordinationSpace) space));
 		}

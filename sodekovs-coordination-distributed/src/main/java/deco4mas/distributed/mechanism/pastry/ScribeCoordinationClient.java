@@ -96,4 +96,8 @@ public class ScribeCoordinationClient implements ScribeMultiClient {
 		ScribeCoordinationContent scc = new ScribeCoordinationContent(ci);
 		this.scribe.publish(this.topic, scc);
 	}
+
+	public void unsubscribe() {
+		this.scribe.unsubscribe(topic, this);
+	}
 }

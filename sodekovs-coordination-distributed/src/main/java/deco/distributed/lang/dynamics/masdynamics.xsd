@@ -5,6 +5,8 @@
 
   <xs:element name="agent" type="agentReference"/>
 
+  <xs:element name="agent_data_mapping" type="dataMapping"/>
+
   <xs:element name="agent_element" type="agentElement"/>
 
   <xs:element name="agent_model" type="agentModel"/>
@@ -17,7 +19,7 @@
 
   <xs:element name="configuration" type="directLinkConfiguration"/>
 
-  <xs:element name="constraints" type="propertyContraints"/>
+  <xs:element name="constraints" type="propertyConstraints"/>
 
   <xs:element name="deco_link" type="decentralMechanismLink"/>
 
@@ -25,7 +27,7 @@
 
   <xs:element name="direct_link" type="directLink"/>
 
-  <xs:element name="direkt_link_configuration" type="directCausality"/>
+  <xs:element name="direct_link_configuration" type="directCausality"/>
 
   <xs:element name="element" type="elementReference"/>
 
@@ -39,7 +41,7 @@
 
   <xs:element name="parametermapping" nillable="true" type="xs:anyType"/>
 
-  <xs:element name="realization" type="causality"/>
+  <xs:element name="realization" type="decentralizedCausality"/>
 
   <xs:element name="role_occupation" type="roleOccupation"/>
 
@@ -58,10 +60,10 @@
 
   <xs:complexType name="causalities">
     <xs:sequence>
-      <xs:element name="direkt_link_configurations" minOccurs="0">
+      <xs:element name="direct_link_configurations" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="direkt_link_configuration" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="direct_link_configuration" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -90,8 +92,17 @@
   </xs:complexType>
 
   <xs:complexType name="directCausality">
+    <xs:complexContent>
+      <xs:extension base="causalityModel">
+        <xs:sequence>
+          <xs:element ref="configuration" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="causalityModel">
     <xs:sequence>
-      <xs:element ref="configuration" minOccurs="0"/>
       <xs:element name="from" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -151,6 +162,13 @@
 
   <xs:complexType name="agentElement">
     <xs:sequence>
+      <xs:element name="agent_data_mappings" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="mapping" type="dataMapping" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="parameter_mappings" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -164,6 +182,14 @@
     <xs:attribute name="element" type="xs:string"/>
   </xs:complexType>
 
+  <xs:complexType name="dataMapping">
+    <xs:sequence/>
+    <xs:attribute name="data" type="xs:string"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="ref" type="xs:string"/>
+  </xs:complexType>
+
   <xs:complexType name="parameterMapping">
     <xs:sequence/>
     <xs:attribute name="class" type="xs:string"/>
@@ -175,7 +201,6 @@
     <xs:complexContent>
       <xs:extension base="causalLink">
         <xs:sequence/>
-        <xs:attribute name="realized_by" type="xs:string"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -197,8 +222,15 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
+    <xs:attribute name="flow" type="xs:boolean"/>
     <xs:attribute name="name" type="xs:string"/>
     <xs:attribute name="rate" type="xs:double"/>
+    <xs:attribute name="realization" type="xs:string"/>
+    <xs:attribute name="spaces">
+      <xs:simpleType>
+        <xs:list itemType="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
     <xs:attribute name="type" type="coordinationType"/>
   </xs:complexType>
 
@@ -206,30 +238,19 @@
     <xs:complexContent>
       <xs:extension base="causalLink">
         <xs:sequence/>
-        <xs:attribute name="realization" type="xs:string"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="causality">
-    <xs:sequence>
-      <xs:element name="from" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="agent_element" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="mechanism_configuration" type="mechanismConfiguration" minOccurs="0"/>
-      <xs:element name="to" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="agent_element" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-    <xs:attribute name="id" type="xs:string"/>
+  <xs:complexType name="decentralizedCausality">
+    <xs:complexContent>
+      <xs:extension base="causalityModel">
+        <xs:sequence>
+          <xs:element name="active" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="mechanism_configuration" type="mechanismConfiguration" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="mechanismConfiguration">
@@ -367,7 +388,7 @@
     <xs:attribute name="id" type="xs:string"/>
   </xs:complexType>
 
-  <xs:complexType name="propertyContraints">
+  <xs:complexType name="propertyConstraints">
     <xs:sequence>
       <xs:element ref="condition" minOccurs="0"/>
       <xs:element name="inhibitions" minOccurs="0">
@@ -424,8 +445,10 @@
       <xs:enumeration value="BDI_BELIEF"/>
       <xs:enumeration value="BDI_BELIEFSET"/>
       <xs:enumeration value="BDI_GOAL"/>
+      <xs:enumeration value="MICRO_STEP"/>
       <xs:enumeration value="INTERNAL_EVENT"/>
       <xs:enumeration value="GENERIC_ACTIVITY"/>
+      <xs:enumeration value="AGENT_ELEMENT_TYPE"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -1,9 +1,12 @@
 package deco4mas.distributed.mechanism.service;
 
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.Collection;
@@ -22,6 +25,9 @@ public class ServiceMechanism extends CoordinationMechanism {
 
 	/** The applications interpreter */
 	protected StatelessAbstractInterpreter applicationInterpreter = null;
+
+	/** The identifier of the offered coordination service */
+	protected IServiceIdentifier serviceIdentifier = null;
 
 	/**
 	 * Default Constructor.
@@ -78,6 +84,19 @@ public class ServiceMechanism extends CoordinationMechanism {
 	 *            the actual service instance
 	 */
 	private void addService(String name, Class<?> type, Object service) {
-		applicationInterpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+		IFuture<IInternalService> result = applicationInterpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
+		result.addResultListener(new DefaultResultListener<IInternalService>() {
+
+			@Override
+			public void resultAvailable(IInternalService is) {
+				serviceIdentifier = is.getServiceIdentifier();
+			}
+		});
+	}
+
+	@Override
+	public void stop() {
+		if (serviceIdentifier != null)
+			applicationInterpreter.getServiceContainer().removeService(serviceIdentifier);
 	}
 }
