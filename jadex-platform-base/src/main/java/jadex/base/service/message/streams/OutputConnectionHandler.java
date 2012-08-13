@@ -195,6 +195,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				checkWaitForReady();
 				sendStored();
 				checkClose();
 				return IFuture.DONE;

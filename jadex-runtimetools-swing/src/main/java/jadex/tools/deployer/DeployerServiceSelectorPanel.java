@@ -136,5 +136,15 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 			}
 		}
 	}
+
+	/**
+	 *  Get the jccaccess.
+	 *  @return The jccaccess.
+	 */
+	public IExternalAccess getJCCAccess()
+	{
+		return jccaccess;
+	}
+	
 }
 

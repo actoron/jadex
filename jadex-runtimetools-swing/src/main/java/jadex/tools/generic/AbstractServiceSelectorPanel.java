@@ -88,4 +88,15 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	{
 		return element.getServiceIdentifier().toString();
 	}
+
+	/**
+	 *  Get the platform.
+	 *  @return The platform.
+	 */
+	public IExternalAccess getPlatformAccess()
+	{
+		return platform;
+	}
+	
+	
 }

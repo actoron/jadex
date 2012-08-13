@@ -6,17 +6,26 @@ import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
+import jadex.tools.jcc.JCCAgent;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -169,42 +178,89 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					
 					if(sel_1!=null && sel_2!=null)
 					{
-						final File source = new File(sel_1);
+						final IComponentIdentifier lcid = jcc.getJCCAccess().getComponentIdentifier();
 						
-						try
+						first.getPlatformAccess().scheduleStep(new IComponentStep<Void>()
 						{
-							final FileInputStream fis = new FileInputStream(source);
-							ServiceOutputConnection soc = new ServiceOutputConnection();
-							soc.writeFromInputStream(fis, jcc.getPlatformAccess());
-							ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), sel_2, source.getName());
-							fut.addResultListener(new SwingIntermediateDefaultResultListener<Long>()
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								public void customIntermediateResultAvailable(Long result)
-								{
-									jcc.setStatusText("Copy "+(result/source.length())+"% done");
-								}
+								final Future<Void> ret = new Future<Void>();
 								
-								public void customFinished()
+								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 								{
-									jcc.setStatusText("Copied: "+sel_1+" to "+sel_2);
-									second.refreshTreePaths(null);
-								}
+									public void customResultAvailable(IComponentManagementService cms)
+									{
+										cms.getExternalAccess(lcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+										{
+											public void customResultAvailable(final IExternalAccess jccacc) 
+											{
+												ret.setResult(null);
+												
+												try
+												{
+													final File source = new File(sel_1);
+													final FileInputStream fis = new FileInputStream(source);
+													ServiceOutputConnection soc = new ServiceOutputConnection();
+													soc.writeFromInputStream(fis, first.getPlatformAccess());
+													ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), sel_2, source.getName());
+													fut.addResultListener(new IIntermediateResultListener<Long>()
+													{
+														public void intermediateResultAvailable(final Long result)
+														{
+															jccacc.scheduleStep(new IComponentStep<Void>()
+															{
+																public IFuture<Void> execute(IInternalAccess ia)
+																{
+																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+(result/source.length())+"% done");
+																	return IFuture.DONE;
+																}
+															});
+														}
+														
+														public void finished()
+														{
+															jccacc.scheduleStep(new IComponentStep<Void>()
+															{
+																public IFuture<Void> execute(IInternalAccess ia)
+																{
+																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel_1+" to "+sel_2);
+																	return IFuture.DONE;
+																}
+															});
+//															second.refreshTreePaths(null);
+														}
+														
+														public void resultAvailable(Collection<Long> result)
+														{
+															finished();
+														}
+														
+														public void exceptionOccurred(final Exception exception)
+														{
+															jccacc.scheduleStep(new IComponentStep<Void>()
+															{
+																public IFuture<Void> execute(IInternalAccess ia)
+																{
+																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception.getMessage());
+																	return IFuture.DONE;
+																}
+															});
+														}
+													});
+												}
+												catch(Exception ex)
+												{
+													jcc.setStatusText("Copy error: "+sel_1+" "+ex.getMessage());
+												}
+											}
+										});
+									}
+								}));
 								
-								public void customResultAvailable(Collection<Long> result)
-								{
-									finished();
-								}
-								
-								public void customExceptionOccurred(Exception exception)
-								{
-									jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception.getMessage());
-								}
-							});
-						}
-						catch(Exception ex)
-						{
-							jcc.setStatusText("Copy error: "+sel_1+" "+ex.getMessage());
-						}
+								return ret;
+							}
+						});
 					}
 				}
 			}

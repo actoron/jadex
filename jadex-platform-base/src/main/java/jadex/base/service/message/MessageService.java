@@ -1708,6 +1708,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else if(type==StreamSendTask.DATA_OUTPUT_INITIATOR)
 				{
+//					System.out.println("received data");
 					InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
 					if(ich!=null)
 					{

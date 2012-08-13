@@ -60,6 +60,8 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	{
 		super(sender, receiver, id, true, initiator, ch);
 		this.data = new ArrayList<byte[]>();
+		
+//		System.out.println("created input con: "+id+" "+receiver.getName());
 	}
 	
 	//-------- IInputConnection methods --------

@@ -36,6 +36,9 @@ public class DeploymentService implements IDeploymentService
 	 */
 	public ITerminableIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name)
 	{
+//		TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
+//		ret.setFinished();
+//		return ret;
 		try
 		{
 			return con.writeToOutputStream(new FileOutputStream(path+File.separator+name), agent);
