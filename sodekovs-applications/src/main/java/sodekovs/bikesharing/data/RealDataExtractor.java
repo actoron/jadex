@@ -166,9 +166,9 @@ public class RealDataExtractor {
 	private void validate(SimulationDescription sd) throws ValidationException {
 		List<TimeSlice> timeSlices = sd.getTimeSlices().getTimeSlice();
 
-		double run = 0.0;
+		// double run = 0.0;
 		for (TimeSlice timeSlice : timeSlices) {
-			run += timeSlice.getRunRelative();
+			// run += timeSlice.getRunRelative();
 
 			List<ProbabilitiesForStation> probabilitiesForStations = timeSlice.getProbabilitiesForStations().getProbabilitiesForStation();
 			double departureProbs = 0.0;
@@ -188,8 +188,8 @@ public class RealDataExtractor {
 			if (departureProbs < 0.9999)
 				throw new ValidationException("Departure probabilities sum for TimeSlice " + timeSlice.getStartTime() + " is " + departureProbs);
 		}
-		if (run < 0.9999)
-			throw new ValidationException("Relative run sum for all TimeSlices is " + run);
+		// if (run < 0.9999)
+		// throw new ValidationException("Relative run sum for all TimeSlices is " + run);
 	}
 
 	/**
@@ -356,9 +356,15 @@ public class RealDataExtractor {
 		SimulationDescription sd = of.createSimulationDescription();
 		TimeSlices timeSlices = of.createSimulationDescriptionTimeSlices();
 
-		int overallRun = 0;
+		// int overallRun = 0;
+		// for (List<Rental> rentals : rentalsByHour.values()) {
+		// overallRun += rentals.size();
+		// }
+
+		int maxRun = 0;
 		for (List<Rental> rentals : rentalsByHour.values()) {
-			overallRun += rentals.size();
+			if (maxRun < rentals.size())
+				maxRun = rentals.size();
 		}
 
 		for (Integer hour : rentalsByHour.keySet()) {
@@ -416,7 +422,8 @@ public class RealDataExtractor {
 			timeSlice.setStartTime(hour * 60);
 			timeSlice.setOffset(60);
 			timeSlice.setRunTotal(rentals.size());
-			double runRelative = (double) rentals.size() / (double) overallRun;
+			// double runRelative = (double) rentals.size() / (double) overallRun;
+			double runRelative = (double) rentals.size() / (double) maxRun;
 			timeSlice.setRunRelative(runRelative);
 
 			ProbabilitiesForStations probabilitiesForStations = of.createTimeSliceProbabilitiesForStations();
