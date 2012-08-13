@@ -117,16 +117,31 @@ public class ClassChooserPanel	extends JPanel
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
-					JarFile	jar	= new JarFile(f);
-					for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+					JarFile	jar = null;
+					try
 					{
-						JarEntry	je	= e.nextElement();
-						if(filter.filter(je))	
+						jar	= new JarFile(f);
+						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
 						{
-							ret.add(je.getName());
+							JarEntry	je	= e.nextElement();
+							if(filter.filter(je))	
+							{
+								ret.add(je.getName());
+							}
+						}
+						jar.close();
+					}
+					catch(Exception e)
+					{
+						System.out.println("Eror opening jar: "+urls[i]+" "+e.getMessage());
+					}
+					finally
+					{
+						if(jar!=null)
+						{
+							jar.close();
 						}
 					}
-					jar.close();
 				}
 				else if(f.isDirectory())
 				{

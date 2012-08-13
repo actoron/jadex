@@ -66,11 +66,27 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	{
 		this(null, treemodel);
 	}
+	
+	/**
+	 *  Create a new filter menu item constructor.
+	 */
+	public DefaultFileFilterMenuItemConstructor(AsyncTreeModel treemodel, boolean selall)
+	{
+		this(null, treemodel, selall);
+	}
 		
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
 	public DefaultFileFilterMenuItemConstructor(String[] types, final AsyncTreeModel treemodel)
+	{
+		this(null, treemodel, false);
+	}
+	
+	/**
+	 *  Create a new filter menu item constructor.
+	 */
+	public DefaultFileFilterMenuItemConstructor(String[] types, final AsyncTreeModel treemodel, boolean selall)
 	{
 		this.types = types==null? STANDARD_TYPES: types;
 		this.treemodel = treemodel;
@@ -94,6 +110,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 				});
 			}
 		});
+		all.setSelected(selall);
 		menu.add(all);
 		menu.addSeparator();
 		filetypes.put(SELECT_ALL, all);
@@ -125,6 +142,15 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	public boolean isAll()
 	{
 		return ((JCheckBoxMenuItem)filetypes.get(SELECT_ALL)).isSelected();
+	}
+	
+	/**
+	 *  Set the all flag.
+	 *  @param bool True for selecting all.
+	 */
+	public void setAll(boolean bool)
+	{
+		((JCheckBoxMenuItem)filetypes.get(SELECT_ALL)).setSelected(bool);
 	}
 	
 	/**
@@ -182,6 +208,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 			supported.add(SELECT_ALL);
 					
 			// add new file types
+			boolean all = isAll();
 			for(int i=0; i<types.length; i++)
 			{
 				supported.add(types[i]);
@@ -213,6 +240,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 							((ITreeNode)treemodel.getRoot()).refresh(true);
 						}
 					});
+					ff.setEnabled(!all);
 					filetypes.put(types[i], ff);
 				}
 			}
@@ -256,17 +284,17 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	 */
 	public IFuture<Void> setProperties(final Properties props)
 	{
-		if(props!=null)
-		{
-			Property[] mps = props.getProperties();
-			Set selected = new HashSet();
-			for(int i=0; i<mps.length; i++)
-			{
-				if(Boolean.parseBoolean(mps[i].getValue())) 
-					selected.add(mps[i].getType());
-			}
-			setSelectedComponentTypes(selected);
-		}
+//		if(props!=null)
+//		{
+//			Property[] mps = props.getProperties();
+//			Set selected = new HashSet();
+//			for(int i=0; i<mps.length; i++)
+//			{
+//				if(Boolean.parseBoolean(mps[i].getValue())) 
+//					selected.add(mps[i].getType());
+//			}
+//			setSelectedComponentTypes(selected);
+//		}
 		return IFuture.DONE;
 	}
 

@@ -74,7 +74,7 @@ public class RemoteJarNode extends RemoteDirNode
 							rjfentries.put(tmp[0], tmp[1]);
 						}
 						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
-							FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), jad.separatorChar, FileData.getPrefixLength(jad));
+							FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), jad.separatorChar, FileData.getPrefixLength(jad), jad.length());
 						Collection files = rjf.listFiles();
 						ret.setResult(files);
 					}
@@ -93,7 +93,7 @@ public class RemoteJarNode extends RemoteDirNode
 						ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
 //						System.out.println("ename: "+ename+" "+entry.getName());
 						final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
-							entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), jad.separatorChar, FileData.getPrefixLength(jad));
+							entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), jad.separatorChar, FileData.getPrefixLength(jad), jad.length());
 						
 						myfilter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener()
 						{

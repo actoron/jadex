@@ -23,4 +23,9 @@ public interface IFileNode extends ITreeNode
 	 *  Check if the file is a directory. 
 	 */
 	public boolean	isDirectory();
+	
+	/**
+	 *  Get the file size.
+	 */
+	public long getFileSize();
 }

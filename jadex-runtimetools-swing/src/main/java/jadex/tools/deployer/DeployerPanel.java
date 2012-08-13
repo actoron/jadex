@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.tree.TreePath;
 
@@ -75,8 +76,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		nh2.setFirstPanel(p2);
 		nh2.setSecondPanel(p1);
 		
-		splitpanel.add(p1);
-		splitpanel.add(p2);
+		splitpanel.add(new JScrollPane(p1));
+		splitpanel.add(new JScrollPane(p2));
 		
 		splitpanel.setOneTouchExpandable(true);
 	
@@ -196,13 +197,13 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 								
 								public void customExceptionOccurred(Exception exception)
 								{
-									jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception);
+									jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception.getMessage());
 								}
 							});
 						}
 						catch(Exception ex)
 						{
-							jcc.setStatusText("Copy error: "+sel_1);
+							jcc.setStatusText("Copy error: "+sel_1+" "+ex.getMessage());
 						}
 					}
 				}

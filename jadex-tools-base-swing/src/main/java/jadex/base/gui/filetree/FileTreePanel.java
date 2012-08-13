@@ -5,7 +5,6 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
-import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -114,7 +113,22 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			}
 		});
 		
-		tree.setCellRenderer(new AsyncTreeCellRenderer());
+		tree.setCellRenderer(new AsyncTreeCellRenderer()
+		{
+			protected String getLabel(ITreeNode node)
+			{
+				String ret = super.getLabel(node);
+				if(node instanceof IFileNode)
+				{
+					IFileNode fn = (IFileNode)node;
+					if(fn.getFileSize()>0 && (!fn.isDirectory() || fn.getFileName().indexOf(".")!=-1)) // hmm zip files are dirs?
+					{
+						ret += " ["+SUtil.bytesToString(fn.getFileSize())+"]";
+					}
+				}
+				return ret;
+			}
+		});
 		tree.addMouseListener(new TreePopupListener());
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);

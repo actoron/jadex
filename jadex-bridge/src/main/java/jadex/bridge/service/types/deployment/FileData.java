@@ -46,6 +46,9 @@ public class FileData
 	/** The prefix length. */
 	protected int prefix;
 	
+	/** The file size. */
+	protected long filesize;
+	
 	//-------- constructors --------
 
 	/**
@@ -60,7 +63,7 @@ public class FileData
 	 *  Create a new remote file.
 	 */
 	public FileData(String filename, String path, boolean directory, boolean exists,
-		String displayname, long lastmodified, char separator, int prefix)
+		String displayname, long lastmodified, char separator, int prefix, long filesize)
 	{
 		this.filename = filename;
 		this.path = path;
@@ -70,6 +73,7 @@ public class FileData
 		this.lastmodified = lastmodified;
 		this.separator = separator;
 		this.prefix = prefix;
+		this.filesize = filesize;
 	}
 	
 	/**
@@ -88,6 +92,7 @@ public class FileData
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 		this.separator = File.separatorChar;
 		this.prefix = getPrefixLength(file);
+		this.filesize = file.length();
 	}
 	
 	//-------- methods --------
@@ -262,6 +267,24 @@ public class FileData
 	public void setPrefixLength(int prefix)
 	{
 		this.prefix = prefix;
+	}
+	
+	/**
+	 *  Get the filesize.
+	 *  @return The filesize.
+	 */
+	public long getFileSize()
+	{
+		return filesize;
+	}
+
+	/**
+	 *  Set the filesize.
+	 *  @param filesize The filesize to set.
+	 */
+	public void setFileSize(long filesize)
+	{
+		this.filesize = filesize;
 	}
 
 	/**

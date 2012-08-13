@@ -497,7 +497,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3)): homedir;
+		return homedir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3, 0)): homedir;
 	}
 
 	/**
@@ -531,7 +531,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3)): currentdir;
+		return currentdir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3, 0)): currentdir;
 	}
 	
 	/**
@@ -569,7 +569,7 @@ public class RemoteFileSystemView extends FileSystemView
 			});
 		}
 		
-		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3)): defaultdir;
+		return defaultdir==null? new RemoteFile(new FileData("unknown", "unknown", true, true, "unknown", 0, File.separatorChar, 3, 0)): defaultdir;
 	}
 
 	/**
@@ -599,7 +599,7 @@ public class RemoteFileSystemView extends FileSystemView
 			String path = fd.getPath()+fd.getSeparatorChar()+filename;
 			boolean isdir = filename.indexOf(".")==-1; // Hack!!! directory if no point in name
 			ret = new RemoteFile(new FileData(filename, path, isdir, true,	// Hack!!! assume existence.
-				null, fd.getLastModified(), fd.getSeparatorChar(), fd.getPrefixLength()));
+				null, fd.getLastModified(), fd.getSeparatorChar(), fd.getPrefixLength(), fd.getFileSize()));
 		}
 		else if(ret==null)
 		{

@@ -246,4 +246,12 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 		return rid.getGlobalIdentifier().toString();
 	}
 	
+	/**
+	 *  Get the file size.
+	 */
+	public long getFileSize()
+	{
+		return file==null? 0: file.length();
+	}
+	
 }

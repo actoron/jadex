@@ -170,7 +170,7 @@ public class RemoteFile extends File
     			name = pa.substring(lindex+1);
     		}
     		ret = new RemoteFile(new FileData(name, path, true, true, name, filedata.getLastModified(), 
-    			filedata.getSeparatorChar(), filedata.getPrefixLength()));
+    			filedata.getSeparatorChar(), filedata.getPrefixLength(), 0));
     	}
 //    	System.out.println("getPaF: "+getPath()+" "+pa);
     	return ret;

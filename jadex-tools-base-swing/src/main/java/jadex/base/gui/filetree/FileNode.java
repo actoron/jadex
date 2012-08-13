@@ -32,6 +32,9 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	
 	/** The properties component (if any). */
 //	protected ComponentProperties	propcomp;
+	
+	/** The cached display name. */
+	protected String name;
 		
 	//-------- constructors --------
 	
@@ -109,34 +112,52 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public String toString()
 	{
-		String	name	= FileData.getDisplayName(file);
-		
-		// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
-		if(getParent() instanceof RootNode)
+		if(name==null)
 		{
-			int	idx	= -1;
-			List	siblings	= getParent().getCachedChildren();
-			for(int i=0; siblings!=null && i<siblings.size(); i++)
+			name	= FileData.getDisplayName(file);
+			
+			// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
+			if(getParent() instanceof RootNode)
 			{
-				if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
+				int	idx	= -1;
+				List	siblings	= getParent().getCachedChildren();
+				for(int i=0; siblings!=null && i<siblings.size(); i++)
 				{
-					File	sib	= ((FileNode)siblings.get(i)).getFile();
-					if(FileData.getDisplayName(sib).equals(name) && !sib.getPath().endsWith(file.getPath()))
+					if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
 					{
-						int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
-						while(sib.getPath().endsWith(file.getPath().substring(tmp)))
+						File	sib	= ((FileNode)siblings.get(i)).getFile();
+						if(FileData.getDisplayName(sib).equals(name) && !sib.getPath().endsWith(file.getPath()))
 						{
-							tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
+							int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
+							while(sib.getPath().endsWith(file.getPath().substring(tmp)))
+							{
+								tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
+							}
+							idx	= idx==-1 ? tmp : Math.min(idx, tmp);
 						}
-						idx	= idx==-1 ? tmp : Math.min(idx, tmp);
 					}
 				}
+				if(idx>-1)
+				{
+					name	= file.getPath().substring(idx);
+				}
 			}
-			if(idx>-1)
-			{
-				name	= file.getPath().substring(idx);
-			}
+		
+//			if(true)
+//			{
+//				try
+//				{
+//					if(file.length()>0 && (!file.isDirectory() || file.getName().indexOf(".")!=-1)) // hmm zip files are dirs?
+//					{
+//						name += " ["+SUtil.bytesToString(file.length())+"]";
+//					}
+//				}
+//				catch(Exception e)
+//				{
+//				}
+//			}
 		}
+		
 		return name;
 	}
 	
@@ -245,6 +266,14 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	public boolean	isDirectory()
 	{
 		return file.isDirectory();
+	}
+	
+	/**
+	 *  Get the file size.
+	 */
+	public long getFileSize()
+	{
+		return file.length();
 	}
 
 }

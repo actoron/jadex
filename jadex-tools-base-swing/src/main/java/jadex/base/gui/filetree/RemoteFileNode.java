@@ -6,6 +6,7 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.commons.SUtil;
 
 import java.util.List;
 
@@ -163,6 +164,14 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 				name	= file.getPath().substring(idx);
 			}
 		}
+		
+//		if(true)
+//		{
+//			if(file.getFileSize()>0 && (!file.isDirectory() || file.getFilename().indexOf(".")!=-1)) // hmm zip files are dirs?
+//			{
+//				name += " ["+SUtil.bytesToString(file.getFileSize())+"]";
+//			}
+//		}
 		return name;
 	}
 	
@@ -206,6 +215,15 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 	{
 		return file;
 	}
+	
+	/**
+	 *  Get the file size.
+	 */
+	public long getFileSize()
+	{
+		return file.getFileSize();
+	}
+
 //	
 //	/**
 //	 *  Get the relative path.
