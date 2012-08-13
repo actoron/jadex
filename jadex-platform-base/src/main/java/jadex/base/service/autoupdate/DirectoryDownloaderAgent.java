@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -165,6 +166,8 @@ public class DirectoryDownloaderAgent
 		{
 			// Find newest directory.
 			String	dir	= null;
+			File	localdir	= null;
+			File	tmpdir	= null;
 			HttpURLConnection	con	= conman.openConnection(baseurl);
 			s	= new Scanner(new BufferedInputStream(con.getInputStream()));
 			while(s.findWithinHorizon("<a href=\"(.*?)\">", 0)!=null)
@@ -182,6 +185,9 @@ public class DirectoryDownloaderAgent
 				if(match.endsWith("/") && (dir==null || dir.compareTo(match)<0))
 				{
 					dir	= match;
+					String	ldir	= dir.substring(relurl.length(), dir.length()-1);
+					localdir	= new File(targetdir, ldir);
+					tmpdir	= new File(targetdir, "tmp_"+ldir);
 				}
 			}
 			s.close();
@@ -189,9 +195,10 @@ public class DirectoryDownloaderAgent
 			
 			if(dir!=null)
 			{
+				
 				if(!quiet)
 				{
-					System.out.println("Downloading from: "+dir);
+					System.out.println("Downloading from "+dir+" to "+tmpdir);
 				}
 				
 				// Discover files from that directory.
@@ -211,7 +218,7 @@ public class DirectoryDownloaderAgent
 						file	= relurl+file;
 					}
 
-					if(file.startsWith(dir)	// ignores back-links
+					if(file.startsWith(dir)	// ignores back links
 						&& file.substring(dir.length()).matches(pattern))
 					{
 						files.add(file);
@@ -221,17 +228,19 @@ public class DirectoryDownloaderAgent
 				conman.remove(con);
 				
 				// Check for downloading discovered files.
-				for(String file: files)
+				for(Iterator<String> it=files.iterator(); it.hasNext(); )
 				{
+					String file	= it.next();
 					con	= conman.openConnection(file);
-					File	targetfile	= new File(targetdir, file.substring(baseurl.length()));
+					String	localfile	= file.substring(dir.length());
+					File	targetfile	= new File(localdir, localfile);
 					if(!targetfile.exists() || con.getLastModified()>targetfile.lastModified())
 					{
 						if(!quiet)
 						{
 							System.out.println("Downloading new(er) file: "+file);
 						}
-						
+						targetfile	= new File(tmpdir, localfile);
 						targetfile.getParentFile().mkdirs();
 						int	length	= con.getContentLength();
 						long	done	= 0;
@@ -271,8 +280,41 @@ public class DirectoryDownloaderAgent
 					else
 					{
 						System.out.println("Skipping up-to-date file: "+file);
+						it.remove();
 					}
 					conman.remove(con);
+				}
+				
+				// Change tmp dir to real dir.
+				if(tmpdir.exists())
+				{
+					if(localdir.exists())
+					{
+						for(String file: files)
+						{
+							String	lfile	= file.substring(dir.length());
+							File	localfile	= new File(localdir, lfile);
+							File	tmpfile	= new File(tmpdir, lfile);
+							if(!quiet)
+							{
+								System.out.println("Renaming "+tmpfile+" to "+localfile+".");
+							}
+							if(localfile.exists())
+							{
+								localfile.delete();
+							}
+							tmpfile.renameTo(localfile);
+						}
+						tmpdir.delete();
+					}
+					else
+					{
+						if(!quiet)
+						{
+							System.out.println("Renaming "+tmpdir+" to "+localdir+".");
+						}
+						tmpdir.renameTo(localdir);
+					}
 				}
 			}
 			else

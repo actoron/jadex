@@ -14,7 +14,7 @@ if(infos.length>0)
 {
 	StringBuffer markers	= new StringBuffer();
 	Set<String> positions	= new HashSet<String>();
-	for(int i=0; i<infos.length; i++)
+	for(int i=0; i<infos.length && positions.size()<85; i++)	// hack!!! limit markers to 85 as url gets too long otherwise
 	{
 		if(infos[i].getPosition()!=null)
 		{
