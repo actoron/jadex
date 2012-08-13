@@ -2622,6 +2622,31 @@ public class SUtil
 	}
 	
 	/**
+	 *  Delete a directory completely (including all subdirs and files).
+	 *  @param dir The dir to delete. 
+	 *  @return True, if was successfully deleted.
+	 */
+	static public boolean deleteDirectory(File dir)
+	{
+		if(dir.exists())
+		{
+			File[] files = dir.listFiles();
+			for(int i=0; i<files.length; i++)
+			{
+				if(files[i].isDirectory())
+				{
+					deleteDirectory(files[i]);
+				}
+				else
+				{
+					files[i].delete();
+				}
+			}
+		}
+		return dir.delete();
+	}
+	
+	/**
 	 *  An subclass of print stream to allow accessing the underlying stream.
 	 */
 	public static class AccessiblePrintStream	extends PrintStream

@@ -281,7 +281,7 @@ public class UpdateAgent implements IUpdateService
 	 */
 	public IFuture<IComponentIdentifier> startPlatformInSameVM()
 	{
-		System.out.println("Starting platform in same vm");
+//		System.out.println("Starting platform in same vm");
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
@@ -326,7 +326,7 @@ public class UpdateAgent implements IUpdateService
 	 */
 	public IFuture<IComponentIdentifier> startPlatformInSeparateVM(final StartOptions so)
 	{
-		System.out.println("Starting platform in separate vm");
+//		System.out.println("Starting platform in separate vm");
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		

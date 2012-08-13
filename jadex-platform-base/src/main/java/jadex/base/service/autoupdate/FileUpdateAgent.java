@@ -34,7 +34,7 @@ import java.util.zip.ZipFile;
 {
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
-	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-[[0-9]+\\..|.*[addon]].*.zip\"", description="Only main Jadex distribution jars.")
+	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars.")
 })
 @RequiredServices(
 {
@@ -125,8 +125,9 @@ public class FileUpdateAgent extends UpdateAgent
 		{
 			public void customResultAvailable(Long curver)
 			{
-				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hhmmss");
-				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curver)));
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hhmmss");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curver)));
 				
 				TreeSet<File> res = new TreeSet<File>(new Comparator<File>()
 				{
@@ -140,9 +141,7 @@ public class FileUpdateAgent extends UpdateAgent
 				long foundver = 0;
 				if(res.size()>0)
 				{
-					File dir = res.iterator().next();
-					
-					File[] files = dir.listFiles(new FilenameFilter()
+					File[] files = res.iterator().next().listFiles(new FilenameFilter()
 					{
 						public boolean accept(File dir, String name)
 						{
@@ -154,21 +153,26 @@ public class FileUpdateAgent extends UpdateAgent
 					boolean force = false; // force update
 					if(foundver>curver || force) 
 					{
+						File dir = null;
 						try
 						{
 							// create new directory for distribution
 							Date founddate = new Date(foundver);
-							File tdir = new File(sdf.format(founddate));
-							tdir.mkdir();
+							dir = new File(sdf.format(founddate)+"_dist");
+							if(dir.exists())
+							{
+								SUtil.deleteDirectory(dir);
+							}
+							dir.mkdir();
 							
 							// unzip all files
 							for(File file: files)
 							{
-								SUtil.unzip(new ZipFile(file), tdir);
+								SUtil.unzip(new ZipFile(file), dir);
 							}
 							
 							// find distribution directory (must be one)
-							File[] decoms = tdir.listFiles(new FileFilter()
+							File[] decoms = dir.listFiles(new FileFilter()
 							{
 								public boolean accept(File file)
 								{
@@ -184,12 +188,14 @@ public class FileUpdateAgent extends UpdateAgent
 							}
 							else
 							{
+								SUtil.deleteDirectory(dir);
 								ret.setException(new RuntimeException("Unexpectedly found not exactly one directory in decompressed distribution: "+SUtil.arrayToString(decoms)));
 							}
 						}
 						catch(Exception e)
 						{
 							e.printStackTrace();
+							SUtil.deleteDirectory(dir);
 							ret.setException(e);
 						}
 					}
@@ -198,7 +204,7 @@ public class FileUpdateAgent extends UpdateAgent
 				if(!ret.isDone())
 				{
 					// no newer version found
-					System.out.println("No newer version found, latest is: "+sdf.format(foundver));
+//					System.out.println("No newer version found, latest is: "+sdf.format(foundver));
 					ret.setResult(null);
 				}
 			}
@@ -327,9 +333,14 @@ public class FileUpdateAgent extends UpdateAgent
 	public static void main(String[] args)
 	{
 //		String pat = "jadex-[0-9]+\\..*.zip";
-		String pat = "jadex-[[0-9]+\\..|.*[addon]].*.zip";
+//		String pat = "jadex-[[0-9]+\\.|.*[addon]].*.zip";
+		String pat = "jadex-(([0-9]+\\.)|(.*addon)).*.zip";
+//		String pat = "jadex-.*addon.*.zip";
 		
 		System.out.println("jadex-2.1.zip".matches(pat));
 		System.out.println("jadex-3d-addon.zip".matches(pat));
+		System.out.println("jadex-webservice-addon-2.1.1-SNAPSHOT.zip".matches(pat));
+		System.out.println("apache-maven-3.0.4-bin.zip".matches(pat));
+		System.out.println("jadex-example-project.zip".matches(pat));
 	}
 }
