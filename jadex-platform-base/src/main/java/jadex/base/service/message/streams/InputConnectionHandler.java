@@ -25,7 +25,7 @@ import javax.swing.Timer;
  *  Is used by connection to forward user requests.
  *  Is used by the message service to signal arrived messages.
  */
-public class InputConnectionHandler extends AbstractConnectionHandler
+public class InputConnectionHandler extends AbstractConnectionHandler implements IInputConnectionHandler
 {
 	//-------- attributes -------- 
 	
@@ -369,6 +369,15 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected boolean isStop()
 	{
 		return getInputConnection().getStoredDataSize()>=maxstored;
+	}
+	
+	/**
+	 *  Called by connection when user read some data
+	 *  so that other side can continue to send.
+	 */
+	public void notifyDataRead()
+	{
+		// nop, only used for local connections
 	}
 	
 	/**

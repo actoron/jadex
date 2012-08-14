@@ -205,4 +205,12 @@ public abstract class AbstractConnection implements IConnection
 	{
 		return ch.getNonFunctionalProperties();
 	}
+	
+	/**
+	 *  Get the connection handler.
+	 */
+	public IAbstractConnectionHandler getConnectionHandler()
+	{
+		return ch;
+	}
 }

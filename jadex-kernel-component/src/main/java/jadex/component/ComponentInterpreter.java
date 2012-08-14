@@ -10,6 +10,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -184,12 +185,11 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			{
 				Future future = (Future)step[1];
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				try
 				{
 					IFuture<?> res = ((IComponentStep<?>)step[0]).execute(this);
-					res.addResultListener(res instanceof IntermediateFuture? new IntermediateDelegationResultListener((IntermediateFuture)future):
-						new DelegationResultListener(future));
+					FutureFunctionality.connectDelegationFuture(future, res);
 				}
 				catch(RuntimeException e)
 				{
@@ -198,7 +198,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					throw e;
 				}
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 			}
 			
 			boolean ret;

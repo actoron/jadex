@@ -36,6 +36,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -1369,9 +1370,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 								{
 //									((IComponentStep)step).execute(getInternalAccess())
 //										.addResultListener(new DelegationResultListener(ret));
-									((IComponentStep)step).execute(getInternalAccess()).addResultListener(ret instanceof IntermediateFuture? 
-										new IntermediateDelegationResultListener((IntermediateFuture)ret):
-										new DelegationResultListener(ret));
+									IFuture res = ((IComponentStep)step).execute(getInternalAccess());
+									FutureFunctionality.connectDelegationFuture(ret, res);
 								}
 								catch(Exception e)
 								{
@@ -1430,10 +1430,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				{
 					try
 					{
-						step.execute(new CapabilityFlyweight(state, scope))
-							.addResultListener(ret instanceof IntermediateFuture? 
-								new IntermediateDelegationResultListener((IntermediateFuture)ret)
-								: new DelegationResultListener(ret));
+						IFuture res = step.execute(new CapabilityFlyweight(state, scope));
+						FutureFunctionality.connectDelegationFuture(ret, res);	
 					}
 					catch(Exception e)
 					{

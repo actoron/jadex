@@ -2,6 +2,7 @@ package jadex.base.service.message.streams;
 
 import java.util.Map;
 
+import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -13,6 +14,9 @@ public class LocalOutputConnectionHandler extends LocalAbstractConnectionHandler
 {
 	/** The maximum bytes of data that can be stored in connection (without being consumed). */
 	protected int maxstored;
+	
+	/** The ready future. */
+	protected Future<Integer> readyfuture;
 	
 	/**
 	 * 
@@ -54,8 +58,41 @@ public class LocalOutputConnectionHandler extends LocalAbstractConnectionHandler
 	 */
 	public IFuture<Integer> waitForReady()
 	{
-		// todo: how to implement locally without timer :-( ?
-		return new Future<Integer>(32768);	// todo: useful value?
+		Future<Integer> ret = null;
+		
+		int allowed = ((LocalInputConnectionHandler)getConnectionHandler()).getAllowedSendSize();
+		
+//		System.out.println("allowed: "+allowed);
+		
+		if(allowed>0)
+		{
+			ret = new Future<Integer>(new Integer(allowed));
+		}
+		else
+		{
+			if(readyfuture==null)
+			{
+				readyfuture = new Future<Integer>();
+			}
+			ret = readyfuture;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Called by local input connection handler to signal
+	 *  that user has read some data.
+	 */
+	public void ready(int available)
+	{
+		if(readyfuture!=null)
+		{
+//			System.out.println("ready: "+available);
+			Future<Integer> fut = readyfuture;
+			readyfuture = null;
+			fut.setResult(new Integer(available));
+		}
 	}
 	
 //	/**

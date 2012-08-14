@@ -36,6 +36,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -1299,7 +1300,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public  <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future ret = createStepFuture(step);
+		final Future<T> ret = new Future<T>();
+		// todo:
+		//final Future ret = createStepFuture(step);
+		// todo: use FutureFunctionality.connectDelegationFuture(future, res); 
 		
 		try
 		{

@@ -135,7 +135,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 									read += is.read(buf, read, buf.length-read);
 								}
 								write(buf);
-	//							System.out.println("wrote: "+size);
+								System.out.println("wrote: "+size);
 								
 								ret.addIntermediateResultIfUndone(new Long(filesize));
 								

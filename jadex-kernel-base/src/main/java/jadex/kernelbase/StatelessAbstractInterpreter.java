@@ -33,15 +33,14 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -52,10 +51,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -1854,17 +1851,18 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	protected Future createStepFuture(IComponentStep step)
 	{
-		boolean im = false;
+		Future ret;
 		try
 		{
-			Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
-			im = IIntermediateFuture.class.isAssignableFrom(m.getReturnType());
+			Method method = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+			Class clazz = method.getReturnType();
+			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getLogger()));
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		
-		return im? new IntermediateFuture(): new Future();
+		return ret;
 	}
 }

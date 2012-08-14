@@ -113,9 +113,9 @@ public class Traverser
 //		System.out.println("Cloning: "+object);
 //		if(!clone) 
 		
-		if(object!=null && (object.getClass().getName().indexOf("Connection")!=-1 || 
-			(object.getClass().getName().indexOf("TerminableIntermediateFuture")!=-1)))
-			System.out.println("Traversing: "+object+" "+object.getClass());
+//		if(object!=null && (object.getClass().getName().indexOf("Connection")!=-1 || 
+//			(object.getClass().getName().indexOf("TerminableIntermediateFuture")!=-1)))
+//			System.out.println("Traversing: "+object+" "+object.getClass());
 	
 		Object ret = null;
 		try

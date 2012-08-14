@@ -230,7 +230,8 @@ public class FutureFunctionality
 	}
 	
 	/**
-	 * 
+	 *  Connect a delegation future with the source.
+	 *  Add delegation listener on the source (+ termination handling).
 	 */
 	public static void connectDelegationFuture(Future target, IFuture source)
 	{

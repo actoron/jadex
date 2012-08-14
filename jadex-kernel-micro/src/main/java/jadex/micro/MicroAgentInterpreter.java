@@ -11,6 +11,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -435,8 +436,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				try
 				{
 					IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
-					res.addResultListener(res instanceof IntermediateFuture? new IntermediateDelegationResultListener((IntermediateFuture)future):
-						new DelegationResultListener(future));
+					FutureFunctionality.connectDelegationFuture(future, res);
 				}
 				catch(RuntimeException e)
 				{
@@ -445,7 +445,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				}
 				
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 			}
 	
 			return steps!=null && !steps.isEmpty();

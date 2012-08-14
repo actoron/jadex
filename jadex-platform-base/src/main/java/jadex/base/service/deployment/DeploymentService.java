@@ -39,6 +39,7 @@ public class DeploymentService implements IDeploymentService
 //		TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
 //		ret.setFinished();
 //		return ret;
+		System.out.println("uploadFile: "+Thread.currentThread());
 		try
 		{
 			return con.writeToOutputStream(new FileOutputStream(path+File.separator+name), agent);

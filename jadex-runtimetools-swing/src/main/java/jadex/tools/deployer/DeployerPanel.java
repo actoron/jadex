@@ -18,6 +18,7 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,6 +27,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.jcc.JCCAgent;
 
 import java.awt.BorderLayout;
@@ -183,7 +185,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 						
 						first.getPlatformAccess().scheduleStep(new IComponentStep<Void>()
 						{
-							public IFuture<Void> execute(IInternalAccess ia)
+							public IFuture<Void> execute(final IInternalAccess ia)
 							{
 								final Future<Void> ret = new Future<Void>();
 								
@@ -192,7 +194,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 								{
 									public void customResultAvailable(IComponentManagementService cms)
 									{
-										cms.getExternalAccess(lcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+										cms.getExternalAccess(lcid).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 										{
 											public void customResultAvailable(final IExternalAccess jccacc) 
 											{
@@ -207,11 +209,14 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 													{
 														public void intermediateResultAvailable(final Long result)
 														{
+															System.out.println("rec: "+result);
 															jccacc.scheduleStep(new IComponentStep<Void>()
 															{
 																public IFuture<Void> execute(IInternalAccess ia)
 																{
-																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+(result/source.length())+"% done");
+																	double done = ((int)((result/(double)source.length())*100))/100.0;
+//																	System.out.println("done: "+done);
+																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+done+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")");
 																	return IFuture.DONE;
 																}
 															});
@@ -256,13 +261,13 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 													jcc.setStatusText("Copy error: "+sel_1+" "+ex.getMessage());
 												}
 											}
-										});
+										}));
 									}
 								}));
 								
 								return ret;
 							}
-						}).addResultListener(new IResultListener<Void>()
+						}).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -272,7 +277,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 							{
 								second.refreshTreePaths(null);
 							}
-						});
+						}));
 					}
 				}
 			}
