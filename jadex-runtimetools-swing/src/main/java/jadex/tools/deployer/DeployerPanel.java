@@ -22,6 +22,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
@@ -195,8 +196,6 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 										{
 											public void customResultAvailable(final IExternalAccess jccacc) 
 											{
-												ret.setResult(null);
-												
 												try
 												{
 													final File source = new File(sel_1);
@@ -225,6 +224,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 																public IFuture<Void> execute(IInternalAccess ia)
 																{
 																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel_1+" to "+sel_2);
+																	ret.setResult(null);
 																	return IFuture.DONE;
 																}
 															});
@@ -243,6 +243,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 																public IFuture<Void> execute(IInternalAccess ia)
 																{
 																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception.getMessage());
+																	ret.setResult(null);
 																	return IFuture.DONE;
 																}
 															});
@@ -251,6 +252,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 												}
 												catch(Exception ex)
 												{
+													ret.setResult(null);
 													jcc.setStatusText("Copy error: "+sel_1+" "+ex.getMessage());
 												}
 											}
@@ -259,6 +261,16 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 								}));
 								
 								return ret;
+							}
+						}).addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								second.refreshTreePaths(null);
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								second.refreshTreePaths(null);
 							}
 						});
 					}

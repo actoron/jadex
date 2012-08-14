@@ -1299,7 +1299,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public  <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future<T> ret = new Future<T>();
+		final Future ret = createStepFuture(step);
 		
 		try
 		{

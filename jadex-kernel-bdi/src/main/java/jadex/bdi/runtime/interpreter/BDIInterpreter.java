@@ -53,8 +53,11 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
@@ -67,6 +70,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1344,7 +1348,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public <T> IFuture<T> scheduleStep(final Object step, final Object scope)
 	{
-		final Future<T> ret = new Future<T>();
+		final Future ret = createStepFuture((IComponentStep)step);
+//		final Future<T> ret = new Future<T>();
 		
 		if(getComponentAdapter().isExternalThread()
 			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
@@ -1362,8 +1367,11 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 								// Hack!!! During init phase execute directly as rule engine isn't running.
 								try
 								{
-									((IComponentStep)step).execute(getInternalAccess())
-										.addResultListener(new DelegationResultListener(ret));
+//									((IComponentStep)step).execute(getInternalAccess())
+//										.addResultListener(new DelegationResultListener(ret));
+									((IComponentStep)step).execute(getInternalAccess()).addResultListener(ret instanceof IntermediateFuture? 
+										new IntermediateDelegationResultListener((IntermediateFuture)ret):
+										new DelegationResultListener(ret));
 								}
 								catch(Exception e)
 								{
@@ -1412,7 +1420,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IFuture scheduleImmediate(final IComponentStep step, final Object scope)
 	{
-		final Future ret = new Future();
+		final Future ret = createStepFuture(step);
 		
 		try
 		{
@@ -1423,7 +1431,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					try
 					{
 						step.execute(new CapabilityFlyweight(state, scope))
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(ret instanceof IntermediateFuture? 
+								new IntermediateDelegationResultListener((IntermediateFuture)ret)
+								: new DelegationResultListener(ret));
 					}
 					catch(Exception e)
 					{

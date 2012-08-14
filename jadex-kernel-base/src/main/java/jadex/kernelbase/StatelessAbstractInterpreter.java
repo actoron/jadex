@@ -52,11 +52,14 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1844,5 +1847,24 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public boolean isComponentThread()
 	{
 		return !getComponentAdapter().isExternalThread();
+	}
+	
+	/**
+	 *  Create intermediate of direct future.
+	 */
+	protected Future createStepFuture(IComponentStep step)
+	{
+		boolean im = false;
+		try
+		{
+			Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+			im = IIntermediateFuture.class.isAssignableFrom(m.getReturnType());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return im? new IntermediateFuture(): new Future();
 	}
 }

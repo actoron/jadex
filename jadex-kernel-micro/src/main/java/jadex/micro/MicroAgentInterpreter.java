@@ -24,6 +24,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
@@ -433,7 +435,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				try
 				{
 					IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
-					res.addResultListener(new DelegationResultListener(future));
+					res.addResultListener(res instanceof IntermediateFuture? new IntermediateDelegationResultListener((IntermediateFuture)future):
+						new DelegationResultListener(future));
 				}
 				catch(RuntimeException e)
 				{
@@ -652,8 +655,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future<T> ret = new Future<T>();
-//		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+		final Future ret = createStepFuture(step);
+		
 		if(adapter.isExternalThread())
 		{
 			try

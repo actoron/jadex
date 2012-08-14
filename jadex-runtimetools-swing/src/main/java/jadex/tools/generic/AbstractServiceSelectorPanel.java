@@ -7,7 +7,10 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collection;
@@ -52,33 +55,96 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		platform.scheduleStep(new IComponentStep<Collection<IService>>()
 		{
 			@Classname("search-services")
-			public IFuture<Collection<IService>> execute(IInternalAccess ia)
+//			public IFuture<Collection<IService>> execute(IInternalAccess ia)
+			public IIntermediateFuture<IService> execute(IInternalAccess ia)
 			{
-				return SServiceProvider.getServices(ia.getServiceContainer(), type, scope);
-			}
-		}).addResultListener(new SwingDefaultResultListener<Collection<IService>>(this)
-		{
-			public void customResultAvailable(Collection<IService> newservices)
-			{
-				// Find items to remove
-				JComboBox selcb = getSelectionComboBox();
-				for(int i=0; i<selcb.getItemCount(); i++)
-				{
-					Object oldservice = selcb.getItemAt(i);
-					if(!newservices.contains(oldservice))
-					{
-						// remove old cid
-						removePanel(oldservice);
-					}
-				}
+				IIntermediateFuture<IService> fut = SServiceProvider.getServices(ia.getServiceContainer(), type, scope);
 				
-				selcb.removeAllItems();
-				for(Iterator<IService> it=newservices.iterator(); it.hasNext(); )
+//				fut.addResultListener(new IIntermediateResultListener<IService>()
+//				{
+//					public void resultAvailable(Collection<IService> result)
+//					{
+//						System.out.println("ra: "+result);
+//					}
+//					public void intermediateResultAvailable(IService result)
+//					{
+//						System.out.println("found: "+result);
+//					}
+//					public void finished()
+//					{
+//						System.out.println("fini");
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println("ex: "+exception);
+//					}
+//				});
+				
+				return fut;
+			}
+		}).addResultListener(new SwingIntermediateResultListener<IService>(new IIntermediateResultListener<IService>()
+		{
+			boolean first = true;
+			public void intermediateResultAvailable(IService result)
+			{
+				reset();
+				selcb.addItem(result);
+			}
+			public void finished()
+			{
+				reset();
+			}
+			public void resultAvailable(Collection<IService> result)
+			{
+				reset();
+				for(Iterator<IService> it=result.iterator(); it.hasNext(); )
 				{
 					selcb.addItem(it.next());
 				}
 			}
-		});
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+			
+			protected void reset()
+			{
+				if(first)
+				{
+					first = false;
+					JComboBox selcb = getSelectionComboBox();
+					for(int i=0; i<selcb.getItemCount(); i++)
+					{
+						Object oldservice = selcb.getItemAt(i);
+						removePanel(oldservice);
+					}
+					selcb.removeAllItems();
+				}
+			}
+			
+		}));
+//		}).addResultListener(new SwingDefaultResultListener<Collection<IService>>(this)
+//		{
+//			public void customResultAvailable(Collection<IService> newservices)
+//			{
+//				// Find items to remove
+//				JComboBox selcb = getSelectionComboBox();
+//				for(int i=0; i<selcb.getItemCount(); i++)
+//				{
+//					Object oldservice = selcb.getItemAt(i);
+//					if(!newservices.contains(oldservice))
+//					{
+//						// remove old cid
+//						removePanel(oldservice);
+//					}
+//				}
+//				
+//				selcb.removeAllItems();
+//				for(Iterator<IService> it=newservices.iterator(); it.hasNext(); )
+//				{
+//					selcb.addItem(it.next());
+//				}
+//			}
+//		});
 	}
 		
 	/**

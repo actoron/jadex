@@ -1,11 +1,10 @@
 package jadex.kernelbase;
 
-import java.util.Map;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
@@ -17,6 +16,12 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
+
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  *  External access for applications.
@@ -269,31 +274,69 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future<T> ret = new Future<T>();
-		
-		if(adapter.isExternalThread())
+		boolean im = false;
+		try
 		{
-			try
+			Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+			im = IIntermediateFuture.class.isAssignableFrom(m.getReturnType());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		if(im)
+		{
+			final IntermediateFuture ret = new IntermediateFuture();
+			if(adapter.isExternalThread())
 			{
-				adapter.invokeLater(new Runnable() 
+				try
 				{
-					public void run() 
+					adapter.invokeLater(new Runnable() 
 					{
-						interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-					}
-				});
+						public void run() 
+						{
+							interpreter.scheduleStep(step).addResultListener(new IntermediateDelegationResultListener(ret));
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
 			}
-			catch(Exception e)
+			else
 			{
-				ret.setException(e);
+				interpreter.scheduleStep(step).addResultListener(new IntermediateDelegationResultListener(ret));
 			}
+			return ret;
 		}
 		else
 		{
-			interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+			final Future<T> ret = new Future<T>();
+			if(adapter.isExternalThread())
+			{
+				try
+				{
+					adapter.invokeLater(new Runnable() 
+					{
+						public void run() 
+						{
+							interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+			else
+			{
+				interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+			}
+			return ret;
 		}
-		
-		return ret;
 	}
 	
 	/**

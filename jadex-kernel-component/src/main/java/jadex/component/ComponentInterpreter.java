@@ -20,9 +20,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.kernelbase.AbstractInterpreter;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +90,8 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future<T> ret = new Future<T>();
+		final Future ret = createStepFuture(step);
+		
 //		System.out.println("ss: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		if(adapter.isExternalThread())
 		{
@@ -96,7 +101,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 				{			
 					public void run()
 					{
-	//						System.out.println("as1: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+	//					System.out.println("as1: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 						addStep(new Object[]{step, ret});
 					}
 					
@@ -113,7 +118,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		}
 		else
 		{
-//				System.out.println("as2: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+//			System.out.println("as2: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 			addStep(new Object[]{step, ret});
 		}
 		return ret;
@@ -183,7 +188,8 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 				try
 				{
 					IFuture<?> res = ((IComponentStep<?>)step[0]).execute(this);
-					res.addResultListener(new DelegationResultListener(future));
+					res.addResultListener(res instanceof IntermediateFuture? new IntermediateDelegationResultListener((IntermediateFuture)future):
+						new DelegationResultListener(future));
 				}
 				catch(RuntimeException e)
 				{

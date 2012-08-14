@@ -78,6 +78,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	{
 		final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+	
+//		if(method.getName().indexOf("schedule")!=-1)
+//		System.out.println("step: "+method.getName());
 		
 		ProxyInfo pi = pr.getProxyInfo();
 		
