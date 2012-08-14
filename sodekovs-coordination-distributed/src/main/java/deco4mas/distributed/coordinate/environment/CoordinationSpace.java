@@ -3,6 +3,7 @@ package deco4mas.distributed.coordinate.environment;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -15,6 +16,7 @@ import jadex.extension.envsupport.environment.EnvironmentEvent;
 import jadex.extension.envsupport.environment.IPerceptGenerator;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.micro.IMicroExternalAccess;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import deco.distributed.lang.dynamics.MASDynamics;
+import deco4mas.distributed.coordinate.service.CoordinationSpaceService;
+import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 import deco4mas.distributed.helper.Constants;
 import deco4mas.distributed.mechanism.CoordinationInformation;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
@@ -76,6 +80,8 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	public IFuture<Void> initSpace() {
 		super.initSpace();
 
+		startService();
+
 		initSpaces();
 		initDeco4mas();
 		for (CoordinationMechanism icord : activeCoordinationMechanisms) {
@@ -83,6 +89,14 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		}
 
 		return IFuture.DONE;
+	}
+
+	/**
+	 * Starts the {@link ICoordinationSpaceService} the space offers.
+	 */
+	private void startService() {
+		((StatelessAbstractInterpreter) getApplicationInternalAccess()).addService(this.toString(), ICoordinationSpaceService.class, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null,
+				new CoordinationSpaceService(this), null);
 	}
 
 	/**

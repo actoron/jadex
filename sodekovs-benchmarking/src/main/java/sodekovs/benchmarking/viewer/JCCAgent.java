@@ -19,6 +19,7 @@ import jadex.tools.libtool.LibraryServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
+import deco4mas.distributed.jcc.viewer.CoordinationPlugin;
 
 /**
  * Micro component for opening the JCC gui.
@@ -41,19 +42,18 @@ public class JCCAgent extends MicroAgent {
 	 * Open the gui on agent startup.
 	 */
 	public IFuture<Void> agentCreated() {
-		// this.saveonexit = ((Boolean)getArgument("saveonexit")).booleanValue();		
+		// this.saveonexit = ((Boolean)getArgument("saveonexit")).booleanValue();
 		Future<Void> ret = new Future<Void>();
 		this.cc = new ControlCenter();
-		cc.init(getExternalAccess(), new String[] { StarterPlugin.class.getName(),
-				// StarterServicePlugin.class.getName(),
-				DFServicePlugin.class.getName(), ConversationPlugin.class.getName(), "jadex.tools.comanalyzer.ComanalyzerPlugin", TestCenterPlugin.class.getName(),
-				// JadexdocPlugin.class.getName(),
-				SimulationServicePlugin.class.getName(), DebuggerPlugin.class.getName(),
-				// RuleProfilerPlugin.class.getName(),
-				LibraryServicePlugin.class.getName(), AwarenessComponentPlugin.class.getName(), ComponentViewerPlugin.class.getName(), 
-				BenchmarkingPlugin.class.getName(),
-				DeployerPlugin.class.getName() }, saveonexit).addResultListener(
-				createResultListener(new DelegationResultListener<Void>(ret)));
+		cc.init(getExternalAccess(),
+				new String[] { StarterPlugin.class.getName(),
+						// StarterServicePlugin.class.getName(),
+						DFServicePlugin.class.getName(), ConversationPlugin.class.getName(), "jadex.tools.comanalyzer.ComanalyzerPlugin", TestCenterPlugin.class.getName(),
+						// JadexdocPlugin.class.getName(),
+						SimulationServicePlugin.class.getName(), DebuggerPlugin.class.getName(),
+						// RuleProfilerPlugin.class.getName(),
+						LibraryServicePlugin.class.getName(), AwarenessComponentPlugin.class.getName(), ComponentViewerPlugin.class.getName(), BenchmarkingPlugin.class.getName(),
+						CoordinationPlugin.class.getName(), DeployerPlugin.class.getName() }, saveonexit).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 		return ret;
 	}
 
