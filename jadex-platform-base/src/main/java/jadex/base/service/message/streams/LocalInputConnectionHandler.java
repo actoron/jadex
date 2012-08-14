@@ -58,6 +58,8 @@ public class LocalInputConnectionHandler extends LocalAbstractConnectionHandler 
 	public int getAllowedSendSize()
 	{
 		InputConnection icon = (InputConnection)getConnection();
-		return Math.max(0, maxstored-icon.getStoredDataSize());
+		int ret = Math.max(0, maxstored-icon.getStoredDataSize());
+//		System.out.println("allowed: "+ret);
+		return ret;
 	}
 }

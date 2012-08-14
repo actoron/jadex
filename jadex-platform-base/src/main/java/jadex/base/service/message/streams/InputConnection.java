@@ -403,9 +403,9 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 *  @param is The input stream.
 	 *  @param component The component.
 	 */
-	public ITerminableIntermediateFuture<Long> writeToOutputStream(final OutputStream os, final IExternalAccess component)
+	public ISubscriptionIntermediateFuture<Long> writeToOutputStream(final OutputStream os, final IExternalAccess component)
 	{
-		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
+		final SubscriptionIntermediateFuture<Long> ret = new SubscriptionIntermediateFuture<Long>();
 		
 		try
 		{
@@ -430,7 +430,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 						
 						public void intermediateResultAvailable(byte[] result)
 						{
-//							System.out.println("got: "+result.length);
+//							System.out.println("got: "+(filesize[0]+result.length));
 							
 							// Check if was aborted on receiver side
 							if(ret.isDone())

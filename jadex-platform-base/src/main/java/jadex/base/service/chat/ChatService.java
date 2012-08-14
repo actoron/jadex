@@ -1142,7 +1142,7 @@ public class ChatService implements IChatService, IChatGuiService
 		try
 		{
 			final FileInputStream fis = new FileInputStream(new File(ti.getFilePath()));
-			final ITerminableIntermediateFuture<Long> fut = ocon.writeFromInputStream(fis, agent.getExternalAccess());
+			final ISubscriptionIntermediateFuture<Long> fut = ocon.writeFromInputStream(fis, agent.getExternalAccess());
 
 			fut.addResultListener(new IIntermediateResultListener<Long>()
 			{

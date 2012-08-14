@@ -34,6 +34,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.DecimalFormat;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
@@ -203,20 +204,39 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 													final File source = new File(sel_1);
 													final FileInputStream fis = new FileInputStream(source);
 													ServiceOutputConnection soc = new ServiceOutputConnection();
-													soc.writeFromInputStream(fis, first.getPlatformAccess());
+													soc.writeFromInputStream(fis, first.getPlatformAccess());//.addResultListener(new IIntermediateResultListener<Long>()
+//													{
+//														public void intermediateResultAvailable(Long result) 
+//														{
+//															System.out.println("wro ira: "+result);
+//														}
+//														public void finished()
+//														{
+//															System.out.println("wro fin");
+//														}
+//														public void resultAvailable(Collection<Long> result)
+//														{
+//															System.out.println("wro ra: "+result);
+//														}
+//														public void exceptionOccurred(Exception exception)
+//														{
+//															System.out.println("wro ex: "+exception);
+//														}
+//													});
 													ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), sel_2, source.getName());
-													fut.addResultListener(new IIntermediateResultListener<Long>()
+													fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
 													{
 														public void intermediateResultAvailable(final Long result)
 														{
-															System.out.println("rec: "+result);
+//															System.out.println("rec: "+result);
 															jccacc.scheduleStep(new IComponentStep<Void>()
 															{
 																public IFuture<Void> execute(IInternalAccess ia)
 																{
-																	double done = ((int)((result/(double)source.length())*100))/100.0;
+																	double done = ((int)((result/(double)source.length())*10000))/100.0;
 //																	System.out.println("done: "+done);
-																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+done+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")");
+																	DecimalFormat fm = new DecimalFormat("#0.00");
+																	((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")");
 																	return IFuture.DONE;
 																}
 															});
@@ -253,7 +273,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 																}
 															});
 														}
-													});
+													}));
 												}
 												catch(Exception ex)
 												{

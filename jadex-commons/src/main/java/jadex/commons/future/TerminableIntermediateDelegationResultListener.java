@@ -5,8 +5,7 @@ package jadex.commons.future;
  *  Requires the source and target as parameters
  *  and establishes their connection.
  */
-public class TerminableIntermediateDelegationResultListener<E> 
-	extends IntermediateDelegationResultListener<E>
+public class TerminableIntermediateDelegationResultListener<E> extends IntermediateDelegationResultListener<E>
 {
 	/**
 	 *  Create a new listener.

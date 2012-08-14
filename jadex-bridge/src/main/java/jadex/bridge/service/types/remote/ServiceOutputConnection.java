@@ -8,8 +8,8 @@ import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.io.InputStream;
@@ -224,9 +224,9 @@ public class ServiceOutputConnection implements IOutputConnection
 	 *  @param is The input stream.
 	 *  @param agen
 	 */
-	public ITerminableIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
+	public ISubscriptionIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
 	{
-		final TerminableIntermediateDelegationFuture<Long> ret = new TerminableIntermediateDelegationFuture<Long>();
+		final SubscriptionIntermediateDelegationFuture<Long> ret = new SubscriptionIntermediateDelegationFuture<Long>();
 		
 		if(con==null)
 		{
@@ -236,7 +236,7 @@ public class ServiceOutputConnection implements IOutputConnection
 				{
 					public void execute(Object args)
 					{
-						ITerminableIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
+						ISubscriptionIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
 						TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
 						src.addResultListener(lis);
 					}
@@ -249,7 +249,7 @@ public class ServiceOutputConnection implements IOutputConnection
 		}
 		else
 		{
-			ITerminableIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
+			ISubscriptionIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
 			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
 			src.addResultListener(lis);
 		}

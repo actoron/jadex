@@ -1,9 +1,8 @@
 package jadex.bridge.service.types.deployment;
 
 import jadex.bridge.IInputConnection;
-import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Interface for the deployment service.
@@ -33,7 +32,7 @@ public interface IDeploymentService //extends IService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public ITerminableIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name);
+	public ISubscriptionIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name);
 	
 	/**
 	 *  Rename a file.

@@ -11,8 +11,8 @@ import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,19 +34,19 @@ public class DeploymentService implements IDeploymentService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public ITerminableIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name)
+	public ISubscriptionIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name)
 	{
 //		TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
 //		ret.setFinished();
 //		return ret;
-		System.out.println("uploadFile: "+Thread.currentThread());
+//		System.out.println("uploadFile: "+Thread.currentThread());
 		try
 		{
 			return con.writeToOutputStream(new FileOutputStream(path+File.separator+name), agent);
 		}
 		catch(Exception e)
 		{
-			return new TerminableIntermediateFuture<Long>(e);
+			return new SubscriptionIntermediateFuture<Long>(e);
 		}
 	}
 	

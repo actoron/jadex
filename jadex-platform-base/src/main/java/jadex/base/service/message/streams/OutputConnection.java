@@ -1,7 +1,5 @@
 package jadex.base.service.message.streams;
 
-import java.io.InputStream;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -10,8 +8,10 @@ import jadex.bridge.IOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+
+import java.io.InputStream;
 
 /**
  *  Output connection for writing data.
@@ -95,14 +95,16 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	/**
 	 *  Do write all data from the input stream.  
 	 */
-	public ITerminableIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
-	{
-		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
+	public ISubscriptionIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
+	{		
+		final SubscriptionIntermediateFuture<Long> ret = new SubscriptionIntermediateFuture<Long>();
 		
 		component.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
+				final IComponentStep<Void> self = this;
+				
 				waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
 				{
 					long filesize = 0;
@@ -135,14 +137,37 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 									read += is.read(buf, read, buf.length-read);
 								}
 								write(buf);
-								System.out.println("wrote: "+size);
+//								System.out.println("wrote: "+size);
 								
 								ret.addIntermediateResultIfUndone(new Long(filesize));
 								
 								// Hack!!! Should not assume that stream is at end, only if currently no bytes are available
 								if(is.available()>0)
 								{
-									waitForReady().addResultListener(ia.createResultListener(this));
+//									final IResultListener<Integer> lis = this;
+//									ia.waitForDelay(100, new IComponentStep<Void>()
+//									{
+//										public IFuture<Void> execute(IInternalAccess ia)
+//										{
+//											waitForReady().addResultListener(ia.createResultListener(lis));
+//											return IFuture.DONE;
+//										}
+//									});
+									
+									// Cannot use simple version below, because this will lead to
+									// a non-ending loop of calls in local case (same platform, two components)
+									// (ia.createResultListener() does not help as is on right thread)
+//									waitForReady().addResultListener(ia.createResultListener(this));
+									waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
+									{
+										public void resultAvailable(Integer result)
+										{
+											component.scheduleStep(self);
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									}));
 								}
 								else
 								{
