@@ -75,7 +75,7 @@ public class JCCTest extends TestCase
 		{
 			final Future<Void>	fut	= new Future<Void>();
 			ret	= fut;
-//			System.out.println("Activating plugin: "+plugins[i]);
+			System.out.println("Activating plugin: "+plugins[i]);
 			pcc.getPanel().setPerspective(plugins[i]).addResultListener(new SwingDelegationResultListener<Void>(fut)
 			{
 				public void customResultAvailable(Void result)
