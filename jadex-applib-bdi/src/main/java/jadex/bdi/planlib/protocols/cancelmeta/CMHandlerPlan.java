@@ -115,7 +115,7 @@ public class CMHandlerPlan extends Plan
 				// Use user defined language/ontology (hack???, may not support string content?).
 				reply.getParameter(SFipa.CONTENT).setValue(failure_reason);
 			}
-			sendMessage(reply);
+			sendMessage(reply).get(this);
 			getLogger().info("Receiver sent reply: "+getComponentName());
 		}
 		else if(InteractionState.INTERACTION_RUNNING.equals(state.getInteractionState()))
@@ -126,7 +126,7 @@ public class CMHandlerPlan extends Plan
 			// Inform initator side about dropped out participant using "not-understood" message.
 			IMessageEvent	inimsg	= (IMessageEvent)interaction_goal.getParameter("message").getValue();
 			IMessageEvent	reply	= getEventbase().createReply(inimsg, "cm_not_understood");
-			sendMessage(reply);
+			sendMessage(reply).get(this);
 			getLogger().info("Receiver cancelled: "+getComponentName());
 		}
 		getLogger().info("Receiver aborted: "+getComponentName());
