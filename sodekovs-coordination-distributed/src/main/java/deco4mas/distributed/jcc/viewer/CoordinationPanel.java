@@ -16,6 +16,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -24,9 +25,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 import deco4mas.distributed.jcc.service.ICoordinationManagementService;
+import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
  * Panel for the {@link CoordinationPlugin}.
@@ -42,6 +45,7 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 	private ICoordinationManagementService coordinationManagementService;
 
 	private JList serviceList;
+	private JTable mechanismTable;
 
 	/*
 	 * (non-Javadoc)
@@ -105,16 +109,16 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 	public IFuture<Void> init(IControlCenter jcc, IService service) {
 		this.coordinationManagementService = (ICoordinationManagementService) service;
 
-		BorderLayout borderLayout = new BorderLayout();
-
+		// the title panel
 		JPanel titlePanel = new JPanel(new FlowLayout());
 		JLabel titleLabel = new JLabel("Coordination Management");
 		titlePanel.add(titleLabel);
 
-		JLabel serviceLabel = new JLabel("Coordination Space Services");
+		// the coordination service panel
 		JPanel servicePanel = new JPanel(new BorderLayout());
+		JLabel serviceLabel = new JLabel("Coordination Space Services");
 		this.serviceList = new JList(new DefaultListModel());
-		JScrollPane listScroller = new JScrollPane(serviceList);
+		JScrollPane serviceListScroller = new JScrollPane(serviceList);
 		JButton serviceButton = new JButton("Get Coordination Space Services");
 		serviceButton.addActionListener(new ActionListener() {
 
@@ -124,16 +128,58 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 			}
 		});
 		servicePanel.add(serviceLabel, BorderLayout.NORTH);
-		servicePanel.add(listScroller, BorderLayout.CENTER);
+		servicePanel.add(serviceListScroller, BorderLayout.CENTER);
 		servicePanel.add(serviceButton, BorderLayout.SOUTH);
 
-		this.setLayout(borderLayout);
+		// the mechanism panel
+		JPanel mechanismPanel = new JPanel(new BorderLayout());
+		JLabel mechanismLabel = new JLabel("Coordination Mechanisms");
+		this.mechanismTable = new JTable(new MechanismTableModel());
+		JScrollPane mechanismTableScroller = new JScrollPane(mechanismTable);
+		this.mechanismTable.setFillsViewportHeight(true);
+		JButton mechanismButton = new JButton("Get Coordination Mechanisms");
+		mechanismButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getCoordinationMechanisms();
+			}
+		});
+		mechanismPanel.add(mechanismLabel, BorderLayout.NORTH);
+		mechanismPanel.add(mechanismTableScroller, BorderLayout.CENTER);
+		mechanismPanel.add(mechanismButton, BorderLayout.SOUTH);
+
+		// bringing all together
+		this.setLayout(new BorderLayout());
 		this.add(titlePanel, BorderLayout.NORTH);
 		this.add(servicePanel, BorderLayout.WEST);
+		this.add(mechanismPanel, BorderLayout.CENTER);
 
 		getCoordinationServices();
+		getCoordinationMechanisms();
 
 		return IFuture.DONE;
+	}
+
+	protected void getCoordinationMechanisms() {
+		DefaultListModel lm = (DefaultListModel) serviceList.getModel();
+		if (!lm.isEmpty()) {
+			int selectedIndex = serviceList.getSelectedIndex() < 0 ? 0 : serviceList.getSelectedIndex();
+			ICoordinationSpaceService css = (ICoordinationSpaceService) lm.get(selectedIndex);
+
+			final MechanismTableModel mtm = (MechanismTableModel) mechanismTable.getModel();
+
+			css.getCoordinationMechanisms().addResultListener(new SwingDefaultResultListener<Map<CoordinationMechanism, Boolean>>(this) {
+
+				@Override
+				public void customResultAvailable(Map<CoordinationMechanism, Boolean> result) {
+					for (CoordinationMechanism mechanism : result.keySet()) {
+						MechanismTableEntry mte = new MechanismTableEntry(mechanism, result.get(mechanism));
+						mtm.getData().add(mte);
+					}
+				}
+			});
+		}
 	}
 
 	protected void getCoordinationServices() {
