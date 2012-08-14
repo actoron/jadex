@@ -309,8 +309,6 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 *  @param data The data to add.
 	 *  
 	 *  If stream is closed adding data is not allowed.
-	 *  
-	 *  @return The number of bytes the input connection can store.
 	 */
 	public void addData(byte[] data)
 	{

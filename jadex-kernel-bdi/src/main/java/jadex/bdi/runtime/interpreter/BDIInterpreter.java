@@ -1349,8 +1349,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public <T> IFuture<T> scheduleStep(final Object step, final Object scope)
 	{
-		final Future ret = createStepFuture((IComponentStep)step);
-//		final Future<T> ret = new Future<T>();
+		final Future ret = step instanceof IComponentStep<?> ?  createStepFuture((IComponentStep)step) : new Future<T>();
 		
 		if(getComponentAdapter().isExternalThread()
 			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)

@@ -8,6 +8,7 @@ import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IValueFetcher;
@@ -486,7 +487,7 @@ public class AgentRules
 						Object r = st.execute(new CapabilityFlyweight(state, step[2]));
 						if(r instanceof IFuture)
 						{
-							((IFuture)r).addResultListener(new DelegationResultListener(res));
+							FutureFunctionality.connectDelegationFuture(res, (IFuture)r);
 						}
 						else
 						{
