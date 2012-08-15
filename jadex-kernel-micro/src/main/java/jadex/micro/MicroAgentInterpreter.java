@@ -19,14 +19,13 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
@@ -66,6 +65,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** The classloader (hack? should be in model). */
 	protected ClassLoader classloader;
 	
+	/** The micro model. */
+	protected MicroModel micromodel;
+	
 	//-------- constructors --------
 	
 	/**
@@ -79,6 +81,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, resultlistener, inited);
+		
+		this.micromodel = model;
 		
 		try
 		{
@@ -186,6 +190,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				for(int i=0; i<names.length; i++)
 				{
 					Object val = getArguments().get(names[i]);
+					
+//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
 					final Tuple2<Field, String>[] infos = model.getArgumentInjections(names[i]);
 					
 					try
@@ -194,17 +200,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						{
 							Field field = infos[j].getFirstEntity();
 							String convert = infos[j].getSecondEntity();
-							if(val!=null || !SReflect.isBasicType(field.getType()))
-							{
-								if(convert!=null)
-								{
-									SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
-									fetcher.setValue("$value", val);
-									val = SJavaParser.evaluateExpression(convert, fetcher);
-								}
-								field.setAccessible(true);
-								field.set(agent, val);
-							}
+//							System.out.println("seting arg: "+names[i]+" "+val);
+							setFieldValue(val, field, convert);
 						}
 					}
 					catch(Exception e)
@@ -217,10 +214,67 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			}
 		}
 		
+		// Inject default result values
+		if(getResults()!=null)
+		{
+			String[] names = model.getResultInjectionNames();
+			if(names.length>0)
+			{
+				for(int i=0; i<names.length; i++)
+				{
+					if(getResults().containsKey(names[i]))
+					{
+						Object val = getResults().get(names[i]);
+						final Tuple3<Field, String, String> info = model.getResultInjection(names[i]);
+						
+						try
+						{
+							Field field = info.getFirstEntity();
+							String convert = info.getSecondEntity();
+//							System.out.println("seting res: "+names[i]+" "+val);
+							setFieldValue(val, field, convert);
+						}
+						catch(Exception e)
+						{
+							getLogger().warning("Field injection failed: "+e);
+							if(!ret.isDone())
+								ret.setException(e);
+						}
+					}
+				}
+			}
+		}
+		
 		if(!ret.isDone())
 			ret.setResult(null);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Set an injected field value.
+	 */
+	protected void setFieldValue(Object val, Field field, String convert)
+	{
+		if(val!=null || !SReflect.isBasicType(field.getType()))
+		{
+			try
+			{
+				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
+				if(convert!=null)
+				{
+					SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+					fetcher.setValue("$value", val);
+					val = SJavaParser.evaluateExpression(convert, fetcher);
+				}
+				field.setAccessible(true);
+				field.set(agent, val);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	/**
@@ -592,8 +646,15 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		
 		microagent.agentKilled().addResultListener(microagent.createResultListener(new DelegationResultListener<Void>(ret)
 		{
+			public void customResultAvailable(Void result)
+			{
+				collectInjectedResults();
+				super.customResultAvailable(result);
+			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
+				collectInjectedResults();
 				nosteps = true;
 				exitState();
 				StringWriter	sw	= new StringWriter();
@@ -604,6 +665,39 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}));
 		
 		return ret;
+	}
+	
+	/**
+	 *  Collect the results of the fields.
+	 */
+	protected void collectInjectedResults()
+	{
+		for(String name: micromodel.getResultInjectionNames())
+		{
+			Tuple3<Field, String, String> inj = micromodel.getResultInjection(name);
+			Field field = inj.getFirstEntity();
+			String convback = inj.getThirdEntity();
+			
+			try
+			{
+				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
+				field.setAccessible(true);
+				Object val = field.get(agent);
+				
+				if(convback!=null)
+				{
+					SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+					fetcher.setValue("$value", val);
+					val = SJavaParser.evaluateExpression(convback, fetcher);
+				}
+				
+				setResultValue(name, val);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	/**

@@ -701,7 +701,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		IArgument[] res = model.getResults();
 		for(int i=0; i<res.length; i++)
 		{
-			if(!done.contains(res[i].getName()))
+			// Prevents unset results being added to be able to check whether a user has
+			// set an argument explicitly to null or if it just is null (e.g. for field injections)
+			if(!done.contains(res[i].getName()) && res[i].getDefaultValue().getValue()!=null)
 			{
 				addDefaultResult(res[i].getName(), 
 					UnparsedExpression.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));

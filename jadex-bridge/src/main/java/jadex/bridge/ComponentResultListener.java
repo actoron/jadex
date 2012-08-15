@@ -159,15 +159,15 @@ public class ComponentResultListener<E> implements IResultListener<E>
 					{
 						public void run()
 						{
-							try
-							{
+//							try
+//							{
 								listener.exceptionOccurred(exception);
-							}
-							catch(Exception e) 
-							{
-								exception.printStackTrace();
-								e.printStackTrace();
-							}
+//							}
+//							catch(Exception e) 
+//							{
+//								exception.printStackTrace();
+//								e.printStackTrace();
+//							}
 						}
 						
 						public String toString()

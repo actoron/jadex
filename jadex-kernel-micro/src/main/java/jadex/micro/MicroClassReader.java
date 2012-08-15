@@ -26,6 +26,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -634,17 +635,29 @@ public class MicroClassReader
 				{
 					micromodel.addAgentInjection(fields[i]);
 				}
-				else if(fields[i].isAnnotationPresent(AgentArgument.class))
-				{
-					AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
-					String name = arg.value().length()>0? arg.value(): fields[i].getName();
-					micromodel.addArgumentInjection(name, fields[i], arg.convert());
-				}
 				else if(fields[i].isAnnotationPresent(AgentService.class))
 				{
 					AgentService ser = (AgentService)fields[i].getAnnotation(AgentService.class);
 					String name = ser.name().length()>0? ser.name(): fields[i].getName();
 					micromodel.addServiceInjection(name, fields[i]);
+				}
+				else
+				{
+					if(fields[i].isAnnotationPresent(AgentArgument.class))
+					{
+						AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+						String name = arg.value().length()>0? arg.value(): fields[i].getName();
+						micromodel.addArgumentInjection(name, fields[i], arg.convert());
+					}
+					if(fields[i].isAnnotationPresent(AgentResult.class))
+					{
+						AgentResult res = (AgentResult)fields[i].getAnnotation(AgentResult.class);
+						String name = res.value().length()>0? res.value(): fields[i].getName();
+						if(micromodel.getResultInjection(name)==null)
+						{
+							micromodel.addResultInjection(name, fields[i], res.convert(), res.convertback());
+						}
+					}
 				}
 			}
 			

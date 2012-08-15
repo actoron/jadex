@@ -1,16 +1,18 @@
 package jadex.micro;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -23,6 +25,9 @@ public class MicroModel extends CacheableKernelModel
 	/** The argument injection targets. */
 	protected Map argumentinjections;
 
+	/** The result injection targets. */
+	protected Map<String, Tuple3<Field, String, String>> resultinjections;
+	
 	/** The service injection targets. */
 	protected Map serviceinjections;
 	
@@ -88,6 +93,39 @@ public class MicroModel extends CacheableKernelModel
 	{
 		return argumentinjections==null? SUtil.EMPTY_STRING_ARRAY: 
 			(String[])argumentinjections.keySet().toArray(new String[argumentinjections.size()]);
+	}
+	
+	/**
+	 *  Add an injection field.
+	 *  @param name The name.
+	 *  @param field The field. 
+	 */
+	public void addResultInjection(String name, Field field, String convert, String convback)
+	{
+		if(resultinjections==null)
+			resultinjections = new HashMap<String, Tuple3<Field, String, String>>();
+		resultinjections.put(name, new Tuple3<Field, String, String>(field, 
+			convert!=null && convert.length()==0? null: convert,
+			convback!=null && convback.length()==0? null: convback));
+	}
+	
+	/**
+	 *  Get the result injection field.
+	 *  @return The fields.
+	 */
+	public Tuple3<Field, String, String> getResultInjection(String name)
+	{
+		return resultinjections==null? null: (Tuple3<Field, String, String>)resultinjections.get(name);
+	}
+	
+	/**
+	 *  Get the Result injection names.
+	 *  @return The names.
+	 */
+	public String[] getResultInjectionNames()
+	{
+		return resultinjections==null? SUtil.EMPTY_STRING_ARRAY: 
+			(String[])resultinjections.keySet().toArray(new String[resultinjections.size()]);
 	}
 	
 	/**

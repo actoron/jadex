@@ -83,7 +83,6 @@ public class Argument	extends UnparsedExpression	implements IArgument
 			+ this.clazz + ")";
 	}
 	
-	
 	/**
 	 *  Get a specific result from a result collection.
 	 */

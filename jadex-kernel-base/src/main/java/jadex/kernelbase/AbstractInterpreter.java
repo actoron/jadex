@@ -334,6 +334,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
+//		System.out.println("add def res: "+name+" "+value);
+		
 		if(results==null)
 		{
 			results	= new HashMap<String, Object>();
