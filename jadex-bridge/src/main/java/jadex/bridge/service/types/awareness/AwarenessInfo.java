@@ -1,7 +1,7 @@
 package jadex.bridge.service.types.awareness;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IVersionInfo;
+import jadex.bridge.VersionInfo;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;
@@ -25,6 +25,17 @@ public class AwarenessInfo
 	
 	/** The property for the Jadex build date. */
 	public static final String	PROPERTY_JADEXDATE	= "jadex.date";
+	
+	/** The system properties to send in awareness infos. */
+	protected static final String[]	SYSTEM_PROPERTIES	= new String[]
+	{
+		"os.name",						//	e.g. Windows 7
+		"os.version",					//	e.g. 6.1
+		"os.arch",						//	e.g. amd64
+		"java.specification.version",	//	e.g. 1.7
+		"java.vendor",					//	e.g. Oracle Corporation
+	};
+	// cf. System.getProperties().list(System.out);
 	
 	//-------- attributes --------
 	
@@ -78,9 +89,14 @@ public class AwarenessInfo
 		this.includes	= includes!=null? includes.clone(): null;
 		this.excludes	= excludes!=null? excludes.clone(): null;
 		this.masterid = masterid;
-		this.properties	= new HashMap<String, String>();
-		properties.put(PROPERTY_JADEXVERSION, IVersionInfo.RELEASE_NUMBER);
-		properties.put(PROPERTY_JADEXDATE, IVersionInfo.RELEASE_DATE);
+		
+//		// fill in platform properties (todo: only fill in for some infos?)
+//		this.properties	= new HashMap<String, String>();
+//		properties.put(PROPERTY_JADEXVERSION, VersionInfo.getInstance().getVersion());
+//		for(String prop: SYSTEM_PROPERTIES)
+//		{
+//			properties.put(prop, System.getProperty(prop));
+//		}
 	}
 	
 	//-------- methods --------

@@ -5,8 +5,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
@@ -17,6 +19,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -119,6 +122,31 @@ public class UpdateAgent implements IUpdateService
 			Map<String, Object> msg = new HashMap<String, Object>();
 			msg.put(SFipa.RECEIVERS, creator);
 			agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new DelegationResultListener<Void>(ret));
+			
+			// Post update notification as local chat agent.
+			agent.getServiceContainer().searchService(IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<IChatGuiService>()
+			{
+				public void resultAvailable(final IChatGuiService chat)
+				{
+					// Wait before notification to discover remote platforms first.
+					agent.waitForDelay(30000, new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							System.out.println("Platform updated itself to Jadex "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getNumberDateString()+")");
+							chat.message("Platform updated itself to Jadex "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getNumberDateString()+")", null, true);
+							return IFuture.DONE;
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("Platform update notification failed: "+exception);
+					// ignore.
+				}
+			});
 			
 			// difficult with service as no proxy to the other platform may exist
 	//		agent.getServiceContainer().getService(IUpdateService.class, cid)

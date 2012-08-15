@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Map;
 
 
 /**
@@ -70,6 +71,9 @@ public class PlatformInfo
 	
 	/** The preferred codecs (if any). */
 	protected ICodec[] pcodecs;
+	
+	/** The properties (if any). */
+	protected Map<String, String>	properties;
 	
 	//-------- constructors --------
 	
@@ -360,6 +364,11 @@ public class PlatformInfo
 	public void	setAwarenessInfo(AwarenessInfo awainfo)
 	{
 		this.awainfo	= awainfo;
+		if(awainfo!=null)
+		{
+			setProperties(awainfo.getProperties());
+			StatsDB.getDB().save(this);
+		}
 	}
 	
 	/**
@@ -386,7 +395,7 @@ public class PlatformInfo
 		return "PlatformInfo(id="+getDBId()+", platform="+getId()+", host="+getHostName()+"("+getHostIP()+"), scheme="+getScheme()
 			+ ", connected="+getConnectTime()+", disconnected="+getDisconnectTime()
 			+ ", messages="+getMessageCount()+"("+getByteCount()+"), rate="+getTransferRate()
-			+ ")";
+			+ ", properties="+properties+")";
 	}
 
 	/**
@@ -421,5 +430,23 @@ public class PlatformInfo
 	public void setPreferredCodecs(ICodec[] pcodecs)
 	{
 		this.pcodecs	= pcodecs;
+	}
+
+	/**
+	 *  Get the properties.
+	 *  @return The properties, if any.
+	 */
+	public Map<String, String>	getProperties()
+	{
+		return properties;
+	}
+	
+	/**
+	 *  Set the properties.
+	 *  @param props The properties.
+	 */
+	public void	setProperties(Map<String, String> props)
+	{
+		this.properties	= props;
 	}
 }

@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  Database connector for reading and writing statistics via JavaDB.
+ */
 public class StatsDB
 {
 	//-------- static part --------
@@ -24,6 +27,7 @@ public class StatsDB
 	
 	/**
 	 *  Get the db instance.
+	 *  @return The db instance.
 	 */
 	public static StatsDB	getDB()
 	{
@@ -41,6 +45,12 @@ public class StatsDB
 	/** The prepared update statement. */
 	protected PreparedStatement	update;
 	
+	/** The prepared delete properties statement. */
+	protected PreparedStatement	deleteprops;
+	
+	/** The prepared insert properties statement. */
+	protected PreparedStatement	insertprops;
+	
 	//-------- constructors --------
 	
 	/**
@@ -56,12 +66,13 @@ public class StatsDB
 			Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
 			con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
 
-			// Create the table, if it doesn't exist.
+			// Create the platform info table, if it doesn't exist.
 //			con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
 			DatabaseMetaData	meta	= con.getMetaData();
 			ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
 			if(!rs.next())
 			{
+				rs.close();
 				con.createStatement().execute("CREATE TABLE RELAY.PLATFORMINFO ("
 					+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
 					+ "PLATFORM	VARCHAR(60)," 
@@ -77,6 +88,7 @@ public class StatsDB
 			}
 			else
 			{
+				rs.close();
 				// Add platform prefix column, if it doesn't exist.
 				rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
 				if(!rs.next())
@@ -92,6 +104,7 @@ public class StatsDB
 						update.setInt(param++, rs.getInt("ID"));
 						update.executeUpdate();
 					}
+					rs.close();
 				}
 				
 				// Update platform entries where disconnection was missed.
@@ -111,8 +124,22 @@ public class StatsDB
 					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
 					update.setInt(param++, rs.getInt("ID"));
 					update.executeUpdate();
-				}				
+				}
+				rs.close();
 			}
+
+			// Create the properties table, if it doesn't exist.
+//			con.createStatement().execute("drop table RELAY.PROPERTIES");	// uncomment to create a fresh table.
+			meta	= con.getMetaData();
+			rs	= meta.getTables(null, "RELAY", "PROPERTIES", null);
+			if(!rs.next())
+			{
+				con.createStatement().execute("CREATE TABLE RELAY.PROPERTIES ("
+					+ "ID	INTEGER CONSTRAINT PLATFORM_KEY REFERENCES RELAY.PLATFORMINFO(ID),"
+					+ "NAME	VARCHAR(30)," 
+					+ "VALUE	VARCHAR(60))");
+			}
+			rs.close();
 		}
 		catch(Exception e)
 		{
@@ -125,6 +152,7 @@ public class StatsDB
 	
 	/**
 	 *  Save (insert or update) a platform info object.
+	 *  @param pi The platform info.
 	 */
 	public void	save(PlatformInfo pi)
 	{
@@ -161,6 +189,7 @@ public class StatsDB
 					ResultSet	keys	= insert.getGeneratedKeys();
 					keys.next();
 					pi.setDBId(new Integer(keys.getInt(1)));
+					keys.close();
 				}
 				else
 				{
@@ -185,6 +214,33 @@ public class StatsDB
 					update.setInt(param++, pi.getDBId().intValue());
 					update.executeUpdate();
 				}
+				
+				// Rewrite properties (hack??? inefficient)
+				if(pi.getProperties()!=null)
+				{
+					if(deleteprops==null)
+					{
+						deleteprops	= con.prepareStatement("DELETE FROM relay.properties WHERE ID=?");
+					}
+					int	param	= 1;
+					deleteprops.setInt(param++, pi.getDBId().intValue());
+					deleteprops.executeUpdate();
+					
+					if(insertprops==null)
+					{
+						insertprops	= con.prepareStatement("INSERT INTO relay.properties"
+								+ " (ID, NAME, VALUE)"
+								+ " VALUES (?, ?, ?)");
+					}
+					for(String propname: pi.getProperties().keySet())
+					{
+						param	= 1;
+						insertprops.setInt(param++, pi.getDBId());
+						insertprops.setString(param++, propname);
+						insertprops.setString(param++, pi.getProperties().get(propname));
+						insertprops.executeUpdate();
+					}
+				}
 			}
 			catch(Exception e)
 			{
@@ -195,7 +251,8 @@ public class StatsDB
 	}
 	
 	/**
-	 *  Get all saved platform infos (sorted by id, oldest first).
+	 *  Get all saved platform infos for direct data export (sorted by id, oldest first).
+	 *  @return All stored platform infos.
 	 */
 	public PlatformInfo[]	getAllPlatformInfos()
 	{
@@ -208,10 +265,22 @@ public class StatsDB
 				ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by id asc");
 				while(rs.next())
 				{
-					ret.add(new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
-						rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
-						rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME")));
+					PlatformInfo	pi	= new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+							rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+							rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
+					ret.add(pi);
+
+					// Load properties of platform.
+					Map<String, String>	props	= new HashMap<String, String>();
+					pi.setProperties(props);
+					ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
+					while(rs2.next())
+					{
+						props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+					}
+					rs2.close();
 				}
+				rs.close();
 			}
 			catch(Exception e)
 			{
@@ -223,8 +292,9 @@ public class StatsDB
 	}
 	
 	/**
-	 *  Get cumulated platform infos (sorted by recency, newest first).
-	 *  @param limit	Limit the number of result (-1 for no limit);
+	 *  Get cumulated platform infos per prefix to use for display (sorted by recency, newest first).
+	 *  @param limit	Limit the number of results (-1 for no limit);
+	 *  @return Up to limit platform infos.
 	 */
 	public PlatformInfo[]	getPlatformInfos(int limit)
 	{
@@ -236,7 +306,7 @@ public class StatsDB
 			{
 				Map<String, PlatformInfo>	map	= new HashMap<String, PlatformInfo>();
 				ResultSet	rs	= con.createStatement().executeQuery(
-					"select prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
+					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
 					+"from relay.platforminfo group by hostip, prefix order by CONTIME desc");
 				while(rs.next() && (limit==-1 || ret.size()<limit))
@@ -259,12 +329,24 @@ public class StatsDB
 					}
 					else
 					{
-						map.put(rs.getString("HOSTIP"), new PlatformInfo(null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
-							rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
-							rs.getInt("MSGS"), 0, 0));
-						ret.add(map.get(rs.getString("HOSTIP")));
+						PlatformInfo	pi	= new PlatformInfo(rs.getInt("ID"), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+								rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+								rs.getInt("MSGS"), 0, 0);
+						map.put(rs.getString("HOSTIP"), pi);
+						ret.add(pi);
+						
+						// Load latest properties of platform.
+						Map<String, String>	props	= new HashMap<String, String>();
+						pi.setProperties(props);
+						ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
+						while(rs2.next())
+						{
+							props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+						}
+						rs2.close();
 					}
 				}
+				rs.close();
 			}
 			catch(Exception e)
 			{
@@ -275,6 +357,9 @@ public class StatsDB
 		return ret.toArray(new PlatformInfo[ret.size()]);
 	}
 	
+	/**
+	 *  Close the database connection on exit.
+	 */
 	public void shutdown()
 	{
 		try
@@ -295,6 +380,8 @@ public class StatsDB
 	
 	/**
 	 *  Test the stats db.
+	 *  @param args	Ignored.
+	 *  @throws Exception on database problems.
 	 */
 	public static void	main(String[] args) throws Exception
 	{
@@ -317,6 +404,9 @@ public class StatsDB
 		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
 		DatabaseMetaData	meta	= db.con.getMetaData();
 		printResultSet(meta.getColumns(null, "RELAY", "PLATFORMINFO", null));
+		printResultSet(meta.getColumns(null, "RELAY", "PROPERTIES", null));
+		
+		printResultSet(db.con.createStatement().executeQuery("select * from relay.properties"));
 
 	}
 	

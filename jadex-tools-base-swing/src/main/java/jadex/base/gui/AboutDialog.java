@@ -1,6 +1,6 @@
 package jadex.base.gui;
 
-import jadex.bridge.IVersionInfo;
+import jadex.bridge.VersionInfo;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.SGUI;
 
@@ -86,8 +86,8 @@ public class AboutDialog extends JAutoPositionDialog
 		infotext = "<head/><body>(c) 2002-2012<br>"
 			+ "Alexander Pokahr, Lars Braubach<br>"
 			+ "All rights reserved<br>";
-		String rn = IVersionInfo.RELEASE_NUMBER;
-		String rd = IVersionInfo.RELEASE_DATE;
+		String rn = VersionInfo.getInstance().getVersion();
+		String rd = VersionInfo.getInstance().getNumberDateString();
 		infotext += "Version " + rn + " (" + rd + ")<br>";
 		infotext += "<a href=\"http://sourceforge.net/projects/jadex\">http://sourceforge.net/projects/jadex</a><br>";
 		infotext += "</body>";

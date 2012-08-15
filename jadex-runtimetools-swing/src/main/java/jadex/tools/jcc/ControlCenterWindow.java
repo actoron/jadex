@@ -2,7 +2,7 @@ package jadex.tools.jcc;
 
 import jadex.base.gui.AboutDialog;
 import jadex.base.gui.StatusBar;
-import jadex.bridge.IVersionInfo;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -90,7 +90,7 @@ public class ControlCenterWindow extends JFrame
 	{
 		this.controlcenter = main;
 		this.setTitle("Jadex Control Center "
-			+ IVersionInfo.RELEASE_NUMBER + " (" + IVersionInfo.RELEASE_DATE_TEXT + "): "
+			+ VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + "): "
 			+ controlcenter.getJCCAccess().getComponentIdentifier().getName());
 	
 		getContentPane().setLayout(new BorderLayout());

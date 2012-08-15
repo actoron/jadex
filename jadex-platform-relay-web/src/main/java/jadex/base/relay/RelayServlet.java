@@ -498,6 +498,13 @@ public class RelayServlet extends HttpServlet
 					// Send other awareness infos to newly connected platform.
 					if(initial)
 					{
+						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+						if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
+						{
+							awainfo2	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId());
+							awainfo2.setProperties(null);
+						}
+						
 						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, p2.getPreferredCodecs(), getClass().getClassLoader());
 						byte[]	info2	= new byte[data2.length+4];
 						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
