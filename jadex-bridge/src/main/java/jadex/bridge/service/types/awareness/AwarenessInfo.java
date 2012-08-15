@@ -90,13 +90,13 @@ public class AwarenessInfo
 		this.excludes	= excludes!=null? excludes.clone(): null;
 		this.masterid = masterid;
 		
-//		// fill in platform properties (todo: only fill in for some infos?)
-//		this.properties	= new HashMap<String, String>();
-//		properties.put(PROPERTY_JADEXVERSION, VersionInfo.getInstance().getVersion());
-//		for(String prop: SYSTEM_PROPERTIES)
-//		{
-//			properties.put(prop, System.getProperty(prop));
-//		}
+		// fill in platform properties (todo: only fill in for some infos?)
+		this.properties	= new HashMap<String, String>();
+		properties.put(PROPERTY_JADEXVERSION, VersionInfo.getInstance().getVersion());
+		for(String prop: SYSTEM_PROPERTIES)
+		{
+			properties.put(prop, System.getProperty(prop));
+		}
 	}
 	
 	//-------- methods --------
