@@ -82,6 +82,7 @@
 		<module>../jadex-platform-relay-web</module>
 		
 		<!-- SodekoVS-->
+		<module>../sodekovs-distribution-root</module>
 		<module>../sodekovs-applications</module>
 		<module>../sodekovs-benchmarking</module>
 		<module>../sodekovs-coordination</module>
@@ -89,7 +90,8 @@
 		<module>../sodekovs-productionline</module>
 		<module>../sodekovs-simulationcontrol</module>
 		<module>../sodekovs-util</module>
-		<module>../sodekovs-distribution-root</module>
+		<module>../sodekovs-investigation-framework</module>
+		
 	</modules>
 			
 	<profiles>	    
@@ -490,6 +492,7 @@
 				<module>../sodekovs-simulationcontrol</module>
 				<module>../sodekovs-util</module>
 				<module>../sodekovs-distribution-root</module>
+				<module>../sodekovs-investigation-framework</module>
 				
 				
 			</modules>
