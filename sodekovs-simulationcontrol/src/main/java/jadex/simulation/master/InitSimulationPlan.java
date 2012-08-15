@@ -14,6 +14,7 @@ import jadex.simulation.model.result.IntermediateResult;
 import java.util.HashMap;
 import java.util.Map;
 
+import sodekovs.benchmarking.logger.ScheduleLogger;
 import sodekovs.util.misc.TimeConverter;
 import sodekovs.util.misc.XMLHandler;
 
@@ -53,7 +54,7 @@ public class InitSimulationPlan extends Plan{
 		IGoal goal = createGoal("StartSimulationExperiments");
 		System.out.println("#InitSim# Starting first round of Simulation Experiments.");
 		dispatchTopLevelGoal(goal);
-		
+				
 		//trigger the start of the simulation control center
 //		IGoal ca = createGoal("cmscap.cms_create_component");
 //		ca.getParameter("type").setValue("/jadex/simulation/client/ControlCenter.agent.xml");

@@ -2,12 +2,15 @@ package sodekovs.bikesharing.env;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceProcess;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -44,8 +47,10 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	// required in order to synchronize these to "times"
 	private double tickDelta = -1;
 	private Random rand = new java.util.Random();
+	private IClockService clockservice;
+	private ISimulationService simulationservice;
 
-//	int counterTmp = 0;
+	// int counterTmp = 0;
 
 	// -------- constructors --------
 
@@ -68,8 +73,21 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
 
-//			init((String) getProperty("simDataSetupFilePath"), space);
-			init(space);		
+		// init((String) getProperty("simDataSetupFilePath"), space);
+		init(space);
+		
+		
+		//*******************************************************************************
+		//If time manipulations are required
+
+//		initSimService(space);
+//		initClockService(space);		
+//		printClockAndSimSettings();
+//		//Change  Sim and Clock settings
+//		setClockAndSimSettings(50);		
+//		printClockAndSimSettings();
+		
+		//*******************************************************************************
 	}
 
 	/**
@@ -97,23 +115,26 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			tickDelta = clock.getTick();
 		}
 
-//		if (counterTmp < 6) {
-			for (int i = 0; i < timeSlicesList.size(); i++) {
-				// avoid index out of bounds exception
-				if (i + 1 < timeSlicesList.size()) {
-					if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
-						executeTimeSlice(i, space);
-//						System.out.println("Time Slice exetuced:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
-//						counterTmp++;
-						break;
-					}
-				} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
+		// if (counterTmp < 6) {
+		for (int i = 0; i < timeSlicesList.size(); i++) {
+			// avoid index out of bounds exception
+			if (i + 1 < timeSlicesList.size()) {
+				if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
 					executeTimeSlice(i, space);
-//					System.out.println("Time Slice exetuced:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+					// System.out.println("Time Slice exetuced:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+					// counterTmp++;
+					break;
 				}
+			} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
+				executeTimeSlice(i, space);
+				// System.out.println("Time Slice exetuced:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 			}
 		}
-//	}
+		
+		printClockAndSimSettings();
+	}
+
+	// }
 
 	/**
 	 * Parse the xml setup file.
@@ -126,7 +147,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	private void init(IEnvironmentSpace space){
+	private void init(IEnvironmentSpace space) {
 		scenario = (SimulationDescription) space.getProperty("SimulationDescription");
 
 		// make stations available via HashMap
@@ -167,7 +188,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			if (station.getDepartureProbability() >= rand.nextDouble()) {
 				// compute destination probabilities of this departure
 				int destination = computeDestination(station);
-				System.out.println("Start Event from: " + station.getStationID() + "  to : " + station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
+				// System.out.println("Start Event from: " + station.getStationID() + "  to : " + station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 				createPedestrian(space, station.getStationID(), station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 			}
 
@@ -176,6 +197,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 	/**
 	 * Compute the destination station of this departure according to the probabilities defined in the xml.
+	 * 
 	 * @param station
 	 * @return
 	 */
@@ -183,7 +205,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		double destProb = rand.nextDouble();
 		List<DestinationProbability> destProbabilites = station.getDestinationProbabilities().getDestinationProbability();
 
-//		System.out.println("rand is: +" + destProb);
+		// System.out.println("rand is: +" + destProb);
 
 		double sum = 0.0;
 		for (int i = 0; i < destProbabilites.size(); i++) {
@@ -193,11 +215,11 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			// avoid index out of bounds exception and additionally avoid error that the sum of all probabilities is not exactly 1.0
 			if (i + 1 < destProbabilites.size()) {
 				if (sum >= destProb) {
-//					System.out.println("prob pos: " + i + " has won");
+					// System.out.println("prob pos: " + i + " has won");
 					return i;
 				}
 			} else {
-//				System.out.println("#last bucket# prob pos: " + i + " has won");
+				// System.out.println("#last bucket# prob pos: " + i + " has won");
 				return i;
 			}
 		}
@@ -239,7 +261,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 						final IComponentIdentifier cid = (IComponentIdentifier) result;
 						cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
 							public void resultAvailable(Object result) {
-								//add the start position to the agent/avatar
+								// add the start position to the agent/avatar
 								space.getAvatar((IComponentDescription) result).setProperty(Space2D.PROPERTY_POSITION, depPos);
 
 							}
@@ -252,4 +274,41 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		// System.out.println("#CreateInitialSettingsProcess# pedestrians in Space?: "
 		// + space.getSpaceObjectsByType("pedestrian").length);
 	}
+
+	private void initSimService(final IEnvironmentSpace space) {
+		SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), ISimulationService.class).addResultListener(new DefaultResultListener<ISimulationService>() {
+			public void resultAvailable(ISimulationService result) {
+				simulationservice = result;
+//				System.out.println("Got SIM Serv!: " + simulationservice.toString());
+			}
+		});
+	}
+
+	private void initClockService(final IEnvironmentSpace space) {
+		SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener<IClockService>() {
+			public void resultAvailable(IClockService result) {
+				clockservice = result;
+//				System.out.println("Got Clock Serv!: " + clockservice.getState());
+			}
+		});
+	}
+
+	private void printClockAndSimSettings() {		
+		simulationservice.getMode().addResultListener(new DefaultResultListener<String>() {
+			public void resultAvailable(String result) {
+				String clockState = result;
+				System.out.println("#ManageTimeSlicesProcess# + Current Tick: " + clockservice.getTick() + " - Delta: " + clockservice.getDelta() + " - SimServState: " + clockState);				 
+			}
+		});
+	}
+	
+	private void setClockAndSimSettings(long tickSize) {
+
+		//change clock type
+		simulationservice.setClockType(IClock.TYPE_TIME_DRIVEN);
+		
+		//change tick size
+		clockservice.setDelta(tickSize);
+	}
+
 }

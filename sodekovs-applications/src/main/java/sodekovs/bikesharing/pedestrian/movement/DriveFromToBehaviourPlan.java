@@ -52,7 +52,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 //		Random rand = new java.util.Random();
 //		Vector2Double nextDestination = (Vector2Double) allBikestations[rand.nextInt(allBikestations.length)].getProperty(ContinuousSpace2D.PROPERTY_POSITION);				
 //		Vector2Double destinationStation = (Vector2Double) myself.getProperty("DESTINATION_STATION");
-		System.out.println("#DriveFromToBehaviourPlan# " + myself.getId() + " Going from to " + myPos + "..to .." + dest);
+//		System.out.println("#DriveFromToBehaviourPlan# " + myself.getId() + " Going from to " + myPos + "..to .." + dest);
 		moveToDestination(dest, space, myself);
 		
 		//Rent bike at station
