@@ -302,7 +302,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
 			if(dif==null)
 			{
-				dif = new DiscoveryInfo(sender, null, getClockTime(), info.getDelay(), remoteexcluded);
+				dif = new DiscoveryInfo(sender, null, getClockTime(), info.getDelay(), remoteexcluded, info.getProperties());
 				discovered.put(sender, dif);
 				informListeners(dif);
 				ret	= true;

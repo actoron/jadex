@@ -724,7 +724,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 
 		public int getColumnCount()
 		{
-			return 5;
+			return 6;
 		}
 
 		public String getColumnName(int column)
@@ -734,12 +734,14 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				case 0:
 					return "Component Identifier";
 				case 1:
-					return "Delay";
+					return "Properties";
 				case 2:
-					return "Time of Last Info";
+					return "Delay";
 				case 3:
-					return "Has a Proxy";
+					return "Time of Last Info";
 				case 4:
+					return "Has a Proxy";
+				case 5:
 					return "Remote Excluded";
 				default:
 					return "";
@@ -748,7 +750,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 
 		public boolean isCellEditable(int row, int column)
 		{
-			return column==3;	// only proxy is editable
+			return column==4;	// only proxy is editable
 		}
 
 		public Object getValueAt(int row, int column)
@@ -761,17 +763,21 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 			else if(column == 1)
 			{
-				value = new Long(dif.getDelay());
+				value = ""+dif.getProperties();
 			}
 			else if(column == 2)
 			{
-				value = new Date(dif.getTime());
+				value = new Long(dif.getDelay());
 			}
 			else if(column == 3)
 			{
-				value = dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? Boolean.TRUE : Boolean.FALSE;
+				value = new Date(dif.getTime());
 			}
 			else if(column == 4)
+			{
+				value = dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? Boolean.TRUE : Boolean.FALSE;
+			}
+			else if(column == 5)
 			{
 				value = dif.isRemoteExcluded() ? Boolean.TRUE : Boolean.FALSE;
 			}
@@ -873,17 +879,21 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 			else if(column == 1)
 			{
-				ret = Long.class;
+				ret = String.class;
 			}
 			else if(column == 2)
 			{
-				ret = Date.class;
+				ret = Long.class;
 			}
 			else if(column == 3)
 			{
-				ret = Boolean.class;
+				ret = Date.class;
 			}
 			else if(column == 4)
+			{
+				ret = Boolean.class;
+			}
+			else if(column == 5)
 			{
 				ret = Boolean.class;
 			}

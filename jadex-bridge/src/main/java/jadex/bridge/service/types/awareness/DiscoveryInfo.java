@@ -4,6 +4,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
+import java.util.Map;
+
 /**
  *  Local information about discovered platforms.
  */
@@ -15,6 +17,7 @@ public class DiscoveryInfo
 //	public static long NOW = 0;
 	
 	//-------- attributes --------
+	// todo: why public?
 	
 	/** The component identifier of the remote component. */
 	public IComponentIdentifier cid;
@@ -30,7 +33,10 @@ public class DiscoveryInfo
 
 	/** Flag indicating that the remote component has excluded our local component. */
 	public boolean	remoteexcluded;
-
+	
+	/** Platform properties (if any). */
+	public Map<String, String>	properties;
+	
 	//-------- constructors --------
 	
 	/**
@@ -43,13 +49,14 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, long time, long delay, boolean remoteexcluded)
+	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, long time, long delay, boolean remoteexcluded, Map<String, String> properties)
 	{
 		this.cid = cid;
 		this.proxy = proxy;
 		this.time = time;
 		this.delay = delay;
 		this.remoteexcluded = remoteexcluded;
+		this.properties	= properties;
 	}
 	
 	//-------- methods --------
@@ -142,6 +149,24 @@ public class DiscoveryInfo
 	public void setRemoteExcluded(boolean remoteexcluded)
 	{
 		this.remoteexcluded = remoteexcluded;
+	}
+	
+	/**
+	 *  Get the properties.
+	 *  @return The properties, if any.
+	 */
+	public Map<String, String>	getProperties()
+	{
+		return properties;
+	}
+	
+	/**
+	 *  Set the properties.
+	 *  @param props The properties.
+	 */
+	public void	setProperties(Map<String, String> props)
+	{
+		this.properties	= props;
 	}
 
 	/**

@@ -1,7 +1,11 @@
 package jadex.bridge.service.types.awareness;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IVersionInfo;
 import jadex.commons.SUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Simple info object that is sent between awareness agents.
@@ -15,6 +19,12 @@ public class AwarenessInfo
 	
 	/** State indicating that a component is going offline. */
 	public static final String	STATE_OFFLINE	= "offline";
+	
+	/** The property for the Jadex version. */
+	public static final String	PROPERTY_JADEXVERSION	= "jadex.version";
+	
+	/** The property for the Jadex build date. */
+	public static final String	PROPERTY_JADEXDATE	= "jadex.date";
 	
 	//-------- attributes --------
 	
@@ -35,6 +45,9 @@ public class AwarenessInfo
 
 	/** The masterid (or null if not a master). */
 	protected String masterid;
+	
+	/** A map of properties (if any). */
+	protected Map<String, String>	properties;
 	
 	//-------- constructors --------
 	
@@ -65,6 +78,9 @@ public class AwarenessInfo
 		this.includes	= includes!=null? includes.clone(): null;
 		this.excludes	= excludes!=null? excludes.clone(): null;
 		this.masterid = masterid;
+		this.properties	= new HashMap<String, String>();
+		properties.put(PROPERTY_JADEXVERSION, IVersionInfo.RELEASE_NUMBER);
+		properties.put(PROPERTY_JADEXDATE, IVersionInfo.RELEASE_DATE);
 	}
 	
 	//-------- methods --------
@@ -176,6 +192,25 @@ public class AwarenessInfo
 	{
 		this.masterid = masterid;
 	}
+	
+	/**
+	 *  Get the properties.
+	 *  @return The properties, if any.
+	 */
+	public Map<String, String>	getProperties()
+	{
+		return properties;
+	}
+	
+	/**
+	 *  Set the properties.
+	 *  @param props The properties.
+	 */
+	public void	setProperties(Map<String, String> props)
+	{
+		this.properties	= props;
+	}
+	
 
 	/**
 	 *  Get the string representation.

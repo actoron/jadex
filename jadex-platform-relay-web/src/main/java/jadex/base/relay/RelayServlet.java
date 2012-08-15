@@ -440,10 +440,8 @@ public class RelayServlet extends HttpServlet
 		
 		if(platform!=null || AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
 		{
-			byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
-			byte[]	info	= new byte[data.length+4];
-			System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
-			System.arraycopy(data, 0, info, 4, data.length);
+			byte[]	propinfo	= null;
+			byte[]	nopropinfo	= null;
 			
 			Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
 			for(int i=0; i<entries.length; i++)
@@ -455,7 +453,42 @@ public class RelayServlet extends HttpServlet
 				{
 					try
 					{
-						entries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info)));
+						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+						if(awainfo2.getProperties()==null && nopropinfo==null)
+						{
+							AwarenessInfo	awanoprop	= awainfo;
+							if(awainfo.getProperties()!=null)
+							{
+								awanoprop	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId());
+								awanoprop.setProperties(null);
+							}
+							
+							byte[]	data	= MapSendTask.encodeMessage(awanoprop, pcodecs, getClass().getClassLoader());
+							nopropinfo	= new byte[data.length+4];
+							System.arraycopy(SUtil.intToBytes(data.length), 0, nopropinfo, 0, 4);
+							System.arraycopy(data, 0, nopropinfo, 4, data.length);
+							
+							if(awainfo.getProperties()==null)
+							{
+								propinfo	= nopropinfo;
+							}
+
+						}
+						else if(awainfo2.getProperties()!=null && propinfo==null)
+						{
+							byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
+							propinfo	= new byte[data.length+4];
+							System.arraycopy(SUtil.intToBytes(data.length), 0, propinfo, 0, 4);
+							System.arraycopy(data, 0, propinfo, 4, data.length);
+							
+							if(awainfo.getProperties()==null)
+							{
+								nopropinfo	= propinfo;
+							}
+
+						}
+						
+						entries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(awainfo2.getProperties()==null ? nopropinfo : propinfo)));
 					}
 					catch(Exception e)
 					{
