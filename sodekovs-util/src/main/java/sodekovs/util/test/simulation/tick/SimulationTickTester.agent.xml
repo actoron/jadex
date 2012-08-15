@@ -1,0 +1,36 @@
+
+	<!--
+		<H3>Environment / Observer Agent</H3> Used to maintain the GUI /
+		Observer.
+	-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="SimulationTickTester" package="sodekovs.util.test.simulation.tick">
+
+	<imports>
+	</imports>
+
+
+	
+	
+	
+	
+	<plans>
+		<!-- Init the Simulation.-->
+		<plan name="init">
+			<body class="InitTickTest" />
+		</plan>
+	</plans>
+
+
+	<configurations>
+		<configuration name="default">			
+			<plans>				
+				<initialplan ref="init" />
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
