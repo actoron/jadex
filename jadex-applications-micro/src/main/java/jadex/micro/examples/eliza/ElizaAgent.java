@@ -1,6 +1,7 @@
 package jadex.micro.examples.eliza;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.commons.LazyResource;
@@ -60,11 +61,12 @@ public class ElizaAgent
 		{
 		}
 		
+		final IComponentIdentifier	self	= ((IService)chat).getServiceIdentifier().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)
 			{
-				if(ChatEvent.TYPE_MESSAGE.equals(event.getType()))
+				if(ChatEvent.TYPE_MESSAGE.equals(event.getType()) && !self.equals(event.getComponentIdentifier()))
 				{
 					String	s	= (String)event.getValue();
 					s=s.trim();
