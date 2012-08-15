@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>sodekovs-util</artifactId>
+	<artifactId>sodekovs-investigation-framework</artifactId>
 	<packaging>jar</packaging>
 	<version>2.1</version>
-	<name>sodekovs-util</name>
+	<name>sodekovs-investigation-framework</name>
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 
 	<!--
