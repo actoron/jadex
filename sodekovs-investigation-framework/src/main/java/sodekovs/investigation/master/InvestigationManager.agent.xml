@@ -1,0 +1,217 @@
+
+	<!--
+		<H3>Environment / Observer Agent</H3> Used to maintain the GUI /
+		Observer.
+	-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="InvestigationManager" package="sodekovs.investigation.master">
+
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>java.util.Map</import>
+		<import>java.util.HashMap</import>
+		<import>java.util.Random</import>
+		<import>sodekovs.investigation.model.*</import>
+		<import>sodekovs.investigation.model.result.IntermediateResult</import>
+		<import>sodekovs.investigation.controlcenter.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>sodekovs.investigation.helper.*</import>
+	</imports>
+
+
+	<capabilities>
+		<!-- use capability that logs the memory consumption -->
+		<capability name="memoryLoggerCap"
+			file="sodekovs.util.logger.MemoryLogger" />
+	</capabilities>
+	
+	
+	
+	<beliefs>
+
+		<!-- Number of currently running experiments.-->
+		<belief name="runningSimulations" class="int">
+			<fact>0</fact>
+		</belief>
+
+		<!-- Number of started runs till yet: Increment.-->
+		<belief name="numberOfRuns" class="int">
+			<fact>0</fact>
+		</belief>
+
+		<!--
+			Contains general facts about the Simulation that are the same for all
+			simulation experiments.
+		-->
+		<belief name="generalSimulationFacts" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+
+		<!--  Contains the results of the experiments of one row. -->
+		<belief name="experimentResults" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+
+		<!--  Contains the results of the rows.-->
+		<belief name="rowResults" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+
+		<!--
+			Contains the intermediate results of an ensemble, i.e. the results of
+			the already conducted experiments of this ensemble. The results
+			contain the aggregated information of the ExperimentResults classes
+			of the ensemble.
+		-->
+		<belief name="intermediateResults" class="IntermediateResult" />
+
+		<!--  The parsed simulation configuration xml file. -->
+		<belief name="investigationConf" class="InvestigationConfiguration" />
+
+		<!--
+			Reference to the XML file that contains the simulation description.
+			This file is parsed on agent start. The reference to the file is passes by the surrounding application file description.
+		-->
+		<belief name="investigationDescriptionFile" class="String"/>			
+
+		<!-- Reference to the memory Loger Capability --> 
+		<belief name="MemoryLogerID" class="String">
+			<fact> String.valueOf(new java.util.Random().nextInt())</fact>
+			<assignto ref="memoryLoggerCap.MemoryLoggerID" />
+		</belief>
+		
+	</beliefs>
+
+	<goals>
+		<!--  Start a new round of experiments. -->
+		<achievegoal name="StartSimulationExperiments"/>
+		
+		<performgoal name="EvaluateSingleResult" retry="false" exclude="never">
+			<!-- Map with results from client -->
+			<parameter name="args" class="Map" />
+		</performgoal>
+		
+		<performgoal name="DistributeExperimentGoal" retry="false" exclude="never">
+			<!-- HashMap with data for the simulation client. Contains the InvestigationConfiguration. -->
+			<parameter name="clientArgs" class="HashMap" />
+			<!-- Map that contains the "args" for the start of the application. -->
+			<parameter name="applicationArgs" class="Map" />
+		</performgoal>
+	</goals>
+
+	<plans>
+
+		<!-- Init the Simulation.-->
+		<plan name="init_simulation">
+			<body class="InitSimulationPlan" />
+		</plan>
+
+		<!-- Start Simulation Experiments.-->
+		<plan name="start_sim_experiments">
+			<body class="StartSimulationExperimentsPlan" />
+			<trigger>
+				<goal ref="StartSimulationExperiments" />
+			</trigger>
+		</plan>
+		
+		<!-- Distribute a single simulation experiment to a (remote) client. 
+		 -->
+		<plan name="DistributeExperimentPlan">
+			<body class="ManageDistributionPlan" />
+			<parameter name="clientArgs" class="HashMap">
+				<goalmapping ref="DistributeExperimentPlanGoal.clientArgs"/>
+			</parameter>
+			<parameter name="applicationArgs" class="Map">
+				<goalmapping ref="DistributeExperimentPlanGoal.applicationArgs"/>
+			</parameter>
+			<trigger>
+				<goal ref="DistributeExperimentGoal" />
+			</trigger>
+		</plan>
+
+		<!--
+			Compute / Evaluate the result of one single simulation experiment.
+		-->
+		<plan name="computeSingleResults">
+			<body class="ComputeSingleResultPlan" />
+			<parameter name="args" class="Map">
+				<goalmapping ref="EvaluateSingleResult.args"/>
+			</parameter>
+			<trigger>
+				<goal ref="EvaluateSingleResult" />
+			</trigger>
+		</plan>
+
+		<!--
+			Compute / Evaluate the results of one simulation experiment ROW.
+		-->
+		<plan name="computeExperimentRowResults">
+			<body class="ComputeExperimentRowResultsPlan" />
+			<trigger>
+				<internalevent ref="triggerExperimentRowEvaluation" />
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!--
+			Message sent by simulation client to inform the manager about the
+			outcome of the simulation.
+		-->
+		<!-- <messageevent name="inform_simulation_master" direction="receive"
+			type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent> -->
+
+		<!-- Event to trigger a new simulation experiment. -->
+		<internalevent name="triggerNextExperiment" />
+
+		<!-- Event to trigger the evaluation of a simulation row. -->
+		<internalevent name="triggerExperimentRowEvaluation" />
+
+	</events>
+
+
+	<properties>
+		<!--
+			The environment may throw exceptions when executing property
+			listeners and these listeners are not valid any longer. This leads to
+			normal plan failure and can therefore be ignored.
+		-->
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">false</property>
+		<!-- <property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property> -->						
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<!-- <goals>
+				<initialgoal ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+						$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
+								.createDFServiceDescription("master_simulation_agent",
+							"receive_simulation_run_results", "University of Hamburg"))
+						</value>
+					</parameter>
+					<parameter ref="leasetime">
+						<value>20000</value>
+					</parameter>
+				</initialgoal>				
+			</goals> -->
+			<plans>
+				<!-- <initialplan ref="start_sim_experiments" />-->
+				<initialplan ref="init_simulation" />
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
