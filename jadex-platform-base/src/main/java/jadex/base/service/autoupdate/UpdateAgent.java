@@ -9,6 +9,7 @@ import jadex.bridge.VersionInfo;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.chat.IChatGuiService;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
@@ -20,6 +21,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -41,6 +43,7 @@ import jadex.xml.writer.XMLWriterFactory;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +57,7 @@ import java.util.Map;
 @RequiredServices(
 {	
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, componenttype="daemon"))
 })
@@ -256,11 +260,45 @@ public class UpdateAgent implements IUpdateService
 		{
 //			System.out.println("Update acknowledged, shutting down old platform: "+agent.getComponentIdentifier());
 			cms.destroyComponent(agent.getComponentIdentifier().getRoot());
+			
+			notifyUpdatePerformed("Successfully updated platform (new / old): "
+				+agent.getComponentIdentifier().getRoot()+" / "+caller.getRoot());
 		}
 		else if(newcomp==null)
 		{
 			newcomp = caller;
 		}
+	}
+	
+	/**
+	 *  Notify administrators that platform update has
+	 *  been successfully performed.
+	 */
+	protected IFuture<Void> notifyUpdatePerformed(final String text)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		IFuture<IChatGuiService> fut = agent.getRequiredService("chatser");
+		fut.addResultListener(new ExceptionDelegationResultListener<IChatGuiService, Void>(ret)
+		{
+			public void customResultAvailable(IChatGuiService chatser)
+			{
+				chatser.message(text, null, true).addResultListener(new IntermediateExceptionDelegationResultListener<IChatService, Void>(ret)
+				{
+					public void intermediateResultAvailable(IChatService result)
+					{
+					}
+					public void finished()
+					{
+					}
+					public void customResultAvailable(Collection<IChatService> result)
+					{
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

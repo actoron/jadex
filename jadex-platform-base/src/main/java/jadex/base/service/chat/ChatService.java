@@ -396,7 +396,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
 		
-		if(receivers.length>0)
+		if(receivers!=null && receivers.length>0)
 		{
 			boolean foundself = false;
 			
