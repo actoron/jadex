@@ -29,8 +29,8 @@ public class ConversationAgent extends MicroAgent {
 
 	@SuppressWarnings("unchecked")
 	private void saySomething(String message) {
-		waitFor(5000, new SpeakQuietStep(message));
-		waitFor(1000, new SpeakLoudStep(message));
+		waitFor(10000, new SpeakQuietStep(message));
+		waitFor(15000, new SpeakLoudStep(message));
 	}
 
 	public class SpeakLoudStep extends CoordinationComponentStep {
@@ -41,9 +41,11 @@ public class ConversationAgent extends MicroAgent {
 			this.message = message.toUpperCase();
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			System.out.println(name + " says: " + message);
+			// System.out.println(name + " says: " + message);
+			waitFor(5000, this);
 			return IFuture.DONE;
 		}
 	}
@@ -56,9 +58,11 @@ public class ConversationAgent extends MicroAgent {
 			this.message = message.toLowerCase();
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			System.out.println(name + " says: " + message);
+			// System.out.println(name + " says: " + message);
+			waitFor(5000, this);
 			return IFuture.DONE;
 		}
 	}
