@@ -86,7 +86,7 @@ for (int X=1;X<=N1;X++)
 
 
 
-PRINT("HI! I'M ELIZA. WHAT'S YOUR PROBLEM?");
+PRINT("Hi! I'm Eliza. What's your problem?");
 
 }
 
@@ -95,21 +95,21 @@ public boolean exit=false;
 
 public void handleLine(String I)
 {
-I="  "+I.toUpperCase()+"  ";
+I="  "+I.toLowerCase()+"  ";
 
 //Remove apostrophes = Line 210-210
 I=removeChar(I,'\'');
 
-if (I.indexOf("SHUT")>=0)
+if (I.indexOf("shut")>=0)
 {
-PRINT ("O.K. IF YOU FEEL THAT WAY I'LL SHUT UP....");
+PRINT ("O.K. If you feel that way I'll shut up...");
  exit=true;
  return;
 }
 
 if (I.equals(lastline))
 {
-PRINT ("PLEASE DON'T REPEAT YOURSELF!");
+PRINT ("Please don't repeat yourself!");
 return;
 }
 
@@ -171,7 +171,7 @@ else
  if (C.equals("   "))
  {
 //626 PRINT "YOU WILL HAVE TO ELABORATE MORE FOR ME TO HELP YOU"
-PRINT ("YOU WILL HAVE TO ELABORATE MORE FOR ME TO HELP YOU");
+PRINT ("You will have to elaborate more fore me to help you");
 //627 GOTO 170
  }
  else
@@ -192,137 +192,137 @@ String lastline="-";
 Line 1000
 */
 static String KEYWORD[]=
-{ "CAN YOU ","CAN I ","YOU ARE ","YOU'RE ","I DON'T ","I FEEL ",
- "WHY DON'T YOU ","WHY CAN'T I ","ARE YOU ","I CAN'T ","I AM ","I'M ",
- "YOU ","I WANT ","WHAT ","HOW ","WHO ","WHERE ","WHEN ","WHY ",
- "NAME ","CAUSE ","SORRY ","DREAM ","HELLO ","HI ","MAYBE ",
- "NO","YOUR ","ALWAYS ","THINK ","ALIKE ","YES ","FRIEND ",
- "COMPUTER", "NOKEYFOUND"};
+{ "can you ","can i ","you are ","you're ","i don't ","i feel ",
+ "why don't you ","why can't i ","are you ","i can't ","i am ","i'm ",
+ "you ","i want ","what ","how ","who ","where ","when ","why ",
+ "name ","cause ","sorry ","dream ","hello ","hi ","maybe ",
+ "no ","you ","always ","think ","alike ","yes ","friend ",
+ "computer", "nokeyfound"};
 
 /**
 Line 1200
 */
 static String wordinout[][]=
-{{" ARE "," AM "},{" WERE "," WAS "},{" YOU "," I "},{" YOUR"," MY "},
-{" I'VE "," YOU'VE "},{" I'M "," YOU'RE "},
-{" ME "," YOU "}};
+{{" are "," am "},{" were "," was "},{" you "," I "},{" your "," my "},
+{" i've "," you've "},{" i'm "," you're "},
+{" me "," you "}};
 
 /**
 Line 1300
 */
 static String REPLIES[]=
-{"DON'T YOU BELIEVE THAT I CAN*",
-"PERHAPS YOU WOULD LIKE TO BE LIKE ME*",
-"YOU WANT ME TO BE ABLE TO*",
-"PERHAPS YOU DON'T WANT TO*",
-"DO YOU WANT TO BE ABLE TO*",
-"WHAT MAKES YOU THINK I AM*",
-"DOES IT PLEASE YOU TO BELIEVE I AM*",
-"PERHAPS YOU WOULD LIKE TO BE*",
-"DO YOU SOMETIMES WISH YOU WERE*",
-"DON'T YOU REALLY*",
-"WHY DON'T YOU*",
-"DO YOU WISH TO BE ABLE TO*",
-"DOES THAT TROUBLE YOU*",
-"DO YOU OFTEN FEEL*",
-"DO YOU OFTEN FEEL*",
-"DO YOU ENJOY FEELING*",
-"DO YOU REALLY BELIEVE I DON'T*",
-"PERHAPS IN GOOD TIME I WILL*",
-"DO YOU WANT ME TO*",
-"DO YOU THINK YOU SHOULD BE ABLE TO*",
-"WHY CAN'T YOU*",
-"WHY ARE YOU INTERESTED IN WHETHER OR NOT I AM*",
-"WOULD YOU PREFER IF I WERE NOT*",
-"PERHAPS IN YOUR FANTASIES I AM*",
-"HOW DO YOU KNOW YOU CAN'T*",
-"HAVE YOU TRIED?",
-"PERHAPS YOU CAN NOW*",
-"DID YOU COME TO ME BECAUSE YOU ARE*",
-"HOW LONG HAVE YOU BEEN*",
-"DO YOU BELIEVE IT IS NORMAL TO BE*",
-"DO YOU ENJOY BEING*",
-"WE WERE DISCUSSING YOU--NOT ME.",
-"OH, I*",
-"YOU'RE NOT REALLY TALKING ABOUT ME, ARE YOU?",
-"WHAT WOULD IT MEAN TO YOU IF YOU GOT*",
-"WHY DO YOU WANT*",
-"SUPPOSE YOU SOON GOT*",
-"WHAT IF YOU NEVER GOT*",
-"I SOMETIMES ALSO WANT*",
-"WHY DO YOU ASK?",
-"DOES THAT QUESTION INTEREST YOU?",
-"WHAT ANSWER WOULD PLEASE YOU THE MOST?",
-"WHAT DO YOU THINK?",
-"ARE SUCH QUESTIONS ON YOUR MIND OFTEN?",
-"WHAT IS IT THAT YOU REALLY WANT TO KNOW?",
-"HAVE YOU ASKED ANYONE ELSE?",
-"HAVE YOU ASKED SUCH QUESTIONS BEFORE?",
-"WHAT ELSE COMES TO MIND WHEN YOU ASK THAT?",
-"NAMES DON'T INTEREST ME.",
-"I DON'T CARE ABOUT NAMES --PLEASE GO ON.",
-"IS THAT THE REAL REASON?",
-"DON'T ANY OTHER REASONS COME TO MIND?",
-"DOES THAT REASON EXPLAIN ANYTHING ELSE?",
-"WHAT OTHER REASONS MIGHT THERE BE?",
-"PLEASE DON'T APOLOGIZE!",
-"APOLOGIES ARE NOT NECESSARY.",
-"WHAT FEELINGS DO YOU HAVE WHEN YOU APOLOGIZE?",
-"DON'T BE SO DEFENSIVE!",
-"WHAT DOES THAT DREAM SUGGEST TO YOU?",
-"DO YOU DREAM OFTEN?",
-"WHAT PERSONS APPEAR IN YOUR DREAMS?",
-"ARE YOU DISTURBED BY YOUR DREAMS?",
-"HOW DO YOU DO ...PLEASE STATE YOUR PROBLEM.",
-"YOU DON'T SEEM QUITE CERTAIN.",
-"WHY THE UNCERTAIN TONE?",
-"CAN'T YOU BE MORE POSITIVE?",
-"YOU AREN'T SURE?",
-"DON'T YOU KNOW?",
-"ARE YOU SAYING NO JUST TO BE NEGATIVE?",
-"YOU ARE BEING A BIT NEGATIVE.",
-"WHY NOT?",
-"ARE YOU SURE?",
-"WHY NO?",
-"WHY ARE YOU CONCERNED ABOUT MY*",
-"WHAT ABOUT YOUR OWN*",
-"CAN YOU THINK OF A SPECIFIC EXAMPLE?",
-"WHEN?",
-"WHAT ARE YOU THINKING OF?",
-"REALLY, ALWAYS?",
-"DO YOU REALLY THINK SO?",
-"BUT YOU ARE NOT SURE YOU*",
-"DO YOU DOUBT YOU*",
-"IN WHAT WAY?",
-"WHAT RESEMBLANCE DO YOU SEE?",
-"WHAT DOES THE SIMILARITY SUGGEST TO YOU?",
-"WHAT OTHER CONNECTIONS DO YOU SEE?",
-"COULD THERE REALLY BE SOME CONNECTION?",
-"HOW?",
-"YOU SEEM QUITE POSITIVE.",
-"ARE YOU SURE?",
-"I SEE.",
-"I UNDERSTAND.",
-"WHY DO YOU BRING UP THE TOPIC OF FRIENDS?",
-"DO YOUR FRIENDS WORRY YOU?",
-"DO YOUR FRIENDS PICK ON YOU?",
-"ARE YOU SURE YOU HAVE ANY FRIENDS?",
-"DO YOU IMPOSE ON YOUR FRIENDS?",
-"PERHAPS YOUR LOVE FOR FRIENDS WORRIES YOU.",
-"DO COMPUTERS WORRY YOU?",
-"ARE YOU TALKING ABOUT ME IN PARTICULAR?",
-"ARE YOU FRIGHTENED BY MACHINES?",
-"WHY DO YOU MENTION COMPUTERS?",
-"WHAT DO YOU THINK MACHINES HAVE TO DO WITH YOUR PROBLEM?",
-"DON'T YOU THINK COMPUTERS CAN HELP PEOPLE?",
-"WHAT IS IT ABOUT MACHINES THAT WORRIES YOU?",
-"SAY, DO YOU HAVE ANY PSYCHOLOGICAL PROBLEMS?",
-"WHAT DOES THAT SUGGEST TO YOU?",
-"I SEE.",
-"I'M NOT SURE I UNDERSTAND YOU FULLY.",
-"COME COME ELUCIDATE YOUR THOUGHTS.",
-"CAN YOU ELABORATE ON THAT?",
-"THAT IS QUITE INTERESTING.",
+{"Don't you believe that I can*",
+	"Perhaps you would like to be like me*",
+	"You want me to be able to*",
+	"Perhaps you don't want to*",
+	"Do you want to be able to*",
+	"What makes you think I am*",
+	"Does it please you to believe I am*",
+	"Perhaps you would like to be*",
+	"Do you sometimes wish you were*",
+	"Don't you really*",
+	"Why don't you*",
+	"Do you wish to be able to*",
+	"Does that trouble you*",
+	"Do you often feel*",
+	"Do you often feel*",
+	"Do you enjoy feeling*",
+	"Do you really believe I don't*",
+	"Perhaps in good time I will*",
+	"Do you want me to*",
+	"Do you think you should be able to*",
+	"Why can't you*",
+	"Why are you interested in whether or not I am*",
+	"Would you prefer if I were not*",
+	"Perhaps in your fantasies I am*",
+	"How do you know you can't*",
+	"Have you tried?",
+	"Perhaps you can now*",
+	"Did you come to me because you are*",
+	"How long have you been*",
+	"Do you believe it is normal to be*",
+	"Do you enjoy being*",
+	"We were discussing you--not me.",
+	"Oh, I*",
+	"You're not really talking about me, are you?",
+	"What would it mean to you if you got*",
+	"Why do you want*",
+	"Suppose you soon got*",
+	"What if you never got*",
+	"I sometimes also want*",
+	"Why do you ask?",
+	"Does that question interest you?",
+	"What answer would please you the most?",
+	"What do you think?",
+	"Are such questions on your mind often?",
+	"What is it that you really want to know?",
+	"Have you asked anyone else?",
+	"Have you asked such questions before?",
+	"What else comes to mind when you ask that?",
+	"Names don't interest me.",
+	"I don't care about names --please go on.",
+	"Is that the real reason?",
+	"Don't any other reasons come to mind?",
+	"Does that reason explain anything else?",
+	"What other reasons might there be?",
+	"Please don't apologize!",
+	"Apologies are not necessary.",
+	"What feelings do you have when you apologize?",
+	"Don't be so defensive!",
+	"What does that dream suggest to you?",
+	"Do you dream often?",
+	"What persons appear in your dreams?",
+	"Are you disturbed by your dreams?",
+	"How do you do ...please state your problem.",
+	"You don't seem quite certain.",
+	"Why the uncertain tone?",
+	"Can't you be more positive?",
+	"You aren't sure?",
+	"Don't you know?",
+	"Are you saying no just to be negative?",
+	"You are being a bit negative.",
+	"Why not?",
+	"Are you sure?",
+	"Why no?",
+	"Why are you concerned about my*",
+	"What about your own*",
+	"Can you think of a specific example?",
+	"When?",
+	"What are you thinking of?",
+	"Really, always?",
+	 "Do you really think so?",
+	 "But you are not sure you*",
+	 "Do you doubt you*",
+	 "In what way?",
+	 "What resemblance do you see?",
+	 "What does the similarity suggest to you?",
+	 "What other connections do you see?",
+	 "Could there really be some connection?",
+	 "How?",
+	 "You seem quite positive.",
+	 "Are you sure?",
+	 "I see.",
+	 "I understand.",
+	 "Why do you bring up the topic of friends?",
+	 "Do your friends worry you?",
+	 "Do your friends pick on you?",
+	 "Are you sure you have any friends?",
+	 "Do you impose on your friends?",
+	 "Perhaps your love for friends worries you.",
+	 "Do computers worry you?",
+	 "Are you talking about me in particular?",
+	 "Are you frightened by machines?",
+	 "Why do you mention computers?",
+	 "What do you think machines have to do with your problem?",
+	 "Don't you think computers can help people?",
+	 "What is it about machines that worries you?",
+	 "Say, do you have any psychological problems?",
+	"What does that suggest to you?",
+	 "I see.",
+	  "I'm not sure I understand you fully.",
+	  "Come come elucidate your thoughts.",
+	  "Can you elaborate on that?",
+	  "That is quite interesting.",
 };
 
 /**

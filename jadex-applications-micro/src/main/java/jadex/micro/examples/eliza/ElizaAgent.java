@@ -93,7 +93,7 @@ public class ElizaAgent
 					}
 					else if(s.toLowerCase().indexOf("eliza")!=-1)
 					{
-						chat.message("HI! I'M ELIZA. PLEASE TELL ME YOUR PROBLEM IN PRIVATE.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+						chat.message("Hi! I'm Eliza. Please tell me your problem in private.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
 					}
 				}
 			}
