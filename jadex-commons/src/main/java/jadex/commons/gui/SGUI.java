@@ -819,11 +819,29 @@ public class SGUI
 	}
 	
 	/**
+	 *  Scale an image.
+	 *  @param scr The src image.
+	 *  @param w The width.
+	 *  @param h The height.
+	 *  @param type The type (Image.SCALE_XYZ).
+	 */
+	public static BufferedImage scaleImage(Image src, int w, int h, int type)
+	{
+		Image img = src.getScaledInstance(w, h, type);
+		BufferedImage ret = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		Graphics g = ret.createGraphics();
+		g.drawImage(img, 0, 0, new Color(0,0,0), null);
+		g.dispose();
+		return ret;
+	}
+	
+	/**
 	 * Use SwingUtilities to put the given runnable in the AWT Event queue.
 	 * 
 	 * @param runnable
 	 */
-	public static void invokeLater(Runnable runnable) {
+	public static void invokeLater(Runnable runnable) 
+	{
 		SwingUtilities.invokeLater(runnable);
 	}
 	

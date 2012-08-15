@@ -41,10 +41,10 @@ import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -56,6 +56,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -72,8 +74,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -719,6 +721,24 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 									read+=fis.read(data, read, data.length-read);
 								}
 
+								double twh = 40.0;
+								BufferedImage src = ImageIO.read(new ByteArrayInputStream(data));
+								int sw = src.getWidth();
+								int sh = src.getHeight();
+								int tw = sw;
+								int th = sh;
+								double fac = Math.max(sw, sh)/twh;
+								if(fac>1)
+								{
+									tw /= fac;
+									th /= fac; 
+									
+//									System.out.println("scaled: "+sw+" "+sh+" "+tw+" "+th);
+									
+									Image target = SGUI.scaleImage(src, tw, th, Image.SCALE_FAST);
+									data = SGUI.imageToStandardBytes(target, "image/png");
+								}
+								
 								getService().setImage(data);
 								
 								tfava.setText(SUtil.convertPathToRelative(sel.getAbsolutePath()));
@@ -730,7 +750,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 					}
 				});
-				
+
 				final JComboBox jcom = new JComboBox(new String[]{NOTIFICATION_NEW_MSG, NOTIFICATION_NEW_USER,
 					NOTIFICATION_MSG_FAILED, NOTIFICATION_NEW_FILE, NOTIFICATION_FILE_ABORT, NOTIFICATION_FILE_COMPLETE});
 				final JTextField jtxt = new JTextField();

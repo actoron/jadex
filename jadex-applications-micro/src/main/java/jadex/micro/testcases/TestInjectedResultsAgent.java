@@ -23,7 +23,9 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
- * 
+ *  Test if result back transfer from injected fields works.
+ *  Starts a subagent that uses the result injection and
+ *  checks if its result values are correct.
  */
 @Agent
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
