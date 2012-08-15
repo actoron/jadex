@@ -86,16 +86,17 @@ public class InitDeco4mas {
 				mechanism.setRealisationName(dml.getRealization());
 
 				if (dc.getActive())
-					((CoordinationSpace) space).getActiveCoordinationMechanisms().add(mechanism);
+					((CoordinationSpace) space).getActiveCoordinationMechanisms().put(mechanism.getRealisationName(), mechanism);
 
 				else if (!dc.getActive())
-					((CoordinationSpace) space).getInactiveCoordinationMechanisms().add(mechanism);
+					((CoordinationSpace) space).getInactiveCoordinationMechanisms().put(mechanism.getRealisationName(), mechanism);
 			}
 		}
 
 		// TODO do the same as above for the direct links, right now this did not seem to be supported...
 		for (DirectLink dml : masDyn.getCausalities().getDirectLinks()) {
-			((CoordinationSpace) space).getActiveCoordinationMechanisms().add(getMechanism(dml.getRealization(), (CoordinationSpace) space));
+			CoordinationMechanism mechanism = getMechanism(dml.getRealization(), (CoordinationSpace) space);
+			((CoordinationSpace) space).getActiveCoordinationMechanisms().put(mechanism.getRealisationName(), mechanism);
 		}
 
 		ArrayList<String> allReferencedAgentTypesList = new ArrayList<String>();

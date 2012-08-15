@@ -19,7 +19,7 @@ public class MechanismTableModel extends AbstractTableModel {
 	 */
 	private static final long serialVersionUID = -7095729062453218114L;
 
-	private String[] columnNames = new String[] { "Realisation Name", "Active?" };
+	private String[] columnNames = new String[] { "Realisation Name", "Implementation", "Active?" };
 
 	private List<MechanismTableEntry> data = new ArrayList<MechanismTableEntry>();
 
@@ -67,7 +67,7 @@ public class MechanismTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		if (columnIndex == 1)
+		if (columnIndex == 2)
 			return true;
 		return false;
 	}
@@ -79,8 +79,11 @@ public class MechanismTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		super.setValueAt(aValue, rowIndex, columnIndex);
+		MechanismTableEntry mte = data.get(rowIndex);
+		if (columnIndex == 2) {
+			mte.setActive((Boolean) aValue);
+			fireTableCellUpdated(rowIndex, columnIndex);
+		}
 	}
 
 	/*
@@ -95,6 +98,8 @@ public class MechanismTableModel extends AbstractTableModel {
 		case 0:
 			return entry.getMechanism().getRealisationName();
 		case 1:
+			return entry.getMechanism().getClass().getName();
+		case 2:
 			return entry.getActive();
 		default:
 			return null;

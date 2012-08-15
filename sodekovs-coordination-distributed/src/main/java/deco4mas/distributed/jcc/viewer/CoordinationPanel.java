@@ -26,6 +26,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 import deco4mas.distributed.jcc.service.ICoordinationManagementService;
@@ -36,7 +40,7 @@ import deco4mas.distributed.mechanism.CoordinationMechanism;
  * 
  * @author Thomas Preisler
  */
-public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
+public class CoordinationPanel extends JPanel implements IServiceViewerPanel, TableModelListener, ListSelectionListener {
 
 	/** Generated serial id */
 	private static final long serialVersionUID = -199457116748815908L;
@@ -110,14 +114,15 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 		this.coordinationManagementService = (ICoordinationManagementService) service;
 
 		// the title panel
-		JPanel titlePanel = new JPanel(new FlowLayout());
+		JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		JLabel titleLabel = new JLabel("Coordination Management");
 		titlePanel.add(titleLabel);
 
 		// the coordination service panel
-		JPanel servicePanel = new JPanel(new BorderLayout());
+		JPanel servicePanel = new JPanel(new BorderLayout(5, 5));
 		JLabel serviceLabel = new JLabel("Coordination Space Services");
 		this.serviceList = new JList(new DefaultListModel());
+		this.serviceList.addListSelectionListener(this);
 		JScrollPane serviceListScroller = new JScrollPane(serviceList);
 		JButton serviceButton = new JButton("Get Coordination Space Services");
 		serviceButton.addActionListener(new ActionListener() {
@@ -132,9 +137,11 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 		servicePanel.add(serviceButton, BorderLayout.SOUTH);
 
 		// the mechanism panel
-		JPanel mechanismPanel = new JPanel(new BorderLayout());
+		JPanel mechanismPanel = new JPanel(new BorderLayout(5, 5));
 		JLabel mechanismLabel = new JLabel("Coordination Mechanisms");
-		this.mechanismTable = new JTable(new MechanismTableModel());
+		MechanismTableModel mtm = new MechanismTableModel();
+		mtm.addTableModelListener(this);
+		this.mechanismTable = new JTable(mtm);
 		JScrollPane mechanismTableScroller = new JScrollPane(mechanismTable);
 		this.mechanismTable.setFillsViewportHeight(true);
 		JButton mechanismButton = new JButton("Get Coordination Mechanisms");
@@ -150,7 +157,7 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 		mechanismPanel.add(mechanismButton, BorderLayout.SOUTH);
 
 		// bringing all together
-		this.setLayout(new BorderLayout());
+		this.setLayout(new BorderLayout(5, 5));
 		this.add(titlePanel, BorderLayout.NORTH);
 		this.add(servicePanel, BorderLayout.WEST);
 		this.add(mechanismPanel, BorderLayout.CENTER);
@@ -162,12 +169,11 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 	}
 
 	protected void getCoordinationMechanisms() {
-		DefaultListModel lm = (DefaultListModel) serviceList.getModel();
-		if (!lm.isEmpty()) {
-			int selectedIndex = serviceList.getSelectedIndex() < 0 ? 0 : serviceList.getSelectedIndex();
-			ICoordinationSpaceService css = (ICoordinationSpaceService) lm.get(selectedIndex);
+		ICoordinationSpaceService css = getSelectedCoordinationSpaceService();
 
+		if (css != null) {
 			final MechanismTableModel mtm = (MechanismTableModel) mechanismTable.getModel();
+			mtm.getData().clear();
 
 			css.getCoordinationMechanisms().addResultListener(new SwingDefaultResultListener<Map<CoordinationMechanism, Boolean>>(this) {
 
@@ -177,6 +183,7 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 						MechanismTableEntry mte = new MechanismTableEntry(mechanism, result.get(mechanism));
 						mtm.getData().add(mte);
 					}
+					mtm.fireTableDataChanged();
 				}
 			});
 		}
@@ -186,11 +193,45 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 		coordinationManagementService.getCoordSpaceServices(false).addResultListener(new SwingDefaultResultListener<Collection<ICoordinationSpaceService>>(this) {
 			public void customResultAvailable(Collection<ICoordinationSpaceService> result) {
 				DefaultListModel lm = (DefaultListModel) serviceList.getModel();
-				lm.clear();
 				for (ICoordinationSpaceService iCoordinationSpaceService : result) {
-					lm.addElement(iCoordinationSpaceService);
+					if (!lm.contains(iCoordinationSpaceService))
+						lm.addElement(iCoordinationSpaceService);
 				}
 			}
 		});
+	}
+
+	protected ICoordinationSpaceService getSelectedCoordinationSpaceService() {
+		DefaultListModel dlm = (DefaultListModel) serviceList.getModel();
+		if (!dlm.isEmpty()) {
+			int selectedIndex = serviceList.getSelectedIndex() < 0 ? 0 : serviceList.getSelectedIndex();
+			ICoordinationSpaceService css = (ICoordinationSpaceService) dlm.get(selectedIndex);
+
+			return css;
+		}
+
+		return null;
+	}
+
+	@Override
+	public void tableChanged(TableModelEvent e) {
+		int row = e.getFirstRow();
+		int column = e.getColumn();
+		MechanismTableModel mtm = (MechanismTableModel) e.getSource();
+		MechanismTableEntry mte = mtm.getData().get(row);
+		if (column == 2) {
+			ICoordinationSpaceService css = getSelectedCoordinationSpaceService();
+
+			if (mte.getActive()) {
+				css.activateCoordinationMechanism(mte.getMechanism().getRealisationName());
+			} else {
+				css.deactivateCoordinationMechanism(mte.getMechanism().getRealisationName());
+			}
+		}
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		getCoordinationMechanisms();
 	}
 }

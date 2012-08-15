@@ -2,6 +2,7 @@ package deco4mas.distributed.coordinate.service;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,9 +30,9 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	 * 
 	 * @return all active coordination mechanisms
 	 */
-	public Future<Collection<CoordinationMechanism>> getActiveCoordinationMechanisms() {
+	public IFuture<Collection<CoordinationMechanism>> getActiveCoordinationMechanisms() {
 		Future<Collection<CoordinationMechanism>> ret = new Future<Collection<CoordinationMechanism>>();
-		ret.setResult(space.getActiveCoordinationMechanisms());
+		ret.setResult(space.getActiveCoordinationMechanisms().values());
 
 		return ret;
 	}
@@ -41,9 +42,9 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	 * 
 	 * @return all inactive coordination mechanisms
 	 */
-	public Future<Collection<CoordinationMechanism>> getInactiveCoordinationMechanisms() {
+	public IFuture<Collection<CoordinationMechanism>> getInactiveCoordinationMechanisms() {
 		Future<Collection<CoordinationMechanism>> ret = new Future<Collection<CoordinationMechanism>>();
-		ret.setResult(space.getInactiveCoordinationMechanisms());
+		ret.setResult(space.getInactiveCoordinationMechanisms().values());
 
 		return ret;
 	}
@@ -53,18 +54,44 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	 * 
 	 * @return all coordination mechanisms
 	 */
-	public Future<Map<CoordinationMechanism, Boolean>> getCoordinationMechanisms() {
+	public IFuture<Map<CoordinationMechanism, Boolean>> getCoordinationMechanisms() {
 		Future<Map<CoordinationMechanism, Boolean>> ret = new Future<Map<CoordinationMechanism, Boolean>>();
 
 		Map<CoordinationMechanism, Boolean> mechanisms = new HashMap<CoordinationMechanism, Boolean>();
-		for (CoordinationMechanism mechanism : space.getActiveCoordinationMechanisms()) {
+		for (CoordinationMechanism mechanism : space.getActiveCoordinationMechanisms().values()) {
 			mechanisms.put(mechanism, Boolean.TRUE);
 		}
-		for (CoordinationMechanism mechanism : space.getInactiveCoordinationMechanisms()) {
+		for (CoordinationMechanism mechanism : space.getInactiveCoordinationMechanisms().values()) {
 			mechanisms.put(mechanism, Boolean.FALSE);
 		}
 
 		ret.setResult(mechanisms);
 		return ret;
+	}
+
+	/**
+	 * Activates the {@link CoordinationMechanism} given by its realization name by removing it from the list of inactive mechanisms from the services space
+	 * {@link CoordinationSpace#inactiveCoordinationMechanisms} and adding it to the list of active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms}. Also the
+	 * {@link CoordinationMechanism#start()} method is called to start the mechanism.
+	 * 
+	 * @param mechanism
+	 *            the given {@link CoordinationMechanism} to activate
+	 */
+	public IFuture<Void> activateCoordinationMechanism(String realization) {
+		space.activateCoordinationMechanism(realization);
+		return IFuture.DONE;
+	}
+
+	/**
+	 * Deactivates the {@link CoordinationMechanism} given by its realization name by removing it from the list of active mechanisms from the services space
+	 * {@link CoordinationSpace#activeCoordinationMechanisms} and adding it to the list of inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms}. Also the
+	 * {@link CoordinationMechanism#stop()} method is called to stop the mechanism.
+	 * 
+	 * @param mechanism
+	 *            the given {@link CoordinationMechanism} to deactivate
+	 */
+	public IFuture<Void> deactivateCoordinationMechanism(String realization) {
+		space.deactivateCoordinationMechanism(realization);
+		return IFuture.DONE;
 	}
 }

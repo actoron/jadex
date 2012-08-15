@@ -19,7 +19,6 @@ import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.micro.IMicroExternalAccess;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,11 +35,11 @@ import deco4mas.distributed.mechanism.CoordinationMechanism;
 @SuppressWarnings("unchecked")
 public class CoordinationSpace extends AbstractEnvironmentSpace {
 
-	/** The list of currently supported / active coordination mechanisms. */
-	private ArrayList<CoordinationMechanism> activeCoordinationMechanisms = new ArrayList<CoordinationMechanism>();
+	/** The map of currently supported / active coordination mechanisms. Key is realization name and value the actual mechanism. */
+	private Map<String, CoordinationMechanism> activeCoordinationMechanisms = new HashMap<String, CoordinationMechanism>();
 
-	/** The list of currently unsupported / inactive coordination mechanisms. */
-	private ArrayList<CoordinationMechanism> inactiveCoordinationMechanisms = new ArrayList<CoordinationMechanism>();
+	/** The map of currently unsupported / inactive coordination mechanisms. Key is realization name and value the actual mechanism. */
+	private Map<String, CoordinationMechanism> inactiveCoordinationMechanisms = new HashMap<String, CoordinationMechanism>();
 
 	private MASDynamics masDnyModel = null;
 
@@ -84,7 +83,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 
 		initSpaces();
 		initDeco4mas();
-		for (CoordinationMechanism icord : activeCoordinationMechanisms) {
+		for (CoordinationMechanism icord : activeCoordinationMechanisms.values()) {
 			icord.start();
 		}
 
@@ -107,7 +106,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	public void perceiveCoordinationEvent(Object obj) {
 		if (obj instanceof CoordinationInformation) {
 			CoordinationInformation ci = (CoordinationInformation) obj;
-			for (CoordinationMechanism mechanism : activeCoordinationMechanisms) {
+			for (CoordinationMechanism mechanism : activeCoordinationMechanisms.values()) {
 				if (mechanism.getRealisationName().equals(ci.getValueByName(Constants.DML_REALIZATION_NAME))) {
 					mechanism.perceiveCoordinationEvent(obj);
 				}
@@ -253,14 +252,14 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	/**
 	 * @return the activeCoordinationMechanisms
 	 */
-	public ArrayList<CoordinationMechanism> getActiveCoordinationMechanisms() {
+	public Map<String, CoordinationMechanism> getActiveCoordinationMechanisms() {
 		return activeCoordinationMechanisms;
 	}
 
 	/**
 	 * @return the inactiveCoordinationMechanisms
 	 */
-	public ArrayList<CoordinationMechanism> getInactiveCoordinationMechanisms() {
+	public Map<String, CoordinationMechanism> getInactiveCoordinationMechanisms() {
 		return inactiveCoordinationMechanisms;
 	}
 
@@ -284,29 +283,33 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	}
 
 	/**
-	 * Activates the given {@link CoordinationMechanism} by removing it from the list of inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms} and adding it to the list of
-	 * active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms}. Also the {@link CoordinationMechanism#start()} method is called to start the mechanism.
+	 * Activates the {@link CoordinationMechanism} given by its realization name by removing it from the map of inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms} and adding
+	 * it to the map of active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms}. Also the {@link CoordinationMechanism#start()} method is called to start the mechanism.
 	 * 
 	 * @param mechanism
 	 *            the given {@link CoordinationMechanism} to activate
 	 */
-	public void activateCoordinationMechanism(CoordinationMechanism mechanism) {
-		this.inactiveCoordinationMechanisms.remove(mechanism);
-		this.activeCoordinationMechanisms.add(mechanism);
+	public void activateCoordinationMechanism(String realization) {
+		CoordinationMechanism mechanism = this.inactiveCoordinationMechanisms.get(realization);
+		this.inactiveCoordinationMechanisms.remove(realization);
+
+		this.activeCoordinationMechanisms.put(realization, mechanism);
 
 		mechanism.start();
 	}
 
 	/**
-	 * Deactivates the given {@link CoordinationMechanism} by removing it from the list of active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms} and adding it to the list of
-	 * inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms}. Also the {@link CoordinationMechanism#stop()} method is called to stop the mechanism.
+	 * Deactivates the {@link CoordinationMechanism} given by its realization name by removing it from the map of active mechanisms {@link CoordinationSpace#activeCoordinationMechanisms} and adding it
+	 * to the map of inactive mechanisms {@link CoordinationSpace#inactiveCoordinationMechanisms}. Also the {@link CoordinationMechanism#stop()} method is called to stop the mechanism.
 	 * 
 	 * @param mechanism
 	 *            the given {@link CoordinationMechanism} to deactivate
 	 */
-	public void deactivateCoordinationMechanism(CoordinationMechanism mechanism) {
-		this.activeCoordinationMechanisms.remove(mechanism);
-		this.inactiveCoordinationMechanisms.add(mechanism);
+	public void deactivateCoordinationMechanism(String realization) {
+		CoordinationMechanism mechanism = this.activeCoordinationMechanisms.get(realization);
+		this.activeCoordinationMechanisms.remove(realization);
+
+		this.inactiveCoordinationMechanisms.put(realization, mechanism);
 
 		mechanism.stop();
 	}
