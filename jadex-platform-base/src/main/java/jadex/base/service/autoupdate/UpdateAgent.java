@@ -435,16 +435,16 @@ public class UpdateAgent implements IUpdateService
 								{
 									for(int i=0; i<oldargs.length; i++)
 									{
-										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.base.service.autoupdate.FileUpdateAgent")!=-1)
+//										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.base.service.autoupdate.FileUpdateAgent")!=-1)
+										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("FileUpdateAgent")!=-1)
 										{
 											i+=2;
 										}
 										else
 										{
-											newargs.add(oldargs[i]);
+											newargs.add("\""+oldargs[i]+"\"");
 										}
 									}
-									
 								}
 								
 								// Add -component jadex.base.service.autoupdate.FileUpdateAgent.class with fresh argument
@@ -453,7 +453,7 @@ public class UpdateAgent implements IUpdateService
 								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
 								argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
 								String deser = "\"jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)\"";
-								newargs.add("-component");
+								newargs.add("\"-component\"");
 								newargs.add(updateagent+"(:"+deser+")");
 //								System.out.println("generated: "+newargs);
 
