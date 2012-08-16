@@ -473,4 +473,6 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 			 this.second = second;
 		}
 	}
+
 }
+

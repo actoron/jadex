@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.tools.generic.AbstractServiceSelectorPanel;
 
+import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 /**
@@ -144,6 +145,20 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	public IExternalAccess getJCCAccess()
 	{
 		return jccaccess;
+	}
+	
+	/**
+	 *  Get the selected path.
+	 */
+	public JTree getTree()
+	{
+		JTree ret = null;
+		DeploymentServiceViewerPanel dvp = (DeploymentServiceViewerPanel)getCurrentPanel();
+		if(dvp!=null)
+		{
+			ret = dvp.getFileTreePanel().getTree();
+		}
+		return ret;
 	}
 	
 }
