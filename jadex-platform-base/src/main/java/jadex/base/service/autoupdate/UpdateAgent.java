@@ -133,7 +133,7 @@ public class UpdateAgent implements IUpdateService
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					notifyUpdatePerformed("Started new platform "+agent.getComponentIdentifier().getRoot()
-						+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") replacing old platform "+creator);
+						+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") replacing old platform "+creator.getRoot());
 					return IFuture.DONE;
 				}
 			});
