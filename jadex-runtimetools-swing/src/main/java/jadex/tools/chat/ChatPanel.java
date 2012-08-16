@@ -48,7 +48,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -274,6 +274,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			public void customResultAvailable(Void result)
 			{
+				System.out.println("chatpanel init");
+				
 				DefaultTableCellRenderer userrend = new DefaultTableCellRenderer()
 				{
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
@@ -1007,6 +1009,63 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //				udpane.add(utable);
 //				udpane.setOneTouchExpandable(true);
 //				udpane.setDividerLocation(0.5);
+
+				// Repaint tables if shown to update timeout column.
+				dtpan.addComponentListener(new ComponentAdapter()
+				{
+					Timer	timer;
+					public void componentShown(ComponentEvent e)
+					{
+						if(timer==null)
+						{
+							timer	= new Timer(1000, new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									dtable.repaint();
+								}
+							});
+							timer.start();
+						}
+					}
+					
+					public void componentHidden(ComponentEvent e)
+					{
+						if(timer!=null)
+						{
+							timer.stop();
+						}
+						timer	= null;
+					}
+				});
+				utpan.addComponentListener(new ComponentAdapter()
+				{
+					Timer	timer;
+					public void componentShown(ComponentEvent e)
+					{
+						if(timer==null)
+						{
+							timer	= new Timer(1000, new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									utable.repaint();
+								}
+							});
+							timer.start();
+						}
+					}
+					
+					public void componentHidden(ComponentEvent e)
+					{
+						if(timer!=null)
+						{
+							timer.stop();
+						}
+						timer	= null;
+					}
+				});
+				
 				
 				dtable.getColumnModel().getColumn(0).setCellRenderer(stringrend);
 				dtable.getColumnModel().getColumn(1).setCellRenderer(stringrend);
@@ -1649,6 +1708,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		pp.addComponent("File path: ", fnp);
 		pp.createTextField("Size: ", SUtil.bytesToString(ti.getSize()));
 		pp.createTextField("Sender: ", ""+(ti.getOther()==null? ti.getOther(): ti.getOther().getName()));
+		pp.createTextField("Time left: ", "", false);
 		
 		initial.addResultListener(new ExceptionDelegationResultListener<Tuple2<String, Boolean>, String>(ret)
 		{
@@ -1658,8 +1718,18 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				exists[0]	= result.getSecondEntity().booleanValue();
 				
 				dialogs.put(ti, pp);
+				Timer	timer	= new Timer(1000, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						pp.getTextField("Time left: ").setText(
+							Long.toString(Math.max(0, (ti.getTimeout()-System.currentTimeMillis())/1000)));
+					}
+				});
+				timer.start();
 				int res	= JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject", "Cancel"}, "Accept");
+				timer.stop();
 				dialogs.remove(ti);
 				if(JOptionPane.YES_OPTION==res)
 				{
@@ -1780,19 +1850,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			if(tab!=-1 && !tpane.getComponentAt(tab).isShowing())
 			{
 				tpane.setIconAt(tab, ChatPlugin.getTabIcon());
-				tpane.getComponentAt(tab).addComponentListener(new ComponentListener()
+				tpane.getComponentAt(tab).addComponentListener(new ComponentAdapter()
 				{
 					public void componentShown(ComponentEvent e)
 					{
 						tpane.setIconAt(tab, null);
 						tpane.getComponentAt(tab).removeComponentListener(this);
 					}
-					
-					public void componentResized(ComponentEvent e) {}
-					
-					public void componentMoved(ComponentEvent e) {}
-					
-					public void componentHidden(ComponentEvent e) {}
 				});
 			}
 			
