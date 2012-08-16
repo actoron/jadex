@@ -18,7 +18,10 @@ import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,18 +88,44 @@ public class ElizaAgent
 						conversations.put(event.getComponentIdentifier(), new Tuple2<ElizaParse, Long>(eliza, new Long(System.currentTimeMillis())));
 						
 						eliza.handleLine(s);
+						writeToLog(s, event.getComponentIdentifier());
 						while(!eliza.msg.isEmpty())
 						{
 							chat.message((String)eliza.msg.elementAt(0), new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+							writeToLog("> "+eliza.msg.elementAt(0), event.getComponentIdentifier());
 							eliza.msg.removeElementAt(0);
 						}
 					}
 					else if(s.toLowerCase().indexOf("eliza")!=-1)
 					{
+						writeToLog(s, event.getComponentIdentifier());
 						chat.message("Hi! I'm Eliza. Please tell me your problem in private.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+						writeToLog("> "+"Hi! I'm Eliza. Please tell me your problem in private.", event.getComponentIdentifier());
 					}
 				}
 			}
 		});
+	}
+	
+	/**
+	 *  Write logs of conversations.
+	 *  @param text	The text to write to the log.
+	 *  @param cid	The component identifier of the chat partner.
+	 */
+	protected void	writeToLog(String text, IComponentIdentifier partner)
+	{
+		try
+		{
+			File	f	= new File(".eliza", partner.getName()+".txt");
+			f.getParentFile().mkdirs();
+			PrintStream	os	= new PrintStream(new FileOutputStream(f, true));
+			os.println(text);
+			os.flush();
+			os.close();
+		}
+		catch(Exception e)
+		{
+			// ignore.
+		}
 	}
 }

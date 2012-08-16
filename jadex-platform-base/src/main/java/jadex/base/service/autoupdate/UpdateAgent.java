@@ -20,7 +20,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -128,27 +127,14 @@ public class UpdateAgent implements IUpdateService
 			agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new DelegationResultListener<Void>(ret));
 			
 			// Post update notification as local chat agent.
-			agent.getServiceContainer().searchService(IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new IResultListener<IChatGuiService>()
+			// Wait before notification to discover remote platforms first.
+			agent.waitForDelay(30000, new IComponentStep<Void>()
 			{
-				public void resultAvailable(final IChatGuiService chat)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					// Wait before notification to discover remote platforms first.
-					agent.waitForDelay(30000, new IComponentStep<Void>()
-					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							System.out.println("Platform updated itself to Jadex "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getNumberDateString()+")");
-							chat.message("Platform updated itself to Jadex "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getNumberDateString()+")", null, true);
-							return IFuture.DONE;
-						}
-					});
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("Platform update notification failed: "+exception);
-					// ignore.
+					notifyUpdatePerformed("Started new platform "+agent.getComponentIdentifier().getRoot()
+						+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") replacing old platform "+creator);
+					return IFuture.DONE;
 				}
 			});
 			
@@ -261,8 +247,8 @@ public class UpdateAgent implements IUpdateService
 //			System.out.println("Update acknowledged, shutting down old platform: "+agent.getComponentIdentifier());
 			cms.destroyComponent(agent.getComponentIdentifier().getRoot());
 			
-			notifyUpdatePerformed("Successfully updated platform (new / old): "
-				+agent.getComponentIdentifier().getRoot()+" / "+caller.getRoot());
+			notifyUpdatePerformed("Shutting down old platform "+agent.getComponentIdentifier().getRoot()
+				+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") for new platform "+caller.getRoot());
 		}
 		else if(newcomp==null)
 		{
@@ -283,7 +269,8 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IChatGuiService chatser)
 			{
-				chatser.message(text, null, true).addResultListener(new IntermediateExceptionDelegationResultListener<IChatService, Void>(ret)
+				chatser.message(agent.getComponentIdentifier().getName()+": "+text, null, true)
+					.addResultListener(new IntermediateExceptionDelegationResultListener<IChatService, Void>(ret)
 				{
 					public void intermediateResultAvailable(IChatService result)
 					{
