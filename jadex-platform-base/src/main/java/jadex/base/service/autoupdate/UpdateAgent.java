@@ -16,6 +16,7 @@ import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -467,7 +468,7 @@ public class UpdateAgent implements IUpdateService
 										}
 										else
 										{
-											newargs.add("\""+oldargs[i]+"\"");
+											newargs.add("\""+SUtil.escapeString(oldargs[i])+"\"");
 										}
 									}
 								}

@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
@@ -2619,6 +2620,16 @@ public class SUtil
 			{
 			}
 		}
+		if(zip!=null)
+		{
+			try
+			{
+				zip.close();
+			}
+			catch(IOException e)
+			{
+			}
+		}
 	}
 	
 	/**
@@ -2696,5 +2707,118 @@ public class SUtil
 	{
 		// Todo: ask android helper for android UI thread.
 		return SReflect.isAndroid() ? false : SNonAndroid.isGuiThread();
+	}
+	
+	/**
+	 *  Escape a java string.
+	 *  @param str The string to escape.
+	 *  @return The escaped string.
+	 */
+	public static String escapeString(String str) 
+	{
+		if(str == null)
+			return null;
+		
+		StringWriter writer = new StringWriter(str.length() * 2);
+		
+		boolean essq = true;
+		boolean esfs = true;
+		
+		int sz;
+		sz = str.length();
+		for(int i = 0; i < sz; i++)
+		{
+			char ch = str.charAt(i);
+
+			if(ch > 0xfff)
+			{
+				writer.write("\\u" + hex(ch));
+			}
+			else if(ch > 0xff)
+			{
+				writer.write("\\u0" + hex(ch));
+			}
+			else if(ch > 0x7f)
+			{
+				writer.write("\\u00" + hex(ch));
+			}
+			else if(ch < 32)
+			{
+				switch(ch)
+				{
+					case '\b':
+						writer.write('\\');
+						writer.write('b');
+						break;
+					case '\n':
+						writer.write('\\');
+						writer.write('n');
+						break;
+					case '\t':
+						writer.write('\\');
+						writer.write('t');
+						break;
+					case '\f':
+						writer.write('\\');
+						writer.write('f');
+						break;
+					case '\r':
+						writer.write('\\');
+						writer.write('r');
+						break;
+					default:
+						if(ch > 0xf)
+						{
+							writer.write("\\u00" + hex(ch));
+						}
+						else
+						{
+							writer.write("\\u000" + hex(ch));
+						}
+						break;
+				}
+			}
+			else
+			{
+				switch(ch)
+				{
+					case '\'':
+						if(essq)
+						{
+							writer.write('\\');
+						}
+						writer.write('\'');
+						break;
+					case '"':
+						writer.write('\\');
+						writer.write('"');
+						break;
+					case '\\':
+						writer.write('\\');
+						writer.write('\\');
+						break;
+					case '/':
+						if(esfs)
+						{
+							writer.write('\\');
+						}
+						writer.write('/');
+						break;
+					default:
+						writer.write(ch);
+						break;
+				}
+			}
+		}
+		
+		return writer.toString();
+	}
+	
+	/**
+	 *  Convert char to hex vavlue.
+	 */
+	public static String hex(char ch) 
+	{
+		return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
 	}
 }

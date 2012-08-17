@@ -150,7 +150,7 @@ public class FileUpdateAgent extends UpdateAgent
 					});
 					
 					foundver = files[0].lastModified();
-					boolean force = false; // force update
+					boolean force = true; // force update
 					if(foundver>curver || force) 
 					{
 						File dir = null;
