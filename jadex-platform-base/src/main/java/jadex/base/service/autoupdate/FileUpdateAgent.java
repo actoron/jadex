@@ -21,17 +21,23 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.net.URL;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.zip.ZipFile;
 
 @Arguments(replace=false, value=
 {
+	@Argument(name="rootdir", clazz=String.class, description="Directory where to create new distribution directories", defaultvalue="\".\""),
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
 	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars.")
@@ -48,6 +54,9 @@ import java.util.zip.ZipFile;
  */
 public class FileUpdateAgent extends UpdateAgent
 {
+	@AgentArgument
+	protected String rootdir;
+	
 	@AgentArgument
 	protected String scandir;
 	
@@ -95,6 +104,7 @@ public class FileUpdateAgent extends UpdateAgent
 						}
 						
 						so.setClassPath(flattenStrings((Iterator)SReflect.getIterator(jarurls), File.pathSeparator));
+						System.out.println("start options: "+so);
 						
 						ret.setResult(so);
 					}
@@ -126,8 +136,8 @@ public class FileUpdateAgent extends UpdateAgent
 		{
 			public void customResultAvailable(Long curver)
 			{
-//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hhmmss");
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hhmmss");
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 //				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curver)));
 				
 				TreeSet<File> res = new TreeSet<File>(new Comparator<File>()
@@ -159,7 +169,7 @@ public class FileUpdateAgent extends UpdateAgent
 						{
 							// create new directory for distribution
 							Date founddate = new Date(foundver);
-							dir = new File(sdf.format(founddate)+"_dist");
+							dir = new File(rootdir, sdf.format(founddate)+"_dist");
 							if(dir.exists())
 							{
 								SUtil.deleteDirectory(dir);
@@ -171,7 +181,7 @@ public class FileUpdateAgent extends UpdateAgent
 							{
 								SUtil.unzip(new ZipFile(file), dir);
 							}
-							
+
 							// find distribution directory (must be one)
 							File[] decoms = dir.listFiles(new FileFilter()
 							{
@@ -184,7 +194,21 @@ public class FileUpdateAgent extends UpdateAgent
 							{
 								System.out.println("Updating to version: "+sdf.format(founddate));
 
-								UpdateInfo ui = new UpdateInfo(foundver, new File(decoms[0], "lib").getCanonicalPath());
+								File	target	= new File(decoms[0], "lib");
+								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
+								
+								// copy .settings.xml files (if any).
+								for(File settings: target.listFiles(new FileFilter()
+								{
+									public boolean accept(File file)
+									{
+										return !file.isDirectory() && file.getName().endsWith(".setting.xml");
+									}
+								}))
+								{
+									Files.copy(Paths.get(settings.toURI()), Paths.get(target.toURI()), StandardCopyOption.REPLACE_EXISTING);
+								}
+
 								ret.setResult(ui);
 							}
 							else
@@ -325,6 +349,16 @@ public class FileUpdateAgent extends UpdateAgent
 			ret.setException(new RuntimeException("Unable to determine current version."));
 		}
 	
+		return ret;
+	}
+
+	/**
+	 *  Convert the root dir to absolute to avoid nesting dist dirs in dist dirs.
+	 */
+	protected Map<String, Object> getUpdateArguments()
+	{
+		Map<String, Object>	ret	= super.getUpdateArguments();
+		ret.put("rootdir", new File(rootdir).getAbsolutePath());
 		return ret;
 	}
 	

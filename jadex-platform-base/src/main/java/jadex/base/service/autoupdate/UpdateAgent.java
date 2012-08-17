@@ -474,14 +474,16 @@ public class UpdateAgent implements IUpdateService
 								}
 								
 								// Add -component jadex.base.service.autoupdate.FileUpdateAgent.class with fresh argument
-								Map<String, Object> uaargs = new HashMap<String, Object>();
+								Map<String, Object> uaargs = getUpdateArguments();
 								uaargs.put("creator", agent.getComponentIdentifier());
 								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
-								argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
+								System.out.println("pre: "+argsstr);
+								argsstr	= SUtil.escapeString(SUtil.escapeString(argsstr));	// argl...
+//								argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
+								System.out.println("post: "+argsstr);
 								String deser = "\"jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)\"";
 								newargs.add("\"-component\"");
 								newargs.add(updateagent+"(:"+deser+")");
-//								System.out.println("generated: "+newargs);
 
 								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
 								
@@ -521,4 +523,13 @@ public class UpdateAgent implements IUpdateService
 		return new Future<UpdateInfo>((UpdateInfo)null);
 	}
 	
+	/**
+	 *  Get the arguments to use for the update agent. 
+	 */
+	protected Map<String, Object>	getUpdateArguments()
+	{
+		Map<String, Object>	ret	= new HashMap<String, Object>();
+		ret.putAll(agent.getArguments());
+		return ret;
+	}
 }

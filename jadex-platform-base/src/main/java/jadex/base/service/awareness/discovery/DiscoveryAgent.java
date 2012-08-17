@@ -12,6 +12,7 @@ import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -31,7 +32,10 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,7 +45,9 @@ import java.util.TimerTask;
 @Agent
 @Arguments({
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior).")
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
+	@Argument(name="includes", clazz=String[].class, description="A list of platforms/IPs/hostnames to include. Matches start of platform/IP/hostname."),
+	@Argument(name="excludes", clazz=String[].class, description="A list of platforms/IPs/hostnames to exclude. Matches start of platform/IP/hostname.")
 })
 /*@Configurations(
 {
@@ -75,9 +81,11 @@ public abstract class DiscoveryAgent
 	protected boolean fast;
 	
 	/** The includes list. */
+	@AgentArgument
 	protected String[] includes;
 	
 	/** The excludes list. */
+	@AgentArgument
 	protected String[] excludes;
 
 	/** Flag indicating that the agent is started and the send behavior may be activated. */
@@ -117,6 +125,9 @@ public abstract class DiscoveryAgent
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+//		System.out.println(agent.getComponentIdentifier()+" includes: "+SUtil.arrayToString(includes));
+//		System.out.println(agent.getComponentIdentifier()+" excludes: "+SUtil.arrayToString(excludes));
 		
 //		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 		

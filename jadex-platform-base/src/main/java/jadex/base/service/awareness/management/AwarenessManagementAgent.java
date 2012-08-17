@@ -167,49 +167,71 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
-		final String mechas = (String)getArgument("mechanisms");
-		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
-		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
+		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void resultAvailable(ISettingsService settings)
 			{
-				AwarenessManagementAgent.this.cms	= cms;
-				StringTokenizer	stok	= mechas!=null ? new StringTokenizer(mechas, ", \r\n\t") : new StringTokenizer("");
-				CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
-					false, new DelegationResultListener<Void>(ret)
+				settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
+					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
-						setfut.addResultListener(new IResultListener<ISettingsService>()
-						{
-							public void resultAvailable(ISettingsService settings)
-							{
-								settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
-									.addResultListener(new DelegationResultListener<Void>(ret));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// No settings service: ignore.
-								ret.setResult(null);
-							}
-						});
+						proceed();
 					}
 				});
-				
-				CreationInfo info = new CreationInfo(getComponentIdentifier());
-				info.setConfiguration(getConfiguration());
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("delay", getArgument("delay"));
-				info.setArguments(args);
-				while(stok.hasMoreTokens())
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				proceed();
+			}
+			
+			protected void	proceed()
+			{
+				final String mechas = (String)getArgument("mechanisms");
+				if(mechas!=null)
 				{
-//					System.out.println("mecha: "+mechas[i]);
-					cms.createComponent(null, stok.nextToken(), info, null).addResultListener(lis);
+					IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
+					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+					{
+						public void customResultAvailable(IComponentManagementService cms)
+						{
+							AwarenessManagementAgent.this.cms	= cms;
+							StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
+							CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
+								false, new DelegationResultListener<Void>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									ret.setResult(null);
+								}
+							});
+							
+							CreationInfo info = new CreationInfo(getComponentIdentifier());
+							info.setConfiguration(getConfiguration());
+							Map<String, Object> args = new HashMap<String, Object>();
+							args.put("delay", new Long(getDelay()));
+							args.put("fast", isFastAwareness() ? Boolean.TRUE : Boolean.FALSE);
+							args.put("includes", getIncludes());
+							args.put("excludes", getExcludes());
+							info.setArguments(args);
+							while(stok.hasMoreTokens())
+							{
+	//							System.out.println("mecha: "+mechas[i]);
+								cms.createComponent(null, stok.nextToken(), info, null).addResultListener(lis);
+							}
+						}
+					});
+				}
+				else
+				{
+					ret.setResult(null);
 				}
 			}
 		});
+
 		
 		return ret;
 	}
@@ -490,7 +512,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				getLogger().warning("Could not find discoveries: "+exception);
+				// No discoveries: ignore
 			}
 		});
 	}
@@ -514,7 +536,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				getLogger().warning("Could not find discoveries: "+exception);
+				// No discoveries: ignore
 			}
 		});
 }
@@ -595,7 +617,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				getLogger().warning("Could not find discoveries: "+exception);
+				// No discoveries: ignore
 			}
 		});
 	}
@@ -621,7 +643,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 
 			public void exceptionOccurred(Exception exception)
 			{
-				getLogger().warning("Could not find discoveries: "+exception);
+				// No discoveries: ignore
 			}
 		});
 	}

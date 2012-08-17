@@ -172,5 +172,17 @@ public class StartOptions
 		
 		return cmd.toString();
 	}
-	
+
+	/**
+	 *  String representation.
+	 */
+	public String toString()
+	{
+		return "StartOptions(javacmd="+javacmd
+			+", classpath="+classpath
+			+", main="+main
+			+", prgmargs="+prgmargs
+			+", vmargs="+vmargs
+			+", startdir="+startdir+")";
+	}
 }

@@ -2722,7 +2722,7 @@ public class SUtil
 		StringWriter writer = new StringWriter(str.length() * 2);
 		
 		boolean essq = true;
-		boolean esfs = true;
+		boolean esfs = false;
 		
 		int sz;
 		sz = str.length();
