@@ -84,7 +84,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		// Initial state using refresh action to avoid duplicated code.
 		ra.actionPerformed(null);
 		
-		panel	= new JPanel(new BorderLayout());
+		panel = new JPanel(new BorderLayout());
 		panel.add(ftp, BorderLayout.CENTER);
 		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title+" ("+exta.getComponentIdentifier().getPlatformName()+")"));
 	}
@@ -185,22 +185,19 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
  */
 class TreeTransferHandler extends TransferHandler
 {
-	protected DataFlavor				nodesFlavor;
+	protected DataFlavor flavor;
 
-	protected DataFlavor[]				flavors	= new DataFlavor[1];
-
-	protected DefaultMutableTreeNode[]	nodesToRemove;
+	protected DataFlavor[] flavors	= new DataFlavor[1];
 
 	public TreeTransferHandler()
 	{
+		this.flavors = new DataFlavor[1];
 		try
 		{
-			String mimeType = DataFlavor.javaJVMLocalObjectMimeType
-					+ ";class=\""
-					+ javax.swing.tree.DefaultMutableTreeNode[].class.getName()
-					+ "\"";
-			nodesFlavor = new DataFlavor(mimeType);
-			flavors[0] = nodesFlavor;
+			String mimeType = DataFlavor.javaJVMLocalObjectMimeType+";class=\""
+				+ javax.swing.tree.DefaultMutableTreeNode[].class.getName()+"\"";
+			flavor = new DataFlavor(mimeType);
+			flavors[0] = flavor;
 		}
 		catch(ClassNotFoundException e)
 		{
@@ -218,7 +215,7 @@ class TreeTransferHandler extends TransferHandler
 			return false;
 		}
 		support.setShowDropLocation(true);
-		if(!support.isDataFlavorSupported(nodesFlavor))
+		if(!support.isDataFlavorSupported(flavor))
 		{
 			return false;
 		}
@@ -268,7 +265,7 @@ class TreeTransferHandler extends TransferHandler
 	{
 		try
 		{
-			System.out.println("done: "+((String[])data.getTransferData(nodesFlavor))[0]);
+			System.out.println("done: "+((String[])data.getTransferData(flavor))[0]);
 		}
 		catch(Exception e)
 		{
@@ -309,10 +306,9 @@ class TreeTransferHandler extends TransferHandler
 			try
 			{
 				Transferable t = support.getTransferable();
-				Object to = t.getTransferData(nodesFlavor);
+				Object to = t.getTransferData(flavor);
 				
 //				((NodesTransferable)to).setContent(new String[]{"bla"});
-				
 				
 //				// Get drop location info.
 				JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
@@ -364,8 +360,9 @@ class TreeTransferHandler extends TransferHandler
 	 */
 	public class NodesTransferable implements Transferable
 	{
+//		protected Tuple2<String, IDeploymentService> content;
 		protected String[] content;
-
+		
 		public NodesTransferable(String[] content)
 		{
 			this.content = content;
@@ -385,7 +382,8 @@ class TreeTransferHandler extends TransferHandler
 
 		public boolean isDataFlavorSupported(DataFlavor flavor)
 		{
-			return nodesFlavor.equals(flavor);
+			return flavor.equals(flavor);
 		}
 	}
+	
 }
