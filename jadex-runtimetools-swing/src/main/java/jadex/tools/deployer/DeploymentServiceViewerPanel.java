@@ -21,7 +21,6 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple3;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -44,12 +43,9 @@ import java.util.Collection;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -181,151 +177,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		return ftp;
 	}
 
-//	/**
-//	 * 
-//	 */
-//	public static void copy(final String sel1, final String sel2, final IExternalAccess exta1, final IExternalAccess exta2,  
-//		 final JTree tree2, final IDeploymentService ds2, IExternalAccess jccaccess) 
-//	{
-//		if(sel1!=null && sel2!=null)
-//		{
-//			final IComponentIdentifier lcid = jccaccess.getComponentIdentifier();
-////			final IDeploymentService ds = second.getDeploymentService();
-//			
-//			exta1.scheduleStep(new IComponentStep<Void>()
-//			{
-//				public IFuture<Void> execute(final IInternalAccess ia)
-//				{
-//					final Future<Void> ret = new Future<Void>();
-//					
-//					SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//						.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-//					{
-//						public void customResultAvailable(IComponentManagementService cms)
-//						{
-//							cms.getExternalAccess(lcid).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-//							{
-//								public void customResultAvailable(final IExternalAccess jccacc) 
-//								{
-//									try
-//									{
-//										final File source = new File(sel1);
-//										final FileInputStream fis = new FileInputStream(source);
-//										ServiceOutputConnection soc = new ServiceOutputConnection();
-//										soc.writeFromInputStream(fis, exta1);//.addResultListener(new IIntermediateResultListener<Long>()
-////										{
-////											public void intermediateResultAvailable(Long result) 
-////											{
-////												System.out.println("wro ira: "+result);
-////											}
-////											public void finished()
-////											{
-////												System.out.println("wro fin");
-////											}
-////											public void resultAvailable(Collection<Long> result)
-////											{
-////												System.out.println("wro ra: "+result);
-////											}
-////											public void exceptionOccurred(Exception exception)
-////											{
-////												System.out.println("wro ex: "+exception);
-////											}
-////										});
-//										ITerminableIntermediateFuture<Long> fut = ds2.uploadFile(soc.getInputConnection(), sel2, source.getName());
-//										fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
-//										{
-//											public void intermediateResultAvailable(final Long result)
-//											{
-////												System.out.println("rec: "+result);
-//												jccacc.scheduleStep(new IComponentStep<Void>()
-//												{
-//													public IFuture<Void> execute(IInternalAccess ia)
-//													{
-//														double done = ((int)((result/(double)source.length())*10000))/100.0;
-////														System.out.println("done: "+done);
-//														DecimalFormat fm = new DecimalFormat("#0.00");
-//														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")");
-//														return IFuture.DONE;
-//													}
-//												});
-//											}
-//											
-//											public void finished()
-//											{
-//												jccacc.scheduleStep(new IComponentStep<Void>()
-//												{
-//													public IFuture<Void> execute(IInternalAccess ia)
-//													{
-//														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel1+" to "+sel2);
-//														ret.setResult(null);
-//														return IFuture.DONE;
-//													}
-//												});
-////												second.refreshTreePaths(null);
-//											}
-//											
-//											public void resultAvailable(Collection<Long> result)
-//											{
-//												finished();
-//											}
-//											
-//											public void exceptionOccurred(final Exception exception)
-//											{
-//												jccacc.scheduleStep(new IComponentStep<Void>()
-//												{
-//													public IFuture<Void> execute(IInternalAccess ia)
-//													{
-//														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" to: "+sel2+" exception: "+exception.getMessage());
-//														ret.setResult(null);
-//														return IFuture.DONE;
-//													}
-//												});
-//											}
-//										}));
-//									}
-//									catch(final Exception ex)
-//									{
-//										ret.setResult(null);
-//										jccacc.scheduleStep(new IComponentStep<Void>()
-//										{
-//											public IFuture<Void> execute(IInternalAccess ia)
-//											{
-//												((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" "+ex.getMessage());
-//												return IFuture.DONE;
-//											}
-//										});
-////										jcc.setStatusText("Copy error: "+sel_1+" "+ex.getMessage());
-//									}
-//								}
-//							}));
-//						}
-//					}));
-//					
-//					return ret;
-//				}
-//			}).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
-//			{
-//				public void resultAvailable(Void result)
-//				{
-//					refreshTreePaths();
-//				}
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					refreshTreePaths();
-//				}
-//				
-//				protected void refreshTreePaths()
-//				{
-//					TreePath[] paths = tree2.getSelectionPaths();
-//					for(int i=0; paths!=null && i<paths.length; i++)
-//					{
-//						((ITreeNode)paths[i].getLastPathComponent()).refresh(true);
-//					}
-//				}
-//			}));
-//		}
-//	}
-	
 	/**
 	 * 
 	 */
@@ -362,25 +213,25 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 										final File source = new File(sel1);
 										final FileInputStream fis = new FileInputStream(source);
 										ServiceOutputConnection soc = new ServiceOutputConnection();
-										soc.writeFromInputStream(fis, exta1);//.addResultListener(new IIntermediateResultListener<Long>()
-//										{
-//											public void intermediateResultAvailable(Long result) 
-//											{
+										soc.writeFromInputStream(fis, exta1).addResultListener(new IIntermediateResultListener<Long>()
+										{
+											public void intermediateResultAvailable(Long result) 
+											{
 //												System.out.println("wro ira: "+result);
-//											}
-//											public void finished()
-//											{
-//												System.out.println("wro fin");
-//											}
-//											public void resultAvailable(Collection<Long> result)
-//											{
+											}
+											public void finished()
+											{
+												System.out.println("wro fin");
+											}
+											public void resultAvailable(Collection<Long> result)
+											{
 //												System.out.println("wro ra: "+result);
-//											}
-//											public void exceptionOccurred(Exception exception)
-//											{
-//												System.out.println("wro ex: "+exception);
-//											}
-//										});
+											}
+											public void exceptionOccurred(Exception exception)
+											{
+												System.out.println("wro ex: "+exception);
+											}
+										});
 										ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), sel2, source.getName());
 										fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
 										{
@@ -402,6 +253,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											
 											public void finished()
 											{
+												System.out.println("rec fin");
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
@@ -421,6 +273,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											
 											public void exceptionOccurred(final Exception exception)
 											{
+												exception.printStackTrace();
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
@@ -435,6 +288,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 									}
 									catch(Exception ex)
 									{
+										ex.printStackTrace();
 										ret.setResult(null);
 										final String extxt = ex.getMessage();
 										jccacc.scheduleStep(new IComponentStep<Void>()
