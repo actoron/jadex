@@ -9,6 +9,8 @@ import jadex.bridge.service.IService;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
@@ -31,6 +33,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import deco4mas.distributed.coordinate.service.CoordinationChangeEvent;
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 import deco4mas.distributed.jcc.service.ICoordinationManagementService;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
@@ -168,6 +171,9 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel, Ta
 		return IFuture.DONE;
 	}
 
+	/**
+	 * Fills the mechanism table with all the coordination mechanisms from the selected {@link ICoordinationSpaceService}.
+	 */
 	protected void getCoordinationMechanisms() {
 		ICoordinationSpaceService css = getSelectedCoordinationSpaceService();
 
@@ -189,18 +195,52 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel, Ta
 		}
 	}
 
+	/**
+	 * Fills the service list with all the {@link ICoordinationSpaceService} that could be found and subscribes to their {@link CoordinationChangeEvent}s.
+	 */
 	protected void getCoordinationServices() {
 		coordinationManagementService.getCoordSpaceServices(false).addResultListener(new SwingDefaultResultListener<Collection<ICoordinationSpaceService>>(this) {
+
 			public void customResultAvailable(Collection<ICoordinationSpaceService> result) {
+				// fill the list model
 				DefaultListModel lm = (DefaultListModel) serviceList.getModel();
-				for (ICoordinationSpaceService iCoordinationSpaceService : result) {
-					if (!lm.contains(iCoordinationSpaceService))
+				for (final ICoordinationSpaceService iCoordinationSpaceService : result) {
+					// only if the list does not already contain the service
+					if (!lm.contains(iCoordinationSpaceService)) {
 						lm.addElement(iCoordinationSpaceService);
+						// subscribe for future CoordinationChangeEvents
+						ISubscriptionIntermediateFuture<CoordinationChangeEvent> subscription = iCoordinationSpaceService.subscribe();
+						subscription.addResultListener(new IntermediateDefaultResultListener<CoordinationChangeEvent>() {
+
+							@Override
+							public void intermediateResultAvailable(CoordinationChangeEvent result) {
+								// only do something in case that the service is currently selected
+								if (iCoordinationSpaceService.equals(getSelectedCoordinationSpaceService())) {
+									MechanismTableModel mtm = (MechanismTableModel) mechanismTable.getModel();
+									// update the entry
+									for (MechanismTableEntry entry : mtm.getData()) {
+										if (entry.getMechanism().getRealisationName().equals(result.getRealization())) {
+											entry.setActive(result.getActive());
+											mtm.fireTableDataChanged();
+										}
+									}
+								}
+							}
+						});
+					}
 				}
+				// select the first entry
+				serviceList.setSelectionInterval(0, 0);
 			}
 		});
+
 	}
 
+	/**
+	 * Returns the currently selected {@link ICoordinationSpaceService} from the {@link CoordinationPanel#serviceList}.
+	 * 
+	 * @return the selected service
+	 */
 	protected ICoordinationSpaceService getSelectedCoordinationSpaceService() {
 		DefaultListModel dlm = (DefaultListModel) serviceList.getModel();
 		if (!dlm.isEmpty()) {

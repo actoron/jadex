@@ -3,9 +3,14 @@ package deco4mas.distributed.coordinate.service;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
@@ -21,8 +26,11 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 
 	private CoordinationSpace space = null;
 
+	private List<SubscriptionIntermediateFuture<CoordinationChangeEvent>> subscribers = null;
+
 	public CoordinationSpaceService(CoordinationSpace space) {
 		this.space = space;
+		this.subscribers = new ArrayList<SubscriptionIntermediateFuture<CoordinationChangeEvent>>();
 	}
 
 	/**
@@ -93,5 +101,54 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	public IFuture<Void> deactivateCoordinationMechanism(String realization) {
 		space.deactivateCoordinationMechanism(realization);
 		return IFuture.DONE;
+	}
+
+	/**
+	 * Listener method which is called if a {@link CoordinationMechanism} was activated.
+	 * 
+	 * @param realization
+	 *            the mechanisms realization name
+	 */
+	public void mechanismActivated(String realization) {
+		CoordinationChangeEvent event = new CoordinationChangeEvent(realization, Boolean.TRUE);
+		publish(event);
+	}
+
+	/**
+	 * Informs all the subscribers if a {@link CoordinationChangeEvent} occurs.
+	 * 
+	 * @param event
+	 *            the {@link CoordinationChangeEvent}
+	 */
+	private void publish(CoordinationChangeEvent event) {
+		for (Iterator<SubscriptionIntermediateFuture<CoordinationChangeEvent>> it = subscribers.iterator(); it.hasNext();) {
+			SubscriptionIntermediateFuture<CoordinationChangeEvent> sub = it.next();
+			if (!sub.addIntermediateResultIfUndone(event)) {
+				it.remove();
+			}
+		}
+	}
+
+	/**
+	 * Listener method which is called if a {@link CoordinationMechanism} was deactivated.
+	 * 
+	 * @param realization
+	 *            the mechanisms realization name
+	 */
+	public void mechanismDeactivated(String realization) {
+		CoordinationChangeEvent event = new CoordinationChangeEvent(realization, Boolean.FALSE);
+		publish(event);
+	}
+
+	/**
+	 * Allows other to subscribe for {@link CoordinationChangeEvent}. The subscribers are called if any change happens on the spaces {@link CoordinationMechanism}s.
+	 * 
+	 * @return an {@link ISubscriptionIntermediateFuture} holding the {@link CoordinationChangeEvent}
+	 */
+	public ISubscriptionIntermediateFuture<CoordinationChangeEvent> subscribe() {
+		SubscriptionIntermediateFuture<CoordinationChangeEvent> ret = new SubscriptionIntermediateFuture<CoordinationChangeEvent>();
+
+		subscribers.add(ret);
+		return ret;
 	}
 }

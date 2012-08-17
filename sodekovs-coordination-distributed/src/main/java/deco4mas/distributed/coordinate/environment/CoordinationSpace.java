@@ -25,7 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.event.EventListenerList;
+
 import deco.distributed.lang.dynamics.MASDynamics;
+import deco4mas.distributed.coordinate.service.CoordinationEventListener;
 import deco4mas.distributed.coordinate.service.CoordinationSpaceService;
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 import deco4mas.distributed.helper.Constants;
@@ -51,6 +54,9 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 
 	/** Contains the mapping of an agent's name and it's {@link IComponentDescription} */
 	private Map<String, IComponentDescription> descriptionMapping = new HashMap<String, IComponentDescription>();
+
+	/** List of EventListener that should be informed when something on coordination mechanisms changes */
+	private EventListenerList coordinationEventListener = new EventListenerList();
 
 	// -------- constructors --------
 
@@ -94,8 +100,11 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 * Starts the {@link ICoordinationSpaceService} the space offers.
 	 */
 	private void startService() {
-		((StatelessAbstractInterpreter) getApplicationInternalAccess()).addService(this.toString(), ICoordinationSpaceService.class, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null,
-				new CoordinationSpaceService(this), null);
+		ICoordinationSpaceService css = new CoordinationSpaceService(this);
+		this.addCoordinationEventListener(css);
+
+		((StatelessAbstractInterpreter) getApplicationInternalAccess())
+				.addService(this.toString(), ICoordinationSpaceService.class, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, css, null);
 	}
 
 	/**
@@ -296,6 +305,8 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		this.activeCoordinationMechanisms.put(realization, mechanism);
 
 		mechanism.start();
+
+		notifyMechanismActivated(realization);
 	}
 
 	/**
@@ -312,5 +323,52 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		this.inactiveCoordinationMechanisms.put(realization, mechanism);
 
 		mechanism.stop();
+
+		notifyMechanismDeactivated(realization);
+	}
+
+	/**
+	 * Adds an {@code CoordinationEventListener} to the radio.
+	 * 
+	 * @param listener
+	 *            the {@code CoordinationEventListener} to be added
+	 */
+	public void addCoordinationEventListener(CoordinationEventListener listener) {
+		coordinationEventListener.add(CoordinationEventListener.class, listener);
+	}
+
+	/**
+	 * Removes an {@code CoordinationEventListener} from the radio.
+	 * 
+	 * @param listener
+	 *            the listener to be removed
+	 */
+
+	public void removeCoordinationEventListener(CoordinationEventListener listener) {
+		coordinationEventListener.remove(CoordinationEventListener.class, listener);
+	}
+
+	/**
+	 * Notifies all {@link CoordinationEventListener}s that the given {@link CoordinationMechanism} was activated.
+	 * 
+	 * @param mechanism
+	 *            the given {@link CoordinationMechanism}
+	 */
+	private synchronized void notifyMechanismActivated(String realization) {
+		for (CoordinationEventListener listener : coordinationEventListener.getListeners(CoordinationEventListener.class)) {
+			listener.mechanismActivated(realization);
+		}
+	}
+
+	/**
+	 * Notifies all {@link CoordinationEventListener} that the given {@link CoordinationMechanism} was deactivated.
+	 * 
+	 * @param mechanism
+	 *            the given {@link CoordinationMechanism}
+	 */
+	private synchronized void notifyMechanismDeactivated(String realization) {
+		for (CoordinationEventListener listener : coordinationEventListener.getListeners(CoordinationEventListener.class)) {
+			listener.mechanismDeactivated(realization);
+		}
 	}
 }

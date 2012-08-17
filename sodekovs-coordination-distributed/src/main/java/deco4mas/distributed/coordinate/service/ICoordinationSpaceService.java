@@ -1,6 +1,7 @@
 package deco4mas.distributed.coordinate.service;
 
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,7 +14,7 @@ import deco4mas.distributed.mechanism.CoordinationMechanism;
  * 
  * @author Thomas Preisler
  */
-public interface ICoordinationSpaceService {
+public interface ICoordinationSpaceService extends CoordinationEventListener {
 
 	/**
 	 * Gets all currently active {@link CoordinationMechanism}s of the according {@link CoordinationSpace}.
@@ -55,4 +56,11 @@ public interface ICoordinationSpaceService {
 	 *            the given {@link CoordinationMechanism} to deactivate
 	 */
 	public IFuture<Void> deactivateCoordinationMechanism(String realization);
+
+	/**
+	 * Allows other to subscribe for {@link CoordinationChangeEvent}. The subscribers are called if any change happens on the spaces {@link CoordinationMechanism}s.
+	 * 
+	 * @return an {@link ISubscriptionIntermediateFuture} holding the {@link CoordinationChangeEvent}
+	 */
+	public ISubscriptionIntermediateFuture<CoordinationChangeEvent> subscribe();
 }
