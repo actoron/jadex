@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -62,32 +63,52 @@ public class RemoteDirNode extends RemoteFileNode
 			public void customResultAvailable(Object result)
 			{
 				Collection files = (Collection)result;
-				CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.size(), true, 
-					new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						setChildren((List)result);
-					}
-				});
+//				CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.size(), true, 
+//					new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						setChildren((List)result);
+//					}
+//				});
+//				
+//				if(files!=null)
+//				{
+//					for(Iterator it=files.iterator(); it.hasNext();)
+//					{
+//						FileData file = (FileData)it.next();
+//						ITreeNode node = getModel().getNode(file.toString());
+//						if(node!=null)
+//						{
+//							lis.resultAvailable(node);
+//						}
+//						else
+//						{
+//							lis.resultAvailable(factory.createNode(RemoteDirNode.this, model, tree, 
+//								file, iconcache, exta, factory));
+//						}
+//					}
+//				}
 				
-				if(files!=null)
+				List	nodes	= new SortedList(DirNode.FILENODE_COMPARATOR, true);
+//				List	nodes	= new ArrayList();
+				for(Iterator it=files.iterator(); it.hasNext();)
 				{
-					for(Iterator it=files.iterator(); it.hasNext();)
+					FileData file = (FileData)it.next();
+					ITreeNode node = getModel().getNode(file.toString());//.getAbsolutePath());
+					if(node!=null)
 					{
-						FileData file = (FileData)it.next();
-						ITreeNode node = getModel().getNode(file.toString());
-						if(node!=null)
-						{
-							lis.resultAvailable(node);
-						}
-						else
-						{
-							lis.resultAvailable(factory.createNode(RemoteDirNode.this, model, tree, 
-								file, iconcache, exta, factory));
-						}
+//						lis.resultAvailable(node);
+						nodes.add(node);
+					}
+					else
+					{
+//						lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
+						nodes.add(factory.createNode(RemoteDirNode.this, model, tree, file, iconcache, exta, factory));
 					}
 				}
+
+				setChildren(nodes);
 			}
 		});
 	}

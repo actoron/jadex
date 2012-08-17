@@ -12,7 +12,10 @@ import jadex.base.gui.filetree.IFileNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -21,6 +24,7 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -186,7 +190,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		final String sel2 = ((IFileNode)sp2.getLastPathComponent()).getFilePath();
 		final IDeploymentService ds = pan2.getDeploymentService();
 		
-		System.out.println("sel1: "+sel1+" sel2:"+sel2);
+		System.out.println("sel1: "+sel1+" sel2:"+sel2+" "+jccaccess.getComponentIdentifier());
 		
 		if(sel1!=null && sel2!=null)
 		{
@@ -240,15 +244,24 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											public void intermediateResultAvailable(final Long result)
 											{
 //												System.out.println("rec: "+result);
+												final double done = ((int)((result/(double)source.length())*10000))/100.0;
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														double done = ((int)((result/(double)source.length())*10000))/100.0;
 //														System.out.println("done: "+done);
 														DecimalFormat fm = new DecimalFormat("#0.00");
 														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")");
 														return IFuture.DONE;
+													}
+												}).addResultListener(new IResultListener<Void>()
+												{
+													public void resultAvailable(Void result)
+													{
+													}
+													public void exceptionOccurred(Exception exception)
+													{
+														exception.printStackTrace();
 													}
 												});
 											}
@@ -260,11 +273,11 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
+														System.out.println("rec fin2: "+ia.getComponentIdentifier());
 														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel1+" to "+sel2);
-														ret.setResult(null);
 														return IFuture.DONE;
 													}
-												});
+												}).addResultListener(new DelegationResultListener<Void>(ret));
 //												second.refreshTreePaths(null);
 											}
 											
@@ -284,7 +297,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 														ret.setResult(null);
 														return IFuture.DONE;
 													}
-												});
+												}).addResultListener(new DelegationResultListener<Void>(ret));
 											}
 										}));
 									}
@@ -300,7 +313,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 												((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" "+extxt);
 												return IFuture.DONE;
 											}
-										});
+										}).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 								}
 							}));
@@ -332,6 +345,25 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				}
 			}));
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> doJccOutput(IExternalAccess jccacc, final Runnable run)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		jccacc.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				run.run();
+				return IFuture.DONE;
+			}
+		}).addResultListener(new DelegationResultListener<Void>(ret));
+		
+		return ret;
 	}
 	
 //	/**

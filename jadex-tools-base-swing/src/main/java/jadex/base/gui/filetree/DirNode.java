@@ -169,10 +169,10 @@ public class DirNode extends FileNode
 	{
 		public int compare(Object o1, Object o2)
 		{
-			String	name1	= o1 instanceof FileNode ? ((FileNode)o1).getFile().getName() : ((RemoteFileNode)o1).getRemoteFile().getFilename();
-			String	name2	= o2 instanceof FileNode ? ((FileNode)o2).getFile().getName() : ((RemoteFileNode)o2).getRemoteFile().getFilename();
-			boolean	dir1	= o1 instanceof FileNode ? ((FileNode)o1).getFile().isDirectory() && !(o1 instanceof JarNode) : ((RemoteFileNode)o1).getRemoteFile().isDirectory() && !(o1 instanceof RemoteJarNode);
-			boolean	dir2	= o2 instanceof FileNode ? ((FileNode)o2).getFile().isDirectory() && !(o2 instanceof JarNode) : ((RemoteFileNode)o2).getRemoteFile().isDirectory() && !(o2 instanceof RemoteJarNode);
+			String	name1	= ((IFileNode)o1).getFileName();
+			String	name2	= ((IFileNode)o2).getFileName();
+			boolean	dir1	= ((IFileNode)o1).isDirectory() && !(o1 instanceof JarNode || o1 instanceof RemoteJarNode);
+			boolean	dir2	= ((IFileNode)o2).isDirectory() && !(o2 instanceof JarNode || o2 instanceof RemoteJarNode);
 
 			int	ret;
 			if(dir1 && !dir2)
