@@ -341,7 +341,7 @@ public class UpdateAgent implements IUpdateService
 		
 		// todo: create new classpath for new version 
 		
-		Map<String, Object> args = new HashMap<String, Object>();
+		Map<String, Object> args = agent.getArguments();//new HashMap<String, Object>();
 		args.put("creator", agent.getComponentIdentifier());
 		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 //		String argsstr = JavaWriter.objectToXML(args, null);
