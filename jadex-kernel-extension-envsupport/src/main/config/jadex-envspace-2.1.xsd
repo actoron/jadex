@@ -480,20 +480,21 @@
 		<xs:attribute name="x" type="xs:string"/>
 		<xs:attribute name="y" type="xs:string"/>
 		<xs:attribute name="z" type="xs:string"/>
-		<xs:attribute name="rotatex" type="xs:string"/>
-		<xs:attribute name="rotatey"/>
-		<xs:attribute name="rotatez"/>
-		<xs:attribute name="initialrotatex"/>
-		<xs:attribute name="inititalrotatey"/>
-		<xs:attribute name="inititalrotatez"/>
 		<xs:attribute name="width"/>
 		<xs:attribute name="depth"/>
-		<xs:attribute name="position"/>
-		<xs:attribute name="rotation"/>
-		<xs:attribute name="size"/>
-		<xs:attribute name="hasSpaceobject" type="xs:boolean"/>
-		<xs:attribute name="rotation3d"/>
-		<xs:attribute name="autoRotation" type="xs:boolean"/>
+		<xs:attribute name="height" type="xs:string"/>
+		<xs:attribute name="rotation" type="xs:string"/>
+		<xs:attribute name="rotatex" type="xs:string"/>
+		<xs:attribute name="rotatey" type="xs:string"/>
+		<xs:attribute name="rotatez" type="xs:string"/>
+		<xs:attribute name="position" type="xs:string"/>
+		<xs:attribute name="size" type="xs:string"/>
+		<xs:attribute name="abspos" type="xs:string"/>
+		<xs:attribute name="abssize" type="xs:string"/>
+		<xs:attribute name="absrot" type="xs:string"/>
+		<xs:attribute name="color" type="xs:string"/>
+		<xs:attribute name="texturepath" type="xs:string"/>
+		<xs:attribute name="shadowtype" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="texturedrectangle">
 		<xs:annotation>
@@ -535,6 +536,161 @@
 				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sphere">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="box">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="cylinder">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="radius" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="dome">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="radius" type="xs:string"/>
+				<xs:attribute name="planes" type="xs:string"/>
+				<xs:attribute name="samples" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="torus">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="innerRadius" type="xs:string"/>
+				<xs:attribute name="outerRadius" type="xs:string"/>
+				<xs:attribute name="circleSamples" type="xs:string"/>
+				<xs:attribute name="radialSamples" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="object3d">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="modelpath" type="xs:string"/>
+				<xs:attribute name="hasLightMaterials" type="xs:string"/>
+				<xs:attribute name="rigDebug" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="arrow">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="text3d">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="text" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sky">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="skyfile" type="xs:string"/>
+		<xs:attribute name="skypath" type="xs:string"/>
+		<xs:attribute name="west" type="xs:string"/>
+		<xs:attribute name="east" type="xs:string"/>
+		<xs:attribute name="north" type="xs:string"/>
+		<xs:attribute name="south" type="xs:string"/>
+		<xs:attribute name="up" type="xs:string"/>
+		<xs:attribute name="down" type="xs:string"/>
+		<xs:attribute name="isSphere" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="terrain">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="terrapath" type="xs:string"/>
+				<xs:attribute name="alphamap" type="xs:string"/>
+				<xs:attribute name="heightmap" type="xs:string"/>
+				<xs:attribute name="texture01" type="xs:string"/>
+				<xs:attribute name="texture02" type="xs:string"/>
+				<xs:attribute name="texture03" type="xs:string"/>
+				<xs:attribute name="texture04" type="xs:string"/>
+				<xs:attribute name="texture05" type="xs:string"/>
+				<xs:attribute name="tex01val" type="xs:string"/>
+				<xs:attribute name="tex02val" type="xs:string"/>
+				<xs:attribute name="tex03val" type="xs:string"/>
+				<xs:attribute name="tex04val" type="xs:string"/>
+				<xs:attribute name="tex05val" type="xs:string"/>
+				<xs:attribute name="patchsize" type="xs:string"/>
+				<xs:attribute name="picsize" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="rndterrain">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:attribute name="tiles" type="xs:string"/>
+				<xs:attribute name="terrapath" type="xs:string"/>
+				<xs:attribute name="alphamap" type="xs:string"/>
+				<xs:attribute name="interations" type="xs:string"/>
+				<xs:attribute name="minradius" type="xs:string"/>
+				<xs:attribute name="maxradius" type="xs:string"/>
+				<xs:attribute name="seed" type="xs:string"/>
+				<xs:attribute name="texture01" type="xs:string"/>
+				<xs:attribute name="texture02" type="xs:string"/>
+				<xs:attribute name="texture03" type="xs:string"/>
+				<xs:attribute name="texture04" type="xs:string"/>
+				<xs:attribute name="texture05" type="xs:string"/>
+				<xs:attribute name="tex01val" type="xs:string"/>
+				<xs:attribute name="tex02val" type="xs:string"/>
+				<xs:attribute name="tex03val" type="xs:string"/>
+				<xs:attribute name="tex04val" type="xs:string"/>
+				<xs:attribute name="tex05val" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sound3d">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="soundfile" type="xs:string"/>
+		<xs:attribute name="loop" type="xs:string"/>
+		<xs:attribute name="continuosly" type="xs:string"/>
+		<xs:attribute name="positional" type="xs:string"/>
+		<xs:attribute name="volume" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="layers">
 		<xs:annotation>
