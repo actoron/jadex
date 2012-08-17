@@ -94,7 +94,7 @@ import java.util.logging.Level;
 	@Argument(name="chat", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="awamechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\", \"Multicast\", \"Message\", \"Relay\"}"),
+	@Argument(name="awamechanisms", clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay\""),
 	@Argument(name="awadelay", clazz=long.class, defaultvalue="20000"),
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
 	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),

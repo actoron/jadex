@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
@@ -433,7 +434,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(nonmanaged==null)
 		{
 			nonmanaged	= new LinkedHashSet<URL>();
-			collectClasspathURLs(baseloader, nonmanaged);
+			collectClasspathURLs(baseloader, nonmanaged, new HashSet<String>());
 		}
 		return nonmanaged;
 	}
@@ -963,30 +964,58 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
-	protected void	collectClasspathURLs(ClassLoader classloader, Set<URL> set)
+	protected void	collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
 	{
 		assert classloader!=null;
 		
 		if(classloader.getParent()!=null)
 		{
-			collectClasspathURLs(classloader.getParent(), set);
+			collectClasspathURLs(classloader.getParent(), set, jarnames);
 		}
 		
 		if(classloader instanceof URLClassLoader)
 		{
 			URL[] urls = ((URLClassLoader)classloader).getURLs();
+			for(int i=0; i<urls.length; i++)
+			{
+				if(urls[i].getFile().endsWith(".jar"))
+				{
+					String jarname	= getJarName(urls[i].getFile());
+					jarnames.add(jarname);
+				}
+			}
+			
 			for(int i = 0; i < urls.length; i++)
 			{
 				set.add(urls[i]);
-				collectManifestURLs(urls[i], set);
+				collectManifestURLs(urls[i], set, jarnames);
 			}
 		}
 	}
 	
 	/**
+	 *  Get the name of a jar file without extension and version info.
+	 */
+	protected static String	getJarName(String filename)
+	{
+		String	ret	= filename;
+		int	slash	= filename.lastIndexOf('/');
+		if(slash!=-1)
+		{
+			ret	= ret.substring(slash+1);
+		}
+		Scanner	s	= new Scanner(ret);
+		s.findWithinHorizon("(.*?)(-[0-9]+\\.|\\.jar)", 0);
+		ret	= s.match().group(1);
+//		System.out.println("jar: "+filename+" is "+ret);
+		s.close();
+		return ret;
+	}
+	
+	/**
 	 *  Collect all URLs as specified in a manifest.
 	 */
-	protected void	collectManifestURLs(URL url, Set<URL> set)
+	protected void	collectManifestURLs(URL url, Set<URL> set, Set<String> jarnames)
 	{
 		File	file	= SUtil.urlToFile(url.toString());
 		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
@@ -1027,15 +1056,20 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		            			try
 			                	{
 		            				URL depurl = urlfile.toURI().toURL();
+		            				if(depurl.getFile().endsWith(".jar"))
+		            				{
+		            					String jarname	= getJarName(depurl.getFile());
+		            					jarnames.add(jarname);
+		            				}
 		            				set.add(depurl);
-		            				collectManifestURLs(depurl, set);
+		            				collectManifestURLs(depurl, set, jarnames);
 		            			}
 		                    	catch (Exception e)
 		                    	{
 		                    		component.getLogger().warning("Error collecting manifest URLs for "+urlfile+": "+e);
 		                    	}
 	                    	}
-	            			else
+	            			else if(!path.endsWith(".jar") || !jarnames.contains(getJarName(path)))
 	            			{
 	            				component.getLogger().warning("Jar not found: "+file+", "+path);
 	            			}

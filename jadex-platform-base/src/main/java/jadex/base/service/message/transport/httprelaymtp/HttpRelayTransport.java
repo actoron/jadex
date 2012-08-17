@@ -35,6 +35,10 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+/**
+ *  A transport that allows communication and awareness
+ *  using relay servers.
+ */
 public class HttpRelayTransport implements ITransport
 {
 	//-------- constants --------

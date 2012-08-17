@@ -418,6 +418,7 @@ public class HttpReceiver
 									InputStream	in	= con.getInputStream();
 									address	= RelayConnectionManager.relayAddress(adr);
 									transport.connected(address, false);
+//									System.out.println("connected to: "+address);
 									while(true)
 									{
 										// Read message type.

@@ -72,7 +72,7 @@ import java.util.TimerTask;
 {
 //	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 //	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
-	@Argument(name="mechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\"}", description="The discovery mechanisms."),
+	@Argument(name="mechanisms", clazz=String.class, description="The discovery mechanisms."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
@@ -167,14 +167,15 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
-		final String[] mechas = (String[])getArgument("mechanisms");
+		final String mechas = (String)getArgument("mechanisms");
 		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
 		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				AwarenessManagementAgent.this.cms	= cms;
-				CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(mechas.length, 
+				StringTokenizer	stok	= mechas!=null ? new StringTokenizer(mechas, ", \r\n\t") : new StringTokenizer("");
+				CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
 					false, new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
@@ -202,10 +203,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("delay", getArgument("delay"));
 				info.setArguments(args);
-				for(int i=0; i<mechas.length; i++)
+				while(stok.hasMoreTokens())
 				{
 //					System.out.println("mecha: "+mechas[i]);
-					cms.createComponent(null, mechas[i], info, null).addResultListener(lis);
+					cms.createComponent(null, stok.nextToken(), info, null).addResultListener(lis);
 				}
 			}
 		});

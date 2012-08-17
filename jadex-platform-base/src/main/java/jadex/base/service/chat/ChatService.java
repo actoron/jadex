@@ -111,20 +111,27 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					settings.registerPropertiesProvider(agent.getComponentIdentifier().getLocalName(), pp)
-						.addResultListener(new DelegationResultListener<Void>(ret)
+					if(!(agent.getArguments().get("nosave") instanceof Boolean) || !((Boolean)agent.getArguments().get("nosave")).booleanValue())
 					{
-						public void customResultAvailable(Void result)
+						settings.registerPropertiesProvider(getSubname(), pp)
+							.addResultListener(new DelegationResultListener<Void>(ret)
 						{
-//							pp.isCalled().addResultListener(new DelegationResultListener<Void>(ret)
-//							{
-//								public void customResultAvailable(Void result)
-//								{
-									proceed();
-//								}
-//							});
-						}
-					});
+							public void customResultAvailable(Void result)
+							{
+		//							pp.isCalled().addResultListener(new DelegationResultListener<Void>(ret)
+		//							{
+		//								public void customResultAvailable(Void result)
+		//								{
+										proceed();
+		//								}
+		//							});
+							}
+						});
+					}
+					else
+					{
+						proceed();
+					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -211,17 +218,66 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			});
 			
-			// Only wait 2 secs before terminating the agent.
-			done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(),
-				new DelegationResultListener<Void>(ret)
+			agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<ISettingsService>()
 			{
+				public void resultAvailable(ISettingsService settings)
+				{
+					if(!(agent.getArguments().get("nosave") instanceof Boolean) || !((Boolean)agent.getArguments().get("nosave")).booleanValue())
+					{
+						settings.deregisterPropertiesProvider(getSubname())
+							.addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								proceed();
+							}
+						});
+					}
+					else
+					{
+						proceed();
+					}
+				}
+				
 				public void exceptionOccurred(Exception exception)
 				{
-					super.resultAvailable(null);
+					// No settings service: ignore.
+					proceed();
 				}
-			}));
+				
+				public void proceed()
+				{
+					
+					// Only wait 2 secs for sending status before terminating the agent.
+					done.addResultListener(new TimeoutResultListener<Void>(2000, agent.getExternalAccess(),
+						new DelegationResultListener<Void>(ret)
+					{
+						public void exceptionOccurred(Exception exception)
+						{
+							super.resultAvailable(null);
+						}
+					}));
+				}
+			});
+			
 			return ret;
 		}
+	}
+
+	/**
+	 *  Get the "semi-qualified" sub name for settings.
+	 */
+	protected String	getSubname()
+	{
+		String	subname	= null;
+		IComponentIdentifier	cid	= agent.getComponentIdentifier();
+		while(cid.getParent()!=null)
+		{
+			subname	= subname==null ? cid.getLocalName() : subname+"."+cid.getLocalName();
+			cid	= cid.getParent();
+		}
+		return subname;
 	}
 	
 	//-------- IChatService interface --------

@@ -274,8 +274,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			public void customResultAvailable(Void result)
 			{
-				System.out.println("chatpanel init");
-				
 				DefaultTableCellRenderer userrend = new DefaultTableCellRenderer()
 				{
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)

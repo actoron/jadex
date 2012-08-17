@@ -1,11 +1,14 @@
 package jadex.micro.examples.eliza;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.commons.LazyResource;
 import jadex.commons.Tuple2;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -15,6 +18,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -23,7 +27,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
 
 /**
  *  This agent implements a simple chat bot
@@ -31,18 +37,21 @@ import java.util.Map;
  */
 @Agent
 @ComponentTypes(@ComponentType(name="chat", filename="jadex/base/service/chat/ChatAgent.class"))	// Hack!!! Implicit dependency to jadex-platform-base
-@Configurations(@Configuration(name="default", components=@Component(type="chat")))
+@Configurations(@Configuration(name="default", components=@Component(type="chat", arguments=@NameValue(name="nosave", value="true"))))
 @RequiredServices(@RequiredService(name="chat", type=IChatGuiService.class))
 public class ElizaAgent
 {
 	//-------- attributes --------
+	
+	/** The eliza agent. */
+	@Agent
+	protected IInternalAccess	agent;
 	
 	/** The gui service for controlling the inner chat component. */
 	@AgentService
 	protected IChatGuiService	chat;
 	
 	/** Each contact gets its own eliza conversation. */
-	// Todo: remove old conversation (e.g. after 5 min)
 	protected Map<IComponentIdentifier, Tuple2<ElizaParse, Long>>	conversations;
 	
 	//-------- methods --------
@@ -103,6 +112,30 @@ public class ElizaAgent
 						writeToLog("> "+"Hi! I'm Eliza. Please tell me your problem in private.", event.getComponentIdentifier());
 					}
 				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// ignore... (e.g. FutureTerminationException on exit)
+			}
+		});
+		
+		
+		// Regularly clean up old conversations after 5 minutes of inactivity.
+		agent.waitForDelay(60000, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				for(Iterator<IComponentIdentifier> it=conversations.keySet().iterator(); it.hasNext(); )
+				{
+					Tuple2<ElizaParse, Long>	tup	= conversations.get(it.next());
+					if(tup.getSecondEntity().longValue()+30000<System.currentTimeMillis())
+					{
+						it.remove();
+					}
+				}
+				
+				return IFuture.DONE;
 			}
 		});
 	}

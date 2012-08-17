@@ -178,6 +178,7 @@ public class Player
 	 */
 	public void setColorValue(int colorvalue)
 	{
+		this.color	= null;
 		this.colorvalue = new Integer(colorvalue);
 	}
 

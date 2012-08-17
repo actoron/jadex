@@ -146,7 +146,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public Map<String, Object> getArguments()
 	{
-		return arguments;
+		return arguments!=null ? arguments : Collections.EMPTY_MAP;
 	}
 	
 	/**

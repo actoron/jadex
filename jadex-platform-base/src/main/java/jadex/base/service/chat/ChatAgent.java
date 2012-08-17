@@ -3,6 +3,8 @@ package jadex.base.service.chat;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
@@ -23,6 +25,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
 		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))
 )
+@Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
 public class ChatAgent extends MicroAgent
 {
 }
