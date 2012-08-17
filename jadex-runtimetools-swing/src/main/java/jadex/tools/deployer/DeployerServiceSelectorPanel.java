@@ -69,7 +69,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 					{
 						IExternalAccess component = (IExternalAccess)result; 
 						boolean remote = !jccaccess.getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
-						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, remote, (IDeploymentService)service, nodehandler, title);
+						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, jccaccess, remote, (IDeploymentService)service, nodehandler, title);
 						ret.setResult(dp);
 					};
 				});

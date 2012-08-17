@@ -80,6 +80,7 @@ public class FileUpdateAgent extends UpdateAgent
 					if(ui.getAccess()!=null)
 					{
 						File dir = new File((String)ui.getAccess());
+						so.setStartDirectory(dir.getCanonicalPath());
 						File[] jars = dir.listFiles(new FilenameFilter()
 						{
 							public boolean accept(File dir, String name)
