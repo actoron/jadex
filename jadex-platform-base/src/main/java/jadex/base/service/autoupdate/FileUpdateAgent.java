@@ -149,6 +149,8 @@ public class FileUpdateAgent extends UpdateAgent
 				});
 				findDistDirs(new File(scandir), res);
 				
+				System.out.println("scanning: "+scandir);
+				
 				long foundver = 0;
 				if(res.size()>0)
 				{
@@ -161,6 +163,7 @@ public class FileUpdateAgent extends UpdateAgent
 					});
 					
 					foundver = files[0].lastModified();
+					System.out.println("foundver: "+files[0]+", "+foundver);
 					boolean force = false; // force update
 					if(foundver>curver || force) 
 					{
