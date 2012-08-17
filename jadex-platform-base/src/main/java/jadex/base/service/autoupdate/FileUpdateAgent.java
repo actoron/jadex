@@ -37,7 +37,7 @@ import java.util.zip.ZipFile;
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
 	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars."),
-	@Argument(name="safety_delay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000"),
+	@Argument(name="safetydelay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000"),
 })
 @RequiredServices(
 {
