@@ -466,6 +466,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				
 				protected void refreshTreePaths()
 				{
+					System.out.println("ref: "+sp2.getLastPathComponent());
 					((ITreeNode)sp2.getLastPathComponent()).refresh(true);
 //					TreePath[] paths = pan2.getFileTreePanel().getTree().getSelectionPaths();
 //					for(int i=0; paths!=null && i<paths.length; i++)
