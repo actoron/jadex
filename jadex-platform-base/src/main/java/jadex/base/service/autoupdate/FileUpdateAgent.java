@@ -200,8 +200,8 @@ public class FileUpdateAgent extends UpdateAgent
 								File	target	= new File(decoms[0], "lib");
 								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
 								
-								// copy .settings.xml files (if any).
-								for(File settings: target.listFiles(new FileFilter()
+								// copy .settings.xml files from current directory (if any).
+								for(File settings: new File(".").listFiles(new FileFilter()
 								{
 									public boolean accept(File file)
 									{
@@ -209,7 +209,7 @@ public class FileUpdateAgent extends UpdateAgent
 									}
 								}))
 								{
-									Files.copy(Paths.get(settings.toURI()), Paths.get(target.toURI()), StandardCopyOption.REPLACE_EXISTING);
+									SUtil.copyFile(settings, target);
 								}
 
 								ret.setResult(ui);

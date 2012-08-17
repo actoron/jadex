@@ -2821,4 +2821,31 @@ public class SUtil
 	{
 		return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
 	}
+	
+	/**
+	 *  Copy a file.
+	 *  @param source	The source file.
+	 *  @param target	The target file or directory (will be deleted first).
+	 */
+	public static void	copyFile(File source, File target)	throws IOException
+	{
+		if(target.isDirectory())
+		{
+			target	= new File(target, source.getName());
+		}
+		if(target.exists())
+		{
+			target.delete();
+		}
+		InputStream	is	= new FileInputStream(source);
+		OutputStream	os	= new FileOutputStream(target);
+		byte[]	buf	= new byte[8192];
+		int	read;
+		while((read=is.read(buf))!=-1)
+		{
+			os.write(buf, 0, read);
+		}
+		os.close();
+		is.close();
+	}
 }
