@@ -12,10 +12,7 @@ import jadex.base.gui.filetree.IFileNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -190,7 +187,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		final String sel2 = ((IFileNode)sp2.getLastPathComponent()).getFilePath();
 		final IDeploymentService ds = pan2.getDeploymentService();
 		
-		System.out.println("sel1: "+sel1+" sel2:"+sel2+" "+jccaccess.getComponentIdentifier());
+//		System.out.println("sel1: "+sel1+" sel2:"+sel2+" "+jccaccess.getComponentIdentifier());
 		
 		if(sel1!=null && sel2!=null)
 		{
@@ -201,7 +198,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			{
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
-					System.out.println("on exta1: "+exta1.getComponentIdentifier());
+//					System.out.println("on exta1: "+exta1.getComponentIdentifier());
 					final Future<Void> ret = new Future<Void>();
 					
 					SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -215,7 +212,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 								{
 									try
 									{
-										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
+//										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
 										final File source = new File(sel1);
 										final FileInputStream fis = new FileInputStream(source);
 										ServiceOutputConnection soc = new ServiceOutputConnection();
@@ -227,7 +224,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											}
 											public void finished()
 											{
-												System.out.println("wro fin");
+//												System.out.println("wro fin");
 											}
 											public void resultAvailable(Collection<Long> result)
 											{
@@ -235,7 +232,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											}
 											public void exceptionOccurred(Exception exception)
 											{
-												System.out.println("wro ex: "+exception);
+//												System.out.println("wro ex: "+exception);
 											}
 										});
 										ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), sel2, source.getName());
@@ -269,12 +266,12 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											
 											public void finished()
 											{
-												System.out.println("rec fin");
+//												System.out.println("rec fin");
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														System.out.println("rec fin2: "+ia.getComponentIdentifier());
+//														System.out.println("rec fin2: "+ia.getComponentIdentifier());
 														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel1+" to "+sel2);
 														return IFuture.DONE;
 													}
@@ -336,7 +333,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				
 				protected void refreshTreePaths()
 				{
-					System.out.println("ref: "+sp2.getLastPathComponent());
+//					System.out.println("ref: "+sp2.getLastPathComponent());
 					((ITreeNode)sp2.getLastPathComponent()).refresh(true);
 //					TreePath[] paths = pan2.getFileTreePanel().getTree().getSelectionPaths();
 //					for(int i=0; paths!=null && i<paths.length; i++)
