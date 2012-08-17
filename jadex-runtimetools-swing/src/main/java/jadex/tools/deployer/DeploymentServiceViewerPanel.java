@@ -339,7 +339,8 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		{
 			final IComponentIdentifier lcid = jccaccess.getComponentIdentifier();
 			
-			pan1.getFileTreePanel().getExternalAccess().scheduleStep(new IComponentStep<Void>()
+			final IExternalAccess exta1 = pan1.getFileTreePanel().getExternalAccess();
+			exta1.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
@@ -359,7 +360,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 										final File source = new File(sel1);
 										final FileInputStream fis = new FileInputStream(source);
 										ServiceOutputConnection soc = new ServiceOutputConnection();
-										soc.writeFromInputStream(fis, pan1.getFileTreePanel().getExternalAccess());//.addResultListener(new IIntermediateResultListener<Long>()
+										soc.writeFromInputStream(fis, exta1);//.addResultListener(new IIntermediateResultListener<Long>()
 //										{
 //											public void intermediateResultAvailable(Long result) 
 //											{
@@ -577,7 +578,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		 */
 		protected void exportDone(JComponent source, Transferable data, int action)
 		{
-			if(!data.isDataFlavorSupported(flavor))
+			if(data==null || !data.isDataFlavorSupported(flavor))
 				return;
 			
 			try
