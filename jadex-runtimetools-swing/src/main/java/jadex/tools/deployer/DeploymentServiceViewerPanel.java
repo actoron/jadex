@@ -30,6 +30,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.tools.jcc.JCCAgent;
 
 import java.awt.BorderLayout;
@@ -40,6 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.DecimalFormat;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
@@ -183,7 +185,18 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 */
 	public static void copy(final DeploymentServiceViewerPanel pan1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
 	{
-		final String sel1 = pan1.getSelectedPath();
+		String sel1 = pan1.getSelectedPath();
+		IExternalAccess exta1 = pan1.getFileTreePanel().getExternalAccess();
+		copy(sel1, exta1, pan2, sp2, jccaccess);
+	}
+	
+	/**
+	 * 
+	 */
+	public static void copy(final String sel1, final IExternalAccess exta1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
+//	public static void copy(final DeploymentServiceViewerPanel pan1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
+	{
+//		final String sel1 = pan1.getSelectedPath();
 		final String sel2 = ((IFileNode)sp2.getLastPathComponent()).getFilePath();
 		final IDeploymentService ds = pan2.getDeploymentService();
 		
@@ -193,9 +206,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		{
 			final IComponentIdentifier lcid = jccaccess.getComponentIdentifier();
 			
-			final IExternalAccess exta1 = pan1.getFileTreePanel().getExternalAccess();
+//			final IExternalAccess exta1 = pan1.getFileTreePanel().getExternalAccess();
 			exta1.scheduleStep(new IComponentStep<Void>()
 			{
+				@Classname("onexta1")
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
 //					System.out.println("on exta1: "+exta1.getComponentIdentifier());
@@ -212,7 +226,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 								{
 									try
 									{
-//										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
+										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
 										final File source = new File(sel1);
 										final FileInputStream fis = new FileInputStream(source);
 										ServiceOutputConnection soc = new ServiceOutputConnection();
@@ -246,6 +260,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 												final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")";
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
+													@Classname("ira")
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
 //														System.out.println("done: "+done);
@@ -269,6 +284,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 //												System.out.println("rec fin");
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
+													@Classname("recfin")
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
 //														System.out.println("rec fin2: "+ia.getComponentIdentifier());
@@ -289,6 +305,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 												exception.printStackTrace();
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
+													@Classname("recexoc")
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
 														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" to: "+sel2+" exception: "+exception.getMessage());
@@ -306,6 +323,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 										final String extxt = ex.getMessage();
 										jccacc.scheduleStep(new IComponentStep<Void>()
 										{
+											@Classname("exoncopy")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" "+extxt);
@@ -328,6 +346,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				}
 				public void exceptionOccurred(Exception exception)
 				{
+					exception.printStackTrace();
 					refreshTreePaths();
 				}
 				
@@ -410,18 +429,28 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		{
 			boolean ret = false;
 			
-			if(support.isDrop() && support.isDataFlavorSupported(flavor))
+			if(support.isDrop())
 			{
-				try
+				support.setShowDropLocation(true);
+				
+				if(support.isDataFlavorSupported(flavor))
 				{
-					support.setShowDropLocation(true);
-					TransferInfo ti = (TransferInfo)support.getTransferable().getTransferData(flavor);
+					try
+					{
+						TransferInfo ti = (TransferInfo)support.getTransferable().getTransferData(flavor);
+						JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
+						IFileNode fn = (IFileNode)dl.getPath().getLastPathComponent();
+						ret = !support.getComponent().equals(ti.getSource().getFileTreePanel().getTree()) && isRealDirectory(fn);
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				else if(support.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+				{
 					JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
 					IFileNode fn = (IFileNode)dl.getPath().getLastPathComponent();
-					ret = !support.getComponent().equals(ti.getSource().getFileTreePanel().getTree()) && isRealDirectory(fn);
-				}
-				catch(Exception e)
-				{
+					ret = isRealDirectory(fn);
 				}
 			}
 			
@@ -464,7 +493,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				{
 					TransferInfo ti = (TransferInfo)o;
 					DeploymentServiceViewerPanel second = ti.getTarget();
+//					String sel1 = DeploymentServiceViewerPanel.this.getSelectedPath();
+//					IExternalAccess exta1 = DeploymentServiceViewerPanel.this.getFileTreePanel().getExternalAccess();
 					copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
+//					copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
 				}
 			}
 			catch(Exception e)
@@ -492,19 +524,46 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				try
 				{
 					Transferable t = support.getTransferable();
-					Object to = t.getTransferData(flavor);
 					
-					if(to instanceof TransferInfo)
+					if(t.isDataFlavorSupported(flavor))
 					{
-						TransferInfo ti = (TransferInfo)to;
+						Object to = t.getTransferData(flavor);
+						
+						if(to instanceof TransferInfo)
+						{
+							TransferInfo ti = (TransferInfo)to;
+							
+							JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
+							TreePath dest = dl.getPath();
+							Object n = dest.getLastPathComponent();
+							
+							if(n instanceof IFileNode && ((IFileNode)n).isDirectory())
+							{
+								ti.setSelection(dest);
+								ti.setTarget(DeploymentServiceViewerPanel.this);
+							}
+						}
+					}
+					else if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+					{
+						List<File> files = (List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
+
+//						System.out.println(files);
 						
 						JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
 						TreePath dest = dl.getPath();
 						Object n = dest.getLastPathComponent();
+						
 						if(n instanceof IFileNode && ((IFileNode)n).isDirectory())
 						{
-							ti.setSelection(dest);
-							ti.setTarget(DeploymentServiceViewerPanel.this);
+							for(File file: files)
+							{
+								if(file.exists())
+								{
+									String sel1 = file.getAbsolutePath();
+									copy(sel1, jccaccess, DeploymentServiceViewerPanel.this, dest, jccaccess);
+								}
+							}
 						}
 					}
 				}
