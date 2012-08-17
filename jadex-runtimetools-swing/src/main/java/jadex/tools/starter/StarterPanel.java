@@ -965,7 +965,7 @@ public class StarterPanel extends JLayeredPane
 		else if(error!=null)
 		{
 			details.setExternals(null);
-			details.setText(error);
+			details.setText("<pre>"+error+"</pre>");
 		}
 		else
 		{

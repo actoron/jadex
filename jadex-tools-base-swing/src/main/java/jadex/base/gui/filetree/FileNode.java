@@ -34,7 +34,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 //	protected ComponentProperties	propcomp;
 	
 	/** The cached display name. */
-	protected String name;
+	protected String displayname;
 		
 	//-------- constructors --------
 	
@@ -112,36 +112,36 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public String toString()
 	{
-		if(name==null)
+		String name	= getDisplayName();
+		
+		// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
+		if(getParent() instanceof RootNode)
 		{
-			name	= FileData.getDisplayName(file);
-			
-			// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
-			if(getParent() instanceof RootNode)
+			int	idx	= -1;
+			List	siblings	= getParent().getCachedChildren();
+			for(int i=0; siblings!=null && i<siblings.size(); i++)
 			{
-				int	idx	= -1;
-				List	siblings	= getParent().getCachedChildren();
-				for(int i=0; siblings!=null && i<siblings.size(); i++)
+				if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
 				{
-					if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
+					File	sib	= ((FileNode)siblings.get(i)).getFile();
+//					System.out.println("vs: "+file+", "+sib);
+					if(((FileNode)siblings.get(i)).getDisplayName().equals(getDisplayName()) && !sib.getPath().endsWith(file.getPath()))
 					{
-						File	sib	= ((FileNode)siblings.get(i)).getFile();
-						if(FileData.getDisplayName(sib).equals(name) && !sib.getPath().endsWith(file.getPath()))
+//						System.out.println("vs1: "+file+", "+sib);
+						int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
+						while(sib.getPath().endsWith(file.getPath().substring(tmp)))
 						{
-							int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
-							while(sib.getPath().endsWith(file.getPath().substring(tmp)))
-							{
-								tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
-							}
-							idx	= idx==-1 ? tmp : Math.min(idx, tmp);
+							tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
 						}
+						idx	= idx==-1 ? tmp : Math.min(idx, tmp);
 					}
 				}
-				if(idx>-1)
-				{
-					name	= file.getPath().substring(idx);
-				}
 			}
+			if(idx>-1)
+			{
+				name	= file.getPath().substring(idx);
+			}
+		}
 		
 //			if(true)
 //			{
@@ -156,9 +156,19 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 //				{
 //				}
 //			}
-		}
-		
 		return name;
+	}
+	
+	/**
+	 *  Get the display name.
+	 */
+	public String	getDisplayName()
+	{
+		if(displayname==null)
+		{
+			displayname	= FileData.getDisplayName(file);
+		}
+		return displayname;
 	}
 	
 	/**
