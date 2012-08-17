@@ -335,6 +335,8 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		final String sel2 = ((IFileNode)sp2.getLastPathComponent()).getFilePath();
 		final IDeploymentService ds = pan2.getDeploymentService();
 		
+		System.out.println("sel1: "+sel1+" sel2:"+sel2);
+		
 		if(sel1!=null && sel2!=null)
 		{
 			final IComponentIdentifier lcid = jccaccess.getComponentIdentifier();
@@ -565,7 +567,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			Object o = path.getLastPathComponent();
 			if(path != null && ((ITreeNode)o).isLeaf() && o instanceof IFileNode)
 			{
-				IFileNode fn = (IFileNode)o;
+//				IFileNode fn = (IFileNode)o;
 //				TransferInfo ti = new TransferInfo(fn.getFilePath());
 				ret = new NodesTransferable(new TransferInfo());
 			}
