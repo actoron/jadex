@@ -275,6 +275,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public boolean	isDirectory()
 	{
+//		System.out.println("isDir: "+file.getAbsolutePath()+" "+file.isDirectory());
 		return false;
 	}
 	

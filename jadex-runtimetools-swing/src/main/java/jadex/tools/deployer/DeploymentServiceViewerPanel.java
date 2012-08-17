@@ -245,13 +245,14 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 											{
 //												System.out.println("rec: "+result);
 												final double done = ((int)((result/(double)source.length())*10000))/100.0;
+												DecimalFormat fm = new DecimalFormat("#0.00");
+												final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")";
 												jccacc.scheduleStep(new IComponentStep<Void>()
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
 //														System.out.println("done: "+done);
-														DecimalFormat fm = new DecimalFormat("#0.00");
-														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")");
+														((JCCAgent)ia).getControlCenter().getPCC().setStatusText(txt);
 														return IFuture.DONE;
 													}
 												}).addResultListener(new IResultListener<Void>()
@@ -348,22 +349,13 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	}
 	
 	/**
-	 * 
+	 *  Helper method that returns zips and jar not as directories.
+	 *  How to get rid of that. file.isDirectory(zip) gives true :-(
 	 */
-	protected IFuture<Void> doJccOutput(IExternalAccess jccacc, final Runnable run)
+	public static boolean isRealDirectory(IFileNode fn)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		jccacc.scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				run.run();
-				return IFuture.DONE;
-			}
-		}).addResultListener(new DelegationResultListener<Void>(ret));
-		
-		return ret;
+		String name = fn.getFileName().toLowerCase();
+		return !name.endsWith(".zip") && !name.endsWith(".jar") && fn.isDirectory(); 
 	}
 	
 //	/**
@@ -389,7 +381,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 //	}
 	
 	/**
-	 * 
+	 *  Tree handler for drag and drop support.
 	 */
 	class TreeTransferHandler extends TransferHandler
 	{
@@ -409,43 +401,38 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			}
 			catch(ClassNotFoundException e)
 			{
-				System.out.println("ClassNotFound: " + e.getMessage());
+				// should never happen
+				e.printStackTrace();
 			}
 		}
 
 		/**
-		 * 
+		 *  Check if the 
 		 */
 		public boolean canImport(TransferHandler.TransferSupport support)
 		{
-			if(!support.isDrop())
-			{
-				return false;
-			}
-			support.setShowDropLocation(true);
-			if(!support.isDataFlavorSupported(flavor))
-			{
-				return false;
-			}
+			boolean ret = false;
 			
-			// Do not allow a drop on the drag source selections.
-			JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
-			JTree tree = (JTree)support.getComponent();
-			int dropRow = tree.getRowForPath(dl.getPath());
-			int[] selRows = tree.getSelectionRows();
-			for(int i = 0; i < selRows.length; i++)
+			if(support.isDrop() && support.isDataFlavorSupported(flavor))
 			{
-				if(selRows[i] == dropRow)
+				try
 				{
-					return false;
+					support.setShowDropLocation(true);
+					TransferInfo ti = (TransferInfo)support.getTransferable().getTransferData(flavor);
+					JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
+					IFileNode fn = (IFileNode)dl.getPath().getLastPathComponent();
+					ret = !support.getComponent().equals(ti.getSource().getFileTreePanel().getTree()) && isRealDirectory(fn);
+				}
+				catch(Exception e)
+				{
 				}
 			}
 			
-			return true;
+			return ret;
 		}
 
 		/**
-		 * 
+		 *  Create transferable on drag start.
 		 */
 		protected Transferable createTransferable(JComponent c)
 		{
@@ -454,18 +441,17 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			JTree tree = (JTree)c;
 			TreePath path = tree.getSelectionPath();
 			Object o = path.getLastPathComponent();
-			if(path != null && ((ITreeNode)o).isLeaf() && o instanceof IFileNode)
+			if(path != null && o instanceof IFileNode && ((ITreeNode)o).isLeaf() || !isRealDirectory((IFileNode)o))
 			{
-//				IFileNode fn = (IFileNode)o;
-//				TransferInfo ti = new TransferInfo(fn.getFilePath());
-				ret = new NodesTransferable(new TransferInfo());
+				ret = new NodesTransferable(new TransferInfo(DeploymentServiceViewerPanel.this));
 			}
 			
 			return ret;
 		}
 
 		/**
-		 * 
+		 *  Called after successful drop.
+		 *  The target has added data to the transferable.
 		 */
 		protected void exportDone(JComponent source, Transferable data, int action)
 		{
@@ -487,21 +473,10 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			catch(Exception e)
 			{
 			}
-			
-//			if((action & MOVE) == MOVE)
-//			{
-//				JTree tree = (JTree)source;
-//				DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
-//				// Remove nodes saved in nodesToRemove in createTransferable.
-//				for(int i = 0; i < nodesToRemove.length; i++)
-//				{
-//					model.removeNodeFromParent(nodesToRemove[i]);
-//				}
-//			}
 		}
 
 		/**
-		 * 
+		 *  Get the allowed source actions.
 		 */
 		public int getSourceActions(JComponent c)
 		{
@@ -509,7 +484,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		}
 
 		/**
-		 * 
+		 *  Called when dropping on a possible target.
 		 */
 		public boolean importData(TransferHandler.TransferSupport support)
 		{
@@ -545,7 +520,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		}
 
 		/**
-		 * 
+		 *  Get the string representation.
 		 */
 		public String toString()
 		{
@@ -553,7 +528,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		}
 
 		/**
-		 * 
+		 *  Transferable implementation class.
 		 */
 		public class NodesTransferable implements Transferable
 		{
@@ -583,14 +558,45 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		}
 		
 		/**
-		 * 
+		 *  The transferable content class.
 		 */
 		public class TransferInfo
 		{
+			/** The source panel. */
+			protected DeploymentServiceViewerPanel source;
+			
+			/** The target panel. */
 			protected DeploymentServiceViewerPanel target;
-
+			
+			/** The selected drop location (is not made selection in tree). */
 			protected TreePath selection;
 			
+			/**
+			 *  Create a new TransferInfo.
+			 */
+			public TransferInfo(DeploymentServiceViewerPanel source)
+			{
+				this.source = source;
+			}
+
+			/**
+			 *  Get the source.
+			 *  @return The source.
+			 */
+			public DeploymentServiceViewerPanel getSource()
+			{
+				return source;
+			}
+
+			/**
+			 *  Set the source.
+			 *  @param source The source to set.
+			 */
+			public void setSource(DeploymentServiceViewerPanel source)
+			{
+				this.source = source;
+			}
+
 			/**
 			 *  Get the target.
 			 *  @return The target.
