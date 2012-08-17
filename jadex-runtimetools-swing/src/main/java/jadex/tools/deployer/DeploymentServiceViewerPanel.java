@@ -197,6 +197,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			{
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
+					System.out.println("on exta1: "+exta1.getComponentIdentifier());
 					final Future<Void> ret = new Future<Void>();
 					
 					SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -210,6 +211,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 								{
 									try
 									{
+										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
 										final File source = new File(sel1);
 										final FileInputStream fis = new FileInputStream(source);
 										ServiceOutputConnection soc = new ServiceOutputConnection();
