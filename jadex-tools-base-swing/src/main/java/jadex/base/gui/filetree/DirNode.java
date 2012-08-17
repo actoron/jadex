@@ -163,6 +163,14 @@ public class DirNode extends FileNode
 	}
 	
 	/**
+	 *  Check if the file is a directory. 
+	 */
+	public boolean	isDirectory()
+	{
+		return true;
+	}
+	
+	/**
 	 *  Comparator for filenodes.
 	 */
 	public static final Comparator FILENODE_COMPARATOR = new Comparator()

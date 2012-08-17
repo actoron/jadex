@@ -275,7 +275,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public boolean	isDirectory()
 	{
-		return file.isDirectory();
+		return false;
 	}
 	
 	/**
@@ -283,7 +283,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public long getFileSize()
 	{
-		return file.length();
+		return isDirectory() ? 0 : file.length();
 	}
 
 }

@@ -92,7 +92,7 @@ public class FileData
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 		this.separator = File.separatorChar;
 		this.prefix = getPrefixLength(file);
-		this.filesize = file.length();
+		this.filesize = directory ? 0 : file.length();
 	}
 	
 	//-------- methods --------

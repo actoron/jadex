@@ -213,6 +213,7 @@ public class FileUpdateAgent extends UpdateAgent
 									}
 								}))
 								{
+									System.out.println("copying: "+settings+" to "+target);
 									SUtil.copyFile(settings, target);
 								}
 
