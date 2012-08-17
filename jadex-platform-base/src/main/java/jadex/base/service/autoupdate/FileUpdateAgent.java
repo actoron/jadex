@@ -36,7 +36,8 @@ import java.util.zip.ZipFile;
 	@Argument(name="rootdir", clazz=String.class, description="Directory where to create new distribution directories", defaultvalue="\".\""),
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
-	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars.")
+	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars."),
+	@Argument(name="safety_delay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000"),
 })
 @RequiredServices(
 {
@@ -66,6 +67,10 @@ public class FileUpdateAgent extends UpdateAgent
 	/** The dir exclude pattern. */
 	@AgentArgument
 	protected String excludedirs;
+	
+	/** The safety delay. */
+	@AgentArgument
+	protected long safetydelay;
 
 	/**
 	 *  Generate the start options.
@@ -158,10 +163,13 @@ public class FileUpdateAgent extends UpdateAgent
 						}
 					});
 					
-					foundver = files[0].lastModified();
-					System.out.println("foundver: "+files[0]+", "+foundver);
+					for(int i=0; i<files.length; i++)
+					{
+						foundver = Math.max(foundver, files[i].lastModified());
+					}
+					System.out.println("foundver vs curver: "+foundver+", "+curver);
 					boolean force = false; // force update
-					if(foundver>curver || force) 
+					if(foundver>curver && foundver+safetydelay<System.currentTimeMillis() || force) // Only update when not younger than 30 seconds.
 					{
 						File dir = null;
 						try
