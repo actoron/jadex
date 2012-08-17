@@ -209,7 +209,7 @@ public class FileUpdateAgent extends UpdateAgent
 								{
 									public boolean accept(File file)
 									{
-										return !file.isDirectory() && file.getName().endsWith(".setting.xml");
+										return !file.isDirectory() && file.getName().endsWith(".settings.xml");
 									}
 								}))
 								{
