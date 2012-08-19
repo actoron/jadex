@@ -198,7 +198,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 * 
 	 */
-	public static void copy(final String sel1, final IExternalAccess exta1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
+	public static void copy(final String sel1, final IExternalAccess exta1, final DeploymentServiceViewerPanel pan2, TreePath sp2, IExternalAccess jccaccess) 
 //	public static void copy(final DeploymentServiceViewerPanel pan1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
 	{
 //		final String sel1 = pan1.getSelectedPath();
@@ -358,7 +358,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				protected void refreshTreePaths()
 				{
 //					System.out.println("ref: "+sp2.getLastPathComponent());
-					((ITreeNode)sp2.getLastPathComponent()).refresh(true);
+//					((ITreeNode)sp2.getLastPathComponent()).refresh(true);
 //					TreePath[] paths = pan2.getFileTreePanel().getTree().getSelectionPaths();
 //					for(int i=0; paths!=null && i<paths.length; i++)
 //					{
