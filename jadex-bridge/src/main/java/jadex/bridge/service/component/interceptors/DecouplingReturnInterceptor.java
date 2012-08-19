@@ -113,17 +113,18 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 										public void run() 
 										{
-//											System.out.println("Rescheduled to rescue thread: "+e);
 //											System.out.println("out ex2: "+mycnt);
 											
 											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
 											if(sic.getMethod().getName().equals("destroyComponent")
 												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
 											{
+												System.out.println("Rescheduled to rescue thread1: "+e+", "+sic);
 												listener.resultAvailable(null);
 											}
 											else
 											{
+												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic);
 												listener.exceptionOccurred(new RuntimeException("Cannot reschedule "+sic+": "+e));
 											}
 										}

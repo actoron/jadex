@@ -259,7 +259,7 @@ public class Starter
 //		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 //		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 
-		System.out.println("Arguments: "+args.length/2+" "+SUtil.arrayToString(args));
+//		System.out.println("Arguments: "+args.length/2+" "+SUtil.arrayToString(args));
 		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		

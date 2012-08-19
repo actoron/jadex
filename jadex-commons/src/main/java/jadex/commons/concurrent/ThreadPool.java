@@ -20,7 +20,7 @@ public class ThreadPool implements IThreadPool
 	//-------- profiling --------
 	
 	/** Enable call profiling. */
-	public static final boolean	PROFILING	= true;
+	public static final boolean	PROFILING	= false;
 	
 	/** Print every 10 seconds. */
 	public static final long	PRINT_DELAY	= 10000;
