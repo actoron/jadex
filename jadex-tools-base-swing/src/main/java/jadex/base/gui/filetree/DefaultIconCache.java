@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -35,6 +36,8 @@ public class DefaultIconCache implements IIconCache
 	 */
 	public Icon	getIcon(final ITreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		Icon	ret	= null;
 		
 		if(node instanceof FileNode)
@@ -94,7 +97,7 @@ public class DefaultIconCache implements IIconCache
 				
 				if(ret!=null)
 				{
-					if(suffix.length()==0 && !isroot)
+					if(suffix.length()==0 && !isroot && file.isDirectory())
 						suffix = DEFAULT_FOLDER;
 					if(suffix.length()>0 && !icons.containsKey(suffix))
 						icons.put(suffix, ret);

@@ -787,7 +787,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	
 	/**
-	 * 
+	 *  Get the specific xml read info for rms.
 	 */
 	protected Tuple2<TypeInfoPathManager, IObjectReaderHandler> getXMLReadInfo()
 	{

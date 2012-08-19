@@ -31,6 +31,7 @@ import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.jcc.JCCAgent;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,8 +91,10 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		nh2.setFirstPanel(p2);
 		nh2.setSecondPanel(p1);
 		
-		splitpanel.add(new JScrollPane(p1));
-		splitpanel.add(new JScrollPane(p2));
+		p1.setMinimumSize(new Dimension(1, 1));
+		p2.setMinimumSize(new Dimension(1, 1));
+		splitpanel.add(p1);
+		splitpanel.add(p2);
 		
 		splitpanel.setOneTouchExpandable(true);
 	

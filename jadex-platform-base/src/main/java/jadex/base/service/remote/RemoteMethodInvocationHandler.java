@@ -4,8 +4,10 @@ import jadex.base.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -20,6 +22,7 @@ import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -32,6 +35,8 @@ import java.util.Map;
  */
 public class RemoteMethodInvocationHandler implements InvocationHandler
 {
+	protected static Method schedulestep;
+	
 	protected static Method finalize;
 	
 	static
@@ -39,6 +44,14 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		try
 		{
 			finalize = IFinalize.class.getMethod("finalize", new Class[0]);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		try
+		{
+			schedulestep = IExternalAccess.class.getMethod("scheduleStep", new Class[]{IComponentStep.class});
 		}
 		catch(Exception e)
 		{
@@ -99,7 +112,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		final Map<String, Object> nonfunc = nf; 
 		
 		Future future;
-		Class type = method.getReturnType();
+		Class type = determineReturnType(proxy, method, args);
+//		Class type = method.getReturnType();
 
 		if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, type))
 		{
@@ -352,6 +366,35 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //			System.out.println("Resumed call: "+method.getName()+" "+ret);
 		}
 	
+		return ret;
+	}
+	
+	/**
+	 *  Determine return type of method.
+	 */
+	public Class<?> determineReturnType(Object proxy, final Method method, Object[] args)
+	{
+		Class<?> ret = null;
+		
+		// Hack! special case schedule step, which may return different
+		// kinds of result types according to the concrete step used.
+		if(schedulestep.equals(method))
+		{
+			try
+			{
+				Method m = args[0].getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+				ret = m.getReturnType();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		else
+		{
+			ret = method.getReturnType();
+		}
+		
 		return ret;
 	}
 	

@@ -37,10 +37,12 @@ import java.awt.BorderLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.DecimalFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -103,6 +105,9 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		ftp.getTree().setDragEnabled(true);
 		ftp.getTree().setDropMode(DropMode.ON);
 		ftp.getTree().setTransferHandler(new TreeTransferHandler());
+		
+//		DragSourceListener[] lis = DragSource.getDefaultDragSource().getDragSourceListeners();
+//		System.out.println("lis: "+SUtil.arrayToString(lis));
 		
 		// Initial state using refresh action to avoid duplicated code.
 		ra.actionPerformed(null);
@@ -226,7 +231,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 								{
 									try
 									{
-										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
+//										System.out.println("starting stream copy: "+exta1.getComponentIdentifier());
 										final File source = new File(sel1);
 										final FileInputStream fis = new FileInputStream(source);
 										ServiceOutputConnection soc = new ServiceOutputConnection();
@@ -403,17 +408,56 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	{
 		protected DataFlavor flavor;
 
-		protected DataFlavor[] flavors	= new DataFlavor[1];
+		protected DataFlavor[] flavors;
 
+		/**
+		 * 
+		 */
 		public TreeTransferHandler()
 		{
-			this.flavors = new DataFlavor[1];
+//			DragSourceListener[] lis = DragSource.getDefaultDragSource().getDragSourceListeners();
+//			System.out.println("listeners: "+SUtil.arrayToString(lis));
+//			DragSource.getDefaultDragSource().removeDragSourceListener(lis[0]);
+			
+//			DragSource.getDefaultDragSource().addDragSourceListener(new DragSourceListener()
+//			{
+//				public void dropActionChanged(DragSourceDragEvent dsde)
+//				{
+//				}
+//				
+//				public void dragOver(DragSourceDragEvent dsde)
+//				{
+//				}
+//				
+//				public void dragExit(DragSourceEvent dse)
+//				{
+//					System.out.println("dde");
+//				}
+//				
+//				public void dragEnter(DragSourceDragEvent dsde)
+//				{
+//				}
+//				
+//				public void dragDropEnd(DragSourceDropEvent dsde)
+//				{
+//					System.out.println("dde");
+//				}
+//				
+//				public String toString()
+//				{
+//					return "mylistener";
+//				}
+//			});
+//			DragSource.getDefaultDragSource().addDragSourceMotionListener(dsml)
+			
+			this.flavors = new DataFlavor[2];
 			try
 			{
 				String mimeType = DataFlavor.javaJVMLocalObjectMimeType+";class=\""
 					+ TransferInfo.class.getName()+"\"";
 				flavor = new DataFlavor(mimeType);
 				flavors[0] = flavor;
+				flavors[1] = DataFlavor.javaFileListFlavor;
 			}
 			catch(ClassNotFoundException e)
 			{
@@ -427,6 +471,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		 */
 		public boolean canImport(TransferHandler.TransferSupport support)
 		{
+//			System.out.println("canImp");
 			boolean ret = false;
 			
 			if(support.isDrop())
@@ -481,28 +526,84 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		 */
 		protected void exportDone(JComponent source, Transferable data, int action)
 		{
-			if(data==null || !data.isDataFlavorSupported(flavor))
-				return;
-			
-			try
+			System.out.println("expDone");
+			if(data!=null)
 			{
-//				System.out.println("export done: "+data.getTransferData(flavor));
-				
-				Object o = data.getTransferData(flavor);
-				if(o instanceof TransferInfo)
+				if(data.isDataFlavorSupported(flavor))
 				{
-					TransferInfo ti = (TransferInfo)o;
-					DeploymentServiceViewerPanel second = ti.getTarget();
-//					String sel1 = DeploymentServiceViewerPanel.this.getSelectedPath();
-//					IExternalAccess exta1 = DeploymentServiceViewerPanel.this.getFileTreePanel().getExternalAccess();
-					copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
-//					copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
+					try
+					{
+		//				System.out.println("export done: "+data.getTransferData(flavor));
+						
+						TransferInfo ti = (TransferInfo)data.getTransferData(flavor);
+						DeploymentServiceViewerPanel second = ti.getTarget();
+	//					String sel1 = DeploymentServiceViewerPanel.this.getSelectedPath();
+	//					IExternalAccess exta1 = DeploymentServiceViewerPanel.this.getFileTreePanel().getExternalAccess();
+						copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
+	//					copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				else if(data.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+				{
+					System.out.println("jlf");
+//					try
+//					{
+//		//				System.out.println("export done: "+data.getTransferData(flavor));
+//						List<File> files = (List<File>)data.getTransferData(DataFlavor.javaFileListFlavor);
+//						DeploymentServiceViewerPanel second = ti.getTarget();
+//	//					String sel1 = DeploymentServiceViewerPanel.this.getSelectedPath();
+//	//					IExternalAccess exta1 = DeploymentServiceViewerPanel.this.getFileTreePanel().getExternalAccess();
+//						copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
+//	//					copy(DeploymentServiceViewerPanel.this, second, ti.getSelection(), jccaccess);
+//					}
+//					catch(Exception e)
+//					{
+//					}
 				}
 			}
-			catch(Exception e)
-			{
-			}
 		}
+		
+		/**
+		 * 
+		 */
+		public void exportAsDrag(JComponent comp, InputEvent e, int action)
+		{
+//			System.out.println("expAsDrag");
+			super.exportAsDrag(comp, e, action);
+			
+//			int srcActions = getSourceActions(comp);
+//
+//	        // only mouse events supported for drag operations
+//	        if (!(e instanceof MouseEvent)
+//	                // only support known actions
+//	                || !(action == COPY || action == MOVE || action == LINK)
+//	                // only support valid source actions
+//	                || (srcActions & action) == 0) {
+//
+//	            action = NONE;
+//	        }
+//
+//	        if (action != NONE && !GraphicsEnvironment.isHeadless()) {
+//	            if (recognizer == null) {
+//	                recognizer = new SwingDragGestureRecognizer(new DragHandler());
+//	            }
+//	            recognizer.gestured(comp, (MouseEvent)e, srcActions, action);
+//	        } else {
+//	            exportDone(comp, null, NONE);
+//	        }
+		}
+		
+//		/**
+//		 * 
+//		 */
+//		public void exportToClipboard(JComponent comp, Clipboard clip, int action) throws IllegalStateException
+//		{
+//			System.out.println("expToClip");
+//			super.exportToClipboard(comp, clip, action);
+//		}
 
 		/**
 		 *  Get the allowed source actions.
@@ -519,6 +620,8 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		{
 			boolean ret = false;
 		
+			System.out.println("impData: "+support);
+			
 			if(canImport(support))
 			{
 				try
@@ -584,21 +687,32 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		}
 
 		/**
-		 *  Transferable implementation class.
+		 * Transferable implementation class.
 		 */
 		public class NodesTransferable implements Transferable
 		{
-			protected TransferInfo content;
-			
+			protected TransferInfo	content;
+
 			public NodesTransferable(TransferInfo content)
 			{
 				this.content = content;
 			}
 
-			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException
+			public Object getTransferData(DataFlavor flavor)
+					throws UnsupportedFlavorException
 			{
 				if(!isDataFlavorSupported(flavor))
 					throw new UnsupportedFlavorException(flavor);
+				if(flavor.equals(TreeTransferHandler.this.flavor))
+				{
+					return content;
+				}
+				else if(flavor.equals(DataFlavor.javaFileListFlavor))
+				{
+					System.out.println("getTransferData: " + flavor);
+//					Thread.dumpStack();
+					return Collections.EMPTY_LIST;
+				}
 				return content;
 			}
 
@@ -609,7 +723,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 
 			public boolean isDataFlavorSupported(DataFlavor flavor)
 			{
-				return flavor.equals(flavor);
+				return SUtil.arrayToSet(flavors).contains(flavor);
 			}
 		}
 		
@@ -691,4 +805,5 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		}
 	}
 }
+
 

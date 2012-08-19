@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
- * 
+ *  Default future functionality.
  */
 public class FutureFunctionality
 {

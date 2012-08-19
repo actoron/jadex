@@ -35,6 +35,9 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	
 	/** The cached display name. */
 	protected String displayname;
+
+	/** The last siblings. */
+	protected List	lastsiblings;
 		
 	//-------- constructors --------
 	
@@ -118,28 +121,35 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 		if(getParent() instanceof RootNode)
 		{
 			int	idx	= -1;
-			List	siblings	= getParent().getCachedChildren();
-			for(int i=0; siblings!=null && i<siblings.size(); i++)
+			List siblings = getParent().getCachedChildren();
+			if(lastsiblings==null || !lastsiblings.equals(siblings))
 			{
-				if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
+//				System.out.println("check");
+				lastsiblings = siblings;
+				
+				for(int i=0; siblings!=null && i<siblings.size(); i++)
 				{
-					File	sib	= ((FileNode)siblings.get(i)).getFile();
-//					System.out.println("vs: "+file+", "+sib);
-					if(((FileNode)siblings.get(i)).getDisplayName().equals(getDisplayName()) && !sib.getPath().endsWith(file.getPath()))
+					if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
 					{
-//						System.out.println("vs1: "+file+", "+sib);
-						int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
-						while(sib.getPath().endsWith(file.getPath().substring(tmp)))
+						File	sib	= ((FileNode)siblings.get(i)).getFile();
+	//					System.out.println("vs: "+file+", "+sib);
+						if(((FileNode)siblings.get(i)).getDisplayName().equals(getDisplayName()) && !sib.getPath().endsWith(file.getPath()))
 						{
-							tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
+	//						System.out.println("vs1: "+file+", "+sib);
+							int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
+							while(sib.getPath().endsWith(file.getPath().substring(tmp)))
+							{
+								tmp	= Math.max(file.getPath().lastIndexOf("/", tmp-2), file.getPath().lastIndexOf("\\", tmp-2))+1;
+							}
+							idx	= idx==-1 ? tmp : Math.min(idx, tmp);
 						}
-						idx	= idx==-1 ? tmp : Math.min(idx, tmp);
 					}
 				}
-			}
-			if(idx>-1)
-			{
-				name	= file.getPath().substring(idx);
+				
+				if(idx>-1)
+				{
+					name	= file.getPath().substring(idx);
+				}
 			}
 		}
 		
