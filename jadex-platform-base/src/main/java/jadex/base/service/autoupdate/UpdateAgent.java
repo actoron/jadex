@@ -478,12 +478,12 @@ public class UpdateAgent implements IUpdateService
 								uaargs.put("creator", agent.getComponentIdentifier());
 								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
 								System.out.println("pre: "+argsstr);
-								argsstr	= SUtil.escapeString(SUtil.escapeString(argsstr));	// argl...
-//								argsstr = argsstr.replaceAll("\"", "\\\\\\\\\\\\\"");
+								argsstr	= SUtil.escapeString(argsstr);	// First: escape string
+								argsstr = argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
 								System.out.println("post: "+argsstr);
-								String deser = "\"jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\""+",null)\"";
-								newargs.add("\"-component\"");
-								newargs.add(updateagent+"(:"+deser+")");
+								String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
+								newargs.add("-component");
+								newargs.add("\""+updateagent+"(:"+deser+")\"");
 
 								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
 								

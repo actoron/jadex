@@ -137,7 +137,7 @@ public class FileUpdateAgent extends UpdateAgent
 		{
 			public void customResultAvailable(Long curver)
 			{
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hhmmss");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
 //				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 //				System.out.println("Running on version: "+agent.getComponentIdentifier()+" "+sdf.format(new Date(curver)));
 				
@@ -155,11 +155,14 @@ public class FileUpdateAgent extends UpdateAgent
 				long foundver = 0;
 				if(res.size()>0)
 				{
+					System.out.println("include filter: "+includefiles);
 					File[] files = res.iterator().next().listFiles(new FilenameFilter()
 					{
 						public boolean accept(File dir, String name)
 						{
-							return name.toLowerCase().matches(includefiles);
+							boolean	ret	= name.toLowerCase().matches(includefiles);
+							System.out.println("match dist file: "+ret+", "+name);
+							return ret;
 						}
 					});
 					
@@ -167,9 +170,10 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						foundver = Math.max(foundver, files[i].lastModified());
 					}
-					System.out.println("foundver vs curver: "+foundver+", "+curver);
+					System.out.println(agent.getComponentIdentifier()+": foundver vs curver(+safety): "+foundver+", "+(curver+safetydelay));
 					boolean force = false; // force update
-					if(foundver>curver && foundver+safetydelay<System.currentTimeMillis() || force) // Only update when not younger than 30 seconds.
+					// Only update when not younger than safetydelay and difference between versions also greater than safetydelay.
+					if(foundver>curver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
 					{
 						File dir = null;
 						try
@@ -199,17 +203,20 @@ public class FileUpdateAgent extends UpdateAgent
 							});
 							if(decoms.length==1)
 							{
-								System.out.println("Updating to version: "+sdf.format(founddate));
+								System.out.println(agent.getComponentIdentifier()+": Updating to version: "+sdf.format(founddate));
 
 								File	target	= new File(decoms[0], "lib");
 								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
 								
 								// copy .settings.xml files from current directory (if any).
+								System.out.println("copy settings "+new File(".").getAbsolutePath());
 								for(File settings: new File(".").listFiles(new FileFilter()
 								{
 									public boolean accept(File file)
 									{
-										return !file.isDirectory() && file.getName().endsWith(".settings.xml");
+										boolean	ret	= !file.isDirectory() && file.getName().endsWith(".settings.xml");
+										System.out.println("copy "+ret+": "+file);
+										return ret;
 									}
 								}))
 								{
@@ -306,6 +313,7 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						public void customResultAvailable(List<URL> result)
 						{
+							System.out.println(agent.getComponentIdentifier()+": curversion urls "+result);
 							// search for jadex jar file
 							for(URL url: result)
 							{
@@ -315,6 +323,7 @@ public class FileUpdateAgent extends UpdateAgent
 									File f = new File(fileurl);
 									if(f.exists())
 									{
+										System.out.println(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 										curversion = f.lastModified();
 										ret.setResult(new Long(curversion));
 										break;
@@ -333,6 +342,7 @@ public class FileUpdateAgent extends UpdateAgent
 										File f = new File(fileurl);
 										if(f.exists() && f.isDirectory())
 										{
+											System.out.println(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 											curversion = f.lastModified();
 											ret.setResult(new Long(curversion));
 											break;
@@ -380,6 +390,8 @@ public class FileUpdateAgent extends UpdateAgent
 		String pat = "jadex-(([0-9]+\\.)|(.*addon)).*.zip";
 //		String pat = "jadex-.*addon.*.zip";
 		
+		
+		System.out.println("jadex-2.1.1-SNAPSHOT.zip".matches(pat));
 		System.out.println("jadex-2.1.zip".matches(pat));
 		System.out.println("jadex-3d-addon.zip".matches(pat));
 		System.out.println("jadex-webservice-addon-2.1.1-SNAPSHOT.zip".matches(pat));

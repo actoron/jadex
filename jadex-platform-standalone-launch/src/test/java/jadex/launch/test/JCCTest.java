@@ -31,16 +31,20 @@ public class JCCTest extends TestCase
 	{
 		long timeout	= 30000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
+		System.err.println("starting platform");
 		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-//			"-logging_level", "java.util.logging.Level.INFO",
+			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"}).get(sus, timeout);
 		
+		System.err.println("fetching cms");
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
-		
+
+		System.err.println("fetching jcc");
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
 			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(sus, timeout);
 		
+		System.err.println("activating plugins");
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

@@ -5,7 +5,11 @@ import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *  A thread pool manages pool and saves resources
@@ -13,6 +17,59 @@ import java.util.List;
  */
 public class ThreadPool implements IThreadPool
 {
+	//-------- profiling --------
+	
+	/** Enable call profiling. */
+	public static final boolean	PROFILING	= true;
+	
+	/** Print every 10 seconds. */
+	public static final long	PRINT_DELAY	= 10000;
+	
+	/** Service calls per runnable class. */
+	protected static Map<Class<?>, Integer>	calls	= PROFILING ? new HashMap<Class<?>, Integer>() : null;
+	
+	static
+	{
+		if(PROFILING)
+		{
+			final Timer	timer	= new Timer(true);
+			final Runnable	run	= new Runnable()
+			{
+				public void run()
+				{
+					StringBuffer	out	= new StringBuffer("Threadpool executes:\n");
+					synchronized(calls)
+					{
+						for(Class<?> c: calls.keySet())
+						{
+							out.append("\t").append(calls.get(c)).append(":\t")
+								.append(c)
+								.append("\n");
+						}
+					}
+					System.out.println(out);
+					
+					final Runnable	run	= this;
+					timer.schedule(new TimerTask()
+					{
+						public void run()
+						{
+							run.run();
+						}
+					}, PRINT_DELAY);
+				}
+			};
+			
+			timer.schedule(new TimerTask()
+			{
+				public void run()
+				{
+					run.run();
+				}
+			}, PRINT_DELAY);
+		}
+	}
+	
 	//-------- constants --------
 	
 	/** The thread number. */
@@ -91,6 +148,16 @@ public class ThreadPool implements IThreadPool
 	 */
 	public synchronized void execute(Runnable task)
 	{
+		// profile
+		if(PROFILING)
+		{
+			synchronized(calls)
+			{
+				Integer	cnt	= calls.get(task.getClass());
+				calls.put(task.getClass(), new Integer(cnt==null ? 0 : cnt.intValue()+1));
+			}
+		}
+		
 		if(!running)
 			throw new RuntimeException("Thread pool not running: "+this);
 		

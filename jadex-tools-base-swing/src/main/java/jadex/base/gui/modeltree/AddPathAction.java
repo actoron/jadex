@@ -54,6 +54,7 @@ public class AddPathAction extends ToolTipAction
 		super(name, icon, desc);
 		this.treepanel = treepanel;
 		
+		System.err.println("filechooser1");
 		filechooser = new JFileChooser(".");
 		filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		filechooser.addChoosableFileFilter(new FileFilter()
