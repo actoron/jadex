@@ -1291,7 +1291,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		final Future<IThreadPoolService> ret = new Future<IThreadPoolService>();
 		
-		getServiceContainer().searchService(IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		// Don't use service container to avoid using proxy for thread pool:
+		// proxy may lead to endless loop in decoupling return interceptor, trying to call threadpool.execute() again and again for rescue thread.
+//		getServiceContainer().searchService(IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
 			.addResultListener(new IResultListener<IThreadPoolService>()
 		{
 			public void resultAvailable(IThreadPoolService tp)

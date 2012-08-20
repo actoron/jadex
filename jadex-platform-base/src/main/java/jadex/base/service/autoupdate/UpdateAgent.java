@@ -263,6 +263,7 @@ public class UpdateAgent implements IUpdateService
 	 */
 	protected IFuture<Void> notifyUpdatePerformed(final String text)
 	{
+		Thread.dumpStack();
 		final Future<Void> ret = new Future<Void>();
 		
 		IFuture<IChatGuiService> fut = agent.getRequiredService("chatser");
@@ -270,17 +271,32 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IChatGuiService chatser)
 			{
+				Thread.dumpStack();
+				System.out.println("update message 0");
 				chatser.message(agent.getComponentIdentifier().getName()+": "+text, null, true)
 					.addResultListener(new IntermediateExceptionDelegationResultListener<IChatService, Void>(ret)
 				{
 					public void intermediateResultAvailable(IChatService result)
 					{
+						System.out.println("update message 1");
 					}
 					public void finished()
 					{
+						System.out.println("update message 2");
 					}
 					public void customResultAvailable(Collection<IChatService> result)
 					{
+						System.out.println("update message 3");
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("update message 4");
+						super.exceptionOccurred(exception);
+					}
+					public void resultAvailable(Collection<IChatService> result)
+					{
+						System.out.println("update message 5");
+						super.resultAvailable(result);
 					}
 				});
 			}
