@@ -67,7 +67,7 @@ public class ControlCenterWindow extends JFrame
 	protected ControlCenter controlcenter;
 
 	/** The file chooser. */
-	protected final JFileChooser filechooser;
+	protected JFileChooser filechooser;
 	
     /** The status bar. */
 	protected StatusBar statusbar;
@@ -100,7 +100,15 @@ public class ControlCenterWindow extends JFrame
 		getContentPane().add("South", statusbar);
 
 		System.out.println("cc init 2");
-		this.filechooser = new JFileChooser(".");
+		try
+		{
+			this.filechooser = new JFileChooser(".");
+		}
+		catch(Exception e)
+		{
+			System.out.println("cc init 2a");
+			this.filechooser = new JFileChooser();			
+		}
 		System.out.println("cc init 3");
 		filechooser.setFileFilter(new FileFilter()
 		{
