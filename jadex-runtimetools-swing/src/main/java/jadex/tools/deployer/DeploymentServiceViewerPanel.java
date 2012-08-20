@@ -13,6 +13,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -198,11 +199,14 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 * 
 	 */
-	public static void copy(final String sel1, final IExternalAccess exta1, final DeploymentServiceViewerPanel pan2, TreePath sp2, IExternalAccess jccaccess) 
+	public static void copy(final String sel1, final IExternalAccess exta1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
 //	public static void copy(final DeploymentServiceViewerPanel pan1, final DeploymentServiceViewerPanel pan2, final TreePath sp2, IExternalAccess jccaccess) 
 	{
 //		final String sel1 = pan1.getSelectedPath();
-		final String sel2 = ((IFileNode)sp2.getLastPathComponent()).getFilePath();
+		IFileNode fn = ((IFileNode)sp2.getLastPathComponent());
+		final String sel2 = fn.getFilePath();
+		Object id2 = fn.getId();
+		final String idstr2 = id2 instanceof File? ((File)id2).getAbsolutePath(): (String)id2;
 		final IDeploymentService ds = pan2.getDeploymentService();
 		
 //		System.out.println("sel1: "+sel1+" sel2:"+sel2+" "+jccaccess.getComponentIdentifier());
@@ -314,7 +318,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
 														((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" to: "+sel2+" exception: "+exception.getMessage());
-														ret.setResult(null);
 														return IFuture.DONE;
 													}
 												}).addResultListener(new DelegationResultListener<Void>(ret));
@@ -324,7 +327,6 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 									catch(Exception ex)
 									{
 										ex.printStackTrace();
-										ret.setResult(null);
 										final String extxt = ex.getMessage();
 										jccacc.scheduleStep(new IComponentStep<Void>()
 										{
@@ -357,8 +359,34 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				
 				protected void refreshTreePaths()
 				{
+					
+//					final Future<Void> ret = new Future<Void>();
+//					SServiceProvider.getService(exta1.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//					{
+//						public void customResultAvailable(IComponentManagementService cms)
+//						{
+//							cms.getExternalAccess(lcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//							{
+//								public void customResultAvailable(IExternalAccess jccacc)
+//								{
+//									jccacc.scheduleStep(new IComponentStep<Void>()
+//									{
+//										@Classname("refreshtree")
+//										public IFuture<Void> execute(IInternalAccess ia)
+//										{
+//											((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" "+extxt);
+//											return IFuture.DONE;
+//										}
+//									}).addResultListener(new DelegationResultListener<Void>(ret));
+//								}
+//							});
+//						}
+//					});
+						
 //					System.out.println("ref: "+sp2.getLastPathComponent());
-//					((ITreeNode)sp2.getLastPathComponent()).refresh(true);
+					
+					((ITreeNode)sp2.getLastPathComponent()).refresh(true);
 //					TreePath[] paths = pan2.getFileTreePanel().getTree().getSelectionPaths();
 //					for(int i=0; paths!=null && i<paths.length; i++)
 //					{
@@ -367,6 +395,23 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				}
 			}));
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IExternalAccess> getJCCAccess(IServiceContainer container, final IComponentIdentifier cid)
+	{
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		SServiceProvider.getService(container, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+			}
+		});
+		return ret;
 	}
 	
 	/**
