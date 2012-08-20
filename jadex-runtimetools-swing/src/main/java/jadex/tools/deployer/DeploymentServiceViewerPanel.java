@@ -353,7 +353,17 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					exception.printStackTrace();
+					// todo: 
+//					jccacc.scheduleStep(new IComponentStep<Void>()
+//					{
+//						@Classname("exoncopy")
+//						public IFuture<Void> execute(IInternalAccess ia)
+//						{
+//							((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copy error: "+sel1+" "+extxt);
+//							return IFuture.DONE;
+//						}
+//					}).addResultListener(new DelegationResultListener<Void>(ret));
+//					exception.printStackTrace();
 					refreshTreePaths();
 				}
 				
