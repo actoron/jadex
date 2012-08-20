@@ -88,6 +88,7 @@ public class ControlCenterWindow extends JFrame
 	 */
 	public ControlCenterWindow(ControlCenter main)
 	{
+		System.out.println("cc init 1");
 		this.controlcenter = main;
 		this.setTitle("Jadex Control Center "
 			+ VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + "): "
@@ -98,7 +99,9 @@ public class ControlCenterWindow extends JFrame
 		statusbar = new StatusBar();
 		getContentPane().add("South", statusbar);
 
+		System.out.println("cc init 2");
 		this.filechooser = new JFileChooser(".");
+		System.out.println("cc init 3");
 		filechooser.setFileFilter(new FileFilter()
 		{
 			public boolean accept(File f)
@@ -111,6 +114,7 @@ public class ControlCenterWindow extends JFrame
 				return "JCC Settings Files";
 			}
 		});
+		System.out.println("cc init 4");
 		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter()

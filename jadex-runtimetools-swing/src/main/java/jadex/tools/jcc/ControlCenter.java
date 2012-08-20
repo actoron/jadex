@@ -94,19 +94,16 @@ public class ControlCenter
 		this.plugin_classes	= plugin_classes;
 		this.pccs	= new HashMap();
 		this.saveonexit	= saveonexit;
-		System.out.println("jcc init 1");
 		this.window = new ControlCenterWindow(this);
 		
 		// Default platform control center for local platform.
 		final Future<Void>	inited	= new Future<Void>();
-		System.out.println("jcc init 2");
 		this.pcc	= new PlatformControlCenter();
 		
 		SJCC.getRootAccess(jccaccess).addResultListener(new SwingDelegationResultListener(inited)
 		{
 			public void customResultAvailable(Object result)
 			{
-				System.out.println("jcc init 3");
 				IExternalAccess	platformaccess	= (IExternalAccess)result;
 				pccs.put(platformaccess.getComponentIdentifier(), pcc);
 				pcc.init(platformaccess, ControlCenter.this, plugin_classes)
@@ -118,17 +115,14 @@ public class ControlCenter
 		{
 			public void customResultAvailable(Object result)
 			{
-				System.out.println("jcc init 4");
 				// Load settings and open window.
 				loadSettings().addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						System.out.println("jcc init 5");
 						// Add PCC to window.
 						window.showPlatformPanel(pcc);
 						window.setVisible(true);
-						System.out.println("jcc init 6");
 						ret.setResult(null);
 					}
 				});
