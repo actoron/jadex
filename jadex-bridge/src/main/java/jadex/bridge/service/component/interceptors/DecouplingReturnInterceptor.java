@@ -124,7 +124,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											}
 											else
 											{
-												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic);
+												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic+", "+this);
+												Thread.dumpStack();
 												listener.exceptionOccurred(new RuntimeException("Cannot reschedule "+sic+": "+e));
 											}
 										}

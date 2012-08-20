@@ -90,44 +90,55 @@ public class ControlCenter
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		this.jccaccess = jccaccess;
-		this.plugin_classes	= plugin_classes;
-		this.pccs	= new HashMap();
-		this.saveonexit	= saveonexit;
-		this.window = new ControlCenterWindow(this);
-		
-		// Default platform control center for local platform.
-		final Future<Void>	inited	= new Future<Void>();
-		this.pcc	= new PlatformControlCenter();
-		
-		SJCC.getRootAccess(jccaccess).addResultListener(new SwingDelegationResultListener(inited)
+		try
 		{
-			public void customResultAvailable(Object result)
+			
+			this.jccaccess = jccaccess;
+			this.plugin_classes	= plugin_classes;
+			this.pccs	= new HashMap();
+			this.saveonexit	= saveonexit;
+			this.window = new ControlCenterWindow(this);
+			
+			// Default platform control center for local platform.
+			final Future<Void>	inited	= new Future<Void>();
+			this.pcc	= new PlatformControlCenter();
+			
+			SJCC.getRootAccess(jccaccess).addResultListener(new SwingDelegationResultListener(inited)
 			{
-				IExternalAccess	platformaccess	= (IExternalAccess)result;
-				pccs.put(platformaccess.getComponentIdentifier(), pcc);
-				pcc.init(platformaccess, ControlCenter.this, plugin_classes)
-					.addResultListener(new SwingDelegationResultListener(inited));
-			}
-		});
-		
-		inited.addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				// Load settings and open window.
-				loadSettings().addResultListener(new SwingDelegationResultListener(ret)
+				public void customResultAvailable(Object result)
 				{
-					public void customResultAvailable(Object result)
+					IExternalAccess	platformaccess	= (IExternalAccess)result;
+					pccs.put(platformaccess.getComponentIdentifier(), pcc);
+					pcc.init(platformaccess, ControlCenter.this, plugin_classes)
+						.addResultListener(new SwingDelegationResultListener(inited));
+				}
+			});
+			
+			inited.addResultListener(new SwingDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					// Load settings and open window.
+					loadSettings().addResultListener(new SwingDelegationResultListener(ret)
 					{
-						// Add PCC to window.
-						window.showPlatformPanel(pcc);
-						window.setVisible(true);
-						ret.setResult(null);
-					}
-				});
-			}
-		});
+						public void customResultAvailable(Object result)
+						{
+							// Add PCC to window.
+							window.showPlatformPanel(pcc);
+							window.setVisible(true);
+							ret.setResult(null);
+						}
+					});
+				}
+			});
+		}
+		catch(RuntimeException e)
+		{
+			System.out.println("JCC init error");
+			Thread.dumpStack();
+			e.printStackTrace();
+			throw e;
+		}
 		
 		return ret;
 	}
