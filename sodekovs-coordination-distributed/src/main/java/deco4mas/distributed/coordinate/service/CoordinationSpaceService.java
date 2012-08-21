@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
@@ -24,10 +25,22 @@ import deco4mas.distributed.mechanism.CoordinationMechanism;
 @Service
 public class CoordinationSpaceService implements ICoordinationSpaceService {
 
+	/**
+	 * The Coordination Space
+	 */
 	private CoordinationSpace space = null;
 
+	/**
+	 * The List of {@link CoordinationChangeEvent} subscribers
+	 */
 	private List<SubscriptionIntermediateFuture<CoordinationChangeEvent>> subscribers = null;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param space
+	 *            the given {@link CoordinationSpace}
+	 */
 	public CoordinationSpaceService(CoordinationSpace space) {
 		this.space = space;
 		this.subscribers = new ArrayList<SubscriptionIntermediateFuture<CoordinationChangeEvent>>();
@@ -110,7 +123,9 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	 *            the mechanisms realization name
 	 */
 	public void mechanismActivated(String realization) {
-		CoordinationChangeEvent event = new CoordinationChangeEvent(realization, Boolean.TRUE);
+		CoordinationChangeEvent event = new CoordinationChangeEvent(CoordinationChangeEvent.MECHANISM_CHANGE_EVENT);
+		event.setRealization(realization);
+		event.setActive(Boolean.TRUE);
 		publish(event);
 	}
 
@@ -136,7 +151,9 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	 *            the mechanisms realization name
 	 */
 	public void mechanismDeactivated(String realization) {
-		CoordinationChangeEvent event = new CoordinationChangeEvent(realization, Boolean.FALSE);
+		CoordinationChangeEvent event = new CoordinationChangeEvent(CoordinationChangeEvent.MECHANISM_CHANGE_EVENT);
+		event.setRealization(realization);
+		event.setActive(Boolean.FALSE);
 		publish(event);
 	}
 
@@ -150,5 +167,60 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 
 		subscribers.add(ret);
 		return ret;
+	}
+
+	/**
+	 * Returns the {@link MechanismConfiguration} of the {@link CoordinationMechanism} given by the realization name.
+	 * 
+	 * @param realization
+	 *            the given realization name
+	 * @return the {@link MechanismConfiguration}
+	 */
+	public IFuture<MechanismConfiguration> getCoordinationMechanismConfiguration(String realization) {
+		Future<MechanismConfiguration> fut = new Future<MechanismConfiguration>();
+
+		CoordinationMechanism mechanism = space.getActiveCoordinationMechanisms().get(realization);
+		if (mechanism == null)
+			mechanism = space.getInactiveCoordinationMechanisms().get(realization);
+
+		if (mechanism != null) {
+			fut.setResult(mechanism.getMechanismConfiguration());
+		}
+
+		return fut;
+	}
+
+	/**
+	 * Changes the {@link MechanismConfiguration} for {@link CoordinationMechanism} given by the realization name. By changing the properties for the given key value pair.
+	 * 
+	 * @param realization
+	 *            the realization name
+	 * @param key
+	 *            the given key
+	 * @param value
+	 *            the given value
+	 * @return
+	 */
+	public IFuture<Void> changeCoordinationMechanismConfiguration(String realization, String key, String value) {
+		space.changeCoordinationMechanismConfiguration(realization, key, value);
+		return IFuture.DONE;
+	}
+
+	/**
+	 * Listener method which is called if the {@link MechanismConfiguration} of a {@link CoordinationMechanism} was changed.
+	 * 
+	 * @param realization
+	 *            the coordination mechanisms realization name
+	 * @param key
+	 *            the key of the changed value
+	 * @param value
+	 *            the changed value
+	 */
+	public void mechanismConfigurationChanged(String realization, String key, String value) {
+		CoordinationChangeEvent event = new CoordinationChangeEvent(CoordinationChangeEvent.CONFIGURATION_CHANGE_EVENT);
+		event.setRealization(realization);
+		event.setKey(key);
+		event.setValue(value);
+		publish(event);
 	}
 }

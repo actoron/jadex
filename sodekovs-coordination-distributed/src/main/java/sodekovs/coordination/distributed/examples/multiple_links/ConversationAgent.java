@@ -45,7 +45,7 @@ public class ConversationAgent extends MicroAgent {
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
 			// System.out.println(name + " says: " + message);
-			waitFor(5000, this);
+			waitFor(1000, this);
 			return IFuture.DONE;
 		}
 	}
@@ -62,7 +62,7 @@ public class ConversationAgent extends MicroAgent {
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
 			// System.out.println(name + " says: " + message);
-			waitFor(5000, this);
+			waitFor(1000, this);
 			return IFuture.DONE;
 		}
 	}

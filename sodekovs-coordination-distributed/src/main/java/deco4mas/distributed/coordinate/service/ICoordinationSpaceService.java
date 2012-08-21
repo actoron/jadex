@@ -6,6 +6,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import java.util.Collection;
 import java.util.Map;
 
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
@@ -63,4 +64,26 @@ public interface ICoordinationSpaceService extends CoordinationEventListener {
 	 * @return an {@link ISubscriptionIntermediateFuture} holding the {@link CoordinationChangeEvent}
 	 */
 	public ISubscriptionIntermediateFuture<CoordinationChangeEvent> subscribe();
+
+	/**
+	 * Returns the {@link MechanismConfiguration} of the {@link CoordinationMechanism} given by the realization name.
+	 * 
+	 * @param realization
+	 *            the given realization name
+	 * @return the {@link MechanismConfiguration}
+	 */
+	public IFuture<MechanismConfiguration> getCoordinationMechanismConfiguration(String realization);
+
+	/**
+	 * Changes the {@link MechanismConfiguration} for {@link CoordinationMechanism} given by the realization name. By changing the properties for the given key value pair.
+	 * 
+	 * @param realization
+	 *            the realization name
+	 * @param key
+	 *            the given key
+	 * @param value
+	 *            the given value
+	 * @return
+	 */
+	public IFuture<Void> changeCoordinationMechanismConfiguration(String realization, String key, String value);
 }

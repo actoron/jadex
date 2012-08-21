@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.swing.event.EventListenerList;
 
 import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
 import deco4mas.distributed.coordinate.service.CoordinationEventListener;
 import deco4mas.distributed.coordinate.service.CoordinationSpaceService;
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
@@ -369,6 +370,45 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	private synchronized void notifyMechanismDeactivated(String realization) {
 		for (CoordinationEventListener listener : coordinationEventListener.getListeners(CoordinationEventListener.class)) {
 			listener.mechanismDeactivated(realization);
+		}
+	}
+
+	/**
+	 * Changes the given value for the {@link CoordinationMechanism} given by the realization name in the mechanisms {@link MechanismConfiguration} with the according key.
+	 * 
+	 * @param realization
+	 *            the given realization name
+	 * @param key
+	 *            the given key
+	 * @param value
+	 *            the given value
+	 */
+	public void changeCoordinationMechanismConfiguration(String realization, String key, String value) {
+		CoordinationMechanism mechanism = getActiveCoordinationMechanisms().get(realization);
+		if (mechanism == null) {
+			mechanism = getInactiveCoordinationMechanisms().get(realization);
+		}
+		if (mechanism != null) {
+			Map<String, String> props = mechanism.getMechanismConfiguration().getProperties();
+			props.put(key, value);
+			notifMechanismConfigurationChanged(realization, key, value);
+		}
+
+	}
+
+	/**
+	 * Notifies all {@link CoordinationEventListener} that the {@link MechanismConfiguration} of the {@link CoordinationMechanism} given by its realization was changed for the given key value pair.
+	 * 
+	 * @param realization
+	 *            the given realization name
+	 * @param key
+	 *            the given key
+	 * @param value
+	 *            the given value
+	 */
+	private synchronized void notifMechanismConfigurationChanged(String realization, String key, String value) {
+		for (CoordinationEventListener listener : coordinationEventListener.getListeners(CoordinationEventListener.class)) {
+			listener.mechanismConfigurationChanged(realization, key, value);
 		}
 	}
 }
