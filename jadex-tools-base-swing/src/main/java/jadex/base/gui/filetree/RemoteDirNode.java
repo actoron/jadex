@@ -9,12 +9,10 @@ import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
@@ -58,9 +56,9 @@ public class RemoteDirNode extends RemoteFileNode
 	 */
 	protected void	searchChildren()
 	{
-		listFiles().addResultListener(new SwingDefaultResultListener()
+		listFiles().addResultListener(new IResultListener()
 		{
-			public void customResultAvailable(Object result)
+			public void resultAvailable(Object result)
 			{
 				Collection files = (Collection)result;
 //				CollectionResultListener lis = new CollectionResultListener(files==null? 0: files.size(), true, 
@@ -109,6 +107,11 @@ public class RemoteDirNode extends RemoteFileNode
 				}
 
 				setChildren(nodes);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// use logger to print warning?
 			}
 		});
 	}

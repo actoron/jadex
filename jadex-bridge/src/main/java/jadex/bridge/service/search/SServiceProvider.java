@@ -260,7 +260,10 @@ public class SServiceProvider
 				{
 //					if(type.toString().indexOf("IFile")!=-1)
 //						System.out.println("Ex result: "+exception);
-					ret.setException(exception);
+					if(!ret.isDone())
+					{
+						ret.setException(exception);
+					}
 				}
 			});
 		}
