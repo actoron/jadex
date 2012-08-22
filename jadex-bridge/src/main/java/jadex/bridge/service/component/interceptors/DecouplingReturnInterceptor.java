@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -126,7 +127,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											{
 //												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic+", "+this);
 //												Thread.dumpStack();
-												listener.exceptionOccurred(new RuntimeException("Cannot reschedule "+sic+": "+e));
+												listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
 											}
 										}
 									};

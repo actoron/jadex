@@ -1,5 +1,6 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -163,8 +164,11 @@ public class MessagePerformanceAgent extends MicroAgent
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											System.out.println("message not sent: "+exception);
-//											exception.printStackTrace();
+											if(!(exception instanceof ComponentTerminatedException))
+											{
+												System.out.println("message not sent: "+exception);
+//												exception.printStackTrace();
+											}
 										}
 									});
 									if(i%100==0)

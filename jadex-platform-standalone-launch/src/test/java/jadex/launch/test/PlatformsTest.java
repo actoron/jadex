@@ -63,7 +63,7 @@ public class PlatformsTest extends TestCase
 	/** Platforms to exclude from comparison. */
 	protected static final Set<String>	EXCLUDEPLATFORMS	= new HashSet<String>(Arrays.asList(new String[]
 	{
-		"jadex.standalone.Platform.bpmn"	// BPMN platform is just proof of concept. 
+		"jadex.platform.Platform.bpmn"	// BPMN platform is just proof of concept. 
 	}));
 
 	/**
@@ -289,21 +289,21 @@ public class PlatformsTest extends TestCase
 	
 	//-------- uncomment below to switch from test failure to print out --------
 	
-	public static void assertNotNull(String message, Object val)
-	{
-		if(val==null)
-			System.out.println(message);
-	}
-	
-	public static void assertEquals(String message, Object val1, Object val2)
-	{
-		if(!SUtil.equals(val1, val2))
-			System.out.println(message+" Expected "+val1+" but was "+val2);
-	}
-	
-	public static void assertEquals(String message, String val1, String val2)
-	{
-		if(!SUtil.equals(val1, val2))
-			System.out.println(message+" Expected "+val1+" but was "+val2);
-	}
+//	public static void assertNotNull(String message, Object val)
+//	{
+//		if(val==null)
+//			System.out.println(message);
+//	}
+//	
+//	public static void assertEquals(String message, Object val1, Object val2)
+//	{
+//		if(!SUtil.equals(val1, val2))
+//			System.out.println(message+" Expected "+val1+" but was "+val2);
+//	}
+//	
+//	public static void assertEquals(String message, String val1, String val2)
+//	{
+//		if(!SUtil.equals(val1, val2))
+//			System.out.println(message+" Expected "+val1+" but was "+val2);
+//	}
 }

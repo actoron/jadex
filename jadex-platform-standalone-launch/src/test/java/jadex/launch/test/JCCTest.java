@@ -33,18 +33,15 @@ public class JCCTest extends TestCase
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		System.err.println("starting platform");
 		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-			"-logging", "true",
+//			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"}).get(sus, timeout);
 		
-		System.err.println("fetching cms");
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 
-		System.err.println("fetching jcc");
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
 			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(sus, timeout);
 		
-		System.err.println("activating plugins");
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -79,7 +76,6 @@ public class JCCTest extends TestCase
 		{
 			final Future<Void>	fut	= new Future<Void>();
 			ret	= fut;
-			System.out.println("Activating plugin: "+plugins[i]);
 			pcc.getPanel().setPerspective(plugins[i]).addResultListener(new SwingDelegationResultListener<Void>(fut)
 			{
 				public void customResultAvailable(Void result)
