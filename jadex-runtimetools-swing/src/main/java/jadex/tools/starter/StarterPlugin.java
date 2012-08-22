@@ -262,9 +262,9 @@ public class StarterPlugin extends AbstractJCCPlugin
 					public void resultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
-//								createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
+//								createComponent("jadex/platform/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
 						
-						cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", 
+						cms.createComponent(cid.getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", 
 							new CreationInfo(args), null).addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)

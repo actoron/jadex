@@ -258,8 +258,8 @@ public class DefaultWebServicePublishService implements IPublishService
 //		try
 //		{
 //			ClassPool cp = ClassPool.getDefault();
-//			CtClass bean = cp.get("jadex.base.service.publish.TestBean");
-//			CtClass called = cp.get("jadex.base.service.publish.DefaultWebServicePublishService");
+//			CtClass bean = cp.get("jadex.platform.service.publish.TestBean");
+//			CtClass called = cp.get("jadex.platform.service.publish.DefaultWebServicePublishService");
 ////			MyCodeConverter cc = new MyCodeConverter();
 ////			cc.replaceFieldWrite(bean.getDeclaredField("name"), called, "writeField");
 ////			cc.replaceFieldRead(bean.getDeclaredField("name"), called, "readField");
@@ -272,7 +272,7 @@ public class DefaultWebServicePublishService implements IPublishService
 //					if(f.isWriter())
 //					{
 ////						f.replace("System.out.println(\"new: \"+$1); $proceed($$);");
-////						f.replace("jadex.base.service.publish.DefaultWebServicePublishService.writeField($0, $1,\""+f.getFieldName()+"\");");
+////						f.replace("jadex.platform.service.publish.DefaultWebServicePublishService.writeField($0, $1,\""+f.getFieldName()+"\");");
 //						f.replace("$0.writeField($1,\""+f.getFieldName()+"\");");
 //					}
 //				}

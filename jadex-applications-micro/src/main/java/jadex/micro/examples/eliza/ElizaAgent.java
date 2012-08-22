@@ -36,7 +36,7 @@ import java.util.Map;
  *  based on Eliza code from http://www.jesperjuul.net/eliza/
  */
 @Agent
-@ComponentTypes(@ComponentType(name="chat", filename="jadex/base/service/chat/ChatAgent.class"))	// Hack!!! Implicit dependency to jadex-platform
+@ComponentTypes(@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"))	// Hack!!! Implicit dependency to jadex-platform
 @Configurations(@Configuration(name="default", components=@Component(type="chat", arguments=@NameValue(name="nosave", value="true"))))
 @RequiredServices(@RequiredService(name="chat", type=IChatGuiService.class))
 public class ElizaAgent

@@ -908,7 +908,7 @@ public class SServiceProvider
 //			}
 //			else 
 //			{
-//				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+//				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.platform.service.remote
 //				ret = Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 //			}
 //		}

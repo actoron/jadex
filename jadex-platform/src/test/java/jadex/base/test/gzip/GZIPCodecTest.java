@@ -1,7 +1,7 @@
 package jadex.base.test.gzip;
 
-import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.service.types.message.ICodec;
+import jadex.platform.service.message.transport.codecs.GZIPCodec;
 import junit.framework.TestCase;
 
 public class GZIPCodecTest extends TestCase

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Container component for extension components (to avoid having all extensions in main tree).
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.1.xsd"
+	name="Extensions" package="jadex.platform.service.extensions">
+		
+	<imports>
+		<import>jadex.bridge.service.types.factory.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
+	</imports>
+	
+    <arguments>
+		<!-- The name(s) of extension component(s) to load (separated by comma). -->
+		<argument name="extensions" class="String"/>
+	</arguments>
+	
+	<services>
+		<providedservice class="IExtensionLoaderService">
+			<implementation class="ExtensionLoaderService"/>
+		</providedservice>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>	
+</componenttype>

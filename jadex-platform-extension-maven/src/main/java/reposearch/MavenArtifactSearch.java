@@ -1,7 +1,7 @@
 package reposearch;
-import jadex.base.service.dependency.maven.SMaven;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.platform.service.dependency.maven.SMaven;
 
 import java.io.File;
 import java.io.IOException;

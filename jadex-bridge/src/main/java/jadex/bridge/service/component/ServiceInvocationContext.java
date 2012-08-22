@@ -446,7 +446,7 @@ public class ServiceInvocationContext
 //		Object target = getObject();
 ////		if(Proxy.isProxyClass(target.getClass()))
 ////			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
-//		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+//		// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.platform.service.remote
 //		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 //	}
 	

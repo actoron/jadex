@@ -3,15 +3,15 @@ package jadex.android.controlcenter.settings;
 import jadex.android.controlcenter.preference.DiscoveryPreference;
 import jadex.android.controlcenter.preference.JadexBooleanPreference;
 import jadex.android.controlcenter.preference.JadexIntegerPreference;
-import jadex.base.service.awareness.management.AwarenessManagementAgent;
-import jadex.base.service.awareness.management.AwarenessManagementAgentHelper;
-import jadex.base.service.awareness.management.AwarenessSettingsData;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.platform.service.awareness.management.AwarenessManagementAgent;
+import jadex.platform.service.awareness.management.AwarenessManagementAgentHelper;
+import jadex.platform.service.awareness.management.AwarenessSettingsData;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package jadex.base.relay;
 
-import jadex.base.service.message.transport.httprelaymtp.RelayConnectionManager;
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.io.File;
 import java.io.FileInputStream;

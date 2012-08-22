@@ -7,7 +7,6 @@ import jadex.base.gui.modeltree.AddRemotePathAction;
 import jadex.base.gui.modeltree.ITreeAbstraction;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.base.service.library.LibraryService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -39,6 +38,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.platform.service.library.LibraryService;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

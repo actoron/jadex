@@ -1,6 +1,5 @@
 package maventest;
 
-import jadex.base.service.dependency.maven.MavenDependencyResolverService;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -8,6 +7,7 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.platform.service.dependency.maven.MavenDependencyResolverService;
 
 import java.io.File;
 import java.net.URL;

@@ -70,7 +70,7 @@ public class AddRIDAction extends ToolTipAction
 	 */
 	public boolean isEnabled()
 	{
-		Class cl = SReflect.findClass0("jadex.base.service.dependency.maven.MavenDependencyResolverService", null, null);
+		Class cl = SReflect.findClass0("jadex.platform.service.dependency.maven.MavenDependencyResolverService", null, null);
 //		return cl!=null && treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();
 		return cl!=null;
 //		return (ITreeNode)treepanel.getTree().getLastSelectedPathComponent()==null && !treepanel.isRemote();

@@ -20,7 +20,7 @@ import java.lang.reflect.Proxy;
 @Agent
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-@ComponentTypes(@ComponentType(name="invocation", filename="jadex/base/service/ws/WebServiceInvocationAgent.class"))
+@ComponentTypes(@ComponentType(name="invocation", filename="jadex/platform/service/ws/WebServiceInvocationAgent.class"))
 public class WebServiceAgent
 {
 	//-------- attributes --------
