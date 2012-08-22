@@ -88,7 +88,6 @@ public class ControlCenterWindow extends JFrame
 	 */
 	public ControlCenterWindow(ControlCenter main)
 	{
-		System.out.println("cc init 1");
 		this.controlcenter = main;
 		this.setTitle("Jadex Control Center "
 			+ VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + "): "

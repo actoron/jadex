@@ -171,7 +171,7 @@ public class MessagePerformanceAgent extends MicroAgent
 											}
 										}
 									});
-									if(i%100==0)
+									if(i%10==0)
 									{
 										break;
 									}
