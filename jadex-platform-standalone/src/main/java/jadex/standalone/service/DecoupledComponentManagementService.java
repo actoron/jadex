@@ -1,5 +1,7 @@
 package jadex.standalone.service;
 
+import jadex.base.service.cms.ComponentAdapterFactory;
+import jadex.base.service.cms.StandaloneComponentAdapter;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -8,8 +10,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.standalone.ComponentAdapterFactory;
-import jadex.standalone.StandaloneComponentAdapter;
 
 /**
  *  Standalone implementation of component execution service.

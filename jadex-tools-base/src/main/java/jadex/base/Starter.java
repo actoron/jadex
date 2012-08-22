@@ -20,7 +20,6 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -50,8 +49,8 @@ public class Starter
 	//-------- constants --------
 
 	/** The fallback platform configuration. */
-//	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/standalone/Platform.component.xml";
-	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/standalone/PlatformAgent.class";
+//	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/Platform.component.xml";
+	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformAgent.class";
 
 	/** The component factory to be used for platform component. */
 //	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";

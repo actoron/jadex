@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_KhDMUJv9EeCTM9TB44euIw" type="Bpmn" name="Platform.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_KhWuUJv9EeCTM9TB44euIw" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_KhYjgJv9EeCTM9TB44euIw" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_KhZKkJv9EeCTM9TB44euIw" type="5001">
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_KhZKkZv9EeCTM9TB44euIw"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_KhZKkpv9EeCTM9TB44euIw"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_KhZKk5v9EeCTM9TB44euIw"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_KhWuUZv9EeCTM9TB44euIw" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_KhWuUpv9EeCTM9TB44euIw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_KhWuU5v9EeCTM9TB44euIw" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_KhWuVJv9EeCTM9TB44euIw" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="Platform.bpmn#_KhTD8Zv9EeCTM9TB44euIw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KhZxoJv9EeCTM9TB44euIw" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_KhDMUZv9EeCTM9TB44euIw"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_KhDMUpv9EeCTM9TB44euIw"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_KhDMU5v9EeCTM9TB44euIw"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="Platform.bpmn#_KhAwEZv9EeCTM9TB44euIw"/>
+</notation:Diagram>

@@ -69,15 +69,13 @@ import java.util.logging.Logger;
  *  Abstract default implementation of component management service.
  */
 @Service
-public abstract class DecoupledComponentManagementService implements IComponentManagementService
+public class DecoupledComponentManagementService implements IComponentManagementService
 {
-	//-------- constants --------
-
-//	/** The component counter. Used for generating unique component ids. */
-//	public static int compcnt = 0;
-
 	//-------- attributes --------
-
+	
+	/** The adapter factory. */
+	protected ComponentAdapterFactory adapterfactory = new ComponentAdapterFactory();
+	
 	/** The agent. */
 	@ServiceComponent
 	protected IInternalAccess agent;
@@ -190,27 +188,51 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	/**
 	 *  Get the component instance from an adapter.
 	 */
-	public abstract IComponentInstance getComponentInstance(IComponentAdapter adapter);
+	public IComponentInstance getComponentInstance(IComponentAdapter adapter)
+	{
+		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
+	}
 
 	/**
 	 *  Get the component adapter factory.
 	 */
-	public abstract IComponentAdapterFactory getComponentAdapterFactory();
+	public IComponentAdapterFactory getComponentAdapterFactory()
+	{
+		return adapterfactory;
+	}
 	
 	/**
 	 *  Invoke kill on adapter.
 	 */
-	public abstract IFuture<Void> killComponent(IComponentAdapter adapter);
+	public IFuture<Void> killComponent(IComponentAdapter adapter)
+	{
+		Future<Void> ret = new Future<Void>();
+		((StandaloneComponentAdapter)adapter).killComponent()
+			.addResultListener(new DelegationResultListener<Void>(ret));
+		return ret;
+	}
 	
 	/**
 	 *  Cancel the execution.
 	 */
-	public abstract IFuture<Void> cancel(IComponentAdapter adapter);
+	public IFuture<Void> cancel(IComponentAdapter adapter)
+	{
+		Future<Void> ret = new Future<Void>();
+		getExecutionService().cancel((StandaloneComponentAdapter)adapter)
+			.addResultListener(new DelegationResultListener<Void>(ret));
+		return ret;
+	}
 
 	/**
 	 *  Do a step.
 	 */
-	public abstract IFuture<Void> doStep(IComponentAdapter adapter);
+	public IFuture doStep(IComponentAdapter adapter)
+	{
+		Future ret = new Future();
+		((StandaloneComponentAdapter)adapter).doStep()
+			.addResultListener(new DelegationResultListener(ret));
+		return ret;
+	}
 	
     //-------- IComponentManagementService interface --------
     
