@@ -18,13 +18,7 @@
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-standalone</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-tools-base</artifactId>
+			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

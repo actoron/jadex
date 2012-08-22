@@ -62,11 +62,6 @@
 			<artifactId>jadex-xml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-tools-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Kernels -->
 		<dependency>
@@ -131,11 +126,6 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-standalone</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

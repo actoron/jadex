@@ -71,7 +71,6 @@
 		<module>../jadex-rules-applications</module>
 		<module>../jadex-rules-tools</module>
 
-		<module>../jadex-tools-base</module>
 		<module>../jadex-tools-base-swing</module>
 		<module>../jadex-runtimetools-swing</module>
 		<module>../jadex-tools-bdi</module>
@@ -461,7 +460,6 @@
 				<module>jadex-rules-applications</module>
 				<module>jadex-rules-tools</module>
 
-				<module>jadex-tools-base</module>
 				<module>jadex-tools-base-swing</module>
 				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
@@ -512,7 +510,6 @@
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-xml</module>
-				<module>jadex-tools-base</module>
 				<module>jadex-rules</module>
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-micro</module>

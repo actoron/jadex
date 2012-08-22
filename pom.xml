@@ -71,13 +71,11 @@
 		<module>jadex-rules-applications</module>
 		<module>jadex-rules-tools</module>
 
-		<module>jadex-tools-base</module>
 		<module>jadex-tools-base-swing</module>
 		<module>jadex-runtimetools-swing</module>
 		<module>jadex-tools-bdi</module>
 		<module>jadex-tools-bpmn</module>
 		<module>jadex-tools-comanalyzer</module>
-		<module>jadex-platform-standalone</module>
 		<module>jadex-platform-standalone-launch</module>
 		<module>jadex-platform-relay-web</module>
 	</modules>
@@ -507,7 +505,6 @@
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-xml</module>
-				<module>jadex-tools-base</module>
 				<module>jadex-rules</module>
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-micro</module>
@@ -515,7 +512,6 @@
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-platform</module>
-				<module>jadex-platform-standalone</module>
 				
 				<!- - Android specific modules - ->
 				<module>jadex-android-parent</module>

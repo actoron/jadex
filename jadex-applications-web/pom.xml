@@ -67,7 +67,7 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-standalone</artifactId>
+			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>

@@ -287,19 +287,26 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 						childs.length, true, new DelegationResultListener(ret));
 					for(int i=0; i<childs.length; i++)
 					{
-						cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
+						if(cms!=null)
 						{
-							public void resultAvailable(Object result)
+							cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
 							{
-								IExternalAccess exta = (IExternalAccess)result;
-								lis.resultAvailable(exta.getServiceProvider());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								lis.exceptionOccurred(exception);
-							}
-						});
+								public void resultAvailable(Object result)
+								{
+									IExternalAccess exta = (IExternalAccess)result;
+									lis.resultAvailable(exta.getServiceProvider());
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(exception);
+								}
+							});
+						}
+						else
+						{
+							lis.exceptionOccurred(new ComponentTerminatedException(id));
+						}
 					}
 				}
 				else

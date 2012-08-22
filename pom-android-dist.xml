@@ -138,7 +138,6 @@
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-xml</module>
-				<module>jadex-tools-base</module>
 				<module>jadex-rules</module>
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-micro</module>
@@ -146,7 +145,6 @@
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-platform</module>
-				<module>jadex-platform-standalone</module>
 
 				<!-- Modules required for integration test -->
 				<module>jadex-android-integration-test</module>

@@ -25,7 +25,6 @@
 		<module>jadex-kernel-extension-envsupport</module>
 		<module>jadex-kernel-extension-agr</module>
 		<module>jadex-applib-bdi</module>
-		<module>jadex-tools-base</module>
 		<module>jadex-tools-base-swing</module>
 		<module>jadex-platform-extension-webservice</module>
 	</modules>

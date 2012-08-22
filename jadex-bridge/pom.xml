@@ -67,7 +67,14 @@
 			<artifactId>jadex-javaparser</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>provided</scope>	<!-- Hack!!! don't want to depend on junit. only needed when doing tests, so should be there anyways. -->
+		</dependency>
+		
 		<!--
 			<dependency> <groupId>stax</groupId> <artifactId>stax</artifactId>
 			<version>1.2.0</version> </dependency>
