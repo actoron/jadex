@@ -43,7 +43,7 @@
 		<module>jadex-xml</module>
 		<module>jadex-javaparser</module>
 		<module>jadex-bridge</module>
-		<module>jadex-platform-base</module>
+		<module>jadex-platform</module>
 		<module>jadex-nuggets</module>
 
 		<module>jadex-kernel-base</module>
@@ -493,90 +493,7 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== eclipse (all modules) ======== - ->
-
-		<profile>
-			<id>jadex-eclipse-projects</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<modules>
-				<module>jadex-parent</module>
-				<module>jadex-parent-pro</module>
-				<module>jadex-javadocs</module>
-				<module>jadex-commons</module>
-				<module>jadex-xml</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-bridge</module>
-				<module>jadex-platform-base</module>
-				<module>jadex-nuggets</module>
-
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-kernel-bdibpmn</module>
-				<module>jadex-kernel-gpmn</module>
-				<module>jadex-kernel-extension-envsupport</module>
-				<module>jadex-kernel-extension-envsupport-opengl</module>
-				<module>jadex-kernel-extension-envsupport-jmonkey</module>
-				<module>jadex-kernel-extension-agr</module>
-				<module>jadex-kernel-bdiv3</module>
-
-				<!- -<module>jadex-kernel-bdi-continuations</module>- ->
-
-				<module>jadex-applib-bdi</module>
-				<module>jadex-applications-bdi</module>
-				<module>jadex-applications-micro</module>
-				<module>jadex-applications-bpmn</module>
-				<module>jadex-applications-bdibpmn</module>
-				<module>jadex-applications-gpmn</module>
-				<module>jadex-applications-mixed</module>
-				<module>jadex-applications-web</module>
-				<module>jadex-applications-webservice</module>
-
-				<module>jadex-rules</module>
-				<module>jadex-rules-applications</module>
-				<module>jadex-rules-tools</module>
-
-				<module>jadex-tools-base</module>
-				<module>jadex-tools-base-swing</module>
-				<module>jadex-runtimetools-swing</module>
-				<module>jadex-tools-bdi</module>
-				<module>jadex-tools-bpmn</module>
-				<module>jadex-tools-comanalyzer</module>
-				<module>jadex-platform-standalone</module>
-				<module>jadex-platform-standalone-launch</module>
-				<module>jadex-platform-standalone-maven-launch</module>
-				<module>jadex-platform-relay-web</module>
-				<module>jadex-platform-extension-webservice</module>
-				<module>jadex-platform-extension-maven</module>
-				<module>jadex-platform-extension-natmtp</module>
-								
-				<module>jadex-rules-eca</module>
-
-				<module>jadex-platform-wfms</module>
-				<!- - <module>jadex-wfms-launch</module> - ->
-				<module>jadex-applications-wfms</module>
-
-				<module>jadex-platform-jade</module>
-				<module>jadex-platform-jade-launch</module>
-
-				<module>sodekovs-simulationcontrol</module>
-				<module>sodekovs-coordination</module>
-				<module>sodekovs-coordination-distributed</module>
-				<module>sodekovs-benchmarking</module>
-				<module>sodekovs-util</module>
-				<module>sodekovs-productionline</module>
-				<module>sodekovs-applications</module>
-				<module>jadex-xwiki</module>
-				
-			</modules>
-		</profile>
-		-->
-		<!-- ======== Android ======== -->
+		<!-- ======== Android ======== - ->
 
 		<profile>
 			<id>jadex-android</id>
@@ -584,7 +501,7 @@
 				<finalName>jadex-android-${project.version}</finalName>
 			</build>
 			<modules>
-				<!-- Jadex modules -->
+				<!- - Jadex modules - ->
 				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-bridge</module>
@@ -597,15 +514,16 @@
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
-				<module>jadex-platform-base</module>
+				<module>jadex-platform</module>
 				<module>jadex-platform-standalone</module>
 				
-				<!-- Android specific modules -->
+				<!- - Android specific modules - ->
 				<module>jadex-android-parent</module>
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-android-antlr</module>
 				<module>jadex-runtimetools-android</module>
 			</modules>
 		</profile>
+		-->
 	</profiles>
 </project>

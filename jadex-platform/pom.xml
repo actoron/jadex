@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jadex-platform-base</artifactId>
+	<artifactId>jadex-platform</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-platform-base</name>
+	<name>jadex-platform</name>
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-parent</artifactId>
@@ -12,8 +12,8 @@
 	</parent>
 
 	<description>
-		The Jadex platform base package contains
-		functionality useful for constructing platforms.
+		The Jadex platform package contains implementations of
+		platform services as well as the platform component itself.
 	</description>
 
 	<dependencies>

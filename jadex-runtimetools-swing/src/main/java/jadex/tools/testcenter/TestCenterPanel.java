@@ -134,6 +134,9 @@ public class TestCenterPanel extends JSplitPanel
 	/** The list of tests. */
 	protected List<Tuple2<String, IResourceIdentifier>> tests;
 	
+	/** File chooser for loading saving testsuites. */
+	protected JFileChooser loadsavechooser;
+	
 	//-------- constructors --------
 
 	/**
@@ -146,40 +149,6 @@ public class TestCenterPanel extends JSplitPanel
 		this.tests = new ArrayList<Tuple2<String, IResourceIdentifier>>();
 		this.setResizeWeight(0.5);
 	
-		final JFileChooser loadsavechooser = new JFileChooser(".");
-		final javax.swing.filechooser.FileFilter save_filter = new javax.swing.filechooser.FileFilter()
-		{
-			public String getDescription()
-			{
-				return "Testcases (*.tests)";
-			}
-
-			public boolean accept(File f)
-			{
-				return f.isDirectory() || f.getName().endsWith(FILEEXTENSION_TESTS);
-			}
-		};
-		loadsavechooser.addChoosableFileFilter(save_filter);
-		
-		final JFileChooser saverepchooser = new JFileChooser(".");
-		saverepchooser.setSelectedFile(new File("test_report.html"));
-		saverepchooser.setAcceptAllFileFilterUsed(true);
-		final javax.swing.filechooser.FileFilter savereport_filter = new javax.swing.filechooser.FileFilter()
-		{
-			public String getDescription()
-			{
-				return "HTMLs (*.html)";
-			}
-
-			public boolean accept(File f)
-			{
-				String name = f.getName();
-				return f.isDirectory() || name.toLowerCase().endsWith("html") || name.toLowerCase().endsWith("htm");
-			}
-		};
-		saverepchooser.addChoosableFileFilter(savereport_filter);
-		saverepchooser.setMultiSelectionEnabled(true);
-
 		JPanel testcases = new ScrollablePanel(null, false, true);
 		testcases.setLayout(new GridBagLayout());
 		testcases.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Test suite settings "));
@@ -311,6 +280,23 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
+				if(loadsavechooser==null)
+				{
+					loadsavechooser = new JFileChooser(".");
+					loadsavechooser.addChoosableFileFilter(new javax.swing.filechooser.FileFilter()
+					{
+						public String getDescription()
+						{
+							return "Testcases (*.tests)";
+						}
+					
+						public boolean accept(File f)
+						{
+							return f.isDirectory() || f.getName().endsWith(FILEEXTENSION_TESTS);
+						}
+					});
+				}
+				
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
@@ -358,6 +344,23 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
+				if(loadsavechooser==null)
+				{
+					loadsavechooser = new JFileChooser(".");
+					loadsavechooser.addChoosableFileFilter(new javax.swing.filechooser.FileFilter()
+					{
+						public String getDescription()
+						{
+							return "Testcases (*.tests)";
+						}
+					
+						public boolean accept(File f)
+						{
+							return f.isDirectory() || f.getName().endsWith(FILEEXTENSION_TESTS);
+						}
+					});
+				}
+				
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
@@ -429,8 +432,31 @@ public class TestCenterPanel extends JSplitPanel
 		
 		savereport.addActionListener(new ActionListener()
 		{
+			JFileChooser saverepchooser;
 			public void actionPerformed(ActionEvent ev)
 			{
+				if(saverepchooser==null)
+				{
+					saverepchooser = new JFileChooser(".");
+					saverepchooser.setSelectedFile(new File("test_report.html"));
+					saverepchooser.setAcceptAllFileFilterUsed(true);
+					final javax.swing.filechooser.FileFilter savereport_filter = new javax.swing.filechooser.FileFilter()
+					{
+						public String getDescription()
+						{
+							return "HTMLs (*.html)";
+						}
+			
+						public boolean accept(File f)
+						{
+							String name = f.getName();
+							return f.isDirectory() || name.toLowerCase().endsWith("html") || name.toLowerCase().endsWith("htm");
+						}
+					};
+					saverepchooser.addChoosableFileFilter(savereport_filter);
+					saverepchooser.setMultiSelectionEnabled(true);
+				}
+				
 				if(saverepchooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this),
 					"Save Report")==JFileChooser.APPROVE_OPTION)
 				{

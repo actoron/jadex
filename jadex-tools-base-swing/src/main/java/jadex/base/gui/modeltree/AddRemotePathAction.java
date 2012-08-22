@@ -1,10 +1,7 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.RemoteFileChooser;
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.service.types.deployment.FileData;
-import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
@@ -15,7 +12,6 @@ import java.io.File;
 
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 

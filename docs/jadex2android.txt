@@ -1,4 +1,4 @@
-Porting Jadex to Android
+Porting Jadex to Android (outdated)
 =================================
 
 For a minimal version of Jadex, following packages are required:
@@ -8,7 +8,7 @@ For a minimal version of Jadex, following packages are required:
 * jadex-javaparser
 * jadex-kernel-application
 * jadex-kernel-micro
-* jadex-platform-base
+* jadex-platform
 * jadex-platform-standalone
 * jadex-xml
 

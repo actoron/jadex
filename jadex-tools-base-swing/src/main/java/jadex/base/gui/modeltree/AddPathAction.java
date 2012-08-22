@@ -1,7 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.FileTreePanel;
 import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
@@ -52,24 +50,7 @@ public class AddPathAction extends ToolTipAction
 	public AddPathAction(String name, Icon icon, String desc, ITreeAbstraction treepanel)
 	{
 		super(name, icon, desc);
-		this.treepanel = treepanel;
-		
-		System.err.println("filechooser1");
-		filechooser = new JFileChooser(".");
-		filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		filechooser.addChoosableFileFilter(new FileFilter()
-		{
-			public String getDescription()
-			{
-				return "Paths or .jar files";
-			}
-
-			public boolean accept(File f)
-			{
-				String name = f.getName().toLowerCase();
-				return f.isDirectory() || name.endsWith(".jar");
-			}
-		});
+		this.treepanel = treepanel;		
 	}
 	
 	//-------- methods --------
@@ -90,6 +71,25 @@ public class AddPathAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
+		if(filechooser==null)
+		{
+			filechooser = new JFileChooser(".");
+			filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			filechooser.addChoosableFileFilter(new FileFilter()
+			{
+				public String getDescription()
+				{
+					return "Paths or .jar files";
+				}
+	
+				public boolean accept(File f)
+				{
+					String name = f.getName().toLowerCase();
+					return f.isDirectory() || name.endsWith(".jar");
+				}
+			});
+		}
+		
 		if(filechooser.showDialog(SGUI.getWindowParent(treepanel.getTree())
 			, "Add Path")==JFileChooser.APPROVE_OPTION)
 		{

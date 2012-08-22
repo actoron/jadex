@@ -43,7 +43,7 @@
 		<module>../jadex-xml</module>
 		<module>../jadex-javaparser</module>
 		<module>../jadex-bridge</module>
-		<module>../jadex-platform-base</module>
+		<module>../jadex-platform</module>
 		<module>../jadex-nuggets</module>
 
 		<module>../jadex-kernel-base</module>
@@ -429,7 +429,7 @@
 				<module>jadex-xml</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
-				<module>jadex-platform-base</module>
+				<module>jadex-platform</module>
 				<module>jadex-nuggets</module>
 
 				<module>jadex-kernel-base</module>
@@ -519,7 +519,7 @@
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
-				<module>jadex-platform-base</module>
+				<module>jadex-platform</module>
 				<module>jadex-platform-standalone</module>
 				
 				<!-- Android specific modules -->

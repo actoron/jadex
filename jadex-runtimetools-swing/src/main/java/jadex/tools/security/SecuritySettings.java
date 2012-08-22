@@ -125,23 +125,15 @@ public class SecuritySettings	implements IServiceViewerPanel
 		tfkeypass = new JTextField(10);
 		JButton bustoreset = new JButton("Set");
 
-		final JFileChooser fc = new JFileChooser(".");
-//		fcava.setFileFilter(new FileFilter()
-//		{
-//			public String getDescription()
-//			{
-//				return "*.jpg, *.png";
-//			}
-//			
-//			public boolean accept(File f)
-//			{
-//				return f.isDirectory() || f.getName().endsWith(".jpg") || f.getName().endsWith(".png");
-//			}
-//		});
 		bustpa.addActionListener(new ActionListener()
 		{
+			JFileChooser fc;
 			public void actionPerformed(ActionEvent e)
 			{
+				if(fc==null)
+				{
+					fc = new JFileChooser(".");
+				}
 				fc.showOpenDialog(inner);
 				File sel = fc.getSelectedFile();
 				if(sel!=null && sel.exists())

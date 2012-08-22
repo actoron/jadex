@@ -145,7 +145,7 @@
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
-				<module>jadex-platform-base</module>
+				<module>jadex-platform</module>
 				<module>jadex-platform-standalone</module>
 
 				<!-- Modules required for integration test -->

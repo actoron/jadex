@@ -7,13 +7,10 @@ import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.List;
 
 import javax.swing.Icon;
-import javax.swing.JFileChooser;
 import javax.swing.UIDefaults;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 
 /**
@@ -34,9 +31,6 @@ public class CollapseAllAction extends ToolTipAction
 	/** The tree. */
 	protected FileTreePanel treepanel;
 	
-	/** The file chooser. */
-	protected JFileChooser filechooser;
-	
 	//-------- constructors --------
 	
 	/**
@@ -54,22 +48,6 @@ public class CollapseAllAction extends ToolTipAction
 	{
 		super(name, icon, desc);
 		this.treepanel = treepanel;
-		
-		filechooser = new JFileChooser(".");
-		filechooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		filechooser.addChoosableFileFilter(new FileFilter()
-		{
-			public String getDescription()
-			{
-				return "Paths or .jar files";
-			}
-
-			public boolean accept(File f)
-			{
-				String name = f.getName().toLowerCase();
-				return f.isDirectory() || name.endsWith(".jar");
-			}
-		});
 	}
 	
 	//-------- methods --------

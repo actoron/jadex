@@ -57,12 +57,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -450,24 +448,31 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			GridBagConstraints.NONE, new Insets(2, 4, 4, 2), 0, 0));
 //		buts.add(fetch, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST,
 //			GridBagConstraints.NONE, new Insets(2, 4, 4, 2), 0, 0));
-		final JFileChooser cchooser = new JFileChooser(".");
-		cchooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		cchooser.setFileFilter(new FileFilter()
-		{
-			public boolean accept(File name)
-			{
-				return name.isDirectory() || name.getName().endsWith(".jar");
-			}
-			public String getDescription()
-			{
-				return "*.jar";
-			}
-		});
-		cchooser.setMultiSelectionEnabled(true);
 		add.addActionListener(new ActionListener()
 		{
+			JFileChooser cchooser;
+			
 			public void actionPerformed(ActionEvent e)
 			{
+				if(cchooser==null)
+				{
+					cchooser  = new JFileChooser(".");
+					cchooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					cchooser.setFileFilter(new FileFilter()
+					{
+						public boolean accept(File name)
+						{
+							return name.isDirectory() || name.getName().endsWith(".jar");
+						}
+						public String getDescription()
+						{
+							return "*.jar";
+						}
+					});
+					cchooser.setMultiSelectionEnabled(true);
+				}
+				
+				
 				if(cchooser.showDialog(SGUI.getWindowParent(classview)
 					, "Add")==JFileChooser.APPROVE_OPTION)
 				{

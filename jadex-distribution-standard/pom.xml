@@ -60,7 +60,7 @@
 		<!-- Platforms -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-base</artifactId>
+			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

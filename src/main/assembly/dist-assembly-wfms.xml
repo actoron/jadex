@@ -20,7 +20,7 @@
 				<exclude>*:jadex-commons</exclude>
 				<exclude>*:jadex-bridge</exclude>
 				<exclude>*:jadex-javaparser</exclude>
-				<exclude>*:jadex-platform-base</exclude>
+				<exclude>*:jadex-platform</exclude>
 				<exclude>*:jadex-kernel-*</exclude>
 				<exclude>*:jadex-rules</exclude>
 				<exclude>*:jadex-xml</exclude>
