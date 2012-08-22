@@ -7,42 +7,20 @@ import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
-import jadex.base.fipa.SFipa;
-import jadex.base.service.message.ManagerSendTask;
-import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.GZIPCodec;
-import jadex.base.service.message.transport.codecs.ICodec;
-import jadex.base.service.message.transport.codecs.JadexXMLCodec;
-import jadex.base.service.remote.RemoteServiceContainer;
-import jadex.base.service.remote.commands.RemoteSearchCommand;
-import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.search.BasicResultSelector;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.xml.ObjectInfo;
-import jadex.xml.TypeInfo;
-import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaWriter;
-import jadex.xml.writer.WriteContext;
 import jadex.xml.writer.Writer;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javaxx.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
@@ -101,22 +77,23 @@ public class BTTransportTest extends TestCase {
 		// new ObjectInfo(IRemotable.class));
 		// typeinfoswrite.add(ti_proxyable);
 
-		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite,
-				true)) {
-			public void writeObject(WriteContext wc, Object object, QName tag)
-					throws Exception {
-
-				if (object != null && !(object instanceof BasicService)
-						&& object.getClass().isAnnotationPresent(Service.class)) {
-					{
-						object = BasicServiceInvocationHandler
-								.getPojoServiceProxy(object);
-					}
-				}
-
-				super.writeObject(wc, object, tag);
-			};
-		};
+//		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite,
+//				true)) {
+//			public void writeObject(WriteContext wc, Object object, QName tag)
+//					throws Exception {
+//
+//				if (object != null && !(object instanceof BasicService)
+//						&& object.getClass().isAnnotationPresent(Service.class)) {
+//					{
+//						object = BasicServiceInvocationHandler
+//								.getPojoServiceProxy(object);
+//					}
+//				}
+//
+//				super.writeObject(wc, object, tag);
+//			};
+//		};
+		this.writer = new Writer();
 	}
 
 	@Test

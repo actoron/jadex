@@ -1,6 +1,5 @@
 package jadex.android.bluetooth;
 
-import jadex.android.bluetooth.shadows.MyShadowBluetoothAdapter;
 import jadex.android.bluetooth.shadows.MyShadowLog;
 
 import org.junit.runners.model.InitializationError;
@@ -19,6 +18,7 @@ public class CustomTestRunner extends RobolectricTestRunner {
 	protected void bindShadowClasses() {
 		Robolectric.bindShadowClass(MyShadowBluetoothAdapter.class);
 		Robolectric.bindShadowClass(MyShadowLog.class);
+		
 	}
 
 }

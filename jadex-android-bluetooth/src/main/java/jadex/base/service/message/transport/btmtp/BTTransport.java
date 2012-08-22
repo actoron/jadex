@@ -1,6 +1,7 @@
 package jadex.base.service.message.transport.btmtp;
 
-import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
+import jadex.android.JadexAndroidContext;
+import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.exceptions.ActivityIsNotJadexBluetoothActivityException;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -10,7 +11,6 @@ import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
 import jadex.base.service.message.ISendTask;
-import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -19,15 +19,16 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.IResultCommand;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import android.app.Activity;
@@ -99,7 +100,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 */
 	public BTTransport(final IServiceProvider container) {
 		this.container = container;
-		JadexBluetoothActivity.addContextChangeListener(this);
+		JadexAndroidContext.getInstance().addContextChangeListener(this);
 	}
 
 	/**
@@ -387,6 +388,13 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 		}
 		return ret;
 	}
+	
+
+	@Override
+	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc)
+	{
+		return false;
+	}
 
 	class BTServiceConnection implements ServiceConnection {
 
@@ -453,4 +461,5 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 //					});
 		}
 	}
+
 }

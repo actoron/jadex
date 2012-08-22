@@ -1,6 +1,7 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
-import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
+import jadex.android.JadexAndroidContext;
+import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -14,8 +15,8 @@ import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -61,7 +62,7 @@ import android.util.Log;
 @RequiredServices(
 {
 	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="management", type=IManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements AndroidContextChangeListener
 {
@@ -77,7 +78,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 	public BluetoothP2PDiscoveryAgent() {
 		intent = new Intent();
 		_knownDevices = new IBluetoothDevice[0];
-		JadexBluetoothActivity.addContextChangeListener(this);
+		JadexAndroidContext.getInstance().addContextChangeListener(this);
 		//intent.setClassName("jadex.android.bluetooth.service", "jadex.android.bluetooth.service.ConnectionService");
 	}
 

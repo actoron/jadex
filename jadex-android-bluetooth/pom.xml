@@ -16,13 +16,19 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-core</artifactId>
+			<artifactId>jadex-bridge</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-misc</artifactId>
+			<artifactId>jadex-platform</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -31,6 +37,12 @@
 			<artifactId>protobuf-java</artifactId>
 			<version>2.4.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android-test</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -52,9 +64,19 @@
 					<generateApk>false</generateApk>
 					<attachJar>true</attachJar>
 					<sdk>
-						<path>${project.basedir}/sdktools</path>
+						<path>${env.ANDROID_HOME}</path>
 						<platform>2.2</platform>
 					</sdk>
+					<dex>
+						<jvmArguments>
+							<jvmArgument>-Xms256m</jvmArgument>
+							<jvmArgument>-Xmx1024m</jvmArgument>
+						</jvmArguments>
+						<coreLibrary>false</coreLibrary>
+						<noLocals>false</noLocals>
+						<optimize>true</optimize>
+					</dex>
+
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>
