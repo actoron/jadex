@@ -98,31 +98,6 @@ public class ControlCenterWindow extends JFrame
 	
 		statusbar = new StatusBar();
 		getContentPane().add("South", statusbar);
-
-		System.out.println("cc init 2");
-		try
-		{
-			this.filechooser = new JFileChooser(".");
-		}
-		catch(Exception e)
-		{
-			System.out.println("cc init 2a");
-			this.filechooser = new JFileChooser();			
-		}
-		System.out.println("cc init 3");
-		filechooser.setFileFilter(new FileFilter()
-		{
-			public boolean accept(File f)
-			{
-				return f.isDirectory() || f.getName().toLowerCase().endsWith(ControlCenter.SETTINGS_EXTENSION);
-			}
-
-			public String getDescription()
-			{
-				return "JCC Settings Files";
-			}
-		});
-		System.out.println("cc init 4");
 		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter()
@@ -245,9 +220,9 @@ public class ControlCenterWindow extends JFrame
 	 */
 	protected void saveSettingsAs()
 	{
-		if(filechooser.showDialog(this, "Save Settings As")==JFileChooser.APPROVE_OPTION)
+		if(getFileChooser().showDialog(this, "Save Settings As")==JFileChooser.APPROVE_OPTION)
 		{
-			final File f = filechooser.getSelectedFile();
+			final File f = getFileChooser().getSelectedFile();
 			// Todo: why invoke later?
 			SwingUtilities.invokeLater(new Runnable()
 			{
@@ -269,7 +244,7 @@ public class ControlCenterWindow extends JFrame
 						else if(!file.getName().toLowerCase().endsWith(ControlCenter.SETTINGS_EXTENSION))
 						{
 							file = new File(file.getAbsolutePath()+ControlCenter.SETTINGS_EXTENSION);
-							filechooser.setSelectedFile(file);
+							getFileChooser().setSelectedFile(file);
 						}
 						controlcenter.saveSettings(file);
 					}
@@ -284,11 +259,34 @@ public class ControlCenterWindow extends JFrame
 	 */
 	protected void	loadSettings()
 	{
-		if(filechooser.showDialog(this, "Load Settings")==JFileChooser.APPROVE_OPTION)
+		if(getFileChooser().showDialog(this, "Load Settings")==JFileChooser.APPROVE_OPTION)
 		{
-			File file = filechooser.getSelectedFile();
+			File file = getFileChooser().getSelectedFile();
 			controlcenter.loadSettings(file);
 		}
+	}
+	
+	/**
+	 *  Get the file chooser.
+	 */
+	protected JFileChooser	getFileChooser()
+	{
+		// Lazy creation to avoid nullpointer when running jenkins build as windows service.
+		this.filechooser = new JFileChooser(".");
+		filechooser.setFileFilter(new FileFilter()
+		{
+			public boolean accept(File f)
+			{
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(ControlCenter.SETTINGS_EXTENSION);
+			}
+
+			public String getDescription()
+			{
+				return "JCC Settings Files";
+			}
+		});
+		
+		return filechooser;
 	}
 	
 	/**
