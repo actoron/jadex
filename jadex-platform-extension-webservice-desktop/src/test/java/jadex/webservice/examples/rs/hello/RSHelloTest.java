@@ -54,9 +54,10 @@ public class RSHelloTest extends TestCase
 		httpServer.start();
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false", "-componentfactory",
-				"jadex.component.ComponentComponentFactory", "-conf", "jadex/standalone/Platform.component.xml", "-component",
-				"jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
+		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+//				"-componentfactory", "jadex.component.ComponentComponentFactory",
+//				"-conf", "jadex/platform/Platform.component.xml",
+				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		ThreadSuspendable sus = new ThreadSuspendable();
 		extAcc = fut.get(sus);
