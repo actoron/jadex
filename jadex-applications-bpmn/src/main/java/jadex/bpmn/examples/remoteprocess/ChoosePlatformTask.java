@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 /**
  *  Search for platforms and choose one by its component identifier.
@@ -33,6 +34,8 @@ import javax.swing.JTextArea;
 })
 public class ChoosePlatformTask implements ITask
 {
+	JPanel	pmsg;
+	
 	/**
 	 *  Execute the task.
 	 *  @param context	The accessible values.
@@ -46,51 +49,58 @@ public class ChoosePlatformTask implements ITask
 		process.getServiceContainer().searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, Void>(ret)
 		{
-			public void customResultAvailable(Collection<IComponentManagementService> result)
+			public void customResultAvailable(final Collection<IComponentManagementService> result)
 			{
-				JPanel	pmsg	= new JPanel(new GridBagLayout());
-				GridBagConstraints	gbc	= new GridBagConstraints();
-				gbc.gridy	= 0;
-				gbc.anchor	= GridBagConstraints.WEST;
-				
-				JTextArea	msg	= new JTextArea("Please choose the platform");
-				msg.setEditable(false);  
-				msg.setCursor(null);  
-				msg.setOpaque(false);
-				
-				pmsg.add(msg, gbc);
-				gbc.gridy++;
-				gbc.insets	= new Insets(1,10,1,1);
-				
-				IComponentIdentifier[]	cids	= new IComponentIdentifier[result.size()];
-				JRadioButton[]	buts	= new JRadioButton[result.size()];
-				ButtonGroup	bg	= new ButtonGroup();
-				Iterator<IComponentManagementService> it=result.iterator();
-				for(int i=0; i<cids.length; i++)
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					IService	next	= (IService)it.next();
-					cids[i]	= (IComponentIdentifier)next.getServiceIdentifier().getProviderId();
-					buts[i]	= new JRadioButton(cids[i].getName());
-					bg.add(buts[i]);
-					pmsg.add(buts[i], gbc);
-					gbc.gridy++;
-				}
-				
-				int	res	= JOptionPane.showConfirmDialog(null, pmsg, "Choose Platform", JOptionPane.OK_CANCEL_OPTION);
-				IComponentIdentifier	cid	= null;
-				if(res==JOptionPane.OK_OPTION)
-				{
-					for(int i=0; cid==null && i<buts.length; i++)
+					public void run()
 					{
-						if(buts[i].isSelected())
+						pmsg	= new JPanel(new GridBagLayout());
+						GridBagConstraints	gbc	= new GridBagConstraints();
+						gbc.gridy	= 0;
+						gbc.anchor	= GridBagConstraints.WEST;
+						
+						JTextArea	msg	= new JTextArea("Please choose the platform");
+						msg.setEditable(false);  
+						msg.setCursor(null);  
+						msg.setOpaque(false);
+						
+						pmsg.add(msg, gbc);
+						gbc.gridy++;
+						gbc.insets	= new Insets(1,10,1,1);
+						
+						IComponentIdentifier[]	cids	= new IComponentIdentifier[result.size()];
+						JRadioButton[]	buts	= new JRadioButton[result.size()];
+						ButtonGroup	bg	= new ButtonGroup();
+						Iterator<IComponentManagementService> it=result.iterator();
+						for(int i=0; i<cids.length; i++)
 						{
-							cid	= cids[i];
+							IService	next	= (IService)it.next();
+							cids[i]	= (IComponentIdentifier)next.getServiceIdentifier().getProviderId();
+							buts[i]	= new JRadioButton(cids[i].getName());
+							bg.add(buts[i]);
+							pmsg.add(buts[i], gbc);
+							gbc.gridy++;
 						}
+						
+						int	res	= JOptionPane.showConfirmDialog(null, pmsg, "Choose Platform", JOptionPane.OK_CANCEL_OPTION);
+						pmsg	= null;
+						IComponentIdentifier	cid	= null;
+						if(res==JOptionPane.OK_OPTION)
+						{
+							for(int i=0; cid==null && i<buts.length; i++)
+							{
+								if(buts[i].isSelected())
+								{
+									cid	= cids[i];
+								}
+							}
+						}
+						
+						context.setParameterValue("cid", cid);
+						ret.setResult(null);
 					}
-				}
-				
-				context.setParameterValue("cid", cid);
-				ret.setResult(null);
+				});
 			}
 		});
 		return ret;
@@ -102,6 +112,25 @@ public class ChoosePlatformTask implements ITask
 	 */
 	public IFuture<Void> cancel(BpmnInterpreter instance)
 	{
-		return IFuture.DONE;
+		final Future<Void>	ret	= new Future<Void>();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if(pmsg!=null)
+				{
+					try
+					{
+						SwingUtilities.getWindowAncestor(pmsg).dispose();
+						ret.setResult(null);
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			}
+		});
+		return ret;
 	}
 }

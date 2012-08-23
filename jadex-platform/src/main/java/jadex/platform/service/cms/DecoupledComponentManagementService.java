@@ -1010,7 +1010,18 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		IComponentAdapter adapter;
 		adapter = (IComponentAdapter)adapters.get(paid);
 		if(adapter==null)
-			adapter = getParentInfo(cinfo).getAdapter();
+		{
+			InitInfo	pinfo = getParentInfo(cinfo);
+			
+			// Hack!!! happens when parent is killed while trying to create subcomponent (todo: integrate locking for destroy and create of component structure)
+			if(pinfo==null)
+			{
+				throw new ComponentTerminatedException(paid);
+			}
+			
+			adapter = pinfo.getAdapter();
+		}
+		
 		return adapter;
 	}
 	
@@ -1937,6 +1948,15 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //					System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
 //						classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
 					ret.setResult(ea.getModel().getResourceIdentifier());
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					// External access of parent not found, because already terminated (hack!!! fix creation/destroy structure lock)
+					if(ci.getParent()!=null)
+					{
+						exception 	= new ComponentTerminatedException(ci.getParent());
+					}
+					super.exceptionOccurred(exception);
 				}
 			}));
 		}

@@ -282,10 +282,16 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void exceptionOccurred(final Exception exception)
 						{
-//							System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-							thread.setNonWaiting();
-							thread.setException(exception);
-							instance.step(activity, instance, thread, null);
+							// Hack!!! Ignore exception, when component already terminated.
+							if(!(exception instanceof ComponentTerminatedException)
+								|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
+							{
+//								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+								exception.printStackTrace();
+								thread.setNonWaiting();
+								thread.setException(exception);
+								instance.step(activity, instance, thread, null);
+							}
 						}
 						
 						protected void updateParameters(ProcessThread thread)
@@ -341,11 +347,11 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							if(!(exception instanceof ComponentTerminatedException)
 								|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 							{
+								//							System.out.println("exception: "+exception);
+								exception.printStackTrace();
 								thread.setNonWaiting();
 								thread.setException(exception);
 								instance.step(activity, instance, thread, null);
-	//							System.out.println("exception: "+exception);
-	//							exception.printStackTrace();
 							}
 						}
 					};

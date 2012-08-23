@@ -975,7 +975,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(killfuture!=null)
 		{
 			// Already in termination.
-			killfuture.setException(exception);
+			// todo: shouldn't be called when killfuture already done!?
+			killfuture.setExceptionIfUndone(exception);
 		}
 		else
 		{
