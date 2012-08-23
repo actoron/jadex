@@ -1,6 +1,6 @@
-package jadex.platform.service.remote.replacements;
+package jadex.base.service.remote.replacements;
 
-import jadex.platform.service.remote.IMethodReplacement;
+import jadex.base.service.remote.IMethodReplacement;
 
 import java.lang.reflect.Proxy;
 

@@ -1,5 +1,6 @@
 package jadex.platform.service.message.streams;
 
+import jadex.base.service.message.streams.AckInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Tuple2;

@@ -3,6 +3,7 @@ package jadex.platform.service.message.transport.localmtp;
 import java.util.Arrays;
 import java.util.Map;
 
+import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -13,7 +14,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
-import jadex.platform.service.message.transport.MessageEnvelope;
 
 
 /**

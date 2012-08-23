@@ -1,5 +1,6 @@
 package jadex.base.relay;
 
+import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.ICodec;
@@ -10,7 +11,6 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.platform.service.message.MapSendTask;
-import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 import jadex.xml.bean.JavaReader;

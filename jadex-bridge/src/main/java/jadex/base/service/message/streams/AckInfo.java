@@ -1,8 +1,10 @@
-package jadex.platform.service.message.streams;
+package jadex.base.service.message.streams;
 
 /**
  * 
  */
+//legacy package for jadex 2.1
+//todo: implement alias names for XML/binary classes
 public class AckInfo
 {
 	/** The start seqno. */

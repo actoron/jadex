@@ -1,5 +1,13 @@
 package jadex.platform.service.remote;
 
+import jadex.base.service.remote.IMethodReplacement;
+import jadex.base.service.remote.ProxyInfo;
+import jadex.base.service.remote.ProxyReference;
+import jadex.base.service.remote.RemoteReference;
+import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
+import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
+import jadex.base.service.remote.replacements.DefaultEqualsMethodReplacement;
+import jadex.base.service.remote.replacements.DefaultHashcodeMethodReplacement;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -33,10 +41,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.ExternalAccess;
-import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
-import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
-import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
-import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

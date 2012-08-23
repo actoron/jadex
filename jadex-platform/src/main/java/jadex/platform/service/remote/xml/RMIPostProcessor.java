@@ -1,6 +1,6 @@
 package jadex.platform.service.remote.xml;
 
-import jadex.platform.service.remote.ProxyReference;
+import jadex.base.service.remote.ProxyReference;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;

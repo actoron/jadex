@@ -1,5 +1,8 @@
 package jadex.platform.service.message;
 
+import jadex.base.service.message.streams.AckInfo;
+import jadex.base.service.message.streams.InitInfo;
+import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -51,15 +54,12 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.awareness.discovery.message.IMessageAwarenessService;
 import jadex.platform.service.cms.AbstractComponentAdapter;
 import jadex.platform.service.message.streams.AbstractConnectionHandler;
-import jadex.platform.service.message.streams.AckInfo;
-import jadex.platform.service.message.streams.InitInfo;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.InputConnectionHandler;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.message.streams.OutputConnectionHandler;
 import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
-import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 
 import java.io.BufferedInputStream;

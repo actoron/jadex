@@ -1,4 +1,4 @@
-package jadex.platform.service.remote;
+package jadex.base.service.remote;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,8 @@
 package jadex.platform.service.remote;
 
+import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.commands.AbstractRemoteCommand;
+import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
@@ -29,8 +32,6 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
-import jadex.platform.service.remote.commands.AbstractRemoteCommand;
-import jadex.platform.service.remote.commands.RemoteResultCommand;
 
 import java.util.Collection;
 import java.util.Iterator;
