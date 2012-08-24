@@ -108,8 +108,8 @@ public class ElizaAgent
 					else if(s.toLowerCase().indexOf("eliza")!=-1)
 					{
 						writeToLog(s, event.getComponentIdentifier());
-						chat.message("Hi! I'm Eliza. Please tell me your problem in private.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
-						writeToLog("> "+"Hi! I'm Eliza. Please tell me your problem in private.", event.getComponentIdentifier());
+						chat.message("Hi! I'm the famous Eliza program. Please tell me your problem in private.", new IComponentIdentifier[]{event.getComponentIdentifier()}, true);
+						writeToLog("> "+"Hi! I'm the famous Eliza program. Please tell me your problem in private.", event.getComponentIdentifier());
 					}
 				}
 			}
