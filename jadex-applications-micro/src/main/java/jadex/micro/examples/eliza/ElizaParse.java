@@ -86,7 +86,7 @@ for (int X=1;X<=N1;X++)
 
 
 
-PRINT("Hi! I'm Eliza. What's your problem?");
+PRINT("Hi! I'm the famous Eliza program. What's your problem?");
 
 }
 
