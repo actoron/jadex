@@ -72,6 +72,12 @@ public interface IInternalAccess
 	 */
 	public IFuture<Map<String, Object>> killComponent();
 	
+//	/**
+//	 *  Test if component has been killed.
+//	 *  @return True, if has been killed.
+//	 */
+//	public boolean isKilled();
+	
 	/**
 	 *  Create a result listener that is executed on the
 	 *  component thread.

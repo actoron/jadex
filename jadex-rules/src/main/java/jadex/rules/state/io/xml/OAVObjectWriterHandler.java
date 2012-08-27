@@ -1,12 +1,12 @@
 package jadex.rules.state.io.xml;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.BasicTypeConverter;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.xml.AttributeInfo;
-import jadex.xml.BasicTypeConverter;
 import jadex.xml.IContext;
 import jadex.xml.Namespace;
 import jadex.xml.ObjectInfo;

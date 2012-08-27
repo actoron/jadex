@@ -1,11 +1,11 @@
 package jadex.xml.writer;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.annotations.IncludeFields;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
-import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPreProcessor;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;

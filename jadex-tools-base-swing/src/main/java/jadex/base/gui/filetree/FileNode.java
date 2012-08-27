@@ -7,6 +7,7 @@ import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -35,7 +36,8 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	
 	/** The cached display name. */
 	protected String displayname;
-
+	protected String tostring;
+	
 	/** The last siblings. */
 	protected List	lastsiblings;
 		
@@ -115,7 +117,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	 */
 	public String toString()
 	{
-		String name	= getDisplayName();
+		String name	= tostring==null? getDisplayName(): tostring;
 		
 		// For equally named path entries (e.g. 'classes') build larger name to differentiate (e.g. 'myapp/classes').
 		if(getParent() instanceof RootNode)
@@ -124,18 +126,18 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 			List siblings = getParent().getCachedChildren();
 			if(lastsiblings==null || !lastsiblings.equals(siblings))
 			{
-//				System.out.println("check");
-				lastsiblings = siblings;
+//				System.out.println("check: "+file.getAbsolutePath());
+				lastsiblings = new ArrayList(siblings);
 				
 				for(int i=0; siblings!=null && i<siblings.size(); i++)
 				{
 					if(siblings.get(i)!=this && siblings.get(i) instanceof FileNode)
 					{
 						File	sib	= ((FileNode)siblings.get(i)).getFile();
-	//					System.out.println("vs: "+file+", "+sib);
+//						System.out.println("vs: "+file+", "+sib);
 						if(((FileNode)siblings.get(i)).getDisplayName().equals(getDisplayName()) && !sib.getPath().endsWith(file.getPath()))
 						{
-	//						System.out.println("vs1: "+file+", "+sib);
+//							System.out.println("vs1: "+file+", "+sib);
 							int	tmp	= Math.max(file.getPath().lastIndexOf("/"), file.getPath().lastIndexOf("\\"))+1;
 							while(sib.getPath().endsWith(file.getPath().substring(tmp)))
 							{
@@ -149,6 +151,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 				if(idx>-1)
 				{
 					name	= file.getPath().substring(idx);
+					tostring = name;
 				}
 			}
 		}

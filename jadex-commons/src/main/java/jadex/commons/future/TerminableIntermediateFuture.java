@@ -68,6 +68,24 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 		}
 	}
 	
+	/**
+	 *  Get the terminate.
+	 *  @return The terminate.
+	 */
+	public ITerminationCommand getTerminationCommand()
+	{
+		return terminate;
+	}
+
+	/**
+	 *  Set the terminate.
+	 *  @param terminate The terminate to set.
+	 */
+	public void setTerminationCommand(ITerminationCommand terminate)
+	{
+		this.terminate = terminate;
+	}
+	
 //	/**
 //	 *  Test if future is terminated.
 //	 *  @return True, if terminated.

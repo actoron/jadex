@@ -6,11 +6,10 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.IObjectStringConverter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
-import jadex.xml.IContext;
-import jadex.xml.IObjectStringConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
@@ -211,7 +210,7 @@ public class JavaWriter
 			// java.lang.Class
 			IObjectStringConverter clconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 //					String	ret	= ""+((Class)val).getCanonicalName();
 					// Todo: SReflect doesn not work for some case!? (Lars)
@@ -252,7 +251,7 @@ public class JavaWriter
 				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("level", null), new AttributeConverter(null, new IObjectStringConverter()
 				{
-					public String convertObject(Object val, IContext context)
+					public String convertObject(Object val, Object context)
 					{
 						return ((Level)val).getName();
 					}
@@ -276,7 +275,7 @@ public class JavaWriter
 			// java.lang.Class
 			IObjectStringConverter oclconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					String	ret	= SReflect.getClassName(val.getClass());
 					return ret;
@@ -323,7 +322,7 @@ public class JavaWriter
 			// java.lang.Byte
 			IObjectStringConverter byteconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					return new String(Base64.encode(new byte[]{((Byte)val).byteValue()}));
 				}
@@ -340,7 +339,7 @@ public class JavaWriter
 			// java.lang.enum
 			IObjectStringConverter enumconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Enum en = (Enum)val;
 					String clazz = SReflect.getClassName(val.getClass());
@@ -357,7 +356,7 @@ public class JavaWriter
 			// boolean/Boolean Array
 			IObjectStringConverter booleanconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					boolean[] data = (boolean[])val;
 					StringBuilder bul = new StringBuilder();
@@ -375,7 +374,7 @@ public class JavaWriter
 			
 			IObjectStringConverter bbooleanconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Boolean[] data = (Boolean[])val;
 					StringBuilder bul = new StringBuilder();
@@ -394,7 +393,7 @@ public class JavaWriter
 			// int/Integer Array
 			IObjectStringConverter intconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					int[] data = (int[])val;
 					StringBuilder bul = new StringBuilder();
@@ -415,7 +414,7 @@ public class JavaWriter
 			
 			IObjectStringConverter integerconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Integer[] data = (Integer[])val;
 					StringBuilder bul = new StringBuilder();
@@ -437,7 +436,7 @@ public class JavaWriter
 			// double/Double Array
 			IObjectStringConverter doubleconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					double[] data = (double[])val;
 					StringBuilder bul = new StringBuilder();
@@ -458,7 +457,7 @@ public class JavaWriter
 			
 			IObjectStringConverter bdoubleconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Double[] data = (Double[])val;
 					StringBuilder bul = new StringBuilder();
@@ -480,7 +479,7 @@ public class JavaWriter
 			// float/Float array
 			IObjectStringConverter floatconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					float[] data = (float[])val;
 					StringBuilder bul = new StringBuilder();
@@ -501,7 +500,7 @@ public class JavaWriter
 			
 			IObjectStringConverter bfloatconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Float[] data = (Float[])val;
 					StringBuilder bul = new StringBuilder();
@@ -523,7 +522,7 @@ public class JavaWriter
 			// java.lang.Long
 			IObjectStringConverter longconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					long[] data = (long[])val;
 					StringBuilder bul = new StringBuilder();
@@ -544,7 +543,7 @@ public class JavaWriter
 			
 			IObjectStringConverter blongconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Long[] data = (Long[])val;
 					StringBuilder bul = new StringBuilder();
@@ -566,7 +565,7 @@ public class JavaWriter
 			// short/Short Array
 			IObjectStringConverter shortconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					short[] data = (short[])val;
 					StringBuilder bul = new StringBuilder();
@@ -587,7 +586,7 @@ public class JavaWriter
 			
 			IObjectStringConverter bshortconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Short[] data = (Short[])val;
 					StringBuilder bul = new StringBuilder();
@@ -609,7 +608,7 @@ public class JavaWriter
 			// byte/Byte Array
 			IObjectStringConverter bytesconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					byte[] bytes = Base64.encode((byte[])val);
 //					byte[] bytes = (byte[])val;
@@ -623,7 +622,7 @@ public class JavaWriter
 			
 			IObjectStringConverter bbyteconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Byte[] bbytes = (Byte[])val;
 					byte[] bytes = new byte[bbytes.length];
@@ -640,7 +639,7 @@ public class JavaWriter
 			// java.lang.Character
 			IObjectStringConverter charconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					char[] chars = (char[])val;
 					return new String(chars);
@@ -654,7 +653,7 @@ public class JavaWriter
 			
 			IObjectStringConverter characterconv = new IObjectStringConverter()
 			{
-				public String convertObject(Object val, IContext context)
+				public String convertObject(Object val, Object context)
 				{
 					Character[] bchars = (Character[])val;
 					char[] chars = new char[bchars.length];

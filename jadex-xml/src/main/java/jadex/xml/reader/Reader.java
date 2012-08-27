@@ -1,9 +1,9 @@
 package jadex.xml.reader;
 
 import jadex.commons.SUtil;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;

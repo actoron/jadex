@@ -5,13 +5,13 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
@@ -487,7 +487,7 @@ public class JavaReader
 			// boolean/Boolean Array
 			IStringObjectConverter booleanconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					boolean[] ret = new boolean[val.length()];
 					for(int i=0; i<val.length(); i++)
@@ -501,7 +501,7 @@ public class JavaReader
 			
 			IStringObjectConverter bbooleanconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					Boolean[] ret = new Boolean[val.length()];
 					for(int i=0; i<val.length(); i++)
@@ -516,7 +516,7 @@ public class JavaReader
 			// int/Integer Array
 			IStringObjectConverter intconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, ",");
 					int len = Integer.parseInt(stok.nextToken());
@@ -533,7 +533,7 @@ public class JavaReader
 			
 			IStringObjectConverter integerconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, ",");
 					int len = Integer.parseInt(stok.nextToken());
@@ -551,7 +551,7 @@ public class JavaReader
 			// double/Double array
 			IStringObjectConverter doubleconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, "_");
 					int len = Integer.parseInt(stok.nextToken());
@@ -568,7 +568,7 @@ public class JavaReader
 			
 			IStringObjectConverter bdoubleconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, "_");
 					int len = Integer.parseInt(stok.nextToken());
@@ -586,7 +586,7 @@ public class JavaReader
 			// java.lang.Float
 			IStringObjectConverter floatconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, "_");
 					int len = Integer.parseInt(stok.nextToken());
@@ -603,7 +603,7 @@ public class JavaReader
 			
 			IStringObjectConverter bfloatconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, "_");
 					int len = Integer.parseInt(stok.nextToken());
@@ -621,7 +621,7 @@ public class JavaReader
 			// java.lang.Long
 			IStringObjectConverter longconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, ",");
 					int len = Integer.parseInt(stok.nextToken());
@@ -638,7 +638,7 @@ public class JavaReader
 			
 			IStringObjectConverter blongconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, ",");
 					int len = Integer.parseInt(stok.nextToken());
@@ -656,7 +656,7 @@ public class JavaReader
 			// short/Short Array
 			IStringObjectConverter shortconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, ",");
 					int len = Integer.parseInt(stok.nextToken());
@@ -673,7 +673,7 @@ public class JavaReader
 			
 			IStringObjectConverter bshortconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					StringTokenizer stok = new StringTokenizer(val, ",");
 					int len = Integer.parseInt(stok.nextToken());
@@ -691,7 +691,7 @@ public class JavaReader
 			// byte/Byte Array
 			IStringObjectConverter byteconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					return Base64.decode(val.getBytes());
 				}
@@ -702,7 +702,7 @@ public class JavaReader
 			
 			IStringObjectConverter bbyteconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					byte[] bytes = val.getBytes();
 					Byte[] bbytes = new Byte[bytes.length];
@@ -718,7 +718,7 @@ public class JavaReader
 			// java.lang.Character
 			IStringObjectConverter charconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					return val.toCharArray();
 				}
@@ -729,7 +729,7 @@ public class JavaReader
 			
 			IStringObjectConverter characterconv = new IStringObjectConverter()
 			{
-				public Object convertString(String val, IContext context)
+				public Object convertString(String val, Object context)
 				{
 					char[] chars = val.toCharArray();
 					Character[] bchars = new Character[chars.length];

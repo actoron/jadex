@@ -2823,6 +2823,101 @@ public class SUtil
 	}
 	
 	/**
+	 *  Taken from ant.
+	 *  Split a command line.
+	 * 
+	 *  @param line The command line to process.
+	 *  @return The command line broken into strings. An empty or null toProcess
+	 *    parameter results in a zero sized array.
+	 */
+	public static String[] splitCommandline(String line)
+	{
+		if(line == null || line.length() == 0)
+		{
+			// no command? no string
+			return new String[0];
+		}
+		
+		// parse with a simple finite state machine
+
+		final int normal = 0;
+		final int inquote = 1;
+		final int indoublequote = 2;
+		
+		int state = normal;
+		StringTokenizer tok = new StringTokenizer(line, "\"\' ", true);
+		Vector v = new Vector();
+		StringBuffer current = new StringBuffer();
+		boolean lasttok = false;
+
+		while(tok.hasMoreTokens())
+		{
+			String nextTok = tok.nextToken();
+			switch(state)
+			{
+				case inquote:
+					if("\'".equals(nextTok))
+					{
+						lasttok = true;
+						state = normal;
+					}
+					else
+					{
+						current.append(nextTok);
+					}
+					break;
+				case indoublequote:
+					if("\"".equals(nextTok))
+					{
+						lasttok = true;
+						state = normal;
+					}
+					else
+					{
+						current.append(nextTok);
+					}
+					break;
+				default:
+					if("\'".equals(nextTok))
+					{
+						state = inquote;
+					}
+					else if("\"".equals(nextTok))
+					{
+						state = indoublequote;
+					}
+					else if(" ".equals(nextTok))
+					{
+						if(lasttok || current.length() != 0)
+						{
+							v.addElement(current.toString());
+							current = new StringBuffer();
+						}
+					}
+					else
+					{
+						current.append(nextTok);
+					}
+					lasttok = false;
+					break;
+			}
+		}
+		if(lasttok || current.length() != 0)
+		{
+			v.addElement(current.toString());
+		}
+		if(state == inquote || state == indoublequote)
+		{
+			throw new RuntimeException("unbalanced quotes in " + line);
+		}
+		String[] args = new String[v.size()];
+		v.copyInto(args);
+		
+		return args;
+	}
+
+	
+	/**
 	 *  Copy a file.
 	 *  @param source	The source file.
 	 *  @param target	The target file or directory (will be deleted first).

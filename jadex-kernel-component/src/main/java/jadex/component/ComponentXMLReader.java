@@ -25,14 +25,14 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
-import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.StackElement;
@@ -98,15 +98,15 @@ public class ComponentXMLReader
 	
 	public static IStringObjectConverter classconv = new IStringObjectConverter()
 	{
-		public Object convertString(String val, IContext context) throws Exception
+		public Object convertString(String val, Object context) throws Exception
 		{
-			return new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader()));
+			return new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader()));
 		}
 	};
 	
 	public static IObjectStringConverter reclassconv = new IObjectStringConverter()
 	{
-		public String convertObject(Object val, IContext context)
+		public String convertObject(Object val, Object context)
 		{
 			String ret = null;
 			if(val instanceof ClassInfo)

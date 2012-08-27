@@ -1,5 +1,8 @@
 package jadex.xml;
 
+import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
+
 /**
  *  Converter for attributes. Consist of a string-object and a object-string converter.
  *  The first for reading the second for writing.
@@ -31,7 +34,7 @@ public class AttributeConverter implements IAttributeConverter
 	 *  Convert a string value to another type.
 	 *  @param val The value to convert.
 	 */
-	public Object convertString(String val, IContext context) throws Exception
+	public Object convertString(String val, Object context) throws Exception
 	{
 		return soconv!=null? soconv.convertString(val, context): val;
 	}
@@ -40,7 +43,7 @@ public class AttributeConverter implements IAttributeConverter
 	 *  Convert a value to a string type.
 	 *  @param val The value to convert.
 	 */
-	public String convertObject(Object val, IContext context)
+	public String convertObject(Object val, Object context)
 	{
 		return osconv!=null? osconv.convertObject(val, context): ""+val;
 	}

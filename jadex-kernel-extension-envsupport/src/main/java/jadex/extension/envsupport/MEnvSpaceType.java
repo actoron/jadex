@@ -7,6 +7,8 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.gui.SGUI;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.component.ComponentXMLReader;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AvatarMapping;
@@ -43,12 +45,10 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
-import jadex.xml.BasicTypeConverter;
 import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
@@ -2348,7 +2348,7 @@ public class MEnvSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertString(String val, IContext context)
+		public Object convertString(String val, Object context)
 		{
 			Object ret = null;
 			
@@ -2356,11 +2356,11 @@ public class MEnvSpaceType
 			try
 			{
 				ret = exp_parser.parseExpression((String)val, ((IModelInfo)
-					context.getRootObject()).getAllImports(), null, context.getClassLoader());
+					((IContext)context).getRootObject()).getAllImports(), null, ((IContext)context).getClassLoader());
 			}
 			catch(Exception e)
 			{
-				reportError(context, e.toString());
+				reportError((IContext)context, e.toString());
 			}
 			
 			return ret;
@@ -2376,16 +2376,16 @@ public class MEnvSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertString(String val, IContext context)
+		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
 			if(val instanceof String)
 			{
 				ret = SReflect.findClass0((String)val, ((IModelInfo)
-					context.getRootObject()).getAllImports(), context.getClassLoader());
+					((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader());
 				if(ret==null)
 				{
-					reportError(context, "Class not found: "+val);
+					reportError((IContext)context, "Class not found: "+val);
 				}
 			}
 			return ret;
@@ -2401,7 +2401,7 @@ public class MEnvSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertString(String val, IContext context)
+		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
 		
@@ -2431,7 +2431,7 @@ public class MEnvSpaceType
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertString(String val, IContext context)
+		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
 			if(val instanceof String)
@@ -2453,7 +2453,7 @@ public class MEnvSpaceType
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertString(String val, IContext context)
+		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
 			if(val instanceof String)
@@ -2475,7 +2475,7 @@ public class MEnvSpaceType
 		 *  Convert a string value to another type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertString(String val, IContext context)
+		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
 			if(val instanceof String)

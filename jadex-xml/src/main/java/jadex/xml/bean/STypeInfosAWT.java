@@ -3,12 +3,12 @@ package jadex.xml.bean;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
+import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
-import jadex.xml.IObjectStringConverter;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
@@ -39,7 +39,7 @@ public class STypeInfosAWT
 		// java.util.Color
 		IObjectStringConverter coconv = new IObjectStringConverter()
 		{
-			public String convertObject(Object val, IContext context)
+			public String convertObject(Object val, Object context)
 			{
 				return "" + ((Color) val).getRGB();
 			}
@@ -51,7 +51,7 @@ public class STypeInfosAWT
 		// java.awt.image.RenderedImage
 		IObjectStringConverter imgconv = new IObjectStringConverter()
 		{
-			public String convertObject(Object val, IContext context)
+			public String convertObject(Object val, Object context)
 			{
 				try
 				{
@@ -68,7 +68,7 @@ public class STypeInfosAWT
 		// java.lang.Class
 		IObjectStringConverter oclconv = new IObjectStringConverter()
 		{
-			public String convertObject(Object val, IContext context)
+			public String convertObject(Object val, Object context)
 			{
 				String ret = SReflect.getClassName(val.getClass());
 				return ret;
@@ -99,7 +99,7 @@ public class STypeInfosAWT
 		// java.util.Color
 		IStringObjectConverter coconv = new IStringObjectConverter()
 		{
-			public Object convertString(String val, IContext context)
+			public Object convertString(String val, Object context)
 			{
 				return Color.decode(val);
 			}

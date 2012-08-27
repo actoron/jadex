@@ -1,4 +1,4 @@
-package jadex.xml;
+package jadex.commons.transformation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +81,17 @@ public class BasicTypeConverter //implements ITypeConverter
 	{
 		return (IStringObjectConverter)basicconverters.get(clazz);
 	}
+	
+	/**
+	 *  Get a X -> String converter for a source clazz.
+	 *  @param clazz The clazz.
+	 *  @return converter The converter.
+	 */
+//	public static IStringObjectConverter getBasicObjectConverter(Class clazz)
+//	{
+////		if(isBuiltInType(clazz))
+//		return (IStringObjectConverter)basicconverters.get(clazz);
+//	}
 }
 
 /**
@@ -92,7 +103,7 @@ class StringTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return val;
 	}
@@ -108,7 +119,7 @@ class IntegerTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Integer(val);
 	}
@@ -124,7 +135,7 @@ class LongTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Long(val);
 	}
@@ -140,7 +151,7 @@ class FloatTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Float(val);
 	}
@@ -156,7 +167,7 @@ class DoubleTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Double(val);
 	}
@@ -171,7 +182,7 @@ class BooleanTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Boolean(val);
 	}
@@ -186,7 +197,7 @@ class ShortTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Short(val);
 	}
@@ -201,7 +212,7 @@ class ByteTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Byte((String)val);
 	}
@@ -216,7 +227,7 @@ class CharacterTypeConverter implements IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The string value to convert.
 	 */
-	public Object convertString(String val, IContext context)
+	public Object convertString(String val, Object context)
 	{
 		return new Character(((String)val).charAt(0)); //?
 	}

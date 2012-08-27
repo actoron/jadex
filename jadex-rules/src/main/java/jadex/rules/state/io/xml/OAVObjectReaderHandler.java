@@ -1,14 +1,14 @@
 package jadex.rules.state.io.xml;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.xml.AttributeInfo;
-import jadex.xml.BasicTypeConverter;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
