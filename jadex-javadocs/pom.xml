@@ -103,11 +103,6 @@
 			<artifactId>jadex-xml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-tools-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Kernels -->
 		<dependency>
