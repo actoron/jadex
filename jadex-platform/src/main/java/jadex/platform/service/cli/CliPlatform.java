@@ -132,13 +132,17 @@ public class CliPlatform implements ICliService
 		
 		// Split the command line to parts
 		String[] parts = SUtil.splitCommandline(line);
+		for(int i=0; i<parts.length; i++)
+		{
+			parts[i] = parts[i].trim();
+		}
 		
 		// Invoke a command
 		boolean exe = false;
 		if(parts!=null && parts.length>0)
 		{
 			// Fetch command
-			String cmdstr = parts[0];
+			String cmdstr = parts[0].trim();
 			if(cmdstr.startsWith("-"))
 			{
 				cmdstr = cmdstr.substring(1);

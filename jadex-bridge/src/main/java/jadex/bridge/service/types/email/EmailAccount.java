@@ -5,6 +5,11 @@ package jadex.bridge.service.types.email;
  */
 public class EmailAccount
 {
+	/** Test account. */
+	public static final EmailAccount TEST_ACCOUNT = new EmailAccount("jadexagent@gmail.com", "***REMOVED***", "jadexagent", 
+		"***REMOVED***", 587, false, true,
+		"imap.gmail.com", "imaps");
+	
 	//-------- attributes --------
 
 	/** The user name. */

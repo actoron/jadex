@@ -79,45 +79,42 @@ public class EmailAgent implements IEmailService
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
-	public void body()
-	{
-		EmailAccount account = new EmailAccount("jadexagent@gmail.com", "***REMOVED***", "jadexagent", 
-			"***REMOVED***", 587, false, true,
-			"imap.gmail.com", "imaps");
-		Email email = new Email("Hi all, its a test message.", "test",
-				"braubach@informatik.uni-hamburg.de");
-
-		IEmailService es = (IEmailService)agent.getServiceContainer()
-			.getProvidedServices(IEmailService.class)[0];
-		
-//		es.sendEmail(email, account);
-//		System.out.println("sent successfully");
-		
-		es.subscribeForEmail(new ConstantFilter<Email>(true), account)
-			.addResultListener(new IIntermediateResultListener<Email>()
-		{
-			public void intermediateResultAvailable(Email result)
-			{
-				System.out.println("ir: "+result);
-			}
-
-			public void finished()
-			{
-				System.out.println("fini");
-			}
-
-			public void resultAvailable(Collection<Email> result)
-			{
-				System.out.println("ra: "+result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("ex: "+exception);
-			}
-		});
-	}
+//	@AgentBody
+//	public void body()
+//	{
+//		Email email = new Email("Hi all, its a test message.", "test",
+//			"braubach@informatik.uni-hamburg.de");
+//
+//		IEmailService es = (IEmailService)agent.getServiceContainer()
+//			.getProvidedServices(IEmailService.class)[0];
+//		
+////		es.sendEmail(email, account);
+////		System.out.println("sent successfully");
+//		
+//		es.subscribeForEmail(new ConstantFilter<Email>(true), EmailAccount.TEST_ACCOUNT)
+//			.addResultListener(new IIntermediateResultListener<Email>()
+//		{
+//			public void intermediateResultAvailable(Email result)
+//			{
+//				System.out.println("ir: "+result);
+//			}
+//
+//			public void finished()
+//			{
+//				System.out.println("fini");
+//			}
+//
+//			public void resultAvailable(Collection<Email> result)
+//			{
+//				System.out.println("ra: "+result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
+//	}
 			
 	/**
 	 *  Called when service is shudowned.
