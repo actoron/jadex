@@ -1,6 +1,7 @@
 package jadex.base.gui;
 
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -52,14 +53,13 @@ public class ClassChooserPanel	extends JPanel
 		super(new BorderLayout());
 		this.filefilter = filefilter;
 		this.classfilter = classfilter;
-		this.filefilter = filefilter;
 		this.urls = urls;
 		this.classloader = classloader;
 		
 		this.box = new JComboBox();
 		this.add(box, BorderLayout.CENTER);
 		
-		Class<?>[] plugins = scanForClasses();
+		Class<?>[] plugins = SReflect.scanForClasses(urls, classloader, filefilter, classfilter);
 		for(int i=0; i<plugins.length; i++)
 		{
 			box.addItem(plugins[i]);
@@ -74,132 +74,132 @@ public class ClassChooserPanel	extends JPanel
 		return box.getSelectedItem();
 	}
 	
-	/**
-	 * 
-	 */
-	public Class<?>[] scanForClasses()
-	{
-		List<Class<?>>	ret	= new ArrayList<Class<?>>();
-		String[] facs = scanForFiles(filefilter);
-		try
-		{
-			for(int i=0; i<facs.length; i++)
-			{
-				String	clname	= facs[i].substring(0, facs[i].length()-6).replace('/', '.');
-//				System.out.println("Found candidate: "+clname);
-				Class<?>	fac	= SReflect.findClass0(clname, null, getClassLoader());
-				
-				if(fac!=null && classfilter.filter(fac))
-				{
-					ret.add(fac);
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return ret.toArray(new Class[ret.size()]);
-	}
-
-	/**
-	 * 
-	 */
-	public String[] scanForFiles(IFilter filter)
-	{
-		List<String>	ret	= new ArrayList<String>();
-		try
-		{
-			for(int i=0; i<urls.length; i++)
-			{
-//				System.out.println("Scanning: "+entry);
-//				System.out.println("url: "+urls[i].toURI());
-				File f = new File(urls[i].toURI());
-				if(f.getName().endsWith(".jar"))
-				{
-					JarFile	jar = null;
-					try
-					{
-						jar	= new JarFile(f);
-						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
-						{
-							JarEntry	je	= e.nextElement();
-							if(filter.filter(je))	
-							{
-								ret.add(je.getName());
-							}
-						}
-						jar.close();
-					}
-					catch(Exception e)
-					{
-						System.out.println("Eror opening jar: "+urls[i]+" "+e.getMessage());
-					}
-					finally
-					{
-						if(jar!=null)
-						{
-							jar.close();
-						}
-					}
-				}
-				else if(f.isDirectory())
-				{
-					scanDir(f, filter, ret, new ArrayList<String>());
-//					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		return ret.toArray(new String[ret.size()]);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void scanDir(File file, IFilter filter, List<String> results, List<String> donedirs)
-	{
-		File[] files = file.listFiles(new FileFilter()
-		{
-			public boolean accept(File f)
-			{
-				return !f.isDirectory();
-			}
-		});
-		for(File fi: files)
-		{
-			if(fi.getName().endsWith(".class") && filter.filter(fi))
-			{
-				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
-//				System.out.println("fn: "+fi.getName());
-				results.add(fn+"."+fi.getName());
-			}
-		}
-		
-		if(file.isDirectory())
-		{
-			donedirs.add(file.getAbsolutePath());
-			File[] sudirs = file.listFiles(new FileFilter()
-			{
-				public boolean accept(File f)
-				{
-					return f.isDirectory();
-				}
-			});
-			
-			for(File dir: sudirs)
-			{
-				if(!donedirs.contains(dir.getAbsolutePath()))
-				{
-					scanDir(dir, filter, results, donedirs);
-				}
-			}
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	public Class<?>[] scanForClasses()
+//	{
+//		List<Class<?>>	ret	= new ArrayList<Class<?>>();
+//		String[] facs = scanForFiles(filefilter);
+//		try
+//		{
+//			for(int i=0; i<facs.length; i++)
+//			{
+//				String	clname	= facs[i].substring(0, facs[i].length()-6).replace('/', '.');
+////				System.out.println("Found candidate: "+clname);
+//				Class<?>	fac	= SReflect.findClass0(clname, null, classloader);
+//				
+//				if(fac!=null && classfilter.filter(fac))
+//				{
+//					ret.add(fac);
+//				}
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//		return ret.toArray(new Class[ret.size()]);
+//	}
+//
+//	/**
+//	 * 
+//	 */
+//	public String[] scanForFiles(IFilter filter)
+//	{
+//		List<String>	ret	= new ArrayList<String>();
+//		try
+//		{
+//			for(int i=0; i<urls.length; i++)
+//			{
+////				System.out.println("Scanning: "+entry);
+////				System.out.println("url: "+urls[i].toURI());
+//				File f = new File(urls[i].toURI());
+//				if(f.getName().endsWith(".jar"))
+//				{
+//					JarFile	jar = null;
+//					try
+//					{
+//						jar	= new JarFile(f);
+//						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+//						{
+//							JarEntry	je	= e.nextElement();
+//							if(filter.filter(je))	
+//							{
+//								ret.add(je.getName());
+//							}
+//						}
+//						jar.close();
+//					}
+//					catch(Exception e)
+//					{
+//						System.out.println("Eror opening jar: "+urls[i]+" "+e.getMessage());
+//					}
+//					finally
+//					{
+//						if(jar!=null)
+//						{
+//							jar.close();
+//						}
+//					}
+//				}
+//				else if(f.isDirectory())
+//				{
+//					scanDir(f, filter, ret, new ArrayList<String>());
+////					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+//				}
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//		
+//		return ret.toArray(new String[ret.size()]);
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	protected void scanDir(File file, IFilter filter, List<String> results, List<String> donedirs)
+//	{
+//		File[] files = file.listFiles(new FileFilter()
+//		{
+//			public boolean accept(File f)
+//			{
+//				return !f.isDirectory();
+//			}
+//		});
+//		for(File fi: files)
+//		{
+//			if(fi.getName().endsWith(".class") && filter.filter(fi))
+//			{
+//				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+////				System.out.println("fn: "+fi.getName());
+//				results.add(fn+"."+fi.getName());
+//			}
+//		}
+//		
+//		if(file.isDirectory())
+//		{
+//			donedirs.add(file.getAbsolutePath());
+//			File[] sudirs = file.listFiles(new FileFilter()
+//			{
+//				public boolean accept(File f)
+//				{
+//					return f.isDirectory();
+//				}
+//			});
+//			
+//			for(File dir: sudirs)
+//			{
+//				if(!donedirs.contains(dir.getAbsolutePath()))
+//				{
+//					scanDir(dir, filter, results, donedirs);
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 * 

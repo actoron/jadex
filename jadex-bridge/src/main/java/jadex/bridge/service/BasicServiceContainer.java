@@ -534,15 +534,18 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			throw new ComponentTerminatedException(id);
 
 		IService ret = null;
-		for(Iterator<Class<?>> it=services.keySet().iterator(); it.hasNext() && ret==null; )
+		if(services!=null)
 		{
-			Collection<IInternalService> sers = services.get(it.next());
-			for(Iterator<IInternalService> it2=sers.iterator(); it2.hasNext() && ret==null; )
+			for(Iterator<Class<?>> it=services.keySet().iterator(); it.hasNext() && ret==null; )
 			{
-				IService ser = it2.next();
-				if(ser.getServiceIdentifier().getServiceName().equals(name))
+				Collection<IInternalService> sers = services.get(it.next());
+				for(Iterator<IInternalService> it2=sers.iterator(); it2.hasNext() && ret==null; )
 				{
-					ret = ser;
+					IService ser = it2.next();
+					if(ser.getServiceIdentifier().getServiceName().equals(name))
+					{
+						ret = ser;
+					}
 				}
 			}
 		}
@@ -560,7 +563,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		if(shutdowned)
 			throw new ComponentTerminatedException(id);
 		
-		Collection<IInternalService> coll = services.get(clazz);
+		Collection<IInternalService> coll = services!=null? services.get(clazz): null;
 		return coll==null ? new IService[0] : coll.toArray(new IService[coll.size()]);
 	}
 	

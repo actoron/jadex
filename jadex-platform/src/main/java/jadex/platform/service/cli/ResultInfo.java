@@ -1,7 +1,6 @@
 package jadex.platform.service.cli;
 
 import jadex.commons.transformation.IObjectStringConverter;
-import jadex.commons.transformation.IStringObjectConverter;
 
 /**
  * 

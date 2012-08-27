@@ -3,28 +3,41 @@ package jadex.platform.service.cli;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  The command line command interface.
  */
 public interface ICliCommand
 {
 	/**
-	 *  Get the argument info.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
-	public ArgumentInfo[] getArgumentInfos();
+	public String[] getNames();
+	
+	/**
+	 *  Get the command description.
+	 *  @return The command description.
+	 */
+	public String getDescription();
+	
+	/**
+	 *  Get the argument info.
+	 *  @param context The context.
+	 *  @return The argument infos.
+	 */
+	public ArgumentInfo[] getArgumentInfos(CliContext context);
 
 	/**
 	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
-	public ResultInfo getResultInfo();
+	public ResultInfo getResultInfo(CliContext context);
 	
-//	/**
-//	 *  Invoke the command.
-//	 */
-//	public Object invokeCommand(Object context, Object[] args);
-	
+	// used internally to execute the command, remove from interface?
 	/**
 	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
-	public IFuture<String> invokeCommand(Object context, String[] args);
-
+	public IFuture<String> invokeCommand(CliContext context, String[] args);
 }

@@ -59,16 +59,5 @@
 			<artifactId>mail</artifactId>
 			<version>1.4.1</version>
 		</dependency>
-		
-<!--  	<dependency>
-			<groupId>com.lexicalscope.jewelcli</groupId>
-			<artifactId>jewelcli</artifactId>
-		<version>0.8.3</version>
--->		
-		<dependency>
-		    <groupId>io.airlift</groupId>
-		    <artifactId>airline</artifactId>
-		    <version>0.4</version>
-		</dependency>
 	</dependencies>
 </project>

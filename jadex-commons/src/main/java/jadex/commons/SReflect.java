@@ -3,11 +3,14 @@ package jadex.commons;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  *  This class provides several useful static reflection methods.
@@ -1189,6 +1194,141 @@ public class SReflect
 		return Thread.currentThread().getStackTrace()[2].getMethodName();
 	}
 	
+	/**
+	 * 
+	 */
+	public static Class<?>[] scanForClasses(URL[] urls, ClassLoader classloader, IFilter filefilter, IFilter classfilter)
+	{
+		List<Class<?>>	ret	= new ArrayList<Class<?>>();
+		String[] facs = scanForFiles(urls, filefilter);
+		try
+		{
+			for(int i=0; i<facs.length; i++)
+			{
+				try
+				{
+					String	clname	= facs[i].substring(0, facs[i].length()-6).replace('/', '.');
+	//				System.out.println("Found candidate: "+clname);
+					Class<?>	fac	= SReflect.findClass0(clname, null, classloader);
+					
+					if(fac!=null && classfilter.filter(fac))
+					{
+						ret.add(fac);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					System.out.println(facs[i]);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ret.toArray(new Class[ret.size()]);
+	}
+
+	/**
+	 * 
+	 */
+	public static String[] scanForFiles(URL[] urls, IFilter filter)
+	{
+		List<String>	ret	= new ArrayList<String>();
+		try
+		{
+			for(int i=0; i<urls.length; i++)
+			{
+//				System.out.println("Scanning: "+entry);
+//				System.out.println("url: "+urls[i].toURI());
+				File f = new File(urls[i].toURI());
+				if(f.getName().endsWith(".jar"))
+				{
+					JarFile	jar = null;
+					try
+					{
+						jar	= new JarFile(f);
+						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+						{
+							JarEntry	je	= e.nextElement();
+							if(filter.filter(je))	
+							{
+								ret.add(je.getName());
+							}
+						}
+						jar.close();
+					}
+					catch(Exception e)
+					{
+						System.out.println("Eror opening jar: "+urls[i]+" "+e.getMessage());
+					}
+					finally
+					{
+						if(jar!=null)
+						{
+							jar.close();
+						}
+					}
+				}
+				else if(f.isDirectory())
+				{
+					scanDir(urls, f, filter, ret, new ArrayList<String>());
+//					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret.toArray(new String[ret.size()]);
+	}
+	
+	/**
+	 * 
+	 */
+	public static void scanDir(URL[] urls, File file, IFilter filter, List<String> results, List<String> donedirs)
+	{
+		File[] files = file.listFiles(new FileFilter()
+		{
+			public boolean accept(File f)
+			{
+				return !f.isDirectory();
+			}
+		});
+		for(File fi: files)
+		{
+			if(fi.getName().endsWith(".class") && filter.filter(fi))
+			{
+				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+//				System.out.println("fn: "+fi.getName());
+				results.add(fn+"."+fi.getName());
+			}
+		}
+		
+		if(file.isDirectory())
+		{
+			donedirs.add(file.getAbsolutePath());
+			File[] sudirs = file.listFiles(new FileFilter()
+			{
+				public boolean accept(File f)
+				{
+					return f.isDirectory();
+				}
+			});
+			
+			for(File dir: sudirs)
+			{
+				if(!donedirs.contains(dir.getAbsolutePath()))
+				{
+					scanDir(urls, dir, filter, results, donedirs);
+				}
+			}
+		}
+	}
+	
 //	public static void main(String[] args)
 //	{
 //		System.out.println(getMethodName());
@@ -1253,7 +1393,8 @@ public class SReflect
 	 * encoding and decoding support.
 	 * @return true, if platform supports xml
 	 */
-	public static boolean hasXmlSupport() {
+	public static boolean hasXmlSupport() 
+	{
 		if (hasXmlSupport == null)
 		{
 			try
@@ -1261,13 +1402,17 @@ public class SReflect
 				classForName("jadex.xml.reader.XMLReaderFactoryAndroid", null);
 				classForName("jadex.xml.writer.XMLWriterFactoryAndroid", null);
 				hasXmlSupport = true;
-			} catch (ClassNotFoundException e)
+			} 
+			catch (ClassNotFoundException e)
 			{
 				hasXmlSupport = false;
-			} finally {
+			} 
+			finally 
+			{
 				return hasXmlSupport.booleanValue();
 			}
-		} else
+		} 
+		else
 		{
 			return hasXmlSupport.booleanValue();
 		}

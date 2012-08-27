@@ -1,6 +1,5 @@
 package jadex.platform.service.cli;
 
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -8,15 +7,36 @@ import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 
  */
-public class ACliCommand implements ICliCommand
+public abstract class ACliCommand implements ICliCommand
 {
+	/**
+	 *  Get the command names.
+	 */
+	public abstract String[] getNames();
+	
+	/**
+	 *  Invoke the command.
+	 */
+	public abstract Object invokeCommand(CliContext context, Map<String, Object> args);
+	
+	/**
+	 *  Get the command description.
+	 */
+	public String getDescription()
+	{
+		return "No command description given for: "+getNames()[0];
+	}
+	
 	/**
 	 *  Get the argument types.
 	 */
-	public ArgumentInfo[] getArgumentInfos()
+	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
 		return null;
 	}
@@ -24,7 +44,7 @@ public class ACliCommand implements ICliCommand
 	/**
 	 *  Get the result info.
 	 */
-	public ResultInfo getResultInfo()
+	public ResultInfo getResultInfo(CliContext context)
 	{
 		return null;
 	}
@@ -32,26 +52,45 @@ public class ACliCommand implements ICliCommand
 	/**
 	 *  Invoke the command.
 	 */
-	public IFuture<String> invokeCommand(final Object context, String[] strargs)
+	public IFuture<String> invokeCommand(final CliContext context, String[] strargs)
 	{
 		final Future<String> ret = new Future<String>();
 		
 		// Convert arguments
-		ArgumentInfo[] arginfos = getArgumentInfos();
+		Map<String, ArgumentInfo> argimap = new HashMap<String, ArgumentInfo>();
+		ArgumentInfo[] tmp = getArgumentInfos(context);
+		if(tmp!=null)
+		{
+			for(ArgumentInfo ai: tmp)
+			{
+				argimap.put(ai.getName(), ai);
+			}
+		}
 				
-		Object[] args = null;
+		Map<String, Object> args = new HashMap<String, Object>();
+		
 		if(strargs!=null && strargs.length>0)
 		{
-			args = new Object[strargs.length];
 			for(int i=0; i<strargs.length; i++)
 			{
-				IStringObjectConverter conv = arginfos[i].getConverter();
-				Class<?> target = arginfos[i].getType();
+				String name = strargs[i].startsWith("-")? strargs[i++]: null;
+				Object val = null;
+				
+				ArgumentInfo cai = argimap.get(name);
+				if(cai==null)
+				{
+					ret.setException(new RuntimeException("Unknown argument: "+name));
+					return ret;
+				}
+				val = strargs[i];
+				
+				IStringObjectConverter conv = cai.getConverter();
+				Class<?> target = cai.getType();
 				if(conv!=null)
 				{
 					try
 					{
-						args[i] = conv.convertString(strargs[i], context);
+						val = conv.convertString(strargs[i], context);
 					}
 					catch(Exception e)
 					{
@@ -61,7 +100,7 @@ public class ACliCommand implements ICliCommand
 				}
 				else if(!String.class.equals(target))
 				{
-					conv = BasicTypeConverter.getBasicStringConverter(arginfos[i].getType());
+					conv = BasicTypeConverter.getBasicStringConverter(cai.getType());
 					if(conv==null)
 					{
 						ret.setException(new RuntimeException("No converter for conversion from string -> "+target.getName()));
@@ -71,7 +110,7 @@ public class ACliCommand implements ICliCommand
 					{
 						try
 						{
-							args[i] = conv.convertString(strargs[i], context);
+							val = conv.convertString(strargs[i], context);
 						}
 						catch(Exception e)
 						{
@@ -80,10 +119,8 @@ public class ACliCommand implements ICliCommand
 						}
 					}
 				}
-				else
-				{
-					args[i] = strargs[i];
-				}
+				
+				args.put(name, val);
 			}
 		}
 
@@ -98,14 +135,14 @@ public class ACliCommand implements ICliCommand
 			{
 				public void customResultAvailable(Object result)
 				{
-					IObjectStringConverter conv = getResultInfo()==null? null: getResultInfo().getConverter();
+					IObjectStringConverter conv = getResultInfo(context)==null? null: getResultInfo(context).getConverter();
 					if(conv!=null)
 					{
 						result = conv.convertObject(result, context);
 					}
 					else if(!(result instanceof String))
 					{
-						conv = BasicTypeConverter.getBasicObjectConverter(getResultInfo().getType());
+						conv = BasicTypeConverter.getBasicObjectConverter(getResultInfo(context).getType());
 						if(conv==null)
 						{
 							exceptionOccurred(new RuntimeException("No converter for conversion from "+result.getClass().getSimpleName()+" -> String"));
@@ -131,15 +168,6 @@ public class ACliCommand implements ICliCommand
 		}
 		
 		return ret;
-	}
-
-	
-	/**
-	 *  Invoke the command.
-	 */
-	public Object invokeCommand(Object context, Object[] args)
-	{
-		return null;
 	}
 
 }

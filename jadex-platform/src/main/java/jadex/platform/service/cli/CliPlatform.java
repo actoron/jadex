@@ -1,29 +1,22 @@
 package jadex.platform.service.cli;
 
-import io.airlift.command.Arguments;
-import io.airlift.command.Cli;
-import io.airlift.command.Cli.CliBuilder;
-import io.airlift.command.Command;
-import io.airlift.command.Help;
-import io.airlift.command.Option;
-import io.airlift.command.OptionType;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.awareness.DiscoveryInfo;
-import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.cli.ICliService;
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.IObjectStringConverter;
+import jadex.platform.service.cli.commands.DestroyComponentCommand;
+import jadex.platform.service.cli.commands.HelpCommand;
+import jadex.platform.service.cli.commands.ListComponentsCommand;
+import jadex.platform.service.cli.commands.ListPlatformsCommand;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -36,54 +29,95 @@ public class CliPlatform implements ICliService
 	protected Map<String, ICliCommand> commands;
 	
 	/**
-	 * 
+	 *  Create a new cli.
 	 */
 	public CliPlatform()
 	{
-		commands = new HashMap<String, ICliCommand>();
-		commands.put("-lp", new ACliCommand()
-		{
-			public Object invokeCommand(Object context, Object[] args)
-			{
-				final Future<Collection<DiscoveryInfo>> ret = new Future<Collection<DiscoveryInfo>>();
-				IExternalAccess comp = (IExternalAccess)context;
-				SServiceProvider.getService(comp.getServiceProvider(), IAwarenessManagementService.class)
-					.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, Collection<DiscoveryInfo>>(ret)
-				{
-					public void customResultAvailable(IAwarenessManagementService awas)
-					{
-						awas.getKnownPlatforms().addResultListener(new DelegationResultListener<Collection<DiscoveryInfo>>(ret));
-					}
-				});
-				return ret;
-			}
-			
-			/**
-			 *
-			 */
-			public ResultInfo getResultInfo()
-			{
-				return new ResultInfo(Collection.class, "desc", new IObjectStringConverter()
-				{
-					public String convertObject(Object val, Object context)
-					{
-						StringBuffer buf = new StringBuffer();
-						Collection<DiscoveryInfo> res = (Collection<DiscoveryInfo>)val;
-						if(res!=null)
-						{
-							Iterator<DiscoveryInfo> it = res.iterator();
-							for(int i=0; it.hasNext(); i++)
-							{
-								buf.append("(").append(i).append(") ").append(it.next().getComponentIdentifier());
-							}
-						}
-						return buf.toString();
-					}
-				});
-			}
-		});
+		commands = new LinkedHashMap<String, ICliCommand>();
 	}
 	
+	/**
+	 * 
+	 */
+	public void addAllCommandsFromClassPath()
+	{
+		URL[] urls = null;
+		ClassLoader cl = getClass().getClassLoader();
+		if(cl instanceof URLClassLoader)
+		{
+			urls = ((URLClassLoader)cl).getURLs();
+		}
+		
+		Class<?>[] cmds = SReflect.scanForClasses(urls, cl, new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				boolean ret = false;
+				String name =null;
+				if(obj instanceof File)
+				{
+					name = ((File)obj).getName();
+				}
+				else if(obj instanceof String)
+				{
+					name = ((String)obj);
+				}
+				
+				if(name!=null)
+				{
+					ret = name.endsWith(".class") && name.indexOf("Command")!=-1;
+				}
+				
+				return ret;
+			}
+		}, 
+		new IFilter<Class<?>>()
+		{
+			public boolean filter(Class<?> cl)
+			{
+				return !cl.isInterface() && !Modifier.isAbstract(cl.getModifiers()) 
+					&& ICliCommand.class.isAssignableFrom(cl);
+			}
+		});
+		
+		for(int i=0; i<cmds.length; i++)
+		{
+			try
+			{
+				ICliCommand cmd = (ICliCommand)cmds[i].newInstance();
+				addCommand(cmd);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 *  Add a command.
+	 *  @param cmd The command.
+	 */
+	public void addCommand(ICliCommand cmd)
+	{
+		String[] names = cmd.getNames();
+		for(String name: names)
+		{
+			if(commands.containsKey(name))
+				throw new RuntimeException("Command name already regsisterd: "+name);
+			commands.put(name, cmd);
+		}
+	}
+	
+	/**
+	 *  Get the commands.
+	 *  @return The commands.
+	 */
+	public Map<String, ICliCommand> getCommands()
+	{
+		return commands;
+	}
+
 	/**
 	 *  Execute a command line command and
 	 *  get back the results.
@@ -94,6 +128,8 @@ public class CliPlatform implements ICliService
 	{
 		final Future<String> ret = new Future<String>();
 		
+		CliContext ccontext = new CliContext(this, context);
+		
 		// Split the command line to parts
 		String[] parts = SUtil.splitCommandline(line);
 		
@@ -102,11 +138,22 @@ public class CliPlatform implements ICliService
 		if(parts!=null && parts.length>0)
 		{
 			// Fetch command
-			ICliCommand cmd = commands.get(parts[0]);
+			String cmdstr = parts[0];
+			if(cmdstr.startsWith("-"))
+			{
+				cmdstr = cmdstr.substring(1);
+			}
+			ICliCommand cmd = commands.get(cmdstr);
 		
 			if(cmd!=null)
 			{
-				cmd.invokeCommand(context, null).addResultListener(new DelegationResultListener<String>(ret));
+				String[] nargs = null;
+				if(parts.length>1)
+				{
+					nargs = new String[parts.length-1];
+					System.arraycopy(parts, 1, nargs, 0, parts.length-1);
+				}
+				cmd.invokeCommand(ccontext, nargs).addResultListener(new DelegationResultListener<String>(ret));
 				exe = true;
 			}
 		}

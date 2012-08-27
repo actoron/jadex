@@ -1,16 +1,5 @@
 package jadex.platform.service.cli;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
@@ -22,6 +11,19 @@ import jadex.commons.gui.SGUI;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -29,6 +31,7 @@ import jadex.micro.annotation.AgentBody;
  */
 @Agent
 @Service
+@ProvidedServices(@ProvidedService(type=ICliService.class, implementation=@Implementation(expression="$pojoagent")))
 public class CliAgent implements ICliService
 {
 	/** The agent. */
@@ -41,12 +44,17 @@ public class CliAgent implements ICliService
 	@AgentBody
 	public void body()
 	{
+		clip = new CliPlatform();
+		clip.addAllCommandsFromClassPath();
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				final JTextField tf = new JTextField(20);
-				final JTextArea ta = new JTextArea();
+				final JTextArea ta = new JTextArea(20, 20);
+				ta.setEditable(false);
+				
 				tf.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
