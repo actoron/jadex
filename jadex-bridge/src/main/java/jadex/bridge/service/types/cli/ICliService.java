@@ -15,5 +15,5 @@ public interface ICliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(String command);
+	public IFuture<String> executeCommand(String command, Object context);
 }

@@ -18,8 +18,8 @@ public class CliAgent implements ICliService
 	@Agent
 	protected MicroAgent agent;
 	
-	/** The command line interpreter. */
-//	protected CliInterpreter clii; 
+	/** The command line. */
+	protected CliPlatform clip; 
 	
 	/**
 	 *  Execute a command line command and
@@ -27,9 +27,9 @@ public class CliAgent implements ICliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(String command)
+	public IFuture<String> executeCommand(String line, Object context)
 	{
-		return null;
+		return clip.executeCommand(line, context);
 	}
 
 }

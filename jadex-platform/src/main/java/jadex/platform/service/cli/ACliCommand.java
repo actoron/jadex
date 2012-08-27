@@ -105,7 +105,7 @@ public class ACliCommand implements ICliCommand
 					}
 					else if(!(result instanceof String))
 					{
-						conv = BasicTypeConverter.getBasicStringConverter(arginfos[i].getType());
+						conv = BasicTypeConverter.getBasicObjectConverter(getResultInfo().getType());
 						if(conv==null)
 						{
 							exceptionOccurred(new RuntimeException("No converter for conversion from "+result.getClass().getSimpleName()+" -> String"));

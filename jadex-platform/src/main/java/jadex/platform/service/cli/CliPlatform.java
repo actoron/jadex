@@ -39,7 +39,7 @@ public class CliPlatform implements ICliService
 	public CliPlatform()
 	{
 		commands = new HashMap<String, ICliCommand>();
-		commands.put("-lp", new ICliCommand()
+		commands.put("-lp", new ACliCommand()
 		{
 			public Object invokeCommand(Object context, Object[] args)
 			{
@@ -55,11 +55,6 @@ public class CliPlatform implements ICliService
 				});
 				return ret;
 			}
-			
-			public Class<?>[] getArgumentTypes()
-			{
-				return null;
-			}
 		});
 	}
 	
@@ -69,7 +64,7 @@ public class CliPlatform implements ICliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(Object context, String line)
+	public IFuture<String> executeCommand(String line, Object context)
 	{
 		final Future<String> ret = new Future<String>();
 		
@@ -77,6 +72,7 @@ public class CliPlatform implements ICliService
 		String[] parts = SUtil.splitCommandline(line);
 		
 		// Invoke a command
+		boolean exe = false;
 		if(parts!=null && parts.length>0)
 		{
 			// Fetch command
@@ -84,29 +80,14 @@ public class CliPlatform implements ICliService
 		
 			if(cmd!=null)
 			{
-				// Convert arguments
-				Class<?>[] argtypes = cmd.getArgumentTypes();
-				
-				Object[] args = null;
-				if(argtypes!=null && argtypes.length>0)
-				{
-					args = new Object[argtypes.length];
-					for(int i=0; i<argtypes.length; i++)
-					{
-						// todo: convert
-					}
-				}
-	
-				// Invoke command
-				Object res = cmd.invokeCommand(context, args);
-			
-				// Result conversion
-				if(res instanceof IFuture)
-				{
-					IFuture<String> fut = (IFuture<String>)res;
-					fut.addResultListener(new Dele)
-				}
+				cmd.invokeCommand(context, null).addResultListener(new DelegationResultListener<String>(ret));
+				exe = true;
 			}
+		}
+		
+		if(!exe)
+		{
+			ret.setException(new RuntimeException("Command not found: "+line));
 		}
 		
 		return ret;

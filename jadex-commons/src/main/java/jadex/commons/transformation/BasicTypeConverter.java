@@ -77,7 +77,7 @@ public class BasicTypeConverter //implements ITypeConverter
 	 *  @param clazz The clazz.
 	 *  @return converter The converter.
 	 */
-	public static IStringObjectConverter getBasicStringConverter(Class clazz)
+	public static IStringObjectConverter getBasicStringConverter(Class<?> clazz)
 	{
 		return (IStringObjectConverter)basicconverters.get(clazz);
 	}
@@ -87,11 +87,21 @@ public class BasicTypeConverter //implements ITypeConverter
 	 *  @param clazz The clazz.
 	 *  @return converter The converter.
 	 */
-//	public static IStringObjectConverter getBasicObjectConverter(Class clazz)
-//	{
-////		if(isBuiltInType(clazz))
-//		return (IStringObjectConverter)basicconverters.get(clazz);
-//	}
+	public static IObjectStringConverter getBasicObjectConverter(Class<?> clazz)
+	{
+		IObjectStringConverter ret = null;
+		if(isBuiltInType(clazz))
+		{
+			ret = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, Object context)
+				{
+					return val==null? "null": val.toString();
+				}
+			};
+		}
+		return ret;
+	}
 }
 
 /**
