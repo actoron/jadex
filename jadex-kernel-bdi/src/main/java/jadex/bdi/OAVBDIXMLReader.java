@@ -891,7 +891,7 @@ public class OAVBDIXMLReader
 	 */
 	public static class ExpressionToStringConverter implements IObjectStringConverter
 	{
-		public String convertObject(Object val, IContext context)
+		public String convertObject(Object val, Object context)
 		{
 			String ret = null;
 			if(val instanceof IParsedExpression)

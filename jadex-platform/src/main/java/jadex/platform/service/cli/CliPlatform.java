@@ -18,9 +18,11 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.IObjectStringConverter;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +56,30 @@ public class CliPlatform implements ICliService
 					}
 				});
 				return ret;
+			}
+			
+			/**
+			 *
+			 */
+			public ResultInfo getResultInfo()
+			{
+				return new ResultInfo(Collection.class, "desc", new IObjectStringConverter()
+				{
+					public String convertObject(Object val, Object context)
+					{
+						StringBuffer buf = new StringBuffer();
+						Collection<DiscoveryInfo> res = (Collection<DiscoveryInfo>)val;
+						if(res!=null)
+						{
+							Iterator<DiscoveryInfo> it = res.iterator();
+							for(int i=0; it.hasNext(); i++)
+							{
+								buf.append("(").append(i).append(") ").append(it.next().getComponentIdentifier());
+							}
+						}
+						return buf.toString();
+					}
+				});
 			}
 		});
 	}
@@ -92,69 +118,4 @@ public class CliPlatform implements ICliService
 		
 		return ret;
 	}
-	
-	
-	
-	
-	public static void main(String[] args)
-    {
-		args = new String[]{"git", "add", "-p", "file"};
-		
-        CliBuilder<Runnable> builder = Cli.buildCli("git", Runnable.class)
-                .withDescription("the stupid content tracker")
-                .withDefaultCommand(Help.class)
-                .withCommands(Help.class,
-                        Add.class);
-
-        builder.withGroup("remote")
-                .withDescription("Manage set of tracked repositories")
-                .withDefaultCommand(RemoteShow.class)
-                .withCommands(RemoteShow.class,
-                        RemoteAdd.class);
-
-        Cli<Runnable> gitParser = builder.build();
-
-        gitParser.parse(args).run();
-    }
-
-    public static class GitCommand implements Runnable
-    {
-        @Option(type = OptionType.GLOBAL, name = "-v", description = "Verbose mode")
-        public boolean verbose;
-
-        public void run()
-        {
-            System.out.println(getClass().getSimpleName());
-        }
-    }
-
-    @Command(name = "add", description = "Add file contents to the index")
-    public static class Add extends GitCommand
-    {
-        @Arguments(description = "Patterns of files to be added")
-        public List<String> patterns;
-
-        @Option(name = "-i", description = "Add modified contents interactively.")
-        public boolean interactive;
-    }
-
-    @Command(name = "show", description = "Gives some information about the remote <name>")
-    public static class RemoteShow extends GitCommand
-    {
-        @Option(name = "-n", description = "Do not query remote heads")
-        public boolean noQuery;
-
-        @Arguments(description = "Remote to show")
-        public String remote;
-    }
-
-    @Command(name = "add", description = "Adds a remote")
-    public static class RemoteAdd extends GitCommand
-    {
-        @Option(name = "-t", description = "Track only a specific branch")
-        public String branch;
-
-        @Arguments(description = "Remote repository to add")
-        public List<String> remote;
-    }
 }
