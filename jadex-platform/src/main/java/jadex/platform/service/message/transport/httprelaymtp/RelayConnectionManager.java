@@ -31,6 +31,17 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	public void	ping(String address)	throws IOException
 	{
 		address	= httpAddress(address);
+		
+		// Hack!!! when pinging before awareness message, strip extension
+		if(address.endsWith("/awareness"))
+		{
+			address	= address.substring(0, address.lastIndexOf("/awareness")+1);
+		}
+		else if(address.endsWith("/awareness/"))
+		{
+			address	= address.substring(0, address.lastIndexOf("/awareness/")+1);
+		}
+		
 		HttpURLConnection	con	= null;
 		try
 		{

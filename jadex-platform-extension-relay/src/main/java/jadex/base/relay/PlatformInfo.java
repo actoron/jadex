@@ -129,7 +129,7 @@ public class PlatformInfo
 					{
 						fut.setResult("unknown");
 					}
-					System.out.println("hostip: "+PlatformInfo.this.hostip+", "+fut.get(null));
+//					System.out.println("hostip: "+PlatformInfo.this.hostip+", "+fut.get(null));
 				}
 			}).start();
 			hostnamefut	= fut;

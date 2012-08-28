@@ -165,7 +165,7 @@ public class GeoIPService
 				{
 					lastupdate	= update;
 					
-					File	dbfile	= new File(RelayServlet.SYSTEMDIR, "GeoLiteCity.dat");
+					File	dbfile	= new File(RelayHandler.SYSTEMDIR, "GeoLiteCity.dat");
 					
 					try
 					{

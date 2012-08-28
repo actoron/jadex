@@ -17,24 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-commons</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- Bridge required for cid and awareness objects. -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-bridge</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- Platform base required for codecs. -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform</artifactId>
+			<artifactId>jadex-platform-extension-relay</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>
@@ -44,16 +27,5 @@
             <scope>provided</scope>
         </dependency>
         
-        <dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.8.2.2</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.util</groupId>
-			<artifactId>util-geolocation-ejb</artifactId>
-			<version>1.0.31</version>
-		</dependency>
 	</dependencies>
 </project>

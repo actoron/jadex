@@ -77,6 +77,7 @@
 		<module>jadex-tools-bpmn</module>
 		<module>jadex-tools-comanalyzer</module>
 		<module>jadex-platform-standalone-launch</module>
+		<module>jadex-platform-extension-relay</module>
 		<module>jadex-platform-relay-web</module>
 	</modules>
 			
@@ -445,6 +446,61 @@
 	        <modules>
 	        	<module>jadex-parent-pro</module>
 				<module>jadex-platform-extension-securetransport</module>
+		    </modules>
+		</profile>
+		
+		<!-- ======== Standalone relay modules and assembly ======== -->
+		
+		<profile>
+		    <id>jadex-relay-standalone</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-platform-extension-relay-standalone</exists>
+	            </file>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+<!-- 							<execution>
+								<id>sources-3d</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!- - .zip is appended automatically to the final name. - ->
+									<finalName>sources-3d</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution> -->
+							<execution>
+								<id>make-assembly-relay</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-relay-standalone-${project.version}</finalName>
+									<outputDirectory>target/pro-addons</outputDirectory>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-relay.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+	        <modules>
+	        	<module>jadex-parent-pro</module>
+				<module>jadex-platform-extension-relay-standalone</module>
 		    </modules>
 		</profile>
 		

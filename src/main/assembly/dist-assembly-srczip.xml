@@ -27,6 +27,8 @@
 				<exclude>*:*-webservice*</exclude>
 				<!-- Exclude all secure transport modules -->
 				<exclude>*:*-securetransport</exclude>
+				<!-- Exclude relay standalone module -->
+				<exclude>*:*-relay-standalone</exclude>
 			</excludes>
 		    <sources>
 				<includeModuleDirectory>false</includeModuleDirectory>

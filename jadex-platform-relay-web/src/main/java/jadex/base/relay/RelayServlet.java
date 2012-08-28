@@ -41,37 +41,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RelayServlet extends HttpServlet
 {
-	//-------- constants --------
-
-	/** The directory for settings and statistics. */ 
-	public final static File	SYSTEMDIR;
-	
-	static
-	{
-		File dir;
-		String	home	= System.getenv("RELAY_HOME");	// System.getProperty() does not return environment variables, but just server VM properties.
-		if(home!=null)
-		{
-			dir	= new File(home);
-		}
-		else
-		{
-			dir	= new File(System.getProperty("user.home"), ".relaystats");
-		}
-		
-		if(!dir.exists())
-		{
-			dir.mkdirs();
-		}
-		else if(!dir.isDirectory())
-		{
-			throw new RuntimeException("Settings path '"+dir+"' is not a directory.");
-		}
-		SYSTEMDIR	= dir;
-		
-		System.out.println("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
-	}
-	
 	//-------- attributes --------
 	
 	/** The relay map (id -> queue for pending requests). */

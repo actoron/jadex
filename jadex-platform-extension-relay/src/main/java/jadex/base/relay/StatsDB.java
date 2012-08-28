@@ -61,7 +61,7 @@ public class StatsDB
 		try
 		{
 			// Set up derby and create a database connection
-			System.setProperty("derby.system.home", RelayServlet.SYSTEMDIR.getAbsolutePath());		
+			System.setProperty("derby.system.home", RelayHandler.SYSTEMDIR.getAbsolutePath());		
 			// New instance required in case derby is reloaded in same VM (e.g. servlet container).
 			Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
 			con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");

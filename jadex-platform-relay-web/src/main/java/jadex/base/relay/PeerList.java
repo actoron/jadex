@@ -63,7 +63,7 @@ public class PeerList
 		this.conman	= new RelayConnectionManager();
 		
 		Properties	props	= new Properties();
-		File	propsfile	= new File(RelayServlet.SYSTEMDIR, "peer.properties");
+		File	propsfile	= new File(RelayHandler.SYSTEMDIR, "peer.properties");
 		if(propsfile.exists())
 		{
 			try
