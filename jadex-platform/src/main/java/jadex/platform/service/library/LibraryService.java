@@ -340,8 +340,20 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Add a new url.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, final URL url)
+	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, URL url)
 	{
+		// Normalize files to avoid duplicate urls.
+		if("file".equals(url.getProtocol()))
+		{
+			try
+			{
+				url	= new File(url.getFile()).getCanonicalFile().toURI().toURL();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		internalGetResourceIdentifier(url).addResultListener(
 			new DelegationResultListener<IResourceIdentifier>(ret)
@@ -1219,7 +1231,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		if(rid!=null && rid.getLocalIdentifier()!=null)
 		{
-			ret.addProperty(new Property("lid_url", rid.getLocalIdentifier().getUrl().toString()));
+			ret.addProperty(new Property("lid_url", SUtil.convertPathToRelative(rid.getLocalIdentifier().getUrl().toString())));
 			// todo: check if own platform cid?
 //			ret.addProperty(new Property("lid_cid", rid.getLocalIdentifier().getComponentIdentifier()));
 		}
@@ -1250,7 +1262,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			try
 			{
-				lid = new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), new URL(lid_url));
+				URL	url	= new File(new URL(lid_url).getFile()).getCanonicalFile().toURI().toURL();
+//				System.out.println("url: "+url);
+				lid = new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url);
 			}
 			catch(Exception e)
 			{

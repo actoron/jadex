@@ -1716,14 +1716,55 @@ public class SUtil
 		// Special treatment for files in jar file -> just make jar file name relative and keep inner name 
 		if(absolute.startsWith("jar:file:") && absolute.indexOf("!")!=-1)
 		{
+			String	jarname	= absolute.substring(9, absolute.indexOf("!"));
+			String	filename	= absolute.substring(absolute.indexOf("!"));
+			if(File.separatorChar=='\\')
+			{
+				jarname	= jarname.replace("/", "\\");
+			}
+				
 			try
 			{
-				return "jar:file:" +convertPathToRelative(URLDecoder.decode(absolute.substring(9, absolute.indexOf("!")), "UTF-8")) + absolute.substring(absolute.indexOf("!"));
+				jarname	= URLDecoder.decode(jarname, "UTF-8");
 			}
 			catch(UnsupportedEncodingException e)
 			{
-				return "jar:file:" +convertPathToRelative(absolute.substring(9, absolute.indexOf("!"))) + absolute.substring(absolute.indexOf("!"));
 			}
+			
+			jarname	= convertPathToRelative(jarname);
+			
+			if(File.separatorChar=='\\')
+			{
+				jarname	= jarname.replace("\\", "/");
+			}
+			
+			return "jar:file:"+jarname+filename;
+		}
+		// Special treatment for file urls 
+		if(absolute.startsWith("file:"))
+		{
+			String	filename	= absolute.substring(5);
+			if(File.separatorChar=='\\')
+			{
+				filename	= filename.replace("/", "\\");
+			}
+				
+			try
+			{
+				filename	= URLDecoder.decode(filename, "UTF-8");
+			}
+			catch(UnsupportedEncodingException e)
+			{
+			}
+			
+			filename	= convertPathToRelative(filename);
+			
+			if(File.separatorChar=='\\')
+			{
+				filename	= filename.replace("\\", "/");
+			}
+			
+			return "file:"+filename;
 		}
 		
 		// Build path as list of files (directories).
@@ -1774,6 +1815,8 @@ public class SUtil
 		{
 			ret = absolute;
 		}
+		
+//		System.out.println("CPtR: "+ret+", "+absolute);
 
 		return ret;
 	}
