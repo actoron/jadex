@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import sodekovs.bikesharing.model.SimulationDescription;
+import sodekovs.bikesharing.model.Station;
+import sodekovs.bikesharing.model.TimeSlice;
 import sodekovs.investigation.helper.Constants;
 import sodekovs.util.misc.XMLHandler;
 
@@ -19,7 +22,7 @@ public class BikeSharingEvaluation {
 	// conf. following method for understanding the data structure:
 	// EvaluateRow.evaluateRowData(preparedRowData)
 	private HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> simulationData;
-	//contains the final results of the evaluation
+	// contains the final results of the evaluation
 	private HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> finalResultsMap = new HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>>();
 
 	public BikeSharingEvaluation(HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> simulationData) {
@@ -116,22 +119,22 @@ public class BikeSharingEvaluation {
 	}
 
 	private HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> compareResults(HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> transformedSimDataMap) {
-		
+
 		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(dealDataXMLFile, SimulationDescription.class);
 
 		for (TimeSlice tSlice : scenario.getTimeSlices().getTimeSlice()) {
 			long startTime = tSlice.getStartTime();
 
 			for (Station station : tSlice.getStations().getStation()) {
-//				station.getNumberOfBikes();
+				// station.getNumberOfBikes();
 				// String observedVal =
 				// transformedSimDataMap.get((int)startTime).get(station.getStationID()).get("stock").get(Constants.MEAN_VALUE);
 
 				// check, whether there are suimulation results for this station
-//				HashMap<String, HashMap<String, String>> stationInstancesMap = transformedSimDataMap.get((int) startTime).get(station.getStationID());
-				
-				//check , whether there are results for this tick
-				//check also, whether there are simulation results for this station
+				// HashMap<String, HashMap<String, String>> stationInstancesMap = transformedSimDataMap.get((int) startTime).get(station.getStationID());
+
+				// check , whether there are results for this tick
+				// check also, whether there are simulation results for this station
 				if (transformedSimDataMap.get((int) startTime) != null && transformedSimDataMap.get((int) startTime).get(station.getStationID()) != null) {
 					// HashMap<String, String> prop = statID.get("stock");
 					// String val = prop.get(Constants.MEAN_VALUE);
@@ -173,41 +176,40 @@ public class BikeSharingEvaluation {
 		}
 		return finalResultsMap;
 	}
-	
-	public String resultsToString(){
-		StringBuffer result = new StringBuffer();
-		
-//		ew HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>>();
-		
-		// get object instances
-				for (Iterator<Integer> it1 = finalResultsMap.keySet().iterator(); it1.hasNext();) {
-					int timeSliceKey = it1.next();
-					HashMap<String, HashMap<String, HashMap<String, String>>> timeSlicesMap = finalResultsMap.get(timeSliceKey);
-					
-					result.append("TIME SLICE: ");
-					result.append("\t");
-					result.append(timeSliceKey);
-					result.append("\n");
-					
-					for (Iterator<String> it2 = timeSlicesMap.keySet().iterator(); it2.hasNext();) {
-						String objectInstancesKey = it2.next();
-						HashMap<String, HashMap<String, String>> objectInstancesMap = timeSlicesMap.get(objectInstancesKey);
-						
-//						for (Iterator<String> it3 = propertiesMap.keySet().iterator(); it3.hasNext();) {
-//							String observedPropertyValuesKey = it3.next();
-							HashMap<String, String> observedPropertyValues = objectInstancesMap.get("stock");
-							
-//							result.append("Station ");
-							result.append(objectInstancesKey);
-							result.append("\t: ");
-							result.append(observedPropertyValues.get(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA));
-							result.append("\n");
-//						}
-						
-					}
-					result.append("***************************************");
-				}
 
+	public String resultsToString() {
+		StringBuffer result = new StringBuffer();
+
+		// ew HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>>();
+
+		// get object instances
+		for (Iterator<Integer> it1 = finalResultsMap.keySet().iterator(); it1.hasNext();) {
+			int timeSliceKey = it1.next();
+			HashMap<String, HashMap<String, HashMap<String, String>>> timeSlicesMap = finalResultsMap.get(timeSliceKey);
+
+			result.append("TIME SLICE: ");
+			result.append("\t");
+			result.append(timeSliceKey);
+			result.append("\n");
+
+			for (Iterator<String> it2 = timeSlicesMap.keySet().iterator(); it2.hasNext();) {
+				String objectInstancesKey = it2.next();
+				HashMap<String, HashMap<String, String>> objectInstancesMap = timeSlicesMap.get(objectInstancesKey);
+
+				// for (Iterator<String> it3 = propertiesMap.keySet().iterator(); it3.hasNext();) {
+				// String observedPropertyValuesKey = it3.next();
+				HashMap<String, String> observedPropertyValues = objectInstancesMap.get("stock");
+
+				// result.append("Station ");
+				result.append(objectInstancesKey);
+				result.append("\t: ");
+				result.append(observedPropertyValues.get(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA));
+				result.append("\n");
+				// }
+
+			}
+			result.append("***************************************");
+		}
 
 		return result.toString();
 	}
