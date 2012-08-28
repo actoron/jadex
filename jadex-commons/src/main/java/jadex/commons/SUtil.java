@@ -2943,4 +2943,16 @@ public class SUtil
 		os.close();
 		is.close();
 	}
+	
+	/**
+	 *  Get the exception stack trace as string. 
+	 *  @param e The exception.
+	 *  @return The string.
+	 */
+	public static String getStackTrace(Exception e)
+	{
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
+	}
 }
