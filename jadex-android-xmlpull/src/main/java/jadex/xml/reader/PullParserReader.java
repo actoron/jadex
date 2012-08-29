@@ -1,9 +1,9 @@
 package jadex.xml.reader;
 
 import jadex.commons.SUtil;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
@@ -12,8 +12,6 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;

@@ -1,6 +1,6 @@
 package jadex.micro.benchmarks;
 
-import jadex.base.service.message.transport.httprelaymtp.SRelay;
+import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;

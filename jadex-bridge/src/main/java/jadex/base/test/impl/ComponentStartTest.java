@@ -67,7 +67,7 @@ public class ComponentStartTest implements	Test
 		try
 		{
 //			System.out.println("starting: "+comp.getFilename());
-			IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), null).get(new ThreadSuspendable(), 30000);
+			IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), null).get(new ThreadSuspendable());
 			try
 			{
 //				if(comp.getFilename().indexOf("Heatbugs")!=-1)
@@ -75,7 +75,7 @@ public class ComponentStartTest implements	Test
 //					System.out.println("killing: "+comp.getFilename());
 //					SyncExecutionService.DEBUG	= true;
 //				}
-				cms.destroyComponent(cid).get(new ThreadSuspendable(), 60000); // hack!!! 30000 too fast for some agents on toaster.
+				cms.destroyComponent(cid).get(new ThreadSuspendable());
 //				System.out.println("killed: "+comp.getFilename());
 			}
 			catch(ComponentTerminatedException cte)

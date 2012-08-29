@@ -52,7 +52,6 @@ public class HelpCommand extends ACliCommand
 	 * 
 	 * @param context
 	 * @param args
-	 * @return
 	 */
 	public Object invokeCommand(CliContext context, Map<String, Object> args)
 	{
@@ -79,7 +78,6 @@ public class HelpCommand extends ACliCommand
 	/**
 	 * 
 	 * @param context
-	 * @return
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{

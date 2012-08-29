@@ -49,7 +49,6 @@ public class CreateComponentCommand extends ACliCommand
 	 * 
 	 * @param context
 	 * @param args
-	 * @return
 	 */
 	public Object invokeCommand(final CliContext context, final Map<String, Object> args)
 	{
@@ -121,7 +120,6 @@ public class CreateComponentCommand extends ACliCommand
 	/**
 	 * 
 	 * @param context
-	 * @return
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
@@ -137,7 +135,6 @@ public class CreateComponentCommand extends ACliCommand
 	/**
 	 * 
 	 * @param context
-	 * @return
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{
