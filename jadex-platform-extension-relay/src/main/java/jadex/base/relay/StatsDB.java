@@ -11,9 +11,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  *  Database connector for reading and writing statistics via JavaDB.
@@ -254,41 +257,95 @@ public class StatsDB
 	 *  Get all saved platform infos for direct data export (sorted by id, oldest first).
 	 *  @return All stored platform infos.
 	 */
-	public PlatformInfo[]	getAllPlatformInfos()
+	public Iterator<PlatformInfo>	getAllPlatformInfos()
 	{
-		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
+		Iterator<PlatformInfo>	ret;
 		
 		if(con!=null)
 		{
 			try
 			{
-				ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by id asc");
-				while(rs.next())
+				final ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by id asc");
+				ret	= new Iterator<PlatformInfo>()
 				{
-					PlatformInfo	pi	= new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
-							rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
-							rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
-					ret.add(pi);
-
-					// Load properties of platform.
-					Map<String, String>	props	= new HashMap<String, String>();
-					pi.setProperties(props);
-					ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
-					while(rs2.next())
+					boolean	cursormoved;
+					boolean	hasnext;
+					public boolean hasNext()
 					{
-						props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+						if(!cursormoved)
+						{
+							try
+							{
+								hasnext	= rs.next();
+								cursormoved	= true;
+								if(!hasnext)
+								{
+									rs.close();
+								}
+							}
+							catch(SQLException e)
+							{
+								throw new RuntimeException(e);
+							}
+						}
+						return hasnext;
 					}
-					rs2.close();
-				}
-				rs.close();
+					
+					public PlatformInfo next()
+					{
+						if(hasNext())
+						{
+							try
+							{
+								PlatformInfo	pi	= new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
+	
+								// Load properties of platform.
+								Map<String, String>	props	= new HashMap<String, String>();
+								pi.setProperties(props);
+								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
+								while(rs2.next())
+								{
+									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+								}
+								rs2.close();
+								
+								cursormoved	= false;
+								
+								return pi;
+							}
+							catch(SQLException e)
+							{
+								throw new RuntimeException(e);
+							}
+						}
+						else
+						{
+							throw new NoSuchElementException();
+						}
+					}
+					
+					public void remove()
+					{
+						throw new UnsupportedOperationException();
+					}
+				};
 			}
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
 				System.err.println("Warning: Could not read from relay stats DB: "+ e);
+				List<PlatformInfo> list = Collections.emptyList();
+				ret	= list.iterator();
 			}
 		}
-		return ret.toArray(new PlatformInfo[ret.size()]);
+		else
+		{
+			List<PlatformInfo> list = Collections.emptyList();
+			ret	= list.iterator();
+		}
+		return ret;
 	}
 	
 	/**

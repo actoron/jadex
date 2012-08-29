@@ -8,18 +8,19 @@
 %>Relay Statistics of <%= InetAddress.getLocalHost().getHostName() %> (<%= PlatformInfo.TIME_FORMAT_LONG.format(new Date()) %>)
 ID;Platform;Host;IP;Scheme;Connected;Disconnected;Messages;Bytes;Transfer_Time 
 <%
-	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
-	for(int i=0; i<infos.length; i++)
+	Iterator<PlatformInfo>	infos	= (Iterator<PlatformInfo>)request.getAttribute("platforms");
+	while(infos.hasNext())
 	{
-		%><%= infos[i].getDBId()
-		%>;<%= infos[i].getId()
-		%>;<%= infos[i].getHostName()
-		%>;<%= infos[i].getHostIP()
-		%>;<%= infos[i].getScheme()
-		%>;<%= infos[i].getConnectDate()!=null ? infos[i].getConnectDate().getTime() : ""
-		%>;<%= infos[i].getDisconnectDate()!=null ? infos[i].getDisconnectDate().getTime() : ""
-		%>;<%= infos[i].getMessageCount()
-		%>;<%= infos[i].getBytes()
-		%>;<%= infos[i].getTransferTime() %>
+		PlatformInfo info	= infos.next();
+		%><%= info.getDBId()
+		%>;<%= info.getId()
+		%>;<%= info.getHostName()
+		%>;<%= info.getHostIP()
+		%>;<%= info.getScheme()
+		%>;<%= info.getConnectDate()!=null ? info.getConnectDate().getTime() : ""
+		%>;<%= info.getDisconnectDate()!=null ? info.getDisconnectDate().getTime() : ""
+		%>;<%= info.getMessageCount()
+		%>;<%= info.getBytes()
+		%>;<%= info.getTransferTime() %>
 <%	}
 %>
