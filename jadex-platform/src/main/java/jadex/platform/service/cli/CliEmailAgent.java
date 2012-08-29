@@ -5,6 +5,8 @@ import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
+import jadex.bridge.service.types.security.DefaultAuthorizable;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
@@ -52,7 +54,9 @@ import java.util.StringTokenizer;
 	@RequiredService(name="emailser", type=IEmailService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, componenttype="emailagent")),
 	@RequiredService(name="cliser", type=ICliService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, componenttype="cliagent"))
+		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, componenttype="cliagent")),
+	@RequiredService(name="secser", type=ISecurityService.class, 
+		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @ComponentTypes(
 {
@@ -142,12 +146,6 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
-//			if(content.indexOf("<html>")!=-1)
-//			{
-//				// Remove all tags
-//				content = content.replaceAll("\\<[^>]*>","");
-//			}
-			
 			IFuture<ICliService> clifut = agent.getServiceContainer().getRequiredService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
@@ -155,11 +153,14 @@ public class CliEmailAgent
 				{
 					// First find commands and rest is digest
 					StringTokenizer stok = new StringTokenizer(eml.getContent(), ";");
-					List<String> lines = new ArrayList<String>();
+					final List<String> lines = new ArrayList<String>();
 					String digests = null;
+					StringBuffer buf = new StringBuffer();
 					while(stok.hasMoreTokens())
 					{
-						String str = stok.nextToken().trim();
+						String tmp = stok.nextToken();
+						buf.append(tmp).append(";");
+						String str = tmp.trim();
 						if(str.startsWith("#"))
 						{
 							digests = str;
@@ -170,10 +171,12 @@ public class CliEmailAgent
 						}
 					}
 					
+					final String content = buf.toString();
+					
 					if(digests!=null)
 					{
 						stok = new StringTokenizer(digests, "#");
-						List<String> dgs = new ArrayList<String>();
+						final List<String> dgs = new ArrayList<String>();
 						while(stok.hasMoreTokens())
 						{
 							String tmp = stok.nextToken().trim();
@@ -181,12 +184,39 @@ public class CliEmailAgent
 								dgs.add(tmp);
 						}
 						System.out.println(dgs);
+						
+						IFuture<ISecurityService> secfut = agent.getServiceContainer().getRequiredService("secser");
+						secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
+						{
+							public void customResultAvailable(final ISecurityService secser)
+							{
+								DefaultAuthorizable da = new DefaultAuthorizable();
+								da.setTimestamp(Long.parseLong(dgs.get(0)));
+								da.setDigestContent(content);
+								secser.validateRequest(da).addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+										executeCommands(cliser, lines.iterator(), eml, new StringBuffer())
+											.addResultListener(new DelegationResultListener<Email>(ret));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										Email rep = new Email(account.getSender(), "Security exception, invalid request.", "failed to execute: "
+											+SUtil.arrayToString(lines), eml.getSender());
+										ret.setResult(rep);
+									}
+								});
+							}
+						});
 					}
-					
-					executeCommands(cliser, lines.iterator(), eml, new StringBuffer())
-						.addResultListener(new DelegationResultListener<Email>(ret));
-					
-					System.out.println("Executing email command: "+eml.getContent());
+					else
+					{
+						Email rep = new Email(account.getSender(), "Security exception, not signed.", "failed to execute: "
+							+SUtil.arrayToString(lines), eml.getSender());
+						ret.setResult(rep);
+					}
 				}
 			});
 		}
@@ -204,6 +234,8 @@ public class CliEmailAgent
 		if(cmds.hasNext())
 		{
 			String cmd = cmds.next();
+			System.out.println("Executing email command: "+cmd);
+
 			cliser.executeCommand(cmd, agent.getExternalAccess()).addResultListener(new IResultListener<String>()
 			{
 				public void resultAvailable(String result)

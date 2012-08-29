@@ -53,11 +53,11 @@ public class DefaultAuthorizable implements IAuthorizable
 
 	/**
 	 *  Set the digestContent.
-	 *  @param digestContent The digestContent to set.
+	 *  @param dcontent The digestContent to set.
 	 */
-	public void setDigestContent(String digestContent)
+	public void setDigestContent(String dcontent)
 	{
-		this.dcontent = digestContent;
+		this.dcontent = dcontent;
 	}
 
 	/**
