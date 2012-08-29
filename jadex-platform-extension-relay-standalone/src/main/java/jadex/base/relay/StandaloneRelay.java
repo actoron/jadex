@@ -86,7 +86,7 @@ public class StandaloneRelay
 						{
 							String	id	= URLDecoder.decode(path.substring(path.indexOf('=')+1), "UTF-8");
 							String	hostip	= ((InetSocketAddress)client.getRemoteSocketAddress()).getAddress().getHostAddress();
-							String	hostname	= ((InetSocketAddress)client.getRemoteSocketAddress()).getHostString();
+							String	hostname	= ((InetSocketAddress)client.getRemoteSocketAddress()).getHostName();
 							handler.initConnection(id, hostip, hostname, "http");	// Hack!!! https?
 //							System.out.println("id: '"+id+"'");
 //							System.out.println("hostip: '"+hostip+"'");
