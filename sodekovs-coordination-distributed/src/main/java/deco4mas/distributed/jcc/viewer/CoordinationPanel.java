@@ -317,7 +317,7 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 
 	protected String getSelectedMechanismRealization() {
 		int row = mechanismTable.getSelectedRow();
-		if (row <= 0) {
+		if (row >= 0) {
 			MechanismTableModel mtm = (MechanismTableModel) mechanismTable.getModel();
 			MechanismTableEntry mte = mtm.getData().get(row);
 			return mte.getMechanism().getRealisationName();
