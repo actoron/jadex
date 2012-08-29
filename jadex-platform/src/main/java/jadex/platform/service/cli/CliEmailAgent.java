@@ -7,9 +7,9 @@ import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
 import jadex.bridge.service.types.security.DefaultAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.Base64;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -146,6 +146,10 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
+			String cnt = eml.getContent();
+			List<String> cmds = new ArrayList<String>();
+			
+			
 			IFuture<ICliService> clifut = agent.getServiceContainer().getRequiredService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
@@ -183,7 +187,12 @@ public class CliEmailAgent
 							if(tmp.length()>0)
 								dgs.add(tmp);
 						}
-						System.out.println(dgs);
+						System.out.println("digests: "+dgs);
+						final List<byte[]> authdata = new ArrayList<byte[]>();
+						for(String tmp: dgs)
+						{
+							authdata.add(Base64.decode(tmp.getBytes()));
+						}
 						
 						IFuture<ISecurityService> secfut = agent.getServiceContainer().getRequiredService("secser");
 						secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
@@ -193,6 +202,7 @@ public class CliEmailAgent
 								DefaultAuthorizable da = new DefaultAuthorizable();
 								da.setTimestamp(Long.parseLong(dgs.get(0)));
 								da.setDigestContent(content);
+								da.setAuthenticationData(authdata);
 								secser.validateRequest(da).addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
