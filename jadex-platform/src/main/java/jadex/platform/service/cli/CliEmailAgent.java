@@ -7,7 +7,9 @@ import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,7 +28,11 @@ import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  *  The agent listens on a specified email account for command line emails
@@ -136,43 +142,129 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
-			if(content.indexOf("<html>")!=-1)
-			{
-				// Remove all tags
-				content = content.replaceAll("\\<[^>]*>","");
-			}
-			
-			System.out.println("Executing email command: "+eml.getContent());
+//			if(content.indexOf("<html>")!=-1)
+//			{
+//				// Remove all tags
+//				content = content.replaceAll("\\<[^>]*>","");
+//			}
 			
 			IFuture<ICliService> clifut = agent.getServiceContainer().getRequiredService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
 				public void customResultAvailable(final ICliService cliser)
 				{
-					cliser.executeCommand(eml.getContent(), agent.getExternalAccess())
-						.addResultListener(new IResultListener<String>()
+					// First find commands and rest is digest
+					StringTokenizer stok = new StringTokenizer(eml.getContent(), ";");
+					List<String> lines = new ArrayList<String>();
+					String digests = null;
+					while(stok.hasMoreTokens())
 					{
-						public void resultAvailable(String result)
+						String str = stok.nextToken().trim();
+						if(str.startsWith("#"))
 						{
-							System.out.println("Result: "+result);
-							String cnt = "Result of the execution :"+SUtil.LF+result;
-							Email rep = new Email(account.getSender(), cnt, "command executed: "+eml.getContent(), eml.getSender());
-							ret.setResult(rep);
+							digests = str;
 						}
-		
-						public void exceptionOccurred(Exception exception)
+						else
 						{
-							System.out.println("Exception: "+exception);
-							String cnt = "Result of the execution :"+SUtil.LF+SUtil.getStackTrace(exception);
-							Email rep = new Email(account.getSender(), cnt, "command failed: "+eml.getContent(), eml.getSender());
-							ret.setResult(rep);
+							lines.add(str);
 						}
-					});
+					}
+					
+					if(digests!=null)
+					{
+						stok = new StringTokenizer(digests, "#");
+						List<String> dgs = new ArrayList<String>();
+						while(stok.hasMoreTokens())
+						{
+							String tmp = stok.nextToken().trim();
+							if(tmp.length()>0)
+								dgs.add(tmp);
+						}
+						System.out.println(dgs);
+					}
+					
+					executeCommands(cliser, lines.iterator(), eml, new StringBuffer())
+						.addResultListener(new DelegationResultListener<Email>(ret));
+					
+					System.out.println("Executing email command: "+eml.getContent());
 				}
 			});
 		}
 		
 		return ret;
 	}
-
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Email> executeCommands(final ICliService cliser, final Iterator<String> cmds, final Email eml, final StringBuffer buf)
+	{
+		final Future<Email> ret = new Future<Email>();
+		
+		if(cmds.hasNext())
+		{
+			String cmd = cmds.next();
+			cliser.executeCommand(cmd, agent.getExternalAccess()).addResultListener(new IResultListener<String>()
+			{
+				public void resultAvailable(String result)
+				{
+					if(buf.length()==0)
+						buf.append("Result of the execution :").append(SUtil.LF).append(SUtil.LF);
+					buf.append(result);
+					executeCommands(cliser, cmds, eml, buf);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					if(buf.length()==0)
+						buf.append("Result of the execution :").append(SUtil.LF).append(SUtil.LF);
+					buf.append(SUtil.getStackTrace(exception));
+					executeCommands(cliser, cmds, eml, buf);
+				}
+			});
+		}
+		else
+		{
+			Email rep = new Email(account.getSender(), buf.toString(), "executed: "+SUtil.arrayToString(cmds), eml.getSender());
+			ret.setResult(rep);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void main(String[] args)
+	{
+		String test = "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid\r\napplications-micro;help;\r\n==1346225963008==\r\n==xiA5dSIYwQYt6veZ4P4XqkUgMr34PdWnlU5NXOmzManvGkQiJoAdIw7bXiSMYrRv==\r\n==QrxVsuMG1Y2xQ0GK2km+lmPWQ21jFmsWPri2R9BWoTvUiKmBRpztOv4gcy2iItLk==\r\n==FwuRNAUJRrsb+gAVanlyp5TDKlvmfoRcr/AfUpVwpZFFtT2ZS5sLQJcMos911IoL==\r\n==bgxBOGCoODY7ydTxS4PfX4bRBCt1dCqnn9ik0Cj0UM3UV874VERNLu70Mj/Fj3k0==";
+		
+		StringTokenizer stok = new StringTokenizer(test, ";");
+		List<String> lines = new ArrayList<String>();
+		String digests = null;
+		while(stok.hasMoreTokens())
+		{
+			String str = stok.nextToken().trim();
+			if(str.startsWith("=="))
+			{
+				digests = str;
+			}
+			else
+			{
+				lines.add(str);
+			}
+		}
+		
+		if(digests!=null)
+		{
+			stok = new StringTokenizer(digests, "==");
+			List<String> dgs = new ArrayList<String>();
+			while(stok.hasMoreTokens())
+			{
+				String tmp = stok.nextToken().trim();
+				if(tmp.length()>0)
+					dgs.add(tmp);
+			}
+			System.out.println(dgs);
+		}
+	}
 }

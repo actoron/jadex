@@ -69,15 +69,15 @@ public class EmailClientPluginPanel extends JPanel
 							{
 								final StringBuffer buf = new StringBuffer();
 								
-								buf.append(intxt).append(SUtil.LF).append("== ");
-								buf.append(da.getTimestamp()).append(" ==").append(SUtil.LF);
+								buf.append(intxt).append(SUtil.LF).append("#");
+								buf.append(da.getTimestamp()).append("#").append(SUtil.LF);
 
 								List<byte[]> dgs = da.getAuthenticationData();
 								for(byte[] dg: dgs)
 								{
 									String txt = new String(Base64.encode(dg));
-									buf.append("== ");
-									buf.append(txt).append(" ==").append(SUtil.LF);
+									buf.append("#");
+									buf.append(txt).append("#").append(SUtil.LF);
 								}	
 								
 								SwingUtilities.invokeLater(new Runnable()
