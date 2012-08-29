@@ -7,7 +7,7 @@ import java.util.List;
 /**
  *  Default implementation for a authorizable.
  */
-public abstract class DefaultAuthorizable implements IAuthorizable
+public class DefaultAuthorizable implements IAuthorizable
 {
 	//-------- attributes --------
 	
@@ -17,6 +17,9 @@ public abstract class DefaultAuthorizable implements IAuthorizable
 	/** The authentication data. */
 	protected List<byte[]>	authdata;
 	
+	/** The digest content (the content the digest should be applied to). */
+	protected String dcontent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -24,6 +27,8 @@ public abstract class DefaultAuthorizable implements IAuthorizable
 	 */
 	public DefaultAuthorizable()
 	{
+		// per default no digest content (for messages)
+		dcontent = "";
 	}
 	
 	//-------- IAuthorizable interface --------
@@ -37,6 +42,24 @@ public abstract class DefaultAuthorizable implements IAuthorizable
 		return Security.PASSWORD;
 	}
 	
+	/**
+	 *  Get the digestContent.
+	 *  @return The digestContent.
+	 */
+	public String getDigestContent()
+	{
+		return dcontent;
+	}
+
+	/**
+	 *  Set the digestContent.
+	 *  @param digestContent The digestContent to set.
+	 */
+	public void setDigestContent(String digestContent)
+	{
+		this.dcontent = digestContent;
+	}
+
 	/**
 	 *  The time stamp of the command.
 	 *  Used for digest authentication and preventing replay attacks.

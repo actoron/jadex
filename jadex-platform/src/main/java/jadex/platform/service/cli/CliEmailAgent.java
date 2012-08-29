@@ -156,7 +156,7 @@ public class CliEmailAgent
 						{
 							System.out.println("Result: "+result);
 							String cnt = "Result of the execution :"+SUtil.LF+result;
-							Email rep = new Email(cnt, "command executed", eml.getSender());
+							Email rep = new Email(account.getSender(), cnt, "command executed: "+eml.getContent(), eml.getSender());
 							ret.setResult(rep);
 						}
 		
@@ -164,7 +164,7 @@ public class CliEmailAgent
 						{
 							System.out.println("Exception: "+exception);
 							String cnt = "Result of the execution :"+SUtil.LF+SUtil.getStackTrace(exception);
-							Email rep = new Email(cnt, "command failed", eml.getSender());
+							Email rep = new Email(account.getSender(), cnt, "command failed: "+eml.getContent(), eml.getSender());
 							ret.setResult(rep);
 						}
 					});

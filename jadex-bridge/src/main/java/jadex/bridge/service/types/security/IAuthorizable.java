@@ -25,6 +25,11 @@ public interface IAuthorizable
 	public String	getSecurityLevel();
 	
 	/**
+	 *  Get the digest content.
+	 */
+	public String getDigestContent();
+	
+	/**
 	 *  The time stamp of the request.
 	 *  Used for digest authentication and preventing replay attacks.
 	 *  Ignored, when no authentication is supplied.

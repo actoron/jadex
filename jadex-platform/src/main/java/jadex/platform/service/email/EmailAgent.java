@@ -7,12 +7,9 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
-import jadex.commons.ConstantFilter;
 import jadex.commons.IFilter;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
@@ -20,33 +17,27 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
-import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.mail.Flags;
-import javax.mail.Folder;
+import javax.mail.Authenticator;
 import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.Store;
 import javax.mail.Transport;
-import javax.mail.event.MessageCountEvent;
-import javax.mail.event.MessageCountListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.search.FlagTerm;
-
-import com.sun.mail.imap.IMAPFolder;
 
 
 /**
@@ -145,42 +136,32 @@ public class EmailAgent implements IEmailService
 	 */
 	public IFuture<Void> sendEmail(Email email, final EmailAccount account)
 	{
-		Properties props = new Properties();
-		props.setProperty("mail.smtp.auth", "true");
-		props.setProperty("mail.smtps.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
-        
-		Session sess = Session.getDefaultInstance(props, null);
-		sess.setDebug(true);
-
-		try
-		{
-			MimeMessage message = new MimeMessage(sess);
-			message.setFrom(new InternetAddress("jadexagent"));
-			message.setContent("test", "text/ plain");
-			message.setSubject("test");
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress("braubach@informatik.uni-hamburg.de"));
-			
-			Transport tr;
-			tr	= sess.getTransport("smtp");
-			tr.connect(EmailAccount.TEST_ACCOUNT.getSmtpHost(), EmailAccount.TEST_ACCOUNT.getSmtpPort().intValue(), 
-				EmailAccount.TEST_ACCOUNT.getUser(), EmailAccount.TEST_ACCOUNT.getPassword());
-//			tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
-			
-			message.saveChanges();
-			tr.sendMessage(message, message.getAllRecipients());
-			tr.close();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		
 		final Future<Void> ret = new Future<Void>();
 		
-		// Todo: attachments?
-//			Object[]	attachments	= getParameterSet("attachments").getValues(); // todo:
+		Properties props = new Properties();
+		props.put("mail.smtp.host", account.getSmtpHost());
+		props.put("mail.from", email.getSender());
+		props.put("mail.smtp.auth", "true");
+		props.setProperty("mail.smtps.auth", "true");
+//		props.put("mail.debug", "true");
+
+		if(account.isStartTls())
+		{
+			props.put("mail.smtp.starttls.enable", "true");
+		}
+		if(account.isSsl())
+		{
+			props.put("mail.smtp.socketFactory.port", ""+account.getSmtpPort());
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}
+		
+		Session sess = Session.getInstance(props, new Authenticator()
+		{
+			protected PasswordAuthentication getPasswordAuthentication()
+			{
+				return new PasswordAuthentication(account.getUser(), account.getPassword());
+			}
+		});
 		
 //		Properties props = new Properties();
 //		props.setProperty("mail.smtp.auth", "true");
@@ -197,72 +178,69 @@ public class EmailAgent implements IEmailService
 //        
 //		Session sess = Session.getDefaultInstance(props, null);
 //		sess.setDebug(true);
-//		
-//
-//		try
-//		{
-//			Transport tr = sess.getTransport("smtp");
-//			tr.connect(account.getSmtpHost(), account.getSmtpPort().intValue(), account.getUser(), account.getPassword());
-//
-//			MimeMessage message = new MimeMessage(sess);
-//			message.setFrom(new InternetAddress(account.getSender()));
-//			message.setContent(email.getContent(), "text/ plain");
-//			message.setSubject(email.getSubject());
-//			String[] recs = email.getReceivers();
-//			if(recs!=null)
-//			{
-//				for(int i=0; i<email.getReceivers().length; i++)
-//				{
-//					message.addRecipient(Message.RecipientType.TO, new InternetAddress(recs[i]));
-//				}
-//			}
-//			String[] ccs = email.getCcs();
-//			if(ccs!=null)
-//			{
-//				for(int i=0; i<ccs.length; i++)
-//				{
-//					message.addRecipient(Message.RecipientType.CC, new InternetAddress(ccs[i]));
-//				}
-//			}
-//			String[] bccs = email.getBccs();
-//			if(bccs!=null)
-//			{
-//				for(int i=0; i<bccs.length; i++)
-//				{
-//					message.addRecipient(Message.RecipientType.BCC, new InternetAddress(bccs[i]));
-//				}
-//			}
-//			
-////			Transport tr;
-//			if(account.isSsl())
-//			{
-//				tr	= sess.getTransport("smtps");
-//			}
-//			else
-//			{
-//				tr	= sess.getTransport("smtp");
-//			}
-//			
-//			if(account.getSmtpPort()!=null)
-//			{
+
+		try
+		{
+			MimeMessage message = new MimeMessage(sess);
+			message.setFrom(new InternetAddress(account.getSender()));
+			message.setContent(email.getContent(), "text/ plain");
+			message.setSubject(email.getSubject());
+			String[] recs = email.getReceivers();
+			if(recs!=null)
+			{
+				for(int i=0; i<email.getReceivers().length; i++)
+				{
+					message.addRecipient(Message.RecipientType.TO, new InternetAddress(recs[i]));
+				}
+			}
+			String[] ccs = email.getCcs();
+			if(ccs!=null)
+			{
+				for(int i=0; i<ccs.length; i++)
+				{
+					message.addRecipient(Message.RecipientType.CC, new InternetAddress(ccs[i]));
+				}
+			}
+			String[] bccs = email.getBccs();
+			if(bccs!=null)
+			{
+				for(int i=0; i<bccs.length; i++)
+				{
+					message.addRecipient(Message.RecipientType.BCC, new InternetAddress(bccs[i]));
+				}
+			}
+			
+			Transport tr;
+			if(account.isSsl())
+			{
+				tr	= sess.getTransport("smtps");
+			}
+			else
+			{
+				tr	= sess.getTransport("smtp");
+			}
+			
+			if(account.getSmtpPort()!=null)
+			{
 //				System.out.println("connect: "+account.getSmtpHost()+" "+account.getSmtpPort()+" "+account.getUser()+" "+account.getPassword());
-//				tr.connect(account.getSmtpHost(), account.getSmtpPort().intValue(), account.getUser(), account.getPassword());
-//			}
-//			else
-//			{
+				tr.connect(account.getSmtpHost(), account.getSmtpPort().intValue(), account.getUser(), account.getPassword());
+			}
+			else
+			{
 //				System.out.println("connect: "+account.getSmtpHost()+" "+account.getUser()+" "+account.getPassword());
-//				tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
-//			}
-//			
-//			message.saveChanges();
-//			tr.sendMessage(message, message.getAllRecipients());
-//			tr.close();
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//			throw new RuntimeException(e);
-//		}
+				tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
+			}
+			
+			message.saveChanges();
+			tr.sendMessage(message, message.getAllRecipients());
+			tr.close();
+			ret.setResult(null);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			ret.setException(e);
+		}
 		
 		return ret;
 	}
@@ -288,8 +266,6 @@ public class EmailAgent implements IEmailService
 			}
 		};
 		ret.setTerminationCommand(tcom);
-		
-		ret.addIntermediateResult(new Email());
 		
 		addSubscription(ret, new SubscriptionInfo(filter, account));
 		getReceiveBehavior(checkformail);
@@ -346,7 +322,8 @@ public class EmailAgent implements IEmailService
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					agent.getLogger().warning("Email fetching error: "+e.getMessage());
+//					e.printStackTrace();
 				}
 			}
 		}
@@ -388,41 +365,89 @@ public class EmailAgent implements IEmailService
 	}
 	
 	/**
-	 *  Main for testing.
+	 * 
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) 
 	{
 		Properties props = new Properties();
-		props.setProperty("mail.smtp.auth", "true");
-		props.setProperty("mail.smtps.auth", "true");
+		props.put("mail.smtp.host", "***REMOVED***");
+		props.put("mail.from", "aaa@gmail.com");
 		props.put("mail.smtp.starttls.enable", "true");
-        
-		Session sess = Session.getDefaultInstance(props, null);
-		sess.setDebug(true);
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.debug", "true");
 
+		Session session = Session.getInstance(props, new Authenticator()
+		{
+			protected PasswordAuthentication getPasswordAuthentication()
+			{
+				return new PasswordAuthentication("jadexagent@gmail.com", "***REMOVED***");
+			}
+		});
 		try
 		{
-			MimeMessage message = new MimeMessage(sess);
-			message.setFrom(new InternetAddress("jadexagent"));
-			message.setContent("test", "text/ plain");
-			message.setSubject("test");
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress("braubach@informatik.uni-hamburg.de"));
-			
-			Transport tr;
-			tr	= sess.getTransport("smtp");
-			tr.connect(EmailAccount.TEST_ACCOUNT.getSmtpHost(), EmailAccount.TEST_ACCOUNT.getSmtpPort().intValue(), 
-				EmailAccount.TEST_ACCOUNT.getUser(), EmailAccount.TEST_ACCOUNT.getPassword());
-//			tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
-			
-			message.saveChanges();
-			tr.sendMessage(message, message.getAllRecipients());
-			tr.close();
+			MimeMessage msg = new MimeMessage(session);
+			msg.setFrom();
+			msg.setRecipients(Message.RecipientType.TO, "braubach@gmx.net");
+			msg.setSubject("JavaMail hello world example");
+			msg.setSentDate(new Date());
+			msg.setText("Hello, world!\n");
+			Transport.send(msg);
 		}
-		catch(Exception e)
+		catch(MessagingException mex)
 		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			System.out.println("send failed, exception: " + mex);
 		}
+
+	}
+	
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		Properties props = new Properties();
+//		props.setProperty("mail.smtp.auth", "true");
+//		props.setProperty("mail.smtps.auth", "true");
+//		props.setProperty("mail.smtp.starttls.enable", "true");
+//		props.setProperty("mail.smtp.user", "jadexagent@gmail.com");
+//		props.setProperty("mail.smtp.EnableSSL.enable", "true");
+//		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");   
+//		props.setProperty("mail.smtp.socketFactory.fallback", "false");   
+//		props.setProperty("mail.smtp.port", "465");   
+//		props.setProperty("mail.smtp.socketFactory.port", "465"); 
+//		
+//		Session sess = Session.getDefaultInstance(props, new javax.mail.Authenticator() 
+//		{
+//		    protected PasswordAuthentication getPasswordAuthentication() 
+//		    {
+//		      return new PasswordAuthentication("jadexagent@gmail.com", "***REMOVED***");
+//		    }
+//		});
+//		sess.setDebug(true);
+//
+//		try
+//		{
+//			MimeMessage message = new MimeMessage(sess);
+//			message.setFrom(new InternetAddress("jadexagent"));
+//			message.setContent("test", "text/ plain");
+//			message.setSubject("test");
+//			message.addRecipient(Message.RecipientType.TO, new InternetAddress("braubach@informatik.uni-hamburg.de"));
+//			
+//			Transport tr;
+//			tr	= sess.getTransport("smtps");
+//			tr.connect(EmailAccount.TEST_ACCOUNT.getSmtpHost(), EmailAccount.TEST_ACCOUNT.getSmtpPort().intValue(), 
+//				EmailAccount.TEST_ACCOUNT.getUser(), EmailAccount.TEST_ACCOUNT.getPassword());
+////			tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
+//			
+//			message.saveChanges();
+//			tr.sendMessage(message, message.getAllRecipients());
+//			tr.close();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//			throw new RuntimeException(e);
+//		}
 		
 //		Properties props = System.getProperties();
 //		props.setProperty("mail.store.protocol", "imaps");
@@ -470,5 +495,5 @@ public class EmailAgent implements IEmailService
 //		{
 //			e.printStackTrace();
 //	    }
-	}
+//	}
 }

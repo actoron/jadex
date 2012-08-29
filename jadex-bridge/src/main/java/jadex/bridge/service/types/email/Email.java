@@ -7,7 +7,7 @@ import java.util.Arrays;
  */
 public class Email
 {
-	/** The content. */
+	/** The plain content. */
 	protected String content; 
 
 	/** The subject. */
@@ -38,17 +38,18 @@ public class Email
 	/**
 	 *  Create an email.
 	 */
-	public Email(String content, String subject, String receiver)
+	public Email(String sender, String content, String subject, String receiver)
 	{
-		this(content, subject, new String[]{receiver}, null, null);
+		this(sender, content, subject, new String[]{receiver}, null, null);
 	}
 	
 	/**
 	 *  Create an email.
 	 */
-	public Email(String content, String subject, String[] receivers,
+	public Email(String sender, String content, String subject, String[] receivers,
 		String[] ccs, String[] bccs)
 	{
+		this.sender = sender;
 		this.content = content;
 		this.subject = subject;
 		this.receivers = receivers;

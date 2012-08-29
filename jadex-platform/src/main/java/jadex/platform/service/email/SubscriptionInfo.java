@@ -166,7 +166,8 @@ public class SubscriptionInfo
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
+//			e.printStackTrace();
 		}
 		finally
 		{
@@ -259,9 +260,13 @@ public class SubscriptionInfo
 			}
 			else
 			{
-				if(part.isMimeType("text/html") || part.isMimeType("text/plain"))
+				if(part.isMimeType("text/plain"))
 				{
 					contents.add((String)part.getContent());
+				}
+				else if(part.isMimeType("text/html"))
+				{
+					// todo: html content
 				}
 				else
 				{

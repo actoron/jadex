@@ -35,6 +35,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -615,38 +616,43 @@ public class SecurityService implements ISecurityService
 		{
 			if(request.getAuthenticationData()!=null)
 			{
-				if(Math.abs(request.getTimestamp()-System.currentTimeMillis())<3000000)	// Todo: make freshness period configurable.
+				if(!checkDigests(request.getTimestamp(), request.getAuthenticationData(), password, networkpasses))
 				{
-					List<byte[]> digests = request.getAuthenticationData();
-					
-					boolean ok = false;
-					
-					// test if other knows my password
-					ok = checkDigest(buildDigest(request.getTimestamp(), password), digests);
-					
-					// test if other shares one of my networks
-					if(!ok)
-					{
-						for(String net: networkpasses.keySet())
-						{
-							byte[] netdig = buildDigest(request.getTimestamp(), net+networkpasses.get(net));
-							ok = checkDigest(netdig, digests);
-							if(ok)
-								break;
-						}
-					}
-					
-					if(!ok)
-					{
-//						System.out.println("received auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+request.getTimestamp());
-//						System.out.println("expected auth data: "+new String(Base64.encode(buildDigest(request.getTimestamp(), password)))+", "+password);
-						error	= "No valid authentication.";
-					}
+					error = "Invalid authentication";
 				}
-				else
-				{
-					error	= "Timestamp too old.";
-				}
+				
+//				if(Math.abs(request.getTimestamp()-System.currentTimeMillis())<3000000)	// Todo: make freshness period configurable.
+//				{
+//					List<byte[]> digests = request.getAuthenticationData();
+//					
+//					boolean ok = false;
+//					
+//					// test if other knows my password
+//					ok = checkDigest(buildDigest(request.getTimestamp(), password), digests);
+//					
+//					// test if other shares one of my networks
+//					if(!ok)
+//					{
+//						for(String net: networkpasses.keySet())
+//						{
+//							byte[] netdig = buildDigest(request.getTimestamp(), net+networkpasses.get(net));
+//							ok = checkDigest(netdig, digests);
+//							if(ok)
+//								break;
+//						}
+//					}
+//					
+//					if(!ok)
+//					{
+////						System.out.println("received auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+request.getTimestamp());
+////						System.out.println("expected auth data: "+new String(Base64.encode(buildDigest(request.getTimestamp(), password)))+", "+password);
+//						error	= "No valid authentication.";
+//					}
+//				}
+//				else
+//				{
+//					error	= "Timestamp too old.";
+//				}
 			}
 			else
 			{
@@ -681,7 +687,7 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Check if the test digest in contained in the digest list. 
 	 */
-	protected boolean checkDigest(byte[] test, List<byte[]> digests)
+	public static boolean checkDigest(byte[] test, List<byte[]> digests)
 	{
 		boolean ret = false;
 		for(byte[] dig: digests)
@@ -690,6 +696,35 @@ public class SecurityService implements ISecurityService
 			if(ret)
 				break;
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Check if there is a shared secret.
+	 */
+	public static boolean checkDigests(long timestamp, List<byte[]> digests, 
+		String password, Map<String, String> networkpasses)
+	{
+		boolean ret = false;
+		
+		if(Math.abs(timestamp-System.currentTimeMillis())<3000000)	// Todo: make freshness period configurable.
+		{
+			// test if other knows my password
+			ret = checkDigest(buildDigest(timestamp, password), digests);
+			
+			// test if other shares one of my networks
+			if(!ret)
+			{
+				for(String net: networkpasses.keySet())
+				{
+					byte[] netdig = buildDigest(timestamp, net+networkpasses.get(net));
+					ret = checkDigest(netdig, digests);
+					if(ret)
+						break;
+				}
+			}
+		}
+		
 		return ret;
 	}
 	
@@ -708,23 +743,37 @@ public class SecurityService implements ISecurityService
 		request.setTimestamp(timestamp);
 		
 		List<byte[]> authdata = new ArrayList<byte[]>();
-		
-		// First password of target
-		String	stripped	= target.getPlatformPrefix();
-		// Use stored password or local password for local targets.  
-		String	pw	= platformpasses.containsKey(stripped) ? platformpasses.get(stripped)
-			: stripped.equals(component.getComponentIdentifier().getPlatformPrefix()) ? password : null;
 
-		if(pw!=null)
+		if(target!=null)
 		{
-			authdata.add(getDigest(timestamp, pw));
-//			System.out.println("sending auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+pw+", "+timestamp);
+			// First password of target
+			String	stripped	= target.getPlatformPrefix();
+			// Use stored password or local password for local targets.  
+			String	pw	= platformpasses.containsKey(stripped) ? platformpasses.get(stripped)
+				: stripped.equals(component.getComponentIdentifier().getPlatformPrefix()) ? password : null;
+	
+			if(pw!=null)
+			{
+				authdata.add(getDigest(timestamp, request.getDigestContent()+pw));
+	//			System.out.println("sending auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+pw+", "+timestamp);
+			}
+		}
+		else
+		{
+			// + own
+			authdata.add(getDigest(timestamp, request.getDigestContent()+password));
+			
+			// Add all password authentications
+			for(String name: platformpasses.keySet())
+			{
+				authdata.add(getDigest(timestamp, request.getDigestContent()+name+platformpasses.get(name)));
+			}
 		}
 		
 		// Add all network authentications
 		for(String net: networkpasses.keySet())
 		{
-			authdata.add(getDigest(timestamp, net+networkpasses.get(net)));
+			authdata.add(getDigest(timestamp, request.getDigestContent()+net+networkpasses.get(net)));
 		}
 		
 		// Add trusted authentications (in case other has turned on lan trusted and this one not)
@@ -732,7 +781,7 @@ public class SecurityService implements ISecurityService
 		{
 			for(InetAddress addr: contextser.getNetworkIps())
 			{
-				authdata.add(getDigest(timestamp, addr.getHostAddress()));
+				authdata.add(getDigest(timestamp, request.getDigestContent()+addr.getHostAddress()));
 			}
 		}
 		
