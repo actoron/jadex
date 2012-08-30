@@ -35,7 +35,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -95,7 +94,7 @@ public class SecurityService implements ISecurityService
 	/** The ContextService. */
 	protected IContextService contextser;
 	
-	/** The currently valid digests. */
+	/** The currently valid digests. (secret -> timestamp, digest)*/
 	protected Map<String, Tuple2<Long, byte[]>> digests;
 
 	
@@ -616,47 +615,11 @@ public class SecurityService implements ISecurityService
 		{
 			if(request.getAuthenticationData()!=null)
 			{
-				if(!checkDigests(request.getTimestamp(), request.getAuthenticationData(), password, networkpasses))
-				{
-					error = "Invalid authentication";
-				}
-				
-//				if(Math.abs(request.getTimestamp()-System.currentTimeMillis())<3000000)	// Todo: make freshness period configurable.
-//				{
-//					List<byte[]> digests = request.getAuthenticationData();
-//					
-//					boolean ok = false;
-//					
-//					// test if other knows my password
-//					ok = checkDigest(buildDigest(request.getTimestamp(), password), digests);
-//					
-//					// test if other shares one of my networks
-//					if(!ok)
-//					{
-//						for(String net: networkpasses.keySet())
-//						{
-//							byte[] netdig = buildDigest(request.getTimestamp(), net+networkpasses.get(net));
-//							ok = checkDigest(netdig, digests);
-//							if(ok)
-//								break;
-//						}
-//					}
-//					
-//					if(!ok)
-//					{
-////						System.out.println("received auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+request.getTimestamp());
-////						System.out.println("expected auth data: "+new String(Base64.encode(buildDigest(request.getTimestamp(), password)))+", "+password);
-//						error	= "No valid authentication.";
-//					}
-//				}
-//				else
-//				{
-//					error	= "Timestamp too old.";
-//				}
+				error = checkDigests(request, password, networkpasses);
 			}
 			else
 			{
-				error	= "Password required.";
+				error	= "Shared secret required.";
 			}
 		}
 		
@@ -669,8 +632,11 @@ public class SecurityService implements ISecurityService
 	public byte[] getDigest(long timestamp, String secret)
 	{
 		byte[] ret;
+		// Get the digest that belongs to the secret
 		Tuple2<Long, byte[]> tst = digests.get(secret);
 		Long ts = new Long(timestamp);
+		
+		// Check if the timestamp of the digest is still ok
 		if(tst!=null && tst.getFirstEntity().equals(ts))
 		{
 //			System.out.println("reuse: "+timestamp+" "+secret);
@@ -702,27 +668,44 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Check if there is a shared secret.
 	 */
-	public static boolean checkDigests(long timestamp, List<byte[]> digests, 
-		String password, Map<String, String> networkpasses)
+	public static String checkDigests(IAuthorizable request, String password, Map<String, String> networkpasses)
 	{
-		boolean ret = false;
+		String ret = null;
 		
-		if(Math.abs(timestamp-System.currentTimeMillis())<3000000)	// Todo: make freshness period configurable.
+		List<byte[]> digests = request.getAuthenticationData();
+		long timestamp = request.getTimestamp();
+		long vd = request.getValidityDuration()==0? 65536: request.getValidityDuration();
+		
+		String prefix = request.getValidityDuration()==0? request.getDigestContent(): 
+			request.getValidityDuration()+request.getDigestContent();
+//		String prefix = request.getValidityDuration()+request.getDigestContent();
+		
+		boolean tst = false;
+		if(Math.abs(timestamp-System.currentTimeMillis())<vd)	
 		{
 			// test if other knows my password
-			ret = checkDigest(buildDigest(timestamp, password), digests);
+			tst = checkDigest(buildDigest(timestamp, prefix+password), digests);
 			
 			// test if other shares one of my networks
-			if(!ret)
+			if(!tst)
 			{
 				for(String net: networkpasses.keySet())
 				{
-					byte[] netdig = buildDigest(timestamp, net+networkpasses.get(net));
-					ret = checkDigest(netdig, digests);
-					if(ret)
+					byte[] netdig = buildDigest(timestamp, prefix+net+networkpasses.get(net));
+					tst = checkDigest(netdig, digests);
+					if(tst)
 						break;
 				}
 			}
+			
+			if(!tst)
+			{
+				ret = "No shared secret.";
+			}
+		}
+		else
+		{
+			ret = "Timestamp too old.";
 		}
 		
 		return ret;
@@ -738,42 +721,55 @@ public class SecurityService implements ISecurityService
 	{
 		long	timestamp	= System.currentTimeMillis();
 //		System.out.println("ts1: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
-		timestamp = timestamp>>>16<<16; // New digest every minute
+//		timestamp = timestamp>>>16<<16; // New digest every minute
+		long vd = request.getValidityDuration()==0? 65536: request.getValidityDuration();
+		int num = SUtil.log2(vd);
+		for(int i=0; i<num; i++)
+		{
+			timestamp >>>= 1;
+		}
+		for(int i=0; i<num; i++)
+		{
+			timestamp <<= 1;
+		}
 //		System.out.println("ts2: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
 		request.setTimestamp(timestamp);
 		
 		List<byte[]> authdata = new ArrayList<byte[]>();
 
+		String prefix = request.getValidityDuration()==0? request.getDigestContent(): 
+			request.getValidityDuration()+request.getDigestContent();
+		
 		if(target!=null)
 		{
 			// First password of target
 			String	stripped	= target.getPlatformPrefix();
 			// Use stored password or local password for local targets.  
-			String	pw	= platformpasses.containsKey(stripped) ? platformpasses.get(stripped)
-				: stripped.equals(component.getComponentIdentifier().getPlatformPrefix()) ? password : null;
+			String	pw	= platformpasses.containsKey(stripped)? platformpasses.get(stripped)
+				: stripped.equals(component.getComponentIdentifier().getPlatformPrefix())? password : null;
 	
 			if(pw!=null)
 			{
-				authdata.add(getDigest(timestamp, request.getDigestContent()+pw));
+				authdata.add(getDigest(timestamp, prefix+pw));
 	//			System.out.println("sending auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+pw+", "+timestamp);
 			}
 		}
 		else
 		{
 			// + own
-			authdata.add(getDigest(timestamp, request.getDigestContent()+password));
+			authdata.add(getDigest(timestamp, prefix+password));
 			
 			// Add all password authentications
 			for(String name: platformpasses.keySet())
 			{
-				authdata.add(getDigest(timestamp, request.getDigestContent()+name+platformpasses.get(name)));
+				authdata.add(getDigest(timestamp, prefix+name+platformpasses.get(name)));
 			}
 		}
 		
 		// Add all network authentications
 		for(String net: networkpasses.keySet())
 		{
-			authdata.add(getDigest(timestamp, request.getDigestContent()+net+networkpasses.get(net)));
+			authdata.add(getDigest(timestamp, prefix+net+networkpasses.get(net)));
 		}
 		
 		// Add trusted authentications (in case other has turned on lan trusted and this one not)
@@ -781,7 +777,7 @@ public class SecurityService implements ISecurityService
 		{
 			for(InetAddress addr: contextser.getNetworkIps())
 			{
-				authdata.add(getDigest(timestamp, request.getDigestContent()+addr.getHostAddress()));
+				authdata.add(getDigest(timestamp, prefix+addr.getHostAddress()));
 			}
 		}
 		
@@ -819,6 +815,17 @@ public class SecurityService implements ISecurityService
 	 */
 	public static void	main(String args[]) throws Exception
 	{
+//		long	timestamp	= System.currentTimeMillis();
+////		System.out.println("ts1: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
+//		
+//		timestamp = timestamp>>>16<<16; // New digest every minute
+//		long ts2 = timestamp>>>16;
+//		long ts = timestamp;
+//		for(int i=0; i<16; i++)
+//		{
+//			ts >>>= 1;
+//		}
+		
 		// Test performance of algorithms
 		// See http://download.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest
 		String[]	names	= new String[]

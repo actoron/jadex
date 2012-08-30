@@ -20,6 +20,9 @@ public class DefaultAuthorizable implements IAuthorizable
 	/** The digest content (the content the digest should be applied to). */
 	protected String dcontent;
 	
+	/** The validity duration. */
+	protected long dur;
+	
 	//-------- constructors --------
 	
 	/**
@@ -27,8 +30,9 @@ public class DefaultAuthorizable implements IAuthorizable
 	 */
 	public DefaultAuthorizable()
 	{
-		// per default no digest content (for messages)
-		dcontent = "";
+		dcontent = ""; // per default no digest content (for messages)
+//		dur = 65536; // one minute per default
+		dur = 0; // if used this way cannot communicate with old platforms
 	}
 	
 	//-------- IAuthorizable interface --------
@@ -42,6 +46,24 @@ public class DefaultAuthorizable implements IAuthorizable
 		return Security.PASSWORD;
 	}
 	
+	/**
+	 *  Get the validityDuration.
+	 *  @return The validityDuration.
+	 */
+	public long getValidityDuration()
+	{
+		return dur;
+	}
+
+	/**
+	 *  Set the validityDuration.
+	 *  @param validityDuration The validityDuration to set.
+	 */
+	public void setValidityDuration(long validityDuration)
+	{
+		this.dur = validityDuration;
+	}
+
 	/**
 	 *  Get the digestContent.
 	 *  @return The digestContent.

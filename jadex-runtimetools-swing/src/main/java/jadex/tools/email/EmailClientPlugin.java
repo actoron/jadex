@@ -18,8 +18,8 @@ public class EmailClientPlugin extends AbstractJCCPlugin
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"starter",	SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/common/images/new_starter.png"),
-		"starter_sel",	SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
+		"email", SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/email/images/email.png"),
+		"email_sel", SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/email/images/email_sel.png"),
 	});
 
 	//-------- methods --------
@@ -40,9 +40,12 @@ public class EmailClientPlugin extends AbstractJCCPlugin
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
-		return selected? icons.getIcon("starter_sel"): icons.getIcon("starter");
+		return selected? icons.getIcon("email_sel"): icons.getIcon("email");
 	}
 	
+	/**
+	 *  Create the view.
+	 */
 	public JComponent createView()
 	{
 		return new EmailClientPluginPanel(getJCC());
@@ -53,7 +56,8 @@ public class EmailClientPlugin extends AbstractJCCPlugin
 	 */
 	public IFuture<Void> shutdown()
 	{
-		((EmailClientPluginPanel)getView()).dispose();
+		if(getView()!=null)
+			((EmailClientPluginPanel)getView()).dispose();
 		return super.shutdown();
 	}
 }

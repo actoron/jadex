@@ -40,6 +40,8 @@ import java.util.StringTokenizer;
  *  The agent listens on a specified email account for command line emails
  *  (must have 'command' in subject).
  *  
+ *  The email has to be signed using the Jadex email sign tool (in JCC).
+ *  
  *  The content of the email is sent to the command line agent for interpretation.
  *  
  *  The result of the invocation is sent back to the issuer.
@@ -137,7 +139,7 @@ public class CliEmailAgent
 	}
 	
 	/**
-	 * 
+	 *  Called when a command email was received.
 	 */
 	protected IFuture<Email> receivedCommandEmail(final Email eml) 
 	{
@@ -146,98 +148,125 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
-			String cnt = eml.getContent();
-			List<String> cmds = new ArrayList<String>();
-			
-			
 			IFuture<ICliService> clifut = agent.getServiceContainer().getRequiredService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
 				public void customResultAvailable(final ICliService cliser)
 				{
-					// First find commands and rest is digest
-					StringTokenizer stok = new StringTokenizer(eml.getContent(), ";");
-					final List<String> lines = new ArrayList<String>();
-					String digests = null;
-					StringBuffer buf = new StringBuffer();
-					while(stok.hasMoreTokens())
+					try
 					{
-						String tmp = stok.nextToken();
-						buf.append(tmp).append(";");
-						String str = tmp.trim();
-						if(str.startsWith("#"))
+						// First find commands and rest is digest
+						StringTokenizer stok = new StringTokenizer(eml.getContent(), ";");
+						final List<String> lines = new ArrayList<String>();
+						String digests = null;
+						StringBuffer buf = new StringBuffer();
+						boolean end = false;
+						while(stok.hasMoreTokens())
 						{
-							digests = str;
+							String tmp = stok.nextToken();
+							String str = tmp.trim();
+							if(str.startsWith("#"))
+							{
+								end = true;
+								digests = str;
+							}
+							else
+							{
+								lines.add(str);
+							}
+							
+							if(!end)
+							{
+								buf.append(tmp).append(";");
+							}
+						}
+						
+						String fcnt = buf.toString();
+						final String content = fcnt.replaceAll("\\r|\\n", "");
+						
+						if(digests!=null)
+						{
+							stok = new StringTokenizer(digests, "#");
+							final List<String> dgs = new ArrayList<String>();
+							while(stok.hasMoreTokens())
+							{
+								String tmp = stok.nextToken().trim();
+								if(tmp.length()>0) // skip empty strings
+									dgs.add(tmp);
+							}
+	//						System.out.println("digests: "+dgs);
+							final long ts = Long.parseLong(dgs.get(0));
+							final long dur = Long.parseLong(dgs.get(1));
+							
+							final List<byte[]> authdata = new ArrayList<byte[]>();
+							for(int i=2; i<dgs.size(); i++)
+							{
+								byte[] dec = Base64.decode(dgs.get(i).getBytes());
+								authdata.add(dec);
+	//							System.out.println("authdata: "+SUtil.arrayToString(dec));
+							}
+	//						System.out.println("ts: "+ts);
+	//						System.out.println("dur: "+dur);
+	//						System.out.println("content: "+content);
+							
+							IFuture<ISecurityService> secfut = agent.getServiceContainer().getRequiredService("secser");
+							secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
+							{
+								public void customResultAvailable(final ISecurityService secser)
+								{
+									DefaultAuthorizable da = new DefaultAuthorizable();
+									da.setTimestamp(ts);
+									da.setValidityDuration(dur);
+									da.setDigestContent(content);
+									da.setAuthenticationData(authdata);
+									secser.validateRequest(da).addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+											executeCommands(cliser, lines.iterator(), eml, new StringBuffer(), new StringBuffer())
+												.addResultListener(new DelegationResultListener<Email>(ret));
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											Email rep = new Email(account.getSender(), "Security exception, invalid request.", "failed to execute: "
+												+SUtil.arrayToString(lines).replaceAll("\\r|\\n", ""), eml.getSender());
+											ret.setResult(rep);
+										}
+									});
+								}
+							});
 						}
 						else
 						{
-							lines.add(str);
+							Email rep = new Email(account.getSender(), "Security exception, not signed.", "failed to execute: "
+								+SUtil.arrayToString(lines).replaceAll("\\r|\\n", ""), eml.getSender());
+							ret.setResult(rep);
 						}
 					}
-					
-					final String content = buf.toString();
-					
-					if(digests!=null)
+					catch(Exception e)
 					{
-						stok = new StringTokenizer(digests, "#");
-						final List<String> dgs = new ArrayList<String>();
-						while(stok.hasMoreTokens())
-						{
-							String tmp = stok.nextToken().trim();
-							if(tmp.length()>0)
-								dgs.add(tmp);
-						}
-						System.out.println("digests: "+dgs);
-						final List<byte[]> authdata = new ArrayList<byte[]>();
-						for(String tmp: dgs)
-						{
-							authdata.add(Base64.decode(tmp.getBytes()));
-						}
-						
-						IFuture<ISecurityService> secfut = agent.getServiceContainer().getRequiredService("secser");
-						secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
-						{
-							public void customResultAvailable(final ISecurityService secser)
-							{
-								DefaultAuthorizable da = new DefaultAuthorizable();
-								da.setTimestamp(Long.parseLong(dgs.get(0)));
-								da.setDigestContent(content);
-								da.setAuthenticationData(authdata);
-								secser.validateRequest(da).addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										executeCommands(cliser, lines.iterator(), eml, new StringBuffer())
-											.addResultListener(new DelegationResultListener<Email>(ret));
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										Email rep = new Email(account.getSender(), "Security exception, invalid request.", "failed to execute: "
-											+SUtil.arrayToString(lines), eml.getSender());
-										ret.setResult(rep);
-									}
-								});
-							}
-						});
-					}
-					else
-					{
-						Email rep = new Email(account.getSender(), "Security exception, not signed.", "failed to execute: "
-							+SUtil.arrayToString(lines), eml.getSender());
+						Email rep = new Email(account.getSender(), "Processing exception."+SUtil.LF+SUtil.getStackTrace(e), 
+							"failed to execute commands", eml.getSender());
 						ret.setResult(rep);
 					}
 				}
 			});
+		}
+		else
+		{
+			Email rep = new Email(account.getSender(), "No commands in body.", "no commands", eml.getSender());
+			ret.setResult(rep);
 		}
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Execute a number of commands.
 	 */
-	protected IFuture<Email> executeCommands(final ICliService cliser, final Iterator<String> cmds, final Email eml, final StringBuffer buf)
+	protected IFuture<Email> executeCommands(final ICliService cliser, final Iterator<String> cmds, final Email eml, 
+		final StringBuffer content, final StringBuffer subject)
 	{
 		final Future<Email> ret = new Future<Email>();
 		
@@ -245,28 +274,31 @@ public class CliEmailAgent
 		{
 			String cmd = cmds.next();
 			System.out.println("Executing email command: "+cmd);
+			if(subject.length()!=0)
+				subject.append(" ");
+			subject.append(cmd);
 
 			cliser.executeCommand(cmd, agent.getExternalAccess()).addResultListener(new IResultListener<String>()
 			{
 				public void resultAvailable(String result)
 				{
-					if(buf.length()==0)
-						buf.append("Result of the execution :").append(SUtil.LF).append(SUtil.LF);
-					buf.append(result);
-					executeCommands(cliser, cmds, eml, buf);
+					if(content.length()==0)
+						content.append("Result of the execution :").append(SUtil.LF).append(SUtil.LF);
+					content.append(result);
+					executeCommands(cliser, cmds, eml, content, subject).addResultListener(new DelegationResultListener<Email>(ret));
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					if(buf.length()==0)
-						buf.append("Result of the execution :").append(SUtil.LF).append(SUtil.LF);
-					buf.append(SUtil.getStackTrace(exception));
-					executeCommands(cliser, cmds, eml, buf);
+					if(content.length()==0)
+						content.append("Result of the execution :").append(SUtil.LF).append(SUtil.LF);
+					content.append(SUtil.getStackTrace(exception));
+					executeCommands(cliser, cmds, eml, content, subject).addResultListener(new DelegationResultListener<Email>(ret));
 				}
 			});
 		}
 		else
 		{
-			Email rep = new Email(account.getSender(), buf.toString(), "executed: "+SUtil.arrayToString(cmds), eml.getSender());
+			Email rep = new Email(account.getSender(), content.toString(), "executed: "+subject, eml.getSender());
 			ret.setResult(rep);
 		}
 		
@@ -286,7 +318,7 @@ public class CliEmailAgent
 		while(stok.hasMoreTokens())
 		{
 			String str = stok.nextToken().trim();
-			if(str.startsWith("=="))
+			if(str.startsWith("#"))
 			{
 				digests = str;
 			}
@@ -298,7 +330,7 @@ public class CliEmailAgent
 		
 		if(digests!=null)
 		{
-			stok = new StringTokenizer(digests, "==");
+			stok = new StringTokenizer(digests, "#");
 			List<String> dgs = new ArrayList<String>();
 			while(stok.hasMoreTokens())
 			{

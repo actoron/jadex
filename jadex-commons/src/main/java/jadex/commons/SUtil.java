@@ -1673,20 +1673,11 @@ public class SUtil
 		// String rand = ""+Math.random();
 		// rand = rand.substring(2, 2+Math.min(length-2, rand.length()-2));
 		// return name+"_"+rand+(++convidcnt%100);
-	}
-
+	}	
+	
 	/**
-	 * Main method for testing.
+	 * 
 	 */
-	public static void main(String[] args)
-	{
-//		System.out.println("Here: " + createUniqueId("test", 3));
-		System.out.println(htmlwraps);
-		testIntByteConversion();
-	}
-	
-	
-
 	private static void testIntByteConversion()
 	{
 		Random	rnd	= new Random(123);	
@@ -2998,4 +2989,96 @@ public class SUtil
 		e.printStackTrace(new PrintWriter(sw));
 		return sw.toString();
 	}
+	
+	/**
+	 *  Fast way to compute log2(x).
+	 *  @param num The number.
+	 *  @return The log2(x).
+	 */
+	public static int log2(int num) 
+	{
+	    int ret = 0;
+	    if((num & 0xffff0000)!= 0) 
+	    { 
+	    	num >>>= 16; 
+			ret = 16; 
+	    }
+	    if(num >= 256) 
+	    { 
+	    	num >>>= 8; 
+	    	ret += 8; 
+	    }
+	    if(num >= 16) 
+	    { 
+	    	num >>>= 4; 
+	    	ret += 4; 
+	    }
+	    if(num >= 4) 
+	    { 
+	    	num >>>= 2; 
+	    	ret += 2; 
+	    }
+	    return ret + (num >>> 1);
+	}
+	
+	/**
+	 *  Fast way to compute log2(x).
+	 *  @param num The number.
+	 *  @return The log2(x).
+	 */
+	public static int log2(long num) 
+	{
+	    int ret = 0;
+	    
+	    if((num & 0xffffffff00000000l)!= 0) 
+	    { 
+	    	num >>>= 64; 
+			ret = 64; 
+	    }
+	    if(num >= 4294967296l) 
+	    { 
+	    	num >>>= 32; 
+			ret = 32; 
+	    }
+	    if(num >= 65536) 
+	    { 
+	    	num >>>= 16; 
+			ret = 16; 
+	    }
+	    if(num >= 256) 
+	    { 
+	    	num >>>= 8; 
+	    	ret += 8; 
+	    }
+	    if(num >= 16) 
+	    { 
+	    	num >>>= 4; 
+	    	ret += 4; 
+	    }
+	    if(num >= 4) 
+	    { 
+	    	num >>>= 2; 
+	    	ret += 2; 
+	    }
+	    if(num >= 2)
+	    {
+	    	ret++;
+	    }
+	    return ret;
+	}
+
+	/**
+	 * Main method for testing.
+	 */
+	public static void main(String[] args)
+	{
+		System.out.println(log2(8));
+		System.out.println(log2(800000000000L));
+		
+		
+//		System.out.println("Here: " + createUniqueId("test", 3));
+//		System.out.println(htmlwraps);
+//		testIntByteConversion();
+	}
+	
 }

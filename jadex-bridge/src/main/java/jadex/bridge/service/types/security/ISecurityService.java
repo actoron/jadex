@@ -156,6 +156,7 @@ public interface ISecurityService
 	 *  Adds authentication data to the request, if required by the intended target.
 	 *  @param request	The request to be preprocessed.
 	 *  @param target	The target to which the request should be sent later.
+	 *  @param dur The request validity duration.
 	 */
 	public IFuture<Void>	preprocessRequest(IAuthorizable request, IComponentIdentifier target);
 }

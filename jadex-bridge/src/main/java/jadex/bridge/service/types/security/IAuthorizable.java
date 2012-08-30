@@ -36,6 +36,11 @@ public interface IAuthorizable
 	 */
 	public long	getTimestamp();
 	
+	/** 
+	 *  The validity duration.
+	 */
+	public long getValidityDuration();
+	
 	/**
 	 *  Set the time stamp of the request.
 	 *  Is automatically called by the security service if necessary, when the request is preprocessed.
