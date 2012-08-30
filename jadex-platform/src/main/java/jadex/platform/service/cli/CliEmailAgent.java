@@ -172,7 +172,7 @@ public class CliEmailAgent
 							}
 							else
 							{
-								lines.add(str);
+								lines.add(str.replaceAll("\\r|\\n", ""));
 							}
 							
 							if(!end)
@@ -230,7 +230,7 @@ public class CliEmailAgent
 										public void exceptionOccurred(Exception exception)
 										{
 											Email rep = new Email(account.getSender(), "Security exception, invalid request.", "failed to execute: "
-												+SUtil.arrayToString(lines).replaceAll("\\r|\\n", ""), eml.getSender());
+												+SUtil.arrayToString(lines), eml.getSender());
 											ret.setResult(rep);
 										}
 									});
@@ -240,7 +240,7 @@ public class CliEmailAgent
 						else
 						{
 							Email rep = new Email(account.getSender(), "Security exception, not signed.", "failed to execute: "
-								+SUtil.arrayToString(lines).replaceAll("\\r|\\n", ""), eml.getSender());
+								+SUtil.arrayToString(lines), eml.getSender());
 							ret.setResult(rep);
 						}
 					}
