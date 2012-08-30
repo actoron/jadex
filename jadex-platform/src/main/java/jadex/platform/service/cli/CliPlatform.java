@@ -7,12 +7,11 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.cli.commands.DestroyComponentCommand;
-import jadex.platform.service.cli.commands.HelpCommand;
-import jadex.platform.service.cli.commands.ListComponentsCommand;
-import jadex.platform.service.cli.commands.ListPlatformsCommand;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;

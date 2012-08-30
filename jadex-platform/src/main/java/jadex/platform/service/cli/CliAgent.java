@@ -4,7 +4,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cli.ICliService;
-import jadex.bridge.service.types.email.IEmailService;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -19,6 +18,10 @@ import jadex.micro.annotation.ProvidedServices;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -95,6 +98,51 @@ public class CliAgent implements ICliService
 				f.setVisible(true);
 			}
 		});
+		
+		Runnable reader = new Runnable()
+		{
+			public void run()
+			{
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				
+				while(true)
+				{
+					try
+					{
+						final String tmp = br.readLine();
+						final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
+						if("exit".equals(cmd))
+							break;
+						
+						agent.scheduleStep(new IComponentStep<Void>()
+						{
+							public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+							{
+								executeCommand(cmd, ia.getExternalAccess()).addResultListener(new IResultListener<String>()
+								{
+									public void resultAvailable(String result)
+									{
+										System.out.println(result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										System.out.println(SUtil.getStackTrace(exception));
+									}
+								});
+								
+								return IFuture.DONE;
+							}
+						});
+					}
+					catch(IOException ioe)
+					{
+					}
+				}
+			}
+		};
+		Thread t = new Thread(reader);
+		t.start();
 	}
 	
 	/**
