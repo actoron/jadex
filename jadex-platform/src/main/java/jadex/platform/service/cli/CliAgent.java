@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Writer;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -127,7 +126,7 @@ public class CliAgent implements ICliService
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										System.out.println(SUtil.getStackTrace(exception));
+										exception.printStackTrace();
 									}
 								});
 								
