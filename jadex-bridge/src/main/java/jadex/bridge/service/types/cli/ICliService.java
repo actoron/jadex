@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cli;
 
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
@@ -15,5 +16,6 @@ public interface ICliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(String command);//, Object context);
+	public IFuture<String> executeCommand(@CheckNotNull String command, @CheckNotNull String session);//, Object context);
+	
 }

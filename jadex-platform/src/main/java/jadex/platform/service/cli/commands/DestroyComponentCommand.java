@@ -2,7 +2,9 @@ package jadex.platform.service.cli.commands;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -10,6 +12,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.platform.service.cli.ACliCommand;
@@ -40,7 +43,8 @@ public class DestroyComponentCommand extends ACliCommand
 	};
 	
 	/**
-	 *  Get the command names.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
 	public String[] getNames()
 	{
@@ -49,6 +53,7 @@ public class DestroyComponentCommand extends ACliCommand
 	
 	/**
 	 *  Get the command description.
+	 *  @return The command description.
 	 */
 	public String getDescription()
 	{
@@ -56,9 +61,9 @@ public class DestroyComponentCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
-	 * @param args
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public Object invokeCommand(final CliContext context, final Map<String, Object> args)
 	{
@@ -73,22 +78,33 @@ public class DestroyComponentCommand extends ACliCommand
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 			
-			SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
+			comp.scheduleStep(new IComponentStep<Map<String, Object>>()
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				public IFuture<Map<String, Object>> execute(IInternalAccess ia)
 				{
-					cms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
+					final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
+			
+					SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
+					{
+						public void customResultAvailable(IComponentManagementService cms)
+						{
+							cms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
+						}
+					});
+					
+					return ret;
 				}
-			});
+			}).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		}
 		
 		return ret;
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the argument infos.
+	 *  @param context The context.
+	 *  @return The argument infos.
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
@@ -97,8 +113,9 @@ public class DestroyComponentCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{

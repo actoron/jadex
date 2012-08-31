@@ -24,7 +24,8 @@ import java.util.Map;
 public class KillPlatform extends ACliCommand
 {
 	/**
-	 *  Get the command names.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
 	public String[] getNames()
 	{
@@ -33,6 +34,7 @@ public class KillPlatform extends ACliCommand
 	
 	/**
 	 *  Get the command description.
+	 *  @return The command description.
 	 */
 	public String getDescription()
 	{
@@ -40,9 +42,9 @@ public class KillPlatform extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
-	 * @param args
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public Object invokeCommand(final CliContext context, final Map<String, Object> args)
 	{
@@ -63,8 +65,9 @@ public class KillPlatform extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{

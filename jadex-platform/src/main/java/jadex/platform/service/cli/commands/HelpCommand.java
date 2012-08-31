@@ -24,7 +24,8 @@ import java.util.Set;
 public class HelpCommand extends ACliCommand
 {
 	/**
-	 *  Get the command names.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
 	public String[] getNames()
 	{
@@ -33,6 +34,7 @@ public class HelpCommand extends ACliCommand
 	
 	/**
 	 *  Get the command description.
+	 *  @return The command description.
 	 */
 	public String getDescription()
 	{
@@ -49,9 +51,9 @@ public class HelpCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
-	 * @param args
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public Object invokeCommand(CliContext context, Map<String, Object> args)
 	{
@@ -60,24 +62,23 @@ public class HelpCommand extends ACliCommand
 		String arg = (String)args.get(null);
 		if(arg!=null)
 		{
-			ICliCommand cmd = context.getClip().getCommands().get(arg);
+			ICliCommand cmd = context.getShell().getCommands().get(arg);
 			Set<ICliCommand> res = new HashSet<ICliCommand>();
 			res.add(cmd);
 			ret.setResult(res);
 		}
 		else
 		{
-			ret.setResult(new LinkedHashSet<ICliCommand>(context.getClip().getCommands().values()));
+			ret.setResult(new LinkedHashSet<ICliCommand>(context.getShell().getCommands().values()));
 		}
 		
 		return ret;
 	}
 	
-	
-	
 	/**
-	 * 
-	 * @param context
+	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{
@@ -120,7 +121,8 @@ public class HelpCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
+	 *  Get a short command info.
+	 *  @param cmd The command.
 	 */
 	protected String getShortCommandInfo(ICliCommand cmd)
 	{

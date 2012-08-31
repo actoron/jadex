@@ -12,7 +12,7 @@ public class CliContext
 	//-------- attributes --------
 	
 	/** The cli shell. */
-	protected CliShell clip;
+	protected ACliShell shell;
 	
 	/** The user context. */
 	protected Object usercontext;
@@ -29,9 +29,9 @@ public class CliContext
 	/**
 	 *  Create a new CliContext.
 	 */
-	public CliContext(CliShell clip, Object usercontext)
+	public CliContext(ACliShell clip, Object usercontext)
 	{
-		this.clip = clip;
+		this.shell = clip;
 		this.usercontext = usercontext;
 	}
 
@@ -39,18 +39,18 @@ public class CliContext
 	 *  Get the clip.
 	 *  @return The clip.
 	 */
-	public CliShell getClip()
+	public ACliShell getShell()
 	{
-		return clip;
+		return shell;
 	}
 
 	/**
 	 *  Set the clip.
 	 *  @param clip The clip to set.
 	 */
-	public void setClip(CliShell clip)
+	public void setShell(ACliShell clip)
 	{
-		this.clip = clip;
+		this.shell = clip;
 	}
 
 	/**
@@ -66,9 +66,9 @@ public class CliContext
 	 *  Set the userContext.
 	 *  @param userContext The userContext to set.
 	 */
-	public void setUserContext(Object userContext)
+	public void setUserContext(Object usercontext)
 	{
-		this.usercontext = userContext;
+		this.usercontext = usercontext;
 	}
 	
 }

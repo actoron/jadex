@@ -43,7 +43,7 @@ public abstract class ACliCommand implements ICliCommand
 	}
 	
 	/**
-	 *  Get the argument info.
+	 *  Get the argument infos.
 	 *  @param context The context.
 	 *  @return The argument infos.
 	 */

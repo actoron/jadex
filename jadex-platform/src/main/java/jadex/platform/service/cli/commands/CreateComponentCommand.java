@@ -4,7 +4,9 @@
 package jadex.platform.service.cli.commands;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -15,6 +17,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -30,7 +33,8 @@ import java.util.Map;
 public class CreateComponentCommand extends ACliCommand
 {
 	/**
-	 *  Get the command names.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
 	public String[] getNames()
 	{
@@ -39,6 +43,7 @@ public class CreateComponentCommand extends ACliCommand
 	
 	/**
 	 *  Get the command description.
+	 *  @return The command description.
 	 */
 	public String getDescription()
 	{
@@ -46,9 +51,9 @@ public class CreateComponentCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
-	 * @param args
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public Object invokeCommand(final CliContext context, final Map<String, Object> args)
 	{
@@ -56,70 +61,81 @@ public class CreateComponentCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		comp.scheduleStep(new IComponentStep<IComponentIdentifier>()
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
 			{
-				final String name = (String)args.get("-name");
-				final String model = (String)args.get("-model");
-				final String config = (String)args.get("-config");
-				final IComponentIdentifier parent = (IComponentIdentifier)args.get("-parent");
-				final String ridtext = (String)args.get("-rid");
+				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 				
-				IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
-		
-				SServiceProvider.getService(comp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 				{
-					public void customResultAvailable(ILibraryService  libs)
+					public void customResultAvailable(final IComponentManagementService cms)
 					{
-						libs.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IComponentIdentifier>(ret)
+						final String name = (String)args.get("-name");
+						final String model = (String)args.get("-model");
+						final String config = (String)args.get("-config");
+						final IComponentIdentifier parent = (IComponentIdentifier)args.get("-parent");
+						final String ridtext = (String)args.get("-rid");
+						
+						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
+				
+						SServiceProvider.getService(comp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 						{
-							public void customResultAvailable(List<IResourceIdentifier> rids) 
+							public void customResultAvailable(ILibraryService  libs)
 							{
-								IResourceIdentifier found = null;
-								if(ridtext!=null)
+								libs.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IComponentIdentifier>(ret)
 								{
-									for(IResourceIdentifier rid: rids)
+									public void customResultAvailable(List<IResourceIdentifier> rids) 
 									{
-										if(rid.toString().indexOf(ridtext)!=-1)
+										IResourceIdentifier found = null;
+										if(ridtext!=null)
 										{
-											if(found==null)
+											for(IResourceIdentifier rid: rids)
 											{
-												found = rid;
-											}
-											else
-											{
-												ret.setException(new RuntimeException("More than one rid possible: "+found+" "+rid));
-												return;
+												if(rid.toString().indexOf(ridtext)!=-1)
+												{
+													if(found==null)
+													{
+														found = rid;
+													}
+													else
+													{
+														ret.setException(new RuntimeException("More than one rid possible: "+found+" "+rid));
+														return;
+													}
+												}
 											}
 										}
+										
+										CreationInfo info = new CreationInfo();
+										if(parent!=null)
+											info.setParent(parent);
+										if(config!=null)
+											info.setConfiguration(config);
+										if(found!=null)
+											info.setResourceIdentifier(found);
+										
+										cms.createComponent(name, model, info, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 									}
-								}
-								
-								CreationInfo info = new CreationInfo();
-								if(parent!=null)
-									info.setParent(parent);
-								if(config!=null)
-									info.setConfiguration(config);
-								if(found!=null)
-									info.setResourceIdentifier(found);
-								
-								cms.createComponent(name, model, info, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+								});
 							}
 						});
 					}
 				});
+				
+				return ret;
 			}
-		});
+		}).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 		
 		return ret;
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the argument infos.
+	 *  @param context The context.
+	 *  @return The argument infos.
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
@@ -133,8 +149,9 @@ public class CreateComponentCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{

@@ -290,7 +290,9 @@ public class CliEmailAgent
 				subject.append(" ");
 			subject.append(cmd);
 
-			cliser.executeCommand(cmd).addResultListener(new IResultListener<String>()
+			String sess = SUtil.createUniqueId("emailsess");
+			
+			cliser.executeCommand(cmd, sess).addResultListener(new IResultListener<String>()
 			{
 				public void resultAvailable(String result)
 				{

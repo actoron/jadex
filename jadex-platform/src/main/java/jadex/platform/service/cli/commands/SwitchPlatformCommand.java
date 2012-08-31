@@ -1,21 +1,27 @@
 package jadex.platform.service.cli.commands;
 
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.awareness.DiscoveryInfo;
-import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
+import jadex.platform.service.cli.CliShell;
+import jadex.platform.service.cli.CloseShellException;
+import jadex.platform.service.cli.IInternalCliService;
+import jadex.platform.service.cli.RemoteCliShell;
 import jadex.platform.service.cli.ResultInfo;
 
 import java.util.Collection;
@@ -27,7 +33,8 @@ import java.util.Map;
 public class SwitchPlatformCommand extends ACliCommand
 {
 	/**
-	 *  Get the command names.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
 	public String[] getNames()
 	{
@@ -36,6 +43,7 @@ public class SwitchPlatformCommand extends ACliCommand
 	
 	/**
 	 *  Get the command description.
+	 *  @return The command description.
 	 */
 	public String getDescription()
 	{
@@ -43,67 +51,81 @@ public class SwitchPlatformCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
-	 * @param args
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public Object invokeCommand(final CliContext context, Map<String, Object> args)
 	{
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		final Future<IInternalCliService> ret = new Future<IInternalCliService>();
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		final IComponentIdentifier cid = new ComponentIdentifier((String)args.get(null));
-		
-		SServiceProvider.getService(comp.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, IExternalAccess>(ret)
+		if("..".equals(args.get(null)))
 		{
-			public void customResultAvailable(IAwarenessManagementService awas)
+			// cannot directly close shell because this has to be done by the one that survives
+			ret.setException(new CloseShellException());
+		}
+		else
+		{
+			final IComponentIdentifier cid = new ComponentIdentifier((String)args.get(null));
+			
+			SServiceProvider.getServices(comp.getServiceProvider(), IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
 			{
-				awas.getKnownPlatforms().addResultListener(new ExceptionDelegationResultListener<Collection<DiscoveryInfo>, IExternalAccess>(ret)
+				boolean found = false;
+				public void intermediateResultAvailable(final IInternalCliService cliser)
 				{
-					public void customResultAvailable(Collection<DiscoveryInfo> results)
+					final IComponentIdentifier plat = ((IService)cliser).getServiceIdentifier().getProviderId().getRoot();
+					if(plat.equals(cid) && !ret.isDone())
 					{
-						boolean found = false;
-						for(DiscoveryInfo di: results)
+						found = true;
+						SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IInternalCliService>(ret)
 						{
-							final IComponentIdentifier fcid = di.getComponentIdentifier();
-							if(fcid.equals(cid))
+							public void customResultAvailable(IComponentManagementService cms)
 							{
-								found = true;
-								SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+								cms.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
 								{
-									public void customResultAvailable(IComponentManagementService cms)
+									public void customResultAvailable(IExternalAccess exta)
 									{
-										cms.getExternalAccess(fcid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
-										{
-											public void customResultAvailable(IExternalAccess result)
-											{
-												context.setUserContext(result);
-												ret.setResult(result);
-											}
-										});
+//										String prompt = ((IService)cliser).getServiceIdentifier().getProviderId().getRoot().getName();
+										context.getShell().addSubshell(new RemoteCliShell(cliser, context.getShell().getSessionId()));
+//										ret.setResult(cliser);
+										ret.setResult(null);
 									}
 								});
-								break;
 							}
-						}
-						
-						if(!found)
-						{
-							ret.setException(new RuntimeException("Platform not found: "+cid));
-						}
+						});
 					}
-				}); 
-			}
-		});
+				}
+				
+				public void finished()
+				{
+					if(!found)
+						ret.setExceptionIfUndone(new RuntimeException("Target not found: "+cid));
+				}
+				
+				public void resultAvailable(Collection<IInternalCliService> result)
+				{
+					for(IInternalCliService ser: result)
+						intermediateResultAvailable(ser);
+					finished();
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setExceptionIfUndone(new RuntimeException("Target not found: "+cid));
+				}
+			});
+		}
 		
 		return ret;
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the argument infos.
+	 *  @param context The context.
+	 *  @return The argument infos.
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
@@ -112,16 +134,17 @@ public class SwitchPlatformCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
-	 * @param context
+	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{
-		return new ResultInfo(Collection.class, "The nameo of the new platform:", new IObjectStringConverter()
+		return new ResultInfo(Collection.class, "The name of the new platform:", new IObjectStringConverter()
 		{
 			public String convertObject(Object val, Object context)
 			{
-				return ((IExternalAccess)val).getComponentIdentifier().getName();
+				return val!=null? ((IService)val).getServiceIdentifier().getProviderId().getRoot().getName(): "";
 			}
 		});
 	}
