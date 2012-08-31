@@ -37,7 +37,7 @@ import java.util.zip.ZipFile;
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
 	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars."),
-	@Argument(name="safetydelay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000"),
+	@Argument(name="safetydelay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000")
 })
 @RequiredServices(
 {
@@ -57,8 +57,8 @@ public class FileUpdateAgent extends UpdateAgent
 	@AgentArgument
 	protected String scandir;
 	
-	/** The current version date. */
-	protected long curversion;
+	/** The newest version date (either current version or newest detected file). */
+	protected long newestversion;
 	
 	/** The file include pattern. */
 	@AgentArgument
@@ -133,9 +133,9 @@ public class FileUpdateAgent extends UpdateAgent
 	{
 		final Future<UpdateInfo> ret = new Future<UpdateInfo>();
 		
-		getCurrentVersion().addResultListener(new ExceptionDelegationResultListener<Long, UpdateInfo>(ret)
+		getLastVersion().addResultListener(new ExceptionDelegationResultListener<Long, UpdateInfo>(ret)
 		{
-			public void customResultAvailable(Long curver)
+			public void customResultAvailable(Long lastver)
 			{
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
 //				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -170,11 +170,12 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						foundver = Math.max(foundver, files[i].lastModified());
 					}
-					System.out.println(agent.getComponentIdentifier()+": foundver vs curver(+safety): "+foundver+", "+(curver+safetydelay));
+					System.out.println(agent.getComponentIdentifier()+": foundver vs lastver(+safety): "+foundver+", "+(lastver+safetydelay));
 					boolean force = false; // force update
 					// Only update when not younger than safetydelay and difference between versions also greater than safetydelay.
-					if(foundver>curver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
+					if(foundver>lastver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
 					{
+						newestversion	= foundver;
 						File dir = null;
 						try
 						{
@@ -290,18 +291,18 @@ public class FileUpdateAgent extends UpdateAgent
 	}
 	
 	/**
-	 *  Get the current version.
+	 *  Get the last version (current or from last update check).
 	 *  Uses the timestamp of a jadex jar in the used classpath.
 	 */
-	protected IFuture<Long> getCurrentVersion()
+	protected IFuture<Long> getLastVersion()
 	{
 		final Future<Long> ret = new Future<Long>();
 		
-		if(curversion!=0)
+		if(newestversion!=0)
 		{
-			ret.setResult(new Long(curversion));
+			ret.setResult(new Long(newestversion));
 		}
-		else if(curversion!=-1)
+		else if(newestversion!=-1)
 		{
 			IFuture<ILibraryService> fut = agent.getRequiredService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Long>(ret)
@@ -324,14 +325,14 @@ public class FileUpdateAgent extends UpdateAgent
 									if(f.exists())
 									{
 										System.out.println(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
-										curversion = f.lastModified();
-										ret.setResult(new Long(curversion));
+										newestversion = f.lastModified();
+										ret.setResult(new Long(newestversion));
 										break;
 									}
 								}
 							}
 							
-							if(curversion==0)
+							if(newestversion==0)
 							{
 								// search for jadex classes dir
 								for(URL url: result)
@@ -343,17 +344,17 @@ public class FileUpdateAgent extends UpdateAgent
 										if(f.exists() && f.isDirectory())
 										{
 											System.out.println(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
-											curversion = f.lastModified();
-											ret.setResult(new Long(curversion));
+											newestversion = f.lastModified();
+											ret.setResult(new Long(newestversion));
 											break;
 										}
 									}
 								}
 								
 								// remember that nothing was found
-								if(curversion==0)
+								if(newestversion==0)
 								{
-									curversion = -1;
+									newestversion = -1;
 									ret.setException(new RuntimeException("Unable to determine current version."));
 								}
 							}

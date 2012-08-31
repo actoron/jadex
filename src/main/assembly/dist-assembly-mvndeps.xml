@@ -3,40 +3,36 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 
-	<id>distribution-relay</id>
+	<id>distribution-mvndeps</id>
 
 	<formats>
 		<!-- <format>dir</format> -->
 		<format>zip</format>
 	</formats>
 
-	<includeBaseDirectory>true</includeBaseDirectory>
+	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<moduleSets>
 		<moduleSet>
 			<includes>
-				<include>*:*-relay-standalone</include>
+				<include>*:*-maven</include>
 			</includes>
 			<binaries>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
-				<outputDirectory>/lib</outputDirectory>
+				<outputDirectory>jadex-${version}/lib</outputDirectory>
 				<unpack>false</unpack>
 			</binaries>
 		</moduleSet>
 	</moduleSets>
 
 	<files>
+		<!-- <file>
+			<source>docs/readme-3d.txt</source>
+			<outputDirectory>jadex-${version}/</outputDirectory>
+		</file> -->
 		<file>
-			<source>docs/jadex-relay.bat</source>
-			<outputDirectory>/</outputDirectory>
-		</file>
-		<file>
-			<source>docs/jadex-relay.sh</source>
-			<outputDirectory>/</outputDirectory>
-		</file>
-		<file>
-			<source>target/sources-relay.zip</source>
-			<outputDirectory>/</outputDirectory>
+			<source>target/sources-mvndeps.zip</source>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 	</files>
 

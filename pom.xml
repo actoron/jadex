@@ -24,7 +24,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
+				<version>2.3</version>
 				<configuration>
 					<appendAssemblyId>false</appendAssemblyId>
 					<archiverConfig>
@@ -39,6 +39,7 @@
 	
 	<modules>
 		<module>jadex-parent</module>
+		<module>jadex-parent-pro</module>
 		<module>jadex-commons</module>
 		<module>jadex-xml</module>
 		<module>jadex-javaparser</module>
@@ -90,7 +91,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<id>jadex-example-project</id>
@@ -243,7 +243,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<id>sources-3d</id>
@@ -292,39 +291,38 @@
 	                <exists>jadex-platform-extension-maven</exists>
 	            </file>
 	        </activation>
-	        <!-- 
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
-								<id>sources-3d</id>
+								<id>sources-mvndeps</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
 								<configuration>
-									<!- - .zip is appended automatically to the final name. - ->
-									<finalName>sources-3d</finalName>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-mvndeps</finalName>
 									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
+										<descriptor>src/main/assembly/dist-assembly-mvndepssrczip.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
 							<execution>
-								<id>make-assembly-3d</id>
+								<id>make-assembly-mvndeps</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
 								<configuration>
-									<!- - .zip is appended automatically to the final name. - ->
-									<finalName>jadex-3d-addon-${project.version}</finalName>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-mavendependencies-addon-${project.version}</finalName>
+									<outputDirectory>target/pro-addons</outputDirectory>
 								    <descriptors>
-										<descriptor>src/main/assembly/dist-assembly-3d.xml</descriptor>
+										<descriptor>src/main/assembly/dist-assembly-mvndeps.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
@@ -332,7 +330,6 @@
 					</plugin>
 				</plugins>
 			</build>
- -->
  	        <modules>
 				<module>jadex-parent-pro</module>
 				<module>jadex-platform-extension-maven</module>
@@ -353,7 +350,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<id>sources-ws</id>
@@ -408,7 +404,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<id>sources-sectrans</id>
@@ -463,22 +458,21 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
-<!-- 							<execution>
-								<id>sources-3d</id>
+ 							<execution>
+								<id>sources-relay</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
 								<configuration>
-									<!- - .zip is appended automatically to the final name. - ->
-									<finalName>sources-3d</finalName>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-relay</finalName>
 									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
+										<descriptor>src/main/assembly/dist-assembly-relaysrczip.xml</descriptor>
 									</descriptors>
 								</configuration>
-							</execution> -->
+							</execution>
 							<execution>
 								<id>make-assembly-relay</id>
 								<phase>package</phase>
@@ -547,35 +541,5 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== Android ======== - ->
-
-		<profile>
-			<id>jadex-android</id>
-			<build>
-				<finalName>jadex-android-${project.version}</finalName>
-			</build>
-			<modules>
-				<!- - Jadex modules - ->
-				<module>jadex-parent</module>
-				<module>jadex-commons</module>
-				<module>jadex-bridge</module>
-				<module>jadex-javaparser</module>
-				<module>jadex-xml</module>
-				<module>jadex-rules</module>
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-kernel-bpmn</module>
-				<module>jadex-platform</module>
-				
-				<!- - Android specific modules - ->
-				<module>jadex-android-parent</module>
-				<module>jadex-android-xmlpull</module>
-				<module>jadex-android-antlr</module>
-				<module>jadex-runtimetools-android</module>
-			</modules>
-		</profile>
-		-->
 	</profiles>
 </project>

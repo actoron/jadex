@@ -46,14 +46,10 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 
 	/**
 	 *  Execute the interceptor.
-	 *  @param context The invocation context.
 	 */
-//	static int cnt;
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		Future<Void> fut	= new Future<Void>();
-//		final int mycnt=cnt++;
-//		System.out.println("in:"+mycnt+" "+sic.getMethod().getName()+" "+sic.getArguments());
 		
 		final IComponentAdapter	ada	= /*adapter!=null ? adapter :*/ sic.getCallerAdapter();
 		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
@@ -80,7 +76,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		{
 			public void customResultAvailable(Void result)
 			{
-				final boolean	destroy	= sic.getMethod().getName().toString().indexOf("destroyComponent")!=-1;
+//				final boolean	destroy	= sic.getMethod().getName().toString().indexOf("destroyComponent")!=-1;
 				
 				Object	res	= sic.getResult();
 				

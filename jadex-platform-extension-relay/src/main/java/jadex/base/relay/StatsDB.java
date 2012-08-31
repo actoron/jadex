@@ -301,15 +301,16 @@ public class StatsDB
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	
-								// Load properties of platform.
-								Map<String, String>	props	= new HashMap<String, String>();
-								pi.setProperties(props);
-								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
-								while(rs2.next())
-								{
-									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
-								}
-								rs2.close();
+								// Todo: export properties (sqldump?)
+//								// Load properties of platform.
+//								Map<String, String>	props	= new HashMap<String, String>();
+//								pi.setProperties(props);
+//								ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
+//								while(rs2.next())
+//								{
+//									props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
+//								}
+//								rs2.close();
 								
 								cursormoved	= false;
 								

@@ -1133,7 +1133,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			{
 				// Hack!!! functionality failed -> should change result of future to failure?
 				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
-				DelegatingIntermediateFuture.super.notifyListener(listener);
+				DelegatingIntermediateFuture.super.startScheduledNotifications();
 			}
 		});
     }

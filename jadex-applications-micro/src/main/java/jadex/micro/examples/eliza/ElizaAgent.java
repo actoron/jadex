@@ -149,7 +149,8 @@ public class ElizaAgent
 	{
 		try
 		{
-			File	f	= new File(".eliza", partner.getName()+".txt");
+			File	dir	= new File(System.getProperty("user.home"), ".eliza");
+			File	f	= new File(dir, partner.getName()+".txt");
 			f.getParentFile().mkdirs();
 			PrintStream	os	= new PrintStream(new FileOutputStream(f, true));
 			os.println(text);

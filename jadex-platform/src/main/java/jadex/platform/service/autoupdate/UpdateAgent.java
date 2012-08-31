@@ -21,6 +21,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -103,6 +104,9 @@ public class UpdateAgent implements IUpdateService
 	/** The new cid (need to be acknowledge by create and via call ack). */
 	protected IComponentIdentifier newcomp;
 	
+	/** The future to be set when updatign was successful. */
+	protected Future<Void> updated;
+	
 	/** The vmargs that should not be used. */
 	@AgentArgument()
 	protected String[] forbiddenvmargs;
@@ -129,7 +133,7 @@ public class UpdateAgent implements IUpdateService
 			
 			// Post update notification as local chat agent.
 			// Wait before notification to discover remote platforms first.
-			agent.waitForDelay(30000, new IComponentStep<Void>()
+			agent.waitForDelay(15000, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -161,45 +165,47 @@ public class UpdateAgent implements IUpdateService
 	 *  The agent body.
 	 */
 	@AgentBody
-	public IFuture<Void> body()
+	public void body()
 	{
-		return startUpdating();
-	}
-	
-	/**
-	 *  Start the update check.
-	 */
-	protected IFuture<Void> startUpdating()
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IComponentStep<Void> self = this;
-				checkForUpdate().addResultListener(new ExceptionDelegationResultListener<UpdateInfo, Void>(ret)
+				checkForUpdate().addResultListener(new IResultListener<UpdateInfo>()
 				{
-					public void customResultAvailable(UpdateInfo ui)
+					public void resultAvailable(UpdateInfo ui)
 					{
 						if(ui!=null)
 						{
-							performUpdate(ui).addResultListener(new DelegationResultListener<Void>(ret));
+							performUpdate(ui).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									// Kill platform.
+									cms.destroyComponent(agent.getComponentIdentifier().getRoot());	
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									agent.waitFor(interval, self);
+								}
+							});
 						}
 						else
 						{
 							agent.waitFor(interval, self);
 						}
 					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						agent.waitFor(interval, self);
+					}
 				});
 				return IFuture.DONE;
 			}
-		};
-		
-		agent.scheduleStep(step);
-//		agent.waitFor(interval, step);
-
-		return ret;
+		});
 	}
 	
 	//-------- interface methods --------
@@ -239,22 +245,31 @@ public class UpdateAgent implements IUpdateService
 	 *  
 	 *  After ack is complete platform shutdown will be initiated.
 	 */
-	public void acknowledgeUpdate(IComponentIdentifier caller)
+	public IFuture<Void> acknowledgeUpdate(IComponentIdentifier caller)
 	{
 //		System.out.println("ack: "+caller);
 		
 		if(caller.equals(newcomp))
 		{
 //			System.out.println("Update acknowledged, shutting down old platform: "+agent.getComponentIdentifier());
-			cms.destroyComponent(agent.getComponentIdentifier().getRoot());
-			
 			notifyUpdatePerformed("Shutting down old platform "+agent.getComponentIdentifier().getRoot()
-				+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") for new platform "+caller.getRoot());
+					+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") for new platform "+caller.getRoot())
+				.addResultListener(new DelegationResultListener<Void>(updated)
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					// Update is successful even if notification fails.
+					resultAvailable(null);
+				}
+			});
 		}
 		else if(newcomp==null)
 		{
 			newcomp = caller;
+			updated	= new Future<Void>();
 		}
+		
+		return updated;
 	}
 	
 	/**
@@ -263,7 +278,6 @@ public class UpdateAgent implements IUpdateService
 	 */
 	protected IFuture<Void> notifyUpdatePerformed(final String text)
 	{
-		Thread.dumpStack();
 		final Future<Void> ret = new Future<Void>();
 		
 		IFuture<IChatGuiService> fut = agent.getRequiredService("chatser");
@@ -271,32 +285,19 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IChatGuiService chatser)
 			{
-				Thread.dumpStack();
-				System.out.println("update message 0");
 				chatser.message(agent.getComponentIdentifier().getName()+": "+text, null, true)
 					.addResultListener(new IntermediateExceptionDelegationResultListener<IChatService, Void>(ret)
 				{
 					public void intermediateResultAvailable(IChatService result)
 					{
-						System.out.println("update message 1");
-					}
-					public void finished()
-					{
-						System.out.println("update message 2");
 					}
 					public void customResultAvailable(Collection<IChatService> result)
 					{
-						System.out.println("update message 3");
+						ret.setResult(null);
 					}
-					public void exceptionOccurred(Exception exception)
+					public void finished()
 					{
-						System.out.println("update message 4");
-						super.exceptionOccurred(exception);
-					}
-					public void resultAvailable(Collection<IChatService> result)
-					{
-						System.out.println("update message 5");
-						super.resultAvailable(result);
+						ret.setResult(null);
 					}
 				});
 			}
@@ -324,7 +325,7 @@ public class UpdateAgent implements IUpdateService
 					{
 						public void customResultAvailable(IComponentIdentifier result) 
 						{
-							acknowledgeUpdate(result);
+							acknowledgeUpdate(result).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});
 				}
@@ -338,7 +339,7 @@ public class UpdateAgent implements IUpdateService
 			{
 				public void customResultAvailable(IComponentIdentifier result) 
 				{
-					acknowledgeUpdate(result);
+					acknowledgeUpdate(result).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
