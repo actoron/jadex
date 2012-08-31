@@ -30,25 +30,34 @@ import javax.swing.SwingUtilities;
 
 
 /**
- * 
+ *  The client agent allows for executing command line commands.
+ *  
+ *  It offers the executeCommand() method via the ICliService.
  */
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=ICliService.class, implementation=@Implementation(expression="$pojoagent")))
 public class CliAgent implements ICliService
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
 	
 	/** The command line. */
-	protected CliPlatform clip; 
+	protected CliShell clip; 
 	
+	//-------- methods --------
+	
+	/**
+	 *  The agent body.
+	 */
 	@AgentBody
 	public void body()
 	{
-		clip = new CliPlatform();
-		clip.addAllCommandsFromClassPath();
+		clip = new CliShell(agent.getExternalAccess());
+		clip.addAllCommandsFromClassPath(agent.getClassLoader());
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -70,7 +79,7 @@ public class CliAgent implements ICliService
 								String txt = tf.getText();
 								ta.append(txt+SUtil.LF);
 								tf.setText("");
-								clis.executeCommand(txt, ia.getExternalAccess()).addResultListener(new IResultListener<String>()
+								clis.executeCommand(txt).addResultListener(new IResultListener<String>()
 								{
 									public void resultAvailable(String result)
 									{
@@ -117,7 +126,7 @@ public class CliAgent implements ICliService
 						{
 							public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 							{
-								executeCommand(cmd, ia.getExternalAccess()).addResultListener(new IResultListener<String>()
+								executeCommand(cmd).addResultListener(new IResultListener<String>()
 								{
 									public void resultAvailable(String result)
 									{
@@ -150,9 +159,8 @@ public class CliAgent implements ICliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(String line, Object context)
+	public IFuture<String> executeCommand(String line)//, Object context)
 	{
-		return clip.executeCommand(line, context);
+		return clip.executeCommand(line);//, context);
 	}
-
 }

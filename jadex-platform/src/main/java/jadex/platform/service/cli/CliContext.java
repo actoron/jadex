@@ -4,16 +4,21 @@
 package jadex.platform.service.cli;
 
 /**
- *
+ *  The cli context that is passed to the commands.
+ *  Provides access to the cli platform and a user context.
  */
 public class CliContext
 {
-	/** The cli platform. */
-	protected CliPlatform clip;
+	//-------- attributes --------
+	
+	/** The cli shell. */
+	protected CliShell clip;
 	
 	/** The user context. */
-	protected Object userContext;
+	protected Object usercontext;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new CliContext.
 	 */
@@ -24,17 +29,17 @@ public class CliContext
 	/**
 	 *  Create a new CliContext.
 	 */
-	public CliContext(CliPlatform clip, Object userContext)
+	public CliContext(CliShell clip, Object usercontext)
 	{
 		this.clip = clip;
-		this.userContext = userContext;
+		this.usercontext = usercontext;
 	}
 
 	/**
 	 *  Get the clip.
 	 *  @return The clip.
 	 */
-	public CliPlatform getClip()
+	public CliShell getClip()
 	{
 		return clip;
 	}
@@ -43,7 +48,7 @@ public class CliContext
 	 *  Set the clip.
 	 *  @param clip The clip to set.
 	 */
-	public void setClip(CliPlatform clip)
+	public void setClip(CliShell clip)
 	{
 		this.clip = clip;
 	}
@@ -54,7 +59,7 @@ public class CliContext
 	 */
 	public Object getUserContext()
 	{
-		return userContext;
+		return usercontext;
 	}
 
 	/**
@@ -63,8 +68,7 @@ public class CliContext
 	 */
 	public void setUserContext(Object userContext)
 	{
-		this.userContext = userContext;
+		this.usercontext = userContext;
 	}
-	
 	
 }

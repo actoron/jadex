@@ -18,8 +18,8 @@ public class EmailClientPlugin extends AbstractJCCPlugin
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"email", SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/email/images/email.png"),
-		"email_sel", SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/email/images/email_sel.png"),
+		"email", SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/common/images/new_starter.png"),
+		"email_sel", SGUI.makeIcon(EmailClientPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
 	});
 
 	//-------- methods --------

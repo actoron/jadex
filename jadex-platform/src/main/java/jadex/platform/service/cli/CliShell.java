@@ -8,10 +8,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -20,28 +17,44 @@ import java.util.Map;
 
 
 /**
- * 
+ *  The cli shell contains the commands and
+ *  allows for executing a command.
+ *  
+ *  Use addAllCommandsFromClassPath() to add
+ *  all commands from the current classpath or
+ *  addCommand() to add them manually.
  */
-public class CliPlatform implements ICliService
+public class CliShell implements ICliService
 {
+	//-------- attributes --------
+	
 	/** The commands. */
 	protected Map<String, ICliCommand> commands;
+	
+	/** The context. */
+	protected CliContext context;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new cli.
 	 */
-	public CliPlatform()
+	public CliShell(Object context)
 	{
-		commands = new LinkedHashMap<String, ICliCommand>();
+		this.commands = new LinkedHashMap<String, ICliCommand>();
+		this.context = new CliContext(this, context);
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Add all commands from classpath.
+	 *  @param cl The classloader to use.
 	 */
-	public void addAllCommandsFromClassPath()
+	public void addAllCommandsFromClassPath(ClassLoader cl)
 	{
 		URL[] urls = null;
-		ClassLoader cl = getClass().getClassLoader();
+//		ClassLoader cl = getClass().getClassLoader();
 		if(cl instanceof URLClassLoader)
 		{
 			urls = ((URLClassLoader)cl).getURLs();
@@ -123,11 +136,11 @@ public class CliPlatform implements ICliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(String line, Object context)
+	public IFuture<String> executeCommand(String line)//, Object context)
 	{
 		final Future<String> ret = new Future<String>();
 		
-		CliContext ccontext = new CliContext(this, context);
+//		CliContext ccontext = new CliContext(this, context);
 		
 		// Split the command line to parts
 		String[] parts = SUtil.splitCommandline(line);
@@ -156,7 +169,7 @@ public class CliPlatform implements ICliService
 					nargs = new String[parts.length-1];
 					System.arraycopy(parts, 1, nargs, 0, parts.length-1);
 				}
-				cmd.invokeCommand(ccontext, nargs).addResultListener(new DelegationResultListener<String>(ret));
+				cmd.invokeCommand(context, nargs).addResultListener(new DelegationResultListener<String>(ret));
 				exe = true;
 			}
 		}

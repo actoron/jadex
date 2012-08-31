@@ -3,10 +3,13 @@ package jadex.platform.service.cli;
 import jadex.commons.transformation.IObjectStringConverter;
 
 /**
- * 
+ *  Information about a result.
+ *  Includes type, description and converter (object -> string).
  */
 public class ResultInfo
 {
+	//-------- attributes --------
+	
 	/** The type. */
 	protected Class<?> type;
 	
@@ -16,6 +19,8 @@ public class ResultInfo
 	/** The converter. */
 	protected IObjectStringConverter converter;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new argument info.
 	 */
@@ -33,11 +38,13 @@ public class ResultInfo
 		this.converter = converter;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the type.
 	 *  @return The type.
 	 */
-	public Class< ? > getType()
+	public Class<?> getType()
 	{
 		return type;
 	}
@@ -46,7 +53,7 @@ public class ResultInfo
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class< ? > type)
+	public void setType(Class<?> type)
 	{
 		this.type = type;
 	}

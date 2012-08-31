@@ -11,22 +11,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  The abstract command implementation implements the logic for:
+ *  
+ *  invokeCommand(final CliContext context, String[] strargs)
+ *  
+ *  by converting the arguments to objects using the argument infos (and converts)
+ *  and converting back the result to a string using the result info.
  */
 public abstract class ACliCommand implements ICliCommand
 {
 	/**
-	 *  Get the command names.
+	 *  Get the command names (name including alias').
+	 *  @return A string array of the command name and optional further alias names.
 	 */
 	public abstract String[] getNames();
 	
 	/**
 	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public abstract Object invokeCommand(CliContext context, Map<String, Object> args);
 	
 	/**
 	 *  Get the command description.
+	 *  @return The command description.
 	 */
 	public String getDescription()
 	{
@@ -34,7 +43,9 @@ public abstract class ACliCommand implements ICliCommand
 	}
 	
 	/**
-	 *  Get the argument types.
+	 *  Get the argument info.
+	 *  @param context The context.
+	 *  @return The argument infos.
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
@@ -43,6 +54,8 @@ public abstract class ACliCommand implements ICliCommand
 	
 	/**
 	 *  Get the result info.
+	 *  @param context The context.
+	 *  @return The result info.
 	 */
 	public ResultInfo getResultInfo(CliContext context)
 	{
@@ -51,6 +64,8 @@ public abstract class ACliCommand implements ICliCommand
 
 	/**
 	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
 	 */
 	public IFuture<String> invokeCommand(final CliContext context, String[] strargs)
 	{

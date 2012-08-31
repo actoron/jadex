@@ -3,10 +3,13 @@ package jadex.platform.service.cli;
 import jadex.commons.transformation.IStringObjectConverter;
 
 /**
- * 
+ *  The argument info provides info about an arguments including
+ *  its name, type, defaultvalue, description and a converter.
  */
 public class ArgumentInfo
 {
+	//-------- attributes --------
+	
 	/** The name. */
 	protected String name;
 	
@@ -22,6 +25,8 @@ public class ArgumentInfo
 	/** The converter. */
 	protected IStringObjectConverter converter;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new argument info.
 	 */
@@ -41,6 +46,8 @@ public class ArgumentInfo
 		this.converter = converter;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the name.
 	 *  @return The name.
@@ -132,7 +139,8 @@ public class ArgumentInfo
 	}
 	
 	/**
-	 * 
+	 *  Get the usage text.
+	 *  @return The usage text.
 	 */
 	public String getUsageText()
 	{

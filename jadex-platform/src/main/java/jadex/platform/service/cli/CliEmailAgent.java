@@ -50,7 +50,13 @@ import java.util.StringTokenizer;
 {	
 	"jadex.bridge.service.types.email.EmailAccount"
 })
-@Arguments(@Argument(name="account", clazz=EmailAccount.class, defaultvalue="EmailAccount.TEST_ACCOUNT"))
+@Arguments(
+{
+	@Argument(name="subject", clazz=String.class, defaultvalue="\"command\"", 
+		description="The regular expression for the subject to match identify command emails."),
+	@Argument(name="account", clazz=EmailAccount.class, defaultvalue="EmailAccount.TEST_ACCOUNT",
+		description="The email account used to listen for email commands.")
+})
 @RequiredServices(
 {
 	@RequiredService(name="emailser", type=IEmailService.class, 
@@ -78,6 +84,10 @@ public class CliEmailAgent
 	@AgentArgument
 	protected EmailAccount account;
 	
+	/** The subject. */
+	@AgentArgument
+	protected String subject;
+	
 	//-------- methods --------
 	
 	/**
@@ -98,11 +108,13 @@ public class CliEmailAgent
 				{
 					public void customResultAvailable(final IEmailService emailser)
 					{
+						// filter is passed as argument to other agent -> cannot access this.subject
+						final String sub = subject;
 						emailser.subscribeForEmail(new IFilter<Email>()
 						{
 							public boolean filter(Email eml)
 							{
-								return eml.getSubject().indexOf("command")!=-1;
+								return eml.getSubject()!=null && eml.getSubject().matches(sub);
 							}
 						}, account).addResultListener(new IntermediateExceptionDelegationResultListener<Email, Void>(ret)
 						{
@@ -278,7 +290,7 @@ public class CliEmailAgent
 				subject.append(" ");
 			subject.append(cmd);
 
-			cliser.executeCommand(cmd, agent.getExternalAccess()).addResultListener(new IResultListener<String>()
+			cliser.executeCommand(cmd).addResultListener(new IResultListener<String>()
 			{
 				public void resultAvailable(String result)
 				{
@@ -306,10 +318,12 @@ public class CliEmailAgent
 	}
 	
 	/**
-	 * 
+	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
+		System.out.println("command".matches("command"));
+		
 		String test = "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid\r\napplications-micro;help;\r\n==1346225963008==\r\n==xiA5dSIYwQYt6veZ4P4XqkUgMr34PdWnlU5NXOmzManvGkQiJoAdIw7bXiSMYrRv==\r\n==QrxVsuMG1Y2xQ0GK2km+lmPWQ21jFmsWPri2R9BWoTvUiKmBRpztOv4gcy2iItLk==\r\n==FwuRNAUJRrsb+gAVanlyp5TDKlvmfoRcr/AfUpVwpZFFtT2ZS5sLQJcMos911IoL==\r\n==bgxBOGCoODY7ydTxS4PfX4bRBCt1dCqnn9ik0Cj0UM3UV874VERNLu70Mj/Fj3k0==";
 		
 		StringTokenizer stok = new StringTokenizer(test, ";");

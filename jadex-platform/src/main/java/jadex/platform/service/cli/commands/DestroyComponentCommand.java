@@ -30,9 +30,10 @@ public class DestroyComponentCommand extends ACliCommand
 		public Object convertString(String val, Object context) throws Exception
 		{
 			IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
-			if(val.indexOf("@")==-1)
+			String pfn = comp.getComponentIdentifier().getPlatformName();
+			if(val.indexOf("@")==-1 && !val.equals(pfn))
 			{
-				val += "@"+comp.getComponentIdentifier().getPlatformName();
+				val += "@"+pfn;
 			}
 			return new ComponentIdentifier(val);
 		}
