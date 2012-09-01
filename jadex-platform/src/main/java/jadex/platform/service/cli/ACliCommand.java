@@ -179,6 +179,11 @@ public abstract class ACliCommand implements ICliCommand
 					
 					super.customResultAvailable(result);
 				}
+				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					super.customResultAvailable("Invocation error: "+exception.getMessage());
+//				}
 			});
 		}
 		

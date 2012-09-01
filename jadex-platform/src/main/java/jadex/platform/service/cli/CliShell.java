@@ -218,7 +218,7 @@ public class CliShell extends ACliShell
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> doExecuteCommand(String line)//, Object context)
+	public IFuture<String> doExecuteCommand(String line)
 	{
 		final Future<String> ret = new Future<String>();
 		

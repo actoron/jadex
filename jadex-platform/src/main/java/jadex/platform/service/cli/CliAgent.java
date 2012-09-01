@@ -152,7 +152,7 @@ public class CliAgent implements ICliService, IInternalCliService
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										exception.printStackTrace();
+										System.out.println("Invocation error: "+exception.getMessage());
 										printPrompt();
 									}
 									
