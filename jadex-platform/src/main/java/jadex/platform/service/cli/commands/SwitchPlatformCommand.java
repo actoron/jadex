@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -88,8 +89,9 @@ public class SwitchPlatformCommand extends ACliCommand
 								{
 									public void customResultAvailable(IExternalAccess exta)
 									{
-//										String prompt = ((IService)cliser).getServiceIdentifier().getProviderId().getRoot().getName();
-										context.getShell().addSubshell(new RemoteCliShell(cliser, context.getShell().getSessionId()));
+										Tuple2<String, Integer> osid = context.getShell().getSessionId();
+										Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), new Integer(osid.getSecondEntity().intValue()+1)); 
+										context.getShell().addSubshell(new RemoteCliShell(cliser, nsid));
 //										ret.setResult(cliser);
 										ret.setResult(null);
 									}

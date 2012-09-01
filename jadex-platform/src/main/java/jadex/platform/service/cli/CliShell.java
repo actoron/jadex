@@ -1,10 +1,10 @@
 package jadex.platform.service.cli;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.remote.RemoteException;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -47,9 +47,9 @@ public class CliShell extends ACliShell
 	/**
 	 *  Create a new cli.
 	 */
-	public CliShell(Object context, String prompt, String session)
+	public CliShell(Object context, String prompt, Tuple2<String, Integer> sessionid)
 	{
-		super(session);
+		super(sessionid);
 		this.commands = new LinkedHashMap<String, ICliCommand>();
 		this.context = new CliContext(this, context);
 		this.prompt = prompt;
@@ -346,13 +346,5 @@ public class CliShell extends ACliShell
 	public String getPrompt()
 	{
 		return prompt==null? "prompt": prompt;
-	}
-	
-	/**
-	 * 
-	 */
-	public String getSessionId()
-	{
-		return sessionid;
 	}
 }

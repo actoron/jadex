@@ -5,23 +5,26 @@ package jadex.platform.service.cli;
 
 import java.util.Map;
 
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- *
+ *  A remote shell is backed by an internal client service
+ *  to which the commands are forwarded.
  */
 public class RemoteCliShell extends ACliShell
 {
+	/** The client service used to delegate commands to. */
 	protected IInternalCliService cliser;
 	
 	/**
-	 * 
+	 *  Create a new remote shell.
 	 */
-	public RemoteCliShell(IInternalCliService cliser, String session)
+	public RemoteCliShell(IInternalCliService cliser, Tuple2<String, Integer> sessionid)
 	{
-		super(session);
+		super(sessionid);
 		this.cliser = cliser;
 	}
 	

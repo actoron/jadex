@@ -10,6 +10,7 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Base64;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -290,7 +291,7 @@ public class CliEmailAgent
 				subject.append(" ");
 			subject.append(cmd);
 
-			String sess = SUtil.createUniqueId("emailsess");
+			Tuple2<String, Integer> sess = new Tuple2<String, Integer>(SUtil.createUniqueId("emailsess"), new Integer(0));
 			
 			cliser.executeCommand(cmd, sess).addResultListener(new IResultListener<String>()
 			{

@@ -1,12 +1,11 @@
 package jadex.platform.service.cli;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -57,7 +56,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	protected MicroAgent agent;
 	
 	/** The shells per session. */
-	protected Map<Object, CliShell> shells;
+	protected Map<Tuple2<String, Integer>, CliShell> shells;
 	
 	//-------- methods --------
 	
@@ -67,7 +66,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	@AgentBody
 	public void body()
 	{
-		shells = new HashMap<Object, CliShell>();
+		shells = new HashMap<Tuple2<String, Integer>, CliShell>();
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -77,7 +76,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				final JTextArea ta = new JTextArea(20, 20);
 				ta.setEditable(false);
 
-				final String guisess = SUtil.createUniqueId("guisess");
+				final Tuple2<String, Integer> guisess = new Tuple2<String, Integer>(SUtil.createUniqueId("guisess"), new Integer(0));
 				tf.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -123,7 +122,7 @@ public class CliAgent implements ICliService, IInternalCliService
 			public void run()
 			{
 				ThreadSuspendable sus = new ThreadSuspendable();
-				final String consess = SUtil.createUniqueId("consess");
+				final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), new Integer(0));
 				System.out.println(getShell(consess).getShellPrompt().get(sus));
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				
@@ -191,41 +190,41 @@ public class CliAgent implements ICliService, IInternalCliService
 	 *  @param command The command.
 	 *  @return The result of the command.
 	 */
-	public IFuture<String> executeCommand(String line, String session)
+	public IFuture<String> executeCommand(String line, Tuple2<String, Integer> sessionid)
 	{
-		return getShell(session).executeCommand(line);
+		return getShell(sessionid).executeCommand(line);
 	}
 	
 	/**
 	 * 
 	 */
-	public IFuture<String> internalGetShellPrompt(String session)
+	public IFuture<String> internalGetShellPrompt(Tuple2<String, Integer> sessionid)
 	{
-		return getShell(session).internalGetShellPrompt();
+		return getShell(sessionid).internalGetShellPrompt();
 	}
 	
 	/**
 	 * 
 	 */
-	public IFuture<Boolean> removeSubshell(String session)
+	public IFuture<Boolean> removeSubshell(Tuple2<String, Integer> sessionid)
 	{
-		return getShell(session).removeSubshell();
+		return getShell(sessionid).removeSubshell();
 	}
 	
 	/**
 	 * 
 	 */
-	public IFuture<Void> addAllCommandsFromClassPath(String session)
+	public IFuture<Void> addAllCommandsFromClassPath(Tuple2<String, Integer> sessionid)
 	{
-		return getShell(session).addAllCommandsFromClassPath();
+		return getShell(sessionid).addAllCommandsFromClassPath();
 	}
 	
 	/**
 	 * 
 	 */
-	public IFuture<Void> addCommand(ICliCommand cmd, String session)
+	public IFuture<Void> addCommand(ICliCommand cmd, Tuple2<String, Integer> sessionid)
 	{
-		return getShell(session).addCommand(cmd);
+		return getShell(sessionid).addCommand(cmd);
 	}
 	
 	/**
@@ -233,20 +232,20 @@ public class CliAgent implements ICliService, IInternalCliService
 	 *  @param session The session.
 	 *  @return The shell.
 	 */
-	public CliShell getShell(String session)
+	public CliShell getShell(Tuple2<String, Integer> sessionid)
 	{
-		if(session==null)
+		if(sessionid==null)
 			throw new IllegalArgumentException("Must not null");
 		
 		// todo: remove obsolete shells
 		
-		CliShell shell = shells.get(session);
+		CliShell shell = shells.get(sessionid);
 		if(shell==null)
 		{
-			System.out.println("created new shell for session: "+session);
-			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getComponentIdentifier().getRoot().getName(), session);
+			System.out.println("created new shell for session: "+sessionid);
+			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getComponentIdentifier().getRoot().getName(), sessionid);
 			shell.addAllCommandsFromClassPath(); // agent.getClassLoader()
-			shells.put(session, shell);
+			shells.put(sessionid, shell);
 		}
 		return shell;
 	}

@@ -1,8 +1,6 @@
-/**
- * 
- */
 package jadex.platform.service.cli;
 
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -10,7 +8,7 @@ import jadex.commons.future.IFuture;
 import java.util.Map;
 
 /**
- *
+ *  Abstract base class for shells.
  */
 public abstract class ACliShell
 {
@@ -18,16 +16,16 @@ public abstract class ACliShell
 	//-------- attributes --------
 	
 	/** The session id. */
-	protected String sessionid;
+	protected Tuple2<String, Integer> sessionid;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new cli.
 	 */
-	public ACliShell(String session)
+	public ACliShell(Tuple2<String, Integer> sessionid)
 	{
-		this.sessionid = session;
+		this.sessionid = sessionid;
 	}
 	
 	//-------- methods --------
@@ -96,9 +94,10 @@ public abstract class ACliShell
 	public abstract IFuture<String> internalGetShellPrompt();
 	
 	/**
-	 * 
+	 *  Get the session id.
+	 *  @return The session id.
 	 */
-	public String getSessionId()
+	public Tuple2<String, Integer> getSessionId()
 	{
 		return sessionid;
 	}
