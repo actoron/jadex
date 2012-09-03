@@ -32,9 +32,10 @@ import jadex.micro.annotation.RequiredServices;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -208,16 +209,16 @@ public class CliAgent implements ICliService, IInternalCliService
 						// redirect System.in
 						try{SUtil.getOutForSystemIn(tp);}catch(Exception e){}
 //						System.out.println("sysin: "+System.in+" "+System.in.getClass());
-//						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-						Scanner sc = new Scanner(System.in);
+						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//						Scanner sc = new Scanner(System.in);
 						
 						while(true)
 						{
 							try
 							{
-								String tmp = sc.next();
+//								String tmp = sc.nextLine();
 //								System.out.println(tmp);
-//								final String tmp = br.readLine();
+								final String tmp = br.readLine();
 								final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
 								if("exit".equals(cmd) || "quit".equals(cmd))
 									break;
