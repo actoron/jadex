@@ -1,5 +1,6 @@
 package jadex.platform.service.cli.commands;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -63,7 +64,8 @@ public class UploadFileCommand extends ACliCommand
 		
 		final String s = (String)args.get("-s");
 		final String d = (String)args.get("-d");
-		final IComponentIdentifier cid = (IComponentIdentifier)args.get("-p");
+		final String pname = (String)args.get("-p");
+		final IComponentIdentifier p = pname==null? null: new ComponentIdentifier(pname);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
@@ -71,7 +73,7 @@ public class UploadFileCommand extends ACliCommand
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				getDeploymentService(ia, cid)
+				getDeploymentService(ia, p)
 					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
 				{
 					public void customResultAvailable(final IDeploymentService ds)
@@ -220,7 +222,7 @@ public class UploadFileCommand extends ACliCommand
 	{
 		ArgumentInfo srcfile = new ArgumentInfo("-s", String.class, null, "The source file.", null);
 		ArgumentInfo destdir = new ArgumentInfo("-d", String.class, null, "The destination dir.", null);
-		ArgumentInfo targetplat = new ArgumentInfo("-p", IComponentIdentifier.class, null, "The target platform", DestroyComponentCommand.CID_CONVERTER);
+		ArgumentInfo targetplat = new ArgumentInfo("-p", String.class, null, "The target platform", null);
 		return new ArgumentInfo[]{srcfile, destdir, targetplat};
 	}
 	
