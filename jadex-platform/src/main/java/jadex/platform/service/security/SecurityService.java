@@ -263,7 +263,7 @@ public class SecurityService implements ISecurityService
 													{
 														for(String network: networkpasses.keySet())
 														{
-															ret.addProperty(new Property(network, "networks", platformpasses.get(network)));
+															ret.addProperty(new Property(network, "networks", networkpasses.get(network)));
 														}
 													}
 													ret.addProperty(new Property("trustedlan", ""+trustedlan));
