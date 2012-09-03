@@ -82,7 +82,7 @@ public class GeoIPService
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not get Geo location: "+ e);
+				RelayHandler.getLogger().warning("Warning: Could not get Geo location: "+ e);
 			}
 		}
 		
@@ -115,7 +115,7 @@ public class GeoIPService
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not get Geo location: "+ e);
+				RelayHandler.getLogger().warning("Warning: Could not get Geo location: "+ e);
 			}
 		}
 		
@@ -143,7 +143,7 @@ public class GeoIPService
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not get Geo location: "+ e);
+				RelayHandler.getLogger().warning("Warning: Could not get Geo location: "+ e);
 			}
 		}
 		
@@ -202,12 +202,12 @@ public class GeoIPService
 								dbfile.renameTo(oldfile);
 							}
 							tmpfile.renameTo(dbfile);
-							System.out.println("Downloaded GeoIP database to: "+dbfile);
+							RelayHandler.getLogger().info("Downloaded GeoIP database to: "+dbfile);
 						}
 					}
 					catch(Exception e)
 					{
-						System.err.println("Warning: Relay could not access GeoIP database: "+ e);
+						RelayHandler.getLogger().warning("Warning: Relay could not access GeoIP database: "+ e);
 					}
 
 					if(ls==null)
@@ -215,13 +215,13 @@ public class GeoIPService
 						try
 						{
 							// Set up geo ip lookup service.
-							System.out.println("Using GeoIP database from: "+dbfile);
+							RelayHandler.getLogger().info("Using GeoIP database from: "+dbfile);
 						    ls	= new LookupService(dbfile.getAbsolutePath(), LookupService.GEOIP_MEMORY_CACHE);
 						}
 						catch(Exception e)
 						{
 							// Ignore errors and let relay work without geo location.
-							System.err.println("Warning: Relay could not initialize GeoIP service: "+ e);
+							RelayHandler.getLogger().warning("Warning: Relay could not initialize GeoIP service: "+ e);
 						}
 					}
 				}

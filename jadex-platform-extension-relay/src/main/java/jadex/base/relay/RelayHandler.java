@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
@@ -61,7 +62,7 @@ public class RelayHandler
 		}
 		SYSTEMDIR	= dir;
 		
-		System.out.println("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
+		getLogger().info("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
 	}
 	
 	//-------- attributes --------
@@ -74,7 +75,7 @@ public class RelayHandler
 	
 	/** The available codecs for awareness infos (cached for speed). */
 	protected Map<Byte, ICodec>	codecs;
-		
+	
 	//-------- constructors --------
 
 	/**
@@ -156,7 +157,7 @@ public class RelayHandler
 //		// Set cache header to avoid interference of proxies (e.g. vodafone umts)
 //		response.setHeader("Cache-Control", "no-cache, no-transform");
 //		response.setHeader("Pragma", "no-cache");
-		System.out.println("Client connected: '"+id+"'");//, "+client.getSendBufferSize());
+		getLogger().info("Client connected: '"+id+"'");//, "+client.getSendBufferSize());
 	}
 				
 	/**
@@ -220,7 +221,7 @@ public class RelayHandler
 		{
 			// exception on queue, when same platform reconnects or servlet is destroyed
 			// exception on output stream, when client disconnects
-//			System.out.println("Disconnected: "+id+", "+e);
+			getLogger().info("Client disconnected: "+id+", "+e);
 		}
 		
 		if(!queue.isClosed())
@@ -458,5 +459,13 @@ public class RelayHandler
 			num	= num + read;
 		}
 		return buffer;
+	}
+	
+	/**
+	 *  Get the logger.
+	 */
+	public static Logger	getLogger()
+	{
+		return Logger.getLogger("jadex.relay");		
 	}
 }

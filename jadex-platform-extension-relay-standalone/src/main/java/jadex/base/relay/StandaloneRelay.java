@@ -128,7 +128,7 @@ public class StandaloneRelay
 					}
 					catch(Exception e)
 					{
-						System.out.println("Client disconnected: "+e);
+						RelayHandler.getLogger().warning("Unexpected exception: "+e);
 //						e.printStackTrace();
 					}
 				}

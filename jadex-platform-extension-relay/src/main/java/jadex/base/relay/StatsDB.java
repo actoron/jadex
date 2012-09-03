@@ -147,7 +147,7 @@ public class StatsDB
 		catch(Exception e)
 		{
 			// Ignore errors and let relay work without stats.
-			System.err.println("Warning: Could not connect to relay stats DB: "+ e);
+			RelayHandler.getLogger().warning("Warning: Could not connect to relay stats DB: "+ e);
 		}
 	}
 	
@@ -248,7 +248,7 @@ public class StatsDB
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not save platform info: "+ e);
+				RelayHandler.getLogger().warning("Warning: Could not save platform info: "+ e);
 			}
 		}
 	}
@@ -336,7 +336,7 @@ public class StatsDB
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not read from relay stats DB: "+ e);
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
 				List<PlatformInfo> list = Collections.emptyList();
 				ret	= list.iterator();
 			}
@@ -409,7 +409,7 @@ public class StatsDB
 			catch(Exception e)
 			{
 				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not read from relay stats DB: "+ e);
+				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
 			}
 		}
 		return ret.toArray(new PlatformInfo[ret.size()]);
