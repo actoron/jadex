@@ -1,28 +1,64 @@
-<%@ page errorPage="500" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-	<head>
-		<title>Jadex Relay Transport Status</title>
-		<% if(request.getAttribute("refresh")!=null)  { %>
-		<meta http-equiv="refresh" content="<%= request.getAttribute("refresh") %>">
-		<% } %>
-		<style type="text/css">
-		<%@ include file="style.css" %>
-		</style>
-	</head>
+<%@page import="java.net.InetAddress"%>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<HEAD>
+<META content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<TITLE><%= request.getParameter("title") %></TITLE>
+<LINK rel="shortcut icon" type="image/ico" href="images/jadex_icon.ico" />
+<SCRIPT type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push([ '_setAccount', 'UA-33705718-1' ]);
+	_gaq.push([ '_trackPageview' ]);
 
-	<body bgcolor="#F0F0FF">
-	<table width="100%" height="85%"  cellpadding="0" cellspacing="0">
-	<tr height="15%">
-		<td colspan="2">
-			<jsp:include page="title.jsp" flush="true"/>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2" valign="middle" height="16" class="horbar">&nbsp;</td>
-	</tr>
-	<tr valign="top">
-		<td width="12%" class="menublock_top">
-			<jsp:include page="navigation.jsp" flush="false"/>
-		</td>
-		<td class="textblock">
+	(function() {
+		var ga = document.createElement('script');
+		ga.type = 'text/javascript';
+		ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl'
+				: 'http://www')
+				+ '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(ga, s);
+	})();
+</SCRIPT>
+
+<META name="google-site-verification"
+	content="PSu8atqC7qDGHNZBfqQjVV8xM13xwyOUQs-4BmycCXc" />
+<LINK rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/resources/colibri.css" media="all" />
+<BODY id="body"
+	class="wiki-xwiki space-AC_User_Guide viewbody hideright">
+	<DIV id="xwikimaincontainer">
+		<DIV id="xwikimaincontainerinner">
+			<DIV id="headerglobal" class="layoutsection">
+				<DIV class="minwidthb"></DIV>
+				<DIV id="company">
+					<DIV id="companylogo">
+						<A title="Home" href="http://www.activecomponents.org/" rel="home"><IMG
+							alt="Wiki Logo" src="<%= request.getContextPath() %>/resources/logo.png"></A>
+					</DIV>
+				</DIV>
+				<DIV class="clearfloats"></DIV>
+			</DIV>
+			<DIV
+				style="top: 60px; width: 100%; text-align: right; position: absolute;">
+				<IMG alt="<%= InetAddress.getLocalHost().getHostName() %>" src="<%= request.getContextPath() %>/resources/<%= InetAddress.getLocalHost().getHostName() %>.png">
+			</DIV>
+			<DIV id="contentcontainer" class="contenthideright">
+				<DIV id="contentcontainerinner">
+					<DIV class="leftsidecolumns">
+						<DIV id="contentcolumn">
+							<DIV class="main layoutsubsection">
+								<DIV id="contentmenu" class="actionmenu">
+									<DIV class="gradientfilterIE"></DIV>
+								</DIV>
+								<DIV id="mainContentArea">
+									<DIV id="document-title">
+										<H1><%= request.getParameter("title") %></H1>
+									</DIV>
+									<DIV id="document-info">
+
+										<DIV class="clearfloats"></DIV>
+									</DIV>
+									<DIV id="xwikicontent">
+										<H1 class="hidden"><%= request.getParameter("title") %></H1>

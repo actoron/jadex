@@ -1,4 +1,6 @@
-<jsp:include page="header.jsp" flush="true"/>
+<jsp:include page="header.jsp">
+	<jsp:param name="title" value="Relay Transport - Live Platforms" />	
+</jsp:include>
 
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
@@ -8,7 +10,6 @@
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
 %>
 
-<h2>Connected Platforms</h2>
 <%
 if(infos.length>0)
 {
