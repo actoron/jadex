@@ -209,7 +209,8 @@ public class RelayHandler
 				catch(TimeoutException te)
 				{
 					// Send ping and continue loop.
-					out.write(SRelay.MSGTYPE_PING);  
+//					System.out.println("pinging: "+id);
+					out.write(SRelay.MSGTYPE_PING);
 					out.flush();
 				}
 			}
@@ -218,6 +219,7 @@ public class RelayHandler
 		{
 			// exception on queue, when same platform reconnects or servlet is destroyed
 			// exception on output stream, when client disconnects
+			System.out.println("Disconnected: "+id+", "+e);
 		}
 		
 		if(!queue.isClosed())
@@ -230,6 +232,7 @@ public class RelayHandler
 			AwarenessInfo	awainfo	= platform!=null ? platform.getAwarenessInfo() : null;
 			if(awainfo!=null)
 			{
+//				System.out.println("Sending offline info: "+id);
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
 				sendAwarenessInfos(awainfo, platform.getPreferredCodecs());
 			}

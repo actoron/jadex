@@ -1,9 +1,11 @@
 package jadex.base.relay;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -83,6 +85,8 @@ public class StandaloneRelay
 						}
 						else if(get && path.startsWith("/?id="))
 						{
+//							client.setTcpNoDelay(true);
+							
 							String	id	= URLDecoder.decode(path.substring(path.indexOf('=')+1), "UTF-8");
 							String	hostip	= ((InetSocketAddress)client.getRemoteSocketAddress()).getAddress().getHostAddress();
 							String	hostname	= ((InetSocketAddress)client.getRemoteSocketAddress()).getHostName();
@@ -90,10 +94,9 @@ public class StandaloneRelay
 //							System.out.println("id: '"+id+"'");
 //							System.out.println("hostip: '"+hostip+"'");
 //							System.out.println("hostname: '"+hostname+"'");
-							PrintStream	out	= new PrintStream(client.getOutputStream());
-							out.print("HTTP/1.0 200 OK\r\n");
-							out.println("\r\n");
-							System.out.println("Client connected: '"+id+"'");
+							OutputStream	out	= new BufferedOutputStream(client.getOutputStream(), client.getSendBufferSize());
+							out.write("HTTP/1.0 200 OK\r\n\r\n".getBytes());
+							System.out.println("Client connected: '"+id+"'");//, "+client.getSendBufferSize());
 							handler.handleConnection(id, out);	// Hack!!! https?
 						}
 						else if(!get)
