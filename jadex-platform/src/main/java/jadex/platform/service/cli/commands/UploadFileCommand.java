@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.SUtil;
@@ -155,6 +156,7 @@ public class UploadFileCommand extends ACliCommand
 		
 		if(cid!=null)
 		{
+			// global search not a good idea due to long timeout
 			ia.getServiceContainer().searchServices(IDeploymentService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 				.addResultListener(ia.createResultListener(new IIntermediateResultListener<IDeploymentService>()
 			{
@@ -187,19 +189,23 @@ public class UploadFileCommand extends ACliCommand
 				}
 			}));
 			
+			// does not work due to cid has no address
 //			SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IDeploymentService>(ret)
 //			{
 //				public void customResultAvailable(final IComponentManagementService cms)
 //				{
-//					
 //					cms.getExternalAccess(cid).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IDeploymentService>(ret)
 //					{
-//						public void customResultAvailable(IExternalAccess tplat)
+//						public void customResultAvailable(IExternalAccess plat)
 //						{
-//							tplat.scheduleStep(new IComponentStep<IE>()
+//							plat.scheduleStep(new IComponentStep<IDeploymentService>()
 //							{
-//							});
+//								public IFuture<IDeploymentService> execute(IInternalAccess ia)
+//								{
+//									return ia.getServiceContainer().searchService(IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//								}
+//							}).addResultListener(new DelegationResultListener<IDeploymentService>(ret));
 //						}
 //					}));
 //				}
