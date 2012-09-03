@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.clock;
 
+import java.util.TimerTask;
+
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IChangeListener;
@@ -100,6 +102,14 @@ public interface IClockService extends IService
 	 *  @param to The timed object.
 	 */
 	public ITimer createTickTimer(ITimedObject to);
+	
+	/**
+	 *  Create a new realtime timer.
+	 *  
+	 *  @param timespan The relative timespan after which the timed object should be notified.
+	 *  @param to The timed object.
+	 */
+	public TimerTask createRealtimeTimer(final long time, final ITimedObject to);
 	
 	/**
 	 *  Get the next timer.

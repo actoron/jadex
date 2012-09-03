@@ -497,7 +497,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			{
 				// Hack!!! notification in functionality failed -> should change result of future to failure?
 				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
-				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyListener(listener);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
 			}
 		});
     }

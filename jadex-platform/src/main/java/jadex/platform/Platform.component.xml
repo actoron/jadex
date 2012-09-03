@@ -103,6 +103,8 @@
 		
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
+		<!-- Start the platform with cli activated? -->
+		<argument name="cli" class="boolean">true</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>
 		<!-- Enable verbose logging (shortcut for setting logging_level to info). -->
@@ -215,6 +217,7 @@
 		<componenttype filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
 		<componenttype filename="jadex/extension/rs/publish/RSPublishAgent.class" name="rspublish"/>
 		<componenttype filename="jadex/extension/ws/publish/WSPublishAgent.class" name="wspublish"/>
+		<componenttype filename="jadex/platform/service/cli/CliAgent.class" name="cli"/>
 		
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 	</componenttypes>
@@ -387,6 +390,7 @@
 				</component>
 				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
 				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
+				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" />
 			</components>
 		</configuration>
 		
@@ -422,6 +426,7 @@
 				</component>
 				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
 				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
+				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" />
 			</components>
 		</configuration>
 		

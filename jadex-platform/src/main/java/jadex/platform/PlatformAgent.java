@@ -78,6 +78,7 @@ import java.util.logging.Level;
 	@Argument(name="programarguments", clazz=String[].class),
 	
 	@Argument(name="gui", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="cli", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="logging", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="logging_level", clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
@@ -143,7 +144,8 @@ import java.util.logging.Level;
 	@ComponentType(name="awa", filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
 	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/RSPublishAgent.class"),
-	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class")
+	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class"),
+	@ComponentType(name="cli", filename="jadex/platform/service/cli/CliAgent.class")
 })
 
 @ProvidedServices({
@@ -201,7 +203,8 @@ import java.util.logging.Level;
 		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit")),
 		@Component(name="rspub", type="rspublish", number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
-		@Component(name="wspub", type="wspublish", number="Boolean.TRUE.equals($args.wspublish)? 1: 0")
+		@Component(name="wspub", type="wspublish", number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
+		@Component(name="cli", type="cli", number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0")
 	}),
 	@Configuration(name="fixed", arguments={
 		@NameValue(name="tcpport", value="0"),
@@ -226,7 +229,8 @@ import java.util.logging.Level;
 		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit")),
 		@Component(name="rspub", type="rspublish", number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
-		@Component(name="wspub", type="wspublish", number="Boolean.TRUE.equals($args.wspublish)? 1: 0")
+		@Component(name="wspub", type="wspublish", number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
+		@Component(name="cli", type="cli", number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0")
 	})
 })
 public class PlatformAgent extends MicroAgent

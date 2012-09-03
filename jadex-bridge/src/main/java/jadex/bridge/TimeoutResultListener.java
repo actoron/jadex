@@ -182,16 +182,27 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 										{
 											if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
 											{
-												Timer t = new Timer();
-												TimerTask tt = new TimerTask()
+												// each timer creates a thread!
+												
+//												System.out.println("create timer");
+//												Timer t = new Timer();
+//												TimerTask tt = new TimerTask()
+//												{
+//													public void run()
+//													{
+//														notify.run();
+//													}
+//												};
+//												timer = tt;
+//												t.schedule(tt, timeout);
+												
+												clock.createRealtimeTimer(timeout, new ITimedObject()
 												{
-													public void run()
+													public void timeEventOccurred(long currenttime)
 													{
 														notify.run();
 													}
-												};
-												timer = tt;
-												t.schedule(tt, timeout);
+												});
 											}
 											else
 											{

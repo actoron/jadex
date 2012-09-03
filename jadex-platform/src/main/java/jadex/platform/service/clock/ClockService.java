@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 
 /**
  *  A clock service abstracts away from clock implementations.
@@ -50,6 +51,9 @@ public class ClockService extends BasicService implements IClockService, IProper
 	
 	/** Was simulation set via argument? */
 	protected Boolean simulation;
+	
+	/** The realtime timer. */
+	protected java.util.Timer timer;
 	
 	//-------- constructors --------
 	
@@ -179,6 +183,29 @@ public class ClockService extends BasicService implements IClockService, IProper
 	public ITimer createTickTimer(ITimedObject to)
 	{
 		return clock.createTickTimer(to);
+	}
+	
+	/**
+	 *  Create a new realtime timer.
+	 *  
+	 *  @param timespan The relative timespan after which the timed object should be notified.
+	 *  @param to The timed object.
+	 */
+	public TimerTask createRealtimeTimer(final long time, final ITimedObject to)
+	{
+		if(timer==null)
+		{
+			timer = new java.util.Timer(true);
+		}
+		TimerTask tt = new TimerTask()
+		{
+			public void run()
+			{
+				to.timeEventOccurred(System.currentTimeMillis());
+			}
+		};
+		timer.schedule(tt, time);
+		return tt;
 	}
 	
 	/**
