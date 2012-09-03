@@ -5,12 +5,16 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -30,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -80,6 +85,9 @@ public class ConsolePanel extends JPanel
 	/** The console text pane. */
 	protected JTextPane	console;
 	
+	/** The console in. */
+	protected JTextField in;
+	
 	/** The console title. */
 	protected JLabel	label;
 	
@@ -96,13 +104,14 @@ public class ConsolePanel extends JPanel
 	/**
 	 *  Create a new console panel.
 	 */
-	public ConsolePanel(IExternalAccess platformaccess, IExternalAccess jccaccess, String title)
+	public ConsolePanel(final IExternalAccess platformaccess, IExternalAccess jccaccess, String title)
 	{
 		this.platformaccess	= platformaccess;
 		this.jccaccess	= jccaccess;
 		this.console = new JTextPane();
 		this.doc = console.getStyledDocument();
 		this.label	= new JLabel(title);
+		this.in = new JTextField();
 	
 		Style def = StyleContext.getDefaultStyleContext().
 	    	getStyle(StyleContext.DEFAULT_STYLE);
@@ -113,6 +122,48 @@ public class ConsolePanel extends JPanel
 		this.sdout = new StyledDocumentOutputStream(doc, outstyle);
 		this.sderr = new StyledDocumentOutputStream(doc, errorstyle);
 			
+		in.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final String txt = in.getText()+SUtil.LF;
+				in.setText("");
+				platformaccess.scheduleImmediate(new IComponentStep<Void>()
+				{
+					@Classname("redir")
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						SServiceProvider.getService(ia.getServiceContainer(), IDaemonThreadPoolService.class)
+							.addResultListener(ia.createResultListener(new IResultListener<IDaemonThreadPoolService>()
+						{
+							public void resultAvailable(IDaemonThreadPoolService tp)
+							{
+								proceed(tp);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								proceed(null);
+							}
+							
+							protected void proceed(IThreadPool tp)
+							{
+								try
+								{
+									SUtil.getOutForSystemIn(tp).write(txt.getBytes());
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
+							}
+						}));
+						return IFuture.DONE;
+					}
+				});
+			}
+		});
+		
 		JButton clear = new JButton(icons.getIcon("clear"));
 		clear.setMargin(new Insets(0,0,0,0));
 		clear.setToolTipText("Clear the console output");
@@ -169,8 +220,9 @@ public class ConsolePanel extends JPanel
 			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		
 		this.setLayout(new BorderLayout());
-		this.add("Center", center);
-		this.add("North", north);
+		this.add(center, BorderLayout.CENTER);
+		this.add(north, BorderLayout.NORTH);
+		this.add(in, BorderLayout.SOUTH);
 	}
 	
 	//-------- methods --------
@@ -369,3 +421,56 @@ public class ConsolePanel extends JPanel
 		}
 	}
 }
+
+//class TexfFieldInputStream extends InputStream implements ActionListener 
+//{
+//    private JTextField tf;
+//    private String str = null;
+//    private int pos = 0;
+//
+//    public TexfFieldInputStream(JTextField jtf) 
+//    {
+//        tf = jtf;
+//    }
+//
+//    public void actionPerformed(ActionEvent e) 
+//    {
+//        str = tf.getText() + "\n";
+//        pos = 0;
+//        tf.setText("");
+//        synchronized (this) 
+//        {
+//            //maybe this should only notify() as multiple threads may
+//            //be waiting for input and they would now race for input
+//            this.notifyAll();
+//        }
+//    }
+//
+//    public int read() 
+//    {
+//        if(str!= null && pos==str.length())
+//        {
+//            str = null;
+//            return java.io.StreamTokenizer.TT_EOF;
+//        }
+//
+//        while (str == null || pos >= str.length()) 
+//        {
+//            try 
+//            {
+//                synchronized (this) 
+//                {
+//                    this.wait();
+//                }
+//            }
+//            catch(InterruptedException ex) 
+//            {
+//                ex.printStackTrace();
+//            }
+//        }
+//        return str.charAt(pos++);
+//    }
+//}
+
+
+

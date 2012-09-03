@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IThreadPool;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -2286,6 +2288,31 @@ public class SUtil
 		{
 			((ListenableStream)((AccessiblePrintStream)System.err).out).removeLineListener(listener);
 		}
+	}
+	
+	/**
+	 *  Get an output stream that is automatically fed into the new System.in,
+	 *  i.e. this method replaces System.in and delivers an output stream to
+	 *  which can be written.
+	 *  @param tp The thread pool.
+	 */
+	public static synchronized OutputStream getOutForSystemIn(IThreadPool tp) throws IOException
+	{
+		OutputStream ret;
+		
+		if(System.in instanceof CombinedInputStream)
+		{
+			ret = ((CombinedInputStream)System.in).getOutin();
+		}
+		else
+		{
+			PipedOutputStream pos = new PipedOutputStream();
+			CombinedInputStream cis = new CombinedInputStream(new ProtectedInputStream(System.in), pos, tp);
+			System.setIn(cis);
+			ret = pos;
+		}
+		
+		return ret;
 	}
 	
 	/**

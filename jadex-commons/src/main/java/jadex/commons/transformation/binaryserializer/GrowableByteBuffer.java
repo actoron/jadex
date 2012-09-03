@@ -37,10 +37,21 @@ public class GrowableByteBuffer
 	}
 	
 	/**
+	 *  Writes a byte, appending it to the buffer.
+	 *  @param b The byte.
+	 */
+	public void write(byte b)
+	{
+		allocateSpace(1);
+		
+		buffer[pos++] = b;
+	}
+	
+	/**
 	 *  Writes a byte array, appending it to the buffer.
 	 *  @param b The byte array.
 	 */
-	public void write (byte[] b)
+	public void write(byte[] b)
 	{
 		allocateSpace(b.length);
 		

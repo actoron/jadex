@@ -10,15 +10,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.transformation.IObjectStringConverter;
-import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
@@ -89,7 +86,7 @@ public class ListPlatformsCommand extends ACliCommand
 									{
 										for(IComponentDescription desc: results)
 										{
-											// Hack, use constant?!
+											// Hack, use constant?!o
 											if("jadex.platform.service.remote.Proxy".equals(desc.getModelName())
 												&& !res.contains(desc.getName()))
 											{

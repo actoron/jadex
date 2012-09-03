@@ -2,10 +2,13 @@ package jadex.platform.service.cli;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cli.ICliService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,10 +17,16 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -42,11 +51,19 @@ import javax.swing.SwingUtilities;
  */
 @Agent
 @Service
+@Arguments(
+{
+	@Argument(name="console", clazz=boolean.class, description="Flag if a console reader should be opened.", defaultvalue="true"),
+	@Argument(name="gui", clazz=boolean.class, description="Flag if a gui for console in and out should be opened.", defaultvalue="false")
+})
 @ProvidedServices(
 {
 	@ProvidedService(name="cliser", type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
 	@ProvidedService(type=IInternalCliService.class, implementation=@Implementation(expression="$component.getRawService(\"cliser\")"))
 })
+@RequiredServices(
+	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+)
 public class CliAgent implements ICliService, IInternalCliService
 {
 	//-------- attributes --------
@@ -54,6 +71,14 @@ public class CliAgent implements ICliService, IInternalCliService
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
+	
+	/** The gui flag. */
+	@AgentArgument
+	protected boolean gui;
+
+	/** The console flag. */
+	@AgentArgument
+	protected boolean console;
 	
 	/** The shells per session. */
 	protected Map<Tuple2<String, Integer>, CliShell> shells;
@@ -68,12 +93,24 @@ public class CliAgent implements ICliService, IInternalCliService
 	{
 		shells = new HashMap<Tuple2<String, Integer>, CliShell>();
 		
+		if(gui)
+			createGui();
+		
+		if(console)
+			createConsole();
+	}
+	
+	/**
+	 *  Create a gui frame for console in and out.
+	 */
+	protected void createGui()
+	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				final JTextField tf = new JTextField(20);
-				final JTextArea ta = new JTextArea(20, 20);
+				final JTextArea ta = new JTextArea(40, 20);
 				ta.setEditable(false);
 
 				final Tuple2<String, Integer> guisess = new Tuple2<String, Integer>(SUtil.createUniqueId("guisess"), new Integer(0));
@@ -116,72 +153,103 @@ public class CliAgent implements ICliService, IInternalCliService
 				f.setVisible(true);
 			}
 		});
-		
-		Runnable reader = new Runnable()
+	}
+	
+	/**
+	 *  Create a console reader.
+	 */
+	protected void createConsole()
+	{
+		IFuture<IDaemonThreadPoolService> fut = agent.getRequiredService("dtp");
+		fut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
-			public void run()
+			public void resultAvailable(IDaemonThreadPoolService tp)
 			{
-				ThreadSuspendable sus = new ThreadSuspendable();
-				final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), new Integer(0));
-				System.out.println(getShell(consess).getShellPrompt().get(sus));
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-				
-				while(true)
+				proceed(tp);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				proceed(null);
+			}
+			
+			protected void proceed(IThreadPool tp)
+			{
+				Runnable reader = new Runnable()
 				{
-					try
+					public void run()
 					{
-						final String tmp = br.readLine();
-						final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
-						if("exit".equals(cmd))
-							break;
+						ThreadSuspendable sus = new ThreadSuspendable();
+						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), new Integer(0));
+						System.out.println(getShell(consess).getShellPrompt().get(sus));
+						System.out.println("sysin: "+System.in+" "+System.in.getClass());
+						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 						
-						agent.scheduleStep(new IComponentStep<Void>()
+						while(true)
 						{
-							public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+							try
 							{
-								final Future<Void> ret = new Future<Void>();
+								final String tmp = br.readLine();
+								final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
+								if("exit".equals(cmd))
+									break;
 								
-								executeCommand(cmd, consess).addResultListener(new IResultListener<String>()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									public void resultAvailable(String result)
+									public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 									{
-										if(result!=null)
-											System.out.println(result);
-										printPrompt();
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										System.out.println("Invocation error: "+exception.getMessage());
-										printPrompt();
-									}
-									
-									protected void printPrompt()
-									{
-										getShell(consess).getShellPrompt().addResultListener(new DefaultResultListener<String>()
+										final Future<Void> ret = new Future<Void>();
+										
+										executeCommand(cmd, consess).addResultListener(new IResultListener<String>()
 										{
 											public void resultAvailable(String result)
 											{
-												System.out.println(result);
-												ret.setResult(null);
+												if(result!=null)
+													System.out.println(result);
+												printPrompt();
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												System.out.println("Invocation error: "+exception.getMessage());
+												printPrompt();
+											}
+											
+											protected void printPrompt()
+											{
+												getShell(consess).getShellPrompt().addResultListener(new DefaultResultListener<String>()
+												{
+													public void resultAvailable(String result)
+													{
+														System.out.println(result);
+														ret.setResult(null);
+													}
+												});
 											}
 										});
+										
+										return ret;
 									}
-								});
-								
-								return ret;
+								}).get(new ThreadSuspendable());
 							}
-						}).get(new ThreadSuspendable());
+							catch(IOException ioe)
+							{
+								ioe.printStackTrace();
+							}
+						}
 					}
-					catch(IOException ioe)
-					{
-						ioe.printStackTrace();
-					}
+				};
+				if(tp!=null)
+				{
+					tp.execute(reader);
+				}
+				else
+				{
+					Thread t = new Thread(reader);
+					t.start();
 				}
 			}
-		};
-		Thread t = new Thread(reader);
-		t.start();
+		});
 	}
 	
 	/**
