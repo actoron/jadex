@@ -8,7 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.SUtil;
@@ -18,7 +17,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -32,7 +30,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- *
+ *  Command to upload a file.
  */
 public class UploadFileCommand extends ACliCommand
 {
@@ -61,7 +59,8 @@ public class UploadFileCommand extends ACliCommand
 	 */
 	public Object invokeCommand(final CliContext context, final Map<String, Object> args)
 	{
-		final SubscriptionIntermediateFuture<Long> ret = new SubscriptionIntermediateFuture<Long>();
+//		final SubscriptionIntermediateFuture<Long> ret = new SubscriptionIntermediateFuture<Long>();
+		final Future<String> ret = new Future<String>();
 		
 		final String s = (String)args.get("-s");
 		final String d = (String)args.get("-d");
@@ -75,7 +74,8 @@ public class UploadFileCommand extends ACliCommand
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				getDeploymentService(ia, p)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, String>(ret)
+//					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
 				{
 					public void customResultAvailable(final IDeploymentService ds)
 					{
@@ -122,8 +122,8 @@ public class UploadFileCommand extends ACliCommand
 								
 								public void finished()
 								{
-									System.out.println("Copied: "+s+" to "+d);
-									ret.setResult(null);
+//									System.out.println("Copied: "+s+" to "+d);
+									ret.setResult(s+" to "+d+" on "+p);
 			//						((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel1+" to "+sel2);
 								}
 								
@@ -134,7 +134,7 @@ public class UploadFileCommand extends ACliCommand
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									exception.printStackTrace();
+									ret.setExceptionIfUndone(exception);
 								}
 							}));
 						}
@@ -153,7 +153,7 @@ public class UploadFileCommand extends ACliCommand
 	}
 	
 	/**
-	 * 
+	 *  Get the deployment service. 
 	 */
 	protected IFuture<IDeploymentService> getDeploymentService(final IInternalAccess ia, final IComponentIdentifier cid)
 	{
@@ -161,13 +161,13 @@ public class UploadFileCommand extends ACliCommand
 		
 		if(cid!=null)
 		{
-			// global search not a good idea due to long timeout
+			// global search not a good idea due to long timeout but what to do else?
 			ia.getServiceContainer().searchServices(IDeploymentService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 				.addResultListener(ia.createResultListener(new IIntermediateResultListener<IDeploymentService>()
 			{
 				public void intermediateResultAvailable(IDeploymentService result)
 				{
-					System.out.println("found: "+((IService)result).getServiceIdentifier().getProviderId().getRoot()+" - "+cid);
+//					System.out.println("found: "+((IService)result).getServiceIdentifier().getProviderId().getRoot()+" - "+cid);
 					if(((IService)result).getServiceIdentifier().getProviderId().getRoot().equals(cid))
 					{
 						ret.setResult(result);
