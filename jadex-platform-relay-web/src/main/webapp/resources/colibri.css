@@ -317,7 +317,20 @@ td {
 	font-size: 1em;
 }
 th {
-	font-weight: 700; background-color: rgb(243, 243, 243);
+	font-weight: 700;
+	/* background-color: rgb(243, 243, 243);*/
+  background-color: #ECECEC;
+      background-image: -moz-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -o-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -ms-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+}
+tr.even {
+	background-color: #FFFFFF;
+}
+tr.odd {
+	background-color: #ECECEC;
 }
 table pre {
 	white-space: pre-wrap;
@@ -1406,7 +1419,7 @@ ul.xwikitabbar {
 }
 h1.xwikipaneltitle {
   background-color: #ECECEC;
-                                                background-image: -moz-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
+      background-image: -moz-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
       background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
       background-image: -o-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
       background-image: -ms-linear-gradient(top, #FFFFFF 0%, #ECECEC 100%);
