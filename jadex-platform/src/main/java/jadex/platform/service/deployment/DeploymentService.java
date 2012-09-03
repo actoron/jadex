@@ -59,15 +59,17 @@ public class DeploymentService implements IDeploymentService
 	 *  @param file The file data.
 	 *  @return True, when the file has been copied.
 	 */
-	public ISubscriptionIntermediateFuture<Long> downloadFile(IOutputConnection con, String path, String name)
+	public ISubscriptionIntermediateFuture<Long> downloadFile(IOutputConnection con, String name)
 	{
 		SubscriptionIntermediateDelegationFuture<Long> ret = new SubscriptionIntermediateDelegationFuture<Long>();
 		
 		try
 		{
-			File f = new File(path+File.separator+name);
+			File f = new File(name);
 			if(f.exists())
 			{
+//				System.out.println("src size: "+f.length());
+				ret.addIntermediateResult(f.length());
 				FileInputStream fis = new FileInputStream(f);
 				ISubscriptionIntermediateFuture<Long> fut = con.writeFromInputStream(fis, agent);
 				TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, fut);

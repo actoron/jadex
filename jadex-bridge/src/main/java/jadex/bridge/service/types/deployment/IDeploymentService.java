@@ -24,7 +24,7 @@ public interface IDeploymentService //extends IService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public ISubscriptionIntermediateFuture<Long> downloadFile(IOutputConnection con, String path, String name);
+	public ISubscriptionIntermediateFuture<Long> downloadFile(IOutputConnection con, String name);
 
 	/**
 	 *  Rename a file.

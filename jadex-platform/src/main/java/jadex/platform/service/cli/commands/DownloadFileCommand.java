@@ -81,24 +81,37 @@ public class DownloadFileCommand extends ACliCommand
 					{
 						try
 						{
-							File dest = new File(d+File.separator+s);
+							// extract src file name
+							int idx = Math.max(s.lastIndexOf("/"), s.lastIndexOf("\\"));
+							String fn = idx!=-1? s.substring(idx+1): s;
+							File dest = new File(d+File.separator+fn);
 							FileOutputStream fos = new FileOutputStream(dest);
 							ServiceInputConnection sic = new ServiceInputConnection();
 							
-							ITerminableIntermediateFuture<Long> fut = ds.downloadFile(sic.getOutputConnection(), d, dest.getName());
+							ITerminableIntermediateFuture<Long> fut = ds.downloadFile(sic.getOutputConnection(), s);
 							fut.addResultListener(new IIntermediateResultListener<Long>()
 							{
 								long last = 0;
+								long size = -1;
 								public void intermediateResultAvailable(final Long result)
 								{
-									if(last==0 || System.currentTimeMillis()-2000>last)
+									if(size==-1)
 									{
-										last = System.currentTimeMillis();
-	//									System.out.println("rec: "+result);
-										final double done = ((int)((result/(double)result)*10000))/100.0;
-										DecimalFormat fm = new DecimalFormat("#0.00");
-										final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(result)+")";
-										System.out.println(txt);
+//										System.out.println("size: "+result);
+										size = result.longValue();
+									}
+									else
+									{
+//										System.out.println("res: "+result);
+										if(last==0 || System.currentTimeMillis()-2000>last)
+										{
+											last = System.currentTimeMillis();
+		//									System.out.println("rec: "+result);
+											final double done = ((int)((result/(double)size)*10000))/100.0;
+											DecimalFormat fm = new DecimalFormat("#0.00");
+											final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(size)+")";
+											System.out.println(txt);
+										}
 									}
 								}
 								

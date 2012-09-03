@@ -99,6 +99,8 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	{		
 		final SubscriptionIntermediateFuture<Long> ret = new SubscriptionIntermediateFuture<Long>();
 		
+		final long[] filesize = new long[1];
+
 		component.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
@@ -106,9 +108,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 				final IComponentStep<Void> self = this;
 				
 				waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
-				{
-					long filesize = 0;
-					
+				{					
 					public void resultAvailable(Integer bytes)
 					{
 						// Stop transfer on cancel etc.
@@ -128,7 +128,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 							try
 							{
 								int size = Math.min(bytes.intValue(), is.available());
-								filesize += size;
+								filesize[0] += size;
 								byte[] buf = new byte[size];
 								int read = 0;
 								// Hack!!! Should only read once, as subsequent reads might block, because available() only provides an estimate
@@ -137,9 +137,9 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 									read += is.read(buf, read, buf.length-read);
 								}
 								write(buf);
-//								System.out.println("wrote: "+size);
+//								System.out.println("wrote: "+filesize[0]);
 								
-								ret.addIntermediateResultIfUndone(new Long(filesize));
+								ret.addIntermediateResultIfUndone(new Long(filesize[0]));
 								
 								// Hack!!! Should not assume that stream is at end, only if currently no bytes are available
 								if(is.available()>0)
