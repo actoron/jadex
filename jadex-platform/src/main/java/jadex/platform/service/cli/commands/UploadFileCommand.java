@@ -160,6 +160,7 @@ public class UploadFileCommand extends ACliCommand
 			{
 				public void intermediateResultAvailable(IDeploymentService result)
 				{
+					System.out.println("found: "+((IService)result).getServiceIdentifier().getProviderId().getRoot()+" - "+cid);
 					if(((IService)result).getServiceIdentifier().getProviderId().getRoot().equals(cid))
 					{
 						ret.setResult(result);
