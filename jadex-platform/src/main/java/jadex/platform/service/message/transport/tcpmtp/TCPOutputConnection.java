@@ -2,7 +2,6 @@ package jadex.platform.service.message.transport.tcpmtp;
 
 import jadex.commons.SUtil;
 import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.tcpmtp.TCPTransport.Cleaner;
 
 import java.io.BufferedOutputStream;

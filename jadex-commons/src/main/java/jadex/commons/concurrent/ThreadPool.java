@@ -225,7 +225,7 @@ public class ThreadPool implements IThreadPool
 //			thread.setDaemon(false);
 			pool.add(thread);
 			thread.start();
-			System.out.println("pool: "+toString()+" "+pool.size());
+//			System.out.println("pool: "+toString()+" "+pool.size());
 		}
 	}
 

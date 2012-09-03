@@ -1,5 +1,8 @@
 package jadex.platform.service.message.transport.tcpmtp;
 
+import jadex.bridge.IGlobalResourceIdentifier;
+import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -352,38 +355,33 @@ public class TCPTransport implements ITransport
 			{
 				public void run()
 				{
-					final TCPOutputConnection con = getConnection(address, true);
-					if(con!=null)
+					IFuture<TCPOutputConnection> fut = getConnection(address, true);
+					fut.addResultListener(new IResultListener<TCPOutputConnection>()
 					{
-						task.ready(new IResultCommand<IFuture<Void>, Void>()
+						public void resultAvailable(final TCPOutputConnection con)
 						{
-							public IFuture<Void> execute(Void args)
+							task.ready(new IResultCommand<IFuture<Void>, Void>()
 							{
-//								if(task instanceof StreamSendTask)
-//								{
-//									System.out.println("transport.send "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-//								}
-								
-								if(con.send(task.getProlog(), task.getData(), task))
+								public IFuture<Void> execute(Void args)
 								{
-	//								System.out.println("Sent with IO TCP: "+task.getReceivers()[0]);
-//									if(task instanceof StreamSendTask)
-//									{
-//										System.out.println("transport.sent "+System.currentTimeMillis()+": "+((StreamSendTask)task).getSequenceNumber());
-//									}
-									return IFuture.DONE;
+									if(con.send(task.getProlog(), task.getData(), task))
+									{
+										return IFuture.DONE;
+									}
+									else
+									{
+										return new Future<Void>(new RuntimeException("Send failed: "+con));
+									}
 								}
-								else
-								{
-									return new Future<Void>(new RuntimeException("Send failed: "+con));
-								}
-							}
-						});
-					}
-					else
-					{
-						task.ready(send_failure);
-					}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							task.ready(send_failure);
+						}
+					});
+					
 				}
 			});
 		}
@@ -473,10 +471,14 @@ public class TCPTransport implements ITransport
 	 *  @param address
 	 *  @return a connection of this type
 	 */
-	protected TCPOutputConnection getConnection(String address, boolean create)
+	protected IFuture<TCPOutputConnection> getConnection(String address, boolean create)
 	{
+		Future<TCPOutputConnection> fut = new Future<TCPOutputConnection>();
 		if(connections==null)
-			return null;
+		{
+			fut.setResult(null);
+			return fut;
+		}
 		
 		address = address.toLowerCase();
 		
@@ -494,16 +496,26 @@ public class TCPTransport implements ITransport
 			if(dead.shouldRetry())
 			{
 				connections.remove(address);
-				ret = null; 
+				fut.setResult(null);
 			}
 		}
+		else if(ret instanceof Future)
+		{
+			fut = (Future<TCPOutputConnection>)ret;
+		}
+		else if(ret instanceof TCPOutputConnection)
+		{
+			fut.setResult((TCPOutputConnection)ret);
+		}
+			
 		
 		if(ret==null && create)
+		{
+//			System.out.println("create con: "+address);
 			ret = createConnection(address);
-		if(ret instanceof TCPDeadConnection)
-			ret = null;
+		}
 		
-		return (TCPOutputConnection)ret;
+		return fut;
 	}
 	
 	/**
@@ -511,9 +523,11 @@ public class TCPTransport implements ITransport
 	 *  @param address The connection address.
 	 *  @return the connection to this address
 	 */
-	protected TCPOutputConnection createConnection(String address)
+	protected IFuture<TCPOutputConnection> createConnection(String address)
 	{
-		TCPOutputConnection ret = null;
+		final Future<TCPOutputConnection> ret = new Future<TCPOutputConnection>();
+		
+		connections.put(address, ret);
 		
 		address = address.toLowerCase();
 		for(int i=0; i<getServiceSchemas().length; i++)
@@ -543,8 +557,9 @@ public class TCPTransport implements ITransport
 					
 					// todo: which resource identifier to use for outgoing connections?
 //					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address), createClientSocket());
-					ret = new TCPOutputConnection(new Cleaner(address), createClientSocket(hostname, iport));
-					connections.put(address, ret);
+					TCPOutputConnection con = new TCPOutputConnection(new Cleaner(address), createClientSocket(hostname, iport));
+					connections.put(address, con);
+					ret.setResult(con);
 				}
 				catch(Exception e)
 				{

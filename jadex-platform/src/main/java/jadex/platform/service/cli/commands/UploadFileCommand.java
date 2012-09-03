@@ -106,13 +106,18 @@ public class UploadFileCommand extends ACliCommand
 							ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), d, source.getName());
 							fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
 							{
+								long last = 0;
 								public void intermediateResultAvailable(final Long result)
 								{
-//									System.out.println("rec: "+result);
-									final double done = ((int)((result/(double)source.length())*10000))/100.0;
-									DecimalFormat fm = new DecimalFormat("#0.00");
-									final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")";
-									System.out.println(txt);
+									if(last==0 || System.currentTimeMillis()-2000>last)
+									{
+										last = System.currentTimeMillis();
+	//									System.out.println("rec: "+result);
+										final double done = ((int)((result/(double)source.length())*10000))/100.0;
+										DecimalFormat fm = new DecimalFormat("#0.00");
+										final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")";
+										System.out.println(txt);
+									}
 								}
 								
 								public void finished()
