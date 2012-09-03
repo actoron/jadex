@@ -91,7 +91,7 @@ public class RelayHandler
 	/**
 	 *  Cleanup on shutdown.
 	 */
-	public void destroy()
+	public void dispose()
 	{
 		if(map!=null && !map.isEmpty())
 		{
@@ -156,24 +156,25 @@ public class RelayHandler
 //		// Set cache header to avoid interference of proxies (e.g. vodafone umts)
 //		response.setHeader("Cache-Control", "no-cache, no-transform");
 //		response.setHeader("Pragma", "no-cache");
+		System.out.println("Client connected: '"+id+"'");//, "+client.getSendBufferSize());
 	}
 				
 	/**
 	 *  Called when a platform registers itself at the relay. 
 	 *  Blocks the thread until the platform disconnects.
 	 */
-	public void handleConnection(String id, OutputStream out)	throws Exception
+	public void handleConnection(String id, OutputStream out)
 	{
 		PlatformInfo	info	= platforms.get(id);
 		IBlockingQueue<Message>	queue	= map.get(id);
 		
-		// Ping to let client know that it is connected.
-		out.write(SRelay.MSGTYPE_PING);
-		out.flush();
-//		response.flushBuffer();
-				
 		try
 		{
+			// Ping to let client know that it is connected.
+			out.write(SRelay.MSGTYPE_PING);
+			out.flush();
+//			response.flushBuffer();
+			
 			while(true)
 			{
 				try
@@ -219,7 +220,7 @@ public class RelayHandler
 		{
 			// exception on queue, when same platform reconnects or servlet is destroyed
 			// exception on output stream, when client disconnects
-			System.out.println("Disconnected: "+id+", "+e);
+//			System.out.println("Disconnected: "+id+", "+e);
 		}
 		
 		if(!queue.isClosed())
@@ -310,6 +311,14 @@ public class RelayHandler
 			info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 		}
 		sendAwarenessInfos(info, pcodecs);
+	}
+	
+	/**
+	 *  Get the current platforms
+	 */
+	public PlatformInfo[]	getCurrentPlatforms()
+	{
+		return platforms.values().toArray(new PlatformInfo[0]);
 	}
 	
 	//-------- helper methods --------	
