@@ -20,16 +20,15 @@ public class StandaloneRelay
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		int	p	= 80;
+		int	port	= 80;
 		for(int i=0; args!=null && i<args.length; i++)
 		{
 			if("-port".equals(args[i]) && i+1<args.length)
 			{
-				p	= Integer.parseInt(args[i+1]);
+				port	= Integer.parseInt(args[i+1]);
 			}
 		}
 		
-		final int	port	= p;
 		final RelayHandler	handler	= new RelayHandler();
 		ServerSocket	server	= new ServerSocket(port);
 		while(true)
@@ -70,7 +69,7 @@ public class StandaloneRelay
 							out.print("HTTP/1.0 200 OK\r\n");
 							out.print("Content-type: text/plain\r\n");
 							out.println("\r\n");
-							out.println("http://"+host+":"+port+"/");
+							out.println("http://"+host+"/");
 							out.flush();
 							client.close();
 						}
