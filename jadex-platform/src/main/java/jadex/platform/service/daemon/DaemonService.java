@@ -209,6 +209,8 @@ public class DaemonService implements IDaemonService
 				}
 			};
 
+			// processbuilder get
+			
 			new Thread(new StreamCopy(proc.getInputStream(), fos)).start();
 			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
 

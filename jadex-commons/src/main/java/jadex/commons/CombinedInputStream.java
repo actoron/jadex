@@ -45,6 +45,8 @@ class CombinedInputStream extends PipedInputStream
 	/** Closed flag. */
 	protected boolean closed;
 	
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new combined input stream.
 	 *  @param in1 The first input stream.
@@ -105,6 +107,8 @@ class CombinedInputStream extends PipedInputStream
 		}
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the outin.
 	 *  @return The outin.
@@ -164,13 +168,14 @@ class CombinedInputStream extends PipedInputStream
 	 */
 	class Reader implements Runnable
 	{
+		/** The input stream. */
 		protected InputStream in;
+		
+		/** The output stream. */
 		protected OutputStream out;
 
 		/**
-		 * 
-		 * @param in
-		 * @param out
+		 *  Create a new reader.
 		 */
 		public Reader(InputStream in, OutputStream out)
 		{
@@ -178,6 +183,9 @@ class CombinedInputStream extends PipedInputStream
 			this.out = out;
 		}
 		
+		/**
+		 *  The run method that reads in and writes out.
+		 */
 		public void run()
 		{
 			threads.add(Thread.currentThread());
@@ -189,7 +197,7 @@ class CombinedInputStream extends PipedInputStream
 					byte[] data = (br.readLine()+SUtil.LF).getBytes();
 					synchronized(out)
 					{
-						System.out.println("wrote to comb is: "+new String(data));
+//						System.out.println("wrote to comb is: "+new String(data));
 						out.write(data);	
 					}
 				}
@@ -198,7 +206,7 @@ class CombinedInputStream extends PipedInputStream
 			{
 				e.printStackTrace();
 			}
-			System.out.println("exit: "+in);
+//			System.out.println("exit: "+in);
 		}
 	}
 }

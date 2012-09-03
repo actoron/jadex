@@ -25,9 +25,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -98,7 +101,7 @@ public class ConsolePanel extends JPanel
 	 */
 	public ConsolePanel(IExternalAccess platformaccess, IExternalAccess jccaccess)
 	{
-		this(platformaccess, jccaccess, "Console Output");
+		this(platformaccess, jccaccess, "Console In- and Output");
 	}
 	
 	/**
@@ -113,6 +116,8 @@ public class ConsolePanel extends JPanel
 		this.label	= new JLabel(title);
 		this.in = new JTextField();
 	
+		in.setToolTipText("Use this text field to enter data in System.in");
+		
 		Style def = StyleContext.getDefaultStyleContext().
 	    	getStyle(StyleContext.DEFAULT_STYLE);
 		Style outstyle = doc.addStyle("out", def);
@@ -122,11 +127,17 @@ public class ConsolePanel extends JPanel
 		this.sdout = new StyledDocumentOutputStream(doc, outstyle);
 		this.sderr = new StyledDocumentOutputStream(doc, errorstyle);
 			
+		final List<String> history = new ArrayList<String>();
+		final int[] hpos = new int[1];
 		in.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				final String txt = in.getText()+SUtil.LF;
+				history.add(0, txt);
+				if(history.size()>100)
+					history.remove(history.size()-1);
+				hpos[0] = 0;
 				in.setText("");
 				platformaccess.scheduleImmediate(new IComponentStep<Void>()
 				{
@@ -161,6 +172,38 @@ public class ConsolePanel extends JPanel
 						return IFuture.DONE;
 					}
 				});
+			}
+		});
+		in.addKeyListener(new KeyListener()
+		{
+			public void keyTyped(KeyEvent e)
+			{
+			}
+			
+			public void keyReleased(KeyEvent e)
+			{
+			}
+			
+			public void keyPressed(KeyEvent e)
+			{
+				if(KeyEvent.VK_UP==e.getKeyCode())
+				{
+					int hs =history.size();
+					if(hs>hpos[0])
+					{
+						in.setText(history.get(hpos[0]));
+						if(hs>hpos[0]+1)
+							hpos[0]++;
+					}
+				}
+				else if(KeyEvent.VK_DOWN==e.getKeyCode())
+				{
+					if(hpos[0]-1>-1)
+					{
+						hpos[0]--;
+						in.setText(history.get(hpos[0]));
+					}
+				}
 			}
 		});
 		
@@ -254,6 +297,8 @@ public class ConsolePanel extends JPanel
 		final String	id	= jccaccess.getComponentIdentifier().getPlatformName()+"#console@"+hashCode();
 		if(!enable)
 		{
+//			in.setEnabled(false);
+			in.setEditable(false);
 			onoff.setIcon(icons.getIcon("on"));
 			onoff.setToolTipText("Turn on the console");
 			if(!label.getText().endsWith(" (off)"))
@@ -273,6 +318,8 @@ public class ConsolePanel extends JPanel
 		}
 		else
 		{
+//			in.setEnabled(true);
+			in.setEditable(true);
 			final IRemoteChangeListener	rcl	= new IRemoteChangeListener()
 			{
 				final static String	OUT_OCCURRED	= "out" + RemoteChangeListenerHandler.EVENT_OCCURRED;
@@ -422,55 +469,6 @@ public class ConsolePanel extends JPanel
 	}
 }
 
-//class TexfFieldInputStream extends InputStream implements ActionListener 
-//{
-//    private JTextField tf;
-//    private String str = null;
-//    private int pos = 0;
-//
-//    public TexfFieldInputStream(JTextField jtf) 
-//    {
-//        tf = jtf;
-//    }
-//
-//    public void actionPerformed(ActionEvent e) 
-//    {
-//        str = tf.getText() + "\n";
-//        pos = 0;
-//        tf.setText("");
-//        synchronized (this) 
-//        {
-//            //maybe this should only notify() as multiple threads may
-//            //be waiting for input and they would now race for input
-//            this.notifyAll();
-//        }
-//    }
-//
-//    public int read() 
-//    {
-//        if(str!= null && pos==str.length())
-//        {
-//            str = null;
-//            return java.io.StreamTokenizer.TT_EOF;
-//        }
-//
-//        while (str == null || pos >= str.length()) 
-//        {
-//            try 
-//            {
-//                synchronized (this) 
-//                {
-//                    this.wait();
-//                }
-//            }
-//            catch(InterruptedException ex) 
-//            {
-//                ex.printStackTrace();
-//            }
-//        }
-//        return str.charAt(pos++);
-//    }
-//}
 
 
 

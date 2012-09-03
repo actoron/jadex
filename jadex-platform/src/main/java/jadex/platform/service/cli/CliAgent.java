@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -173,7 +174,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				proceed(null);
 			}
 			
-			protected void proceed(IThreadPool tp)
+			protected void proceed(final IThreadPool tp)
 			{
 				Runnable reader = new Runnable()
 				{
@@ -182,16 +183,21 @@ public class CliAgent implements ICliService, IInternalCliService
 						ThreadSuspendable sus = new ThreadSuspendable();
 						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), new Integer(0));
 						System.out.println(getShell(consess).getShellPrompt().get(sus));
-						System.out.println("sysin: "+System.in+" "+System.in.getClass());
-						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+						// redirect System.in
+						try{SUtil.getOutForSystemIn(tp);}catch(Exception e){}
+//						System.out.println("sysin: "+System.in+" "+System.in.getClass());
+//						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+						Scanner sc = new Scanner(System.in);
 						
 						while(true)
 						{
 							try
 							{
-								final String tmp = br.readLine();
+								String tmp = sc.next();
+//								System.out.println(tmp);
+//								final String tmp = br.readLine();
 								final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
-								if("exit".equals(cmd))
+								if("exit".equals(cmd) || "quit".equals(cmd))
 									break;
 								
 								agent.scheduleStep(new IComponentStep<Void>()
@@ -232,9 +238,9 @@ public class CliAgent implements ICliService, IInternalCliService
 									}
 								}).get(new ThreadSuspendable());
 							}
-							catch(IOException ioe)
+							catch(Exception e)
 							{
-								ioe.printStackTrace();
+								e.printStackTrace();
 							}
 						}
 					}
