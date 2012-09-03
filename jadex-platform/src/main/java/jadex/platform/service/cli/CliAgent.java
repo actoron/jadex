@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
+import jadex.micro.IntervalBehavior;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -31,9 +32,6 @@ import jadex.micro.annotation.RequiredServices;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -55,7 +53,8 @@ import javax.swing.SwingUtilities;
 @Arguments(
 {
 	@Argument(name="console", clazz=boolean.class, description="Flag if a console reader should be opened.", defaultvalue="true"),
-	@Argument(name="gui", clazz=boolean.class, description="Flag if a gui for console in and out should be opened.", defaultvalue="false")
+	@Argument(name="gui", clazz=boolean.class, description="Flag if a gui for console in and out should be opened.", defaultvalue="false"),
+	@Argument(name="shelltimeout", clazz=boolean.class, description="The timeout after whichs shells become garbage collected (default = 5 mins).", defaultvalue="5*60*1000")
 })
 @ProvidedServices(
 {
@@ -81,8 +80,12 @@ public class CliAgent implements ICliService, IInternalCliService
 	@AgentArgument
 	protected boolean console;
 	
+	/** The shell timeout. */
+	@AgentArgument
+	protected long shelltimeout;;
+	
 	/** The shells per session. */
-	protected Map<Tuple2<String, Integer>, CliShell> shells;
+	protected Map<Tuple2<String, Integer>, Tuple2<ACliShell, Long>> shells;
 	
 	//-------- methods --------
 	
@@ -92,13 +95,32 @@ public class CliAgent implements ICliService, IInternalCliService
 	@AgentBody
 	public void body()
 	{
-		shells = new HashMap<Tuple2<String, Integer>, CliShell>();
+		shells = new HashMap<Tuple2<String, Integer>, Tuple2<ACliShell, Long>>();
 		
 		if(gui)
 			createGui();
 		
 		if(console)
 			createConsole();
+		
+		IntervalBehavior<Void> b = new IntervalBehavior<Void>(agent, 30000, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				long ct = System.currentTimeMillis();
+				for(Tuple2<String, Integer> key: shells.keySet())
+				{
+					Tuple2<ACliShell, Long> val = shells.get(key);
+					
+					if(ct-shelltimeout>val.getSecondEntity().longValue())
+					{
+						removeShell(key);
+					}
+				}
+				return IFuture.DONE;
+			}
+		});
+		b.startBehavior();
 	}
 	
 	/**
@@ -306,22 +328,36 @@ public class CliAgent implements ICliService, IInternalCliService
 	 *  @param session The session.
 	 *  @return The shell.
 	 */
-	public CliShell getShell(Tuple2<String, Integer> sessionid)
+	public ACliShell getShell(Tuple2<String, Integer> sessionid)
 	{
 		if(sessionid==null)
 			throw new IllegalArgumentException("Must not null");
 		
 		// todo: remove obsolete shells
 		
-		CliShell shell = shells.get(sessionid);
-		if(shell==null)
+		Tuple2<ACliShell, Long> tup = shells.get(sessionid);
+		ACliShell shell;
+		if(tup==null)
 		{
 			System.out.println("created new shell for session: "+sessionid);
 			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getComponentIdentifier().getRoot().getName(), sessionid);
 			shell.addAllCommandsFromClassPath(); // agent.getClassLoader()
-			shells.put(sessionid, shell);
+			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, new Long(System.currentTimeMillis())));
+		}
+		else
+		{
+			shell = tup.getFirstEntity();
+			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, new Long(System.currentTimeMillis())));
 		}
 		return shell;
 	}
-
+	
+	/**
+	 *  Remove a shell.
+	 *  @param session The session.
+	 */
+	public void removeShell(Tuple2<String, Integer> sessionid)
+	{
+		shells.remove(sessionid);
+	}
 }

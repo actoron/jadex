@@ -1,4 +1,4 @@
-package jadex.platform.service.email;
+package jadex.micro;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
