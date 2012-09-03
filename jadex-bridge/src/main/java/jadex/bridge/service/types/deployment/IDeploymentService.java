@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.deployment;
 
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IOutputConnection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -9,23 +10,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  */
 public interface IDeploymentService //extends IService
 {
-	/** Default fragment size 10kB. */
-	public static final int FRAGMENT_SIZE = 1024*10;
-	
-//	/**
-//	 *  Get a file.
-//	 *  @return The file data.
-//	 */
-//	public IFuture<Tuple2<FileContent,String>> getFile(String path, int fragment, int fileid);
-
-//	/**
-//	 *  Put a file.
-//	 *  @param file The file data.
-//	 *  @param path The target path.
-//	 *  @return True, when the file has been copied.
-//	 */
-//	public IFuture<String> putFile(FileContent filedata, String path, String fileid);
-	
 	/**
 	 *  Put a file.
 	 *  @param file The file data.
@@ -34,6 +18,14 @@ public interface IDeploymentService //extends IService
 	 */
 	public ISubscriptionIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name);
 	
+	/**
+	 *  Download a file.
+	 *  @param file The file data.
+	 *  @param path The target path.
+	 *  @return True, when the file has been copied.
+	 */
+	public ISubscriptionIntermediateFuture<Long> downloadFile(IOutputConnection con, String path, String name);
+
 	/**
 	 *  Rename a file.
 	 *  @param path The target path.

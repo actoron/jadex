@@ -2,6 +2,7 @@ package jadex.platform.service.deployment;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.search.SServiceProvider;
@@ -12,9 +13,12 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -48,6 +52,38 @@ public class DeploymentService implements IDeploymentService
 		{
 			return new SubscriptionIntermediateFuture<Long>(e);
 		}
+	}
+	
+	/**
+	 *  Download a file.
+	 *  @param file The file data.
+	 *  @return True, when the file has been copied.
+	 */
+	public ISubscriptionIntermediateFuture<Long> downloadFile(IOutputConnection con, String path, String name)
+	{
+		SubscriptionIntermediateDelegationFuture<Long> ret = new SubscriptionIntermediateDelegationFuture<Long>();
+		
+		try
+		{
+			File f = new File(path+File.separator+name);
+			if(f.exists())
+			{
+				FileInputStream fis = new FileInputStream(f);
+				ISubscriptionIntermediateFuture<Long> fut = con.writeFromInputStream(fis, agent);
+				TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, fut);
+				fut.addResultListener(lis);
+			}
+			else
+			{
+				ret.setException(new RuntimeException("File does not exist: "+name));
+			}
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
 	}
 	
 	/**

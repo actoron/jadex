@@ -9,7 +9,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.IDeploymentService;
-import jadex.bridge.service.types.remote.ServiceOutputConnection;
+import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -24,15 +24,15 @@ import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Map;
 
 /**
- *  Command to upload a file.
+ *  Command to download a file.
  */
-public class UploadFileCommand extends ACliCommand
+public class DownloadFileCommand extends ACliCommand
 {
 	/**
 	 *  Get the command names (name including alias').
@@ -40,7 +40,7 @@ public class UploadFileCommand extends ACliCommand
 	 */
 	public String[] getNames()
 	{
-		return new String[]{"uf", "uploadfile", "upload"};
+		return new String[]{"df", "downloadfile", "download"};
 	}
 	
 	/**
@@ -49,7 +49,7 @@ public class UploadFileCommand extends ACliCommand
 	 */
 	public String getDescription()
 	{
-		return "Upload a file.";
+		return "Download a file.";
 	}
 	
 	/**
@@ -81,10 +81,46 @@ public class UploadFileCommand extends ACliCommand
 					{
 						try
 						{
-							final File source = new File(s);
-							final FileInputStream fis = new FileInputStream(source);
-							ServiceOutputConnection soc = new ServiceOutputConnection();
-							soc.writeFromInputStream(fis, comp).addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
+							File dest = new File(d+File.separator+s);
+							FileOutputStream fos = new FileOutputStream(dest);
+							ServiceInputConnection sic = new ServiceInputConnection();
+							
+							ITerminableIntermediateFuture<Long> fut = ds.downloadFile(sic.getOutputConnection(), d, dest.getName());
+							fut.addResultListener(new IIntermediateResultListener<Long>()
+							{
+								long last = 0;
+								public void intermediateResultAvailable(final Long result)
+								{
+									if(last==0 || System.currentTimeMillis()-2000>last)
+									{
+										last = System.currentTimeMillis();
+	//									System.out.println("rec: "+result);
+										final double done = ((int)((result/(double)result)*10000))/100.0;
+										DecimalFormat fm = new DecimalFormat("#0.00");
+										final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(result)+")";
+										System.out.println(txt);
+									}
+								}
+								
+								public void finished()
+								{
+//									System.out.println("Copied: "+s+" to "+d);
+									ret.setResult(s+" on "+p+" to "+d);
+			//						((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel1+" to "+sel2);
+								}
+								
+								public void resultAvailable(Collection<Long> result)
+								{
+									finished();
+								}
+								
+								public void exceptionOccurred(final Exception exception)
+								{
+									ret.setExceptionIfUndone(exception);
+								}
+							});
+							
+							sic.writeToOutputStream(fos, comp).addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -101,40 +137,6 @@ public class UploadFileCommand extends ACliCommand
 								public void exceptionOccurred(Exception exception)
 								{
 			//						System.out.println("wro ex: "+exception);
-								}
-							}));
-							ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), d, source.getName());
-							fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<Long>()
-							{
-								long last = 0;
-								public void intermediateResultAvailable(final Long result)
-								{
-									if(last==0 || System.currentTimeMillis()-2000>last)
-									{
-										last = System.currentTimeMillis();
-	//									System.out.println("rec: "+result);
-										final double done = ((int)((result/(double)source.length())*10000))/100.0;
-										DecimalFormat fm = new DecimalFormat("#0.00");
-										final String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(source.length())+")";
-										System.out.println(txt);
-									}
-								}
-								
-								public void finished()
-								{
-//									System.out.println("Copied: "+s+" to "+d);
-									ret.setResult(s+" to "+d+" on "+p);
-			//						((JCCAgent)ia).getControlCenter().getPCC().setStatusText("Copied: "+sel1+" to "+sel2);
-								}
-								
-								public void resultAvailable(Collection<Long> result)
-								{
-									finished();
-								}
-								
-								public void exceptionOccurred(final Exception exception)
-								{
-									ret.setExceptionIfUndone(exception);
 								}
 							}));
 						}
@@ -232,9 +234,9 @@ public class UploadFileCommand extends ACliCommand
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
-		ArgumentInfo srcfile = new ArgumentInfo("-s", String.class, null, "The source file.", null);
-		ArgumentInfo destdir = new ArgumentInfo("-d", String.class, null, "The destination dir.", null);
-		ArgumentInfo targetplat = new ArgumentInfo("-p", String.class, null, "The target platform", null);
+		ArgumentInfo srcfile = new ArgumentInfo("-s", String.class, null, "The remote source file.", null);
+		ArgumentInfo destdir = new ArgumentInfo("-d", String.class, null, "The local destination dir.", null);
+		ArgumentInfo targetplat = new ArgumentInfo("-p", String.class, null, "The source platform", null);
 		return new ArgumentInfo[]{srcfile, destdir, targetplat};
 	}
 	
@@ -257,26 +259,4 @@ public class UploadFileCommand extends ACliCommand
 			}
 		});
 	}
-	
-//	public static void main(String[] args)
-//	{
-//		String[] phases = {"|", "/", "-", "\\"};
-//
-//		System.out.printf("Spinning... |");
-//
-//		while(true)
-//		{
-//			for(String phase : phases)
-//			{
-//				System.out.printf("\b" + phase);
-//				try
-//				{
-//					Thread.sleep(100);
-//				}
-//				catch(Exception e)
-//				{
-//				}
-//			}
-//		}
-//	}
 }

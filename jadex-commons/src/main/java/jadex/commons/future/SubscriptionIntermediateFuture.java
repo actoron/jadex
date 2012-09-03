@@ -3,9 +3,8 @@ package jadex.commons.future;
 import java.util.Collection;
 
 
-
 /**
- * 
+ *  Implementation of the subscription intermediate future.
  */
 public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFuture<E>
 	implements ISubscriptionIntermediateFuture<E>
