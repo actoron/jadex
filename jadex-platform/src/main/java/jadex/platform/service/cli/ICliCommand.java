@@ -1,5 +1,7 @@
 package jadex.platform.service.cli;
 
+import java.util.Map;
+
 import jadex.commons.future.IFuture;
 
 /**
@@ -31,7 +33,14 @@ public interface ICliCommand
 	 *  @param context The context.
 	 *  @return The result info.
 	 */
-	public ResultInfo getResultInfo(CliContext context);
+	public ResultInfo getResultInfo(CliContext context, Map<String, Object> args);
+	
+	/**
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
+	 */
+	public Object invokeCommand(CliContext context, Map<String, Object> args);
 	
 	// used internally to execute the command, remove from interface?
 	/**

@@ -161,27 +161,50 @@ public class DeploymentService implements IDeploymentService
 	public IFuture<Void> openFile(final String path)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(agent.getServiceProvider(), IContextService.class).addResultListener(
-				new DefaultResultListener<IContextService>()
+		SServiceProvider.getService(agent.getServiceProvider(), IContextService.class)
+			.addResultListener(new DefaultResultListener<IContextService>()
+		{
+			public void resultAvailable(IContextService cs)
+			{
+				try
 				{
-					public void resultAvailable(IContextService cs)
-					{
-						try
-						{
-							cs.openFile(path);
-						}
-						catch (IOException e)
-						{
-							e.printStackTrace();
-							ret.setException(e);
-						}
-					}
-				});
+					cs.openFile(path);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+					ret.setException(e);
+				}
+			}
+		});
 
 		// exec produces strange exceptions?!
 		// Runtime.getRuntime().exec(path);
 		ret.setResult(null);
 		return ret;
+	}
+	
+	/**
+	 *  List the contents of a directory.
+	 *  @param dir The directory, null for current directory.
+	 *  @return The contained files.
+	 */
+	public IFuture<FileData[]> listDirectory(String dir)
+	{
+		Future<FileData[]> ret = new Future<FileData[]>();
+		File file = dir==null? new File("."): new File(dir);
+		if(!file.exists())
+		{
+			ret.setException(new RuntimeException("Directory does not exist: "+dir));
+			return ret;
+		}
+		if(!file.isDirectory())
+		{
+			ret.setException(new RuntimeException("File is not directory: "+dir));
+			return ret;
+		}
+		File[] files = file.listFiles();
+		return new Future<FileData[]>(FileData.convertToRemoteFiles(files));
 	}
 	
 	/**

@@ -65,7 +65,7 @@ public class ListComponentsCommand extends ACliCommand
 	 *  @param context The context.
 	 *  @return The result info.
 	 */
-	public ResultInfo getResultInfo(CliContext context)
+	public ResultInfo getResultInfo(CliContext context, Map<String, Object> args)
 	{
 		return new ResultInfo(Map.class, "List of running components", new IObjectStringConverter()
 		{

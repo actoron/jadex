@@ -57,7 +57,7 @@ public abstract class ACliCommand implements ICliCommand
 	 *  @param context The context.
 	 *  @return The result info.
 	 */
-	public ResultInfo getResultInfo(CliContext context)
+	public ResultInfo getResultInfo(CliContext context, Map<String, Object> args)
 	{
 		return null;
 	}
@@ -82,7 +82,7 @@ public abstract class ACliCommand implements ICliCommand
 			}
 		}
 				
-		Map<String, Object> args = new HashMap<String, Object>();
+		final Map<String, Object> args = new HashMap<String, Object>();
 		
 		if(strargs!=null && strargs.length>0)
 		{
@@ -151,14 +151,15 @@ public abstract class ACliCommand implements ICliCommand
 			{
 				public void customResultAvailable(Object result)
 				{
-					IObjectStringConverter conv = getResultInfo(context)==null? null: getResultInfo(context).getConverter();
+					ResultInfo ri = getResultInfo(context, args);
+					IObjectStringConverter conv = ri==null? null: ri.getConverter();
 					if(conv!=null)
 					{
 						result = conv.convertObject(result, context);
 					}
 					else if(!(result instanceof String))
 					{
-						conv = BasicTypeConverter.getBasicObjectConverter(getResultInfo(context).getType());
+						conv = BasicTypeConverter.getBasicObjectConverter(ri.getType());
 						if(conv==null)
 						{
 							exceptionOccurred(new RuntimeException("No converter for conversion from "+result.getClass().getSimpleName()+" -> String"));

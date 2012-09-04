@@ -52,4 +52,11 @@ public interface IDeploymentService //extends IService
 	 *  @return The root device files.
 	 */
 	public IFuture<FileData[]> getRoots();
+	
+	/**
+	 *  List the contents of a directory.
+	 *  @param dir The directory, null for current directory.
+	 *  @return The contained files.
+	 */
+	public IFuture<FileData[]> listDirectory(String dir);
 }
