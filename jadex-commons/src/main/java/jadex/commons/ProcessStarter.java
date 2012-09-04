@@ -59,6 +59,8 @@ public class ProcessStarter
 			final Process proc = Runtime.getRuntime().exec(cmd, null, curdir);
 
 			// empty streams of subprocess to dev null 
+//			new Thread(new StreamCopy(proc.getInputStream(), System.out)).start(); // the input is the output stream :-(
+//			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
 			new Thread(new StreamCopy(proc.getInputStream(), new NullOutputStream())).start(); // the input is the output stream :-(
 			new Thread(new StreamCopy(proc.getErrorStream(), new NullOutputStream())).start();
 			
@@ -80,12 +82,14 @@ public class ProcessStarter
 		try
 		{
 			// empty streams of this process to dev null 
-			System.setOut(new PrintStream(new NullOutputStream()));
-			System.setErr(new PrintStream(new NullOutputStream()));
+			System.setOut(new PrintStream(System.out));
+			System.setErr(new PrintStream(System.err));
+//			System.setOut(new PrintStream(new NullOutputStream()));
+//			System.setErr(new PrintStream(new NullOutputStream()));
 			new Thread(new StreamCopy(System.in, new NullOutputStream())).start();
 			
 //			String[] parts = SUtil.splitCommandline(cmd);
-			String[] args = new String[parts.length];
+			String[] args = new String[parts.length-1];
 			System.arraycopy(parts, 1, args, 0, parts.length-1);
 			Class<?> mcl = SReflect.classForName(parts[0], null);
 			Method m = mcl.getMethod("main", new Class[]{String[].class});

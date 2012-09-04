@@ -150,18 +150,18 @@ public class FileUpdateAgent extends UpdateAgent
 				});
 				findDistDirs(new File(scandir), res);
 				
-				System.out.println("scanning: "+scandir);
+//				System.out.println("scanning: "+scandir);
 				
 				long foundver = 0;
 				if(res.size()>0)
 				{
-					System.out.println("include filter: "+includefiles);
+//					System.out.println("include filter: "+includefiles);
 					File[] files = res.iterator().next().listFiles(new FilenameFilter()
 					{
 						public boolean accept(File dir, String name)
 						{
 							boolean	ret	= name.toLowerCase().matches(includefiles);
-							System.out.println("match dist file: "+ret+", "+name);
+//							System.out.println("match dist file: "+ret+", "+name);
 							return ret;
 						}
 					});
@@ -210,18 +210,18 @@ public class FileUpdateAgent extends UpdateAgent
 								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
 								
 								// copy .settings.xml files from current directory (if any).
-								System.out.println("copy settings "+new File(".").getAbsolutePath());
+//								System.out.println("copy settings "+new File(".").getAbsolutePath());
 								for(File settings: new File(".").listFiles(new FileFilter()
 								{
 									public boolean accept(File file)
 									{
 										boolean	ret	= !file.isDirectory() && file.getName().endsWith(".settings.xml");
-										System.out.println("copy "+ret+": "+file);
+//										System.out.println("copy "+ret+": "+file);
 										return ret;
 									}
 								}))
 								{
-									System.out.println("copying: "+settings+" to "+target);
+//									System.out.println("copying: "+settings+" to "+target);
 									SUtil.copyFile(settings, target);
 								}
 
