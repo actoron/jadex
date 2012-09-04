@@ -199,7 +199,7 @@ public class StartOptions
 			String nargs = " "+getMain()+" "+getProgramArguments();
 			nargs = nargs.replaceAll("\"", "\\\\\"");
 			
-			cmd.append(" ").append(nargs);
+			cmd.append(" ").append("\""+nargs+"\"");
 		}
 		
 		System.out.println("starting with: "+cmd.toString());
