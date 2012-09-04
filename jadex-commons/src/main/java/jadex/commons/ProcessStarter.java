@@ -17,17 +17,29 @@ public class ProcessStarter
 	 */
 	public static void main(String[] args)
 	{
-		if(args.length==1)
+		if(args.length<2)
+			throw new IllegalArgumentException("Syntax is (-java cmds+)|(-external dir! cmd)");
+		
+		if("-java".equals(args[0]))
 		{
-			startJavaProcess(args[0]);
+			String[] nargs = new String[args.length-1];
+			System.arraycopy(args, 1, nargs, 0, args.length-1);
+			startJavaProcess(nargs);
 		}
-		else if(args.length==2)
+		else if("-external".equals(args[0]))
 		{
-			startExternalProcess(args[0], args[1]);
+			if(args.length==2)
+			{
+				startExternalProcess(null, args[1]);
+			}
+			else
+			{
+				startExternalProcess(args[1], args[2]);
+			}
 		}
 		else
 		{
-			throw new IllegalArgumentException("Must be called with two arguments: dir, cmd");
+			throw new IllegalArgumentException("Syntax is (-java cmds+)|(-external dir! cmd)");
 		}
 	}
 	
@@ -63,7 +75,7 @@ public class ProcessStarter
 	/**
 	 *  Start a java process.
 	 */
-	public static void startJavaProcess(String cmd)
+	public static void startJavaProcess(String[] parts)
 	{
 		try
 		{
@@ -72,7 +84,7 @@ public class ProcessStarter
 			System.setErr(new PrintStream(new NullOutputStream()));
 			new Thread(new StreamCopy(System.in, new NullOutputStream())).start();
 			
-			String[] parts = SUtil.splitCommandline(cmd);
+//			String[] parts = SUtil.splitCommandline(cmd);
 			String[] args = new String[parts.length];
 			System.arraycopy(parts, 1, args, 0, parts.length-1);
 			Class<?> mcl = SReflect.classForName(parts[0], null);
