@@ -53,6 +53,15 @@ public class UploadFileCommand extends ACliCommand
 	}
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "uf -s c:\\zips\\basic-miktex-2.8.3761.exe -d c:\\Files -p Delle_a10";
+	}
+	
+	/**
 	 *  Invoke the command.
 	 *  @param context The context.
 	 *  @param args The arguments.

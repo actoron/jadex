@@ -22,6 +22,12 @@ public interface ICliCommand
 	public String getDescription();
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage();
+	
+	/**
 	 *  Get the argument info.
 	 *  @param context The context.
 	 *  @return The argument infos.

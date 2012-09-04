@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -40,6 +41,15 @@ public class SetSecretCommand extends ACliCommand
 	public String getDescription()
 	{
 		return "Set a secret, i.e. a platform password or network.";
+	}
+	
+	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "ss -pn hans -p secrethans"+SUtil.LF+"ss -nn net -p secretnet"+SUtil.LF+"ss -pn hans";
 	}
 	
 	/**

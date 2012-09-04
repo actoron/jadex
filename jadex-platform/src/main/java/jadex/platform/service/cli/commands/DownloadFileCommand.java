@@ -53,6 +53,15 @@ public class DownloadFileCommand extends ACliCommand
 	}
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "df -s c:\\zips\\basic-miktex-2.8.3761.exe -d c:\\temp -p Lars-PC_b14";
+	}
+	
+	/**
 	 *  Invoke the command.
 	 *  @param context The context.
 	 *  @param args The arguments.

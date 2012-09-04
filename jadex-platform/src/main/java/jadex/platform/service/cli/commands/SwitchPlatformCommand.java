@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -49,6 +50,15 @@ public class SwitchPlatformCommand extends ACliCommand
 	public String getDescription()
 	{
 		return "Switch to a platform.";
+	}
+	
+	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "sp Hans-PC_664"+SUtil.LF+"sp ..";
 	}
 	
 	/**

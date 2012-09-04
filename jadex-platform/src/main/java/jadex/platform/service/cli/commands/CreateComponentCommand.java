@@ -51,6 +51,15 @@ public class CreateComponentCommand extends ACliCommand
 	}
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid applications-micro";
+	}
+	
+	/**
 	 *  Invoke the command.
 	 *  @param context The context.
 	 *  @param args The arguments.

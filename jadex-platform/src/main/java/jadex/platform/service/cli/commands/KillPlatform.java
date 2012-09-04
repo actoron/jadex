@@ -29,7 +29,7 @@ public class KillPlatform extends ACliCommand
 	 */
 	public String[] getNames()
 	{
-		return new String[]{"kp", "killcomponent"};
+		return new String[]{"kp", "killplatform"};
 	}
 	
 	/**
@@ -39,6 +39,15 @@ public class KillPlatform extends ACliCommand
 	public String getDescription()
 	{
 		return "Destroy the platform.";
+	}
+	
+	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "kp";
 	}
 	
 	/**

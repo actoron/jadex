@@ -26,12 +26,6 @@ public abstract class ACliCommand implements ICliCommand
 	 */
 	public abstract String[] getNames();
 	
-	/**
-	 *  Invoke the command.
-	 *  @param context The context.
-	 *  @param args The arguments.
-	 */
-	public abstract Object invokeCommand(CliContext context, Map<String, Object> args);
 	
 	/**
 	 *  Get the command description.
@@ -39,8 +33,24 @@ public abstract class ACliCommand implements ICliCommand
 	 */
 	public String getDescription()
 	{
-		return "No command description given for: "+getNames()[0];
+		return null;
 	}
+	
+	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return null;
+	}
+	
+	/**
+	 *  Invoke the command.
+	 *  @param context The context.
+	 *  @param args The arguments.
+	 */
+	public abstract Object invokeCommand(CliContext context, Map<String, Object> args);
 	
 	/**
 	 *  Get the argument infos.

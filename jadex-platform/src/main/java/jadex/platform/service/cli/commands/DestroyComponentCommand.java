@@ -61,6 +61,15 @@ public class DestroyComponentCommand extends ACliCommand
 	}
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "dc chat";
+	}
+	
+	/**
 	 *  Invoke the command.
 	 *  @param context The context.
 	 *  @param args The arguments.

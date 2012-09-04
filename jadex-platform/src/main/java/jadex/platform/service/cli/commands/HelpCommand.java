@@ -42,6 +42,15 @@ public class HelpCommand extends ACliCommand
 	}
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "h cc";
+	}
+	
+	/**
 	 *  Get the argument types.
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
@@ -99,11 +108,15 @@ public class HelpCommand extends ACliCommand
 						ArgumentInfo[] ais = cmd.getArgumentInfos((CliContext)context);
 						if(ais!=null)
 						{
-							for(ArgumentInfo ai: ais)
+							for(int i=0; i<ais.length; i++)
 							{
-								buf.append(ai.getUsageText()).append(SUtil.LF);
+								buf.append(ais[i].getUsageText());
+								if(i+1<ais.length)
+									buf.append(SUtil.LF);
 							}
 						}
+						if(cmd.getExampleUsage()!=null)
+							buf.append(SUtil.LF).append("example: ").append(cmd.getExampleUsage());
 					}
 					else
 					{
@@ -144,7 +157,8 @@ public class HelpCommand extends ACliCommand
 			buf.append(")");
 		}
 		
-		buf.append(" :").append(cmd.getDescription());
+		if(cmd.getDescription()!=null)
+			buf.append(": ").append(cmd.getDescription());
 		
 		return buf.toString();
 	}

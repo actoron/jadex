@@ -48,6 +48,15 @@ public class AddResourceCommand extends ACliCommand
 	}
 	
 	/**
+	 *  Get example usage(s).
+	 *  @return Example usages.
+	 */
+	public String getExampleUsage()
+	{
+		return "ar c:\\temp\\my.jar";
+	}
+	
+	/**
 	 *  Invoke the command.
 	 *  @param context The context.
 	 *  @param args The arguments.
