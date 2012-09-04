@@ -24,6 +24,9 @@ public class StartOptions
 	
 	/** The start directory. */
 	protected String startdir;
+	
+	/** Flag if process starter should be used for complete process decoupling. */
+	protected boolean childproc;
 
 	/**
 	 *  Get the java command.
@@ -132,6 +135,24 @@ public class StartOptions
 	{
 		this.startdir = startdir;
 	}
+	
+	/**
+	 *  Get the childProcess.
+	 *  @return The childProcess.
+	 */
+	public boolean isChildProcess()
+	{
+		return childproc;
+	}
+
+	/**
+	 *  Set the childProcess.
+	 *  @param childProcess The childProcess to set.
+	 */
+	public void setChildProcess(boolean childproc)
+	{
+		this.childproc = childproc;
+	}
 
 	/**
 	 *  Get the complete start command.
@@ -162,13 +183,26 @@ public class StartOptions
 		// main class or jar
 		if(getMain()==null)
 			throw new RuntimeException("No main class or executable jar specified: "+this);
-		cmd.append(" ").append(getMain());
 		
-		// program arguments
-		if(getProgramArguments()!=null)
-			cmd.append(" ").append(getProgramArguments());
+		if(isChildProcess())
+		{
+			cmd.append(" ").append(getMain());
+			
+			// program arguments
+			if(getProgramArguments()!=null)
+				cmd.append(" ").append(getProgramArguments());
+		}
+		else
+		{
+			cmd.append(" ").append("jadex.commons.ProcessStarter");
+			
+			String nargs = " "+getMain()+" "+getProgramArguments();
+			nargs = nargs.replaceAll("\"", "\\\\\"");
+			
+			cmd.append(" ").append(nargs);
+		}
 		
-//		System.out.println("starting with: "+cmd.toString());
+		System.out.println("starting with: "+cmd.toString());
 		
 		return cmd.toString();
 	}

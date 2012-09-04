@@ -202,10 +202,14 @@ public class DaemonService implements IDaemonService
 //			String cmd = options.getStartCommand();
 //			System.out.println("Starting process: " + cmd);
 
-			// Todo: use decoupled java starter
+			
 			final Process proc = Runtime.getRuntime().exec(options.getStartCommand(), null, newcurdir);
-			new Thread(new StreamCopy(proc.getInputStream(), System.out)).start();
-			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
+			
+			if(options.isChildProcess())
+			{
+				new Thread(new StreamCopy(proc.getInputStream(), System.out)).start();
+				new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
+			}
 			
 			System.out.println("Waiting for platform "+pid);
 			ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getInstance().getTimeout(), agent.getExternalAccess(),
