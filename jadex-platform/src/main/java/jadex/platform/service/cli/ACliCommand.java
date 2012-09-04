@@ -90,38 +90,19 @@ public abstract class ACliCommand implements ICliCommand
 			{
 				String name = strargs[i].startsWith("-")? strargs[i++]: null;
 				Object val = null;
-				
-				ArgumentInfo cai = argimap.get(name);
-				if(cai==null)
+				if(i<strargs.length)
 				{
-					ret.setException(new RuntimeException("Unknown argument: "+name));
-					return ret;
-				}
-				val = strargs[i];
-				
-				IStringObjectConverter conv = cai.getConverter();
-				Class<?> target = cai.getType();
-				if(conv!=null)
-				{
-					try
+					ArgumentInfo cai = argimap.get(name);
+					if(cai==null)
 					{
-						val = conv.convertString(strargs[i], context);
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
+						ret.setException(new RuntimeException("Unknown argument: "+name));
 						return ret;
 					}
-				}
-				else if(!String.class.equals(target))
-				{
-					conv = BasicTypeConverter.getBasicStringConverter(cai.getType());
-					if(conv==null)
-					{
-						ret.setException(new RuntimeException("No converter for conversion from string -> "+target.getName()));
-						return ret;
-					}
-					else
+					val = strargs[i];
+					
+					IStringObjectConverter conv = cai.getConverter();
+					Class<?> target = cai.getType();
+					if(conv!=null)
 					{
 						try
 						{
@@ -133,8 +114,28 @@ public abstract class ACliCommand implements ICliCommand
 							return ret;
 						}
 					}
+					else if(!String.class.equals(target))
+					{
+						conv = BasicTypeConverter.getBasicStringConverter(cai.getType());
+						if(conv==null)
+						{
+							ret.setException(new RuntimeException("No converter for conversion from string -> "+target.getName()));
+							return ret;
+						}
+						else
+						{
+							try
+							{
+								val = conv.convertString(strargs[i], context);
+							}
+							catch(Exception e)
+							{
+								ret.setException(e);
+								return ret;
+							}
+						}
+					}
 				}
-				
 				args.put(name, val);
 			}
 		}
