@@ -195,11 +195,11 @@ public class StartOptions
 		else
 		{
 			cmd.append(" ").append("jadex.commons.ProcessStarter");
+			cmd.append(" -java ").append(getMain()).append(" ").append(getProgramArguments());
 			
-			String nargs = " "+getMain()+" "+getProgramArguments();
-			nargs = nargs.replaceAll("\"", "\\\\\"");
-			
-			cmd.append(" ").append("\""+nargs+"\"");
+//			String nargs = " "+getMain()+" "+getProgramArguments();
+//			nargs = nargs.replaceAll("\"", "\\\\\"");
+//			cmd.append(" ").append("\""+nargs+"\"");
 		}
 		
 		System.out.println("starting with: "+cmd.toString());
