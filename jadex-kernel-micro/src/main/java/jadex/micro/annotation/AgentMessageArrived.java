@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  *  Marker for agent message arrived.
+ *  Method arguments should adhere to:
+ *  void messageArrived(Map<String, Object> msg, MessageType mt)
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

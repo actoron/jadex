@@ -33,6 +33,7 @@ public class StandaloneRelay
 		
 		final RelayHandler	handler	= new RelayHandler();
 		ServerSocket	server	= new ServerSocket(port);
+		RelayHandler.getLogger().info("Jadex Relay listening on port "+port);
 		while(true)
 		{
 			final Socket	client	= server.accept();

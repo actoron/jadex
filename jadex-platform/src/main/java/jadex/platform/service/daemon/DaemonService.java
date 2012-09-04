@@ -3,6 +3,8 @@ package jadex.platform.service.daemon;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -18,17 +20,18 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.xml.bean.JavaWriter;
+import jadex.xml.writer.AWriter;
+import jadex.xml.writer.XMLWriterFactory;
 
 import java.io.File;
-import java.io.FilterOutputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *  The daemon service.
@@ -45,6 +48,9 @@ public class DaemonService implements IDaemonService
 	/** The started platforms. */
 	protected Map<IComponentIdentifier, Process> platforms;
 
+	/** The futures waiting for starting platforms. */
+	protected Map<String, Future<IComponentIdentifier>> futures;
+
 	/** The listeners. */
 	protected List<IRemoteChangeListener<IComponentIdentifier>>	listeners;
 
@@ -57,19 +63,20 @@ public class DaemonService implements IDaemonService
 	@ServiceStart
 	public void start()
 	{
-		platforms = Collections.synchronizedMap(new HashMap());
-		listeners = Collections.synchronizedList(new ArrayList());
-		// addService("daemonservice", IDaemonService.class, new
-		// DaemonService(getExternalAccess()),
-		// BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-
-//		SGUI.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				DaemonPanel.createGui(agent.getExternalAccess());
-//			}
-//		});
+		platforms = new HashMap<IComponentIdentifier, Process>();
+		futures = new HashMap<String, Future<IComponentIdentifier>>();
+		listeners = new ArrayList<IRemoteChangeListener<IComponentIdentifier>>();
+	}
+	
+	/**
+	 *  Called when a message is recieved.
+	 */
+	protected void	messageReceived(IComponentIdentifier cid, String pid)
+	{
+		if(futures.containsKey(pid))
+		{
+			futures.remove(pid).setResult(cid);
+		}
 	}
 	
 	/**
@@ -140,19 +147,32 @@ public class DaemonService implements IDaemonService
 		return ret;
 	}
 
+//	public IFuture startPlatform(StartOptions opt)
+//	{
+//		final Future ret = new Future();
+//		// Start platform in the same VM.
+//		Starter.createPlatform(args).addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				IExternalAccess platform = (IExternalAccess)result;
+//				platforms.put(platform.getComponentIdentifier(), platform);
+//				ret.setResult(result);
+//			}
+//			
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
+//		return ret;
+//	}
+	
 	/**
 	 * Start a platform using a configuration.
+	 * Append the daemon responder to that start arguments to receive the cid of the new platform.
 	 * 
-	 * @param args The arguments. / public IFuture startPlatform(StartOptions
-	 *        opt) { final Future ret = new Future(); // Start platform in the
-	 *        same VM. Starter.createPlatform(args).addResultListener(new
-	 *        IResultListener() { public void resultAvailable(Object source,
-	 *        Object result) { IExternalAccess platform =
-	 *        (IExternalAccess)result;
-	 *        platforms.put(platform.getComponentIdentifier(), platform);
-	 *        ret.setResult(result); } public void exceptionOccurred(Object
-	 *        source, Exception exception) { ret.setException(exception); } });
-	 *        return ret; }
+	 * @param args The arguments. 
 	 */
 	public IFuture<IComponentIdentifier> doStartPlatform(StartOptions options)
 	{
@@ -161,6 +181,20 @@ public class DaemonService implements IDaemonService
 		// Start platform in another VM.
 		try
 		{
+			// Build arguments for responder agent.
+			final String	pid	= UUID.randomUUID().toString();
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("cid", agent.getComponentIdentifier());
+			args.put("content", pid);
+			String	argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
+			argsstr	= SUtil.escapeString(argsstr);	// First: escape string
+			argsstr	= argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
+			String	deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
+			String	responder	= " -component \""+DaemonResponderAgent.class.getName().replace(".", "/")+".class(:"+deser+")\"";
+			options.setProgramArguments(options.getProgramArguments()+responder);
+			
+			futures.put(pid, ret);
+			
 			// Can be called in another directory
 			File newcurdir = new File(options.getStartDirectory());
 			newcurdir.mkdirs();
@@ -168,82 +202,23 @@ public class DaemonService implements IDaemonService
 //			String cmd = options.getStartCommand();
 //			System.out.println("Starting process: " + cmd);
 
+			// Todo: use decoupled java starter
 			final Process proc = Runtime.getRuntime().exec(options.getStartCommand(), null, newcurdir);
-
-			FilterOutputStream fos = new FilterOutputStream(System.out)
-			{
-				StringBuffer	buf	= new StringBuffer();
-				boolean	fin	= false;
-
-				public void write(byte[] b) throws IOException
-				{
-					if(!fin)
-					{
-						buf.append(new String(b));
-						fin = checkPlatformIdentifier(buf, proc, ret);
-					}
-					super.write(b);
-				}
-
-				public void write(byte[] b, int off, int len) throws IOException
-				{
-					if(!fin)
-					{
-						for(int i = 0; i < len; i++)
-						{
-							buf.append((char)b[i]);
-						}
-						fin = checkPlatformIdentifier(buf, proc, ret);
-					}
-					super.write(b, off, len);
-				}
-
-				public void write(int b) throws IOException
-				{
-					if(!fin)
-					{
-						buf.append((char)b);
-						fin = checkPlatformIdentifier(buf, proc, ret);
-					}
-					super.write(b);
-				}
-			};
-
-			// processbuilder get
-			
-			new Thread(new StreamCopy(proc.getInputStream(), fos)).start();
+			new Thread(new StreamCopy(proc.getInputStream(), System.out)).start();
 			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
-
-			// boolean finished = false;
-			// while(!finished && !abort)
-			// {
-			// try
-			// {
-			// Thread.sleep(300);
-			// if(proc.exitValue()!=0)
-			// throw new
-			// RuntimeException("Java returned an error or could not be invoked.");
-			// finished = true;
-			// }
-			// catch(IllegalThreadStateException ie)
-			// {
-			// if(abort)
-			// proc.destroy();
-			// }
-			// }
-
-			/*
-			 * Process proc = Runtime.getRuntime().exec(cmd+" "+cmdline); new
-			 * Thread(new StreamCopy(proc.getInputStream(),
-			 * System.out)).start(); new Thread(new
-			 * StreamCopy(proc.getErrorStream(), System.out)).start();
-			 * if(proc.waitFor()!=0) // todo: does not work because process
-			 * output stream is not read :-(
-			 * //if(Runtime.getRuntime().exec(cmd+" -classpath "
-			 * +cp+cmdline).waitFor()!=0) { throw new
-			 * RuntimeException("Javadoc returned an error or could not be invoked."
-			 * ); }
-			 */
+			
+			ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getInstance().getTimeout(), agent.getExternalAccess(),
+				new IResultListener<IComponentIdentifier>()
+			{
+				public void resultAvailable(IComponentIdentifier result)
+				{
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					futures.remove(pid);
+					ret.setExceptionIfUndone(exception);
+				}
+			}));
 		}
 		catch(Exception ex)
 		{

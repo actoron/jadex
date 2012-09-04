@@ -2,7 +2,7 @@ This is a source distribution of Jadex.
 For building from the sources unpack the sources to a directory of your choice.
 
 For building with Maven just type:
-mvn clean package
+mvn clean test
 
 For rebuilding the distribution zip type: 
 mvn -P dist clean package

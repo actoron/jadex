@@ -10,7 +10,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.util.Timer;
 import java.util.TimerTask;
 
 
@@ -170,7 +169,16 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 												}
 											}
 											if(notify)
-												listener.exceptionOccurred(ex!=null ? ex : new TimeoutException());
+											{
+												exta.scheduleStep(new IComponentStep<Void>()
+												{
+													public IFuture<Void> execute(IInternalAccess ia)
+													{
+														listener.exceptionOccurred(ex!=null ? ex : new TimeoutException());
+														return IFuture.DONE;
+													}
+												});
+											}
 										}
 									};
 									

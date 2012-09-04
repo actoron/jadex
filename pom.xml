@@ -282,6 +282,61 @@
 		</profile>
 
 		
+		<!-- ======== Full pro assembly ======== -->
+		
+		<profile>
+		    <id>jadex-full-pro</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-platform-extension-maven</exists>
+	            </file>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sources-pro</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-pro</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-prosrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-pro</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-pro-${project.version}</finalName>
+									<outputDirectory>target/pro-addons</outputDirectory>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-pro.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+ 	        <modules>
+				<module>jadex-parent-pro</module>
+				<module>jadex-platform-extension-maven</module>
+		    </modules>
+		</profile>
+
+		
 		<!-- ======== Maven dependency extension modules and assembly ======== -->
 		
 		<profile>
@@ -335,7 +390,7 @@
 				<module>jadex-platform-extension-maven</module>
 		    </modules>
 		</profile>
-	
+			
 		<!-- ======== Web service extension modules and assembly ======== -->
 		
 		<profile>
