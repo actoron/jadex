@@ -66,7 +66,7 @@ public class DestroyComponentCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "dc chat";
+		return "dc chat : destroy component named chat at current platform";
 	}
 	
 	/**

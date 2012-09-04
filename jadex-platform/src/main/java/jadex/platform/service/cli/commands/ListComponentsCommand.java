@@ -45,7 +45,7 @@ public class ListComponentsCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "lc";
+		return "lc : list all currently running components";
 	}
 	
 	/**

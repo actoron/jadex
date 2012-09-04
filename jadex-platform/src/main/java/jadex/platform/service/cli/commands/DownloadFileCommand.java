@@ -58,7 +58,7 @@ public class DownloadFileCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "df -s c:\\zips\\basic-miktex-2.8.3761.exe -d c:\\temp -p Lars-PC_b14";
+		return "df -s c:\\zips\\basic.zip -d c:\\temp -p Lars-PC_b14 : download file basic.zip from platform Lars-PC_b14 to local dir c:\\temp";
 	}
 	
 	/**

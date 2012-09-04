@@ -12,11 +12,13 @@ import java.util.Map;
  */
 public abstract class ACliShell
 {
-
 	//-------- attributes --------
 	
 	/** The session id. */
 	protected Tuple2<String, Integer> sessionid;
+	
+	/** The current working dir. */
+	protected String workingdir;
 	
 	//-------- constructors --------
 	
@@ -26,6 +28,7 @@ public abstract class ACliShell
 	public ACliShell(Tuple2<String, Integer> sessionid)
 	{
 		this.sessionid = sessionid;
+		this.workingdir = ".";
 	}
 	
 	//-------- methods --------
@@ -100,5 +103,23 @@ public abstract class ACliShell
 	public Tuple2<String, Integer> getSessionId()
 	{
 		return sessionid;
+	}
+
+	/**
+	 *  Get the workingdir.
+	 *  @return The workingdir.
+	 */
+	public String getWorkingDir()
+	{
+		return workingdir;
+	}
+
+	/**
+	 *  Set the workingdir.
+	 *  @param workingdir The workingdir to set.
+	 */
+	public void setWorkingDir(String workingdir)
+	{
+		this.workingdir = workingdir;
 	}
 }

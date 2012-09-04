@@ -47,7 +47,7 @@ public class KillPlatform extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "kp";
+		return "kp : kill the current platform";
 	}
 	
 	/**

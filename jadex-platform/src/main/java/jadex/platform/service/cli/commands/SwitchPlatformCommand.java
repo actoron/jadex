@@ -58,7 +58,10 @@ public class SwitchPlatformCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "sp Hans-PC_664"+SUtil.LF+"sp ..";
+		StringBuffer buf = new StringBuffer();
+		buf.append("sp Hans-PC_664").append(" : switch to platform Hans-PC_664").append(SUtil.LF);
+		buf.append("sp ..").append(" : switch back to platform you came from").append(SUtil.LF);
+		return buf.toString();
 	}
 	
 	/**

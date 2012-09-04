@@ -56,7 +56,8 @@ public class CreateComponentCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid applications-micro";
+		return "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid applications-micro " +
+			": create component from model jadex/micro/examples/helloworld/HelloWorldAgent.class with resource id similar to rid applications-micro";
 	}
 	
 	/**

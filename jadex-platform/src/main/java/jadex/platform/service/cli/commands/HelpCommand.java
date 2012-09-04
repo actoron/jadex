@@ -19,7 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ *  The help command can be used to display all available or
+ *  a specific command.
  */
 public class HelpCommand extends ACliCommand
 {
@@ -116,7 +117,7 @@ public class HelpCommand extends ACliCommand
 							}
 						}
 						if(cmd.getExampleUsage()!=null)
-							buf.append(SUtil.LF).append("example: ").append(cmd.getExampleUsage());
+							buf.append(SUtil.LF).append("examples: ").append(SUtil.LF).append(cmd.getExampleUsage());
 					}
 					else
 					{

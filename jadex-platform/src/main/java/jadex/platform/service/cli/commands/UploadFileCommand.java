@@ -58,7 +58,7 @@ public class UploadFileCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "uf -s c:\\zips\\basic-miktex-2.8.3761.exe -d c:\\Files -p Delle_a10";
+		return "uf -s c:\\zips\\basic.zip -d c:\\Files -p Delle_a10 : upload local file basic.zip to target dir c:\\Files on platform Delle_a10";
 	}
 	
 	/**

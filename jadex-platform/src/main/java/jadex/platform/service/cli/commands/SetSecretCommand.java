@@ -49,7 +49,12 @@ public class SetSecretCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "ss -pn hans -p secrethans"+SUtil.LF+"ss -nn net -p secretnet"+SUtil.LF+"ss -pn hans";
+		StringBuffer buf = new StringBuffer();
+		buf.append("ss -pn hans -p secrethans").append(" : sets password for platform hans to secrethans").append(SUtil.LF);
+		buf.append("ss -nn net -p secretnet").append(" : sets password for network net to secretnet").append(SUtil.LF);
+		buf.append("ss -pn hans").append(" : removes platform password for platform hans").append(SUtil.LF);
+		buf.append("ss -p mysec").append(" : sets own platform password to mysec").append(SUtil.LF);
+		return buf.toString();
 	}
 	
 	/**
@@ -66,9 +71,9 @@ public class SetSecretCommand extends ACliCommand
 		// If -p is given without value it will be set as empty
 		final String pass = args.containsKey("-p") && args.get("-p")==null? "": (String)args.get("-p"); 
 		
-		if(plat==null && net==null)
+		if(plat==null && net==null && args.get("-p")==null)
 		{
-			ret.setException(new RuntimeException());
+			ret.setException(new RuntimeException("no parameters given."));
 		}
 		else
 		{
@@ -84,10 +89,14 @@ public class SetSecretCommand extends ACliCommand
 						ss.setPlatformPassword(new ComponentIdentifier(plat), pass)
 							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
-					else
+					else if(net!=null)
 					{
 						ss.setNetworkPassword(net, pass)
 							.addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					else
+					{
+						ss.setLocalPassword(pass).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				}
 			});

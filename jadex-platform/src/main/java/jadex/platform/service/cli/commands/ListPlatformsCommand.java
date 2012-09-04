@@ -55,7 +55,7 @@ public class ListPlatformsCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "lp";
+		return "lp : list all available platforms";
 	}
 	
 	/**

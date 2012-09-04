@@ -57,7 +57,7 @@ public class ListDirectoryCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "ls c:\temp";
+		return "ls c:\temp : list the content of directory c:\temp";
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class ListDirectoryCommand extends ACliCommand
 	{
 		final Future<FileData[]> ret = new Future<FileData[]>();
 		
-		final String dir = (String)args.get(null);
+		final String dir = args.get(null)==null? context.getShell().getWorkingDir(): (String)args.get(null);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
@@ -109,7 +109,7 @@ public class ListDirectoryCommand extends ACliCommand
 	 *  @param context The context.
 	 *  @return The result info.
 	 */
-	public ResultInfo getResultInfo(CliContext context, final Map<String, Object> args)
+	public ResultInfo getResultInfo(final CliContext clicontext, final Map<String, Object> args)
 	{
 		return new ResultInfo(IComponentIdentifier.class, "The creation result.", new IObjectStringConverter()
 		{
@@ -119,7 +119,8 @@ public class ListDirectoryCommand extends ACliCommand
 				
 				final String dir = (String)args.get(null);
 				
-				buf.append((dir==null? ".": dir)+" content: ").append(SUtil.LF);
+				String wd = clicontext.getShell().getWorkingDir();
+				buf.append((dir==null? wd: dir)+" content: ").append(SUtil.LF);
 				
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 				

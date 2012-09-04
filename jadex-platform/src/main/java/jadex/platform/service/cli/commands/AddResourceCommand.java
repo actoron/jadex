@@ -1,6 +1,3 @@
-/**
- * 
- */
 package jadex.platform.service.cli.commands;
 
 import jadex.bridge.IComponentIdentifier;
@@ -53,7 +50,7 @@ public class AddResourceCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "ar c:\\temp\\my.jar";
+		return "ar c:\\temp\\my.jar : add path c:\\temp\\my.jar as resource url";
 	}
 	
 	/**
