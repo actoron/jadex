@@ -112,7 +112,7 @@ public class ListDirectoryCommand extends ACliCommand
 				
 				buf.append((dir==null? ".": dir)+" content: ").append(SUtil.LF);
 				
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 				
 				FileData[] fds = (FileData[])val;
 				Arrays.sort(fds, FILE_COMPARATOR);
