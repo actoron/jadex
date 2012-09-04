@@ -109,7 +109,8 @@ public class CliAgent implements ICliService, IInternalCliService
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				long ct = System.currentTimeMillis();
-				for(Tuple2<String, Integer> key: shells.keySet())
+				Tuple2<String, Integer>[] keys = (Tuple2<String, Integer>[])shells.keySet().toArray(new Tuple2[0]);
+				for(Tuple2<String, Integer> key: keys)
 				{
 					Tuple2<ACliShell, Long> val = shells.get(key);
 					

@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *  Change the current working directory of the shell.
+ *
  */
-public class ChangeDirectoryCommand extends ACliCommand
+public class MakeDirectoryCommand extends ACliCommand
 {
 	/**
 	 *  Get the command names (name including alias').
@@ -24,7 +24,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public String[] getNames()
 	{
-		return new String[]{"cd", "changedir"};
+		return new String[]{"md", "mkdir", "mdir"};
 	}
 	
 	/**
@@ -33,7 +33,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public String getDescription()
 	{
-		return "Change current directory.";
+		return "Create a new directory.";
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "cd temp : change the directory to temp";
+		return "mkdir temp : create a new directory with name temp";
 	}
 	
 	/**
@@ -65,40 +65,17 @@ public class ChangeDirectoryCommand extends ACliCommand
 				String cwdp = cwd.getCanonicalPath();
 				ret.setResult(cwdp);
 			}
-			else if(dir.trim().equals(".."))
-			{
-				File p = cwd.getParentFile();
-				if(p!=null)
-				{
-					context.getShell().setWorkingDir(p.getCanonicalPath());
-					ret.setResult(p.getCanonicalPath());
-				}
-				else
-				{
-					String cwdp = cwd.getCanonicalPath();
-					ret.setResult(cwdp);
-				}
-			}
 			else
 			{
 				File nd = new File(cwd, dir);
-				if(nd.exists() && nd.isDirectory())
+				if(!nd.exists())
 				{
-					context.getShell().setWorkingDir(nd.getCanonicalPath());
+					nd.mkdir();
 					ret.setResult(nd.getCanonicalPath());
 				}
 				else
 				{
-					nd = new File(dir);
-					if(nd.exists() && nd.isDirectory())
-					{
-						context.getShell().setWorkingDir(nd.getCanonicalPath());
-						ret.setResult(nd.getCanonicalPath());
-					}
-					else
-					{
-						ret.setException(new RuntimeException("path not found."));
-					}
+					ret.setException(new RuntimeException("path not found."));
 				}
 			}
 		}

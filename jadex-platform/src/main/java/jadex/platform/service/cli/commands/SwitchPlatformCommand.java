@@ -74,7 +74,11 @@ public class SwitchPlatformCommand extends ACliCommand
 		final Future<IInternalCliService> ret = new Future<IInternalCliService>();
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		if("..".equals(args.get(null)))
+		if(args.get(null)==null)
+		{
+			ret.setException(new RuntimeException("no target platform given"));
+		}
+		else if("..".equals(args.get(null)))
 		{
 			// cannot directly close shell because this has to be done by the one that survives
 			ret.setException(new CloseShellException());

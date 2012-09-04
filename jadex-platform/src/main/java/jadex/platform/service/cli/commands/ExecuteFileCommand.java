@@ -3,6 +3,7 @@
  */
 package jadex.platform.service.cli.commands;
 
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -14,9 +15,9 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- *  Change the current working directory of the shell.
+ *  Execute a file.
  */
-public class ChangeDirectoryCommand extends ACliCommand
+public class ExecuteFileCommand extends ACliCommand
 {
 	/**
 	 *  Get the command names (name including alias').
@@ -24,7 +25,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public String[] getNames()
 	{
-		return new String[]{"cd", "changedir"};
+		return new String[]{"ef", "exec", "run"};
 	}
 	
 	/**
@@ -33,7 +34,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public String getDescription()
 	{
-		return "Change current directory.";
+		return "Execute a file.";
 	}
 	
 	/**
@@ -42,7 +43,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "cd temp : change the directory to temp";
+		return "rf temp : delete the temp directory";
 	}
 	
 	/**
@@ -60,46 +61,29 @@ public class ChangeDirectoryCommand extends ACliCommand
 		{
 			File cwd = new File(context.getShell().getWorkingDir()).getCanonicalFile();
 		
-			if(dir==null)
+			if(dir!=null)
 			{
-				String cwdp = cwd.getCanonicalPath();
-				ret.setResult(cwdp);
-			}
-			else if(dir.trim().equals(".."))
-			{
-				File p = cwd.getParentFile();
-				if(p!=null)
-				{
-					context.getShell().setWorkingDir(p.getCanonicalPath());
-					ret.setResult(p.getCanonicalPath());
-				}
-				else
-				{
-					String cwdp = cwd.getCanonicalPath();
-					ret.setResult(cwdp);
-				}
-			}
-			else
-			{
-				File nd = new File(cwd, dir);
-				if(nd.exists() && nd.isDirectory())
-				{
-					context.getShell().setWorkingDir(nd.getCanonicalPath());
-					ret.setResult(nd.getCanonicalPath());
-				}
-				else
-				{
-					nd = new File(dir);
-					if(nd.exists() && nd.isDirectory())
-					{
-						context.getShell().setWorkingDir(nd.getCanonicalPath());
-						ret.setResult(nd.getCanonicalPath());
-					}
-					else
-					{
-						ret.setException(new RuntimeException("path not found."));
-					}
-				}
+//				File f = new File(cwd, dir);
+//				if(f.exists() && !f.isDirectory())
+//				{
+//					ProcessBuilder pb = new ProcessBuilder(f.getCanonicalPath());
+//					pb.redirectOutput(destination)
+//					Runtime.getRuntime().exec();
+//					ret.setResult(cwd.getCanonicalPath());
+//				}
+//				else
+//				{
+//					f = new File(dir);
+//					if(f.exists() && !f.isDirectory())
+//					{
+//						SUtil.deleteDirectory(f);
+//						ret.setResult(cwd.getCanonicalPath());
+//					}
+//					else
+//					{
+//						ret.setException(new RuntimeException("path not found."));
+//					}
+//				}
 			}
 		}
 		catch(IOException e)
@@ -117,7 +101,7 @@ public class ChangeDirectoryCommand extends ACliCommand
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
-		ArgumentInfo dir = new ArgumentInfo(null, String.class, null, "The directory.", null);
+		ArgumentInfo dir = new ArgumentInfo(null, String.class, null, "The file or directory to delete.", null);
 		return new ArgumentInfo[]{dir};
 	}
 	

@@ -428,9 +428,10 @@ public class UpdateAgent implements IUpdateService
 		final StartOptions so = new StartOptions();
 		
 		so.setMain("jadex.base.Starter");
+//		so.setMain("jadex.commons.ProcessStarter");
 		
-		RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
-		List<String> vmargs = new ArrayList<String>(RuntimemxBean.getInputArguments());
+		RuntimeMXBean rbean = ManagementFactory.getRuntimeMXBean();
+		List<String> vmargs = new ArrayList<String>(rbean.getInputArguments());
 
 		if(vmargs!=null && vmargs.size()>0)
 		{

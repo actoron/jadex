@@ -2700,18 +2700,21 @@ public class SUtil
 	 */
 	static public boolean deleteDirectory(File dir)
 	{
-		if(dir.exists())
+		if(dir.exists() && dir.isDirectory())
 		{
 			File[] files = dir.listFiles();
-			for(int i=0; i<files.length; i++)
+			if(files!=null)
 			{
-				if(files[i].isDirectory())
+				for(int i=0; i<files.length; i++)
 				{
-					deleteDirectory(files[i]);
-				}
-				else
-				{
-					files[i].delete();
+					if(files[i].isDirectory())
+					{
+						deleteDirectory(files[i]);
+					}
+					else
+					{
+						files[i].delete();
+					}
 				}
 			}
 		}
