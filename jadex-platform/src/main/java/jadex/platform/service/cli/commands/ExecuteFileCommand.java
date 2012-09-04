@@ -1,9 +1,7 @@
-/**
- * 
- */
 package jadex.platform.service.cli.commands;
 
-import jadex.commons.SUtil;
+import jadex.commons.NullOutputStream;
+import jadex.commons.StreamCopy;
 import jadex.commons.future.Future;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -63,27 +61,25 @@ public class ExecuteFileCommand extends ACliCommand
 		
 			if(dir!=null)
 			{
-//				File f = new File(cwd, dir);
-//				if(f.exists() && !f.isDirectory())
-//				{
-//					ProcessBuilder pb = new ProcessBuilder(f.getCanonicalPath());
-//					pb.redirectOutput(destination)
-//					Runtime.getRuntime().exec();
-//					ret.setResult(cwd.getCanonicalPath());
-//				}
-//				else
-//				{
-//					f = new File(dir);
-//					if(f.exists() && !f.isDirectory())
-//					{
-//						SUtil.deleteDirectory(f);
-//						ret.setResult(cwd.getCanonicalPath());
-//					}
-//					else
-//					{
-//						ret.setException(new RuntimeException("path not found."));
-//					}
-//				}
+				File f = new File(cwd, dir);
+				if(f.exists() && !f.isDirectory())
+				{
+					executeFile(f);
+					ret.setResult(cwd.getCanonicalPath());
+				}
+				else
+				{
+					f = new File(dir);
+					if(f.exists() && !f.isDirectory())
+					{
+						executeFile(f);
+						ret.setResult(cwd.getCanonicalPath());
+					}
+					else
+					{
+						ret.setException(new RuntimeException("path not found."));
+					}
+				}
 			}
 		}
 		catch(IOException e)
@@ -92,6 +88,16 @@ public class ExecuteFileCommand extends ACliCommand
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void executeFile(File f) throws IOException
+	{
+		Process proc = Runtime.getRuntime().exec(f.getCanonicalPath());
+		new Thread(new StreamCopy(proc.getInputStream(), new NullOutputStream())).start(); // the input is the output stream :-(
+		new Thread(new StreamCopy(proc.getErrorStream(), new NullOutputStream())).start();
 	}
 	
 	/**
