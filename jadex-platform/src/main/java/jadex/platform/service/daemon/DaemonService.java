@@ -1,6 +1,5 @@
 package jadex.platform.service.daemon;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -73,9 +72,10 @@ public class DaemonService implements IDaemonService
 	 */
 	protected void	messageReceived(IComponentIdentifier cid, String pid)
 	{
+		System.out.println("Received message from "+cid+": "+pid+", "+futures.containsKey(pid));
 		if(futures.containsKey(pid))
 		{
-			futures.remove(pid).setResult(cid);
+			futures.remove(pid).setResult(cid.getRoot());
 		}
 	}
 	
@@ -207,14 +207,17 @@ public class DaemonService implements IDaemonService
 			new Thread(new StreamCopy(proc.getInputStream(), System.out)).start();
 			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
 			
+			System.out.println("Waiting for platform "+pid);
 			ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getInstance().getTimeout(), agent.getExternalAccess(),
 				new IResultListener<IComponentIdentifier>()
 			{
 				public void resultAvailable(IComponentIdentifier result)
 				{
+					System.out.println("Platform found: "+pid+", "+result);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
+					System.out.println("No platform found: "+pid);
 					futures.remove(pid);
 					ret.setExceptionIfUndone(exception);
 				}
@@ -229,58 +232,58 @@ public class DaemonService implements IDaemonService
 		return ret;
 	}
 	
-	/**
-	 *  Check the platform identifier.
-	 */
-	protected boolean checkPlatformIdentifier(StringBuffer buf, Process proc, Future<IComponentIdentifier> fut)
-	{
-		boolean ret = false;
-		
-		IComponentIdentifier cid = getPlatformIdentifier(buf);
-		if(cid!=null)
-		{
-			ret = true;
-			platforms.put(cid, proc);
-			notifyListeners(new ChangeEvent<IComponentIdentifier>(null,IDaemonService.ADDED, cid));
-			fut.setResult(cid);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the platform identifier.
-	 */
-	protected static IComponentIdentifier getPlatformIdentifier(StringBuffer buf)
-	{
-		IComponentIdentifier ret = null;
-		
-		String str = buf.toString();
-		int idx = str.indexOf("platform startup time"); // hack?! better way to identify platform cid?
-		if(idx!=-1)
-		{
-			str = str.substring(0, idx);
-			idx = str.lastIndexOf(SUtil.LF);
-			if(idx!=-1)
-			{
-				str = str.substring(idx+SUtil.LF.length());
-			}
-			
-//			System.out.println("platform id: "+str);
-			ret = new ComponentIdentifier(str.trim());
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		String s = "Using stored platform password: a6e73638-094+\n\rLars-PC_a71 platform startup time: 7542 ms.";
-		System.out.println(getPlatformIdentifier(new StringBuffer().append(s)));
-	}
+//	/**
+//	 *  Check the platform identifier.
+//	 */
+//	protected boolean checkPlatformIdentifier(StringBuffer buf, Process proc, Future<IComponentIdentifier> fut)
+//	{
+//		boolean ret = false;
+//		
+//		IComponentIdentifier cid = getPlatformIdentifier(buf);
+//		if(cid!=null)
+//		{
+//			ret = true;
+//			platforms.put(cid, proc);
+//			notifyListeners(new ChangeEvent<IComponentIdentifier>(null,IDaemonService.ADDED, cid));
+//			fut.setResult(cid);
+//		}
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Get the platform identifier.
+//	 */
+//	protected static IComponentIdentifier getPlatformIdentifier(StringBuffer buf)
+//	{
+//		IComponentIdentifier ret = null;
+//		
+//		String str = buf.toString();
+//		int idx = str.indexOf("platform startup time"); // hack?! better way to identify platform cid?
+//		if(idx!=-1)
+//		{
+//			str = str.substring(0, idx);
+//			idx = str.lastIndexOf(SUtil.LF);
+//			if(idx!=-1)
+//			{
+//				str = str.substring(idx+SUtil.LF.length());
+//			}
+//			
+////			System.out.println("platform id: "+str);
+//			ret = new ComponentIdentifier(str.trim());
+//		}
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		String s = "Using stored platform password: a6e73638-094+\n\rLars-PC_a71 platform startup time: 7542 ms.";
+//		System.out.println(getPlatformIdentifier(new StringBuffer().append(s)));
+//	}
 
 	/**
 	 * Shutdown a platform.

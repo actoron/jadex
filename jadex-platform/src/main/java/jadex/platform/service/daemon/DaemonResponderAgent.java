@@ -8,6 +8,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -48,6 +49,8 @@ public class DaemonResponderAgent
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		System.out.println("Sending message "+content+" to "+cid);
+		
 		Future<Void>	ret	= new Future<Void>();
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 		msg.put(SFipa.RECEIVERS, cid);
@@ -55,5 +58,13 @@ public class DaemonResponderAgent
 		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
 			.addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;
+	}
+	
+	/**
+	 *  Agent body just ends the agent.
+	 */
+	@AgentBody(keepalive=false)
+	public void	body()
+	{
 	}
 }
