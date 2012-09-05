@@ -17,14 +17,13 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
  */
 @Description("This agent looks for other awareness agents in the local net.")
-@Arguments(
+@Arguments(replace=false, value=
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55670", description="The port used for finding other agents.")
 })

@@ -22,6 +22,9 @@ public class TimeoutException	extends RuntimeException
 		super(message);
 	}
 	
+	/**
+	 *  Hack for finding print source.
+	 */
 	public void printStackTrace()
 	{
 		Thread.dumpStack();

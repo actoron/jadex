@@ -218,7 +218,6 @@ public class MicroClassReader
 	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class clazz, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
-		
 		Class cma = clazz;
 		
 		int cnt = 0;

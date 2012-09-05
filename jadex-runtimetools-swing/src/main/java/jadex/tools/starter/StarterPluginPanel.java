@@ -21,10 +21,12 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
@@ -187,9 +189,9 @@ public class StarterPluginPanel extends JPanel
 				if(filename!=null)
 				{
 					final String ffilename = filename;
-					createResourceIdentifier().addResultListener(new SwingDefaultResultListener<IResourceIdentifier>(mpanel)
+					createResourceIdentifier().addResultListener(new SwingResultListener<IResourceIdentifier>(new IResultListener<IResourceIdentifier>()
 					{
-						public void customResultAvailable(final IResourceIdentifier rid)
+						public void resultAvailable(final IResourceIdentifier rid)
 						{
 							// Models have to be loaded with absolute path.
 							// An example to facilitate understanding:
@@ -215,7 +217,11 @@ public class StarterPluginPanel extends JPanel
 //								loadModel(model);
 //							}
 						}
-					});
+						public void exceptionOccurred(Exception exception)
+						{
+							jcc.setStatusText("Error refreshing selection: "+exception.getMessage());
+						}
+					}));
 				}
 			}
 		});

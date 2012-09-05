@@ -22,7 +22,7 @@ import java.net.InetAddress;
  *  all slaves over the network.
  */
 @Description("This agent looks for other awareness agents in the local net.")
-@Arguments(
+@Arguments(replace=false, value=
 {
 //	@Argument(name="address", clazz=String.class, defaultvalue="\"192.168.56.1\"", description="The ip address of registry."),
 	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.233\"", description="The ip address of registry."),

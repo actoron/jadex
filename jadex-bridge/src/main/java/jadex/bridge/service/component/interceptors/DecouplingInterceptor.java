@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.BasicServiceContainer;
@@ -234,27 +235,28 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		
 //		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 //			|| sic.getMethod().getReturnType().equals(void.class);
+
+		ServiceCall sc = ServiceCall.getInvocation();
+		long to = sc!=null? sc.getTimeout(): BasicServiceContainer.getMethodTimeout(
+			sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
+		boolean rt = sc!=null && sc.getRealtime()!=null? rt = sc.getRealtime().booleanValue(): realtime;
 		
 		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
-			long to = BasicServiceContainer.getMethodTimeout(
-				sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
-			CallStack.push(IComponentIdentifier.LOCAL.get(), to, realtime);
+			CallStack.push(IComponentIdentifier.LOCAL.get(), to, rt);
 //			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 
 //				new CopyReturnValueResultListener(ret, sic)));
-			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
+			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
 			CallStack.pop();
 		}
 		else
 		{
 //			if(sic.getMethod().getName().equals("getServiceProxies"))
 //				System.out.println("decouple: "+Thread.currentThread());
-			long to = BasicServiceContainer.getMethodTimeout(
-					sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
-			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, realtime))
-				.addResultListener(new CopyReturnValueResultListener(ret, sic));
+			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, rt))
+				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
 		}
 		
 		return ret;
@@ -366,15 +368,23 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		/** The service invocation context. */
 		protected ServiceInvocationContext	sic;
 		
+		/** The timeout. */
+		protected long timeout;
+		
+		/** The realtime. */
+		protected boolean realtime;
+		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a result listener.
 		 */
-		protected CopyReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic)
+		protected CopyReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic, long timeout, boolean realtime)
 		{
 			super(future);
 			this.sic = sic;
+			this.timeout = timeout;
+			this.realtime = realtime;
 		}
 		
 		//-------- IResultListener interface --------
@@ -500,14 +510,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
-					long to = BasicServiceContainer.getMethodTimeout(
-						sic.getObject().getClass().getInterfaces(), method, sic.isRemoteCall());
+//					long to = BasicServiceContainer.getMethodTimeout(
+//						sic.getObject().getClass().getInterfaces(), method, sic.isRemoteCall());
 //					System.out.println("local timeout is: "+to+" "+method.getName());
-					if(to>=0)
+					if(timeout>=0)
 					{
 						if(fut instanceof IIntermediateFuture)
 						{
-							fut.addResultListener(new TimeoutIntermediateResultListener(to, ea, realtime, new IIntermediateResultListener()
+							fut.addResultListener(new TimeoutIntermediateResultListener(timeout, ea, realtime, new IIntermediateResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -540,7 +550,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						else
 						{
 //							SIC.set(sic);
-							fut.addResultListener(new TimeoutResultListener(to, ea, realtime, new IResultListener()
+							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{

@@ -219,26 +219,28 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public IFuture<Object> getServiceProxies(final IComponentIdentifier cid, 
 		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
+//		System.out.println("gsp: "+cid);
 		return component.scheduleStep(new IComponentStep<Object>()
 		{
 			@Classname("getServiceProxies")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				final Future<Object> fut = new Future<Object>();
-				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
-				{
-					public void customResultAvailable(IComponentManagementService cms)
-					{
+//				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
 						// Hack! create remote rms cid with "rms" assumption.
 						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
 						
+//						System.out.println("send to: "+rrms+" "+SUtil.arrayToString(rrms.getAddresses()));
 						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null); // todo: non-func
-					}
-				});
+//					}
+//				});
 				
 				return fut;
 			}

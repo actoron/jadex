@@ -49,7 +49,7 @@ public abstract class CallStack	extends ServiceCall
 			}
 			stack.add(previous);
 		}
-		ServiceCall.CALLS.set(ServiceCall.createServiceCall(caller, timeout, realtime));
+		ServiceCall.CALLS.set(ServiceCall.createServiceCall(caller, timeout, realtime? Boolean.TRUE: Boolean.FALSE));
 	}
 	
 	/**

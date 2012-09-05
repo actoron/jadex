@@ -125,6 +125,8 @@ public abstract class DiscoveryAgent
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
+	
+//		System.out.println("fast: "+fast);
 		
 //		System.out.println(agent.getComponentIdentifier()+" includes: "+SUtil.arrayToString(includes));
 //		System.out.println(agent.getComponentIdentifier()+" excludes: "+SUtil.arrayToString(excludes));

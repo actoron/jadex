@@ -1,20 +1,16 @@
 package jadex.micro.testcases;
 
 import jadex.base.Starter;
-import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -112,7 +108,7 @@ public abstract class TestAgent
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //				"-logging_level", "java.util.logging.Level.INFO",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
-			"-gui", "false", "-simulation", "false", "-printpass", "false"};
+			"-gui", "true", "-simulation", "false", "-printpass", "false"};
 		
 		if(args!=null && args.length>0)
 		{
@@ -158,10 +154,23 @@ public abstract class TestAgent
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
-				boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
-				CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
+				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
 				cms.createComponent(null, filename, ci, reslis)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						super.customResultAvailable(result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						super.exceptionOccurred(exception);
+					}
+				}
+				);
 			}
 		});
 		

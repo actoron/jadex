@@ -1,8 +1,5 @@
 package jadex.platform.service.message.transport.tcpmtp;
 
-import jadex.bridge.IGlobalResourceIdentifier;
-import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -21,7 +18,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.cms.AbstractComponentAdapter;
 import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
 
 import java.io.IOException;
@@ -471,48 +467,83 @@ public class TCPTransport implements ITransport
 	 *  @param address
 	 *  @return a connection of this type
 	 */
-	protected IFuture<TCPOutputConnection> getConnection(String address, boolean create)
+	protected IFuture<TCPOutputConnection> getConnection(String addr, boolean create)
 	{
 		Future<TCPOutputConnection> fut = new Future<TCPOutputConnection>();
+		
 		if(connections==null)
 		{
 			fut.setResult(null);
 			return fut;
 		}
 		
-		address = address.toLowerCase();
+		final String address = addr.toLowerCase();
+	
+		boolean cr = false;
 		
-		Object ret = connections.get(address);
-		if(ret instanceof TCPOutputConnection && ((TCPOutputConnection)ret).isClosed())
-		{
-			removeConnection(address);
-			ret = null;
-		}
+		Object ret;
+		boolean notify = false;
 		
-		if(ret instanceof TCPDeadConnection)
+		synchronized(TCPTransport.this)
 		{
-			TCPDeadConnection dead = (TCPDeadConnection)ret;
-			// Reset connection if connection should be retried.
-			if(dead.shouldRetry())
+			ret = connections.get(address);
+		
+			if(ret instanceof TCPOutputConnection)
 			{
-				connections.remove(address);
-				fut.setResult(null);
+				notify = true;
+			}
+			else if(ret instanceof Future)
+			{
+				fut = (Future<TCPOutputConnection>)ret;
+			}
+			else
+			{
+				if(ret instanceof TCPOutputConnection && ((TCPOutputConnection)ret).isClosed())
+				{
+					removeConnection(address);
+					ret = null;
+				}
+				else if(ret instanceof TCPDeadConnection)
+				{
+					TCPDeadConnection dead = (TCPDeadConnection)ret;
+					// Reset connection if connection should be retried.
+					if(dead.shouldRetry())
+					{
+						removeConnection(address);
+//						connections.remove(address);
+						ret = null;
+					}
+				}
+				
+				if(ret==null && create)
+				{
+					connections.put(address, fut);
+					cr = true;
+				}
 			}
 		}
-		else if(ret instanceof Future)
-		{
-			fut = (Future<TCPOutputConnection>)ret;
-		}
-		else if(ret instanceof TCPOutputConnection)
+
+		if(notify)
 		{
 			fut.setResult((TCPOutputConnection)ret);
 		}
-			
-		
-		if(ret==null && create)
+		if(cr)
 		{
 //			System.out.println("create con: "+address);
-			ret = createConnection(address);
+			createConnection(address).addResultListener(new DelegationResultListener<TCPOutputConnection>(fut)
+			{
+				public void customResultAvailable(TCPOutputConnection result)
+				{
+					synchronized(TCPTransport.this)
+					{		
+						if(connections!=null)
+						{
+							connections.put(address, result==null? new TCPDeadConnection(): result);
+						}
+					}
+					super.customResultAvailable(result);
+				}
+			});
 		}
 		
 		return fut;
@@ -525,11 +556,10 @@ public class TCPTransport implements ITransport
 	 */
 	protected IFuture<TCPOutputConnection> createConnection(String address)
 	{
-		final Future<TCPOutputConnection> ret = new Future<TCPOutputConnection>();
-		
-		connections.put(address, ret);
+		Future<TCPOutputConnection>  ret = new Future<TCPOutputConnection>();
 		
 		address = address.toLowerCase();
+		
 		for(int i=0; i<getServiceSchemas().length; i++)
 		{
 			if(address.startsWith(getServiceSchemas()[i]))
@@ -558,15 +588,19 @@ public class TCPTransport implements ITransport
 					// todo: which resource identifier to use for outgoing connections?
 //					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address), createClientSocket());
 					TCPOutputConnection con = new TCPOutputConnection(new Cleaner(address), createClientSocket(hostname, iport));
-					connections.put(address, con);
 					ret.setResult(con);
+//					connections.put(address, con);
+//					ret.setResult(con);
+					break;
 				}
 				catch(Exception e)
 				{
-					if(connections!=null)	// May be already shut down.
-					{
-						connections.put(address, new TCPDeadConnection());
-					}
+//					if(connections!=null)	// May be already shut down.
+//					{
+//						connections.put(address, new TCPDeadConnection());
+//					}
+					ret.setResult(null);
+					break;
 	//				logger.warning("Could not create connection: "+e.getMessage());
 					//e.printStackTrace();
 				}

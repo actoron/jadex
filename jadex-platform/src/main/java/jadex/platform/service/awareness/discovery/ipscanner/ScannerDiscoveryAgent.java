@@ -25,7 +25,7 @@ import java.nio.channels.Selector;
  *  Agent that sends multicasts to locate other Jadex awareness agents.
  */
 @Description("This agent looks for other awareness agents in the local net.")
-@Arguments(
+@Arguments(replace=false, value=
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55668", description="The port used for finding other agents."),
 	@Argument(name="scanfactor", clazz=long.class, defaultvalue="1", description="The delay between scanning as factor of delay time, e.g. 1=10000, 2=20000."),

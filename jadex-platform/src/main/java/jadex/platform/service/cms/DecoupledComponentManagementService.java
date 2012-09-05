@@ -307,7 +307,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		
 //		final DebugException	de	= new DebugException();
 	
-//		System.out.println("create component: "+modelname+" "+name);
+//		if(modelname.indexOf("Provider")!=-1)
+//			System.out.println("create component: "+modelname+" "+name);
 		
 		final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
 		final Future<Void> resfut = new Future<Void>();
@@ -1689,7 +1690,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //			System.out.println("CleanupCommand: "+cid);
 //			boolean shutdown = false;
 
-//					System.out.println("CleanupCommand remove called for: "+cid);
+//			System.out.println("CleanupCommand remove called for: "+cid);
 			adapter = (IComponentAdapter)adapters.remove(cid);
 			if(adapter==null)
 				throw new RuntimeException("Component Identifier not registered: "+cid);
@@ -1888,7 +1889,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 					}
 					else
 					{
-//							System.out.println("getExternalAccess: not delayed");
+//						System.out.println("getExternalAccess: not delayed");
 						adapter = ii.getAdapter();
 					}
 				}

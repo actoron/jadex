@@ -199,9 +199,11 @@ public abstract class ReceiveHandler
 						public void resultAvailable(Boolean result)
 						{
 							boolean initial = result.booleanValue();
+							
+//							System.out.println("new p found: "+initial+" "+agent.isFast()+" "+agent.isStarted());
 							if(initial && agent.isFast() && agent.isStarted() && !agent.isKilled())
 							{
-		//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
+//								System.out.println(System.currentTimeMillis()+" fast discovery: "+agent.getMicroAgent().getComponentIdentifier()+", "+info.getSender());
 								received_self = false;
 								agent.doWaitFor((long)(Math.random()*500), new IComponentStep<Void>()
 								{
@@ -213,7 +215,7 @@ public abstract class ReceiveHandler
 										if(!received_self)
 										{
 											cnt++;
-		//									System.out.println("CSMACD try #"+(++cnt));
+//											System.out.println("CSMACD try #"+(++cnt));
 											agent.createAwarenessInfo().addResultListener(agent.getMicroAgent()
 												.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 											{

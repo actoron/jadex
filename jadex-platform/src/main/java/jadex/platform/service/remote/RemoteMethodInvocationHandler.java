@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
@@ -102,6 +103,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		// Get method timeout
 		final long to = pi.getMethodTimeout(method);
+		
+		if(method.getName().indexOf("method")!=-1)
+		{
+			ServiceCall sc = ServiceCall.getInstance();
+			if(sc!=null)
+				System.out.println("sc to: "+sc.getTimeout());
+		}
 		
 		// Get the secure transmission
 		boolean sec = pi.isSecure(method);

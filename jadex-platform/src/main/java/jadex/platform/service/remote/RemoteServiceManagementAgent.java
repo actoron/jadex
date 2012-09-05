@@ -3,6 +3,7 @@ package jadex.platform.service.remote;
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
+import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
@@ -124,7 +125,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
 	{
-//		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
+		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
 //		System.out.println("RMS "+getComponentIdentifier()+" received message from "+msg.get(SFipa.SENDER)
 //			+": "+tmp.substring(0, Math.min(tmp.length(), 80)));
 		
@@ -170,8 +171,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
 						
-//						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
-//							System.out.println("result of command1: "+com+" "+result);
+//						if(content instanceof RemoteSearchCommand)
+//							System.out.println("result of command1: "+com);
 						
 //								System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
 						
