@@ -47,8 +47,8 @@ import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentAdapter;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -219,8 +219,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** Registration at the service. */
 	protected ISubscriptionIntermediateFuture<ChatEvent> subscription;
 	
-	/** The timer. */
-	protected Timer timer;
+	/** The refresh timer. */
+	protected Timer refreshtimer;
 	
 	/** The split panel on left hand side. */
 	protected JSplitPanel listpan;
@@ -851,6 +851,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public void actionPerformed(ActionEvent e)
 					{
 						autorefresh = cbar.isSelected();
+						updateRefreshTimer();
 					}
 				});
 				
@@ -997,8 +998,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				utable = new JTable(new FileTableModel(false));
 //				dtable.setPreferredSize(new Dimension(400, 100));
 //				utable.setPreferredSize(new Dimension(400, 100));
-				JScrollPane dtpan = new JScrollPane(dtable);
-				JScrollPane utpan = new JScrollPane(utable);
+				final JScrollPane dtpan = new JScrollPane(dtable);
+				final JScrollPane utpan = new JScrollPane(utable);
 //				dtpan.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Downloads"));
 //				utpan.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Uploads"));
 //				udpane.add(dtpan);
@@ -1008,14 +1009,27 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //				udpane.setOneTouchExpandable(true);
 //				udpane.setDividerLocation(0.5);
 
+				// User refresh only when table is visible
+				usertable.addHierarchyListener(new HierarchyListener()
+				{
+					public void hierarchyChanged(HierarchyEvent e)
+					{
+						if((e.getChangeFlags()&HierarchyEvent.SHOWING_CHANGED)!=0)
+						{
+							updateRefreshTimer();
+						}
+					}
+				});
+				
 				// Repaint tables if shown to update timeout column.
-				dtpan.addComponentListener(new ComponentAdapter()
+				dtpan.addHierarchyListener(new HierarchyListener()
 				{
 					Timer	timer;
-					public void componentShown(ComponentEvent e)
+					public void hierarchyChanged(HierarchyEvent e)
 					{
-						if(timer==null)
+						if(dtpan.isShowing() && timer==null)
 						{
+//							System.out.println("start dtpan timer");
 							timer	= new Timer(1000, new ActionListener()
 							{
 								public void actionPerformed(ActionEvent e)
@@ -1025,24 +1039,22 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							});
 							timer.start();
 						}
-					}
-					
-					public void componentHidden(ComponentEvent e)
-					{
-						if(timer!=null)
+						else if(!dtpan.isShowing() && timer!=null)
 						{
+//							System.out.println("stop dtpan timer");
 							timer.stop();
+							timer	= null;
 						}
-						timer	= null;
 					}
 				});
-				utpan.addComponentListener(new ComponentAdapter()
+				utpan.addHierarchyListener(new HierarchyListener()
 				{
 					Timer	timer;
-					public void componentShown(ComponentEvent e)
+					public void hierarchyChanged(HierarchyEvent e)
 					{
-						if(timer==null)
+						if(utpan.isShowing() && timer==null)
 						{
+//							System.out.println("start utpan timer");
 							timer	= new Timer(1000, new ActionListener()
 							{
 								public void actionPerformed(ActionEvent e)
@@ -1052,15 +1064,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							});
 							timer.start();
 						}
-					}
-					
-					public void componentHidden(ComponentEvent e)
-					{
-						if(timer!=null)
+						else if(!utpan.isShowing() && timer!=null)
 						{
+//							System.out.println("stop utpan timer");
 							timer.stop();
+							timer	= null;
 						}
-						timer	= null;
 					}
 				});
 				
@@ -1171,54 +1180,73 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 					}
 				});
+				
+				updateRefreshTimer();
 			}
 		});
-		
-		timer = new Timer(10000, new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(autorefresh)
-				{
-//					System.out.println("refresh");
-					final Set<ChatUser>	known	= new HashSet<ChatUser>(usermodel.getUsers());
-					
-					getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
-					{
-						public void customIntermediateResultAvailable(final IChatService chat)
-						{
-							final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
-							if(usermodel.getUser(cid)!=null)
-							{
-								known.remove(usermodel.getUser(cid));
-							}
-							updateChatUser(cid, chat);
-						}
-						
-						public void customFinished()
-						{
-							updateOfflineUsers();
-						}
-						
-						public void customExceptionOccurred(Exception exception)
-						{
-							updateOfflineUsers();
-						}
-						
-						protected void	updateOfflineUsers()
-						{
-							for(ChatUser cu: known)
-							{
-								setUserState(cu.getComponentIdentifier(), Boolean.FALSE, null, null, null);
-							}
-						}
-					});
-				}
-			}
-		});
-		timer.start();
 		
 		return ret;
+	}
+	
+	/**
+	 *  Start or stop the refresh timer, if necessary.
+	 */
+	protected void	updateRefreshTimer()
+	{
+		if(usertable.isShowing() && autorefresh && refreshtimer==null)
+		{
+//			System.out.println("enabling refresh timer");
+			refreshtimer = new Timer(10000, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if(autorefresh)
+					{
+	//					System.out.println("refresh");
+						final Set<ChatUser>	known	= new HashSet<ChatUser>(usermodel.getUsers());
+						
+						getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
+						{
+							public void customIntermediateResultAvailable(final IChatService chat)
+							{
+								final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
+								if(usermodel.getUser(cid)!=null)
+								{
+									known.remove(usermodel.getUser(cid));
+								}
+								updateChatUser(cid, chat);
+							}
+							
+							public void customFinished()
+							{
+								updateOfflineUsers();
+							}
+							
+							public void customExceptionOccurred(Exception exception)
+							{
+								updateOfflineUsers();
+							}
+							
+							protected void	updateOfflineUsers()
+							{
+								for(ChatUser cu: known)
+								{
+									setUserState(cu.getComponentIdentifier(), Boolean.FALSE, null, null, null);
+								}
+							}
+						});
+					}
+				}
+			});
+			refreshtimer.setInitialDelay(0);	// start first search immediately.
+			refreshtimer.start();
+		}
+		else if((!autorefresh || !usertable.isShowing()) && refreshtimer!=null)
+		{
+//			System.out.println("disabling refresh timer");
+			refreshtimer.stop();
+			refreshtimer	= null;
+		}
 	}
 	
 	/**
@@ -1363,7 +1391,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void> shutdown()
 	{
 		Future<Void>	ret	= new Future<Void>();
-		timer.stop();
+		if(refreshtimer!=null)
+		{
+			refreshtimer.stop();
+		}
 		if(icontimer!=null)
 		{
 			icontimer.stop();
@@ -1797,8 +1828,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			
 			if(text!=null)
 			{
-				// Add status component, if panel is not showing.
-				if(!panel.isShowing())
+				// Add status component for improtant events, if panel is not showing.
+				if(!tpane.isShowing() && (NOTIFICATION_NEW_MSG.equals(type)
+						|| NOTIFICATION_NEW_FILE.equals(type)))
 				{
 					JComponent	scomp	= getJCC().getStatusComponent("chat-status-comp");
 					if(scomp==null)
@@ -1823,12 +1855,22 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							public void actionPerformed(ActionEvent e)
 							{
 								getJCC().showPlugin(ChatPlugin.PLUGIN_NAME);
-								getJCC().removeStatusComponent("chat-status-comp");
-								icontimer.stop();
-								icontimer	= null;
 							}
 						});
 						getJCC().addStatusComponent("chat-status-comp", scomp);
+						tpane.addHierarchyListener(new HierarchyListener()
+						{
+							public void hierarchyChanged(HierarchyEvent e)
+							{
+								if(tpane.isShowing())
+								{
+									getJCC().removeStatusComponent("chat-status-comp");
+									icontimer.stop();
+									icontimer	= null;
+									tpane.removeHierarchyListener(this);
+								}
+							}
+						});
 					}
 					String	tip	= scomp.getToolTipText();
 					if(tip==null || !tip.contains(text))
@@ -1848,12 +1890,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			if(tab!=-1 && !tpane.getComponentAt(tab).isShowing())
 			{
 				tpane.setIconAt(tab, ChatPlugin.getTabIcon());
-				tpane.getComponentAt(tab).addComponentListener(new ComponentAdapter()
+				tpane.getComponentAt(tab).addHierarchyListener(new HierarchyListener()
 				{
-					public void componentShown(ComponentEvent e)
+					public void hierarchyChanged(HierarchyEvent e)
 					{
-						tpane.setIconAt(tab, null);
-						tpane.getComponentAt(tab).removeComponentListener(this);
+						if(tpane.getComponentAt(tab).isShowing())
+						{
+							tpane.setIconAt(tab, null);
+							tpane.getComponentAt(tab).removeHierarchyListener(this);
+						}
 					}
 				});
 			}
@@ -2556,32 +2601,51 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		String ar = props.getStringProperty("autorefresh");
 		if(ar!=null)
+		{
 			autorefresh = Boolean.parseBoolean(ar);
+			updateRefreshTimer();
+		}
 		String snd = props.getStringProperty("sound");
 		if(snd!=null)
+		{
 			sound = Boolean.parseBoolean(snd);
+		}
 		double lp = props.getDoubleProperty("listpan");
 		if(lp!=0)
+		{
 			listpan.setDividerLocation(lp);
+		}
 		double hs = props.getDoubleProperty("horsplit");
 		if(hs!=0)
+		{
 			horsplit.setDividerLocation(hs);
+		}
 		
 		snd = props.getStringProperty(NOTIFICATION_FILE_ABORT);
 		if(snd!=null)
+		{
 			notificationsounds.put(NOTIFICATION_FILE_ABORT, snd);
+		}
 		snd = props.getStringProperty(NOTIFICATION_FILE_COMPLETE);
 		if(snd!=null)
+		{
 			notificationsounds.put(NOTIFICATION_FILE_COMPLETE, snd);
+		}
 		snd = props.getStringProperty(NOTIFICATION_NEW_FILE);
 		if(snd!=null)
+		{
 			notificationsounds.put(NOTIFICATION_NEW_FILE, snd);
+		}
 		snd = props.getStringProperty(NOTIFICATION_NEW_MSG);
 		if(snd!=null)
+		{
 			notificationsounds.put(NOTIFICATION_NEW_MSG, snd);
+		}
 		snd = props.getStringProperty(NOTIFICATION_NEW_USER);
 		if(snd!=null)
+		{
 			notificationsounds.put(NOTIFICATION_NEW_USER, snd);
+		}
 		
 		return IFuture.DONE;
 	}
