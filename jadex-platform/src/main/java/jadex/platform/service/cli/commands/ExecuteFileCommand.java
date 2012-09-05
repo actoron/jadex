@@ -1,7 +1,13 @@
 package jadex.platform.service.cli.commands;
 
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.NullOutputStream;
 import jadex.commons.StreamCopy;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -41,7 +47,7 @@ public class ExecuteFileCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "rf temp : delete the temp directory";
+		return "ef jadex.bat : execute the jadex.bat file";
 	}
 	
 	/**
@@ -55,49 +61,57 @@ public class ExecuteFileCommand extends ACliCommand
 		
 		final String dir = (String)args.get(null);
 		
-		try
+		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
+		SServiceProvider.getService(comp.getServiceProvider(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, String>(ret)
 		{
-			File cwd = new File(context.getShell().getWorkingDir()).getCanonicalFile();
-		
-			if(dir!=null)
+			public void customResultAvailable(IDaemonThreadPoolService tp)
 			{
-				File f = new File(cwd, dir);
-				if(f.exists() && !f.isDirectory())
+				try
 				{
-					executeFile(f);
-					ret.setResult(cwd.getCanonicalPath());
+					File cwd = new File(context.getShell().getWorkingDir()).getCanonicalFile();
+				
+					if(dir!=null)
+					{
+						File f = new File(cwd, dir);
+						if(f.exists() && !f.isDirectory())
+						{
+							executeFile(f, tp);
+							ret.setResult(cwd.getCanonicalPath());
+						}
+						else
+						{
+							f = new File(dir);
+							if(f.exists() && !f.isDirectory())
+							{
+								executeFile(f, tp);
+								ret.setResult(cwd.getCanonicalPath());
+							}
+							else
+							{
+								ret.setException(new RuntimeException("path not found."));
+							}
+						}
+					}
 				}
-				else
+				catch(IOException e)
 				{
-					f = new File(dir);
-					if(f.exists() && !f.isDirectory())
-					{
-						executeFile(f);
-						ret.setResult(cwd.getCanonicalPath());
-					}
-					else
-					{
-						ret.setException(new RuntimeException("path not found."));
-					}
+					ret.setException(e);
 				}
 			}
-		}
-		catch(IOException e)
-		{
-			ret.setException(e);
-		}
+		});
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Execute a file.
 	 */
-	protected void executeFile(File f) throws IOException
+	protected void executeFile(File f, IThreadPool tp) throws IOException
 	{
 		Process proc = Runtime.getRuntime().exec(f.getCanonicalPath());
-		new Thread(new StreamCopy(proc.getInputStream(), new NullOutputStream())).start(); // the input is the output stream :-(
-		new Thread(new StreamCopy(proc.getErrorStream(), new NullOutputStream())).start();
+		tp.execute(new StreamCopy(proc.getInputStream(), new NullOutputStream())); // the input is the output stream :-(
+		tp.execute(new StreamCopy(proc.getErrorStream(), new NullOutputStream()));
 	}
 	
 	/**
@@ -107,6 +121,8 @@ public class ExecuteFileCommand extends ACliCommand
 	 */
 	public ArgumentInfo[] getArgumentInfos(CliContext context)
 	{
+		// todo: support command line option for e.g. bin/sh cmd
+		
 		ArgumentInfo dir = new ArgumentInfo(null, String.class, null, "The file or directory to delete.", null);
 		return new ArgumentInfo[]{dir};
 	}
