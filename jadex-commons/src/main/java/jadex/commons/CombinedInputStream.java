@@ -194,7 +194,12 @@ class CombinedInputStream extends PipedInputStream
 			{
 				while(!closed)
 				{
-					byte[] data = (br.readLine()+SUtil.LF).getBytes();
+					String	line	= br.readLine();
+					if(line==null)	// null means end of stream
+					{
+						break;
+					}
+					byte[] data = (line+SUtil.LF).getBytes();
 					synchronized(out)
 					{
 //						System.out.println("wrote to comb is: "+new String(data));

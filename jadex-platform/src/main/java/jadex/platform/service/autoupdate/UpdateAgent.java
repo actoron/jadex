@@ -480,9 +480,10 @@ public class UpdateAgent implements IUpdateService
 									for(int i=0; i<oldargs.length; i++)
 									{
 //										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.platform.service.autoupdate.FileUpdateAgent")!=-1)
-										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("FileUpdateAgent")!=-1)
+										if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("FileUpdateAgent")!=-1
+												|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
 										{
-											i+=2;
+											i++;
 										}
 										else
 										{

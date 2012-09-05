@@ -82,10 +82,10 @@ public class ProcessStarter
 		try
 		{
 			// empty streams of this process to dev null 
-			System.setOut(new PrintStream(System.out));
-			System.setErr(new PrintStream(System.err));
-//			System.setOut(new PrintStream(new NullOutputStream()));
-//			System.setErr(new PrintStream(new NullOutputStream()));
+//			System.setOut(new PrintStream(System.out));
+//			System.setErr(new PrintStream(System.err));
+			System.setOut(new PrintStream(new NullOutputStream()));
+			System.setErr(new PrintStream(new NullOutputStream()));
 			new Thread(new StreamCopy(System.in, new NullOutputStream())).start();
 			
 //			String[] parts = SUtil.splitCommandline(cmd);

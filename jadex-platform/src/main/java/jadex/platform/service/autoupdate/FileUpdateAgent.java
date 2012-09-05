@@ -171,7 +171,7 @@ public class FileUpdateAgent extends UpdateAgent
 						foundver = Math.max(foundver, files[i].lastModified());
 					}
 					System.out.println(agent.getComponentIdentifier()+": foundver vs lastver(+safety): "+foundver+", "+(lastver+safetydelay));
-					boolean force = true; // force update
+					boolean force = false; // force update
 					// Only update when not younger than safetydelay and difference between versions also greater than safetydelay.
 					if(foundver>lastver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
 					{

@@ -213,16 +213,23 @@ public class CliAgent implements ICliService, IInternalCliService
 						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 //						Scanner sc = new Scanner(System.in);
 						
-						while(true)
+						try
 						{
-							try
+							while(true)
 							{
 //								String tmp = sc.nextLine();
 //								System.out.println(tmp);
 								final String tmp = br.readLine();
+								if(tmp==null)	// null means end of stream.
+								{
+									break;
+								}
+								
 								final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
 								if("exit".equals(cmd) || "quit".equals(cmd))
+								{
 									break;
+								}
 								
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
@@ -262,10 +269,10 @@ public class CliAgent implements ICliService, IInternalCliService
 									}
 								}).get(new ThreadSuspendable());
 							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-							}
+						}
+						catch(Exception e)
+						{
+							agent.getLogger().warning("Console closed due to "+e);
 						}
 					}
 				};
