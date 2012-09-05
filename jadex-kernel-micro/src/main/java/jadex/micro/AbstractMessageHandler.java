@@ -139,5 +139,5 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	/**
 	 *  Handle the message.
 	 */
-	public abstract void handleMessage(Map msg, MessageType type);
+	public abstract void handleMessage(Map<String, Object> msg, MessageType type);
 }

@@ -8,16 +8,24 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.AbstractMessageHandler;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
 import jadex.platform.service.awareness.discovery.SendHandler;
@@ -38,6 +46,7 @@ import java.util.Map;
 @Agent
 @ProvidedServices(@ProvidedService(type=IMessageAwarenessService.class,
 	implementation=@Implementation(expression="$component.getPojoAgent()")))
+@RequiredServices(@RequiredService(name="awa", type=IAwarenessManagementService.class))
 @Service
 public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwarenessService
 {
@@ -45,6 +54,47 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	
 	/** The map of announced component identifiers. */
 	protected Map<IComponentIdentifier, Long> announcements = new HashMap<IComponentIdentifier, Long>();
+	
+	//-------- methods --------
+	
+	/**
+	 *  Init the agent.
+	 */
+	@AgentCreated
+	public IFuture<Void> agentCreated()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		IFuture<IAwarenessManagementService>	awa	= agent.getServiceContainer().getRequiredService("awa");
+		awa.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, Void>(ret)
+		{
+			public void customResultAvailable(IAwarenessManagementService awa)
+			{
+				awa.subscribeToPlatformList(true).addResultListener(new IntermediateDefaultResultListener<DiscoveryInfo>()
+				{
+					public void intermediateResultAvailable(DiscoveryInfo di)
+					{
+						if(di.isAlive())
+						{
+							long	time	= di.getDelay()==-1 ? -1 : di.getTime()+di.getDelay();
+							refreshComponentIdentifier(di.getComponentIdentifier(), time);
+						}
+
+						// If platform removed, force task to ping (and probably fail) on next execution.
+						else if(announcements.containsKey(di.getComponentIdentifier()))
+						{
+							announcements.put(di.getComponentIdentifier(), new Long(0));
+						}
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+				MessageDiscoveryAgent.super.agentCreated()
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		return ret;
+	}
 	
 	//-------- service methods --------
 	
@@ -57,23 +107,36 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 		// Only handle platforms
 		IComponentIdentifier cid = ccid.getRoot();
 		
-		// Return in case of self message.
-		if(getMicroAgent().getComponentIdentifier().getRoot().equals(cid))
-			return IFuture.DONE;
-		
-		// Do not start another check if already contained
-		if(announcements.containsKey(cid))
+		// Ignore self messages
+		if(!getMicroAgent().getComponentIdentifier().getRoot().equals(cid))
 		{
-			// Update time
-			announcements.put(cid, System.currentTimeMillis());
+			refreshComponentIdentifier(cid, System.currentTimeMillis());
 		}
-		else
+		
+		return IFuture.DONE;		
+	}
+	
+	/**
+	 *  Refresh a component identifier.
+	 *  @param cid The component identifier.
+	 */
+	public void refreshComponentIdentifier(IComponentIdentifier cid, long time)
+	{
+		// Do not start another check if already contained
+		boolean contained	= announcements.containsKey(cid);
+		
+		// Update time
+		long	old	= announcements.containsKey(cid) ? announcements.get(cid).longValue() : Long.MIN_VALUE;
+		if(old!=-1 && time>old)
+		{
+			announcements.put(cid, new Long(time));
+		}
+
+		if(!contained)
 		{
 //			System.out.println("enter: "+cid);
 			performAnnouncements(cid);
 		}
-		
-		return IFuture.DONE;
 	}
 	
 	//-------- internal methods --------
@@ -84,38 +147,46 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	protected void performAnnouncements(final IComponentIdentifier cid)
 	{
 		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, getDelay(), null, null, null);
-		announcements.put(cid, System.currentTimeMillis());
 		announceAwareness(info);
 		
 		// Check alive via sending ping message before delay is due
-		long del = (long)(getDelay()-((double)getDelay())*0.1);
-		
-//		System.out.println("performing: "+cid+" "+del+" "+System.currentTimeMillis());
+		final long del = (long)(getDelay()-((double)getDelay())*0.1);
+		refreshComponentIdentifier(cid, System.currentTimeMillis() + del);
 		
 		doWaitFor(del, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				Map<String, Object> msg = new HashMap<String, Object>();
-				ComponentIdentifier rec = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
-				msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rec});
-				msg.put(SFipa.CONTENT, "ping");
-				msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
-				msg.put(SFipa.CONVERSATION_ID, SUtil.createUniqueId("msg_dis"));
-				getMicroAgent().sendMessageAndWait(msg, SFipa.FIPA_MESSAGE_TYPE, new AbstractMessageHandler(5000, true)
+				long	valid	= announcements.get(cid).longValue();
+				if(valid!=-1 && valid<System.currentTimeMillis())
 				{
-					public void handleMessage(Map msg, MessageType type)
+//					System.out.println("pinging: "+cid);
+					Map<String, Object> msg = new HashMap<String, Object>();
+					ComponentIdentifier rec = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+					msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rec});
+					msg.put(SFipa.CONTENT, "ping");
+					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
+					msg.put(SFipa.CONVERSATION_ID, SUtil.createUniqueId("msg_dis"));
+					getMicroAgent().sendMessageAndWait(msg, SFipa.FIPA_MESSAGE_TYPE, new AbstractMessageHandler(5000, true)
 					{
-//						System.out.println("received reply: "+msg);
-						performAnnouncements(cid);
-					}
-					
-					public void timeoutOccurred()
-					{
-//						System.out.println("Received no ping reply, removed: "+cid);
-						announcements.remove(cid);
-					}
-				});
+						public void handleMessage(Map<String, Object> msg, MessageType type)
+						{
+//							System.out.println("received reply: "+msg);
+							performAnnouncements(cid);
+						}
+						
+						public void timeoutOccurred()
+						{
+//							System.out.println("Received no ping reply, removed: "+cid);
+							announcements.remove(cid);
+						}
+					});
+				}
+				else
+				{
+					performAnnouncements(cid);					
+				}
+				
 				return IFuture.DONE;
 			}
 		});

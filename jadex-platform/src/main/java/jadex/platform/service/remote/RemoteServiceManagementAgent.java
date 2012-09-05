@@ -133,7 +133,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 			|| SFipa.QUERY_REF.equals(msg.get(SFipa.PERFORMATIVE))) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
-//			System.out.println("received ping and reply");
+//			System.out.println("replying to ping from "+msg.get(SFipa.SENDER));
 			Map rep = createReply(msg, mt);
 			rep.put(SFipa.CONTENT, "alive");
 			rep.put(SFipa.PERFORMATIVE, SFipa.INFORM);

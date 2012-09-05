@@ -403,6 +403,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			discovered.remove(sender);
 			if(dif!=null)
 			{
+				dif.setTime(-1);
+				informListeners(dif);
 				deleteProxy(dif);
 			}
 		}
@@ -683,18 +685,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					for(Iterator<DiscoveryInfo> it=discovered.values().iterator(); it.hasNext(); )
 					{
 						DiscoveryInfo dif = it.next();
-						if(dif.getDelay()!=-1)
+						if(!dif.isAlive())
 						{
-							// five seconds buffer
-							if(time>dif.getTime()+dif.getDelay()*3.2) // Have some time buffer before delete
+//							System.out.println("Removing: "+dif);
+							it.remove();
+							informListeners(dif);
+							if(autodelete)
 							{
-	//							System.out.println("Removing: "+dif);
-								it.remove();
-								informListeners(dif);
-								if(autodelete)
-								{
-									todel.add(dif);
-								}
+								todel.add(dif);
 							}
 						}
 						

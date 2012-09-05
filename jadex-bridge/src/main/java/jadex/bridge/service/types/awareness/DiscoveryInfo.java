@@ -197,6 +197,16 @@ public class DiscoveryInfo
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Check, if the platform is still alive.
+	 *  The liveness is calculated based on current time and delay and last received update.
+	 */
+	public boolean	isAlive()
+	{
+		// Allow three missed updates and some time buffer before delete
+		return getTime()>0 && (getDelay()==-1 || getTime()+getDelay()*3.2 > System.currentTimeMillis());
+	}
 
 	/**
 	 *  Get the string representation.
