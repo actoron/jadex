@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -14,7 +13,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -40,11 +38,11 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-//		{
-//			public void customResultAvailable(TestReport result)
-//			{
-//				tc.addReport(result);
+		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		{
+			public void customResultAvailable(TestReport result)
+			{
+				tc.addReport(result);
 				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
@@ -53,8 +51,8 @@ public class InitiatorAgent extends TestAgent
 						ret.setResult(null);
 					}
 				}));
-//			}
-//		}));
+			}
+		}));
 		
 		return ret;
 	}
@@ -166,67 +164,67 @@ public class InitiatorAgent extends TestAgent
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
-		fut.addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("res: "+result+" "+SUtil.arrayToString(result.getClass().getInterfaces()));
-				try
-				{
-					ITestService ts = (ITestService)result;
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
-		
-//		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
+//		fut.addResultListener(new IResultListener()
 //		{
-//			public void customResultAvailable(final ITestService ts)
+//			public void resultAvailable(Object result)
 //			{
-//				// create a service call meta object and set the timeout
-//				final long start = System.currentTimeMillis();
-//				if(to!=-1)
+//				System.out.println("res: "+result+" "+SUtil.arrayToString(result.getClass().getInterfaces()));
+//				try
 //				{
-//					ServiceCall.createInstance(to, true);
+//					ITestService ts = (ITestService)result;
 //				}
-//				ts.method("test1").addResultListener(new IResultListener<Void>()
+//				catch(Exception e)
 //				{
-//					public void resultAvailable(Void result)
-//					{
-//						tr.setFailed("No timeout occurred");
-//						ret.setResult(tr);
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						if(exception instanceof TimeoutException)
-//						{
-//							long diff = System.currentTimeMillis() - (start+to);
-//							if(diff>=0 && diff<2000) // 2 secs max overdue delay?
-//							{
-//								tr.setSucceeded(true);
-//							}
-//							else
-//							{
-//								tr.setFailed("Timeout difference too high: "+diff);
-//							}
-//						}
-//						else
-//						{
-//							tr.setFailed("No timeout occurred");
-//						}
-//						ret.setResult(tr);
-//					}
-//				});
+//					e.printStackTrace();
+//				}
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
 //			}
 //		});
+		
+		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
+		{
+			public void customResultAvailable(final ITestService ts)
+			{
+				// create a service call meta object and set the timeout
+				final long start = System.currentTimeMillis();
+				if(to!=-1)
+				{
+					ServiceCall.createInstance(to, true);
+				}
+				ts.method("test1").addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						tr.setFailed("No timeout occurred");
+						ret.setResult(tr);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof TimeoutException)
+						{
+							long diff = System.currentTimeMillis() - (start+to);
+							if(diff>=0 && diff<2000) // 2 secs max overdue delay?
+							{
+								tr.setSucceeded(true);
+							}
+							else
+							{
+								tr.setFailed("Timeout difference too high: "+diff);
+							}
+						}
+						else
+						{
+							tr.setFailed("No timeout occurred");
+						}
+						ret.setResult(tr);
+					}
+				});
+			}
+		});
 		return ret;
 	}
 }

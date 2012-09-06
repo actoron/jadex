@@ -1898,8 +1898,8 @@ public class SUtil
 			{
 				String	abs	= ((File)url).getAbsolutePath();
 				String	rel	= SUtil.convertPathToRelative(abs);
-				ret	= abs.equals(rel) ? new File(abs).toURI().toURL()
-					: new File(System.getProperty("user.dir"), rel).toURI().toURL();
+				ret	= abs.equals(rel) ? new File(abs).getCanonicalFile().toURI().toURL()
+					: new File(System.getProperty("user.dir"), rel).getCanonicalFile().toURI().toURL();
 				if(jar)
 				{
 					if(ret.toString().endsWith("!"))
@@ -1908,7 +1908,7 @@ public class SUtil
 						ret	= new URL("jar:"+ret.toString());						
 				}
 			}
-			catch (MalformedURLException e)
+			catch (Exception e)
 			{
 				throw new RuntimeException(e);
 			}

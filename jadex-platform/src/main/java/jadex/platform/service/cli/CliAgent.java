@@ -9,7 +9,7 @@ import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -237,33 +237,47 @@ public class CliAgent implements ICliService, IInternalCliService
 									{
 										final Future<Void> ret = new Future<Void>();
 										
-										executeCommand(cmd, consess).addResultListener(new IResultListener<String>()
+										if(cmd.length()>0)
 										{
-											public void resultAvailable(String result)
+											executeCommand(cmd, consess).addResultListener(new IResultListener<String>()
 											{
-												if(result!=null)
-													System.out.println(result);
-												printPrompt();
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-												System.out.println("Invocation error: "+exception.getMessage());
-												printPrompt();
-											}
-											
-											protected void printPrompt()
-											{
-												getShell(consess).getShellPrompt().addResultListener(new DefaultResultListener<String>()
+												public void resultAvailable(String result)
 												{
-													public void resultAvailable(String result)
-													{
+													if(result!=null)
 														System.out.println(result);
-														ret.setResult(null);
-													}
-												});
-											}
-										});
+													printPrompt();
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+													System.out.println("Invocation error: "+exception.getMessage());
+													printPrompt();
+												}
+												
+												protected void printPrompt()
+												{
+													getShell(consess).getShellPrompt().addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
+													{
+														public void customResultAvailable(String result)
+														{
+															System.out.println(result);
+															ret.setResult(null);
+														}
+													});
+												}
+											});
+										}
+										else
+										{
+											getShell(consess).getShellPrompt().addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
+											{
+												public void customResultAvailable(String result)
+												{
+													System.out.println(result);
+													ret.setResult(null);
+												}
+											});
+										}
 										
 										return ret;
 									}

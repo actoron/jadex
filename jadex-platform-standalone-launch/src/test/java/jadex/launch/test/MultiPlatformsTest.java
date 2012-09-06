@@ -32,7 +32,7 @@ public class MultiPlatformsTest extends TestCase
 				System.out.println("Starting platform "+i);
 			}
 			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i,
-				"-gui", "false", "-printpass", "false",
+				"-gui", "false", "-printpass", "false", "-cli", "false",
 				"-deftimeout", ""+timeout,
 //				"-logging", "true",
 //				"-awareness", "false",

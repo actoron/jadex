@@ -103,7 +103,7 @@
 		
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
-		<!-- Start the platform with cli activated? -->
+		<!-- Start the platform with command line interface (cli) activated? -->
 		<argument name="cli" class="boolean">true</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>

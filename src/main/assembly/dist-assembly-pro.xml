@@ -25,6 +25,9 @@
 				<!-- Exclude all maven distribution modules -->
 				<exclude>*:*-distribution-*</exclude>
 			</excludes>
+			
+			<!-- Size of module/dependency tree requires bigger stack size on 32bit vm due to maven bug (-Xss2m).
+				 see http://jira.codehaus.org/browse/MASSEMBLY-549 -->
 			<binaries>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
 				<!-- <outputFileNameMapping>${module.artifactId}-${module.version}${dashClassifier?}.${module.extension}</outputFileNameMapping> -->

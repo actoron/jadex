@@ -4,6 +4,9 @@
 <HTML lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <HEAD>
 <META content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<% if(request.getAttribute("refresh")!=null)  { %>
+	<meta http-equiv="refresh" content="<%= request.getAttribute("refresh") %>">
+<% } %>
 <TITLE><%= request.getParameter("title") %></TITLE>
 <LINK rel="shortcut icon" type="image/ico" href="images/jadex_icon.ico" />
 <SCRIPT type="text/javascript">

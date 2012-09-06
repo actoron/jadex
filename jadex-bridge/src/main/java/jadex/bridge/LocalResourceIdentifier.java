@@ -37,9 +37,21 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	public LocalResourceIdentifier(IComponentIdentifier cid, URL url)
 	{
 		if(cid==null)
+		{
 			throw new IllegalArgumentException("Cid must not null.");
+		}
 		if(url==null)
+		{
 			throw new IllegalArgumentException("Url must not null.");
+		}
+		if(url.toString().indexOf("..")!=-1)
+		{
+			throw new IllegalArgumentException("Url must use canonical path: "+url);
+		}
+		if(url.getFile().startsWith("."))
+		{
+			throw new IllegalArgumentException("Url must be absolute: "+url);
+		}
 		
 		this.cid = cid;
 		this.url = url;
