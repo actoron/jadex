@@ -38,7 +38,7 @@
 														else
 														{
 													%>
-													<SPAN class="wikilink"><A href="<%= request.getContextPath() %>">
+													<SPAN class="wikilink"><A href=".">
 														<SPAN class="wikigeneratedlinkcontent">Live Platforms</SPAN>
 													</A></SPAN>
 													<%
