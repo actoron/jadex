@@ -553,7 +553,7 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== Secure transport extension modules and assembly ======== -->
+		<!-- ======== Cli extension modules and assembly ======== -->
 		
 		<profile>
 		    <id>jadex-cli</id>
@@ -569,7 +569,7 @@
 						<artifactId>maven-assembly-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>sources-sectrans</id>
+								<id>sources-cli</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
