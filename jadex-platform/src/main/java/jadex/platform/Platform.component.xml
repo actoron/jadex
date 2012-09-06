@@ -105,6 +105,8 @@
 		<argument name="gui" class="boolean">true</argument>
 		<!-- Start the platform with command line interface (cli) activated? -->
 		<argument name="cli" class="boolean">true</argument>
+		<!-- Start cli with console in or not -->
+		<argument name="cliconsole" class="boolean">true</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>
 		<!-- Enable verbose logging (shortcut for setting logging_level to info). -->
@@ -390,7 +392,11 @@
 				</component>
 				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
 				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
-				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" />
+				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
+					<arguments>
+						<argument name="console">$args.cliconsole</argument>
+					</arguments>
+				</component>
 			</components>
 		</configuration>
 		
@@ -426,7 +432,11 @@
 				</component>
 				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
 				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
-				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" />
+				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
+					<arguments>
+						<argument name="console">$args.cliconsole</argument>
+					</arguments>
+				</component>
 			</components>
 		</configuration>
 		
