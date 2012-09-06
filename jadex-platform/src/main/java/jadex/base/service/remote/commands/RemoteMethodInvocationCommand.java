@@ -92,7 +92,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		super(nonfunc);
 //		if(method.getName().equals("secMethod"))
-//			System.out.println("callid of getResult: "+callid);
+//		System.out.println("caller: "+caller);
 		
 		this.rr = rr;
 		this.method = method;

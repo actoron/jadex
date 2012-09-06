@@ -360,6 +360,9 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			{
 				public void customResultAvailable(IComponentManagementService rcms)
 				{
+					// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
+					// will deliver the platform (as this second call is performed by the cms itself)
+					
 					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
 				}
 			}));

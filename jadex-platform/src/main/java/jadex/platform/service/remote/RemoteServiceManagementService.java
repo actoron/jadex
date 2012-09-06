@@ -577,7 +577,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								{
 									if(rid!=null)
 									{
-//										System.out.println("rid: "+rid+" "+content.getClass());
+//										System.out.println("rid: "+rid+" "+content.getClass()+" "+msg.get(SFipa.SENDER));
 										msg.put(SFipa.X_RID, rid);
 									}
 //									else

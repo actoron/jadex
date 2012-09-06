@@ -1,8 +1,13 @@
 package jadex.commons;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *  The process starter allows for starting another process in a completely
@@ -12,41 +17,83 @@ import java.lang.reflect.Method;
  */
 public class ProcessStarter
 {
+	protected static Set<String> reserved;
+	
+	static
+	{
+		reserved.add("-external"); // false=other java proc
+		reserved.add("-stdout");
+		reserved.add("-stderr");
+		reserved.add("-dir");
+	}
+	
 	/**
 	 *  Start a java or non-java process. 
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
 		if(args.length<2)
-			throw new IllegalArgumentException("Syntax is (-java cmds+)|(-external dir! cmd)");
+			throw new IllegalArgumentException("Syntax is -external -true|false [-stdout file] [-stderr file] cmds");
 		
-		if("-java".equals(args[0]))
+		OutputStream out = null;
+		OutputStream err = null;
+		try
 		{
-			String[] nargs = new String[args.length-1];
-			System.arraycopy(args, 1, nargs, 0, args.length-1);
-			startJavaProcess(nargs);
-		}
-		else if("-external".equals(args[0]))
-		{
-			if(args.length==2)
+			Map<String, Object> nargs = processArguments(args);
+			
+			out = nargs.get("-stdout")!=null? new FileOutputStream(new File((String)nargs.get("-stdout"))): new NullOutputStream();
+			err = nargs.get("-stderr")!=null? new FileOutputStream(new File((String)nargs.get("-stdout"))): new NullOutputStream();
+			
+			if("true".equals(nargs.get("-external")))
 			{
-				startExternalProcess(null, args[1]);
+				String[] pargs = (String[])nargs.get("args");
+				String dir = nargs.get("-dir")!=null? (String)nargs.get("-dir"): ".";
+				startExternalProcess(dir, pargs[0], out, err);
 			}
 			else
 			{
-				startExternalProcess(args[1], args[2]);
+				startJavaProcess((String[])nargs.get("args"), out, err);
 			}
 		}
-		else
+		catch(Exception e)
 		{
-			throw new IllegalArgumentException("Syntax is (-java cmds+)|(-external dir! cmd)");
+			close(out);
+			close(err);
+			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Process the cmd line args.
+	 */
+	protected static Map<String, Object> processArguments(String[] args)
+	{
+		Map<String, Object> ret = new HashMap<String, Object>();
+		
+		for(int i=0; i<args.length; i++)
+		{
+			if(reserved.contains(args[i]))
+			{
+				ret.put(args[i], args[++i]);
+			}
+			else
+			{
+				if(i+1<args.length)
+				{
+					String[] nargs = new String[args.length-1-i];
+					System.arraycopy(args, i+1, nargs, 0, nargs.length);
+					ret.put("args", nargs);
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Start an external process.
 	 */
-	public static void startExternalProcess(String dir, String cmd)
+	public static void startExternalProcess(String dir, String cmd, OutputStream out, OutputStream err)
 	{
 		try
 		{
@@ -61,8 +108,8 @@ public class ProcessStarter
 			// empty streams of subprocess to dev null 
 //			new Thread(new StreamCopy(proc.getInputStream(), System.out)).start(); // the input is the output stream :-(
 //			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
-			new Thread(new StreamCopy(proc.getInputStream(), new NullOutputStream())).start(); // the input is the output stream :-(
-			new Thread(new StreamCopy(proc.getErrorStream(), new NullOutputStream())).start();
+			new Thread(new StreamCopy(proc.getInputStream(), out)).start(); // the input is the output stream :-(
+			new Thread(new StreamCopy(proc.getErrorStream(), err)).start();
 			
 			proc.waitFor();
 			System.exit(0);
@@ -77,15 +124,15 @@ public class ProcessStarter
 	/**
 	 *  Start a java process.
 	 */
-	public static void startJavaProcess(String[] parts)
+	public static void startJavaProcess(String[] parts, OutputStream out, OutputStream err)
 	{
 		try
 		{
 			// empty streams of this process to dev null 
 //			System.setOut(new PrintStream(System.out));
 //			System.setErr(new PrintStream(System.err));
-			System.setOut(new PrintStream(new NullOutputStream()));
-			System.setErr(new PrintStream(new NullOutputStream()));
+			System.setOut(new PrintStream(out));
+			System.setErr(new PrintStream(err));
 			new Thread(new StreamCopy(System.in, new NullOutputStream())).start();
 			
 //			String[] parts = SUtil.splitCommandline(cmd);
@@ -99,6 +146,23 @@ public class ProcessStarter
 		{
 			ex.printStackTrace();
 			throw new RuntimeException("Could not start process. Reason: "+ ex.getMessage());
+		}
+	}
+	
+	/**
+	 *  Close a stream.
+	 */
+	protected static void close(OutputStream os)
+	{	
+		try
+		{
+			if(os!=null)
+			{
+				os.close();
+			}
+		}
+		catch(Exception e)
+		{
 		}
 	}
 }

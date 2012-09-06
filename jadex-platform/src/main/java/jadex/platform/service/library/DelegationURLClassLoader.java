@@ -58,6 +58,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0],
 			// No parent class loader to avoid multiple lookups of unavailable classes (not supported on android)
 			SReflect.isAndroid() ? basecl : null);
+		
 		this.rid = rid;
 		this.basecl	= basecl;
 		this.delegates = delegates==null? new ArrayList(): SUtil.arrayToList(delegates);
@@ -252,9 +253,6 @@ public class DelegationURLClassLoader extends URLClassLoader
 	{
 		Class<?> ret = null;
 		
-//		if(name.indexOf("RemoteServiceManagementAgent")!=-1)
-//			System.out.println("here");
-		
 		if(basecl!=null)
 		{
 			try
@@ -376,6 +374,6 @@ public class DelegationURLClassLoader extends URLClassLoader
 	public String toString()
 	{
 //		return SReflect.getInnerClassName(getClass())+"("+rid+", "+SUtil.arrayToString(delegates)+")";
-		return SReflect.getInnerClassName(getClass())+"("+rid+", "+delegates.size()+")";
+		return SReflect.getInnerClassName(getClass())+"("+rid+", "+delegates.size()+", "+basecl+")";
 	}
 }

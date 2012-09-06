@@ -1373,6 +1373,9 @@ public class MessageService extends BasicService implements IMessageService
 //		MessageType mt = getMessageType(type);
 		final IResourceIdentifier rid = (IResourceIdentifier)msg.get(mt.getResourceIdIdentifier());
 		final IComponentIdentifier	realrec	= (IComponentIdentifier)msg.get(mt.getRealReceiverIdentifier());
+		
+//		System.out.println("getRIDCl: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+" "+rid+" "+realrec);
+		
 		if(rid!=null)
 		{
 			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
@@ -1393,10 +1396,12 @@ public class MessageService extends BasicService implements IMessageService
 									|| (recs instanceof List && ((List<?>)recs).size()==1
 										&& ((IComponentIdentifier)((List<?>)recs).get(0)).getLocalName().equals("rms")))
 								{
+//									System.out.println("cl is global");
 									ls.getClassLoader(null).addResultListener(new DelegationResultListener<ClassLoader>(ret));
 								}
 								else
 								{
+//									System.out.println("cl is ridloader: "+result);
 									super.customResultAvailable(result);
 								}
 							}
