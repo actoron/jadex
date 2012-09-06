@@ -553,6 +553,60 @@
 		    </modules>
 		</profile>
 		
+		<!-- ======== Auto upadte modules and assembly ======== -->
+		
+		<profile>
+		    <id>jadex-autoupdate</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-platform-extension-autoupdate</exists>
+	            </file>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+ 							<execution>
+								<id>sources-autoupdate</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-autoupdate</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-autoupdatesrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-autoupdate</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-autoupdate-addon-${project.version}</finalName>
+									<outputDirectory>target/pro-addons</outputDirectory>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-autoupdate.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+	        <modules>
+	        	<module>jadex-parent-pro</module>
+				<module>jadex-platform-extension-autoupdate</module>
+		    </modules>
+		</profile>
+		
 		<!-- ======== Minimal distribution ======== -->
 		
 		<profile>

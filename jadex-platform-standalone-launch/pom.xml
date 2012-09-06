@@ -247,6 +247,21 @@
 				</dependency>
 	        </dependencies>
 	    </profile>
+	    <profile>
+	        <id>autoupdate</id>
+	        <activation>
+	            <file>
+	                <exists>../jadex-platform-extension-autoupdate</exists>
+	            </file>
+	        </activation>
+	        <dependencies>
+	          	<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-extension-autoupdate</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+	        </dependencies>
+	    </profile>
 	</profiles>
 	
 </project>

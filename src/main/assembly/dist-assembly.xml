@@ -16,9 +16,11 @@
 		<moduleSet>
 			<!-- Selected by profile. <includes> <include>jadex:*</include> </includes> -->
 			<excludes>
+			  	<!-- Exclude auto update. -->
+				<exclude>*:*-autoupdate</exclude>
 			  	<!-- Exclude maven dependency manager. -->
 				<exclude>*:*-maven</exclude>
-			    <!-- Exclude JMonkey support from normal dist to save space. -->
+							    <!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
 				<!-- Exclude launch.jar to avoid optional dependencies being copied to lib. launch.jar is copied manually later. -->
 				<exclude>*:*-launch</exclude>

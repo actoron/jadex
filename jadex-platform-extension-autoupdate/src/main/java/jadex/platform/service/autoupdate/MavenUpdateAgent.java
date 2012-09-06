@@ -1,19 +1,8 @@
 package jadex.platform.service.autoupdate;
 
-import java.util.List;
-import java.util.Map;
-
 import jadex.bridge.GlobalResourceIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.types.library.IDependencyService;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 
 @Agent

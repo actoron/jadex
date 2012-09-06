@@ -1,5 +1,9 @@
 package jadex.bridge.service.types.daemon;
 
+import jadex.commons.StreamCopy;
+
+import java.io.File;
+
 
 /**
  *   java [ options ] class [ argument ... ]
@@ -206,6 +210,29 @@ public class StartOptions
 		
 		return cmd.toString();
 	}
+	
+	/**
+	 * Start a platform using a configuration.
+	 * 
+	 * @param options The arguments. 
+	 */
+	public Process	startProcess()	throws Exception
+	{
+		// Can be called in another directory
+		File newcurdir = new File(getStartDirectory());
+		newcurdir.mkdirs();
+	
+		Process proc = Runtime.getRuntime().exec(getStartCommand(), null, newcurdir);
+				
+		if(isChildProcess())
+		{
+			new Thread(new StreamCopy(proc.getInputStream(), System.out)).start();
+			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
+		}
+		
+		return proc;
+	}
+
 
 	/**
 	 *  String representation.

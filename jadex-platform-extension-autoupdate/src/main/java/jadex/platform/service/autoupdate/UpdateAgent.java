@@ -27,7 +27,6 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
@@ -65,9 +64,7 @@ import java.util.Map;
 @Arguments(
 {
 	@Argument(name="interval", clazz=long.class, defaultvalue="10000"),
-	@Argument(name="creator", clazz=IComponentIdentifier.class),
 	@Argument(name="separatevm", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="updateagent", clazz=String.class, defaultvalue="\"jadex.platform.service.autoupdate.FileUpdateAgent.class\""),
 	@Argument(name="forbiddenvmargs", clazz=String[].class, defaultvalue="new String[]{\"-agentlib:jdwp=transport\"}")
 })
 @ComponentTypes(
@@ -78,10 +75,6 @@ public class UpdateAgent implements IUpdateService
 {
 	//-------- attributes --------
 	
-	/** The creator. */
-	@AgentArgument
-	protected IComponentIdentifier creator;
-	
 	/** The check for update interval. */
 	@AgentArgument
 	protected long interval;
@@ -89,9 +82,6 @@ public class UpdateAgent implements IUpdateService
 	/** Flag if new vm should be used. */
 	@AgentArgument
 	protected boolean separatevm;
-	
-	@AgentArgument
-	protected String updateagent;
 	
 	/** The agent. */
 	@Agent
@@ -112,54 +102,6 @@ public class UpdateAgent implements IUpdateService
 	protected String[] forbiddenvmargs;
 	
 	//-------- methods --------
-	
-	/**
-	 *  Called on component startup.
-	 */
-	@AgentCreated
-	public IFuture<Void> start()
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(creator!=null)
-		{
-//			System.out.println("ack creator: "+creator);
-			
-			// Acknowledge creation if creator is not null
-			
-			Map<String, Object> msg = new HashMap<String, Object>();
-			msg.put(SFipa.RECEIVERS, creator);
-			agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new DelegationResultListener<Void>(ret));
-			
-			// Post update notification as local chat agent.
-			// Wait before notification to discover remote platforms first.
-			agent.waitForDelay(15000, new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					notifyUpdatePerformed("Started new platform "+agent.getComponentIdentifier().getRoot()
-						+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") replacing old platform "+creator.getRoot());
-					return IFuture.DONE;
-				}
-			});
-			
-			// difficult with service as no proxy to the other platform may exist
-	//		agent.getServiceContainer().getService(IUpdateService.class, cid)
-	//			.addResultListener(new ExceptionDelegationResultListener<IUpdateService, Void>(ret)
-	//		{
-	//			public void customResultAvailable(IUpdateService us)
-	//			{
-	//				us.acknowledgeUpdate().addResultListener(new DelegationResultListener<Void>(ret));
-	//			}
-	//		});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
 	
 	/**
 	 *  The agent body.
@@ -406,7 +348,7 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IDaemonService daeser)
 			{
-				daeser.startPlatform(so).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)); 
+				daeser.startPlatformAndWait(so).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)); 
 			}
 		});
 		
@@ -481,6 +423,7 @@ public class UpdateAgent implements IUpdateService
 									{
 //										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.platform.service.autoupdate.FileUpdateAgent")!=-1)
 										if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("FileUpdateAgent")!=-1
+												// Hack!!! Shouldn't know about daemon responder!?
 												|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
 										{
 											i++;
@@ -494,15 +437,14 @@ public class UpdateAgent implements IUpdateService
 								
 								// Add -component jadex.platform.service.autoupdate.FileUpdateAgent.class with fresh argument
 								Map<String, Object> uaargs = getUpdateArguments();
-								uaargs.put("creator", agent.getComponentIdentifier());
 								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
-								System.out.println("pre: "+argsstr);
+//								System.out.println("pre: "+argsstr);
 								argsstr	= SUtil.escapeString(argsstr);	// First: escape string
 								argsstr = argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
-								System.out.println("post: "+argsstr);
+//								System.out.println("post: "+argsstr);
 								String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
 								newargs.add("-component");
-								newargs.add("\""+updateagent+"(:"+deser+")\"");
+								newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+".class(:"+deser+")\"");
 
 								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
 								

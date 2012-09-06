@@ -1,6 +1,7 @@
 package jadex.platform.service.daemon;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutResultListener;
@@ -13,7 +14,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
-import jadex.commons.StreamCopy;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -68,81 +68,136 @@ public class DaemonService implements IDaemonService
 	}
 	
 	/**
-	 *  Called when a message is recieved.
+	 *  Called from agent when a handshake message is recieved.
 	 */
 	protected void	messageReceived(IComponentIdentifier cid, String pid)
 	{
-		System.out.println("Received message from "+cid+": "+pid+", "+futures.containsKey(pid));
+//		System.out.println("Received message from "+cid+": "+pid+", "+futures.containsKey(pid));
 		if(futures.containsKey(pid))
 		{
 			futures.remove(pid).setResult(cid.getRoot());
 		}
 	}
 	
+	//-------- IDaemonService interface --------
+	
 	/**
 	 *  Start a platform using a configuration.
-	 *  (automatically sets classpath to current cp if not set).
-	 *  @param args The arguments.
+	 *  Performs no checking if the new platform runs.
+	 *  @param options The start arguments.
 	 */
-	public IFuture<IComponentIdentifier> startPlatform(StartOptions opt)
+	public IFuture<Void> startPlatform(StartOptions options)
+	{
+		return startPlatform(options, 0);
+	}
+	
+	/**
+	 *  Start a platform using a configuration.
+	 *  Wait for some time to check if the platform doesn't fail.
+	 *  Only detects, if the new platform process exits during that time.
+	 *  @param options The start arguments.
+	 */
+	public IFuture<Void> startPlatform(StartOptions options, final long wait)
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, Void>(ret)
+		{
+			public void customResultAvailable(StartOptions options)
+			{
+				try
+				{
+					final Process	proc	= options.startProcess();
+				
+					// Wait for process
+					if(wait>0)
+					{
+						agent.waitForDelay(wait, new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								IFuture<Void>	ret;
+								try
+								{
+									proc.exitValue();
+									ret	= new Future<Void>(new RuntimeException("Platform exited."));
+								}
+								catch(Exception e)
+								{
+									// Not yet terminated -> ignore.
+									ret	= IFuture.DONE;
+								}
+								// TODO Auto-generated method stub
+								return ret;
+							}
+						}).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
+
+		return ret;
+	}
+	
+	/**
+	 *  Start a platform using a configuration.
+	 *  Wait for successful handshake and return the component identifier of the new platform.
+	 *  Successful handshake means that the init phase of the new platform, including starting
+	 *  of initial components, has completed successfully.
+	 *  @param opt The start arguments.
+	 */
+	public IFuture<IComponentIdentifier> startPlatformAndWait(StartOptions options)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
-		final StartOptions options = opt == null ? new StartOptions() : opt;
-
-		// if(options.getMain()==null)
-		// {
-		// options.setMain("jadex.base.Starter");
-		// }
-
-		if(options.getClassPath() == null || options.getClassPath().length() == 0)
+		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, IComponentIdentifier>(ret)
 		{
-			IFuture<ILibraryService> fut = agent.getServiceContainer().getRequiredService("libservice");
-			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
+			public void customResultAvailable(StartOptions options)
 			{
-				public void customResultAvailable(ILibraryService result)
+				// Change arguments to include responder agent for handshake.
+				final String	pid	= UUID.randomUUID().toString();
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("cid", agent.getComponentIdentifier());
+				args.put("content", pid);
+				String	argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
+				argsstr	= SUtil.escapeString(argsstr);	// First: escape string
+				argsstr	= argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
+				String	deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
+				String	responder	= " -component \""+DaemonResponderAgent.class.getName().replace(".", "/")+".class(:"+deser+")\"";
+				options.setProgramArguments(options.getProgramArguments()+responder);
+				futures.put(pid, ret);
+				
+				try
 				{
-					ILibraryService ls = (ILibraryService)result;
-					ls.getAllURLs().addResultListener(new ExceptionDelegationResultListener<List<URL>, IComponentIdentifier>(ret)
+					options.startProcess();
+				
+					// Wait for handshake.
+//					System.out.println("Waiting for platform "+pid);
+					ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getCurrentInvocation().getTimeout(), agent.getExternalAccess(),
+						new IResultListener<IComponentIdentifier>()
 					{
-						public void customResultAvailable(List<URL> urls)
+						public void resultAvailable(IComponentIdentifier result)
 						{
-							List<String> res = new ArrayList<String>();
-							for(int i = 0; i<urls.size(); i++)
-							{
-								URL url = (URL)urls.get(i);
-								String name = SUtil.convertURLToString(url);
-								if(name != null)
-								{
-									res.add(name);
-								}
-								else
-								{
-									System.out.println("Cannot convert url to file: "+ url);
-								}
-							}
-							StringBuffer buf = new StringBuffer();
-							for(int i = 0; i < res.size(); i++)
-							{
-								buf.append(res.get(i));
-								if(i + 1 < res.size())
-									buf.append(File.pathSeparator);
-							}
-							options.setClassPath(buf.toString());
-
-							System.out.println("cp: "+options.getClassPath());
-							
-							doStartPlatform(options).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//							System.out.println("Platform found: "+pid+", "+result);
 						}
-					});
+						public void exceptionOccurred(Exception exception)
+						{
+//							System.out.println("No platform found: "+pid);
+							futures.remove(pid);
+							ret.setExceptionIfUndone(exception);
+						}
+					}));
 				}
-			});
-		}
-		else
-		{
-			doStartPlatform(options).addResultListener(
-				agent.createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
-		}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
 
 		return ret;
 	}
@@ -169,72 +224,66 @@ public class DaemonService implements IDaemonService
 //	}
 	
 	/**
-	 * Start a platform using a configuration.
-	 * Append the daemon responder to that start arguments to receive the cid of the new platform.
-	 * 
-	 * @param args The arguments. 
+	 *  Create or adjust options (e.g. fill in classpath) if necessary.
 	 */
-	public IFuture<IComponentIdentifier> doStartPlatform(StartOptions options)
+	protected IFuture<StartOptions>	adjustOptions(StartOptions opt)
 	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		final Future<StartOptions>	ret	= new Future<StartOptions>();
+	
+		final StartOptions options = opt==null ? new StartOptions() : opt;
 
-		// Start platform in another VM.
-		try
+		// Clone current classpath if not set. 
+		if(options.getClassPath()==null || options.getClassPath().length()==0)
 		{
-			// Build arguments for responder agent.
-			final String	pid	= UUID.randomUUID().toString();
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("cid", agent.getComponentIdentifier());
-			args.put("content", pid);
-			String	argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
-			argsstr	= SUtil.escapeString(argsstr);	// First: escape string
-			argsstr	= argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
-			String	deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
-			String	responder	= " -component \""+DaemonResponderAgent.class.getName().replace(".", "/")+".class(:"+deser+")\"";
-			options.setProgramArguments(options.getProgramArguments()+responder);
-			
-			futures.put(pid, ret);
-			
-			// Can be called in another directory
-			File newcurdir = new File(options.getStartDirectory());
-			newcurdir.mkdirs();
-
-//			String cmd = options.getStartCommand();
-//			System.out.println("Starting process: " + cmd);
-
-			
-			final Process proc = Runtime.getRuntime().exec(options.getStartCommand(), null, newcurdir);
-			
-			if(options.isChildProcess())
+			IFuture<ILibraryService> fut = agent.getServiceContainer().getRequiredService("libservice");
+			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, StartOptions>(ret)
 			{
-				new Thread(new StreamCopy(proc.getInputStream(), System.out)).start();
-				new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
-			}
-			
-			System.out.println("Waiting for platform "+pid);
-			ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getCurrentInvocation().getTimeout(), agent.getExternalAccess(),
-				new IResultListener<IComponentIdentifier>()
-			{
-				public void resultAvailable(IComponentIdentifier result)
+				public void customResultAvailable(ILibraryService result)
 				{
-					System.out.println("Platform found: "+pid+", "+result);
+					ILibraryService ls = (ILibraryService)result;
+					ls.getAllURLs().addResultListener(new ExceptionDelegationResultListener<List<URL>, StartOptions>(ret)
+					{
+						public void customResultAvailable(List<URL> urls)
+						{
+							List<String> res = new ArrayList<String>();
+							for(int i = 0; i<urls.size(); i++)
+							{
+								URL url = (URL)urls.get(i);
+								String name = SUtil.convertURLToString(url);
+								if(name != null)
+								{
+									res.add(name);
+								}
+								else
+								{
+									System.out.println("Cannot convert url to file: "+ url);
+								}
+							}
+							StringBuffer buf = new StringBuffer();
+							for(int i = 0; i < res.size(); i++)
+							{
+								buf.append(res.get(i));
+								if(i + 1 < res.size())
+									buf.append(File.pathSeparator);
+							}
+							options.setClassPath(buf.toString());
+
+//							System.out.println("cp: "+options.getClassPath());
+							
+							ret.setResult(options);
+						}
+					});
 				}
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("No platform found: "+pid);
-					futures.remove(pid);
-					ret.setExceptionIfUndone(exception);
-				}
-			}));
+			});
 		}
-		catch(Exception ex)
+		else
 		{
-			ex.printStackTrace();
-			throw new RuntimeException("Could not start process. Reason: "+ ex.getMessage());
+			ret.setResult(options);
 		}
 
 		return ret;
 	}
+	
 	
 //	/**
 //	 *  Check the platform identifier.
