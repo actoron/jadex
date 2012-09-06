@@ -42,7 +42,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 		try
 		{
 			boolean	setcaller	= false;
-			if(!Proxy.isProxyClass(sic.getObject().getClass()) && ServiceCall.getInstance()==null)
+			if(!Proxy.isProxyClass(sic.getObject().getClass()) && ServiceCall.getCurrentInvocation()==null)
 				// && sic.getMethod().getName().indexOf("Area")!=-1)
 			{
 				long to = BasicServiceContainer.getMethodTimeout(

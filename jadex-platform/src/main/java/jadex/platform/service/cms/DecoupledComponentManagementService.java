@@ -300,7 +300,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-		final IComponentIdentifier creator = ServiceCall.getInstance().getCaller();
+		final IComponentIdentifier creator = ServiceCall.getCurrentInvocation().getCaller();
 
 //		if(modelname.indexOf("jadex/micro/testcases/securetrans/ProviderAgent.class")!=-1)
 //			System.out.println("create: "+modelname);
@@ -1870,7 +1870,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				if(ii!=null)
 				{
 //					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
-					if(!internal && (ii.getAdapter()==null || !ServiceCall.getInstance().getCaller().equals(cid)))
+					if(!internal && (ii.getAdapter()==null || !ServiceCall.getCurrentInvocation().getCaller().equals(cid)))
 					{
 //							System.out.println("getExternalAccess: delayed");
 						delayed = true;

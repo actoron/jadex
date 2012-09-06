@@ -52,31 +52,17 @@ public class ServiceCall
 	 *  to the current execution context.
 	 *  @return The service call instance or null.
 	 */
-	public static ServiceCall	getInstance()
+	public static ServiceCall	getCurrentInvocation()
 	{
 		return CALLS.get();
 	}
 	
 	/**
-	 * 
+	 *  Set the properties of the next invocation.
+	 *  @param timeout The timeout.
+	 *  @param realtime The realtime flag.
 	 */
-	public static ServiceCall getInvocation()
-	{
-		return INVOCATIONS.get();
-	}
-	
-	/**
-	 * 
-	 */
-	public static void removeInvocation()
-	{
-		INVOCATIONS.set(null);
-	}
-	
-	/**
-	 * 
-	 */
-	public static ServiceCall createInstance(long timeout, Boolean realtime)
+	public static ServiceCall setInvocationProperties(long timeout, Boolean realtime)
 	{
 		ServiceCall ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), timeout, realtime);
 		INVOCATIONS.set(ret);

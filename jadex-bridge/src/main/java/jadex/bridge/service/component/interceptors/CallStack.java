@@ -38,7 +38,7 @@ public abstract class CallStack	extends ServiceCall
 	 */
 	protected static void	push(IComponentIdentifier caller, long timeout, boolean realtime)
 	{
-		ServiceCall	previous	= ServiceCall.getInstance();
+		ServiceCall	previous	= ServiceCall.getCurrentInvocation();
 		if(previous!=null)
 		{
 			List<ServiceCall>	stack	= CALLSTACK.get();
@@ -64,5 +64,21 @@ public abstract class CallStack	extends ServiceCall
 			previous	= stack.remove(stack.size()-1);
 		}
 		ServiceCall.CALLS.set(previous);
+	}
+	
+	/**
+	 * 
+	 */
+	public static ServiceCall getInvocation()
+	{
+		return INVOCATIONS.get();
+	}
+	
+	/**
+	 * 
+	 */
+	public static void removeInvocation()
+	{
+		INVOCATIONS.set(null);
 	}
 }

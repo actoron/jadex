@@ -129,7 +129,7 @@ public abstract class AbstractEnvironmentService
 	protected IFuture<IComponentDescription>	getCallingComponent()
 	{
 		final Future<IComponentDescription>	ret	= new Future<IComponentDescription>();
-		final IComponentIdentifier	caller	= ServiceCall.getInstance().getCaller();
+		final IComponentIdentifier	caller	= ServiceCall.getCurrentInvocation().getCaller();
 		
 		// Hack!!! Space cannot be looked up in service start as service is initialized before envsupport extension.
 		final Future<Void>	spacedone	= new Future<Void>();

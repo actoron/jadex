@@ -27,8 +27,8 @@ public class ProviderAgent implements ITestService
 	 */
 	public IFuture<Void> method(String msg)
 	{
-		System.out.println("Called method: "+msg+" "+ServiceCall.getInstance().getTimeout()
-			+" "+ServiceCall.getInstance().isRealtime());
+		System.out.println("Called method: "+msg+" "+ServiceCall.getCurrentInvocation().getTimeout()
+			+" "+ServiceCall.getCurrentInvocation().isRealtime());
 		Future<Void> ret = new Future<Void>();
 		return ret;
 //		return IFuture.DONE;

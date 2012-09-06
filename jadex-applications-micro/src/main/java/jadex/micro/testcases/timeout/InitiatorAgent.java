@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.CallStack;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -192,7 +193,7 @@ public class InitiatorAgent extends TestAgent
 				final long start = System.currentTimeMillis();
 				if(to!=-1)
 				{
-					ServiceCall.createInstance(to, true);
+					ServiceCall.setInvocationProperties(to, true);
 				}
 				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{
@@ -204,7 +205,11 @@ public class InitiatorAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(exception instanceof TimeoutException)
+						if(CallStack.getInvocation()!=null)
+						{
+							tr.setFailed("User inocation data still available: "+CallStack.getInvocation());
+						}
+						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
 							if(diff>=0 && diff<2000) // 2 secs max overdue delay?

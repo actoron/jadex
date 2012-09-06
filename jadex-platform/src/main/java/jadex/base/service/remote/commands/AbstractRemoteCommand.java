@@ -1,11 +1,8 @@
 package jadex.base.service.remote.commands;
 
-import java.util.Map;
-
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.security.DefaultAuthorizable;
@@ -15,6 +12,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.remote.RemoteReferenceModule;
+
+import java.util.Map;
 
 /**
  *  Default base class for remote commands.
@@ -26,6 +25,14 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
+	
+	// todo: gets overwritten by decoupling interceptor
+	// todo: unify with non-functional properties of AbstractRemoteCommand
+//	/** The declared or remote default timeout value. */
+//	protected long	timeout;
+	
+//	/** The real time timeout flag. */
+//	protected boolean	realtime;
 	
 	//-------- constructors --------
 	
@@ -138,5 +145,15 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	public void setNonFunctionalProperties(Map<String, Object> nonfunc)
 	{
 		this.nonfunc = nonfunc;
+	}
+	
+	/**
+	 *  Get a non-func value.
+	 *  @param name The name.
+	 *  @return The result.
+	 */
+	public Object getNonFunctionalProperty(String name)
+	{
+		return nonfunc==null? null: nonfunc.get(name);
 	}
 }

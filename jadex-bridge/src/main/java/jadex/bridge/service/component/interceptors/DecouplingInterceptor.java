@@ -160,7 +160,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.
-		if(copy && !sic.isRemoteCall() && !marshal.isRemoteObject(sic.getProxy()))
+		boolean callrem = marshal.isRemoteObject(sic.getProxy());
+		if(copy && !sic.isRemoteCall() && !callrem)
 		{
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
@@ -236,10 +237,17 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 //			|| sic.getMethod().getReturnType().equals(void.class);
 
-		ServiceCall sc = ServiceCall.getInvocation();
+		ServiceCall sc = CallStack.getInvocation();
 		long to = sc!=null? sc.getTimeout(): BasicServiceContainer.getMethodTimeout(
 			sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
 		boolean rt = sc!=null && sc.getRealtime()!=null? rt = sc.getRealtime().booleanValue(): realtime;
+		
+		// Remove meta info about current invocation if call is local
+		// In remote case it is removed in remote invocation handler
+		if(!callrem)
+		{
+			CallStack.removeInvocation();
+		}
 		
 		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{

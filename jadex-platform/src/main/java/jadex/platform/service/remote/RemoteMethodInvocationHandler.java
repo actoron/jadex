@@ -11,7 +11,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.interceptors.CallStack;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -26,7 +27,6 @@ import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -101,15 +101,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		ProxyInfo pi = pr.getProxyInfo();
 		
-		// Get method timeout
-		final long to = pi.getMethodTimeout(method);
+		// Get the current service invocation 
+		ServiceCall invoc = CallStack.getInvocation();
+		CallStack.removeInvocation();
 		
-		if(method.getName().indexOf("method")!=-1)
-		{
-			ServiceCall sc = ServiceCall.getInstance();
-			if(sc!=null)
-				System.out.println("sc to: "+sc.getTimeout());
-		}
+		// Get method timeout
+		final long to = invoc!=null && invoc.getTimeout()!=-1? invoc.getTimeout(): pi.getMethodTimeout(method);
+		// The reatime property is not necessary, as currently message are sent with realtime timeouts always  
 		
 		// Get the secure transmission
 		boolean sec = pi.isSecure(method);
@@ -119,6 +117,12 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		{
 			nf = new HashMap<String, Object>();
 			nf.put(SecureTransmission.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
+		}
+		if(invoc!=null && invoc.getTimeout()!=-1)
+		{
+			if(nf==null)
+				nf = new HashMap<String, Object>();
+			nf.put(Timeout.TIMEOUT, new Long(to));
 		}
 		final Map<String, Object> nonfunc = nf; 
 		

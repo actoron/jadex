@@ -212,7 +212,7 @@ public class DaemonService implements IDaemonService
 			}
 			
 			System.out.println("Waiting for platform "+pid);
-			ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getInstance().getTimeout(), agent.getExternalAccess(),
+			ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getCurrentInvocation().getTimeout(), agent.getExternalAccess(),
 				new IResultListener<IComponentIdentifier>()
 			{
 				public void resultAvailable(IComponentIdentifier result)

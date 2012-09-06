@@ -17,6 +17,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Timeout
 {
+	/** Constant for timeout name in non-functional properties. */
+	public static final String TIMEOUT = "timeout";
+	
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
 	

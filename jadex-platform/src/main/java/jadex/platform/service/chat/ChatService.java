@@ -289,7 +289,7 @@ public class ChatService implements IChatService, IChatGuiService
 	public IFuture<Void>	message(String nick, String text, boolean privatemessage)
 	{
 //		System.out.println("Timeout: "+ServiceCall.getInstance().getTimeout()+", "+ServiceCall.getInstance().isRealtime());
-		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getInstance().getCaller(), text, privatemessage, null);
+		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, ServiceCall.getCurrentInvocation().getCaller(), text, privatemessage, null);
 		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
 	}
 
@@ -299,7 +299,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IFuture<Void>	status(String nick, String status, byte[] image)
 	{
-		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, ServiceCall.getInstance().getCaller(), status, false, image);
+		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, ServiceCall.getCurrentInvocation().getCaller(), status, false, image);
 		return IFuture.DONE;
 	}
 	
@@ -317,7 +317,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public ITerminableIntermediateFuture<Long> sendFile(final String nick, String filename, long size, String id, final IInputConnection con)
 	{
-		final ServiceCall call = ServiceCall.getInstance();
+		final ServiceCall call = ServiceCall.getCurrentInvocation();
 		
 		// Hack!!! always assume real time for chat interaction.
 		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, call.getCaller(), size, System.currentTimeMillis() + call.getTimeout());
@@ -352,7 +352,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public ITerminableFuture<IOutputConnection> startUpload(final String nick, String filename, long size, String id)
 	{
-		final ServiceCall call = ServiceCall.getInstance();
+		final ServiceCall call = ServiceCall.getCurrentInvocation();
 		
 		final TransferInfo	ti	= new TransferInfo(true, id, filename, null, call.getCaller(), size, System.currentTimeMillis() + call.getTimeout());
 		ti.setState(TransferInfo.STATE_WAITING);

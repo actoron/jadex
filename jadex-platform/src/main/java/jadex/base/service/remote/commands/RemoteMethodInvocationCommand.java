@@ -6,6 +6,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.interceptors.CallStack;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
@@ -52,14 +54,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	
 	/** The parameter values. */
 	protected Object[] parametervalues;
-	
-	// todo: gets overwritten by decoupling interceptor
-//	/** The declared or remote default timeout value. */
-//	protected long	timeout;
-//	
-//	/** The real time timeout flag. */
-//	protected boolean	realtime;
-	
+		
 	/** The declared reference flag for the return value. */
 	protected boolean returnisref;
 	
@@ -74,7 +69,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	
 	/** The caller. */
 	protected IComponentIdentifier caller;
-		
+	
 	//-------- constructors --------
 	
 	/**
@@ -101,6 +96,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		this.parametervalues = parametervalues!=null? parametervalues.clone(): null;
 		this.callid = callid;
 		this.caller	= caller;
+//		this.timeout = timeout;
 //		System.out.println("rmi on client: "+callid+" "+methodname);
 	}
 	
@@ -221,6 +217,12 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
+		Long to = (Long)getNonFunctionalProperty(Timeout.TIMEOUT);
+		if(to!=null && to.longValue()>0)
+		{
+			CallStack.setInvocationProperties(to, null);
+		}
+		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
 		IComponentIdentifier.LOCAL.set(caller);
@@ -228,6 +230,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		invokeMethod(ret, rsms);
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		IComponentAdapter.LOCAL.set(ada);
+		
+		CallStack.removeInvocation();
 		
 		return ret;
 	}
