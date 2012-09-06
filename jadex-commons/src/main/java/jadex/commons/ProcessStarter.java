@@ -30,7 +30,7 @@ public class ProcessStarter
 	/**
 	 *  Start a java or non-java process. 
 	 */
-	public static void main(String[] args) throws Exception
+	public static void main(String[] args)
 	{
 		if(args.length<2)
 			throw new IllegalArgumentException("Syntax is -external -true|false [-stdout file] [-stderr file] cmds");
@@ -42,7 +42,7 @@ public class ProcessStarter
 			Map<String, Object> nargs = processArguments(args);
 			
 			out = nargs.get("-stdout")!=null? new FileOutputStream(new File((String)nargs.get("-stdout"))): new NullOutputStream();
-			err = nargs.get("-stderr")!=null? new FileOutputStream(new File((String)nargs.get("-stdout"))): new NullOutputStream();
+			err = nargs.get("-stderr")!=null? new FileOutputStream(new File((String)nargs.get("-stderr"))): new NullOutputStream();
 			
 			if("true".equals(nargs.get("-external")))
 			{
