@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class ProcessStarter
 	
 	static
 	{
+		reserved	= new HashSet<String>();
 		reserved.add("-external"); // false=other java proc
 		reserved.add("-stdout");
 		reserved.add("-stderr");
@@ -70,21 +72,17 @@ public class ProcessStarter
 	{
 		Map<String, Object> ret = new HashMap<String, Object>();
 		
-		for(int i=0; i<args.length; i++)
+		int i=0;
+		for(; i<args.length && reserved.contains(args[i]); i++)
 		{
-			if(reserved.contains(args[i]))
-			{
-				ret.put(args[i], args[++i]);
-			}
-			else
-			{
-				if(i+1<args.length)
-				{
-					String[] nargs = new String[args.length-1-i];
-					System.arraycopy(args, i+1, nargs, 0, nargs.length);
-					ret.put("args", nargs);
-				}
-			}
+			ret.put(args[i], args[++i]);
+		}
+		
+		if(i<args.length)
+		{
+			String[] nargs = new String[args.length-i];
+			System.arraycopy(args, i, nargs, 0, nargs.length);
+			ret.put("args", nargs);
 		}
 		
 		return ret;

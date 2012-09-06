@@ -103,7 +103,7 @@
 		
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
-		<!-- Start the platform with command line interface (cli) activated? -->
+		<!-- Start the platform with command line interface (cli) activated?  (requires Jadex Pro add-on) -->
 		<argument name="cli" class="boolean">true</argument>
 		<!-- Start cli with console in or not -->
 		<argument name="cliconsole" class="boolean">true</argument>
@@ -172,7 +172,7 @@
 		<argument name="relaytransport" class="boolean">true</argument>
 		<!-- Address(es) for relay transport (one or more addresses separated by commas). -->
 		<argument name="relayaddress" class="String">jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
-		<!-- Flag if ssltcp transport should enabled (requires Jadex Pro). -->
+		<!-- Flag if ssltcp transport should enabled (requires Jadex Pro add-on). -->
 		<argument name="ssltcptransport" class="boolean">false</argument>
 		<!-- Port for SSL TCP transport. -->
 		<argument name="ssltcpport" class="int">44334</argument>
@@ -197,7 +197,7 @@
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 		
-		<!-- Flag to enable the Maven dependency service (requires Jadex Pro). -->
+		<!-- Flag to enable the Maven dependency service (requires Jadex Pro add-on). -->
 		<argument name="maven_dependencies" class="boolean">false</argument>
 	</arguments>
 	

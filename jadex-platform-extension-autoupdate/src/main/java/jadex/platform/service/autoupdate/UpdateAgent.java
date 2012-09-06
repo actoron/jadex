@@ -65,7 +65,9 @@ import java.util.Map;
 {
 	@Argument(name="interval", clazz=long.class, defaultvalue="10000"),
 	@Argument(name="separatevm", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="forbiddenvmargs", clazz=String[].class, defaultvalue="new String[]{\"-agentlib:jdwp=transport\"}")
+	@Argument(name="forbiddenvmargs", clazz=String[].class, defaultvalue="new String[]{\"-agentlib:jdwp=transport\"}"),
+	@Argument(name="outputfile", clazz=String.class, description="Redirect output stream of new platform to file"),
+	@Argument(name="errorfile", clazz=String.class, description="Redirect error stream of new platform to file")
 })
 @ComponentTypes(
 {
@@ -100,6 +102,14 @@ public class UpdateAgent implements IUpdateService
 	/** The vmargs that should not be used. */
 	@AgentArgument()
 	protected String[] forbiddenvmargs;
+	
+	/** The output file (if any). */
+	@AgentArgument()
+	protected String outputfile;
+	
+	/** The error file (if any). */
+	@AgentArgument()
+	protected String errorfile;
 	
 	//-------- methods --------
 	
@@ -370,7 +380,8 @@ public class UpdateAgent implements IUpdateService
 		final StartOptions so = new StartOptions();
 		
 		so.setMain("jadex.base.Starter");
-//		so.setMain("jadex.commons.ProcessStarter");
+		so.setOutputFile(outputfile);
+		so.setErrorFile(errorfile);
 		
 		RuntimeMXBean rbean = ManagementFactory.getRuntimeMXBean();
 		List<String> vmargs = new ArrayList<String>(rbean.getInputArguments());

@@ -29,6 +29,12 @@ public class StartOptions
 	/** The start directory. */
 	protected String startdir;
 	
+	/** The output stream redirection file name (if any). */
+	protected String outputfile;
+	
+	/** The error stream redirection file name (if any). */
+	protected String errorfile;
+	
 	/** Flag if process starter should be used for complete process decoupling. */
 	protected boolean childproc;
 
@@ -141,6 +147,42 @@ public class StartOptions
 	}
 	
 	/**
+	 *  Get the output stream redirection file (if any).
+	 *  @return The output file name.
+	 */
+	public String getOutputFile()
+	{
+		return outputfile;
+	}
+
+	/**
+	 *  Set the output stream redirection file (if any).
+	 *  @param outputfile The output file name.
+	 */
+	public void setOutputFile(String outputfile)
+	{
+		this.outputfile	= outputfile;
+	}
+
+	/**
+	 *  Get the error stream redirection file (if any).
+	 *  @return The error file name.
+	 */
+	public String getErrorFile()
+	{
+		return errorfile;
+	}
+
+	/**
+	 *  Set the error stream redirection file (if any).
+	 *  @param errorfile The error file name.
+	 */
+	public void setErrorFile(String errorfile)
+	{
+		this.errorfile	= errorfile;
+	}
+
+	/**
 	 *  Get the childProcess.
 	 *  @return The childProcess.
 	 */
@@ -199,7 +241,18 @@ public class StartOptions
 		else
 		{
 			cmd.append(" ").append("jadex.commons.ProcessStarter");
-			cmd.append(" -java ").append(getMain()).append(" ").append(getProgramArguments());
+			cmd.append(" -external false");
+			
+			if(outputfile!=null)
+			{
+				cmd.append(" -stdout ").append(outputfile);
+			}
+			if(errorfile!=null)
+			{
+				cmd.append(" -stderr ").append(errorfile);
+			}
+			
+			cmd.append(" ").append(getMain()).append(" ").append(getProgramArguments());
 			
 //			String nargs = " "+getMain()+" "+getProgramArguments();
 //			nargs = nargs.replaceAll("\"", "\\\\\"");
