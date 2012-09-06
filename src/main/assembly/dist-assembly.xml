@@ -34,6 +34,8 @@
 				<exclude>*:*-webservice*</exclude>
 				<!-- Exclude all secure transport modules -->
 				<exclude>*:*-securetransport</exclude>
+				<!-- Exclude all cli modules -->
+				<exclude>*:*-cli</exclude>
 				<!-- Exclude all secure transport modules -->
 				<exclude>*:*-relay*</exclude>
 			</excludes>

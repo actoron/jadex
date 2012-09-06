@@ -248,6 +248,21 @@
 	        </dependencies>
 	    </profile>
 	    <profile>
+	        <id>cli</id>
+	        <activation>
+	            <file>
+	                <exists>../jadex-platform-extension-cli</exists>
+	            </file>
+	        </activation>
+	        <dependencies>
+	          	<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-extension-cli</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+	        </dependencies>
+	    </profile>
+	    <profile>
 	        <id>autoupdate</id>
 	        <activation>
 	            <file>
