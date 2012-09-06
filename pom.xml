@@ -590,7 +590,7 @@
 								</goals>
 								<configuration>
 									<!-- .zip is appended automatically to the final name. -->
-									<finalName>jadex-securetransport-addon-${project.version}</finalName>
+									<finalName>jadex-cli-addon-${project.version}</finalName>
 									<outputDirectory>target/pro-addons</outputDirectory>
 								    <descriptors>
 										<descriptor>src/main/assembly/dist-assembly-cli.xml</descriptor>
