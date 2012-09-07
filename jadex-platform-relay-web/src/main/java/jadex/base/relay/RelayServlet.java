@@ -183,7 +183,9 @@ public class RelayServlet extends HttpServlet
         {
         	response.setContentLength((int)file.length());
             response.setDateHeader("Last-Modified", file.lastModified());
-        	String	mimetype	= URLConnection.guessContentTypeFromName(file.getName());
+            response.setDateHeader("Expires", System.currentTimeMillis() + 24*60*60*1000);
+            response.addHeader("Cache-Control", "max-age="+24*60*60);
+            String	mimetype	= URLConnection.guessContentTypeFromName(file.getName());
         	if(mimetype!=null)
         	{
         		response.setContentType(mimetype);
