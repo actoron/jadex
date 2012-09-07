@@ -58,7 +58,7 @@ import java.util.Map;
 {	
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationtype="emailagent")),
 	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationtype="daemon"))
 })
@@ -74,6 +74,7 @@ import java.util.Map;
 })
 @ComponentTypes(
 {
+	@ComponentType(name="emailagent", filename="jadex/platform/service/email/EmailAgent.class"),
 	@ComponentType(name="daemon", filename="jadex/platform/service/daemon/DaemonAgent.class")
 })
 public class UpdateAgent implements IUpdateService
