@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.VersionInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.chat.IChatGuiService;
@@ -337,14 +338,22 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IChatGuiService chatser)
 			{
+				// Only wait 2 secs for sending status before continuing.
 				chatser.message(agent.getComponentIdentifier().getName()+": "+text, null, true)
-					.addResultListener(new ExceptionDelegationResultListener<Collection<IChatService>, Void>(firstret)
+					.addResultListener(new TimeoutResultListener<Collection<IChatService>>(2000, agent.getExternalAccess(),
+					new IResultListener<Collection<IChatService>>()
 				{
-					public void customResultAvailable(Collection<IChatService> result)
+					public void resultAvailable(Collection<IChatService> result)
 					{
 						firstret.setResult(null);
 					}
-				});
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						firstret.setResult(null);
+					}
+				}));
+
 			}
 		});
 		

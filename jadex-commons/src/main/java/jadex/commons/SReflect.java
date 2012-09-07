@@ -1261,7 +1261,7 @@ public class SReflect
 					}
 					catch(Exception e)
 					{
-						System.out.println("Eror opening jar: "+urls[i]+" "+e.getMessage());
+						System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
 					}
 					finally
 					{

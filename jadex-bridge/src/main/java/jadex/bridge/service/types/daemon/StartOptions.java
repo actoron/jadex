@@ -3,6 +3,7 @@ package jadex.bridge.service.types.daemon;
 import jadex.commons.StreamCopy;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 
 /**
@@ -259,7 +260,7 @@ public class StartOptions
 //			cmd.append(" ").append("\""+nargs+"\"");
 		}
 		
-		System.out.println("starting with: "+cmd.toString());
+		Logger.getLogger("jadex.startoptions").info("starting with: "+cmd.toString());
 		
 		return cmd.toString();
 	}
