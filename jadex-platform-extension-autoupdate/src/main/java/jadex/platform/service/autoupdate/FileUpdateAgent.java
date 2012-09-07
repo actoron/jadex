@@ -207,7 +207,7 @@ public class FileUpdateAgent extends UpdateAgent
 							{
 								agent.getLogger().info(agent.getComponentIdentifier()+": Updating to version: "+sdf.format(founddate));
 
-								File	target	= new File(decoms[0], ".");
+								File	target	= decoms[0];
 								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
 								
 								// copy .settings.xml files from current directory (if any).
@@ -318,7 +318,7 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						public void customResultAvailable(List<URL> result)
 						{
-							System.out.println(agent.getComponentIdentifier()+": curversion urls "+result);
+							agent.getLogger().info(agent.getComponentIdentifier()+": curversion urls "+result);
 							// search for jadex jar file
 							for(URL url: result)
 							{

@@ -161,6 +161,7 @@ public class DaemonService implements IDaemonService
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
 //		System.out.println("start in daemon 2");
+		final long timeout	= ServiceCall.getCurrentInvocation().getTimeout();
 
 		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, IComponentIdentifier>(ret)
 		{
@@ -185,7 +186,7 @@ public class DaemonService implements IDaemonService
 				
 					// Wait for handshake.
 					System.out.println("Waiting for platform "+pid);
-					ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getCurrentInvocation().getTimeout(), agent.getExternalAccess(),
+					ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(timeout, agent.getExternalAccess(),
 						new IResultListener<IComponentIdentifier>()
 					{
 						public void resultAvailable(IComponentIdentifier result)
@@ -202,7 +203,8 @@ public class DaemonService implements IDaemonService
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
+					futures.remove(pid);
 					ret.setException(e);
 				}
 			}
