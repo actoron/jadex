@@ -160,7 +160,7 @@ public class DaemonService implements IDaemonService
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
-		System.out.println("start in daemon 2");
+//		System.out.println("start in daemon 2");
 
 		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, IComponentIdentifier>(ret)
 		{

@@ -105,7 +105,7 @@ public class FileUpdateAgent extends UpdateAgent
 						}
 						
 						so.setClassPath(flattenStrings((Iterator)SReflect.getIterator(jarurls), File.pathSeparator));
-						System.out.println("start options: "+so);
+//						System.out.println("start options: "+so);
 						
 						ret.setResult(so);
 					}
@@ -150,7 +150,7 @@ public class FileUpdateAgent extends UpdateAgent
 				});
 				findDistDirs(new File(scandir), res);
 				
-				System.out.println("scanning: "+res);
+//				System.out.println("scanning: "+res);
 				
 				long foundver = 0;
 				if(res.size()>0)

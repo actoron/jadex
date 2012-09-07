@@ -281,16 +281,21 @@ public class UpdateAgent implements IUpdateService
 		// notify via email
 		final Future<Void> secret = new Future<Void>(); 
 		secret.addResultListener(lis);
-		if(account!=null && receivers!=null && receivers.length>0)
+		if(receivers!=null && receivers.length>0)
 		{
 			IFuture<IEmailService> efut = agent.getRequiredService("emailser");
-			efut.addResultListener(new ExceptionDelegationResultListener<IEmailService, Void>(secret)
+			efut.addResultListener(new IResultListener<IEmailService>()
 			{
-				public void customResultAvailable(IEmailService emailser)
+				public void resultAvailable(IEmailService emailser)
 				{
-					Email eml = new Email(account.getSender(), text, "platform update notification", null);
+					Email eml = new Email(null, text, "platform update notification", null);
 					eml.setReceivers(receivers);
 					emailser.sendEmail(eml, account).addResultListener(new DelegationResultListener<Void>(secret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().warning("Failed to send email: "+exception);
+					secret.setResult(null);
 				}
 			});
 		}
