@@ -1656,12 +1656,14 @@ table.xwikilogintable th {
 fieldset.xwikimessage .xwikimessage {
 	text-align: left; clear: both; font-size: 110%; font-weight: 700;
 }
+/*
 .accordionTabTitleBar h1 {
 	background: url("/resources/icons/xwiki/accordion.png") no-repeat left rgb(236, 236, 236); font: 700 0.8em/1.8em sans-serif; margin: 0px; padding: 4px 21px; color: rgb(77, 88, 96); text-transform: uppercase; border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(232, 232, 232); border-top-width: 1px; border-bottom-width: 1px; border-top-style: solid; border-bottom-style: solid; display: block; font-size-adjust: none; font-stretch: normal;
 }
 .accordionTabTitleBar h6 {
 	background: url("/resources/icons/xwiki/accordion.png") no-repeat left rgb(236, 236, 236); font: 700 0.8em/1.8em sans-serif; margin: 0px; padding: 4px 21px; color: rgb(77, 88, 96); text-transform: uppercase; border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(232, 232, 232); border-top-width: 1px; border-bottom-width: 1px; border-top-style: solid; border-bottom-style: solid; display: block; font-size-adjust: none; font-stretch: normal;
 }
+*/
 .accordionTabContentBox {
 	background: rgb(243, 243, 243); padding: 5px; overflow: auto;
 }

@@ -48,6 +48,24 @@ public class RelayServlet extends HttpServlet
 	//-------- methods --------
 	
 	/**
+	 *  Provide last modified time for static content
+	 *  to aid browser caches.
+	 */
+	protected long getLastModified(HttpServletRequest request)
+	{
+		long	ret;
+		if(request.getServletPath().startsWith("/resources"))
+		{
+			ret	= new File(getServletContext().getRealPath(request.getServletPath())).lastModified();
+		}
+		else
+		{
+			ret	= super.getLastModified(request);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Called when a platform registers itself at the relay. 
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
