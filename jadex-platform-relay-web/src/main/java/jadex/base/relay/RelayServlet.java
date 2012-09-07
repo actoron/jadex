@@ -169,6 +169,9 @@ public class RelayServlet extends HttpServlet
 	
 	//-------- helper methods --------
 	
+	/** Time in seconds before browsers should refresh static resources (7 days). */
+	protected static long	MAXAGE	= 60*60*24*7;
+	
 	/**
 	 *  Serve a static resource from the file system.
 	 */
@@ -183,8 +186,8 @@ public class RelayServlet extends HttpServlet
         {
         	response.setContentLength((int)file.length());
             response.setDateHeader("Last-Modified", file.lastModified());
-            response.setDateHeader("Expires", System.currentTimeMillis() + 24*60*60*1000);
-            response.addHeader("Cache-Control", "max-age="+24*60*60);
+            response.setDateHeader("Expires", System.currentTimeMillis() + MAXAGE*1000);
+            response.addHeader("Cache-Control", "max-age="+MAXAGE);
             String	mimetype	= URLConnection.guessContentTypeFromName(file.getName());
         	if(mimetype!=null)
         	{

@@ -1,5 +1,4 @@
-<Context antiResourceLocking="true">
-
+<Context antiResourceLocking="true"  cookies="false">
     <!-- Default set of monitored resources - ->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
 	-->

@@ -1,3 +1,4 @@
+<%@page session="false"%>
 <%@page import="java.net.InetAddress"%>
 <%@ page language="java" contentType="text/comma-separated-values; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"

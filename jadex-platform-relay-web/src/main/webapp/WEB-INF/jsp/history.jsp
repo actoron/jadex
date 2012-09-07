@@ -2,6 +2,7 @@
 	<jsp:param name="title" value="Relay Transport - Connection History" />	
 </jsp:include>
 
+<%@page session="false"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="jadex.base.relay.*" %>

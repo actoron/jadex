@@ -1,3 +1,4 @@
+<%@page session="false"%>
 <%@page import="java.net.InetAddress"%>
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -8,7 +9,8 @@
 	<meta http-equiv="refresh" content="<%= request.getAttribute("refresh") %>">
 <% } %>
 <TITLE><%= request.getParameter("title") %></TITLE>
-<LINK rel="shortcut icon" type="image/ico" href="images/jadex_icon.ico" />
+<LINK rel="shortcut icon" type="image/ico" href="resources/jadex_icon.ico" />
+<% /*
 <SCRIPT type="text/javascript">
 	var _gaq = _gaq || [];
 	_gaq.push([ '_setAccount', 'UA-33705718-1' ]);
@@ -25,9 +27,9 @@
 		s.parentNode.insertBefore(ga, s);
 	})();
 </SCRIPT>
-
 <META name="google-site-verification"
 	content="PSu8atqC7qDGHNZBfqQjVV8xM13xwyOUQs-4BmycCXc" />
+*/ %>
 <LINK rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/resources/colibri.css" media="all" />
 <BODY id="body"
 	class="wiki-xwiki space-AC_User_Guide viewbody hideright">
