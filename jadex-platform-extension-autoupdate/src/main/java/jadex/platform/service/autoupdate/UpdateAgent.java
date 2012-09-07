@@ -6,7 +6,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.VersionInfo;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -17,7 +16,6 @@ import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
 import jadex.bridge.service.types.library.IDependencyService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
@@ -26,12 +24,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -64,7 +60,7 @@ import java.util.Map;
 	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, componenttype="daemon"))
+	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationtype="daemon"))
 })
 @Arguments(
 {
@@ -73,8 +69,8 @@ import java.util.Map;
 	@Argument(name="forbiddenvmargs", clazz=String[].class, defaultvalue="new String[]{\"-agentlib:jdwp=transport\"}"),
 	@Argument(name="account", clazz=EmailAccount.class, description="The email account to send the emails."),
 	@Argument(name="receivers", clazz=String[].class, description="The email receivers."),
-	@Argument(name="outputfile", clazz=String.class, description="Redirect output stream of new platform to file"),
-	@Argument(name="errorfile", clazz=String.class, description="Redirect error stream of new platform to file")
+	@Argument(name="outputfile", clazz=String.class, description="Redirect output stream of new platform to file", defaultvalue="\"./platform_out.txt\""),
+	@Argument(name="errorfile", clazz=String.class, description="Redirect error stream of new platform to file", defaultvalue="\"./platform_err.txt\"")
 })
 @ComponentTypes(
 {

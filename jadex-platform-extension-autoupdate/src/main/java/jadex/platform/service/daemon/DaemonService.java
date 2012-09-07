@@ -101,6 +101,8 @@ public class DaemonService implements IDaemonService
 	{
 		final Future<Void> ret = new Future<Void>();
 
+		System.out.println("start in daemon");
+		
 		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, Void>(ret)
 		{
 			public void customResultAvailable(StartOptions options)
@@ -127,14 +129,18 @@ public class DaemonService implements IDaemonService
 									// Not yet terminated -> ignore.
 									ret	= IFuture.DONE;
 								}
-								// TODO Auto-generated method stub
 								return ret;
 							}
 						}).addResultListener(new DelegationResultListener<Void>(ret));
 					}
+					else
+					{
+						ret.setResult(null);
+					}
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					ret.setException(e);
 				}
 			}
@@ -153,6 +159,8 @@ public class DaemonService implements IDaemonService
 	public IFuture<IComponentIdentifier> startPlatformAndWait(StartOptions options)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+
+		System.out.println("start in daemon 2");
 
 		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, IComponentIdentifier>(ret)
 		{
@@ -176,17 +184,17 @@ public class DaemonService implements IDaemonService
 					options.startProcess();
 				
 					// Wait for handshake.
-//					System.out.println("Waiting for platform "+pid);
+					System.out.println("Waiting for platform "+pid);
 					ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(ServiceCall.getCurrentInvocation().getTimeout(), agent.getExternalAccess(),
 						new IResultListener<IComponentIdentifier>()
 					{
 						public void resultAvailable(IComponentIdentifier result)
 						{
-//							System.out.println("Platform found: "+pid+", "+result);
+							System.out.println("Platform found: "+pid+", "+result);
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-//							System.out.println("No platform found: "+pid);
+							System.out.println("No platform found: "+pid);
 							futures.remove(pid);
 							ret.setExceptionIfUndone(exception);
 						}
@@ -194,6 +202,7 @@ public class DaemonService implements IDaemonService
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					ret.setException(e);
 				}
 			}

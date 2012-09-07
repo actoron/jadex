@@ -37,6 +37,8 @@ public class ProcessStarter
 		if(args.length<2)
 			throw new IllegalArgumentException("Syntax is -external -true|false [-stdout file] [-stderr file] cmds");
 		
+		System.out.println("enter main");
+		
 		OutputStream out = null;
 		OutputStream err = null;
 		try
@@ -59,6 +61,7 @@ public class ProcessStarter
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			close(out);
 			close(err);
 			throw new RuntimeException(e);
@@ -124,6 +127,7 @@ public class ProcessStarter
 	 */
 	public static void startJavaProcess(String[] parts, OutputStream out, OutputStream err)
 	{
+		System.out.println("starting java in procs: "+SUtil.arrayToString(parts));
 		try
 		{
 			// empty streams of this process to dev null 
