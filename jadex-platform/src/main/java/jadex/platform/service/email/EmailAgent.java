@@ -24,6 +24,7 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -303,7 +304,9 @@ public class EmailAgent implements IEmailService
 	 */
 	protected void checkForNewMails()
 	{
-		System.out.println("checking for new mails");
+//		System.out.println("checking for new mails");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		agent.getLogger().info("checking for new mails: "+sdf.format(new Date(System.currentTimeMillis())));
 		
 		if(subscriptions!=null)
 		{
@@ -352,149 +355,17 @@ public class EmailAgent implements IEmailService
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("receive ended");
+//				System.out.println("receive ended");
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("execep: "+exception);
-				exception.printStackTrace();
+				System.out.println("exeception checking mail: "+exception);
+//				exception.printStackTrace();
 			}
 		});
 		
 		return receive;
 	}
 	
-	/**
-	 * 
-	 */
-	public static void main(String[] args) 
-	{
-		Properties props = new Properties();
-		props.put("mail.smtp.host", "***REMOVED***");
-		props.put("mail.from", "aaa@gmail.com");
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.debug", "true");
-
-		Session session = Session.getInstance(props, new Authenticator()
-		{
-			protected PasswordAuthentication getPasswordAuthentication()
-			{
-				return new PasswordAuthentication("jadexagent@gmail.com", "***REMOVED***");
-			}
-		});
-		try
-		{
-			MimeMessage msg = new MimeMessage(session);
-			msg.setFrom();
-			msg.setRecipients(Message.RecipientType.TO, "braubach@gmx.net");
-			msg.setSubject("JavaMail hello world example");
-			msg.setSentDate(new Date());
-			msg.setText("Hello, world!\n");
-			Transport.send(msg);
-		}
-		catch(MessagingException mex)
-		{
-			System.out.println("send failed, exception: " + mex);
-		}
-
-	}
-	
-//	/**
-//	 *  Main for testing.
-//	 */
-//	public static void main(String[] args)
-//	{
-//		Properties props = new Properties();
-//		props.setProperty("mail.smtp.auth", "true");
-//		props.setProperty("mail.smtps.auth", "true");
-//		props.setProperty("mail.smtp.starttls.enable", "true");
-//		props.setProperty("mail.smtp.user", "jadexagent@gmail.com");
-//		props.setProperty("mail.smtp.EnableSSL.enable", "true");
-//		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");   
-//		props.setProperty("mail.smtp.socketFactory.fallback", "false");   
-//		props.setProperty("mail.smtp.port", "465");   
-//		props.setProperty("mail.smtp.socketFactory.port", "465"); 
-//		
-//		Session sess = Session.getDefaultInstance(props, new javax.mail.Authenticator() 
-//		{
-//		    protected PasswordAuthentication getPasswordAuthentication() 
-//		    {
-//		      return new PasswordAuthentication("jadexagent@gmail.com", "***REMOVED***");
-//		    }
-//		});
-//		sess.setDebug(true);
-//
-//		try
-//		{
-//			MimeMessage message = new MimeMessage(sess);
-//			message.setFrom(new InternetAddress("jadexagent"));
-//			message.setContent("test", "text/ plain");
-//			message.setSubject("test");
-//			message.addRecipient(Message.RecipientType.TO, new InternetAddress("braubach@informatik.uni-hamburg.de"));
-//			
-//			Transport tr;
-//			tr	= sess.getTransport("smtps");
-//			tr.connect(EmailAccount.TEST_ACCOUNT.getSmtpHost(), EmailAccount.TEST_ACCOUNT.getSmtpPort().intValue(), 
-//				EmailAccount.TEST_ACCOUNT.getUser(), EmailAccount.TEST_ACCOUNT.getPassword());
-////			tr.connect(account.getSmtpHost(), account.getUser(), account.getPassword());
-//			
-//			message.saveChanges();
-//			tr.sendMessage(message, message.getAllRecipients());
-//			tr.close();
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//			throw new RuntimeException(e);
-//		}
-		
-//		Properties props = System.getProperties();
-//		props.setProperty("mail.store.protocol", "imaps");
-//		try
-//		{
-//			Session session = Session.getDefaultInstance(props, null);
-//			final Store store = session.getStore("imaps");
-//			store.connect("imap.gmail.com", "jadexagent@gmail.com", "***REMOVED***");
-//			
-//			Folder f = store.getFolder("inbox");
-//			f.open(Folder.READ_ONLY);
-//
-//			f.addMessageCountListener(new MessageCountListener()
-//			{
-//				public void messagesRemoved(MessageCountEvent e)
-//				{
-//					System.out.println("msg removed: "+e);
-//				}
-//				
-//				public void messagesAdded(MessageCountEvent e)
-//				{
-//					System.out.println("msg added: "+e);
-//				}
-//			});
-//			
-//			if(f instanceof IMAPFolder)
-//			{
-//				IMAPFolder imf = (IMAPFolder)f;
-//				imf.idle();
-//			}
-////				else if(f instanceof POP3Folder)
-////				{
-////					POP3Folder ptf = (POP3Folder)f;
-////					ptf.s
-////				}
-//			
-//			FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.SEEN), false);
-//			Message messages[] = f.search(ft);
-//
-//			System.out.println("new msg: "+SUtil.arrayToString(messages));
-//
-//	        f.close(false);        
-//	    } 
-//		catch(Exception e) 
-//		{
-//			e.printStackTrace();
-//	    }
-//	}
 }

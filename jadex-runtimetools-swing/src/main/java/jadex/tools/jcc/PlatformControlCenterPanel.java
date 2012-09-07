@@ -7,6 +7,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -213,8 +214,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 												{
 													public boolean filter(Object obj)
 													{
+//														System.out.println("found: "+obj);
+																
 														Class<?> cl = (Class<?>)obj;
-														boolean ret = !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+														boolean ret = SReflect.isSupertype(IControlCenterPlugin.class, cl) && !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
 														
 														if(ret)
 														{

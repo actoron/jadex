@@ -1,15 +1,15 @@
 package jadex.bridge.service.types.email;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
+
 /**
  *  Email account data.
  */
 public class EmailAccount
 {
-	/** Test account. */
-	public static final EmailAccount TEST_ACCOUNT = new EmailAccount("jadexagent@gmail.com", "***REMOVED***", "jadexagent", 
-		"***REMOVED***", 587, false, true,
-		"imap.gmail.com", "imaps");
-	
 	//-------- attributes --------
 
 	/** The user name. */
@@ -45,6 +45,21 @@ public class EmailAccount
 	
 	//-------- constructors --------
 
+	/**
+	 *  Create a new EmailAccount.
+	 */
+	public EmailAccount()
+	{
+	}
+	
+	/**
+	 *  Create a new EmailAccount.
+	 */
+	public EmailAccount(String filename)
+	{
+		readAccount(filename);
+	}
+	
 	/**
 	 *  Create a new account.
 	 *  @param smtphost The smtp host.
@@ -233,6 +248,65 @@ public class EmailAccount
 		this.receiveprotocol = receiveprotocol;
 	}
 
+	/**
+	 *  Store data to a property file.
+	 */
+	public void writeAccount(String filename)
+	{
+		try
+		{
+			Properties ps = new Properties();
+			
+			ps.setProperty("user", getUser());
+			ps.setProperty("password", getPassword());
+			ps.setProperty("sender", getSender());
+			ps.setProperty("smtphost", getSmtpHost());
+			ps.setProperty("smtpport", ""+getSmtpPort());
+			ps.setProperty("ssl", ""+isSsl());
+			ps.setProperty("starttls", ""+isStartTls());
+			ps.setProperty("receivehost", getReceiveHost());
+			ps.setProperty("receiveprotocol", getReceiveProtocol());
+			
+			ps.store(new FileOutputStream(new File(filename)), null);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 	
+	/**
+	 *  Read account data from property file.
+	 */
+	public void readAccount(String filename)
+	{
+		try 
+		{
+			Properties ps = new Properties();
+		    ps.load(new FileInputStream(filename));
+		    if(ps.getProperty("user")!=null)
+		    	setUser(ps.getProperty("user"));
+		    if(ps.getProperty("password")!=null)
+		    	setPassword(ps.getProperty("password"));
+		    if(ps.getProperty("sender")!=null)
+		    	setSender(ps.getProperty("sender"));
+		    if(ps.getProperty("smtphost")!=null)
+		    	setSmtpHost(ps.getProperty("smtphost"));
+		    if(ps.getProperty("smtpport")!=null)
+		    	setSmtpPort(new Integer(ps.getProperty("smtpport")));
+		    if(ps.getProperty("ssl")!=null)
+		    	setSsl(Boolean.parseBoolean(ps.getProperty("ssl")));
+		    if(ps.getProperty("starttls")!=null)
+		    	setStartTls(Boolean.parseBoolean(ps.getProperty("starttls")));
+		    if(ps.getProperty("receivehost")!=null)
+		    	setReceiveHost(ps.getProperty("receivehost"));
+		    if(ps.getProperty("receiveprotocol")!=null)
+		    	setReceiveProtocol(ps.getProperty("receiveprotocol"));
+		} 
+		catch(Exception e) 
+		{
+			throw new RuntimeException(e);
+		}
+	}
 }
 

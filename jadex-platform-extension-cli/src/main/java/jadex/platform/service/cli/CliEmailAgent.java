@@ -55,7 +55,7 @@ import java.util.StringTokenizer;
 {
 	@Argument(name="subject", clazz=String.class, defaultvalue="\"command\"", 
 		description="The regular expression for the subject to match identify command emails."),
-	@Argument(name="account", clazz=EmailAccount.class, defaultvalue="EmailAccount.TEST_ACCOUNT",
+	@Argument(name="account", clazz=EmailAccount.class, defaultvalue="new EmailAccount(\"default_account.properties\")",
 		description="The email account used to listen for email commands.")
 })
 @RequiredServices(
@@ -320,42 +320,42 @@ public class CliEmailAgent
 		return ret;
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		System.out.println("command".matches("command"));
-		
-		String test = "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid\r\napplications-micro;help;\r\n==1346225963008==\r\n==xiA5dSIYwQYt6veZ4P4XqkUgMr34PdWnlU5NXOmzManvGkQiJoAdIw7bXiSMYrRv==\r\n==QrxVsuMG1Y2xQ0GK2km+lmPWQ21jFmsWPri2R9BWoTvUiKmBRpztOv4gcy2iItLk==\r\n==FwuRNAUJRrsb+gAVanlyp5TDKlvmfoRcr/AfUpVwpZFFtT2ZS5sLQJcMos911IoL==\r\n==bgxBOGCoODY7ydTxS4PfX4bRBCt1dCqnn9ik0Cj0UM3UV874VERNLu70Mj/Fj3k0==";
-		
-		StringTokenizer stok = new StringTokenizer(test, ";");
-		List<String> lines = new ArrayList<String>();
-		String digests = null;
-		while(stok.hasMoreTokens())
-		{
-			String str = stok.nextToken().trim();
-			if(str.startsWith("#"))
-			{
-				digests = str;
-			}
-			else
-			{
-				lines.add(str);
-			}
-		}
-		
-		if(digests!=null)
-		{
-			stok = new StringTokenizer(digests, "#");
-			List<String> dgs = new ArrayList<String>();
-			while(stok.hasMoreTokens())
-			{
-				String tmp = stok.nextToken().trim();
-				if(tmp.length()>0)
-					dgs.add(tmp);
-			}
-			System.out.println(dgs);
-		}
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		System.out.println("command".matches("command"));
+//		
+//		String test = "cc -model jadex/micro/examples/helloworld/HelloWorldAgent.class -rid\r\napplications-micro;help;\r\n==1346225963008==\r\n==xiA5dSIYwQYt6veZ4P4XqkUgMr34PdWnlU5NXOmzManvGkQiJoAdIw7bXiSMYrRv==\r\n==QrxVsuMG1Y2xQ0GK2km+lmPWQ21jFmsWPri2R9BWoTvUiKmBRpztOv4gcy2iItLk==\r\n==FwuRNAUJRrsb+gAVanlyp5TDKlvmfoRcr/AfUpVwpZFFtT2ZS5sLQJcMos911IoL==\r\n==bgxBOGCoODY7ydTxS4PfX4bRBCt1dCqnn9ik0Cj0UM3UV874VERNLu70Mj/Fj3k0==";
+//		
+//		StringTokenizer stok = new StringTokenizer(test, ";");
+//		List<String> lines = new ArrayList<String>();
+//		String digests = null;
+//		while(stok.hasMoreTokens())
+//		{
+//			String str = stok.nextToken().trim();
+//			if(str.startsWith("#"))
+//			{
+//				digests = str;
+//			}
+//			else
+//			{
+//				lines.add(str);
+//			}
+//		}
+//		
+//		if(digests!=null)
+//		{
+//			stok = new StringTokenizer(digests, "#");
+//			List<String> dgs = new ArrayList<String>();
+//			while(stok.hasMoreTokens())
+//			{
+//				String tmp = stok.nextToken().trim();
+//				if(tmp.length()>0)
+//					dgs.add(tmp);
+//			}
+//			System.out.println(dgs);
+//		}
+//	}
 }
