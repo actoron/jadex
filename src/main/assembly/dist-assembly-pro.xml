@@ -68,16 +68,16 @@
 		</file>
 		<file>
 			<source>docs/api-changes.txt</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/jcc.settings.xml</source>
-			<outputDirectory>jadex-${version}/lib</outputDirectory>
+			<outputDirectory>jadex-${version}</outputDirectory>
 		</file>
 		<file>
 			<source>docs/default.settings.xml</source>
-			<outputDirectory>jadex-${version}/lib</outputDirectory>
+			<outputDirectory>jadex-${version}</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex.bat</source>

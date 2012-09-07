@@ -86,6 +86,8 @@ public class EmailAgent implements IEmailService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+//		System.out.println("email agent started");
+		
 		if(account==null)
 		{
 			try
@@ -132,10 +134,12 @@ public class EmailAgent implements IEmailService
 		
 		if(acc==null && this.account==null)
 		{
+//			System.out.println("email agent send email: no account");
 			ret.setException(new RuntimeException("No email account given."));
 			return ret;
 		}
 		
+//		System.out.println("email agent trying to send email");
 		final EmailAccount account = acc!=null? acc: this.account;
 		
 		if(email.getSender()==null)

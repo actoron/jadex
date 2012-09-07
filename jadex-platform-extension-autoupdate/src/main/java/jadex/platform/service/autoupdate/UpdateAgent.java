@@ -24,6 +24,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -144,16 +145,49 @@ public class UpdateAgent implements IUpdateService
 						{
 							performUpdate(ui).addResultListener(new IResultListener<IComponentIdentifier>()
 							{
-								public void resultAvailable(IComponentIdentifier result)
+								public void resultAvailable(final IComponentIdentifier newcid)
 								{
-									notifyUpdatePerformed("Shutting down old platform "+agent.getComponentIdentifier().getRoot()
-										+" (Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+") for new platform "+result)
+									getVersionInfo(newcid).addResultListener(new IResultListener<String>()
+									{
+										public void exceptionOccurred(Exception exception)
+										{
+											resultAvailable("unknown version due to "+exception);
+										}
+										
+										public void resultAvailable(String newversion)
+										{
+											String text	= "Shutting down old platform "+agent.getComponentIdentifier().getRoot()
+													+" ("+getLocalVersionInfo()+") for new platform "+newcid+" ("+newversion+")";
+											
+											notifyUpdateResult(text)
+												.addResultListener(new IResultListener<Void>()
+											{
+												public void resultAvailable(Void result) 
+												{
+													// Kill platform.
+													cms.destroyComponent(agent.getComponentIdentifier().getRoot());	
+												}
+												
+												public void exceptionOccurred(Exception exception) 
+												{
+													resultAvailable(null);
+												}
+											});
+										}
+									});									
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									String text	= "Update of platform "+agent.getComponentIdentifier().getRoot()
+											+" ("+getLocalVersionInfo()+") failed due to "+exception;
+									
+									notifyUpdateResult(text)
 										.addResultListener(new IResultListener<Void>()
 									{
 										public void resultAvailable(Void result) 
 										{
-											// Kill platform.
-											cms.destroyComponent(agent.getComponentIdentifier().getRoot());	
+											agent.waitFor(interval, self);
 										}
 										
 										public void exceptionOccurred(Exception exception) 
@@ -161,11 +195,6 @@ public class UpdateAgent implements IUpdateService
 											resultAvailable(null);
 										}
 									});
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									agent.waitFor(interval, self);
 								}
 							});
 						}
@@ -250,10 +279,51 @@ public class UpdateAgent implements IUpdateService
 //	}
 	
 	/**
-	 *  Notify administrators that platform update has
-	 *  been successfully performed.
+	 *  Get the version info for a new platform.
 	 */
-	protected IFuture<Void> notifyUpdatePerformed(final String text)
+	protected IFuture<String>	getVersionInfo(final IComponentIdentifier newcid)
+	{
+		// Todo: version service!?
+		final Future<String>	ret	= new Future<String>();
+		IFuture<IComponentManagementService>	cms	= agent.getServiceContainer().getRequiredService("cms");
+		cms.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+				{
+					public void customResultAvailable(IExternalAccess exta)
+					{
+						exta.scheduleStep(new IComponentStep<String>()
+						{
+							@Classname("getVersionInfo")
+							
+							public IFuture<String> execute(IInternalAccess ia)
+							{
+								return new Future<String>(getLocalVersionInfo());
+							}
+						}).addResultListener(new DelegationResultListener<String>(ret));
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a string for the local Jadex version.
+	 */
+	protected static String	getLocalVersionInfo()
+	{
+		return "Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString();
+	}
+	
+	/**
+	 *  Notify administrators that platform update has
+	 *  been tried.
+	 */
+	protected IFuture<Void> notifyUpdateResult(final String text)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -283,6 +353,7 @@ public class UpdateAgent implements IUpdateService
 		secret.addResultListener(lis);
 		if(receivers!=null && receivers.length>0)
 		{
+//			System.out.println("update send email");
 			IFuture<IEmailService> efut = agent.getRequiredService("emailser");
 			efut.addResultListener(new IResultListener<IEmailService>()
 			{
@@ -294,6 +365,8 @@ public class UpdateAgent implements IUpdateService
 				}
 				public void exceptionOccurred(Exception exception)
 				{
+//							System.out.println("update send email failed: "+exception);
+//							exception.printStackTrace();
 					agent.getLogger().warning("Failed to send email: "+exception);
 					secret.setResult(null);
 				}
@@ -301,6 +374,7 @@ public class UpdateAgent implements IUpdateService
 		}
 		else
 		{
+//			System.out.println("update no send email");
 			secret.setResult(null);
 		}
 		
