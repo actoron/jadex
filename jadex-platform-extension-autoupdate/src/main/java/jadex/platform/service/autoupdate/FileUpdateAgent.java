@@ -175,6 +175,7 @@ public class FileUpdateAgent extends UpdateAgent
 					// Only update when not younger than safetydelay and difference between versions also greater than safetydelay.
 					if(foundver>lastver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
 					{
+						System.out.println("new version");
 						newestversion	= foundver;
 						File dir = null;
 						try
@@ -229,6 +230,7 @@ public class FileUpdateAgent extends UpdateAgent
 							}
 							else
 							{
+								System.out.println("corrupt");
 								SUtil.deleteDirectory(dir);
 								ret.setException(new RuntimeException("Unexpectedly found not exactly one directory in decompressed distribution: "+SUtil.arrayToString(decoms)));
 							}

@@ -10,7 +10,7 @@
 		<format>zip</format>
 	</formats>
 
-	<includeBaseDirectory>true</includeBaseDirectory>
+	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<moduleSets>
 		<moduleSet>
@@ -32,7 +32,7 @@
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
 				<!-- <outputFileNameMapping>${module.artifactId}-${module.version}${dashClassifier?}.${module.extension}</outputFileNameMapping> -->
 				<!-- <outputFileNameMapping>${artifactId}-${version}${dashClassifier?}.${extension}</outputFileNameMapping> -->
-				<outputDirectory>lib</outputDirectory>
+				<outputDirectory>jadex-${version}/lib</outputDirectory>
 				<unpack>false</unpack>
 			</binaries>
 		</moduleSet>
@@ -43,28 +43,28 @@
 		   - due to Maven assembly bug: http://jira.codehaus.org/browse/MASSEMBLY-558 -->
 		<file>
 			<source>docs/junit-3.8.1.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>jadex-${version}/lib</outputDirectory>
 		</file>
 		<file>
 			<source>jadex-platform-standalone-launch/target/jadex-platform-standalone-launch-${version}.jar</source>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>jadex-${version}/lib</outputDirectory>
 		</file>
 		<file>
 			<source>target/jadex-example-project.zip</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>target/sources-pro.zip</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/readme.txt</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>docs/license.txt</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/api-changes.txt</source>
@@ -73,39 +73,39 @@
 		</file>
 		<file>
 			<source>docs/jcc.settings.xml</source>
-			<outputDirectory>/lib</outputDirectory>
+			<outputDirectory>jadex-${version}/lib</outputDirectory>
 		</file>
 		<file>
 			<source>docs/default.settings.xml</source>
-			<outputDirectory>/lib</outputDirectory>
+			<outputDirectory>jadex-${version}/lib</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex.bat</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.bat</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex.sh</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex_no_awareness.sh</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex-relay.bat</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jadex-relay.sh</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 		<file>
 			<source>docs/howtostart.txt</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 	</files>
 

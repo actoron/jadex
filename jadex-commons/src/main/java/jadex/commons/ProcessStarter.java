@@ -37,7 +37,7 @@ public class ProcessStarter
 		if(args.length<2)
 			throw new IllegalArgumentException("Syntax is -external -true|false [-stdout file] [-stderr file] cmds");
 		
-		System.out.println("enter main");
+//		System.out.println("enter main");
 		
 		OutputStream out = null;
 		OutputStream err = null;
@@ -47,6 +47,8 @@ public class ProcessStarter
 			
 			out = nargs.get("-stdout")!=null? new FileOutputStream(new File((String)nargs.get("-stdout"))): new NullOutputStream();
 			err = nargs.get("-stderr")!=null? new FileOutputStream(new File((String)nargs.get("-stderr"))): new NullOutputStream();
+			
+			out.write("starting using process starter\n".getBytes());
 			
 			if("true".equals(nargs.get("-external")))
 			{
@@ -127,7 +129,7 @@ public class ProcessStarter
 	 */
 	public static void startJavaProcess(String[] parts, OutputStream out, OutputStream err)
 	{
-		System.out.println("starting java in procs: "+SUtil.arrayToString(parts));
+//		System.out.println("starting java in procs: "+SUtil.arrayToString(parts));
 		try
 		{
 			// empty streams of this process to dev null 
