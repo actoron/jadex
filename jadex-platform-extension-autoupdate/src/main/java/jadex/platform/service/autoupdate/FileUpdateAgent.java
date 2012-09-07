@@ -31,6 +31,11 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.zip.ZipFile;
 
+/**
+ *  The file update agent is based on a scan directory in which new versions
+ *  are detected. If a new version was found the agent will initiate a platform
+ *  restart.
+ */
 @Arguments(replace=false, value=
 {
 	@Argument(name="rootdir", clazz=String.class, description="Directory where to create new distribution directories", defaultvalue="\".\""),
@@ -44,11 +49,6 @@ import java.util.zip.ZipFile;
 	@RequiredService(name="libservice", type=ILibraryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Agent
-/**
- *  The file update agent is based on a scan directory in which new versions
- *  are detected. If a new version was found the agent will initiate a platform
- *  restart.
- */
 public class FileUpdateAgent extends UpdateAgent
 {
 	@AgentArgument

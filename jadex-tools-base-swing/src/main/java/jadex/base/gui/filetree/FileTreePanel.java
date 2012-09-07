@@ -486,8 +486,12 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						{
 							for(int i=0; i<entries.length; i++)
 							{
-								ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, exta, factory);
-								addNode(node);
+								File f = new File(entries[i]);
+								if(f.exists())
+								{
+									ITreeNode node = factory.createNode(root, model, tree, f, iconcache, exta, factory);
+									addNode(node);
+								}
 							}
 							rootdone.setResult(null);
 						}
@@ -498,12 +502,16 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 								@Classname("createRootEntries")
 								public IFuture<FileData[]> execute(IInternalAccess ia)
 								{
-									FileData[]	ret	= new FileData[entries.length];
+									List<FileData>	ret	= new ArrayList<FileData>();
 									for(int i=0; i<entries.length; i++)
 									{
-										ret[i]	= new FileData(new File(entries[i]).getAbsoluteFile());
+										File f = new File(entries[i]);
+										if(f.exists())
+										{
+											ret.add(new FileData(new File(entries[i]).getAbsoluteFile()));
+										}
 									}
-									return new Future<FileData[]>(ret);
+									return new Future<FileData[]>((FileData[])ret.toArray(new FileData[ret.size()]));
 								}
 							}).addResultListener(new SwingDelegationResultListener<FileData[]>(rootdone)
 							{

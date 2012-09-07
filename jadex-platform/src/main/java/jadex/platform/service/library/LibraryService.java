@@ -189,6 +189,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		final IResourceIdentifier orid, final boolean workspace)
 	{
 //		System.out.println("adding: "+orid+" on: "+parid);
+
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
 		if(parid!=null && !rootloader.getAllResourceIdentifiers().contains(parid))
@@ -211,19 +212,28 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					}
 					else
 					{
-//						System.out.println("add end "+rid+" on: "+parid);
-	
-						// Must be added with resolved rid (what about resolving parent)
-						addLink(parid, rid);
-	
-						getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
-							new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
+						// Check if file exists
+						File f = new File(rid.getLocalIdentifier().getUrl().getFile());
+						if(!checkUrl(rid.getLocalIdentifier().getUrl()))
 						{
-							public void customResultAvailable(final DelegationURLClassLoader chil)
+							ret.setException(new RuntimeException("Local rid url invalid: "+rid));
+						}
+						else
+						{
+	//						System.out.println("add end "+rid+" on: "+parid);
+		
+							// Must be added with resolved rid (what about resolving parent)
+							addLink(parid, rid);
+		
+							getClassLoader(rid, deps.getSecondEntity(), parid, workspace).addResultListener(
+								new ExceptionDelegationResultListener<DelegationURLClassLoader, IResourceIdentifier>(ret)
 							{
-								ret.setResult(rid);
-							}
-						});
+								public void customResultAvailable(final DelegationURLClassLoader chil)
+								{
+									ret.setResult(rid);
+								}
+							});
+						}
 					}
 				}
 				
@@ -342,6 +352,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, URL url)
 	{
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+
+//		System.out.println("add url: "+url);
+		
+		if(!checkUrl(url))
+		{
+			ret.setException(new RuntimeException("URL not backed by local file: "+url));
+			return ret;
+		}
+//		System.out.println("add url2: "+url);
+		
 		// Normalize files to avoid duplicate urls.
 		if("file".equals(url.getProtocol()))
 		{
@@ -354,7 +375,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		}
 		
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		internalGetResourceIdentifier(url).addResultListener(
 			new DelegationResultListener<IResourceIdentifier>(ret)
 		{
@@ -402,6 +422,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> addTopLevelURL(@CheckNotNull URL url)
 	{
+		if(!checkUrl(url))
+			return new Future<Void>(new RuntimeException("URL not backed by local file: "+url));
+		
 		baseloader.addURL(url);
 		nonmanaged = null;
 		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null);
@@ -1273,6 +1296,22 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		
 		return gid!=null || lid!=null? new ResourceIdentifier(lid, gid): null;
+	}
+	
+	/**
+	 *  Check if a local url is backed by a file.
+	 */
+	protected boolean checkUrl(URL url)
+	{
+		boolean ret = true;
+		
+		if("file".equals(url.getProtocol()))
+		{
+			File f = new File(url.getFile());
+			ret = f.exists();
+		}
+		
+		return ret;
 	}
 }
 
