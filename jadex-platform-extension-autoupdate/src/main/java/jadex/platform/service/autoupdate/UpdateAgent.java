@@ -70,8 +70,8 @@ import java.util.Map;
 	@Argument(name="forbiddenvmargs", clazz=String[].class, defaultvalue="new String[]{\"-agentlib:jdwp=transport\"}"),
 	@Argument(name="account", clazz=EmailAccount.class, description="The email account to send the emails."),
 	@Argument(name="receivers", clazz=String[].class, description="The email receivers."),
-	@Argument(name="outputfile", clazz=String.class, description="Redirect output stream of new platform to file", defaultvalue="\"../platform_out.txt\""),
-	@Argument(name="errorfile", clazz=String.class, description="Redirect error stream of new platform to file", defaultvalue="\"../platform_err.txt\"")
+	@Argument(name="outputfile", clazz=String.class, description="Redirect output stream of new platform to file", defaultvalue="\"./platform_out.txt\""),
+	@Argument(name="errorfile", clazz=String.class, description="Redirect error stream of new platform to file", defaultvalue="\"./platform_err.txt\"")
 })
 @ComponentTypes(
 {

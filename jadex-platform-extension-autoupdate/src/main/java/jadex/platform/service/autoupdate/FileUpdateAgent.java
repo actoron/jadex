@@ -207,7 +207,7 @@ public class FileUpdateAgent extends UpdateAgent
 							{
 								agent.getLogger().info(agent.getComponentIdentifier()+": Updating to version: "+sdf.format(founddate));
 
-								File	target	= new File(decoms[0], "lib");
+								File	target	= new File(decoms[0], ".");
 								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
 								
 								// copy .settings.xml files from current directory (if any).
