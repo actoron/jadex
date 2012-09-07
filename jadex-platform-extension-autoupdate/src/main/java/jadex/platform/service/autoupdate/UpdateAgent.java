@@ -365,8 +365,8 @@ public class UpdateAgent implements IUpdateService
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-//							System.out.println("update send email failed: "+exception);
-//							exception.printStackTrace();
+//					System.out.println("update send email failed: "+exception);
+//					exception.printStackTrace();
 					agent.getLogger().warning("Failed to send email: "+exception);
 					secret.setResult(null);
 				}

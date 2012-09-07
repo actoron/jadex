@@ -118,12 +118,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			nf = new HashMap<String, Object>();
 			nf.put(SecureTransmission.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
 		}
-		if(invoc!=null && invoc.getTimeout()!=-1)
-		{
-			if(nf==null)
-				nf = new HashMap<String, Object>();
-			nf.put(Timeout.TIMEOUT, new Long(to));
-		}
+		if(nf==null)
+			nf = new HashMap<String, Object>();
+		nf.put(Timeout.TIMEOUT, new Long(to));
 		final Map<String, Object> nonfunc = nf; 
 		
 		Future future;
