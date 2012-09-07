@@ -464,9 +464,9 @@ public class UpdateAgent implements IUpdateService
 									for(int i=0; i<oldargs.length; i++)
 									{
 //										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.platform.service.autoupdate.FileUpdateAgent")!=-1)
-										if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("FileUpdateAgent")!=-1
-												// Hack!!! Shouldn't know about daemon responder!?
-												|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
+										if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("UpdateAgent")!=-1
+											// Hack!!! Shouldn't know about daemon responder!?
+											|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
 										{
 											i++;
 										}
@@ -486,7 +486,7 @@ public class UpdateAgent implements IUpdateService
 //								System.out.println("post: "+argsstr);
 								String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
 								newargs.add("-component");
-								newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+".class(:"+deser+")\"");
+								newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+"Agent.class(:"+deser+")\"");
 
 								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
 								

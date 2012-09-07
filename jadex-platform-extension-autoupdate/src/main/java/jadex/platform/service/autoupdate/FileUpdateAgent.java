@@ -36,7 +36,7 @@ import java.util.zip.ZipFile;
 	@Argument(name="rootdir", clazz=String.class, description="Directory where to create new distribution directories", defaultvalue="\".\""),
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
-	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)).*.zip\"", description="Only main Jadex distribution jars."),
+	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)|(pro)).*.zip\"", description="Only main Jadex distribution jars."),
 	@Argument(name="safetydelay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000")
 })
 @RequiredServices(
@@ -150,7 +150,7 @@ public class FileUpdateAgent extends UpdateAgent
 				});
 				findDistDirs(new File(scandir), res);
 				
-//				System.out.println("scanning: "+scandir);
+				System.out.println("scanning: "+res);
 				
 				long foundver = 0;
 				if(res.size()>0)
@@ -171,7 +171,7 @@ public class FileUpdateAgent extends UpdateAgent
 						foundver = Math.max(foundver, files[i].lastModified());
 					}
 					System.out.println(agent.getComponentIdentifier()+": foundver vs lastver(+safety): "+foundver+", "+(lastver+safetydelay));
-					boolean force = true; // force update
+					boolean force = false; // force update
 					// Only update when not younger than safetydelay and difference between versions also greater than safetydelay.
 					if(foundver>lastver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
 					{
