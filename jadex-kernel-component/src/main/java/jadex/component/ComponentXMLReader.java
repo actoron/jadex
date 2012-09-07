@@ -395,6 +395,8 @@ public class ComponentXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
+				new AttributeInfo(new AccessInfo("creationname", "creationName")),
+				new AttributeInfo(new AccessInfo("creationtype", "creationType")),
 			})));
 		
 //		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 

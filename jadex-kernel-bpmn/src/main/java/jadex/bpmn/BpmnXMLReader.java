@@ -1436,6 +1436,8 @@ public class BpmnXMLReader
 							String dynamictxt = table.getCellValue(row, 5);
 							String createtxt = table.getCellValue(row, 6);
 							String recovertxt = table.getCellValue(row, 7);
+//							String creationtype = table.getCellValue(row, 8); todo
+
 							boolean dynamic = new Boolean(dynamictxt).booleanValue();
 							boolean create = new Boolean(createtxt).booleanValue();
 							boolean recover = new Boolean(recovertxt).booleanValue();
@@ -1444,7 +1446,7 @@ public class BpmnXMLReader
 							
 							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, 
 								scope, create, recover, null, proxytype==null || proxytype.length()==0? 
-									BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype);
+									BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype, null, null);
 							bindings.put(name, binding);
 						}
 

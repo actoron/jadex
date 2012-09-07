@@ -608,7 +608,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final Future ret = new Future();
 //		final IComponentIdentifier parent = pa!=null? pa: (IComponentIdentifier)provider.getId();
 		
-		if(binding.isCreate() && binding.getComponentType()!=null)
+		if(binding.isCreate() && binding.getCreationType()!=null)
 		{
 //			System.out.println("Create comp: "+provider+", "+binding.getComponentType());
 			getParentAccess(provider, info, binding).addResultListener(new DelegationResultListener(ret)
@@ -623,14 +623,14 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						public void customResultAvailable(Object result)
 						{
 							final IComponentManagementService cms = (IComponentManagementService)result;
-							exta.getFileName(binding.getComponentType()).addResultListener(new DelegationResultListener(ret)
+							exta.getFileName(binding.getCreationType()).addResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
 									final String filename = (String)result;
 //									System.out.println("file: "+filename+" "+binding.getComponentType());
 									CreationInfo ci = new CreationInfo(exta.getComponentIdentifier());
-									cms.createComponent(binding.getComponentName(), filename, ci, null)
+									cms.createComponent(binding.getCreationName(), filename, ci, null)
 										.addResultListener(new DelegationResultListener(ret)
 									{
 										public void customResultAvailable(Object result)

@@ -18,9 +18,11 @@ import jadex.micro.IntervalBehavior;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -34,7 +36,6 @@ import java.util.Properties;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -43,11 +44,17 @@ import javax.mail.internet.MimeMessage;
 
 
 /**
- * 
+ *  The email agent can be used to send emails and subscribe for incoming mails.
  */
 @Agent
 @Service
-@Arguments(@Argument(name="checkformail", description="Delay between checking for new mails.", clazz=long.class, defaultvalue="60000"))
+@Imports({"jadex.bridge.service.types.email.*"})
+@Arguments(
+{
+	@Argument(name="checkformail", description="Delay between checking for new mails.", clazz=long.class, defaultvalue="60000"),
+	@Argument(name="account", clazz=EmailAccount.class, defaultvalue="new EmailAccount(\"default_account.properties\")", 
+		description="The default email account that is used to send/receive emails.")
+})
 @ProvidedServices(@ProvidedService(type = IEmailService.class, implementation = @Implementation(expression="$pojoagent")))
 public class EmailAgent implements IEmailService
 {
@@ -61,6 +68,10 @@ public class EmailAgent implements IEmailService
 	@AgentArgument
 	protected long checkformail;
 	
+	/** The email account. */
+	@AgentArgument
+	protected EmailAccount account;
+	
 	/** The receive behavior. */
 	protected IntervalBehavior<Void> receive; 
 	
@@ -70,45 +81,24 @@ public class EmailAgent implements IEmailService
 	//-------- agent lifecycle methods --------
 	
 	/**
-	 * The agent body.
+	 *  Called on agent start.
 	 */
-//	@AgentBody
-//	public void body()
-//	{
-//		Email email = new Email("Hi all, its a test message.", "test",
-//			"braubach@informatik.uni-hamburg.de");
-//
-//		IEmailService es = (IEmailService)agent.getServiceContainer()
-//			.getProvidedServices(IEmailService.class)[0];
-//		
-////		es.sendEmail(email, account);
-////		System.out.println("sent successfully");
-//		
-//		es.subscribeForEmail(new ConstantFilter<Email>(true), EmailAccount.TEST_ACCOUNT)
-//			.addResultListener(new IIntermediateResultListener<Email>()
-//		{
-//			public void intermediateResultAvailable(Email result)
-//			{
-//				System.out.println("ir: "+result);
-//			}
-//
-//			public void finished()
-//			{
-//				System.out.println("fini");
-//			}
-//
-//			public void resultAvailable(Collection<Email> result)
-//			{
-//				System.out.println("ra: "+result);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("ex: "+exception);
-//			}
-//		});
-//	}
-			
+	@AgentCreated
+	public IFuture<Void> start()
+	{
+		if(account==null)
+		{
+			try
+			{
+				account = new EmailAccount("default_account.properties");
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		return IFuture.DONE;
+	}
+	
 	/**
 	 *  Called when service is shudowned.
 	 */
@@ -136,9 +126,20 @@ public class EmailAgent implements IEmailService
 	 *  @param email The email.
 	 *  @param account The email account.
 	 */
-	public IFuture<Void> sendEmail(Email email, final EmailAccount account)
+	public IFuture<Void> sendEmail(Email email, EmailAccount acc)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		if(acc==null && this.account==null)
+		{
+			ret.setException(new RuntimeException("No email account given."));
+			return ret;
+		}
+		
+		final EmailAccount account = acc!=null? acc: this.account;
+		
+		if(email.getSender()==null)
+			email.setSender(account.getSender());
 		
 		Properties props = new Properties();
 		props.put("mail.smtp.host", account.getSmtpHost());
@@ -252,9 +253,18 @@ public class EmailAgent implements IEmailService
 	 *  @param filter The filter.
 	 *  @param account The email account.
 	 */
-	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount account)
+	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount acc)
 	{
 		final SubscriptionIntermediateFuture<Email> ret = new SubscriptionIntermediateFuture<Email>();
+		
+		if(acc==null && this.account==null)
+		{
+			ret.setException(new RuntimeException("No email account given."));
+			return ret;
+		}
+		
+		final EmailAccount account = acc!=null? acc: this.account;
+		
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
 			public void terminated(Exception reason)

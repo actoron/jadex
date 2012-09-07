@@ -16,7 +16,7 @@ public interface IEmailService
 	 *  @param email The email.
 	 *  @param account The email account.
 	 */
-	public IFuture<Void> sendEmail(@CheckNotNull Email email, @CheckNotNull EmailAccount account);
+	public IFuture<Void> sendEmail(@CheckNotNull Email email, EmailAccount account);
 
 	/**
 	 *  Subscribe for email.
@@ -24,5 +24,5 @@ public interface IEmailService
 	 *  @param account The email account.
 	 */
 	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, @CheckNotNull EmailAccount account);
+	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount account);
 }

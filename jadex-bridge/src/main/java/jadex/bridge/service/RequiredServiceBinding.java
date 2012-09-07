@@ -16,12 +16,18 @@ public class RequiredServiceBinding
 	/** The service name. */
 	protected String name;
 	
-	/** The component name. */
+	/** The component name used for searching. */
 	protected String componentname;
 	
-	/** The component type, i.e. the model name. */
+	/** The component type, i.e. the model name used for searching. */
 	protected String componenttype;
 
+	/** The component creation name. */
+	protected String creationname;
+
+	/** The component creation type. */
+	protected String creationtype;
+	
 	/** The component filename. */
 //	protected String componentfilename;
 	
@@ -65,7 +71,8 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String scope, boolean dynamic)
 	{
-		this(name, null, null, dynamic, scope, false, false, null, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
+		this(name, null, null, dynamic, scope, false, false, null, 
+			BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
 	}
 
 	/**
@@ -73,7 +80,7 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String componentname,
 		String componenttype, boolean dynamic, String scope, boolean create, boolean recover,
-		UnparsedExpression[] interceptors, String proxytype)
+		UnparsedExpression[] interceptors, String proxytype, String creationtype, String creationname)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -83,6 +90,8 @@ public class RequiredServiceBinding
 		this.create = create;
 		this.recover = recover;
 		this.proxytype = proxytype;
+		this.creationtype = creationtype;
+		this.creationname = creationname;
 		if(interceptors!=null)
 		{
 			for(int i=0; i<interceptors.length; i++)
@@ -100,7 +109,7 @@ public class RequiredServiceBinding
 	{
 		this(orig.getName(), orig.getComponentName(), orig.getComponentType(), 
 			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover(), 
-			orig.getInterceptors(), orig.getProxytype());
+			orig.getInterceptors(), orig.getProxytype(), orig.getCreationType(), orig.getCreationName());
 	}
 
 	//-------- methods --------
@@ -278,6 +287,42 @@ public class RequiredServiceBinding
 	{
 		this.proxytype = proxytype;
 	}
+	
+	/**
+	 *  Get the creationname.
+	 *  @return The creationname.
+	 */
+	public String getCreationName()
+	{
+		return creationname;
+	}
+
+	/**
+	 *  Set the creationname.
+	 *  @param creationname The creationname to set.
+	 */
+	public void setCreationName(String creationname)
+	{
+		this.creationname = creationname;
+	}
+
+	/**
+	 *  Get the creationtype.
+	 *  @return The creationtype.
+	 */
+	public String getCreationType()
+	{
+		return creationtype;
+	}
+
+	/**
+	 *  Set the creationtype.
+	 *  @param creationtype The creationtype to set.
+	 */
+	public void setCreationType(String creationtype)
+	{
+		this.creationtype = creationtype;
+	}
 
 	/**
 	 *  Get the string representation.
@@ -285,7 +330,8 @@ public class RequiredServiceBinding
 	public String toString()
 	{
 		return " scope=" + scope + ", dynamic="+ dynamic + ", create=" + create + ", recover=" 
-			+ recover+ ", componentname=" + componentname + ", componenttype="+ componenttype;
+			+ recover+ ", componentname=" + componentname + ", componenttype="+ componenttype
+			+" , creationtype="+creationtype+" , creationname="+creationname;
 	}
 
 	

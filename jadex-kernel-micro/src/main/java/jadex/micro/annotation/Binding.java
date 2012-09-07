@@ -70,10 +70,21 @@ public @interface Binding
 	 */
 	public String componenttype() default "";
 	
+//	/**
+//	 *  The component filename.
+//	 */
+//	public String componentfilename() default "";
+
 	/**
-	 *  The component filename.
+	 *  The creation name.
 	 */
-	public String componentfilename() default "";
+	public String creationname() default "";
+
+	
+	/**
+	 *  The creation type.
+	 */
+	public String creationtype() default "";
 	
 	/**
 	 *  The search scope.

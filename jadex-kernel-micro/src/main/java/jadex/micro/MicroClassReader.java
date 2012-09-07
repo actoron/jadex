@@ -732,7 +732,7 @@ public class MicroClassReader
 		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
 			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
-			bd.proxytype());
+			bd.proxytype(), bd.creationtype().length()==0? null: bd.creationtype(), bd.creationname().length()==0? null: bd.creationname());
 	}
 	
 	/**
