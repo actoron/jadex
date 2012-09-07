@@ -107,7 +107,7 @@ public class UpdateAgent implements IUpdateService
 //	protected Future<Void> updated;
 	
 	/** The vmargs that should not be used. */
-	@AgentArgument()
+	@AgentArgument
 	protected String[] forbiddenvmargs;
 	
 	/** The email account. */
@@ -119,11 +119,11 @@ public class UpdateAgent implements IUpdateService
 	protected String[] receivers;
 	
 	/** The output file (if any). */
-	@AgentArgument()
+	@AgentArgument
 	protected String outputfile;
 	
 	/** The error file (if any). */
-	@AgentArgument()
+	@AgentArgument
 	protected String errorfile;
 	
 	//-------- methods --------
@@ -287,11 +287,11 @@ public class UpdateAgent implements IUpdateService
 		if(account!=null && receivers!=null && receivers.length>0)
 		{
 			IFuture<IEmailService> efut = agent.getRequiredService("emailser");
-			efut.addResultListener(new ExceptionDelegationResultListener<IEmailService, Void>(ret)
+			efut.addResultListener(new ExceptionDelegationResultListener<IEmailService, Void>(secret)
 			{
 				public void customResultAvailable(IEmailService emailser)
 				{
-					Email eml = new Email(account.getSender(), text, "platform update", null);
+					Email eml = new Email(account.getSender(), text, "platform update notification", null);
 					eml.setReceivers(receivers);
 					emailser.sendEmail(eml, account).addResultListener(new DelegationResultListener<Void>(secret));
 				}
