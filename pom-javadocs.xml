@@ -6,7 +6,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-javadocs-dist</artifactId>
 	<packaging>pom</packaging>
-	<version>2.1.1-SNAPSHOT</version>
+	<version>2.2</version>
 	<name>jadex-javadocs-dist</name>
 	
 	<!-- ======== Modules to include in javadocs ======== -->

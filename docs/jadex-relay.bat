@@ -1,1 +1,1 @@
-java -jar lib\jadex-platform-extension-relay-standalone-2.1.1-SNAPSHOT.jar -port 80
+java -jar lib\jadex-platform-extension-relay-standalone-2.2.jar -port 80
