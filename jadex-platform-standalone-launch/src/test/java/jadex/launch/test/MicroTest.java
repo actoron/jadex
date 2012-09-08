@@ -55,9 +55,10 @@ public class MicroTest	extends ComponentTestSuite
 			"3d",
 			"showrooms",
 			
-			// Non-tests that don't stop until finished (why?)
+			// Non-tests that sometimes don't stop until finished (why?)
 			"AgentCreationAgent",	
-			"PojoAgentCreationAgent"
+			"PojoAgentCreationAgent",
+			"MegaParallelStarter"
 		});
 //		}, 600000, true, false);
 	}

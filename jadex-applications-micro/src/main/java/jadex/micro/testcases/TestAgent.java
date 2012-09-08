@@ -106,7 +106,7 @@ public abstract class TestAgent
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//				"-logging_level", "java.util.logging.Level.INFO",
+//				"-logging", "true",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
 			"-gui", "true", "-simulation", "false", "-printpass", "false"};
 		
