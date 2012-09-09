@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agrspace" xmlns="http://jadex.sourceforge.net/jadex-agrspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agrspace" xmlns="http://jadex.sourceforge.net/jadex-agrspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.2">
 	<!-- 	
-	<xs:import namespace="http://jadex.sourceforge.net/jadex" schemaLocation="http://jadex.sourceforge.net/jadex-application-2.1.xsd"/>
+	<xs:import namespace="http://jadex.sourceforge.net/jadex" schemaLocation="http://jadex.sourceforge.net/jadex-application-2.2.xsd"/>
 	
 	<xs:complexType name="spacetype">
 		<xs:complexContent>

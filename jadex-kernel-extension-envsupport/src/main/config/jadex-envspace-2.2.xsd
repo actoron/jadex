@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Mit XMLSpy v2012 rel. 2 sp1 (http://www.altova.com) von Philip Wil (Universität Hamburg) bearbeitet -->
-<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
 <xs:schema xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
 	<xs:element name="envspacetype" type="envspacetype">
 		<xs:annotation>

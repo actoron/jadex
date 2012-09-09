@@ -101,7 +101,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 <agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.1.xsd"
+	                    http://jadex.sourceforge.net/jadex-bdi-2.2.xsd"
 	name="Blocksworld"
 	package="jadex.bdi.examples.blocksworld">
 

@@ -16,7 +16,7 @@
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
-	                    http://jadex.sourceforge.net/jadex-application-2.1.xsd"
+	                    http://jadex.sourceforge.net/jadex-application-2.2.xsd"
 	name="MarsWorld" package="jadex.bdi.examples.marsworld_classic">
 	
 	<componenttypes>

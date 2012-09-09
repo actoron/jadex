@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.2">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>

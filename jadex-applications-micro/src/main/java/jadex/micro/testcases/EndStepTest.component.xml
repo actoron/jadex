@@ -2,7 +2,7 @@
 <!-- Test execution of end steps. -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-component-2.1.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-component-2.2.xsd"
 	name="EndStepTest" package="jadex.micro.testcases">
 	
 	<imports>
