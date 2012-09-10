@@ -267,6 +267,7 @@ public class MEnvSpaceType
 			new SubobjectInfo(new AccessInfo(new QName(uri, "dataview"), "dataviews", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "spaceexecutor"), null, null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "perspective"), "perspectives", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "perspective3d"), "perspectives", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "percepttype"), "percepttypes", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "dataprovider"), "dataproviders", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, new BeanAccessInfo("property")))
@@ -477,33 +478,12 @@ public class MEnvSpaceType
 						((Perspective2D) ret).setPostlayers((Layer[]) targetpostlayers.toArray(new Layer[0]));
 					}
 										
-					if(ret instanceof Perspective3D)
-					{
-						Perspective3D pers = (Perspective3D)ret;				
-						
-						List drawables3d = (List)args.get("drawables3d");
-						if(drawables3d!=null)
-						{
-							for(int k=0; k<drawables3d.size(); k++)
-							{
-								Map sourcedrawable3d = (Map)drawables3d.get(k);
-								Map tmp = new HashMap();
-								tmp.put("fetcher", fetcher);
-								tmp.put("object", sourcedrawable3d);
-								ret.addVisual(getProperty(sourcedrawable3d, "objecttype"), 
-									((IObjectCreator)getProperty(sourcedrawable3d, "creator")).createObject(tmp));
-								
-							}
-						}
-						
-					}
 
 					return ret;
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawable3d"), "drawables3d", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "drawable"), "drawables", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "gridlayer")}), new AccessInfo(new QName(uri, "gridlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
@@ -512,6 +492,58 @@ public class MEnvSpaceType
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "colorlayer")}), new AccessInfo(new QName(uri, "colorlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
+		
+		
+		
+		
+		
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perspective3d")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(ti_po, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),		
+				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
+						args = (Map)args.get("object");
+						
+						IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
+
+											
+						if(ret instanceof Perspective3D)
+						{
+							Perspective3D pers = (Perspective3D)ret;				
+							
+							List drawables3d = (List)args.get("drawables3d");
+							if(drawables3d!=null)
+							{
+								for(int k=0; k<drawables3d.size(); k++)
+								{
+									Map sourcedrawable3d = (Map)drawables3d.get(k);
+									Map tmp = new HashMap();
+									tmp.put("fetcher", fetcher);
+									tmp.put("object", sourcedrawable3d);
+									ret.addVisual(getProperty(sourcedrawable3d, "objecttype"), 
+										((IObjectCreator)getProperty(sourcedrawable3d, "creator")).createObject(tmp));
+									
+								}
+							}
+							
+						}
+
+						return ret;
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawable3d"), "drawables3d", null, null, new BeanAccessInfo(AccessInfo.THIS)))
+				})));
+		
+		
+		
+		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable3d")}), new ObjectInfo(MultiCollection.class),
 				new MappingInfo(ti_po, new AttributeInfo[]{

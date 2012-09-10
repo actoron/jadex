@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Mit XMLSpy v2012 rel. 2 sp1 (http://www.altova.com) von Philip Wil (Universität Hamburg) bearbeitet -->
 <xs:schema xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
 	<xs:element name="envspacetype" type="envspacetype">
 		<xs:annotation>
@@ -136,6 +137,7 @@
 										<xs:documentation>A perspective is used to define the visual representation of space objects.</xs:documentation>
 									</xs:annotation>
 								</xs:element>
+								<xs:element name="perspective3d" type="perspective3d" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
@@ -297,11 +299,6 @@
 							<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="drawable3d" type="drawable3d" minOccurs="0" maxOccurs="unbounded">
-						<xs:annotation>
-							<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
 					<xs:element name="prelayers" type="layers" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Layers that are shown behind the space objects (drawn before). </xs:documentation>
@@ -374,62 +371,62 @@
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
 				<xs:choice minOccurs="0" maxOccurs="unbounded">
-					<xs:element name="sphere" type="drawableelement3d" minOccurs="0">
+					<xs:element name="sphere" type="sphere" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Sphere display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="box" type="drawableelement3d" minOccurs="0">
+					<xs:element name="box" type="box" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Box display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="cylinder" type="drawableelement3d" minOccurs="0">
+					<xs:element name="cylinder" type="cylinder" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Cylinder display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="dome" type="drawableelement3d" minOccurs="0">
+					<xs:element name="dome" type="dome" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Dome display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="torus" type="drawableelement3d" minOccurs="0">
+					<xs:element name="torus" type="torus" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Torus display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="object3d" type="drawableelement3d" minOccurs="0">
+					<xs:element name="object3d" type="object3d" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>3D object display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="arrow" type="drawableelement3d" minOccurs="0">
+					<xs:element name="arrow" type="arrow" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>3D arrow (vector) display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="text3d" type="drawableelement3d" minOccurs="0">
+					<xs:element name="text3d" type="text3d" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="sky" type="drawableelement3d" minOccurs="0">
+					<xs:element name="sky" type="sky" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Skymap. </xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="terrain" type="drawableelement3d" minOccurs="0">
+					<xs:element name="terrain" type="terrain" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Terrain, heightmap </xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="rndterrain" type="drawableelement3d" minOccurs="0">
+					<xs:element name="rndterrain" type="rndterrain" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Randon generated Heightmap. </xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="sound3d" type="drawableelement3d" minOccurs="0">
+					<xs:element name="sound3d" type="sound3d" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Skymap. </xs:documentation>
 						</xs:annotation>
@@ -441,6 +438,7 @@
 				<xs:attribute name="depth" type="xs:string" use="required"/>
 				<xs:attribute name="rotation3d" type="xs:string"/>
 				<xs:attribute name="hasSpaceobject" type="xs:boolean"/>
+				<xs:attribute name="autoRotation"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -478,21 +476,18 @@
 		<xs:attribute name="x" type="xs:string"/>
 		<xs:attribute name="y" type="xs:string"/>
 		<xs:attribute name="z" type="xs:string"/>
-		<xs:attribute name="width"/>
-		<xs:attribute name="depth"/>
+		<xs:attribute name="width" type="xs:double"/>
 		<xs:attribute name="height" type="xs:string"/>
-		<xs:attribute name="rotation" type="xs:string"/>
+		<xs:attribute name="depth"/>
 		<xs:attribute name="rotatex" type="xs:string"/>
 		<xs:attribute name="rotatey" type="xs:string"/>
 		<xs:attribute name="rotatez" type="xs:string"/>
 		<xs:attribute name="position" type="xs:string"/>
+		<xs:attribute name="rotation" type="xs:string"/>
 		<xs:attribute name="size" type="xs:string"/>
-		<xs:attribute name="abspos" type="xs:string"/>
-		<xs:attribute name="abssize" type="xs:string"/>
-		<xs:attribute name="absrot" type="xs:string"/>
 		<xs:attribute name="color" type="xs:string"/>
-		<xs:attribute name="texturepath" type="xs:string"/>
-		<xs:attribute name="shadowtype" type="xs:string"/>
+		<xs:attribute name="shadowtype"/>
+		<xs:attribute name="texturepath"/>
 	</xs:complexType>
 	<xs:complexType name="texturedrectangle">
 		<xs:annotation>
@@ -540,7 +535,15 @@
 			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="drawableelement3d"/>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="box">
@@ -548,7 +551,15 @@
 			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="drawableelement3d"/>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="cylinder">
@@ -557,6 +568,13 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 				<xs:attribute name="radius" type="xs:string"/>
 			</xs:extension>
 		</xs:complexContent>
@@ -567,6 +585,13 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 				<xs:attribute name="radius" type="xs:string"/>
 				<xs:attribute name="planes" type="xs:string"/>
 				<xs:attribute name="samples" type="xs:string"/>
@@ -579,10 +604,17 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
-				<xs:attribute name="innerRadius" type="xs:string"/>
-				<xs:attribute name="outerRadius" type="xs:string"/>
-				<xs:attribute name="circleSamples" type="xs:string"/>
-				<xs:attribute name="radialSamples" type="xs:string"/>
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="innerRadius" type="xs:string" use="required"/>
+				<xs:attribute name="outerRadius" type="xs:string" use="required"/>
+				<xs:attribute name="circleSamples" type="xs:string" use="required"/>
+				<xs:attribute name="radialSamples" type="xs:string" use="required"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -592,9 +624,36 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="animation" type="animation" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 				<xs:attribute name="modelpath" type="xs:string"/>
 				<xs:attribute name="hasLightMaterials" type="xs:string"/>
 				<xs:attribute name="rigDebug" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="animation">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="animationcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string"/>
+				<xs:attribute name="channel" type="xs:string"/>
+				<xs:attribute name="loop" type="xs:string"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -603,7 +662,15 @@
 			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="drawableelement3d"/>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="text3d">
@@ -612,6 +679,13 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 				<xs:attribute name="text" type="xs:string" use="required"/>
 			</xs:extension>
 		</xs:complexContent>
@@ -636,6 +710,13 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 				<xs:attribute name="terrapath" type="xs:string"/>
 				<xs:attribute name="alphamap" type="xs:string"/>
 				<xs:attribute name="heightmap" type="xs:string"/>
@@ -660,6 +741,13 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
 				<xs:attribute name="tiles" type="xs:string"/>
 				<xs:attribute name="terrapath" type="xs:string"/>
 				<xs:attribute name="alphamap" type="xs:string"/>
@@ -677,6 +765,7 @@
 				<xs:attribute name="tex03val" type="xs:string"/>
 				<xs:attribute name="tex04val" type="xs:string"/>
 				<xs:attribute name="tex05val" type="xs:string"/>
+				<xs:attribute name="iterations"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -684,6 +773,13 @@
 		<xs:annotation>
 			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
 		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="soundcondition" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
 		<xs:attribute name="soundfile" type="xs:string"/>
 		<xs:attribute name="loop" type="xs:string"/>
 		<xs:attribute name="continuosly" type="xs:string"/>
@@ -952,6 +1048,17 @@
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
 				<xs:attribute name="type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="perspective3d">
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="drawable3d" type="drawable3d" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
