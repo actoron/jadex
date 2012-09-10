@@ -449,7 +449,7 @@
 		<xs:sequence>
 			<xs:element name="drawcondition" type="xs:string" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+					<xs:documentation>This condition is used, for deciding if the element should be displayed or not.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -532,7 +532,7 @@
 	</xs:complexType>
 	<xs:complexType name="sphere">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A threedimensional Sphere</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -548,7 +548,7 @@
 	</xs:complexType>
 	<xs:complexType name="box">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A threedimensional box or cube</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -564,7 +564,7 @@
 	</xs:complexType>
 	<xs:complexType name="cylinder">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A threedimensional cylinder</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -581,7 +581,7 @@
 	</xs:complexType>
 	<xs:complexType name="dome">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A threedimensional dome</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -600,7 +600,7 @@
 	</xs:complexType>
 	<xs:complexType name="torus">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A threedimensional torus</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -620,7 +620,7 @@
 	</xs:complexType>
 	<xs:complexType name="object3d">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A threedimensional complex object</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -640,7 +640,7 @@
 	</xs:complexType>
 	<xs:complexType name="animation">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A animation ONLY for an complex object3d</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -659,7 +659,7 @@
 	</xs:complexType>
 	<xs:complexType name="arrow">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>A simple arrow</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -692,7 +692,7 @@
 	</xs:complexType>
 	<xs:complexType name="sky">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>The Sky object, only one per perspective3d</xs:documentation>
 		</xs:annotation>
 		<xs:attribute name="skyfile" type="xs:string"/>
 		<xs:attribute name="skypath" type="xs:string"/>
@@ -706,7 +706,7 @@
 	</xs:complexType>
 	<xs:complexType name="terrain">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>The terrain object for loading complex terrain</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -737,7 +737,7 @@
 	</xs:complexType>
 	<xs:complexType name="rndterrain">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>The terrain object for generating complex terrain</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="drawableelement3d">
@@ -771,7 +771,7 @@
 	</xs:complexType>
 	<xs:complexType name="sound3d">
 		<xs:annotation>
-			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+			<xs:documentation>Soundfiles can be played here</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="soundcondition" type="xs:string" minOccurs="0">
@@ -1052,6 +1052,9 @@
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="perspective3d">
+		<xs:annotation>
+			<xs:documentation>A perspective3d is used to define the visual representation of space objects.</xs:documentation>
+		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
 				<xs:sequence>
