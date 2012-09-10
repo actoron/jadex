@@ -116,7 +116,6 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 						<env:animationcondition>$object.getProperty("status").equals("Attack")</env:animationcondition>
 						</env:animation>
 				</env:object3d>
-				<env:object3d  />
 				</env:drawable3d>
 			</env:perspective3d>	
 			</env:perspectives>
