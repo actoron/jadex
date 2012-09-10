@@ -1,7 +1,14 @@
 Jadex Releases Overview
 
-Release 2.1.1 (Bugfix release 08/2012)
-	- Fixed memory leak in chat sound
+Release 2.2 (Pro release 09/2012)
+	- Email connector (sending and receiving via service)
+	- Per call timeouts for service invocations
+	- New Eliza example
+	- Performance improvements
+	- Standalone relay (Pro feature)
+	- Platform auto update (Pro feature)
+	- Command line interface (Pro feature)
+	- E-mail command interface (Pro feature)
 
 Release 2.1 (Global Connectivity release 07/2012)
 	- Relay transport and awareness for global connectivity

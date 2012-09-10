@@ -6,7 +6,7 @@ Make sure that:
 - ADF checker works and is released
 
 Bump Revision:
-- set release number in poms and in jadex.bridge.IVersionInfo
+- set release number in poms, bats, shs, schemata, txts
 - update maven project configuration for all projects in eclipse
 - Add tag in SVN
 - After release: set revision in poms to <next revision>-SNAPSHOT
