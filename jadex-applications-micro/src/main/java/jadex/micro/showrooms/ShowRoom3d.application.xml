@@ -106,7 +106,7 @@
 			</env:dataviews>
 
 			<env:perspectives>
-				<env:perspective name="Complex3D" class="Perspective3D">
+				<env:perspective3d name="Complex3D" class="Perspective3D">
 					<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
 						<env:sky skypath="jadex3d/textures/sky/space/nebula02/"
 							west="right.jpg" east="left.jpg" north="back.jpg" south="front.jpg"
@@ -122,7 +122,7 @@
 						<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true">
 						</env:object3d>
 					</env:drawable3d>
-				</env:perspective>
+				</env:perspective3d>
 			</env:perspectives>
 
 			<!-- executor -->

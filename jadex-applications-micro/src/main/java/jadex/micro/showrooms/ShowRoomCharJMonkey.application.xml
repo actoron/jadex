@@ -90,7 +90,7 @@
 			
 			
 			<env:perspectives>
-			<env:perspective name="Complex3D" class="Perspective3D">
+			<env:perspective3d name="Complex3D" class="Perspective3D">
 				
 				<env:drawable3d objecttype="rotationplattform" width="0.2" height="0.2" depth="0.2" rotation3d="false">
 				
@@ -102,7 +102,7 @@
 
 				
 					
-			</env:perspective>	
+			</env:perspective3d>	
 
 			</env:perspectives>
 				

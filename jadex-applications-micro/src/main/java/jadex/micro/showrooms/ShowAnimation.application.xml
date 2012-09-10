@@ -61,9 +61,9 @@
 			</env:dataviews>
 
 			<env:perspectives>
-				<env:perspective name="Complex3D" class="Perspective3D">
+				<env:perspective3d name="Complex3D" class="Perspective3D">
 				
-								<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
 				<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
 					<env:box  width="10" height="0.01" depth="10" x="-1" y="-0.75" z="1" color="#D2B48CFF" shadowtype="Receive"/>
 
@@ -98,7 +98,7 @@
 	
 						
 					</env:drawable3d>
-				</env:perspective>
+				</env:perspective3d>
 			</env:perspectives>
 
 			<!-- executor -->

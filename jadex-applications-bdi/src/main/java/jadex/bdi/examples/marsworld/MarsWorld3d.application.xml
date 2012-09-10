@@ -122,7 +122,7 @@
 			</env:avatarmappings>
 			
 			<env:perspectives>
-			<env:perspective name="Complex3D" class="Perspective3D">
+			<env:perspective3d name="Complex3D" class="Perspective3D">
 				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
 					<env:sky skypath="jadex3d/textures/sky/sky01/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
 					<env:rndterrain width="2" height="0.1" depth="2"  
@@ -242,7 +242,7 @@
 						<env:soundcondition>$object.getProperty("status").equals("ore")</env:soundcondition>
 					</env:sound3d>
 					</env:drawable3d>	
-				</env:perspective>	
+				</env:perspective3d>	
 
 			</env:perspectives>
 				
