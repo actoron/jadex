@@ -29,7 +29,8 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<doctitle>Jadex Active Component Platform ${project.version} API.</doctitle>
+						    <finalName>jadex-${project.version}</finalName>
+						    <doctitle>Jadex Active Component Platform ${project.version} API.</doctitle>
 							<windowtitle>Jadex Active Component Platform ${project.version} API.</windowtitle>
 							<groups>
 								<group>
