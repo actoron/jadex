@@ -3,9 +3,9 @@
 <html>
 	<head>
 		<title>Jadexdoc: <%= request.getAttribute("title") %></title>
-		<% if(((Boolean)request.getAttribute("jaxcent")).booleanValue()) { %>
-		<script type="text/javascript" src="<%= request.getContextPath() %>/resources/jadexdoc/jaxcent21.js"></script>
-		<% } %>
+		<% /*if(((Boolean)request.getAttribute("jaxcent")).booleanValue()) { % >
+		<script type="text/javascript" src="<%= request.getContextPath() % >/resources/jadexdoc/jaxcent21.js"></script>
+		<% } */ %>
 		<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/jadexdoc/style.css" type="text/css">
 		<link rel="stylesheet" href="<%= request.getContextPath() %>/resources/jadexdoc/print.css" type="text/css" media="print"> 
 	</head>
@@ -22,6 +22,7 @@
 	</tr>
 	<tr valign="top">
 		<td width="20%" class="navblock">
-			<jsp:include page="navigation.jsp" flush="false"/>
+			<jsp:include page="modellist.jsp" flush="false"/>
+			<!--<jsp:include page="navigation.jsp" flush="false"/>-->
 		</td>
 		<td class="textblock">

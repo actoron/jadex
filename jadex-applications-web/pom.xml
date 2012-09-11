@@ -14,7 +14,7 @@
 	<description>
 		Jadex examples that can be deployed as web application.
 	</description>
-
+<!-- 
 	<repositories>
 		<repository>
 			<id>project</id>
@@ -22,7 +22,7 @@
 			<url>file:///${basedir}/lib</url>
 		</repository>
 	</repositories>
-
+ -->
 	<!-- ======== Skip deployment (i.e. neither central nor snapshot repo) ======== -->
 		
 	<build>
@@ -83,7 +83,7 @@
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+		<!-- 
 		<dependency>
             <groupId>com.jaxcent</groupId>
             <artifactId>jaxcent</artifactId>
@@ -94,6 +94,7 @@
             <artifactId>jaxcent-framework</artifactId>
             <version>2.1</version>
         </dependency>
+         -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

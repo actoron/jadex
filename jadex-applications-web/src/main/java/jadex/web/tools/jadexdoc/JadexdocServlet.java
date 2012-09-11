@@ -119,40 +119,41 @@ public class JadexdocServlet extends HttpServlet
 			{
 				IFuture<IModelInfo>	model	= file!=null ? loadModel(file) : null;
 				request.setAttribute("model", model);
+				request.setAttribute("models", models);
 				
-				// Async page.
-				if("/view".equals(request.getPathInfo()))
-				{
-					jaxcent	= true;
-					title	= "Loading.";
-					view	= "/WEB-INF/jsp/jadexdoc/loading.jsp";
-					request.getSession().setAttribute("model", model);
-					request.getSession().setAttribute("models", models);
-					request.getSession().setAttribute("url", getContentUrl(request));
-					request.getSession().setAttribute("murl", getModelsUrl(request));
-					request.getSession().setAttribute("file", file);
-				}
-				
-				// Model contents page (blocking, but model already loaded).
-				else if("/contents".equals(request.getPathInfo()))
-				{
-					jaxcent	= true;
-					long	timeout	= 30000;
-					ThreadSuspendable	sus	= new ThreadSuspendable();
-					title	= model.get(sus, timeout).getFullName();
-					view	= "/WEB-INF/jsp/jadexdoc/modelcontents.jsp";
-				}
-				
-				// Model overview page (nonblocking, based on available results).
-				else if("/models".equals(request.getPathInfo()))
-				{
-					title	= "Overview";
-					view	= "/WEB-INF/jsp/jadexdoc/modellist.jsp";
-					request.setAttribute("models", models);
-				}
-				
-				// Blocking page.
-				else
+//				// Async page.
+//				if("/view".equals(request.getPathInfo()))
+//				{
+//					jaxcent	= true;
+//					title	= "Loading.";
+//					view	= "/WEB-INF/jsp/jadexdoc/loading.jsp";
+//					request.getSession().setAttribute("model", model);
+//					request.getSession().setAttribute("models", models);
+//					request.getSession().setAttribute("url", getContentUrl(request));
+//					request.getSession().setAttribute("murl", getModelsUrl(request));
+//					request.getSession().setAttribute("file", file);
+//				}
+//				
+//				// Model contents page (blocking, but model already loaded).
+//				else if("/contents".equals(request.getPathInfo()))
+//				{
+//					jaxcent	= true;
+//					long	timeout	= 30000;
+//					ThreadSuspendable	sus	= new ThreadSuspendable();
+//					title	= model.get(sus, timeout).getFullName();
+//					view	= "/WEB-INF/jsp/jadexdoc/modelcontents.jsp";
+//				}
+//				
+//				// Model overview page (nonblocking, based on available results).
+//				else if("/models".equals(request.getPathInfo()))
+//				{
+//					title	= "Overview";
+//					view	= "/WEB-INF/jsp/jadexdoc/modellist.jsp";
+//					request.setAttribute("models", models);
+//				}
+//				
+//				// Blocking page.
+//				else
 				{
 					long	timeout	= 30000;
 					ThreadSuspendable	sus	= new ThreadSuspendable();
