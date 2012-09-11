@@ -27,6 +27,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -281,7 +282,7 @@ public class SUtil
 				try
 				{
 					long modified = con.getLastModified();
-					String	filename	= con.getURL().getFile();
+					String	filename	= URLDecoder.decode(con.getURL().getFile(), "UTF-8");
 					ret	= new ResourceInfo(filename, con.getInputStream(), modified);
 				}
 				catch(IOException e)
@@ -1709,29 +1710,10 @@ public class SUtil
 		// Special treatment for files in jar file -> just make jar file name relative and keep inner name 
 		if(absolute.startsWith("jar:file:") && absolute.indexOf("!")!=-1)
 		{
-			String	jarname	= absolute.substring(9, absolute.indexOf("!"));
+			String	jarname	= absolute.substring(4, absolute.indexOf("!"));
 			String	filename	= absolute.substring(absolute.indexOf("!"));
-			if(File.separatorChar=='\\')
-			{
-				jarname	= jarname.replace("/", "\\");
-			}
-				
-			try
-			{
-				jarname	= URLDecoder.decode(jarname, "UTF-8");
-			}
-			catch(UnsupportedEncodingException e)
-			{
-			}
-			
 			jarname	= convertPathToRelative(jarname);
-			
-			if(File.separatorChar=='\\')
-			{
-				jarname	= jarname.replace("\\", "/");
-			}
-			
-			return "jar:file:"+jarname+filename;
+			return "jar:"+jarname+filename;
 		}
 		// Special treatment for file urls 
 		if(absolute.startsWith("file:"))
@@ -1740,14 +1722,6 @@ public class SUtil
 			if(File.separatorChar=='\\')
 			{
 				filename	= filename.replace("/", "\\");
-			}
-				
-			try
-			{
-				filename	= URLDecoder.decode(filename, "UTF-8");
-			}
-			catch(UnsupportedEncodingException e)
-			{
 			}
 			
 			filename	= convertPathToRelative(filename);
@@ -2981,6 +2955,30 @@ public class SUtil
 	}
 
 	
+	/**
+	 *  Get the file from an URL.
+	 *	@param url	The file URL.
+	 *  @return	The file.
+	 */
+	public static File	getFile(URL url)
+	{
+		assert url.getProtocol().equals("file");
+		
+		File	file;
+		try
+		{
+			file = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+//			String	filename	= URLDecoder.decode(url.toString(), "UTF-8");
+//			file = new File(filename.substring(5));	// strip "file:"
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			// Shouldn't happen for existing files!?
+			throw new RuntimeException(e);			
+		}
+		return file;
+	}
+
 	/**
 	 *  Copy a file.
 	 *  @param source	The source file.

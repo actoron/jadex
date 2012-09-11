@@ -8,11 +8,11 @@ import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -59,18 +58,10 @@ import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
-import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResult;
-import org.sonatype.aether.resolution.MetadataRequest;
-import org.sonatype.aether.resolution.MetadataResult;
-import org.sonatype.aether.resolution.VersionRangeRequest;
-import org.sonatype.aether.resolution.VersionRangeResult;
-import org.sonatype.aether.resolution.VersionRequest;
-import org.sonatype.aether.resolution.VersionResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 /**
@@ -532,7 +523,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		// Classes directory
 		else
 		{
-			File dir = findBasedir(getFile(url));
+			File dir = findBasedir(SUtil.getFile(url));
 			if(dir!=null)
 			{
 				try
@@ -540,7 +531,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 					pom	= new FileModelSource(new File(dir, "pom.xml"));
 					ret = loadPom(pom);
 					
-					File dest = new File(url.getFile());
+					File dest = SUtil.getFile(url);
 					File tmp = new File(ret.getBuild().getOutputDirectory());
 					if(!dest.getCanonicalPath().equals(tmp.getCanonicalPath()))
 					{
@@ -554,7 +545,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 				}
 				catch(Exception e)
 				{
-					// Shouldn't happen for exiting files?
+					// Shouldn't happen for existing files?
 					throw new RuntimeException(e);
 				}
 			}
@@ -609,29 +600,6 @@ public class MavenDependencyResolverService	implements IDependencyService
 			throw new RuntimeException(e);
 		}
 		return ret;
-	}
-	
-	/**
-	 *  Get the file from an URL.
-	 *	@param url	The jar or file URL.
-	 *  @return	The file.
-	 */
-	protected static File	getFile(URL url)
-	{
-		assert url.getProtocol().equals("file");
-		
-		File	file;
-		try
-		{
-			String	filename	= URLDecoder.decode(url.toString(), "UTF-8");
-			file = new File(filename.substring(5));	// strip "file:"
-		}
-		catch(Exception e)
-		{
-			// Shouldn't happen for existing files!?
-			throw new RuntimeException(e);			
-		}
-		return file;
 	}
 	
 	/**

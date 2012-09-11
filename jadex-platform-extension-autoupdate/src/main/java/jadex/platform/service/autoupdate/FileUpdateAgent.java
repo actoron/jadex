@@ -20,7 +20,9 @@ import jadex.micro.annotation.RequiredServices;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -322,17 +324,13 @@ public class FileUpdateAgent extends UpdateAgent
 							// search for jadex jar file
 							for(URL url: result)
 							{
-								String fileurl = (url.getFile());
-								if(fileurl.endsWith(".jar") && fileurl.indexOf("jadex")!=-1)
+								File f = SUtil.getFile(url);
+								if(f.exists() && f.getName().endsWith(".jar") && f.getName().indexOf("jadex")!=-1)
 								{
-									File f = new File(fileurl);
-									if(f.exists())
-									{
-										agent.getLogger().info(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
-										newestversion = f.lastModified();
-										ret.setResult(new Long(newestversion));
-										break;
-									}
+									agent.getLogger().info(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
+									newestversion = f.lastModified();
+									ret.setResult(new Long(newestversion));
+									break;
 								}
 							}
 							
@@ -341,17 +339,13 @@ public class FileUpdateAgent extends UpdateAgent
 								// search for jadex classes dir
 								for(URL url: result)
 								{
-									String fileurl = (url.getFile());
-									if(fileurl.indexOf("jadex")!=-1)
+									File f = SUtil.getFile(url);
+									if(f.exists() && f.isDirectory() && f.getName().indexOf("jadex")!=-1)
 									{
-										File f = new File(fileurl);
-										if(f.exists() && f.isDirectory())
-										{
-											agent.getLogger().info(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
-											newestversion = f.lastModified();
-											ret.setResult(new Long(newestversion));
-											break;
-										}
+										agent.getLogger().info(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
+										newestversion = f.lastModified();
+										ret.setResult(new Long(newestversion));
+										break;
 									}
 								}
 								

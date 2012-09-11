@@ -901,7 +901,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			}
 			else if(getParent()!=null && LibraryService.SYSTEMCPRID.equals(((LazyNode)getParent()).getMyUserObject()))
 			{
-				if(((IResourceIdentifier)o).getLocalIdentifier().getUrl().getFile().indexOf(".jar")!=-1)
+				if(((IResourceIdentifier)o).getLocalIdentifier().getUrl().toString().indexOf(".jar")!=-1)
 				{
 					ilist.add(icons.getIcon("jar"));
 				}
@@ -920,7 +920,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 				{
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					
-					if(lrid.getUrl().getFile().indexOf(".jar")!=-1)
+					if(lrid.getUrl().toString().indexOf(".jar")!=-1)
 					{
 						ilist.add(icons.getIcon("jar"));
 					}
@@ -1058,11 +1058,11 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 			
 			int cnt = getChildCount();
 			boolean inserted = false;
-			boolean nhasch = n.getChildCount()>0 || (issyscp && ((IResourceIdentifier)n.getMyUserObject()).getLocalIdentifier().getUrl().getFile().indexOf(".jar")==-1);
+			boolean nhasch = n.getChildCount()>0 || (issyscp && ((IResourceIdentifier)n.getMyUserObject()).getLocalIdentifier().getUrl().toString().indexOf(".jar")==-1);
 			for(int i=0; i<cnt && !inserted; i++)
 			{
 				LazyNode tmp = (LazyNode)getChildAt(i);
-				boolean tmphasch = tmp.getChildCount()>0 || (issyscp && ((IResourceIdentifier)tmp.getMyUserObject()).getLocalIdentifier().getUrl().getFile().indexOf(".jar")==-1);
+				boolean tmphasch = tmp.getChildCount()>0 || (issyscp && ((IResourceIdentifier)tmp.getMyUserObject()).getLocalIdentifier().getUrl().toString().indexOf(".jar")==-1);
 				if((!tmphasch && nhasch) 
 					|| (tmphasch==nhasch && n.toString().compareTo(tmp.toString())<0 )) 
 				{

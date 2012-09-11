@@ -32,8 +32,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -213,7 +215,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					else
 					{
 						// Check if file exists
-						File f = new File(rid.getLocalIdentifier().getUrl().getFile());
 						if(!checkUrl(rid.getLocalIdentifier().getUrl()))
 						{
 							ret.setException(new RuntimeException("Local rid url invalid: "+rid));
@@ -368,7 +369,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			try
 			{
-				url	= new File(url.getFile()).getCanonicalFile().toURI().toURL();
+				url	= SUtil.getFile(url).getCanonicalFile().toURI().toURL();
 			}
 			catch(Exception e)
 			{
@@ -1013,9 +1014,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			URL[] urls = ((URLClassLoader)classloader).getURLs();
 			for(int i=0; i<urls.length; i++)
 			{
-				if(urls[i].getFile().endsWith(".jar"))
+				String	name	= SUtil.getFile(urls[i]).getName();
+				if(name.endsWith(".jar"))
 				{
-					String jarname	= getJarName(urls[i].getFile());
+					String jarname	= getJarName(name);
 					jarnames.add(jarname);
 				}
 			}
@@ -1090,12 +1092,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	            			{
 		            			try
 			                	{
-		            				URL depurl = urlfile.toURI().toURL();
-		            				if(depurl.getFile().endsWith(".jar"))
+		            				if(urlfile.getName().endsWith(".jar"))
 		            				{
-		            					String jarname	= getJarName(depurl.getFile());
+		            					String jarname	= getJarName(urlfile.getName());
 		            					jarnames.add(jarname);
 		            				}
+		            				URL depurl = urlfile.toURI().toURL();
 		            				set.add(depurl);
 		            				collectManifestURLs(depurl, set, jarnames);
 		            			}
@@ -1285,7 +1287,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			try
 			{
-				URL	url	= new File(new URL(lid_url).getFile()).getCanonicalFile().toURI().toURL();
+				URL	url	= SUtil.getFile(new URL(lid_url)).getCanonicalFile().toURI().toURL();
 //				System.out.println("url: "+url);
 				lid = new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url);
 			}
@@ -1307,7 +1309,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		if("file".equals(url.getProtocol()))
 		{
-			File f = new File(url.getFile());
+			File f = SUtil.getFile(url);
 			ret = f.exists();
 		}
 		
