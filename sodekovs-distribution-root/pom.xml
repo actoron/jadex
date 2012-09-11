@@ -57,6 +57,8 @@
 		<module>../jadex-kernel-extension-envsupport</module>
 		<module>../jadex-kernel-extension-envsupport-opengl</module>
 		<module>../jadex-kernel-extension-agr</module>
+		<module>../jadex-kernel-extension-relay</module>
+		
 
 		<module>../jadex-applib-bdi</module>
 		<module>../jadex-applications-bdi</module>
@@ -77,8 +79,7 @@
 		<module>../jadex-tools-bpmn</module>
 		<module>../jadex-tools-comanalyzer</module>
 		<module>../jadex-platform-standalone</module>
-		<module>../jadex-platform-standalone-launch</module>
-		<module>../jadex-platform-relay-web</module>
+		<module>../jadex-platform-standalone-launch</module>		
 		
 		<!-- SodekoVS-->
 		<module>../sodekovs-distribution-root</module>
@@ -467,8 +468,7 @@
 				<module>jadex-tools-comanalyzer</module>
 				<module>jadex-platform-standalone</module>
 				<module>jadex-platform-standalone-launch</module>
-				<module>jadex-platform-standalone-maven-launch</module>
-				<module>jadex-platform-relay-web</module>
+				<module>jadex-platform-standalone-maven-launch</module>				
 				<module>jadex-platform-extension-webservice</module>
 				<module>jadex-platform-extension-maven</module>
 				<module>jadex-platform-extension-natmtp</module>
