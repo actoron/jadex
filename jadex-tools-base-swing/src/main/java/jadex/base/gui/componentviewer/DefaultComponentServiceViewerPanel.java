@@ -8,7 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
-import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -56,7 +56,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		final Future<Void> ret = new Future<Void>();
 		
 		// Init interface is asynchronous but super implementation is not.
-		IFuture	fut	= super.init(jcc, component);
+		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
 		component.scheduleStep(new IComponentStep<List>()
@@ -83,7 +83,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		{
 			public void resultAvailable(List result)
 			{
-				createPanels(component, result).addResultListener(new DelegationResultListener(ret));
+				createPanels(component, result).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -107,12 +107,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		{
 			public void resultAvailable(final ClassLoader cl)
 			{
-				final List panels = new ArrayList();
+				final List<Object[]> panels = new ArrayList<Object[]>();
 				
-				final CollectionResultListener lis = new CollectionResultListener(
-					services.size()+1, true, new DelegationResultListener(ret)
+				final CounterResultListener<Void> lis = new CounterResultListener<Void>(
+					services.size()+1, true, new DelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result) 
+					public void customResultAvailable(Void result) 
 					{
 		//				if(subpanels.size()==1)
 		//				{
@@ -129,7 +129,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							}
 							panel.add(tp, BorderLayout.CENTER);
 						}
-						super.customResultAvailable(result);
+						super.customResultAvailable(null);
 					}	
 				});
 				

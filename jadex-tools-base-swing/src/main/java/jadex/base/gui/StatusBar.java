@@ -73,10 +73,9 @@ public class StatusBar extends JPanel
 			public void run()
 			{
 				textl.setText(txt);
+				timer.restart();
 			}
 		});
-
-		timer.restart();
 	}
 
 	/**

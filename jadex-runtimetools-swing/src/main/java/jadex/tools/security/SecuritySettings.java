@@ -12,9 +12,9 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.tools.jcc.JCCResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -40,7 +39,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileFilter;
 
 /**
  *  The security settings panel.
@@ -93,7 +91,8 @@ public class SecuritySettings	implements IServiceViewerPanel
 		final Future<Void>	ret	= new Future<Void>();
 		
 		this.secservice	= (ISecurityService)service;
-		
+		this.inner	= new JPanel(new BorderLayout());
+
 		cbusepass	= new JCheckBox("Use password");
 		final JLabel	lbpass	= new JLabel("Password");
 		tfpass	= new JPasswordField(10);
@@ -204,13 +203,13 @@ public class SecuritySettings	implements IServiceViewerPanel
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
 		slocal.add(bustoreset, new GridBagConstraints(x++, y, 1, 1, 0, 0, 
 			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
-		
+				
 		ICommand paddrem = new ICommand()
 		{
 			public void execute(Object args)
 			{
 				String[] tmp = (String[])args;
-				secservice.setPlatformPassword(new ComponentIdentifier(tmp[0]), tmp[1]).addResultListener(new SwingDefaultResultListener<Void>()
+				secservice.setPlatformPassword(new ComponentIdentifier(tmp[0]), tmp[1]).addResultListener(new JCCResultListener<Void>(jcc)
 				{
 					public void customResultAvailable(Void result)
 					{
@@ -224,7 +223,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 			public void execute(Object args)
 			{
 				String[] tmp = (String[])args;
-				secservice.setNetworkPassword(tmp[0], tmp[1]).addResultListener(new SwingDefaultResultListener<Void>()
+				secservice.setNetworkPassword(tmp[0], tmp[1]).addResultListener(new JCCResultListener<Void>(jcc)
 				{
 					public void customResultAvailable(Void result)
 					{
@@ -254,7 +253,6 @@ public class SecuritySettings	implements IServiceViewerPanel
 		no.add(slocal, BorderLayout.SOUTH);
 		
 		// Overall layout.
-		this.inner	= new JPanel(new BorderLayout());
 		inner.add(no, BorderLayout.NORTH);
 		inner.add(sp, BorderLayout.CENTER);
 		
@@ -265,7 +263,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 			public void stateChanged(ChangeEvent e)
 			{
 				final boolean	usepass	= cbusepass.isSelected();
-				secservice.setUsePassword(usepass).addResultListener(new SwingDefaultResultListener<Void>(inner)
+				secservice.setUsePassword(usepass).addResultListener(new JCCResultListener<Void>(jcc)
 				{
 					public void customResultAvailable(Void result)
 					{
@@ -281,7 +279,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				String	newpass	= new String(tfpass.getPassword());
-				secservice.setLocalPassword(newpass).addResultListener(new SwingDefaultResultListener<Void>(inner)
+				secservice.setLocalPassword(newpass).addResultListener(new JCCResultListener<Void>(jcc)
 				{
 					public void customResultAvailable(Void result)
 					{

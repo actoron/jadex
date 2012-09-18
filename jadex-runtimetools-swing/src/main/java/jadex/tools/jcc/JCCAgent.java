@@ -44,7 +44,8 @@ public class JCCAgent extends MicroAgent
 		Future<Void>	ret	= new Future<Void>();
 		this.cc	= new ControlCenter();
 		cc.init(getExternalAccess(),
-			new String[]{
+			new String[]
+			{
 				StarterPlugin.class.getName(),
 				ChatPlugin.class.getName(),
 //				StarterServicePlugin.class.getName(),

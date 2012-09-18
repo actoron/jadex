@@ -376,15 +376,6 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	//										System.out.println("gotacha: "+sis[0].getProviderId().getName());
 										if((pros!=null && pros.length>0 || (reqs!=null && reqs.length>0)))
 										{
-											Arrays.sort(pros, new java.util.Comparator<ProvidedServiceInfo>()
-											{
-												public int compare(ProvidedServiceInfo o1, ProvidedServiceInfo o2)
-												{
-													return SReflect.getUnqualifiedTypeName(o1.getType().getTypeName())
-														.compareTo(SReflect.getUnqualifiedTypeName(o2.getType().getTypeName()));
-												}
-											});
-											
 											ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
 											if(scn==null)
 												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
@@ -409,6 +400,17 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 														e.printStackTrace();
 													}
 												}
+												
+												Collections.sort(subchildren, new java.util.Comparator<ITreeNode>()
+												{
+													public int compare(ITreeNode t1, ITreeNode t2)
+													{
+														ProvidedServiceInfo si1 = ((ProvidedServiceInfoNode)t1).getServiceInfo();
+														ProvidedServiceInfo si2 = ((ProvidedServiceInfoNode)t2).getServiceInfo();
+														return SReflect.getUnqualifiedTypeName(si1.getType().getTypeName())
+															.compareTo(SReflect.getUnqualifiedTypeName(si2.getType().getTypeName()));
+													}
+												});
 											}
 											
 											if(reqs!=null)

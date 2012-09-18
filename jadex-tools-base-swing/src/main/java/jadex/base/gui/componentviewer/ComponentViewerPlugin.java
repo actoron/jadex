@@ -11,8 +11,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
@@ -84,7 +86,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	protected ObjectCardLayout	cards;
 	
 	/** The service viewer panels. */
-	protected Map	panels;
+	protected Map<Object, IAbstractViewerPanel>	panels;
 	
 	/** Loaded properties. */
 	protected Properties	props;
@@ -99,7 +101,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 */
 	public ComponentViewerPlugin()
 	{
-		this.panels	= new HashMap();
+		this.panels	= new HashMap<Object, IAbstractViewerPanel>();
 		this.viewables = Collections.synchronizedMap(new HashMap<Object, IFuture<Boolean>>());
 	}
 	
@@ -171,7 +173,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						if(cards.getComponent(nodeid)!=null)
 						{
 							storeCurrentPanelSettings();
-							IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(nodeid);
+							IAbstractViewerPanel panel = panels.get(nodeid);
 							panel.setProperties(props!=null ? props.getSubproperty(panel.getId()) : null);
 							cards.show(nodeid);
 						}
@@ -299,7 +301,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					storeCurrentPanelSettings();
 //					System.out.println("removeing: "+nodeid+" "+cards.getComponent(nodeid));
 					detail.remove(cards.getComponent(nodeid));
-					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
+					IAbstractViewerPanel panel = panels.remove(nodeid);
 					panel.shutdown();
 					comptree.getModel().fireNodeChanged(node);
 				}
@@ -329,64 +331,71 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
 //						final IService service = node.getService();
 						
-						SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), node.getServiceIdentifier())
-							.addResultListener(new SwingDefaultResultListener(comptree)
+						IFuture<IService> fut = SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), node.getServiceIdentifier());
+						fut.addResultListener(new SwingDefaultResultListener<IService>(comptree)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(final IService service)
 							{
-								final IService service = (IService)result;
-
-								AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
-									.addResultListener(new SwingDefaultResultListener(comptree)
+								SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//								AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
+									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(ILibraryService ls)
 									{
-										ClassLoader	cl	= (ClassLoader)result;
-										
-										Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
-										
-										if (clid instanceof String[]) {
-											// use first gui class found
-											for (String classname : (String[])clid) {
-												Class clazz = SReflect.classForName0(classname, cl);
-												if (clazz != null){
-													clid = clazz;
-													break;
-												}
-											}
-										}
-										
-										final Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
-										
-										if(clid!=null)
+										ls.getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 										{
-											try
+											public void customResultAvailable(ClassLoader cl)
 											{
-												storeCurrentPanelSettings();
-												final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
-												panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
+												Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+												
+												if(clid instanceof String[]) 
 												{
-													public void customResultAvailable(Object result)
+													// use first gui class found
+													for(String classname : (String[])clid) 
 													{
-														Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-														if(sub!=null)
-															panel.setProperties(sub);
-														JComponent comp = panel.getComponent();
-														
-														// todo: help 
-														//SHelp.setupHelp(comp, getHelpID());
-														panels.put(node.getServiceIdentifier(), panel);
-														detail.add(comp, node.getServiceIdentifier());
-														comptree.getModel().fireNodeChanged(node);
+														Class<?> clazz = SReflect.classForName0(classname, cl);
+														if(clazz != null)
+														{
+															clid = clazz;
+															break;
+														}
 													}
-												});
+												}
+												
+												final Class<?> clazz = clid instanceof Class? (Class<?>)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+												
+												if(clid!=null)
+												{
+													try
+													{
+														storeCurrentPanelSettings();
+														final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
+														panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener<Void>(comptree)
+														{
+															public void customResultAvailable(Void result)
+															{
+																Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+																if(sub!=null)
+																	panel.setProperties(sub);
+																JComponent comp = panel.getComponent();
+																
+																// todo: help 
+																//SHelp.setupHelp(comp, getHelpID());
+																panels.put(node.getServiceIdentifier(), panel);
+																detail.add(comp, node.getServiceIdentifier());
+																comptree.getModel().fireNodeChanged(node);
+															}
+														});
+													}
+													catch(Exception e)
+													{
+														e.printStackTrace();
+														getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
+													}
+												}
+												
 											}
-											catch(Exception e)
-											{
-												e.printStackTrace();
-												getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
-											}
-										}
+										});
 									}
 								});
 							}
@@ -397,49 +406,52 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
-							.addResultListener(new SwingDefaultResultListener(comptree)
+						IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class);
+						fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(comptree)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IComponentManagementService cms)
 							{
-								final IComponentManagementService cms = (IComponentManagementService)result;
-								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(final IExternalAccess exta)
 									{
-										final IExternalAccess exta = (IExternalAccess)result;
-										
-										// todo: 
-										AbstractJCCPlugin.getClassLoader(cid, getJCC())
-											.addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
+										SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//										AbstractJCCPlugin.getClassLoader(cid, getJCC())
+											.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 										{
-											public void customResultAvailable(ClassLoader cl)
+											public void customResultAvailable(ILibraryService ls)
 											{
-												Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-												
-												if(clid instanceof String[]) 
+												ls.getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 												{
-													// use first gui class found
-													for(String classname : (String[])clid) 
+													public void customResultAvailable(ClassLoader cl)
 													{
-														Class clazz = SReflect.classForName0(classname, cl);
-														if(clazz != null)
+														Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+														
+														if(clid instanceof String[]) 
 														{
-															clid = clazz;
-															break;
+															// use first gui class found
+															for(String classname : (String[])clid) 
+															{
+																Class<?> clazz = SReflect.classForName0(classname, cl);
+																if(clazz != null)
+																{
+																	clid = clazz;
+																	break;
+																}
+															}
+														}
+														
+														if(clid instanceof String)
+														{
+															Class<?> clazz	= SReflect.classForName0((String)clid, cl);
+															createPanel(clazz, exta, node);
+														}
+														else if(clid instanceof Class)
+														{
+															createPanel((Class<?>)clid, exta, node);
 														}
 													}
-												}
-												
-												if(clid instanceof String)
-												{
-													Class clazz	= SReflect.classForName0((String)clid, cl);
-													createPanel(clazz, exta, node);
-												}
-												else if(clid instanceof Class)
-												{
-													createPanel((Class)clid, exta, node);
-												}
+												});
 											}
 										});
 									}
@@ -455,15 +467,15 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	/**
 	 * 
 	 */
-	protected void createPanel(Class clazz, final IExternalAccess exta, final IActiveComponentTreeNode node)
+	protected void createPanel(Class<?> clazz, final IExternalAccess exta, final IActiveComponentTreeNode node)
 	{
 		try
 		{
 			storeCurrentPanelSettings();
 			final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
-			panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener(comptree)
+			panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener<Void>(comptree)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 					if(sub!=null)
@@ -497,10 +509,10 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final ITreeNode node = (ITreeNode)paths[i].getLastPathComponent();
 					Object nodeid = node.getId();
 					detail.remove(cards.getComponent(nodeid));
-					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
-					panel.shutdown().addResultListener(new SwingDefaultResultListener(comptree)
+					IAbstractViewerPanel panel = panels.remove(nodeid);
+					panel.shutdown().addResultListener(new SwingDefaultResultListener<Void>(comptree)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
 							comptree.getModel().fireNodeChanged(node);
 						}
@@ -533,14 +545,14 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					if(viewable.isDone() && viewable.getException()==null)
 					{
 						ret = viewable.get(null).booleanValue();
-//						System.out.println("isVis result: "+node.getId()+" "+ret);
+//						System.out.println("isVis result: "+node.getId()+" "+ret+" "+sid);
 					}
 				}
 				else
 				{
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(sid, fut);
-					final long start	= System.currentTimeMillis();
+//					final long start	= System.currentTimeMillis();
 					// Unknown -> start search to find out asynchronously
 					SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), sid)
 						.addResultListener(new SwingExceptionDelegationResultListener<Object, Boolean>(fut)
@@ -548,7 +560,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						public void customResultAvailable(Object result)
 						{
 							IService service = (IService)result;
-							Map	props = service.getPropertyMap();
+							Map<String, Object>	props = service.getPropertyMap();
 							boolean vis = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
 							fut.setResult(vis? Boolean.TRUE: Boolean.FALSE);
 							node.refresh(false);
@@ -622,9 +634,9 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		comptree.dispose();
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(panels.size(), 
 			true, new SwingDelegationResultListener<Void>(ret));
-		for(Iterator it=panels.values().iterator(); it.hasNext(); )
+		for(Iterator<IAbstractViewerPanel> it=panels.values().iterator(); it.hasNext(); )
 		{
-			((IAbstractViewerPanel)it.next()).shutdown().addResultListener(lis);
+			it.next().shutdown().addResultListener(lis);
 		}
 		return ret;
 	}
@@ -650,7 +662,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		this.props	=	ps;
 		
 		IAbstractViewerPanel[] pans = (IAbstractViewerPanel[])panels.values().toArray(new IAbstractViewerPanel[0]);
-		CounterResultListener<Void> lis = new CounterResultListener<Void>(pans.length, true, new SwingDelegationResultListener(ret));
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(pans.length, true, new SwingDelegationResultListener<Void>(ret));
 		
 		for(int i=0; i<pans.length; i++)
 		{

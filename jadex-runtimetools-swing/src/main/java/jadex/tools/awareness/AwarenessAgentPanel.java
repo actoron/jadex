@@ -64,7 +64,7 @@ import javax.swing.table.AbstractTableModel;
  *  Panel for the awareness infos.
  */
 public class AwarenessAgentPanel implements IComponentViewerPanel
-{
+{	
 	//-------- constants --------
 	
 	/** The property key for the settings object. */

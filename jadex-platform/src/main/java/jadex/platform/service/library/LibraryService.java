@@ -32,10 +32,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -833,6 +831,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			{
 				removeSupport(del.getResourceIdentifier(), rid);
 			}
+			classloaders.remove(rid);
+			classloaders.remove(ResourceIdentifier.getLocalResourceIdentifier(rid));
 		}
 	}
 	

@@ -181,24 +181,36 @@ public class DelegationURLClassLoader extends URLClassLoader
 			{
 				if(dependencies==null)
 				{
-					dependencies	= new LinkedHashSet<DelegationURLClassLoader>();
-					for(int i=0; i<delegates.size(); i++)
-					{
-						dependencies.add(delegates.get(i));
-						dependencies.addAll(delegates.get(i).getFlattenedDependencies());
-					}
-					
-//					System.out.println("Dependencies: "+rid+", "+dependencies.size());
-//					for(DelegationURLClassLoader dep: dependencies)
-//					{
-//						System.out.println("\t"+dep.getResourceIdentifier());
-//					}
+					dependencies = computeFlattenedDependencies(getDelegates());
 				}
 			}
 		}
 		return dependencies;
 	}
 	
+	/**
+	 *  Get transitive dependencies as flattened set (without duplicates).
+	 */
+	public static Set<DelegationURLClassLoader>	computeFlattenedDependencies(List<DelegationURLClassLoader> deps)
+	{
+		Set<DelegationURLClassLoader> ret = new LinkedHashSet<DelegationURLClassLoader>();
+		for(int i=0; i<deps.size(); i++)
+		{
+			ret.add(deps.get(i));
+			ret.addAll(deps.get(i).getFlattenedDependencies());
+		}
+					
+		return ret;
+	}
+	
+	/**
+	 *  Get the delegates.
+	 */
+	public List<DelegationURLClassLoader> getDelegates()
+	{
+		return delegates;
+	}
+
 	/**
 	 *  Get the own url.
 	 */
@@ -266,6 +278,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 			}
 			catch(Exception e)
 			{
+//				e.printStackTrace();
 			}
 		}
 		
