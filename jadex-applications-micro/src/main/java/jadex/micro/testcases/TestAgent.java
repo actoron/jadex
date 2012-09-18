@@ -108,6 +108,7 @@ public abstract class TestAgent
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //				"-logging", "true",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
+			"-binarymessages", "false",
 			"-gui", "true", "-simulation", "false", "-printpass", "false"};
 		
 		if(args!=null && args.length>0)

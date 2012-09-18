@@ -1,6 +1,3 @@
-/**
- * 
- */
 package jadex.platform.service.cli.commands;
 
 import jadex.commons.SUtil;

@@ -45,6 +45,8 @@ public interface ISettingsService
 	 *  @return A future containing the properties (if any).
 	 */
 	public IFuture<Properties>	getProperties(String id);
+
+	// todo: load/saveProperties(String filename)
 	
 	/**
 	 *  Load the default platform properties.

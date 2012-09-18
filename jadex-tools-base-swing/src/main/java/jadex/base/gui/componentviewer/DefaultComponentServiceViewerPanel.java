@@ -11,6 +11,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -18,6 +19,7 @@ import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -64,7 +66,17 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 			
 			public IFuture<List> execute(final IInternalAccess ia)
 			{
-				IFuture ret = SServiceProvider.getDeclaredServices(ia.getServiceContainer());
+				final Future<List> ret = new Future<List>();
+				
+				SServiceProvider.getDeclaredServices(ia.getServiceContainer())
+					.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, List>(ret)
+				{
+					public void customResultAvailable(Collection<IService> result) 
+					{
+						ret.setResult(new ArrayList(result));
+					}
+				});
+				
 				return ret;
 			}
 		}).addResultListener(new IResultListener<List>()

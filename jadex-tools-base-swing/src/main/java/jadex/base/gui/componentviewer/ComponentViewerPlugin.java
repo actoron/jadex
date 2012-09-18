@@ -409,6 +409,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
 										
+										// todo: 
 										AbstractJCCPlugin.getClassLoader(cid, getJCC())
 											.addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 										{
@@ -416,11 +417,14 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 											{
 												Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
 												
-												if (clid instanceof String[]) {
+												if(clid instanceof String[]) 
+												{
 													// use first gui class found
-													for (String classname : (String[])clid) {
+													for(String classname : (String[])clid) 
+													{
 														Class clazz = SReflect.classForName0(classname, cl);
-														if (clazz != null){
+														if(clazz != null)
+														{
 															clid = clazz;
 															break;
 														}

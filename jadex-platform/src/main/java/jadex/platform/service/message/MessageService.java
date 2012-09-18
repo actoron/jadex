@@ -53,6 +53,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.awareness.discovery.message.IMessageAwarenessService;
 import jadex.platform.service.cms.AbstractComponentAdapter;
+import jadex.platform.service.library.DelegationURLClassLoader;
 import jadex.platform.service.message.streams.AbstractConnectionHandler;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.InputConnectionHandler;
@@ -2160,6 +2161,7 @@ public class MessageService extends BasicService implements IMessageService
 								{
 									if(decode)
 									{
+//										System.out.println("dec: "+cl+" "+component.getComponentIdentifier()+" "+MessageService.this.component.getComponentIdentifier());
 										// Conversion via platform specific codecs
 										IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
 										for(Iterator it=fmessage.keySet().iterator(); it.hasNext(); )
@@ -2173,6 +2175,7 @@ public class MessageService extends BasicService implements IMessageService
 											
 											if(codec!=null)
 											{
+//												System.out.println("dec2: "+codec+fmessage);
 												try
 												{
 													Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()));
