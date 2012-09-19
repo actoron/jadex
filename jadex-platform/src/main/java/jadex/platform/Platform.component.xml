@@ -390,9 +390,9 @@
 						<argument name="saveonexit">$args.saveonexit</argument>
 					</arguments>
 				</component>
-				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
-				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
-				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
+				<component name="rspub" type="rspublish" daemon="true" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
+				<component name="wspub" type="wspublish" daemon="true" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
+				<component name="cli" type="cli" daemon="true" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
 					<arguments>
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
@@ -430,9 +430,9 @@
 						<argument name="saveonexit">$args.saveonexit</argument>
 					</arguments>
 				</component>
-				<component name="rspub" type="rspublish" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
-				<component name="wspub" type="wspublish" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
-				<component name="cli" type="cli" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
+				<component name="rspub" type="rspublish" daemon="true" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
+				<component name="wspub" type="wspublish" daemon="true" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
+				<component name="cli" type="cli" daemon="true" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
 					<arguments>
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>

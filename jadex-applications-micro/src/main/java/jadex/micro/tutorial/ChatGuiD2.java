@@ -9,6 +9,8 @@ import jadex.commons.future.IFuture;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -77,6 +79,15 @@ public class ChatGuiD2 extends JFrame
 				});
 			}
 		});
+		
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				agent.killComponent();
+			}
+		});
+		
 		pack();
 		setVisible(true);
 	}

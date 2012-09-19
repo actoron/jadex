@@ -792,7 +792,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		else
 		{
 			pcreatefut = new Future<IComponentIdentifier>();
-			cms.createComponent("platforms", "jadex/platform/service/awareness/RemotePlatformAgent.class", new CreationInfo(getComponentIdentifier().getRoot()), null)
+			CreationInfo	ci	= new CreationInfo(getComponentIdentifier().getRoot());
+			ci.setDaemon(Boolean.TRUE);
+			cms.createComponent("platforms", "jadex/platform/service/awareness/RemotePlatformAgent.class", ci, null)
 				.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
 		}
 		
