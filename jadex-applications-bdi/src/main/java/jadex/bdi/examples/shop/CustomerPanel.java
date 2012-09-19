@@ -79,6 +79,8 @@ public class CustomerPanel extends JPanel
 	 */
 	public CustomerPanel(final IBDIExternalAccess agent)
 	{
+		System.out.println("creating gui");
+		
 		this.agent = agent;
 		this.shops	= new HashMap();
 		
@@ -245,45 +247,52 @@ public class CustomerPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new IBeliefSetListener()
+				try
 				{
-					public void factRemoved(final AgentEvent ae)
+					bia.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new IBeliefSetListener()
 					{
-						SwingUtilities.invokeLater(new Runnable()
+						public void factRemoved(final AgentEvent ae)
 						{
-							public void run()
+							SwingUtilities.invokeLater(new Runnable()
 							{
-								invlist.remove(ae.getValue());
-								invmodel.fireTableDataChanged();
-							}
-						});
-					}
-					
-					public void factChanged(final AgentEvent ae)
-					{
-						SwingUtilities.invokeLater(new Runnable()
+								public void run()
+								{
+									invlist.remove(ae.getValue());
+									invmodel.fireTableDataChanged();
+								}
+							});
+						}
+						
+						public void factChanged(final AgentEvent ae)
 						{
-							public void run()
+							SwingUtilities.invokeLater(new Runnable()
 							{
-								invlist.remove(ae.getValue());
-								invlist.add(ae.getValue());
-								invmodel.fireTableDataChanged();
-							}
-						});
-					}
-					
-					public void factAdded(final AgentEvent ae)
-					{
-						SwingUtilities.invokeLater(new Runnable()
+								public void run()
+								{
+									invlist.remove(ae.getValue());
+									invlist.add(ae.getValue());
+									invmodel.fireTableDataChanged();
+								}
+							});
+						}
+						
+						public void factAdded(final AgentEvent ae)
 						{
-							public void run()
+							SwingUtilities.invokeLater(new Runnable()
 							{
-								invlist.add(ae.getValue());
-								invmodel.fireTableDataChanged();
-							}
-						});
-					}
-				});
+								public void run()
+								{
+									invlist.add(ae.getValue());
+									invmodel.fireTableDataChanged();
+								}
+							});
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				return IFuture.DONE;
 			}
 		});

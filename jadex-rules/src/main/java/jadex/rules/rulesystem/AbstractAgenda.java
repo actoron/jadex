@@ -53,6 +53,8 @@ public abstract class AbstractAgenda implements IAgenda
 				history.add(last.toString());
 
 //			System.err.println("++++++++ executing: "+last);
+//			if(last.toString().indexOf("listener_belief_changed")!=-1)
+//				System.out.println("hhhhh");
 			last.execute();
 			
 			// Hack!!! Shouldn't remove executed activations?
