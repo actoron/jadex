@@ -109,14 +109,16 @@ public class CustomerPanel extends JPanel
 				{
 					public IFuture<Collection<IShopService>> execute(IInternalAccess ia)
 					{
-						IFuture<Collection<IShopService>>	ret;
+						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
 						if(remote.isSelected())
 						{
-							ret	= ia.getServiceContainer().getRequiredServices("remoteshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("remoteshopservices");
+							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						else
 						{
-							ret	= ia.getServiceContainer().getRequiredServices("localshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("localshopservices");
+							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						return ret;
 					}

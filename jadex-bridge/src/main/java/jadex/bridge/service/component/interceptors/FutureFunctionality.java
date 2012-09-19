@@ -255,7 +255,14 @@ public class FutureFunctionality
 		}
 		else if(source instanceof IIntermediateFuture)
 		{
-			source.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
+			try
+			{
+				source.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		else if(source instanceof IFuture)
 		{
