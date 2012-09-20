@@ -26,8 +26,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //	/** The component adapter. */
 //	protected IComponentAdapter adapter;
 	
-	/** The thread pool. */
-	protected IThreadPoolService tp;
+//	/** The thread pool. */
+//	protected IThreadPoolService tp;
 	
 	//-------- constructors --------
 	
@@ -35,12 +35,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	 *  Create a new invocation handler.
 	 *  @param tp the rescue thread pool (if any).
 	 */
-	public DecouplingReturnInterceptor(/*IExternalAccess ea, IComponentAdapter adapter,*/ IThreadPoolService tp)
+//	public DecouplingReturnInterceptor(/*IExternalAccess ea, IComponentAdapter adapter,*/ IThreadPoolService tp)
+	public DecouplingReturnInterceptor()
 	{
 //		assert ea!=null;
 //		this.ea = ea;
 //		this.adapter = adapter;
-		this.tp = tp;
+//		this.tp = tp;
 	}
 	
 	//-------- methods --------
