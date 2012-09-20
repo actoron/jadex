@@ -6,7 +6,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-rules-dist</artifactId>
 	<packaging>pom</packaging>
-	<version> 2.3-SNAPSHOT </version>
+	<version> 2.2.1 </version>
 	<name>jadex-rules-dist</name>
 	
 	<!-- ======== common plugin configurations ======== -->

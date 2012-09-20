@@ -6,9 +6,9 @@ Make sure that:
 - ADF checker works and is released
 
 Bump Revision:
-- set version number in poms (search '<version> 2.3-SNAPSHOT </version>')
-- set version number in bats, shs, settings, txts (search '-2.3-SNAPSHOT.jar')
-- set version number in XMLs, XSDs (search '-2.3.xsd')
+- set version number in poms (search '<version> 2.2.1 </version>')
+- set version number in bats, shs, settings, txts (search '-2.2.1.jar')
+- set version number in XMLs, XSDs (search '-2.2.xsd')
 - rename XSDs to reflect version number (search 'jadex' in *.xsd)
 - Add tag in SVN
 - After release: set version to <next revision>-SNAPSHOT (w/o SNAPSHOT for XSDs)

@@ -20,7 +20,7 @@
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
-	                    http://jadex.sourceforge.net/jadex-application-2.3.xsd"
+	                    http://jadex.sourceforge.net/jadex-application-2.2.xsd"
 	name="HunterPrey" package="jadex.bdi.examples.hunterprey_classic">
 	
 	<componenttypes>
