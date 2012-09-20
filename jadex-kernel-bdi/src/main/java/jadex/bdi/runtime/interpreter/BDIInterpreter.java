@@ -1339,7 +1339,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return scheduleStep(step, ragent);
+		return scheduleStep(step, null);
 	}
 	
 	/**
@@ -1369,7 +1369,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 								{
 //									((IComponentStep)step).execute(getInternalAccess())
 //										.addResultListener(new DelegationResultListener(ret));
-									IFuture res = ((IComponentStep)step).execute(getInternalAccess());
+									IFuture res = ((IComponentStep)step).execute(getInternalAccess(scope));
 									FutureFunctionality.connectDelegationFuture(ret, res);
 								}
 								catch(Exception e)
@@ -1379,7 +1379,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 							}
 							else
 							{
-								getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+								getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope!=null ? scope : ragent});
 							}
 						}
 						else
@@ -1398,7 +1398,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		{
 			if(getState().containsObject(ragent))
 			{
-				getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+				getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope!=null ? scope : ragent});
 			}
 			else
 			{
@@ -1882,7 +1882,16 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IInternalAccess	getInternalAccess()
 	{
-		return new CapabilityFlyweight(state, initcapa!=null ? findSubcapability(initcapa) : ragent);
+		return getInternalAccess(null);
+	}
+	
+	/**
+	 *  Get the internal access.
+	 *  @return The internal access.
+	 */
+	public IInternalAccess	getInternalAccess(Object scope)
+	{
+		return new CapabilityFlyweight(state, scope!=null ? scope : initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
 		
 	/**

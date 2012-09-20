@@ -79,8 +79,6 @@ public class CustomerPanel extends JPanel
 	 */
 	public CustomerPanel(final IBDIExternalAccess agent)
 	{
-		System.out.println("creating gui");
-		
 		this.agent = agent;
 		this.shops	= new HashMap();
 		

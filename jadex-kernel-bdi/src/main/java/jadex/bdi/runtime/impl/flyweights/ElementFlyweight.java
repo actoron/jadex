@@ -241,7 +241,7 @@ public abstract class ElementFlyweight implements IElement
 		String string	= SReflect.getUnqualifiedClassName(this.getClass());
 		if(string.endsWith("Flyweight"))
 			string	= string.substring(0, string.length()-9);
-		return string;
+		return string+"("+handle+")";
 		
 //		if(getInterpreter().getComponentAdapter().isExternalThread())
 //		{

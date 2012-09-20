@@ -1193,10 +1193,12 @@ public class AgentRules
 	 */
 	protected static IFuture	initializeCapabilityInstance(final IOAVState state, final Object rcapa)
 	{
+		
 		final Future	ret	= new Future();
 		
 		// Get configuration.
 		final Object	mcapa	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
+//		System.out.println("iCI "+state.getAttributeValue(mcapa, OAVBDIMetaModel.modelelement_has_name)+", "+rcapa);
 		final Object	mconfig = getConfiguration(state, rcapa);
 		
 //		// Hack!!! cache expression parameters?
@@ -1655,6 +1657,7 @@ public class AgentRules
 	 */
 	public static IFuture	initBelief(final IOAVState state, final Object rcapa, final Object mbel, IValueFetcher fetcher)
 	{
+//		System.out.println("iB "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+", "+rcapa);
 		final Future	ret	= new Future();
 		
 		Object agent = BDIInterpreter.getInterpreter(state).getAgent();
@@ -1961,6 +1964,7 @@ public class AgentRules
 	 */
 	public static IFuture	initBeliefSet(final IOAVState state, final Object rcapa, final Object mbelset, IValueFetcher fetcher)
 	{
+//		System.out.println("iBs "+state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name)+", "+rcapa);
 		Future	ret	= new Future();
 		
 		Object agent = BDIInterpreter.getInterpreter(state).getAgent();

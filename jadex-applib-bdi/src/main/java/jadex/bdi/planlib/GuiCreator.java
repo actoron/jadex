@@ -1,5 +1,7 @@
 package jadex.bdi.planlib;
 
+import jadex.commons.SUtil;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
