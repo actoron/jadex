@@ -29,7 +29,6 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.xml.PropertiesXMLHelper;
-import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -1104,7 +1103,7 @@ public class TestCenterPanel extends JSplitPanel
 		protected Testcase[]	results;
 		
 		/** A set of running testcases to be destroyed on abort (name->cid). */
-		protected Map	testcases;
+		protected Map<Tuple2<String, IResourceIdentifier>, IComponentIdentifier>	testcases;
 		
 		/** Flag indicating that the test suite is running. */
 		protected boolean	running;
@@ -1124,7 +1123,7 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			this.names	= names;
 			this.results	= new Testcase[names.length];
-			this.testcases	= new HashMap();
+			this.testcases	= new HashMap<Tuple2<String, IResourceIdentifier>, IComponentIdentifier>();
 			this.running	= false;
 		}
 		
@@ -1187,20 +1186,30 @@ public class TestCenterPanel extends JSplitPanel
 		 */
 		public void	abort()
 		{
+			assert SwingUtilities.isEventDispatchThread();
+//			System.out.println("abort: "+testcases.keySet());
 			this.aborted	= true;
 			
-			CounterResultListener	crl	= new CounterResultListener(testcases.size(), new SwingDefaultResultListener(TestCenterPanel.this)
+			CounterResultListener<Void>	crl	= new CounterResultListener<Void>(testcases.size(), new SwingDefaultResultListener<Void>(TestCenterPanel.this)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
-					testcases.clear();
+//					System.out.println("aborted: "+testcases.keySet());
+//					testcases.clear();
 					updateProgress();
-					updateDetails();			
+					updateDetails();
+				}
+				public void customExceptionOccurred(Exception exception)
+				{
+//					System.out.println("aborted: "+exception);
+					super.customExceptionOccurred(exception);
+					customResultAvailable(null);
 				}
 			});
-			for(Iterator it=testcases.values().iterator(); it.hasNext(); )
+			for(Iterator<IComponentIdentifier> it=testcases.values().iterator(); it.hasNext(); )
 			{
-				IComponentIdentifier	testcase	= (IComponentIdentifier)it.next(); 
+				IComponentIdentifier	testcase	= it.next(); 
+//				System.out.println("aborting: "+testcase);
 				if(testcase!=null)
 				{
 					abortTestcase(testcase).addResultListener(crl);
@@ -1272,23 +1281,32 @@ public class TestCenterPanel extends JSplitPanel
 			}
 			
 			running	= !testcases.isEmpty();
+//			System.out.println("running: "+running);
 		}
 
 		/**
 		 *  Abort a testcase.
 		 */
-		protected IFuture	abortTestcase(final IComponentIdentifier testcase)
+		protected IFuture<Void>	abortTestcase(final IComponentIdentifier testcase)
 		{
-			final Future	ret	= new Future();
+			final Future<Void>	ret	= new Future<Void>();
 			
 			SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
 				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new SwingDelegationResultListener(ret)
+				.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService cms)
 				{
-					IComponentManagementService	cms	= (IComponentManagementService)result;
-					cms.destroyComponent(testcase).addResultListener(new SwingDelegationResultListener(ret));
+//					System.out.println("destroying: "+testcase);
+					cms.destroyComponent(testcase)
+						.addResultListener(new SwingExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+					{
+						public void customResultAvailable(Map<String, Object> result)
+						{
+//							System.out.println("aborted: "+testcase);
+							ret.setResult(null);
+						}
+					});
 				}
 			});
 			
@@ -1360,10 +1378,12 @@ public class TestCenterPanel extends JSplitPanel
 			 */
 			protected void	testFinished(final Testcase result)
 			{
+//				System.out.println("finished: "+result);
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
+//						System.out.println("finished2: "+result);
 						if(testcases.containsKey(name))
 						{
 							for(int i=0; i<names.length; i++)
