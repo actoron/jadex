@@ -256,7 +256,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 										{
 											try
 											{
-												final URL url = ((File)obj).toURI().toURL();
+												final URL url = ((File)obj).getCanonicalFile().toURI().toURL();
 												jcc.setStatusText("Started adding: "+url);
 												libservice.addTopLevelURL(url)
 													.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
@@ -289,7 +289,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 												
 												public void exceptionOccurred(Exception exception)
 												{
-													jcc.setStatusText("Erro adding: "+filename+" "+exception.getMessage());
+													jcc.setStatusText("Error adding: "+filename+" "+exception.getMessage());
 												}
 											});
 										}
@@ -318,7 +318,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											IResourceIdentifier rid = null;
 											if(obj instanceof File)
 											{
-												URL url = ((File)obj).toURI().toURL();
+												URL url = ((File)obj).getCanonicalFile().toURI().toURL();
 												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
 												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 												rid = new ResourceIdentifier(lid, null);
@@ -512,10 +512,10 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					{
 						try
 						{
-							URL url = files[i].toURI().toURL();
+							URL url = files[i].getCanonicalFile().toURI().toURL();
 							libservice.addURL(parid, url).addResultListener(lis);
 						}
-						catch(MalformedURLException ex)
+						catch(Exception ex)
 						{
 							ex.printStackTrace();
 						}

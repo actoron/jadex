@@ -213,7 +213,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					else
 					{
 						// Check if file exists
-						if(!checkUrl(rid.getLocalIdentifier().getUrl()))
+						if(checkUrl(rid.getLocalIdentifier().getUrl())==null)
 						{
 							ret.setException(new RuntimeException("Local rid url invalid: "+rid));
 						}
@@ -355,7 +355,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 //		System.out.println("add url: "+url);
 		
-		if(!checkUrl(url))
+		url = checkUrl(url);
+		if(url==null)
 		{
 			ret.setException(new RuntimeException("URL not backed by local file: "+url));
 			return ret;
@@ -421,7 +422,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> addTopLevelURL(@CheckNotNull URL url)
 	{
-		if(!checkUrl(url))
+		url = checkUrl(url);
+		if(url==null)
 			return new Future<Void>(new RuntimeException("URL not backed by local file: "+url));
 		
 		baseloader.addURL(url);
@@ -1303,14 +1305,24 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Check if a local url is backed by a file.
 	 */
-	protected boolean checkUrl(URL url)
+	protected URL checkUrl(URL url)
 	{
-		boolean ret = true;
+		URL ret = null;
 		
 		if("file".equals(url.getProtocol()))
 		{
 			File f = SUtil.getFile(url);
-			ret = f.exists();
+			if(f.exists())
+			{
+				try
+				{
+					ret = f.getCanonicalFile().toURI().toURL();
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		
 		return ret;
