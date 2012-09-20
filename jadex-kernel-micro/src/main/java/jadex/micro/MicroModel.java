@@ -8,6 +8,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class MicroModel extends CacheableKernelModel
 {
 	/** The agent injection targets. */
-	protected List agentinjections;
+	protected List<Field> agentinjections;
 
 	/** The argument injection targets. */
 	protected Map argumentinjections;
@@ -31,9 +32,11 @@ public class MicroModel extends CacheableKernelModel
 	/** The service injection targets. */
 	protected Map serviceinjections;
 	
+	/** The breakpoint method. */
+	protected Method bpmethod;
+	
 	/** The class loader. */
 	protected ClassLoader classloader;
-
 	
 	/**
 	 *  Create a new model.
@@ -50,7 +53,7 @@ public class MicroModel extends CacheableKernelModel
 	public void addAgentInjection(Field field)
 	{
 		if(agentinjections==null)
-			agentinjections = new ArrayList();
+			agentinjections = new ArrayList<Field>();
 		agentinjections.add(field);
 	}
 	
@@ -158,6 +161,24 @@ public class MicroModel extends CacheableKernelModel
 	{
 		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
 			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
+	}
+
+	/**
+	 *  Get the breakpoint method.
+	 *  @return The breakpoint method.
+	 */
+	public Method getBreakpointMethod()
+	{
+		return bpmethod;
+	}
+
+	/**
+	 *  Set the breakpoint method.
+	 *  @param breakpoint method The breakpoint method to set.
+	 */
+	public void setBreakpointMethod(Method breakpointMethod)
+	{
+		this.bpmethod = breakpointMethod;
 	}
 
 	/**

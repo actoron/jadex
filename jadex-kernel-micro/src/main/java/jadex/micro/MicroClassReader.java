@@ -7,7 +7,6 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelValueProvider;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -23,9 +22,9 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
-import jadex.kernelbase.CacheableKernelModel;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
@@ -656,6 +655,19 @@ public class MicroClassReader
 						{
 							micromodel.addResultInjection(name, fields[i], res.convert(), res.convertback());
 						}
+					}
+				}
+			}
+			
+			if(micromodel.getBreakpointMethod()==null)
+			{
+				Method[] methods = cma.getDeclaredMethods();
+				for(int i=0; i<methods.length; i++)
+				{
+					final Method method = methods[i];
+					if(methods[i].isAnnotationPresent(AgentBreakpoint.class))
+					{
+						micromodel.setBreakpointMethod(method);
 					}
 				}
 			}

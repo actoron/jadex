@@ -1174,4 +1174,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		return classloader;
 	}
+
+	/**
+	 *  Get the micro model.
+	 *  @return The micro model.
+	 */
+	public MicroModel getMicroModel()
+	{
+		return micromodel;
+	}
 }
