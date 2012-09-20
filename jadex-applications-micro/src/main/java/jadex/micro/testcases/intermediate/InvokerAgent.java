@@ -65,8 +65,11 @@ public class InvokerAgent
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();				
 			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println(agent.isComponentThread()+" "+agent.getComponentIdentifier());
+				
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();	
 			}
@@ -174,7 +177,7 @@ public class InvokerAgent
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 				tr.setReason(""+exception);
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				super.resultAvailable(tr);
 			}
 		});

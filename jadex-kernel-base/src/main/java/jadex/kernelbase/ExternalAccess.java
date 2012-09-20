@@ -1,5 +1,6 @@
 package jadex.kernelbase;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -145,9 +146,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -194,9 +201,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -236,9 +249,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -300,9 +319,15 @@ public class ExternalAccess implements IExternalAccess
 						}
 					});
 				}
-				catch(Exception e)
+				catch(final Exception e)
 				{
-					ret.setException(e);
+					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+					{
+						public void run()
+						{
+							ret.setException(e);
+						}
+					});
 				}
 			}
 			else
@@ -326,9 +351,15 @@ public class ExternalAccess implements IExternalAccess
 						}
 					});
 				}
-				catch(Exception e)
+				catch(final Exception e)
 				{
-					ret.setException(e);
+					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+					{
+						public void run()
+						{
+							ret.setException(e);
+						}
+					});
 				}
 			}
 			else
@@ -376,9 +407,15 @@ public class ExternalAccess implements IExternalAccess
 				}
 			});
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			ret.setException(e);
+			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			{
+				public void run()
+				{
+					ret.setException(e);
+				}
+			});
 		}
 		
 		return ret;
@@ -466,9 +503,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -500,9 +543,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -535,9 +584,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -569,9 +624,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -602,9 +663,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else

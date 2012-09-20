@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.base.Starter;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -78,9 +79,16 @@ public class ComponentResultListener<E> implements IResultListener<E>
 				public void resultAvailable(Void result)
 				{
 				}
-				public void exceptionOccurred(Exception exception)
+				
+				public void exceptionOccurred(final Exception exception)
 				{
-					listener.exceptionOccurred(exception);
+					Starter.scheduleRescueStep(access.getComponentIdentifier(), new Runnable()
+					{
+						public void run()
+						{
+							listener.exceptionOccurred(exception);
+						}
+					});
 				}
 			});
 		}
@@ -103,9 +111,15 @@ public class ComponentResultListener<E> implements IResultListener<E>
 						}
 					});
 				}
-				catch(Exception e)
+				catch(final Exception e)
 				{
-					listener.exceptionOccurred(e);
+					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+					{
+						public void run()
+						{
+							listener.exceptionOccurred(e);
+						}
+					});
 				}
 			}
 			else

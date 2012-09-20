@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.interpreter;
 
+import jadex.base.Starter;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
@@ -1389,9 +1390,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
@@ -1439,9 +1446,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				}
 			});
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			ret.setException(e);
+			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			{
+				public void run()
+				{
+					ret.setException(e);
+				}
+			});
 		}
 		
 		return ret;
@@ -1480,7 +1493,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */ 
 	public boolean isExternalThread()
 	{
-		return initthread!=Thread.currentThread() && !isPlanThread();
+		return initthread!=Thread.currentThread() && !isPlanThread() &&
+			!(IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState()) 
+				&& Starter.isRescueThread(getComponentIdentifier()));
 	}
 
 	/**

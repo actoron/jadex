@@ -30,7 +30,7 @@ public @interface CheckState
 
 	/**
 	 *  Flag how many intermediate results should be preserved.
-	 *  On necessary if a subscription future is used.
+	 *  Only necessary if a subscription future is used.
 	 */
 	public int keep() default 0;
 

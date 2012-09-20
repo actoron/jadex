@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
@@ -127,25 +128,26 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											}
 										}
 									};
-									if(tp!=null)
-									{
-										// Hack!!! Thread pool service should be asynchronous.
-										try
-										{
-											tp.execute(run);
-										}
-										catch(RuntimeException re)
-										{
-											// Happens when thread pool already terminated.
-											Thread t = new Thread(run);
-											t.start();																
-										}
-									}
-									else
-									{
-										Thread t = new Thread(run);
-										t.start();
-									}
+									Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+//									if(tp!=null)
+//									{
+//										// Hack!!! Thread pool service should be asynchronous.
+//										try
+//										{
+//											tp.execute(run);
+//										}
+//										catch(RuntimeException re)
+//										{
+//											// Happens when thread pool already terminated.
+//											Thread t = new Thread(run);
+//											t.start();																
+//										}
+//									}
+//									else
+//									{
+//										Thread t = new Thread(run);
+//										t.start();
+//									}
 								}
 							}
 						}

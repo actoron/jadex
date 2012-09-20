@@ -1,6 +1,7 @@
 package jadex.base;
 
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -21,6 +22,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.BlockingQueue;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -39,6 +41,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 
 /**
@@ -732,5 +735,68 @@ public class Starter
 		
 		return ret;
 	}	
+	
+	/** The rescue threads - per platform. */
+	protected static Map<IComponentIdentifier, Tuple2<BlockingQueue, Thread>> rescuethreads;
+	
+	/**
+	 *  Schedule a rescue step.
+	 *  @param cid The id of a component of the platform.
+	 *  @param run The runnable to execute.
+	 */
+	public synchronized static void scheduleRescueStep(IComponentIdentifier cid, Runnable run)
+	{
+		cid = cid.getRoot();
+		if(rescuethreads==null)
+		{
+			rescuethreads = new HashMap<IComponentIdentifier, Tuple2<BlockingQueue, Thread>>();
+		}	
+		
+		Tuple2<BlockingQueue, Thread> tup = rescuethreads.get(cid);
+		if(tup==null)
+		{
+			final BlockingQueue bq = new BlockingQueue();
+			final IComponentIdentifier fcid = cid;
+			Thread rescuethread = new Thread(new Runnable()
+			{
+				public void run()
+				{
+					while(true)
+					{
+						Runnable next = (Runnable)bq.dequeue();
+						try
+						{
+							next.run();
+						}
+						catch(Exception e)
+						{
+							Logger.getLogger(fcid.getLocalName()).severe("Exception during step on rescue thread: "+e);
+						}
+					}
+				}
+			}, "rescue_thread_"+cid.getName());
+			tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
+			rescuethreads.put(cid, tup);
+			rescuethread.setDaemon(true);
+			rescuethread.start();
+		}
+		tup.getFirstEntity().enqueue(run);
+	}
+	
+	/**
+	 *  Test if the current thread is the rescue thread of the platform.
+	 *  @param cid The id of a component of the platform.
+	 *  @return True, if is the rescue thread.
+	 */
+	public static synchronized boolean isRescueThread(IComponentIdentifier cid)
+	{
+		boolean ret = false;
+		Tuple2<BlockingQueue, Thread> tup = rescuethreads==null? null: rescuethreads.get(cid.getRoot());
+		if(tup!=null)
+		{
+			ret = Thread.currentThread().equals(tup.getSecondEntity());
+		}
+		return ret;
+	}
 }
 

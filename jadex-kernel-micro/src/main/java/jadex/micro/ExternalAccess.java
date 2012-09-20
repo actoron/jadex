@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DelegationResultListener;
@@ -51,9 +52,15 @@ public class ExternalAccess extends jadex.kernelbase.ExternalAccess implements I
 				}
 			});
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			ret.setException(e);
+			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			{
+				public void run()
+				{
+					ret.setException(e);
+				}
+			});
 		}
 		return ret;
 	}
@@ -97,9 +104,15 @@ public class ExternalAccess extends jadex.kernelbase.ExternalAccess implements I
 				}
 			});
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
-			ret.setException(e);
+			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			{
+				public void run()
+				{
+					ret.setException(e);
+				}
+			});
 		}
 		return ret;
 	}

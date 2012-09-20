@@ -1,5 +1,6 @@
 package jadex.component;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
@@ -112,9 +113,15 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					}
 				});
 			}
-			catch(ComponentTerminatedException e)
+			catch(final ComponentTerminatedException e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else

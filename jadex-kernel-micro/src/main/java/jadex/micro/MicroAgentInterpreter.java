@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
@@ -137,7 +138,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Create the agent.
 	 */
 	protected MicroAgent createAgent(Class microclass, MicroModel model) throws Exception
 	{
@@ -768,9 +769,15 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					}
 				});
 			}
-			catch(ComponentTerminatedException cte)
+			catch(final ComponentTerminatedException cte)
 			{
-				ret.setException(cte);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(cte);
+					}
+				});
 			}
 		}
 		else

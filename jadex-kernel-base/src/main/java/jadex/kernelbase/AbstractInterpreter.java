@@ -401,6 +401,17 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Check if threa is allowed. 
+	 *  
+	 *  There is the problem that a component is already terminated and calls come back later.
+	 *  In that case we allow the listeners to be called on the wrong thread.
+	 */
+	public void checkAllowedThread()
+	{
+		assert !getComponentAdapter().isExternalThread() || IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState());
+	}
+	
+	/**
 	 *  Get the configuration.
 	 *  @return The configuration.
 	 */

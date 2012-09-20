@@ -1,5 +1,6 @@
 package jadex.platform.service.cms;
 
+import jadex.base.Starter;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -1017,7 +1018,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean isExternalThread()
 	{
-		boolean ret = Thread.currentThread()!=componentthread;
+		boolean ret = Thread.currentThread()!=componentthread && 
+			!(IComponentDescription.STATE_TERMINATED.equals(getDescription().getState()) 
+				&& Starter.isRescueThread(getComponentIdentifier()));
 		if(ret)
 			ret = getComponentInstance().isExternalThread();
 		return ret;

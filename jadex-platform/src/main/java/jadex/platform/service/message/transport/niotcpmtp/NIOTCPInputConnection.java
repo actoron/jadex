@@ -150,6 +150,13 @@ public class NIOTCPInputConnection
 	 */
 	public String toString()
 	{
-		return SReflect.getUnqualifiedClassName(getClass())+"("+sc.socket()+")";
+		try
+		{
+			return SReflect.getUnqualifiedClassName(getClass())+"("+sc.socket()+")";
+		}
+		catch(Exception e)
+		{
+			return SReflect.getUnqualifiedClassName(getClass());
+		}
 	}
 }

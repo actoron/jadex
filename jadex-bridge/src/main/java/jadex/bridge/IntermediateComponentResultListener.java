@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.base.Starter;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IIntermediateResultListener;
 
@@ -82,9 +83,15 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				listener.exceptionOccurred(e);
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						listener.exceptionOccurred(e);
+					}
+				});
 			}
 		}
 		else
