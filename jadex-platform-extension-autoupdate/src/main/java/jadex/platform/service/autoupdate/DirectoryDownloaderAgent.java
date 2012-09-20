@@ -49,10 +49,7 @@ import java.util.Scanner;
 		name="pattern", clazz=String.class, defaultvalue="\".*\""),
 	
 	@Argument(description="The update interval (defaults to 24h).",
-		name="interval", clazz=long.class, defaultvalue=""+1000*60*60*24),
-
-	@Argument(description="Disable printing of download notifications to console.",
-		name="quiet", clazz=boolean.class, defaultvalue=""+false)
+		name="interval", clazz=long.class, defaultvalue=""+1000*60*60*24)
 })
 @RequiredServices(
 	@RequiredService(name="tp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
@@ -80,10 +77,6 @@ public class DirectoryDownloaderAgent
 	/** The update interval (defaults to 24h). */
 	@AgentArgument
 	protected long	interval;
-	
-	/** Disable printing of download notifications to console. */
-	@AgentArgument
-	protected boolean	quiet;
 	
 	/** The thread pool for asynchronous download. */
 	@AgentService
@@ -155,11 +148,8 @@ public class DirectoryDownloaderAgent
 		s.findWithinHorizon("(.*?://.*?/).*", 0);
 		final String	rooturl	= s.match().group(1);
 		final String	relurl	= baseurl.substring(0, baseurl.lastIndexOf("/")+1);
-		if(!quiet)
-		{
-			System.out.println("Root url is: "+rooturl);
-			System.out.println("Relative url is: "+relurl);
-		}
+		agent.getLogger().info("Root url is: "+rooturl);
+		agent.getLogger().info("Relative url is: "+relurl);
 		s.close();
 
 		try
@@ -196,10 +186,7 @@ public class DirectoryDownloaderAgent
 			if(dir!=null)
 			{
 				
-				if(!quiet)
-				{
-					System.out.println("Downloading from "+dir+" to "+tmpdir);
-				}
+				agent.getLogger().info("Downloading from "+dir+" to "+tmpdir);
 				
 				// Discover files from that directory.
 				List<String>	files	= new ArrayList<String>();
@@ -236,50 +223,44 @@ public class DirectoryDownloaderAgent
 					File	targetfile	= new File(localdir, localfile);
 					if(!targetfile.exists() || con.getLastModified()>targetfile.lastModified())
 					{
-						if(!quiet)
-						{
-							System.out.println("Downloading new(er) file: "+file);
-						}
+						agent.getLogger().info("Downloading new(er) file: "+file);
 						targetfile	= new File(tmpdir, localfile);
 						targetfile.getParentFile().mkdirs();
-						int	length	= con.getContentLength();
-						long	done	= 0;
+//						long	done	= 0;
+//						String	pct	= "";
+//						long	lastprint	= 0;
+//						int	length	= con.getContentLength();
 						InputStream	is	= con.getInputStream();
 						OutputStream	os	= new FileOutputStream(targetfile);
 						byte[]	buf	= new byte[8192];
 						int read;
-						String	pct	= "";
-						long	lastprint	= 0;
 						while((read=is.read(buf))!=-1)
 						{
 							os.write(buf, 0, read);
-							if(!quiet && length>0)
-							{
-								done	+= read;
-								String	newpct	= (1000*done/length)/10.0+" %";
-								if(!pct.equals(newpct) && lastprint+1000<System.currentTimeMillis())
-								{
-									lastprint	= System.currentTimeMillis();
-									// Doesn't work in eclipse, grrr: https://bugs.eclipse.org/bugs/show_bug.cgi?id=76936
-	//								for(int i=0; i<pct.length(); i++)
-	//								{
-	//									System.out.print("\b");
-	//								}
-									pct	= newpct;
-									System.out.println(pct);
-								}
-							}
+//							if(length>0)
+//							{
+//								done	+= read;
+//								String	newpct	= (1000*done/length)/10.0+" %";
+//								if(!pct.equals(newpct) && lastprint+1000<System.currentTimeMillis())
+//								{
+//									lastprint	= System.currentTimeMillis();
+//									// Doesn't work in eclipse, grrr: https://bugs.eclipse.org/bugs/show_bug.cgi?id=76936
+//	//								for(int i=0; i<pct.length(); i++)
+//	//								{
+//	//									System.out.print("\b");
+//	//								}
+//									pct	= newpct;
+//									System.out.println(pct);
+//								}
+//							}
 						}
-						if(!quiet)
-						{
-							System.out.println("100 %");
-						}
+//						System.out.println("100 %");
 						os.close();
 						is.close();
 					}
 					else
 					{
-						System.out.println("Skipping up-to-date file: "+file);
+						agent.getLogger().info("Skipping up-to-date file: "+file);
 						it.remove();
 					}
 					conman.remove(con);
@@ -295,10 +276,7 @@ public class DirectoryDownloaderAgent
 							String	lfile	= file.substring(dir.length());
 							File	localfile	= new File(localdir, lfile);
 							File	tmpfile	= new File(tmpdir, lfile);
-							if(!quiet)
-							{
-								System.out.println("Renaming "+tmpfile+" to "+localfile+".");
-							}
+							agent.getLogger().info("Renaming "+tmpfile+" to "+localfile+".");
 							if(localfile.exists())
 							{
 								localfile.delete();
@@ -309,28 +287,19 @@ public class DirectoryDownloaderAgent
 					}
 					else
 					{
-						if(!quiet)
-						{
-							System.out.println("Renaming "+tmpdir+" to "+localdir+".");
-						}
+						agent.getLogger().info("Renaming "+tmpdir+" to "+localdir+".");
 						tmpdir.renameTo(localdir);
 					}
 				}
 			}
 			else
 			{
-				if(!quiet)
-				{
-					System.out.println("No download dir found.");					
-				}
+				agent.getLogger().info("No download dir found.");					
 			}
 		}
 		catch(Exception e)
 		{
-			if(!quiet)
-			{
-				System.out.println("Download stopped: "+ e.getMessage());
-			}
+			agent.getLogger().info("Download stopped: "+ e.getMessage());
 		}
 		
 		return IFuture.DONE;

@@ -101,7 +101,7 @@ public class DaemonService implements IDaemonService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		System.out.println("start in daemon");
+		agent.getLogger().info("start in daemon");
 		
 		adjustOptions(options).addResultListener(new ExceptionDelegationResultListener<StartOptions, Void>(ret)
 		{
@@ -185,17 +185,17 @@ public class DaemonService implements IDaemonService
 					options.startProcess();
 				
 					// Wait for handshake.
-					System.out.println("Waiting for platform "+pid);
+					agent.getLogger().info("Waiting for platform "+pid);
 					ret.addResultListener(new TimeoutResultListener<IComponentIdentifier>(timeout, agent.getExternalAccess(),
 						new IResultListener<IComponentIdentifier>()
 					{
 						public void resultAvailable(IComponentIdentifier result)
 						{
-							System.out.println("Platform found: "+pid+", "+result);
+							agent.getLogger().info("Platform found: "+pid+", "+result);
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("No platform found: "+pid);
+							agent.getLogger().info("No platform found: "+pid);
 							futures.remove(pid);
 							ret.setExceptionIfUndone(exception);
 						}
@@ -267,7 +267,7 @@ public class DaemonService implements IDaemonService
 								}
 								else
 								{
-									System.out.println("Cannot convert url to file: "+ url);
+									agent.getLogger().warning("Cannot convert url to file: "+ url);
 								}
 							}
 							StringBuffer buf = new StringBuffer();

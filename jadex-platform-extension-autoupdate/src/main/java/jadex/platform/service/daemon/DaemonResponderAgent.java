@@ -49,7 +49,7 @@ public class DaemonResponderAgent
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		System.out.println("Sending message "+content+" to "+cid);
+		agent.getLogger().info("Sending message "+content+" to "+cid);
 		
 		Future<Void>	ret	= new Future<Void>();
 		Map<String, Object>	msg	= new HashMap<String, Object>();
