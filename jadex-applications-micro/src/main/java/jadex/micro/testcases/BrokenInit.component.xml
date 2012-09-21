@@ -2,7 +2,7 @@
 <!-- Component that contains a subcomponent producing an exception during init. -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-component-2.2.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex http://jadex.sourceforge.net/jadex-component-2.3.xsd"
 	name="BrokenInit" package="jadex.micro.testcases">
 	
 	<componenttypes>

@@ -3,12 +3,12 @@
   The platform provides the basic services for running components.
   In addition, the platform exposes several configuration options as arguments.
   Further platform start parameters, e.g. for custom initial components, are defined in the 
-  <a href="http://www.activecomponents.org/docs/jadex-2.2.1-javadoc/index.html?jadex/base/Starter.html">jadex.base.Starter class</a>.
+  <a href="http://www.activecomponents.org/docs/jadex-2.3-SNAPSHOT-javadoc/index.html?jadex/base/Starter.html">jadex.base.Starter class</a>.
 -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-						http://jadex.sourceforge.net/jadex-component-2.2.xsd"
+						http://jadex.sourceforge.net/jadex-component-2.3.xsd"
 	name="Platform" package="jadex.platform">
 	
 	<!--
