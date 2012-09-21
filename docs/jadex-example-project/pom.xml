@@ -9,7 +9,7 @@
 	
 	<properties>
 		<!-- Specify desired Jadex version here. -->
-		<jadex.version>2.2</jadex.version>
+		<jadex.version> 2.2.1 </jadex.version>
 	</properties>
 	
 	<!-- Snapshot repository (only required when using snapshot version of Jadex) -->

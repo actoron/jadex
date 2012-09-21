@@ -72,27 +72,6 @@
 							</execution>
 						</executions>
 					</plugin>
-					<!-- ======== Download user guide as PDF ======== - ->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<version>1.0-beta-3</version>
-						<executions>
-							<execution>
-								<id>rules-guide</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>download-single</goal>
-								</goals>
-								<configuration>
-									<url>http://jadex-rules.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
-									<fromFile>User+Guide</fromFile>
-									<toFile>${basedir}/target/rules_guide.pdf</toFile>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					-->
 				</plugins>
 			</build>
 		</profile>

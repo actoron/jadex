@@ -7,7 +7,9 @@ Make sure that:
 
 Bump Revision:
 - set version number in poms (search '<version> 2.2.1 </version>')
+- set version number in example pom (search '<jadex.version> 2.2.1 </jadex.version>')
 - set version number in bats, shs, settings, txts (search '-2.2.1.jar')
+- set javadoc link in platform xml (search 'docs/jadex-2.2.1-javadoc') 
 - set version number in XMLs, XSDs (search '-2.2.xsd')
 - rename XSDs to reflect version number (search 'jadex' in *.xsd)
 - Add tag in SVN

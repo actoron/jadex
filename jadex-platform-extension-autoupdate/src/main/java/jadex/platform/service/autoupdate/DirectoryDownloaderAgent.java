@@ -40,7 +40,7 @@ import java.util.Scanner;
 @Arguments({
 	
 	@Argument(description="The base server URL to start looking for subdirectories.",
-		name="baseurl", clazz=String.class, defaultvalue="\"http://jadex.informatik.uni-hamburg.de/nightlybuilds/\""),
+		name="baseurl", clazz=String.class, defaultvalue="\"http://www.activecomponents.org/nightlybuilds/\""),
 	
 	@Argument(description="The target directory for downloading changed files (defaults to current directory).",
 		name="targetdir", clazz=String.class, defaultvalue="\".\""),

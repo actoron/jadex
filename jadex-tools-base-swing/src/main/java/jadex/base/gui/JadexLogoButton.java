@@ -45,7 +45,7 @@ public class JadexLogoButton extends JButton
 			{
 				try
 				{
-					BrowserLauncher2.openURL("http://vsis-www.informatik.uni-hamburg.de/projects/jadex");
+					BrowserLauncher2.openURL("http://www.activecomponents.org/");
 				}
 				catch(java.io.IOException ex)
 				{

@@ -405,7 +405,7 @@ public class ControlCenterWindow extends JFrame
 		{
 			try
 			{
-				BrowserLauncher.openURL("http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Resources/Online+Documentation");
+				BrowserLauncher.openURL("http://www.activecomponents.org/bin/view/Documentation/Overview");
 			}
 			catch(IOException e)
 			{

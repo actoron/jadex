@@ -5,7 +5,7 @@
       version="2.0.1.qualifier"
       provider-name="jadex.sourceforge.net">
 
-   <description url="http://jadex-agents.informatik.uni-hamburg.de">
+   <description url="http://www.activecomponents.org">
       The ADF Checker inspects Jadex XML model files (ADFs)
 and displays errors (such as in Java expressions)
 in the problems view and as markers in the corresponding
@@ -32,7 +32,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
    </copyright>
 
-   <license url="http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Download/License">
+   <license url="http://www.activecomponents.org/bin/view/Download/License">
       GNU LESSER GENERAL PUBLIC LICENSE
          Version 2.1, February 1999
 

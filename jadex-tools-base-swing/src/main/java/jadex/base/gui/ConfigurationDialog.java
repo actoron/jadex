@@ -111,8 +111,8 @@ public class ConfigurationDialog extends JAutoPositionDialog
 		// Add info about addons.
 		BrowserPane	addons	= new BrowserPane();
 		addons.setText("Some of these settings require add-ons <br> available from the "
-			+"<a href=\"http://vsis-www.informatik.uni-hamburg.de/projects/jadex/addons.php\">"
-			+"Jadex add-ons page</a>.");
+			+"<a href=\"http://www.activecomponents.org/download\">"
+			+"Jadex download page</a>.");
 		addons.setCaretPosition(0);
 		addons.setDefaultOpenMode(true);
 		int index	= this.getContentPane().getComponentCount();

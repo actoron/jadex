@@ -40,8 +40,8 @@ public class Main
 		// omit prefix for default namespace.
 		
 		// Create minimal type infos for both types that need to be mapped
-		String uri1 = "http://jadex.informatik.uni-hamburg.de/ns1";
-		String uri2 = "http://jadex.informatik.uni-hamburg.de/ns2";
+		String uri1 = "http://jadex.sourceforge.net/ns1";
+		String uri2 = "http://jadex.sourceforge.net/ns2";
 		
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri1, "invoice")}), new ObjectInfo(Invoice.class)));
