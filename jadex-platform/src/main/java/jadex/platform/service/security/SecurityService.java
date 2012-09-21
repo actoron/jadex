@@ -681,7 +681,12 @@ public class SecurityService implements ISecurityService
 //		String prefix = request.getValidityDuration()+request.getDigestContent();
 		
 		boolean tst = false;
-		if(Math.abs(timestamp-System.currentTimeMillis())<vd)	
+		// because timestamp is stripped, validity duration needs to be extended into future,
+		// i.e. timestamp is valid in relative range -1..2 as follows:
+		// |- vd - | - stripped timestamp in vd range -|- vd -|
+		// -1      0                                   1      2
+		long	dt	= System.currentTimeMillis()-timestamp;
+		if(dt<0 && dt>-vd || dt>=0 && dt<2*vd)
 		{
 			// test if other knows my password
 			tst = checkDigest(buildDigest(timestamp, prefix+password), digests);
@@ -705,6 +710,7 @@ public class SecurityService implements ISecurityService
 		}
 		else
 		{
+			System.out.println("Timestamp too old: "+timestamp+", vd="+vd);
 			ret = "Timestamp too old.";
 		}
 		
