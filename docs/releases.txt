@@ -1,5 +1,9 @@
 Jadex Releases Overview
 
+Release 2.2.1 (Bugfix release 09/2012)
+	- fixed problems with spaces in path names
+	- fixed problems with duration of timestamps (timestamp too old)
+	
 Release 2.2 (Pro release 09/2012)
 	- Email connector (sending and receiving via service)
 	- Per call timeouts for service invocations
