@@ -94,9 +94,10 @@ public class FileUpdateAgent extends UpdateAgent
 					if(ui.getAccess()!=null)
 					{
 						// Todo: allow recursive search for jars.
-						File dir = new File((String)ui.getAccess(), libdir);
-						so.setStartDirectory(dir.getCanonicalPath());
-						File[] jars = dir.listFiles(new FilenameFilter()
+						File startdir = new File((String)ui.getAccess());
+						so.setStartDirectory(startdir.getCanonicalPath());
+						File jardir	= new File(startdir, libdir);
+						File[] jars = jardir.listFiles(new FilenameFilter()
 						{
 							public boolean accept(File dir, String name)
 							{
