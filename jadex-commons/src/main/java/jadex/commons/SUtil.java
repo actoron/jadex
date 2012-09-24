@@ -2604,7 +2604,7 @@ public class SUtil
 			try
 			{
 				is = zip.getInputStream(entry);
-				byte[] buffer = new byte[1024];
+				byte[] buffer = new byte[8192];
 				int bytesRead = 0;
 
 				File f = new File(dir.getAbsolutePath()+ File.separator + entry.getName());

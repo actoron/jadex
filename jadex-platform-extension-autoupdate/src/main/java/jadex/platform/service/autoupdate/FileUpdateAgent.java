@@ -20,9 +20,7 @@ import jadex.micro.annotation.RequiredServices;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,7 +42,8 @@ import java.util.zip.ZipFile;
 	@Argument(name="scandir", clazz=String.class, defaultvalue="\".\""),
 	@Argument(name="excludedirs", clazz=String.class, defaultvalue="\"tmp.*\""),
 	@Argument(name="includefiles", clazz=String.class, defaultvalue="\"jadex-(([0-9]+\\\\.)|(.*addon)|(pro)).*.zip\"", description="Only main Jadex distribution jars."),
-	@Argument(name="safetydelay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000")
+	@Argument(name="safetydelay", clazz=long.class, description="Additional waiting time before update to prevent updating to incomplete builds.", defaultvalue="10000"),
+	@Argument(name="libdir", clazz=String.class, description="Directory in the distribution, where jar files are located.", defaultvalue="\"lib\""),
 })
 @RequiredServices(
 {
@@ -58,6 +57,9 @@ public class FileUpdateAgent extends UpdateAgent
 	
 	@AgentArgument
 	protected String scandir;
+	
+	@AgentArgument
+	protected String libdir;
 	
 	/** The newest version date (either current version or newest detected file). */
 	protected long newestversion;
@@ -91,7 +93,8 @@ public class FileUpdateAgent extends UpdateAgent
 				{
 					if(ui.getAccess()!=null)
 					{
-						File dir = new File((String)ui.getAccess());
+						// Todo: allow recursive search for jars.
+						File dir = new File((String)ui.getAccess(), libdir);
 						so.setStartDirectory(dir.getCanonicalPath());
 						File[] jars = dir.listFiles(new FilenameFilter()
 						{
@@ -340,7 +343,7 @@ public class FileUpdateAgent extends UpdateAgent
 								for(URL url: result)
 								{
 									File f = SUtil.getFile(url);
-									if(f.exists() && f.isDirectory() && f.getName().indexOf("jadex")!=-1)
+									if(f.exists() && f.isDirectory() && f.getAbsolutePath().indexOf("jadex")!=-1)
 									{
 										agent.getLogger().info(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 										newestversion = f.lastModified();
@@ -348,6 +351,7 @@ public class FileUpdateAgent extends UpdateAgent
 										break;
 									}
 								}
+								
 								
 								// remember that nothing was found
 								if(newestversion==0)
