@@ -76,7 +76,7 @@
 		<snapshotRepository>
 			<id>jadex-public-snapshots</id>
 			<name>Jadex Snapshot Repository</name>
-			<url>http://localhost/content/repositories/snapshots/</url>
+			<url>http://localhost/nexus/content/repositories/snapshots/</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
