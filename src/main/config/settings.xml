@@ -10,7 +10,7 @@
 			<username>Lars</username>
 			<password>lax</password>
 		</server>
-		<server>
+		<!-- <server>
 			<id>private-snapshots</id>
 			<username>deployment</username>
 			<password>lax</password>
@@ -19,8 +19,18 @@
 			<id>private-releases</id>
 			<username>deployment</username>
 			<password>lax</password>
+		</server> -->
+		<server>
+			<id>private-snapshots</id>
+			<username>deployment</username>
+			<password>laxlax</password>
 		</server>
-			</servers>
+		<server>
+			<id>private-releases</id>
+			<username>deployment</username>
+			<password>laxlax</password>
+		</server>
+	</servers>
 
 	<!-- <profiles>
 		<profile>
