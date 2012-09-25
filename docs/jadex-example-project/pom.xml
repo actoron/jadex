@@ -12,11 +12,20 @@
 		<jadex.version> 2.3-SNAPSHOT </jadex.version>
 	</properties>
 	
-	<!-- Snapshot repository (only required when using snapshot version of Jadex) -->
+	<!-- Additional repositories (only required when using snapshot and/or pro version of Jadex).
+	     You may use www0.activecomponents.org/..., www1.activecomponents.org/... to address mirrors directly. -->
 	<repositories>
 		<repository>
-			<id>snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<id>jadex-snapshots</id>
+			<url>http://www.activecomponents.org/nexus/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+			<id>jadex-pro-snapshots</id>
+			<url>http://www.activecomponents.org/nexus/content/repositories/pro-snapshots</url>
+		</repository>
+		<repository>
+			<id>jadex-pro-releases</id>
+			<url>http://www.activecomponents.org/nexus/content/repositories/pro-releases</url>
 		</repository>
 	</repositories>
 	
