@@ -74,7 +74,7 @@ public class PeerList
 			}
 			catch(Exception e)
 			{
-				System.out.println("Relay failed to load: "+propsfile);
+				RelayHandler.getLogger().warning("Relay failed to load: "+propsfile);
 			}
 		}
 		else
@@ -92,18 +92,21 @@ public class PeerList
 			}
 			catch(Exception e)
 			{
-				System.out.println("Relay failed to save: "+propsfile);
+				RelayHandler.getLogger().warning("Relay failed to save: "+propsfile);
 			}
 		}
 		
 		// Todo: check that specified url is valid and connects to this server.
-		this.url	= "".equals(props.getProperty(PROPERTY_URL)) ? ""
-			: RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL));
+		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
+			? RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL)) : "";
 		
-		StringTokenizer	stok	= new StringTokenizer(props.getProperty(PROPERTY_PEERS), ",");
-		while(stok.hasMoreTokens())
+		if(props.containsKey(PROPERTY_PEERS))
 		{
-			addPeer(stok.nextToken().trim(), true);
+			StringTokenizer	stok	= new StringTokenizer(props.getProperty(PROPERTY_PEERS), ",");
+			while(stok.hasMoreTokens())
+			{
+				addPeer(stok.nextToken().trim(), true);
+			}
 		}
 	}
 	
@@ -167,10 +170,11 @@ public class PeerList
 		else
 		{
 			peerurl	= RelayConnectionManager.relayAddress(peerurl);
-			if(!peers.containsKey(peerurl))
+			if(!url.equals(peerurl) && !peers.containsKey(peerurl))
 			{
 				final PeerEntry	peer	= new PeerEntry(peerurl, initial);
 				peers.put(peerurl, peer);
+				RelayHandler.getLogger().info("Peer added: "+peer.getURL());
 	
 				// Create timer on demand.
 				if(timer==null)
@@ -245,7 +249,7 @@ public class PeerList
 			else
 			{
 				peers.remove(peer.getURL());
-				System.out.println("Peer removed: "+peer.getURL());
+				RelayHandler.getLogger().info("Peer removed: "+peer.getURL());
 			}
 		}
 	}

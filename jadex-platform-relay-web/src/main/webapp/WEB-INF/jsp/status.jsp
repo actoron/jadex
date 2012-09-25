@@ -47,8 +47,8 @@ if(infos.length>0)
 	if(markers.length()>0)
 	{ %>
 		<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%= markers %>"/>
-<%	}
-} %>
+<%	} %>
+
 <table>
 	<tr>
 		<th>&nbsp;</th>
@@ -93,4 +93,68 @@ if(infos.length>0)
 
 </table>
 
+<% } else { %>
+
+<p>Currently there are no platforms connected to this relay.</p>
+<p>You can check the <a href="history">connection history</a> for more information.</p>
+
+<% } %>
+<H2>Alternative Relay Servers</H2>
+<p>
+	For redundancy and load balancing reasons there are several public relay servers available as stated below.
+	You can also host you own relay server by deploying the relay web application in a servlet container such as Tomcat. 
+</p>
+<table style="margin-left: 30px">
+	<tr>
+		<td style="border: 0; padding: 0">
+			o<SPAN class="wikilink">
+				<A href="http://jadex.informatik.uni-hamburg.de/relay"><SPAN class="wikigeneratedlinkcontent">http://jadex.informatik.uni-hamburg.de/relay</SPAN></A>
+			</SPAN>
+		</td>
+		<td style="border: 0; padding: 0; text-align: center">
+			<img src="resources/uhh-9e763cf9f3e.png"/>
+		</td>
+	</tr>
+	<tr>
+		<td style="border: 0; padding: 0">
+			o<SPAN class="wikilink">
+				<A href="http://www0.activecomponents.org/relay"><SPAN class="wikigeneratedlinkcontent">http://www0.activecomponents.org/relay</SPAN></A>
+			</SPAN>
+		</td>
+		<td style="border: 0; padding: 0; text-align: center">
+			<img src="resources/lars-server.png"/>
+		</td>
+	</tr>
+	<tr>
+		<td style="border: 0; padding: 0">
+			o<SPAN class="wikilink">
+				<A href="http://relay1.activecomponents.org/"><SPAN class="wikigeneratedlinkcontent">http://relay1.activecomponents.org/</SPAN></A>
+			</SPAN>
+		</td>
+		<td style="border: 0; padding: 0; text-align: center">
+			<img src="resources/Garfield.png"/>
+		</td>
+	</tr>
+</table>
+<!-- 
+<span style="display: inline-block">
+<UL>
+	<LI style="clear: both; height: 32px; line-height: 32px">
+		<SPAN class="wikilink">
+			<A href="http://jadex.informatik.uni-hamburg.de/relay"><SPAN class="wikigeneratedlinkcontent">http://jadex.informatik.uni-hamburg.de/relay</SPAN></A></SPAN>
+		<span style="float: right; width: 80px; text-align: center"><img src="resources/uhh-9e763cf9f3e.png"/></span>		
+	</LI>
+	<LI style="clear: both; height: 32px; line-height: 32px">
+		<SPAN class="wikilink">
+			<A href="http://www0.activecomponents.org/relay"><SPAN class="wikigeneratedlinkcontent">http://www0.activecomponents.org/relay</SPAN></A></SPAN>
+		<span style="float: right; width: 80px; text-align: center"><img src="resources/lars-server.png"/></span>
+	</LI>
+	<LI style="clear: both; height: 32px; line-height: 32px">
+		<SPAN class="wikilink">
+			<A href="http://relay1.activecomponents.org/"><SPAN class="wikigeneratedlinkcontent">http://relay1.activecomponents.org/</SPAN></A></SPAN>
+		<span style="float: right; width: 80px; text-align: center"><img src="resources/Garfield.png"/></span>
+	</LI>
+</UL>
+</span>
+ -->
 <jsp:include page="footer.jsp" flush="true"/>
