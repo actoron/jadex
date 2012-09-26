@@ -21,13 +21,13 @@
 			<id>private-releases</id>
 			<name>Jadex Pro Release Repository</name>
 			<!-- <url>http://jadex.informatik.uni-hamburg.de/nexus/content/repositories/releases/</url> -->
-			<url>http://127.0.0.1/nexus/content/repositories/pro-releases</url>
+			<url>http://localhost/nexus/content/repositories/pro-releases</url>
 		</repository>
 		<snapshotRepository>
 			<id>private-snapshots</id>
 			<name>Jadex Pro Snapshot Repository</name>
 			<!-- <url>http://jadex.informatik.uni-hamburg.de/nexus/content/repositories/snapshots/</url> -->
-			<url>http://127.0.0.1/nexus/content/repositories/pro-snapshots</url>
+			<url>http://localhost/nexus/content/repositories/pro-snapshots</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
