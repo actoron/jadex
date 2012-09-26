@@ -35,6 +35,7 @@
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/effects.js' defer='defer'></script>
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/scriptaculous.js' defer='defer'></script>
 <script type='text/javascript' src='<%= request.getContextPath() %>/resources/accordion.js' defer='defer'></script>
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 </HEAD>
 <BODY id="body"
 	onload="createAccordion({div:'xwikinav', no:0, height:150});"
@@ -53,7 +54,13 @@
 			</DIV>
 			<DIV
 				style="top: 60px; width: 100%; text-align: right; position: absolute;">
-				<IMG alt="<%= InetAddress.getLocalHost().getHostName() %>" src="<%= request.getContextPath() %>/resources/<%= InetAddress.getLocalHost().getHostName() %>.png">
+				<p>
+					<div class="g-plusone" data-size="medium" href="www.activecomponents.org">
+					</div>
+					<a href="http://www.activecomponents.org/Infrastructure/Overview">
+						<IMG alt="<%= InetAddress.getLocalHost().getHostName() %>" src="<%= request.getContextPath() %>/resources/<%= InetAddress.getLocalHost().getHostName() %>.png"/>
+					</a>
+				</p>
 			</DIV>
 			<DIV id="contentcontainer" class="contenthideright">
 				<DIV id="contentcontainerinner">
