@@ -57,7 +57,7 @@
 				<p>
 					<div class="g-plusone" data-size="medium" href="www.activecomponents.org">
 					</div>
-					<a href="http://www.activecomponents.org/Infrastructure/Overview">
+					<a href="http://www.activecomponents.org/bin/view/Infrastructure/Overview">
 						<IMG alt="<%= InetAddress.getLocalHost().getHostName() %>" src="<%= request.getContextPath() %>/resources/<%= InetAddress.getLocalHost().getHostName() %>.png"/>
 					</a>
 				</p>
