@@ -7,14 +7,13 @@
 	IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get(null);
 	boolean	jaxcent	= ((Boolean)request.getAttribute("jaxcent")).booleanValue();
 %>
-<h1><%= model.getName() %> (<%= model.getType() %>)</h1>
 <h2>Package <%= model.getPackage() %></h2>
 <div class="desc"><%= model.getDescription()!=null ? model.getDescription() : "No description." %></div>
 
 <% 	ConfigurationInfo[]	confs	=	model.getConfigurations();
 	if(confs.length>0) { %>
 <h2>Configurations</h2>
-<div class="desc">Click on a configuration to show corresponding argument and result values.</div>
+<%/* <div class="desc">Click on a configuration to show corresponding argument and result values.</div> */%>
 <table class="printtable">
 	<tr>
 		<th>Name</th>
@@ -25,8 +24,8 @@
 	{
 %>
 	<tr <%= jaxcent ? "id=\"config"+i+"\"" : "class=\""+ (i%2==0 ? "even\"" : "odd\"") %>>
-		<td class="name" style="cursor:pointer;"><%= confs[i].getName() %></td>
-		<td class="desc" style="cursor:pointer;"><%= confs[i].getDescription() %></td>
+		<td class="name" <%/* style="cursor:pointer;" */%>><%= confs[i].getName() %></td>
+		<td class="desc" <%/* style="cursor:pointer;" */%>><%= confs[i].getDescription() %></td>
 	</tr>
 <%	} %>
 </table>

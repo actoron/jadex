@@ -1,7 +1,0 @@
-<JaxcentConfiguration>
-	<Page>
-		<PagePath>/jadex-applications-web/jadexdoc/view</PagePath>
-		<PageClass>jadex.web.tools.jadexdoc.JaxcentHandler</PageClass>
-		<UseSession>true</UseSession>
-	</Page>
-</JaxcentConfiguration>

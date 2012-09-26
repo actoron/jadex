@@ -76,6 +76,12 @@
 											</UL>
 										</DIV>
 									</DIV>
+									<!-- 
+									<script type="text/javascript">
+										var obj = {div:'xwikinav', no:-1, height:250};
+										var acc = createAccordion(obj);
+									</script>
+									 -->
 								</DIV>
 							</DIV>
 						</DIV>

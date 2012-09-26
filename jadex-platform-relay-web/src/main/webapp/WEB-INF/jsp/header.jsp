@@ -31,7 +31,13 @@
 	content="PSu8atqC7qDGHNZBfqQjVV8xM13xwyOUQs-4BmycCXc" />
 */ %>
 <LINK rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/resources/colibri.css" media="all" />
+<script type='text/javascript' src='<%= request.getContextPath() %>/resources/prototype.js' defer='defer'></script>
+<script type='text/javascript' src='<%= request.getContextPath() %>/resources/effects.js' defer='defer'></script>
+<script type='text/javascript' src='<%= request.getContextPath() %>/resources/scriptaculous.js' defer='defer'></script>
+<script type='text/javascript' src='<%= request.getContextPath() %>/resources/accordion.js' defer='defer'></script>
+</HEAD>
 <BODY id="body"
+	onload="createAccordion({div:'xwikinav', no:0, height:150});"
 	class="wiki-xwiki space-AC_User_Guide viewbody hideright">
 	<DIV id="xwikimaincontainer">
 		<DIV id="xwikimaincontainerinner">

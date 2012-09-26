@@ -159,7 +159,8 @@ public class JadexdocServlet extends HttpServlet
 					ThreadSuspendable	sus	= new ThreadSuspendable();
 					if(model.get(sus, timeout)!=null)
 					{
-						title	= model.get(sus, timeout).getFullName();
+						IModelInfo	mi	= model.get(sus, timeout);
+						title	= mi.getName() + " (" + mi.getType() + ")";
 						view	= "/WEB-INF/jsp/jadexdoc/model.jsp";
 					}
 					else
