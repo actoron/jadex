@@ -300,15 +300,22 @@ public class SReflect
 						ret = Class.forName(name, initialize, classloader);
 	//					System.out.println("cFN0: loaded "+clazz);
 					}
-					catch(ClassNotFoundException e)
+					catch(Throwable e)
 					{
-//						e.printStackTrace();
+						// Catch anything as sometimes strange errors appear
+						// E.g. (http://pastebin.com/6xkRhJqG)
+						// Exception in thread "AWT-EventQueue-0" java.lang.InternalError: Unable to find plugin native libraries
+				        //   at sun.plugin2.util.NativeLibLoader.load(Unknown Source)
 					}
-					// Also handled by dynamic url class loader, but not in applets/webstart.
-					catch(LinkageError e)
-					{
-//						e.printStackTrace();
-					}
+//					catch(ClassNotFoundException e)
+//					{
+////						e.printStackTrace();
+//					}
+//					// Also handled by dynamic url class loader, but not in applets/webstart.
+//					catch(LinkageError e)
+//					{
+////						e.printStackTrace();
+//					}
 				}
 				
 				if(ret==null)
