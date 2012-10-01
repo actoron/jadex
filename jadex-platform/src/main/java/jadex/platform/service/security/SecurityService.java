@@ -710,7 +710,7 @@ public class SecurityService implements ISecurityService
 		}
 		else
 		{
-			System.out.println("Timestamp too old: "+timestamp+", vd="+vd);
+//			System.out.println("Timestamp too old: "+timestamp+", vd="+vd);
 			ret = "Timestamp too old.";
 		}
 		
