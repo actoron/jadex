@@ -5,12 +5,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -45,10 +43,10 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	protected IInternalAccess ia;
 	
 	/** The workitem queues */
-	protected Map workitemQueues;
+	protected Map<String, Set<IWorkitem>> workitemQueues;
 	
 	/** Current user activities */
-	protected Map userActivities;
+	protected Map<String, Set<IClientActivity>> userActivities;
 	
 	
 	protected Map processWorkitemListeners;
@@ -68,8 +66,8 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public WorkitemHandlerService()
 	{
 		processWorkitemListeners = new HashMap();
-		workitemQueues = new HashMap();
-		userActivities = new HashMap();
+		workitemQueues = new HashMap<String, Set<IWorkitem>>();
+		userActivities = new HashMap<String, Set<IClientActivity>>();
 		workitemQueueListeners = new HashMap();
 		activityListeners = new HashMap();
 		globalActivityListeners = new HashMap();
@@ -82,7 +80,8 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture startService()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -127,7 +126,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture shutdownService()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -145,7 +144,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param listener result listener
 	 *  @return Null, when done.
 	 */
-	public IFuture queueWorkitem(final IWorkitem workitem, IResultListener listener)
+	public IFuture<Void> queueWorkitem(final IWorkitem workitem, IResultListener listener)
 	{
 		ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
@@ -178,19 +177,21 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param workitem the workitem being terminated
 	 *  @return Null, when done.
 	 */
-	public IFuture withdrawWorkitem(final IWorkitem workitem)
+	public IFuture<Void> withdrawWorkitem(final IWorkitem workitem)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		terminateActivity((IClientActivity) workitem).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				IResultListener listener = (IResultListener) processWorkitemListeners.remove(workitem);
 				listener.exceptionOccurred(new RuntimeException("Workitem terminated."));
-				workitemQueues.get(workitem.getRole());
-				Set workitems = (Set) workitemQueues.get(workitem.getRole());
+				Set<IWorkitem> workitems = workitemQueues.get(workitem.getRole());
 				if (workitems.remove(workitem))
+				{
 					fireWorkitemRemovedEvent(workitem);
+				}
+				
 				ComponentChangeEvent.getTimeStamp(ia.getServiceContainer()).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -210,17 +211,17 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 * 
 	 * @return current activities for all users
 	 */
-	public IFuture getUserActivities()
+	public IFuture<Map<String, Set<IClientActivity>>> getUserActivities()
 	{
 		Map ret = new HashMap();
-		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
+		for (Iterator<Map.Entry<String, Set<IClientActivity>>> it = userActivities.entrySet().iterator(); it.hasNext(); )
 		{
-			Map.Entry userEntry = (Map.Entry) it.next();
-			Set activities = (Set) userEntry.getValue();
-			ret.put(userEntry.getKey(), new HashSet(activities));
+			Map.Entry<String, Set<IClientActivity>> userEntry = it.next();
+			Set<IClientActivity> activities = userEntry.getValue();
+			ret.put(userEntry.getKey(), new HashSet<IClientActivity>(activities));
 		}
 		
-		return new Future(ret);
+		return new Future<Map<String, Set<IClientActivity>>>(ret);
 	}
 	
 	/**
@@ -229,7 +230,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 * @param activity the activity
 	 * @return Null, when done.
 	 */
-	public IFuture terminateActivity(final IClientActivity activity)
+	public IFuture<Void> terminateActivity(final IClientActivity activity)
 	{
 		String userName = null;
 		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
@@ -267,7 +268,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param activity the activity being finished
 	 *  @return Null, when done.
 	 */
-	public IFuture finishActivity(final String userName, IClientActivity activity)
+	public IFuture<Void> finishActivity(final String userName, IClientActivity activity)
 	{
 		final IWorkitem workitem = (IWorkitem) activity;
 		final String id = activity.getActivityId();
@@ -293,7 +294,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param workitem the workitem being requested for the activity
 	 *  @return Null, when done.
 	 */
-	public IFuture beginActivity(final String userName, final IWorkitem workitem)
+	public IFuture<Void> beginActivity(final String userName, final IWorkitem workitem)
 	{
 		final IClientActivity activity = (IClientActivity) workitem;
 		activity.setActivityId(SUtil.createUniqueId("Activity"));
@@ -328,7 +329,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param activity the activity being canceled
 	 *  @return Null, when done.
 	 */
-	public IFuture cancelActivity(final String userName, final IClientActivity activity)
+	public IFuture<Void> cancelActivity(final String userName, final IClientActivity activity)
 	{
 		final String id = activity.getActivityId();
 		activity.setActivityId(null);
@@ -345,11 +346,16 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 		return IFuture.DONE;
 	}
 	
-	public IFuture getAvailableWorkitems(final String username)
+	/**
+	 *  Gets the available workitems for the given user.
+	 *  
+	 *  @param userName The user.
+	 *  @return The available workitems.
+	 */
+	public IFuture<Set<IWorkitem>> getAvailableWorkitems(final String username)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -358,12 +364,12 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 					public void customResultAvailable(Object result)
 					{
 						Set roles = (Set) result;
-						Set workitems = new HashSet();
+						Set<IWorkitem> workitems = new HashSet();
 						if (roles.contains(IAAAService.ALL_ROLES))
 						{
-							for (Iterator it = workitemQueues.values().iterator(); it.hasNext(); )
+							for (Iterator<Set<IWorkitem>> it = workitemQueues.values().iterator(); it.hasNext(); )
 							{
-								Set roleItems = (Set) it.next();
+								Set<IWorkitem> roleItems = it.next();
 								workitems.addAll(roleItems);
 							}
 						}
@@ -371,7 +377,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 						{
 							for (Iterator it = roles.iterator(); it.hasNext(); )
 							{
-								Set roleItems = (Set) workitemQueues.get(it.next());
+								Set<IWorkitem> roleItems = workitemQueues.get(it.next());
 								if (roleItems != null)
 									workitems.addAll(roleItems);
 							}
@@ -390,10 +396,10 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param userName the user name
 	 *  @return a set of activities that are available for this client
 	 */
-	public IFuture getAvailableActivities(final String userName)
+	public IFuture<Set<IClientActivity>> getAvailableActivities(final String userName)
 	{
 		final Future ret = new Future();
-		ret.setResult(new HashSet((Set) userActivities.get(userName)));
+		ret.setResult(new HashSet<IClientActivity>(userActivities.get(userName)));
 		return ret;
 	}
 	
@@ -402,11 +408,11 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public IFuture addWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
+	public IFuture<Void> addWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -453,13 +459,13 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public IFuture removeWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
+	public IFuture<Void> removeWorkitemListener(final IComponentIdentifier client, final IWorkitemListener listener)
 	{
-		final Future ret = new Future();
+		//final Future ret = new Future();
 		Set listeners = (Set) workitemQueueListeners.get(client);
 		if (listeners != null)
 			listeners.remove(listener);
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -467,7 +473,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param listener a new activity listener
 	 *  @return Null, when done.
 	 */
-	public IFuture addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
+	public IFuture<Void> addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
 	{
 		Set listeners = (Set) globalActivityListeners.get(client);
 		if (listeners == null)
@@ -493,7 +499,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param listener activity listener
 	 *  @return Null, when done.
 	 */
-	public IFuture removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
+	public IFuture<Void> removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener)
 	{
 		Set listeners = (Set) globalActivityListeners.get(client);
 		if (listeners != null)
@@ -506,10 +512,10 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public IFuture addActivityListener(final IComponentIdentifier client, final IActivityListener listener)
+	public IFuture<Void> addActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		final Future<Void> ret = new Future<Void>();
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -534,6 +540,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 								listener.activityAdded(new ActivityEvent(username, (IClientActivity) it.next()));
 							}
 						}
+						ret.setResult(null);
 					}
 				}));
 			}
@@ -547,19 +554,19 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public IFuture removeActivityListener(final IComponentIdentifier client, final IActivityListener listener)
+	public IFuture<Void> removeActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
-		final Future ret = new Future();
+		//final Future ret = new Future();
 		Set listeners = (Set) activityListeners.get(client);
 		if (listeners != null)
 			listeners.remove(listener);
 		
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	private void fireWorkitemAddedEvent(final IWorkitem workitem)
 	{
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -601,7 +608,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	{
 		// Workitem Disposed event CANNOT be here since its semantics are different
 		// (workitems are not "disposed" when an activity starts)
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
@@ -642,7 +649,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	
 	private void fireActivityAddedEvent(final String userName, final IClientActivity activity)
 	{
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -677,7 +684,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	
 	private void fireActivityRemovedEvent(final String userName, final IClientActivity activity)
 	{
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

@@ -1,6 +1,11 @@
 package jadex.wfms.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.future.IFuture;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.client.IClientActivity;
@@ -18,135 +23,118 @@ public interface IExternalWfmsService
 	 *  Returns the name of the Workflow Management System.
 	 *  @return Name of the Workflow Management System.
 	 */
-	public IFuture getName();
+	public IFuture<IComponentIdentifier> getName();
 	
 	/**
 	 * Authenticate a new client.
-	 * @param client the new client
-	 * @return true, if the client has been successfully authenticated.
+	 * @return When done, return exception if the client was not authenticated.
 	 */
-	public IFuture authenticate(IComponentIdentifier client, ClientInfo info);
+	public IFuture<Void> authenticate(ClientInfo info);
 	
 	/**
 	 * Deauthenticate a client.
 	 * @param client the client
 	 */
-	public IFuture deauthenticate(IComponentIdentifier client);
+	public IFuture<Void> deauthenticate();
 	
 	/**
 	 * Returns the capabilities of the client
-	 * @param client the client
 	 * @return set of capabilities
 	 */
-	public IFuture getCapabilities(IComponentIdentifier client);
+	public IFuture<Set<Integer>> getCapabilities();
 	//public Set getCapabilities(ClientIdentifier client);
 	
 	/**
 	 *  Starts a new process
-	 *  @param client the client
-	 *  @param name name of the process
+	 *  @param info The process resource information.
 	 */
-	public IFuture startProcess(IComponentIdentifier client, String name);
+	public IFuture<IComponentIdentifier> startProcess(ProcessResourceInfo info);
 	
 	/**
 	 *  Gets the names of all available process models
-	 *  @param client the client
 	 *  @return the names of all available process models
 	 */
-	public IFuture getModelNames(IComponentIdentifier client);
+	public IFuture<List<ProcessResourceInfo>> getModels();
 	
 	/**
 	 *  Finishes an Activity.
-	 *  @param client the client
 	 *  @param activity the activity being finished
 	 */
-	public IFuture finishActivity(IComponentIdentifier client, IClientActivity activity);
+	public IFuture<Void> finishActivity(IClientActivity activity);
 	
 	/**
 	 *  Begins an activity for a client.
-	 *  @param client the client
 	 *  @param workitem the workitem being requested for the activity
 	 */
-	public IFuture beginActivity(IComponentIdentifier client, IWorkitem workitem);
+	public IFuture<Void> beginActivity(IWorkitem workitem);
 	
 	/**
 	 *  Cancel an activity.
-	 *  @param client the client
 	 *  @param activity the activity being canceled
 	 */
-	public IFuture cancelActivity(IComponentIdentifier client, IClientActivity activity);
+	public IFuture<Void> cancelActivity(IClientActivity activity);
 	
 	/**
 	 *  Returns all workitems available to a client.
-	 *  @param client the client
 	 *  @return a set of workitems that are available for acquisition by this client
 	 */
-	public IFuture getAvailableWorkitems(IComponentIdentifier client);
+	public IFuture<Set<IWorkitem>> getAvailableWorkitems();
 	
 	/**
 	 *  Returns all activities available to a client.
-	 *  @param client the client
 	 *  @return a set of activities that are available for this client
 	 */
-	public IFuture getAvailableActivities(IComponentIdentifier client);
+	public IFuture<Set<IClientActivity>> getAvailableActivities();
 	
 	/**
 	 *  Adds a listener for workitem queue changes relevant to the client.
-	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public IFuture addWorkitemListener(IComponentIdentifier client, IWorkitemListener listener);
+	public IFuture<Void> addWorkitemListener(IWorkitemListener listener);
 	
 	/**
 	 *  Removes a listener for workitem queue changes relevant to the client.
-	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public IFuture removeWorkitemListener(IComponentIdentifier client, IWorkitemListener listener);
+	public IFuture<Void> removeWorkitemListener(IWorkitemListener listener);
 	
 	/**
 	 *  Adds a listener for activity changes of the client.
-	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public IFuture addActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> addActivityListener(IActivityListener listener);
 	
 	/**
 	 *  Removes a listener for activity changes of the client.
-	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public IFuture removeActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> removeActivityListener(IActivityListener listener);
 	
 	/**
 	 * Adds a process model resource to the repository
-	 * @param client the client
-	 * @param url url to the model resource
+	 * @param resource The process resource.
 	 */
-	public IFuture addProcessResource(IComponentIdentifier client, ProcessResource resource);
+	public IFuture<Void> addProcessResource(ProcessResource resource);
 	
 	/**
 	 * Removes a process model resource from the repository
-	 * @param client the client
-	 * @param url url of the model resource
+	 * @param info The process resource information.
 	 */
-	public IFuture removeProcessResource(IComponentIdentifier client, String resourceName);
+	public IFuture<Void> removeProcessResource(final ProcessResourceInfo info);
 	
 	/**
 	 * Gets a process model.
-	 * @param name name of the model
-	 * @return the model
+	 * @param info The process resource information.
+	 * @return The model.
 	 */
-	public IFuture getProcessModel(IComponentIdentifier client, String name);
+	//public IFuture getProcessModel(String name);
 	
 	/**
-	 * Loads a process model not listed in the model repository.
-	 * @param client the client
-	 * @param path path of the model
-	 * @param imports the imports
-	 * @return the model
+	 * Gets a process model information not listed in the model repository.
+	 * @param info Process resource information
+	 * @return The model info.
 	 */
-	public IFuture loadProcessModel(IComponentIdentifier client, String path, String[] imports);
+	public IFuture<IModelInfo> getProcessModelInfo(ProcessResourceInfo info);
 	
 	/**
 	 * Gets the names of all available process models
@@ -154,14 +142,14 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @return the names of all available process models
 	 */
-	public IFuture getProcessModelNames(IComponentIdentifier client);
+	//public IFuture getProcessModelNames(IComponentIdentifier client);
 	
 	/**
 	 * Returns a potentially incomplete set of loadable model paths
 	 * 
 	 * @return set of model paths
 	 */
-	public IFuture getLoadableModelPaths(IComponentIdentifier client);
+	//public IFuture getLoadableModelPaths(IComponentIdentifier client);
 	
 	/**
 	 * Adds a process repository listener.
@@ -169,7 +157,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture addProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
+	public IFuture<Void> addProcessRepositoryListener(IProcessRepositoryListener listener);
 	
 	/**
 	 * Removes a process repository listener.
@@ -177,7 +165,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture removeProcessRepositoryListener(IComponentIdentifier client, IProcessRepositoryListener listener);
+	public IFuture<Void> removeProcessRepositoryListener(IProcessRepositoryListener listener);
 	
 	/**
 	 * Returns the current activities for all users
@@ -185,7 +173,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @return current activities for all users
 	 */
-	public IFuture getUserActivities(IComponentIdentifier client);
+	public IFuture<Map<String, Set<IClientActivity>>> getUserActivities();
 	
 	/**
 	 * Terminates the activity of a user.
@@ -193,7 +181,7 @@ public interface IExternalWfmsService
 	 * @param client the client issuing the termination request
 	 * @param activity the activity
 	 */
-	public IFuture terminateActivity(IComponentIdentifier client, IClientActivity activity);
+	public IFuture<Void> terminateActivity(IClientActivity activity);
 	
 	/**
 	 * Adds a user activities listener which will trigger for
@@ -202,7 +190,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture addActivitiesListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> addActivitiesListener(IActivityListener listener);
 	
 	/**
 	 * Removes a user activities listener.
@@ -210,7 +198,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture removeActivitiesListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> removeActivitiesListener(IActivityListener listener);
 	
 	/**
 	 * Adds a log listener to the workflow management system.
@@ -219,7 +207,7 @@ public interface IExternalWfmsService
 	 * @param listener the listener
 	 * @param pastEvents True, if the listener wishes to receive past events.
 	 */
-	public IFuture addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents);
+	public IFuture<Void> addLogListener(ILogListener listener, boolean pastEvents);
 	
 	/**
 	 * Removes a log listener from the workflow management system.
@@ -227,7 +215,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener);
+	public IFuture<Void> removeLogListener(ILogListener listener);
 	
 	/**
 	 * Adds a process listener to the workflow management system.
@@ -235,7 +223,7 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture addProcessListener(IComponentIdentifier client, IProcessListener listener);
+	public IFuture<Void> addProcessListener(IProcessListener listener);
 	
 	/**
 	 * Removes a process listener from the workflow management system.
@@ -243,5 +231,5 @@ public interface IExternalWfmsService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture removeProcessListener(IComponentIdentifier client, IProcessListener listener);
+	public IFuture<Void> removeProcessListener(IProcessListener listener);
 }

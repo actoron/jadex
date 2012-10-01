@@ -1,6 +1,10 @@
 package jadex.wfms.client.standard;
 
-import jadex.base.gui.SwingDefaultResultListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.ExceptionResultListener;
+import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.standard.parametergui.ActivityComponent;
@@ -294,15 +298,18 @@ public class WorkitemListComponent extends JPanel
 				final IClientActivity activity = ac.getActivity();
 				activity.setMultipleParameterValues(ac.getParameterValues());
 				
-				client.getWfms().finishActivity(client.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
+				client.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 				{
-					public void customResultAvailable(Object result)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-					}
-					
-					public void customExceptionOccurred(Exception exception)
-					{
-						JOptionPane.showMessageDialog(WorkitemListComponent.this, "Failed finishing activity.");
+						client.getWfms().finishActivity(activity).addResultListener(new SwingResultListener(new ExceptionResultListener<Void>()
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								JOptionPane.showMessageDialog(WorkitemListComponent.this, "Failed finishing activity.");
+							}
+						}));
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -311,18 +318,23 @@ public class WorkitemListComponent extends JPanel
 		return ac;
 	}
 	
-	protected void cancelActivity(IClientActivity activity)
+	protected void cancelActivity(final IClientActivity activity)
 	{
-		client.getWfms().cancelActivity(client.getComponentIdentifier(), activity).addResultListener(new SwingDefaultResultListener()
+		client.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
-			public void customResultAvailable(Object result)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-			}
-			
-			public void customExceptionOccurred(Exception exception)
-			{
-				JOptionPane.showMessageDialog(WorkitemListComponent.this, "Activity cancelation failed.");
+				client.getWfms().cancelActivity(activity).addResultListener(new SwingResultListener(new ExceptionResultListener<Void>()
+				{
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						JOptionPane.showMessageDialog(WorkitemListComponent.this, "Activity cancelation failed.");
+					}
+				}));
+				return IFuture.DONE;
 			}
 		});
+		
 	}
 }

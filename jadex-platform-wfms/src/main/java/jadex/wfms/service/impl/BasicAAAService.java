@@ -2,12 +2,12 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -16,9 +16,13 @@ import jadex.wfms.client.standard.SCapReqs;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.listeners.IAuthenticationListener;
 
+import java.security.AccessControlException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +41,7 @@ public class BasicAAAService implements IAAAService
 	
 	protected Map<String, UserAAAEntry> users;
 	
-	protected Map secRoleCaps;
+	protected Map<String, Set<Integer>> secRoleCaps;
 	
 	protected Set authenticationListeners;
 	
@@ -65,9 +69,9 @@ public class BasicAAAService implements IAAAService
 		for (int i = 0; i < users.length; ++i)
 			this.users.put(users[i].getUserName(), users[i]);
 		
-		this.secRoleCaps = secrolecaps!=null? secrolecaps: new HashMap();
-		secRoleCaps.put(IAAAService.SEC_ROLE_NONE, new HashSet());
-		secRoleCaps.put(IAAAService.SEC_ROLE_ADMIN, new HashSet(IAAAService.CAPABILITIES));
+		this.secRoleCaps = secrolecaps!=null? secrolecaps: new HashMap<String, Set<Integer>>();
+		secRoleCaps.put(IAAAService.SEC_ROLE_NONE, new HashSet<Integer>());
+		secRoleCaps.put(IAAAService.SEC_ROLE_ADMIN, new HashSet<Integer>(IAAAService.CAPABILITIES));
 		
 		clientInfos = new HashMap<IComponentIdentifier, ClientInfo>();
 	}
@@ -77,13 +81,72 @@ public class BasicAAAService implements IAAAService
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public IFuture authenticate(IComponentIdentifier client, ClientInfo info)
+	public IFuture<Void> authenticate(final IComponentIdentifier client, final ClientInfo info)
 	{
-		if (!users.containsKey(info.getUserName()))
-			return new Future(false);
-		clientInfos.put(client, info);
-		fireAuthenticationEvent(client, info);
-		return new Future(true);
+		final Future ret = new Future<Void>();
+		if (client != null)
+		{
+			ia.getServiceContainer().getRequiredServices("aaa_services").addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<Object>, Boolean>(ret)
+			{
+				public void customResultAvailable(Collection<Object> result)
+				{
+					final List<IAAAService> aaaservices = new ArrayList<IAAAService>();
+					for (Object obj : result)
+					{
+						IAAAService service = (IAAAService) obj;
+						aaaservices.add(service);
+					}
+					
+					IResultListener<Boolean> rl = ia.createResultListener(new DelegationResultListener<Boolean>(ret)
+					{
+						public void customResultAvailable(Boolean result)
+						{
+							if (Boolean.TRUE.equals(result))
+							{
+								ret.setResult(null);
+								System.out.println("Authenticated: " + info.getUserName());
+								clientInfos.put(client, info);
+								fireAuthenticationEvent(client, info);
+							}
+							else
+							{
+								if (!aaaservices.isEmpty())
+								{
+									IAAAService aaaservice = aaaservices.remove(0);
+									aaaservice.canAuthenticate(info).addResultListener(this);
+								}
+								else
+								{
+									ret.setException(new SecurityException("User " + info.getUserName() + " authentication failed."));
+								}
+							}
+						}
+					});
+					IAAAService aaaservice = aaaservices.remove(0);
+					aaaservice.canAuthenticate(info).addResultListener(rl);
+				}
+			}));
+		}
+		else
+		{
+			ret.setException(new NullPointerException("Authentication failed: Client must not be null!"));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * Tests if a client is allowed to authenticate.
+	 * @param info The client info.
+	 * @return true, if the client can be authenticated.
+	 */
+	public IFuture<Boolean> canAuthenticate(ClientInfo info)
+	{
+		if (users.containsKey(info.getUserName()))
+		{
+			return new Future(Boolean.TRUE);
+		}
+		return new Future<Boolean>(Boolean.FALSE);
 	}
 	
 	/**
@@ -91,7 +154,7 @@ public class BasicAAAService implements IAAAService
 	 * @param client the client
 	 * @return True, when done.
 	 */
-	public IFuture deauthenticate(IComponentIdentifier client)
+	public IFuture<Void> deauthenticate(IComponentIdentifier client)
 	{
 		ClientInfo info = clientInfos.remove(client);
 		if (info != null)
@@ -106,9 +169,9 @@ public class BasicAAAService implements IAAAService
 	 * @parameter userName the user name
 	 * @return Set of connected clients
 	 */
-	public IFuture getAuthenticatedClients(String userName)
+	public IFuture<Set<IComponentIdentifier>> getAuthenticatedClients(String userName)
 	{
-		HashSet ret = new HashSet();
+		HashSet<IComponentIdentifier> ret = new HashSet<IComponentIdentifier>();
 		for (Iterator<Map.Entry<IComponentIdentifier, ClientInfo>> it = clientInfos.entrySet().iterator();
 			 it.hasNext(); )
 		{
@@ -116,7 +179,7 @@ public class BasicAAAService implements IAAAService
 			if (entry.getValue().getUserName().equals(userName))
 				ret.add(entry.getKey());
 		}
-		return new Future(ret);
+		return new Future<Set<IComponentIdentifier>>(ret);
 	}
 	
 	/**
@@ -125,9 +188,9 @@ public class BasicAAAService implements IAAAService
 	 * @param action the action the client is requesting
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public IFuture accessAction(IComponentIdentifier client, final Integer action)
+	public IFuture<Void> accessAction(IComponentIdentifier client, final Integer action)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		ClientInfo info = clientInfos.get(client);
 		if (info != null)
 		{
@@ -136,12 +199,18 @@ public class BasicAAAService implements IAAAService
 				public void customResultAvailable(Object result)
 				{
 					Set secroles = (Set) result;
-					ret.setResult(secroles.contains(action));
+					if (secroles.contains(action))
+					{
+						ret.setResult(null);
+					}
 				}
 			}));
 		}
 		else
-			ret.setResult(false);
+		{
+			ret.setException(new AccessControlException("Not allowed: "+client + " " + action));
+		}
+		
 		return ret;
 	}
 	
@@ -189,12 +258,19 @@ public class BasicAAAService implements IAAAService
 	 *  @param client the client
 	 *  @return user name
 	 */
-	public IFuture getUserName(IComponentIdentifier client)
+	public IFuture<String> getUserName(IComponentIdentifier client)
 	{
+		Future<String> ret = new Future<String>();
 		ClientInfo info = clientInfos.get(client);
 		if (info != null)
-			return new Future(info.getUserName());
-		return IFuture.DONE;
+		{
+			ret.setResult(info.getUserName());
+		}
+		else
+		{
+			ret.setException(new RuntimeException("No user found for " + String.valueOf(client)));
+		}
+		return ret;
 	}
 	
 	/**
@@ -202,10 +278,10 @@ public class BasicAAAService implements IAAAService
 	 * @param username the user name
 	 * @return the roles of the client
 	 */
-	public IFuture getRoles(String username)
+	public IFuture<Set<String>> getRoles(String username)
 	{
-		Set roles = ((UserAAAEntry) users.get(username)).getRoles();
-		return new Future(new HashSet(roles));
+		Set<String> roles = ((UserAAAEntry) users.get(username)).getRoles();
+		return new Future<Set<String>>(new HashSet<String>(roles));
 	}
 	
 	/**
@@ -213,7 +289,7 @@ public class BasicAAAService implements IAAAService
 	 * @param userName the user name
 	 * @return the security roles
 	 */
-	public IFuture getSecurityRole(String userName)
+	public IFuture<Set<String>> getSecurityRoles(String userName)
 	{
 		return new Future(new HashSet(((UserAAAEntry) users.get(userName)).getSecRoles()));
 	}
@@ -223,9 +299,9 @@ public class BasicAAAService implements IAAAService
 	 * @param secRole the security role
 	 * @return the capabilities of the security role
 	 */
-	public IFuture getCapabilities(String secRole)
+	public IFuture<Set<Integer>> getCapabilities(String secRole)
 	{
-		return new Future(new HashSet((Set) secRoleCaps.get(secRole)));
+		return new Future<Set<Integer>>(new HashSet<Integer>(secRoleCaps.get(secRole)));
 	}
 	
 	/**
@@ -233,13 +309,13 @@ public class BasicAAAService implements IAAAService
 	 * @param secRoles the security roles
 	 * @return the combined capabilities of the security roles
 	 */
-	public IFuture getCapabilities(Set secRoles)
+	public IFuture<Set<Integer>> getCapabilities(Set<String> secRoles)
 	{
-		HashSet caps = new HashSet();
+		Set<Integer> caps = new HashSet<Integer>();
 		for (Iterator it = secRoles.iterator(); it.hasNext(); )
-			caps.addAll((Set) secRoleCaps.get(it.next()));
+			caps.addAll(secRoleCaps.get(it.next()));
 		
-		return new Future(caps);
+		return new Future<Set<Integer>>(caps);
 	}
 	
 	/**
@@ -248,7 +324,7 @@ public class BasicAAAService implements IAAAService
 	 * 
 	 * @param listener the listener
 	 */
-	public IFuture addAuthenticationListener(IAuthenticationListener listener)
+	public IFuture<Void> addAuthenticationListener(IAuthenticationListener listener)
 	{
 		authenticationListeners.add(listener);
 		return IFuture.DONE;
@@ -259,7 +335,7 @@ public class BasicAAAService implements IAAAService
 	 * 
 	 * @param listener the listener
 	 */
-	public IFuture removeAuthenticationListener(IAuthenticationListener listener)
+	public IFuture<Void> removeAuthenticationListener(IAuthenticationListener listener)
 	{
 		authenticationListeners.remove(listener);
 		return IFuture.DONE;
@@ -305,9 +381,9 @@ public class BasicAAAService implements IAAAService
 		}
 	}
 	
-	protected static void kickClient(IServiceProvider provider, final IComponentIdentifier client)
+	protected static void kickClient(IServiceContainer provider, final IComponentIdentifier client)
 	{
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DefaultResultListener()
+		provider.getRequiredService("aaa_service").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

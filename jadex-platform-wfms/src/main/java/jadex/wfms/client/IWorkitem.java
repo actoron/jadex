@@ -1,6 +1,7 @@
 package jadex.wfms.client;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IServiceIdentifier;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,12 @@ public interface IWorkitem
 	 *  @return Identifier of the process which issued the workitem.
 	 */
 	public IComponentIdentifier getProcess();
+	
+	/**
+	 *  Gets the identifier of the work item handler managing the workitem
+	 *  @return Identifier of the handler managing the workitem.
+	 */
+	public IServiceIdentifier getHandler();
 	
 	/**
 	 *  Gets the creation time of the process which issued the workitem

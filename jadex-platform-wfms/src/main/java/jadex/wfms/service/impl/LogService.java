@@ -64,13 +64,13 @@ public class LogService implements ILogService
 	public IFuture startService()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getRequiredService("clock_service").addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
 				final IClockService clockservice = (IClockService) result;
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -106,7 +106,7 @@ public class LogService implements ILogService
 										{
 											{
 												setTime(clockservice.getTime());
-												setComponentCreationTime(ncea.getCreationTime());
+												setComponentCreationTime(desc.getCreationTime());
 												setEventType(IComponentChangeEvent.EVENT_TYPE_CREATION);
 												setSourceCategory(IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
 												setSourceType(desc.getModelName());
@@ -153,7 +153,7 @@ public class LogService implements ILogService
 	public IFuture shutdownService()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -172,9 +172,8 @@ public class LogService implements ILogService
 	 *  @param pastEvents True, if past events should be passed to the listener.
 	 *  @return Indication of success.
 	 */
-	public IFuture addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents)
+	public IFuture<Void> addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents)
 	{
-		Future ret = new Future();
 		synchronized (listeners)
 		{
 			Set<ILogListener> lSet = listeners.get(client);
@@ -194,8 +193,7 @@ public class LogService implements ILogService
 				}
 			}
 		}
-		ret.setResult(null);
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -205,9 +203,9 @@ public class LogService implements ILogService
 	 *  @param listener The listener.
 	 *  @return Indication of success.
 	 */
-	public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener)
+	public IFuture<Void> removeLogListener(IComponentIdentifier client, ILogListener listener)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		synchronized (listeners)
 		{
 			Set<ILogListener> lSet = listeners.get(client);
@@ -227,7 +225,7 @@ public class LogService implements ILogService
 	 *  @param event The event.
 	 *  @return Null, when done.
 	 */
-	public IFuture logEvent(IComponentChangeEvent event)
+	public IFuture<Void> logEvent(IComponentChangeEvent event)
 	{
 		synchronized (listeners)
 		{

@@ -48,7 +48,7 @@ import com.mxgraph.view.mxStylesheet;
 
 public class EditorWindow extends JFrame implements IControllerAccess, IViewAccess
 {
-	public static String VERSION = "0.9";
+	public static String VERSION = "0.1";
 	
 	/** The model factory. */
 	//protected IGpmnModelFactory mfactory;

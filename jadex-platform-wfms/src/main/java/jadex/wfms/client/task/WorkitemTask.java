@@ -57,7 +57,7 @@ public class WorkitemTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(final BpmnInterpreter instance)
+	public IFuture cancel(final BpmnInterpreter instance)
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = instance.getServiceContainer();
@@ -167,7 +167,7 @@ public class WorkitemTask implements ITask
 		//System.out.println("Parent: " + process.getParent());
 		//System.out.println("Model: " + process.getModel());
 		//System.out.println("Modelname: " + process.getModel().getFilename());
-		Workitem wi = new Workitem(process.getComponentIdentifier(), process.getCreationTime(), context.getActivity().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
+		Workitem wi = new Workitem(process.getComponentIdentifier(), process.getComponentDescription().getCreationTime(), context.getActivity().getName(), name, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}

@@ -36,4 +36,26 @@ public class ProcessResource
 	{
 		return content;
 	}
+
+	/**
+	 *  Sets the fileName.
+	 *
+	 *  @param fileName The fileName.
+	 */
+	public void setFileName(String fileName)
+	{
+		this.fileName = fileName;
+	}
+
+	/**
+	 *  Sets the content.
+	 *
+	 *  @param content The content.
+	 */
+	public void setContent(byte[] content)
+	{
+		this.content = content;
+	}
+	
+	
 }

@@ -1,7 +1,6 @@
 package jadex.gpmn.editor.gui;
 
 import jadex.gpmn.editor.gui.SGuiHelper.ModulateComposite;
-import jadex.gpmn.editor.gui.stylesheets.GpmnStylesheetColor;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -29,8 +28,14 @@ import javax.swing.ImageIcon;
  */
 public class ImageProvider
 {
+	/** The gui directory */
+	protected static final String GUI_DIR = ImageProvider.class.getPackage().getName().replaceAll("\\.", "/");
+	
 	/** The image directory */
-	protected static final String IMAGE_DIR = "/" + ImageProvider.class.getPackage().getName().replaceAll("\\.", "/") + "/images/";
+	protected static final String IMAGE_DIR = GUI_DIR + "/images/";
+	
+	/** The font directory */
+	protected static final String FONT_DIR = GUI_DIR + "/fonts/";
 	
 	/** The image cache. */
 	protected Map<String, Image> imagecache = new HashMap<String, Image>();
@@ -48,7 +53,7 @@ public class ImageProvider
 	{
 		try
 		{
-			InputStream fontis = GpmnStylesheetColor.class.getClassLoader().getResourceAsStream("jadex/gpmn/editor/gui/fonts/VeraBd.ttf");
+			InputStream fontis = this.getClass().getClassLoader().getResourceAsStream(FONT_DIR + "VeraBd.ttf");
 			Font font = Font.createFont(Font.TRUETYPE_FONT, fontis);
 			//iconfont = font;
 			iconfont = font.deriveFont(144.0f);
@@ -287,7 +292,7 @@ public class ImageProvider
 		{
 			try
 			{
-				ret = ImageIO.read(SGuiHelper.class.getResource(IMAGE_DIR + name));
+				ret = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + name));
 				imagecache.put(name, ret);
 			}
 			catch (IOException e)
@@ -327,7 +332,7 @@ public class ImageProvider
 		BufferedImage ret = null;
 		try
 		{
-			Image orig = ImageIO.read(SGuiHelper.class.getResource(IMAGE_DIR + filename));
+			Image orig = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + filename));
 			orig = orig.getScaledInstance(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, Image.SCALE_AREA_AVERAGING);
 			ret = new BufferedImage(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ret.createGraphics();

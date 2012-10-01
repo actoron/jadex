@@ -1,5 +1,8 @@
 package jadex.wfms.service;
 
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -19,7 +22,7 @@ public interface IWorkitemHandlerService
 	 * 
 	 * @return Map of current activities for all users.
 	 */
-	public IFuture getUserActivities();
+	public IFuture<Map<String, Set<IClientActivity>>> getUserActivities();
 	
 	/**
 	 * Terminates the activity of a user.
@@ -27,7 +30,7 @@ public interface IWorkitemHandlerService
 	 * @param activity the activity
 	 * @return Null, when done.
 	 */
-	public IFuture terminateActivity(IClientActivity activity);
+	public IFuture<Void> terminateActivity(IClientActivity activity);
 	
 	/**
 	 *  Finishes an Activity.
@@ -35,7 +38,7 @@ public interface IWorkitemHandlerService
 	 *  @param workitem the activity being finished
 	 *  @return Null, when done.
 	 */
-	public IFuture finishActivity(String userName, IClientActivity activity);
+	public IFuture<Void> finishActivity(String userName, IClientActivity activity);
 	
 	/**
 	 *  Begins an activity for a client.
@@ -43,7 +46,7 @@ public interface IWorkitemHandlerService
 	 *  @param workitem the workitem being requested for the activity
 	 *  @return Null, when done.
 	 */
-	public IFuture beginActivity(String userName, IWorkitem workitem);
+	public IFuture<Void> beginActivity(String userName, IWorkitem workitem);
 	
 	/**
 	 *  Cancel an activity.
@@ -51,58 +54,64 @@ public interface IWorkitemHandlerService
 	 *  @param activity the activity being canceled
 	 *  @return Null, when done.
 	 */
-	public IFuture cancelActivity(String userName, IClientActivity activity);
+	public IFuture<Void> cancelActivity(String userName, IClientActivity activity);
 	
-	public IFuture getAvailableWorkitems(String userName);
+	/**
+	 *  Gets the available workitems for the given user.
+	 *  
+	 *  @param userName The user.
+	 *  @return The available workitems.
+	 */
+	public IFuture<Set<IWorkitem>> getAvailableWorkitems(String userName);
 	
 	/**
 	 *  Returns all activities available to a client.
 	 *  @param userName the user name
 	 *  @return a set of activities that are available for this client
 	 */
-	public IFuture getAvailableActivities(String userName);
+	public IFuture<Set<IClientActivity>> getAvailableActivities(String userName);
 	
 	/**
 	 *  Adds a listener for workitem queue changes relevant to the client.
 	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public IFuture addWorkitemListener(IComponentIdentifier client, IWorkitemListener listener);
+	public IFuture<Void> addWorkitemListener(IComponentIdentifier client, IWorkitemListener listener);
 	
 	/**
 	 *  Removes a listener for workitem queue changes relevant to the client.
 	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public IFuture removeWorkitemListener(IComponentIdentifier client, IWorkitemListener listener);
+	public IFuture<Void> removeWorkitemListener(IComponentIdentifier client, IWorkitemListener listener);
 	
 	/**
 	 *  Adds a listener for activity changes.
 	 *  @param listener a new activity listener
 	 *  @return Null, when done.
 	 */
-	public IFuture addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> addGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
 	
 	/**
 	 *  Removes a listener for activity changes.
 	 *  @param listener activity listener
 	 *  @return Null, when done.
 	 */
-	public IFuture removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> removeGlobalActivityListener(IComponentIdentifier client, IActivityListener listener);
 	
 	/**
 	 *  Adds a listener for activity changes of the client.
 	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public IFuture addActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> addActivityListener(IComponentIdentifier client, IActivityListener listener);
 	
 	/**
 	 *  Removes a listener for activity changes of the client.
 	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public IFuture removeActivityListener(IComponentIdentifier client, IActivityListener listener);
+	public IFuture<Void> removeActivityListener(IComponentIdentifier client, IActivityListener listener);
 	
 	/**
 	 *  Queues a new Workitem.
@@ -110,7 +119,7 @@ public interface IWorkitemHandlerService
 	 *  @param listener result listener
 	 *  @return Null, when done.
 	 */
-	public IFuture queueWorkitem(IWorkitem workitem, IResultListener listener);
+	public IFuture<Void> queueWorkitem(IWorkitem workitem, IResultListener listener);
 	
 	/**
 	 *  Withdraws a Workitem/Activity.

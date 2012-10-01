@@ -18,6 +18,10 @@
 				jadex.wfms.service.impl.BasicAAAService.getTestService()
 			</implementation>
 		</providedservice>
+		
+		<requiredservice name="aaa_services" class="IAAAService" multiple="true">
+			<binding scope="global" dynamic="true" />
+		</requiredservice>
 	</services>
 	
 </componenttype>

@@ -10,6 +10,7 @@
 	
 	<imports>
 		<import>jadex.wfms.service.IExternalWfmsService</import>
+		<import>jadex.wfms.service.IAAAService</import>
 	</imports>
 	
 	<services>
@@ -18,6 +19,9 @@
 				new jadex.wfms.service.impl.ExternalWfmsService()
 			</implementation>
 		</providedservice>
+		
+		<requiredservice name="aaa_service" class="IAAAService">
+			<binding recover="true" scope="global" />
+		</requiredservice>
 	</services>
-	
 </componenttype>

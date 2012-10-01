@@ -1,20 +1,23 @@
 package jadex.wfms.service.impl;
 
-import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -22,12 +25,14 @@ import jadex.wfms.IProcess;
 import jadex.wfms.client.ClientInfo;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IExecutionService;
+import jadex.wfms.service.ProcessResourceInfo;
 import jadex.wfms.service.listeners.IAuthenticationListener;
 import jadex.wfms.service.listeners.IProcessListener;
 import jadex.wfms.service.listeners.ProcessEvent;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +51,10 @@ public class ExecutionService implements IExecutionService
 	/** Component access. */
 	@ServiceComponent
 	protected IInternalAccess ia;
+	
+	/** The service identifier */
+	@ServiceIdentifier
+	protected IServiceIdentifier id;
 	
 	/** Running process instances (id -> IProcess) */
 	protected Map processes;
@@ -72,21 +81,63 @@ public class ExecutionService implements IExecutionService
 	
 	/**
 	 *  Load a process model.
-	 *  @param filename The file name.
+	 *  @param info The process resource information.
 	 *  @return The process model.
 	 */
-	public IFuture loadModel(String filename, String[] imports)
+	public IFuture<IModelInfo> loadModel(final ProcessResourceInfo info)
 	{
-		return SComponentFactory.loadModel(ia.getExternalAccess(), filename);
+		
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
+		if (!info.getExecutionServiceId().equals(id))
+		{
+			ia.getServiceContainer().getRequiredServices("execution_services").addResultListener(new ExceptionDelegationResultListener<Collection<Object>, IModelInfo>(ret)
+			{
+				public void customResultAvailable(Collection<Object> result)
+				{
+					IExecutionService targetservice = null;
+					for (Object obj : result)
+					{
+						IExecutionService service = (IExecutionService) obj;
+						if (((IService) service).getServiceIdentifier().equals(info.getExecutionServiceId()))
+						{
+							targetservice = service;
+							break;
+						}
+					}
+					if (targetservice == null)
+					{
+						ret.setException(new RuntimeException("Execution Service on component " + 
+							String.valueOf(ia.getComponentIdentifier()) +
+							" is unable to find resource managed by " +
+							String.valueOf(info.getRepositoryId())));
+					}
+					else
+					{
+						targetservice.loadModel(info).addResultListener(new DelegationResultListener<IModelInfo>(ret));
+					}
+				}
+			});
+			
+		}
+		else
+		{
+			SComponentFactory.loadModel(ia.getExternalAccess(), info.getPath(), info.getResourceId()).addResultListener(new DelegationResultListener<IModelInfo>(ret));
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Start a process instance.
+	 *  
+	 *  @param info The process resource information.
+	 *  @param id ID of the process instance
+	 *  @param arguments arguments for the process
+	 *  @return assigned process instance ID
 	 */
-	public IFuture startProcess(final String modelname, final Object id, final Map arguments)
+	public IFuture<IComponentIdentifier> startProcess(final ProcessResourceInfo info, Object id, final Map arguments)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), (Class) IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		ia.getServiceContainer().getRequiredService("cms").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -95,12 +146,12 @@ public class ExecutionService implements IExecutionService
 				CreationInfo ci = new CreationInfo(null, arguments, ia.getComponentIdentifier(), true);
 				// Todo: what is platform loader for!?
 //				ci.setPlatformloader(true);
-				String prefix = modelname.substring(Math.max(modelname.lastIndexOf("/"), 0) + 1);
+				String prefix = info.getPath().substring(Math.max(info.getPath().lastIndexOf("/"), 0) + 1);
 				prefix = prefix.substring(0, Math.min(prefix.lastIndexOf("."), prefix.length()));
 				ByteBuffer b = ByteBuffer.allocate(8);
 				b.putLong(random.nextLong());
 				//prefix + "_" + Base64.encodeBytes(b.array())
-				cms.createComponent(null, modelname, ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				cms.createComponent(null, info.getPath(), ci, null).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -145,12 +196,12 @@ public class ExecutionService implements IExecutionService
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param model The model.
+	 *  @param info The process resource information.
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String name)
+	public IFuture<Boolean> isLoadable(ProcessResourceInfo info)
 	{
-		return SComponentFactory.isLoadable(ia.getExternalAccess(), name);
+		return SComponentFactory.isLoadable(ia.getExternalAccess(), info.getPath(), info.getResourceId());
 	}
 	
 	/**
@@ -159,7 +210,7 @@ public class ExecutionService implements IExecutionService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture addProcessListener(IComponentIdentifier client, IProcessListener listener)
+	public IFuture<Void> addProcessListener(IComponentIdentifier client, IProcessListener listener)
 	{
 		Map<IComponentIdentifier, Set<IProcessListener>> processListeners =  getListeners();
 		Future ret = new Future();
@@ -182,7 +233,7 @@ public class ExecutionService implements IExecutionService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture removeProcessListener(IComponentIdentifier client, IProcessListener listener)
+	public IFuture<Void> removeProcessListener(IComponentIdentifier client, IProcessListener listener)
 	{
 		Map<IComponentIdentifier, Set<IProcessListener>> processListeners =  getListeners();
 		Future ret = new Future();
@@ -198,7 +249,7 @@ public class ExecutionService implements IExecutionService
 		if (procListeners == null)
 		{
 			procListeners = new HashMap<IComponentIdentifier, Set<IProcessListener>>();
-			SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(ia.createResultListener(new DefaultResultListener()
+			ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

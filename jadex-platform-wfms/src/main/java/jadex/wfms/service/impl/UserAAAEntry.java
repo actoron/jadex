@@ -14,10 +14,10 @@ public class UserAAAEntry
 	private String userName;
 	
 	/** The roles of the user */
-	private Set roles;
+	private Set<String> roles;
 	
 	/** The security roles of the user */
-	private Set secRoles;
+	private Set<String> secRoles;
 	
 	/**
 	 * Creates a new AAA Entry
@@ -28,8 +28,8 @@ public class UserAAAEntry
 	public UserAAAEntry(String userName, String[] roles, String[] secRoles)
 	{
 		this.userName = userName;
-		this.roles = new HashSet(Arrays.asList(roles));
-		this.secRoles = new HashSet(Arrays.asList(secRoles));
+		this.roles = new HashSet<String>(Arrays.asList(roles));
+		this.secRoles = new HashSet<String>(Arrays.asList(secRoles));
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class UserAAAEntry
 	 * Returns the roles of the user.
 	 * @return roles of the user
 	 */
-	public Set getRoles()
+	public Set<String> getRoles()
 	{
 		return roles;
 	}
@@ -54,7 +54,7 @@ public class UserAAAEntry
 	 * Returns the security roles of the user.
 	 * @return security roles of the user
 	 */
-	public Set getSecRoles()
+	public Set<String> getSecRoles()
 	{
 		return secRoles;
 	}

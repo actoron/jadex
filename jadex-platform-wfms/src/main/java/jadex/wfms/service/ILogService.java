@@ -14,7 +14,7 @@ public interface ILogService
 	 *  @param pastEvents True, if past events should be passed to the listener.
 	 *  @return Indication of success.
 	 */
-	public IFuture addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents);
+	public IFuture<Void> addLogListener(IComponentIdentifier client, ILogListener listener, boolean pastEvents);
 	
 	/**
 	 *  Removes a log listener.
@@ -23,12 +23,12 @@ public interface ILogService
 	 *  @param listener The listener.
 	 *  @return Indication of success.
 	 */
-	public IFuture removeLogListener(IComponentIdentifier client, ILogListener listener);
+	public IFuture<Void> removeLogListener(IComponentIdentifier client, ILogListener listener);
 	
 	/**
 	 *  Writes an event into the WfMS log.
 	 *  @param event The event.
 	 *  @return Null, when done.
 	 */
-	public IFuture logEvent(IComponentChangeEvent event);
+	public IFuture<Void> logEvent(IComponentChangeEvent event);
 }

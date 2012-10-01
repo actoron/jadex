@@ -1,6 +1,7 @@
 package jadex.wfms.service;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.future.IFuture;
 import jadex.wfms.service.listeners.IProcessListener;
 
@@ -13,11 +14,10 @@ public interface IExecutionService
 {
 	/**
 	 *  Load a process model.
-	 *  @param filename The file name.
-	 *  @param imports The imports.
+	 *  @param info The process resource information.
 	 *  @return The process model.
 	 */
-	public IFuture loadModel(String filename, String[] imports);
+	public IFuture<IModelInfo> loadModel(ProcessResourceInfo info);
 	
 	/**
 	 *  Create a new process.
@@ -26,13 +26,13 @@ public interface IExecutionService
 	
 	/**
 	 *  Start a process instance.
-	 *  @param modelName name of the process model
+	 *  
+	 *  @param info The process resource information.
 	 *  @param id ID of the process instance
 	 *  @param arguments arguments for the process
-	 *  @param stepmode enable step mode
 	 *  @return assigned process instance ID
 	 */
-	public IFuture startProcess(String modelname, Object id, Map arguments);
+	public IFuture<IComponentIdentifier> startProcess(ProcessResourceInfo info, Object id, Map arguments);
 
 	/**
 	 *  Stop a process instance.
@@ -41,10 +41,10 @@ public interface IExecutionService
 
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param modelname The model name.
+	 *  @param info The process resource information.
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture isLoadable(String modelname);
+	public IFuture<Boolean> isLoadable(ProcessResourceInfo info);
 	
 	/**
 	 * Adds a process listener to the workflow management system.
@@ -52,7 +52,7 @@ public interface IExecutionService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture addProcessListener(IComponentIdentifier client, IProcessListener listener);
+	public IFuture<Void> addProcessListener(IComponentIdentifier client, IProcessListener listener);
 	
 	/**
 	 * Removes a process listener from the workflow management system.
@@ -60,5 +60,5 @@ public interface IExecutionService
 	 * @param client the client
 	 * @param listener the listener
 	 */
-	public IFuture removeProcessListener(IComponentIdentifier client, IProcessListener listener);
+	public IFuture<Void> removeProcessListener(IComponentIdentifier client, IProcessListener listener);
 }

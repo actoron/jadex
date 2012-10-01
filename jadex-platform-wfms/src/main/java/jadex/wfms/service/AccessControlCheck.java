@@ -2,7 +2,6 @@ package jadex.wfms.service;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ICommand;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -29,8 +28,7 @@ public class AccessControlCheck
 	
 	public void checkAccess(final Future targetFuture, IServiceContainer provider, final ICommand actionCommand)
 	{
-		SServiceProvider.getService(provider, IAAAService.class)
-			.addResultListener(new DelegationResultListener(targetFuture)
+		provider.getRequiredService("aaa_service").addResultListener(new DelegationResultListener(targetFuture)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -44,15 +42,12 @@ public class AccessControlCheck
 				for (int i = 0; i < actions.length; ++i)
 				{
 					final Integer action = actions[i];
-					((IAAAService) result).accessAction(client, action).addResultListener(new IResultListener()
+					((IAAAService) result).accessAction(client, action).addResultListener(new IResultListener<Void>()
 					{
 						
-						public void resultAvailable(Object result)
+						public void resultAvailable(Void result)
 						{
-							if (Boolean.TRUE.equals(result))
-								actionCounter.resultAvailable(true);
-							else
-								actionCounter.exceptionOccurred(new AccessControlException("Not allowed: "+client + " " + action));
+							actionCounter.resultAvailable(null);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -60,7 +55,7 @@ public class AccessControlCheck
 							actionCounter.exceptionOccurred(new AccessControlException("Not allowed: "+client + " " + exception));
 						}
 					});
-				}	
+				}
 			}
 		});
 	}

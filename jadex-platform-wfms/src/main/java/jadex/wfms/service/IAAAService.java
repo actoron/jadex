@@ -61,8 +61,8 @@ public interface IAAAService
 	public static final Integer PD_REMOVE_REPOSITORY_LISTENER	 = new Integer(701);
 	
 	/** All capabilities */
-	public static final Set CAPABILITIES = new HashSet(Arrays.asList(
-											   new Object[] {
+	public static final Set<Integer> CAPABILITIES = new HashSet<Integer>(Arrays.asList(
+											   new Integer[] {
 											   REQUEST_PD_SERVICE,
 											   REQUEST_MONITORING_SERVICE,
 											   START_PROCESS,
@@ -94,31 +94,38 @@ public interface IAAAService
 	/**
 	 * Authenticate a new client.
 	 * @param client the new client
-	 * @return true, if the client has been successfully authenticated.
+	 * @return null when authenticated, throws exception when authentication is denied.
 	 */
-	public IFuture authenticate(IComponentIdentifier client, ClientInfo info);
+	public IFuture<Void> authenticate(IComponentIdentifier client, ClientInfo info);
+	
+	/**
+	 * Tests if a client is allowed to authenticate.
+	 * @param info The client info.
+	 * @return true, if the client can be authenticated.
+	 */
+	public IFuture<Boolean> canAuthenticate(ClientInfo info);
 	
 	/**
 	 * Deauthenticate a client.
 	 * @param client the client
-	 * @return True, when done.
+	 * @return When done.
 	 */
-	public IFuture deauthenticate(IComponentIdentifier client);
+	public IFuture<Void> deauthenticate(IComponentIdentifier client);
 	
 	/**
 	 * Returns the authenticated clients for a specific user name
 	 * @parameter userName the user name
 	 * @return Set of connected clients
 	 */
-	public IFuture getAuthenticatedClients(String userName);
+	public IFuture<Set<IComponentIdentifier>> getAuthenticatedClients(String userName);
 	
 	/**
 	 * Checks if a client can access an action
 	 * @param client the client requesting the action
 	 * @param action the action the client is requesting
-	 * @return true, if the client is authorized to perform the action, false otherwise
+	 * @return Null when done, Exception when access is denied.
 	 */
-	public IFuture accessAction(IComponentIdentifier client, Integer action);
+	public IFuture<Void> accessAction(IComponentIdentifier client, Integer action);
 	
 	/**
 	 * Checks if a client can access an event
@@ -132,35 +139,35 @@ public interface IAAAService
 	 *  @param client the client
 	 *  @return user name
 	 */
-	public IFuture getUserName(IComponentIdentifier client);
+	public IFuture<String> getUserName(IComponentIdentifier client);
 	
 	/**
 	 * Returns the roles of a particular user
 	 * @param userName the user name
 	 * @return Set of the roles of the client.
 	 */
-	public IFuture getRoles(String userName);
+	public IFuture<Set<String>> getRoles(String userName);
 	
 	/**
 	 * Returns the security roles of the user
 	 * @param userName the user name
 	 * @return Set of the security roles.
 	 */
-	public IFuture getSecurityRole(String userName);
+	public IFuture<Set<String>> getSecurityRoles(String userName);
 	
 	/**
 	 * Returns the capabilities of a security role
 	 * @param secRole the security role
 	 * @return Set of the capabilities of the security role.
 	 */
-	public IFuture getCapabilities(String secRole);
+	public IFuture<Set<Integer>> getCapabilities(String secRole);
 	
 	/**
 	 * Returns the capabilities a set of security roles
 	 * @param secRoles the security roles
 	 * @return the combined capabilities of the security roles
 	 */
-	public IFuture getCapabilities(Set secRoles);
+	public IFuture<Set<Integer>> getCapabilities(Set<String> secRoles);
 	
 	/**
 	 * Adds an authentication listener which triggers on
@@ -169,7 +176,7 @@ public interface IAAAService
 	 * @param listener the listener
 	 * @return Null, when done.
 	 */
-	public IFuture addAuthenticationListener(IAuthenticationListener listener);
+	public IFuture<Void> addAuthenticationListener(IAuthenticationListener listener);
 	
 	/**
 	 * Removes an authentication listener.
@@ -177,5 +184,5 @@ public interface IAAAService
 	 * @param listener the listener
 	 * @return Null, when done.
 	 */
-	public IFuture removeAuthenticationListener(IAuthenticationListener listener);
+	public IFuture<Void> removeAuthenticationListener(IAuthenticationListener listener);
 }

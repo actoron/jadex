@@ -10,6 +10,8 @@
 	
 	<imports>
 		<import>jadex.wfms.service.ILogService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.types.cms.IComponentManagementService</import>
 	</imports>
 	
 	<services>
@@ -18,6 +20,12 @@
 				new jadex.wfms.service.impl.LogService()
 			</implementation>
 		</providedservice>
+		<requiredservice name="clock_service" class="IClockService">
+			<binding scope="platform" />
+		</requiredservice>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform" />
+		</requiredservice>
 	</services>
 	
 </componenttype>

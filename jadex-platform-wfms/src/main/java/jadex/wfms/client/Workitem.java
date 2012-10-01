@@ -1,6 +1,7 @@
 package jadex.wfms.client;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.Collections;
@@ -17,6 +18,9 @@ public class Workitem implements IWorkitem, IClientActivity
 {
 	/** Identifier of the process which issued the workitem */
 	private IComponentIdentifier process;
+	
+	/** Identifier of the handler managing the workitem */
+	private IServiceIdentifier handler;
 	
 	/** Creation time of the process which issued the workitem */
 	private long processcreationtime;
@@ -81,6 +85,24 @@ public class Workitem implements IWorkitem, IClientActivity
 	public IComponentIdentifier getProcess()
 	{
 		return process;
+	}
+	
+	/**
+	 *  Gets the identifier of the workitem handler managing the workitem
+	 *  @return Identifier of the handler managing the workitem.
+	 */
+	public IServiceIdentifier getHandler()
+	{
+		return this.handler;
+	}
+	
+	/**
+	 *  Sets the identifier of the workitem handler managing the workitem
+	 *  @return Identifier of the handler managing the workitem.
+	 */
+	public void setHandler(IServiceIdentifier handler)
+	{
+		this.handler = handler;
 	}
 	
 	/**

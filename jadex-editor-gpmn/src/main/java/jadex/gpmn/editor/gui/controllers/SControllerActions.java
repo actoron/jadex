@@ -26,6 +26,7 @@ import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.layout.mxOrganicLayout;
+import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
@@ -129,7 +130,7 @@ public class SControllerActions
 					graphmodel = gpmnmodel.generateGraphModel();
 					graph.setModel(graphmodel);
 					//applyOrganicLayout(modelcontainer);
-					applyTreeLayout(modelcontainer);
+					applyOrganicLayout(modelcontainer);
 				}
 				else
 				{
@@ -315,6 +316,7 @@ public class SControllerActions
 	{
 		mxCircleLayout layout = new mxCircleLayout(modelcontainer.getGraph());
 		layout.execute(modelcontainer.getGraph().getDefaultParent());
+		modelcontainer.setDirty(true);
 	}
 	
 	/**
@@ -329,6 +331,7 @@ public class SControllerActions
 		layout.setHorizontal(false);
 		layout.setNodeDistance(GuiConstants.DEFAULT_GOAL_WIDTH);
 		layout.execute(modelcontainer.getGraph().getDefaultParent());
+		modelcontainer.setDirty(true);
 	}
 	
 	/**
@@ -339,7 +342,16 @@ public class SControllerActions
 	public static final void applyOrganicLayout(IModelContainer modelcontainer)
 	{
 		mxOrganicLayout layout = new mxOrganicLayout(modelcontainer.getGraph());
+		Object root = ((mxCell) modelcontainer.getGraph().getModel().getRoot()).getChildAt(0);
+		int count = modelcontainer.getGraph().getChildVertices(root).length;
+		int len = count * GuiConstants.DEFAULT_GOAL_WIDTH;
+		modelcontainer.getGraph().getView().setGraphBounds(new mxRectangle(0.0, 0.0, len, len));
+		layout.setAverageNodeArea(0.0);
+		layout.setOptimizeNodeDistribution(true);
+		layout.setNodeDistributionCostFactor(10000000.0);
+		layout.setEdgeCrossingCostFactor(60000.0);
 		layout.execute(modelcontainer.getGraph().getDefaultParent());
+		modelcontainer.setDirty(true);
 	}
 	
 	/**

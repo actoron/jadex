@@ -10,6 +10,7 @@
 	
 	<imports>
 		<import>jadex.wfms.service.IWorkitemHandlerService</import>
+		<import>jadex.wfms.service.IAAAService</import>
 	</imports>
 	
 	<services>
@@ -18,6 +19,10 @@
 				new jadex.wfms.service.impl.WorkitemHandlerService()
 			</implementation>
 		</providedservice>
+		
+		<requiredservice name="aaa_service" class="IAAAService">
+			<binding recover="true" scope="global" />
+		</requiredservice>
 	</services>
 	
 </componenttype>

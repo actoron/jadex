@@ -1,11 +1,11 @@
 package jadex.wfms.guicomponents;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.wfms.gui.images.SImage;
 import jadex.wfms.service.IExternalWfmsService;
 
@@ -263,7 +263,7 @@ public abstract class AbstractLoginPanel extends JPanel
 			public void customResultAvailable(Object result)
 			{
 				final Collection coll = (Collection) result;
-				
+				System.out.println("NO " + coll.size());
 				getWfmsNames(coll).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)

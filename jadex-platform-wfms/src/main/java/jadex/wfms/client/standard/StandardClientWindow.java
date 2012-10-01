@@ -1,6 +1,5 @@
 package jadex.wfms.client.standard;
 
-import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -10,9 +9,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class StandardClientWindow extends JFrame
 {
@@ -24,16 +24,15 @@ public class StandardClientWindow extends JFrame
 	{
 		access.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("dispose") 
+			@Classname("dispose") 
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new TerminationAdapter()
 				{
 					public void componentTerminated()
 					{
-						EventQueue.invokeLater(new Runnable()
+						SwingUtilities.invokeLater(new Runnable()
 						{
-							
 							public void run()
 							{
 								dispose();
@@ -53,7 +52,7 @@ public class StandardClientWindow extends JFrame
 				app.disconnect();
 				access.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("kill") 
+					@Classname("kill") 
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.killComponent();

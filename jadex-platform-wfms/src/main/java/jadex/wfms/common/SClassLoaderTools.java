@@ -23,7 +23,8 @@ public class SClassLoaderTools
 	{
 		final Future ret = new Future();
 		
-		libService.getURLs().addResultListener(new DelegationResultListener(ret)
+		//FIXME: Correct?
+		libService.getAllURLs().addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

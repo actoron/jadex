@@ -7,6 +7,13 @@ public class ClientInfo
 	
 	/**
 	 * Creates a new client info.
+	 */
+	public ClientInfo()
+	{
+	}
+	
+	/**
+	 * Creates a new client info.
 	 * @param userName user name.
 	 */
 	public ClientInfo(String userName)
@@ -21,5 +28,14 @@ public class ClientInfo
 	public String getUserName()
 	{
 		return userName;
+	}
+	
+	/**
+	 * Sets the user name of the client.
+	 * @param username The user name.
+	 */
+	public void setUserName(String username)
+	{
+		this.userName = username;
 	}
 }

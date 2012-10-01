@@ -1,5 +1,7 @@
 package jadex.wfms.client.standard;
 
+import jadex.wfms.service.ProcessResourceInfo;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,6 +21,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 
 public class ProcessModelComponent extends JPanel
@@ -38,7 +41,7 @@ public class ProcessModelComponent extends JPanel
 	private MouseListener processMouseListener;
 	
 	/** Model for the table listing the process model names */
-	private DefaultTableModel processTableModel;
+	private ProcessModelTableModel processTableModel;
 	
 	/** Start process button */
 	private JButton startButton;
@@ -64,8 +67,8 @@ public class ProcessModelComponent extends JPanel
 	public ProcessModelComponent()
 	{
 		super(new GridBagLayout());
-		processTableModel = new DefaultTableModel();
-		processTableModel.setColumnIdentifiers(new Object[] {PROCESS_MODEL_COLUMN_NAME});
+		processTableModel = new ProcessModelTableModel();
+		//processTableModel.setColumnIdentifiers(new Object[] {PROCESS_MODEL_COLUMN_NAME});
 		
 		processTable = new JTable(processTableModel)
 		{
@@ -75,6 +78,7 @@ public class ProcessModelComponent extends JPanel
 			}
 		};
 		processTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		((DefaultTableColumnModel) processTable.getColumnModel()).getColumn(0);
 		JScrollPane processScrollPane = new JScrollPane(processTable);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
@@ -129,45 +133,34 @@ public class ProcessModelComponent extends JPanel
 	 * Sets the listed process model names, deleting the previous list.
 	 * @param processModelNames new set of process model names
 	 */
-	public void setProcessModelNames(Set processModelNames)
+	public void setProcessModels(Set<ProcessResourceInfo> processmodels)
 	{
-		while (processTableModel.getRowCount() != 0)
-			processTableModel.removeRow(0);
+		processTableModel.clear();
 		
-		for (Iterator it = processModelNames.iterator(); it.hasNext(); )
-			processTableModel.addRow(new Object[] {it.next()});
-	}
-	
-	public void addProcessModelName(String name)
-	{
-		processTableModel.addRow(new Object[] {name});
-	}
-	
-	public void removeProcessModelName(String name)
-	{
-		int row = 0;
-		while (row < processTableModel.getRowCount())
+		for (Iterator<ProcessResourceInfo> it = processmodels.iterator(); it.hasNext(); )
 		{
-			if (name.equals(processTableModel.getValueAt(row, 0)))
-			{
-				processTableModel.removeRow(row);
-				return;
-			}
-			++row;
+			processTableModel.addProcessModel(it.next());
 		}
+	}
+	
+	public void addProcessModel(ProcessResourceInfo info)
+	{
+		processTableModel.addProcessModel(info);
+	}
+	
+	public void removeProcessModel(ProcessResourceInfo info)
+	{
+		processTableModel.removeProcessModel(info);
 	}
 	
 	/**
 	 * Returns the current selected process model name.
 	 * @return currently selected process model name
 	 */
-	public String getSelectedModelName()
+	public ProcessResourceInfo getSelectedModel()
 	{
 		int row = processTable.getSelectedRow();
-		int column = processTable.getSelectedColumn();
-		if ((row >= 0) && (column >= 0))
-			return (String) processTableModel.getValueAt(row, column);
-		return null;
+		return processTableModel.getModelAt(row);
 	}
 	
 	/**
@@ -226,8 +219,7 @@ public class ProcessModelComponent extends JPanel
 	 */
 	public void clear()
 	{
-		while (processTableModel.getRowCount() > 0)
-			processTableModel.removeRow(0);
+		processTableModel.clear();
 	}
 	
 	private void createMenus()
