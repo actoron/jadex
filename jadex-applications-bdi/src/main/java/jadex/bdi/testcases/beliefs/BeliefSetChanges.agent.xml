@@ -76,6 +76,7 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 			</parameter>
 			<body class="BeliefIncrementPlan"/>
 			<trigger>
+			    <condition>$beliefbase.bel.size>=2</condition>
 				<factadded ref="belset_a"/>
 			</trigger>
 		</plan>

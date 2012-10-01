@@ -535,7 +535,7 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== Auto upadte modules and assembly ======== -->
+		<!-- ======== Auto update modules and assembly ======== -->
 		
 		<profile>
 		    <id>jadex-autoupdate</id>
@@ -586,6 +586,60 @@
 	        <modules>
 	        	<module>jadex-parent-pro</module>
 				<module>jadex-platform-extension-autoupdate</module>
+		    </modules>
+		</profile>
+		
+		<!-- ======== Backup modules and assembly ======== -->
+		
+		<profile>
+		    <id>jadex-backup</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-backup</exists>
+	            </file>
+	        </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+ 							<execution>
+								<id>sources-backup</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-backup</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-backupsrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-backup</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-backup-${project.version}</finalName>
+									<outputDirectory>target/pro-addons</outputDirectory>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-backup.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+	        	        <modules>
+	        	<module>jadex-parent-pro</module>
+				<module>jadex-backup</module>
 		    </modules>
 		</profile>
 		

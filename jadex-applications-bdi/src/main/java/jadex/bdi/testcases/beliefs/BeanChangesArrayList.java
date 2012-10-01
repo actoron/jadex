@@ -28,7 +28,12 @@ public class BeanChangesArrayList extends ArrayList
 	}
 
 	//-------- methods --------
-
+	
+	public int	getSize()
+	{
+		return size();
+	}
+	
 	/**
 	 * Replaces the element at the specified position in this list with
 	 * the specified element.
