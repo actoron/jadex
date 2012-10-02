@@ -38,7 +38,7 @@
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>
-			<source>src/main/assembly/dist-assembly-backupzip.xml</source>
+			<source>src/main/assembly/dist-assembly-backupsrczip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<!-- <file>

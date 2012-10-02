@@ -19,6 +19,8 @@
 				<exclude>*:*-jmonkey</exclude>
 				<!-- Exclude all maven distribution modules -->
 				<exclude>*:*-distribution-*</exclude>
+				<!-- Exclude all backup modules -->
+				<exclude>*:*-backup</exclude>
 			</excludes>
 		    <sources>
 				<includeModuleDirectory>false</includeModuleDirectory>

@@ -15,46 +15,48 @@
 		Decentralized backup solution based on distributed Jadex platforms.
 	</description>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+        		<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<useUniqueVersions>false</useUniqueVersions>
+							<mainClass>jadex.backup.JadexBackup</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-commons</artifactId>
+			<artifactId>jadex-distribution-minimal</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-bridge</artifactId>
+			<artifactId>jadex-kernel-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-micro</artifactId>
-			<version>${project.version}</version>
-		</dependency>				
 	</dependencies>
 
 
-	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
+	<!-- Exclude some unused jars from dist by setting their scope to provided. -->
 	<profiles>
 		<profile>
 			<id>dist</id>
 			<dependencies>
 				<dependency>
-					<groupId>net.sourceforge.jadex</groupId>
-					<artifactId>jadex-commons</artifactId>
-					<version>${project.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>net.sourceforge.jadex</groupId>
-					<artifactId>jadex-bridge</artifactId>
-					<version>${project.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>net.sourceforge.jadex</groupId>
-					<artifactId>jadex-kernel-micro</artifactId>
-					<version>${project.version}</version>
+					<groupId>javax.mail</groupId>
+					<artifactId>mail</artifactId>
+					<version>1.4.1</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>

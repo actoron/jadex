@@ -16,11 +16,13 @@
 		<moduleSet>
 			<!-- Selected by profile. <includes> <include>jadex:*</include> </includes> -->
 			<excludes>
+			  	<!-- Exclude backup modules. -->
+				<exclude>*:*-backup</exclude>
 			  	<!-- Exclude auto update. -->
 				<exclude>*:*-autoupdate</exclude>
-			  	<!-- Exclude maven dependency manager. -->
+				<!-- Exclude maven dependency manager. -->
 				<exclude>*:*-maven</exclude>
-							    <!-- Exclude JMonkey support from normal dist to save space. -->
+				<!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
 				<!-- Exclude launch.jar to avoid optional dependencies being copied to lib. launch.jar is copied manually later. -->
 				<exclude>*:*-launch</exclude>
@@ -36,7 +38,7 @@
 				<exclude>*:*-securetransport</exclude>
 				<!-- Exclude all cli modules -->
 				<exclude>*:*-cli</exclude>
-				<!-- Exclude all secure transport modules -->
+				<!-- Exclude all relay server modules -->
 				<exclude>*:*-relay*</exclude>
 			</excludes>
 			<binaries>

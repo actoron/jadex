@@ -35,7 +35,7 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
-			<source>target/sources-relay.zip</source>
+			<source>target/sources-backup.zip</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 	</files>

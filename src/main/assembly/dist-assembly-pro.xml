@@ -24,6 +24,8 @@
 				<exclude>*:*-web</exclude>
 				<!-- Exclude all maven distribution modules -->
 				<exclude>*:*-distribution-*</exclude>
+				<!-- Exclude all backup modules -->
+				<exclude>*:*-backup</exclude>
 			</excludes>
 			
 			<!-- Size of module/dependency tree requires bigger stack size on 32bit vm due to maven bug (-Xss2m).
