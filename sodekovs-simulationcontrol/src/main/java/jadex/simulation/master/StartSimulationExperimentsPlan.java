@@ -283,7 +283,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			double startValue = 0;
 
 			// loop only if lower configuration has reached the end and backed
-			// to "end";the lowest configuraion loops for always
+			// to "end";the lowest configuration loops for always
 			if ((i == parameterConf.size() - 1) || conf.getParameterSweepCounter() == 0 || (parameterConf.get(parameterConf.size() - 1).atEnd() && parameterConf.get(i + 1).atEnd())) {
 				if (conf.getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
 					endValue = Double.parseDouble(conf.getEnd());
