@@ -1,8 +1,7 @@
 <!-- The simulation startup -->
 
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
@@ -15,13 +14,13 @@
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.extension.envsupport.math.Vector2Int</import>
 		<import>jadex.extension.envsupport.math.IVector3</import>
-		<import>jadex.extension.envsupport.math.Vector2Double</import>		
+		<import>jadex.extension.envsupport.math.Vector2Double</import>
 		<import>jadex.extension.envsupport.evaluation.CSVFileDataConsumer</import>
 		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.extension.envsupport.dataview.GeneralDataView2D</import>
-		<import>jadex.extension.envsupport.dataview.*</import>						
+		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
-		<import>jadex.bridge.service.search.*</import>		
+		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.commons.SFunction</import>
@@ -35,7 +34,8 @@
 	</imports>
 
 	<extensiontypes>
-		<env:envspacetype name="MySimulation" width="100" height="100" class="ContinuousSpace2D">
+		<env:envspacetype name="MySimulation" width="100"
+			height="100" class="ContinuousSpace2D">
 
 			<env:processtypes>
 				<env:processtype name="init" class="CreateInitialSettingsProcess">
@@ -45,71 +45,91 @@
 					<!-- <env:property name="simDataSetupFilePath">null</env:property> -->
 				</env:processtype>
 			</env:processtypes>
-			
+
 			<env:objecttypes>
-			
-			<env:objecttype name="pedestrian">
+
+				<env:objecttype name="pedestrian">
 					<env:property name="vision">0.15</env:property>
 					<env:property name="vision_range">0.3</env:property>
 					<env:property name="speed">2.5</env:property>
 					<env:property name="drives_bike">false</env:property>
-					<!-- check the movement.capability.xml for an explanation of possible strategies -->
-					<env:property name="behaviour_strategy">1</env:property>					
+					<!-- check the movement.capability.xml for an explanation of possible 
+						strategies -->
+					<env:property name="behaviour_strategy">1</env:property>
 				</env:objecttype>
 				<env:objecttype name="bikestation">
 					<env:property name="stationID" class="String" />
 					<env:property name="stock" class="int" />
 					<env:property name="capacity" class="int" />
-					<env:property name="position" class="Vector2Double" />					
-				</env:objecttype>				
-						
+					<env:property name="position" class="Vector2Double" />
+				</env:objecttype>
+
+				<!-- Placeholder to display simulation information. -->
+				<env:objecttype name="SimInfo">
+					<env:property name="duration" dynamic="true">$properties.clock.getTick()</env:property>
+				</env:objecttype>
+
 			</env:objecttypes>
 
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Pedestrian"
-					objecttype="pedestrian" />					
+					objecttype="pedestrian" />
 			</env:avatarmappings>
-			
+
 			<env:tasktypes>
-				<env:tasktype name="move" class="MoveTask" />											
+				<env:tasktype name="move" class="MoveTask" />
 				<env:tasktype name="rent" class="RentBikeTask" />
-				<env:tasktype name="return" class="ReturnBikeTask" />				
+				<env:tasktype name="return" class="ReturnBikeTask" />
 			</env:tasktypes>
 
 			<env:perspectives>
-				<env:perspective name="main" class="Perspective2D"	opengl="true" objectplacement="center">
-				
-				
-				<!-- Pedestrian -->
-					<env:drawable objecttype="pedestrian" width="2.0" height="2.0">
-						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+				<env:perspective name="main" class="Perspective2D"
+					opengl="true" objectplacement="center">
+
+
+					<!-- Pedestrian -->
+					<env:drawable objecttype="pedestrian" width="1.5"
+						height="1.5">
+						<env:property name="visionsize" dynamic="true">new
+							Vector2Double($object.getProperty("vision").doubleValue()*2)
+						</env:property>
 						<env:ellipse layer="1" size="visionsize" abssize="true"
 							color="#FAFA1E32" />
-						<env:texturedrectangle layer="2" imagepath="sodekovs/bikesharing/bilder/pedestrian.jpg" />
-							<env:texturedrectangle layer="3" imagepath="sodekovs/bikesharing/bilder/bike.gif">
-								<env:drawcondition>$object.drives_bike</env:drawcondition>
-							</env:texturedrectangle>
-					</env:drawable>							
-				
-				<!-- Bike station -->
-					<env:drawable objecttype="bikestation" width="1.0" height="1.0">												
 						<env:texturedrectangle layer="2"
-							imagepath="sodekovs/bikesharing/bilder/rectangle.png" />
-					</env:drawable>				
-			
-					<!-- SimInfo -->
-					<env:drawable objecttype="SimInfo" width="1.0"
-						height="1.0">
-						<env:texturedrectangle layer="2" width="15" height="4" imagepath="sodekovs/bikesharing/bilder/WhiteSpace.png"/>						
-						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
-						<env:text layer="2" size="8" font="Arial"
-							abssize="true" text="$text$" align="left" color="black" />							
-							<env:text layer="2" size="8" font="Arial"
-							abssize="true" text="$duration$" align="left" color="black" />
+							imagepath="sodekovs/bikesharing/bilder/pedestrian.jpg" />
+						<env:texturedrectangle layer="3"
+							imagepath="sodekovs/bikesharing/bilder/bike.gif">
+							<env:drawcondition>$object.drives_bike</env:drawcondition>
+						</env:texturedrectangle>
 					</env:drawable>
-					
+
+					<!-- Bike station -->
+					<env:drawable objecttype="bikestation" width="1.0"
+						height="1.0">
+						<env:texturedrectangle layer="2" imagepath="sodekovs/bikesharing/bilder/GreenRectangle.png">
+							<env:drawcondition>$object.getProperty("stock")>0 &amp;&amp;$object.getProperty("stock") &lt; $object.getProperty("capacity")</env:drawcondition>
+						</env:texturedrectangle>
+						<env:texturedrectangle layer="2" imagepath="sodekovs/bikesharing/bilder/BlueRectangle.png">
+							<env:drawcondition>$object.getProperty("stock")  >= $object.getProperty("capacity")</env:drawcondition>
+						</env:texturedrectangle>
+						<env:texturedrectangle layer="2" imagepath="sodekovs/bikesharing/bilder/RedRectangle.png">
+							<env:drawcondition>$object.getProperty("stock") &lt; 1</env:drawcondition>
+						</env:texturedrectangle>
+					</env:drawable>
+
+					<!-- SimInfo -->
+					<env:drawable objecttype="SimInfo" width="2.4" height="0.7">
+						<env:texturedrectangle layer="2" width="15"
+							height="4" imagepath="sodekovs/bikesharing/bilder/WhiteSpace.png" />
+						<env:rectangle layer="1" width="2" height="1"
+							color="#1e1e1e46" />						
+						<env:text layer="2" size="7" font="Arial" abssize="true"
+							text="$duration$" align="left" color="black" />
+					</env:drawable>
+
 					<env:prelayers>
-						<env:tiledlayer width="1" height="1" imagepath="sodekovs/bikesharing/bilder/WashingtonMap.png" />
+						<env:tiledlayer width="1" height="1"
+							imagepath="sodekovs/bikesharing/bilder/WashingtonMap.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
@@ -118,105 +138,107 @@
 				<env:dataview name="view_all" class="GeneralDataView2D" />
 			</env:dataviews>
 
-			<!-- <env:spaceexecutor class="RoundBasedExecutor">
-				<env:property name="space">$space</env:property>
-			</env:spaceexecutor> -->			
-			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">			
+			<!-- <env:spaceexecutor class="RoundBasedExecutor"> <env:property name="space">$space</env:property> 
+				</env:spaceexecutor> -->
+			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
-			
+
 		</env:envspacetype>
 	</extensiontypes>
 
 	<componenttypes>
-	
-	<componenttype name="Pedestrian"
-			filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />					
+
+		<componenttype name="Pedestrian"
+			filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />
 	</componenttypes>
 
 	<properties>
-		<property name="clock" class="IFuture">SServiceProvider.getService($component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
+		<property name="clock" class="IFuture">SServiceProvider.getService($component.getServiceProvider(),
+			IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
-	
+
 	<configurations>
 		<configuration name="HamburgStandard">
 			<extension>
-				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
-				 	<env:processes>
+				<env:envspace name="my2dspace" type="MySimulation"
+					width="100" height="100">
+					<env:processes>
 						<env:process type="init">
-							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property>
-						</env:process>								
-						<env:process type="manageTimeSlices">
-							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"
+							</env:property>
 						</env:process>
-					</env:processes> 
+						<env:process type="manageTimeSlices">
+							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex 
+								mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+						</env:process>
+					</env:processes>
 
 					<env:objects>
-					<!-- 	<env:object type="SimInfo">
-						<env:property name="position">new Vector2Double(2.0, 4.0)</env:property>							
-						</env:object>-->						
+						<env:object type="SimInfo"> <env:property name="position">new 
+							Vector2Double(2.0, 4.0)</env:property> </env:object>
 					</env:objects>
-					 
-  					<env:observers> 
-  						<env:observer name="world" dataview="view_all"
-  							perspective="main" /> 
-  					</env:observers> 
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main" />
+					</env:observers>
 				</env:envspace>
-			</extension>				
+			</extension>
 		</configuration>
 		<configuration name="Washington-100">
 			<extension>
-				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
-				 	<env:processes>
-						<env:process type="init">																																		
-							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_100.xml"</env:property>
-						</env:process>								
-						<env:process type="manageTimeSlices">
-							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+				<env:envspace name="my2dspace" type="MySimulation"
+					width="100" height="100">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_100.xml"
+							</env:property>
 						</env:process>
-					</env:processes> 
+						<env:process type="manageTimeSlices">
+							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex 
+								mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+						</env:process>
+					</env:processes>
 
-					<env:objects>
-					<!-- 	<env:object type="SimInfo">
-						<env:property name="position">new Vector2Double(2.0, 4.0)</env:property>							
-						</env:object>
-						-->						
-					</env:objects>
-					 
-  					<env:observers> 
-  						<env:observer name="world" dataview="view_all"
-  							perspective="main" /> 
-  					</env:observers>
-  					  					
+						<env:objects>
+							<env:object type="SimInfo"> <env:property name="position">new Vector2Double(2.0, 4.0)</env:property> </env:object>
+						</env:objects>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main" />
+					</env:observers>
+
 				</env:envspace>
-			</extension>				
+			</extension>
 		</configuration>
 		<configuration name="Washington">
 			<extension>
-				<env:envspace name="my2dspace" type="MySimulation" width="100" height="100">				
-				 	<env:processes>
+				<env:envspace name="my2dspace" type="MySimulation"
+					width="100" height="100">
+					<env:processes>
 						<env:process type="init">
-							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday.xml"</env:property>
-						</env:process>								
-						<env:process type="manageTimeSlices">
-							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday.xml"
+							</env:property>
 						</env:process>
-					</env:processes> 
+						<env:process type="manageTimeSlices">
+							<!-- <env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex 
+								mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property> -->
+						</env:process>
+					</env:processes>
 
-					<env:objects>
-					<!-- 	<env:object type="SimInfo">
-						<env:property name="position">new Vector2Double(2.0, 4.0)</env:property>							
-						</env:object>
-						-->						
-					</env:objects>
-					 
-  					<env:observers> 
-  						<env:observer name="world" dataview="view_all"
-  							perspective="main" /> 
-  					</env:observers> 
+						<env:objects>
+							<env:object type="SimInfo"> <env:property name="position">new	Vector2Double(2.0, 4.0)</env:property> </env:object>
+						</env:objects>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main" />
+					</env:observers>
 				</env:envspace>
-			</extension>				
+			</extension>
 		</configuration>
 	</configurations>
 
