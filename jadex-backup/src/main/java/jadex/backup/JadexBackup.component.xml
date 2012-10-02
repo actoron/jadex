@@ -8,5 +8,28 @@
 						http://jadex.sourceforge.net/jadex-component-2.3.xsd"
 	name="JadexBackup" package="jadex.backup">
 	
+    <componenttypes>
+        <componenttype name="ResourceProvider" filename="jadex/backup/resource/ResourceProviderAgent.class"/>
+    </componenttypes>
     
+    <configurations>
+        <configuration name="test">
+            <components>
+                <component type="ResourceProvider">
+                    <arguments>
+                        <argument name="dir">
+                            "test"
+                        </argument>
+                    </arguments>
+                </component>
+                <component type="ResourceProvider">
+                    <arguments>
+                        <argument name="dir">
+                            "target"
+                        </argument>
+                    </arguments>
+                </component>
+                </components>
+        </configuration>
+    </configurations>
 </componenttype>
