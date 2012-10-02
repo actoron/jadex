@@ -267,6 +267,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	//Application specific evaluation --> compare simulations results with real data
 	private void compareSimulationWithRealData(HashMap rowResults){
 		
+		
 		for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
 		
 			BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());

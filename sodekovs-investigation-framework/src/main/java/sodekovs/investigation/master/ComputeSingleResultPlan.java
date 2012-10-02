@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import sodekovs.investigation.helper.Constants;
 import sodekovs.investigation.model.Dataconsumer;
-import sodekovs.investigation.model.ObservedEvent;
-import sodekovs.investigation.model.Property;
 import sodekovs.investigation.model.InvestigationConfiguration;
+import sodekovs.investigation.model.MixedProperty;
+import sodekovs.investigation.model.ObservedEvent;
 import sodekovs.investigation.model.result.ExperimentResult;
 import sodekovs.util.misc.GlobalConstants;
 
@@ -159,7 +159,7 @@ public class ComputeSingleResultPlan extends Plan {
 		for (Dataconsumer con : investigationConf.getDataconsumers().getDataconsumer()) {
 			// Do buckets only for SimulationDataConsumer
 			if (con.getClazz().equalsIgnoreCase(Constants.SIMULATION_DATA_CONSUMER)) {
-				for (Property prop : con.getProperty()) {
+				for (MixedProperty prop : con.getMixedProperty()) {
 					// Check for elements whether the "last" condition applies: check first whether filter !=null 
 					if (prop.getFilter() != null) {
 						if (!prop.getName().equalsIgnoreCase(Constants.DATAPROVIDER) && prop.getFilter().equalsIgnoreCase("last")) {

@@ -131,7 +131,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			}
 		}
 		
-		printClockAndSimSettings();
+//		printClockAndSimSettings();
 	}
 
 	// }

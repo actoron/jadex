@@ -18,11 +18,21 @@
 	</componenttypes>
 	
 	<configurations>
-		<configuration name="Simulate MarsWorld with RemoteClient">
+		<configuration name="Simulate MarsWorld with RemoteClient - Nur SimTeil">
 			<components>
 				<component type="InvestigationManager" master="true">
 					<arguments>
-						<argument name="investigationDescriptionFile">"../sodekovs-investigation-framework/src/main/java/sodekovs/investigation/examples/Configuration1.xml"</argument>
+						<argument name="investigationDescriptionFile">"../sodekovs-investigation-framework/src/main/java/sodekovs/investigation/examples/InvestigationConf1.xml"</argument>
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
+		<configuration name="Simulate MarsWorld with RemoteClient -  Sim + BenchTeil">
+			<components>
+				<component type="InvestigationManager" master="true">
+					<arguments>
+						<argument name="investigationDescriptionFile">"../sodekovs-investigation-framework/src/main/java/sodekovs/investigation/examples/InvestigationConf2.xml"</argument>
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>

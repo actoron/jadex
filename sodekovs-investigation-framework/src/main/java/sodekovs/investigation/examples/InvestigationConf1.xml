@@ -6,6 +6,18 @@
 		of the document follows. -> "1 Sentry / 2 Producers / 3 Carries" / TestRemote <-
 	-->
 
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+<!--                      ENTHÄLT NUR TEILE AUS DEM BISHERIGEN SIMULATIONS-TEIL -->
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+<!-- ******************************************************************************************** -->
+
+
 <InvestigationConfiguration name="MarsWorldExperiments"
 	applicationReference="..\\sodekovs-simulationcontrol\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml"
 	applicationConfiguration="TestRemote"	 
@@ -39,32 +51,32 @@
 
 	<Dataconsumers>
 		<Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="title">"Evaluation of homebase"</Property>
-				<Property name="labelx">"Time"</Property>
-				<Property name="labely">"Collected Ore"</Property>							
-				<Property name="seriesname_0">"Collected Ore"</Property>
-				<Property name="valuex_0">"time"</Property>
-				<Property name="valuey_0">"ore_amount"</Property>
+				<MixedProperty name="dataprovider">"homebaselogger2"</MixedProperty>
+				<MixedProperty name="title">"Evaluation of homebase"</MixedProperty>
+				<MixedProperty name="labelx">"Time"</MixedProperty>
+				<MixedProperty name="labely">"Collected Ore"</MixedProperty>							
+				<MixedProperty name="seriesname_0">"Collected Ore"</MixedProperty>
+				<MixedProperty name="valuex_0">"time"</MixedProperty>
+				<MixedProperty name="valuey_0">"ore_amount"</MixedProperty>
 		</Dataconsumer>
 		<Dataconsumer name="homebaseConsumerReloaded" clazz="XYChartDataConsumer">
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="title">"Evaluation of homebase"</Property>				
-				<Property name="labelx">"Collected Ore"</Property>			
-				<Property name="labely">"Time"</Property>				
-				<Property name="seriesname_0">"Collected Ore"</Property>				
-				<Property name="valuex_0">"ore_amount"</Property>
-				<Property name="valuey_0">"time"</Property>
+				<MixedProperty name="dataprovider">"homebaselogger2"</MixedProperty>
+				<MixedProperty name="title">"Evaluation of homebase"</MixedProperty>				
+				<MixedProperty name="labelx">"Collected Ore"</MixedProperty>			
+				<MixedProperty name="labely">"Time"</MixedProperty>				
+				<MixedProperty name="seriesname_0">"Collected Ore"</MixedProperty>				
+				<MixedProperty name="valuex_0">"ore_amount"</MixedProperty>
+				<MixedProperty name="valuey_0">"time"</MixedProperty>
 		</Dataconsumer>
 		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
+				<MixedProperty name="dataprovider">"homebaselogger2"</MixedProperty>
+				<MixedProperty name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
 		</Dataconsumer>
 		 
 		<!--<Dataconsumer name="homebaseConsumer" clazz="SimulationLogger">
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="title">"Logging Simulation"</Property>
-				<Property name="filelocation">"C:\simulation\marsworld.log"</Property>
+				<MixedProperty name="dataprovider">"homebaselogger2"</MixedProperty>
+				<MixedProperty name="title">"Logging Simulation"</MixedProperty>
+				<MixedProperty name="filelocation">"C:\simulation\marsworld.log"</MixedProperty>
 		</Dataconsumer>-->		
 	</Dataconsumers>
 
@@ -139,19 +151,19 @@
 				Randoms gleich sind.
 			-->
 			<TerminateCondition>
-				<Time value="30000" type="absolute" />
+				<TerminationTime value="30000" type="absolute" />
 			</TerminateCondition>
 		</General>
 		<Rows experiments="3">
 			<TerminateCondition>
-				    <Time value="30000" type="relative" />
+				    <!-- <TerminationTime value="10000" type="relative" /> -->
 				  				
-			<!-- 		<TargetFunction function="$object.getProperty(&quot;ore&quot;) >=
-					55">	<ObjectSource type="ISpaceObject" name="homebase" /> </TargetFunction> -->
+			 		<SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >=
+					55">	<ObjectSource type="ISpaceObject" name="homebase" /> </SemanticCondition>
 				
 				<!--
-					<TargetFunction function="$beliefbase.tmpCounter>= 13">
-					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
+					<SemanticCondition condition="$beliefbase.tmpCounter>= 13">
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </SemanticCondition>
 				-->
 			</TerminateCondition>
 		</Rows>

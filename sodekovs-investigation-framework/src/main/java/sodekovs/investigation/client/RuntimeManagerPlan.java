@@ -39,11 +39,11 @@ import sodekovs.investigation.helper.Constants;
 import sodekovs.investigation.model.Data;
 import sodekovs.investigation.model.Dataconsumer;
 import sodekovs.investigation.model.Dataprovider;
-import sodekovs.investigation.model.ObservedEvent;
 import sodekovs.investigation.model.InvestigationConfiguration;
+import sodekovs.investigation.model.ObservedEvent;
+import sodekovs.investigation.model.SemanticCondition;
 import sodekovs.investigation.model.Source;
-import sodekovs.investigation.model.TargetFunction;
-import sodekovs.investigation.model.Time;
+import sodekovs.investigation.model.TerminationTime;
 import sodekovs.util.misc.AgentMethods;
 import sodekovs.util.misc.EvaluateExpression;
 import sodekovs.util.misc.FileHandler;
@@ -96,7 +96,7 @@ public class RuntimeManagerPlan extends Plan {
 		cms = (IComponentManagementService) getScope().getServiceContainer().getRequiredService("cms").get(this);
 				
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, investigationConf);
-		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
+		System.out.println("#RumtimeManagerPlan- InvestigationFramework# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
 				+ clientConfMap.get(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION));
 		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
 
@@ -105,9 +105,10 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Determine terminate condition
 		// Time determines termination
-		if (investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTime() != null) {
+		if (investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTerminationTime() != null) {
 
-			Time time = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
+//			Time time = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
+			TerminationTime time = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTerminationTime();
 			Long terminationTime = new Long(-1);
 
 			if (time.getType().equals(Constants.RELATIVE_TIME_EXPRESSION)) {
@@ -124,9 +125,9 @@ public class RuntimeManagerPlan extends Plan {
 			}
 			// Application semantic determines termination, e.g.
 			// $homebase.NumberOfOre > 100
-		} else if (investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction() != null) {
+		} else if (investigationConf.getRunConfiguration().getRows().getTerminateCondition().getSemanticCondition() != null) {
 
-			TargetFunction targetFunct = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction();
+			SemanticCondition semanticCond = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getSemanticCondition();
 
 			// HACK: Need a observer / listener instead evaluating expression every 1000ms
 			while (true) {
@@ -136,12 +137,12 @@ public class RuntimeManagerPlan extends Plan {
 				// of that type...
 				// Additionally: only one part of the equation can be an
 				// object...
-				if (targetFunct.getObjectSource().getType().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
+				if (semanticCond.getObjectSource().getType().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 
 					// // String expression =
 					// "$object.getProperty(\"ore\") >= 10";
 
-					boolean res = EvaluateExpression.evaluate(space, targetFunct.getFunction(), targetFunct.getObjectSource().getName(), targetFunct.getObjectSource().getType());
+					boolean res = EvaluateExpression.evaluate(space, semanticCond.getCondition(), semanticCond.getObjectSource().getName(), semanticCond.getObjectSource().getType());
 
 					if (res) {
 						System.out.println("#RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
@@ -149,7 +150,7 @@ public class RuntimeManagerPlan extends Plan {
 						break;
 					}
 				} else {
-					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
+					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, semanticCond.getObjectSource().getName());
 					fut = cms.getExternalAccess(agentIdentifier);
 					IExternalAccess exta = (IExternalAccess) fut.get(this);
 
@@ -158,7 +159,7 @@ public class RuntimeManagerPlan extends Plan {
 
 					// Evaluate condition/expression
 					OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rCapability);
-					boolean res = EvaluateExpression.evaluateExpression(fetcher, targetFunct.getFunction());
+					boolean res = EvaluateExpression.evaluateExpression(fetcher, semanticCond.getCondition());
 
 					if (res) {
 						System.out.println("#RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
@@ -389,15 +390,15 @@ public class RuntimeManagerPlan extends Plan {
 				}
 				// List of Hashmaps with dynamic=false
 				List<Map> tmpPropertyList = new ArrayList<Map>();
-				for (int j = 0; j < dcon.getProperty().size(); j++) {
+				for (int j = 0; j < dcon.getMixedProperty().size(); j++) {
 					Map map = new HashMap();
 					map.put("dynamic", false);
-					map.put("name", dcon.getProperty().get(j).getName());
+					map.put("name", dcon.getMixedProperty().get(j).getName());
 					// map.put("value",
 					// dcon.getPropertyList().get(j).getValue());
 					// Hack: has to be "initially" an expression that can be
 					// parsed
-					map.put("value", EvaluateExpression.getParsedExpression(dcon.getProperty().get(j).getContent(), parser));
+					map.put("value", EvaluateExpression.getParsedExpression(dcon.getMixedProperty().get(j).getContent(), parser));
 					tmpPropertyList.add(map);
 				}
 				// MEnvSpaceInstance.setProperties(con,
