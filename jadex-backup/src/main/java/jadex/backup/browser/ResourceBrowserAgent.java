@@ -70,14 +70,14 @@ public class ResourceBrowserAgent
 						if(value instanceof Tuple2)
 						{
 							FileInfo	fi	= (FileInfo)((Tuple2<?,?>)value).getFirstEntity();
-							if(fi!=null)
-							{
-								value	= fi.getLocation() + " ("+TSFORMAT.format(new Date(fi.getTimeStamp()))+")";
-							}
-							else
+							if("./".equals(fi.getLocation()))
 							{
 								List<?>	res	= (List<?>)((Tuple2<?,?>)value).getSecondEntity();
 								value	= ((IResourceService)res.get(0)).getResourceId() +" ("+res.size()+" instances)";
+							}
+							else
+							{
+								value	= fi.getLocation() + " ("+TSFORMAT.format(new Date(fi.getTimeStamp()))+")";
 							}
 						}
 						

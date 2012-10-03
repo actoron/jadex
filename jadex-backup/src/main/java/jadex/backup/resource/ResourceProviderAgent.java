@@ -3,9 +3,11 @@ package jadex.backup.resource;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
@@ -13,13 +15,8 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
 
 /**
  *  A component that publishes a local folder.
@@ -40,11 +37,11 @@ public class ResourceProviderAgent	implements IResourceService
 	@AgentArgument
 	protected String	dir;
 	
-	/** The resource id. */
-	protected String	id;
+	/** The resource meta information. */
+	protected BackupResource	resource;
 	
-	/** The resource directory. */
-	protected File	root;
+	/** Future for a scan in progress. */
+	protected ITerminableFuture<Void>	scan;
 	
 	//-------- constructors --------
 	
@@ -52,43 +49,34 @@ public class ResourceProviderAgent	implements IResourceService
 	 *  Called at startup.
 	 */
 	@AgentCreated
-	public void	start()
+	public IFuture<Void>	start()
 	{
-		this.root	= new File(dir);
-		root.mkdirs();
-		File	fprops	= new File(root, ".jadexbackup/resource.properties");
-		if(fprops.exists())
+		Future<Void>	ret	= new Future<Void>();
+		try
 		{
-			try
-			{
-				FileInputStream	fips	= new FileInputStream(fprops);
-				Properties	props	= new Properties();
-				props.load(fips);
-				fips.close();
-				id	= props.getProperty("id");
-			}
-			catch(IOException e)
-			{
-				throw new RuntimeException(e);
-			}
+			this.resource	= new BackupResource(new File(dir));
+			this.scan	= scan();
+			ret.setResult(null);			
 		}
-		else
+		catch(Exception e)
 		{
-			this.id	= root.getName()+"_"+UUID.randomUUID().toString();
-			Properties	props	= new Properties();
-			props.setProperty("id", id);
-			fprops.getParentFile().mkdirs();
-			try
-			{
-				FileOutputStream	fops	= new FileOutputStream(fprops);
-				props.store(fops, "Jadex Backup meta information.");
-				fops.close();
-			}
-			catch(IOException e)
-			{
-				throw new RuntimeException(e);
-			}
+			ret.setException(e);
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Called on shutdown.
+	 */
+	@AgentKilled
+	public void	stop()
+	{
+		if(scan!=null)
+		{
+			scan.terminate();
+		}
+		
+		resource.dispose();
 	}
 	
 	//-------- IResourceService interface --------
@@ -104,7 +92,7 @@ public class ResourceProviderAgent	implements IResourceService
 	 */
 	public String	getResourceId()
 	{
-		return id;
+		return resource.getResourceId();
 	}
 	
 	/**
@@ -113,13 +101,13 @@ public class ResourceProviderAgent	implements IResourceService
 	public IFuture<FileInfo[]>	getFiles(FileInfo dir)
 	{
 		List<FileInfo>	ret	= null;
-		File	fdir	= dir!=null ? dir.toFile(root) : root;
+		File	fdir	= resource.toFile(dir);
 		if(dir==null || fdir.lastModified()>dir.getTimeStamp())
 		{
 			ret	= new ArrayList<FileInfo>();
 			for(String file: fdir.list())
 			{
-				FileInfo	fi	= FileInfo.fromFile(root, new File(fdir, file));
+				FileInfo	fi	= resource.toFileInfo(new File(fdir, file));
 				if(!".jadexbackup".equals(fi.getLocation()))
 				{
 					ret.add(fi);
@@ -127,5 +115,16 @@ public class ResourceProviderAgent	implements IResourceService
 			}
 		}
 		return new Future<FileInfo[]>(ret==null ? null : ret.toArray(new FileInfo[ret.size()]));
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Scan the directory and update the meta information.
+	 */
+	protected ITerminableFuture<Void>	scan()
+	{
+		
+		return null;
 	}
 }

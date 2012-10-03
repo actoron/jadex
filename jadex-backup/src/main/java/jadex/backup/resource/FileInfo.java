@@ -1,11 +1,10 @@
 package jadex.backup.resource;
 
-import java.io.File;
-import java.io.IOException;
 
 
 /**
- *  Information about a file in a resource.
+ *  Public meta information about a file in a resource
+ *  used for transfer between resource providers and clients.
  */
 public class FileInfo
 {
@@ -84,47 +83,5 @@ public class FileInfo
 	public void setTimeStamp(long timestamp)
 	{
 		this.timestamp = timestamp;
-	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Get the file for a file info.
-	 *  @param root	The resource root.
-	 *  @return The local file.
-	 */
-	public File	toFile(File root)
-	{
-		return new File(root, location.replace('/', File.separatorChar));
-	}
-	
-	/**
-	 *  Get the file info for a local file.
-	 *  @param root	The resource root.
-	 *  @param file The local file.
-	 *  @return The file info.
-	 */
-	public static FileInfo	fromFile(File root, File file)
-	{
-		try
-		{
-			String	rpath	= root.getCanonicalPath();
-			String	fpath	= file.getCanonicalPath();
-			if(!fpath.startsWith(rpath))
-			{
-				throw new IllegalArgumentException("File '"+fpath+"' must be contained in resource root '"+rpath+"'.");
-			}
-			
-			FileInfo	ret	= new FileInfo();
-			ret.setLocation(fpath.substring(rpath.length()+1).replace(File.separatorChar, '/'));
-			ret.setDirectory(file.isDirectory());
-			ret.setTimeStamp(file.lastModified());
-			
-			return ret;
-		}
-		catch(IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+	}	
 }

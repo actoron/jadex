@@ -178,7 +178,10 @@ public class ResourceTreeModel	implements TreeModel
 					ret	= new ArrayList<Object>();
 					for(List<IResourceService> l: found.values())
 					{
-						ret.add(new Tuple2<FileInfo, List<IResourceService>>(null, l));
+						FileInfo	fi	= new FileInfo();
+						fi.setLocation("./");
+						fi.setDirectory(true);
+						ret.add(new Tuple2<FileInfo, List<IResourceService>>(fi, l));
 					}
 				}			
 			}
@@ -193,10 +196,7 @@ public class ResourceTreeModel	implements TreeModel
 				for(Object rs: (List<?>)res.getSecondEntity())
 				{
 					FileInfo	fi	= (FileInfo)res.getFirstEntity();
-					if(fi!=null)
-					{
-						fi.setTimeStamp(0);	// query all
-					}
+					fi.setTimeStamp(0);	// query all
 					((IResourceService)rs).getFiles(fi).addResultListener(new IResultListener<FileInfo[]>()
 					{
 						public void resultAvailable(FileInfo[] result)
