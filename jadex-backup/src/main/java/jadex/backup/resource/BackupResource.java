@@ -142,7 +142,7 @@ public class BackupResource
 			
 			String	location	= fpath.substring(rpath.length()+1).replace(File.separatorChar, '/');
 			
-			String	vtime;
+			String	vtime	= null;
 			if(props.containsKey(location))
 			{
 				Tuple2<Long, String>	entry	= parseEntry(props.getProperty(location));
@@ -150,14 +150,24 @@ public class BackupResource
 				if(file.lastModified()!=entry.getFirstEntity().longValue())
 				{
 					// Increment local vector time point to indicate changes.
+					int	flvtime	= getVTime(vtime, cid.getPlatformPrefix());
 					int	lvtime	= 0;
 					if(props.containsKey("vtime"))
 					{
 						lvtime	= Integer.parseInt(props.getProperty("vtime"));
-						lvtime++;
+					}
+
+					if(lvtime>flvtime)
+					{
+						flvtime	= lvtime;
+					}
+					else
+					{
+						flvtime	= ++lvtime;
 						props.setProperty("vtime", Integer.toString(lvtime));
 					}
-					vtime	= updateVTime(vtime, cid.getPlatformPrefix(), lvtime);
+					
+					vtime	= updateVTime(vtime, cid.getPlatformPrefix(), flvtime);
 					props.setProperty(location, createEntry(file.lastModified(), vtime));
 					save();				
 				}
@@ -169,7 +179,7 @@ public class BackupResource
 				{
 					lvtime	= Integer.parseInt(props.getProperty("vtime"));
 				}
-				vtime	= updateVTime("", cid.getPlatformPrefix(), lvtime);
+				vtime	= updateVTime(vtime, cid.getPlatformPrefix(), lvtime);
 				props.setProperty(location, createEntry(file.lastModified(), vtime));
 				save();				
 			}
@@ -229,6 +239,33 @@ public class BackupResource
 		long	timestamp	= Long.parseLong(entry.substring(0, idx));
 		String	vtime	= entry.substring(idx+1);
 		return new Tuple2<Long, String>(new Long(timestamp), vtime);
+	}
+	
+	/**
+	 *  Get a part of the vector time.
+	 *  @param vtime	The vtime string.
+	 *  @param node	The platform.
+	 *  @return The time.
+	 */
+	protected static int	getVTime(String vtime, String node)
+	{
+		int	ret	= 0;
+		StringBuffer	buf	= new StringBuffer();
+		StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
+		String	last	= null;
+		while(stok.hasMoreTokens())
+		{
+			String	next	= stok.nextToken();
+			buf.append(next);
+			if("@".equals(next) && node.equals(last) && stok.hasMoreTokens())
+			{
+				ret	= Integer.parseInt(stok.nextToken());
+				break;
+			}
+			last	= next;
+		}
+			
+		return ret;
 	}
 	
 	/**
