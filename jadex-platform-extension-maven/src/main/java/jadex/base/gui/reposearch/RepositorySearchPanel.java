@@ -1,5 +1,6 @@
 package jadex.base.gui.reposearch;
 
+import jadex.base.gui.idtree.IdTreeCellRenderer;
 import jadex.base.gui.idtree.IdTreeModel;
 import jadex.base.gui.idtree.IdTreeNode;
 import jadex.commons.SUtil;
@@ -217,43 +218,7 @@ public class RepositorySearchPanel extends JPanel
 		tree = new JTree(tm);
 		tree.setRootVisible(false);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		tree.setCellRenderer(new DefaultTreeCellRenderer() 
-		{
-			public Component getTreeCellRendererComponent(JTree tree, Object value,
-				boolean selected, boolean expanded, boolean leaf, int row,
-				boolean hasFocus)
-			{
-				assert SwingUtilities.isEventDispatchThread();
-				
-				// Change icons depending on node type.
-				IdTreeNode node = (IdTreeNode)value;
-				Icon icon = node.getIcon();
-				String tooltip = node.getTooltipText();
-				
-				if(icon!=null)
-				{
-					setOpenIcon(icon);
-					setClosedIcon(icon);
-					setLeafIcon(icon);
-				}
-				else
-				{
-					setOpenIcon(getDefaultOpenIcon());
-					setClosedIcon(getDefaultClosedIcon());
-					setLeafIcon(getDefaultLeafIcon());
-				}
-				
-				if(tooltip!=null)
-				{
-					setToolTipText(tooltip);
-				}
-				
-				JComponent comp = (JComponent)super.getTreeCellRendererComponent(tree,
-					node.toString(), selected, expanded, leaf, row, hasFocus);
-
-				return comp;
-			}
-        });
+		tree.setCellRenderer(new IdTreeCellRenderer());
 		tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
 		{
 			public void valueChanged(TreeSelectionEvent e)

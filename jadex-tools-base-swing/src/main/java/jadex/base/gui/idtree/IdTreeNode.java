@@ -20,7 +20,7 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	protected String name;
 	
 	/** The tree model. */
-	protected IdTreeModel tm;
+	protected IdTreeModel<T> tm;
 	
 	/** Flag if is leaf. */
 	protected boolean leaf;
@@ -39,7 +39,7 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	/**
 	 *  Create a new node.
 	 */
-	public IdTreeNode(String key, String name, IdTreeModel tm, boolean leaf,
+	public IdTreeNode(String key, String name, IdTreeModel<T> tm, boolean leaf,
 		Icon icon, String tooltip, T object)
 	{
 		this.key = key;

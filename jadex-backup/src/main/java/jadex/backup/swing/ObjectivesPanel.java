@@ -27,7 +27,7 @@ public class ObjectivesPanel extends JPanel
 		tp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Quick Objective Settings "));
 		
 		tp.addTab("Sync", new SyncPanel(ea));
-		tp.addTab("Backup", new BackupPanel());
+//		tp.addTab("Backup", new BackupPanel());
 		tp.addTab("Jobs", new JobsPanel());
 		
 		add(tp, BorderLayout.CENTER);

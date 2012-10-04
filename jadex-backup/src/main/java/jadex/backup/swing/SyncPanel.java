@@ -2,34 +2,24 @@ package jadex.backup.swing;
 
 import jadex.backup.job.IJobService;
 import jadex.backup.job.SyncJob;
-import jadex.backup.resource.FileInfo;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
-import jadex.base.gui.filetree.RefreshAction;
 import jadex.base.gui.filetree.RefreshSubtreeAction;
+import jadex.base.gui.idtree.IdTreeCellRenderer;
 import jadex.base.gui.idtree.IdTreeModel;
 import jadex.base.gui.idtree.IdTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.deployment.FileData;
-import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.ToolTipAction;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,9 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -52,13 +40,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -69,6 +55,7 @@ public class SyncPanel extends JPanel
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
+		"dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/folder_16.png"),
 		"delete_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/delete_folder_16.png"),
 		"new_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/new_folder_16.png"),
 		"rename_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/rename_folder_16.png")
@@ -335,7 +322,10 @@ public class SyncPanel extends JPanel
 		String ret = null;
 		
 		final IdTreeModel<List<IResourceService>> tm = new IdTreeModel<List<IResourceService>>();
-		final JTree selsourcet = new JTree(tm);
+		final JTree srct = new JTree(tm);
+		srct.setCellRenderer(new IdTreeCellRenderer());
+		srct.setRootVisible(false);
+		
 		final IdTreeNode<List<IResourceService>> root = new IdTreeNode<List<IResourceService>>("root", "root", tm, false, null, null, null);
 		tm.setRoot(root);
 		
@@ -348,16 +338,16 @@ public class SyncPanel extends JPanel
 				if(node==null)
 				{
 					List<IResourceService> sers = new ArrayList<IResourceService>();
-					node = new IdTreeNode<List<IResourceService>>(result.getResourceId(), result.getResourceId(), tm, false, null, null, sers);
+					node = new IdTreeNode<List<IResourceService>>(result.getResourceId(), result.getResourceId(), tm, false, icons.getIcon("dir"), null, sers);
 					root.add(node);
 				}
 				node.getObject().add(result);
 			}
 		}));
 		
-		if(createDialog("Global Resource Id Selection", selsourcet, comp))
+		if(createDialog("Global Resource Id Selection", srct, comp))
 		{
-			TreePath sel = selsourcet.getSelectionPath();
+			TreePath sel = srct.getSelectionPath();
 			if(sel!=null)
 			{
 				IdTreeNode<List<IResourceService>> n = (IdTreeNode<List<IResourceService>>)sel.getLastPathComponent();
