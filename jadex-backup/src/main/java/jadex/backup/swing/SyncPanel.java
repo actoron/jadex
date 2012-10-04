@@ -211,7 +211,7 @@ public class SyncPanel extends JPanel
 	}
 
 	/**
-	 * 
+	 *  Create a new local source dialog.
 	 */
 	public static String createLocalSourceDialog(IExternalAccess ea, JComponent comp)
 	{
@@ -315,7 +315,7 @@ public class SyncPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Create a new global id dialog.
 	 */
 	public static String createGlobalIdDialog(IExternalAccess ea, JComponent comp)
 	{
@@ -360,7 +360,7 @@ public class SyncPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Create a dialog with a specific content panel.
 	 */
 	public static boolean createDialog(String title, JComponent content, JComponent comp)
 	{
