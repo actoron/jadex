@@ -1,16 +1,20 @@
 package jadex.backup.resource;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.Tuple2;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileLock;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 /**
  *  Local meta information for a resource.
- *  Keeps hashcodes, timestamps, vector times etc. for
+ *  Keeps hash codes, time stamps, vector times etc. for
  *  all files and directories of the resource.
  */
 public class BackupResource
@@ -20,6 +24,9 @@ public class BackupResource
 	/** The resource root directory. */
 	protected File	root;
 	
+	/** The local component identifier. */
+	protected IComponentIdentifier	cid;
+	
 	/** A stream needed for file locking. */
 	protected FileOutputStream	lockfos;
 	
@@ -28,7 +35,7 @@ public class BackupResource
 	
 	/** The resource properties. */
 	protected Properties props;
-
+	
 	//-------- constructors --------
 	
 	/**
@@ -36,9 +43,10 @@ public class BackupResource
 	 *  @param root	The resource root directory.
 	 *  @throws Exception, if the resource is already opened by another component or process.
 	 */
-	public BackupResource(File root)	throws Exception
+	public BackupResource(String id, File root, IComponentIdentifier cid)	throws Exception
 	{
 		this.root	= root;
+		this.cid	= cid;
 		File	meta	= new File(root, ".jadexbackup");
 		meta.mkdirs();
 		
@@ -59,11 +67,13 @@ public class BackupResource
 		}
 		else
 		{
-			String id	= root.getName()+"_"+UUID.randomUUID().toString();
+			if(id==null)
+			{
+				id	= root.getName()+"_"+UUID.randomUUID().toString();
+			}
 			props.setProperty("id", id);
-			FileOutputStream	fops	= new FileOutputStream(fprops);
-			props.store(fops, "Jadex Backup meta information.");
-			fops.close();
+			props.setProperty("vtime", "0");
+			save();
 		}
 	}
 	
@@ -104,14 +114,12 @@ public class BackupResource
 		return root;
 	}
 
-	//-------- helper methods --------
-	
 	/**
 	 *  Get the file for a file info.
 	 *  @param fi	The file info.
 	 *  @return The local file.
 	 */
-	public File	toFile(FileInfo fi)
+	public File	getFile(FileInfo fi)
 	{
 		return new File(root, fi.getLocation().replace('/', File.separatorChar));
 	}
@@ -121,7 +129,7 @@ public class BackupResource
 	 *  @param file The local file.
 	 *  @return The file info.
 	 */
-	public FileInfo	toFileInfo(File file)
+	public FileInfo	getFileInfo(File file)
 	{
 		try
 		{
@@ -132,10 +140,41 @@ public class BackupResource
 				throw new IllegalArgumentException("File '"+fpath+"' must be contained in resource root '"+rpath+"'.");
 			}
 			
-			FileInfo	ret	= new FileInfo();
-			ret.setLocation(fpath.substring(rpath.length()+1).replace(File.separatorChar, '/'));
-			ret.setDirectory(file.isDirectory());
-			ret.setTimeStamp(file.lastModified());
+			String	location	= fpath.substring(rpath.length()+1).replace(File.separatorChar, '/');
+			
+			String	vtime;
+			if(props.containsKey(location))
+			{
+				Tuple2<Long, String>	entry	= parseEntry(props.getProperty(location));
+				vtime	= entry.getSecondEntity();
+				if(file.lastModified()!=entry.getFirstEntity().longValue())
+				{
+					// Increment local vector time point to indicate changes.
+					int	lvtime	= 0;
+					if(props.containsKey("vtime"))
+					{
+						lvtime	= Integer.parseInt(props.getProperty("vtime"));
+						lvtime++;
+						props.setProperty("vtime", Integer.toString(lvtime));
+					}
+					vtime	= updateVTime(vtime, cid.getPlatformPrefix(), lvtime);
+					props.setProperty(location, createEntry(file.lastModified(), vtime));
+					save();				
+				}
+			}
+			else
+			{
+				int	lvtime	= 0;
+				if(props.containsKey("vtime"))
+				{
+					lvtime	= Integer.parseInt(props.getProperty("vtime"));
+				}
+				vtime	= updateVTime("", cid.getPlatformPrefix(), lvtime);
+				props.setProperty(location, createEntry(file.lastModified(), vtime));
+				save();				
+			}
+			
+			FileInfo	ret	= new FileInfo(location, file.isDirectory(), vtime);
 			
 			return ret;
 		}
@@ -143,5 +182,101 @@ public class BackupResource
 		{
 			throw new RuntimeException(e);
 		}
+	}
+	
+	//-------- helper methods --------
+
+	/**
+	 *  Save the meta information.
+	 */
+	protected void	save()
+	{
+		try
+		{
+			File	meta	= new File(root, ".jadexbackup");
+			File	fprops	= new File(meta, "resource.properties");
+			FileOutputStream	fops	= new FileOutputStream(fprops);
+			props.store(fops, "Jadex Backup meta information.");
+			fops.close();
+		}
+		catch(Exception e)
+		{
+			// todo: deal with errors.
+			e.printStackTrace();
+		}
+	}
+	
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Create a file entry.
+	 *  @param timestamp	The current file time stamp.
+	 *  @param vtime	The vector time string.
+	 */
+	protected static String	createEntry(long timestamp, String vtime)
+	{
+		return timestamp + "." + vtime;
+	}
+	
+	/**
+	 *  Parse a file entry.
+	 *  @return A tuple containing the local time stamp and the vector time string.
+	 */
+	protected static Tuple2<Long, String>	parseEntry(String entry)
+	{
+		int	idx	= entry.indexOf('.');
+		long	timestamp	= Long.parseLong(entry.substring(0, idx));
+		String	vtime	= entry.substring(idx+1);
+		return new Tuple2<Long, String>(new Long(timestamp), vtime);
+	}
+	
+	/**
+	 *  Update a part of the vector time.
+	 *  @param vtime	The original vtime string.
+	 *  @param node	The platform.
+	 *  @param time	The time.
+	 *  @return The updated vtime string.
+	 */
+	protected static String	updateVTime(String vtime, String node, int time)
+	{
+		boolean	found	= false;
+		if(vtime!=null)
+		{
+			StringBuffer	buf	= new StringBuffer();
+			StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
+			String	last	= null;
+			while(stok.hasMoreTokens())
+			{
+				String	next	= stok.nextToken();
+				buf.append(next);
+				if("@".equals(next) && node.equals(last) && stok.hasMoreTokens())
+				{
+					found	= true;
+					stok.nextToken();	// skip old time.
+					buf.append(time);	// add new time.
+				}
+				last	= next;
+			}
+			
+			if(!found)
+			{
+				if(buf.length()>0)
+				{
+					buf.append('.');
+				}
+				buf.append(node);
+				buf.append("@");
+				buf.append(time);
+			}
+			
+			vtime	= buf.toString();
+		}
+		else
+		{
+			vtime	= node + "@" + time;
+		}
+		
+		return vtime;
 	}
 }

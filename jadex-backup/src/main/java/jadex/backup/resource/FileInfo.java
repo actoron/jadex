@@ -1,7 +1,6 @@
 package jadex.backup.resource;
 
 
-
 /**
  *  Public meta information about a file in a resource
  *  used for transfer between resource providers and clients.
@@ -16,8 +15,8 @@ public class FileInfo
 	/** True, if the file is a directory. */
 	protected boolean	directory;
 	
-	/** The last modification date. */
-	protected long	timestamp;
+	/** The vector time ("platform1@time1.platform2@time2..."). */
+	protected String	vtime;
 	
 	//-------- constructors --------
 	
@@ -27,6 +26,16 @@ public class FileInfo
 	public FileInfo()
 	{
 		// bean constructor.
+	}
+	
+	/**
+	 *  Create a file info.
+	 */
+	public FileInfo(String location, boolean directory, String vtime)
+	{
+		this.location	= location;
+		this.directory	= directory;
+		this.vtime	= vtime;
 	}
 	
 	//-------- methods --------
@@ -66,22 +75,20 @@ public class FileInfo
 	{
 		this.directory = directory;
 	}
-
+	
 	/**
-	 *  Get the time stamp.
-	 *  @return the time stamp.
+	 *  Get the vector time.
 	 */
-	public long getTimeStamp()
+	public String	getVTime()
 	{
-		return timestamp;
+		return vtime;
 	}
-
+	
 	/**
-	 *  Set the time stamp.
-	 *  @param timestamp The time stamp to set.
+	 *  Set the vector time.
 	 */
-	public void setTimeStamp(long timestamp)
+	public void	setVTime(String vtime)
 	{
-		this.timestamp = timestamp;
-	}	
+		this.vtime	= vtime;
+	}
 }

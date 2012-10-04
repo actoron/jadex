@@ -15,9 +15,6 @@ import jadex.micro.annotation.AgentKilled;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -32,11 +29,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 @Agent
 public class ResourceBrowserAgent
 {
-	//-------- constants --------
-	
-	/** A date format for time stamps. */
-	protected static DateFormat	TSFORMAT	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -77,7 +69,7 @@ public class ResourceBrowserAgent
 							}
 							else
 							{
-								value	= fi.getLocation() + " ("+TSFORMAT.format(new Date(fi.getTimeStamp()))+")";
+								value	= fi.getLocation() + " ("+fi.getVTime()+")";
 							}
 						}
 						

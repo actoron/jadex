@@ -196,7 +196,6 @@ public class ResourceTreeModel	implements TreeModel
 				for(Object rs: (List<?>)res.getSecondEntity())
 				{
 					FileInfo	fi	= (FileInfo)res.getFirstEntity();
-					fi.setTimeStamp(0);	// query all
 					((IResourceService)rs).getFiles(fi).addResultListener(new IResultListener<FileInfo[]>()
 					{
 						public void resultAvailable(FileInfo[] result)
