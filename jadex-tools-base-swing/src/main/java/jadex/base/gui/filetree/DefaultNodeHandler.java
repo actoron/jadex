@@ -33,7 +33,7 @@ public class DefaultNodeHandler implements INodeHandler
 	//-------- attributes --------
 
 	/** The actions. */
-	protected List actions;
+	protected List<Action> actions;
 	
 	/** The overlay icons. */
 	protected UIDefaults overlays;
@@ -47,7 +47,7 @@ public class DefaultNodeHandler implements INodeHandler
 	{
 		overlays = new UIDefaults();
 		overlays.putAll(icons);
-		actions = new ArrayList();
+		actions = new ArrayList<Action>();
 		actions.add(new RefreshAction(tree));
 		actions.add(new RefreshSubtreeAction(tree));
 	}
@@ -89,7 +89,14 @@ public class DefaultNodeHandler implements INodeHandler
 			if(baseaction.isEnabled())
 			{
 				String name = (String)baseaction.getValue(Action.NAME);
-				Icon overlay = overlays.getIcon(name);
+				Icon overlay = null;
+				try
+				{
+					overlay = overlays.getIcon(name);
+				}
+				catch(Exception e)
+				{
+				}
 				Action action = new AbstractAction(name, base!=null && overlay!=null? 
 					new CombiIcon(new Icon[]{base, overlay}) 
 					: (Icon)baseaction.getValue(Action.SMALL_ICON))
@@ -131,5 +138,21 @@ public class DefaultNodeHandler implements INodeHandler
 		actions.add(action);
 		if(overlay!=null)
 			overlays.put(action.getValue(Action.NAME), overlay);
+	}
+	
+	/**
+	 *  Get an action with a name.
+	 */
+	public Action getAction(String name)
+	{
+		for(Action action: actions)
+		{
+			if(action.getValue(Action.NAME).equals(name))
+			{
+				return action;
+			}
+		}
+		
+		return null;
 	}
 }

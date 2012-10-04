@@ -4,13 +4,17 @@ import jadex.backup.job.IJobService;
 import jadex.backup.job.SyncJob;
 import jadex.backup.resource.FileInfo;
 import jadex.backup.resource.IResourceService;
+import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
+import jadex.base.gui.filetree.RefreshAction;
+import jadex.base.gui.filetree.RefreshSubtreeAction;
 import jadex.base.gui.idtree.IdTreeModel;
 import jadex.base.gui.idtree.IdTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -20,6 +24,8 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
@@ -36,16 +42,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultTreeModel;
@@ -56,6 +66,14 @@ import javax.swing.tree.TreePath;
  */
 public class SyncPanel extends JPanel
 {
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"delete_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/delete_folder_16.png"),
+		"new_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/new_folder_16.png"),
+		"rename_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/rename_folder_16.png")
+	});
+	
 	protected int cnt;
 	
 	/**
@@ -212,16 +230,91 @@ public class SyncPanel extends JPanel
 	{
 		String ret = null;
 		
-		FileTreePanel selsourcet = new FileTreePanel(ea);
+		final FileTreePanel srct = new FileTreePanel(ea);
+		final DefaultNodeHandler nh = new DefaultNodeHandler(srct.getTree());
+		
+		nh.addAction(new AbstractAction("Create directory", icons.getIcon("new_dir"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String[] sels = srct.getSelectionPaths();
+				if(sels.length==1)
+				{
+					String name = JOptionPane.showInputDialog("Name: ");
+					if(name!=null && name.length()!=0)
+					{
+						File f = new File(sels[0]+File.separator+name);
+						f.mkdir();
+						Action act = nh.getAction(RefreshSubtreeAction.getName());
+						act.actionPerformed(e);
+					}
+				}
+			}
+			
+			public boolean isEnabled()
+			{
+				boolean ret = false;
+				String[] sels = srct.getSelectionPaths();
+				if(sels.length==1)
+				{
+					File f =  new File(sels[0]);
+					ret = f.exists() && f.isDirectory();
+				}
+				return ret;
+			}
+		}, null);
+		
+		nh.addAction(new AbstractAction("Delete file/dir", icons.getIcon("delete_dir"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String[] sels = srct.getSelectionPaths();
+				if(sels.length==1)
+				{
+					File f = new File(sels[0]);
+					if(f.exists())
+					{
+						SUtil.deleteDirectory(f);
+					}
+					Action act = nh.getAction(RefreshSubtreeAction.getName());
+					act.actionPerformed(e);
+				}
+			}
+		}, null);
+		
+		nh.addAction(new AbstractAction("Rename file/dir", icons.getIcon("rename_dir"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String[] sels = srct.getSelectionPaths();
+				if(sels.length==1)
+				{
+					File f = new File(sels[0]);
+					if(f.exists())
+					{
+						String name = JOptionPane.showInputDialog("New name: ");
+						if(name!=null && name.length()!=0)
+						{
+							f.renameTo(new File(f.getParent(), name));
+						}
+					}
+					Action act = nh.getAction(RefreshSubtreeAction.getName());
+					act.actionPerformed(e);
+				}
+			}
+		}, null);
+		
+		srct.addNodeHandler(nh);
+		
 		File[] roots = File.listRoots();
 		for(File root: roots)
 		{
-			selsourcet.addTopLevelNode(root);
+			srct.addTopLevelNode(root);
 		}
 		
-		if(createDialog("Source Folder Selection", selsourcet, comp))
+		if(createDialog("Source Folder Selection", srct, comp))
 		{
-			String[] sels = selsourcet.getSelectionPaths();
+			String[] sels = srct.getSelectionPaths();
 			ret = sels[0];
 //			if(sels!=null)
 //			{
