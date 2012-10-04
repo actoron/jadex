@@ -20,6 +20,9 @@ import java.util.NoSuchElementException;
 
 /**
  *  Database connector for reading and writing statistics via JavaDB.
+ *  Can be invoked as main for executing sql on the DB.
+ *  For example use the following to show properties of platforms froma given IP:
+ *  select * from relay.properties where exists (select * from relay.platforminfo where hostip='127.0.0.1' AND relay.properties.id=relay.platforminfo.id)
  */
 public class StatsDB
 {
@@ -443,29 +446,62 @@ public class StatsDB
 	 */
 	public static void	main(String[] args) throws Exception
 	{
-		StatsDB	db	= getDB();
-		
-		for(int i=1; i<5; i++)
+		if(args.length>0)
 		{
-			/*PlatformInfo	pi	=*/ new PlatformInfo("somid"+i, "hostip", "somename", "prot");
+			String	sql	= null;
+			for(String s: args)
+			{
+				if(sql==null)
+				{
+					sql	= s;
+				}
+				else
+				{
+					sql += " " + s;
+				}
+			}
+			System.out.println("Executing: "+sql);
+			StatsDB	db	= getDB();
+			Statement	stmt	= db.con.createStatement();
+			boolean query	= stmt.execute(sql);
+			if(query)
+			{
+				printResultSet(stmt.getResultSet());
+			}
+			else
+			{
+				System.out.println("Update count: "+stmt.getUpdateCount());
+			}
 		}
-//		printPlatformInfos(db.getAllPlatformInfos());
-		
-//		pi.reconnect("hostip", "other hostname");
-//		pi.addMessage(123, 456);
-//		
-//		pi.disconnect();
-		printPlatformInfos(db.getPlatformInfos(5));
-		System.out.println("---");
-		printPlatformInfos(db.getPlatformInfos(-1));
-		
-		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
-		DatabaseMetaData	meta	= db.con.getMetaData();
-		printResultSet(meta.getColumns(null, "RELAY", "PLATFORMINFO", null));
-		printResultSet(meta.getColumns(null, "RELAY", "PROPERTIES", null));
-		
-		printResultSet(db.con.createStatement().executeQuery("select * from relay.properties"));
-
+		else
+		{
+			StatsDB	db	= getDB();
+			Map<String, String>	props	= new HashMap<String, String>();
+			props.put("a", "b");
+			props.put("a1", "b2");
+			for(int i=1; i<5; i++)
+			{
+				PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
+				pi.setProperties(props);
+				db.save(pi);
+			}
+	//		printPlatformInfos(db.getAllPlatformInfos());
+			
+	//		pi.reconnect("hostip", "other hostname");
+	//		pi.addMessage(123, 456);
+	//		
+	//		pi.disconnect();
+			printPlatformInfos(db.getPlatformInfos(5));
+			System.out.println("---");
+			printPlatformInfos(db.getPlatformInfos(-1));
+			
+			printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
+			DatabaseMetaData	meta	= db.con.getMetaData();
+			printResultSet(meta.getColumns(null, "RELAY", "PLATFORMINFO", null));
+			printResultSet(meta.getColumns(null, "RELAY", "PROPERTIES", null));
+			
+			printResultSet(db.con.createStatement().executeQuery("select * from relay.properties"));
+		}
 	}
 	
 	/**
