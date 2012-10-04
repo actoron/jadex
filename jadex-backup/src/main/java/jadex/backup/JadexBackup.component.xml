@@ -9,6 +9,7 @@
 	name="JadexBackup" package="jadex.backup">
 	
     <componenttypes>
+        <componenttype name="JobManager" filename="jadex/backup/job/JobManagerAgent.class"/>
         <componenttype name="ResourceProvider" filename="jadex/backup/resource/ResourceProviderAgent.class"/>
     </componenttypes>
     
@@ -29,7 +30,8 @@
                         </argument>
                     </arguments>
                 </component>
-                </components>
+                <component type="JobManager"/>
+        	</components>
         </configuration>
     </configurations>
 </componenttype>

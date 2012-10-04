@@ -38,12 +38,11 @@ public class ServiceInputConnection implements IInputConnection
 	protected ICommand transfercommand;
 	
 	/**
-	 * 
+	 *  Create a new service input connection.
 	 */
 	public ServiceInputConnection()
 	{
 	}
-
 	
 	/**
 	 *  Non-blocking read. Tries to read the next byte.
@@ -112,7 +111,7 @@ public class ServiceInputConnection implements IInputConnection
 //	}
 	
 	/**
-	 * 
+	 *  Get the connection id.
 	 */
 	public int getConnectionId()
 	{
@@ -142,7 +141,7 @@ public class ServiceInputConnection implements IInputConnection
 	}
 
 	/**
-	 * 
+	 *  Get the initiator.
 	 */
 	public IComponentIdentifier getInitiator()
 	{
@@ -153,7 +152,7 @@ public class ServiceInputConnection implements IInputConnection
 	}
 
 	/**
-	 * 
+	 *  Get the participant.
 	 */
 	public IComponentIdentifier getParticipant()
 	{
@@ -175,7 +174,7 @@ public class ServiceInputConnection implements IInputConnection
 	}
 	
 	/**
-	 * 
+	 *  Set the input connection.
 	 */
 	protected void setInputConnection(IInputConnection con)
 	{
@@ -201,7 +200,7 @@ public class ServiceInputConnection implements IInputConnection
 	}
 	
 	/**
-	 * 
+	 *  Get the corresponding output connection.
 	 */
 	public IOutputConnection getOutputConnection()
 	{

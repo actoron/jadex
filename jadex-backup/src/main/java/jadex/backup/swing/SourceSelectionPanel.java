@@ -16,6 +16,7 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -62,7 +63,7 @@ class AddPathAction extends AbstractAction
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"add_path", SGUI.makeIcon(FileTreePanel.class, "/jadex/backup/swing/images/add_folder_24.png"),
+		"add_path", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/add_folder_24.png"),
 	});
 	
 	//-------- attributes --------

@@ -1,5 +1,7 @@
 package jadex.base.gui.reposearch;
 
+import jadex.base.gui.idtree.IdTreeModel;
+import jadex.base.gui.idtree.IdTreeNode;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
@@ -24,7 +26,6 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,7 @@ import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -103,7 +100,7 @@ public class RepositorySearchPanel extends JPanel
 	protected PlexusContainer plexus;
 	
 	/** The tree model. */
-	protected IdTreeModel tm;
+	protected IdTreeModel<ArtifactInfo> tm;
 	
 	/** The tree. */
 	protected JTree tree;
@@ -216,7 +213,7 @@ public class RepositorySearchPanel extends JPanel
 		});
 		
 		tm = new IdTreeModel();
-		tm.setRoot(new IdTreeNode("root", null, tm, false, null, null, null));
+		tm.setRoot(new IdTreeNode<ArtifactInfo>("root", null, tm, false, null, null, null));
 		tree = new JTree(tm);
 		tree.setRootVisible(false);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -268,9 +265,9 @@ public class RepositorySearchPanel extends JPanel
 					TreePath sel = tree.getSelectionPath();
 					if(sel!=null)
 					{
-						IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
+						IdTreeNode<ArtifactInfo> node = (IdTreeNode<ArtifactInfo>)sel.getLastPathComponent();
 //						System.out.println("selected: "+node.getArtifactInfo());
-						ai = node.getArtifactInfo();
+						ai = node.getObject();
 					}
 					if(ai!=null)
 					{
@@ -794,9 +791,9 @@ public class RepositorySearchPanel extends JPanel
 		TreePath sel = tree.getSelectionPath();
 		if(sel!=null)
 		{
-			IdTreeNode node = (IdTreeNode)sel.getLastPathComponent();
+			IdTreeNode<ArtifactInfo> node = (IdTreeNode<ArtifactInfo>)sel.getLastPathComponent();
 //			System.out.println("selected: "+node.getArtifactInfo());
-			ret = node.getArtifactInfo();
+			ret = node.getObject();
 			
 			String grid = tfgi.getText();
 			String arid = tfai.getText();
@@ -1194,221 +1191,6 @@ public class RepositorySearchPanel extends JPanel
 		public boolean equals(Object obj)
 		{
 			return obj instanceof RepositoryInfo && SUtil.equals(getUrl(), ((RepositoryInfo)obj).getUrl());
-		}
-	}
-	
-	/**
-	 *  Tree model that allows looking up nodes per id.
-	 */
-	public static class IdTreeModel extends DefaultTreeModel
-	{
-		//-------- attributes --------
-		
-		/** The id map (id -> node). */
-		protected Map<String, IdTreeNode> nodes;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new tree model.
-		 */
-		public IdTreeModel()
-		{
-			super(null, false);
-			
-			assert SwingUtilities.isEventDispatchThread();
-			
-			this.nodes = new HashMap<String, RepositorySearchPanel.IdTreeNode>();
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Add a new node.
-		 *  @param node The node.
-		 */
-		public void addNode(IdTreeNode node)
-		{
-			assert SwingUtilities.isEventDispatchThread();
-			
-			nodes.put(node.getId(), node);
-		}
-		
-		/**
-		 *  Remove a node.
-		 *  @param node The node.
-		 */
-		public void removeNode(IdTreeNode node)
-		{
-			assert SwingUtilities.isEventDispatchThread();
-			
-			deregisterAll(node);
-		}
-		
-		/**
-		 *  Deregister a node and all its children.
-		 *  @param node The node.
-		 */
-		protected void deregisterAll(IdTreeNode node)
-		{
-			nodes.remove(node.getId());
-			
-			for(int i=node.getChildCount()-1; i>=0; i--)
-			{
-				deregisterAll((IdTreeNode)node.getChildAt(i));
-			}
-		}
-		
-		/**
-		 *  Get a node per id.
-		 *  @param id The node id.
-		 *  @return The node.
-		 */
-		public IdTreeNode getNode(String id)
-		{
-			assert SwingUtilities.isEventDispatchThread();
-			
-			return nodes.get(id);
-		}
-	}
-	
-	/**
-	 *  Id tree node.
-	 */
-	public static class IdTreeNode extends DefaultMutableTreeNode
-	{
-		//-------- attributes --------
-
-		/** The node id. */
-		protected String key;
-		
-		/** The node name. */
-		protected String name;
-		
-		/** The tree model. */
-		protected IdTreeModel tm;
-		
-		/** Flag if is leaf. */
-		protected boolean leaf;
-		
-		/** The icon. */
-		protected Icon icon;
-		
-		/** The tooltip text. */
-		protected String tooltip;
-		
-		/** The artifact info. */
-		protected ArtifactInfo ai;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new node.
-		 */
-		public IdTreeNode(String key, String name, IdTreeModel tm, boolean leaf,
-			Icon icon, String tooltip, ArtifactInfo ai)
-		{
-			this.key = key;
-			this.name = name!=null? name: key;
-			this.tm = tm;
-			this.leaf = leaf;
-			this.icon = icon;
-			this.tooltip = tooltip;
-			this.ai = ai;
-		}
-		
-		/**
-		 *  Add a new child.
-		 *  @param child The child.
-		 */
-		public void add(MutableTreeNode child)
-		{
-			assert SwingUtilities.isEventDispatchThread();
-			
-			IdTreeNode itn = (IdTreeNode)child;
-			tm.addNode(itn);
-			super.add(itn);
-			tm.nodesWereInserted(this, new int[]{getChildCount()-1});
-		}
-		
-		/**
-		 *  Insert a new child.
-		 *  @param child The child.
-		 */
-		public void insert(MutableTreeNode child, int index)
-		{
-			assert SwingUtilities.isEventDispatchThread();
-			
-			IdTreeNode itn = (IdTreeNode)child;
-			tm.addNode(itn);
-			super.insert(child, index);
-			tm.nodesWereInserted(this, new int[]{index});
-		}
-
-		/**
-		 *  Remove a child.
-		 *  @param idx The index.
-		 */
-		public void remove(int idx)
-		{
-			assert SwingUtilities.isEventDispatchThread();
-			
-			IdTreeNode child = (IdTreeNode)getChildAt(idx);
-			tm.removeNode(child);
-			super.remove(idx);
-			tm.nodesWereRemoved(this, new int[]{idx}, new TreeNode[]{child});
-		}
-		
-		/**
-		 *  Get the id.
-		 *  @return The id.
-		 */
-		public String getId()
-		{
-			return key;
-		}
-
-		/**
-		 *  Test if node is leaf.
-		 *  @return True, if is leaf.
-		 */
-		public boolean isLeaf()
-		{
-			return leaf;
-		}
-
-		/**
-		 *  Get the icon.
-		 */
-		public Icon getIcon()
-		{
-			return icon;
-		}
-		
-		/**
-		 *  Get the tooltip.
-		 */
-		public String getTooltipText()
-		{
-			return tooltip;
-		}
-		
-		/**
-		 *  Get the artifact info.
-		 *  @return The artifact info.
-		 */
-		public ArtifactInfo getArtifactInfo()
-		{
-			return ai;
-		}
-
-		/**
-		 *  Get the string representation.
-		 *  @return The string representation.
-		 */
-		public String toString()
-		{
-			return name;
 		}
 	}
 }
