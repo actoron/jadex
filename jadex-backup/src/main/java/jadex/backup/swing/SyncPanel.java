@@ -48,23 +48,23 @@ import javax.swing.border.TitledBorder;
 import javax.swing.tree.TreePath;
 
 /**
- * 
+ *  The syncpanel shows data to create/change a sync job.
  */
 public class SyncPanel extends JPanel
 {
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/folder_16.png"),
-		"delete_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/delete_folder_16.png"),
-		"new_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/new_folder_16.png"),
-		"rename_dir", SGUI.makeIcon(SourceSelectionPanel.class, "/jadex/backup/swing/images/rename_folder_16.png")
+		"dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/folder_16.png"),
+		"delete_dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/delete_folder_16.png"),
+		"new_dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/new_folder_16.png"),
+		"rename_dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/rename_folder_16.png")
 	});
 	
 	protected int cnt;
 	
 	/**
-	 * 
+	 *  Create a new panel.
 	 */
 	public SyncPanel(final IExternalAccess ea)
 	{

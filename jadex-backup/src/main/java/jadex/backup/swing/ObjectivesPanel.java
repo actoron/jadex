@@ -28,7 +28,7 @@ public class ObjectivesPanel extends JPanel
 		
 		tp.addTab("Sync", new SyncPanel(ea));
 //		tp.addTab("Backup", new BackupPanel());
-		tp.addTab("Jobs", new JobsPanel());
+		tp.addTab("Jobs", new JobsPanel(ea));
 		
 		add(tp, BorderLayout.CENTER);
 	}

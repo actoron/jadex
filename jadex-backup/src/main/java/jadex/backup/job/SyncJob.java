@@ -2,16 +2,20 @@ package jadex.backup.job;
 
 
 /**
- * 
+ *  Job to sync resources.
  */
 public class SyncJob extends Job
 {
+	//-------- attributes --------
+	
 	/** The local source. */ 
 	protected String lres;
 	
 	/** The global resource. */
 	protected String gres;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new job.
 	 */
@@ -21,6 +25,8 @@ public class SyncJob extends Job
 		this.lres = lres;
 		this.gres = gres;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the localResource.
@@ -56,6 +62,18 @@ public class SyncJob extends Job
 	public void setGlobalResource(String globalResource)
 	{
 		this.gres = globalResource;
+	}
+	
+	/**
+	 *  Get the details about a job.
+	 *  @return The details.
+	 */
+	public String getDetails()
+	{
+		StringBuffer ret = new StringBuffer(lres);
+		if(gres!=null)
+			ret.append(", id: ").append(gres);
+		return ret.toString();
 	}
 	
 }

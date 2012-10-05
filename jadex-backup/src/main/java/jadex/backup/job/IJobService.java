@@ -2,9 +2,11 @@ package jadex.backup.job;
 
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- * 
+ *  Job management interface. Can be used to add/remove jobs
+ *  and get current jobs.
  */
 public interface IJobService
 {
@@ -25,4 +27,9 @@ public interface IJobService
 	 *  @return All jobs.
 	 */
 	public IIntermediateFuture<Job> getJobs();
+	
+	/**
+	 *  Subscribe for job news.
+	 */
+	public ISubscriptionIntermediateFuture<JobEvent> subscribe();
 }

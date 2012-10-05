@@ -11,7 +11,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -27,9 +29,10 @@ import jadex.micro.annotation.RequiredServices;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -39,11 +42,11 @@ import javax.swing.SwingUtilities;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IJobService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IJobService.class, implementation=@Implementation(JobService.class)))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
   binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @ComponentTypes(@ComponentType(name="sa", filename="jadex/backup/resource/ResourceProviderAgent.class"))
-public class JobManagerAgent implements IJobService
+public class JobManagerAgent
 {
 	//-------- attributes --------
 	
@@ -54,9 +57,6 @@ public class JobManagerAgent implements IJobService
 	/** The gui frame. */
 	protected JFrame gui;
 	
-	/** The map of jobs (id -> job). */
-	protected List<Job> jobs;
-	
 	//-------- constructors --------
 	
 	/**
@@ -65,8 +65,6 @@ public class JobManagerAgent implements IJobService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		this.jobs = new ArrayList<Job>();
-		
 		final Future<Void>	ret	= new Future<Void>();
 		final IExternalAccess	ea	= agent.getExternalAccess();
 		SwingUtilities.invokeLater(new Runnable()
@@ -97,63 +95,4 @@ public class JobManagerAgent implements IJobService
 		});
 		return ret;
 	}
-	
-	/**
-	 *  Add a new job.
-	 *  @param job The job.
-	 */
-	public IFuture<Void> addJob(Job job)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		jobs.add(job);
-		if(job instanceof SyncJob)
-		{
-			final SyncJob sjob = (SyncJob)job;
-			IFuture<IComponentManagementService> fut = agent.getRequiredService("cms");
-			fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-			{
-				public void customResultAvailable(IComponentManagementService cms)
-				{
-					Map<String, Object> args = new HashMap<String, Object>();
-					args.put("dir", sjob.getLocalResource());
-					args.put("id", sjob.getGlobalResource());
-					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
-					ci.setArguments(args);
-					cms.createComponent(null, "sa", ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier cid) 
-						{
-							System.out.println("created job agent: "+cid);
-							ret.setResult(null);
-						}
-					});
-				}
-			});
-		}
-			
-		return ret;
-	}
-	
-	/**
-	 *  Remove a job.
-	 *  @param jobid The job id.
-	 */
-	public IFuture<Void> removeJob(String jobid)
-	{
-		jobs.remove(jobid);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Get all jobs. 
-	 *  @return All jobs.
-	 */
-	public IIntermediateFuture<Job> getJobs()
-	{
-		final IntermediateFuture<Job> ret = new IntermediateFuture<Job>();
-		ret.setResult(jobs);
-		return ret;
-	}
-
 }
