@@ -1,5 +1,6 @@
 package jadex.backup.job;
 
+import jadex.backup.resource.ILocalResourceService;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -7,9 +8,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -21,6 +24,7 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +53,7 @@ public class SyncJobAgent
 	protected SyncJob job;
 	
 	/** The corresponding resource service. */
-	protected IResourceService resser;
+	protected ILocalResourceService resser;
 	
 	//-------- constructors --------
 	
@@ -61,7 +65,7 @@ public class SyncJobAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		System.out.println("args: "+agent.getArguments());
+//		System.out.println("args: "+agent.getArguments());
 		
 		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
@@ -77,10 +81,10 @@ public class SyncJobAgent
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						agent.getServiceContainer().getService(IResourceService.class, cid)
-							.addResultListener(new ExceptionDelegationResultListener<IResourceService, Void>(ret)
+						agent.getServiceContainer().getService(ILocalResourceService.class, cid)
+							.addResultListener(new ExceptionDelegationResultListener<ILocalResourceService, Void>(ret)
 						{
-							public void customResultAvailable(IResourceService result)
+							public void customResultAvailable(ILocalResourceService result)
 							{
 								resser = result;
 								ret.setResult(null);
@@ -104,9 +108,23 @@ public class SyncJobAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				final IComponentStep<Void> self = this;
 				System.out.println("initiating sync");
-//				resser.sy
-				agent.waitForDelay(60000, this);
+				resser.updateAll().addResultListener(new IResultListener<Collection<FileData>>()
+				{
+					public void resultAvailable(Collection<FileData> result)
+					{
+						System.out.println("finished sync");
+						agent.waitForDelay(60000, self);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("Update error: "+exception);
+						agent.waitForDelay(60000, self);
+					}
+				});
+				
 				return IFuture.DONE;
 			}
 		});

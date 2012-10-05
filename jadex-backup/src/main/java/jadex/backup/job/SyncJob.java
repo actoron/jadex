@@ -1,5 +1,7 @@
 package jadex.backup.job;
 
+import jadex.bridge.service.annotation.Reference;
+
 
 /**
  *  Job to sync resources.

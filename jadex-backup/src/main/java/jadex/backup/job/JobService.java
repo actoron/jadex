@@ -91,8 +91,8 @@ public class JobService implements IJobService
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
 					Map<String, Object> args = new HashMap<String, Object>();
-//					args.put("job", sjob);
-					System.out.println("job is: "+sjob);
+					args.put("job", sjob);
+//					System.out.println("job is: "+sjob);
 					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 					ci.setArguments(args);
 					cms.createComponent(null, sjob.getAgentType(), ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
@@ -128,7 +128,8 @@ public class JobService implements IJobService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IExternalAccess ea = jobagents.get(jobid);
+		IExternalAccess ea = jobagents.remove(jobid);
+		System.out.println("killing: "+ea+" "+jobid);
 		if(ea!=null)
 		{
 			ea.killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
