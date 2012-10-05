@@ -21,6 +21,13 @@ public abstract class Job
 	/**
 	 *  Create a new job.
 	 */
+	public Job()
+	{
+	}
+	
+	/**
+	 *  Create a new job.
+	 */
 	public Job(String id, String name)
 	{
 		this.id = id;
@@ -64,15 +71,6 @@ public abstract class Job
 	{
 		this.name = name;
 	}	
-	
-	/**
-	 *  Get the details about a job.
-	 *  @return The details.
-	 */
-	public String getDetails()
-	{
-		return null;
-	}
 
 	/**
 	 *  Get the active.
@@ -90,6 +88,23 @@ public abstract class Job
 	public void setActive(boolean active)
 	{
 		this.active = active;
+	}
+	
+	/**
+	 *  Get the details about a job.
+	 *  @return The details.
+	 */
+	public String getDetails()
+	{
+		return null;
+	}
+	
+	/**
+	 *  Get the agent type.
+	 */
+	public String getAgentType()
+	{
+		return null;
 	}
 	
 }

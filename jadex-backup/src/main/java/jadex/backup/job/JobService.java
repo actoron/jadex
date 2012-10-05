@@ -91,11 +91,11 @@ public class JobService implements IJobService
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
 					Map<String, Object> args = new HashMap<String, Object>();
-					args.put("dir", sjob.getLocalResource());
-					args.put("id", sjob.getGlobalResource());
+//					args.put("job", sjob);
+					System.out.println("job is: "+sjob);
 					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 					ci.setArguments(args);
-					cms.createComponent(null, "sa", ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					cms.createComponent(null, sjob.getAgentType(), ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier cid) 
 						{

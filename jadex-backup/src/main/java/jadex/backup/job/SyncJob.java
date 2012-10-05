@@ -19,6 +19,13 @@ public class SyncJob extends Job
 	/**
 	 *  Create a new job.
 	 */
+	public SyncJob()
+	{
+	}
+	
+	/**
+	 *  Create a new job.
+	 */
 	public SyncJob(String id, String name, String lres, String gres)
 	{
 		super(id, name);
@@ -74,6 +81,14 @@ public class SyncJob extends Job
 		if(gres!=null)
 			ret.append(", id: ").append(gres);
 		return ret.toString();
+	}
+	
+	/**
+	 *  Get the agent type.
+	 */
+	public String getAgentType()
+	{
+		return "jadex/backup/job/SyncJobAgent.class";
 	}
 	
 }
