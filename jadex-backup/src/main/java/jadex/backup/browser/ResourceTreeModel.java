@@ -7,9 +7,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
 
@@ -146,7 +145,7 @@ public class ResourceTreeModel	implements TreeModel
 			// To find top-level nodes start global resource search.
 			if(ROOT.equals(node))
 			{
-				final Map<String, List<IResourceService>>	found	= new HashMap<String, List<IResourceService>>();
+				final List<IResourceService>	found	= new ArrayList<IResourceService>();
 				IIntermediateFuture<IResourceService>	fut	= SServiceProvider.getServices(ea.getServiceProvider(), IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 				fut.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 				{
@@ -154,13 +153,7 @@ public class ResourceTreeModel	implements TreeModel
 					{
 						synchronized(found)
 						{
-							List<IResourceService>	list	= found.get(result.getResourceId());
-							if(list==null)
-							{
-								list	= new ArrayList<IResourceService>();
-								found.put(result.getResourceId(), list);
-							}
-							list.add(result);
+							found.add(result);
 						}
 					}
 				});
@@ -176,52 +169,34 @@ public class ResourceTreeModel	implements TreeModel
 				synchronized(found)
 				{
 					ret	= new ArrayList<Object>();
-					for(List<IResourceService> l: found.values())
+					for(IResourceService l: found)
 					{
 						FileInfo	fi	= new FileInfo();
-						fi.setLocation("./");
+						fi.setLocation("/");
 						fi.setDirectory(true);
-						ret.add(new Tuple2<FileInfo, List<IResourceService>>(fi, l));
+						ret.add(new Tuple2<FileInfo, IResourceService>(fi, l));
 					}
 				}			
 			}
 				
-			// Subnodes are a tuple of file info and resource service list.
+			// Subnodes are a tuple of file info and resource service.
 			else if(node instanceof Tuple2)
 			{
+				ret	= new ArrayList<Object>();
 				final Tuple2<?,?>	res	= (Tuple2<?,?>)node;
-				
-				// For speed: Query all services in parallel and continue on first result.
-				final Future<List<Object>>	fut	= new Future<List<Object>>();
-				for(Object rs: (List<?>)res.getSecondEntity())
-				{
-					FileInfo	fi	= (FileInfo)res.getFirstEntity();
-					((IResourceService)rs).getFiles(fi).addResultListener(new IResultListener<FileInfo[]>()
-					{
-						public void resultAvailable(FileInfo[] result)
-						{
-							List<Object>	ret	= new ArrayList<Object>();
-							for(FileInfo info: result)
-							{
-								ret.add(new Tuple2<FileInfo, List<IResourceService>>(info, (List<IResourceService>)res.getSecondEntity()));
-							}
-							fut.setResultIfUndone(ret);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// ignored.
-						}
-					});
-				}
+				FileInfo	fi	= (FileInfo)res.getFirstEntity();
+				IFuture<FileInfo[]>	fut	= ((IResourceService)res.getSecondEntity()).getFiles(fi);
 				try
 				{
 					// Hack!!! Block swing thread until results are available
-					ret	= fut.get(new ThreadSuspendable(), 3000);
+					FileInfo[]	fis	= fut.get(new ThreadSuspendable(), 3000);
+					for(FileInfo tmp : fis)
+					{
+						ret.add(new Tuple2<FileInfo, IResourceService>(tmp, (IResourceService)res.getSecondEntity()));
+					}
 				}
 				catch(TimeoutException e)
 				{
-					ret	= new ArrayList<Object>();
 				}
 			}
 			

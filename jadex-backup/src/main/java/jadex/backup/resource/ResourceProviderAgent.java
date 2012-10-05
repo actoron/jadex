@@ -1,12 +1,15 @@
 package jadex.backup.resource;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.deployment.FileData;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -184,6 +187,67 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	
 	/**
 	 *  Update the local resource with all
+	 *  changes from all available remote resource.
+	 *  @return All changed files and directories that are being processed.
+	 */
+	public ITerminableIntermediateFuture<FileData>	updateAll()
+	{
+		final TerminableIntermediateFuture<FileData>	ret	= new TerminableIntermediateFuture<FileData>();
+		if(update!=null)
+		{
+			ret.setException(new IllegalStateException("Update already running."));
+		}
+		else
+		{
+			update	= ret;
+			component.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
+			{
+				public void intermediateResultAvailable(IResourceService result)
+				{
+					// Hack !!! allow inner update
+					update	= null;
+					update(result).addResultListener(new IntermediateDefaultResultListener<FileData>()
+					{
+						public void intermediateResultAvailable(FileData file)
+						{
+							// Hack !!! allow inner update
+							update	= null;
+//							update(result).addResultListener(listener)
+						}
+						
+						public void finished()
+						{
+							ret.setFinishedIfUndone();
+							update	= null;
+						}
+		
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setExceptionIfUndone(exception);
+							update	= null;
+						}
+					});
+				}
+				
+				public void finished()
+				{
+					ret.setFinishedIfUndone();
+					update	= null;
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setExceptionIfUndone(exception);
+					update	= null;
+				}
+			});
+		}
+		return ret;
+	}
+
+	/**
+	 *  Update the local resource with all
 	 *  changes from the given remote resource.
 	 *  @param remote	The remote resource to synchronize to.
 	 *  @return All changed files and directories that are being processed.
@@ -203,9 +267,9 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 		{
 			update	= ret;
 			remote.getChanges(resource.getVTime(remote.getLocalId()))
-				.addResultListener(new ExceptionDelegationResultListener<FileInfo[], Collection<FileData>>(ret)
+				.addResultListener(new IResultListener<FileInfo[]>()
 			{
-				public void customResultAvailable(FileInfo[] result)
+				public void resultAvailable(FileInfo[] result)
 				{
 					int	maxtime	= -1;
 					for(FileInfo fi: result)
@@ -221,6 +285,12 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 					}
 					
 					ret.setFinishedIfUndone();
+					update	= null;
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setExceptionIfUndone(exception);
 					update	= null;
 				}
 			});

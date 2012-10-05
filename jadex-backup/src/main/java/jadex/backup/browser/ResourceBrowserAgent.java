@@ -15,7 +15,6 @@ import jadex.micro.annotation.AgentKilled;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -62,10 +61,10 @@ public class ResourceBrowserAgent
 						if(value instanceof Tuple2)
 						{
 							FileInfo	fi	= (FileInfo)((Tuple2<?,?>)value).getFirstEntity();
-							if("./".equals(fi.getLocation()))
+							if("/".equals(fi.getLocation()))
 							{
-								List<?>	res	= (List<?>)((Tuple2<?,?>)value).getSecondEntity();
-								value	= ((IResourceService)res.get(0)).getResourceId() +" ("+res.size()+" instances)";
+								IResourceService	res	= (IResourceService)((Tuple2<?,?>)value).getSecondEntity();
+								value	= res.getResourceId() +" ("+res.getLocalId()+")";
 							}
 							else
 							{
