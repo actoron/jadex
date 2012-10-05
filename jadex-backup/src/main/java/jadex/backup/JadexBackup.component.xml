@@ -18,16 +18,14 @@
             <components>
                 <component type="ResourceProvider">
                     <arguments>
-                        <argument name="dir">
-                            "test"
-                        </argument>
+                        <argument name="dir">"test1"</argument>
+                        <argument name="id">"abcdefgh"</argument>
                     </arguments>
                 </component>
                 <component type="ResourceProvider">
                     <arguments>
-                        <argument name="dir">
-                            "target"
-                        </argument>
+                        <argument name="dir">"test2"</argument>
+                        <argument name="id">"abcdefgh"</argument>
                     </arguments>
                 </component>
                 <component type="JobManager"/>

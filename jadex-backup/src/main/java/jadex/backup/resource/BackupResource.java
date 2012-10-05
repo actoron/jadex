@@ -1,6 +1,7 @@
 package jadex.backup.resource;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
 import java.io.File;
@@ -8,8 +9,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.UUID;
 
 /**
@@ -23,9 +24,6 @@ public class BackupResource
 	
 	/** The resource root directory. */
 	protected File	root;
-	
-	/** The local component identifier. */
-	protected IComponentIdentifier	cid;
 	
 	/** A stream needed for file locking. */
 	protected FileOutputStream	lockfos;
@@ -46,7 +44,6 @@ public class BackupResource
 	public BackupResource(String id, File root, IComponentIdentifier cid)	throws Exception
 	{
 		this.root	= root;
-		this.cid	= cid;
 		File	meta	= new File(root, ".jadexbackup");
 		meta.mkdirs();
 		
@@ -72,7 +69,8 @@ public class BackupResource
 				id	= root.getName()+"_"+UUID.randomUUID().toString();
 			}
 			props.setProperty("id", id);
-			props.setProperty("vtime", "0");
+			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3));
+			setVTime(getLocalId(), 0);
 			save();
 		}
 	}
@@ -107,6 +105,17 @@ public class BackupResource
 	}
 	
 	/**
+	 *  Get the local resource id.
+	 *  The local resource id is a unique id that is
+	 *  used to identify an individual instance of a
+	 *  distributed resource on a specific host.
+	 */
+	public String	getLocalId()
+	{
+		return props.getProperty("localid");
+	}
+	
+	/**
 	 *  Get the resource root directory.
 	 */
 	public File	getResourceRoot()
@@ -125,6 +134,34 @@ public class BackupResource
 	}
 	
 	/**
+	 *  Get the last known-to-be-synchronized vector time of a node.
+	 *  @param node	The local resource id of the node.
+	 *  @return	The time point. 
+	 */
+	public int	getVTime(String node)
+	{
+		int	ret	= 0;
+		String	vtimekey	= "vtime_"+node;
+		if(props.containsKey(vtimekey))
+		{
+			ret	= Integer.parseInt(props.getProperty(vtimekey));
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Set the last known-to-be-synchronized vector time of a node.
+	 *  @param node	The local resource id of the node.
+	 *  @param time	The time point.
+	 */
+	public void	setVTime(String node, int time)
+	{
+		String	vtimekey	= "vtime_"+node;
+		props.setProperty(vtimekey, Integer.toString(time));
+		save();				
+	}
+	
+	/**
 	 *  Get the file info for a local file.
 	 *  @param file The local file.
 	 *  @return The file info.
@@ -133,58 +170,46 @@ public class BackupResource
 	{
 		try
 		{
+			FileInfo	ret;
 			String	rpath	= root.getCanonicalPath();
 			String	fpath	= file.getCanonicalPath();
 			if(!fpath.startsWith(rpath))
 			{
 				throw new IllegalArgumentException("File '"+fpath+"' must be contained in resource root '"+rpath+"'.");
 			}
+			String	location	= rpath.equals(fpath) ? "/" : fpath.substring(rpath.length()).replace(File.separatorChar, '/');
+
+			int	lvtime	= getVTime(getLocalId());
 			
-			String	location	= fpath.substring(rpath.length()+1).replace(File.separatorChar, '/');
-			
-			String	vtime	= null;
+			// Existing file -> check for change.
 			if(props.containsKey(location))
 			{
 				Tuple2<Long, String>	entry	= parseEntry(props.getProperty(location));
-				vtime	= entry.getSecondEntity();
+				ret	= new FileInfo(location, file.isDirectory(),  entry.getSecondEntity());
+				
+				// File changed -> increment local vector time point to indicate changes.
 				if(file.lastModified()!=entry.getFirstEntity().longValue())
 				{
-					// Increment local vector time point to indicate changes.
-					int	flvtime	= getVTime(vtime, cid.getPlatformPrefix());
-					int	lvtime	= 0;
-					if(props.containsKey("vtime"))
+					// Same as biggest local time -> increment both.
+					if(lvtime == ret.getVTime(getLocalId()))
 					{
-						lvtime	= Integer.parseInt(props.getProperty("vtime"));
+						lvtime++;
+						setVTime(getLocalId(), lvtime);
 					}
-
-					if(lvtime>flvtime)
-					{
-						flvtime	= lvtime;
-					}
-					else
-					{
-						flvtime	= ++lvtime;
-						props.setProperty("vtime", Integer.toString(lvtime));
-					}
-					
-					vtime	= updateVTime(vtime, cid.getPlatformPrefix(), flvtime);
-					props.setProperty(location, createEntry(file.lastModified(), vtime));
+					ret.updateVTime(getLocalId(), lvtime);
+					props.setProperty(location, createEntry(file.lastModified(), ret.getVTime()));
 					save();				
 				}
 			}
+			
+			// New file -> store at current lvtime.
 			else
 			{
-				int	lvtime	= 0;
-				if(props.containsKey("vtime"))
-				{
-					lvtime	= Integer.parseInt(props.getProperty("vtime"));
-				}
-				vtime	= updateVTime(vtime, cid.getPlatformPrefix(), lvtime);
-				props.setProperty(location, createEntry(file.lastModified(), vtime));
+				ret	= new FileInfo(location, file.isDirectory(), "");
+				ret.updateVTime(getLocalId(), lvtime);
+				props.setProperty(location, createEntry(file.lastModified(), ret.getVTime()));
 				save();				
 			}
-			
-			FileInfo	ret	= new FileInfo(location, file.isDirectory(), vtime);
 			
 			return ret;
 		}
@@ -192,6 +217,32 @@ public class BackupResource
 		{
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Update the file info with e.g. remote information.
+	 *  @param fi	The file info data to be merged with the local state.
+	 */
+	public void	updateFileInfo(FileInfo fi)
+	{
+		long	lastmod	= 0;
+		if(props.containsKey(fi.getLocation()))
+		{
+			Tuple2<Long, String>	entry	= parseEntry(props.getProperty(fi.getLocation()));
+			lastmod	= entry.getFirstEntity().longValue();
+			FileInfo	orig = new FileInfo(fi.getLocation(), false,  entry.getSecondEntity());
+			Map<String, Integer>	vtimes	= orig.getVTimeMap();
+			for(String key: vtimes.keySet())
+			{
+				if(vtimes.get(key).intValue()>fi.getVTime(key))
+				{
+					fi.updateVTime(key, vtimes.get(key).intValue());
+				}
+			}
+		}
+		
+		props.setProperty(fi.getLocation(), createEntry(lastmod, fi.getVTime()));
+		save();
 	}
 	
 	//-------- helper methods --------
@@ -239,81 +290,5 @@ public class BackupResource
 		long	timestamp	= Long.parseLong(entry.substring(0, idx));
 		String	vtime	= entry.substring(idx+1);
 		return new Tuple2<Long, String>(new Long(timestamp), vtime);
-	}
-	
-	/**
-	 *  Get a part of the vector time.
-	 *  @param vtime	The vtime string.
-	 *  @param node	The platform.
-	 *  @return The time.
-	 */
-	protected static int	getVTime(String vtime, String node)
-	{
-		int	ret	= 0;
-		StringBuffer	buf	= new StringBuffer();
-		StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
-		String	last	= null;
-		while(stok.hasMoreTokens())
-		{
-			String	next	= stok.nextToken();
-			buf.append(next);
-			if("@".equals(next) && node.equals(last) && stok.hasMoreTokens())
-			{
-				ret	= Integer.parseInt(stok.nextToken());
-				break;
-			}
-			last	= next;
-		}
-			
-		return ret;
-	}
-	
-	/**
-	 *  Update a part of the vector time.
-	 *  @param vtime	The original vtime string.
-	 *  @param node	The platform.
-	 *  @param time	The time.
-	 *  @return The updated vtime string.
-	 */
-	protected static String	updateVTime(String vtime, String node, int time)
-	{
-		boolean	found	= false;
-		if(vtime!=null)
-		{
-			StringBuffer	buf	= new StringBuffer();
-			StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
-			String	last	= null;
-			while(stok.hasMoreTokens())
-			{
-				String	next	= stok.nextToken();
-				buf.append(next);
-				if("@".equals(next) && node.equals(last) && stok.hasMoreTokens())
-				{
-					found	= true;
-					stok.nextToken();	// skip old time.
-					buf.append(time);	// add new time.
-				}
-				last	= next;
-			}
-			
-			if(!found)
-			{
-				if(buf.length()>0)
-				{
-					buf.append('.');
-				}
-				buf.append(node);
-				buf.append("@");
-				buf.append(time);
-			}
-			
-			vtime	= buf.toString();
-		}
-		else
-		{
-			vtime	= node + "@" + time;
-		}
-		
-		return vtime;
 	}
 }

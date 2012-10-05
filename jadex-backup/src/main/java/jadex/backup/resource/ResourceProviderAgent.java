@@ -2,8 +2,12 @@ package jadex.backup.resource;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.deployment.FileData;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -16,6 +20,9 @@ import jadex.micro.annotation.ProvidedServices;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,12 +32,13 @@ import java.util.List;
 	@Argument(name="dir", clazz=String.class, description="The directory to publish."),
 	@Argument(name="id", clazz=String.class, description="The unique id of the global resource.")
 })
-@ProvidedServices(
-	@ProvidedService(type=IResourceService.class, implementation=@Implementation(expression="$pojoagent"))
-)
+@ProvidedServices({
+	@ProvidedService(type=IResourceService.class, implementation=@Implementation(expression="$pojoagent")),
+	@ProvidedService(type=ILocalResourceService.class, implementation=@Implementation(expression="$pojoagent"))
+})
 @Agent
-@Service
-public class ResourceProviderAgent	implements IResourceService
+@Service(IResourceService.class)
+public class ResourceProviderAgent	implements IResourceService, ILocalResourceService
 {
 	//-------- attributes --------
 	
@@ -49,8 +57,8 @@ public class ResourceProviderAgent	implements IResourceService
 	/** The resource meta information. */
 	protected BackupResource	resource;
 	
-//	/** Future for a scan in progress. */
-//	protected ITerminableFuture<Void>	scan;
+	/** Future for an update in progress. */
+	protected ITerminableIntermediateFuture<FileData>	update;
 	
 	//-------- constructors --------
 	
@@ -91,17 +99,31 @@ public class ResourceProviderAgent	implements IResourceService
 	//-------- IResourceService interface --------
 
 	/**
-	 *  Get the resource id.
-	 *  The resource id is a globally unique id that is
+	 *  Get the global resource id.
+	 *  The global resource id is a unique id that is
 	 *  used to identify the same resource on different
 	 *  hosts, i.e. provided by different service instances.
 	 *  
 	 *  The id is static, i.e. it does not change during
-	 *  the lifetime of the service.
+	 *  the lifetime of the resource.
 	 */
-	public String	getResourceId()
+	public String	getResourceId()	
 	{
 		return resource.getResourceId();
+	}
+	
+	/**
+	 *  Get the local resource id.
+	 *  The local resource id is a unique id that is
+	 *  used to identify an individual instance of a
+	 *  distributed resource on a specific host.
+	 *  
+	 *  The id is static, i.e. it does not change during
+	 *  the lifetime of the resource.
+	 */
+	public String	getLocalId()
+	{
+		return resource.getLocalId();
 	}
 	
 	/**
@@ -126,63 +148,83 @@ public class ResourceProviderAgent	implements IResourceService
 		return new Future<FileInfo[]>(ret==null ? null : ret.toArray(new FileInfo[ret.size()]));
 	}
 	
-	//-------- helper methods --------
 	
-//	/**
-//	 *  Scan the directory and update the meta information.
-//	 */
-//	protected ITerminableFuture<Void>	scan()
-//	{
-//		TerminableFuture<Void>	ret	= new TerminableFuture<Void>();
-//		
-//		List<File>	todo	= new LinkedList<File>();
-//		todo.add(resource.getResourceRoot());
-//		scan(todo, ret);
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Incrementally scan local files and directories.
-//	 */
-//	protected void	scan(final List<File> todo, final TerminableFuture<Void> ret)
-//	{
-//		// Keep processing for 50 milliseconds.
-//		long	start	= System.currentTimeMillis(); 
-//		while(!ret.isDone() && !todo.isEmpty() && System.currentTimeMillis()-start<50)
-//		{
-//			File	next	= todo.remove(0);
-//			if(next.isDirectory())
-//			{
-//				// Todo: meta information about directories.
-//				todo.addAll(Arrays.asList(next.listFiles()));
-//			}
-//			else
-//			{
-//				FileInfo	fi	= resource.getFileInfo(next);
-//				if(fi.getTimeStamp()!=next.lastModified())
-//				{
-//					fi.setTimeStamp(next.lastModified());
-//					resource.setFileInfo(next, fi);
-//				}
-//			}
-//		}
-//		
-//		if(todo.isEmpty())
-//		{
-//			ret.setResultIfUndone(null);
-//		}
-//		else if(!ret.isDone())
-//		{
-//			// Continue after step to stay reactive.
-//			component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-//			{
-//				public IFuture<Void> execute(IInternalAccess ia)
-//				{
-//					scan(todo, ret);
-//					return IFuture.DONE;
-//				}
-//			});
-//		}
-//	}
+	/**
+	 *  Get all changes files and directories since a given time point.
+	 *  @param time	The local vector time point.
+	 *  @return File infos for changed files and directories.
+	 */
+	public IFuture<FileInfo[]>	getChanges(int time)
+	{
+		List<FileInfo>	ret	= new ArrayList<FileInfo>();
+		List<File>	todo	= new LinkedList<File>();
+		todo.add(resource.getResourceRoot());
+		while(!todo.isEmpty())
+		{
+			File	next	= todo.remove(0);
+			if(!".jadexbackup".equals(next.getName()))
+			{
+				FileInfo	fi	= resource.getFileInfo(next);
+				
+				if(fi.getVTime(getLocalId())>time)
+				{
+					ret.add(fi);
+				}
+				
+				if(next.isDirectory())
+				{
+					todo.addAll(Arrays.asList(next.listFiles()));
+				}
+			}
+		}
+		return new Future<FileInfo[]>(ret.toArray(new FileInfo[ret.size()]));
+	}
+	
+	//-------- ILocalResourceService interface --------
+	
+	/**
+	 *  Update the local resource with all
+	 *  changes from the given remote resource.
+	 *  @param remote	The remote resource to synchronize to.
+	 *  @return All changed files and directories that are being processed.
+	 */
+	public ITerminableIntermediateFuture<FileData>	update(final IResourceService remote)
+	{
+		final TerminableIntermediateFuture<FileData>	ret	= new TerminableIntermediateFuture<FileData>();
+		if(update!=null)
+		{
+			ret.setException(new IllegalStateException("Update already running."));
+		}
+		else if(!resource.getResourceId().equals(remote.getResourceId()))
+		{
+			ret.setException(new IllegalArgumentException("Incompatible resource id: "+remote.getResourceId()));			
+		}
+		else
+		{
+			update	= ret;
+			remote.getChanges(resource.getVTime(remote.getLocalId()))
+				.addResultListener(new ExceptionDelegationResultListener<FileInfo[], Collection<FileData>>(ret)
+			{
+				public void customResultAvailable(FileInfo[] result)
+				{
+					int	maxtime	= -1;
+					for(FileInfo fi: result)
+					{
+						ret.addIntermediateResultIfUndone(new FileData(resource.getFile(fi)));
+						maxtime	= Math.max(maxtime, fi.getVTime(remote.getLocalId()));
+						resource.updateFileInfo(fi);
+					}
+					
+					if(maxtime!=-1)
+					{
+						resource.setVTime(remote.getLocalId(), maxtime);
+					}
+					
+					ret.setFinishedIfUndone();
+					update	= null;
+				}
+			});
+		}
+		return ret;
+	}
 }
