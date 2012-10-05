@@ -9,7 +9,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -24,9 +23,10 @@ import jadex.micro.annotation.ProvidedServices;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  A component that publishes a local folder.
@@ -60,8 +60,8 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	/** The resource meta information. */
 	protected BackupResource	resource;
 	
-	/** Future for an update in progress. */
-	protected ITerminableIntermediateFuture<FileData>	update;
+	/** Synchronization requests that are queued or in progress. */
+	protected Map<IResourceService, TerminableIntermediateFuture<FileData>>	updates;
 	
 	//-------- constructors --------
 	
@@ -75,7 +75,6 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 		try
 		{
 			this.resource	= new BackupResource(id, new File(dir), component.getComponentIdentifier());
-//			this.scan	= scan();
 			ret.setResult(null);			
 		}
 		catch(Exception e)
@@ -91,10 +90,13 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	@AgentKilled
 	public void	stop()
 	{
-//		if(scan!=null)
-//		{
-//			scan.terminate();
-//		}
+		if(updates!=null)
+		{
+			for(ITerminableIntermediateFuture<FileData> update: updates.values())
+			{
+				update.terminate();
+			}
+		}
 		
 		resource.dispose();
 	}
@@ -192,57 +194,60 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 */
 	public ITerminableIntermediateFuture<FileData>	updateAll()
 	{
+		final int[]	finished	= new int[2]; // [search_finished, queued_updates]
 		final TerminableIntermediateFuture<FileData>	ret	= new TerminableIntermediateFuture<FileData>();
-		if(update!=null)
+		component.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 		{
-			ret.setException(new IllegalStateException("Update already running."));
-		}
-		else
-		{
-			update	= ret;
-			component.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
+			public void intermediateResultAvailable(IResourceService result)
 			{
-				public void intermediateResultAvailable(IResourceService result)
+				// Synchronize with matching remote resources, but exclude self.
+				if(!ret.isDone() && result.getResourceId().equals(resource.getResourceId())
+					&& !result.getLocalId().equals(resource.getLocalId()))
 				{
-					// Hack !!! allow inner update
-					update	= null;
+					finished[1]++;
 					update(result).addResultListener(new IntermediateDefaultResultListener<FileData>()
 					{
 						public void intermediateResultAvailable(FileData file)
 						{
-							// Hack !!! allow inner update
-							update	= null;
-//							update(result).addResultListener(listener)
+							ret.addIntermediateResultIfUndone(file);
 						}
 						
 						public void finished()
 						{
-							ret.setFinishedIfUndone();
-							update	= null;
+							finished[1]--;
+							checkFinished();
 						}
 		
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setExceptionIfUndone(exception);
-							update	= null;
+							finished[1]--;
+							checkFinished();
 						}
 					});
 				}
-				
-				public void finished()
+			}
+			
+			public void finished()
+			{
+				finished[0]++;
+				checkFinished();
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				finished[0]++;
+				checkFinished();
+			}
+			
+			protected void	checkFinished()
+			{
+				if(finished[0]>0 && finished[1]==0)
 				{
 					ret.setFinishedIfUndone();
-					update	= null;
 				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setExceptionIfUndone(exception);
-					update	= null;
-				}
-			});
-		}
+			}
+		});
 		return ret;
 	}
 
@@ -254,18 +259,39 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 */
 	public ITerminableIntermediateFuture<FileData>	update(final IResourceService remote)
 	{
-		final TerminableIntermediateFuture<FileData>	ret	= new TerminableIntermediateFuture<FileData>();
-		if(update!=null)
+		final TerminableIntermediateFuture<FileData>	ret;
+		if(updates!=null && updates.containsKey(remote))
 		{
-			ret.setException(new IllegalStateException("Update already running."));
-		}
-		else if(!resource.getResourceId().equals(remote.getResourceId()))
-		{
-			ret.setException(new IllegalArgumentException("Incompatible resource id: "+remote.getResourceId()));			
+			ret	= updates.get(remote);
 		}
 		else
 		{
-			update	= ret;
+			ret	= new TerminableIntermediateFuture<FileData>();
+			if(updates==null)
+			{
+				updates	= new LinkedHashMap<IResourceService, TerminableIntermediateFuture<FileData>>();
+			}
+			updates.put(remote, ret);
+			
+			if(updates.size()==1)
+			{
+				startNextUpdate();
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Start a queued update.
+	 */
+	protected void	startNextUpdate()
+	{
+		if(updates!=null && !updates.isEmpty())
+		{
+			final IResourceService	remote	= updates.keySet().iterator().next();
+			final TerminableIntermediateFuture<FileData>	ret	= updates.get(remote);
+			
 			remote.getChanges(resource.getVTime(remote.getLocalId()))
 				.addResultListener(new IResultListener<FileInfo[]>()
 			{
@@ -285,16 +311,21 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 					}
 					
 					ret.setFinishedIfUndone();
-					update	= null;
+					updates.remove(remote);
+					startNextUpdate();
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
 					ret.setExceptionIfUndone(exception);
-					update	= null;
+					updates.remove(remote);
+					startNextUpdate();
 				}
 			});
 		}
-		return ret;
+		else
+		{
+			updates	= null;
+		}
 	}
 }
