@@ -1,5 +1,6 @@
 package jadex.backup.job;
 
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -31,5 +32,6 @@ public interface IJobService
 	/**
 	 *  Subscribe for job news.
 	 */
+	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<JobEvent> subscribe();
 }
