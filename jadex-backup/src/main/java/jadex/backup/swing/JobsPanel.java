@@ -10,6 +10,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 import java.awt.BorderLayout;
@@ -17,26 +18,38 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIDefaults;
 
 /**
  *  The jobs panel shows the current jobs.
  */
 public class JobsPanel extends JPanel
 {
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"delete_job", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/delete_job_16.png")
+	});
+	
 	/**
 	 *  Create a new jobs panel.
 	 */
-	public JobsPanel(IExternalAccess ea)
+	public JobsPanel(final IExternalAccess ea)
 	{
 		setLayout(new BorderLayout());
 		
 		JPanel pan = new JPanel(new GridBagLayout());
 		
-		JTable jobst = new JTable()
+		final JTable jobst = new JTable()
 		{
 			public Dimension getPreferredScrollableViewportSize() 
 			{
@@ -72,6 +85,58 @@ public class JobsPanel extends JPanel
 			}
 		};
 		jobst.setModel(tm);
+		
+		jobst.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				popup(e);
+			}
+			public void mouseReleased(MouseEvent e)
+			{
+				popup(e);
+			}
+			protected void	popup(MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+				{
+					int	row	= jobst.rowAtPoint(e.getPoint());
+					if(row!=-1)
+					{
+						final Job job = (Job)tm.getValueAt(row, -1);
+						JPopupMenu	menu	= new JPopupMenu();
+						menu.add(new AbstractAction("Delete job", icons.getIcon("delete_job"))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								SServiceProvider.getService(ea.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new DefaultResultListener<IJobService>()
+								{
+									public void resultAvailable(IJobService js)
+									{
+										js.removeJob(job.getId()).addResultListener(new DefaultResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+												System.out.println("removed job: "+job);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												exception.printStackTrace();
+												super.exceptionOccurred(exception);
+											}
+										});
+									}
+								});
+							}
+						});
+						
+						menu.show(jobst, e.getX(), e.getY());
+					}
+				}
+			}
+		});
 		
 		// todo: terminate subscription on shutdown
 		

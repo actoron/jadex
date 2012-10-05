@@ -1,10 +1,12 @@
 package jadex.backup.job;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -33,10 +35,24 @@ public class JobService implements IJobService
 	/** The map of jobs (id -> job). */
 	protected Map<String, Job> jobs;
 	
+	/** The job agents. */
+	protected Map<String, IExternalAccess> jobagents;
+	
 	/** The futures of active subscribers. */
 	protected Set<SubscriptionIntermediateFuture<JobEvent>> subscribers;
 
 	//-------- constructors --------
+	
+	/**
+	 *  Called on startup.
+	 */
+	@ServiceStart
+	public IFuture<Void> start()
+	{
+		this.jobs = new LinkedHashMap<String, Job>();
+		this.jobagents = new HashMap<String, IExternalAccess>();
+		return IFuture.DONE;
+	}
 	
 	/**
 	 *  Called on shutdown.
@@ -65,11 +81,6 @@ public class JobService implements IJobService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(jobs==null)
-		{
-			this.jobs = new LinkedHashMap<String, Job>();
-		}
-		
 		jobs.put(job.getId(), job);
 		if(job instanceof SyncJob)
 		{
@@ -77,7 +88,7 @@ public class JobService implements IJobService
 			IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
 			fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				public void customResultAvailable(final IComponentManagementService cms)
 				{
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("dir", sjob.getLocalResource());
@@ -89,10 +100,17 @@ public class JobService implements IJobService
 						public void customResultAvailable(IComponentIdentifier cid) 
 						{
 							System.out.println("created job agent: "+cid);
-							
-							publishEvent(new JobEvent(JobEvent.JOB_ADDED, sjob));
-							
-							ret.setResult(null);
+							cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+							{
+								public void customResultAvailable(IExternalAccess result) 
+								{
+									jobagents.put(sjob.getId(), result);
+									
+									publishEvent(new JobEvent(JobEvent.JOB_ADDED, sjob));
+									
+									ret.setResult(null);
+								}
+							});
 						}
 					});
 				}
@@ -106,18 +124,25 @@ public class JobService implements IJobService
 	 *  Remove a job.
 	 *  @param jobid The job id.
 	 */
-	public IFuture<Void> removeJob(String jobid)
+	public IFuture<Void> removeJob(final String jobid)
 	{
-		// todo: kill agent
+		final Future<Void> ret = new Future<Void>();
 		
-		Job job = jobs.remove(jobid);
-		
-		if(job!=null)
+		IExternalAccess ea = jobagents.get(jobid);
+		if(ea!=null)
 		{
-			publishEvent(new JobEvent(JobEvent.JOB_REMOVED, job));
+			ea.killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+			{
+				public void customResultAvailable(Map<String, Object> result)
+				{
+					Job job = jobs.remove(jobid);
+					publishEvent(new JobEvent(JobEvent.JOB_REMOVED, job));
+					ret.setResult(null);
+				}
+			});
 		}
 		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**
