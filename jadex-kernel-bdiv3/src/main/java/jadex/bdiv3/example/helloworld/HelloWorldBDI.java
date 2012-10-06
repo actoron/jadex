@@ -41,7 +41,7 @@ public class HelloWorldBDI
 	public void body()
 	{
 		sayhello = "Hello BDI agent V3.";
-//		System.out.println("body end");
+		System.out.println("body end: "+getClass().getName());
 	}
 	
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))

@@ -122,9 +122,13 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				if(exception instanceof RuntimeException)
+				{
 					throw (RuntimeException)exception;
+				}
 				else
+				{
 					throw new RuntimeException(exception);
+				}
 			}
 		}));
 	}
@@ -145,9 +149,13 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				if(exception instanceof RuntimeException)
+				{
 					throw (RuntimeException)exception;
+				}
 				else
+				{
 					throw new RuntimeException(exception);
+				}
 			}
 		}));
 	}

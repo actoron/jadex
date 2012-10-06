@@ -431,7 +431,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		if(model.endsWith("agent.xml"))
+//		if(model.endsWith("BDI.class"))
 //			System.out.println("isLoadable: "+model);
 
 		final Future<Boolean> ret = new Future<Boolean>();

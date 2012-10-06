@@ -4,6 +4,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
@@ -127,6 +128,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// Evaluate condition before executing step.
 		if(rulesystem!=null)
 			rulesystem.processAllEvents();
+		
+//		if(steps!=null && steps.size()>0)
+//		{
+//			System.out.println("steps: "+steps.size()+" "+SUtil.arrayToString(steps.get(0)));
+//		}
 		
 		return super.executeStep();
 	}

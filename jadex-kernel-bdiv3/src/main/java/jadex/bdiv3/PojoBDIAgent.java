@@ -1,18 +1,27 @@
 package jadex.bdiv3;
 
+import jadex.bridge.IConnection;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgentInterpreter;
+import jadex.micro.MicroModel;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.AgentStreamArrived;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -40,12 +49,23 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 	
 	//-------- interface methods --------
 	
+	//-------- interface methods --------
+	
 	/**
 	 *  Called once after agent creation.
 	 */
 	public IFuture<Void> agentCreated()
 	{
-		return invokeMethod(AgentCreated.class, null);
+		final Future<Void> ret = new Future<Void>();
+		invokeMethod(AgentCreated.class, null).addResultListener(
+			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+		{
+			public void customResultAvailable(Tuple2<Method, Object> result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
 	}
 		
 	/**
@@ -54,13 +74,43 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
-		return invokeMethod(AgentBody.class, null);
-//		.addResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//			}
-//		});
+		final Future<Void> ret = new Future<Void>();
+		
+		invokeMethod(AgentBody.class, null)
+			.addResultListener(interpreter.createResultListener(
+				new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+		{
+			public void customResultAvailable(Tuple2<Method, Object> res)
+			{
+				// Only end body if future or void and kill is true 
+				Boolean found = null;
+				
+				Method method = res!=null? res.getFirstEntity(): null;
+				
+				if(method!=null)
+				{
+					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					{
+						found = Boolean.TRUE;
+					}
+					else if(void.class.equals(method.getReturnType()))
+					{
+						AgentBody ab = method.getAnnotation(AgentBody.class);
+						found = ab.keepalive()? Boolean.FALSE: Boolean.TRUE;
+					}
+				}
+				else
+				{
+					Agent ag = agent.getClass().getAnnotation(Agent.class);
+					found = ag.keepalive()? Boolean.FALSE: Boolean.TRUE;
+				}
+				
+				if(found.booleanValue())
+					ret.setResult(null);
+			}
+		}));
+		
+		return ret;
 	}
 
 	/**
@@ -70,13 +120,53 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 	 */
 	public void messageArrived(Map msg, MessageType mt)
 	{
-		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(new DefaultResultListener()
+		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(
+			interpreter.createResultListener(new IResultListener<Tuple2<Method, Object>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Tuple2<Method, Object> result)
 			{
 			}
-		});
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof RuntimeException)
+				{
+					throw (RuntimeException)exception;
+				}
+				else
+				{
+					throw new RuntimeException(exception);
+				}
+			}
+		}));
 	}
+	
+	/**
+	 *  Called, whenever a message is received.
+	 *  @param msg The message.
+	 *  @param mt The message type.
+	 */
+	public void streamArrived(IConnection con)
+	{
+		invokeMethod(AgentStreamArrived.class, new Object[]{con}).addResultListener(
+			interpreter.createResultListener(new IResultListener<Tuple2<Method, Object>>()
+		{
+			public void resultAvailable(Tuple2<Method, Object> result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof RuntimeException)
+				{
+					throw (RuntimeException)exception;
+				}
+				else
+				{
+					throw new RuntimeException(exception);
+				}
+			}
+		}));
+	}
+
 
 	/**
 	 *  Called just before the agent is removed from the platform.
@@ -84,7 +174,50 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 	 */
 	public IFuture<Void> agentKilled()
 	{
-		return invokeMethod(AgentKilled.class, null);
+		final Future<Void> ret = new Future<Void>();
+		invokeMethod(AgentKilled.class, null).addResultListener(
+			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
+		{
+			public void customResultAvailable(Tuple2<Method, Object> result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Test if the agent's execution is currently at one of the
+	 *  given breakpoints. If yes, the agent will be suspended by
+	 *  the platform.
+	 *  Available breakpoints can be specified in the
+	 *  micro agent meta info.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		boolean ret = false;
+		
+		MicroModel mm = getInterpreter().getMicroModel();
+		if(mm.getBreakpointMethod()!=null)
+		{
+			try
+			{
+				Object res = mm.getBreakpointMethod().invoke(agent, new Object[]{breakpoints});
+				ret = ((Boolean)res).booleanValue();
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -100,15 +233,16 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 	 *  Invoke double methods.
 	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
-	protected IFuture invokeMethod(Class annotation, Object[] args)
+	protected IFuture<Tuple2<Method, Object>> invokeMethod(Class<? extends Annotation> annotation, Object[] args)
 	{
-		final Future ret = new Future();
+		final Future<Tuple2<Method, Object>> ret = new Future<Tuple2<Method, Object>>();
 		
 		Method[] methods = agent.getClass().getMethods();
 		boolean found = false;
 		
 		for(int i=0; i<methods.length && !found; i++)
 		{
+			final Method method = methods[i];
 			if(methods[i].isAnnotationPresent(annotation))
 			{
 				found = true;
@@ -118,15 +252,24 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 					if(res instanceof IFuture)
 					{
 						((IFuture)res).addResultListener(createResultListener(
-							new DelegationResultListener(ret)));
+							new ExceptionDelegationResultListener<Object, Tuple2<Method, Object>>(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								ret.setResult(new Tuple2<Method, Object>(method, result));
+							}
+						}
+						));
 					}
 					else
 					{
-						ret.setResult(null);
+						ret.setResult(new Tuple2<Method, Object>(method, res));
 					}
 				}
 				catch(Exception e)
 				{
+					e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
+						.getCause() instanceof Exception? ((InvocationTargetException)e).getCause(): e);
 					ret.setException(e);
 					break;
 				}
@@ -148,8 +291,7 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 					if(methods[i].isAnnotationPresent(annotation))
 					{
 						found = true;
-						ret.setException(new RuntimeException(
-							"Method must be declared public: "+methods[i]));
+						ret.setException(new RuntimeException("Method must be declared public: "+methods[i]));
 						break;
 					}
 				}
