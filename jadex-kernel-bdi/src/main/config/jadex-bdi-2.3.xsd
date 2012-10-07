@@ -1,51 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-2.3.xsd">
-		<xs:group name="comptypegroup">
-			<xs:all>
-				<xs:element name="imports" type="imports" minOccurs="0"/>
-				<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
-				<xs:element name="services" type="services" minOccurs="0"/>
-				<xs:element name="properties" type="properties" minOccurs="0"/>
-				<xs:element name="configurations" type="configurations" minOccurs="0"/>
-				<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
-				<xs:element name="capabilities" type="MCapabilityBase" minOccurs="0"/>
-				<xs:element name="beliefs" type="MBeliefbase" minOccurs="0"/>
-				<xs:element name="goals" type="MGoalbase" minOccurs="0"/>
-				<xs:element name="plans" type="MPlanbase" minOccurs="0"/>
-				<xs:element name="events" type="MEventbase" minOccurs="0"/>
-				<xs:element name="expressions" type="MExpressionbase" minOccurs="0"/>
-			</xs:all>
-		</xs:group>
-		<xs:group name="configgroup">
-			<xs:all>
-				<xs:element name="components" type="configcomponents" minOccurs="0"/>
-				<xs:element name="services" type="configservices" minOccurs="0"/>
-				<xs:element name="extensions" type="extensions" minOccurs="0"/>
-				<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0">
-					<xs:key name="config_capability_name">
-						<xs:selector xpath="jadex:initialcapability"/>
-						<xs:field xpath="@ref"/>
-					</xs:key>
-				</xs:element>
-				<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0">
-					<xs:unique name="config_belief_name">
-						<xs:selector xpath="jadex:initialbelief|jadex:initialbeliefset"/>
-						<xs:field xpath="@ref"/>
-					</xs:unique>
-					<xs:unique name="config_belief_cref">
-						<xs:selector xpath="jadex:initialbelief|jadex:initialbeliefset"/>
-						<xs:field xpath="@cref"/>
-					</xs:unique>
-				</xs:element>
-				<xs:element name="goals" type="MConfigGoalbase" minOccurs="0"/>
-				<xs:element name="plans" type="MConfigPlanbase" minOccurs="0"/>
-				<xs:element name="events" type="MConfigEventbase" minOccurs="0"/>
-			</xs:all>
-		</xs:group>
-		<!-- Hack!!! The following combined restriction/extension is actually not valid XSD but works for eclipse XML editor. -->
-	</xs:redefine>
-	<xs:element name="agent" type="componenttype">
+	<xs:include schemaLocation="http://jadex.sourceforge.net/jadex-component-2.3.xsd"/>
+	
+	<xs:element name="agent" type="agenttype">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
 		</xs:annotation>
@@ -297,6 +254,105 @@
 		<!-- key references in configurations -->
 		<!-- copied from jadex-component.xsd, prefixed with 'capa_' to avoid name clashes. -->
 	</xs:element>
+	
+	<!-- the following declarations are copied and altered from component.xsd -->
+	<xs:complexType name="agenttype">
+		<xs:annotation>
+			<xs:documentation>An agent type specifies the interface, the structure, content and behavior of an agent.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="startabletype">
+				<xs:all>
+					<xs:element name="imports" type="imports" minOccurs="0"/>
+					<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
+					<xs:element name="services" type="services" minOccurs="0"/>
+					<xs:element name="properties" type="properties" minOccurs="0"/>
+					<xs:element name="configurations" type="aconfigurations" minOccurs="0"/>
+					<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
+					<xs:element name="capabilities" type="MCapabilityBase" minOccurs="0"/>
+					<xs:element name="beliefs" type="MBeliefbase" minOccurs="0"/>
+					<xs:element name="goals" type="MGoalbase" minOccurs="0"/>
+					<xs:element name="plans" type="MPlanbase" minOccurs="0"/>
+					<xs:element name="events" type="MEventbase" minOccurs="0"/>
+					<xs:element name="expressions" type="MExpressionbase" minOccurs="0"/>
+				</xs:all>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="package" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- just copied to refer to new aconfiguration type -->
+	<xs:complexType name="aconfigurations">
+		<xs:annotation>
+			<xs:documentation>
+In the configurations section, predefined
+ component configurations (i.e. component
+				instances) can be defined.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="configuration" type="aconfiguration" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						A predefined component
+						configuration.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:key name="aconfig_argument_name">
+					<xs:selector xpath="jadex:arguments/jadex:argument"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
+				<xs:key name="aconfig_providedservice_key">
+					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+					<xs:field xpath="@name|@class"/>
+				</xs:key>
+				<xs:unique name="aconfig_providedservice_name">
+					<xs:selector xpath="jadex:services/jadex:providedservice"/>
+					<xs:field xpath="@name"/>
+				</xs:unique>
+				<xs:key name="aconfig_requiredservice_name">
+					<xs:selector xpath="jadex:services/jadex:requiredservice"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
+				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="aconfiguration">
+		<xs:annotation>
+			<xs:documentation>A predefined application configuration.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="startabletype">
+				<xs:all>
+					<xs:element name="components" type="configcomponents" minOccurs="0"/>
+					<xs:element name="services" type="configservices" minOccurs="0"/>
+					<xs:element name="extensions" type="extensions" minOccurs="0"/>
+					<xs:element name="capabilities" type="MConfigCapabilitybase" minOccurs="0">
+						<xs:key name="config_capability_name">
+							<xs:selector xpath="jadex:initialcapability"/>
+							<xs:field xpath="@ref"/>
+						</xs:key>
+					</xs:element>
+					<xs:element name="beliefs" type="MConfigBeliefbase" minOccurs="0">
+						<xs:unique name="config_belief_name">
+							<xs:selector xpath="jadex:initialbelief|jadex:initialbeliefset"/>
+							<xs:field xpath="@ref"/>
+						</xs:unique>
+						<xs:unique name="config_belief_cref">
+							<xs:selector xpath="jadex:initialbelief|jadex:initialbeliefset"/>
+							<xs:field xpath="@cref"/>
+						</xs:unique>
+					</xs:element>
+					<xs:element name="goals" type="MConfigGoalbase" minOccurs="0"/>
+					<xs:element name="plans" type="MConfigPlanbase" minOccurs="0"/>
+					<xs:element name="events" type="MConfigEventbase" minOccurs="0"/>
+				</xs:all>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
 	<xs:complexType name="MCapabilityBase">
 		<xs:annotation>
 			<xs:documentation>In the capabilities section arbitrary many capabilities can be declared. The functionality of a capability can be used within the agent resp. capability.</xs:documentation>
@@ -318,15 +374,22 @@
 		<xs:annotation>
 			<xs:documentation>Base type for a capability.</xs:documentation>
 		</xs:annotation>
-		<xs:complexContent>
-			<xs:restriction base="componenttype">
-				<xs:group ref="comptypegroup"/>
-				<xs:attribute name="suspend" use="prohibited"/>
-				<xs:attribute name="master" use="prohibited"/>
-				<xs:attribute name="autoshutdown" use="prohibited"/>
-				<xs:attribute name="daemon" use="prohibited"/>
-			</xs:restriction>
-		</xs:complexContent>
+		<xs:all>
+			<xs:element name="imports" type="imports" minOccurs="0"/>
+			<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
+			<xs:element name="services" type="services" minOccurs="0"/>
+			<xs:element name="properties" type="properties" minOccurs="0"/>
+			<xs:element name="configurations" type="aconfigurations" minOccurs="0"/>
+			<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
+			<xs:element name="capabilities" type="MCapabilityBase" minOccurs="0"/>
+			<xs:element name="beliefs" type="MBeliefbase" minOccurs="0"/>
+			<xs:element name="goals" type="MGoalbase" minOccurs="0"/>
+			<xs:element name="plans" type="MPlanbase" minOccurs="0"/>
+			<xs:element name="events" type="MEventbase" minOccurs="0"/>
+			<xs:element name="expressions" type="MExpressionbase" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="package" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="MBeliefbase">
 		<xs:annotation>

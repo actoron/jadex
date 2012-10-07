@@ -53,23 +53,21 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="startabletype">
-				<xs:group ref="comptypegroup"/>
+				<!-- When adding something here, also add to BDI schema! -->
+				<xs:all>
+					<xs:element name="imports" type="imports" minOccurs="0"/>
+					<xs:element name="arguments" type="arguments" minOccurs="0"/>
+					<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
+					<xs:element name="services" type="services" minOccurs="0"/>
+					<xs:element name="properties" type="properties" minOccurs="0"/>
+					<xs:element name="configurations" type="configurations" minOccurs="0"/>
+					<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
+				</xs:all>
 				<xs:attribute name="name" type="xs:string" use="required"/>
 				<xs:attribute name="package" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:group name="comptypegroup">
-		<xs:all>
-			<xs:element name="imports" type="imports" minOccurs="0"/>
-			<xs:element name="arguments" type="arguments" minOccurs="0"/>
-			<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
-			<xs:element name="services" type="services" minOccurs="0"/>
-			<xs:element name="properties" type="properties" minOccurs="0"/>
-			<xs:element name="configurations" type="configurations" minOccurs="0"/>
-			<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
-		</xs:all>
-	</xs:group>
 	<xs:complexType name="imports">
 		<xs:annotation>
 			<xs:documentation>
@@ -225,20 +223,18 @@ In this section, specifications for extensions as required
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="startabletype">
-				<xs:group ref="configgroup"/>
+				<!-- When adding something here, also add to BDI schema! -->
+				<xs:all>
+					<xs:element name="arguments" type="configarguments" minOccurs="0"/>
+					<xs:element name="components" type="configcomponents" minOccurs="0"/>
+					<xs:element name="services" type="configservices" minOccurs="0"/>
+					<xs:element name="extensions" type="extensions" minOccurs="0"/>
+					<xs:element name="steps" type="configsteps" minOccurs="0"/>
+				</xs:all>
 				<xs:attribute name="name" type="xs:string" use="required"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:group name="configgroup">
-		<xs:all>
-			<xs:element name="arguments" type="configarguments" minOccurs="0"/>
-			<xs:element name="components" type="configcomponents" minOccurs="0"/>
-			<xs:element name="services" type="configservices" minOccurs="0"/>
-			<xs:element name="extensions" type="extensions" minOccurs="0"/>
-			<xs:element name="steps" type="configsteps" minOccurs="0"/>
-		</xs:all>
-	</xs:group>
 	<xs:complexType name="configarguments">
 		<xs:annotation>
 			<xs:documentation>Container for overridden arguments.</xs:documentation>
