@@ -356,16 +356,16 @@ public class RealDataExtractor {
 		SimulationDescription sd = of.createSimulationDescription();
 		TimeSlices timeSlices = of.createSimulationDescriptionTimeSlices();
 
-		// int overallRun = 0;
-		// for (List<Rental> rentals : rentalsByHour.values()) {
-		// overallRun += rentals.size();
-		// }
-
-		int maxRun = 0;
+		int overallRun = 0;
 		for (List<Rental> rentals : rentalsByHour.values()) {
-			if (maxRun < rentals.size())
-				maxRun = rentals.size();
+			overallRun += rentals.size();
 		}
+
+		// int maxRun = 0;
+		// for (List<Rental> rentals : rentalsByHour.values()) {
+		// if (maxRun < rentals.size())
+		// maxRun = rentals.size();
+		// }
 
 		for (Integer hour : rentalsByHour.keySet()) {
 			List<Rental> rentals = rentalsByHour.get(hour);
@@ -422,8 +422,8 @@ public class RealDataExtractor {
 			timeSlice.setStartTime(hour * 60);
 			timeSlice.setOffset(60);
 			timeSlice.setRunTotal(rentals.size());
-			// double runRelative = (double) rentals.size() / (double) overallRun;
-			double runRelative = (double) rentals.size() / (double) maxRun;
+			double runRelative = (double) rentals.size() / (double) overallRun;
+			// double runRelative = (double) rentals.size() / (double) maxRun;
 			timeSlice.setRunRelative(runRelative);
 
 			ProbabilitiesForStations probabilitiesForStations = of.createTimeSliceProbabilitiesForStations();
