@@ -28,10 +28,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -324,9 +324,9 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 			final IResourceService	remote	= updates.keySet().iterator().next();
 			final TerminableIntermediateFuture<BackupEvent>	ret	= updates.get(remote);
 
-			List<String>	stack	= new LinkedList<String>();
+			List<String>	stack	= new ArrayList<String>();
 			stack.add("/");
-			doUpdate(remote, ret, stack, new LinkedHashMap<String, List<String>>());
+			doUpdate(remote, ret, stack, new ArrayList<List<String>>());
 		}
 		else
 		{
@@ -337,9 +337,9 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	/**
 	 *  Incrementally update the resource.
 	 */
-	protected void	doUpdate(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final Map<String, List<String>> tree)
+	protected void	doUpdate(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final List<List<String>> subdirs)
 	{
-		System.out.println("+++do update: "+stack+", "+tree);
+		System.out.println("+++do update: "+stack+", "+subdirs);
 		
 		// All done.
 		if(stack.isEmpty())
@@ -349,32 +349,35 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 			startNextUpdate();
 		}
 		
-		// Select next subdirectory from list in tree
-		else if(tree.containsKey(stack.get(0)))
+		// Select next sub element from list
+		else if(stack.size()==subdirs.size())
 		{
+			List<String>	files	= subdirs.get(subdirs.size()-1);
+			
 			// No more subdirectories -> pop empty list from stack
-			if(tree.get(stack.get(0)).isEmpty())
+			if(files.isEmpty())
 			{
-				tree.remove(stack.get(0));
-				String file	= stack.remove(0);
+				subdirs.remove(subdirs.size()-1);
+				String file	= stack.remove(stack.size()-1);
 				ret.addIntermediateResult(new BackupEvent("synchronized", new FileData(resource.getFile(file)), -1));
 			}
 			
 			// Remove first element from list and push on stack.
 			else
 			{
-				String	file	= tree.get(stack.get(0)).remove(0);
-				stack.add(0, file);
+				String	file	= files.remove(files.size()-1);
+				String	parent	= stack.get(stack.size()-1);
+				stack.add("/".equals(parent) ? parent + file : parent + "/" + file);
 				ret.addIntermediateResult(new BackupEvent("synchronizing", new FileData(resource.getFile(file)), -1));
 			}
-			doUpdate(remote, ret, stack, tree);
+			doUpdate(remote, ret, stack, subdirs);
 		}
 		
 		// New top entry in stack -> do update and push sub directories (if any). 
 		else
 		{
-			final String	next	= stack.get(0);
-			tree.put(next, new LinkedList<String>());	// Add empty list to be filled with children or indicating that processing is done.
+			final String	next	= stack.get(stack.size()-1);
+			subdirs.add(new ArrayList<String>());	// Add empty list to be filled with children or indicating that processing is done.
 			remote.getFileInfo(next).addResultListener(new IResultListener<FileInfo>()
 			{
 				public void resultAvailable(FileInfo result)
@@ -386,11 +389,11 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 						{
 							if(result.isDirectory())
 							{
-								updateDirectory(remote, ret, stack, tree, result);
+								updateDirectory(remote, ret, stack, subdirs, result);
 							}
 							else
 							{
-								updateFile(remote, ret, stack, tree, result);
+								updateFile(remote, ret, stack, subdirs, result);
 							}
 						}
 //						else
@@ -407,7 +410,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 				public void exceptionOccurred(Exception exception)
 				{
 					ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(resource.getFile(next)), -1));
-					doUpdate(remote, ret, stack, tree);
+					doUpdate(remote, ret, stack, subdirs);
 				}
 			});
 		}		
@@ -416,7 +419,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	/**
 	 *  Update a directory.
 	 */
-	protected void	updateDirectory(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final Map<String, List<String>> tree, final FileInfo dir)
+	protected void	updateDirectory(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final List<List<String>> subdirs, final FileInfo dir)
 	{
 		final File	fdir	= resource.getFile(dir.getLocation());
 		fdir.mkdirs();
@@ -425,16 +428,14 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 		{
 			public void resultAvailable(String[] result)
 			{
-				// Hack!!! continue sync also on error.
-				tree.get(dir.getLocation()).addAll(Arrays.asList(result));
-				
 				// Todo: delete missing files
 				try
 				{
 					// Todo: update only after subtree sync completed.
 					resource.updateFileInfo(dir);
+					subdirs.get(subdirs.size()-1).addAll(Arrays.asList(result));
 					ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
-					doUpdate(remote, ret, stack, tree);
+					doUpdate(remote, ret, stack, subdirs);
 				}
 				catch(Exception e)
 				{
@@ -445,7 +446,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(fdir), -1));
-				doUpdate(remote, ret, stack, tree);
+				doUpdate(remote, ret, stack, subdirs);
 			}
 		});
 	}
@@ -453,7 +454,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	/**
 	 *  Update a file.
 	 */
-	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final Map<String, List<String>> tree, final FileInfo fi)
+	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final List<List<String>> subdirs, final FileInfo fi)
 	{
 		final File	file	= resource.getFile(fi.getLocation());
 		ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 0));
@@ -463,7 +464,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 			{
 				try
 				{
-					File	tmp	= resource.getTempLocation(fi.getLocation(), remote);
+					final File	tmp	= resource.getTempLocation(fi.getLocation(), remote);
 					FileOutputStream	fos	= new FileOutputStream(tmp);
 					result.writeToOutputStream(fos, component.getExternalAccess()).addResultListener(new IIntermediateResultListener<Long>()
 					{
@@ -474,8 +475,19 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 						
 						public void finished()
 						{
-							ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
-							doUpdate(remote, ret, stack, tree);
+							try
+							{
+								resource.updateFileInfo(fi);
+								File	orig	= resource.getFile(fi.getLocation());
+								orig.delete();
+								tmp.renameTo(orig);
+								ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
+								doUpdate(remote, ret, stack, subdirs);
+							}
+							catch(Exception e)
+							{
+								exceptionOccurred(e);
+							}
 						}
 						
 						public void resultAvailable(Collection<Long> result)
@@ -486,7 +498,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 						public void exceptionOccurred(Exception exception)
 						{
 							ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
-							doUpdate(remote, ret, stack, tree);
+							doUpdate(remote, ret, stack, subdirs);
 						}
 					});
 				}
@@ -499,7 +511,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
-				doUpdate(remote, ret, stack, tree);
+				doUpdate(remote, ret, stack, subdirs);
 			}
 		});
 	}

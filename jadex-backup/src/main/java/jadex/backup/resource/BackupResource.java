@@ -217,22 +217,23 @@ public class BackupResource
 	 */
 	public void	checkForConflicts(FileInfo fi)
 	{
-		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
-		{
-			throw new RuntimeException("Found conflict with: "+getLocalId());
-		}
-			
-		if(props.containsKey(fi.getLocation()))
-		{
-			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
-			for(String key: vtimes.keySet())
-			{
-				if(vtimes.get(key).intValue()>fi.getVTime(key))
-				{
-					throw new RuntimeException("Found conflict with: "+key);
-				}
-			}
-		}
+		// Hack!!! continue sync also on error.
+//		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
+//		{
+//			throw new RuntimeException("Found conflict with: "+getLocalId());
+//		}
+//			
+//		if(props.containsKey(fi.getLocation()))
+//		{
+//			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
+//			for(String key: vtimes.keySet())
+//			{
+//				if(vtimes.get(key).intValue()>fi.getVTime(key))
+//				{
+//					throw new RuntimeException("Found conflict with: "+key);
+//				}
+//			}
+//		}
 	}
 	
 	/**
