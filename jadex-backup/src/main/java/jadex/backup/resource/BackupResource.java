@@ -2,13 +2,13 @@ package jadex.backup.resource;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -70,7 +70,6 @@ public class BackupResource
 			}
 			props.setProperty("id", id);
 			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3));
-			setVTime(getLocalId(), 0);
 			save();
 		}
 	}
@@ -125,40 +124,12 @@ public class BackupResource
 
 	/**
 	 *  Get the file for a file info.
-	 *  @param fi	The file info.
+	 *  @param location	The resource-relative file location.
 	 *  @return The local file.
 	 */
-	public File	getFile(FileInfo fi)
+	public File	getFile(String location)
 	{
-		return new File(root, fi.getLocation().replace('/', File.separatorChar));
-	}
-	
-	/**
-	 *  Get the last known-to-be-synchronized vector time of a node.
-	 *  @param node	The local resource id of the node.
-	 *  @return	The time point. 
-	 */
-	public int	getVTime(String node)
-	{
-		int	ret	= 0;
-		String	vtimekey	= "vtime_"+node;
-		if(props.containsKey(vtimekey))
-		{
-			ret	= Integer.parseInt(props.getProperty(vtimekey));
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Set the last known-to-be-synchronized vector time of a node.
-	 *  @param node	The local resource id of the node.
-	 *  @param time	The time point.
-	 */
-	public void	setVTime(String node, int time)
-	{
-		String	vtimekey	= "vtime_"+node;
-		props.setProperty(vtimekey, Integer.toString(time));
-		save();				
+		return new File(root, location.replace('/', File.separatorChar));
 	}
 	
 	/**
@@ -179,35 +150,26 @@ public class BackupResource
 			}
 			String	location	= rpath.equals(fpath) ? "/" : fpath.substring(rpath.length()).replace(File.separatorChar, '/');
 
-			int	lvtime	= getVTime(getLocalId());
-			
 			// Existing file -> check for change.
 			if(props.containsKey(location))
 			{
-				Tuple2<Long, String>	entry	= parseEntry(props.getProperty(location));
-				ret	= new FileInfo(location, file.isDirectory(),  entry.getSecondEntity());
+				ret	= new FileInfo(location, file.isDirectory(), file.isDirectory() ? 0 : file.length(), props.getProperty(location));
 				
 				// File changed -> increment local vector time point to indicate changes.
-				if(file.lastModified()!=entry.getFirstEntity().longValue())
+				if(file.lastModified()>ret.getVTime(getLocalId()))
 				{
-					// Same as biggest local time -> increment both.
-					if(lvtime == ret.getVTime(getLocalId()))
-					{
-						lvtime++;
-						setVTime(getLocalId(), lvtime);
-					}
-					ret.updateVTime(getLocalId(), lvtime);
-					props.setProperty(location, createEntry(file.lastModified(), ret.getVTime()));
+					ret.updateVTime(getLocalId(), file.lastModified());
+					props.setProperty(location, ret.getVTime());
 					save();				
 				}
 			}
 			
-			// New file -> store at current lvtime.
+			// New file -> store at current time.
 			else
 			{
-				ret	= new FileInfo(location, file.isDirectory(), "");
-				ret.updateVTime(getLocalId(), lvtime);
-				props.setProperty(location, createEntry(file.lastModified(), ret.getVTime()));
+				ret	= new FileInfo(location, file.isDirectory(), file.isDirectory() ? 0 : file.length(), "");
+				ret.updateVTime(getLocalId(), file.lastModified());
+				props.setProperty(location, ret.getVTime());
 				save();				
 			}
 			
@@ -220,28 +182,68 @@ public class BackupResource
 	}
 	
 	/**
-	 *  Update the file info with e.g. remote information.
-	 *  @param fi	The file info data to be merged with the local state.
+	 *  Check if the resource needs to be updated when compared to the given time stamps.
+	 *  @param fi	The file info data to be compared with the local state.
+	 *  @return	True, when the local file needs updating.
+	 *  @throws Exception when a conflict was found.
 	 */
-	public void	updateFileInfo(FileInfo fi)
+	public boolean	needsUpdate(FileInfo fi)
 	{
-		long	lastmod	= 0;
+		boolean	update	= true;
+		
 		if(props.containsKey(fi.getLocation()))
 		{
-			Tuple2<Long, String>	entry	= parseEntry(props.getProperty(fi.getLocation()));
-			lastmod	= entry.getFirstEntity().longValue();
-			FileInfo	orig = new FileInfo(fi.getLocation(), false,  entry.getSecondEntity());
-			Map<String, Integer>	vtimes	= orig.getVTimeMap();
+			update	= false;
+			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
+			for(Iterator<String> it=vtimes.keySet().iterator(); !update && it.hasNext(); )
+			{
+				String	key	= it.next();
+				update	= fi.getVTime(key)>vtimes.get(key).longValue();
+			}
+		}
+		
+		if(update && getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
+		{
+			throw new RuntimeException("Found conflict: "+fi.getLocation());
+		}
+		
+		return update;
+	}
+
+	/**
+	 *  Check if some newer local time stamp exists when compared to the given time stamps.
+	 *  @param fi	The file info data to be compared with the local state.
+	 *  @throws Exception when a conflict was found.
+	 */
+	public void	checkForConflicts(FileInfo fi)
+	{
+		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
+		{
+			throw new RuntimeException("Found conflict with: "+getLocalId());
+		}
+			
+		if(props.containsKey(fi.getLocation()))
+		{
+			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
 			for(String key: vtimes.keySet())
 			{
 				if(vtimes.get(key).intValue()>fi.getVTime(key))
 				{
-					fi.updateVTime(key, vtimes.get(key).intValue());
+					throw new RuntimeException("Found conflict with: "+key);
 				}
 			}
 		}
-		
-		props.setProperty(fi.getLocation(), createEntry(lastmod, fi.getVTime()));
+	}
+	
+	/**
+	 *  Update the file info with e.g. remote information.
+	 *  @param fi	The file info data to be merged with the local state.
+	 *  @throws Exception when a conflict was found.
+	 */
+	public void	updateFileInfo(FileInfo fi)
+	{
+		checkForConflicts(fi);
+		props.setProperty(fi.getLocation(), fi.getVTime());
 		save();
 	}
 	
@@ -265,30 +267,5 @@ public class BackupResource
 			// todo: deal with errors.
 			e.printStackTrace();
 		}
-	}
-	
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Create a file entry.
-	 *  @param timestamp	The current file time stamp.
-	 *  @param vtime	The vector time string.
-	 */
-	protected static String	createEntry(long timestamp, String vtime)
-	{
-		return timestamp + "." + vtime;
-	}
-	
-	/**
-	 *  Parse a file entry.
-	 *  @return A tuple containing the local time stamp and the vector time string.
-	 */
-	protected static Tuple2<Long, String>	parseEntry(String entry)
-	{
-		int	idx	= entry.indexOf('.');
-		long	timestamp	= Long.parseLong(entry.substring(0, idx));
-		String	vtime	= entry.substring(idx+1);
-		return new Tuple2<Long, String>(new Long(timestamp), vtime);
 	}
 }

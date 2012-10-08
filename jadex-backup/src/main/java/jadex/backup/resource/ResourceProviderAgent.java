@@ -1,5 +1,6 @@
 package jadex.backup.resource;
 
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -21,7 +22,8 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -61,7 +63,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	protected BackupResource	resource;
 	
 	/** Synchronization requests that are queued or in progress. */
-	protected Map<IResourceService, TerminableIntermediateFuture<FileData>>	updates;
+	protected Map<IResourceService, TerminableIntermediateFuture<BackupEvent>>	updates;
 	
 	//-------- constructors --------
 	
@@ -92,7 +94,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	{
 		if(updates!=null)
 		{
-			for(ITerminableIntermediateFuture<FileData> update: updates.values())
+			for(ITerminableIntermediateFuture<BackupEvent> update: updates.values())
 			{
 				update.terminate();
 			}
@@ -132,59 +134,63 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	}
 	
 	/**
-	 *  Get information about local files.
+	 *  Get information about a local file or directory.
+	 *  @param file	The resource path of the file.
+	 *  @return	The file info with all known time stamps.
 	 */
-	public IFuture<FileInfo[]>	getFiles(FileInfo dir)
+	public IFuture<FileInfo>	getFileInfo(String file)
 	{
-		List<FileInfo>	ret	= null;
-		File	fdir	= resource.getFile(dir);
-//		if(fdir.lastModified()>dir.getTimeStamp())
-		{
-			ret	= new ArrayList<FileInfo>();
-			for(String file: fdir.list())
-			{
-				FileInfo	fi	= resource.getFileInfo(new File(fdir, file));
-				if(!".jadexbackup".equals(file))
-				{
-					ret.add(fi);
-				}
-			}
-		}
-		return new Future<FileInfo[]>(ret==null ? null : ret.toArray(new FileInfo[ret.size()]));
+		return new Future<FileInfo>(resource.getFileInfo(resource.getFile(file)));
 	}
-	
 	
 	/**
-	 *  Get all changes files and directories since a given time point.
-	 *  @param time	The local vector time point.
-	 *  @return File infos for changed files and directories.
+	 *  Get the contents of a directory.
+	 *  @param dir	The file info of the directory.
+	 *  @return	A list of plain file names (i.e. without path).
+	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<FileInfo[]>	getChanges(int time)
+	public IFuture<String[]>	getDirectoryContents(FileInfo dir)
 	{
-		List<FileInfo>	ret	= new ArrayList<FileInfo>();
-		List<File>	todo	= new LinkedList<File>();
-		todo.add(resource.getResourceRoot());
-		while(!todo.isEmpty())
+		Future<String[]>	ret	= new Future<String[]>();
+		try
 		{
-			File	next	= todo.remove(0);
-			if(!".jadexbackup".equals(next.getName()))
+			File	fdir	= resource.getFile(dir.getLocation());
+			if(!fdir.isDirectory())
 			{
-				FileInfo	fi	= resource.getFileInfo(next);
-				
-				if(fi.getVTime(getLocalId())>time)
-				{
-					ret.add(fi);
-				}
-				
-				if(next.isDirectory())
-				{
-					todo.addAll(Arrays.asList(next.listFiles()));
-				}
+				throw new IllegalArgumentException("Not a directory: "+dir.getLocation());
 			}
+			String[]	list = fdir.list(new FilenameFilter()
+			{
+				public boolean accept(File dir, String name)
+				{
+					return !".jadexbackup".equals(name);
+				}
+			});
+			if(list==null)
+			{
+				throw new IOException("Could not read directory: "+dir.getLocation());
+			}
+			resource.checkForConflicts(dir);	// fail if modified in mean time.
+			ret.setResult(list);
 		}
-		return new Future<FileInfo[]>(ret.toArray(new FileInfo[ret.size()]));
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
 	}
 	
+	/**
+	 *  Get the contents of a file.
+	 *  @param file	The file info of the file.
+	 *  @return	A list of plain file names (i.e. without path).
+	 *  @throws Exception if the supplied file info is outdated.
+	 */
+	public IFuture<IInputConnection>	getFileContents(FileInfo dir)
+	{
+		return new Future<IInputConnection>(new UnsupportedOperationException("todo"));
+	}
+
 	//-------- ILocalResourceService interface --------
 	
 	/**
@@ -192,10 +198,10 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 *  changes from all available remote resource.
 	 *  @return All changed files and directories that are being processed.
 	 */
-	public ITerminableIntermediateFuture<FileData>	updateAll()
+	public ITerminableIntermediateFuture<BackupEvent>	updateAll()
 	{
 		final int[]	finished	= new int[2]; // [search_finished, queued_updates]
-		final TerminableIntermediateFuture<FileData>	ret	= new TerminableIntermediateFuture<FileData>();
+		final TerminableIntermediateFuture<BackupEvent>	ret	= new TerminableIntermediateFuture<BackupEvent>();
 		component.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 		{
@@ -206,9 +212,9 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 					&& !result.getLocalId().equals(resource.getLocalId()))
 				{
 					finished[1]++;
-					update(result).addResultListener(new IntermediateDefaultResultListener<FileData>()
+					update(result).addResultListener(new IntermediateDefaultResultListener<BackupEvent>()
 					{
-						public void intermediateResultAvailable(FileData file)
+						public void intermediateResultAvailable(BackupEvent file)
 						{
 							ret.addIntermediateResultIfUndone(file);
 						}
@@ -257,19 +263,19 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 *  @param remote	The remote resource to synchronize to.
 	 *  @return All changed files and directories that are being processed.
 	 */
-	public ITerminableIntermediateFuture<FileData>	update(final IResourceService remote)
+	public ITerminableIntermediateFuture<BackupEvent>	update(final IResourceService remote)
 	{
-		final TerminableIntermediateFuture<FileData>	ret;
+		final TerminableIntermediateFuture<BackupEvent>	ret;
 		if(updates!=null && updates.containsKey(remote))
 		{
 			ret	= updates.get(remote);
 		}
 		else
 		{
-			ret	= new TerminableIntermediateFuture<FileData>();
+			ret	= new TerminableIntermediateFuture<BackupEvent>();
 			if(updates==null)
 			{
-				updates	= new LinkedHashMap<IResourceService, TerminableIntermediateFuture<FileData>>();
+				updates	= new LinkedHashMap<IResourceService, TerminableIntermediateFuture<BackupEvent>>();
 			}
 			updates.put(remote, ret);
 			
@@ -290,42 +296,126 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 		if(updates!=null && !updates.isEmpty())
 		{
 			final IResourceService	remote	= updates.keySet().iterator().next();
-			final TerminableIntermediateFuture<FileData>	ret	= updates.get(remote);
+			final TerminableIntermediateFuture<BackupEvent>	ret	= updates.get(remote);
 			
-			remote.getChanges(resource.getVTime(remote.getLocalId()))
-				.addResultListener(new IResultListener<FileInfo[]>()
-			{
-				public void resultAvailable(FileInfo[] result)
-				{
-					int	maxtime	= -1;
-					for(FileInfo fi: result)
-					{
-						ret.addIntermediateResultIfUndone(new FileData(resource.getFile(fi)));
-						maxtime	= Math.max(maxtime, fi.getVTime(remote.getLocalId()));
-						resource.updateFileInfo(fi);
-					}
-					
-					if(maxtime!=-1)
-					{
-						resource.setVTime(remote.getLocalId(), maxtime);
-					}
-					
-					ret.setFinishedIfUndone();
-					updates.remove(remote);
-					startNextUpdate();
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setExceptionIfUndone(exception);
-					updates.remove(remote);
-					startNextUpdate();
-				}
-			});
+			List<String>	todo	= new LinkedList<String>();
+			todo.add("/");
+			doUpdate(remote, ret, todo);
 		}
 		else
 		{
 			updates	= null;
 		}
+	}
+	
+	/**
+	 *  Incrementally update the resource.
+	 */
+	protected void	doUpdate(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> todo)
+	{
+		if(todo.isEmpty())
+		{
+			ret.setFinishedIfUndone();
+			updates.remove(remote);
+			startNextUpdate();
+		}
+		else
+		{
+			final String	next	= todo.remove(0);
+			ret.addIntermediateResult(new BackupEvent("synchronizing", new FileData(resource.getFile(next)), -1));
+			remote.getFileInfo(next).addResultListener(new IResultListener<FileInfo>()
+			{
+				public void resultAvailable(FileInfo result)
+				{
+					try
+					{
+						if(resource.needsUpdate(result))
+						{
+							if(result.isDirectory())
+							{
+								updateDirectory(remote, ret, todo, result);
+							}
+							else
+							{
+								updateFile(remote, ret, todo, result);
+							}
+						}
+						else
+						{
+							ret.addIntermediateResult(new BackupEvent("synchronized", new FileData(resource.getFile(next)), -1));
+							doUpdate(remote, ret, todo);
+						}
+					}
+					catch(Exception e)
+					{
+						exceptionOccurred(e);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(resource.getFile(next)), -1));
+					doUpdate(remote, ret, todo);
+				}
+			});
+		}		
+	}
+	
+	/**
+	 *  Update a directory.
+	 */
+	protected void	updateDirectory(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> todo, final FileInfo dir)
+	{
+		final File	fdir	= resource.getFile(dir.getLocation());
+		fdir.mkdirs();
+		ret.addIntermediateResult(new BackupEvent("updating", new FileData(fdir), -1));
+		remote.getDirectoryContents(dir).addResultListener(new IResultListener<String[]>()
+		{
+			public void resultAvailable(String[] result)
+			{
+				// Todo: delete missing files
+				try
+				{
+					resource.updateFileInfo(dir);
+					ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
+					todo.addAll(Arrays.asList(result));
+					doUpdate(remote, ret, todo);
+				}
+				catch(Exception e)
+				{
+					exceptionOccurred(e);
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(fdir), -1));
+				doUpdate(remote, ret, todo);
+			}
+		});
+	}
+	
+	/**
+	 *  Update a file.
+	 */
+	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> todo, final FileInfo fi)
+	{
+		final File	file	= resource.getFile(fi.getLocation());
+		ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 0));
+		remote.getFileContents(fi).addResultListener(new IResultListener<IInputConnection>()
+		{
+			public void resultAvailable(IInputConnection result)
+			{
+				// Todo: update files
+				ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
+				doUpdate(remote, ret, todo);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
+				doUpdate(remote, ret, todo);
+			}
+		});
 	}
 }

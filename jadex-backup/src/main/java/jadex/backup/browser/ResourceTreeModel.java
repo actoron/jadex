@@ -7,7 +7,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -171,28 +170,29 @@ public class ResourceTreeModel	implements TreeModel
 					ret	= new ArrayList<Object>();
 					for(IResourceService l: found)
 					{
-						FileInfo	fi	= new FileInfo();
-						fi.setLocation("/");
-						fi.setDirectory(true);
-						ret.add(new Tuple2<FileInfo, IResourceService>(fi, l));
+						ret.add(new Tuple2<String, IResourceService>("/", l));
 					}
 				}			
 			}
 				
-			// Subnodes are a tuple of file info and resource service.
+			// Subnodes are a tuple of path and resource service.
 			else if(node instanceof Tuple2)
 			{
 				ret	= new ArrayList<Object>();
 				final Tuple2<?,?>	res	= (Tuple2<?,?>)node;
-				FileInfo	fi	= (FileInfo)res.getFirstEntity();
-				IFuture<FileInfo[]>	fut	= ((IResourceService)res.getSecondEntity()).getFiles(fi);
+				String	path	= (String)res.getFirstEntity();
+				IResourceService	remote	= (IResourceService)res.getSecondEntity();
 				try
 				{
 					// Hack!!! Block swing thread until results are available
-					FileInfo[]	fis	= fut.get(new ThreadSuspendable(), 3000);
-					for(FileInfo tmp : fis)
+					FileInfo	fi	= remote.getFileInfo(path).get(new ThreadSuspendable(), 3000);
+					if(fi.isDirectory())
 					{
-						ret.add(new Tuple2<FileInfo, IResourceService>(tmp, (IResourceService)res.getSecondEntity()));
+						String[]	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
+						for(String tmp : list)
+						{
+							ret.add(new Tuple2<String, IResourceService>(tmp, remote));
+						}
 					}
 				}
 				catch(TimeoutException e)

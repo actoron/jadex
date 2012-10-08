@@ -1,17 +1,15 @@
 package jadex.backup;
 
+import jadex.backup.resource.BackupEvent;
 import jadex.backup.resource.ILocalResourceService;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
-
-import java.io.File;
 
 /**
  *  Starter class for Jadex Backup.
@@ -47,12 +45,12 @@ public class JadexBackup
 		ILocalResourceService	local	= SServiceProvider.getService(platform.getServiceProvider(),
 			ILocalResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
 		
-		IIntermediateFuture<FileData>	files	= local.updateAll();
-		files.addResultListener(new IntermediateDefaultResultListener<FileData>()
+		IIntermediateFuture<BackupEvent>	files	= local.updateAll();
+		files.addResultListener(new IntermediateDefaultResultListener<BackupEvent>()
 		{
-			public void intermediateResultAvailable(FileData result)
+			public void intermediateResultAvailable(BackupEvent result)
 			{
-				System.out.println("Update: "+new File(result.getPath()).getAbsolutePath());
+				System.out.println(result);
 			}
 		});
 		files.get(sus);

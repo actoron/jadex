@@ -19,11 +19,11 @@ public class FileInfo
 	/** True, if the file is a directory. */
 	protected boolean	directory;
 	
-	/** The vector time ("platform1@time1.platform2@time2..."). */
-	protected String	vtime;
+	/** The file size. */
+	protected long	size;
 	
-	/** The cached vector times as map (not transferred). */
-	protected Map<String, Integer>	vtimes;
+	/** The cached vector times as map (transferred as string "platform1@time1.platform2@time2..."). */
+	protected Map<String, Long>	vtimes;
 	
 	//-------- constructors --------
 	
@@ -38,11 +38,12 @@ public class FileInfo
 	/**
 	 *  Create a file info.
 	 */
-	public FileInfo(String location, boolean directory, String vtime)
+	public FileInfo(String location, boolean directory, long size, String vtime)
 	{
 		this.location	= location;
 		this.directory	= directory;
-		this.vtime	= vtime;
+		this.size	= size;
+		this.vtimes	= parseVTime(vtime);
 	}
 	
 	//-------- bean accessors --------
@@ -84,11 +85,27 @@ public class FileInfo
 	}
 	
 	/**
+	 *  Get the file size.
+	 */
+	public long	getSize()
+	{
+		return size;
+	}
+	
+	/**
+	 *  Set the file size.
+	 */
+	public void	setSize(long size)
+	{
+		this.size	= size;
+	}
+
+	/**
 	 *  Get the vector time.
 	 */
 	public String	getVTime()
 	{
-		return vtime;
+		return vtimesToString(vtimes);
 	}
 	
 	/**
@@ -96,7 +113,7 @@ public class FileInfo
 	 */
 	public void	setVTime(String vtime)
 	{
-		this.vtime	= vtime;
+		this.vtimes	= parseVTime(vtime);
 	}
 
 	//-------- methods --------
@@ -106,9 +123,9 @@ public class FileInfo
 	 *  @param node	The platform.
 	 *  @return The time.
 	 */
-	public int	getVTime(String node)
+	public long	getVTime(String node)
 	{
-		return getVTimeMap().containsKey(node) ? getVTimeMap().get(node).intValue() : 0;
+		return vtimes.containsKey(node) ? vtimes.get(node).longValue() : 0;
 	}
 	
 	/**
@@ -116,13 +133,39 @@ public class FileInfo
 	 *  @param vtime	The original vtime string.
 	 *  @param node	The platform.
 	 *  @param time	The time.
-	 *  @return The updated vtime string.
 	 */
-	public String	updateVTime(String node, int time)
+	public void	updateVTime(String node, long time)
 	{
-		Map<String, Integer>	vtimes	= getVTimeMap();
-		vtimes.put(node, new Integer(time));
-		
+		vtimes.put(node, new Long(time));
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get the vector time as map.
+	 */
+	protected static Map<String, Long>	parseVTime(String vtime)
+	{
+		Map<String, Long>	vtimes	= new LinkedHashMap<String, Long>();
+		StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
+		String	last	= null;
+		while(stok.hasMoreTokens())
+		{
+			String	next	= stok.nextToken();
+			if("@".equals(next) && stok.hasMoreTokens())
+			{
+				vtimes.put(last, new Long(Long.parseLong(stok.nextToken())));
+			}
+			last	= next;
+		}
+		return vtimes;
+	}
+	
+	/**
+	 *  Get the vector time as string.
+	 */
+	protected static String	vtimesToString(Map<String, Long> vtimes)
+	{
 		StringBuffer	buf	= new StringBuffer();
 		for(String key: vtimes.keySet())
 		{
@@ -134,34 +177,6 @@ public class FileInfo
 			buf.append("@");
 			buf.append(vtimes.get(key));
 		}
-		setVTime(buf.toString());
-		
-		return getVTime();
-	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Get the vector time as map.
-	 */
-	protected Map<String, Integer>	getVTimeMap()
-	{
-		if(vtimes==null)
-		{
-			vtimes	= new LinkedHashMap<String, Integer>();
-			StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
-			String	last	= null;
-			while(stok.hasMoreTokens())
-			{
-				String	next	= stok.nextToken();
-				if("@".equals(next) && stok.hasMoreTokens())
-				{
-					vtimes.put(last, new Integer(Integer.parseInt(stok.nextToken())));
-				}
-				last	= next;
-			}
-		}
-		return vtimes;
-		
+		return buf.toString();
 	}
 }

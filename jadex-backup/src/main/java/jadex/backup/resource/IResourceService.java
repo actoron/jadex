@@ -1,5 +1,6 @@
 package jadex.backup.resource;
 
+import jadex.bridge.IInputConnection;
 import jadex.commons.future.IFuture;
 
 /**
@@ -30,16 +31,25 @@ public interface IResourceService
 	public String	getLocalId();
 	
 	/**
-	 *  Get information about local files.
-	 *  Only provide information if newer than the provided info.
-	 *  @param dir	The directory to be queried.
+	 *  Get information about a local file or directory.
+	 *  @param file	The resource path of the file.
+	 *  @return	The file info with all known time stamps.
 	 */
-	public IFuture<FileInfo[]>	getFiles(FileInfo dir);
+	public IFuture<FileInfo>	getFileInfo(String file);
 	
 	/**
-	 *  Get all changes files and directories since a given time point.
-	 *  @param time	The local vector time point.
-	 *  @return File infos for changed files and directories.
+	 *  Get the contents of a directory.
+	 *  @param dir	The file info of the directory.
+	 *  @return	A list of plain file names (i.e. without path).
+	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<FileInfo[]>	getChanges(int time);
+	public IFuture<String[]>	getDirectoryContents(FileInfo dir);
+	
+	/**
+	 *  Get the contents of a file.
+	 *  @param file	The file info of the file.
+	 *  @return	A list of plain file names (i.e. without path).
+	 *  @throws Exception if the supplied file info is outdated.
+	 */
+	public IFuture<IInputConnection>	getFileContents(FileInfo dir);
 }

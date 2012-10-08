@@ -3,7 +3,6 @@ package jadex.bridge;
 import java.io.OutputStream;
 
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 
 
 /**

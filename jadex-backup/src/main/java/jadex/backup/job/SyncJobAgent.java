@@ -1,5 +1,6 @@
 package jadex.backup.job;
 
+import jadex.backup.resource.BackupEvent;
 import jadex.backup.resource.ILocalResourceService;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
@@ -8,11 +9,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -110,9 +110,20 @@ public class SyncJobAgent
 			{
 				final IComponentStep<Void> self = this;
 				System.out.println("initiating sync");
-				resser.updateAll().addResultListener(new IResultListener<Collection<FileData>>()
+				resser.updateAll().addResultListener(new IIntermediateResultListener<BackupEvent>()
 				{
-					public void resultAvailable(Collection<FileData> result)
+					public void intermediateResultAvailable(BackupEvent result)
+					{
+						System.out.println(result);
+					}
+					
+					public void finished()
+					{
+						System.out.println("finished sync");
+						agent.waitForDelay(60000, self);
+					}
+					
+					public void resultAvailable(Collection<BackupEvent> result)
 					{
 						System.out.println("finished sync");
 						agent.waitForDelay(60000, self);
