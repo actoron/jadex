@@ -1,5 +1,8 @@
-package jadex.bdiv3;
+package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.PojoBDIAgent;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -102,10 +105,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
-		List<Class> goals = ((BDIModel)model).getGoals();
+		List<MGoal> goals = ((BDIModel)model).getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
-			rulesystem.observeObject(goals.get(i));
+			rulesystem.observeObject(goals.get(i).getTarget());
 		}
 		
 		return ret;

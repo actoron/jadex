@@ -4,6 +4,11 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -80,7 +85,7 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	protected void fillBDIModelFromAnnotations(BDIModel micromodel, String model, final Class cma, ClassLoader classloader)
 	{
-		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
+//		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
 //		System.out.println("todo: read bdi");
 		
@@ -89,7 +94,7 @@ public class BDIClassReader extends MicroClassReader
 //		List<Class> goals = new ArrayList<Class>();
 //		List<Method> plans = new ArrayList<Method>();
 		
-		Class cl = cma;
+		Class<?> cl = cma;
 		while(cl!=null && !cl.equals(Object.class) && !cl.equals(BDIAgent.class))
 		{
 			Field[] fields = cl.getDeclaredFields();
@@ -98,7 +103,7 @@ public class BDIClassReader extends MicroClassReader
 				if(fields[i].isAnnotationPresent(Belief.class))
 				{
 //					System.out.println("found belief: "+fields[i].getName());
-					micromodel.addBelief(fields[i]);
+					micromodel.addBelief(new MBelief(fields[i]));
 //					beliefs.add(fields[i]);
 					beliefnames.add(fields[i].getName());
 				}
@@ -110,14 +115,21 @@ public class BDIClassReader extends MicroClassReader
 				if(methods[i].isAnnotationPresent(Plan.class))
 				{
 //					System.out.println("found plan: "+methods[i].getName());
-					micromodel.addPlan(methods[i]);
+					MTrigger tr = new MTrigger();
 					Plan p = methods[i].getAnnotation(Plan.class);
 					Trigger trigger = p.trigger();
-					Class[] gs = trigger.goals();
+					Class<?>[] gs = trigger.goals();
 					for(int j=0; j<gs.length; j++)
 					{
-						micromodel.addGoal(gs[j]);
+						MGoal mgoal = new MGoal(gs[j]);
+						tr.addGoal(mgoal);
+						if(!micromodel.getGoals().contains(mgoal))
+						{
+							micromodel.addGoal(mgoal);
+						}
 					}
+					MPlan mplan = new MPlan(methods[i], tr);
+					micromodel.addPlan(mplan);
 				}
 			}
 			

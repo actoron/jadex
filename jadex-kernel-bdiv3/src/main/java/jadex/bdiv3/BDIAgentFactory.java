@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;

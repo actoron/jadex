@@ -15,6 +15,5 @@ public @interface Trigger
 	/**
 	 *  The description.
 	 */
-	public Class[] goals() default {};
-
+	public Class<?>[] goals() default {};
 }

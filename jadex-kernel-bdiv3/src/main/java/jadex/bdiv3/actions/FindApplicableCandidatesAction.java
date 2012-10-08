@@ -1,15 +1,15 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.BDIAgentInterpreter;
-import jadex.bdiv3.BDIModel;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.APL;
+import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.IPojoMicroAgent;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 
  */
-public class FindApplicableCandidatesAction implements IAction
+public class FindApplicableCandidatesAction implements IAction<Void>
 {
 	/** The processable element. */
 	protected Object element;
@@ -53,8 +53,8 @@ public class FindApplicableCandidatesAction implements IAction
 		BDIModel bdimodel = ip.getBDIModel();
 		
 		// todo: support other elements than goals
-		List<Method> applicables = getApplicableMPlansForGoal(element.getClass(), bdimodel);
-		IAction<Void> action = new SelectCandidatesAction(element, applicables);
+		APL apl = getApplicableMPlansForGoal(element.getClass(), bdimodel);
+		IAction<Void> action = new SelectCandidatesAction(element, apl);
 		ia.getExternalAccess().scheduleStep(action);
 		ret.setResult(null);
 		
@@ -64,17 +64,17 @@ public class FindApplicableCandidatesAction implements IAction
 	/**
 	 * 
 	 */
-	public static List<Method> getApplicableMPlansForGoal(Class element, BDIModel bdimodel)
+	public static APL getApplicableMPlansForGoal(Class<?> element, BDIModel bdimodel)
 	{
-		List<Method> ret = new ArrayList<Method>();
+		List<MPlan> ret = new ArrayList<MPlan>();
 		
-		List<Method> mplans = bdimodel.getPlans();
+		List<MPlan> mplans = bdimodel.getPlans();
 		for(int i=0; i<mplans.size(); i++)
 		{
-			Method mplan = mplans.get(i);
-			Plan aplan = mplan.getAnnotation(Plan.class);
+			MPlan mplan = mplans.get(i);
+			Plan aplan = mplan.getTarget().getAnnotation(Plan.class);
 			Trigger atrigger = aplan.trigger();
-			Class[] mgoals = atrigger.goals();
+			Class<?>[] mgoals = atrigger.goals();
 			for(int j=0; j<mgoals.length; j++)
 			{
 //				Goal g = mgoals[j].getAnnotation(Goal.class);
@@ -85,6 +85,6 @@ public class FindApplicableCandidatesAction implements IAction
 			}
 		}
 		
-		return ret;
+		return new APL(ret);
 	}
 }

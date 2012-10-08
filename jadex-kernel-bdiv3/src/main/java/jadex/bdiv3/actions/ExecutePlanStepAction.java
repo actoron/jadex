@@ -49,6 +49,9 @@ public class ExecutePlanStepAction implements IAction<Void>
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
+		// problem plan context for steps needed that allows to know
+		// when a plan has completed 
+		
 		Future<Void> ret = new Future<Void>();
 		try
 		{

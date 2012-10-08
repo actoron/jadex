@@ -1,10 +1,8 @@
-package jadex.bdiv3;
+package jadex.bdiv3.model;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.micro.MicroModel;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +11,11 @@ import java.util.List;
  */
 public class BDIModel extends MicroModel
 {
-	List<Field> beliefs = new ArrayList<Field>();
+	protected List<MBelief> beliefs = new ArrayList<MBelief>();
 
-	List<Class> goals = new ArrayList<Class>();
+	protected List<MGoal> goals = new ArrayList<MGoal>();
 	
-	List<Method> plans = new ArrayList<Method>();
+	protected List<MPlan> plans = new ArrayList<MPlan>();
 	
 	/**
 	 *  Create a new model.
@@ -31,7 +29,7 @@ public class BDIModel extends MicroModel
 	 *  Get the beliefs.
 	 *  @return The beliefs.
 	 */
-	public List<Field> getBeliefs()
+	public List<MBelief> getBeliefs()
 	{
 		return beliefs;
 	}
@@ -40,7 +38,7 @@ public class BDIModel extends MicroModel
 	 *  Set the beliefs.
 	 *  @param beliefs The beliefs to set.
 	 */
-	public void setBeliefs(List<Field> beliefs)
+	public void setBeliefs(List<MBelief> beliefs)
 	{
 		this.beliefs = beliefs;
 	}
@@ -48,10 +46,10 @@ public class BDIModel extends MicroModel
 	/**
 	 *  Add a belief.
 	 */
-	public void addBelief(Field belief)
+	public void addBelief(MBelief belief)
 	{
 		if(beliefs==null)
-			beliefs = new ArrayList<Field>();
+			beliefs = new ArrayList<MBelief>();
 		beliefs.add(belief);
 	}
 	
@@ -59,7 +57,7 @@ public class BDIModel extends MicroModel
 	 *  Get the goals.
 	 *  @return The goals.
 	 */
-	public List<Class> getGoals()
+	public List<MGoal> getGoals()
 	{
 		return goals;
 	}
@@ -68,7 +66,7 @@ public class BDIModel extends MicroModel
 	 *  Set the goals.
 	 *  @param goals The goals to set.
 	 */
-	public void setGoals(List<Class> goals)
+	public void setGoals(List<MGoal> goals)
 	{
 		this.goals = goals;
 	}
@@ -76,10 +74,10 @@ public class BDIModel extends MicroModel
 	/**
 	 *  Add a goal.
 	 */
-	public void addGoal(Class goal)
+	public void addGoal(MGoal goal)
 	{
 		if(goals==null)
-			goals = new ArrayList<Class>();
+			goals = new ArrayList<MGoal>();
 		goals.add(goal);
 	}
 
@@ -87,7 +85,7 @@ public class BDIModel extends MicroModel
 	 *  Get the plans.
 	 *  @return The plans.
 	 */
-	public List<Method> getPlans()
+	public List<MPlan> getPlans()
 	{
 		return plans;
 	}
@@ -96,7 +94,7 @@ public class BDIModel extends MicroModel
 	 *  Set the plans.
 	 *  @param plans The plans to set.
 	 */
-	public void setPlans(List<Method> plans)
+	public void setPlans(List<MPlan> plans)
 	{
 		this.plans = plans;
 	}
@@ -104,10 +102,10 @@ public class BDIModel extends MicroModel
 	/**
 	 *  Add a plan.
 	 */
-	public void addPlan(Method plan)
+	public void addPlan(MPlan plan)
 	{
 		if(plans==null)
-			plans = new ArrayList<Method>();
+			plans = new ArrayList<MPlan>();
 		plans.add(plan);
 	}
 }

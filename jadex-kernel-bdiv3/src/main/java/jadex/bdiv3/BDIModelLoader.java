@@ -1,5 +1,6 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.AbstractModelLoader;

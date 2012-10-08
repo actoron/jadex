@@ -1,7 +1,7 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

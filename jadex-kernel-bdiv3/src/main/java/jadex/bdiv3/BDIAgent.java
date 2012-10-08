@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import java.lang.reflect.Field;
 
 import jadex.bdiv3.actions.AdoptGoalAction;
+import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;

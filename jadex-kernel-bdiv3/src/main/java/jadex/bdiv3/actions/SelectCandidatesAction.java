@@ -1,6 +1,8 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.APL;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,15 +20,15 @@ public class SelectCandidatesAction implements IAction<Void>
 	protected Object element;
 	
 	/** The processable element. */
-	protected List<Method> candidates;
+	protected APL apl;
 	
 	/**
 	 *  Create a new action.
 	 */
-	public SelectCandidatesAction(Object element, List<Method> candidates)
+	public SelectCandidatesAction(Object element, APL apl)
 	{
 		this.element = element;
-		this.candidates = candidates;
+		this.apl = apl;
 	}
 	
 	/**
@@ -47,11 +49,12 @@ public class SelectCandidatesAction implements IAction<Void>
 	{
 		Future<Void> ret = new Future<Void>();
 
-		if(candidates!=null && candidates.size()>0)
+		Object cand = apl.getNextCandidate();
+		if(cand!=null)
 		{
 //			IAction<Void> action = new ExecutePlanStepAction(ia instanceof IPojoMicroAgent? 
 //				((IPojoMicroAgent)ia).getPojoAgent(): ia, candidates.get(0));
-			IAction<Void> action = new ExecutePlanStepAction(element, candidates.get(0));
+			IAction<Void> action = new ExecutePlanStepAction(element, ((MPlan)cand).getTarget());
 			ia.getExternalAccess().scheduleStep(action);
 			ret.setResult(null);
 		}
