@@ -61,6 +61,10 @@ public class BackupResource
 			FileInputStream	fips	= new FileInputStream(fprops);
 			props.load(fips);
 			fips.close();
+			if(getResourceId()==null || !getResourceId().equals(id))
+			{
+				throw new RuntimeException("Local resource already exists with different global id.");
+			}
 		}
 		else
 		{
@@ -191,7 +195,8 @@ public class BackupResource
 	{
 		boolean	update	= true;
 		
-		if(props.containsKey(fi.getLocation()))
+		// Hack!!! always update root for testing.
+		if(!"/".equals(fi.getLocation()) && props.containsKey(fi.getLocation()))
 		{
 			update	= false;
 			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
