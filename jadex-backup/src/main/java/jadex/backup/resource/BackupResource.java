@@ -202,10 +202,11 @@ public class BackupResource
 			}
 		}
 		
-		if(update && getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
-		{
-			throw new RuntimeException("Found conflict: "+fi.getLocation());
-		}
+		// Hack!!! continue sync also on error.
+//		if(update && getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
+//		{
+//			throw new RuntimeException("Found conflict: "+fi.getLocation());
+//		}
 		
 		return update;
 	}

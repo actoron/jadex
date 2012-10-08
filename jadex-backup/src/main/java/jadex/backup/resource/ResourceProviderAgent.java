@@ -384,8 +384,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 				{
 					try
 					{
-						// Hack!!! update always (for testing)
-//						if(resource.needsUpdate(result))
+						if(resource.needsUpdate(result))
 						{
 							if(result.isDirectory())
 							{
@@ -396,10 +395,10 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 								updateFile(remote, ret, stack, subdirs, result);
 							}
 						}
-//						else
-//						{
-//							doUpdate(remote, ret, stack, tree);
-//						}
+						else
+						{
+							doUpdate(remote, ret, stack, subdirs);
+						}
 					}
 					catch(Exception e)
 					{
