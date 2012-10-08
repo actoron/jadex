@@ -93,7 +93,9 @@ public class ResourceTreeModel	implements TreeModel
 	 */
 	public boolean isLeaf(Object node)
 	{
-		return node instanceof Tuple2 && ((Tuple2<?,?>)node).getFirstEntity()!=null && !((FileInfo)((Tuple2<?,?>)node).getFirstEntity()).isDirectory();
+		List<Object>	children	= fetchChildren(node);
+		return children.isEmpty();
+//		return node instanceof Tuple2 && ((Tuple2<?,?>)node).getFirstEntity()!=null && !((FileInfo)((Tuple2<?,?>)node).getFirstEntity()).isDirectory();
 	}
 	
 	/**
