@@ -78,7 +78,7 @@ public class SyncJobPanel extends JPanel
 		if(!editable)
 		{
 			pp = new PropertiesPanel("Sync Job Details");
-			pp.createTextField("Name: ", getName());
+			pp.createTextField("Name: ", job.getName());
 			pp.createTextField("Id: ", job.getId());
 			pp.createTextField("Local Ressource: ", job.getLocalResource());
 			pp.createTextField("Global Ressource: ", job.getGlobalResource());
