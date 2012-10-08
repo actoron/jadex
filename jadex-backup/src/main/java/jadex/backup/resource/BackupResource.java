@@ -247,6 +247,16 @@ public class BackupResource
 		save();
 	}
 	
+	/**
+	 *  Get a temporary location for downloading a file.
+	 *  @param path	The resource location.
+	 *  @param remote	The download source.
+	 */
+	public File	getTempLocation(String path, IResourceService remote)
+	{
+		return new File(root, remote.getLocalId()+"_"+path.replace('/', '_'));
+	}
+	
 	//-------- helper methods --------
 
 	/**
