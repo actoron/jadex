@@ -336,7 +336,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			props.put("stock", station.getNumberOfBikes());
 
 			space.createSpaceObject("bikestation", props, null);
-			System.out.println("Create Station: " + x + "," + y);
+//			System.out.println("Create Station: " + x + "," + y);
 		}
 		
 		//put it here, so it can be reused within the application without the need to parse again

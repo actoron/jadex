@@ -62,11 +62,11 @@ public class RuntimeManagerPlan extends Plan {
 	 * External access of the application that is executed and observed by this agent
 	 */
 	private IExternalAccess exta = null;
-//	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);										
-	private IClockService clockservice = null;//(IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
+	// private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+	private IClockService clockservice = null;// (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 	private IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
-	private int localExperimentCounter = -1;	
+	private int localExperimentCounter = -1;
 	private long callerID = -1;
 	private String directoryPath = null;
 
@@ -78,23 +78,23 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Get local id for this experiment to be conducted and increment counter
 		localExperimentCounter = (Integer) getBeliefbase().getBelief("experimentCounter").getFact();
-		getBeliefbase().getBelief("experimentCounter").setFact(localExperimentCounter+1);
-			
-		//init mapping between calling service and the executed experiment. needed in order to be able to execute experiments in parallel.
-		HashMap<Long,Integer>callerExperimentReference = (HashMap<Long,Integer>)getBeliefbase().getBelief("callerExperimentReference").getFact();
+		getBeliefbase().getBelief("experimentCounter").setFact(localExperimentCounter + 1);
+
+		// init mapping between calling service and the executed experiment. needed in order to be able to execute experiments in parallel.
+		HashMap<Long, Integer> callerExperimentReference = (HashMap<Long, Integer>) getBeliefbase().getBelief("callerExperimentReference").getFact();
 		callerExperimentReference.put(callerID, localExperimentCounter);
 		getBeliefbase().getBelief("callerExperimentReference").setFact(callerExperimentReference);
 
 		HashMap<String, Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
-		
+
 		// extract and persist *.configuration.xml and *.application.xml
 		InvestigationConfiguration investigationConf = prepareXMLFiles(clientConfMap);
 
 		// SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler
 		// .parseXMLFromString((String) clientConfMap.get(Constants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
-//		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		// cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		cms = (IComponentManagementService) getScope().getServiceContainer().getRequiredService("cms").get(this);
-				
+
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, investigationConf);
 		System.out.println("#RumtimeManagerPlan- InvestigationFramework# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
 				+ clientConfMap.get(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION));
@@ -107,21 +107,31 @@ public class RuntimeManagerPlan extends Plan {
 		// Time determines termination
 		if (investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTerminationTime() != null) {
 
-//			Time time = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
 			TerminationTime time = investigationConf.getRunConfiguration().getRows().getTerminateCondition().getTerminationTime();
-			Long terminationTime = new Long(-1);
 
-			if (time.getType().equals(Constants.RELATIVE_TIME_EXPRESSION)) {
-				terminationTime = getTerminationTime(0, time.getValue());
-			} else if (time.getType().equals(Constants.ABSOLUTE_TIME_EXPRESSION)) {
-				terminationTime = getTerminationTime(1, time.getValue());
+			if (time.getType().equals(Constants.TICK_BASED_TIME_EXPRESSION)) {
+				double startTick = clockservice.getTick();
+				// Tick based termination condition
+//				System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
+				while (time.getValue() > (clockservice.getTick()-startTick)) {
+					waitForTick();
+//				System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
+				}
 			} else {
-				System.err.println("#RunTimeManagerPlan# Time type missing " + investigationConf);
-			}
-			if (terminationTime.longValue() > -1) {
-				waitFor(terminationTime);
-			} else {
-				System.err.println("#RunTimeManagerPlan# Error on setting termination time " + investigationConf);
+
+				Long terminationTime = new Long(-1);
+				if (time.getType().equals(Constants.RELATIVE_TIME_EXPRESSION)) {
+					terminationTime = getTerminationTime(0, time.getValue());
+				} else if (time.getType().equals(Constants.ABSOLUTE_TIME_EXPRESSION)) {
+					terminationTime = getTerminationTime(1, time.getValue());
+				} else {
+					System.err.println("#RunTimeManagerPlan# Time type missing " + investigationConf);
+				}
+				if (terminationTime.longValue() > -1) {
+					waitFor(terminationTime);
+				} else {
+					System.err.println("#RunTimeManagerPlan# Error on setting termination time " + investigationConf);
+				}
 			}
 			// Application semantic determines termination, e.g.
 			// $homebase.NumberOfOre > 100
@@ -132,7 +142,7 @@ public class RuntimeManagerPlan extends Plan {
 			// HACK: Need a observer / listener instead evaluating expression every 1000ms
 			while (true) {
 				waitFor(1000);
-								
+
 				// Hack: Works right now only for single objects but not for all
 				// of that type...
 				// Additionally: only one part of the equation can be an
@@ -175,7 +185,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);
 
-		prepareResult(results,(String) clientConfMap.get(GlobalConstants.EXPERIMENT_ID));
+		prepareResult(results, (String) clientConfMap.get(GlobalConstants.EXPERIMENT_ID));
 
 		System.out.println("#RuntimeManagerPlan# Killing executed application....");
 		vis.setExit();
@@ -187,10 +197,10 @@ public class RuntimeManagerPlan extends Plan {
 		// Decrement the number of currently running experiments on this agent
 		numberOfRunningExperiments(-1);
 		cms.destroyComponent(exta.getComponentIdentifier());
-		//delete *.application.xml from disk
-		FileHandler.deleteFile(directoryPath+investigationConf.getName()+".application.xml");
+		// delete *.application.xml from disk
+		FileHandler.deleteFile(directoryPath + investigationConf.getName() + ".application.xml");
 		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
-//		System.out.println("#RuntimeManagerPlan# Goal over???");		
+		// System.out.println("#RuntimeManagerPlan# Goal over???");
 	}
 
 	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents, String experimentID) {
@@ -264,7 +274,8 @@ public class RuntimeManagerPlan extends Plan {
 		// clientConf.get(Constants.APPLICATION_FILE_AS_XML_STRING));
 
 		// create application in suspended modus
-		IFuture fut = cms.createComponent(investigationConf.getName() + (String) clientConf.get(GlobalConstants.EXPERIMENT_ID) + " - " + localExperimentCounter , investigationConf.getApplicationReference(), new CreationInfo(investigationConf.getApplicationConfiguration(), appConf, null, true, false), null);
+		IFuture fut = cms.createComponent(investigationConf.getName() + (String) clientConf.get(GlobalConstants.EXPERIMENT_ID) + " - " + localExperimentCounter,
+				investigationConf.getApplicationReference(), new CreationInfo(investigationConf.getApplicationConfiguration(), appConf, null, true, false), null);
 		IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
 		this.exta = (IExternalAccess) cms.getExternalAccess(cid).get(this);
 
@@ -306,10 +317,10 @@ public class RuntimeManagerPlan extends Plan {
 
 	private void addDataConsumerAndProvider(InvestigationConfiguration investigationConf) {
 
-		IFuture fut =  (exta).getExtension(investigationConf.getNameOfSpace());
+		IFuture fut = (exta).getExtension(investigationConf.getNameOfSpace());
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
-		
-//		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
+
+		// AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
@@ -363,14 +374,14 @@ public class RuntimeManagerPlan extends Plan {
 				// "clazz");
 				Class clazz = null;
 				try {
-//					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
-//							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
-					
-//					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
-//							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
-					
-					//TODO: Check, if works!
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) investigationConf.getImports().getImport()),getState().getTypeModel().getClassLoader());								
+					// clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
+					// ((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+
+					// clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
+					// ((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+
+					// TODO: Check, if works!
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) investigationConf.getImports().getImport()), getState().getTypeModel().getClassLoader());
 
 					// clazz = SReflect.findClass0(classname, imports, classloader);
 
@@ -435,15 +446,14 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private InvestigationConfiguration prepareXMLFiles(HashMap<String, Object> clientConfMap) {
 
-		InvestigationConfiguration investigationConf = (InvestigationConfiguration) XMLHandler
-				.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING), InvestigationConfiguration.class);
-		
+		InvestigationConfiguration investigationConf = (InvestigationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING),
+				InvestigationConfiguration.class);
+
 		// adjust path of directory
 		// 1: delete the ".." at the beginning
 		String oldDirpath = investigationConf.getApplicationReference().substring(2);
 		// 2.delete the *.application.xml at the end of the path
 		directoryPath += oldDirpath.substring(0, oldDirpath.lastIndexOf("\\\\") + 2);
-
 
 		// ***********************************************************
 		// Purpose: Replace 'name' of application in the *.application.xml with the new name
@@ -452,7 +462,7 @@ public class RuntimeManagerPlan extends Plan {
 		// System.out.println("*********************\n" + app.substring(first));
 		// first+7: to start searching for next '"' after the 'name="' one above.
 		int second = applicationAsString.indexOf("\"", first + 7);
-//		System.out.println("*********************\n" + applicationAsString.substring(second));
+		// System.out.println("*********************\n" + applicationAsString.substring(second));
 
 		// get the first part of the *.application.xml till: 'name="'
 		String applicationAsStringNew = applicationAsString.substring(0, first + 6);
@@ -508,8 +518,8 @@ public class RuntimeManagerPlan extends Plan {
 
 		for (int i = 0; i < list.size(); i++) {
 			array[i] = list.get(i);
-		}	
-		
+		}
+
 		return array;
 	}
 }

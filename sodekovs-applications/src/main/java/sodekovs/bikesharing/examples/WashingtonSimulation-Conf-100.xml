@@ -105,7 +105,7 @@
 		</General>
 		<Rows experiments="2">
 			<TerminateCondition>
-				<Time value="2000" type="tick_based" /><!-- relatively, absolute or tick_based -->
+				<Time value="200" type=tick_based /><!-- relatively, absolute or tick_based -->
 				
 					<!-- <TargetFunction function="$object.getProperty(&quot;stock&quot;) >=
 					30">	<ObjectSource type="ISpaceObject" name="bikestation" /> </TargetFunction> -->

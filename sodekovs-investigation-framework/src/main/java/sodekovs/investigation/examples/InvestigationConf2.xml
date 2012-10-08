@@ -151,7 +151,7 @@
 		</General>
 		<Rows experiments="3">
 			<TerminateCondition>
-				<!-- <TerminationTime value="10000" type="relative" /> -->
+				<!-- <TerminationTime value="10000" type="relative" /> --><!-- relatively, absolute or tick_based -->
 
 				<SemanticCondition
 					condition="$object.getProperty(&quot;ore&quot;) >=
