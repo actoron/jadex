@@ -339,7 +339,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 */
 	protected void	doUpdate(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final List<List<String>> subdirs)
 	{
-		System.out.println("+++do update: "+stack+", "+subdirs);
+		System.out.println("+++do update: "+getResourceId()+", "+getLocalId()+", "+stack+", "+subdirs);
 		
 		// All done.
 		if(stack.isEmpty())
