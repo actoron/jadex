@@ -342,7 +342,7 @@ public class SyncJobPanel extends JPanel
 			}
 		}));
 		
-		if(createDialog("Global Resource Id Selection", srct, comp))
+		if(createDialog("Global Resource Id Selection", new JScrollPane(srct), comp))
 		{
 			TreePath sel = srct.getSelectionPath();
 			if(sel!=null)
