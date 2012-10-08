@@ -73,6 +73,15 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	@AgentCreated
 	public IFuture<Void>	start()
 	{
+		if(dir==null)
+		{
+			return new Future<Void>(new IllegalArgumentException("Dir nulls."));
+		}
+		if(id==null)
+		{
+			return new Future<Void>(new IllegalArgumentException("Id nulls."));
+		}
+		
 		Future<Void>	ret	= new Future<Void>();
 		try
 		{
@@ -208,6 +217,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 			public void intermediateResultAvailable(IResourceService result)
 			{
 				// Synchronize with matching remote resources, but exclude self.
+				System.out.println("result: "+result+" "+result.getLocalId()+" "+resource.getResourceId());
 				if(!ret.isDone() && result.getResourceId().equals(resource.getResourceId())
 					&& !result.getLocalId().equals(resource.getLocalId()))
 				{

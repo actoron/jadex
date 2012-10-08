@@ -1,6 +1,6 @@
 package jadex.backup.swing;
 
-import jadex.backup.job.IJobService;
+import jadex.backup.job.Job;
 import jadex.backup.job.SyncJob;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
@@ -13,19 +13,20 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,183 +34,176 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 
 /**
- *  The syncpanel shows data to create/change a sync job.
+ * 
  */
-public class SyncPanel extends JPanel
+public class SyncJobPanel extends JPanel
 {
+	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/folder_16.png"),
-		"delete_dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/delete_folder_16.png"),
-		"new_dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/new_folder_16.png"),
-		"rename_dir", SGUI.makeIcon(SyncPanel.class, "/jadex/backup/swing/images/rename_folder_16.png")
+		"dir", SGUI.makeIcon(SyncJobPanel.class, "/jadex/backup/swing/images/folder_16.png"),
+		"delete_dir", SGUI.makeIcon(SyncJobPanel.class, "/jadex/backup/swing/images/delete_folder_16.png"),
+		"new_dir", SGUI.makeIcon(SyncJobPanel.class, "/jadex/backup/swing/images/new_folder_16.png"),
+		"rename_dir", SGUI.makeIcon(SyncJobPanel.class, "/jadex/backup/swing/images/rename_folder_16.png")
 	});
 	
-	protected int cnt;
+	protected static int cnt;
+
+	protected SyncJob job;
 	
 	/**
-	 *  Create a new panel.
+	 * 
 	 */
-	public SyncPanel(final IExternalAccess ea)
+	public SyncJobPanel(final IExternalAccess ea, boolean editable, final SyncJob job)
 	{
-		setLayout(new BorderLayout());
+		this.job = job;
 		
-		JPanel quickp = new JPanel(new GridBagLayout());
-		quickp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Quick Objective Settings "));
-		
-		JLabel namel = new JLabel("Job name:");
-		final JTextField nametf = new JTextField("job #"+cnt++);
-		
-		JLabel offerl = new JLabel("Local resource:");
-		JLabel connectl = new JLabel("Global resource id:");
-//		JLabel whenl = new JLabel("When should the data be offered:");
-//		JLabel olderl = new JLabel("Should older versions be kept: ");
-
-		final JComboBox offercb = new JComboBox();
-		final JComboBox connectcb = new JComboBox();
-//		JComboBox datacb = new JComboBox(new String[]{"offer new resource", "connect to existing resource"});
-//		JComboBox whencb = new JComboBox(new String[]{"let the system decide"});
-//		JComboBox oldercb = new JComboBox(new String[]{"no", "yes, <=3", "yes, all"});
-		
-//			JButton methodb = new JButton("...");
-		JButton offerb = new JButton("...");
-		JButton connectb = new JButton("...");
-//		JButton olderb = new JButton("...");
-		
-		JButton okb = new JButton("OK");
-		JButton cancelb = new JButton("Cancel");
-		
-		int x = 0;
-		int y = 0;
-
-		x=0;
-		quickp.add(namel, new GridBagConstraints(x++,y,1,1,0,0,GridBagConstraints.WEST,
-			GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
-		quickp.add(nametf, new GridBagConstraints(x,y++,2,1,1,0,GridBagConstraints.WEST,
-			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		x=0;
-		quickp.add(offerl, new GridBagConstraints(x++,y,1,1,0,0,GridBagConstraints.WEST,
-			GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
-		quickp.add(offercb, new GridBagConstraints(x++,y,1,1,1,0,GridBagConstraints.WEST,
-			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		quickp.add(offerb, new GridBagConstraints(x,y++,1,1,0,0,GridBagConstraints.WEST,
-			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		x=0;
-		quickp.add(connectl, new GridBagConstraints(x++,y,1,1,0,0,GridBagConstraints.WEST,
-			GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
-		quickp.add(connectcb, new GridBagConstraints(x++,y,1,1,1,0,GridBagConstraints.WEST,
-			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		quickp.add(connectb, new GridBagConstraints(x,y++,1,1,0,0,GridBagConstraints.WEST,
-			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-//		x=0;
-//		quickp.add(olderl, new GridBagConstraints(x++,y,1,1,0,0,GridBagConstraints.WEST,
-//			GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
-//		quickp.add(oldercb, new GridBagConstraints(x++,y,1,1,1,0,GridBagConstraints.WEST,
-//			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-//		quickp.add(olderb, new GridBagConstraints(x,y++,1,1,0,0,GridBagConstraints.WEST,
-//			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		x=0;
-		JPanel bup = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		bup.add(okb);
-		bup.add(cancelb);
-		quickp.add(bup, new GridBagConstraints(x,y++,3,1,1,1,GridBagConstraints.WEST,
-			GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		
-//		final ObjectCardLayout ocl = new ObjectCardLayout();
-//		final JPanel detailp = new JPanel(ocl);
-//		detailp.setMinimumSize(new Dimension(1,1));
-//		detailp.setPreferredSize(new Dimension(100,100));
-		
-//		JSplitPane splitp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-//		splitp.setDividerLocation(0.5);
-//		splitp.setOneTouchExpandable(true);
-//		splitp.add(quickp);
-//		splitp.add(new JScrollPane(detailp));
-//		splitp.add(detailp);
-		
-		okb.addActionListener(new ActionListener()
+		PropertiesPanel pp;
+		if(!editable)
 		{
-			public void actionPerformed(ActionEvent e)
+			pp = new PropertiesPanel("Sync Job Details");
+			pp.createTextField("Name: ", getName());
+			pp.createTextField("Id: ", job.getId());
+			pp.createTextField("Local Ressource: ", job.getLocalResource());
+			pp.createTextField("Global Ressource: ", job.getGlobalResource());
+			pp.createCheckBox("Active: ", job.isActive(), false, 0);
+		}
+		else
+		{
+			pp = new PropertiesPanel("New Sync Job");
+			String name = "Job #"+(++cnt);
+			final JTextField ntf = pp.createTextField("Name: ", name, editable);
+			job.setName(name);
+			if(job.getId()==null)
+				job.setId(SUtil.createUniqueId(job.getName()));
+			ntf.addFocusListener(new FocusAdapter()
 			{
-				String id = SUtil.createUniqueId(nametf.getText());
-				String lres = (String)offercb.getSelectedItem();
-				String gres = (String)connectcb.getSelectedItem();
-				final SyncJob job = new SyncJob(id, nametf.getText(), lres, gres);
-				SServiceProvider.getService(ea.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DefaultResultListener<IJobService>()
+				public void focusLost(FocusEvent e)
 				{
-					public void resultAvailable(IJobService js)
+					job.setName(ntf.getText());
+				}
+			});
+	//		pp.createTextField("Id: ", getId());
+			
+			JPanel lrp = new JPanel(new GridBagLayout());
+			final JTextField lrtf = new JTextField();
+			lrtf.addFocusListener(new FocusAdapter()
+			{
+				public void focusLost(FocusEvent e)
+				{
+					job.setLocalResource(lrtf.getText());
+				}
+			});
+			JButton lrb = new JButton("...");
+			lrb.setMargin(new Insets(0,0,0,0));
+			lrp.add(lrtf, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
+			lrp.add(lrb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,0,0,0),0,0));
+			pp.addComponent("Local Ressource: ", lrp);
+			
+			JPanel grp = new JPanel(new GridBagLayout());
+			final JTextField grtf = new JTextField();
+			grtf.addFocusListener(new FocusAdapter()
+			{
+				public void focusLost(FocusEvent e)
+				{
+					job.setGlobalResource(grtf.getText());
+				}
+			});
+			String gid = SUtil.createUniqueId("gid");
+			job.setGlobalResource(gid);
+			grtf.setText(gid);
+			JButton grb = new JButton("...");
+			grb.setMargin(new Insets(0,0,0,0));
+			grp.add(grtf, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
+			grp.add(grb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,0,0,0),0,0));
+			pp.addComponent("Global Ressource: ", grp);
+			final JCheckBox acb = pp.createCheckBox("Active: ", true, true, 0);
+			acb.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					job.setActive(acb.isSelected());
+				}
+			});
+			
+			final PropertiesPanel fpp = pp;
+			lrb.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					JFileChooser fc = new JFileChooser(".");
+					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					FileFilter filter = new FileFilter()
 					{
-						js.addJob(job).addResultListener(new DefaultResultListener<Void>()
+						public boolean accept(File file)
 						{
-							public void resultAvailable(Void result)
-							{
-								System.out.println("added new job: "+job);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-								super.exceptionOccurred(exception);
-							}
-						});
+							return file.isDirectory();
+						}
+						
+						public String getDescription()
+						{
+							return "Only directories";
+						}
+					};
+					fc.setFileFilter(filter);
+					int result = fc.showOpenDialog(fpp);
+					if(JFileChooser.APPROVE_OPTION == result)
+					{
+						try
+						{
+							String dir = fc.getSelectedFile().getCanonicalPath();
+							lrtf.setText(dir);
+							job.setLocalResource(dir);
+						}
+						catch(Exception ex)
+						{
+						}
 					}
-				});
-			}
-		});
-		
-		offerb.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-				String res = createLocalSourceDialog(ea, SyncPanel.this);
-				if(res!=null)
-				{
-					offercb.addItem(res);
 				}
-//				if(ocl.getComponent("data")==null)
-//				{
-//					detailp.add(new SourceSelectionPanel(null), "data");
-//				}
-//				ocl.show("data");
-			}
-		});
-		
-		connectb.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
+			});
+			
+			grb.addActionListener(new ActionListener()
 			{
-				String res = createGlobalIdDialog(ea, SyncPanel.this);
-				if(res!=null)
+				public void actionPerformed(ActionEvent e)
 				{
-					connectcb.addItem(res);
+					String ret = createGlobalIdDialog(ea, fpp);
+					if(ret!=null)
+					{
+						grtf.setText(ret);
+						job.setGlobalResource(ret);
+					}
 				}
-//				if(ocl.getComponent("data")==null)
-//				{
-//					detailp.add(new SourceSelectionPanel(null), "data");
-//				}
-//				ocl.show("data");
-			}
-		});
+			});
+		}
 		
-		add(quickp, BorderLayout.CENTER);
+		setLayout(new BorderLayout());
+		add(new JScrollPane(pp), BorderLayout.CENTER);
 	}
-
+	
+//	/**
+//	 * 
+//	 */
+//	public boolean isValid()
+//	{
+//		return job.getLocalResource()!=null && job.getId()!=null && job.getName()!=null;
+//	}
+	
 	/**
 	 *  Create a new local source dialog.
 	 */

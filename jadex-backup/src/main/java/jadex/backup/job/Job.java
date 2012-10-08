@@ -1,5 +1,7 @@
 package jadex.backup.job;
 
+import jadex.bridge.IExternalAccess;
+
 /**
  *  Base class for all kinds of jobs.
  */
@@ -90,14 +92,7 @@ public abstract class Job
 		this.active = active;
 	}
 	
-	/**
-	 *  Get the details about a job.
-	 *  @return The details.
-	 */
-	public String getDetails()
-	{
-		return null;
-	}
+	//-------- additional convenience mapping methods --------
 	
 	/**
 	 *  Get the agent type.
@@ -107,4 +102,12 @@ public abstract class Job
 		return null;
 	}
 	
+	/**
+	 *  Get the view.
+	 */
+	public Object getView(IExternalAccess ea, boolean editable)
+	{
+		return null;
+	}
+
 }

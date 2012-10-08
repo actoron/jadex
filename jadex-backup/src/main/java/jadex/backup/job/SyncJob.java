@@ -1,6 +1,7 @@
 package jadex.backup.job;
 
-import jadex.bridge.service.annotation.Reference;
+import jadex.backup.swing.SyncJobPanel;
+import jadex.bridge.IExternalAccess;
 
 
 /**
@@ -73,17 +74,17 @@ public class SyncJob extends Job
 		this.gres = globalResource;
 	}
 	
-	/**
-	 *  Get the details about a job.
-	 *  @return The details.
-	 */
-	public String getDetails()
-	{
-		StringBuffer ret = new StringBuffer(lres);
-		if(gres!=null)
-			ret.append(", id: ").append(gres);
-		return ret.toString();
-	}
+//	/**
+//	 *  Get the details about a job.
+//	 *  @return The details.
+//	 */
+//	public String getDetails()
+//	{
+//		StringBuffer ret = new StringBuffer(lres);
+//		if(gres!=null)
+//			ret.append(", id: ").append(gres);
+//		return ret.toString();
+//	}
 	
 	/**
 	 *  Get the agent type.
@@ -92,5 +93,23 @@ public class SyncJob extends Job
 	{
 		return "jadex/backup/job/SyncJobAgent.class";
 	}
+	
+	/**
+	 *  Get the view.
+	 */
+	public Object getView(final IExternalAccess ea, boolean editable)
+	{
+		return new SyncJobPanel(ea, editable, this);
+	}
+
+	/**
+	 *  Get the string.
+	 */
+	public String toString()
+	{
+		return "SyncJob [lres=" + lres + ", gres=" + gres + ", id=" + id
+			+ ", name=" + name + ", active=" + active + "]";
+	}
+	
 	
 }

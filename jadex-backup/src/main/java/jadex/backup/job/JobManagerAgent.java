@@ -1,6 +1,6 @@
 package jadex.backup.job;
 
-import jadex.backup.swing.ObjectivesPanel;
+import jadex.backup.swing.JobsPanel;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -52,7 +52,7 @@ public class JobManagerAgent
 		{
 			public void run()
 			{
-				gui = ObjectivesPanel.createFrame(ea);
+				gui = JobsPanel.createFrame(ea);
 				ret.setResult(null);
 			}
 		});
