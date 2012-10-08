@@ -155,23 +155,16 @@ public class JobsPanel extends JPanel
 			}
 		});
 		final JPanel jobsettingsp = new JPanel(new BorderLayout());
+		final JPanel jobsettingscontp = new JPanel(new ObjectCardLayout());
 		jobtypecb.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				Class<?> jobcl = (Class<?>)jobtypecb.getSelectedItem();
-				try
-				{
-					job = (Job)jobcl.newInstance();
-					jobsettingsp.add((JComponent)job.getView(ea, true), BorderLayout.CENTER);
-					jobsettingsp.revalidate();
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
+				Class<? extends Job> jobcl = (Class<? extends Job>)jobtypecb.getSelectedItem();
+				initNewJob(jobcl, ea, jobsettingscontp);
 			}
 		});
+		jobsettingsp.add(jobsettingscontp, BorderLayout.CENTER);
 		JButton okb = new JButton("OK");
 		JButton cancelb = new JButton("Cancel");
 		JPanel jobbutp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -291,6 +284,8 @@ public class JobsPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				Class<? extends Job> jobcl = (Class<? extends Job>)jobtypecb.getSelectedItem();
+				initNewJob(jobcl, ea, jobsettingscontp);
 				detailsp.addTab("New Job", newjobp);
 				detailsp.setSelectedIndex(detailsp.indexOfTab("New Job"));
 			}
@@ -329,6 +324,23 @@ public class JobsPanel extends JPanel
 		splitp.add(detailsp);
 		
 		add(splitp, BorderLayout.CENTER);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void initNewJob(Class<? extends Job> jobcl, IExternalAccess ea, JPanel jobsettingsp)
+	{
+		try
+		{
+			job = (Job)jobcl.newInstance();
+			jobsettingsp.add((JComponent)job.getView(ea, true), "center");
+			jobsettingsp.revalidate();
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 	
 	/**

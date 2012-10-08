@@ -86,12 +86,17 @@ public class SyncJobPanel extends JPanel
 		}
 		else
 		{
-			pp = new PropertiesPanel("New Sync Job");
-			String name = "Job #"+(++cnt);
-			final JTextField ntf = pp.createTextField("Name: ", name, editable);
+			String name = "Job #"+(cnt++);
 			job.setName(name);
 			if(job.getId()==null)
 				job.setId(SUtil.createUniqueId(job.getName()));
+			job.setActive(true);
+			String gid = SUtil.createUniqueId("gid");
+				job.setGlobalResource(gid);
+			
+			pp = new PropertiesPanel("New Sync Job");
+			final JTextField ntf = pp.createTextField("Name: ", name, editable);
+			
 			ntf.addFocusListener(new FocusAdapter()
 			{
 				public void focusLost(FocusEvent e)
@@ -125,8 +130,6 @@ public class SyncJobPanel extends JPanel
 					job.setGlobalResource(grtf.getText());
 				}
 			});
-			String gid = SUtil.createUniqueId("gid");
-			job.setGlobalResource(gid);
 			grtf.setText(gid);
 			JButton grb = new JButton("...");
 			grb.setMargin(new Insets(0,0,0,0));
