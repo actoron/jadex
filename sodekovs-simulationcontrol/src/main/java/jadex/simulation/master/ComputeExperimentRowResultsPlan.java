@@ -272,6 +272,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
 			bikeSharEval.compare();
 			
+			System.out.println("\n\n\n Results of comparison between simulation data and real data");
 			System.out.println(bikeSharEval.resultsToString());
 		}
 	}

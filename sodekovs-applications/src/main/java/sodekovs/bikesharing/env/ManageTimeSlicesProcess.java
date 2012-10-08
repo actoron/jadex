@@ -50,6 +50,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	private Random rand = new java.util.Random();
 	private IClockService clockservice;
 	private ISimulationService simulationservice;
+	private int totalDepartures = 0;
 
 	// int counterTmp = 0;
 
@@ -160,6 +161,11 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		timeSlicesList = scenario.getTimeSlices().getTimeSlice();
 		createOrderedTimeSlicesList(timeSlicesList);
 
+		// compute number of total departures -> required for "Andrang"
+		for (int i = 0; i < timeSlicesList.size(); i++) {
+			totalDepartures += timeSlicesList.get(i).getRunTotal();
+		}
+
 		// for(TimeSlice slice : timeSlicesList){
 		// System.out.println("Time SLice start time: " + slice.getStartTime());
 		// }
@@ -185,12 +191,20 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 		// compute departure station for this tick.
 		List<ProbabilitiesForStation> stationList = timeSlicesList.get(currentTimeSlice).getProbabilitiesForStations().getProbabilitiesForStation();
-		int departureStation = computeDeparture(stationList);
 
-		// compute destination probabilities of this departure
-		int destination = computeDestination(stationList.get(departureStation));
-		// System.out.println("Start Event from: " + station.getStationID() + "  to : " + station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
-		createPedestrian(space, stationList.get(departureStation).getStationID(), stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
+		// Create number of pedestrians according to the "Andrang"
+		long congestion = Math.round((timeSlicesList.get(currentTimeSlice).getRunRelative() * totalDepartures) / 60);
+		
+		for (int i = 0; i < congestion; i++) {
+			int departureStation = computeDeparture(stationList);
+
+			// compute destination probabilities of this departure
+			int destination = computeDestination(stationList.get(departureStation));
+			// System.out.println("Start Event from: " + station.getStationID() + "  to : " + station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
+			createPedestrian(space, stationList.get(departureStation).getStationID(), stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination)
+					.getDestination());
+
+		}
 	}
 
 	/**
@@ -233,7 +247,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	private int computeDeparture(List<ProbabilitiesForStation> stationList) {
 
 		double deptartureProb = rand.nextDouble();
-//		System.out.println("rand is: +" + deptartureProb);
+		// System.out.println("rand is: +" + deptartureProb);
 
 		double sum = 0.0;
 		for (int i = 0; i < stationList.size(); i++) {
@@ -243,11 +257,11 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			// avoid index out of bounds exception and additionally avoid error that the sum of all probabilities is not exactly 1.0
 			if (i + 1 < stationList.size()) {
 				if (sum >= deptartureProb) {
-//					System.out.println("prob pos: " + i + " has won");
+					// System.out.println("prob pos: " + i + " has won");
 					return i;
 				}
 			} else {
-//				System.out.println("#last bucket# prob pos: " + i + " has won");
+				// System.out.println("#last bucket# prob pos: " + i + " has won");
 				return i;
 			}
 		}

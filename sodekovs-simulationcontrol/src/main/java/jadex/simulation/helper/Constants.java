@@ -70,6 +70,9 @@ public class Constants {
 	//Denotes that the time expression is given as absolute time
 	public static final String ABSOLUTE_TIME_EXPRESSION = "absolute";
 	
+//	Denotes that the time expression is given as absolute time
+	public static final String TICK_BASED_TIME_EXPRESSION = "tick_based";
+	
 	//Denotes that the observer should periodically observe/evaluate the data object
 	public static final String PERIODICAL_EVALUATION_MODE = "periodical";
 	

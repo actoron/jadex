@@ -33,11 +33,21 @@
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/WashingtonSimulation-Conf-100.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
+		<configuration name="Washington with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
 						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/WashingtonSimulation-Conf.xml"</argument>			
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
-		</configuration>		
+		</configuration>			
 	</configurations>
 </applicationtype>

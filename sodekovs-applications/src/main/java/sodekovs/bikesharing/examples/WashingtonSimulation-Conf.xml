@@ -8,7 +8,7 @@
 
 <SimulationConfiguration name="BikeSharingWashington"
 	applicationReference="..\\sodekovs-applications\\target\\classes\\sodekovs\\bikesharing\\examples\\BikesharingSimulation.application.xml"
-	applicationConfiguration="Washington-100"
+	applicationConfiguration="Washington"
 	nameOfSpace="my2dspace">
 
 	<Imports>
@@ -105,7 +105,7 @@
 		</General>
 		<Rows experiments="2">
 			<TerminateCondition>
-				 <Time value="10000" type="relative" />
+				 <Time value="200" type="tick_based" /><!-- relatively, absolute or tick_based -->
 				
 					<!-- <TargetFunction function="$object.getProperty(&quot;stock&quot;) >=
 					30">	<ObjectSource type="ISpaceObject" name="bikestation" /> </TargetFunction> -->
