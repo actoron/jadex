@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -23,12 +24,12 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -199,9 +200,20 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 *  @return	A list of plain file names (i.e. without path).
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<IInputConnection>	getFileContents(FileInfo dir)
+	public IFuture<IInputConnection>	getFileContents(FileInfo file)
 	{
-		return new Future<IInputConnection>(new UnsupportedOperationException("todo"));
+		Future<IInputConnection>	ret	= new Future<IInputConnection>();
+		try
+		{
+			ServiceOutputConnection	soc	= new ServiceOutputConnection();
+			soc.writeFromInputStream(new FileInputStream(resource.getFile(file.getLocation())), component.getExternalAccess());
+			ret.setResult(soc.getInputConnection());
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
 	}
 
 	//-------- ILocalResourceService interface --------
@@ -314,7 +326,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 
 			List<String>	stack	= new LinkedList<String>();
 			stack.add("/");
-			doUpdate(remote, ret, stack, new HashMap<String, List<String>>());
+			doUpdate(remote, ret, stack, new LinkedHashMap<String, List<String>>());
 		}
 		else
 		{
@@ -327,6 +339,8 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 */
 	protected void	doUpdate(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<String> stack, final Map<String, List<String>> tree)
 	{
+		System.out.println("+++do update: "+stack+", "+tree);
+		
 		// All done.
 		if(stack.isEmpty())
 		{
@@ -367,7 +381,8 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 				{
 					try
 					{
-						if(resource.needsUpdate(result))
+						// Hack!!! update always (for testing)
+//						if(resource.needsUpdate(result))
 						{
 							if(result.isDirectory())
 							{
@@ -378,10 +393,10 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 								updateFile(remote, ret, stack, tree, result);
 							}
 						}
-						else
-						{
-							doUpdate(remote, ret, stack, tree);
-						}
+//						else
+//						{
+//							doUpdate(remote, ret, stack, tree);
+//						}
 					}
 					catch(Exception e)
 					{

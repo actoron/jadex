@@ -91,6 +91,6 @@ public class BackupEvent
 	
 	public String toString()
 	{
-		return type + ": " + file.getPath() + (progress>=0 ? progress<1 ? "("+(int)(progress*100)+"%)" : " (done)" : ""); 
+		return type + ": " + file.getPath() + (progress>=0 ? progress<1 ? " ("+(int)(progress*100)+"%)" : " (done)" : ""); 
 	}
 }
