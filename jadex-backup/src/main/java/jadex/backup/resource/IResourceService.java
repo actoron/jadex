@@ -40,10 +40,10 @@ public interface IResourceService
 	/**
 	 *  Get the contents of a directory.
 	 *  @param dir	The file info of the directory.
-	 *  @return	A list of plain file names (i.e. without path).
+	 *  @return	A list of file infos for files and subdirectories.
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<String[]>	getDirectoryContents(FileInfo dir);
+	public IFuture<FileInfo[]>	getDirectoryContents(FileInfo dir);
 	
 	/**
 	 *  Get the contents of a file.

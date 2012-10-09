@@ -18,7 +18,6 @@ import jadex.micro.MicroAgent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,8 +35,8 @@ public class LocalResourceService	implements ILocalResourceService
 	@ServiceComponent
 	protected MicroAgent	agent;
 	
-	/** The resource meta information. */
-	protected BackupResource	resource;
+	/** The resource provider agent. */
+	protected ResourceProviderAgent	rpa;
 	
 	/** Synchronization requests that are queued or in progress. */
 	protected Map<IResourceService, TerminableIntermediateFuture<BackupEvent>>	updates;
@@ -50,7 +49,7 @@ public class LocalResourceService	implements ILocalResourceService
 	@ServiceStart
 	public void	start()
 	{
-		resource	= ((ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent()).getResource();
+		rpa	= (ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent();
 	}
 	
 	/**
@@ -86,9 +85,9 @@ public class LocalResourceService	implements ILocalResourceService
 			public void intermediateResultAvailable(IResourceService result)
 			{
 				// Synchronize with matching remote resources, but exclude self.
-				System.out.println("updateAll found: "+result+" "+result.getLocalId()+" "+resource.getResourceId());
-				if(!ret.isDone() && result.getResourceId().equals(resource.getResourceId())
-					&& !result.getLocalId().equals(resource.getLocalId()))
+				System.out.println("updateAll found: "+result+" "+result.getLocalId()+" "+rpa.getResource().getResourceId());
+				if(!ret.isDone() && result.getResourceId().equals(rpa.getResource().getResourceId())
+					&& !result.getLocalId().equals(rpa.getResource().getLocalId()))
 				{
 					finished[1]++;
 					update(result).addResultListener(new IntermediateDefaultResultListener<BackupEvent>()
@@ -177,9 +176,22 @@ public class LocalResourceService	implements ILocalResourceService
 			final IResourceService	remote	= updates.keySet().iterator().next();
 			final TerminableIntermediateFuture<BackupEvent>	ret	= updates.get(remote);
 
-			List<StackElement>	stack	= new ArrayList<StackElement>();
-			stack.add(new StackElement("/"));
-			doUpdate(remote, ret, stack);
+			remote.getFileInfo("/").addResultListener(new IResultListener<FileInfo>()
+			{
+				public void resultAvailable(FileInfo result)
+				{
+					List<StackElement>	stack	= new ArrayList<StackElement>();
+					stack.add(new StackElement(result));
+					doUpdate(remote, ret, stack);
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setExceptionIfUndone(exception);
+					updates.remove(remote);
+					startNextUpdate();
+				}
+			});
 		}
 		else
 		{
@@ -192,7 +204,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected void	doUpdate(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack)
 	{
-		System.out.println("+++do update: "+resource.getResourceId()+", "+resource.getLocalId()+", "+remote.getLocalId()+", "+stack);
+//		System.out.println("+++do update: "+rpa.getResource().getResourceId()+", "+rpa.getResource().getLocalId()+", "+remote.getLocalId()+", "+stack);
 		
 		// All done.
 		if(stack.isEmpty())
@@ -211,11 +223,10 @@ public class LocalResourceService	implements ILocalResourceService
 			if(top.getSubfiles()!=null)
 			{
 				// Get next element from list and push on stack.
-				if(top.getSubfiles().size()<top.getIndex())
+				StackElement	next	= top.getNextSubfile();
+				if(next!=null)
 				{
-					String	file	= top.getNextSubfile();
-					stack.add(new StackElement(file));
-					ret.addIntermediateResult(new BackupEvent("synchronizing", new FileData(resource.getFile(file)), -1));
+					stack.add(next);
 				}
 				
 				// No more sub elements -> pop element from stack
@@ -226,13 +237,15 @@ public class LocalResourceService	implements ILocalResourceService
 					{
 						if(top.getFileInfo().isDirectory())
 						{
+							// todo: synchronize directory in atomic step, i.e. copy new files from temporary location.
+							// todo: delete old files.
 //							resource.updateDirectory(top.getFileInfo(), top.getSubfiles());
 						}
-						ret.addIntermediateResult(new BackupEvent("synchronized", new FileData(resource.getFile(top.getLocation())), -1));
+						ret.addIntermediateResult(new BackupEvent("synchronized", new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
 					}
 					catch(Exception e)
 					{
-						ret.addIntermediateResult(new BackupEvent("Problem: "+e, new FileData(resource.getFile(top.getLocation())), -1));
+						ret.addIntermediateResult(new BackupEvent("Problem: "+e, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
 					}
 				}
 				
@@ -242,39 +255,29 @@ public class LocalResourceService	implements ILocalResourceService
 			// New top entry in stack -> do update and push sub directories (if any). 
 			else
 			{
-				top.setSubfiles(new ArrayList<String>());
-				remote.getFileInfo(top.getLocation()).addResultListener(new IResultListener<FileInfo>()
+				ret.addIntermediateResult(new BackupEvent("synchronizing", new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
+				top.setSubfiles(new ArrayList<StackElement>());
+				try
 				{
-					public void resultAvailable(FileInfo result)
+					// Always update directories (hack?)
+					if(top.getFileInfo().isDirectory())
 					{
-						try
-						{
-							// Always update directories (hack?)
-							if(result.isDirectory())
-							{
-								updateDirectory(remote, ret, stack, result);
-							}
-							else if(resource.needsUpdate(result))
-							{
-								updateFile(remote, ret, stack, result);
-							}
-							else
-							{
-								doUpdate(remote, ret, stack);
-							}
-						}
-						catch(Exception e)
-						{
-							exceptionOccurred(e);
-						}
+						updateDirectory(remote, ret, stack, top.getFileInfo());
 					}
-					
-					public void exceptionOccurred(Exception exception)
+					else if(rpa.getResource().needsUpdate(top.getFileInfo()))
 					{
-						ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(resource.getFile(top.getLocation())), -1));
+						updateFile(remote, ret, stack, top.getFileInfo());
+					}
+					else
+					{
 						doUpdate(remote, ret, stack);
 					}
-				});
+				}
+				catch(Exception e)
+				{
+					ret.addIntermediateResult(new BackupEvent("Problem: "+e, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
+					doUpdate(remote, ret, stack);
+				}
 			}		
 
 		}		
@@ -286,23 +289,21 @@ public class LocalResourceService	implements ILocalResourceService
 	protected void	updateDirectory(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo dir)
 	{
 		// Currently only recurses into directory contents as directory update (i.e. deletion of files) is done elsewhere (hack?)
-		final File	fdir	= resource.getFile(dir.getLocation());
+		final File	fdir	= rpa.getResource().getFile(dir.getLocation());
 		fdir.mkdirs();
 		ret.addIntermediateResult(new BackupEvent("updating", new FileData(fdir), -1));
-		remote.getDirectoryContents(dir).addResultListener(new IResultListener<String[]>()
+		remote.getDirectoryContents(dir).addResultListener(new IResultListener<FileInfo[]>()
 		{
-			public void resultAvailable(String[] result)
+			public void resultAvailable(FileInfo[] result)
 			{
-				try
+				final StackElement	top	= stack.get(stack.size()-1);
+				
+				for(FileInfo fi: result)
 				{
-					stack.get(stack.size()-1).setSubfiles(Arrays.asList(result));
-					ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
-					doUpdate(remote, ret, stack);
+					top.getSubfiles().add(new StackElement(fi));
 				}
-				catch(Exception e)
-				{
-					exceptionOccurred(e);
-				}
+				ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
+				doUpdate(remote, ret, stack);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -320,7 +321,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo fi)
 	{
-		final File	file	= resource.getFile(fi.getLocation());
+		final File	file	= rpa.getResource().getFile(fi.getLocation());
 		ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 0));
 		remote.getFileContents(fi).addResultListener(new IResultListener<IInputConnection>()
 		{
@@ -328,7 +329,7 @@ public class LocalResourceService	implements ILocalResourceService
 			{
 				try
 				{
-					final File	tmp	= resource.getTempLocation(fi.getLocation(), remote);
+					final File	tmp	= rpa.getResource().getTempLocation(fi.getLocation(), remote);
 					FileOutputStream	fos	= new FileOutputStream(tmp);
 					result.writeToOutputStream(fos, agent.getExternalAccess()).addResultListener(new IIntermediateResultListener<Long>()
 					{
@@ -341,7 +342,7 @@ public class LocalResourceService	implements ILocalResourceService
 						{
 							try
 							{
-								resource.updateFile(fi, tmp);
+								rpa.getResource().updateFile(fi, tmp);
 								ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
 								doUpdate(remote, ret, stack);
 							}

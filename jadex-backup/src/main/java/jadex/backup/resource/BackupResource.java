@@ -237,32 +237,6 @@ public class BackupResource
 	}
 
 //	/**
-//	 *  Check if some newer local time stamp exists when compared to the given time stamps.
-//	 *  @param fi	The file info data to be compared with the local state.
-//	 *  @throws Exception when a conflict was found.
-//	 */
-//	public void	checkForConflicts(FileInfo fi)
-//	{
-//		// Hack!!! continue sync also on error.
-//		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
-//		{
-//			throw new RuntimeException("Found conflict with: "+getLocalId());
-//		}
-//			
-//		if(props.containsKey(fi.getLocation()))
-//		{
-//			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
-//			for(String key: vtimes.keySet())
-//			{
-//				if(vtimes.get(key).intValue()>fi.getVTime(key))
-//				{
-//					throw new RuntimeException("Found conflict with: "+key);
-//				}
-//			}
-//		}
-//	}
-	
-//	/**
 //	 *  Update a directory with remote information.
 //	 *  Deletes children that are no longer present.
 //	 *  
@@ -314,9 +288,18 @@ public class BackupResource
 	{
 		if(needsUpdate(fi))
 		{
+			// Todo: all this should be atomic (how?)
 			File	orig	= getFile(fi.getLocation());
+			FileInfo	ofi	= getFileInfo(orig);
 			orig.delete();
 			tmp.renameTo(orig);
+
+			// Update meta information to reflect new current state.
+			// todo: file hash code.
+			ofi.updateVTimes(fi);
+			ofi.setVTime(getLocalId(), orig.lastModified());
+			props.setProperty(ofi.getLocation(), ofi.getVTime());			
+			save();
 		}
 		else
 		{

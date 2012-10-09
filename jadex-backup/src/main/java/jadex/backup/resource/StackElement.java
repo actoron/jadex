@@ -9,14 +9,11 @@ public class StackElement
 {
 	//-------- attributes --------
 	
-	/** The file location. */
-	protected String	location;
-	
 	/** The remote file info. */
 	protected FileInfo	fi;
 	
 	/** The list of children to be processed (for directories). */
-	protected List<String>	subfiles;
+	protected List<StackElement>	subfiles;
 	
 	/** The index of the next subfile to be processed. */
 	protected int	index;
@@ -26,24 +23,15 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(String location)
+	public StackElement(FileInfo fi)
 	{
-		this.location	= location;
+		this.fi	= fi;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *  Get the location.
-	 */
-	public String getLocation()
-	{
-		return location;
-	}
-	
-	/**
 	 *  Get the file info.
-	 *  @return The file info or null, if not yet set.
 	 */
 	public FileInfo getFileInfo()
 	{
@@ -51,18 +39,10 @@ public class StackElement
 	}
 	
 	/**
-	 *  Set the file info.
-	 */
-	public void setFileInfo(FileInfo fi)
-	{
-		this.fi = fi;
-	}
-	
-	/**
 	 *  Get the subfiles.
 	 *  @return The subfiles or null, if not yet set.
 	 */
-	public List<String> getSubfiles()
+	public List<StackElement> getSubfiles()
 	{
 		return subfiles;
 	}
@@ -70,7 +50,7 @@ public class StackElement
 	/**
 	 *  Set the subfiles.
 	 */
-	public void setSubfiles(List<String> subfiles)
+	public void setSubfiles(List<StackElement> subfiles)
 	{
 		this.subfiles = subfiles;
 	}
@@ -84,12 +64,12 @@ public class StackElement
 	}
 	
 	/**
-	 *  Get the full path of the next sub file and increment the index.
+	 *  Get the next sub file if any and increment the index.
+	 *  @return null when all sub elements have been fetched.
 	 */
-	public String getNextSubfile()
+	public StackElement getNextSubfile()
 	{
-		String	file	= subfiles.get(index++);
-		return "/".equals(location) ? location + file : location + "/" + file;
+		return index<subfiles.size() ? subfiles.get(index++) : null;
 	}
 
 	/**
@@ -97,6 +77,6 @@ public class StackElement
 	 */
 	public String toString()
 	{
-		return location+": "+subfiles;
+		return fi.getLocation();
 	}
 }

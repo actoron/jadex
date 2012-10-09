@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Local (i.e. user-oriented) interface to a resource. 
@@ -27,8 +29,8 @@ public class ResourceService	implements IResourceService
 	@ServiceComponent
 	protected MicroAgent	agent;
 	
-	/** The resource meta information. */
-	protected BackupResource	resource;
+	/** The resource provider agent. */
+	protected ResourceProviderAgent	rpa;
 	
 	//-------- constructors --------
 	
@@ -38,7 +40,7 @@ public class ResourceService	implements IResourceService
 	@ServiceStart
 	public void	start()
 	{
-		resource	= ((ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent()).getResource();
+		rpa	= (ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent();
 	}
 	
 	//-------- IResourceService interface --------
@@ -54,7 +56,7 @@ public class ResourceService	implements IResourceService
 	 */
 	public String	getResourceId()	
 	{
-		return resource.getResourceId();
+		return rpa.getResource().getResourceId();
 	}
 	
 	/**
@@ -68,7 +70,7 @@ public class ResourceService	implements IResourceService
 	 */
 	public String	getLocalId()
 	{
-		return resource.getLocalId();
+		return rpa.getResource().getLocalId();
 	}
 	
 	/**
@@ -78,21 +80,21 @@ public class ResourceService	implements IResourceService
 	 */
 	public IFuture<FileInfo>	getFileInfo(String file)
 	{
-		return new Future<FileInfo>(resource.getFileInfo(resource.getFile(file)));
+		return new Future<FileInfo>(rpa.getResource().getFileInfo(rpa.getResource().getFile(file)));
 	}
 	
 	/**
 	 *  Get the contents of a directory.
 	 *  @param dir	The file info of the directory.
-	 *  @return	A list of plain file names (i.e. without path).
+	 *  @return	A list of file infos for files and subdirectories.
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<String[]>	getDirectoryContents(FileInfo dir)
+	public IFuture<FileInfo[]>	getDirectoryContents(FileInfo dir)
 	{
-		Future<String[]>	ret	= new Future<String[]>();
+		Future<FileInfo[]>	ret	= new Future<FileInfo[]>();
 		try
 		{
-			File	fdir	= resource.getFile(dir.getLocation());
+			File	fdir	= rpa.getResource().getFile(dir.getLocation());
 			if(!fdir.isDirectory())
 			{
 				throw new IllegalArgumentException("Not a directory: "+dir.getLocation());
@@ -108,8 +110,18 @@ public class ResourceService	implements IResourceService
 			{
 				throw new IOException("Could not read directory: "+dir.getLocation());
 			}
-//			resource.checkForConflicts(dir);	// fail if modified in mean time.
-			ret.setResult(list);
+			
+			if(rpa.getResource().getFileInfo(rpa.getResource().getFile(dir.getLocation())).isNewerThan(dir))
+			{
+				throw new RuntimeException("Local resource has changed: "+dir.getLocation());
+			}
+			
+			List<FileInfo>	aret	= new ArrayList<FileInfo>();
+			for(String file: list)
+			{
+				aret.add(rpa.getResource().getFileInfo(new File(fdir, file)));
+			}
+			ret.setResult(aret.toArray(new FileInfo[aret.size()]));
 		}
 		catch(Exception e)
 		{
@@ -129,8 +141,13 @@ public class ResourceService	implements IResourceService
 		Future<IInputConnection>	ret	= new Future<IInputConnection>();
 		try
 		{
+			if(rpa.getResource().getFileInfo(rpa.getResource().getFile(file.getLocation())).isNewerThan(file))
+			{
+				throw new RuntimeException("Local resource has changed: "+file.getLocation());
+			}
+
 			ServiceOutputConnection	soc	= new ServiceOutputConnection();
-			soc.writeFromInputStream(new FileInputStream(resource.getFile(file.getLocation())), agent.getExternalAccess());
+			soc.writeFromInputStream(new FileInputStream(rpa.getResource().getFile(file.getLocation())), agent.getExternalAccess());
 			ret.setResult(soc.getInputConnection());
 		}
 		catch(Exception e)

@@ -7,6 +7,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -93,9 +94,7 @@ public class ResourceTreeModel	implements TreeModel
 	 */
 	public boolean isLeaf(Object node)
 	{
-		List<Object>	children	= fetchChildren(node);
-		return children.isEmpty();
-//		return node instanceof Tuple2 && ((Tuple2<?,?>)node).getFirstEntity()!=null && !((FileInfo)((Tuple2<?,?>)node).getFirstEntity()).isDirectory();
+		return node instanceof Tuple2 && !((FileInfo)((Tuple2<?,?>)node).getFirstEntity()).isDirectory();
 	}
 	
 	/**
@@ -146,16 +145,22 @@ public class ResourceTreeModel	implements TreeModel
 			// To find top-level nodes start global resource search.
 			if(ROOT.equals(node))
 			{
-				final List<IResourceService>	found	= new ArrayList<IResourceService>();
+				final List<Tuple2<FileInfo, IResourceService>>	found	= new ArrayList<Tuple2<FileInfo, IResourceService>>();
 				IIntermediateFuture<IResourceService>	fut	= SServiceProvider.getServices(ea.getServiceProvider(), IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 				fut.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 				{
-					public void intermediateResultAvailable(IResourceService result)
+					public void intermediateResultAvailable(final IResourceService remote)
 					{
-						synchronized(found)
+						remote.getFileInfo("/").addResultListener(new DefaultResultListener<FileInfo>()
 						{
-							found.add(result);
-						}
+							public void resultAvailable(FileInfo fi)
+							{
+								synchronized(found)
+								{
+									found.add(new Tuple2<FileInfo, IResourceService>(fi, remote));
+								}
+							}
+						});
 					}
 				});
 				try
@@ -169,31 +174,26 @@ public class ResourceTreeModel	implements TreeModel
 				
 				synchronized(found)
 				{
-					ret	= new ArrayList<Object>();
-					for(IResourceService l: found)
-					{
-						ret.add(new Tuple2<String, IResourceService>("/", l));
-					}
+					ret	= new ArrayList<Object>(found);
 				}			
 			}
 				
-			// Subnodes are a tuple of path and resource service.
+			// Subnodes are a tuple of file info and resource service.
 			else if(node instanceof Tuple2)
 			{
 				ret	= new ArrayList<Object>();
 				final Tuple2<?,?>	res	= (Tuple2<?,?>)node;
-				String	path	= (String)res.getFirstEntity();
+				FileInfo	fi	= (FileInfo)res.getFirstEntity();
 				IResourceService	remote	= (IResourceService)res.getSecondEntity();
 				try
 				{
 					// Hack!!! Block swing thread until results are available
-					FileInfo	fi	= remote.getFileInfo(path).get(new ThreadSuspendable(), 3000);
 					if(fi.isDirectory())
 					{
-						String[]	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
-						for(String tmp : list)
+						FileInfo[]	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
+						for(FileInfo tmp : list)
 						{
-							ret.add(new Tuple2<String, IResourceService>(tmp, remote));
+							ret.add(new Tuple2<FileInfo, IResourceService>(tmp, remote));
 						}
 					}
 				}

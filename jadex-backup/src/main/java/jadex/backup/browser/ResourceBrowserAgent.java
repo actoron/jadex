@@ -1,5 +1,6 @@
 package jadex.backup.browser;
 
+import jadex.backup.resource.FileInfo;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -59,15 +60,15 @@ public class ResourceBrowserAgent
 					{
 						if(value instanceof Tuple2)
 						{
-							String loc	= (String)((Tuple2<?,?>)value).getFirstEntity();
-							if("/".equals(loc))
+							FileInfo fi	= (FileInfo)((Tuple2<?,?>)value).getFirstEntity();
+							if("/".equals(fi.getLocation()))
 							{
 								IResourceService	res	= (IResourceService)((Tuple2<?,?>)value).getSecondEntity();
 								value	= res.getResourceId() +" ("+res.getLocalId()+")";
 							}
 							else
 							{
-								value	= loc;
+								value	= fi.getLocation();
 							}
 						}
 						
