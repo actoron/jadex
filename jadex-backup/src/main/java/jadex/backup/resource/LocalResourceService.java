@@ -8,10 +8,13 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
@@ -247,11 +250,13 @@ public class LocalResourceService	implements ILocalResourceService
 							// todo: delete old files.
 //							resource.updateDirectory(top.getFileInfo(), top.getSubfiles());
 						}
-						ret.addIntermediateResult(new BackupEvent("synchronized", new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
+//						ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_UNCHANGED, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation()))));
+						ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_UNCHANGED, top.getFileInfo()));
 					}
 					catch(Exception e)
 					{
-						ret.addIntermediateResult(new BackupEvent("Problem: "+e, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
+//						ret.addIntermediateResult(new BackupEvent(BackupEvent.ERROR, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), e));
+						ret.addIntermediateResult(new BackupEvent(BackupEvent.ERROR, top.getFileInfo(), e));
 					}
 				}
 				
@@ -261,7 +266,7 @@ public class LocalResourceService	implements ILocalResourceService
 			// New top entry in stack -> do update and push sub directories (if any). 
 			else
 			{
-				ret.addIntermediateResult(new BackupEvent("synchronizing", new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
+//				ret.addIntermediateResult(new BackupEvent("synchronizing", new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation()))));
 				top.setSubfiles(new ArrayList<StackElement>());
 				try
 				{
@@ -281,7 +286,7 @@ public class LocalResourceService	implements ILocalResourceService
 				}
 				catch(Exception e)
 				{
-					ret.addIntermediateResult(new BackupEvent("Problem: "+e, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), -1));
+					ret.addIntermediateResult(new BackupEvent(BackupEvent.ERROR, top.getFileInfo(), e));
 					doUpdate(remote, ret, stack);
 				}
 			}		
@@ -295,9 +300,9 @@ public class LocalResourceService	implements ILocalResourceService
 	protected void	updateDirectory(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo dir)
 	{
 		// Currently only recurses into directory contents as directory update (i.e. deletion of files) is done elsewhere (hack?)
-		final File	fdir	= rpa.getResource().getFile(dir.getLocation());
+		final File	fdir = rpa.getResource().getFile(dir.getLocation());
 		fdir.mkdirs();
-		ret.addIntermediateResult(new BackupEvent("updating", new FileData(fdir), -1));
+		ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_UNCHANGED, rpa.getResource().getFileInfo(fdir))); // todo: dir events?
 		remote.getDirectoryContents(dir).addResultListener(new IResultListener<FileInfo[]>()
 		{
 			public void resultAvailable(FileInfo[] result)
@@ -308,13 +313,14 @@ public class LocalResourceService	implements ILocalResourceService
 				{
 					top.getSubfiles().add(new StackElement(fi));
 				}
-				ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
+//				ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
 				doUpdate(remote, ret, stack);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(fdir), -1));
+				ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_CONFLICT, rpa.getResource().getFileInfo(fdir)));
+//				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(fdir), -1));
 				doUpdate(remote, ret, stack);
 			}
 		});
@@ -327,8 +333,21 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo fi)
 	{
-		final File	file	= rpa.getResource().getFile(fi.getLocation());
-		ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 0));
+//		final File	file	= rpa.getResource().getFile(fi.getLocation());
+		String state = rpa.getResource().getState(fi);
+		ret.addIntermediateResult(new BackupEvent(state, fi, 0));
+		doUpdate(remote, ret, stack);
+	}
+	
+	/**
+	 * 
+	 */
+	public ISubscriptionIntermediateFuture<BackupEvent> updateFile(final IResourceService remote, final FileInfo fi)
+	{
+		final SubscriptionIntermediateFuture<BackupEvent> ret = new SubscriptionIntermediateFuture<BackupEvent>();
+		
+		final File	file = rpa.getResource().getFile(fi.getLocation());
+		ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_START , rpa.getResource().getFileInfo(file), new Double(0)));
 		remote.getFileContents(fi).addResultListener(new IResultListener<IInputConnection>()
 		{
 			public void resultAvailable(IInputConnection result)
@@ -341,7 +360,7 @@ public class LocalResourceService	implements ILocalResourceService
 					{
 						public void intermediateResultAvailable(Long result)
 						{
-							ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), result.doubleValue()/fi.getSize()));
+							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_START, fi, new Double(result.doubleValue()/fi.getSize())));
 						}
 						
 						public void finished()
@@ -349,8 +368,7 @@ public class LocalResourceService	implements ILocalResourceService
 							try
 							{
 								rpa.getResource().updateFile(fi, tmp);
-								ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
-								doUpdate(remote, ret, stack);
+								ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_END, fi, new Double(1)));
 							}
 							catch(Exception e)
 							{
@@ -365,8 +383,7 @@ public class LocalResourceService	implements ILocalResourceService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
-							doUpdate(remote, ret, stack);
+							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_END, fi, exception));
 						}
 					});
 				}
@@ -378,9 +395,74 @@ public class LocalResourceService	implements ILocalResourceService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
-				doUpdate(remote, ret, stack);
+				ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
 			}
 		});
+		
+		return ret;
 	}
+	
+//	/**
+//	 *  Update a file.
+//	 *  Downloads the file to a temporary location.
+//	 *  Afterwards renames the file and updates the meta information.
+//	 */
+//	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo fi)
+//	{
+//		final File	file	= rpa.getResource().getFile(fi.getLocation());
+//		ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 0));
+//		remote.getFileContents(fi).addResultListener(new IResultListener<IInputConnection>()
+//		{
+//			public void resultAvailable(IInputConnection result)
+//			{
+//				try
+//				{
+//					final File	tmp	= rpa.getResource().getTempLocation(fi.getLocation(), remote);
+//					FileOutputStream	fos	= new FileOutputStream(tmp);
+//					result.writeToOutputStream(fos, agent.getExternalAccess()).addResultListener(new IIntermediateResultListener<Long>()
+//					{
+//						public void intermediateResultAvailable(Long result)
+//						{
+//							ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), result.doubleValue()/fi.getSize()));
+//						}
+//						
+//						public void finished()
+//						{
+//							try
+//							{
+//								rpa.getResource().updateFile(fi, tmp);
+//								ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
+//								doUpdate(remote, ret, stack);
+//							}
+//							catch(Exception e)
+//							{
+//								exceptionOccurred(e);
+//							}
+//						}
+//						
+//						public void resultAvailable(Collection<Long> result)
+//						{
+//							finished();
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
+//							doUpdate(remote, ret, stack);
+//						}
+//					});
+//				}
+//				catch(Exception e)
+//				{
+//					exceptionOccurred(e);
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(file), -1));
+//				doUpdate(remote, ret, stack);
+//			}
+//		});
+//	}
 }

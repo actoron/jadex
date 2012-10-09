@@ -21,6 +21,17 @@ import java.util.UUID;
  */
 public class BackupResource
 {
+	public static final String FILE_UNCHANGED = "file_unchanged";
+
+	public static final String FILE_MODIFIED = "file_modified";
+
+	public static final String FILE_CONFLICT = "file_conflict";
+
+	public static final String FILE_ADDED = "file_added";
+
+	public static final String FILE_REMOVED = "file_removed";
+
+	
 	//-------- attributes --------
 	
 	/** The resource root directory. */
@@ -218,22 +229,44 @@ public class BackupResource
 	 */
 	public boolean	needsUpdate(FileInfo fi)
 	{
+		String ret = getState(fi);
+		return FILE_ADDED.equals(ret) || FILE_MODIFIED.equals(ret);
+	}
+	
+	/**
+	 * 
+	 */
+	public String getState(FileInfo fi)
+	{
+		String ret = FILE_UNCHANGED;
+		
 		FileInfo	local	= getFileInfo(getFile(fi.getLocation()));
-		boolean	update	= local==null || fi.isNewerThan(local);
-		
-		// When changed: check for conflict (hack? only for files)
-		if(update && local!=null && !local.isDirectory() && local.isNewerThan(fi))
+		if(local==null)
 		{
-			throw new RuntimeException("Found conflict: "+fi.getLocation());
+			ret = FILE_ADDED;
+		}
+		else
+		{
+			if(fi.isNewerThan(local))
+			{
+				// When changed: check for conflict (hack? only for files)
+				if(!local.isDirectory() && local.isNewerThan(fi))
+				{
+					ret = FILE_MODIFIED;
+				}
+				else
+				{
+					ret = FILE_CONFLICT;
+				}
+			}
+			else
+			{
+				// When not changed: add new time stamps to meta information
+				local.updateVTimes(fi);
+			}
 		}
 		
-		// When not changed: add new time stamps to meta information
-		if(!update && local!=null)
-		{
-			local.updateVTimes(fi);
-		}
-		
-		return update;
+		return ret;
 	}
 
 	/**

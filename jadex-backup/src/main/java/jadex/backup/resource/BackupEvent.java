@@ -1,6 +1,5 @@
 package jadex.backup.resource;
 
-import jadex.bridge.service.types.deployment.FileData;
 
 /**
  *  Struct for posting information about the progress of
@@ -8,16 +7,29 @@ import jadex.bridge.service.types.deployment.FileData;
  */
 public class BackupEvent
 {
+	
+	public static final String FILE_UPDATE_START = "file_update_start";
+	
+	public static final String FILE_UPDATE_STATE = "file_update_state";
+	
+	public static final String FILE_UPDATE_END = "file_update_end";
+	
+	public static final String FILE_UPDATE_ERROR = "file_update_error";
+	
+	public static final String ERROR = "error";
+
+
 	//-------- attributes --------
 	
 	/** The event type. */
 	protected String	type;
 	
 	/** The corresponding file. */
-	protected FileData	file;
+//	protected FileData	file;
+	protected FileInfo file;
 	
-	/** The current progress state of the file (0..1) or -1 if atomic event. */
-	protected double	progress;
+//	/** The current progress state of the file (0..1) or -1 if atomic event. */
+	protected Object details;
 	
 	//-------- constructors --------
 	
@@ -32,11 +44,19 @@ public class BackupEvent
 	/**
 	 *  Create a new backup event.
 	 */
-	public BackupEvent(String type, FileData file, double progress)
+	public BackupEvent(String type, FileInfo file)
+	{
+		this(type, file, null);
+	}
+	
+	/**
+	 *  Create a new backup event.
+	 */
+	public BackupEvent(String type, FileInfo file, Object details)
 	{
 		this.type	= type;
 		this.file	= file;
-		this.progress	= progress;
+		this.details = details;
 	}
 
 	//-------- methods --------
@@ -52,19 +72,11 @@ public class BackupEvent
 	/**
 	 *  Get the file.
 	 */
-	public FileData getFile()
+	public FileInfo getFile()
 	{
 		return file;
 	}
 	
-	/**
-	 *  Get the progress value.
-	 */
-	public double getProgress()
-	{
-		return progress;
-	}
-
 	/**
 	 *  Set the type.
 	 */
@@ -76,21 +88,36 @@ public class BackupEvent
 	/**
 	 *  Set the file.
 	 */
-	public void setFile(FileData file)
+	public void setFile(FileInfo file)
 	{
 		this.file = file;
 	}
 
 	/**
-	 *  Set the progress value.
+	 *  Get the details.
+	 *  @return The details.
 	 */
-	public void setProgress(double progress)
+	public Object getDetails()
 	{
-		this.progress = progress;
+		return details;
 	}
-	
+
+	/**
+	 *  Set the details.
+	 *  @param details The details to set.
+	 */
+	public void setDetails(Object details)
+	{
+		this.details = details;
+	}
+
 	public String toString()
 	{
-		return type + ": " + file.getPath() + (progress>=0 ? progress<1 ? " ("+(int)(progress*100)+"%)" : " (done)" : ""); 
+		return "BackupEvent [type=" + type + ", file=" + file + ", details="+ details + "]";
 	}
+
+//	public String toString()
+//	{
+//		return type + ": " + file.getPath() + (progress>=0 ? progress<1 ? " ("+(int)(progress*100)+"%)" : " (done)" : ""); 
+//	}
 }

@@ -42,18 +42,18 @@ public class JadexBackup
 		
 		
 		// Simple test synchonization.
-		ILocalResourceService	local	= SServiceProvider.getService(platform.getServiceProvider(),
-			ILocalResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
-		
-		IIntermediateFuture<BackupEvent>	files	= local.updateAll();
-		files.addResultListener(new IntermediateDefaultResultListener<BackupEvent>()
-		{
-			public void intermediateResultAvailable(BackupEvent result)
-			{
-				System.out.println(result);
-			}
-		});
-		files.get(sus);
-		System.out.println("Update finished.");
+//		ILocalResourceService	local	= SServiceProvider.getService(platform.getServiceProvider(),
+//			ILocalResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+//		
+//		IIntermediateFuture<BackupEvent>	files	= local.updateAll();
+//		files.addResultListener(new IntermediateDefaultResultListener<BackupEvent>()
+//		{
+//			public void intermediateResultAvailable(BackupEvent result)
+//			{
+//				System.out.println(result);
+//			}
+//		});
+//		files.get(sus);
+//		System.out.println("Update finished.");
 	}
 }

@@ -1,5 +1,6 @@
 package jadex.backup.resource;
 
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 
@@ -22,4 +23,9 @@ public interface ILocalResourceService
 	 *  @return Events as files and directories are being processed.
 	 */
 	public ITerminableIntermediateFuture<BackupEvent>	update(IResourceService remote);
+	
+	/**
+	 * 
+	 */
+	public ISubscriptionIntermediateFuture<BackupEvent> updateFile(final IResourceService remote, final FileInfo fi);
 }
