@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -372,7 +373,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 					{
 						if(top.getFileInfo().isDirectory())
 						{
-							resource.updateDirectory(top.getFileInfo(), top.getSubfiles());
+//							resource.updateDirectory(top.getFileInfo(), top.getSubfiles());
 						}
 						ret.addIntermediateResult(new BackupEvent("synchronized", new FileData(resource.getFile(top.getLocation())), -1));
 					}
@@ -395,16 +396,14 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 					{
 						try
 						{
-							if(resource.needsUpdate(result))
+							// Always update directories (hack?)
+							if(result.isDirectory())
 							{
-								if(result.isDirectory())
-								{
-									updateDirectory(remote, ret, stack, result);
-								}
-								else
-								{
-									updateFile(remote, ret, stack, result);
-								}
+								updateDirectory(remote, ret, stack, result);
+							}
+							else if(resource.needsUpdate(result))
+							{
+								updateFile(remote, ret, stack, result);
 							}
 							else
 							{
@@ -419,7 +418,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 					
 					public void exceptionOccurred(Exception exception)
 					{
-//						ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(resource.getFile(next)), -1));
+						ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(resource.getFile(top.getLocation())), -1));
 						doUpdate(remote, ret, stack);
 					}
 				});
@@ -433,6 +432,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	 */
 	protected void	updateDirectory(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo dir)
 	{
+		// Currently only recurses into directory contents as directory update (i.e. deletion of files) is done elsewhere (hack?)
 		final File	fdir	= resource.getFile(dir.getLocation());
 		fdir.mkdirs();
 		ret.addIntermediateResult(new BackupEvent("updating", new FileData(fdir), -1));
@@ -440,10 +440,9 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 		{
 			public void resultAvailable(String[] result)
 			{
-				// Todo: delete missing files
 				try
 				{
-//					subdirs.get(subdirs.size()-1).addAll(Arrays.asList(result));
+					stack.get(stack.size()-1).setSubfiles(Arrays.asList(result));
 					ret.addIntermediateResult(new BackupEvent("updated", new FileData(fdir), -1));
 					doUpdate(remote, ret, stack);
 				}
@@ -463,6 +462,8 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 	
 	/**
 	 *  Update a file.
+	 *  Downloads the file to a temporary location.
+	 *  Afterwards renames the file and updates the meta information.
 	 */
 	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo fi)
 	{
@@ -487,10 +488,7 @@ public class ResourceProviderAgent	implements IResourceService, ILocalResourceSe
 						{
 							try
 							{
-//								resource.updateFileInfo(fi);
-								File	orig	= resource.getFile(fi.getLocation());
-								orig.delete();
-								tmp.renameTo(orig);
+								resource.updateFile(fi, tmp);
 								ret.addIntermediateResult(new BackupEvent("updating", new FileData(file), 1));
 								doUpdate(remote, ret, stack);
 							}

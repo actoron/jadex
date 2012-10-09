@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.nio.channels.FileLock;
 import java.security.MessageDigest;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -242,8 +240,8 @@ public class BackupResource
 			}
 		}
 		
-		// When changed: check for conflict
-		if(update)
+		// When changed: check for conflict (hack? only for files)
+		if(update && !local.isDirectory())
 		{
 			// Conflict when remotely changed (as we already know) and 
 			// there is no locally valid time stamp that is available remotely (probably as invalid, because remote has changed).
@@ -303,37 +301,37 @@ public class BackupResource
 //		}
 //	}
 	
-	/**
-	 *  Update a directory with remote information.
-	 *  Deletes children that are no longer present.
-	 *  
-	 *  @param fi	The file info data to be merged with the local state.
-	 *  @param contents	The contents of the directory.
-	 *  @throws Exception when a conflict was found.
-	 */
-	public void	updateDirectory(FileInfo fi, List<String> contents)
-	{
-		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
-		{
-			throw new RuntimeException("Found conflict with: "+getLocalId());
-		}
-			
-		if(props.containsKey(fi.getLocation()))
-		{
-			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
-			for(String key: vtimes.keySet())
-			{
-				if(vtimes.get(key).intValue()>fi.getVTime(key))
-				{
-					throw new RuntimeException("Found conflict with: "+key);
-				}
-			}
-		}
-
-		
-		props.setProperty(fi.getLocation(), fi.getVTime());
-		save();
-	}
+//	/**
+//	 *  Update a directory with remote information.
+//	 *  Deletes children that are no longer present.
+//	 *  
+//	 *  @param fi	The file info data to be merged with the local state.
+//	 *  @param contents	The contents of the directory.
+//	 *  @throws Exception when a conflict was found.
+//	 */
+//	public void	updateDirectory(FileInfo fi, List<String> contents)
+//	{
+//		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
+//		{
+//			throw new RuntimeException("Found conflict with: "+getLocalId());
+//		}
+//			
+//		if(props.containsKey(fi.getLocation()))
+//		{
+//			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
+//			for(String key: vtimes.keySet())
+//			{
+//				if(vtimes.get(key).intValue()>fi.getVTime(key))
+//				{
+//					throw new RuntimeException("Found conflict with: "+key);
+//				}
+//			}
+//		}
+//
+//		
+//		props.setProperty(fi.getLocation(), fi.getVTime());
+//		save();
+//	}
 	
 	/**
 	 *  Get a temporary location for downloading a file.
@@ -344,6 +342,27 @@ public class BackupResource
 	{
 		return new File(root, remote.getLocalId()+"_"+path.replace('/', '_'));
 	}
+
+	/**
+	 *  Update a file with a new version.
+	 *  @param fi	The remote file info.
+	 *  @param tmp	The new file already downloaded to a temporary location.
+	 *  @throws Exception when a conflict was detected.
+	 */
+	public void	updateFile(FileInfo fi, File tmp)
+	{
+		if(needsUpdate(fi))
+		{
+			File	orig	= getFile(fi.getLocation());
+			orig.delete();
+			tmp.renameTo(orig);
+		}
+		else
+		{
+			tmp.delete();
+		}
+	}
+
 	
 	//-------- helper methods --------
 

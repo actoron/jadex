@@ -1,5 +1,6 @@
 package jadex.backup.resource;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -194,6 +195,39 @@ public class FileInfo
 	{
 		return vtimes.keySet();
 	}
+		
+	/**
+	 *  Find out if a target file or directory has changed with respect to this file.
+	 *  
+	 *  @param target	The target file info.
+	 *  @return False when both files are equal or if this file is newer than the target.
+	 */
+	protected boolean	hasChanged(FileInfo fi)
+	{
+		if(!location.equals(fi.getLocation()))
+		{
+			throw new IllegalArgumentException("Location differs: "+fi.getLocation());
+		}
+		
+		// Has not changed when
+		// 1: hash values are equal (currently only tested for directories)
+		// 2: a remote valid time stamp is found that exists locally as valid (no change) or invalid (changed locally but not remotely)
+		
+		boolean	changed	= getHash()==null || !getHash().equals(fi.getHash());
+		if(changed)
+		{
+			for(Iterator<String> it=fi.getNodes().iterator(); changed && it.hasNext(); )
+			{
+				String node	= it.next();
+				// No match (changed stays true) when:
+				// remotely invalid or abs values differ.
+				changed	= fi.getVTime(node)<=0 || fi.getVTime(node)!=Math.abs(getVTime(node));
+			}
+		}
+		
+		return changed;
+	}
+
 	
 	//-------- helper methods --------
 	
