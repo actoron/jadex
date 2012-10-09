@@ -364,7 +364,7 @@ public class LocalResourceService	implements ILocalResourceService
 		final SubscriptionIntermediateFuture<BackupEvent> ret = new SubscriptionIntermediateFuture<BackupEvent>();
 		
 		final File	file = rpa.getResource().getFile(fi.getLocation());
-		ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_START , rpa.getResource().getFileInfo(file), new Double(0)));
+		ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_START, rpa.getResource().getFileInfo(file), new Double(0)));
 		remote.getFileContents(fi).addResultListener(new IResultListener<IInputConnection>()
 		{
 			public void resultAvailable(IInputConnection result)
@@ -375,9 +375,14 @@ public class LocalResourceService	implements ILocalResourceService
 					FileOutputStream	fos	= new FileOutputStream(tmp);
 					result.writeToOutputStream(fos, agent.getExternalAccess()).addResultListener(new IIntermediateResultListener<Long>()
 					{
+						long time;
 						public void intermediateResultAvailable(Long result)
 						{
-							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_STATE, fi, new Double(result.doubleValue()/fi.getSize())));
+							if(time==0 || System.currentTimeMillis()-time>1000)
+							{
+								ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_STATE, fi, new Double(result.doubleValue()/fi.getSize())));
+								time = System.currentTimeMillis();
+							}
 						}
 						
 						public void finished()
