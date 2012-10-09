@@ -2,6 +2,7 @@ package jadex.backup.resource;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -24,6 +25,9 @@ public class FileInfo
 	
 	/** The cached vector times as map (transferred as string "platform1@time1.platform2@time2..."). */
 	protected Map<String, Long>	vtimes;
+	
+	/** The cached hash code if any (transferred in base 64 at start of vtime string "hash.platform1@time1..."). */
+	protected String	hash;
 	
 	//-------- constructors --------
 	
@@ -105,7 +109,7 @@ public class FileInfo
 	 */
 	public String	getVTime()
 	{
-		return vtimesToString(vtimes);
+		return vtimesToString(vtimes, hash);
 	}
 	
 	/**
@@ -115,13 +119,29 @@ public class FileInfo
 	{
 		this.vtimes	= parseVTime(vtime);
 	}
+	
+	/**
+	 *  Get the hash code if any.
+	 */
+	public String getHash()
+	{
+		return hash;
+	}
+	
+	/**
+	 *  Set the hash code.
+	 */
+	public void setHash(String hash)
+	{
+		this.hash = hash;
+	}
 
 	//-------- methods --------
 	
 	/**
 	 *  Get a part of the vector time.
 	 *  @param node	The platform.
-	 *  @return The time.
+	 *  @return The time (negative for an outdated time stamp).
 	 */
 	public long	getVTime(String node)
 	{
@@ -129,17 +149,66 @@ public class FileInfo
 	}
 	
 	/**
+	 *  Update a part of the vector time and 
+	 *  invalidate other stored times if hash values differ.
+	 *  @param node	The platform.
+	 *  @param time	The time.
+	 *  @param hash	The new hash.
+	 */
+	public void	bumpVTime(String node, long time, String hash)
+	{
+		boolean	change	= this.hash==null || !this.hash.equals(hash);
+
+		// on change -> invalidate other times and update hash.
+		if(change)
+		{
+			for(String key: vtimes.keySet())
+			{
+				if(!node.equals(key))
+				{
+					// Use abs() for handling valid and invalid times
+					setVTime(key, -Math.abs(vtimes.get(key).longValue()));
+				}
+			}
+			
+			this.hash	= hash;
+		}
+		
+		setVTime(node, time);
+	}
+	
+	/**
 	 *  Update a part of the vector time.
-	 *  @param vtime	The original vtime string.
 	 *  @param node	The platform.
 	 *  @param time	The time.
 	 */
-	public void	updateVTime(String node, long time)
+	public void	setVTime(String node, long time)
 	{
 		vtimes.put(node, new Long(time));
 	}
 	
+	/**
+	 *  Get the known nodes for which time stamps exist.
+	 */
+	public Set<String> getNodes()
+	{
+		return vtimes.keySet();
+	}
+	
 	//-------- helper methods --------
+	
+	/**
+	 *  Get the hash if any.
+	 */
+	protected static String	parseHash(String vtime)
+	{
+		String	ret	= null;
+		if(vtime.indexOf('.')<vtime.indexOf('@'))
+		{
+			ret	= vtime.substring(0, vtime.indexOf('.'));
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get the vector time as map.
@@ -164,7 +233,7 @@ public class FileInfo
 	/**
 	 *  Get the vector time as string.
 	 */
-	protected static String	vtimesToString(Map<String, Long> vtimes)
+	protected static String	vtimesToString(Map<String, Long> vtimes, String hash)
 	{
 		StringBuffer	buf	= new StringBuffer();
 		for(String key: vtimes.keySet())
@@ -177,6 +246,16 @@ public class FileInfo
 			buf.append("@");
 			buf.append(vtimes.get(key));
 		}
+		
+		if(hash!=null)
+		{
+			if(buf.length()>0)
+			{
+				buf.insert(0, '.');
+			}
+			buf.insert(0, hash);
+		}
+
 		return buf.toString();
 	}
 }

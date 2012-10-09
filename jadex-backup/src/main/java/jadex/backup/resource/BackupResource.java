@@ -1,16 +1,21 @@
 package jadex.backup.resource;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.security.MessageDigest;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -138,6 +143,7 @@ public class BackupResource
 	
 	/**
 	 *  Get the file info for a local file.
+	 *  Also updates the meta information, when the file or directory has changed on disk.
 	 *  @param file The local file.
 	 *  @return The file info.
 	 */
@@ -153,33 +159,55 @@ public class BackupResource
 				throw new IllegalArgumentException("File '"+fpath+"' must be contained in resource root '"+rpath+"'.");
 			}
 			String	location	= rpath.equals(fpath) ? "/" : fpath.substring(rpath.length()).replace(File.separatorChar, '/');
-
-			// Existing file -> check for change.
+			
+			// Existing file -> load props and check if update needed.
+			boolean	update;
 			if(props.containsKey(location))
 			{
 				ret	= new FileInfo(location, file.isDirectory(), file.isDirectory() ? 0 : file.length(), props.getProperty(location));
-				
-				// File changed -> increment local vector time point to indicate changes.
-				if(file.lastModified()>ret.getVTime(getLocalId()))
-				{
-					ret.updateVTime(getLocalId(), file.lastModified());
-					props.setProperty(location, ret.getVTime());
-					save();				
-				}
+				update	= file.lastModified()>ret.getVTime(getLocalId());
 			}
 			
 			// New file -> store at current time.
 			else
 			{
 				ret	= new FileInfo(location, file.isDirectory(), file.isDirectory() ? 0 : file.length(), "");
-				ret.updateVTime(getLocalId(), file.lastModified());
+				update	= true;
+			}
+			
+			if(update)
+			{
+				
+				String	hash	= null;
+				
+				// Build hash for contents of directory (Todo: hash for files)
+				if(file.isDirectory())
+				{
+					final MessageDigest	md	= MessageDigest.getInstance("SHA-1");
+					String[]	files	= file.list(new FilenameFilter()
+					{
+						public boolean accept(File dir, String name)
+						{
+							return !".jadexbackup".equals(name);
+						}
+					});
+					for(String name: files)
+					{
+						md.update((byte)0);	// marker between directory names to avoid {a, bc} being the same as {ab, c}. 
+						md.update(name.getBytes("UTF-8"));
+					}
+					
+					hash	= new String(Base64.encode(md.digest()));
+				}
+				
+				ret.bumpVTime(getLocalId(), file.lastModified(), hash);
 				props.setProperty(location, ret.getVTime());
 				save();				
 			}
 			
 			return ret;
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}
@@ -187,43 +215,76 @@ public class BackupResource
 	
 	/**
 	 *  Check if the resource needs to be updated when compared to the given time stamps.
+	 *  When no update is needed, additional time stamps (if any) are merged into the stored meta information.
 	 *  @param fi	The file info data to be compared with the local state.
 	 *  @return	True, when the local file needs updating.
 	 *  @throws Exception when a conflict was found.
 	 */
 	public boolean	needsUpdate(FileInfo fi)
 	{
-		boolean	update	= true;
+		// Needs no update when
+		// 1: hash values are equal (currently only tested for directories)
+		// 2: a remote valid time stamp is found that exists locally as valid (no change) or invalid (changed locally but not remotely)
 		
-		// Hack!!! always update root for testing.
-		if(!"/".equals(fi.getLocation()) && props.containsKey(fi.getLocation()))
+		FileInfo	local	= getFileInfo(getFile(fi.getLocation()));
+		boolean	update	= local.getHash()==null || !local.getHash().equals(fi.getHash());
+		Set<String>	rnodes	= fi.getNodes();
+		Set<String>	lnodes	= local.getNodes();
+		
+		if(update)
 		{
-			update	= false;
-			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
-			for(Iterator<String> it=vtimes.keySet().iterator(); !update && it.hasNext(); )
+			for(Iterator<String> it=rnodes.iterator(); update && it.hasNext(); )
 			{
-				String	key	= it.next();
-				update	= fi.getVTime(key)>vtimes.get(key).longValue();
+				String node	= it.next();
+				// No match (update stays true) when:
+				// remotely invalid or abs values differ.
+				update	= fi.getVTime(node)<=0 || fi.getVTime(node)!=Math.abs(local.getVTime(node));
 			}
 		}
 		
-		// Hack!!! continue sync also on error.
-//		if(update && getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
-//		{
-//			throw new RuntimeException("Found conflict: "+fi.getLocation());
-//		}
+		// When changed: check for conflict
+		if(update)
+		{
+			// Conflict when remotely changed (as we already know) and 
+			// there is no locally valid time stamp that is available remotely (probably as invalid, because remote has changed).
+			boolean	conflict	= true;
+			for(Iterator<String> it=lnodes.iterator(); conflict && it.hasNext(); )
+			{
+				String node	= it.next();
+				// No match (conflict stays true) when:
+				// locally invalid or remotely unavailable or values differ.
+				conflict	= local.getVTime(node)<=0 || local.getVTime(node)!=Math.abs(fi.getVTime(node));
+			}			
+			
+			if(conflict)
+			{
+				throw new RuntimeException("Found conflict: "+fi.getLocation());
+			}
+		}
+		
+		// When not changed: add new time stamps to meta information if abs value is larger
+		else
+		{
+			for(String node: rnodes)
+			{
+				if(Math.abs(local.getVTime(node))<Math.abs(fi.getVTime(node)))
+				{
+					local.setVTime(node, fi.getVTime(node));
+				}
+			}
+		}
 		
 		return update;
 	}
 
-	/**
-	 *  Check if some newer local time stamp exists when compared to the given time stamps.
-	 *  @param fi	The file info data to be compared with the local state.
-	 *  @throws Exception when a conflict was found.
-	 */
-	public void	checkForConflicts(FileInfo fi)
-	{
-		// Hack!!! continue sync also on error.
+//	/**
+//	 *  Check if some newer local time stamp exists when compared to the given time stamps.
+//	 *  @param fi	The file info data to be compared with the local state.
+//	 *  @throws Exception when a conflict was found.
+//	 */
+//	public void	checkForConflicts(FileInfo fi)
+//	{
+//		// Hack!!! continue sync also on error.
 //		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
 //		{
 //			throw new RuntimeException("Found conflict with: "+getLocalId());
@@ -240,16 +301,36 @@ public class BackupResource
 //				}
 //			}
 //		}
-	}
+//	}
 	
 	/**
-	 *  Update the file info with e.g. remote information.
+	 *  Update a directory with remote information.
+	 *  Deletes children that are no longer present.
+	 *  
 	 *  @param fi	The file info data to be merged with the local state.
+	 *  @param contents	The contents of the directory.
 	 *  @throws Exception when a conflict was found.
 	 */
-	public void	updateFileInfo(FileInfo fi)
+	public void	updateDirectory(FileInfo fi, List<String> contents)
 	{
-		checkForConflicts(fi);
+		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
+		{
+			throw new RuntimeException("Found conflict with: "+getLocalId());
+		}
+			
+		if(props.containsKey(fi.getLocation()))
+		{
+			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
+			for(String key: vtimes.keySet())
+			{
+				if(vtimes.get(key).intValue()>fi.getVTime(key))
+				{
+					throw new RuntimeException("Found conflict with: "+key);
+				}
+			}
+		}
+
+		
 		props.setProperty(fi.getLocation(), fi.getVTime());
 		save();
 	}
