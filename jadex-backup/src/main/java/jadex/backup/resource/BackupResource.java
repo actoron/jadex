@@ -11,9 +11,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileLock;
 import java.security.MessageDigest;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -220,56 +218,19 @@ public class BackupResource
 	 */
 	public boolean	needsUpdate(FileInfo fi)
 	{
-		// Needs no update when
-		// 1: hash values are equal (currently only tested for directories)
-		// 2: a remote valid time stamp is found that exists locally as valid (no change) or invalid (changed locally but not remotely)
-		
 		FileInfo	local	= getFileInfo(getFile(fi.getLocation()));
-		boolean	update	= local.getHash()==null || !local.getHash().equals(fi.getHash());
-		Set<String>	rnodes	= fi.getNodes();
-		Set<String>	lnodes	= local.getNodes();
-		
-		if(update)
-		{
-			for(Iterator<String> it=rnodes.iterator(); update && it.hasNext(); )
-			{
-				String node	= it.next();
-				// No match (update stays true) when:
-				// remotely invalid or abs values differ.
-				update	= fi.getVTime(node)<=0 || fi.getVTime(node)!=Math.abs(local.getVTime(node));
-			}
-		}
+		boolean	update	= fi.isNewerThan(local);
 		
 		// When changed: check for conflict (hack? only for files)
-		if(update && !local.isDirectory())
+		if(update && !local.isDirectory() && local.isNewerThan(fi))
 		{
-			// Conflict when remotely changed (as we already know) and 
-			// there is no locally valid time stamp that is available remotely (probably as invalid, because remote has changed).
-			boolean	conflict	= true;
-			for(Iterator<String> it=lnodes.iterator(); conflict && it.hasNext(); )
-			{
-				String node	= it.next();
-				// No match (conflict stays true) when:
-				// locally invalid or remotely unavailable or values differ.
-				conflict	= local.getVTime(node)<=0 || local.getVTime(node)!=Math.abs(fi.getVTime(node));
-			}			
-			
-			if(conflict)
-			{
-				throw new RuntimeException("Found conflict: "+fi.getLocation());
-			}
+			throw new RuntimeException("Found conflict: "+fi.getLocation());
 		}
 		
-		// When not changed: add new time stamps to meta information if abs value is larger
-		else
+		// When not changed: add new time stamps to meta information
+		if(!update)
 		{
-			for(String node: rnodes)
-			{
-				if(Math.abs(local.getVTime(node))<Math.abs(fi.getVTime(node)))
-				{
-					local.setVTime(node, fi.getVTime(node));
-				}
-			}
+			local.updateVTimes(fi);
 		}
 		
 		return update;

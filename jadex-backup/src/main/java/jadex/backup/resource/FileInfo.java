@@ -3,7 +3,6 @@ package jadex.backup.resource;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -188,21 +187,15 @@ public class FileInfo
 		vtimes.put(node, new Long(time));
 	}
 	
+	
 	/**
-	 *  Get the known nodes for which time stamps exist.
-	 */
-	public Set<String> getNodes()
-	{
-		return vtimes.keySet();
-	}
-		
-	/**
-	 *  Find out if a target file or directory has changed with respect to this file.
+	 *  Find out if this file or directory has changed with respect to a target.
+	 *  Note that this method might return true in either direction in case of a conflict
+	 *  (i.e. both local and target are newer with respect to each other).
 	 *  
 	 *  @param target	The target file info.
-	 *  @return False when both files are equal or if this file is newer than the target.
 	 */
-	protected boolean	hasChanged(FileInfo fi)
+	protected boolean	isNewerThan(FileInfo fi)
 	{
 		if(!location.equals(fi.getLocation()))
 		{
@@ -211,23 +204,42 @@ public class FileInfo
 		
 		// Has not changed when
 		// 1: hash values are equal (currently only tested for directories)
-		// 2: a remote valid time stamp is found that exists locally as valid (no change) or invalid (changed locally but not remotely)
+		// 2: a locally valid time stamp is found that exists remotely as valid (no change) or invalid (changed remotely but not locally)
 		
 		boolean	changed	= getHash()==null || !getHash().equals(fi.getHash());
 		if(changed)
 		{
-			for(Iterator<String> it=fi.getNodes().iterator(); changed && it.hasNext(); )
+			for(Iterator<String> it=vtimes.keySet().iterator(); changed && it.hasNext(); )
 			{
 				String node	= it.next();
 				// No match (changed stays true) when:
-				// remotely invalid or abs values differ.
-				changed	= fi.getVTime(node)<=0 || fi.getVTime(node)!=Math.abs(getVTime(node));
+				// locally invalid or abs values differ.
+				changed	= getVTime(node)<=0 || getVTime(node)!=Math.abs(fi.getVTime(node));
 			}
 		}
 		
 		return changed;
 	}
 
+	/**
+	 *  Update the vector times of this file info
+	 *  with vector times of another file info, if the values are larger.
+	 */
+	public void	updateVTimes(FileInfo fi)
+	{
+		if(!location.equals(fi.getLocation()))
+		{
+			throw new IllegalArgumentException("Location differs: "+fi.getLocation());
+		}
+		
+		for(String node: vtimes.keySet())
+		{
+			if(Math.abs(getVTime(node))<Math.abs(fi.getVTime(node)))
+			{
+				setVTime(node, fi.getVTime(node));
+			}
+		}		
+	}
 	
 	//-------- helper methods --------
 	
