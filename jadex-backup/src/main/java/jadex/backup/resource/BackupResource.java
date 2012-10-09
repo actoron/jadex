@@ -147,7 +147,7 @@ public class BackupResource
 	{
 		try
 		{
-			FileInfo	ret;
+			FileInfo	ret	= null;
 			String	rpath	= root.getCanonicalPath();
 			String	fpath	= file.getCanonicalPath();
 			if(!fpath.startsWith(rpath))
@@ -157,7 +157,7 @@ public class BackupResource
 			String	location	= rpath.equals(fpath) ? "/" : fpath.substring(rpath.length()).replace(File.separatorChar, '/');
 			
 			// Existing file -> load props and check if update needed.
-			boolean	update;
+			boolean	update	= false;
 			if(props.containsKey(location))
 			{
 				ret	= new FileInfo(location, file.isDirectory(), file.isDirectory() ? 0 : file.length(), props.getProperty(location));
@@ -165,7 +165,7 @@ public class BackupResource
 			}
 			
 			// New file -> store at current time.
-			else
+			else if(file.exists())
 			{
 				ret	= new FileInfo(location, file.isDirectory(), file.isDirectory() ? 0 : file.length(), "");
 				update	= true;
@@ -219,16 +219,16 @@ public class BackupResource
 	public boolean	needsUpdate(FileInfo fi)
 	{
 		FileInfo	local	= getFileInfo(getFile(fi.getLocation()));
-		boolean	update	= fi.isNewerThan(local);
+		boolean	update	= local==null || fi.isNewerThan(local);
 		
 		// When changed: check for conflict (hack? only for files)
-		if(update && !local.isDirectory() && local.isNewerThan(fi))
+		if(update && local!=null && !local.isDirectory() && local.isNewerThan(fi))
 		{
 			throw new RuntimeException("Found conflict: "+fi.getLocation());
 		}
 		
 		// When not changed: add new time stamps to meta information
-		if(!update)
+		if(!update && local!=null)
 		{
 			local.updateVTimes(fi);
 		}
@@ -236,38 +236,6 @@ public class BackupResource
 		return update;
 	}
 
-//	/**
-//	 *  Update a directory with remote information.
-//	 *  Deletes children that are no longer present.
-//	 *  
-//	 *  @param fi	The file info data to be merged with the local state.
-//	 *  @param contents	The contents of the directory.
-//	 *  @throws Exception when a conflict was found.
-//	 */
-//	public void	updateDirectory(FileInfo fi, List<String> contents)
-//	{
-//		if(getFile(fi.getLocation()).lastModified()>fi.getVTime(getLocalId()))
-//		{
-//			throw new RuntimeException("Found conflict with: "+getLocalId());
-//		}
-//			
-//		if(props.containsKey(fi.getLocation()))
-//		{
-//			Map<String, Long>	vtimes	= FileInfo.parseVTime(props.getProperty(fi.getLocation()));
-//			for(String key: vtimes.keySet())
-//			{
-//				if(vtimes.get(key).intValue()>fi.getVTime(key))
-//				{
-//					throw new RuntimeException("Found conflict with: "+key);
-//				}
-//			}
-//		}
-//
-//		
-//		props.setProperty(fi.getLocation(), fi.getVTime());
-//		save();
-//	}
-	
 	/**
 	 *  Get a temporary location for downloading a file.
 	 *  @param path	The resource location.
@@ -296,9 +264,17 @@ public class BackupResource
 
 			// Update meta information to reflect new current state.
 			// todo: file hash code.
-			ofi.updateVTimes(fi);
-			ofi.setVTime(getLocalId(), orig.lastModified());
-			props.setProperty(ofi.getLocation(), ofi.getVTime());			
+			if(ofi!=null)
+			{
+				ofi.updateVTimes(fi);
+				ofi.setVTime(getLocalId(), orig.lastModified());
+				props.setProperty(ofi.getLocation(), ofi.getVTime());
+			}
+			else
+			{
+				fi.setVTime(getLocalId(), orig.lastModified());
+				props.setProperty(fi.getLocation(), fi.getVTime());
+			}
 			save();
 		}
 		else

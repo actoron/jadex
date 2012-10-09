@@ -76,7 +76,7 @@ public class ResourceService	implements IResourceService
 	/**
 	 *  Get information about a local file or directory.
 	 *  @param file	The resource path of the file.
-	 *  @return	The file info with all known time stamps.
+	 *  @return	The file info with all known time stamps or null if the file does no longer exist.
 	 */
 	public IFuture<FileInfo>	getFileInfo(String file)
 	{
@@ -141,7 +141,8 @@ public class ResourceService	implements IResourceService
 		Future<IInputConnection>	ret	= new Future<IInputConnection>();
 		try
 		{
-			if(rpa.getResource().getFileInfo(rpa.getResource().getFile(file.getLocation())).isNewerThan(file))
+			File	f	= rpa.getResource().getFile(file.getLocation());
+			if(!f.exists() || rpa.getResource().getFileInfo(f).isNewerThan(file))
 			{
 				throw new RuntimeException("Local resource has changed: "+file.getLocation());
 			}
