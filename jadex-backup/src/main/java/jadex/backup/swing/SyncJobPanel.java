@@ -2,6 +2,7 @@ package jadex.backup.swing;
 
 import jadex.backup.job.Job;
 import jadex.backup.job.SyncJob;
+import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -170,6 +171,12 @@ public class SyncJobPanel extends JPanel
 					{
 						try
 						{
+							String gid = BackupResource.getGlobalId(fc.getSelectedFile());
+							if(gid!=null)
+							{
+								grtf.setText(gid);
+								job.setGlobalResource(gid);
+							}
 							String dir = fc.getSelectedFile().getCanonicalPath();
 							lrtf.setText(dir);
 							job.setLocalResource(dir);

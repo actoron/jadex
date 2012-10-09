@@ -305,4 +305,46 @@ public class BackupResource
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 *  Read meta info.
+	 */
+	public static Properties readMetaInfo(File root)
+	{
+		Properties ret = null;
+		
+		File meta = new File(root, ".jadexbackup");
+		if(meta.exists())
+		{
+			ret = new Properties();
+			File fprops	= new File(meta, "resource.properties");
+			if(fprops.exists())
+			{
+				try
+				{
+					FileInputStream	fips = new FileInputStream(fprops);
+					ret.load(fips);
+					fips.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the global id if already under jadex control.
+	 */
+	public static String getGlobalId(File root)
+	{
+		Properties props = readMetaInfo(root);
+		if(props!=null)
+		{
+			return props.getProperty("id");
+		}
+		return null;
+	}
 }
