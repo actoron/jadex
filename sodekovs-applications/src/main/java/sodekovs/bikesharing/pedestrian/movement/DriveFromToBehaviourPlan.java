@@ -2,6 +2,7 @@ package sodekovs.bikesharing.pedestrian.movement;
 
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -17,19 +18,19 @@ import sodekovs.bikesharing.pedestrian.RentBikeTask;
 import sodekovs.bikesharing.pedestrian.ReturnBikeTask;
 
 /**
- Strategy "1" - Drive from station to station strategy:
- *  			1)Take a bike from the start point, which is a bike station
- *  			2)Drive to a bike station, which is stochastically determined
- *  			3)Return bike and terminatee 
+ * Strategy "1" - Drive from station to station strategy: 1)Take a bike from the start point, which is a bike station 2)Drive to a bike station, which is stochastically determined 3)Return bike and
+ * terminatee
  */
 public class DriveFromToBehaviourPlan extends Plan {
 	// -------- constructors --------
+//	private IClockService clockservice = null;
 
 	/**
 	 * Create a new plan.
 	 */
 	public DriveFromToBehaviourPlan() {
 		// getLogger().info("Created: "+this+" for goal "+getRootGoal());
+//		clockservice = (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 	}
 
 	// -------- methods --------
@@ -52,8 +53,12 @@ public class DriveFromToBehaviourPlan extends Plan {
 //		Random rand = new java.util.Random();
 //		Vector2Double nextDestination = (Vector2Double) allBikestations[rand.nextInt(allBikestations.length)].getProperty(ContinuousSpace2D.PROPERTY_POSITION);				
 //		Vector2Double destinationStation = (Vector2Double) myself.getProperty("DESTINATION_STATION");
-//		System.out.println("#DriveFromToBehaviourPlan# " + myself.getId() + " Going from to " + myPos + "..to .." + dest);
+//		System.out.println("#DriveFromToBehaviourPlan# " + myself.getId() + " Going from to " + myPos + "..to .." + dest + " : tick: " + getClock().getTick());
+		double startTime = getClock().getTick();
 		moveToDestination(dest, space, myself);
+//		System.out.println("#DriveFromToBehaviourPlan# Plan accomplished: : tick: " + getClock().getTick());
+		double endTime = getClock().getTick();
+		System.out.println("#DriveFromToBehavoiur# Walking Time: " + (endTime-startTime));
 		
 		//Rent bike at station
 		returnBike(space,myself);
@@ -61,7 +66,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 		//Terminate
 		killAgent();
 	}
-	
+
 	/**
 	 * Move to a destination task.
 	 * 
@@ -70,7 +75,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 	 * @param myself
 	 */
 	private void moveToDestination(IVector2 dest, IEnvironmentSpace env, ISpaceObject myself) {
-		Map<String,Object> props = new HashMap<String,Object>();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
 		props.put(MoveTask.ACTOR_ID, myself.getId());
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
@@ -80,7 +85,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 		env.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 	}
-	
+
 	/**
 	 * Rent a bike at a station.
 	 * 
@@ -88,7 +93,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 	 * @param myself
 	 */
 	private void rentBike(IEnvironmentSpace env, ISpaceObject myself) {
-		Map<String,Object> props = new HashMap<String,Object>();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(RentBikeTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object taskid = env.createObjectTask(RentBikeTask.PROPERTY_TYPENAME, props, myself.getId());
@@ -96,7 +101,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 		env.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 	}
-	
+
 	/**
 	 * Return a bike at a station.
 	 * 
@@ -104,7 +109,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 	 * @param myself
 	 */
 	private void returnBike(IEnvironmentSpace env, ISpaceObject myself) {
-		Map<String,Object> props = new HashMap<String,Object>();
+		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(ReturnBikeTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object taskid = env.createObjectTask(ReturnBikeTask.PROPERTY_TYPENAME, props, myself.getId());
