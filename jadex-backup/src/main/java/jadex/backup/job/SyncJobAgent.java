@@ -138,8 +138,32 @@ public class SyncJobAgent
 					{
 						public void intermediateResultAvailable(IResourceService result)
 						{
-							resservices.add(result);
-							fini.setResultIfUndone(null);
+							if(result.getResourceId().equals(job.getGlobalResource())
+								&& !result.getLocalId().equals(resser.getLocalId()))
+							{
+								resservices.add(result);
+								fini.setResultIfUndone(null);
+							}
+						}
+						
+						public void finished()
+						{
+							if(resservices.size()>0)
+							{
+								fini.setResultIfUndone(null);
+							}
+							else
+							{
+								fini.setExceptionIfUndone(new RuntimeException("No sync partner"));
+							}
+						}
+						
+						public void resultAvailable(Collection<IResourceService> result)
+						{
+							for(IResourceService resser: result)
+							{
+								intermediateResultAvailable(resser);
+							}
 						}
 						
 						public void exceptionOccurred(Exception exception) 
@@ -153,89 +177,81 @@ public class SyncJobAgent
 				{
 					public void resultAvailable(Void result)
 					{
-						agent.getServiceContainer().searchServices(ILocalResourceService.class)
-							.addResultListener(new IntermediateDefaultResultListener<ILocalResourceService>()
+						final IResourceService remresser = resservices.get(0);
+						System.out.println("starting sync with: "+resservices.get(0));
+						
+						final List<Tuple2<String, FileInfo>> changelist = new ArrayList<Tuple2<String, FileInfo>>();
+						
+						resser.update(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
 						{
-							public void intermediateResultAvailable(final ILocalResourceService localresser)
+							public void intermediateResultAvailable(BackupEvent result)
 							{
-								final IResourceService resser = resservices.get(0);
-								System.out.println("starting sync with: "+resservices.get(0));
-								
-								final List<Tuple2<String, FileInfo>> changelist = new ArrayList<Tuple2<String, FileInfo>>();
-								
-								localresser.update(resser).addResultListener(new IIntermediateResultListener<BackupEvent>()
+//								System.out.println(result);
+								if(BackupResource.FILE_ADDED.equals(result.getType())
+//									|| BackupResource.FILE_REMOVED.equals(result.getType())
+									|| BackupResource.FILE_MODIFIED.equals(result.getType()))
 								{
-									public void intermediateResultAvailable(BackupEvent result)
+									if(!autoupdate)
 									{
-//										System.out.println(result);
-										if(BackupResource.FILE_ADDED.equals(result.getType())
-//											|| BackupResource.FILE_REMOVED.equals(result.getType())
-											|| BackupResource.FILE_MODIFIED.equals(result.getType()))
+										changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
+									}
+									else
+									{
+										updateFile(resser, remresser, result.getFile()).addResultListener(new IResultListener<Void>()
 										{
-											if(!autoupdate)
+											public void resultAvailable(Void result)
 											{
-												changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
 											}
-											else
+											
+											public void exceptionOccurred(Exception exception)
 											{
-												updateFile(localresser, resser, result.getFile()).addResultListener(new IResultListener<Void>()
-												{
-													public void resultAvailable(Void result)
-													{
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-													}
-												});
 											}
-										}
+										});
 									}
-									
-									public void finished()
+								}
+							}
+							
+							public void finished()
+							{
+								System.out.println("finished sync");
+								if(!autoupdate)
+								{
+									for(Tuple2<String, FileInfo> tup: changelist)
 									{
-										System.out.println("finished sync");
-										if(!autoupdate)
+										System.out.println(tup);
+										updateFile(resser, remresser, tup.getSecondEntity()).addResultListener(new IResultListener<Void>()
 										{
-											for(Tuple2<String, FileInfo> tup: changelist)
+											public void resultAvailable(Void result)
 											{
-												System.out.println(tup);
-												updateFile(localresser, resser, tup.getSecondEntity()).addResultListener(new IResultListener<Void>()
-												{
-													public void resultAvailable(Void result)
-													{
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-													}
-												});
 											}
-										}
-										resservices.remove(0);
-										agent.waitForDelay(60000, self);
+											
+											public void exceptionOccurred(Exception exception)
+											{
+											}
+										});
 									}
-									
-									public void resultAvailable(Collection<BackupEvent> result)
-									{
-										System.out.println("finished sync");
-										resservices.remove(0);
-										agent.waitForDelay(60000, self);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										System.out.println("Update error: "+exception);
-										agent.waitForDelay(60000, self);
-									}
-								});
+								}
+								resservices.remove(0);
+								agent.waitForDelay(60000, self);
+							}
+							
+							public void resultAvailable(Collection<BackupEvent> result)
+							{
+								System.out.println("finished sync");
+								resservices.remove(0);
+								agent.waitForDelay(60000, self);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								System.out.println("Update error: "+exception);
+								agent.waitForDelay(60000, self);
 							}
 						});
 					}
-				
-					public void exceptionOccurred(Exception exception)
+					
+					public void exceptionOccurred(Exception exception) 
 					{
-						System.out.println("Sync probleme: "+exception);
 						agent.waitForDelay(60000, self);
 					}
 				});

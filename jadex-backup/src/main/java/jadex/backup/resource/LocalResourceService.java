@@ -73,6 +73,20 @@ public class LocalResourceService	implements ILocalResourceService
 	//-------- ILocalResourceService interface --------
 	
 	/**
+	 *  Get the local resource id.
+	 *  The local resource id is a unique id that is
+	 *  used to identify an individual instance of a
+	 *  distributed resource on a specific host.
+	 *  
+	 *  The id is static, i.e. it does not change during
+	 *  the lifetime of the resource.
+	 */
+	public String	getLocalId()
+	{
+		return rpa.getResource().getLocalId();
+	}
+	
+	/**
 	 *  Update the local resource with all
 	 *  changes from all available remote resource.
 	 *  @return All changed files and directories that are being processed.
