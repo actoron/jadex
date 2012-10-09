@@ -58,7 +58,7 @@ public class DriveFromToBehaviourPlan extends Plan {
 		moveToDestination(dest, space, myself);
 //		System.out.println("#DriveFromToBehaviourPlan# Plan accomplished: : tick: " + getClock().getTick());
 		double endTime = getClock().getTick();
-		System.out.println("#DriveFromToBehavoiur# Walking Time: " + (endTime-startTime));
+//		System.out.println("#DriveFromToBehavoiur# Walking Time: " + (endTime-startTime));
 		
 		//Rent bike at station
 		returnBike(space,myself);

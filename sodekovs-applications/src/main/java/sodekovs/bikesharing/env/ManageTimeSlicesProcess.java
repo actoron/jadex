@@ -194,7 +194,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 		// Create number of pedestrians according to the "Andrang"
 		long congestion = Math.round((timeSlicesList.get(currentTimeSlice).getRunRelative() * totalDepartures) / 60);
-//		for (int i = 0; i < congestion; i++) {
+		for (int i = 0; i < congestion; i++) {
 			int departureStation = computeDeparture(stationList);
 
 			// compute destination probabilities of this departure
@@ -202,7 +202,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			// System.out.println("Start Event from: " + station.getStationID() + "  to : " + station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 			createPedestrian(space, stationList.get(departureStation).getStationID(), stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination)
 					.getDestination());
-//		}
+		}
 	}
 
 	/**
