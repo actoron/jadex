@@ -25,7 +25,7 @@ public class BikeSharingEvaluation {
 	private HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> simulationData;
 	// contains the final results of the evaluation
 	private HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> compareSimAndRealWorldResultsMap = new HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>>();
-	//contains the evaluation of the stock level, sorted into three buckets (blue, green, red -> cf. the *.application.xml for details)	
+	// contains the evaluation of the stock level, sorted into three buckets (blue, green, red -> cf. the Bikesharing.application.xml for details)
 	private HashMap<Integer, HashMap<String, Integer>> stockLevelResultsMap = new HashMap<Integer, HashMap<String, Integer>>();
 
 	public BikeSharingEvaluation(HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> simulationData) {
@@ -43,9 +43,9 @@ public class BikeSharingEvaluation {
 
 		// 3.Compare Simulation Results with real data
 		compareResults(transformedSimDataMap);
-		
-		//4. Evaluate the stock level
-//		evalStockLevel();
+
+		// 4. Evaluate the stock level
+		evalStockLevel(transformedSimDataMap);
 
 	}
 
@@ -124,9 +124,9 @@ public class BikeSharingEvaluation {
 		return abritrayObservedPropertyValues.get(abritrayObservedPropertyValuesKey).size();
 	}
 
-	
 	/**
-	 * Compare the sim data with real data: compute the difference with respect to the property "stock" 
+	 * Compare the sim data with real data: compute the difference with respect to the property "stock"
+	 * 
 	 * @param transformedSimDataMap
 	 * @return
 	 */
@@ -155,6 +155,7 @@ public class BikeSharingEvaluation {
 					// compare
 					double difference = station.getNumberOfBikes() / Double.valueOf(stationInstancesMap.get("stock").get(Constants.MEAN_VALUE));
 
+					// ew HashMap<Integer, HashMap<String, Integer>>();
 					// compute relative difference
 					if (difference <= 1.0) {
 						difference = 1.0 - difference;
@@ -177,7 +178,7 @@ public class BikeSharingEvaluation {
 
 					HashMap<String, String> statsForProperty = compareSimAndRealWorldResultsMap.get((int) startTime).get(station.getStationID()).get("stock");
 
-					// put the value, that denotes the difference betwenn the
+					// put the value, that denotes the difference between the
 					// sim data and real data into this HashMap
 					statsForProperty.put(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA, String.valueOf(difference));
 
@@ -203,15 +204,6 @@ public class BikeSharingEvaluation {
 			ArrayList<Integer> diffStats = new ArrayList<Integer>();
 			for (int i = 0; i < 10; i++) {
 				diffStats.add(0);
-			}
-
-			// Compute the stock level of the bikestations: three buckets:
-			// 1.) stock < 1
-			// 2.) stock > 0 && stock < capacity
-			// 3.) stock >= capacity
-			ArrayList<Integer> stockLevel = new ArrayList<Integer>();
-			for (int i = 0; i < 3; i++) {
-				stockLevel.add(0);
 			}
 
 			result.append("TIME SLICE: ");
@@ -249,16 +241,94 @@ public class BikeSharingEvaluation {
 			result.append("\nDifference between 81%-90% " + diffStats.get(8));
 			result.append("\nDifference between 91%-100% " + diffStats.get(9));
 			result.append("\n*********************************************************************");
+			result.append("\n*********************************************************************");
 
-			// Compute the stock level of the bikestations: three buckets:
-			// 1.) stock < 1
-			// 2.) stock > 0 && stock < capacity
-			// 3.) stock >= capacity
-
-			result.append("***************************************");
+			
+			
+			// Print the evaluation of the stock levels of the bikestations using following three buckets:
+			// 1.) stock < 1 --> "red"
+			// 2.) stock > 0 && stock < capacity  --> "green"
+			// 3.) stock >= capacity --> "blue"
+			HashMap<String, Integer> tmp = stockLevelResultsMap.get(timeSliceKey);
+			int red = tmp.get(Constants.STOCK_LEVEL_RED);
+			int green = tmp.get(Constants.STOCK_LEVEL_GREEN);
+			int blue = tmp.get(Constants.STOCK_LEVEL_BLUE);
+			int total = red+blue+green;			
+			result.append("\n******** Print the evaluation of the stock levels of the bikestations using following three buckets:");
+			result.append("\n stock < 1 --> \"red\"");
+			result.append("\n stock > 0 && stock < capacity  --> \"green\"");
+			result.append("\n stock >= capacity --> \"blue\"");
+			result.append("\n");
+			result.append("\n RED: " + red + "(" + (red/total)*100 + "%)");
+			result.append("\n GREEN: " + green + "(" + (green/total)*100 + "%)");
+			result.append("\n BLUE: " + blue + "(" + (blue/total)*100 + "%)");
+			result.append("\n*********************************************************************");
+			result.append("\n*********************************************************************");
 		}
 
 		return result.toString();
+	}
+
+	// Compute the stock level of the bikestations uisng three buckets:
+	// 1.) stock < 1
+	// 2.) stock > 0 && stock < capacity
+	// 3.) stock >= capacity
+	private void evalStockLevel(HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> transformedSimDataMap) {
+		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
+
+		for (TimeSlice tSlice : scenario.getTimeSlices().getTimeSlice()) {
+			long startTime = tSlice.getStartTime();
+
+			for (Station station : tSlice.getStations().getStation()) {
+
+				// check , whether there are results for this tick
+				// check also, whether there are simulation results for this station
+				if (transformedSimDataMap.get((int) startTime) != null && transformedSimDataMap.get((int) startTime).get(station.getStationID()) != null) {
+
+					HashMap<String, HashMap<String, String>> stationInstancesMap = transformedSimDataMap.get((int) startTime).get(station.getStationID());
+
+					// compare
+					double observedStock = Double.valueOf(stationInstancesMap.get("stock").get(Constants.MEAN_VALUE));
+
+					// check, if hashMaps have been already initialized
+					if (stockLevelResultsMap.get((int) startTime) == null) {
+						stockLevelResultsMap.put((int) startTime, new HashMap<String, Integer>());
+					}
+
+					if (stockLevelResultsMap.get((int) startTime).get(Constants.STOCK_LEVEL_RED) == null) {
+						stockLevelResultsMap.get((int) startTime).put(Constants.STOCK_LEVEL_RED, 0);
+					}
+
+					if (stockLevelResultsMap.get((int) startTime).get(Constants.STOCK_LEVEL_GREEN) == null) {
+						stockLevelResultsMap.get((int) startTime).put(Constants.STOCK_LEVEL_GREEN, 0);
+					}
+
+					if (stockLevelResultsMap.get((int) startTime).get(Constants.STOCK_LEVEL_BLUE) == null) {
+						stockLevelResultsMap.get((int) startTime).put(Constants.STOCK_LEVEL_BLUE, 0);
+					}
+
+					if (observedStock < 1.0) {
+						int tmp = stockLevelResultsMap.get((int) startTime).get(Constants.STOCK_LEVEL_RED);
+						stockLevelResultsMap.get((int) startTime).put(Constants.STOCK_LEVEL_RED, tmp + 1);
+					} else if (observedStock >= station.getNumberOfDocks()) {
+						int tmp = stockLevelResultsMap.get((int) startTime).get(Constants.STOCK_LEVEL_BLUE);
+						stockLevelResultsMap.get((int) startTime).put(Constants.STOCK_LEVEL_BLUE, tmp + 1);
+					} else {
+						int tmp = stockLevelResultsMap.get((int) startTime).get(Constants.STOCK_LEVEL_GREEN);
+						stockLevelResultsMap.get((int) startTime).put(Constants.STOCK_LEVEL_GREEN, tmp + 1);
+					}
+
+					// HashMap<String, String> statsForProperty = compareSimAndRealWorldResultsMap.get((int) startTime).get(station.getStationID()).get("stock");
+
+					// put the value, that denotes the difference betwenn the
+					// sim data and real data into this HashMap
+					// statsForProperty.put(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA, String.valueOf(observedStock));
+
+					// add res for this station property to ResultMap
+					// compareSimAndRealWorldResultsMap.get((int) startTime).get(station.getStationID()).put("stock", statsForProperty);
+				}
+			}
+		}
 	}
 
 	private void computeDiff(ArrayList<Integer> diffStats, String value) {
