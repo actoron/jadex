@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimulationDescription>
     <TimeSlices>
-        <TimeSlice offset="60" startTime="1020">
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="1020">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="20th and E St NW" departureProbability="0.058823529411764705">
                     <DestinationProbabilities>
@@ -12,7 +12,7 @@
                     <DestinationProbabilities>
                         <DestinationProbability probability="1.0" destination="Convention Center / 7th and M St NW"/>
                     </DestinationProbabilities>
-                </ProbabilitiesForStation>
+                </ProbabilitiesForStation>w
                 <ProbabilitiesForStation stationID="19th St and Constitution Ave NW" departureProbability="0.058823529411764705">
                     <DestinationProbabilities>
                         <DestinationProbability probability="1.0" destination="4th and M St SW"/>
@@ -81,7 +81,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>
-        <TimeSlice offset="60" startTime="1080">
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="1080">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="19th St and Constitution Ave NW" departureProbability="0.034482758620689655">
                     <DestinationProbabilities>
@@ -200,7 +200,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>
-        <TimeSlice offset="60" startTime="1140">
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="1140">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="Park Rd and Holmead Pl NW" departureProbability="0.13333333333333333">
                     <DestinationProbabilities>
@@ -271,7 +271,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>
-        <TimeSlice offset="60" startTime="1200">
+        <TimeSlice  runRelative="1.0" runTotal="1" offset="60" startTime="1200">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="15th and P St NW" departureProbability="0.08333333333333333">
                     <DestinationProbabilities>
@@ -326,7 +326,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>
-        <TimeSlice offset="60" startTime="1260">
+        <TimeSlice  runRelative="1.0" runTotal="1"offset="60" startTime="1260">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="15th and P St NW" departureProbability="0.07142857142857142">
                     <DestinationProbabilities>
@@ -390,7 +390,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>
-        <TimeSlice offset="60" startTime="1320">
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="1320">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="Lamont and Mt Pleasant NW" departureProbability="0.2857142857142857">
                     <DestinationProbabilities>
@@ -424,7 +424,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>
-        <TimeSlice offset="60" startTime="1380">
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="1380">
             <ProbabilitiesForStations>
                 <ProbabilitiesForStation stationID="Park Rd and Holmead Pl NW" departureProbability="0.16666666666666666">
                     <DestinationProbabilities>
