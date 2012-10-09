@@ -7,6 +7,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.commons.SUtil;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -85,10 +86,10 @@ public class LocalResourceService	implements ILocalResourceService
 			public void intermediateResultAvailable(IResourceService result)
 			{
 				// Synchronize with matching remote resources, but exclude self.
-				System.out.println("updateAll found: "+result+" "+result.getLocalId()+" "+rpa.getResource().getResourceId());
 				if(!ret.isDone() && result.getResourceId().equals(rpa.getResource().getResourceId())
 					&& !result.getLocalId().equals(rpa.getResource().getLocalId()))
 				{
+					System.out.println("updateAll found: "+result+" "+result.getLocalId()+" "+rpa.getResource().getResourceId());
 					finished[1]++;
 					update(result).addResultListener(new IntermediateDefaultResultListener<BackupEvent>()
 					{
@@ -99,12 +100,14 @@ public class LocalResourceService	implements ILocalResourceService
 						
 						public void finished()
 						{
+							System.out.println("update finished");
 							finished[1]--;
 							checkFinished();
 						}
 		
 						public void exceptionOccurred(Exception exception)
 						{
+							System.out.println("update finished: "+exception);
 							finished[1]--;
 							checkFinished();
 						}
@@ -114,18 +117,21 @@ public class LocalResourceService	implements ILocalResourceService
 			
 			public void finished()
 			{
+				System.out.println("search finished");
 				finished[0]++;
 				checkFinished();
 			}
 
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("search finished: "+exception);
 				finished[0]++;
 				checkFinished();
 			}
 			
 			protected void	checkFinished()
 			{
+				System.out.println("finished: "+SUtil.arrayToString(finished));
 				if(finished[0]>0 && finished[1]==0)
 				{
 					ret.setFinishedIfUndone();
