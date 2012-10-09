@@ -8,7 +8,7 @@
 
 <SimulationConfiguration name="BikeSharingWashington"
 	applicationReference="..\\sodekovs-applications\\target\\classes\\sodekovs\\bikesharing\\examples\\BikesharingSimulation.application.xml"
-	applicationConfiguration="Washington"
+	applicationConfiguration="WashingtonTestEnv"
 	nameOfSpace="my2dspace">
 
 	<Imports>
@@ -103,7 +103,7 @@
 				<Time value="17000" type="absolute" />
 			</TerminateCondition> -->
 		</General>
-		<Rows experiments="1">
+		<Rows experiments="2">
 			<TerminateCondition>
 				 <Time value="20000" type="tick_based" /><!-- relatively, absolute or tick_based -->
 				

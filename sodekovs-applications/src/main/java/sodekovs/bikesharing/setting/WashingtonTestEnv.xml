@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimulationDescription>
+    <TimeSlices>
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="0">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="Congress Heights Metro" departureProbability="1.0">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="S Glebe and Potomac Ave"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>                
+            </ProbabilitiesForStations>
+        </TimeSlice>
+        <TimeSlice runRelative="1.0" runTotal="1" offset="60" startTime="1000">
+            <ProbabilitiesForStations>
+                <ProbabilitiesForStation stationID="Congress Heights Metro" departureProbability="1.0">
+                    <DestinationProbabilities>
+                        <DestinationProbability probability="1.0" destination="S Glebe and Potomac Ave"/>
+                    </DestinationProbabilities>
+                </ProbabilitiesForStation>                
+            </ProbabilitiesForStations>            
+        </TimeSlice>
+    </TimeSlices>
+    <Stations>
+       <Station numberOfDocks="11" numberOfBikes="5" longitude="33.511673151749974" latitude="80.43750000000298" stationID="S Glebe and Potomac Ave"/>
+       <Station numberOfDocks="14" numberOfBikes="7" longitude="63.85068093384953" latitude="79.11812500000339" stationID="Congress Heights Metro"/>
+    </Stations>
+</SimulationDescription>

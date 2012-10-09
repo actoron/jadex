@@ -48,6 +48,16 @@
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
-		</configuration>			
+		</configuration>
+		<configuration name="Washington TestEnv with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/WashingtonSimulationTestEnv.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>				
 	</configurations>
 </applicationtype>
