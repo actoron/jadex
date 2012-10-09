@@ -377,7 +377,7 @@ public class LocalResourceService	implements ILocalResourceService
 					{
 						public void intermediateResultAvailable(Long result)
 						{
-							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_START, fi, new Double(result.doubleValue()/fi.getSize())));
+							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_STATE, fi, new Double(result.doubleValue()/fi.getSize())));
 						}
 						
 						public void finished()
@@ -400,7 +400,7 @@ public class LocalResourceService	implements ILocalResourceService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_END, fi, exception));
+							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
 						}
 					});
 				}

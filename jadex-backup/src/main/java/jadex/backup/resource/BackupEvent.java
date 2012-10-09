@@ -113,7 +113,7 @@ public class BackupEvent
 
 	public String toString()
 	{
-		return "BackupEvent [type=" + type + ", file=" + file + ", details="+ details + "]";
+		return "BackupEvent [type=" + type + ", file=" + (file!=null ? file.getLocation() : "null") + ", details="+ details + "]";
 	}
 
 //	public String toString()
