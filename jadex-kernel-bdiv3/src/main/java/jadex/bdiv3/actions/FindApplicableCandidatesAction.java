@@ -4,9 +4,13 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.APL;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.RGoal;
+import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -21,12 +25,12 @@ import java.util.List;
 public class FindApplicableCandidatesAction implements IAction<Void>
 {
 	/** The processable element. */
-	protected Object element;
+	protected RProcessableElement element;
 	
 	/**
 	 *  Create a new action.
 	 */
-	public FindApplicableCandidatesAction(Object element)
+	public FindApplicableCandidatesAction(RProcessableElement element)
 	{
 		this.element = element;
 	}
@@ -52,39 +56,14 @@ public class FindApplicableCandidatesAction implements IAction<Void>
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		BDIModel bdimodel = ip.getBDIModel();
 		
-		// todo: support other elements than goals
-		APL apl = getApplicableMPlansForGoal(element.getClass(), bdimodel);
-		IAction<Void> action = new SelectCandidatesAction(element, apl);
+		APL apl = element.getApplicablePlanList();
+		apl.build(bdimodel);
+		IAction<Void> action = new SelectCandidatesAction(element);
 		ia.getExternalAccess().scheduleStep(action);
 		ret.setResult(null);
 		
 		return ret;
 	}
 	
-	/**
-	 * 
-	 */
-	public static APL getApplicableMPlansForGoal(Class<?> element, BDIModel bdimodel)
-	{
-		List<MPlan> ret = new ArrayList<MPlan>();
-		
-		List<MPlan> mplans = bdimodel.getPlans();
-		for(int i=0; i<mplans.size(); i++)
-		{
-			MPlan mplan = mplans.get(i);
-			Plan aplan = mplan.getTarget().getAnnotation(Plan.class);
-			Trigger atrigger = aplan.trigger();
-			Class<?>[] mgoals = atrigger.goals();
-			for(int j=0; j<mgoals.length; j++)
-			{
-//				Goal g = mgoals[j].getAnnotation(Goal.class);
-				if(mgoals[j].equals(element))
-				{
-					ret.add(mplan);
-				}
-			}
-		}
-		
-		return new APL(ret);
-	}
+	
 }

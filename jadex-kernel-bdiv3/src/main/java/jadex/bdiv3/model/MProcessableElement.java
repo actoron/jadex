@@ -5,11 +5,18 @@ package jadex.bdiv3.model;
  */
 public class MProcessableElement
 {
+	
 	/** Post to all flag. */
 	protected boolean posttoall;
 	
 	/** Random selection flag. */
 	protected boolean randomselection;
+	
+	/** The rebuild mode. */
+	protected boolean rebuild;
+
+	/** The exclude mode. */
+	protected String excludemode;
 	
 	/**
 	 * 
@@ -55,5 +62,41 @@ public class MProcessableElement
 	{
 		this.randomselection = randomselection;
 	}
+	
+	/**
+	 *  Test if rebuild APL.
+	 *  @return True, if rebuild.
+	 */
+	public boolean isRebuild()
+	{
+		return rebuild;
+	}
+	
+	/**
+	 *  Set the rebuild.
+	 *  @param rebuild The rebuild to set.
+	 */
+	public void setRebuild(boolean rebuild)
+	{
+		this.rebuild = rebuild;
+	}
 
+	/**
+	 *  Get the excludemode.
+	 *  @return The excludemode.
+	 */
+	public String getExcludeMode()
+	{
+		return excludemode;
+	}
+
+	/**
+	 *  Set the excludemode.
+	 *  @param excludemode The excludemode to set.
+	 */
+	public void setExcludeMode(String excludemode)
+	{
+		this.excludemode = excludemode;
+	}
+	
 }

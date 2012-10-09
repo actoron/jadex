@@ -46,9 +46,16 @@ public class HelloWorldBDI
 	}
 	
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
-	protected void printHello(HelloGoal goal)
+	protected void printHello1(HelloGoal goal)
 	{
-		System.out.println(goal.getText());
+		System.out.println("1: "+goal.getText());
+		throw new PlanFailureException();
+	}
+	
+	@Plan(trigger=@Trigger(goals=HelloGoal.class))
+	protected void printHello2(HelloGoal goal)
+	{
+		System.out.println("2: "+goal.getText());
 //		throw new PlanFailureException();
 	}
 }

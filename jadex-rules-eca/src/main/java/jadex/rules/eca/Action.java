@@ -1,9 +1,10 @@
 package jadex.rules.eca;
 
-import jadex.commons.IValueFetcher;
-
 import java.lang.reflect.Method;
 
+/**
+ * 
+ */
 public class Action implements IAction
 {
 	/** The object. */

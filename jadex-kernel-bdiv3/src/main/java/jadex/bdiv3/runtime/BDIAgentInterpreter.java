@@ -130,13 +130,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		// Evaluate condition before executing step.
 		if(rulesystem!=null)
+		{
 			rulesystem.processAllEvents();
+		}
 		
-//		if(steps!=null && steps.size()>0)
-//		{
-//			System.out.println("steps: "+steps.size()+" "+SUtil.arrayToString(steps.get(0)));
-//		}
 		
+		if(steps!=null && steps.size()>0)
+		{
+			System.out.println("steps: "+steps.size()+" "+SUtil.arrayToString(steps.get(0)));
+		}
 		return super.executeStep();
 	}
 	

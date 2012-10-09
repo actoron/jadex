@@ -80,6 +80,27 @@ public class BDIModel extends MicroModel
 			goals = new ArrayList<MGoal>();
 		goals.add(goal);
 	}
+	
+	/**
+	 *  Get the goal for a pojo type.
+	 *  @return The goal.
+	 */
+	public MGoal getGoal(Class<?> pojotype)
+	{
+		MGoal ret = null;
+		if(goals!=null)
+		{
+			for(MGoal goal: goals)
+			{
+				if(goal.getTarget().equals(pojotype))
+				{
+					ret = goal;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
 
 	/**
 	 *  Get the plans.

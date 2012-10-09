@@ -1,15 +1,10 @@
 package jadex.bdiv3.actions;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.APL;
+import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.IPojoMicroAgent;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * 
@@ -17,18 +12,14 @@ import java.util.List;
 public class SelectCandidatesAction implements IAction<Void>
 {
 	/** The element. */
-	protected Object element;
-	
-	/** The processable element. */
-	protected APL apl;
+	protected RProcessableElement element;
 	
 	/**
 	 *  Create a new action.
 	 */
-	public SelectCandidatesAction(Object element, APL apl)
+	public SelectCandidatesAction(RProcessableElement element)
 	{
 		this.element = element;
-		this.apl = apl;
 	}
 	
 	/**
@@ -49,7 +40,7 @@ public class SelectCandidatesAction implements IAction<Void>
 	{
 		Future<Void> ret = new Future<Void>();
 
-		Object cand = apl.getNextCandidate();
+		Object cand = element.getApplicablePlanList().getNextCandidate();
 		if(cand!=null)
 		{
 //			IAction<Void> action = new ExecutePlanStepAction(ia instanceof IPojoMicroAgent? 
@@ -60,6 +51,8 @@ public class SelectCandidatesAction implements IAction<Void>
 		}
 		else
 		{
+			// todo: throw goal failed exception for goal listeners
+			
 			System.out.println("No applicable plan found.");
 		}
 		

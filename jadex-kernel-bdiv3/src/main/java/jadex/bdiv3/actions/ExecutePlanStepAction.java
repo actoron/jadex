@@ -1,5 +1,7 @@
 package jadex.bdiv3.actions;
 
+import jadex.bdiv3.runtime.PlanFailureException;
+import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,11 +17,8 @@ import java.lang.reflect.Method;
  */
 public class ExecutePlanStepAction implements IAction<Void>
 {
-//	/** The object. */
-//	protected Object object;
-	
 	/** The element. */
-	protected Object element;
+	protected RProcessableElement element;
 	
 	/** The method. */
 	protected Method method;
@@ -27,7 +26,7 @@ public class ExecutePlanStepAction implements IAction<Void>
 	/**
 	 *  Create a new action.
 	 */
-	public ExecutePlanStepAction(Object element, Method method)
+	public ExecutePlanStepAction(RProcessableElement element, Method method)
 	{
 		this.element = element;
 		this.method = method;
@@ -52,19 +51,23 @@ public class ExecutePlanStepAction implements IAction<Void>
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 
 		
-		Future<Void> ret = new Future<Void>();
+//		Future<Void> ret = new Future<Void>();
 		try
 		{
 			method.setAccessible(true);
 			method.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
-				new Object[]{element});
-			ret.setResult(null);
+				new Object[]{element.getPojoElement()});
+//			ret.setResult(null);
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			ret.setException(e);
+			// todo: call planFailed() on element
+			
+			IAction<Void> action = new SelectCandidatesAction(element);
+			ia.getExternalAccess().scheduleStep(action);
 		}
-		return ret;
+
+//		return ret;
+		return IFuture.DONE;
 	}
 }

@@ -2,6 +2,7 @@ package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.RGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -12,12 +13,12 @@ import jadex.commons.future.IFuture;
 public class AdoptGoalAction implements IAction<Void>
 {
 	/** The goal. */
-	protected Object goal;
+	protected RGoal goal;
 	
 	/**
 	 *  Create a new action.
 	 */
-	public AdoptGoalAction(Object goal)
+	public AdoptGoalAction(RGoal goal)
 	{
 		this.goal = goal;
 	}
@@ -42,7 +43,7 @@ public class AdoptGoalAction implements IAction<Void>
 		try
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			ip.getRuleSystem().observeObject(goal);
+			ip.getRuleSystem().observeObject(goal.getPojoElement());
 			ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(goal));
 			ret.setResult(null);
 		}

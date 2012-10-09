@@ -83,7 +83,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel micromodel, String model, final Class cma, ClassLoader classloader)
+	protected void fillBDIModelFromAnnotations(BDIModel micromodel, String model, final Class<?> cma, ClassLoader classloader)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -162,7 +162,8 @@ public class BDIClassReader extends MicroClassReader
 				// todo: cannot use default pool as model is loaded 2 times with different classloaders ?
 //				ClassPool pool = ClassPool.getDefault();
 				ClassPool pool = new ClassPool(null);
-				pool.appendSystemPath();
+				pool.insertClassPath(new ClassClassPath(cma));
+//				pool.appendSystemPath();
 				CtClass clazz = pool.getAndRename(cma.getName(), clname);
 				clazz.setSuperclass(pool.getCtClass(cma.getName()));
 				clazz.addField(new CtField(getCtClass(BDIAgent.class, pool), "__agent", clazz));

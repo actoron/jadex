@@ -1,15 +1,18 @@
 package jadex.bdiv3;
 
-import java.lang.reflect.Field;
-
 import jadex.bdiv3.actions.AdoptGoalAction;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.RuleSystem;
+
+import java.lang.reflect.Field;
 
 /**
  *  Base class for application agents.
@@ -23,9 +26,14 @@ public class BDIAgent extends MicroAgent
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		ip.getRuleSystem().observeObject(goal);
+		BDIModel bdim = ip.getBDIModel();
+		MGoal mgoal = bdim.getGoal(goal.getClass());
+		if(mgoal==null)
+			throw new RuntimeException("Unknown goal type: "+goal);
+		RGoal rgoal = new RGoal(goal, mgoal);
 		
 //		System.out.println("adopt goal");
-		ip.scheduleStep(new AdoptGoalAction(goal));
+		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	}
 	
 	/**
