@@ -6,9 +6,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -153,7 +151,12 @@ public class LocalResourceService	implements ILocalResourceService
 	public ITerminableIntermediateFuture<BackupEvent>	update(final IResourceService remote)
 	{
 		final TerminableIntermediateFuture<BackupEvent>	ret;
-		if(updates!=null && updates.containsKey(remote))
+		
+		if(!remote.getResourceId().equals(rpa.getResource().getResourceId()))
+		{
+			ret	= new TerminableIntermediateFuture<BackupEvent>(new RuntimeException("Resource id differs: "+remote.getResourceId())); 
+		}
+		else if(updates!=null && updates.containsKey(remote))
 		{
 			ret	= updates.get(remote);
 		}
