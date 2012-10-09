@@ -79,7 +79,7 @@ public class LocalResourceService	implements ILocalResourceService
 	{
 		final int[]	finished	= new int[2]; // [search_finished, queued_updates]
 		final TerminableIntermediateFuture<BackupEvent>	ret	= new TerminableIntermediateFuture<BackupEvent>();
-		agent.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 		{
 			public void intermediateResultAvailable(IResourceService result)
