@@ -1,12 +1,15 @@
 package jadex.backup.swing;
 
-import jadex.backup.job.Job;
+import jadex.backup.job.SyncEntry;
 import jadex.backup.job.SyncJob;
+import jadex.backup.job.SyncRequest;
 import jadex.backup.resource.BackupResource;
+import jadex.backup.resource.FileInfo;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.RefreshSubtreeAction;
+import jadex.base.gui.idtree.IdTableModel;
 import jadex.base.gui.idtree.IdTreeCellRenderer;
 import jadex.base.gui.idtree.IdTreeModel;
 import jadex.base.gui.idtree.IdTreeNode;
@@ -16,6 +19,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -36,6 +40,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -43,10 +48,13 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -84,6 +92,59 @@ public class SyncJobPanel extends JPanel
 			pp.createTextField("Local Ressource: ", job.getLocalResource());
 			pp.createTextField("Global Ressource: ", job.getGlobalResource());
 			pp.createCheckBox("Active: ", job.isActive(), false, 0);
+			
+			List<SyncRequest> reqs = job.getSyncRequests();
+			final JComboBox rcb = pp.createComboBox("Sync Requests", reqs!=null? reqs.toArray(): null);
+			
+			final ObjectCardLayout ocl = new ObjectCardLayout();
+			final JPanel reqp = new JPanel(ocl);
+			pp.addFullLineComponent("Sync Request", reqp);
+			
+			rcb.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					SyncRequest sr = (SyncRequest)rcb.getSelectedItem();
+					if(ocl.getComponent(sr)==null)
+					{
+						JTable reqt = new JTable();
+						IdTableModel<SyncEntry, SyncEntry> tm = new IdTableModel<SyncEntry, SyncEntry>
+							(new String[]{"Sync", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
+						{
+							public Object getValueAt(SyncEntry obj, int column)
+							{
+								Object ret = obj;
+								if(column==0)
+								{
+									ret = obj.isAccepted();
+								}
+								else if(column==1)
+								{
+									ret = obj.getType();
+								}
+								else if(column==2)
+								{
+									ret = obj.getFileInfo().getLocation();
+								}
+								return ret;
+							}
+						};
+						reqt.setModel(tm);
+						List<SyncEntry>  ses = sr.getEntries();
+						for(SyncEntry se: ses)
+						{
+							tm.addObject(se, se);
+						}
+						reqp.add(new JScrollPane(reqt), sr);
+					}
+					ocl.show(sr);
+				}
+			});
+			
+			if(reqs!=null && reqs.size()>0)
+			{
+				rcb.setSelectedIndex(0);
+			}
 		}
 		else
 		{

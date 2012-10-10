@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 public class IdTableModel<T, E>	extends DefaultTableModel
 {
 	/** The known (id->ob). */
-	protected Map<T, E> obs = new LinkedHashMap<T, E>();
+	protected Map<T, E> obs;
 
 	/** The column names. */
 	protected String[] columns;
@@ -45,6 +45,7 @@ public class IdTableModel<T, E>	extends DefaultTableModel
 		this.columns = columns;
 		this.coltypes = coltypes;
 		this.table = table;
+		this.obs = new LinkedHashMap<T, E>();
 	}
 	
 	/**
@@ -88,7 +89,7 @@ public class IdTableModel<T, E>	extends DefaultTableModel
 	 */
 	public Object getValueAt(int row, int column)
 	{
-		String[] ids	= obs.keySet().toArray(new String[obs.size()]);
+		T[] ids	= obs.keySet().toArray((T[])new Object[obs.size()]);
 		E obj = obs.get(ids[row]);
 		return getValueAt(obj, column);
 	}

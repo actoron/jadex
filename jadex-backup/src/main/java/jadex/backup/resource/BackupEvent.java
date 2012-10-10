@@ -7,7 +7,6 @@ package jadex.backup.resource;
  */
 public class BackupEvent
 {
-	
 	public static final String FILE_UPDATE_START = "file_update_start";
 	
 	public static final String FILE_UPDATE_STATE = "file_update_state";

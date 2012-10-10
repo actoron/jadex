@@ -160,6 +160,20 @@ public class JobService implements IJobService
 	}
 	
 	/**
+	 *  Modify a job.
+	 *  @param job The job.
+	 */
+	public IFuture<Void> modifyJob(Job job)
+	{
+		jobs.put(job.getId(), job);
+		
+		publishEvent(new JobEvent(JobEvent.JOB_CHANGED, job));
+		
+		return IFuture.DONE;
+	}
+
+	
+	/**
 	 *  Subscribe for job news.
 	 */
 	public ISubscriptionIntermediateFuture<JobEvent> subscribe()
@@ -208,14 +222,28 @@ public class JobService implements IJobService
 	{
 		if(jobs!=null)
 		{
+			FileOutputStream fos = null;
 			try
 			{
-				FileOutputStream fos = new FileOutputStream("./backup-settings.xml");
+				fos = new FileOutputStream("./backup-settings.xml");
 				JavaWriter.objectToOutputStream(new ArrayList(jobs.values()), fos, null);
 			}
 			catch(Exception e)
 			{
 				System.out.println("Error saving backup configuration: "+e);
+			}
+			finally
+			{
+				if(fos!=null)
+				{
+					try
+					{
+						fos.close();
+					}
+					catch(Exception e)
+					{
+					}
+				}
 			}
 		}
 	}
@@ -227,12 +255,13 @@ public class JobService implements IJobService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		FileInputStream fis = null;
 		try
 		{
 			File fs = new File("./backup-settings.xml");
 			if(fs.exists())
 			{
-				FileInputStream fis = new FileInputStream("./backup-settings.xml");
+				fis = new FileInputStream("./backup-settings.xml");
 				Collection<Job> jobs = (Collection<Job>)JavaReader.objectFromInputStream(fis, null);
 				addJobs(jobs.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
 				{
@@ -250,6 +279,19 @@ public class JobService implements IJobService
 		catch(Exception e)
 		{
 			System.out.println("Error loading backup configuration: "+e);
+		}
+		finally
+		{
+			if(fis!=null)
+			{
+				try
+				{
+					fis.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 		
 		return ret;

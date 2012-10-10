@@ -9,16 +9,21 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -89,6 +94,37 @@ public class SyncJobAgent
 
 		this.resservices = new ArrayList<IResourceService>();
 		
+		SServiceProvider.getService(agent.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IJobService>()
+		{
+			public void resultAvailable(IJobService js)
+			{
+				ISubscriptionIntermediateFuture<JobEvent> subscription = js.subscribe();
+				subscription.addResultListener(new SwingIntermediateDefaultResultListener<JobEvent>()
+				{
+					public void customIntermediateResultAvailable(JobEvent ce)
+					{
+						if(JobEvent.JOB_CHANGED.equals(ce.getType()))
+						{
+							if(ce.getJob().getId().equals(job.getId()))
+							{
+								System.out.println("sync agent received changed job: "+ce.getJob());
+								job = (SyncJob)ce.getJob();
+							}
+						}
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						// todo:
+						System.out.println("ex: "+exception);
+	//					ret.setExceptionIfUndone(exception);
+					}
+				});
+			}
+		});
+		
+		
 		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
@@ -99,7 +135,8 @@ public class SyncJobAgent
 				args.put("id", job.getGlobalResource());
 				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 				ci.setArguments(args);
-				cms.createComponent(null, "jadex/backup/resource/ResourceProviderAgent.class", ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				cms.createComponent(null, "jadex/backup/resource/ResourceProviderAgent.class", ci, null)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
@@ -182,7 +219,8 @@ public class SyncJobAgent
 						final IResourceService remresser = resservices.get(0);
 						System.out.println("starting sync with: "+resservices.get(0));
 						
-						final List<Tuple2<String, FileInfo>> changelist = new ArrayList<Tuple2<String, FileInfo>>();
+//						final List<Tuple2<String, FileInfo>> changelist = new ArrayList<Tuple2<String, FileInfo>>();
+						final SyncRequest sr = new SyncRequest();
 						
 						resser.update(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
 						{
@@ -195,7 +233,8 @@ public class SyncJobAgent
 								{
 									if(!autoupdate)
 									{
-										changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
+//										changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
+										sr.addSyncEntry(new SyncEntry(result.getFile(), result.getType()));
 									}
 									else
 									{
@@ -218,25 +257,37 @@ public class SyncJobAgent
 								System.out.println("finished sync");
 								if(!autoupdate)
 								{
-									updateFiles(resser, remresser, changelist.iterator())
-										.addResultListener(new IResultListener<Void>()
+									SServiceProvider.getService(agent.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(new DefaultResultListener<IJobService>()
 									{
-										public void resultAvailable(Void result)
+										public void resultAvailable(IJobService js)
 										{
-											resservices.remove(0);
-											agent.waitForDelay(60000, self);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											resultAvailable(null);
+											// Publish modified job 
+											System.out.println("publishing sync request");
+											job.addSyncRequest(sr);
+											js.modifyJob(job);
 										}
 									});
+									
+//									updateFiles(resser, remresser, changelist.iterator())
+//										.addResultListener(new IResultListener<Void>()
+//									{
+//										public void resultAvailable(Void result)
+//										{
+//											resservices.remove(0);
+//											agent.waitForDelay(60000, self);
+//										}
+//										
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											resultAvailable(null);
+//										}
+//									});
 								}
-								else
-								{
+//								else
+//								{
 									agent.waitForDelay(60000, self);
-								}
+//								}
 							}
 							
 							public void resultAvailable(Collection<BackupEvent> result)

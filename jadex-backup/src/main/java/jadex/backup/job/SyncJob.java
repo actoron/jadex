@@ -3,6 +3,9 @@ package jadex.backup.job;
 import jadex.backup.swing.SyncJobPanel;
 import jadex.bridge.IExternalAccess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  *  Job to sync resources.
@@ -16,6 +19,9 @@ public class SyncJob extends Job
 	
 	/** The global resource. */
 	protected String gres;
+	
+	/** The sync requests. */
+	protected List<SyncRequest> requests;
 
 	//-------- constructors --------
 	
@@ -40,7 +46,7 @@ public class SyncJob extends Job
 	
 	/**
 	 *  Get the localResource.
-	 *  @return The localResource.
+	 *  @return The local resource.
 	 */
 	public String getLocalResource()
 	{
@@ -49,11 +55,11 @@ public class SyncJob extends Job
 
 	/**
 	 *  Set the localResource.
-	 *  @param localResource The localResource to set.
+	 *  @param lres The localResource to set.
 	 */
-	public void setLocalResource(String localResource)
+	public void setLocalResource(String lres)
 	{
-		this.lres = localResource;
+		this.lres = lres;
 	}
 
 	/**
@@ -101,7 +107,36 @@ public class SyncJob extends Job
 	{
 		return new SyncJobPanel(ea, editable, this);
 	}
+	
+	/**
+	 *  Get the syncRequests.
+	 *  @return The syncRequests.
+	 */
+	public List<SyncRequest> getSyncRequests()
+	{
+		return requests;
+	}
 
+	/**
+	 *  Set the syncRequests.
+	 *  @param syncRequests The syncRequests to set.
+	 */
+	public void setSyncRequests(List<SyncRequest> syncRequests)
+	{
+		this.requests = syncRequests;
+	}
+
+	/**
+	 * 
+	 */
+	public void addSyncRequest(SyncRequest sr)
+	{
+		if(requests==null)
+			requests = new ArrayList<SyncRequest>();
+		
+		requests.add(sr);
+	}
+	
 	/**
 	 *  Get the string.
 	 */
@@ -110,6 +145,4 @@ public class SyncJob extends Job
 		return "SyncJob [lres=" + lres + ", gres=" + gres + ", id=" + id
 			+ ", name=" + name + ", active=" + active + "]";
 	}
-	
-	
 }

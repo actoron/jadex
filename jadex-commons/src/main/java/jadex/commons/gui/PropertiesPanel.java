@@ -174,7 +174,7 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JComboBox createComboBox(String name, Object[] values, boolean editable, double weighty)
 	{
-		JComboBox cb = new JComboBox(values);
+		JComboBox cb = values==null? new JComboBox(): new JComboBox(values);
 		cb.setEditable(editable);
 		addComponent(name, cb, weighty, -1);
 		return cb;

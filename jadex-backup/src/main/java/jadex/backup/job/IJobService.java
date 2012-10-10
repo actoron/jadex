@@ -24,6 +24,12 @@ public interface IJobService
 	public IFuture<Void> removeJob(String jobid);
 	
 	/**
+	 *  Modify a job.
+	 *  @param job The job.
+	 */
+	public IFuture<Void> modifyJob(Job job);
+	
+	/**
 	 *  Get all jobs. 
 	 *  @return All jobs.
 	 */
