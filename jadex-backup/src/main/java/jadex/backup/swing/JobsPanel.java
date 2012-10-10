@@ -9,12 +9,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 import java.awt.BorderLayout;
@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListCellRenderer;
@@ -248,11 +249,24 @@ public class JobsPanel extends JPanel
 		{
 			public void resultAvailable(IJobService js)
 			{
+				js.getJobs().addResultListener(new SwingDefaultResultListener<Collection<Job>>()
+				{
+					public void customResultAvailable(Collection<Job> result) 
+					{
+						for(Job job: result)
+						{
+							tm.addObject(job.getId(), job);
+						}
+					}
+				});
+				
 				ISubscriptionIntermediateFuture<JobEvent> subscription = js.subscribe();
 				subscription.addResultListener(new SwingIntermediateDefaultResultListener<JobEvent>()
 				{
 					public void customIntermediateResultAvailable(JobEvent ce)
 					{
+						System.out.println("job event: "+ce);
+						
 						if(JobEvent.JOB_ADDED.equals(ce.getType()))
 						{
 							tm.addObject(ce.getJob().getId(), ce.getJob());
@@ -378,7 +392,7 @@ public class JobsPanel extends JPanel
 		JFrame f = new JFrame("JadexSync");
 		f.add(new JobsPanel(ea), BorderLayout.CENTER);
 //		f.pack();
-		f.setSize(600, 400);
+		f.setSize(600, 500);
 		f.setLocation(SGUI.calculateMiddlePosition(f));
 		f.setVisible(true);
 		return f;

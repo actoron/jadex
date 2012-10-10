@@ -1,6 +1,7 @@
 package jadex.backup.resource;
 
 import jadex.bridge.IInputConnection;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 
 /**

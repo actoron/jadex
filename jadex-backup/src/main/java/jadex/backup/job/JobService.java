@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,8 +17,16 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -49,9 +58,14 @@ public class JobService implements IJobService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		this.jobs = new LinkedHashMap<String, Job>();
 		this.jobagents = new HashMap<String, IExternalAccess>();
-		return IFuture.DONE;
+		
+		loadSettings().addResultListener(new DelegationResultListener<Void>(ret));
+		
+		return ret;
 	}
 	
 	/**
@@ -77,45 +91,44 @@ public class JobService implements IJobService
 	 *  Add a new job.
 	 *  @param job The job.
 	 */
-	public IFuture<Void> addJob(Job job)
+	public IFuture<Void> addJob(final Job job)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
 		jobs.put(job.getId(), job);
-		if(job instanceof SyncJob)
+		
+		saveSettings();
+		
+		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			final SyncJob sjob = (SyncJob)job;
-			IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
-			fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				public void customResultAvailable(final IComponentManagementService cms)
-				{
-					Map<String, Object> args = new HashMap<String, Object>();
-					args.put("job", sjob);
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("job", job);
 //					System.out.println("job is: "+sjob);
-					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
-					ci.setArguments(args);
-					cms.createComponent(null, sjob.getAgentType(), ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
+				ci.setArguments(args);
+				cms.createComponent(null, job.getAgentType(), ci, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						public void customResultAvailable(IComponentIdentifier cid) 
+						System.out.println("created job agent: "+cid);
+						cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 						{
-							System.out.println("created job agent: "+cid);
-							cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+							public void customResultAvailable(IExternalAccess result) 
 							{
-								public void customResultAvailable(IExternalAccess result) 
-								{
-									jobagents.put(sjob.getId(), result);
-									
-									publishEvent(new JobEvent(JobEvent.JOB_ADDED, sjob));
-									
-									ret.setResult(null);
-								}
-							});
-						}
-					});
-				}
-			});
-		}
+								jobagents.put(job.getId(), result);
+								
+								publishEvent(new JobEvent(JobEvent.JOB_ADDED, job));
+								
+								ret.setResult(null);
+							}
+						});
+					}
+				});
+			}
+		});
 			
 		return ret;
 	}
@@ -186,5 +199,84 @@ public class JobService implements IJobService
 				sub.addIntermediateResult(event);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void saveSettings()
+	{
+		if(jobs!=null)
+		{
+			try
+			{
+				FileOutputStream fos = new FileOutputStream("./backup-settings.xml");
+				JavaWriter.objectToOutputStream(new ArrayList(jobs.values()), fos, null);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Error saving backup configuration: "+e);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> loadSettings()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		try
+		{
+			File fs = new File("./backup-settings.xml");
+			if(fs.exists())
+			{
+				FileInputStream fis = new FileInputStream("./backup-settings.xml");
+				Collection<Job> jobs = (Collection<Job>)JavaReader.objectFromInputStream(fis, null);
+				addJobs(jobs.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						ret.setResult(null);
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("Error loading backup configuration: "+e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> addJobs(final Iterator<Job> it)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(it.hasNext())
+		{
+			addJob(it.next()).addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					addJobs(it).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 }

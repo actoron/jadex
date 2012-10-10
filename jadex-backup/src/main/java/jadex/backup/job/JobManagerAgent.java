@@ -4,6 +4,8 @@ import jadex.backup.swing.JobsPanel;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
@@ -16,6 +18,14 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -56,6 +66,7 @@ public class JobManagerAgent
 				ret.setResult(null);
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -66,6 +77,7 @@ public class JobManagerAgent
 	public IFuture<Void>	stop()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -74,6 +86,7 @@ public class JobManagerAgent
 				ret.setResult(null);
 			}
 		});
+		
 		return ret;
 	}
 }

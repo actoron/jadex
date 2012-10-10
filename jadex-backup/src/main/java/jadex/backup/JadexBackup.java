@@ -28,7 +28,8 @@ public class JadexBackup
 			"-welcome", "false",
 			"-cli", "false",
 			"-printpass", "false",
-			"-networkname", "\"jadexbackup\""
+			"-networkname", "\"jadexbackup\"",
+			"-relayaddress", "\"http://jadex.informatik.uni-hamburg.de/relay\""
 		};
 		String[] newargs = new String[defargs.length+args.length];
 		System.arraycopy(defargs, 0, newargs, 0, defargs.length);

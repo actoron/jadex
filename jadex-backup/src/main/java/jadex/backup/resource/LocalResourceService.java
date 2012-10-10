@@ -391,6 +391,7 @@ public class LocalResourceService	implements ILocalResourceService
 							{
 								rpa.getResource().updateFile(fi, tmp);
 								ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_END, fi, new Double(1)));
+								ret.setFinished();
 							}
 							catch(Exception e)
 							{
@@ -406,6 +407,7 @@ public class LocalResourceService	implements ILocalResourceService
 						public void exceptionOccurred(Exception exception)
 						{
 							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
+							ret.setException(exception);
 						}
 					});
 				}
@@ -418,6 +420,7 @@ public class LocalResourceService	implements ILocalResourceService
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
+				ret.setException(exception);
 			}
 		});
 		

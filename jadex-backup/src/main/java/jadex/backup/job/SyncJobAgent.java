@@ -12,6 +12,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -32,6 +33,7 @@ import jadex.micro.annotation.RequiredServices;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -216,23 +218,25 @@ public class SyncJobAgent
 								System.out.println("finished sync");
 								if(!autoupdate)
 								{
-									for(Tuple2<String, FileInfo> tup: changelist)
+									updateFiles(resser, remresser, changelist.iterator())
+										.addResultListener(new IResultListener<Void>()
 									{
-										System.out.println(tup);
-										updateFile(resser, remresser, tup.getSecondEntity()).addResultListener(new IResultListener<Void>()
+										public void resultAvailable(Void result)
 										{
-											public void resultAvailable(Void result)
-											{
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-											}
-										});
-									}
+											resservices.remove(0);
+											agent.waitForDelay(60000, self);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											resultAvailable(null);
+										}
+									});
 								}
-								resservices.remove(0);
-								agent.waitForDelay(60000, self);
+								else
+								{
+									agent.waitForDelay(60000, self);
+								}
 							}
 							
 							public void resultAvailable(Collection<BackupEvent> result)
@@ -264,6 +268,27 @@ public class SyncJobAgent
 	/**
 	 * 
 	 */
+	public IFuture<Void> updateFiles(ILocalResourceService localresser, IResourceService resser, Iterator<Tuple2<String, FileInfo>> files)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(files.hasNext())
+		{
+			Tuple2<String, FileInfo> tup = files.next();
+			updateFile(localresser, resser, tup.getSecondEntity())
+				.addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
 	public IFuture<Void> updateFile(ILocalResourceService localresser, IResourceService resser, FileInfo fi)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -273,7 +298,7 @@ public class SyncJobAgent
 		{
 			public void intermediateResultAvailable(BackupEvent result)
 			{
-				System.out.println(result);
+				System.out.println("upfi: "+result);
 			}
 			
 			public void exceptionOccurred(Exception exception)
