@@ -15,41 +15,40 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.rs.RSAnnotationHelper;
+import jadex.extension.rs.annotations.Consumes;
+import jadex.extension.rs.annotations.DELETE;
+import jadex.extension.rs.annotations.GET;
+import jadex.extension.rs.annotations.HEAD;
+import jadex.extension.rs.annotations.OPTIONS;
+import jadex.extension.rs.annotations.POST;
+import jadex.extension.rs.annotations.PUT;
+import jadex.extension.rs.annotations.Path;
+import jadex.extension.rs.annotations.Produces;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.invoke.annotation.ParameterMappers;
 import jadex.extension.rs.invoke.annotation.ParametersInURL;
+//import jadex.extension.rs.publish.JadexXMLBodyWriter;
 import jadex.extension.rs.publish.JadexXMLBodyWriter;
-import jadex.extension.rs.publish.RSJAXAnnotationHelper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 
+import java.awt.image.BufferedImage;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MultivaluedMap;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.RequestBuilder;
-import com.sun.jersey.api.client.UniformInterface;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 /**
  *  Create a new web service wrapper invocation handler.
@@ -65,7 +64,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
  *  
  */
 @Service // Used here only to pass allow proxy to be used as service (check is delegated to handler)
-public class RestServiceWrapperInvocationHandler implements InvocationHandler
+public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHandler
 {
 	public static String[] defaultimports = new String[]{"jadex.extension.rs.invoke.*", 
 		"jadex.extension.rs.invoke.annotation.*", "jadex.extension.rs.invoke.mapper.*"};
@@ -77,14 +76,14 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 	
 	/** The annotated service interface. */
 	protected Class<?> iface;
-	
+
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service wrapper invocation handler.
 	 *  @param agent The internal access of the agent.
 	 */
-	public RestServiceWrapperInvocationHandler(IInternalAccess agent, Class<?> iface)
+	public RestServiceWrapperInvocationHandlerAndroid(IInternalAccess agent, Class<?> iface)
 	{
 		if(agent==null)
 			throw new IllegalArgumentException("Agent must not null.");
@@ -133,7 +132,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 										{
 											String baseuri = iface.getAnnotation(Path.class).value();
 											Method m = iface.getMethod(method.getName(), method.getParameterTypes());
-											Class<?> resttype = RSJAXAnnotationHelper.getDeclaredRestType(m);
+											Class<?> resttype = RSAnnotationHelper.getDeclaredRestType(m);
 											String methodname = m.getAnnotation(Path.class).value();
 											
 											String[] consumes = SUtil.EMPTY_STRING_ARRAY;
@@ -187,9 +186,18 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											if(m.isAnnotationPresent(ResultMapper.class))
 												rmapper = m.getAnnotation(ResultMapper.class).value();
 											
-											ClientConfig cc = new DefaultClientConfig();
-											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-											cc.getClasses().add(JadexXMLBodyWriter.class);
+											
+											RestTemplate restTemplate = new RestTemplate();
+											
+											StringHttpMessageConverter stringMessageConverter = new StringHttpMessageConverter();
+											ArrayList<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
+											converters.add(stringMessageConverter);
+											restTemplate.setMessageConverters(converters);
+											
+											
+//											ClientConfig cc = new DefaultClientConfig();
+//											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+//											cc.getClasses().add(JadexXMLBodyWriter.class);
 											
 											Object targetparams = args;
 											if(pmapper!=null)
@@ -199,7 +207,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											}
 											else if(pmappers!=null)
 											{
-												MultivaluedMap<String, String> mv = new MultivaluedMapImpl();
+												MultiValueMap<String, String> mv = new LinkedMultiValueMap<String, String>();
 												for(int i=0; i<pmappers.size(); i++)
 												{
 													Object[] pm = (Object[])pmappers.get(i);
@@ -220,51 +228,57 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 												targetparams = mv;
 											}
 											
-											Client client = Client.create(cc);
-											WebResource wr = client.resource(baseuri); 
-											wr = wr.path(methodname);
-											
-											ClientResponse res = null;
-
 											boolean inurl = GET.class.equals(resttype);
 											if(!inurl && m.isAnnotationPresent(ParametersInURL.class))
 												inurl = m.getAnnotation(ParametersInURL.class).value();
 												
 											if(inurl)
-												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
-											
-											RequestBuilder rb = wr;
-											for(int i=0; i<consumes.length; i++)
 											{
-												rb = rb.type(consumes[i]);
-											}
-											for(int i=0; i<produces.length; i++)
-											{
-												rb = rb.accept(produces[i]);
+//												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
 											}
 											
+//											for(int i=0; i<consumes.length; i++)
+//											{
+//												rb = rb.type(consumes[i]);
+//											}
+//											for(int i=0; i<produces.length; i++)
+//											{
+//												rb = rb.accept(produces[i]);
+//											}
+											
+											Object res = null;
+											
+											if (!baseuri.endsWith("/") && !methodname.startsWith("/")) {
+												baseuri = baseuri + "/";
+											}
+											String uri = baseuri + methodname;
 											if(GET.class.equals(resttype))
-												res = ((UniformInterface)rb).get(ClientResponse.class);
+												res = restTemplate.getForObject(uri, BufferedImage.class, targetparams);
+//												res = ((UniformInterface)rb).get(ClientResponse.class);
 											else if(POST.class.equals(resttype))
-												res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
+												res = restTemplate.postForObject(uri, inurl ? null : targetparams, String.class);
+//												res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
 											else if(PUT.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												restTemplate.put(uri, targetparams, targetparams);
+//												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											else if(HEAD.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												res = restTemplate.headForHeaders(uri, inurl ? null : targetparams);
+//												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											else if(OPTIONS.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												res = restTemplate.optionsForAllow(uri, inurl ? null: targetparams);
+//												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											else if(DELETE.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												restTemplate.delete(uri, inurl ? null: targetparams);
+//												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											
-											Object targetret = res;
 											if(rmapper!=null)
 											{
 												IValueMapper rm = (IValueMapper)jadex.extension.rs.publish.Value.evaluate(rmapper, defaultimports);
-												targetret = rm.convertValue(res);
+												res = rm.convertValue(res);
 											}
 											
 //											System.out.println("result is: "+res);
-											re.setResult(targetret);
+											re.setResult(res);
 											ia.killComponent();
 										}
 										catch(Exception e)

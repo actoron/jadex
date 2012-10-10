@@ -1,26 +1,14 @@
 package jadex.webservice.examples.rs.hello;
 import jadex.base.Starter;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.rs.publish.DefaultRestServicePublishService;
-
-import java.net.BindException;
-
 import junit.framework.TestCase;
-
-import org.glassfish.grizzly.http.server.HttpServer;
-
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
 
 /**
  * Test the Consuming part of the Jadex Rest Webservice Extension.
@@ -60,6 +48,7 @@ public class RSHelloTest extends TestCase
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get(sus);
+		
 	}
 
 //	protected void setUp() throws Exception

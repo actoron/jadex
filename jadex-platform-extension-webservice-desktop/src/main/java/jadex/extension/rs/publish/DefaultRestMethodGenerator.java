@@ -18,12 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -114,7 +110,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 								path = ((Path)bms[i].getAnnotation(Path.class)).value();
 							addPath(path, paths);
 						}
-						else if(getDeclaredRestType(bms[i])!=null)
+						else if(RSJAXAnnotationHelper.getDeclaredRestType(bms[i])!=null)
 						{
 							addPath("", paths);
 						}
@@ -159,7 +155,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			List<MediaType> produced = new ArrayList<MediaType>();
 			
 			// Determine rest method type.
-			Class<?> resttype = getDeclaredRestType(method);
+			Class<?> resttype = RSJAXAnnotationHelper.getDeclaredRestType(method);
 			// User defined method, use as is
 			if(resttype!=null)
 			{
@@ -420,34 +416,5 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 		return ret;
 	}
 	
-	/**
-	 *  Get the declared rest type.
-	 *  @param method The method.
-	 *  @return The rest type.
-	 */
-	public static Class<?> getDeclaredRestType(Method method)
-	{
-		java.lang.annotation.Annotation ret = method.getAnnotation(GET.class);
-		if(ret==null)
-		{
-			ret =  method.getAnnotation(POST.class);
-			if(ret==null)
-			{
-				ret =  method.getAnnotation(PUT.class);
-				if(ret==null)
-				{
-					ret =  method.getAnnotation(DELETE.class);
-					if(ret==null)
-					{
-						ret =  method.getAnnotation(HEAD.class);
-						if(ret==null)
-						{
-							ret =  method.getAnnotation(OPTIONS.class);
-						}
-					}
-				}
-			}
-		}
-		return ret==null? null: ret.annotationType();
-	}
+
 }

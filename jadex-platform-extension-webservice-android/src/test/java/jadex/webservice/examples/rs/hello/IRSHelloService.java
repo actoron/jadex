@@ -2,11 +2,11 @@ package jadex.webservice.examples.rs.hello;
 
 import jadex.bridge.service.annotation.Value;
 import jadex.commons.future.IFuture;
+import jadex.extension.rs.annotations.GET;
+import jadex.extension.rs.annotations.Path;
+import jadex.extension.rs.annotations.Produces;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**

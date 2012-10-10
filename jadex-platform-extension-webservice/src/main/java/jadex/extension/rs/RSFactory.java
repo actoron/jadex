@@ -5,6 +5,9 @@ import jadex.commons.SReflect;
 
 import java.lang.reflect.InvocationHandler;
 
+/**
+ * Factory for instantiating the platform-specific RestServiceWrapperInvocationHandler.
+ */
 public abstract class RSFactory
 {
 	private static RSFactory INSTANCE = null;
@@ -12,9 +15,8 @@ public abstract class RSFactory
 	public static RSFactory getInstance() {
 		if (INSTANCE == null) {
 			Class<?> clazz = null;
-			if (SReflect.isAndroid()) {
-				clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryAndroid", null);
-			} else {
+			clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryAndroid", null);
+			if (clazz == null) {
 				clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryDesktop", null);
 			}
 			if (clazz != null) {

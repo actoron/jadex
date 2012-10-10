@@ -5,6 +5,9 @@ import jadex.extension.rs.invoke.RestServiceWrapperInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
 
+/**
+ * Factory for instantiating the Java SE RestServiceWrapperInvocationHandler.
+ */
 public class RSFactoryDesktop extends RSFactory
 {
 

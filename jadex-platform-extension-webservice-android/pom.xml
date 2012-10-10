@@ -1,0 +1,125 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jadex-platform-extension-webservice-android</artifactId>
+	<packaging>jar</packaging>
+	<name>jadex-platform-extension-webservice-android</name>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-parent</artifactId>
+		<version>2.3-SNAPSHOT </version>
+		<relativePath>../jadex-parent/pom.xml</relativePath>
+	</parent>
+
+	<description>
+		The Jadex android webservice platform extension package contains
+		functionality for using (but not providing) WSDL web services and REST web services.
+	</description>
+	
+	<properties>
+		<jersey.version>1.11</jersey.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+<!-- 		<dependency> -->
+<!-- 		    <groupId>org.springframework.android</groupId> -->
+<!-- 		    <artifactId>spring-android-rest-template</artifactId> -->
+<!-- 		    <version>1.0.0.RELEASE</version> -->
+<!-- 		</dependency> -->
+		
+<!-- 		<dependency> -->
+<!-- 		    <groupId>org.springframework.android</groupId> -->
+<!-- 		    <artifactId>spring-android-core</artifactId> -->
+<!-- 		    <version>1.0.0.RELEASE</version> -->
+<!-- 		</dependency> -->
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>javassist</groupId> -->
+<!-- 			<artifactId>javassist</artifactId> -->
+<!-- 			<version>3.12.1.GA</version> -->
+<!-- 		</dependency> -->
+		
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-component</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>   
+		
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-web</artifactId>
+		    <version>3.1.2.RELEASE</version>
+		    <scope>test</scope>
+		</dependency>         
+	</dependencies>
+	
+	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
+	<profiles>
+		<profile>
+			<id>dist</id>
+			<dependencies>
+				<dependency>
+					<groupId>javassist</groupId>
+					<artifactId>javassist</artifactId>
+					<version>3.12.1.GA</version>
+					<scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+					<groupId>javax.activation</groupId>
+					<artifactId>activation</artifactId>
+					<version>1.1</version>
+					<scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+		
+				<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-component</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+</project>

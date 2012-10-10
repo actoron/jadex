@@ -42,6 +42,7 @@
 		<module>jadex-android-antlr</module>
 		<module>jadex-android-xmlpull</module>
 		<module>jadex-runtimetools-android</module>
+		<module>jadex-platform-extension-webservice-android</module>
 	</modules>
 
 	<profiles>
@@ -144,6 +145,7 @@
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-platform</module>
+				<module>jadex-platform-extension-webservice</module>
 
 				<!-- Modules required for integration test -->
 				<module>jadex-android-integration-test</module>

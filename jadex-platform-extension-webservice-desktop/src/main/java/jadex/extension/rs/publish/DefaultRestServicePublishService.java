@@ -63,6 +63,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.grizzly.Grizzly;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
@@ -73,6 +74,7 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.multipart.FormDataParam;
+import com.sun.jersey.server.impl.container.grizzly.GrizzlyContainer;
 
 /**
  *  The default web service publish service.
@@ -188,17 +190,17 @@ public class DefaultRestServicePublishService implements IPublishService
 			Class<?> rsimpl = createProxyClass(service, cl, baseclazz, mapprops, rmis);
 			
 			Map<String, Object> props = new HashMap<String, Object>();
-			String jerseypack = "com.sun.jersey.config.property.packages";
+			String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
 //			props.put(uri.toString(), service);
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 			// Must not add package because a baseclass could be contained with the same path
 			// This leads to an error in jersey
-			String pack = baseclazz!=null && baseclazz.getPackage()!=null? 
-				baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
-			if(pack!=null)
-				strb.append(", ").append(pack);
+//			String pack = baseclazz!=null && baseclazz.getPackage()!=null? 
+//				baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
+//			if(pack!=null)
+//				strb.append(", ").append(pack);
 			props.put(jerseypack, strb.toString());
-			props.put("com.sun.jersey.config.feature.Redirect", Boolean.TRUE);
+			props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
 			props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
@@ -743,7 +745,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				for(int i=0; i<methods.size(); i++)
 				{
 					Method method = methods.get(i);
-					Class<?> restmethod = DefaultRestMethodGenerator.getDeclaredRestType(method);
+					Class<?> restmethod = RSJAXAnnotationHelper.getDeclaredRestType(method);
 					if(restmethod!=null)
 					{
 //						System.out.println("method: "+method.getName()+" "+SUtil.arrayToString(methods));
