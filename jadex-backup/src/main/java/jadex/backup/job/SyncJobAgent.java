@@ -262,10 +262,13 @@ public class SyncJobAgent
 									{
 										public void resultAvailable(IJobService js)
 										{
-											// Publish modified job 
-											System.out.println("publishing sync request");
-											job.addSyncRequest(sr);
-											js.modifyJob(job);
+											if(sr.getEntries()!=null && sr.getEntries().size()>0)
+											{
+												// Publish modified job 
+												System.out.println("publishing sync request");
+												job.addSyncRequest(sr);
+												js.modifyJob(job);
+											}
 										}
 									});
 									

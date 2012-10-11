@@ -10,10 +10,13 @@ import java.util.List;
 public class SyncRequest
 {
     protected static final SimpleDateFormat sdf 
-    	= new SimpleDateFormat("hh:mm 'o''clock on' MMMM dd yyyy");
+    	= new SimpleDateFormat("hh:mm MMMM dd yyyy");
 
     protected static long cnt = 0;
     
+	/** The sync source. */
+	protected String source;
+
 	/** The request state. */
 	protected boolean finished;
 	

@@ -243,6 +243,7 @@ public class JobService implements IJobService
 				File fs = file!=null? new File(file): new File("./backup-settings.xml");
 				fos = new FileOutputStream(fs);
 				JavaWriter.objectToOutputStream(new ArrayList(jobs.values()), fos, null);
+				System.out.println("Saved settings: "+fs.getPath()+" "+agent.getComponentIdentifier());
 			}
 			catch(Exception e)
 			{
@@ -277,7 +278,7 @@ public class JobService implements IJobService
 			File fs = file!=null? new File(file): new File("./backup-settings.xml");
 			if(fs.exists())
 			{
-				fis = new FileInputStream("./backup-settings.xml");
+				fis = new FileInputStream(fs);
 				Collection<Job> jobs = (Collection<Job>)JavaReader.objectFromInputStream(fis, null);
 				addJobs(jobs.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
 				{
