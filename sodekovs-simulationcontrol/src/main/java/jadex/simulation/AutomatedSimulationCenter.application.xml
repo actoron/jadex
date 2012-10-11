@@ -48,11 +48,21 @@
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
 		</configuration>
-	<configuration name="Simulate MarsWorld with included Remote Client">
+		<configuration name="Simulate MarsWorld with included Remote Client">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
 						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>			
+					</arguments>
+				</component>
+			<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
+		<configuration name="Simulate MarsWorld with CordinationSpace with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/MarsWorldWithCoordSpace.xml"</argument>			
 					</arguments>
 				</component>
 			<component type="RemoteSimulationClient" master="false"/>
