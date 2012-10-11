@@ -4,7 +4,6 @@ import jadex.backup.job.SyncEntry;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.SyncRequest;
 import jadex.backup.resource.BackupResource;
-import jadex.backup.resource.FileInfo;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -19,7 +18,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -42,9 +40,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -53,8 +49,6 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -94,57 +88,59 @@ public class SyncJobPanel extends JPanel
 			pp.createCheckBox("Active: ", job.isActive(), false, 0);
 			
 			List<SyncRequest> reqs = job.getSyncRequests();
-			final JComboBox rcb = pp.createComboBox("Sync Requests", reqs!=null? reqs.toArray(): null);
+			final JComboBox rcb = new JComboBox(reqs!=null? reqs.toArray(): SUtil.EMPTY_STRING_ARRAY);
+			JButton ackb = new JButton("Ack");
+			JButton viewb = new JButton("View ...");
+			JPanel bp = new JPanel(new GridBagLayout());
+			bp.add(rcb, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+			bp.add(viewb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
+			bp.add(ackb, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
+//			final JComboBox rcb = pp.createComboBox("Sync Requests", reqs!=null? reqs.toArray(): null);
+			pp.addComponent("Open Sync Requests: ",bp);
 			
-			final ObjectCardLayout ocl = new ObjectCardLayout();
-			final JPanel reqp = new JPanel(ocl);
-			pp.addFullLineComponent("Sync Request", reqp);
+//			final ObjectCardLayout ocl = new ObjectCardLayout();
+//			final JPanel reqp = new JPanel(ocl);
+//			pp.addFullLineComponent("Sync Request", reqp);
 			
-			rcb.addActionListener(new ActionListener()
+			viewb.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
 					SyncRequest sr = (SyncRequest)rcb.getSelectedItem();
-					if(ocl.getComponent(sr)==null)
+					JTable reqt = new JTable();
+					IdTableModel<SyncEntry, SyncEntry> tm = new IdTableModel<SyncEntry, SyncEntry>
+						(new String[]{"Sync", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
 					{
-						JTable reqt = new JTable();
-						IdTableModel<SyncEntry, SyncEntry> tm = new IdTableModel<SyncEntry, SyncEntry>
-							(new String[]{"Sync", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
+						public Object getValueAt(SyncEntry obj, int column)
 						{
-							public Object getValueAt(SyncEntry obj, int column)
+							Object ret = obj;
+							if(column==0)
 							{
-								Object ret = obj;
-								if(column==0)
-								{
-									ret = obj.isAccepted();
-								}
-								else if(column==1)
-								{
-									ret = obj.getType();
-								}
-								else if(column==2)
-								{
-									ret = obj.getFileInfo().getLocation();
-								}
-								return ret;
+								ret = obj.isAccepted();
 							}
-						};
-						reqt.setModel(tm);
-						List<SyncEntry>  ses = sr.getEntries();
+							else if(column==1)
+							{
+								ret = obj.getType();
+							}
+							else if(column==2)
+							{
+								ret = obj.getFileInfo().getLocation();
+							}
+							return ret;
+						}
+					};
+					reqt.setModel(tm);
+					List<SyncEntry>  ses = sr.getEntries();
+					if(ses!=null)
+					{
 						for(SyncEntry se: ses)
 						{
 							tm.addObject(se, se);
 						}
-						reqp.add(new JScrollPane(reqt), sr);
 					}
-					ocl.show(sr);
+					SGUI.createDialog("Sync Entries", new JScrollPane(reqt), SyncJobPanel.this);
 				}
 			});
-			
-			if(reqs!=null && reqs.size()>0)
-			{
-				rcb.setSelectedIndex(0);
-			}
 		}
 		else
 		{
@@ -364,7 +360,7 @@ public class SyncJobPanel extends JPanel
 			srct.addTopLevelNode(root);
 		}
 		
-		if(createDialog("Source Folder Selection", srct, comp))
+		if(SGUI.createDialog("Source Folder Selection", srct, comp))
 		{
 			String[] sels = srct.getSelectionPaths();
 			ret = sels[0];
@@ -410,7 +406,7 @@ public class SyncJobPanel extends JPanel
 			}
 		}));
 		
-		if(createDialog("Global Resource Id Selection", new JScrollPane(srct), comp))
+		if(SGUI.createDialog("Global Resource Id Selection", new JScrollPane(srct), comp))
 		{
 			TreePath sel = srct.getSelectionPath();
 			if(sel!=null)
@@ -422,45 +418,5 @@ public class SyncJobPanel extends JPanel
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Create a dialog with a specific content panel.
-	 */
-	public static boolean createDialog(String title, JComponent content, JComponent comp)
-	{
-		final JDialog dia = new JDialog((JFrame)null, title, true);
-		
-		JButton bok = new JButton("OK");
-		JButton bcancel = new JButton("Cancel");
-		bok.setMinimumSize(bcancel.getMinimumSize());
-		bok.setPreferredSize(bcancel.getPreferredSize());
-		JPanel ps = new JPanel(new GridBagLayout());
-		ps.add(bok, new GridBagConstraints(0,0,1,1,1,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.VERTICAL, new Insets(2,2,2,2), 0, 0));
-		ps.add(bcancel, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-
-		dia.getContentPane().add(content, BorderLayout.CENTER);
-		dia.getContentPane().add(ps, BorderLayout.SOUTH);
-		final boolean[] ok = new boolean[1];
-		bok.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ok[0] = true;
-				dia.dispose();
-			}
-		});
-		bcancel.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				dia.dispose();
-			}
-		});
-		dia.pack();
-		dia.setLocation(SGUI.calculateMiddlePosition(comp!=null? SGUI.getWindowParent(comp): null, dia));
-		dia.setVisible(true);
-		
-		return ok[0];
 	}
 }

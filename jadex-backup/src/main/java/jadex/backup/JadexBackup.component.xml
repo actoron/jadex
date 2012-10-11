@@ -8,6 +8,10 @@
 						http://jadex.sourceforge.net/jadex-component-2.3.xsd"
 	name="JadexBackup" package="jadex.backup">
 	
+	<arguments>
+		<argument name="cmdargs" class="String[]"/>
+	</arguments>
+	
     <componenttypes>
         <componenttype name="JobManager" filename="jadex/backup/job/JobManagerAgent.class"/>
         <componenttype name="ResourceProvider" filename="jadex/backup/resource/ResourceProviderAgent.class"/>
@@ -16,7 +20,12 @@
     <configurations>
         <configuration name="test">
             <components>
-                <component type="ResourceProvider">
+           		<component type="JobManager">
+           			<arguments>
+           				<argument name="cmdargs">$args.cmdargs</argument>
+           			</arguments>
+           		</component>
+                <!-- <component type="ResourceProvider">
                     <arguments>
                         <argument name="dir">"test1"</argument>
                         <argument name="id">"abcdefgh"</argument>
@@ -27,8 +36,7 @@
                         <argument name="dir">"test2"</argument>
                         <argument name="id">"abcdefgh"</argument>
                     </arguments>
-                </component>
-                <component type="JobManager"/>
+                </component> -->
         	</components>
         </configuration>
     </configurations>

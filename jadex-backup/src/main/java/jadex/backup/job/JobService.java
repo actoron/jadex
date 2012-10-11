@@ -1,5 +1,6 @@
 package jadex.backup.job;
 
+import jadex.backup.JadexBackup;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -49,6 +50,9 @@ public class JobService implements IJobService
 	
 	/** The futures of active subscribers. */
 	protected Set<SubscriptionIntermediateFuture<JobEvent>> subscribers;
+	
+	/** The configfile. */
+	protected String cfgfile;
 
 	//-------- constructors --------
 	
@@ -62,8 +66,19 @@ public class JobService implements IJobService
 		
 		this.jobs = new LinkedHashMap<String, Job>();
 		this.jobagents = new HashMap<String, IExternalAccess>();
-		
-		loadSettings().addResultListener(new DelegationResultListener<Void>(ret));
+
+		String[] cmdargs = (String[])agent.getArguments().get("cmdargs");
+		if(cmdargs!=null)
+		{
+			for(int i=0; i<cmdargs.length; i++)
+			{
+				if(JadexBackup.CFG_FILE.equals(cmdargs[i]))
+				{
+					cfgfile = cmdargs[++i];
+				}
+			}
+		}
+		loadSettings(cfgfile).addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
 	}
@@ -97,7 +112,7 @@ public class JobService implements IJobService
 		
 		jobs.put(job.getId(), job);
 		
-		saveSettings();
+		saveSettings(cfgfile);
 		
 		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
@@ -218,14 +233,15 @@ public class JobService implements IJobService
 	/**
 	 * 
 	 */
-	protected void saveSettings()
+	protected void saveSettings(String file)
 	{
 		if(jobs!=null)
 		{
 			FileOutputStream fos = null;
 			try
 			{
-				fos = new FileOutputStream("./backup-settings.xml");
+				File fs = file!=null? new File(file): new File("./backup-settings.xml");
+				fos = new FileOutputStream(fs);
 				JavaWriter.objectToOutputStream(new ArrayList(jobs.values()), fos, null);
 			}
 			catch(Exception e)
@@ -251,14 +267,14 @@ public class JobService implements IJobService
 	/**
 	 * 
 	 */
-	protected IFuture<Void> loadSettings()
+	protected IFuture<Void> loadSettings(String file)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
 		FileInputStream fis = null;
 		try
 		{
-			File fs = new File("./backup-settings.xml");
+			File fs = file!=null? new File(file): new File("./backup-settings.xml");
 			if(fs.exists())
 			{
 				fis = new FileInputStream("./backup-settings.xml");

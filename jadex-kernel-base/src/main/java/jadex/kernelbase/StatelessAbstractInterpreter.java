@@ -1492,17 +1492,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(ComponentInstanceInfo component, IModelInfo model)
+	public Map<String, Object> getArguments(ComponentInstanceInfo component, IModelInfo model)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		Map ret = null;		
+		Map<String, Object> ret = null;		
 		UnparsedExpression[] arguments = component.getArguments();
 		UnparsedExpression argumentsexp = component.getArgumentsExpression();
 		
 		if(arguments.length>0)
 		{
-			ret = new HashMap();
+			ret = new HashMap<String, Object>();
 
 			for(int i=0; i<arguments.length; i++)
 			{
@@ -1517,7 +1517,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		else if(argumentsexp!=null && argumentsexp.getValue()!=null && argumentsexp.getValue().length()>0)
 		{
 			// todo: language
-			ret = (Map)SJavaParser.evaluateExpression(argumentsexp.getValue(), model.getAllImports(), getFetcher(), getClassLoader());
+			ret = (Map<String, Object>)SJavaParser.evaluateExpression(argumentsexp.getValue(), model.getAllImports(), getFetcher(), getClassLoader());
 		}
 		
 		return ret;

@@ -14,6 +14,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -54,6 +56,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -185,6 +188,46 @@ public class SGUI
 				listener.actionPerformed(ae);
 			}
 		};
+	}
+	
+	/**
+	 *  Create a dialog with a specific content panel.
+	 */
+	public static boolean createDialog(String title, JComponent content, JComponent comp)
+	{
+		final JDialog dia = new JDialog((JFrame)null, title, true);
+		
+		JButton bok = new JButton("OK");
+		JButton bcancel = new JButton("Cancel");
+		bok.setMinimumSize(bcancel.getMinimumSize());
+		bok.setPreferredSize(bcancel.getPreferredSize());
+		JPanel ps = new JPanel(new GridBagLayout());
+		ps.add(bok, new GridBagConstraints(0,0,1,1,1,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.VERTICAL, new Insets(2,2,2,2), 0, 0));
+		ps.add(bcancel, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+
+		dia.getContentPane().add(content, BorderLayout.CENTER);
+		dia.getContentPane().add(ps, BorderLayout.SOUTH);
+		final boolean[] ok = new boolean[1];
+		bok.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ok[0] = true;
+				dia.dispose();
+			}
+		});
+		bcancel.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				dia.dispose();
+			}
+		});
+		dia.pack();
+		dia.setLocation(SGUI.calculateMiddlePosition(comp!=null? SGUI.getWindowParent(comp): null, dia));
+		dia.setVisible(true);
+		
+		return ok[0];
 	}
 
 	/**
