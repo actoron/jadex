@@ -1,11 +1,10 @@
 package jadex.webservice.examples.rs.hello;
 
+import jadex.extension.rs.invoke.RestResponse;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-
-import com.sun.jersey.api.client.ClientResponse;
 
 public class XMLResultMapper implements IValueMapper
 {
@@ -14,9 +13,9 @@ public class XMLResultMapper implements IValueMapper
 	public Object convertValue(Object value) throws Exception
 	{
 		String result = null;
-		if (value instanceof ClientResponse)
+		if (value instanceof RestResponse)
 		{
-			ClientResponse cr = (ClientResponse) value;
+			RestResponse cr = (RestResponse) value;
 			InputStream is = cr.getEntity(InputStream.class);
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			int b = is.read(); 

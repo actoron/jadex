@@ -1,13 +1,13 @@
 package jadex.webservice.examples.rs.hello;
 
+import org.springframework.http.MediaType;
+
 import jadex.bridge.service.annotation.Value;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.annotations.GET;
 import jadex.extension.rs.annotations.Path;
 import jadex.extension.rs.annotations.Produces;
 import jadex.extension.rs.publish.annotation.ResultMapper;
-
-import javax.ws.rs.core.MediaType;
 
 /**
  * The mapping information for the rest service. Describes how the Java service
@@ -22,7 +22,7 @@ public interface IRSHelloService
 	 */
 	@GET
 	@Path("sayXMLHello")
-	@Produces(MediaType.TEXT_XML)
+	@Produces(MediaType.TEXT_XML_VALUE)
 	@ResultMapper(@Value(clazz=XMLResultMapper.class))
 	public IFuture<String> getXMLHello();
 

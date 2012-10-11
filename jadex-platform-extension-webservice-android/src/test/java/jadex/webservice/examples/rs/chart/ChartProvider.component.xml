@@ -1,0 +1,24 @@
+<!--
+	<H3>The chart provider</H3>
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-component-2.3.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.3.xsd"
+	name="ChartProvider" package="jadex.webservice.examples.rs.chart">
+	
+	<imports>
+		<import>jadex.extension.rs.invoke.*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IChartService">
+			<implementation>SRest.createServiceImplementation($component, 
+				IChartService.class, IRSChartService.class)</implementation>
+		</providedservice>
+	</services>
+	
+</componenttype>

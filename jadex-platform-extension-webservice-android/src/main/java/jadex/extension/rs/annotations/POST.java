@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that the annotated method responds to HTTP POST requests
- * @see HttpMethod
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-//@HttpMethod(HttpMethod.POST)
-public @interface POST { 
+// @HttpMethod(HttpMethod.POST)
+public @interface POST
+{
 }

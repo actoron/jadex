@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that the annotated method responds to HTTP HEAD requests
- * @see HttpMethod
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-//@HttpMethod(HttpMethod.HEAD)
-public @interface HEAD { 
+// @HttpMethod(HttpMethod.HEAD)
+public @interface HEAD
+{
 }

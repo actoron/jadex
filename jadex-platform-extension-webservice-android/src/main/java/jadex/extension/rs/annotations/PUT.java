@@ -7,10 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that the annotated method responds to HTTP PUT requests
+ * 
  * @see HttpMethod
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-//@HttpMethod(HttpMethod.PUT)
-public @interface PUT { 
+// @HttpMethod(HttpMethod.PUT)
+public @interface PUT
+{
 }

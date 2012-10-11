@@ -10,6 +10,9 @@ import jadex.extension.rs.annotations.PUT;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+/**
+ * Helper class to extract annotations.
+ */
 public class RSAnnotationHelper
 {
 	private static RSAnnotationHelper INSTANCE = new RSAnnotationHelper();

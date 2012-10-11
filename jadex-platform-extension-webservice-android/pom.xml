@@ -13,38 +13,40 @@
 
 	<description>
 		The Jadex android webservice platform extension package contains
-		functionality for using (but not providing) WSDL web services and REST web services.
+		functionality for using (but not providing) REST web services.
 	</description>
 	
 	<properties>
 		<jersey.version>1.11</jersey.version>
+		<spring.android.version>1.0.0.RELEASE</spring.android.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-web</artifactId>
+		    <version>3.1.2.RELEASE</version>
+		    <scope>test</scope>
+		</dependency>  
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
-<!-- 		<dependency> -->
-<!-- 		    <groupId>org.springframework.android</groupId> -->
-<!-- 		    <artifactId>spring-android-rest-template</artifactId> -->
-<!-- 		    <version>1.0.0.RELEASE</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+		    <groupId>org.springframework.android</groupId>
+		    <artifactId>spring-android-rest-template</artifactId>
+		    <version>${spring.android.version}</version>
+		</dependency>
 		
-<!-- 		<dependency> -->
-<!-- 		    <groupId>org.springframework.android</groupId> -->
-<!-- 		    <artifactId>spring-android-core</artifactId> -->
-<!-- 		    <version>1.0.0.RELEASE</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+		    <groupId>org.springframework.android</groupId>
+		    <artifactId>spring-android-core</artifactId>
+		    <version>${spring.android.version}</version>
+		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>javassist</groupId> -->
-<!-- 			<artifactId>javassist</artifactId> -->
-<!-- 			<version>3.12.1.GA</version> -->
-<!-- 		</dependency> -->
-		
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
@@ -73,18 +75,39 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
-			<version>${project.version}</version>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-grizzly2</artifactId>
+			<version>${jersey.version}</version>
 			<scope>test</scope>
-		</dependency>   
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.jersey.jersey-test-framework</groupId>
+			<artifactId>jersey-test-framework-grizzly2</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.glassfish.grizzly</groupId> -->
+<!-- 			<artifactId>grizzly-http-server</artifactId> -->
+<!-- 			<version>2.1.2</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency>  -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>javax.ws.rs</groupId> -->
+<!-- 			<artifactId>jsr311-api</artifactId> -->
+<!-- 			<version>1.1.1</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency>  -->
 		
 		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-web</artifactId>
-		    <version>3.1.2.RELEASE</version>
-		    <scope>test</scope>
-		</dependency>         
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-bundle</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>       
 	</dependencies>
 	
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->

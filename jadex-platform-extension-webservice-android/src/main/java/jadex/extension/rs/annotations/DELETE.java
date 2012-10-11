@@ -6,11 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated method responds to HTTP DELETE requests
- * @see HttpMethod
+ * Indicates that the annotated method responds to HTTP DELETE requests.
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-//@HttpMethod(HttpMethod.DELETE)
-public @interface DELETE { 
+// @HttpMethod(HttpMethod.DELETE)
+public @interface DELETE
+{
 }

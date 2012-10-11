@@ -28,13 +28,10 @@ import jadex.extension.rs.annotations.Produces;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.invoke.annotation.ParameterMappers;
 import jadex.extension.rs.invoke.annotation.ParametersInURL;
-//import jadex.extension.rs.publish.JadexXMLBodyWriter;
-import jadex.extension.rs.publish.JadexXMLBodyWriter;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 
-import java.awt.image.BufferedImage;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -42,12 +39,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -189,11 +189,38 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 											
 											RestTemplate restTemplate = new RestTemplate();
 											
-											StringHttpMessageConverter stringMessageConverter = new StringHttpMessageConverter();
-											ArrayList<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
-											converters.add(stringMessageConverter);
-											restTemplate.setMessageConverters(converters);
+											HashMap<String, HttpMessageConverter<?>> converterMap = new HashMap<String, HttpMessageConverter<?>>();
+											StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
+											ByteArrayHttpMessageConverter byteConverter = new ByteArrayHttpMessageConverter();
 											
+											ArrayList<MediaType> supportedTypes = new ArrayList<MediaType>();
+											supportedTypes.add(MediaType.TEXT_PLAIN);
+											supportedTypes.add(MediaType.TEXT_XML);
+											stringConverter.setSupportedMediaTypes(supportedTypes);
+											
+											RestResponseHTTPMessageConverter restResponseConverter = new RestResponseHTTPMessageConverter();
+											
+//											for (MediaType mediaType : stringConverter.getSupportedMediaTypes()) {
+//												converterMap.put(mediaType.toString(), stringConverter);
+//											}
+//											
+//											for (MediaType mediaType : byteConverter.getSupportedMediaTypes()) {
+//												converterMap.put(mediaType.toString(), byteConverter);
+//											}
+											
+											ArrayList<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
+//											for (String mediaType : produces) {
+//												HttpMessageConverter<?> httpMessageConverter = converterMap.get(mediaType);
+//												if (httpMessageConverter == null) {
+//													httpMessageConverter = byteConverter;
+//												}
+//												if (!converters.contains(httpMessageConverter)) {
+//													converters.add(httpMessageConverter);
+//												}
+//											}
+											converters.add(restResponseConverter);
+											
+											restTemplate.setMessageConverters(converters);
 											
 //											ClientConfig cc = new DefaultClientConfig();
 //											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -248,27 +275,33 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 											
 											Object res = null;
 											
-											if (!baseuri.endsWith("/") && !methodname.startsWith("/")) {
-												baseuri = baseuri + "/";
+											String uri = buildUri(baseuri, methodname, targetparams);
+											if (targetparams instanceof Map) {
+												@SuppressWarnings("unchecked")
+												Map<String, ?> test = (Map<String,?>) targetparams;
+												targetparams = convertUriParamsToStringValues((Map<String, ?>) targetparams);
 											}
-											String uri = baseuri + methodname;
+											RestResponse restResult = new RestResponse();
+											
+//											System.out.println("Using uri: " + uri);
+//											System.out.println("Using parameters: " + targetparams);
 											if(GET.class.equals(resttype))
-												res = restTemplate.getForObject(uri, BufferedImage.class, targetparams);
+												res = restTemplate.getForObject(uri, RestResponse.class, (Map<String,?>)targetparams);
 //												res = ((UniformInterface)rb).get(ClientResponse.class);
 											else if(POST.class.equals(resttype))
-												res = restTemplate.postForObject(uri, inurl ? null : targetparams, String.class);
+												res = restTemplate.postForObject(uri, inurl ? null : targetparams, RestResponse.class, targetparams);
 //												res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
 											else if(PUT.class.equals(resttype))
-												restTemplate.put(uri, targetparams, targetparams);
+												restTemplate.put(uri, inurl ? null : targetparams, targetparams);
 //												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											else if(HEAD.class.equals(resttype))
-												res = restTemplate.headForHeaders(uri, inurl ? null : targetparams);
+												res = restTemplate.headForHeaders(uri, targetparams);
 //												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											else if(OPTIONS.class.equals(resttype))
-												res = restTemplate.optionsForAllow(uri, inurl ? null: targetparams);
+												res = restTemplate.optionsForAllow(uri, targetparams);
 //												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											else if(DELETE.class.equals(resttype))
-												restTemplate.delete(uri, inurl ? null: targetparams);
+												restTemplate.delete(uri, targetparams);
 //												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											
 											if(rmapper!=null)
@@ -277,9 +310,13 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 												res = rm.convertValue(res);
 											}
 											
-//											System.out.println("result is: "+res);
 											re.setResult(res);
 											ia.killComponent();
+										}
+										
+										catch (RestClientException rce) {
+//											rce.printStackTrace();
+											re.setException(rce);
 										}
 										catch(Exception e)
 										{
@@ -288,6 +325,8 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 										}
 										return re;
 									}
+
+									
 								}).addResultListener(agent.createResultListener(new DelegationResultListener<Object>(ret)));
 							}
 						}));
@@ -297,5 +336,66 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 		}));
 			
 		return ret;
+	}
+	
+	private Map<String,String> convertUriParamsToStringValues(Map<String,?> targetparams)
+	{
+		HashMap<String, String> result = new HashMap<String, String>();
+		for (Entry<String, ?> entry : targetparams.entrySet())
+		{
+			Object value = entry.getValue();
+			StringBuilder resultValue = new StringBuilder();
+			if (value instanceof Object[])
+			{
+				String sep = "";
+				Object[] valueArr = (Object[]) value;
+				for (Object o : valueArr)
+				{
+					resultValue.append(sep);
+					resultValue.append(o.toString());
+					sep = ",";
+				}
+			} else if (value instanceof Iterable<?>)
+			{
+				String sep = "";
+				@SuppressWarnings("unchecked")
+				Iterable<Object> iterable = (Iterable<Object>) value;
+				for (Object o : iterable)
+				{
+					resultValue.append(sep);
+					resultValue.append(o.toString());
+					sep = ",";
+				}
+			} else
+			{
+				resultValue.append(entry.getValue().toString());
+			}
+			result.put(entry.getKey(), resultValue.toString());
+		}
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	private String buildUri(String baseuri, String methodname, Object params)
+	{
+		StringBuilder uriBuilder = new StringBuilder(baseuri);
+		if (!baseuri.endsWith("/") && !methodname.startsWith("/")) {
+			uriBuilder.append("/");
+		}
+		uriBuilder.append(methodname);
+		
+		if (params instanceof Map<?,?>) {
+			uriBuilder.append("?");
+			Map<String, ?> paramMap = (Map<String, ?>) params;
+			for (String key : paramMap.keySet()) {
+				uriBuilder.append(key);
+				uriBuilder.append("={");
+				uriBuilder.append(key);
+				uriBuilder.append("}&");
+			}
+			uriBuilder.deleteCharAt(uriBuilder.length()-1);
+		}
+		
+		return uriBuilder.toString();
 	}
 }

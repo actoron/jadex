@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that the annotated method responds to HTTP OPTIONS requests
- * @see HttpMethod
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-//@HttpMethod(HttpMethod.OPTIONS)
-public @interface OPTIONS { 
+// @HttpMethod(HttpMethod.OPTIONS)
+public @interface OPTIONS
+{
 }
