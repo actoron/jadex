@@ -156,7 +156,7 @@ public class SyncJobPanel extends JPanel
 	                    	}
 	                    	else
 	                    	{
-	                    		System.out.println("Task not open: "+task.getState());
+	                    		System.out.println("Task not open or no task");
 	                    	}
 	                    }
 	                });
@@ -168,6 +168,9 @@ public class SyncJobPanel extends JPanel
 				public void actionPerformed(ActionEvent e)
 				{
 					final SyncTask task = (SyncTask)rcb.getSelectedItem();
+					if(task==null)
+						return;
+					
 					boolean open = Task.STATE_OPEN.equals(task.getState());
 					
 					JTable reqt = new JTable();
