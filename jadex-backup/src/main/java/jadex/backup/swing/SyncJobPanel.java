@@ -135,7 +135,7 @@ public class SyncJobPanel extends JPanel
 	                    	if(task!=null && Task.STATE_OPEN.equals(task.getState()))
 	                    	{
 	                    		task.setState(Task.STATE_ACKNOWLEDGED);
-		                        js.modifyJob(job).addResultListener(new DefaultResultListener<Void>()
+		                        js.modifyTask(task).addResultListener(new DefaultResultListener<Void>()
 		                        {
 		                        	public void resultAvailable(Void result)
 		                        	{
@@ -395,7 +395,7 @@ public class SyncJobPanel extends JPanel
 								public void intermediateResultAvailable(JobProcessingEvent ev)
 								{
 									cmd.execute(ev);
-									ret.setResult(null);
+									ret.setResultIfUndone(null);
 								}
 								
 								public void finished()

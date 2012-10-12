@@ -1,6 +1,7 @@
 package jadex.backup.job.processing;
 
 import jadex.backup.job.Job;
+import jadex.backup.job.Task;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
@@ -22,6 +23,12 @@ public interface IJobProcessingService
 	 *  @param job The job.
 	 */
 	public IFuture<Void> modifyJob(Job job);
+	
+	/**
+	 *  Modify a task.
+	 *  @param task The task.
+	 */
+	public IFuture<Void> modifyTask(Task task);
 	
 	/**
 	 * 

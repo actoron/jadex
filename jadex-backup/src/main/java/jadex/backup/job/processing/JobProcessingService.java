@@ -2,6 +2,7 @@ package jadex.backup.job.processing;
 
 import jadex.backup.job.Job;
 import jadex.backup.job.SyncJob;
+import jadex.backup.job.Task;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -83,6 +84,17 @@ public class JobProcessingService implements IJobProcessingService
 	{
 		pojoagent.jobModified((SyncJob)job);
 				
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Modify a task.
+	 *  @param task The task.
+	 */
+	public IFuture<Void> modifyTask(Task task)
+	{
+		pojoagent.taskModified(task);
+		
 		return IFuture.DONE;
 	}
 

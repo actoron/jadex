@@ -119,7 +119,7 @@ public abstract class Job
 	/**
 	 * 
 	 */
-	public void addSyncRequest(Task task)
+	public void addTask(Task task)
 	{
 		if(tasks==null)
 			tasks = new ArrayList<Task>();
@@ -145,7 +145,7 @@ public abstract class Job
 	}
 
 	/**
-	 * 
+	 *  Get the hashcode.
 	 */
 	public int hashCode()
 	{
@@ -153,13 +153,11 @@ public abstract class Job
 	}
 
 	/**
-	 * 
+	 *  Test for equality.
+	 *  @param obj The object.
 	 */
 	public boolean equals(Object obj)
 	{
 		return obj instanceof Job && ((Job)obj).getId().equals(getId()); 
 	}
-
-	
-	
 }

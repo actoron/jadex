@@ -326,8 +326,8 @@ public class SyncJobProcessingAgent
 							if(st.getEntries()!=null && st.getEntries().size()>0)
 							{
 								// Publish modified job 
-								System.out.println("publishing sync request");
-								job.addSyncRequest(st);
+								System.out.println("publishing sync task");
+								job.addTask(st);
 								JobProcessingService jps = (JobProcessingService)agent.getServiceContainer().getProvidedServiceRawImpl(IJobProcessingService.class);
 								jps.publishEvent(new JobProcessingEvent(JobProcessingEvent.TASK_ADDED, job.getId(), st));
 								ret.setResult(null);
@@ -412,6 +412,54 @@ public class SyncJobProcessingAgent
 								});
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void taskModified(Task t)
+	{
+		SyncTask task = (SyncTask)t;
+		
+		System.out.println("sync agent received changed task: "+task);
+		
+		List<Task> srs = job.getTasks();
+		if(srs!=null && srs.contains(task))
+		{
+			// Update task
+			srs.remove(task);
+			srs.add(task);
+			
+			if(SyncTask.STATE_ACKNOWLEDGED.equals(task.getState()))
+			{
+				task.setState(SyncTask.STATE_ACTIVE);
+				List<SyncTaskEntry> ses = task.getEntries();
+				if(ses!=null)
+				{
+					IResourceService remresser = findRessourceService(task.getSource());
+					if(remresser!=null)
+					{
+						updateFiles(resser, remresser, ses.iterator())
+							.addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								System.out.println("Finished updating files");
+							}
+	
+							public void exceptionOccurred(Exception exception)
+							{
+								System.out.println("Exception during updating files");
+							}
+						});
+					}
+					else
+					{
+						System.out.println("Update src not available: "+remresser);
 					}
 				}
 			}

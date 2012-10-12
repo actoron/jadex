@@ -1,5 +1,7 @@
 package jadex.backup.job;
 
+import jadex.commons.SUtil;
+
 import java.text.SimpleDateFormat;
 
 /**
@@ -15,12 +17,10 @@ public class Task
 
 	public static final String	STATE_FINISHED	= "finished";
 
-	protected static long cnt = 0;
-
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm MM dd yyyy");
 
 	/** The id. */
-	protected long id;
+	protected String id;
   
 	/** The creation date. */
 	protected long date;
@@ -40,7 +40,7 @@ public class Task
 	 */
 	public Task(long date)
 	{
-		this.id = cnt++;
+		this.id = SUtil.createUniqueId("task");
 		this.date = date;
 		this.state = STATE_OPEN;
 	}
@@ -49,7 +49,7 @@ public class Task
 	 *  Get the id.
 	 *  @return The id.
 	 */
-	public long getId()
+	public String getId()
 	{
 		return id;
 	}
@@ -58,7 +58,7 @@ public class Task
 	 *  Set the id.
 	 *  @param id The id to set.
 	 */
-	public void setId(long id)
+	public void setId(String id)
 	{
 		this.id = id;
 	}
@@ -98,5 +98,21 @@ public class Task
 	{
 		this.state = state;
 	}
-	
+
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return 31 + ((id == null) ? 0 : id.hashCode());
+	}
+
+	/**
+	 *  Test for equality.
+	 *  @param obj The object.
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof Task && ((Task)obj).getId().equals(getId()); 
+	}
 }
