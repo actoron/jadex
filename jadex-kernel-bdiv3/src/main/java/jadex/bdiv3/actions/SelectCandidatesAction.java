@@ -43,8 +43,6 @@ public class SelectCandidatesAction implements IAction<Void>
 		Object cand = element.getApplicablePlanList().getNextCandidate();
 		if(cand!=null)
 		{
-//			IAction<Void> action = new ExecutePlanStepAction(ia instanceof IPojoMicroAgent? 
-//				((IPojoMicroAgent)ia).getPojoAgent(): ia, candidates.get(0));
 			IAction<Void> action = new ExecutePlanStepAction(element, ((MPlan)cand).getTarget());
 			ia.getExternalAccess().scheduleStep(action);
 			ret.setResult(null);

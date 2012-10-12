@@ -13,7 +13,7 @@ public class MClassBasedElement extends MProcessableElement
 	 */
 	public MClassBasedElement(Class<?> target)
 	{
-		super(false, false);
+		super(target.getName(), false, false);
 		this.target = target;
 	}
 

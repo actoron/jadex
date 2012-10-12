@@ -5,6 +5,8 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.PlanFailureException;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -46,16 +48,16 @@ public class HelloWorldBDI
 	}
 	
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
-	protected void printHello1(HelloGoal goal)
+	protected IFuture<Void> printHello1(HelloGoal goal)
 	{
 		System.out.println("1: "+goal.getText());
-		throw new PlanFailureException();
+		return new Future<Void>(new PlanFailureException());
 	}
 	
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
-	protected void printHello2(HelloGoal goal)
+	protected IFuture<Void> printHello2(HelloGoal goal)
 	{
 		System.out.println("2: "+goal.getText());
-//		throw new PlanFailureException();
+		return IFuture.DONE;
 	}
 }

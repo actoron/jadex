@@ -10,8 +10,8 @@ public class RGoal extends RProcessableElement
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(Object goal, MGoal mgoal)
+	public RGoal(MGoal mgoal, Object goal)
 	{
-		super(goal, mgoal);
+		super(mgoal, goal);
 	}
 }

@@ -788,7 +788,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
 	{
-//		if(model.toString().indexOf("RemoteServiceManagementAgent")!=-1)
+//		if(model.toString().indexOf("HelloWorld")!=-1)
 //			System.out.println("findLoadableKernel: "+model);
 		
 		IFuture	ret;

@@ -44,6 +44,7 @@ public class AdoptGoalAction implements IAction<Void>
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			ip.getRuleSystem().observeObject(goal.getPojoElement());
+			ip.getCapability().addGoal(goal);
 			ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(goal));
 			ret.setResult(null);
 		}

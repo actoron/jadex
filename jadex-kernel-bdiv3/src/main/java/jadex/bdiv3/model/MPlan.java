@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 /**
  * 
  */
-public class MPlan
+public class MPlan extends MElement
 {
 	/** The trigger. */
 	protected MTrigger trigger;
@@ -13,13 +13,18 @@ public class MPlan
 	/** The target. */
 	protected Method target;
 	
+	/** The plan priority. */
+	protected int priority;
+	
 	/**
 	 *  Create a new belief.
 	 */
-	public MPlan(Method target, MTrigger trigger)
+	public MPlan(Method target, MTrigger trigger, int priority)
 	{
+		super(target.getName());
 		this.target = target;
 		this.trigger = trigger;
+		this.priority = priority;
 	}
 
 	/**
@@ -56,5 +61,23 @@ public class MPlan
 	public void setTrigger(MTrigger trigger)
 	{
 		this.trigger = trigger;
+	}
+
+	/**
+	 *  Get the priority.
+	 *  @return The priority.
+	 */
+	public int getPriority()
+	{
+		return priority;
+	}
+
+	/**
+	 *  Set the priority.
+	 *  @param priority The priority to set.
+	 */
+	public void setPriority(int priority)
+	{
+		this.priority = priority;
 	}
 }

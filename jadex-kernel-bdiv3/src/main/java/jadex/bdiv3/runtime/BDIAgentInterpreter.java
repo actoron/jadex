@@ -33,22 +33,20 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/** The rule system. */
 	protected RuleSystem rulesystem;
 	
-	/** The runtime plans. */
-	protected Set<Object> plans;
-	
-	/** The runtime goals. */
-	protected Set<Object> goals;
+	/** The bdi state. */
+	protected RCapability capa;
 	
 	/**
 	 *  Create a new agent.
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final BDIModel model, Class agentclass, final Map args, final String config, 
+		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
 		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, listener, inited);
 		this.bdimodel = model;
+		this.capa = new RCapability(bdimodel.getCapability());
 	}
 	
 	/**
@@ -105,7 +103,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
-		List<MGoal> goals = ((BDIModel)model).getGoals();
+		List<MGoal> goals = ((BDIModel)model).getCapability().getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
 			rulesystem.observeObject(goals.get(i).getTarget());
@@ -158,5 +156,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public BDIModel getBDIModel()
 	{
 		return bdimodel;
+	}
+	
+	/**
+	 *  Get the state.
+	 *  @return the state.
+	 */
+	public RCapability getCapability()
+	{
+		return capa;
 	}
 }

@@ -27,10 +27,10 @@ public class BDIAgent extends MicroAgent
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		ip.getRuleSystem().observeObject(goal);
 		BDIModel bdim = ip.getBDIModel();
-		MGoal mgoal = bdim.getGoal(goal.getClass());
+		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		RGoal rgoal = new RGoal(goal, mgoal);
+		RGoal rgoal = new RGoal(mgoal, goal);
 		
 //		System.out.println("adopt goal");
 		ip.scheduleStep(new AdoptGoalAction(rgoal));

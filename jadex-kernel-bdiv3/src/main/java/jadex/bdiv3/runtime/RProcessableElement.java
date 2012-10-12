@@ -1,46 +1,31 @@
 package jadex.bdiv3.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bdiv3.model.MProcessableElement;
 
 /**
  * 
  */
-public class RProcessableElement
+public class RProcessableElement extends RElement
 {
 	/** The pojo element. */
 	protected Object pojoelement;
 	
-	/** The model element. */
-	protected MProcessableElement modelelement;
-
 	/** The applicable plan list. */
 	protected APL apl;
+	
+	/** The tried plans. */
+	protected List<Object> triedplans;
 	
 	/**
 	 *  Create a new element.
 	 */
-	public RProcessableElement(Object pojoelement, MProcessableElement modelelement)
+	public RProcessableElement(MProcessableElement modelelement, Object pojoelement)
 	{
+		super(modelelement);
 		this.pojoelement = pojoelement;
-		this.modelelement = modelelement;
-	}
-
-	/**
-	 *  Get the modelelement.
-	 *  @return The modelelement.
-	 */
-	public MProcessableElement getModelElement()
-	{
-		return modelelement;
-	}
-
-	/**
-	 *  Set the modelelement.
-	 *  @param modelelement The modelelement to set.
-	 */
-	public void setModelElement(MProcessableElement modelelement)
-	{
-		this.modelelement = modelelement;
 	}
 
 	/**
@@ -81,5 +66,16 @@ public class RProcessableElement
 		this.pojoelement = pojoelement;
 	}
 	
+	/**
+	 *  Add a tried plan.
+	 */
+	public void addTriedPlan(Object plan)
+	{
+		if(triedplans==null)
+		{
+			triedplans = new ArrayList<Object>();
+		}
+		triedplans.add(plan);
+	}
 	
 }

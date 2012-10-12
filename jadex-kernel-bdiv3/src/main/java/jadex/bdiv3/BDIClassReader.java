@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
@@ -51,7 +52,7 @@ public class BDIClassReader extends MicroClassReader
 	protected BDIModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
 	{
 		ModelInfo modelinfo = new ModelInfo();
-		BDIModel ret = new BDIModel(modelinfo);
+		BDIModel ret = new BDIModel(modelinfo, new MCapability(cma.getName()));
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
@@ -103,7 +104,7 @@ public class BDIClassReader extends MicroClassReader
 				if(fields[i].isAnnotationPresent(Belief.class))
 				{
 //					System.out.println("found belief: "+fields[i].getName());
-					micromodel.addBelief(new MBelief(fields[i]));
+					micromodel.getCapability().addBelief(new MBelief(fields[i]));
 //					beliefs.add(fields[i]);
 					beliefnames.add(fields[i].getName());
 				}
@@ -123,13 +124,13 @@ public class BDIClassReader extends MicroClassReader
 					{
 						MGoal mgoal = new MGoal(gs[j]);
 						tr.addGoal(mgoal);
-						if(!micromodel.getGoals().contains(mgoal))
+						if(!micromodel.getCapability().getGoals().contains(mgoal))
 						{
-							micromodel.addGoal(mgoal);
+							micromodel.getCapability().addGoal(mgoal);
 						}
 					}
-					MPlan mplan = new MPlan(methods[i], tr);
-					micromodel.addPlan(mplan);
+					MPlan mplan = new MPlan(methods[i], tr, p.priority());
+					micromodel.getCapability().addPlan(mplan);
 				}
 			}
 			

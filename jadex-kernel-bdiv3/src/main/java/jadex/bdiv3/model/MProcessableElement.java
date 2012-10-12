@@ -3,9 +3,8 @@ package jadex.bdiv3.model;
 /**
  * 
  */
-public class MProcessableElement
+public class MProcessableElement extends MElement
 {
-	
 	/** Post to all flag. */
 	protected boolean posttoall;
 	
@@ -21,8 +20,9 @@ public class MProcessableElement
 	/**
 	 * 
 	 */
-	public MProcessableElement(boolean posttoall, boolean randomselection)
+	public MProcessableElement(String name, boolean posttoall, boolean randomselection)
 	{
+		super(name);
 		this.posttoall = posttoall;
 		this.randomselection = randomselection;
 	}

@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 /**
  *  Belief model.
  */
-public class MBelief
+public class MBelief extends MElement
 {
 	/** The target. */
 	protected Field target;
@@ -15,6 +15,7 @@ public class MBelief
 	 */
 	public MBelief(Field target)
 	{
+		super(target.getName());
 		this.target = target;
 	}
 

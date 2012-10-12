@@ -9,6 +9,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.APL;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.RCapability;
 import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
@@ -54,10 +55,10 @@ public class FindApplicableCandidatesAction implements IAction<Void>
 		Future<Void> ret = new Future<Void>();
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		BDIModel bdimodel = ip.getBDIModel();
+		RCapability rcapa = ip.getCapability();
 		
 		APL apl = element.getApplicablePlanList();
-		apl.build(bdimodel);
+		apl.build(rcapa, element);
 		IAction<Void> action = new SelectCandidatesAction(element);
 		ia.getExternalAccess().scheduleStep(action);
 		ret.setResult(null);

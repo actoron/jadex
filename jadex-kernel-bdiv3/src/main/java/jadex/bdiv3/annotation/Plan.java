@@ -17,4 +17,8 @@ public @interface Plan
 	 */
 	public Trigger trigger() default @Trigger();
 
+	/**
+	 *  The plan priority. 
+	 */
+	public int priority() default 0;
 }
