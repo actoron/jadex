@@ -102,58 +102,6 @@ public class SyncJobProcessingAgent
 
 		this.resservices = new ArrayList<IResourceService>();
 		
-//		SServiceProvider.getService(agent.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(new DefaultResultListener<IJobManagementService>()
-//		{
-//			public void resultAvailable(IJobManagementService js)
-//			{
-//				ISubscriptionIntermediateFuture<JobEvent> subscription = js.subscribe();
-//				subscription.addResultListener(new SwingIntermediateDefaultResultListener<JobEvent>()
-//				{
-//					public void customIntermediateResultAvailable(JobEvent ce)
-//					{
-//						if(JobEvent.JOB_CHANGED.equals(ce.getType()))
-//						{
-//							if(ce.getJob().getId().equals(job.getId()))
-//							{
-//								System.out.println("sync agent received changed job: "+ce.getJob());
-//								job = (SyncJob)ce.getJob();
-//								
-//								List<SyncRequest> srs = job.getSyncRequests();
-//								{
-//									if(srs!=null)
-//									{
-//										for(Iterator<SyncRequest> it=srs.iterator(); it.hasNext(); )
-//										{
-//											SyncRequest sr = it.next();
-//											if(SyncRequest.STATE_ACKNOWLEDGED.equals(sr.getState()))
-//											{
-//												sr.setState(SyncRequest.STATE_ACTIVE);
-//												List<SyncEntry> ses = sr.getEntries();
-//												if(ses!=null)
-//												{
-//													updateFiles(localresser, resser, ses.iterator())
-//												}
-//												
-//											}
-//										}
-//									}
-//								}
-//							}
-//						}
-//					}
-//					
-//					public void customExceptionOccurred(Exception exception)
-//					{
-//						// todo:
-//						System.out.println("ex: "+exception);
-//	//					ret.setExceptionIfUndone(exception);
-//					}
-//				});
-//			}
-//		});
-		
-		
 		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
@@ -198,7 +146,7 @@ public class SyncJobProcessingAgent
 			{
 				final IComponentStep<Void> self = this;
 								
-				final Future<Void> fini = new Future<Void>();
+				final Future<Void> ret = new Future<Void>();
 				if(resservices.size()==0)
 				{
 					agent.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL)
@@ -210,7 +158,7 @@ public class SyncJobProcessingAgent
 								&& !result.getLocalId().equals(resser.getLocalId()))
 							{
 								resservices.add(result);
-								fini.setResultIfUndone(null);
+								ret.setResultIfUndone(null);
 							}
 						}
 						
@@ -218,11 +166,11 @@ public class SyncJobProcessingAgent
 						{
 							if(resservices.size()>0)
 							{
-								fini.setResultIfUndone(null);
+								ret.setResultIfUndone(null);
 							}
 							else
 							{
-								fini.setExceptionIfUndone(new RuntimeException("No sync partner"));
+								ret.setExceptionIfUndone(new RuntimeException("No sync partner"));
 							}
 						}
 						
@@ -236,12 +184,16 @@ public class SyncJobProcessingAgent
 						
 						public void exceptionOccurred(Exception exception) 
 						{
-							fini.setExceptionIfUndone(new RuntimeException("No sync partner"));
+							ret.setExceptionIfUndone(new RuntimeException("No sync partner"));
 						}
 					});
 				}
+				else
+				{
+					ret.setResult(null);
+				}
 				
-				fini.addResultListener(new IResultListener<Void>() 
+				ret.addResultListener(new IResultListener<Void>() 
 				{
 					public void resultAvailable(Void result)
 					{
@@ -280,7 +232,7 @@ public class SyncJobProcessingAgent
 		final IResourceService remresser = resservices.get(0);
 		System.out.println("starting sync with: "+resservices.get(0));
 		
-		final SyncTask st = new SyncTask(remresser.getLocalId(), System.currentTimeMillis());
+		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
 		
 		resser.update(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
 		{
@@ -294,7 +246,7 @@ public class SyncJobProcessingAgent
 					if(!autoupdate)
 					{
 //						changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
-						st.addSyncEntry(new SyncTaskEntry(result.getFile(), result.getType()));
+						task.addSyncEntry(new SyncTaskEntry(result.getFile(), result.getType()));
 					}
 					else
 					{
@@ -323,13 +275,12 @@ public class SyncJobProcessingAgent
 					{
 						public void resultAvailable(IJobManagementService js)
 						{
-							if(st.getEntries()!=null && st.getEntries().size()>0)
+							if(task.getEntries()!=null && task.getEntries().size()>0)
 							{
 								// Publish modified job 
-								System.out.println("publishing sync task");
-								job.addTask(st);
-								JobProcessingService jps = (JobProcessingService)agent.getServiceContainer().getProvidedServiceRawImpl(IJobProcessingService.class);
-								jps.publishEvent(new JobProcessingEvent(JobProcessingEvent.TASK_ADDED, job.getId(), st));
+//								System.out.println("publishing sync task");
+								job.addTask(task);
+								publishEvent(new TaskEvent(AJobProcessingEvent.TASK_ADDED, task));
 								ret.setResult(null);
 							}
 						}
@@ -378,44 +329,7 @@ public class SyncJobProcessingAgent
 	 */
 	public void jobModified(SyncJob job)
 	{
-		if(job.getId().equals(job.getId()))
-		{
-			System.out.println("sync agent received changed job: "+job);
-			this.job = job;
-			
-			List<Task> srs = job.getTasks();
-			{
-				if(srs!=null)
-				{
-					for(Iterator<Task> it=srs.iterator(); it.hasNext(); )
-					{
-						SyncTask sr = (SyncTask)it.next();
-						if(SyncTask.STATE_ACKNOWLEDGED.equals(sr.getState()))
-						{
-							sr.setState(SyncTask.STATE_ACTIVE);
-							List<SyncTaskEntry> ses = sr.getEntries();
-							if(ses!=null)
-							{
-								IResourceService remresser = findRessourceService(sr.getSource());
-								updateFiles(resser, remresser, ses.iterator())
-									.addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										System.out.println("Finished updating files");
-									}
-
-									public void exceptionOccurred(Exception exception)
-									{
-										System.out.println("Exception during updating files");
-									}
-								});
-							}
-						}
-					}
-				}
-			}
-		}
+		System.out.println("todo: job was modified...");
 	}
 	
 	/**
@@ -423,7 +337,7 @@ public class SyncJobProcessingAgent
 	 */
 	public void taskModified(Task t)
 	{
-		SyncTask task = (SyncTask)t;
+		final SyncTask task = (SyncTask)t;
 		
 		System.out.println("sync agent received changed task: "+task);
 		
@@ -448,6 +362,8 @@ public class SyncJobProcessingAgent
 						{
 							public void resultAvailable(Void result)
 							{
+								task.setState(SyncTask.STATE_FINISHED);
+								publishEvent(new TaskEvent(JobProcessingEvent.TASK_CHANGED, task));
 								System.out.println("Finished updating files");
 							}
 	
@@ -497,7 +413,7 @@ public class SyncJobProcessingAgent
 			{
 				public void customResultAvailable(Void result)
 				{
-					updateFiles(localresser, resser, it);
+					updateFiles(localresser, resser, it).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -546,7 +462,7 @@ public class SyncJobProcessingAgent
 			
 			public void finished()
 			{
-				System.out.println("fini");
+//				System.out.println("fini");
 				ret.setResult(null);
 			}
 		});
@@ -561,6 +477,15 @@ public class SyncJobProcessingAgent
 	public SyncJob getJob()
 	{
 		return job;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void publishEvent(AJobProcessingEvent event)
+	{
+		JobProcessingService jps = (JobProcessingService)agent.getServiceContainer().getProvidedServiceRawImpl(IJobProcessingService.class);
+		jps.publishEvent(event);
 	}
 	
 }

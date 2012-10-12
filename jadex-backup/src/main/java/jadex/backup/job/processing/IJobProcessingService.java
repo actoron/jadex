@@ -34,5 +34,5 @@ public interface IJobProcessingService
 	 * 
 	 */
 	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<JobProcessingEvent> subscribe(IFilter<JobProcessingEvent> filter);
+	public ISubscriptionIntermediateFuture<AJobProcessingEvent> subscribe(IFilter<AJobProcessingEvent> filter);
 }

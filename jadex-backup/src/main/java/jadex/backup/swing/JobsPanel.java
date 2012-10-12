@@ -265,7 +265,7 @@ public class JobsPanel extends JPanel
 				{
 					public void customIntermediateResultAvailable(JobManagementEvent ce)
 					{
-						System.out.println("job event: "+ce);
+//						System.out.println("job event: "+ce);
 						
 						if(JobManagementEvent.JOB_ADDED.equals(ce.getType()))
 						{

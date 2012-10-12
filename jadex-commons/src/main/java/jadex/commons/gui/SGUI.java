@@ -195,18 +195,19 @@ public class SGUI
 	 */
 	public static boolean createDialog(String title, JComponent content, JComponent comp)
 	{
+		return createDialog(title, content, comp, false);
+	}
+	
+	/**
+	 *  Create a dialog with a specific content panel.
+	 */
+	public static boolean createDialog(String title, JComponent content, JComponent comp, boolean info)
+	{
 		final JDialog dia = new JDialog((JFrame)null, title, true);
 		
 		JButton bok = new JButton("OK");
-		JButton bcancel = new JButton("Cancel");
-		bok.setMinimumSize(bcancel.getMinimumSize());
-		bok.setPreferredSize(bcancel.getPreferredSize());
 		JPanel ps = new JPanel(new GridBagLayout());
 		ps.add(bok, new GridBagConstraints(0,0,1,1,1,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.VERTICAL, new Insets(2,2,2,2), 0, 0));
-		ps.add(bcancel, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-
-		dia.getContentPane().add(content, BorderLayout.CENTER);
-		dia.getContentPane().add(ps, BorderLayout.SOUTH);
 		final boolean[] ok = new boolean[1];
 		bok.addActionListener(new ActionListener()
 		{
@@ -216,13 +217,25 @@ public class SGUI
 				dia.dispose();
 			}
 		});
-		bcancel.addActionListener(new ActionListener()
+		
+		if(!info)
 		{
-			public void actionPerformed(ActionEvent e)
+			JButton bcancel = new JButton("Cancel");
+			bok.setMinimumSize(bcancel.getMinimumSize());
+			bok.setPreferredSize(bcancel.getPreferredSize());
+			ps.add(bcancel, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.SOUTHEAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+			bcancel.addActionListener(new ActionListener()
 			{
-				dia.dispose();
-			}
-		});
+				public void actionPerformed(ActionEvent e)
+				{
+					dia.dispose();
+				}
+			});
+		}
+		
+		dia.getContentPane().add(content, BorderLayout.CENTER);
+		dia.getContentPane().add(ps, BorderLayout.SOUTH);
+		
 		dia.pack();
 		dia.setLocation(SGUI.calculateMiddlePosition(comp!=null? SGUI.getWindowParent(comp): null, dia));
 		dia.setVisible(true);

@@ -5,8 +5,10 @@ import jadex.backup.job.SyncJob;
 import jadex.backup.job.SyncTask;
 import jadex.backup.job.SyncTaskEntry;
 import jadex.backup.job.Task;
+import jadex.backup.job.processing.AJobProcessingEvent;
 import jadex.backup.job.processing.IJobProcessingService;
 import jadex.backup.job.processing.JobProcessingEvent;
+import jadex.backup.job.processing.TaskEvent;
 import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
@@ -32,10 +34,12 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -55,7 +59,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -110,8 +116,9 @@ public class SyncJobPanel extends JPanel
 				public Component getListCellRendererComponent(JList list, Object value,
 					int index, boolean isSelected, boolean cellHasFocus)
 				{
-					SyncTask sr = (SyncTask)value;
-					return super.getListCellRendererComponent(list, sr==null? null: sr.getSource()+" "+sr.sdf.format(sr.getDate()), index, isSelected, cellHasFocus);
+					SyncTask task = (SyncTask)value;
+					return super.getListCellRendererComponent(list, task==null? null: task.getSource()
+						+" "+task.sdf.format(task.getDate())+" ("+task.getState()+")", index, isSelected, cellHasFocus);
 				}
 			});
 			JButton ackb = new JButton("Ack");
@@ -120,21 +127,24 @@ public class SyncJobPanel extends JPanel
 			bp.add(rcb, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(0,2,0,2),0,0));
 			bp.add(viewb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
 			bp.add(ackb, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
-			pp.addComponent("Open Sync Requests: ",bp);
+			pp.addComponent("Sync Tasks: ",bp);
 			
 			ackb.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
 					SServiceProvider.getService(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-	                	.addResultListener(new DefaultResultListener<IJobProcessingService>()
+	                	.addResultListener(new SwingDefaultResultListener<IJobProcessingService>()
 	                {
-	                    public void resultAvailable(IJobProcessingService js)
+	                    public void customResultAvailable(IJobProcessingService js)
 	                    {
 	                    	Task task = (Task)rcb.getSelectedItem();
 	                    	if(task!=null && Task.STATE_OPEN.equals(task.getState()))
 	                    	{
 	                    		task.setState(Task.STATE_ACKNOWLEDGED);
+	                    		rcb.invalidate();
+	                    		rcb.doLayout();
+	                    		rcb.repaint();
 		                        js.modifyTask(task).addResultListener(new DefaultResultListener<Void>()
 		                        {
 		                        	public void resultAvailable(Void result)
@@ -155,9 +165,9 @@ public class SyncJobPanel extends JPanel
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					SyncTask sr = (SyncTask)rcb.getSelectedItem();
+					final SyncTask task = (SyncTask)rcb.getSelectedItem();
 					JTable reqt = new JTable();
-					IdTableModel<SyncTaskEntry, SyncTaskEntry> tm = new IdTableModel<SyncTaskEntry, SyncTaskEntry>
+					final IdTableModel<SyncTaskEntry, SyncTaskEntry> tm = new IdTableModel<SyncTaskEntry, SyncTaskEntry>
 						(new String[]{"Include", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
 					{
 						public Object getValueAt(SyncTaskEntry obj, int column)
@@ -180,7 +190,7 @@ public class SyncJobPanel extends JPanel
 						
 						public boolean isCellEditable(int row, int column)
 						{
-							return column==0;
+							return column==0 && Task.STATE_OPEN.equals(task.getState());
 						}
 						
 						public void setValueAt(Object val, int row, int column)
@@ -193,7 +203,7 @@ public class SyncJobPanel extends JPanel
 						}
 					};
 					reqt.setModel(tm);
-					List<SyncTaskEntry>  ses = sr.getEntries();
+					List<SyncTaskEntry> ses = task.getEntries();
 					if(ses!=null)
 					{
 						for(SyncTaskEntry se: ses)
@@ -202,9 +212,51 @@ public class SyncJobPanel extends JPanel
 							tm.addObject(cl, cl);
 						}
 					}
-					if(SGUI.createDialog("Sync Entries", new JScrollPane(reqt), SyncJobPanel.this))
+					
+					JPanel contp = new JPanel(new BorderLayout());
+					contp.add(new JScrollPane(reqt), BorderLayout.CENTER);
+					
+					if(Task.STATE_OPEN.equals(task.getState()))
 					{
-						sr.setEntries(tm.getValues());
+						JPanel bup = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+						JButton selab = new JButton("Select All");
+						JButton clearab = new JButton("Clear All");
+						bup.add(selab);
+						bup.add(clearab);
+						
+						selab.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								for(SyncTaskEntry ste: tm.getValues())
+								{
+									ste.setIncluded(true);
+								}
+								tm.refresh();
+							}
+						});
+						
+						clearab.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								for(SyncTaskEntry ste: tm.getValues())
+								{
+									ste.setIncluded(false);
+								}
+								tm.refresh();
+							}
+						});
+						contp.add(bup, BorderLayout.SOUTH);
+						
+						if(SGUI.createDialog("Sync Entries ("+task.getState()+")", contp, SyncJobPanel.this))
+						{
+							task.setEntries(tm.getValues());
+						}
+					}
+					else
+					{
+						SGUI.createDialog("Sync Entries ("+task.getState()+")", contp, SyncJobPanel.this, true);
 					}
 				}
 			});
@@ -214,27 +266,41 @@ public class SyncJobPanel extends JPanel
 			{
 				public void execute(Object args)
 				{
-					System.out.println("event: "+args);
-					JobProcessingEvent ev = (JobProcessingEvent)args;
+//					System.out.println("event: "+args);
 					
-					if(JobProcessingEvent.INITIAL.equals(ev.getType()))
+					if(args instanceof JobProcessingEvent)
 					{
-						List<Task> tasks = ev.getJob().getTasks();
-						if(tasks!=null)
+						JobProcessingEvent ev = (JobProcessingEvent)args;
+						if(JobProcessingEvent.INITIAL.equals(ev.getType()))
 						{
-							for(Task t: tasks)
+							List<Task> tasks = ev.getJob().getTasks();
+							if(tasks!=null)
 							{
-								rcb.addItem(t);
+								for(Task t: tasks)
+								{
+									rcb.addItem(t);
+								}
 							}
 						}
 					}
-					else if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
+					else
 					{
-						rcb.addItem(ev.getTask());
-					}
-					else if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
-					{
-						rcb.removeItem(ev.getTask());
+						TaskEvent ev = (TaskEvent)args;
+						if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
+						{
+							rcb.addItem(ev.getTask());
+						}
+						else if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
+						{
+							rcb.removeItem(ev.getTask());
+						}
+						else if(JobProcessingEvent.TASK_CHANGED.equals(ev.getType()))
+						{
+							// Update task
+							rcb.removeItem(ev.getTask());
+							rcb.addItem(ev.getTask());
+						}
+						rcb.revalidate();
 					}
 				}
 			}).addResultListener(new IResultListener<Void>()
@@ -388,11 +454,11 @@ public class SyncJobPanel extends JPanel
 					{
 						if(job.equals(sjob))
 						{
-							ISubscriptionIntermediateFuture<JobProcessingEvent> sub = jps.subscribe(null);
+							ISubscriptionIntermediateFuture<AJobProcessingEvent> sub = jps.subscribe(null);
 							
-							sub.addResultListener(new SwingIntermediateResultListener<JobProcessingEvent>(new IIntermediateResultListener<JobProcessingEvent>()
+							sub.addResultListener(new SwingIntermediateResultListener<AJobProcessingEvent>(new IIntermediateResultListener<AJobProcessingEvent>()
 							{
-								public void intermediateResultAvailable(JobProcessingEvent ev)
+								public void intermediateResultAvailable(AJobProcessingEvent ev)
 								{
 									cmd.execute(ev);
 									ret.setResultIfUndone(null);
@@ -402,9 +468,9 @@ public class SyncJobPanel extends JPanel
 								{
 								}
 								
-								public void resultAvailable(Collection<JobProcessingEvent> result)
+								public void resultAvailable(Collection<AJobProcessingEvent> result)
 								{
-									for(JobProcessingEvent ev: result)
+									for(AJobProcessingEvent ev: result)
 									{
 										cmd.execute(ev);
 									}

@@ -19,6 +19,9 @@ public class Task
 
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm MM dd yyyy");
 
+	/** The job id. */
+	protected String jobid;
+	
 	/** The id. */
 	protected String id;
   
@@ -38,8 +41,9 @@ public class Task
 	/**
 	 *  Create a new sync request.
 	 */
-	public Task(long date)
+	public Task(String jobid, long date)
 	{
+		this.jobid = jobid;
 		this.id = SUtil.createUniqueId("task");
 		this.date = date;
 		this.state = STATE_OPEN;
@@ -97,6 +101,24 @@ public class Task
 	public void setState(String state)
 	{
 		this.state = state;
+	}
+	
+	/**
+	 *  Get the job id.
+	 *  @return The jobid.
+	 */
+	public String getJobId()
+	{
+		return jobid;
+	}
+
+	/**
+	 *  Set the job id.
+	 *  @param jobid The jobid to set.
+	 */
+	public void setJobId(String jobid)
+	{
+		this.jobid = jobid;
 	}
 
 	/**

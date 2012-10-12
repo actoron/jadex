@@ -30,9 +30,9 @@ public class SyncTask extends Task
 	/**
 	 *  Create a new sync request.
 	 */
-	public SyncTask(String source, long date)
+	public SyncTask(String jobid, String source, long date)
 	{
-		super(date);
+		super(jobid, date);
 		this.source = source;
 	}
 

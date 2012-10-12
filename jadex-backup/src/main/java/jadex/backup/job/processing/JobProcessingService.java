@@ -35,7 +35,7 @@ public class JobProcessingService implements IJobProcessingService
 	protected SyncJobProcessingAgent pojoagent;
 	
 	/** The futures of active subscribers. */
-	protected Map<SubscriptionIntermediateFuture<JobProcessingEvent>, IFilter<JobProcessingEvent>> subscribers;
+	protected Map<SubscriptionIntermediateFuture<AJobProcessingEvent>, IFilter<AJobProcessingEvent>> subscribers;
 	
 	//-------- constructors --------
 	
@@ -57,7 +57,7 @@ public class JobProcessingService implements IJobProcessingService
 	{
 		if(subscribers!=null)
 		{
-			for(SubscriptionIntermediateFuture<JobProcessingEvent> fut: subscribers.keySet())
+			for(SubscriptionIntermediateFuture<AJobProcessingEvent> fut: subscribers.keySet())
 			{
 				fut.terminate();
 			}
@@ -102,14 +102,14 @@ public class JobProcessingService implements IJobProcessingService
 	/**
 	 *  Subscribe for job news.
 	 */
-	public ISubscriptionIntermediateFuture<JobProcessingEvent> subscribe(IFilter<JobProcessingEvent> filter)
+	public ISubscriptionIntermediateFuture<AJobProcessingEvent> subscribe(IFilter<AJobProcessingEvent> filter)
 	{
 		if(subscribers==null)
 		{
-			subscribers	= new LinkedHashMap<SubscriptionIntermediateFuture<JobProcessingEvent>, IFilter<JobProcessingEvent>>();
+			subscribers	= new LinkedHashMap<SubscriptionIntermediateFuture<AJobProcessingEvent>, IFilter<AJobProcessingEvent>>();
 		}
 		
-		final SubscriptionIntermediateFuture<JobProcessingEvent> ret = new SubscriptionIntermediateFuture<JobProcessingEvent>();
+		final SubscriptionIntermediateFuture<AJobProcessingEvent> ret = new SubscriptionIntermediateFuture<AJobProcessingEvent>();
 		ret.setTerminationCommand(new ITerminationCommand()
 		{
 			public boolean checkTermination(Exception reason)
@@ -134,13 +134,13 @@ public class JobProcessingService implements IJobProcessingService
 	 *  Publish an event to all subscribers.
 	 *  @param event The event.
 	 */
-	protected void publishEvent(JobProcessingEvent event)
+	protected void publishEvent(AJobProcessingEvent event)
 	{
 		if(subscribers!=null)
 		{
-			for(SubscriptionIntermediateFuture<JobProcessingEvent> sub: subscribers.keySet())
+			for(SubscriptionIntermediateFuture<AJobProcessingEvent> sub: subscribers.keySet())
 			{
-				IFilter<JobProcessingEvent> fil = subscribers.get(sub);
+				IFilter<AJobProcessingEvent> fil = subscribers.get(sub);
 				if(fil==null || fil.filter(event))
 				{
 					sub.addIntermediateResult(event);
