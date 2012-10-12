@@ -1,8 +1,12 @@
 package jadex.backup.swing;
 
-import jadex.backup.job.SyncEntry;
+import jadex.backup.job.Job;
 import jadex.backup.job.SyncJob;
-import jadex.backup.job.SyncRequest;
+import jadex.backup.job.SyncTask;
+import jadex.backup.job.SyncTaskEntry;
+import jadex.backup.job.Task;
+import jadex.backup.job.processing.IJobProcessingService;
+import jadex.backup.job.processing.JobProcessingEvent;
 import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.IResourceService;
 import jadex.base.gui.filetree.DefaultNodeHandler;
@@ -15,14 +19,23 @@ import jadex.base.gui.idtree.IdTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -32,15 +45,18 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -87,36 +103,69 @@ public class SyncJobPanel extends JPanel
 			pp.createTextField("Global Ressource: ", job.getGlobalResource());
 			pp.createCheckBox("Active: ", job.isActive(), false, 0);
 			
-			List<SyncRequest> reqs = job.getSyncRequests();
+			List<Task> reqs = job.getTasks();
 			final JComboBox rcb = new JComboBox(reqs!=null? reqs.toArray(): SUtil.EMPTY_STRING_ARRAY);
+			rcb.setRenderer(new DefaultListCellRenderer()
+			{
+				public Component getListCellRendererComponent(JList list, Object value,
+					int index, boolean isSelected, boolean cellHasFocus)
+				{
+					SyncTask sr = (SyncTask)value;
+					return super.getListCellRendererComponent(list, sr==null? null: sr.getSource()+" "+sr.sdf.format(sr.getDate()), index, isSelected, cellHasFocus);
+				}
+			});
 			JButton ackb = new JButton("Ack");
 			JButton viewb = new JButton("View ...");
 			JPanel bp = new JPanel(new GridBagLayout());
-			bp.add(rcb, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-			bp.add(viewb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
-			bp.add(ackb, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.VERTICAL,new Insets(2,2,2,2),0,0));
-//			final JComboBox rcb = pp.createComboBox("Sync Requests", reqs!=null? reqs.toArray(): null);
+			bp.add(rcb, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(0,2,0,2),0,0));
+			bp.add(viewb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
+			bp.add(ackb, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
 			pp.addComponent("Open Sync Requests: ",bp);
 			
-//			final ObjectCardLayout ocl = new ObjectCardLayout();
-//			final JPanel reqp = new JPanel(ocl);
-//			pp.addFullLineComponent("Sync Request", reqp);
+			ackb.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					SServiceProvider.getService(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+	                	.addResultListener(new DefaultResultListener<IJobProcessingService>()
+	                {
+	                    public void resultAvailable(IJobProcessingService js)
+	                    {
+	                    	Task task = (Task)rcb.getSelectedItem();
+	                    	if(task!=null && Task.STATE_OPEN.equals(task.getState()))
+	                    	{
+	                    		task.setState(Task.STATE_ACKNOWLEDGED);
+		                        js.modifyJob(job).addResultListener(new DefaultResultListener<Void>()
+		                        {
+		                        	public void resultAvailable(Void result)
+		                        	{
+		                        	}
+		                        });
+	                    	}
+	                    	else
+	                    	{
+	                    		System.out.println("Task not open: "+task.getState());
+	                    	}
+	                    }
+	                });
+				}
+			});
 			
 			viewb.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					SyncRequest sr = (SyncRequest)rcb.getSelectedItem();
+					SyncTask sr = (SyncTask)rcb.getSelectedItem();
 					JTable reqt = new JTable();
-					IdTableModel<SyncEntry, SyncEntry> tm = new IdTableModel<SyncEntry, SyncEntry>
-						(new String[]{"Sync", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
+					IdTableModel<SyncTaskEntry, SyncTaskEntry> tm = new IdTableModel<SyncTaskEntry, SyncTaskEntry>
+						(new String[]{"Include", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
 					{
-						public Object getValueAt(SyncEntry obj, int column)
+						public Object getValueAt(SyncTaskEntry obj, int column)
 						{
 							Object ret = obj;
 							if(column==0)
 							{
-								ret = obj.isAccepted();
+								ret = obj.isIncluded();
 							}
 							else if(column==1)
 							{
@@ -128,17 +177,75 @@ public class SyncJobPanel extends JPanel
 							}
 							return ret;
 						}
+						
+						public boolean isCellEditable(int row, int column)
+						{
+							return column==0;
+						}
+						
+						public void setValueAt(Object val, int row, int column)
+						{
+							SyncTaskEntry se = (SyncTaskEntry)getValueAt(row, -1);
+							if(column==0)
+							{
+								((SyncTaskEntry)se).setIncluded(((Boolean)val).booleanValue());
+							}
+						}
 					};
 					reqt.setModel(tm);
-					List<SyncEntry>  ses = sr.getEntries();
+					List<SyncTaskEntry>  ses = sr.getEntries();
 					if(ses!=null)
 					{
-						for(SyncEntry se: ses)
+						for(SyncTaskEntry se: ses)
 						{
-							tm.addObject(se, se);
+							SyncTaskEntry cl = new SyncTaskEntry(se);
+							tm.addObject(cl, cl);
 						}
 					}
-					SGUI.createDialog("Sync Entries", new JScrollPane(reqt), SyncJobPanel.this);
+					if(SGUI.createDialog("Sync Entries", new JScrollPane(reqt), SyncJobPanel.this))
+					{
+						sr.setEntries(tm.getValues());
+					}
+				}
+			});
+			
+			// Subscribes to changes of the job at the job processing agent
+			subscribe(ea, new ICommand()
+			{
+				public void execute(Object args)
+				{
+					System.out.println("event: "+args);
+					JobProcessingEvent ev = (JobProcessingEvent)args;
+					
+					if(JobProcessingEvent.INITIAL.equals(ev.getType()))
+					{
+						List<Task> tasks = ev.getJob().getTasks();
+						if(tasks!=null)
+						{
+							for(Task t: tasks)
+							{
+								rcb.addItem(t);
+							}
+						}
+					}
+					else if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
+					{
+						rcb.addItem(ev.getTask());
+					}
+					else if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
+					{
+						rcb.removeItem(ev.getTask());
+					}
+				}
+			}).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
 				}
 			});
 		}
@@ -261,6 +368,77 @@ public class SyncJobPanel extends JPanel
 		
 		setLayout(new BorderLayout());
 		add(new JScrollPane(pp), BorderLayout.CENTER);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> subscribe(final IExternalAccess ea, final ICommand cmd)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		SServiceProvider.getServices(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IIntermediateResultListener<IJobProcessingService>()
+		{
+			public void intermediateResultAvailable(final IJobProcessingService jps)
+			{
+				jps.getJob().addResultListener(new ExceptionDelegationResultListener<Job, Void>(ret)
+				{
+					public void customResultAvailable(Job sjob) 
+					{
+						if(job.equals(sjob))
+						{
+							ISubscriptionIntermediateFuture<JobProcessingEvent> sub = jps.subscribe(null);
+							
+							sub.addResultListener(new SwingIntermediateResultListener<JobProcessingEvent>(new IIntermediateResultListener<JobProcessingEvent>()
+							{
+								public void intermediateResultAvailable(JobProcessingEvent ev)
+								{
+									cmd.execute(ev);
+									ret.setResult(null);
+								}
+								
+								public void finished()
+								{
+								}
+								
+								public void resultAvailable(Collection<JobProcessingEvent> result)
+								{
+									for(JobProcessingEvent ev: result)
+									{
+										cmd.execute(ev);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setException(exception);
+								}
+							}));
+						}
+					}
+				});
+			}
+			
+			public void finished()
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+
+			public void resultAvailable(Collection<IJobProcessingService> result)
+			{
+				for(IJobProcessingService jps: result)
+				{
+					intermediateResultAvailable(jps);
+				}
+			}
+		});
+	
+		return ret;
 	}
 	
 //	/**

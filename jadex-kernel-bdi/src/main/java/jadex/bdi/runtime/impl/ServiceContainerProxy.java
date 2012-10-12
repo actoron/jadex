@@ -118,6 +118,22 @@ public class ServiceContainerProxy implements IServiceContainer
 	}
 	
 	/**
+	 *  Get the provided service raw implementation.
+	 */
+	public Object getProvidedServiceRawImpl(Class<?> clazz)
+	{
+		return interpreter.getServiceContainer().getProvidedServiceRawImpl(clazz);
+	}
+	
+	/**
+	 *  Get the provided service.
+	 */
+	public IService getProvidedService(Class<?> clazz)
+	{
+		return interpreter.getServiceContainer().getProvidedService(clazz);
+	}
+	
+	/**
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.

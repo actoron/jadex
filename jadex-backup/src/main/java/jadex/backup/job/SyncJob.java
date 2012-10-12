@@ -3,9 +3,6 @@ package jadex.backup.job;
 import jadex.backup.swing.SyncJobPanel;
 import jadex.bridge.IExternalAccess;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  *  Job to sync resources.
@@ -20,9 +17,6 @@ public class SyncJob extends Job
 	/** The global resource. */
 	protected String gres;
 	
-	/** The sync requests. */
-	protected List<SyncRequest> requests;
-
 	//-------- constructors --------
 	
 	/**
@@ -97,7 +91,7 @@ public class SyncJob extends Job
 	 */
 	public String getAgentType()
 	{
-		return "jadex/backup/job/SyncJobAgent.class";
+		return "jadex/backup/job/processing/SyncJobProcessingAgent.class";
 	}
 	
 	/**
@@ -106,35 +100,6 @@ public class SyncJob extends Job
 	public Object getView(final IExternalAccess ea, boolean editable)
 	{
 		return new SyncJobPanel(ea, editable, this);
-	}
-	
-	/**
-	 *  Get the syncRequests.
-	 *  @return The syncRequests.
-	 */
-	public List<SyncRequest> getSyncRequests()
-	{
-		return requests;
-	}
-
-	/**
-	 *  Set the syncRequests.
-	 *  @param syncRequests The syncRequests to set.
-	 */
-	public void setSyncRequests(List<SyncRequest> syncRequests)
-	{
-		this.requests = syncRequests;
-	}
-
-	/**
-	 * 
-	 */
-	public void addSyncRequest(SyncRequest sr)
-	{
-		if(requests==null)
-			requests = new ArrayList<SyncRequest>();
-		
-		requests.add(sr);
 	}
 	
 	/**

@@ -2,6 +2,9 @@ package jadex.backup.job;
 
 import jadex.bridge.IExternalAccess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *  Base class for all kinds of jobs.
  */
@@ -17,6 +20,9 @@ public abstract class Job
 	
 	/** Flag if job is active. */
 	protected boolean active;
+	
+	/** The list of tasks. */
+	protected List<Task> tasks;
 	
 	//-------- constructors --------
 	
@@ -92,6 +98,34 @@ public abstract class Job
 		this.active = active;
 	}
 	
+	/**
+	 *  Get the tasks.
+	 *  @return The tasks.
+	 */
+	public List<Task> getTasks()
+	{
+		return tasks;
+	}
+
+	/**
+	 *  Set the tasks.
+	 *  @param tasks The tasks to set.
+	 */
+	public void setTasks(List<Task> tasks)
+	{
+		this.tasks = tasks;
+	}
+
+	/**
+	 * 
+	 */
+	public void addSyncRequest(Task task)
+	{
+		if(tasks==null)
+			tasks = new ArrayList<Task>();
+		tasks.add(task);
+	}
+	
 	//-------- additional convenience mapping methods --------
 	
 	/**
@@ -110,4 +144,22 @@ public abstract class Job
 		return null;
 	}
 
+	/**
+	 * 
+	 */
+	public int hashCode()
+	{
+		return 31 + ((id == null) ? 0 : id.hashCode());
+	}
+
+	/**
+	 * 
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof Job && ((Job)obj).getId().equals(getId()); 
+	}
+
+	
+	
 }

@@ -104,6 +104,24 @@ public class IdTableModel<T, E>	extends DefaultTableModel
 	}
 	
 	/**
+	 *  Get the obs.
+	 *  @return The obs.
+	 */
+	public List<E> getValues()
+	{
+		return new ArrayList<E>(obs.values());
+	}
+
+	/**
+	 *  Set the obs.
+	 *  @param obs The obs to set.
+	 */
+	public void setObs(Map<T, E> obs)
+	{
+		this.obs = obs;
+	}
+
+	/**
 	 *  Test if cell is editable (default is false).
 	 */
 	public boolean isCellEditable(int row, int column)

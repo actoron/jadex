@@ -13,7 +13,7 @@
 	</arguments>
 	
     <componenttypes>
-        <componenttype name="JobManager" filename="jadex/backup/job/JobManagerAgent.class"/>
+        <componenttype name="JobManager" filename="jadex/backup/job/management/JobManagementAgent.class"/>
         <componenttype name="ResourceProvider" filename="jadex/backup/resource/ResourceProviderAgent.class"/>
     </componenttypes>
     

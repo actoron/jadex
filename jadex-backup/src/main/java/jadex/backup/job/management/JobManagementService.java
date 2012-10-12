@@ -1,6 +1,7 @@
-package jadex.backup.job;
+package jadex.backup.job.management;
 
 import jadex.backup.JadexBackup;
+import jadex.backup.job.Job;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -16,6 +17,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.xml.bean.JavaReader;
@@ -33,8 +35,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ *  Service for handling the jobs, i.e. adding and removing jobs.
+ */
 @Service
-public class JobService implements IJobService
+public class JobManagementService implements IJobManagementService
 {
 	//-------- attributes --------
 
@@ -49,7 +54,7 @@ public class JobService implements IJobService
 	protected Map<String, IExternalAccess> jobagents;
 	
 	/** The futures of active subscribers. */
-	protected Set<SubscriptionIntermediateFuture<JobEvent>> subscribers;
+	protected Set<SubscriptionIntermediateFuture<JobManagementEvent>> subscribers;
 	
 	/** The configfile. */
 	protected String cfgfile;
@@ -91,7 +96,7 @@ public class JobService implements IJobService
 	{
 		if(subscribers!=null)
 		{
-			for(SubscriptionIntermediateFuture<JobEvent> fut: subscribers)
+			for(SubscriptionIntermediateFuture<JobManagementEvent> fut: subscribers)
 			{
 				fut.terminate();
 			}
@@ -135,7 +140,7 @@ public class JobService implements IJobService
 							{
 								jobagents.put(job.getId(), result);
 								
-								publishEvent(new JobEvent(JobEvent.JOB_ADDED, job));
+								publishEvent(new JobManagementEvent(JobManagementEvent.JOB_ADDED, job));
 								
 								ret.setResult(null);
 							}
@@ -165,7 +170,7 @@ public class JobService implements IJobService
 				public void customResultAvailable(Map<String, Object> result)
 				{
 					Job job = jobs.remove(jobid);
-					publishEvent(new JobEvent(JobEvent.JOB_REMOVED, job));
+					publishEvent(new JobManagementEvent(JobManagementEvent.JOB_REMOVED, job));
 					ret.setResult(null);
 				}
 			});
@@ -174,31 +179,43 @@ public class JobService implements IJobService
 		return ret;
 	}
 	
-	/**
-	 *  Modify a job.
-	 *  @param job The job.
-	 */
-	public IFuture<Void> modifyJob(Job job)
-	{
-		jobs.put(job.getId(), job);
-		
-		publishEvent(new JobEvent(JobEvent.JOB_CHANGED, job));
-		
-		return IFuture.DONE;
-	}
+//	/**
+//	 *  Modify a job.
+//	 *  @param job The job.
+//	 */
+//	public IFuture<Void> modifyJob(Job job)
+//	{
+//		jobs.put(job.getId(), job);
+//		
+//		publishEvent(new JobEvent(JobEvent.JOB_CHANGED, job));
+//		
+//		return IFuture.DONE;
+//	}
 
 	
 	/**
 	 *  Subscribe for job news.
 	 */
-	public ISubscriptionIntermediateFuture<JobEvent> subscribe()
+	public ISubscriptionIntermediateFuture<JobManagementEvent> subscribe()
 	{
 		if(subscribers==null)
 		{
-			subscribers	= new LinkedHashSet<SubscriptionIntermediateFuture<JobEvent>>();
+			subscribers	= new LinkedHashSet<SubscriptionIntermediateFuture<JobManagementEvent>>();
 		}
 		
-		SubscriptionIntermediateFuture<JobEvent> ret	= new SubscriptionIntermediateFuture<JobEvent>();
+		final SubscriptionIntermediateFuture<JobManagementEvent> ret = new SubscriptionIntermediateFuture<JobManagementEvent>();
+		ret.setTerminationCommand(new ITerminationCommand()
+		{
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+			
+			public void	terminated(Exception reason)
+			{
+				subscribers.remove(ret);
+			}
+		});
 		subscribers.add(ret);
 		
 		return ret;		
@@ -219,11 +236,11 @@ public class JobService implements IJobService
 	 *  Publish an event to all subscribers.
 	 *  @param event The event.
 	 */
-	protected void publishEvent(JobEvent event)
+	protected void publishEvent(JobManagementEvent event)
 	{
 		if(subscribers!=null)
 		{
-			for(SubscriptionIntermediateFuture<JobEvent> sub: subscribers)
+			for(SubscriptionIntermediateFuture<JobManagementEvent> sub: subscribers)
 			{
 				sub.addIntermediateResult(event);
 			}

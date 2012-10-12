@@ -463,6 +463,16 @@ public class CacheServiceContainer	implements IServiceContainer
 		throw new UnsupportedOperationException();
 	}
 	
+	public Object getProvidedServiceRawImpl(Class<?> clazz)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	public IService getProvidedService(Class<?> clazz)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 	/**
 	 *  Get one service of a type.
 	 *  @param type The class.

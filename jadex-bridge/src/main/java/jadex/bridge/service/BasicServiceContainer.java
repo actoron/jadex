@@ -554,6 +554,26 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	}
 	
 	/**
+	 *  Get the raw implementation of the provided service.
+	 *  @param clazz The class.
+	 *  @return The raw object.
+	 */
+	public Object getProvidedServiceRawImpl(Class<?> clazz)
+	{
+		Object ret = null;
+		
+		IService service = getProvidedService(clazz);
+		if(service!=null)
+		{
+			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			ret = handler.getDomainService();
+		}
+		
+		return ret;
+	}
+
+	
+	/**
 	 *  Get provided (declared) service.
 	 *  @param clazz The interface.
 	 *  @return The service.
@@ -565,6 +585,17 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		
 		Collection<IInternalService> coll = services!=null? services.get(clazz): null;
 		return coll==null ? new IService[0] : coll.toArray(new IService[coll.size()]);
+	}
+	
+	/**
+	 *  Get provided (declared) service.
+	 *  @param clazz The interface.
+	 *  @return The service.
+	 */
+	public IService getProvidedService(Class<?> clazz)
+	{
+		IService[] ret = getProvidedServices(clazz);
+		return ret.length>0? ret[0]: null;
 	}
 	
 	/**

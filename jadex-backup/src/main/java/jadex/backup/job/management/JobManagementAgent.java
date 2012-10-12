@@ -1,4 +1,4 @@
-package jadex.backup.job;
+package jadex.backup.job.management;
 
 import jadex.backup.swing.JobsPanel;
 import jadex.bridge.IExternalAccess;
@@ -28,10 +28,10 @@ import javax.swing.SwingUtilities;
  */
 @Agent
 @Arguments(@Argument(name="cmdargs", clazz=String[].class))
-@ProvidedServices(@ProvidedService(type=IJobService.class, implementation=@Implementation(JobService.class)))
+@ProvidedServices(@ProvidedService(type=IJobManagementService.class, implementation=@Implementation(JobManagementService.class)))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
   binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-public class JobManagerAgent
+public class JobManagementAgent
 {	
 	//-------- attributes --------
 	

@@ -1,9 +1,9 @@
 package jadex.backup.swing;
 
-import jadex.backup.job.IJobService;
 import jadex.backup.job.Job;
-import jadex.backup.job.JobEvent;
 import jadex.backup.job.SyncJob;
+import jadex.backup.job.management.IJobManagementService;
+import jadex.backup.job.management.JobManagementEvent;
 import jadex.base.gui.idtree.IdTableModel;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -178,10 +178,10 @@ public class JobsPanel extends JPanel
 			{
 				System.out.println("job: "+job);
 				detailsp.removeTabAt(detailsp.indexOfTab("New Job"));
-                SServiceProvider.getService(ea.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-                    .addResultListener(new DefaultResultListener<IJobService>()
+                SServiceProvider.getService(ea.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+                    .addResultListener(new DefaultResultListener<IJobManagementService>()
                 {
-                    public void resultAvailable(IJobService js)
+                    public void resultAvailable(IJobManagementService js)
                     {
                         js.addJob(job).addResultListener(new DefaultResultListener<Void>()
                         {
@@ -244,10 +244,10 @@ public class JobsPanel extends JPanel
 		
 		// todo: terminate subscription on shutdown
 		
-		SServiceProvider.getService(ea.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener<IJobService>()
+		SServiceProvider.getService(ea.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IJobManagementService>()
 		{
-			public void resultAvailable(IJobService js)
+			public void resultAvailable(IJobManagementService js)
 			{
 				js.getJobs().addResultListener(new SwingDefaultResultListener<Collection<Job>>()
 				{
@@ -260,25 +260,25 @@ public class JobsPanel extends JPanel
 					}
 				});
 				
-				ISubscriptionIntermediateFuture<JobEvent> subscription = js.subscribe();
-				subscription.addResultListener(new SwingIntermediateDefaultResultListener<JobEvent>()
+				ISubscriptionIntermediateFuture<JobManagementEvent> subscription = js.subscribe();
+				subscription.addResultListener(new SwingIntermediateDefaultResultListener<JobManagementEvent>()
 				{
-					public void customIntermediateResultAvailable(JobEvent ce)
+					public void customIntermediateResultAvailable(JobManagementEvent ce)
 					{
 						System.out.println("job event: "+ce);
 						
-						if(JobEvent.JOB_ADDED.equals(ce.getType()))
+						if(JobManagementEvent.JOB_ADDED.equals(ce.getType()))
 						{
 							tm.addObject(ce.getJob().getId(), ce.getJob());
 						}
-						else if(JobEvent.JOB_REMOVED.equals(ce.getType()))
+						else if(JobManagementEvent.JOB_REMOVED.equals(ce.getType()))
 						{
 							tm.removeObject(ce.getJob().getId());
 						}
-						else if(JobEvent.JOB_CHANGED.equals(ce.getType()))
-						{
-							tm.addObject(ce.getJob().getId(), ce.getJob());
-						}
+//						else if(JobManagementEvent.JOB_CHANGED.equals(ce.getType()))
+//						{
+//							tm.addObject(ce.getJob().getId(), ce.getJob());
+//						}
 					}
 					
 					public void customExceptionOccurred(Exception exception)
@@ -362,10 +362,10 @@ public class JobsPanel extends JPanel
 	 */
 	protected void removeJob(IExternalAccess ea, final Job job)
 	{
-		SServiceProvider.getService(ea.getServiceProvider(), IJobService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener<IJobService>()
+		SServiceProvider.getService(ea.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IJobManagementService>()
 		{
-			public void resultAvailable(IJobService js)
+			public void resultAvailable(IJobManagementService js)
 			{
 				js.removeJob(job.getId()).addResultListener(new DefaultResultListener<Void>()
 				{

@@ -1,9 +1,11 @@
-package jadex.backup.job;
+package jadex.backup.job.management;
+
+import jadex.backup.job.Job;
 
 /**
  *  Event that is used to signal job changes.
  */
-public class JobEvent
+public class JobManagementEvent
 {
 	//-------- constants --------
 	
@@ -13,8 +15,8 @@ public class JobEvent
 	/** Constant for indicating when a job was removed. */
 	public static final String JOB_REMOVED = "job_removed";
 	
-	/** Constant for indicating when a job was changed. */
-	public static final String JOB_CHANGED = "job_changed";
+//	/** Constant for indicating when a job was changed. */
+//	public static final String JOB_CHANGED = "job_changed";
 	
 	//-------- attributes --------
 
@@ -29,14 +31,14 @@ public class JobEvent
 	/**
 	 *  Create a new job event.
 	 */
-	public JobEvent()
+	public JobManagementEvent()
 	{
 	}
 	
 	/**
 	 *  Create a new job event.
 	 */
-	public JobEvent(String type, Job job)
+	public JobManagementEvent(String type, Job job)
 	{
 		this.type = type;
 		this.job = job;
