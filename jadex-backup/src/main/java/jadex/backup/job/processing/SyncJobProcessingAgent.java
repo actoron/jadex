@@ -17,7 +17,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -140,6 +139,8 @@ public class SyncJobProcessingAgent
 	@AgentBody
 	public void body()
 	{
+		final long delay = 60000;
+		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -147,6 +148,7 @@ public class SyncJobProcessingAgent
 				final IComponentStep<Void> self = this;
 								
 				final Future<Void> ret = new Future<Void>();
+				
 				if(resservices.size()==0)
 				{
 					agent.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL)
@@ -180,6 +182,7 @@ public class SyncJobProcessingAgent
 							{
 								intermediateResultAvailable(resser);
 							}
+							finished();
 						}
 						
 						public void exceptionOccurred(Exception exception) 
@@ -201,19 +204,22 @@ public class SyncJobProcessingAgent
 						{ 
 							public void resultAvailable(Void result)
 							{
-								agent.waitForDelay(60000, self);
+								System.out.println("waiting...");
+								agent.waitForDelay(delay, self);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								agent.waitForDelay(60000, self);
+								System.out.println("waiting...");
+								agent.waitForDelay(delay, self);
 							}
 						});	
 					}	
 					
 					public void exceptionOccurred(Exception exception) 
 					{
-						agent.waitForDelay(60000, self);
+						System.out.println("waiting...");
+						agent.waitForDelay(delay, self);
 					}
 				});
 				
@@ -229,8 +235,9 @@ public class SyncJobProcessingAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final IResourceService remresser = resservices.get(0);
 		System.out.println("starting sync with: "+resservices.get(0));
+
+		final IResourceService remresser = resservices.get(0);
 		
 		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
 		
@@ -243,14 +250,15 @@ public class SyncJobProcessingAgent
 //					|| BackupResource.FILE_REMOVED.equals(result.getType())
 					|| BackupResource.FILE_MODIFIED.equals(result.getType()))
 				{
+					SyncTaskEntry entry = new SyncTaskEntry(task, result.getFile(), result.getType());
 					if(!autoupdate)
 					{
 //						changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
-						task.addSyncEntry(new SyncTaskEntry(result.getFile(), result.getType()));
+						task.addSyncEntry(entry);
 					}
 					else
 					{
-						updateFile(resser, remresser, result.getFile()).addResultListener(new IResultListener<Void>()
+						updateFile(resser, remresser, entry).addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -271,7 +279,7 @@ public class SyncJobProcessingAgent
 				if(!autoupdate)
 				{
 					SServiceProvider.getService(agent.getServiceProvider(), IJobManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new DefaultResultListener<IJobManagementService>()
+						.addResultListener(new IResultListener<IJobManagementService>()
 					{
 						public void resultAvailable(IJobManagementService js)
 						{
@@ -283,6 +291,11 @@ public class SyncJobProcessingAgent
 								publishEvent(new TaskEvent(AJobProcessingEvent.TASK_ADDED, task));
 								ret.setResult(null);
 							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setResult(null);
 						}
 					});
 					
@@ -408,14 +421,21 @@ public class SyncJobProcessingAgent
 		
 		if(it.hasNext())
 		{
-			updateFile(localresser, resser, it.next())
-				.addResultListener(new DelegationResultListener<Void>(ret)
+			SyncTaskEntry entry = it.next();
+			if(entry.isIncluded())
 			{
-				public void customResultAvailable(Void result)
+				updateFile(localresser, resser, entry).addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					updateFiles(localresser, resser, it).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
+					public void customResultAvailable(Void result)
+					{
+						updateFiles(localresser, resser, it).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		else
 		{
@@ -428,24 +448,17 @@ public class SyncJobProcessingAgent
 	/**
 	 * 
 	 */
-	public IFuture<Void> updateFile(ILocalResourceService localresser, IResourceService resser, SyncTaskEntry se)
-	{
-		return se.isIncluded()? updateFile(localresser, resser, se.getFileInfo()): IFuture.DONE;
-	}
-		
-	/**
-	 * 
-	 */
-	public IFuture<Void> updateFile(ILocalResourceService localresser, IResourceService resser, FileInfo fi)
+	public IFuture<Void> updateFile(ILocalResourceService localresser, IResourceService resser, final SyncTaskEntry entry)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		localresser.updateFile(resser, fi)
+		localresser.updateFile(resser, entry.getFileInfo())
 			.addResultListener(new IIntermediateResultListener<BackupEvent>()
 		{
-			public void intermediateResultAvailable(BackupEvent result)
+			public void intermediateResultAvailable(BackupEvent be)
 			{
-				System.out.println("upfi: "+result);
+				System.out.println("upfi: "+be);
+				publishEvent(new SyncTaskEntryEvent(entry.getTaskId(), entry.getId(), ((Double)be.getDetails()).doubleValue()));
 			}
 			
 			public void exceptionOccurred(Exception exception)

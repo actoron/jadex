@@ -81,6 +81,27 @@ public class SyncTask extends Task
 	{
 		this.source = source;
 	}
+	
+	/**
+	 *  Get an entry per id.
+	 */
+	public SyncTaskEntry getEntry(String id)
+	{
+		SyncTaskEntry ret = null;
+		
+		if(entries!=null)
+		{
+			for(SyncTaskEntry entry: entries)
+			{
+				if(id.equals(entry.getId()))
+				{
+					ret = entry;
+				}
+			}
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Get the string representation.

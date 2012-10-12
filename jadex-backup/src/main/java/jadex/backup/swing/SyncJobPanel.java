@@ -8,6 +8,7 @@ import jadex.backup.job.Task;
 import jadex.backup.job.processing.AJobProcessingEvent;
 import jadex.backup.job.processing.IJobProcessingService;
 import jadex.backup.job.processing.JobProcessingEvent;
+import jadex.backup.job.processing.SyncTaskEntryEvent;
 import jadex.backup.job.processing.TaskEvent;
 import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.IResourceService;
@@ -36,6 +37,7 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.transformation.traverser.Traverser;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -166,9 +168,12 @@ public class SyncJobPanel extends JPanel
 				public void actionPerformed(ActionEvent e)
 				{
 					final SyncTask task = (SyncTask)rcb.getSelectedItem();
+					boolean open = Task.STATE_OPEN.equals(task.getState());
+					
 					JTable reqt = new JTable();
-					final IdTableModel<SyncTaskEntry, SyncTaskEntry> tm = new IdTableModel<SyncTaskEntry, SyncTaskEntry>
-						(new String[]{"Include", "Type", "Filename"}, new Class[]{Boolean.class, String.class, String.class}, reqt)
+					String[] names = open? new String[]{"Include", "Type", "Filename"}: new String[]{"Include", "Type", "Filename", "done"};
+					Class<?>[] types = open? new Class[]{Boolean.class, String.class, String.class}: new Class[]{Boolean.class, String.class, String.class, String.class};
+					final IdTableModel<SyncTaskEntry, SyncTaskEntry> tm = new IdTableModel<SyncTaskEntry, SyncTaskEntry>(names, types, reqt)
 					{
 						public Object getValueAt(SyncTaskEntry obj, int column)
 						{
@@ -184,6 +189,10 @@ public class SyncJobPanel extends JPanel
 							else if(column==2)
 							{
 								ret = obj.getFileInfo().getLocation();
+							}
+							else if(column==3)
+							{
+								ret = obj.getDone();
 							}
 							return ret;
 						}
@@ -203,21 +212,33 @@ public class SyncJobPanel extends JPanel
 						}
 					};
 					reqt.setModel(tm);
+					
+					// Add entries to model
 					List<SyncTaskEntry> ses = task.getEntries();
 					if(ses!=null)
 					{
 						for(SyncTaskEntry se: ses)
 						{
-							SyncTaskEntry cl = new SyncTaskEntry(se);
-							tm.addObject(cl, cl);
+							tm.addObject(se, se);
 						}
 					}
 					
 					JPanel contp = new JPanel(new BorderLayout());
 					contp.add(new JScrollPane(reqt), BorderLayout.CENTER);
 					
-					if(Task.STATE_OPEN.equals(task.getState()))
+					if(open)
 					{
+						// Create clone in case user cancels
+						List<SyncTaskEntry> sesclones = new ArrayList<SyncTaskEntry>();
+						if(ses!=null)
+						{
+							for(SyncTaskEntry se: ses)
+							{
+								SyncTaskEntry cl = new SyncTaskEntry(se);
+								sesclones.add(cl);
+							}
+						}
+						
 						JPanel bup = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 						JButton selab = new JButton("Select All");
 						JButton clearab = new JButton("Clear All");
@@ -249,9 +270,9 @@ public class SyncJobPanel extends JPanel
 						});
 						contp.add(bup, BorderLayout.SOUTH);
 						
-						if(SGUI.createDialog("Sync Entries ("+task.getState()+")", contp, SyncJobPanel.this))
+						if(!SGUI.createDialog("Sync Entries ("+task.getState()+")", contp, SyncJobPanel.this))
 						{
-							task.setEntries(tm.getValues());
+							task.setEntries(sesclones);
 						}
 					}
 					else
@@ -283,7 +304,7 @@ public class SyncJobPanel extends JPanel
 							}
 						}
 					}
-					else
+					else if(args instanceof TaskEvent)
 					{
 						TaskEvent ev = (TaskEvent)args;
 						if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
@@ -301,6 +322,25 @@ public class SyncJobPanel extends JPanel
 							rcb.addItem(ev.getTask());
 						}
 						rcb.revalidate();
+					}
+					else if(args instanceof SyncTaskEntryEvent)
+					{
+						SyncTaskEntryEvent ev = (SyncTaskEntryEvent)args;
+						String taskid = ev.getTaskId();
+						for(int i=0; i<rcb.getItemCount(); i++)
+						{
+							SyncTask task = (SyncTask)rcb.getItemAt(i);
+							if(task.getId().equals(taskid))
+							{
+								SyncTaskEntry entry = task.getEntry(ev.getEntryId());
+								if(entry!=null)
+								{
+									entry.setDone(ev.getDone());
+									System.out.println("updated done: "+entry.getFileInfo().getLocation()+" "+ev.getDone());
+									break;
+								}
+							}
+						}
 					}
 				}
 			}).addResultListener(new IResultListener<Void>()
