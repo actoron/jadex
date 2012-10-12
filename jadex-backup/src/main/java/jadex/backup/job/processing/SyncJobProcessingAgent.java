@@ -7,7 +7,6 @@ import jadex.backup.job.Task;
 import jadex.backup.job.management.IJobManagementService;
 import jadex.backup.resource.BackupEvent;
 import jadex.backup.resource.BackupResource;
-import jadex.backup.resource.FileInfo;
 import jadex.backup.resource.ILocalResourceService;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
@@ -291,6 +290,10 @@ public class SyncJobProcessingAgent
 								publishEvent(new TaskEvent(AJobProcessingEvent.TASK_ADDED, task));
 								ret.setResult(null);
 							}
+							else
+							{
+								ret.setResult(null);
+							}
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -457,7 +460,7 @@ public class SyncJobProcessingAgent
 		{
 			public void intermediateResultAvailable(BackupEvent be)
 			{
-				System.out.println("upfi: "+be);
+//				System.out.println("upfi: "+be);
 				publishEvent(new SyncTaskEntryEvent(entry.getTaskId(), entry.getId(), ((Double)be.getDetails()).doubleValue()));
 			}
 			
@@ -469,7 +472,7 @@ public class SyncJobProcessingAgent
 			
 			public void resultAvailable(Collection<BackupEvent> result)
 			{
-				System.out.println(result);
+//				System.out.println(result);
 				ret.setResult(null);
 			}
 			

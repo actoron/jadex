@@ -37,7 +37,6 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.transformation.traverser.Traverser;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -61,9 +60,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -71,6 +68,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
@@ -280,7 +278,16 @@ public class SyncJobPanel extends JPanel
 					}
 					else
 					{
+						Timer t = new Timer(1000, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								tm.refresh();
+							}
+						});
+						t.start();
 						SGUI.createDialog("Sync Entries ("+task.getState()+")", contp, SyncJobPanel.this, true);
+						t.stop();
 					}
 				}
 			});
