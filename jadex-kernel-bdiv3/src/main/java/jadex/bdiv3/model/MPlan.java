@@ -10,8 +10,8 @@ public class MPlan extends MElement
 	/** The trigger. */
 	protected MTrigger trigger;
 	
-	/** The target. */
-	protected Method target;
+	/** The plan body. */
+	protected Object body;
 	
 	/** The plan priority. */
 	protected int priority;
@@ -19,30 +19,30 @@ public class MPlan extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MPlan(Method target, MTrigger trigger, int priority)
+	public MPlan(String name, Object body, MTrigger trigger, int priority)
 	{
-		super(target.getName());
-		this.target = target;
+		super(name);
+		this.body = body;
 		this.trigger = trigger;
 		this.priority = priority;
 	}
 
 	/**
-	 *  Get the target.
-	 *  @return The target.
+	 *  Get the body.
+	 *  @return The body.
 	 */
-	public Method getTarget()
+	public Object getBody()
 	{
-		return target;
+		return body;
 	}
 
 	/**
-	 *  Set the target.
-	 *  @param target The target to set.
+	 *  Set the body.
+	 *  @param body The body to set.
 	 */
-	public void setTarget(Method target)
+	public void setBody(Object body)
 	{
-		this.target = target;
+		this.body = body;
 	}
 
 	/**

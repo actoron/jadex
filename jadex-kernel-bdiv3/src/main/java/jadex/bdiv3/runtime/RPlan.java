@@ -60,7 +60,7 @@ public class RPlan extends RElement
 //	public static OAVAttributeType plan_has_waitqueueelements;
 	
 	/** The plan has exception attribute. */
-	public Exception plan_has_exception;
+	public Exception exception;
 	
 	/** The plan has lifecycle state attribute. */
 	public String lifecyclestate;
@@ -70,6 +70,9 @@ public class RPlan extends RElement
 	
 //	/** The plan has a timer attribute (when waiting). */
 //	public static ? plan_has_timer;
+	
+	/** The plan body. */
+	protected IPlanBody body;
 	
 	/**
 	 *  Create a new plan.
@@ -115,6 +118,82 @@ public class RPlan extends RElement
 		this.lifecyclestate = lifecyclestate;
 	}
 	
+	/**
+	 *  Get the reason.
+	 *  @return The reason.
+	 */
+	public RProcessableElement getReason()
+	{
+		return reason;
+	}
+
+	/**
+	 *  Set the reason.
+	 *  @param reason The reason to set.
+	 */
+	public void setReason(RProcessableElement reason)
+	{
+		this.reason = reason;
+	}
+
+	/**
+	 *  Get the dispatchedelement.
+	 *  @return The dispatchedelement.
+	 */
+	public RProcessableElement getDispatchedElement()
+	{
+		return dispatchedelement;
+	}
+
+	/**
+	 *  Set the dispatchedelement.
+	 *  @param dispatchedelement The dispatchedelement to set.
+	 */
+	public void setDispatchedElement(RProcessableElement dispatchedelement)
+	{
+		this.dispatchedelement = dispatchedelement;
+	}
+	
+	/**
+	 *  Get the exception.
+	 *  @return The exception.
+	 */
+	public Exception getException()
+	{
+		return exception;
+	}
+
+	/**
+	 *  Set the exception.
+	 *  @param exception The exception to set.
+	 */
+	public void setException(Exception exception)
+	{
+		this.exception = exception;
+	}
+	
+	/**
+	 *  Get the body.
+	 *  @return The body.
+	 */
+	public IPlanBody getBody()
+	{
+		if(body==null)
+		{
+			
+		}
+		return body;
+	}
+
+	/**
+	 *  Set the body.
+	 *  @param body The body to set.
+	 */
+	public void setBody(IPlanBody body)
+	{
+		this.body = body;
+	}
+
 	/**
 	 * 
 	 */

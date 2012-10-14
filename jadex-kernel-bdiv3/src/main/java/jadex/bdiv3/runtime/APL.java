@@ -18,17 +18,20 @@ public class APL
 	/** The processable element. */
 	protected RProcessableElement element;
 	
+	/** The list of candidates. */
+	protected List<Object> candidates;
+	
 	/** The metagoal. */
 //	protected Object apl_has_metagoal;
 	
-	/** The plan candidates. */
-	protected List<MPlan> plancandidates;
+	/** The mplan candidates. */
+	protected List<MPlan> precandidates;
 	
-	/** The plan instance candidates. */
-	protected List<RPlan> planinstancecandidates;
+//	/** The plan instance candidates. */
+//	protected List<RPlan> planinstancecandidates;
 	
-	/** The waitqueue candidates. */
-	protected List<RPlan> waitqueuecandidates;
+//	/** The waitqueue candidates. */
+//	protected List<RPlan> waitqueuecandidates;
 
 	protected boolean built;
 	
@@ -37,84 +40,77 @@ public class APL
 	 */
 	public APL(RProcessableElement element)
 	{
-		this(element, null);
-	}
-	
-	/**
-	 *  Create a new APL.
-	 */
-	public APL(RProcessableElement element, List<MPlan> plancandidates)
-	{
 		this.element = element;
-		this.plancandidates = plancandidates;
-	}
-
-	/**
-	 *  Get the plancandidates.
-	 *  @return The plancandidates.
-	 */
-	public List<MPlan> getPlanCandidates()
-	{
-		return plancandidates;
-	}
-
-	/**
-	 *  Set the plancandidates.
-	 *  @param plancandidates The plancandidates to set.
-	 */
-	public void setPlanCandidates(List<MPlan> plancandidates)
-	{
-		this.plancandidates = plancandidates;
 	}
 	
-	/**
-	 *  Get the next candidate.
-	 */
-	public Object getNextCandidate()
-	{
-		Object ret = null;
-		if(plancandidates!=null && plancandidates.size()>0)
-		{
-			// todo exclude modes
-			ret = plancandidates.remove(0);
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the plancandidates.
+//	 *  @return The plancandidates.
+//	 */
+//	public List<MPlan> getPlanCandidates()
+//	{
+//		return plancandidates;
+//	}
+//
+//	/**
+//	 *  Set the plancandidates.
+//	 *  @param plancandidates The plancandidates to set.
+//	 */
+//	public void setPlanCandidates(List<MPlan> plancandidates)
+//	{
+//		this.plancandidates = plancandidates;
+//	}
+	
+//	/**
+//	 *  Get the next candidate.
+//	 */
+//	public Object getNextCandidate()
+//	{
+//		Object ret = null;
+//		if(plancandidates!=null && plancandidates.size()>0)
+//		{
+//			// todo exclude modes
+//			ret = plancandidates.remove(0);
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 * 
 	 */
-	public void build(RCapability capa, RProcessableElement element)
+	public void build(RCapability capa)
 	{
 		if(!built || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
 			// Use the plan priorities to sort the candidates.
 			// If the priority is the same use the following order:
 			// running plan - waitque of running plan - passive plan
-			ArrayList selected = SCollection.createArrayList();
 
 			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 			
-			// todo: include a number of retries...
-			int numcandidates = 1;
-			if(mpe.isPostToAll())
-				numcandidates = Integer.MAX_VALUE;
-
-			List<Object> candidatelist = new ArrayList<Object>();
-			
-			List<MPlan> mplans = ((MCapability)capa.getModelElement()).getPlans();
-			for(int i=0; i<mplans.size(); i++)
+			// todo: generate binding candidates
+			if(precandidates==null)
 			{
-				MPlan mplan = mplans.get(i);
-				MTrigger mtrigger = mplan.getTrigger();
-				if(element instanceof RGoal)
+				precandidates = new ArrayList<MPlan>();
+				List<MPlan> mplans = ((MCapability)capa.getModelElement()).getPlans();
+				for(int i=0; i<mplans.size(); i++)
 				{
-					List<MGoal> mgoals = mtrigger.getGoals();
-					if(mgoals!=null && mgoals.contains(element.getModelElement()))
+					MPlan mplan = mplans.get(i);
+					MTrigger mtrigger = mplan.getTrigger();
+					if(element instanceof RGoal)
 					{
-						candidatelist.add(mplan);
+						List<MGoal> mgoals = mtrigger.getGoals();
+						if(mgoals!=null && mgoals.contains(element.getModelElement()))
+						{
+							precandidates.add(mplan);
+							candidates.add(mplan);
+						}
 					}
 				}
+			}
+			else
+			{
+				candidates.addAll(precandidates);
 			}
 			
 			List<RPlan> rplans = capa.getPlans();
@@ -124,24 +120,72 @@ public class APL
 				{
 					if(rplan.isWaitingFor(element))
 					{
-						candidatelist.add(rplan);
+						candidates.add(rplan);
 					}
 				}
 			}
-			
 			// todo waitqueue
-			
-
-			boolean random = mpe.isRandomSelection();
-			for(int i=0; i<numcandidates && candidatelist.size()>0; i++)
+		}
+		else
+		{
+			// check rplans and waitqueues
+			// first remove all rplans that do not wait
+			for(Object cand: candidates)
 			{
-				selected.add(getNextCandidate(candidatelist, random));
+				if(cand instanceof RPlan && !((RPlan)cand).isWaitingFor(element))
+				{
+					candidates.remove(cand);
+				}
+			}
+			// add new rplans that are not contained already
+			List<RPlan> rplans = capa.getPlans();
+			if(rplans!=null)
+			{
+				for(RPlan rplan: rplans)
+				{
+					if(!candidates.contains(rplan) && rplan.isWaitingFor(element))
+					{
+						candidates.add(rplan);
+					}
+				}
 			}
 		}
 	}
 	
 	//-------- helper methods --------
 
+//	/**
+//	 * 
+//	 */
+//	public boolean isEmpty()
+//	{
+//		return candidates==null? true: candidates.isEmpty();
+//	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Object> selectCandidates()
+	{
+		List<Object> ret = new ArrayList<Object>();
+		
+		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+		// todo: include a number of retries...
+		int numcandidates = 1;
+		if(mpe.isPostToAll())
+		{
+			numcandidates = Integer.MAX_VALUE;
+		}
+		
+		for(int i=0; i<numcandidates && candidates.size()>0; i++)
+		{
+			ret.add(getNextCandidate());
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Get the next candidate with respect to the plan
 	 *  priority and the rank of the candidate.
@@ -149,17 +193,19 @@ public class APL
 	 *  @param random The random selection flag.
 	 *  @return The next candidate.
 	 */
-	public Object getNextCandidate(List<Object> candidatelist, boolean random)
+	public Object getNextCandidate()
 	{
+		// first find the list of highest ranked candidates
+		// then choose one or more of them
+		
 		List<Object> finals = new ArrayList<Object>();
-		finals.add(candidatelist.get(0));
+		finals.add(candidates.get(0));
 		int candprio = getPriority(finals.get(0));
-		for(int i=1; i<candidatelist.size(); i++)
+		for(int i=1; i<candidates.size(); i++)
 		{
-			Object tmp = candidatelist.get(i);
+			Object tmp = candidates.get(i);
 			int tmpprio = getPriority(tmp);
-			if(tmpprio>candprio
-				|| (tmpprio == candprio && getRank(tmp)>getRank(finals.get(0))))
+			if(tmpprio>candprio || (tmpprio == candprio && getRank(tmp)>getRank(finals.get(0))))
 			{
 				finals.clear();
 				finals.add(tmp);
@@ -172,7 +218,8 @@ public class APL
 		}
 
 		Object cand;
-		if(random)
+		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+		if(mpe.isRandomSelection())
 		{
 			int rand = (int)(Math.random()*finals.size());
 			cand = finals.get(rand);
@@ -184,7 +231,6 @@ public class APL
 			cand = finals.get(0);
 		}
 
-		candidatelist.remove(cand);
 		return cand;
 	}
 
@@ -235,5 +281,37 @@ public class APL
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void planFinished(RPlan rplan)
+	{
+		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+		String exclude = mpe.getExcludeMode();
+
+		// Do nothing is APL is always rebuilt or exclude is never
+		if(((MProcessableElement)element.getModelElement()).isRebuild()
+			|| MProcessableElement.EXCLUDE_NEVER.equals(exclude))
+		{
+			return;
+		}
+
+		if(exclude.equals(MProcessableElement.EXCLUDE_WHEN_TRIED))
+		{
+			candidates.remove(rplan);
+		}
+		else
+		{
+			String state = rplan.getLifecycleState();
+			if(state.equals(RPlan.PLANLIFECYCLESTATE_PASSED)
+				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
+				|| (state.equals(RPlan.PLANLIFECYCLESTATE_FAILED) 
+				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
+			{
+				candidates.remove(rplan);
+			}
+		}
 	}
 }

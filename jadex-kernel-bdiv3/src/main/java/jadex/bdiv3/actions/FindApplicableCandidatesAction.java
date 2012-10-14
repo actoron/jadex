@@ -52,18 +52,15 @@ public class FindApplicableCandidatesAction implements IAction<Void>
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
-		Future<Void> ret = new Future<Void>();
-
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		RCapability rcapa = ip.getCapability();
 		
 		APL apl = element.getApplicablePlanList();
-		apl.build(rcapa, element);
+		apl.build(rcapa);
 		IAction<Void> action = new SelectCandidatesAction(element);
 		ia.getExternalAccess().scheduleStep(action);
-		ret.setResult(null);
 		
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	

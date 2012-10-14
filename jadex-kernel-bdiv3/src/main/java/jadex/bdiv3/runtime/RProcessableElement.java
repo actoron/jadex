@@ -78,4 +78,14 @@ public class RProcessableElement extends RElement
 		triedplans.add(plan);
 	}
 	
+	/**
+	 * 
+	 */
+	public void planFinished(RPlan rplan)
+	{
+		// potentially remove candidate
+		apl.planFinished(rplan);
+		
+		
+	}
 }

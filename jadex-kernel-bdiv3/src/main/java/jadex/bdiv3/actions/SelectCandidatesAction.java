@@ -1,6 +1,12 @@
 package jadex.bdiv3.actions;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.runtime.IPlanBody;
+import jadex.bdiv3.runtime.MethodPlanBody;
+import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -40,12 +46,37 @@ public class SelectCandidatesAction implements IAction<Void>
 	{
 		Future<Void> ret = new Future<Void>();
 
-		Object cand = element.getApplicablePlanList().getNextCandidate();
-		if(cand!=null)
+		List<Object> cands = element.getApplicablePlanList().selectCandidates();
+		if(cands!=null)
 		{
-			IAction<Void> action = new ExecutePlanStepAction(element, ((MPlan)cand).getTarget());
-			ia.getExternalAccess().scheduleStep(action);
-			ret.setResult(null);
+			for(Object cand: cands)
+			{
+				if(cand instanceof MPlan)
+				{
+					MPlan mplan = (MPlan)cand;
+					RPlan rplan = new RPlan((MPlan)cand);
+					IPlanBody body = new MethodPlanBody(ia, rplan, (Method)mplan.getBody());
+					rplan.setBody(body);
+					rplan.setReason(element);
+					rplan.setDispatchedElement(element);
+					IAction<Void> action = new ExecutePlanStepAction(element, rplan);
+					ia.getExternalAccess().scheduleStep(action);
+					ret.setResult(null);
+				}
+				else if(cand instanceof RPlan)
+				{
+					// dispatch to running plan
+					RPlan rplan = (RPlan)cand;
+					rplan.setDispatchedElement(element);
+					IAction<Void> action = new ExecutePlanStepAction(element, rplan);
+					ia.getExternalAccess().scheduleStep(action);
+					ret.setResult(null);
+				}
+				else
+				{
+					// todo: dispatch to waitqueue
+				}
+			}
 		}
 		else
 		{

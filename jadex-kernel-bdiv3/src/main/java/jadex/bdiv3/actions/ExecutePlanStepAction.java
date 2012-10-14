@@ -1,6 +1,10 @@
 package jadex.bdiv3.actions;
 
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.runtime.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.IPlanBody;
 import jadex.bdiv3.runtime.PlanFailureException;
+import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -21,16 +25,16 @@ public class ExecutePlanStepAction implements IAction<Void>
 	/** The element. */
 	protected RProcessableElement element;
 	
-	/** The method. */
-	protected Method method;
+	/** The plan. */
+	protected RPlan rplan;
 	
 	/**
 	 *  Create a new action.
 	 */
-	public ExecutePlanStepAction(RProcessableElement element, Method method)
+	public ExecutePlanStepAction(RProcessableElement element, RPlan rplan)
 	{
 		this.element = element;
-		this.method = method;
+		this.rplan = rplan;
 	}
 	
 	/**
@@ -52,41 +56,7 @@ public class ExecutePlanStepAction implements IAction<Void>
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 
 		
-//		Future<Void> ret = new Future<Void>();
-		try
-		{
-			method.setAccessible(true);
-			Object res = method.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
-				new Object[]{element.getPojoElement()});
-			if(res instanceof IFuture)
-			{
-				((IFuture)res).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// todo: call planFailed() on element
-//						element.getApplicablePlanList().ad
-						
-						IAction<Void> action = new SelectCandidatesAction(element);
-						ia.getExternalAccess().scheduleStep(action);
-					}
-				});
-			}
-		}
-		catch(Exception e)
-		{
-			// todo: call planFailed() on element
-//			element.getApplicablePlanList().ad
-			
-			IAction<Void> action = new SelectCandidatesAction(element);
-			ia.getExternalAccess().scheduleStep(action);
-		}
-
-//		return ret;
-		return IFuture.DONE;
+		IPlanBody body = rplan.getBody();
+		return body.executePlanStep();
 	}
 }

@@ -129,7 +129,7 @@ public class BDIClassReader extends MicroClassReader
 							micromodel.getCapability().addGoal(mgoal);
 						}
 					}
-					MPlan mplan = new MPlan(methods[i], tr, p.priority());
+					MPlan mplan = new MPlan(methods[i].getName(), methods[i], tr, p.priority());
 					micromodel.getCapability().addPlan(mplan);
 				}
 			}

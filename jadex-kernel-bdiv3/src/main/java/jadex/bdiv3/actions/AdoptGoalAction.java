@@ -43,6 +43,7 @@ public class AdoptGoalAction implements IAction<Void>
 		try
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+			// todo: observe class and goal itself!
 			ip.getRuleSystem().observeObject(goal.getPojoElement());
 			ip.getCapability().addGoal(goal);
 			ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(goal));
