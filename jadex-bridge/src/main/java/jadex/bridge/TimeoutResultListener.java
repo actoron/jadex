@@ -213,21 +213,33 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 												
 												timer = clock.createRealtimeTimer(timeout, new ITimedObject()
 												{
+													Object	timer1	= timer;
 													public void timeEventOccurred(long currenttime)
 													{
+														if(timer!=timer1)
+														{
+															System.out.println("wrong timer: "+message);
+														}
 														notify.run();
 													}
 												});
+												System.out.println("new real trl: "+message);
 											}
 											else
 											{
 												timer = clock.createTimer(timeout, new ITimedObject()
 												{
+													Object	timer1	= timer;
 													public void timeEventOccurred(long currenttime)
 													{
+														if(timer!=timer1)
+														{
+															System.out.println("wrong timer: "+message);
+														}
 														notify.run();
 													}
 												});
+												System.out.println("new clock trl: "+message);
 											}
 										}
 									}

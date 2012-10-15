@@ -1,6 +1,5 @@
 package jadex.backup.resource;
 
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
