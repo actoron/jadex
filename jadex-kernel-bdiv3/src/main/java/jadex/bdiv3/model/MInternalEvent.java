@@ -8,8 +8,8 @@ public class MInternalEvent extends MClassBasedElement
 	/**
 	 *  Create a new internal event.
 	 */
-	public MInternalEvent(Class<?> target)
+	public MInternalEvent(Class<?> target)//, boolean posttoall, boolean randomselection, String excludemode)
 	{
-		super(target);
+		super(target, true, false, null);
 	}
 }

@@ -54,7 +54,7 @@ public class SelectCandidatesAction implements IAction<Void>
 				if(cand instanceof MPlan)
 				{
 					MPlan mplan = (MPlan)cand;
-					RPlan rplan = new RPlan((MPlan)cand);
+					RPlan rplan = new RPlan((MPlan)cand, cand);
 					IPlanBody body = new MethodPlanBody(ia, rplan, (Method)mplan.getBody());
 					rplan.setBody(body);
 					rplan.setReason(element);

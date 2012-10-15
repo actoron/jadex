@@ -74,10 +74,13 @@ public class RPlan extends RElement
 	/** The plan body. */
 	protected IPlanBody body;
 	
+	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
+	protected Object candidate;
+	
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan)
+	public RPlan(MPlan mplan, Object candidate)
 	{
 		super(mplan);
 	}
@@ -192,6 +195,24 @@ public class RPlan extends RElement
 	public void setBody(IPlanBody body)
 	{
 		this.body = body;
+	}
+	
+	/**
+	 *  Get the candidate.
+	 *  @return The candidate.
+	 */
+	public Object getCandidate()
+	{
+		return candidate;
+	}
+
+	/**
+	 *  Set the candidate.
+	 *  @param candidate The candidate to set.
+	 */
+	public void setCandidate(Object candidate)
+	{
+		this.candidate = candidate;
 	}
 
 	/**

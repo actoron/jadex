@@ -122,7 +122,9 @@ public class BDIClassReader extends MicroClassReader
 					Class<?>[] gs = trigger.goals();
 					for(int j=0; j<gs.length; j++)
 					{
-						MGoal mgoal = new MGoal(gs[j]);
+						Goal ga = gs[j].getAnnotation(Goal.class);
+						MGoal mgoal = new MGoal(gs[j], ga.posttoall(), ga.randomselection(), ga.excludemode(), 
+							ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay());
 						tr.addGoal(mgoal);
 						if(!micromodel.getCapability().getGoals().contains(mgoal))
 						{

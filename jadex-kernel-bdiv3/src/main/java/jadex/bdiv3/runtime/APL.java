@@ -82,11 +82,14 @@ public class APL
 	{
 		if(!built || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
+			if(candidates==null)
+				candidates = new ArrayList<Object>();
+			
 			// Use the plan priorities to sort the candidates.
 			// If the priority is the same use the following order:
 			// running plan - waitque of running plan - passive plan
 
-			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+//			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 			
 			// todo: generate binding candidates
 			if(precandidates==null)
@@ -300,7 +303,7 @@ public class APL
 
 		if(exclude.equals(MProcessableElement.EXCLUDE_WHEN_TRIED))
 		{
-			candidates.remove(rplan);
+			candidates.remove(rplan.getCandidate());
 		}
 		else
 		{
@@ -310,7 +313,7 @@ public class APL
 				|| (state.equals(RPlan.PLANLIFECYCLESTATE_FAILED) 
 				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
 			{
-				candidates.remove(rplan);
+				candidates.remove(rplan.getCandidate());
 			}
 		}
 	}

@@ -73,6 +73,7 @@ public class RCapability extends RElement
 		{
 			goals = new ArrayList<RGoal>();
 		}
+		goal.setLifecycleState(RGoal.GOALLIFECYCLESTATE_ADOPTED);
 		goals.add(goal);
 	}
 	

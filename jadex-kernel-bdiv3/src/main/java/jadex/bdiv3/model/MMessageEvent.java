@@ -10,6 +10,6 @@ public class MMessageEvent extends MClassBasedElement
 	 */
 	public MMessageEvent(Class<?> target)
 	{
-		super(target);
+		super(target, false, false, null);
 	}
 }

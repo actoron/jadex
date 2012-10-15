@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 
 /**
  * 
  */
-public class RProcessableElement extends RElement
+public abstract class RProcessableElement extends RElement
 {
 	/** The pojo element. */
 	protected Object pojoelement;
@@ -79,13 +81,37 @@ public class RProcessableElement extends RElement
 	}
 	
 	/**
+	 *  Get the triedplans.
+	 *  @return The triedplans.
+	 */
+	public List<Object> getTriedPlans()
+	{
+		return triedplans;
+	}
+
+	/**
+	 *  Set the triedplans.
+	 *  @param triedplans The triedplans to set.
+	 */
+	public void setTriedPlans(List<Object> triedplans)
+	{
+		this.triedplans = triedplans;
+	}
+
+	/**
 	 * 
 	 */
-	public void planFinished(RPlan rplan)
+	public void planFinished(IInternalAccess ia, RPlan rplan)
 	{
 		// potentially remove candidate
+		addTriedPlan(rplan.getCandidate());
 		apl.planFinished(rplan);
-		
-		
+		// create reasoning step depending on the processable element type
+		ia.getExternalAccess().scheduleStep(createReasoningStep(ia));
 	}
+	
+	/**
+	 * 
+	 */
+	public abstract IComponentStep<Void> createReasoningStep(IInternalAccess ia);
 }

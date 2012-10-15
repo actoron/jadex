@@ -33,11 +33,12 @@ public class MProcessableElement extends MElement
 	/**
 	 * 
 	 */
-	public MProcessableElement(String name, boolean posttoall, boolean randomselection)
+	public MProcessableElement(String name, boolean posttoall, boolean randomselection, String excludemode)
 	{
 		super(name);
 		this.posttoall = posttoall;
 		this.randomselection = randomselection;
+		this.excludemode = excludemode==null? EXCLUDE_WHEN_TRIED: excludemode;
 	}
 	
 	/**

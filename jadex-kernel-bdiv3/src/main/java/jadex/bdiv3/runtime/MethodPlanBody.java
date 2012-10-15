@@ -50,13 +50,13 @@ public class MethodPlanBody implements IPlanBody
 				{
 					public void resultAvailable(Object result)
 					{
-						rplan.getReason().planFinished(rplan);
+						rplan.getReason().planFinished(ia, rplan);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						rplan.setException(exception);
-						rplan.getReason().planFinished(rplan);
+						rplan.getReason().planFinished(ia, rplan);
 					}
 				});
 			}
@@ -64,7 +64,7 @@ public class MethodPlanBody implements IPlanBody
 		catch(Exception e)
 		{
 			rplan.setException(e);
-			rplan.getReason().planFinished(rplan);
+			rplan.getReason().planFinished(ia, rplan);
 		}
 		
 		return IFuture.DONE;

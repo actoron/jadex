@@ -1,24 +1,13 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.model.BDIModel;
-import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.APL;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.RCapability;
-import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
