@@ -39,6 +39,9 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	/** The realtime flag. */
 	protected boolean realtime;
 	
+	/** The timeout message. */
+	protected String message;
+	
 	//-------- constructors --------
 
 	/**
@@ -46,24 +49,24 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	 */
 	public TimeoutResultListener(final long timeout, IExternalAccess exta, final IResultListener<E> listener)
 	{
-		this(timeout, exta, false, listener);
+		this(timeout, exta, false, null, listener);
 	}
 	
 	/**
 	 *  Create a new listener.
 	 */
-	public TimeoutResultListener(final long timeout, IExternalAccess exta, final boolean realtime,
-		final IResultListener<E> listener)
+	public TimeoutResultListener(final long timeout, IExternalAccess exta, final boolean realtime, String message, final IResultListener<E> listener)
 	{
 		if(listener==null)
 			throw new IllegalArgumentException("Listener must not null.");
 		if(exta==null)
 			throw new IllegalArgumentException("External access must not null.");
 			
-		this.listener = listener;
-		this.exta = exta;
-		this.timeout = timeout;
-		this.realtime = realtime;
+		this.exta	= exta;
+		this.listener	= listener;
+		this.timeout	= timeout;
+		this.realtime	= realtime;
+		this.message	= message;
 		
 		initTimer();
 	}
@@ -132,7 +135,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	{
 		// Initialize timeout
 		final Object mon = this;
-		final Exception ex	= new TimeoutException();
+//		final Exception ex	= new TimeoutException();
 		
 		exta.scheduleStep(new IComponentStep<Void>()
 		{
@@ -174,7 +177,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														listener.exceptionOccurred(ex!=null ? ex : new TimeoutException());
+														listener.exceptionOccurred(/*ex!=null ? ex :*/ new TimeoutException(message));
 														return IFuture.DONE;
 													}
 												});

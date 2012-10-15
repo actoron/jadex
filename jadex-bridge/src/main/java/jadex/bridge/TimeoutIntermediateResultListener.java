@@ -14,16 +14,15 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 	 */
 	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta, final IIntermediateResultListener<E> listener)
 	{
-		this(timeout, exta, false, listener);
+		this(timeout, exta, false, null, listener);
 	}
 	
 	/**
 	 *  Create a new listener.
 	 */
-	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta, final boolean realtime,
-		final IIntermediateResultListener<E> listener)
+	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta, final boolean realtime, String message, final IIntermediateResultListener<E> listener)
 	{
-		super(timeout, exta, realtime, listener);
+		super(timeout, exta, realtime, message, listener);
 	}
 	
 	/**
