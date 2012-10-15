@@ -194,6 +194,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 										// Do not create new timer if already notified
 										if(timeout>0 && !notified)
 										{
+											cancel();
 											if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
 											{
 												// each timer creates a thread!
@@ -217,7 +218,6 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 														notify.run();
 													}
 												});
-												System.out.println("new real trl");
 											}
 											else
 											{
@@ -228,7 +228,6 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 														notify.run();
 													}
 												});
-												System.out.println("new clock trl");
 											}
 										}
 									}
