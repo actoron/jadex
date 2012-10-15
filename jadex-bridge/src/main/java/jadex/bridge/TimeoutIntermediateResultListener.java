@@ -46,8 +46,8 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 			{
 				notify = true;
 //				notified = true;
-				cancel();
-				// reinit timer on every new result
+//				cancel();
+				// reinit timer on every new result (also cancels old one)
 				initTimer();
 			}
 		}
