@@ -210,7 +210,6 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 //												timer = tt;
 //												t.schedule(tt, timeout);
 												
-												
 												timer = clock.createRealtimeTimer(timeout, new ITimedObject()
 												{
 													public void timeEventOccurred(long currenttime)

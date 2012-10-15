@@ -360,7 +360,8 @@ public abstract class AbstractClock implements IClock
 	{
 		synchronized(this)
 		{
-			timers.remove(timer);
+			if(!timers.remove(timer))
+				System.out.println("Could not remove timer: "+timer+" "+timers);
 //			System.err.println("Removed timer: "+timers);
 		}
 		
