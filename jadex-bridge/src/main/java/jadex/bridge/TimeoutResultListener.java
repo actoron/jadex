@@ -118,11 +118,14 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	 */
 	public synchronized void cancel()
 	{
+		if(timer==null)
+			return;
+		
 		if(timer instanceof TimerTask)
 		{
 			((TimerTask)timer).cancel();
 		}
-		else if(timer instanceof ITimer)
+		else //if(timer instanceof ITimer)
 		{
 			((ITimer)timer).cancel();
 		}
@@ -207,6 +210,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 //												timer = tt;
 //												t.schedule(tt, timeout);
 												
+												
 												timer = clock.createRealtimeTimer(timeout, new ITimedObject()
 												{
 													public void timeEventOccurred(long currenttime)
@@ -214,6 +218,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 														notify.run();
 													}
 												});
+												System.out.println("new real trl");
 											}
 											else
 											{
@@ -224,6 +229,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 														notify.run();
 													}
 												});
+												System.out.println("new clock trl");
 											}
 										}
 									}
