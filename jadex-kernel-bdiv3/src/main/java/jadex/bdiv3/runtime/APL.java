@@ -5,7 +5,6 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MTrigger;
-import jadex.commons.collection.SCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,6 @@ public class APL
 	
 //	/** The waitqueue candidates. */
 //	protected List<RPlan> waitqueuecandidates;
-
-	protected boolean built;
 	
 	/**
 	 *  Create a new APL.
@@ -80,7 +77,7 @@ public class APL
 	 */
 	public void build(RCapability capa)
 	{
-		if(!built || ((MProcessableElement)element.getModelElement()).isRebuild())
+		if(candidates==null || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
 			if(candidates==null)
 				candidates = new ArrayList<Object>();

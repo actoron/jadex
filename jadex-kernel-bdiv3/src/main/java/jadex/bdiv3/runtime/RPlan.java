@@ -83,6 +83,7 @@ public class RPlan extends RElement
 	public RPlan(MPlan mplan, Object candidate)
 	{
 		super(mplan);
+		this.candidate = candidate;
 	}
 
 	/**
