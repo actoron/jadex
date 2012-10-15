@@ -268,12 +268,12 @@ public class LocalResourceService	implements ILocalResourceService
 //							resource.updateDirectory(top.getFileInfo(), top.getSubfiles());
 						}
 //						ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_UNCHANGED, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation()))));
-						ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_UNCHANGED, top.getFileInfo()));
+						ret.addIntermediateResultIfUndone(new BackupEvent(BackupResource.FILE_UNCHANGED, top.getFileInfo()));
 					}
 					catch(Exception e)
 					{
 //						ret.addIntermediateResult(new BackupEvent(BackupEvent.ERROR, new FileData(rpa.getResource().getFile(top.getFileInfo().getLocation())), e));
-						ret.addIntermediateResult(new BackupEvent(BackupEvent.ERROR, top.getFileInfo(), e));
+						ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.ERROR, top.getFileInfo(), e));
 					}
 				}
 				
@@ -303,7 +303,7 @@ public class LocalResourceService	implements ILocalResourceService
 				}
 				catch(Exception e)
 				{
-					ret.addIntermediateResult(new BackupEvent(BackupEvent.ERROR, top.getFileInfo(), e));
+					ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.ERROR, top.getFileInfo(), e));
 					doUpdate(remote, ret, stack);
 				}
 			}		
@@ -319,7 +319,7 @@ public class LocalResourceService	implements ILocalResourceService
 		// Currently only recurses into directory contents as directory update (i.e. deletion of files) is done elsewhere (hack?)
 		final File	fdir = rpa.getResource().getFile(dir.getLocation());
 		fdir.mkdirs();
-		ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_UNCHANGED, rpa.getResource().getFileInfo(fdir))); // todo: dir events?
+		ret.addIntermediateResultIfUndone(new BackupEvent(BackupResource.FILE_UNCHANGED, rpa.getResource().getFileInfo(fdir))); // todo: dir events?
 		remote.getDirectoryContents(dir).addResultListener(new IResultListener<FileInfo[]>()
 		{
 			public void resultAvailable(FileInfo[] result)
@@ -336,7 +336,7 @@ public class LocalResourceService	implements ILocalResourceService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.addIntermediateResult(new BackupEvent(BackupResource.FILE_CONFLICT, rpa.getResource().getFileInfo(fdir)));
+				ret.addIntermediateResultIfUndone(new BackupEvent(BackupResource.FILE_CONFLICT, rpa.getResource().getFileInfo(fdir)));
 //				ret.addIntermediateResult(new BackupEvent("Problem: "+exception, new FileData(fdir), -1));
 				doUpdate(remote, ret, stack);
 			}
@@ -352,7 +352,7 @@ public class LocalResourceService	implements ILocalResourceService
 	{
 //		final File	file	= rpa.getResource().getFile(fi.getLocation());
 		String state = rpa.getResource().getState(fi);
-		ret.addIntermediateResult(new BackupEvent(state, fi, 0));
+		ret.addIntermediateResultIfUndone(new BackupEvent(state, fi, 0));
 		doUpdate(remote, ret, stack);
 	}
 	
@@ -364,7 +364,7 @@ public class LocalResourceService	implements ILocalResourceService
 		final SubscriptionIntermediateFuture<BackupEvent> ret = new SubscriptionIntermediateFuture<BackupEvent>();
 		
 		final File	file = rpa.getResource().getFile(fi.getLocation());
-		ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_START, rpa.getResource().getFileInfo(file), new Double(0)));
+		ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_UPDATE_START, rpa.getResource().getFileInfo(file), new Double(0)));
 		remote.getFileContents(fi).addResultListener(new IResultListener<IInputConnection>()
 		{
 			public void resultAvailable(IInputConnection result)
@@ -380,7 +380,7 @@ public class LocalResourceService	implements ILocalResourceService
 						{
 							if(time==0 || System.currentTimeMillis()-time>1000)
 							{
-								ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_STATE, fi, new Double(result.doubleValue()/fi.getSize())));
+								ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_UPDATE_STATE, fi, new Double(result.doubleValue()/fi.getSize())));
 								time = System.currentTimeMillis();
 							}
 						}
@@ -390,7 +390,7 @@ public class LocalResourceService	implements ILocalResourceService
 							try
 							{
 								rpa.getResource().updateFile(fi, tmp);
-								ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_END, fi, new Double(1)));
+								ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_UPDATE_END, fi, new Double(1)));
 								ret.setFinished();
 							}
 							catch(Exception e)
@@ -406,7 +406,7 @@ public class LocalResourceService	implements ILocalResourceService
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
+							ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
 							ret.setException(exception);
 						}
 					});
@@ -419,7 +419,7 @@ public class LocalResourceService	implements ILocalResourceService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.addIntermediateResult(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
+				ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_UPDATE_ERROR, fi, exception));
 				ret.setException(exception);
 			}
 		});
