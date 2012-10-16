@@ -2,6 +2,7 @@ package jadex.bdiv3;
 
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
@@ -128,8 +129,9 @@ public class BDIClassReader extends MicroClassReader
 						MGoal mgoal = new MGoal(gs[j], ga.posttoall(), ga.randomselection(), ga.excludemode(), 
 							ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay());
 						tr.addGoal(mgoal);
+						
 						if(!micromodel.getCapability().getGoals().contains(mgoal))
-						{
+						{	
 							micromodel.getCapability().addGoal(mgoal);
 						}
 					}
@@ -180,7 +182,7 @@ public class BDIClassReader extends MicroClassReader
 				for(int i=0; i<methods.length; i++)
 				{
 					// todo: all methods except those that throw events themselves
-					if(methods[i].hasAnnotation(AgentBody.class))
+//					if(methods[i].hasAnnotation(AgentBody.class))
 					{
 						try
 						{

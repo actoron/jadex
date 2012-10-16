@@ -39,4 +39,11 @@ public class HelloGoal
 		HelloWorldBDI agent = (HelloWorldBDI)context;
 		agent.getAgent().adoptGoal(new HelloGoal((String)event.getContent()));
 	}
+	
+//	@TargetCondition()
+//	@Condition("target")
+//	protected boolean target(@Event("sayhello") String sayhello)
+//	{
+//		return true;
+//	}
 }

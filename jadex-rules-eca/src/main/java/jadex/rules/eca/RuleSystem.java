@@ -72,7 +72,7 @@ public class RuleSystem
 	 */
 	public Object observeObject(final Object object)
 	{
-		Class clazz = object.getClass();
+		Class<?> clazz = object.getClass();
 		
 //		addPropertyChangeListener(object);
 		
@@ -274,6 +274,15 @@ public class RuleSystem
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Get the rulebase.
+	 *  @return The rule base.
+	 */
+	public IRulebase getRulebase()
+	{
+		return rulebase;
 	}
 	
 	/**  
