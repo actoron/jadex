@@ -81,7 +81,7 @@ public class SelectCandidatesAction implements IAction<Void>
 		else
 		{
 			// todo: throw goal failed exception for goal listeners
-			
+//			element.planFinished(ia, rplan)
 			System.out.println("No applicable plan found.");
 		}
 		
