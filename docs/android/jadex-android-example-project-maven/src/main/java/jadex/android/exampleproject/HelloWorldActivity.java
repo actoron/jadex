@@ -1,21 +1,19 @@
-package jadex.android.application.demo;
+package jadex.android.exampleproject;
 
-import jadex.android.IEventReceiver;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.android.service.IJadexPlatformBinder;
+import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.HashMap;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,18 +22,22 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
+/**
+ * Hello World Activity.
+ * Can Launch a platform and run agents.
+ */
+public class HelloWorldActivity extends JadexAndroidActivity
 {
 
+	/** UI Button */
 	private Button startAgentButton;
-	private Button startBPMNButton;
-	private Button pingButton;
-
-	private int num;
-
-	protected IComponentIdentifier lastComponentIdentifier;
-
+	/** UI Button */
+	private Button startPlatformButton;
+	/** UI textView */
 	private TextView textView;
+
+	/** Handler to allow agents to create Toasts */
+	public static Handler uiHandler;
 
 	/** Called when the activity is first created. */
 	public void onCreate(Bundle savedInstanceState)
@@ -43,16 +45,27 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		// lookup all ui elements:
+
 		startAgentButton = (Button) findViewById(R.id.startAgentButton);
 		startAgentButton.setOnClickListener(buttonListener);
 
-		startBPMNButton = (Button) findViewById(R.id.startBpmnButton);
-		startBPMNButton.setOnClickListener(buttonListener);
-
-		pingButton = (Button) findViewById(R.id.pingButton);
-		pingButton.setOnClickListener(buttonListener);
+		startPlatformButton = (Button) findViewById(R.id.startPlatformButton);
+		startPlatformButton.setOnClickListener(buttonListener);
 
 		textView = (TextView) findViewById(R.id.infoTextView);
+		
+		// create handler for agent ui output
+		uiHandler = new Handler()
+		{
+
+			@Override
+			public void handleMessage(Message msg)
+			{
+				Toast.makeText(HelloWorldActivity.this, msg.getData().getString("message"), Toast.LENGTH_SHORT).show();
+			}
+			
+		};
 	}
 
 	protected void onResume()
@@ -60,6 +73,8 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 		super.onResume();
 		refreshButtons();
 	}
+
+	// BEGIN -------- show control center in menu ---------
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -82,7 +97,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 				{
 					public void run()
 					{
-						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this, "No Platform running!", Toast.LENGTH_SHORT);
+						Toast makeText = Toast.makeText(HelloWorldActivity.this, "No Platform running!", Toast.LENGTH_SHORT);
 						makeText.show();
 					}
 				});
@@ -91,6 +106,11 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 		return true;
 	}
 
+	// END -------- show control center in menu ---------
+
+	/**
+	 * Set correct button state/label.
+	 */
 	private void refreshButtons()
 	{
 		if (isJadexPlatformRunning())
@@ -98,61 +118,51 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 			textView.setText(R.string.started);
 			textView.append(platformId.toString());
 			startAgentButton.setEnabled(true);
-			startBPMNButton.setEnabled(true);
-			pingButton.setEnabled(true);
+			startPlatformButton.setText("Stop Platform");
 		} else
 		{
-			textView.setText(R.string.starting);
 			startAgentButton.setEnabled(false);
-			startBPMNButton.setEnabled(false);
-			pingButton.setEnabled(false);
+			startPlatformButton.setText("Start Platform");
 		}
 	}
 
 	private OnClickListener buttonListener = new OnClickListener()
 	{
+		/** agent counter */
+		private int num;
 
 		public void onClick(View view)
 		{
-			if (view == startAgentButton)
+			if (view == startPlatformButton)
+			{
+				if (isJadexPlatformRunning())
+				{
+					startPlatformButton.setEnabled(false);
+					stopPlatforms();
+					textView.setText(R.string.stopped);
+					startPlatformButton.setEnabled(true);
+				} else
+				{
+					startPlatformButton.setEnabled(false);
+					textView.setText(R.string.starting);
+					startPlatform();
+				}
+			} else if (view == startAgentButton)
 			{
 				startAgentButton.setEnabled(false);
 				num++;
 				startMicroAgent("HelloWorldAgent " + num, AndroidAgent.class).addResultListener(agentCreatedResultListener);
-
-			} else if (view == startBPMNButton)
-			{
-				startBPMNButton.setEnabled(false);
-				num++;
-				startBPMNAgent("SimpleWorkflow " + num, "jadex/android/application/demo/bpmn/SimpleWorkflow.bpmn").addResultListener(bpmnCreatedResultListener);
-			} else if (view == pingButton)
-			{
-				HashMap<String, Object> msg = new HashMap<String, Object>();
-				// msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(),
-				// lastComponentIdentifier);
-				msg.put(SFipa.CONTENT, "ping");
-				// msg.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-
-				sendMessage(msg, lastComponentIdentifier).addResultListener(new DefaultResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-					}
-
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					};
-				});
 			}
 		}
+
 	};
 
 	@Override
-	protected IFuture<IExternalAccess> startPlatform(IJadexPlatformBinder platformService)
+	protected IFuture<IExternalAccess> onPlatformStart(IJadexPlatformBinder platformService)
 	{
 		textView.setText(R.string.starting);
-		return super.startPlatform(platformService);
+		// custom startup: include only micro kernel
+		return platformService.startJadexPlatform(new String[]{JadexPlatformManager.KERNEL_MICRO});
 	}
 
 	@Override
@@ -166,65 +176,25 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 			{
 				textView.setText(R.string.started);
 				textView.append(platformId.toString());
+				startPlatformButton.setEnabled(true);
 				refreshButtons();
 			}
-		});
-
-		registerEventReceiver(ShowToastEvent.TYPE, new IEventReceiver<ShowToastEvent>()
-		{
-
-			public void receiveEvent(final ShowToastEvent event)
-			{
-				runOnUiThread(new Runnable()
-				{
-
-					public void run()
-					{
-						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this, event.getMessage(), Toast.LENGTH_SHORT);
-						makeText.show();
-					}
-				});
-			}
-
-			public Class<ShowToastEvent> getEventClass()
-			{
-				return ShowToastEvent.class;
-			}
-
 		});
 	}
 
 	private IResultListener<IComponentIdentifier> agentCreatedResultListener = new DefaultResultListener<IComponentIdentifier>()
 	{
 
-		public void resultAvailable(IComponentIdentifier arg0)
+		public void resultAvailable(final IComponentIdentifier cid)
 		{
 			runOnUiThread(new Runnable()
 			{
 
 				public void run()
 				{
-					textView.setText("Agents started: " + num);
+					textView.setText("Agent started: " + cid.toString());
 					startAgentButton.setEnabled(true);
 
-				}
-			});
-			lastComponentIdentifier = arg0;
-		}
-	};
-
-	private IResultListener<IComponentIdentifier> bpmnCreatedResultListener = new DefaultResultListener<IComponentIdentifier>()
-	{
-
-		public void resultAvailable(IComponentIdentifier arg0)
-		{
-			runOnUiThread(new Runnable()
-			{
-
-				public void run()
-				{
-					textView.setText("BPMN component started: " + num);
-					startBPMNButton.setEnabled(true);
 				}
 			});
 		}

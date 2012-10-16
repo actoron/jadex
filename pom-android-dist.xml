@@ -43,6 +43,7 @@
 		<module>jadex-android-xmlpull</module>
 		<module>jadex-runtimetools-android</module>
 		<module>jadex-platform-extension-webservice-android</module>
+		<module>jadex-applications-android-demo</module>
 	</modules>
 
 	<profiles>

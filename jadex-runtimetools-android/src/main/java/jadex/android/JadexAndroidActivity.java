@@ -40,14 +40,21 @@ import android.os.IBinder;
  */
 public class JadexAndroidActivity extends Activity implements ServiceConnection
 {
-
+	/**
+	 * Extra bundle key for a boolean to indicate whether the jadex platform
+	 * should be started on service creation.
+	 */
+	public static final String EXTRA_PLATFORM_AUTOSTART = "platform_autostart";
+	
 	private Intent serviceIntent;
 	private IJadexPlatformBinder platformService;
 	protected IComponentIdentifier platformId;
-
+	private boolean autostart;
+	
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		autostart = getIntent().getBooleanExtra(EXTRA_PLATFORM_AUTOSTART, false);
 		serviceIntent = new Intent(this, JadexPlatformService.class);
 		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
 	}
@@ -203,18 +210,9 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
 		platformService = (IJadexPlatformBinder) service;
-		onPlatformStarting();
-		IFuture<IExternalAccess> platform = startPlatform(platformService);
-		platform.addResultListener(new DefaultResultListener<IExternalAccess>()
-		{
-
-			@Override
-			public void resultAvailable(IExternalAccess result)
-			{
-				onPlatformStarted(result);
-			}
-
-		});
+		if (autostart) {
+			startPlatform();
+		}
 	}
 
 	public void onServiceDisconnected(ComponentName name)
@@ -238,7 +236,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	 * @param platformService
 	 * @return external access of the running platform
 	 */
-	protected IFuture<IExternalAccess> startPlatform(IJadexPlatformBinder platformService)
+	protected IFuture<IExternalAccess> onPlatformStart(IJadexPlatformBinder platformService)
 	{
 		return platformService.startJadexPlatform();
 	}
@@ -256,6 +254,26 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	{
 		this.platformId = result.getComponentIdentifier();
 	}
+	
+	protected void startPlatform()
+	{
+		onPlatformStarting();
+		IFuture<IExternalAccess> platform = onPlatformStart(platformService);
+		platform.addResultListener(new DefaultResultListener<IExternalAccess>()
+		{
 
+			@Override
+			public void resultAvailable(IExternalAccess result)
+			{
+				onPlatformStarted(result);
+			}
+
+		});
+	}
+	
+	protected void stopPlatforms()
+	{
+		platformService.shutdownJadexPlatforms();
+	}
 
 }

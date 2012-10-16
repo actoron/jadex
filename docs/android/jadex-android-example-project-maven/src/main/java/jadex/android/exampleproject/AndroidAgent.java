@@ -1,10 +1,9 @@
-package jadex.android.application.demo;
+package jadex.android.exampleproject;
 
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
@@ -15,7 +14,8 @@ import jadex.micro.annotation.RequiredServices;
 
 import java.util.Map;
 
-import android.util.Log;
+import android.os.Bundle;
+import android.os.Message;
 
 /**
  *  Simple example agent that shows messages
@@ -65,21 +65,12 @@ public class AndroidAgent extends MicroAgent
 	 *	Show a message on the device.  
 	 *  @param msg The message to be shown.
 	 */
-	protected void showAndroidMessage(String msg)
+	protected void showAndroidMessage(String txt)
 	{
-		final ShowToastEvent event = new ShowToastEvent();
-		event.setMessage(msg);
-		getRequiredService("androidcontext").addResultListener(new DefaultResultListener<Object>() {
-
-			public void resultAvailable(Object result) {
-				IContextService contextService = (IContextService) result;
-				boolean dispatchUiEvent = contextService.dispatchUiEvent(event);
-				Log.d("Agent", "dispatched: " + dispatchUiEvent);
-			}
-			
-			public void exceptionOccurred(Exception exception) {
-				exception.printStackTrace();
-			}
-		});
+		Message message = new Message();
+		Bundle bundle = new Bundle();
+		bundle.putString("message", txt);
+		message.setData(bundle);
+		HelloWorldActivity.uiHandler.sendMessage(message);
 	}
 }
