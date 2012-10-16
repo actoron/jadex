@@ -5,6 +5,7 @@ import jadex.android.IEventReceiver;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -18,6 +19,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.platform.PlatformAgent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,19 +43,52 @@ public class JadexPlatformService extends Service
 		return new JadexPlatformBinder(jadexPlatformManager)
 		{
 
-			@Override
 			public IFuture<IComponentIdentifier> startMicroAgent(IComponentIdentifier platformId, String name, Class<?> clazz)
 			{
 				return JadexPlatformService.this.startMicroAgent(platformId, name, clazz);
 			}
 
-			@Override
 			public IFuture<IComponentIdentifier> startBPMNAgent(final IComponentIdentifier platformId, String name, String modelPath)
 			{
 				return JadexPlatformService.this.startBPMNAgent(platformId, name, modelPath);
 			}
 
+			public IFuture<IExternalAccess> startJadexPlatform()
+			{
+				return startJadexPlatform(jadexPlatformManager.DEFAULT_KERNELS);
+			}
+
+			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
+			{
+				return startJadexPlatform(kernels, jadexPlatformManager.getRandomPlatformID());
+			}
+
+			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
+			{
+				return startJadexPlatform(kernels, platformId, "");
+			}
+
+			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+			{
+				return JadexPlatformService.this.startJadexPlatform(kernels, platformId, options);
+			}
+
 		};
+	}
+
+	protected IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+	{
+		onPlatformStarting();
+		IFuture<IExternalAccess> fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
+		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
+		{
+			@Override
+			public void resultAvailable(IExternalAccess result)
+			{
+				JadexPlatformService.this.onPlatformStarted(result);
+			}
+		});
+		return fut;
 	}
 
 	@Override
@@ -142,6 +177,23 @@ public class JadexPlatformService extends Service
 	public void unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
 	{
 		AndroidContextManager.getInstance().unregisterEventListener(eventName, rec);
+	}
+
+	/**
+	 * Called right before the platform startup.
+	 */
+	protected void onPlatformStarting()
+	{
+	}
+
+	/**
+	 * Called right after the platform is started.
+	 * 
+	 * @param result
+	 *            The external access to the platform
+	 */
+	protected void onPlatformStarted(IExternalAccess platform)
+	{
 	}
 
 	/**

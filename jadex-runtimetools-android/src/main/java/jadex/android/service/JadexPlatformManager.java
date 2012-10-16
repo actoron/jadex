@@ -101,20 +101,20 @@ public class JadexPlatformManager
 		});
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform()
-	{
-		return startJadexPlatform(DEFAULT_KERNELS);
-	}
-
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels)
-	{
-		return startJadexPlatform(kernels, getRandomPlatformID());
-	}
-
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId)
-	{
-		return startJadexPlatform(kernels, platformId, "");
-	}
+//	public IFuture<IExternalAccess> startJadexPlatform()
+//	{
+//		return startJadexPlatform(DEFAULT_KERNELS);
+//	}
+//
+//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels)
+//	{
+//		return startJadexPlatform(kernels, getRandomPlatformID());
+//	}
+//
+//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId)
+//	{
+//		return startJadexPlatform(kernels, platformId, "");
+//	}
 	
 	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options) {
 		return startJadexPlatform(kernels, platformId, options, true);

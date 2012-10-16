@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, JadexAndroidHelloWorldActivity!</string>
+    <string name="starting">Starting Jadex Platform...</string>
+    <string name="started">Platform started:  </string>
+    <string name="app_name">JadexAndroidHelloWorld</string>
+</resources>

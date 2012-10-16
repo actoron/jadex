@@ -1,7 +1,6 @@
 package jadex.android.benchmarks;
 
-import jadex.android.JadexAndroidContext;
-import jadex.android.JadexAndroidService;
+import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
@@ -14,12 +13,12 @@ import android.os.IBinder;
 /**
  *  Android service for running the Jadex platform.
  */
-public class JadexPlatformService	extends JadexAndroidService	
+public class JadexPlatformService	extends jadex.android.service.JadexPlatformService	
 {
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected Future<IExternalAccess>	platform;
+	protected IExternalAccess	platform;
 	
 	//-------- Android methods --------
 	
@@ -34,8 +33,8 @@ public class JadexPlatformService	extends JadexAndroidService
 			public synchronized IFuture<IExternalAccess>	getPlatform()
 			{
 				Future<IExternalAccess> ret = new Future<IExternalAccess>();
-				if (isJadexPlatformRunning()) {
-					ret.setResult(getJadexContext().getExternalPlatformAccess());
+				if (platform != null) {
+					ret.setResult(platform);
 					return ret;
 				} else {
 					return startPlatform();
@@ -57,8 +56,8 @@ public class JadexPlatformService	extends JadexAndroidService
 				ThreadSuspendable	sus	= new ThreadSuspendable();
 				long start	= System.currentTimeMillis();
 				long timeout	= 4500;	// Android issues hard kill (ANR) after 5 secs!
-				IExternalAccess	ea = platform.get(sus, timeout);
-				ea.killComponent().get(sus, start+timeout-System.currentTimeMillis());
+//				IExternalAccess	ea = platform.get(sus, timeout);
+				platform.killComponent().get(sus, start+timeout-System.currentTimeMillis());
 				System.out.println("Platform shutdown completed");
 			}
 			catch(TimeoutException e)
@@ -79,10 +78,20 @@ public class JadexPlatformService	extends JadexAndroidService
 		// Start the platform
 		System.out.println("Starting Jadex Platform...");
 
-		String options = "-componentfactory jadex.micro.MicroAgentFactory" + " -conf jadex.standalone.PlatformAgent" + " -niotcptransport false"
+		String options = "-componentfactory jadex.micro.MicroAgentFactory" + " -conf jadex.platform.PlatformAgent" + " -niotcptransport false"
 				+ " -saveonexit false";
-		return getJadexContext().startJadexPlatform(new String[]
-		{ JadexAndroidContext.KERNEL_MICRO }, null, options);
+		
+		
+		
+		return startJadexPlatform(new String[]
+		{ JadexPlatformManager.KERNEL_MICRO }, null, options);
+	}
+	
+	@Override
+	protected void onPlatformStarted(IExternalAccess platform)
+	{
+		super.onPlatformStarted(platform);
+		this.platform = platform;
 	}
 
 }
