@@ -43,7 +43,6 @@
 		<module>jadex-android-xmlpull</module>
 		<module>jadex-runtimetools-android</module>
 		<module>jadex-platform-extension-webservice-android</module>
-		<module>jadex-applications-android-demos</module>
 	</modules>
 
 	<profiles>
@@ -148,8 +147,12 @@
 				<module>jadex-platform</module>
 				<module>jadex-platform-extension-webservice</module>
 
+				<!-- skipped in assembly -->
+				<module>jadex-applications-android-demos</module>
+
 				<!-- Modules required for integration test -->
 				<module>jadex-android-integration-test</module>
+				<!-- skipped in assembly -->
 				<module>docs/android/jadex-android-example-project-maven</module>
 			</modules>
 		</profile>
