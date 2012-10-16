@@ -14,6 +14,7 @@
 	<moduleSets>
 		<moduleSet>
 			<excludes>
+				<exclude>net.sourceforge.jadex:jadex-applications-android-demos</exclude>
 				<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
 				<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
 			</excludes>
