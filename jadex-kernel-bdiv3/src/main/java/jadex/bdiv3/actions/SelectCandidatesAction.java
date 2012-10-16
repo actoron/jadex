@@ -47,7 +47,7 @@ public class SelectCandidatesAction implements IAction<Void>
 		Future<Void> ret = new Future<Void>();
 
 		List<Object> cands = element.getApplicablePlanList().selectCandidates();
-		if(cands!=null)
+		if(cands!=null && !cands.isEmpty())
 		{
 			for(Object cand: cands)
 			{

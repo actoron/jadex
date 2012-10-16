@@ -92,7 +92,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		
 		assert desc!=null;
 		
-//		System.out.println("node: "+getClass()+" "+desc.getName());
+//		System.out.println("node: "+getClass()+" "+desc.getName()+" "+desc.getType());
 		
 		this.desc	= desc;
 		this.cms	= cms;

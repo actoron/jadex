@@ -17,6 +17,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.micro.MicroAgentFactory;
 import jadex.micro.MicroClassReader;
 import jadex.micro.annotation.AgentBody;
 
@@ -64,6 +65,7 @@ public class BDIClassReader extends MicroClassReader
 		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
 		modelinfo.setFilename(src+File.separator+SReflect.getClassName(cma)+".class");
 		modelinfo.setStartable(true);
+		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
 		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader);
 		

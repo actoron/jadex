@@ -223,7 +223,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 														notify.run();
 													}
 												});
-												System.out.println("new real trl: "+message);
+//												System.out.println("new real trl: "+message);
 											}
 											else
 											{
@@ -239,7 +239,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 														notify.run();
 													}
 												});
-												System.out.println("new clock trl: "+message);
+//												System.out.println("new clock trl: "+message);
 											}
 										}
 									}

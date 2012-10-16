@@ -273,6 +273,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		{
 			ret.setResult(null);
 		}
+		
+//		System.out.println("getIcon: "+type+" "+type.equals(FILETYPE_BDIAGENT));
 		return ret;
 	}	
 
