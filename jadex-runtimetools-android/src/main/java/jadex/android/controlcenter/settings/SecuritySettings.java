@@ -1,9 +1,9 @@
 package jadex.android.controlcenter.settings;
 
-import jadex.android.JadexAndroidContext;
 import jadex.android.controlcenter.preference.JadexBooleanPreference;
 import jadex.android.controlcenter.preference.JadexStringPreference;
 import jadex.android.controlcenter.preference.LongClickablePreference;
+import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
@@ -86,7 +86,7 @@ public class SecuritySettings extends AServiceSettings
 	{
 		final AlertDialog.Builder builder = new AlertDialog.Builder(platformPasswordsCat.getContext());
 
-		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
+		SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
 				IAwarenessManagementService.class).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
 		{
 			public void resultAvailable(IAwarenessManagementService result)

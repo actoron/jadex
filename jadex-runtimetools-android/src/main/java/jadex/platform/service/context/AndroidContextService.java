@@ -1,9 +1,11 @@
 package jadex.platform.service.context;
 
-import jadex.android.JadexAndroidContext;
-import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
+import jadex.android.AndroidContextManager;
+import jadex.android.AndroidContextManager.AndroidContextChangeListener;
 import jadex.android.exception.JadexAndroidContextNotFoundError;
 import jadex.android.exception.WrongEventClassException;
+import jadex.android.service.JadexPlatformManager;
+import jadex.android.service.JadexPlatformService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
@@ -42,8 +44,8 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	/** The Android Application Context */
 	private Context context;
 
-	/** The {@link JadexAndroidContext} */
-	private JadexAndroidContext jadexAndroidContext;
+	/** The {@link JadexPlatformManager} */
+	private AndroidContextManager androidContext;
 
 	/** Cache the Wifi permission check */
 	private Boolean hasWifiPermission;
@@ -58,8 +60,8 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	public AndroidContextService(IServiceProvider provider)
 	{
 		super(provider.getId(), IContextService.class, null);
-		jadexAndroidContext = JadexAndroidContext.getInstance();
-		jadexAndroidContext.addContextChangeListener(this);
+		androidContext = AndroidContextManager.getInstance();
+		androidContext.addContextChangeListener(this);
 	}
 
 	// -------- methods ----------
@@ -71,7 +73,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 
 	public IFuture<Void> shutdownService()
 	{
-		JadexAndroidContext.getInstance().removeContextChangeListener(this);
+		androidContext.removeContextChangeListener(this);
 		return super.shutdownService();
 	}
 
@@ -141,7 +143,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	{
 		try
 		{
-			return jadexAndroidContext.dispatchEvent(event);
+			return androidContext.dispatchEvent(event);
 		}
 		catch (WrongEventClassException e)
 		{
@@ -238,7 +240,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
           String type = mime.getMimeTypeFromExtension(ext);
        
           intent.setDataAndType(Uri.fromFile(file),type);
-          jadexAndroidContext.getAndroidContext().startActivity(intent); 
+          androidContext.getAndroidContext().startActivity(intent); 
 	}
 
 }

@@ -26,10 +26,16 @@
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-extension-webservice-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

@@ -1,8 +1,8 @@
 package jadex.android.controlcenter.settings;
 
-import jadex.android.JadexAndroidContext;
 import jadex.android.controlcenter.preference.JadexDoublePreference;
 import jadex.android.controlcenter.preference.JadexIntegerPreference;
+import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -319,7 +319,7 @@ public class SimulationSettings extends AServiceSettings {
 	public IFuture<IExternalAccess> getComponentForService() {
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 
-		SServiceProvider.getService(JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
+		SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).getServiceProvider(),
 				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret) {
 					public void customResultAvailable(IComponentManagementService cms) {

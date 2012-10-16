@@ -1,5 +1,7 @@
-package jadex.android;
+package jadex.android.service;
 
+import jadex.android.AndroidContextManager;
+import jadex.android.IEventReceiver;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.exception.WrongEventClassException;
 import jadex.base.Starter;
@@ -22,19 +24,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import android.content.Context;
 import android.util.Log;
 
-public class JadexAndroidContext extends AndroidContext
+/**
+ * Singleton to manage all running jadex platforms and start new ones.
+ */
+public class JadexPlatformManager
 {
-
-	private static final JadexAndroidContext instance = new JadexAndroidContext();
 
 	// --------- static fields -----------
 	public static final String KERNEL_COMPONENT = "component";
@@ -47,69 +48,19 @@ public class JadexAndroidContext extends AndroidContext
 
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
-
-	private Map<String, List<IEventReceiver<?>>> eventReceivers;
-
-	/**
-	 * Listener Interface
-	 */
-	public interface AndroidContextChangeListener
-	{
-		/**
-		 * Called when an Android Context is destroyed
-		 * 
-		 * @param ctx
-		 */
-		void onContextDestroy(Context ctx);
-
-		/**
-		 * Called when an Android Context is created
-		 * 
-		 * @param ctx
-		 */
-		void onContextCreate(Context ctx);
-	}
-
-	/**
-	 * Private Constructor - Singleton
-	 */
-	private JadexAndroidContext()
-	{
-		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
-		eventReceivers = new HashMap<String, List<IEventReceiver<?>>>();
-	}
-
-	/**
-	 * Returns the Instance of this JadexAndroidContext
-	 * 
-	 */
-	public static JadexAndroidContext getInstance()
-	{
+	
+	public static JadexPlatformManager instance;
+	
+	public static JadexPlatformManager getInstance() {
 		return instance;
 	}
 
-	/**
-	 * Sets the External Access for the Jadex Platform
-	 * 
-	 * @param extAcc
-	 *            IExternalAccess
-	 */
-	private void setExternalPlattformAccess(IComponentIdentifier platformID, IExternalAccess extAcc)
+	public JadexPlatformManager()
 	{
-		runningPlatforms.put(platformID, extAcc);
+		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
+		instance = this;
 	}
 
-	/**
-	 * Returns the Jadex External Platform Access object for a random running platform
-	 * 
-	 * @param platformID
-	 * @return IExternalAccess
-	 */
-	public IExternalAccess getExternalPlatformAccess()
-	{
-		return runningPlatforms.get(getFirstRunningPlatformId());
-	}
-	
 	/**
 	 * Returns the Jadex External Platform Access object for a given platform Id
 	 * 
@@ -122,15 +73,6 @@ public class JadexAndroidContext extends AndroidContext
 	}
 
 	/**
-	 * Returns true if ANY jadex platform is running.
-	 * 
-	 */
-	public boolean isPlatformRunning()
-	{
-		return !runningPlatforms.isEmpty();
-	}
-
-	/**
 	 * Returns true if given jadex platform is running.
 	 * 
 	 */
@@ -140,77 +82,6 @@ public class JadexAndroidContext extends AndroidContext
 	}
 
 	
-
-	public void registerEventListener(String eventName, IEventReceiver<?> rec)
-	{
-		List<IEventReceiver<?>> receivers = this.eventReceivers.get(eventName);
-		if (receivers == null)
-		{
-			receivers = new ArrayList<IEventReceiver<?>>();
-			eventReceivers.put(eventName, receivers);
-		}
-		receivers.add(rec);
-	}
-
-	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException
-	{
-		boolean result = false;
-		List<IEventReceiver<?>> list = eventReceivers.get(event.getType());
-		if (list != null)
-		{
-			for (IEventReceiver<?> eventReceiver : list)
-			{
-				Class<?> eventClass = eventReceiver.getEventClass();
-				if (eventClass.equals(event.getClass()))
-				{
-					try
-					{
-						Method method = eventReceiver.getClass().getMethod("receiveEvent", eventClass);
-						method.invoke(eventReceiver, eventClass.cast(event));
-					} catch (SecurityException e)
-					{
-						e.printStackTrace();
-					} catch (NoSuchMethodException e)
-					{
-						e.printStackTrace();
-					} catch (IllegalArgumentException e)
-					{
-						e.printStackTrace();
-					} catch (IllegalAccessException e)
-					{
-						e.printStackTrace();
-					} catch (InvocationTargetException e)
-					{
-						e.printStackTrace();
-					}
-					result = true;
-				} else
-				{
-					throw new WrongEventClassException(eventReceiver.getEventClass(), event.getClass(), "");
-				}
-			}
-		}
-		return result;
-	}
-
-	public boolean unregisterEventListener(String eventName, IEventReceiver<?> rec)
-	{
-		boolean removed = false;
-		List<IEventReceiver<?>> list = eventReceivers.get(eventName);
-		if (list != null)
-		{
-			removed = list.remove(rec);
-		}
-		return removed;
-	}
-	
-	/**
-	 * Retrieves the CMS of a random running platform.
-	 */
-	public IFuture<IComponentManagementService> getCMS() {
-		return getCMS(getFirstRunningPlatformId());
-	}
-
 	/**
 	 * Retrieves the CMS of the Platform with the given ID.
 	 */
@@ -244,8 +115,12 @@ public class JadexAndroidContext extends AndroidContext
 	{
 		return startJadexPlatform(kernels, platformId, "");
 	}
+	
+	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options) {
+		return startJadexPlatform(kernels, platformId, options, true);
+	}
 
-	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
+	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options, final boolean chat)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		new Thread(new Runnable()
@@ -264,6 +139,7 @@ public class JadexAndroidContext extends AndroidContext
 				
 				final String defOptions = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -wspublish false" + " -rspublish false" + " -android true" + " -kernels "
 						+ kernelString.toString() + " -binarymessages true" +
+						" -conf jadex.platform.PlatformAgent" +
 						// " -tcptransport false" +
 						// " -niotcptransport false" +
 						// " -relaytransport true" +
@@ -277,7 +153,7 @@ public class JadexAndroidContext extends AndroidContext
 				{
 					public void resultAvailable(IExternalAccess result)
 					{
-						setExternalPlattformAccess(result.getComponentIdentifier(), result);
+						runningPlatforms.put(result.getComponentIdentifier(), result);
 						ret.setResult(result);
 					}
 
@@ -288,6 +164,20 @@ public class JadexAndroidContext extends AndroidContext
 				});
 			}
 		}).start();
+		
+//		if (chat) {
+//			ret.addResultListener(new DefaultResultListener<IExternalAccess>()
+//			{
+//
+//				@Override
+//				public void resultAvailable(IExternalAccess result)
+//				{
+//					JadexChat jadexChat = new JadexChat(result);
+//					jadexChat.start();
+//				}
+//				
+//			});
+//		}
 
 		return ret;
 	}
@@ -318,21 +208,20 @@ public class JadexAndroidContext extends AndroidContext
 //		long start = System.currentTimeMillis();
 //		long timeout = 4500;
 		runningPlatforms.get(platformID).killComponent().get(sus);
-		setExternalPlattformAccess(platformID, null);
 		runningPlatforms.remove(platformID);
 		Log.d("jadex-android", "Platform shutdown completed: " + platformID.toString());
 	}
 	
 	protected String getRandomPlatformID()
 	{
-		StringBuilder sb = new StringBuilder(getUniqueDeviceName());
+		StringBuilder sb = new StringBuilder(AndroidContextManager.getInstance().getUniqueDeviceName());
 		UUID randomUUID = UUID.randomUUID();
 		sb.append("_");
 		sb.append(randomUUID.toString().substring(0, 3));
 		return sb.toString();
 	}
 	
-	private IComponentIdentifier getFirstRunningPlatformId() {
+	public IComponentIdentifier getFirstRunningPlatformId() {
 		Set<IComponentIdentifier> platformIds = runningPlatforms.keySet();
 		if (!platformIds.isEmpty()) {
 			IComponentIdentifier next = platformIds.iterator().next();

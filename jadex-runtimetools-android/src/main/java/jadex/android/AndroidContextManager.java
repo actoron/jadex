@@ -1,10 +1,16 @@
 package jadex.android;
 
-import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 
+import jadex.android.exception.WrongEventClassException;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import android.content.Context;
@@ -13,13 +19,19 @@ import android.content.Context;
  * This Class manages Android Activity Contexts to make them available for other
  * classes.
  */
-public class AndroidContext
+public class AndroidContextManager
 {
+	// --------- attributes -----------
+	/** The last valid android context object */
 	private Context lastContext;
 
+	/** listeners of context changes */
 	private List<AndroidContextChangeListener> contextListeners;
 
+	/** set of strings to identify the device */
 	private static Set<String> identifiers;
+	
+	private Map<String, List<IEventReceiver<?>>> eventReceivers;
 
 	static
 	{
@@ -35,11 +47,47 @@ public class AndroidContext
 		identifiers.add(android.os.Build.PRODUCT.toLowerCase());
 		identifiers.add(android.os.Build.BOARD.toLowerCase());
 	}
+	
+	/**
+	 * Listener Interface
+	 */
+	public interface AndroidContextChangeListener
+	{
+		/**
+		 * Called when an Android Context is destroyed
+		 * 
+		 * @param ctx
+		 */
+		void onContextDestroy(Context ctx);
+
+		/**
+		 * Called when an Android Context is created
+		 * 
+		 * @param ctx
+		 */
+		void onContextCreate(Context ctx);
+	}
+	
+	private static final AndroidContextManager instance = new AndroidContextManager();
+	
+	/**
+	 * Returns the Instance of this JadexAndroidContext
+	 * 
+	 */
+	public static AndroidContextManager getInstance()
+	{
+		return instance;
+	}
 
 	// -------- constructors --------
-	public AndroidContext()
+	
+	/**
+	 * Private Constructor - Singleton
+	 */
+	private AndroidContextManager()
 	{
 		contextListeners = new ArrayList<AndroidContextChangeListener>();
+		eventReceivers = new HashMap<String, List<IEventReceiver<?>>>();
 	}
 
 	/**
@@ -97,7 +145,7 @@ public class AndroidContext
 		l.onContextDestroy(lastContext);
 	}
 
-	protected String getUniqueDeviceName()
+	public String getUniqueDeviceName()
 	{
 
 		StringBuilder sb = new StringBuilder();
@@ -139,6 +187,69 @@ public class AndroidContext
 				l.onContextCreate(ctx);
 			}
 		}
+	}
+	
+	public void registerEventListener(String eventName, IEventReceiver<?> rec)
+	{
+		List<IEventReceiver<?>> receivers = this.eventReceivers.get(eventName);
+		if (receivers == null)
+		{
+			receivers = new ArrayList<IEventReceiver<?>>();
+			eventReceivers.put(eventName, receivers);
+		}
+		receivers.add(rec);
+	}
+
+	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException
+	{
+		boolean result = false;
+		List<IEventReceiver<?>> list = eventReceivers.get(event.getType());
+		if (list != null)
+		{
+			for (IEventReceiver<?> eventReceiver : list)
+			{
+				Class<?> eventClass = eventReceiver.getEventClass();
+				if (eventClass.equals(event.getClass()))
+				{
+					try
+					{
+						Method method = eventReceiver.getClass().getMethod("receiveEvent", eventClass);
+						method.invoke(eventReceiver, eventClass.cast(event));
+					} catch (SecurityException e)
+					{
+						e.printStackTrace();
+					} catch (NoSuchMethodException e)
+					{
+						e.printStackTrace();
+					} catch (IllegalArgumentException e)
+					{
+						e.printStackTrace();
+					} catch (IllegalAccessException e)
+					{
+						e.printStackTrace();
+					} catch (InvocationTargetException e)
+					{
+						e.printStackTrace();
+					}
+					result = true;
+				} else
+				{
+					throw new WrongEventClassException(eventReceiver.getEventClass(), event.getClass(), "");
+				}
+			}
+		}
+		return result;
+	}
+
+	public boolean unregisterEventListener(String eventName, IEventReceiver<?> rec)
+	{
+		boolean removed = false;
+		List<IEventReceiver<?>> list = eventReceivers.get(eventName);
+		if (list != null)
+		{
+			removed = list.remove(rec);
+		}
+		return removed;
 	}
 
 }

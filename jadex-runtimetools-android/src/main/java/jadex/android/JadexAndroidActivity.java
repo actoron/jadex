@@ -1,8 +1,11 @@
 package jadex.android;
 
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
+import jadex.android.service.IJadexPlatformBinder;
+import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -20,6 +23,14 @@ import jadex.commons.transformation.annotations.Classname;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Activity;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+
 /**
  * This is an Android Activity Class which provides needed Functionality and
  * comfort Features for Jadex Android Activities. It MUST be extended by every
@@ -27,47 +38,61 @@ import java.util.Map;
  * 
  * @author Julian Kalinowski
  */
-public class JadexAndroidActivity extends ContextProvidingActivity
+public class JadexAndroidActivity extends Activity implements ServiceConnection
 {
 
-	private JadexAndroidContext jadexAndroidContext;
+	private Intent serviceIntent;
+	private IJadexPlatformBinder platformService;
+	protected IComponentIdentifier platformId;
 
-	public JadexAndroidActivity()
+	protected void onCreate(Bundle savedInstanceState)
 	{
-		super();
-		jadexAndroidContext = JadexAndroidContext.getInstance();
+		super.onCreate(savedInstanceState);
+		serviceIntent = new Intent(this, JadexPlatformService.class);
+		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
 	}
 
-//	/**
-//	 * Returns the External Access Object of the Jadex Platform.
-//	 * 
-//	 * @return {@link IExternalAccess}
-//	 */
-//	public IExternalAccess getExternalPlatformAccess() throws JadexAndroidPlatformNotStartedError
-//	{
-//		checkIfJadexIsRunning("getExternalPlatformAccess()");
-//		return jadexAndroidContext.getExternalPlattformAccess();
-//	}
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		unbindService(this);
+	}
+
+	// /**
+	// * Returns the External Access Object of the Jadex Platform.
+	// *
+	// * @return {@link IExternalAccess}
+	// */
+	// public IExternalAccess getExternalPlatformAccess() throws
+	// JadexAndroidPlatformNotStartedError
+	// {
+	// checkIfJadexIsRunning("getExternalPlatformAccess()");
+	// return jadexAndroidContext.getExternalPlattformAccess();
+	// }
 
 	protected boolean isJadexPlatformRunning()
 	{
-		return jadexAndroidContext.isPlatformRunning();
+		if (platformService != null) {
+			return platformService.isPlatformRunning(platformId);
+		} else {
+			return false;
+		}
 	}
-	
+
 	protected boolean isJadexPlatformRunning(IComponentIdentifier platformId)
 	{
-		return jadexAndroidContext.isPlatformRunning(platformId);
-	}
-	
-	protected JadexAndroidContext getJadexContext() {
-		return jadexAndroidContext;
+		if (platformService != null) {
+			return platformService.isPlatformRunning(platformId);
+		} else {
+			return false;
+		}
 	}
 
 	protected IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
 	{
 		checkIfJadexIsRunning("startMicroAgent()");
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		jadexAndroidContext.getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 
 			public void resultAvailable(IComponentManagementService cms)
@@ -86,7 +111,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 	{
 		checkIfJadexIsRunning("startBPMNAgent()");
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		jadexAndroidContext.getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 
 			public void resultAvailable(IComponentManagementService cms)
@@ -103,12 +128,12 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 
 	protected void registerEventReceiver(String eventName, IEventReceiver<?> rec)
 	{
-		jadexAndroidContext.registerEventListener(eventName, rec);
+		platformService.registerEventListener(eventName, rec);
 	}
 
 	protected void unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
 	{
-		jadexAndroidContext.unregisterEventListener(eventName, rec);
+		platformService.unregisterEventListener(eventName, rec);
 	}
 
 	/**
@@ -122,7 +147,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 	protected Future<Void> sendMessage(final Map<String, Object> message, IComponentIdentifier receiver)
 	{
 		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
-		IComponentIdentifier cid = jadexAndroidContext.getExternalPlatformAccess().getComponentIdentifier();
+		IComponentIdentifier cid = platformId;
 		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
 		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE, receiver);
 	}
@@ -144,42 +169,16 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 		{
 			public void resultAvailable(IMessageService ms)
 			{
-				ms.sendMessage(message, type, jadexAndroidContext.getExternalPlatformAccess().getComponentIdentifier(), null, receiver, null).addResultListener(
-						new DelegationResultListener<Void>(ret));
+				ms.sendMessage(message, type, platformId, null, receiver, null).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 
 		return ret;
 	}
 
-//	protected IFuture<IExternalAccess> startJadexPlatform()
-//	{
-//		return jadexAndroidContext.startJadexPlatform();
-//	}
-//
-//	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels)
-//	{
-//		return jadexAndroidContext.startJadexPlatform(kernels);
-//	}
-//
-//	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId)
-//	{
-//		return jadexAndroidContext.startJadexPlatform(kernels, platformId);
-//	}
-//
-//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
-//	{
-//		return jadexAndroidContext.startJadexPlatform(kernels, platformId, options);
-//	}
-//
-//	public void shutdownJadexPlatform(IComponentIdentifier platformId)
-//	{
-//		jadexAndroidContext.shutdownJadexPlatform(platformId);
-//	}
-
 	private void checkIfJadexIsRunning(String caller)
 	{
-		if (!jadexAndroidContext.isPlatformRunning())
+		if (!platformService.isPlatformRunning(platformId))
 		{
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}
@@ -187,7 +186,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 
 	private IFuture<IMessageService> getMS()
 	{
-		return jadexAndroidContext.getExternalPlatformAccess().scheduleStep(new IComponentStep<IMessageService>()
+		return platformService.getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<IMessageService>()
 		{
 			@Classname("create-component")
 			public IFuture<IMessageService> execute(IInternalAccess ia)
@@ -200,5 +199,63 @@ public class JadexAndroidActivity extends ContextProvidingActivity
 			}
 		});
 	}
+
+	public void onServiceConnected(ComponentName name, IBinder service)
+	{
+		platformService = (IJadexPlatformBinder) service;
+		onPlatformStarting();
+		IFuture<IExternalAccess> platform = startPlatform(platformService);
+		platform.addResultListener(new DefaultResultListener<IExternalAccess>()
+		{
+
+			@Override
+			public void resultAvailable(IExternalAccess result)
+			{
+				onPlatformStarted(result);
+			}
+
+		});
+	}
+
+	public void onServiceDisconnected(ComponentName name)
+	{
+		platformService = null;
+	}
+
+	
+	/**
+	 * Terminates a given Jadex platform.
+	 * @param platformID Identifier of the platform to terminate
+	 */
+	public void shutdownJadexPlatform(IComponentIdentifier platformID) {
+		platformService.shutdownJadexPlatform(platformID);
+	}
+	
+
+	/**
+	 * Starts the jadex Platform.
+	 * Override to use your own options (use platformService.startJadexPlatform()).
+	 * @param platformService
+	 * @return external access of the running platform
+	 */
+	protected IFuture<IExternalAccess> startPlatform(IJadexPlatformBinder platformService)
+	{
+		return platformService.startJadexPlatform();
+	}
+	
+	/**
+	 * Called right before the platform startup.
+	 */
+	protected void onPlatformStarting() {}
+	
+	/**
+	 * Called right after the platform is started.
+	 * @param result The external access to the platform
+	 */
+	protected void onPlatformStarted(IExternalAccess result)
+	{
+		this.platformId = result.getComponentIdentifier();
+	}
+
 
 }

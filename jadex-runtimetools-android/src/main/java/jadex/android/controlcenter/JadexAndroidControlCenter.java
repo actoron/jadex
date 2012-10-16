@@ -1,9 +1,11 @@
 package jadex.android.controlcenter;
 
-import jadex.android.JadexAndroidContext;
+import jadex.android.AndroidContextManager;
 import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
 import jadex.android.controlcenter.settings.ISettings;
+import jadex.android.controlcenter.settings.ServiceConnectingPreferenceActivity;
+import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -25,8 +27,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
@@ -53,20 +57,20 @@ import android.widget.ListView;
  * -screens)
  * 
  * Can be instanciated by creating an Intent an passing the ComponentIdentifier
- * of the Platform to be configured as Extra with the Key: 
+ * of the Platform to be configured as Extra with the Key:
  * JadexAndroidControlCenter.EXTRA_PLATFORMID
  */
-public class JadexAndroidControlCenter extends PreferenceActivity
+public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivity
 {
 
 	private static final String EXTRA_PLATFORMID = "platformId";
 	private static final String EXTRA_SHOWCHILDPREFSCREEN = "showChildPrefScreen";
 	private static final String EXTRA_SETTINGSKEY = "settingsKey";
-//	private SharedPreferences sharedPreferences;
+	// private SharedPreferences sharedPreferences;
 	private PreferenceCategory servicesCat;
 	private PreferenceCategory componentsCat;
 	private ISettings displayedChildSettings;
-	
+
 	/** The platformID to display preferences for */
 	private IComponentIdentifier platformId;
 
@@ -81,15 +85,66 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+
 		Serializable platformId = getIntent().getSerializableExtra(EXTRA_PLATFORMID);
-		if (platformId == null) {
+		this.platformId = platformId != null ? (IComponentIdentifier) platformId : null;
+	}
+
+	@Override
+	public void onServiceConnected(ComponentName name, IBinder service)
+	{
+		super.onServiceConnected(name, service);
+		if (platformId == null)
+		{
 			Log.d("jadex-android", "ControlCenter: No platformId passed, using a random started platform...");
-			this.platformId = JadexAndroidContext.getInstance().getExternalPlatformAccess().getComponentIdentifier();
-		} else {
+			// TODO remove
+			this.platformId = null;
+		} else
+		{
 			this.platformId = (IComponentIdentifier) platformId;
 		}
-		
+		createView();
+	}
+
+	@Override
+	public void onServiceDisconnected(ComponentName name)
+	{
+		super.onServiceDisconnected(name);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		super.onCreateOptionsMenu(menu);
+		if (displayedChildSettings != null)
+		{
+			// child functionality
+			return displayedChildSettings.onCreateOptionsMenu(menu);
+		} else
+		{
+			// main functionality
+			menu.add("Refresh");
+			return true;
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if (displayedChildSettings != null)
+		{
+			// child functionality
+			return displayedChildSettings.onOptionsItemSelected(item);
+		} else
+		{
+			// main functionality
+			refreshControlCenter();
+			return true;
+		}
+	}
+
+	private void createView()
+	{
 		// Are we displaying Preferences for a child Prefscreen?
 		if (getIntent().getBooleanExtra(EXTRA_SHOWCHILDPREFSCREEN, false))
 		{
@@ -130,37 +185,6 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 			}
 		});
 	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		super.onCreateOptionsMenu(menu);
-		if (displayedChildSettings != null)
-		{
-			// child functionality
-			return displayedChildSettings.onCreateOptionsMenu(menu);
-		} else
-		{
-			// main functionality
-			menu.add("Refresh");
-			return true;
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		if (displayedChildSettings != null)
-		{
-			// child functionality
-			return displayedChildSettings.onOptionsItemSelected(item);
-		} else
-		{
-			// main functionality
-			refreshControlCenter();
-			return true;
-		}
-	}
 
 	/**
 	 * Creates the root preference Hierarchy.
@@ -194,10 +218,10 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 		childSettings.clear();
 		addDummyPrefs();
 
-		if (JadexAndroidContext.getInstance().isPlatformRunning(platformId))
+		if (platformService.isPlatformRunning(platformId))
 		{
 			// get all viewable services
-			IExternalAccess extAcc = JadexAndroidContext.getInstance().getExternalPlatformAccess(platformId);
+			IExternalAccess extAcc = platformService.getExternalPlatformAccess(platformId);
 
 			IServiceProvider sp = extAcc.getServiceProvider();
 			ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
@@ -247,8 +271,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 										{
 											public void resultAvailable(final IExternalAccess acc)
 											{
-												Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
-														getClassLoader());
+												Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS, getClassLoader());
 
 												final Class<?> clazz = getGuiClass(clid);
 
@@ -298,9 +321,7 @@ public class JadexAndroidControlCenter extends PreferenceActivity
 
 	protected boolean addServiceSettings(PreferenceGroup root, IService service)
 	{
-		final Object clid = service.getPropertyMap() != null
-				? service.getPropertyMap().get(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS)
-				: null;
+		final Object clid = service.getPropertyMap() != null ? service.getPropertyMap().get(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS) : null;
 		Class<?> guiClass = getGuiClass(clid);
 		if (guiClass != null)
 		{
