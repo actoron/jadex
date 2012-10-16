@@ -150,10 +150,10 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity
 	};
 
 	@Override
-	protected IFuture<IExternalAccess> startPlatform(IJadexPlatformBinder platformService)
+	protected IFuture<IExternalAccess> onPlatformStart(IJadexPlatformBinder platformService)
 	{
 		textView.setText(R.string.starting);
-		return super.startPlatform(platformService);
+		return super.onPlatformStart(platformService);
 	}
 
 	@Override

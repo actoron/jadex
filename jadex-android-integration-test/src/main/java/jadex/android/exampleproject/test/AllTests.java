@@ -1,4 +1,4 @@
-package jadex.android.application.demo.test;
+package jadex.android.exampleproject.test;
 
 import android.test.suitebuilder.TestSuiteBuilder;
 import junit.framework.Test;

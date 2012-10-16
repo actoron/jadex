@@ -120,7 +120,7 @@
 					</sdk>
 					<extensions>true</extensions>
 					<test>
-						<instrumentationPackage>jadex.android.application.demo.test
+						<instrumentationPackage>jadex.android.exampleproject.test
 						</instrumentationPackage>
 						<instrumentationRunner>android.test.InstrumentationTestRunner
 						</instrumentationRunner>
