@@ -12,10 +12,13 @@ import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.IPlan;
+import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentStep;
@@ -213,6 +216,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 																} else if (elementType.equals(AgentElementType.BDI_GOAL.toString())) {
 																	processBDIGoal(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
 																} else if (elementType.equals(AgentElementType.BDI_PLAN.toString())) {
+																	processBDIPlan(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
 																	System.out.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  " + elementId + " for "
 																			+ exta.getComponentIdentifier().getName() + " Currently unable to process IPlan due limits of used jadex-version");
 																} else if (elementType.equals(AgentElementType.INTERNAL_EVENT.toString())) {
@@ -305,6 +309,50 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 					g.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
 				}
 				base.dispatchTopLevelGoal(g);
+
+			} else {
+				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
+			}
+		}
+	}
+	
+	/**
+	 * Process the perception for an {@link AgentElementType#BDI_PLAN}.
+	 * 
+	 * @param dci
+	 * @param bia
+	 * @param elementId
+	 * @param exta
+	 * @param coordinationSpaceObj
+	 * @param ae
+	 * @param receivedParamDataMappings
+	 */
+	private void processBDIPlan(CoordinationInformation dci, IBDIInternalAccess bia, String elementId, IExternalAccess exta, ISpaceObject coordinationSpaceObj, AgentElement ae,
+			HashMap<String, Object> receivedParamDataMappings) {
+		if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE)) {
+			IPlan[] plans = bia.getPlanbase().getPlans(elementId);
+			plans[plans.length - 1].abortPlan();
+
+			System.out.println("#BDICoordInfInterpreter# Removed PLAN from PLANBASE : " + elementId + " for " + exta.getComponentIdentifier().getName());
+		} else {
+			ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+			IOAVState state = extaFly.getState();
+			Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_plans, scope[0])) {
+//				IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
+				IPlanbase base = PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
+//				IGoal g = base.createGoal(elementId);
+				
+
+				
+				
+				//TODO: Continue here!!!!
+//				IPlan p = base. createPlan(elementId);
+//				for (ParameterMapping pm : ae.getParameter_mappings()) {
+//					g.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
+//				}
+//				base.dispatchTopLevelGoal(g);
 
 			} else {
 				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);

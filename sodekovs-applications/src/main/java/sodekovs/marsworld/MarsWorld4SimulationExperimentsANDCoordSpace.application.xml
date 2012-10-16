@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <H3>This MarsWorld is an enhanced version of the standard version used in the package sodekovs-simulationscontrol. It uses the CoordinationSpace for Coordination between the agents instead of the AGRSpace used previously.<br> -->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace" xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-agrspace 
+	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
+	name="MarsWorld4SimulationExperimentsANDCoordSpace" package="sodekovs.marsworld">
+
+	<imports>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
+		<import>java.text.SimpleDateFormat</import>
+		<import>java.util.Date</import>		
+		<import>sodekovs.marsworld.carry.*</import>
+		<import>sodekovs.marsworld.producer.*</import>
+		<import>sodekovs.marsworld.sentry.*</import>
+		<import>sodekovs.marsworld.movement.*</import>		
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.simulation.environment.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>java.util.HashMap</import>
+		<import>java.lang.*</import>		
+		<import>deco4mas.distributed.coordinate.environment.*</import>						
+	</imports>
+
+	<arguments>
+		<!-- The mission time. -->
+		<argument name="tmp_mission_time" class="String">"Init"</argument>
+		<argument name="tmp_start_time" class="long"></argument>
+		<argument name="al" class="int">new Integer(258)</argument>
+		<argument name="simulationFacts" class="Map" />
+		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
+		<argument name="SentryNumber" class="int">new Integer(10)</argument>
+		<argument name="Experiment_id" class="String">"not set"</argument>
+		<argument name="walkingStrategy" class="int">new Integer(0)</argument>		
+		<!--Context ID. Required for MASDynamics respectice distributed coordination. -->
+		<argument name="CoordinationContextID" class="String">"marsworld-distributed"</argument>
+	</arguments>
+	 
+	<extensiontypes>
+		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">					
+				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/marsworld/coordination/MarsWorldCoordination.dynamics.xml"</env:property>				
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+
+		<env:envspacetype name="2dspace" class="ContinuousSpace2D"
+			width="1" height="1">
+			<env:objecttypes>
+				<env:objecttype name="target">
+					<env:property name="ore">0</env:property>
+					<env:property name="capacity">0</env:property>
+					<env:property name="state">"unknown"</env:property>
+				</env:objecttype>
+				<env:objecttype name="sentry">
+					<env:property name="vision">0.07</env:property>
+					<env:property name="speed">0.05</env:property>
+					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="producer">
+					<env:property name="vision">0.07</env:property>
+					<env:property name="speed">0.1</env:property>
+					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="carry">
+					<env:property name="vision">0.07</env:property>
+					<env:property name="speed">0.15</env:property>
+					<env:property name="ore">0</env:property>
+					<env:property name="capacity">20</env:property>
+					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="homebase">
+					<env:property name="ore">0</env:property>
+					<env:property name="start_time">$args.tmp_start_time</env:property>
+					<!-- <env:property name="duration" dynamic="true">$object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime() 
+						- $object.getProperty("start_time")</env:property> -->
+					<env:property name="duration" dynamic="true">$properties.clock.getTime()-$object.getProperty("start_time")</env:property>
+					<env:property name="text" dynamic="true">"Collected ore:"+$object.getProperty("ore")+" \n"+ "Experiment duration: "+new	SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("duration"))))</env:property>
+					<!-- <env:property name="text" dynamic="false">"Only test showing argument: 
+						" + $args.tmp_mission_time</env:property> -->
+				</env:objecttype>
+
+				<!-- TMP_HACK -->
+				<env:objecttype name="experimentID">
+					<env:property name="experimentID">$args.Experiment_id</env:property>
+				</env:objecttype>
+				<!-- TMP_HACK: Needed in order to able to find the IComponentIdentifier 
+					for this agent from the space. Used within the DeltaTimeExecutor4Simulation. -->
+				<env:objecttype name="clientSimulator" />
+				
+				<!-- Trace object. Depicts the way an agent has walked on. -->
+				<env:objecttype name="trace">					
+					<env:property name="position" dynamic="true">$space.getRandomPosition(Vector2Int.ZERO)</env:property>
+				</env:objecttype>
+				
+				<!-- WalkingStrategy: Are the agents walking:
+				a)"randomly", without remembering already visited positions. 
+				b)"randomlyWithMemory", randomly, with remembering already visited positions.
+				c)"randomlyWithMemoryWithGroup", randomly, with remembering already visited positions AND producer is calling carry as soon as he is informed AND Sentry is calling closest producer. 
+				DEFAULT: "randomly"
+				!!!!Confer WalkingStrategyEnum for Mapping of int values to semantics. -->
+				<env:objecttype name="walkingStrategy">					
+					<env:property name="strategy">$args.walkingStrategy</env:property>
+				</env:objecttype>
+
+			</env:objecttypes>
+
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Sentry"
+					objecttype="sentry" />
+				<env:avatarmapping componenttype="Producer"
+					objecttype="producer" />
+				<env:avatarmapping componenttype="Carry"
+					objecttype="carry" />
+				<env:avatarmapping componenttype="ClientSimulator"
+					objecttype="clientSimulator" />
+			</env:avatarmappings>
+
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
+				<env:tasktype name="produce" class="ProduceOreTask" />
+				<env:tasktype name="load" class="LoadOreTask" />
+			</env:tasktypes>
+
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+			</env:dataviews>
+
+			<env:perspectives>
+				<env:perspective name="icons" class="Perspective2D"
+					opengl="false">
+
+					<!-- Target -->
+					<env:drawable objecttype="target" width="0.1" height="0.1">
+						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
+						<env:property name="oreposition" dynamic="true">new Vector2Double(-0.5,0.1-Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0)/2)</env:property>
+						<env:ellipse layer="0" width="0.2" height="0.2" color="#C8000096">
+							<env:drawcondition>!$object.getProperty("state").equals("analyzed") || $object.getProperty("ore")!=0</env:drawcondition>
+						</env:ellipse>
+						<env:ellipse layer="0" width="0.2" height="0.2" color="#32323296">
+							<env:drawcondition>$object.getProperty("state").equals("analyzed")&amp;&amp; $object.getProperty("ore")==0</env:drawcondition>
+							</env:ellipse>
+						<env:texturedrectangle layer="1" height="0.5"
+							width="0.25" x="0.11" y="-0.24"
+							imagepath="jadex/simulation/examples/marsworld/images/flag.png">
+							<env:drawcondition>$object.getProperty("state").equals("analyzed")&amp;&amp;($object.getProperty("ore")!=0 ||$object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:texturedrectangle>
+						<env:text layer="2" x="0.02" y="-0.01" size="8" font="Arial"
+							abssize="true" text="ore: $ore$\ncapacity: $capacity$" align="left"
+							color="black">
+							<env:drawcondition>$object.getProperty("state").equals("analyzed")</env:drawcondition>
+						</env:text>
+						<env:texturedrectangle layer="1" size="oresize"
+							position="oreposition" imagepath="jadex/simulation/examples/marsworld/images/ore.png">
+							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
+						</env:texturedrectangle>
+					</env:drawable>
+
+					<!-- Homebase -->
+					<env:drawable objecttype="homebase" width="0.14"
+						height="0.12">
+						<env:property name="visitedPos" dynamic="true">new HashMap()</env:property>
+						<env:property name="oresize" dynamic="true">new	Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
+						<env:property name="oreposition" dynamic="true">new	Vector2Double(0,0.3-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
+						<env:rectangle layer="1" width="1" height="1"
+							color="#1e1e1e46" />
+						<env:text layer="2" x="-0.07" y="0.09" size="8" font="Arial"
+							abssize="true" text="$text$" align="left" color="black" />
+						<env:texturedrectangle layer="1" size="oresize"
+							position="oreposition" imagepath="jadex/simulation/examples/marsworld/images/ore.png">
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:texturedrectangle>
+					</env:drawable>
+
+					<!-- Sentry -->
+					<env:drawable objecttype="sentry" width="0.07" height="0.07">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:ellipse layer="1" size="visionsize" abssize="true"
+							color="#FAFA1E32" />
+						<env:texturedrectangle layer="2"
+							imagepath="sodekovs/marsworld/images/sentry.png" />
+					</env:drawable>
+
+					<!-- Producer -->
+					<env:drawable objecttype="producer" width="0.07"
+						height="0.07">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:ellipse layer="1" size="visionsize" abssize="true"
+							color="#FAFA1E32" />
+						<env:texturedrectangle layer="2"
+							imagepath="sodekovs/marsworld/images/producer.png" />
+					</env:drawable>
+
+					<!-- Carry -->
+					<env:drawable objecttype="carry" width="0.07" height="0.07">
+						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						<env:ellipse layer="1" size="visionsize" abssize="true"
+							color="#FAFA1E32" />
+						<env:texturedrectangle layer="2"
+							imagepath="sodekovs/marsworld/images/carry.png" />
+						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
+						<env:property name="oreposition" dynamic="true">new Vector2Double(0.3,-0.08-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
+						<env:texturedrectangle layer="1" size="oresize"
+							position="oreposition" imagepath="sodekovs/marsworld/images/ore.png">
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:texturedrectangle>
+					</env:drawable>
+
+					<!-- Trace -->					
+					<env:drawable objecttype="trace" width="0.1"
+						height="0.1">
+						<env:property name="size" dynamic="true">new Vector2Double(0.1,0.1)</env:property>
+						<env:texturedrectangle layer="1" size="size"
+							imagepath="sodekovs/marsworld/images/ore.png"/>
+					</env:drawable>
+					
+					<env:prelayers>
+						<env:tiledlayer width="0.6" height="0.6"
+							imagepath="sodekovs/marsworld/images/mars.png" />
+					</env:prelayers>
+				</env:perspective>
+			</env:perspectives>
+
+			<!-- executor -->
+			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">
+				<!-- <env:spaceexecutor class="DeltaTimeExecutor"> -->
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+		<componenttype name="Sentry"
+			filename="sodekovs/marsworld/sentry/Sentry.agent.xml" />
+		<componenttype name="Producer"
+			filename="sodekovs/marsworld/producer/Producer.agent.xml" />
+		<componenttype name="Carry"
+			filename="sodekovs/marsworld/carry/Carry.agent.xml" />
+		<componenttype name="ClientSimulator"
+			filename="jadex/simulation/client/ClientSimulator.agent.xml" />
+	</componenttypes>
+
+
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($component.getServiceProvider(),
+			IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM)
+		</property>
+	</properties>
+
+	<configurations>
+		<configuration name="StandardConfiguation">
+			<extensions>
+			<!-- The CoordinationSpace -->
+			<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
+			
+				<!-- <env:envspace name="my2dspace" type="2dspace"> -->
+				<env:envspace name="my2dspace" type="2dspace" width="1"
+					height="1">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="space">$space</env:property>
+							<env:property name="missiontime">7000000 +$properties.clock.getTime()</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
+							<env:property name="ore">20</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.05, 0.7)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.5, 0.6)</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.7, 0.4)</env:property>
+							<env:property name="ore">10</env:property>
+							<!-- <env:property name="ore">$args.al</env:property> -->
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
+							<env:property name="ore">25</env:property>
+						</env:object>
+
+						<!-- TMP-HACK! -->
+						<env:object type="experimentID">
+							<env:property name="experimentID">$args.Experiment_id</env:property>
+						</env:object>
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
+						</env:object>
+
+					</env:objects>
+
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all"
+							perspective="icons">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="$args.NumberOfSentries" />
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />			
+			</components>
+		</configuration>
+	</configurations>
+
+</applicationtype>

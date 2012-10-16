@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MASDynamic name="marsWorldWithCoordSpace">
+	<!--
+		Responsible for the coordination within the MarsWorld.
+	-->
+
+	<!--
+		System Properties: Definitions of the behaviors that agents can adopt
+		and that makes them: - engage in coordinative activities - react to
+		coordinative activities
+	-->
+	<system_properties>
+		<role_occupations>
+			<role_occupation name="sender" multiple="false">
+				<agent id="Producer" />
+				<agent id="Carry" />
+			</role_occupation>
+			<role_occupation name="receiver" multiple="false">
+				<agent id="Sentry" />				
+			</role_occupation>
+		</role_occupations>
+	</system_properties>
+
+
+	<!--
+		Causal links: Definition of the interdependencies between
+		agent-behaviors.
+	-->
+	<causalities>
+		<deco_links>
+			<!-- The encated interdependency: -->
+			<deco_link realization="by_service" type="POSITIVE" name="send-receive" spaces="mycoordspace">
+				<froms>
+					<from>sender</from>
+				</froms>
+				<tos>
+					<to>receiver</to>
+				</tos>
+			</deco_link>
+		</deco_links>
+
+		<!-- The detailed configuration of interdependency enactment. -->
+		<deco-link-realizations>
+			<realization id="by_service">
+				<from>		<!-- Published behaviors / events: -->					
+					<agent_element element="informer" agent_id="Producer" type="BDI_PLAN">
+						<!-- <parameter_mappings>
+							<mapping ref="message" name="message"/>
+						</parameter_mappings> -->
+					</agent_element>
+				</from>
+				<!-- Coordination Medium configuration: -->
+				<mechanism_configuration
+					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
+					agent_type="JADEX">
+				</mechanism_configuration>
+				<to>		<!-- Behaviors / events to be triggered upon reception: -->
+					<!-- <agent_element element="receivehello" agent_id="ExampleBDI" type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping ref="message" name="message"/>
+						</parameter_mappings>
+					</agent_element> -->
+					 <agent_element element="add_target" agent_id="Sentry" type="BDI_PLAN">
+						<!-- <parameter_mappings>
+							<mapping ref="message" name="message"/>
+						</parameter_mappings> -->
+					</agent_element>
+				</to>
+			</realization>
+		</deco-link-realizations>
+	</causalities>
+</MASDynamic>
