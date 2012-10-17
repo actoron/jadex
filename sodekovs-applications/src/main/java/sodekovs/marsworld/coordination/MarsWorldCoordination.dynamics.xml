@@ -43,10 +43,10 @@
 		<deco-link-realizations>
 			<realization id="by_service">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="informer" agent_id="Producer" type="BDI_PLAN">
-						<!-- <parameter_mappings>
-							<mapping ref="message" name="message"/>
-						</parameter_mappings> -->
+					<agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEF">
+						<parameter_mappings>
+							<mapping ref="latest_target" name="target"/>
+						</parameter_mappings>
 					</agent_element>
 				</from>
 				<!-- Coordination Medium configuration: -->
@@ -60,10 +60,10 @@
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>
 					</agent_element> -->
-					 <agent_element element="add_target" agent_id="Sentry" type="BDI_PLAN">
-						<!-- <parameter_mappings>
-							<mapping ref="message" name="message"/>
-						</parameter_mappings> -->
+					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEF">
+						<parameter_mappings>
+							<mapping ref="latest_target" name="target"/>
+						</parameter_mappings>
 					</agent_element>
 				</to>
 			</realization>

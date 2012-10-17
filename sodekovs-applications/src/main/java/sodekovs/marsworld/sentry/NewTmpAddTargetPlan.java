@@ -5,18 +5,20 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 
 /**
  *  Add a new unknown target to test.
  */
-public class AddTargetPlan extends Plan
+public class NewTmpAddTargetPlan extends Plan
 {
 	//-------- constructors --------
 
 	/**
 	 *  Create a new plan.
 	 */
-	public AddTargetPlan()
+	public NewTmpAddTargetPlan()
 	{
 		getLogger().info("Created: "+this+" "+getLogger().getName());
 	}
@@ -27,21 +29,18 @@ public class AddTargetPlan extends Plan
 	 *  The plan body.
 	 */
 	public void body()
-	{
-		//System.out.println("AddPlan found");
+	{		
+		String targetID = (String) this.getBeliefbase().getBelief("latest_target").getFact();
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-		IMessageEvent req = (IMessageEvent)getReason();
-
-		ISpaceObject ot = (ISpaceObject)req.getParameter(SFipa.CONTENT).getValue();
-		ISpaceObject target = env.getSpaceObject(ot.getId());
-
-		//if(ts.length>0)
-		//	System.out.println("Sees: "+SUtil.arrayToString(ts));
+		ISpaceObject target =  env.getSpaceObject( Long.valueOf(targetID)); 
+		
+		
+		
 
 		if(target!=null&& !getBeliefbase().getBeliefSet("my_targets").containsFact(target))
 		{
-			System.out.println("#Sentry-AddTargetPlan# Found a new target: "+target);
-			getBeliefbase().getBeliefSet("my_targets").addFact(target);
+			System.out.println("#Sentry-NewAddTargetPlan# Found a new target: "+target);
+			getBeliefbase().getBeliefSet("my_targets").addFact(target);			
 		}
 	}
 }

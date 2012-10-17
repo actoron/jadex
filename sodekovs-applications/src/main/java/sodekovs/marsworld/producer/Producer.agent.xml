@@ -46,6 +46,9 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 		
+		<!-- TMP? The ID of the latest detected target. -->
+		<belief name="latest_target" class="String"/>
+		
 		<!-- HACK FOR MASDynamics!!!!! -->
 		<!--   mycoordspace -->
 		<!-- Environment. DO NOT CHANGE the name "env".-->

@@ -32,6 +32,7 @@
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>
+			
 		
 		<!--  Test for evaluation! -->
 		<belief name="myPos" class="Vector2Double" evaluationmode="push">
@@ -51,7 +52,10 @@
 		<!-- Missionend belief is used in drop condition of analyze target goal.-->
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
-		</beliefref>		
+		</beliefref>
+		
+		<!-- TMP? The ID of the latest detected target. -->
+		<belief name="latest_target" class="ISpaceObject"/>		
 	</beliefs>
 
   	<goals>
@@ -113,19 +117,6 @@
 			<deliberation cardinality="1">
 				<inhibits cref="move.walk_around"/>
 			</deliberation>
-			<!-- The goal is reached when the target is analysed. - ->
-			<!- - Target condition prevents producers from being called by sentry, because plan is aborted. - ->  
-			<targetcondition language="jcl">
-				$goal.target.state==AnalyzeTargetTask.STATE_ANALYZED
-				
-				// ?rgoal	= (goal (parameterelement_has_parameters ?param_target))
-				// ?param_target	= (parameter (parameter_has_value ?target))
-				// (beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-				// ?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
- 
-				// ?rgoal	= (goal (parameterelement_has_parameters["target"].parameter_has_value ?target))
-				// (beliefset (element_has_model.melement_has_name "analysed_targets") (beliefset_has_facts contains ?target))
- 			</targetcondition>-->
 		</achievegoal>
 	</goals>
 
@@ -146,6 +137,16 @@
 			<body class="AddTargetPlan"/>
 			<trigger>
 				<messageevent ref="target_inform"/>
+			</trigger>
+		</plan>
+		
+		<!-- TMP: Plan for MasDny until IPlan works properply -->
+		<!-- Inform sentries about new targets. -->
+		<plan name="tmpAddTargetPlan">
+			<body class="NewTmpAddTargetPlan"/>
+			<!-- Inform whenever a new fact is added to the belief  latest_target. -->
+			<trigger>
+				<factchanged ref="latest_target"/>
 			</trigger>
 		</plan>
 		
