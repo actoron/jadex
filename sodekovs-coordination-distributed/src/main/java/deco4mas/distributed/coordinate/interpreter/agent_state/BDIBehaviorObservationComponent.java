@@ -164,13 +164,16 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 			base.addPlanListener(agentElement.getElement_id(), new IPlanListener() {
 
 				public void planAdded(AgentEvent ae) {
-					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
+//					System.out.println("BDIBehObsComp# Activated planAdded listener.");
+					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);					
 				}
 
+				//TODO: Distinguish between plan finish and added in the MasDynamics. Currently only "plan added" is supported. 
 				public void planFinished(AgentEvent ae)
 
 				{
-					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
+//					System.out.println("BDIBehObsComp# Activated planFinished listener.");
+//					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
 				}
 			});
 		} else {
@@ -237,9 +240,7 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 			public IFuture<Void> execute(IInternalAccess ia) {
 				IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 				String nameOfElement = getNameOfAgentElement(ae, agentElementType);
-				// get all the DCM Realizations that have the current AgentEvent
-				// as
-				// initiator for a PUBLISH-Event
+				// get all the DCM Realizations that have the current AgentEvent as initiator for a PUBLISH-Event
 				for (String dmlRealizationName : agentEventDCMRealizationMappings.get(agentElementType.toString() + "::" + nameOfElement)) {
 					// Check whether role is active.
 					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, ae, agentElementType, bia);

@@ -238,7 +238,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 							return IFuture.DONE;
 						}
 					});
-					
+
 				}
 			});
 		}
@@ -315,7 +315,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			}
 		}
 	}
-	
+
 	/**
 	 * Process the perception for an {@link AgentElementType#BDI_PLAN}.
 	 * 
@@ -340,19 +340,16 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
 			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_plans, scope[0])) {
-//				IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
+				// IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
 				IPlanbase base = PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
-//				IGoal g = base.createGoal(elementId);
-				
+				// IGoal g = base.createGoal(elementId);
 
-				
-				
-				//TODO: Continue here!!!!
-//				IPlan p = base. createPlan(elementId);
-//				for (ParameterMapping pm : ae.getParameter_mappings()) {
-//					g.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
-//				}
-//				base.dispatchTopLevelGoal(g);
+				// TODO: Continue here!!!!
+				// IPlan p = base. createPlan(elementId);
+				// for (ParameterMapping pm : ae.getParameter_mappings()) {
+				// g.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
+				// }
+				// base.dispatchTopLevelGoal(g);
 
 			} else {
 				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);

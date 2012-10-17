@@ -64,6 +64,7 @@ public class ServiceMechanism extends CoordinationMechanism {
 						for (ICoordinationService service : result) {
 
 							if (service.getCoordinationContextID().equalsIgnoreCase(coordinationContextID)) {
+								System.out.println("#ServiceMechanism# Publishing CoordinationInformation " + ci.toString() + " using following mechanism:  " + service.toString());
 								service.publish(ci);
 							} else {
 								System.out.println("Service does not belong to context.");
