@@ -22,7 +22,6 @@ public class CountGoal
 	}
 	
 	@GoalTargetCondition
-//	@Condition("target")
 	protected boolean target(@Event("counter") int cnt)
 	{
 		return cnt==target;
