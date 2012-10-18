@@ -1,8 +1,10 @@
 package jadex.backup.resource;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -202,9 +204,9 @@ public class FileInfo
 			throw new IllegalArgumentException("Location differs: "+fi.getLocation());
 		}
 		
-		// Has not changed when
+		// Local file has not changed wrt remote when
 		// 1: hash values are equal (currently only tested for directories)
-		// 2: a locally valid time stamp is found that exists remotely as valid (no change) or invalid (changed remotely but not locally)
+		// 2: a locally valid time stamp is found for which a greater or equal time stamp exists remotely as valid or invalid
 		
 		boolean	changed	= getHash()==null || !getHash().equals(fi.getHash());
 		if(changed)
@@ -213,8 +215,10 @@ public class FileInfo
 			{
 				String node	= it.next();
 				// No match (changed stays true) when:
-				// locally invalid or abs values differ.
-				changed	= getVTime(node)<=0 || getVTime(node)!=Math.abs(fi.getVTime(node));
+				// locally invalid or abs value is larger.
+				long	local	= getVTime(node);
+				long	remote	= fi.getVTime(node);
+				changed	= local<=0 || local>Math.abs(remote);
 			}
 		}
 		
@@ -232,7 +236,10 @@ public class FileInfo
 			throw new IllegalArgumentException("Location differs: "+fi.getLocation());
 		}
 		
-		for(String node: vtimes.keySet())
+		Set<String>	nodes	= new HashSet<String>(vtimes.keySet());
+		nodes.addAll(fi.vtimes.keySet());
+		
+		for(String node: nodes)
 		{
 			if(Math.abs(getVTime(node))<Math.abs(fi.getVTime(node)))
 			{

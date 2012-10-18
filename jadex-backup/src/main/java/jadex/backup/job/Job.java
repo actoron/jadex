@@ -113,7 +113,7 @@ public abstract class Job
 	 */
 	public void setTasks(List<Task> tasks)
 	{
-		System.out.println("setTasks: Job@"+super.hashCode());
+//		System.out.println("setTasks: Job@"+super.hashCode());
 		this.tasks = tasks;
 	}
 
@@ -122,7 +122,7 @@ public abstract class Job
 	 */
 	public void addTask(Task task)
 	{
-		System.out.println("addTask: Job@"+super.hashCode());
+//		System.out.println("addTask: Job@"+super.hashCode());
 		if(tasks==null)
 			tasks = new ArrayList<Task>();
 		tasks.add(task);
