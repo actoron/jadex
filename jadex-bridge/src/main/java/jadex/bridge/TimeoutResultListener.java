@@ -216,10 +216,10 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 													Object	timer1	= timer;
 													public void timeEventOccurred(long currenttime)
 													{
-														if(timer!=timer1)
-														{
-															System.out.println("wrong timer: "+message);
-														}
+//														if(timer!=timer1)
+//														{
+//															System.out.println("wrong timer: "+message);
+//														}
 														notify.run();
 													}
 												});
@@ -232,10 +232,10 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 													Object	timer1	= timer;
 													public void timeEventOccurred(long currenttime)
 													{
-														if(timer!=timer1)
-														{
-															System.out.println("wrong timer: "+message);
-														}
+//														if(timer!=timer1)
+//														{
+//															System.out.println("wrong timer: "+message);
+//														}
 														notify.run();
 													}
 												});

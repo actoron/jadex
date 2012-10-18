@@ -45,6 +45,9 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	/** Flag that a step was scheduled. */
 	protected boolean	scheduled;
 	
+	/** The execution monitor (if any). */
+	protected IChangeListener<Object>	mon;
+	
 	//-------- constructors--------
 	
 	/**
@@ -79,7 +82,12 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		this.container	= space.getExternalAccess().getServiceProvider();
-		
+
+		if(Boolean.TRUE.equals(getProperty(PROPERTY_EXECUTION_MONITORING)!=null))
+		{
+			mon	= RoundBasedExecutor.addExecutionMonitor(space.getExternalAccess());			
+		}
+
 		SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -223,6 +231,10 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 				{
 					if(timer!=null)
 						timer.cancel();
+				}
+				if(mon!=null)
+				{
+					RoundBasedExecutor.removeExecutionMonitor(((AbstractEnvironmentSpace)getProperty("space")).getExternalAccess(), mon);
 				}
 			}
 		});

@@ -42,7 +42,7 @@ public class MemorizePositionsPlan extends Plan
 			}
 
 			//System.out.println("inc: "+SUtil.arrayToString(mps));
-			waitFor(300);
+			waitForTick();
 		}
 	}
 }

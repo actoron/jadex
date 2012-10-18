@@ -1,26 +1,32 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.extension.envsupport.dataview.IDataView;
-import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
-import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 
@@ -50,6 +56,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	
 	/** The flag indicating that the executor is terminated. */
 	protected boolean terminated;
+	
+	/** The execution monitor (if any). */
+	protected IChangeListener<Object>	mon;
 	
 	//-------- constructors--------
 	
@@ -91,6 +100,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final IServiceProvider provider	= space.getExternalAccess().getServiceProvider();
+		
+		if(Boolean.TRUE.equals(getProperty(PROPERTY_EXECUTION_MONITORING)!=null))
+		{
+			mon	= addExecutionMonitor(space.getExternalAccess());			
+		}
 
 		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
@@ -237,6 +251,87 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	{
 		terminated = true;
 		if(timer!=null)
+		{
 			timer.cancel();
+		}
+		if(mon!=null)
+		{
+			removeExecutionMonitor(((AbstractEnvironmentSpace)getProperty("space")).getExternalAccess(), mon);
+		}
+	}
+	
+	/**
+	 *  Add a listener to the clock and check if no agent is running whenever the clock advances.
+	 */
+	protected static IChangeListener<Object>	addExecutionMonitor(final IExternalAccess ea)
+	{
+		final IClockService[]	clock	= new IClockService[1];
+		final IExecutionService[]	exe	= new IExecutionService[1];
+		
+		final IChangeListener<Object>	ret	= new IChangeListener<Object>()
+		{
+			long last	= 0;
+			public void changeOccurred(ChangeEvent<Object> event)
+			{
+				long	cur	= clock[0].getTime();
+				if(cur!=last && IClock.EVENT_TYPE_NEXT_TIMEPOINT.equals(event.getType()))
+				{
+					IExecutable[]	tasks	= exe[0].getTasks();
+					for(IExecutable task: tasks)
+					{
+						// Only print warning for sub-components
+						if(task instanceof IComponentAdapter)
+						{
+							IComponentIdentifier	cid	= ((IComponentAdapter)task).getComponentIdentifier();
+							IComponentIdentifier	test	= cid;
+							while(test!=null && !test.equals(ea.getComponentIdentifier()))
+							{
+								test	= test.getParent();
+							}
+							if(test!=null)
+							{
+								System.out.println("Non-idle component at time switch: "+cid);
+							}
+						}
+					}
+				}
+				last	= cur;
+			}
+		};
+		
+		SServiceProvider.getService(ea.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IExecutionService>()
+		{
+			public void resultAvailable(IExecutionService result)
+			{
+				exe[0]	= result;
+				SServiceProvider.getService(ea.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DefaultResultListener<IClockService>()
+				{
+					public void resultAvailable(IClockService result)
+					{
+						clock[0]	= result;
+						clock[0].addChangeListener(ret);
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove the clock listener.
+	 */
+	protected static void	removeExecutionMonitor( IExternalAccess ea, final IChangeListener<Object> mon)
+	{
+		SServiceProvider.getService(ea.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IClockService>()
+		{
+			public void resultAvailable(final IClockService clock)
+			{
+				clock.removeChangeListener(mon);
+			}
+		});
 	}
 }

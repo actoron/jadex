@@ -383,7 +383,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 				}
 	
 //				System.out.println("Exit"+timers.isEmpty());
-				notifyListeners(new ChangeEvent(this, "next_timepoint"));
+				notifyListeners(new ChangeEvent(this, EVENT_TYPE_NEXT_TIMEPOINT));
 	
 				return !timers.isEmpty();
 			}
