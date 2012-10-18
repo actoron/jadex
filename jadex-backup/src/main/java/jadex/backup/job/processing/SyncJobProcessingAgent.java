@@ -246,7 +246,8 @@ public class SyncJobProcessingAgent
 			{
 //				System.out.println(result);
 				if(BackupResource.FILE_ADDED.equals(result.getType())
-//					|| BackupResource.FILE_REMOVED.equals(result.getType())
+					|| BackupResource.FILE_CONFLICT.equals(result.getType())
+					|| BackupResource.FILE_REMOVED.equals(result.getType())
 					|| BackupResource.FILE_MODIFIED.equals(result.getType()))
 				{
 					SyncTaskEntry entry = new SyncTaskEntry(task, result.getFile(), result.getType());
@@ -285,7 +286,7 @@ public class SyncJobProcessingAgent
 							if(task.getEntries()!=null && task.getEntries().size()>0)
 							{
 								// Publish modified job 
-//								System.out.println("publishing sync task");
+								System.out.println("publishing sync task: Job@"+job.hackCode());
 								job.addTask(task);
 								publishEvent(new TaskEvent(AJobProcessingEvent.TASK_ADDED, task));
 								ret.setResult(null);
@@ -355,7 +356,7 @@ public class SyncJobProcessingAgent
 	{
 		final SyncTask task = (SyncTask)t;
 		
-		System.out.println("sync agent received changed task: "+task);
+		System.out.println("sync agent received changed task: "+task+" Job@"+job.hackCode());
 		
 		List<Task> srs = job.getTasks();
 		if(srs!=null && srs.contains(task))

@@ -69,6 +69,17 @@ public class JobProcessingService implements IJobProcessingService
 	//-------- methods --------
 	
 	/**
+	 *  Get the job id.
+	 *  
+	 *  The id is static, i.e. it does not change during
+	 *  the lifetime of the job agent.
+	 */
+	public String	getJobId()
+	{
+		return pojoagent.getJob().getId();
+	}
+
+	/**
 	 *  Get the job of this service.
 	 */
 	public IFuture<Job> getJob()

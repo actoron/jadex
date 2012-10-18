@@ -220,18 +220,18 @@ public class BackupResource
 		}
 	}
 	
-	/**
-	 *  Check if the resource needs to be updated when compared to the given time stamps.
-	 *  When no update is needed, additional time stamps (if any) are merged into the stored meta information.
-	 *  @param fi	The file info data to be compared with the local state.
-	 *  @return	True, when the local file needs updating.
-	 *  @throws Exception when a conflict was found.
-	 */
-	public boolean	needsUpdate(FileInfo fi)
-	{
-		String ret = getState(fi);
-		return FILE_ADDED.equals(ret) || FILE_MODIFIED.equals(ret);
-	}
+//	/**
+//	 *  Check if the resource needs to be updated when compared to the given time stamps.
+//	 *  When no update is needed, additional time stamps (if any) are merged into the stored meta information.
+//	 *  @param fi	The file info data to be compared with the local state.
+//	 *  @return	True, when the local file needs updating.
+//	 *  @throws Exception when a conflict was found.
+//	 */
+//	public boolean	needsUpdate(FileInfo fi)
+//	{
+//		String ret = getState(fi);
+//		return FILE_ADDED.equals(ret) || FILE_MODIFIED.equals(ret);
+//	}
 	
 	/**
 	 * 
@@ -250,7 +250,7 @@ public class BackupResource
 			if(fi.isNewerThan(local))
 			{
 				// When changed: check for conflict (hack? only for files)
-				if(!local.isDirectory() && local.isNewerThan(fi))
+				if(!local.isDirectory() && !local.isNewerThan(fi))
 				{
 					ret = FILE_MODIFIED;
 				}
@@ -266,6 +266,8 @@ public class BackupResource
 			}
 		}
 		
+//		System.out.println("state: "+ret+", "+fi.getLocation());
+		
 		return ret;
 	}
 
@@ -276,18 +278,19 @@ public class BackupResource
 	 */
 	public File	getTempLocation(String path, IResourceService remote)
 	{
-		return new File(root, remote.getLocalId()+"_"+path.replace('/', '_'));
+		File	meta	= new File(root, ".jadexbackup");
+		return new File(meta, remote.getLocalId()+"_"+path.replace('/', '_'));
 	}
 
 	/**
 	 *  Update a file with a new version.
 	 *  @param fi	The remote file info.
 	 *  @param tmp	The new file already downloaded to a temporary location.
-	 *  @throws Exception when a conflict was detected.
 	 */
 	public void	updateFile(FileInfo fi, File tmp)
 	{
-		if(needsUpdate(fi))
+		// todo: Exception when a conflict was detected?
+//		if(needsUpdate(fi))
 		{
 			// Todo: all this should be atomic (how?)
 			File	orig	= getFile(fi.getLocation());
@@ -310,10 +313,10 @@ public class BackupResource
 			}
 			save();
 		}
-		else
-		{
-			tmp.delete();
-		}
+//		else
+//		{
+//			tmp.delete();
+//		}
 	}
 
 	

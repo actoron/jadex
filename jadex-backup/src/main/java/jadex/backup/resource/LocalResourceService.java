@@ -292,14 +292,14 @@ public class LocalResourceService	implements ILocalResourceService
 					{
 						updateDirectory(remote, ret, stack, top.getFileInfo());
 					}
-					else if(rpa.getResource().needsUpdate(top.getFileInfo()))
+					else //if(rpa.getResource().needsUpdate(top.getFileInfo()))
 					{
 						updateFile(remote, ret, stack, top.getFileInfo());
 					}
-					else
-					{
-						doUpdate(remote, ret, stack);
-					}
+//					else
+//					{
+//						doUpdate(remote, ret, stack);
+//					}
 				}
 				catch(Exception e)
 				{
@@ -344,9 +344,7 @@ public class LocalResourceService	implements ILocalResourceService
 	}
 	
 	/**
-	 *  Update a file.
-	 *  Downloads the file to a temporary location.
-	 *  Afterwards renames the file and updates the meta information.
+	 *  Add a file update event.
 	 */
 	protected void	updateFile(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack, final FileInfo fi)
 	{
@@ -357,7 +355,9 @@ public class LocalResourceService	implements ILocalResourceService
 	}
 	
 	/**
-	 * 
+	 *  Update a file.
+	 *  Downloads the file to a temporary location.
+	 *  Afterwards renames the file and updates the meta information.
 	 */
 	public ISubscriptionIntermediateFuture<BackupEvent> updateFile(final IResourceService remote, final FileInfo fi)
 	{

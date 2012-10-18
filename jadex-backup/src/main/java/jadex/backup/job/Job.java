@@ -113,6 +113,7 @@ public abstract class Job
 	 */
 	public void setTasks(List<Task> tasks)
 	{
+		System.out.println("setTasks: Job@"+super.hashCode());
 		this.tasks = tasks;
 	}
 
@@ -121,6 +122,7 @@ public abstract class Job
 	 */
 	public void addTask(Task task)
 	{
+		System.out.println("addTask: Job@"+super.hashCode());
 		if(tasks==null)
 			tasks = new ArrayList<Task>();
 		tasks.add(task);
@@ -159,5 +161,10 @@ public abstract class Job
 	public boolean equals(Object obj)
 	{
 		return obj instanceof Job && ((Job)obj).getId().equals(getId()); 
+	}
+	
+	public int	hackCode()
+	{
+		return super.hashCode();
 	}
 }

@@ -14,6 +14,14 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 public interface IJobProcessingService
 {
 	/**
+	 *  Get the job id.
+	 *  
+	 *  The id is static, i.e. it does not change during
+	 *  the lifetime of the job agent.
+	 */
+	public String	getJobId();
+
+	/**
 	 *  Get the job of this service.
 	 */
 	public IFuture<Job> getJob();

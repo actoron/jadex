@@ -7,10 +7,17 @@ import jadex.rules.eca.annotations.Condition;
 import jadex.rules.eca.annotations.Event;
 
 @Goal 
+//@GoalDeliberation(cardinality=1, inhibits={
+//	@Inhibits(GoodByeGoal.class),
+//	@Inhibits(value=HelloAgainGoal.class, when=Inhibits.WHEN_IN_PROCESS, expression=???)
+//})
 public class HelloGoal
 {
+//	@GoalParameter???(unique=true, bindingoptions=???, assignto=???)
 	protected String text;
 	
+//	@GoalCreation
+//	public HelloGoal(@Event("sayhello") String text)
 	public HelloGoal(String text)
 	{
 		this.text = text;
@@ -25,7 +32,7 @@ public class HelloGoal
 		return text;
 	}
 
-	//	@CreationCondition()
+	//	@GoalCreation()
 	@Condition("creation")
 	protected static boolean create(@Event("sayhello") String sayhello)
 	{
@@ -39,6 +46,13 @@ public class HelloGoal
 		HelloWorldBDI agent = (HelloWorldBDI)context;
 		agent.getAgent().adoptGoal(new HelloGoal((String)event.getContent()));
 	}
+	
+//	@GoalContext / @GoalDrop / @GoalRecur
+//	event???
+//	public boolean	isValid()
+//	{
+//		return text!=null;
+//	}
 	
 //	@TargetCondition()
 //	@Condition("target")

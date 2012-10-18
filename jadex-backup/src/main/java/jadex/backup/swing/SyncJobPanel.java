@@ -22,6 +22,7 @@ import jadex.base.gui.idtree.IdTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -133,8 +134,7 @@ public class SyncJobPanel extends JPanel
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					SServiceProvider.getService(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-	                	.addResultListener(new SwingDefaultResultListener<IJobProcessingService>()
+					getJobService(job, ea).addResultListener(new SwingDefaultResultListener<IJobProcessingService>()
 	                {
 	                    public void customResultAvailable(IJobProcessingService js)
 	                    {
@@ -492,68 +492,39 @@ public class SyncJobPanel extends JPanel
 	protected IFuture<Void> subscribe(final IExternalAccess ea, final ICommand cmd)
 	{
 		final Future<Void> ret = new Future<Void>();
-		
-		SServiceProvider.getServices(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IIntermediateResultListener<IJobProcessingService>()
+		getJobService(job, ea).addResultListener(new ExceptionDelegationResultListener<IJobProcessingService, Void>(ret)
 		{
-			public void intermediateResultAvailable(final IJobProcessingService jps)
+			public void customResultAvailable(IJobProcessingService jps)
 			{
-				jps.getJob().addResultListener(new ExceptionDelegationResultListener<Job, Void>(ret)
+				ISubscriptionIntermediateFuture<AJobProcessingEvent> sub = jps.subscribe(null);
+				
+				sub.addResultListener(new SwingIntermediateResultListener<AJobProcessingEvent>(new IIntermediateResultListener<AJobProcessingEvent>()
 				{
-					public void customResultAvailable(Job sjob) 
+					public void intermediateResultAvailable(AJobProcessingEvent ev)
 					{
-						if(job.equals(sjob))
+						cmd.execute(ev);
+						ret.setResultIfUndone(null);
+					}
+					
+					public void finished()
+					{
+					}
+					
+					public void resultAvailable(Collection<AJobProcessingEvent> result)
+					{
+						for(AJobProcessingEvent ev: result)
 						{
-							ISubscriptionIntermediateFuture<AJobProcessingEvent> sub = jps.subscribe(null);
-							
-							sub.addResultListener(new SwingIntermediateResultListener<AJobProcessingEvent>(new IIntermediateResultListener<AJobProcessingEvent>()
-							{
-								public void intermediateResultAvailable(AJobProcessingEvent ev)
-								{
-									cmd.execute(ev);
-									ret.setResultIfUndone(null);
-								}
-								
-								public void finished()
-								{
-								}
-								
-								public void resultAvailable(Collection<AJobProcessingEvent> result)
-								{
-									for(AJobProcessingEvent ev: result)
-									{
-										cmd.execute(ev);
-									}
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									ret.setException(exception);
-								}
-							}));
+							cmd.execute(ev);
 						}
 					}
-				});
-			}
-			
-			public void finished()
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-
-			public void resultAvailable(Collection<IJobProcessingService> result)
-			{
-				for(IJobProcessingService jps: result)
-				{
-					intermediateResultAvailable(jps);
-				}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
+					}
+				}));
 			}
 		});
-	
 		return ret;
 	}
 	
@@ -711,6 +682,48 @@ public class SyncJobPanel extends JPanel
 			}
 		}
 		
+		return ret;
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get the job processing service for a job.
+	 */
+	protected IFuture<IJobProcessingService>	getJobService(final Job job, IExternalAccess ea)
+	{
+		final Future<IJobProcessingService> ret = new Future<IJobProcessingService>();
+		
+		SServiceProvider.getServices(ea.getServiceProvider(), IJobProcessingService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			.addResultListener(new IIntermediateResultListener<IJobProcessingService>()
+		{
+			public void intermediateResultAvailable(final IJobProcessingService jps)
+			{
+				if(job.getId().equals(jps.getJobId()))
+				{
+					ret.setResultIfUndone(jps);
+				}
+			}
+			
+			public void finished()
+			{
+				ret.setExceptionIfUndone(new ServiceNotFoundException(job.toString()));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+
+			public void resultAvailable(Collection<IJobProcessingService> result)
+			{
+				for(IJobProcessingService jps: result)
+				{
+					intermediateResultAvailable(jps);
+				}
+			}
+		});
+	
 		return ret;
 	}
 }
