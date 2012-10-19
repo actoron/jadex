@@ -107,12 +107,14 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 
+//				TODO: Distinguish between beliefSet removed, changed and added: Currently only "added" is supported.
 				public void factRemoved(AgentEvent ae) {
-					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+//					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 
+//				TODO: Distinguish between beliefSet removed, changed and added: Currently only "added" is supported.
 				public void factChanged(AgentEvent ae) {
-					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+//					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 			});
 		} else {
