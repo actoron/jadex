@@ -14,9 +14,12 @@
 			<role_occupation name="sender" multiple="false">
 				<agent id="Producer" />
 				<agent id="Carry" />
+				<agent id="Sentry" />
 			</role_occupation>
 			<role_occupation name="receiver" multiple="false">
-				<agent id="Sentry" />				
+				<agent id="Sentry" />	
+				<agent id="Producer" />
+				<agent id="Carry" />			
 			</role_occupation>
 		</role_occupations>
 	</system_properties>
@@ -28,8 +31,17 @@
 	-->
 	<causalities>
 		<deco_links>
-			<!-- The encated interdependency: -->
-			<deco_link realization="by_service" type="POSITIVE" name="send-receive" spaces="mycoordspace">
+			<!-- The link, where the producer/carry inform the sentry about the latest detected target: -->
+			<deco_link realization="latest_target_seen" type="POSITIVE" name="send-receive" spaces="mycoordspace">
+				<froms>
+					<from>sender</from>
+				</froms>
+				<tos>
+					<to>receiver</to>
+				</tos>
+			</deco_link>
+			<!-- The link, where the sentry informs the producer about the latest analyzed target: -->
+			<deco_link realization="latest_target_analyzed" type="POSITIVE" name="send-receive" spaces="mycoordspace">
 				<froms>
 					<from>sender</from>
 				</froms>
@@ -41,11 +53,16 @@
 
 		<!-- The detailed configuration of interdependency enactment. -->
 		<deco-link-realizations>
-			<realization id="by_service">
+			<realization id="latest_target_seen">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEF">
+					<agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">
 						<parameter_mappings>
-							<mapping ref="latest_target" name="target"/>
+							<mapping ref="latest_target" name="latest_target"/>
+						</parameter_mappings>
+					</agent_element>
+					<agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">
+						<parameter_mappings>
+							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
 					</agent_element>
 				</from>
@@ -54,15 +71,31 @@
 					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
 					agent_type="JADEX">
 				</mechanism_configuration>
-				<to>		<!-- Behaviors / events to be triggered upon reception: -->
-					<!-- <agent_element element="receivehello" agent_id="ExampleBDI" type="INTERNAL_EVENT">
+				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
+					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEFSET">
 						<parameter_mappings>
-							<mapping ref="message" name="message"/>
+							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
-					</agent_element> -->
-					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEF">
+					</agent_element>
+				</to>
+			</realization>
+			<realization id="latest_target_analyzed">
+				<from>		<!-- Published behaviors / events: -->					
+					<agent_element element="latest_analyzed_target" agent_id="Sentry" type="BDI_BELIEFSET">
 						<parameter_mappings>
-							<mapping ref="latest_target" name="target"/>
+							<mapping ref="latest_analyzed_target" name="latest_analyzed_target"/>
+						</parameter_mappings>
+					</agent_element>					
+				</from>
+				<!-- Coordination Medium configuration: -->
+				<mechanism_configuration
+					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
+					agent_type="JADEX">
+				</mechanism_configuration>
+				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
+					 <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">
+						<parameter_mappings>
+							<mapping ref="latest_analyzed_target" name="latest_analyzed_target"/>
 						</parameter_mappings>
 					</agent_element>
 				</to>

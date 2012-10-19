@@ -46,9 +46,18 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 		
-		<!-- TMP? The ID of the latest detected target. -->
-		<belief name="latest_target" class="String"/>
+		<!-- TMP? The latest detected target. Will be published to sentry agent using the the CoordSpace. -->
+		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
+		<beliefset name="latest_target" class="ISpaceObject"/>
 		
+		<!-- TMP? The latest target that has been analyzed by the sentry. Is is pushed into the producer using the the CoordSpace. -->
+		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
+		<beliefset name="latest_analyzed_target" class="ISpaceObject"/>
+		
+		<!-- TMP? The latest target that has been produced by the producer. It will be published to the CoordSpace in order to inform the carry agent(s). -->
+		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
+		<beliefset name="latest_produced_target" class="ISpaceObject"/>
+				
 		<!-- HACK FOR MASDynamics!!!!! -->
 		<!--   mycoordspace -->
 		<!-- Environment. DO NOT CHANGE the name "env".-->
@@ -64,7 +73,6 @@
 			<parameter name="target" class="ISpaceObject"/>
 			<dropcondition language="jcl">
 				$beliefbase.missionend
-				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
 			</dropcondition>
 			<deliberation>
 				<inhibits cref="move.walk_around"/>
@@ -76,9 +84,9 @@
 		<!-- The main plan handling action requests. -->
 		<plan name="producer_plan">
 			<body class="ProducerPlan"/>
-			<waitqueue>
-				<messageevent ref="request_production"/>
-			</waitqueue>
+			<trigger>
+				<factadded ref="latest_analyzed_target"/>
+			</trigger>
 		</plan>
 
 		<!-- Produce ore at a target. -->
@@ -94,7 +102,7 @@
 
 		<!-- Inform sentries about new targets. -->
 		<plan name="informer">
-			<body class="NewInformNewTargetPlan"/>
+			<body class="InformNewTargetPlan"/>
 			<!-- Inform whenever a new fact is added to the belief set my_targets. -->
 			<trigger>
 				<factadded cref="move.my_targets"/>
@@ -104,32 +112,32 @@
 
 	<events>
 		<!-- Message event for produce ore task allocation. -->
-		<messageevent name="request_production" type="fipa" direction="receive">
+		<!-- <messageevent name="request_production" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<match>$content instanceof RequestProduction</match>
-		</messageevent>
+		</messageevent> -->
 		
 		<!-- Message event for informing sentries about new targets. -->
-		<messageevent name="inform_target" type="fipa" direction="send">
+		<!--<messageevent name="inform_target" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
  			</parameter>
-		</messageevent>
+		</messageevent> -->
 
 		<!-- Message event for carry ore task allocation. -->
-		<messageevent name="request_carries" type="fipa" direction="send">
+		<!--<messageevent name="request_carries" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
  			</parameter>
-		</messageevent>
+		</messageevent> -->
 	</events>
 	
 	<configurations>

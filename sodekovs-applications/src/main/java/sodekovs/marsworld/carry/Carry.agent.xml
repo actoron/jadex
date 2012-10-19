@@ -55,6 +55,14 @@
 			</fact>
 		</belief>
 		
+		<!-- TMP? The latest detected target. Will be published to sentry agent using the the CoordSpace. -->
+		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
+		<beliefset name="latest_target" class="ISpaceObject"/>
+		
+		<!-- TMP? The latest target that has been produced by the producer. It will be pushed into this agent by the CoordSpace. -->
+		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
+		<beliefset name="latest_produced_target" class="ISpaceObject"/>
+		
 	</beliefs>
 
   	<goals>
@@ -75,9 +83,9 @@
 		<!-- The main plan handling action requests. -->
 		<plan name="carry_plan">
 			<body class="CarryPlan"/>
-			<waitqueue>
-				<messageevent ref="request_carry"/>
-			</waitqueue>
+			<trigger>
+				<factadded ref="latest_produced_target"/>
+			</trigger>
 		</plan>
 
 		<!-- Carry ore to the homebase. -->
@@ -93,7 +101,7 @@
 
 		<!-- Inform sentries about new targets. -->
 		<plan name="informer">
-			<body class="NewInformNewTargetPlan"/>
+			<body class="InformNewTargetPlan"/>
 			<!-- Inform whenever a new fact is added to the belief set my_targets. -->
 			<trigger>
 				<factadded cref="move.my_targets"/>
@@ -103,22 +111,22 @@
 
 	<events>
 		<!-- Message event for carry ore task allocation. -->
-		<messageevent name="request_carry" type="fipa" direction="receive">
+		<!-- <messageevent name="request_carry" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<match>$content instanceof RequestCarry</match>
-		</messageevent>
+		</messageevent> -->
 
 		<!-- Message event for informing sentries about new targets. -->
-		<messageevent name="inform_target" type="fipa" direction="send">
+		<!--<messageevent name="inform_target" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
  			</parameter>
-		</messageevent>
+		</messageevent> -->
 	</events>
 
 	<configurations>
