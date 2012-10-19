@@ -1,6 +1,5 @@
 package jadex.backup.resource;
 
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 
@@ -21,22 +20,46 @@ public interface ILocalResourceService
 	public String	getLocalId();
 	
 	/**
-	 *  Update the local resource with all
-	 *  changes from all available remote resource.
-	 *  @return Events as files and directories are being processed.
-	 */
-	public ITerminableIntermediateFuture<BackupEvent>	updateAll();
-
-	/**
-	 *  Update the local resource with all
-	 *  changes from the given remote resource.
+	 *  Scan for changes at the given remote resource
+	 *  that need to be synchronized with the local resource.
 	 *  @param remote	The remote resource to synchronize to.
-	 *  @return Events as files and directories are being processed.
+	 *  @return Events of detected remote changes.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent>	update(IResourceService remote);
+	public ITerminableIntermediateFuture<BackupEvent>	scanForChanges(IResourceService remote);
 	
 	/**
-	 * 
+	 *  Update or revert the local file with the remote version.
+	 *  Checks if local and remote file are unchanged with respect to the previous file infos.
+	 *  @param remote The remote resource.
+	 *  @param localfi The local file info.
+	 *  @param remotefi The remote file info.
+	 *  @return Status events while the file is being downloaded.
+	 *  @throws Exception, e.g. when local or remote file have changed after the last scan.
 	 */
-	public ISubscriptionIntermediateFuture<BackupEvent> updateFile(final IResourceService remote, final FileInfo fi);
+	public ITerminableIntermediateFuture<BackupEvent> updateFromRemote(IResourceService remote, FileInfo localfi, FileInfo remotefi);
+	
+	/**
+	 *  Ignore the remote change and set the local file state as being newer.
+	 *  As a result, the remote file will be reverted the next time the remote resource synchronizes to this resource. 
+	 *  Checks if local and remote file are unchanged with respect to the previous file infos.
+	 *  @param remote The remote resource.
+	 *  @param localfi The local file info.
+	 *  @param remotefi The remote file info.
+	 *  @return Status events of the override operation.
+	 *  @throws Exception when local or remote file have changed after the last scan.
+	 */
+	public ITerminableIntermediateFuture<BackupEvent> overrideRemoteChange(IResourceService remote, FileInfo localfi, FileInfo remotefi);
+	
+	/**
+	 *  Copy the local file before downloading the remote version.
+	 *  If the remote version would be saved as copy, the change would be detected again on next scan.
+	 *  Therefore the remote version is used as new local version whereas
+	 *  the old local version is given a new name of the form 'name.copy.ext'.
+	 *  @param remote The remote resource.
+	 *  @param localfi The local file info.
+	 *  @param remotefi The remote file info.
+	 *  @return Status events while the file is being downloaded.
+	 *  @throws Exception, e.g. when local or remote file have changed after the last scan.
+	 */
+	public ITerminableIntermediateFuture<BackupEvent> updateAsCopy(IResourceService remote, FileInfo localfi, FileInfo remotefi);
 }

@@ -41,7 +41,6 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -172,8 +171,8 @@ public class SyncJobPanel extends JPanel
 					boolean open = Task.STATE_OPEN.equals(task.getState());
 					
 					JTable reqt = new JTable();
-					String[] names = open? new String[]{"Include", "Type", "Filename"}: new String[]{"Include", "Type", "Filename", "done"};
-					Class<?>[] types = open? new Class[]{Boolean.class, String.class, String.class}: new Class[]{Boolean.class, String.class, String.class, String.class};
+					String[] names = open? new String[]{"Action", "Type", "Filename"}: new String[]{"Action", "Type", "Filename", "done"};
+					Class<?>[] types = open? new Class[]{String.class, String.class, String.class}: new Class[]{String.class, String.class, String.class, String.class};
 					final IdTableModel<SyncTaskEntry, SyncTaskEntry> tm = new IdTableModel<SyncTaskEntry, SyncTaskEntry>(names, types, reqt)
 					{
 						public Object getValueAt(SyncTaskEntry obj, int column)
@@ -181,7 +180,7 @@ public class SyncJobPanel extends JPanel
 							Object ret = obj;
 							if(column==0)
 							{
-								ret = obj.isIncluded();
+								ret = obj.getAction();
 							}
 							else if(column==1)
 							{
@@ -189,7 +188,7 @@ public class SyncJobPanel extends JPanel
 							}
 							else if(column==2)
 							{
-								ret = obj.getFileInfo().getLocation();
+								ret = obj.getRemoteFileInfo().getLocation();
 							}
 							else if(column==3)
 							{
@@ -208,7 +207,7 @@ public class SyncJobPanel extends JPanel
 							SyncTaskEntry se = (SyncTaskEntry)getValueAt(row, -1);
 							if(column==0)
 							{
-								((SyncTaskEntry)se).setIncluded(((Boolean)val).booleanValue());
+								((SyncTaskEntry)se).setAction((String)val);
 							}
 						}
 					};
@@ -240,36 +239,36 @@ public class SyncJobPanel extends JPanel
 							}
 						}
 						
-						JPanel bup = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-						JButton selab = new JButton("Select All");
-						JButton clearab = new JButton("Clear All");
-						bup.add(selab);
-						bup.add(clearab);
-						
-						selab.addActionListener(new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								for(SyncTaskEntry ste: tm.getValues())
-								{
-									ste.setIncluded(true);
-								}
-								tm.refresh();
-							}
-						});
-						
-						clearab.addActionListener(new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								for(SyncTaskEntry ste: tm.getValues())
-								{
-									ste.setIncluded(false);
-								}
-								tm.refresh();
-							}
-						});
-						contp.add(bup, BorderLayout.SOUTH);
+//						JPanel bup = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+//						JButton selab = new JButton("Select All");
+//						JButton clearab = new JButton("Clear All");
+//						bup.add(selab);
+//						bup.add(clearab);
+//						
+//						selab.addActionListener(new ActionListener()
+//						{
+//							public void actionPerformed(ActionEvent e)
+//							{
+//								for(SyncTaskEntry ste: tm.getValues())
+//								{
+//									ste.setIncluded(true);
+//								}
+//								tm.refresh();
+//							}
+//						});
+//						
+//						clearab.addActionListener(new ActionListener()
+//						{
+//							public void actionPerformed(ActionEvent e)
+//							{
+//								for(SyncTaskEntry ste: tm.getValues())
+//								{
+//									ste.setIncluded(false);
+//								}
+//								tm.refresh();
+//							}
+//						});
+//						contp.add(bup, BorderLayout.SOUTH);
 						
 						if(!SGUI.createDialog("Sync Entries ("+task.getState()+")", contp, SyncJobPanel.this))
 						{
@@ -346,7 +345,7 @@ public class SyncJobPanel extends JPanel
 								if(entry!=null)
 								{
 									entry.setDone(ev.getDone());
-									System.out.println("updated done: "+entry.getFileInfo().getLocation()+" "+ev.getDone());
+									System.out.println("updated done: "+entry.getRemoteFileInfo().getLocation()+" "+ev.getDone());
 									break;
 								}
 							}

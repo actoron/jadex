@@ -8,20 +8,42 @@ import jadex.commons.SUtil;
  */
 public class SyncTaskEntry
 {
+	//-------- constants --------
+	
+	/** The update action. */
+	public static final String	ACTION_UPDATE	= "update";
+	
+	/** The override action. */
+	public static final String	ACTION_OVERRIDE	= "override";
+	
+	/** The copy action. */
+	public static final String	ACTION_COPY	= "copy";
+	
+	/** The revert action. */
+	public static final String	ACTION_REVERT	= "revert";
+	
+	/** The skip action. */
+	public static final String	ACTION_SKIP	= "skip";
+	
+	//-------- attributes --------
+	
 	/** The id. */
 	protected String id;
 	
 	/** The task id. */
 	protected String taskid;
 	
-	/** The file info. */
-	protected FileInfo fileinfo;
+	/** The local file info. */
+	protected FileInfo localfi;
+	
+	/** The remote file info. */
+	protected FileInfo remotefi;
 	
 	/** The type. */
 	protected String type;
 	
-	/** The flag if it is included. */
-	protected boolean included;
+	/** The action to perform. */
+	protected String action;
 
 	/** The progress done. */
 	protected double done;
@@ -36,13 +58,14 @@ public class SyncTaskEntry
 	/**
 	 * 
 	 */
-	public SyncTaskEntry(Task task, FileInfo fi, String type)
+	public SyncTaskEntry(Task task, FileInfo localfi, FileInfo remotefi, String type, String action)
 	{
 		this.taskid = task.getId();
 		this.id = SUtil.createUniqueId("entry");
-		this.fileinfo = fi;
+		this.localfi = localfi;
+		this.remotefi = remotefi;
 		this.type = type;
-		this.included = true;
+		this.action	= action;
 	}
 	
 	/**
@@ -52,9 +75,10 @@ public class SyncTaskEntry
 	{
 		this.taskid = se.getTaskId();
 		this.id = se.getId();
-		this.fileinfo = se.getFileInfo();
+		this.localfi = se.getLocalFileInfo();
+		this.remotefi = se.getRemoteFileInfo();
 		this.type = se.getType();
-		this.included = se.isIncluded();
+		this.action = se.getAction();
 	}
 	
 	/**
@@ -76,21 +100,39 @@ public class SyncTaskEntry
 	}
 
 	/**
-	 *  Get the fileInfo.
-	 *  @return The fileInfo.
+	 *  Get the local file info.
+	 *  @return The file info.
 	 */
-	public FileInfo getFileInfo()
+	public FileInfo getLocalFileInfo()
 	{
-		return fileinfo;
+		return localfi;
 	}
 
 	/**
-	 *  Set the fileInfo.
-	 *  @param fileInfo The fileInfo to set.
+	 *  Set the local file info.
+	 *  @param fi The file info to set.
 	 */
-	public void setFileInfo(FileInfo fileInfo)
+	public void setLocalFileInfo(FileInfo fi)
 	{
-		this.fileinfo = fileInfo;
+		this.localfi = fi;
+	}
+
+	/**
+	 *  Get the remote file info.
+	 *  @return The file info.
+	 */
+	public FileInfo getRemoteFileInfo()
+	{
+		return remotefi;
+	}
+
+	/**
+	 *  Set the remote file info.
+	 *  @param fi The file info to set.
+	 */
+	public void setRemoteFileInfo(FileInfo fi)
+	{
+		this.localfi = fi;
 	}
 
 	/**
@@ -112,21 +154,21 @@ public class SyncTaskEntry
 	}
 
 	/**
-	 *  Get the included.
+	 *  Get the action.
 	 *  @return The included.
 	 */
-	public boolean isIncluded()
+	public String getAction()
 	{
-		return included;
+		return action;
 	}
 
 	/**
-	 *  Set the included.
-	 *  @param included The included to set.
+	 *  Set the action.
+	 *  @param action The action to set.
 	 */
-	public void setIncluded(boolean included)
+	public void setAction(String action)
 	{
-		this.included = included;
+		this.action = action;
 	}
 
 	/**

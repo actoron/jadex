@@ -227,7 +227,8 @@ public class FileInfo
 
 	/**
 	 *  Update the vector times of this file info
-	 *  with vector times of another file info, if the values are larger.
+	 *  with vector times of another file info,
+	 *  if the absolute values are larger or the same but valid instead of invalid.
 	 */
 	public void	updateVTimes(FileInfo fi)
 	{
@@ -241,7 +242,8 @@ public class FileInfo
 		
 		for(String node: nodes)
 		{
-			if(Math.abs(getVTime(node))<Math.abs(fi.getVTime(node)))
+			if(Math.abs(getVTime(node))<Math.abs(fi.getVTime(node))
+				|| Math.abs(getVTime(node))==fi.getVTime(node))
 			{
 				setVTime(node, fi.getVTime(node));
 			}

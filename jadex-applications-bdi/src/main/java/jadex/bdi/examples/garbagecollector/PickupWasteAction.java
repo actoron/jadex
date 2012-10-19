@@ -33,7 +33,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 
 		if(so.getProperty("garbage")!=null)
 		{
-			throw new IllegalStateException("Has already garbage.");
+//			throw new IllegalStateException("Has already garbage.");
 		}
 		else
 		{

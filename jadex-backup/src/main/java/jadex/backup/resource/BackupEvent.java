@@ -7,13 +7,14 @@ package jadex.backup.resource;
  */
 public class BackupEvent
 {
-	public static final String FILE_UPDATE_START = "file_update_start";
+//	public static final String FILE_UPDATE_START = "file_update_start";
 	
-	public static final String FILE_UPDATE_STATE = "file_update_state";
+	/** Event type for information about a download progress. */
+	public static final String DOWNLOAD_STATE = "download_state";
 	
-	public static final String FILE_UPDATE_END = "file_update_end";
+//	public static final String FILE_UPDATE_END = "file_update_end";
 	
-	public static final String FILE_UPDATE_ERROR = "file_update_error";
+//	public static final String FILE_UPDATE_ERROR = "file_update_error";
 	
 	public static final String ERROR = "error";
 
@@ -23,9 +24,11 @@ public class BackupEvent
 	/** The event type. */
 	protected String	type;
 	
-	/** The corresponding file. */
-//	protected FileData	file;
-	protected FileInfo file;
+	/** The local file info. */
+	protected FileInfo localfi;
+	
+	/** The remote file info. */
+	protected FileInfo remotefi;
 	
 //	/** The current progress state of the file (0..1) or -1 if atomic event. */
 	protected Object details;
@@ -43,18 +46,19 @@ public class BackupEvent
 	/**
 	 *  Create a new backup event.
 	 */
-	public BackupEvent(String type, FileInfo file)
+	public BackupEvent(String type, FileInfo remotefi)
 	{
-		this(type, file, null);
+		this(type, null, remotefi, null);
 	}
 	
 	/**
 	 *  Create a new backup event.
 	 */
-	public BackupEvent(String type, FileInfo file, Object details)
+	public BackupEvent(String type, FileInfo localfi, FileInfo remotefi, Object details)
 	{
 		this.type	= type;
-		this.file	= file;
+		this.localfi	= localfi;
+		this.remotefi	= remotefi;
 		this.details = details;
 	}
 
@@ -71,9 +75,17 @@ public class BackupEvent
 	/**
 	 *  Get the file.
 	 */
-	public FileInfo getFile()
+	public FileInfo getLocalFile()
 	{
-		return file;
+		return localfi;
+	}
+	
+	/**
+	 *  Get the remote file.
+	 */
+	public FileInfo getRemoteFile()
+	{
+		return remotefi;
 	}
 	
 	/**
@@ -87,9 +99,17 @@ public class BackupEvent
 	/**
 	 *  Set the file.
 	 */
-	public void setFile(FileInfo file)
+	public void setLocalFile(FileInfo fi)
 	{
-		this.file = file;
+		this.localfi = fi;
+	}
+	
+	/**
+	 *  Set the remote file.
+	 */
+	public void setRemoteFile(FileInfo fi)
+	{
+		this.remotefi = fi;
 	}
 
 	/**
@@ -112,7 +132,7 @@ public class BackupEvent
 
 	public String toString()
 	{
-		return "BackupEvent [type=" + type + ", file=" + (file!=null ? file.getLocation() : "null") + ", details="+ details + "]";
+		return "BackupEvent [type=" + type + ", file=" + (remotefi!=null ? remotefi.getLocation() : "null") + ", details="+ details + "]";
 	}
 
 //	public String toString()

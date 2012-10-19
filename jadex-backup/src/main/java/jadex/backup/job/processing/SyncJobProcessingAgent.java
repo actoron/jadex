@@ -22,6 +22,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -240,17 +241,28 @@ public class SyncJobProcessingAgent
 		
 		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
 		
-		resser.update(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
+		resser.scanForChanges(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
 		{
 			public void intermediateResultAvailable(BackupEvent result)
 			{
 //				System.out.println(result);
-				if(BackupResource.FILE_ADDED.equals(result.getType())
-					|| BackupResource.FILE_CONFLICT.equals(result.getType())
-					|| BackupResource.FILE_REMOVED.equals(result.getType())
-					|| BackupResource.FILE_MODIFIED.equals(result.getType()))
+				SyncTaskEntry entry = null;
+				if(BackupResource.FILE_REMOTE_ADDED.equals(result.getType())
+					|| BackupResource.FILE_REMOTE_MODIFIED.equals(result.getType()))
 				{
-					SyncTaskEntry entry = new SyncTaskEntry(task, result.getFile(), result.getType());
+					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), SyncTaskEntry.ACTION_UPDATE);
+				}
+				else if(BackupResource.FILE_CONFLICT.equals(result.getType()))
+				{
+					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), SyncTaskEntry.ACTION_COPY);
+				}
+				else if(BackupResource.FILE_LOCAL_MODIFIED.equals(result.getType()))
+				{
+					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), SyncTaskEntry.ACTION_SKIP);
+				}
+										
+				if(entry!=null)
+				{
 					if(!autoupdate)
 					{
 //						changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
@@ -258,7 +270,7 @@ public class SyncJobProcessingAgent
 					}
 					else
 					{
-						updateFile(resser, remresser, entry).addResultListener(new IResultListener<Void>()
+						performAction(resser, remresser, entry).addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -374,7 +386,7 @@ public class SyncJobProcessingAgent
 					IResourceService remresser = findRessourceService(task.getSource());
 					if(remresser!=null)
 					{
-						updateFiles(resser, remresser, ses.iterator())
+						performActions(resser, remresser, ses.iterator())
 							.addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
@@ -419,27 +431,20 @@ public class SyncJobProcessingAgent
 	/**
 	 * 
 	 */
-	public IFuture<Void> updateFiles(final ILocalResourceService localresser, final IResourceService resser, final Iterator<SyncTaskEntry> it)
+	public IFuture<Void> performActions(final ILocalResourceService localresser, final IResourceService resser, final Iterator<SyncTaskEntry> it)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
 		if(it.hasNext())
 		{
 			SyncTaskEntry entry = it.next();
-			if(entry.isIncluded())
+			performAction(localresser, resser, entry).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				updateFile(localresser, resser, entry).addResultListener(new DelegationResultListener<Void>(ret)
+				public void customResultAvailable(Void result)
 				{
-					public void customResultAvailable(Void result)
-					{
-						updateFiles(localresser, resser, it).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-			else
-			{
-				ret.setResult(null);
-			}
+					performActions(localresser, resser, it).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
 		}
 		else
 		{
@@ -452,37 +457,59 @@ public class SyncJobProcessingAgent
 	/**
 	 * 
 	 */
-	public IFuture<Void> updateFile(ILocalResourceService localresser, IResourceService resser, final SyncTaskEntry entry)
+	public IFuture<Void> performAction(ILocalResourceService localresser, IResourceService resser, final SyncTaskEntry entry)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		localresser.updateFile(resser, entry.getFileInfo())
-			.addResultListener(new IIntermediateResultListener<BackupEvent>()
+		ITerminableIntermediateFuture<BackupEvent>	fut	= null;
+		
+		if(SyncTaskEntry.ACTION_UPDATE.equals(entry.getAction())
+			|| SyncTaskEntry.ACTION_REVERT.equals(entry.getAction()))
 		{
-			public void intermediateResultAvailable(BackupEvent be)
-			{
-//				System.out.println("upfi: "+be);
-				publishEvent(new SyncTaskEntryEvent(entry.getTaskId(), entry.getId(), ((Double)be.getDetails()).doubleValue()));
-			}
+			fut	= localresser.updateFromRemote(resser, entry.getLocalFileInfo(), entry.getRemoteFileInfo());
+		}
+		else if(SyncTaskEntry.ACTION_OVERRIDE.equals(entry.getAction()))
+		{
+			fut	= localresser.overrideRemoteChange(resser, entry.getLocalFileInfo(), entry.getRemoteFileInfo());
+		}
+		else if(SyncTaskEntry.ACTION_COPY.equals(entry.getAction()))
+		{
+			fut	= localresser.updateAsCopy(resser, entry.getLocalFileInfo(), entry.getRemoteFileInfo());
+		}
 			
-			public void exceptionOccurred(Exception exception)
+		if(fut!=null)
+		{
+			fut.addResultListener(new IIntermediateResultListener<BackupEvent>()
 			{
-				System.out.println(exception);
-				ret.setResult(null);
-			}
-			
-			public void resultAvailable(Collection<BackupEvent> result)
-			{
-//				System.out.println(result);
-				ret.setResult(null);
-			}
-			
-			public void finished()
-			{
-//				System.out.println("fini");
-				ret.setResult(null);
-			}
-		});
+				public void intermediateResultAvailable(BackupEvent be)
+				{
+	//				System.out.println("upfi: "+be);
+					publishEvent(new SyncTaskEntryEvent(entry.getTaskId(), entry.getId(), ((Double)be.getDetails()).doubleValue()));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println(exception);
+					ret.setResult(null);
+				}
+				
+				public void resultAvailable(Collection<BackupEvent> result)
+				{
+	//				System.out.println(result);
+					ret.setResult(null);
+				}
+				
+				public void finished()
+				{
+	//				System.out.println("fini");
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}
