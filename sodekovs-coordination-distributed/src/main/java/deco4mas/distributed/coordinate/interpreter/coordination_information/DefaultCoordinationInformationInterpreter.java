@@ -15,6 +15,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
@@ -212,7 +213,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 																if (elementType.equals(AgentElementType.BDI_BELIEFSET.toString())) {
 																	processBDIBeliefSet(dci, bia, elementId, exta, coordinationSpaceObj);
 																} else if (elementType.equals(AgentElementType.BDI_BELIEF.toString())) {
-																	processBDIBelief(dci, bia, elementId, exta, coordinationSpaceObj);
+																	processBDIBelief(dci, bia, elementId, exta, coordinationSpaceObj);																
 																} else if (elementType.equals(AgentElementType.BDI_GOAL.toString())) {
 																	processBDIGoal(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
 																} else if (elementType.equals(AgentElementType.BDI_PLAN.toString())) {
@@ -379,9 +380,10 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
 			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0])) {
+				
 				IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
 				IBelief bel = base.getBelief(elementId);
-				bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE).toString());
+				bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE));															
 			} else {
 				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 			}
@@ -414,7 +416,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0])) {
 				IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
 				IBeliefSet belset = base.getBeliefSet(elementId);
-				belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE).toString());
+				belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE));
 			} else {
 				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 			}
