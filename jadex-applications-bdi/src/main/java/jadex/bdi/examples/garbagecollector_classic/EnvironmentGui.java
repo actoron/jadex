@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities;
  */
 public class EnvironmentGui	extends JFrame
 {
+	protected boolean disposed;
+
 	//-------- constructors --------
 
 	/**
@@ -40,12 +42,15 @@ public class EnvironmentGui	extends JFrame
 				{
 					public void run()
 					{
-						MapPanel map = new MapPanel(env);
-						getContentPane().add("Center", map);
-						
-						setSize(400, 400);
-						setLocation(SGUI.calculateMiddlePosition(EnvironmentGui.this));
-						setVisible(true);
+						if(!disposed)
+						{
+							MapPanel map = new MapPanel(env);
+							getContentPane().add("Center", map);
+							
+							setSize(400, 400);
+							setLocation(SGUI.calculateMiddlePosition(EnvironmentGui.this));
+							setVisible(true);
+						}
 					}
 				});
 				return IFuture.DONE;
@@ -94,6 +99,12 @@ public class EnvironmentGui	extends JFrame
 				return IFuture.DONE;
 			}
 		});
+	}
+
+	public void dispose()
+	{
+		disposed	= true;
+		super.dispose();
 	}
 }
 
