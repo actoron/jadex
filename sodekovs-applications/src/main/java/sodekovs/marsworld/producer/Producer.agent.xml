@@ -46,6 +46,11 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 		
+		<!-- The 2D Space where the agent is situated. -->
+		<!-- <beliefsetref name="space">
+			<concrete ref="move.environment"/>
+		</beliefsetref> -->	
+		
 		<!-- TMP? The latest detected target. Will be published to sentry agent using the the CoordSpace. -->
 		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
 		<beliefset name="latest_target" class="ISpaceObject"/>

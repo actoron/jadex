@@ -1,18 +1,8 @@
 package sodekovs.marsworld.producer;
 
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.fipa.SFipa;
-import jadex.extension.agr.AGRSpace;
-import jadex.extension.agr.Group;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.extension.envsupport.math.IVector2;
-import sodekovs.marsworld.RequestCarry;
 
 /**
  * The main plan for the Producer Agent. <br>
@@ -81,6 +71,7 @@ public class ProducerPlan extends Plan {
 //				callCarryAgent(target);
 //			}
 //			target.
+			
 			// Producing ore here.
 			IGoal produce_ore = createGoal("produce_ore");
 			produce_ore.getParameter("target").setValue(latestTarget);
