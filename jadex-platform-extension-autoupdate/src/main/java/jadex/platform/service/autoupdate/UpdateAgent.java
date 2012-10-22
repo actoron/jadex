@@ -42,6 +42,7 @@ import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.XMLWriterFactory;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
@@ -317,7 +318,7 @@ public class UpdateAgent implements IUpdateService
 	 */
 	protected static String	getLocalVersionInfo()
 	{
-		return "Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString();
+		return "Jadex "+VersionInfo.getInstance().getVersion()+", "+VersionInfo.getInstance().getNumberDateString()+" ["+new File(".").getAbsolutePath()+"]";
 	}
 	
 	/**
