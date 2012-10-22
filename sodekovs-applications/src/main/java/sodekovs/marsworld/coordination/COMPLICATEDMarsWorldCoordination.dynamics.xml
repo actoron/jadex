@@ -26,13 +26,6 @@
 			<role_occupation name="target_analyzed_receiver" multiple="false">
 				<agent id="Producer" />										
 			</role_occupation>
-			<!-- The roles required for the coordination of produced targets. -->
-			<role_occupation name="target_produced_sender" multiple="false">
-				<agent id="Producer" />												
-			</role_occupation>
-			<role_occupation name="target_produced_receiver" multiple="false">
-				<agent id="Carry" />										
-			</role_occupation>
 		</role_occupations>
 	</system_properties>
 
@@ -61,15 +54,6 @@
 					<to>target_analyzed_receiver</to>
 				</tos>
 			</deco_link>
-			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<!--  --><deco_link realization="latest_target_produced" type="POSITIVE" name="target_produced_send-receive" spaces="mycoordspace">
-				<froms>
-					<from>target_produced_sender</from>
-				</froms>
-				<tos>
-					<to>target_produced_receiver</to>
-				</tos>
-			</deco_link>
 		</deco_links>
 
 		<!-- The detailed configuration of interdependency enactment. -->
@@ -90,9 +74,15 @@
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
+					mechanism_id="deco4mas.distributed.mechanism.subscription.SubscriptionServiceMechanism"
 					agent_type="JADEX">
-				</mechanism_configuration>			
+					<properties>
+						<entry>
+							<key>lookupInterval</key>
+							<value>1000</value>
+						</entry>
+					</properties>
+				</mechanism_configuration>				
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
 					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEFSET">
 						<parameter_mappings>
@@ -116,7 +106,7 @@
 				<mechanism_configuration
 					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
 					agent_type="JADEX">
-				</mechanism_configuration>	
+				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
 					 <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">
 						<parameter_mappings>
@@ -124,30 +114,7 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-			</realization>
-			
-			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<realization id="latest_target_produced">
-				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">
-						<parameter_mappings>
-							<mapping ref="latest_produced_target" name="latest_produced_target"/>
-						</parameter_mappings>
-					</agent_element>					
-				</from>
-				<!-- Coordination Medium configuration: -->				
-				<mechanism_configuration
-					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
-					agent_type="JADEX">
-				</mechanism_configuration>	
-				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET">
-						<parameter_mappings>
-							<mapping ref="latest_produced_target" name="latest_produced_target"/>
-						</parameter_mappings>
-					</agent_element>
-				</to>
-			</realization>											
+			</realization>						
 		</deco-link-realizations>
 	</causalities>
 </MASDynamic>
