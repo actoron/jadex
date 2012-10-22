@@ -100,7 +100,7 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("File location differs: "+localfi.getLocation())); 
 		}
-		else if(!getResource().isCurrent(localfi))
+		else if(!getResource().isCurrent(remotefi.getLocation(), localfi))
 		{
 			ret.setException(new RuntimeException("Local file has changed: "+localfi.getLocation()));
 		}
@@ -192,7 +192,7 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("File location differs: "+localfi.getLocation())); 
 		}
-		else if(!getResource().isCurrent(localfi))
+		else if(!getResource().isCurrent(remotefi.getLocation(), localfi))
 		{
 			ret.setException(new RuntimeException("Local file has changed: "+localfi.getLocation()));
 		}

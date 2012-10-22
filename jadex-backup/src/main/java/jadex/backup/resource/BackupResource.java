@@ -231,13 +231,14 @@ public class BackupResource
 	
 	/**
 	 *  Check if a local file info is current, i.e. the local file has not changed.
-	 *  @param fi The local file info.
+	 *  @param location	The file location.
+	 *  @param fi	The local file info or null if the file does not exist locally.
 	 *  @return False when the local file has changed with respect to the previous information.
 	 */
-	public boolean isCurrent(FileInfo fi)
+	public boolean isCurrent(String location, FileInfo fi)
 	{
-		FileInfo	current	= getFileInfo(getFile(fi.getLocation()));
-		return current.getVTime(getLocalId())==fi.getVTime(getLocalId());
+		FileInfo	current	= getFileInfo(getFile(location));
+		return current==null && fi==null || current!=null && fi!=null && current.getVTime(getLocalId())==fi.getVTime(getLocalId());
 	}
 
 	/**
@@ -247,43 +248,37 @@ public class BackupResource
 	 */
 	public Tuple2<FileInfo, String> getState(FileInfo fi)
 	{
+		// (hack? only for files)
 		String ret;
-		
 		FileInfo	local	= getFileInfo(getFile(fi.getLocation()));
 		if(local==null)
 		{
 			ret = FILE_REMOTE_ADDED;
 		}
-		else
+		else if(fi.isNewerThan(local))
 		{
-			if(fi.isNewerThan(local))
+			// When changed: check for conflict
+			if(local.isNewerThan(fi))
 			{
-				// When changed: check for conflict (hack? only for files)
-				if(!local.isDirectory() && !local.isNewerThan(fi))
-				{
-					ret = FILE_REMOTE_MODIFIED;
-				}
-				else
-				{
-					ret = FILE_CONFLICT;
-				}
+				ret = FILE_CONFLICT;
 			}
 			else
 			{
-				// When not changed: add new time stamps to meta information
-				local.updateVTimes(fi);
-				props.setProperty(local.getLocation(), local.getVTime());
-				save();
-				
-				if(local.isNewerThan(fi))
-				{
-					ret	= FILE_LOCAL_MODIFIED;
-				}
-				else
-				{
-					ret	= FILE_UNCHANGED;
-				}
+				ret = FILE_REMOTE_MODIFIED;
 			}
+		}
+		else if(local.isNewerThan(fi))
+		{
+			ret	= FILE_LOCAL_MODIFIED;
+		}
+		else
+		{
+			// When not changed: add new time stamps to meta information
+			local.updateVTimes(fi);
+			props.setProperty(local.getLocation(), local.getVTime());
+			save();
+			
+			ret	= FILE_UNCHANGED;
 		}
 		
 //		System.out.println("state: "+ret+", "+fi.getLocation());
@@ -310,26 +305,26 @@ public class BackupResource
 	 */
 	public void	updateFromRemote(FileInfo localfi, FileInfo remotefi, File tmp)
 	{
-		if(isCurrent(localfi))
+		if(!isCurrent(remotefi.getLocation(), localfi))
 		{
-			throw new RuntimeException("Local file has changed: "+localfi.getLocation());
+			throw new RuntimeException("Local file has changed: "+remotefi.getLocation());
 		}
 		else
 		{
 			// Todo: all this should be atomic (how?)
-			File	orig	= getFile(localfi.getLocation());
+			File	orig	= getFile(remotefi.getLocation());
 			FileInfo	ofi	= getFileInfo(orig);
 			if(orig.exists())
 			{
 				if(!orig.delete())
 				{
-					throw new RuntimeException("Cannot delete: "+localfi.getLocation());					
+					throw new RuntimeException("Cannot delete: "+remotefi.getLocation());					
 				}
 			}
 			orig.getParentFile().mkdirs();
 			if(!tmp.renameTo(orig))
 			{
-				throw new RuntimeException("Cannot rename: "+localfi.getLocation());
+				throw new RuntimeException("Cannot rename: "+remotefi.getLocation());
 			}
 
 			// Update meta information to reflect new current state.
@@ -357,26 +352,26 @@ public class BackupResource
 	 */
 	public void updateAsCopy(FileInfo localfi, FileInfo remotefi, File tmp)
 	{
-		if(isCurrent(localfi))
+		if(!isCurrent(remotefi.getLocation(), localfi))
 		{
-			throw new RuntimeException("Local file has changed: "+localfi.getLocation());
+			throw new RuntimeException("Local file has changed: "+remotefi.getLocation());
 		}
 		else
 		{
 			// Todo: all this should be atomic (how?)
-			File	orig	= getFile(localfi.getLocation());
+			File	orig	= getFile(remotefi.getLocation());
 			FileInfo	ofi	= getFileInfo(orig);
 			if(!orig.exists())
 			{
-				throw new RuntimeException("File does not exist: "+localfi.getLocation());					
+				throw new RuntimeException("File does not exist: "+remotefi.getLocation());					
 			}
 			if(!orig.renameTo(getCopyLocation(orig)))
 			{
-				throw new RuntimeException("Cannot rename: "+localfi.getLocation());
+				throw new RuntimeException("Cannot rename: "+remotefi.getLocation());
 			}
 			if(!tmp.renameTo(orig))
 			{
-				throw new RuntimeException("Cannot rename: "+localfi.getLocation());
+				throw new RuntimeException("Cannot rename: "+remotefi.getLocation());
 			}
 
 			// Update meta information to reflect new current state.
@@ -398,25 +393,25 @@ public class BackupResource
 	
 	/**
 	 *  Override a remote change and update local file info as if the current local file was newer.
-	 *  @param localfi	The local file info.
+	 *  @param localfi	The local file info or null if the file does not exist locally.
 	 *  @param remotefi	The remote file info.
 	 */
 	public void overrideRemoteChange(FileInfo localfi, FileInfo remotefi)
 	{
-		if(isCurrent(localfi))
+		if(!isCurrent(remotefi.getLocation(), localfi))
 		{
-			throw new RuntimeException("Local file has changed: "+localfi.getLocation());
+			throw new RuntimeException("Local file has changed: "+remotefi.getLocation());
 		}
 		else
 		{
 			// Todo: all this should be atomic (how?)
-			File	orig	= getFile(localfi.getLocation());
+			File	orig	= getFile(remotefi.getLocation());
 			FileInfo	ofi	= getFileInfo(orig);
 
 			// Update local file such that it becomes newer than the remote version.
 			if(!orig.setLastModified(System.currentTimeMillis()))
 			{
-				throw new RuntimeException("Cannot set time stamp: "+localfi.getLocation());					
+				throw new RuntimeException("Cannot set time stamp: "+remotefi.getLocation());					
 			}
 			
 			// Update meta information to reflect new current state.
