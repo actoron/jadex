@@ -167,7 +167,7 @@ public class FileUpdateAgent extends UpdateAgent
 						public boolean accept(File dir, String name)
 						{
 							boolean	ret	= name.toLowerCase().matches(includefiles);
-							agent.getLogger().info("match dist file: "+ret+", "+name);
+							agent.getLogger().info("match dist file: "+ret+", "+name+", "+dir.getAbsolutePath());
 							return ret;
 						}
 					});

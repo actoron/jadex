@@ -71,6 +71,7 @@ import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.TableColumn;
 import javax.swing.tree.TreePath;
 
 /**
@@ -212,6 +213,12 @@ public class SyncJobPanel extends JPanel
 						}
 					};
 					reqt.setModel(tm);
+					
+					SyncTaskActionCellEditor	editor	= new SyncTaskActionCellEditor();
+					TableColumn actioncol = reqt.getColumnModel().getColumn(0);
+					actioncol.setCellEditor(editor);
+					actioncol.setCellRenderer(editor);
+					reqt.setRowHeight(editor.getComponent().getMinimumSize().height);
 					
 					// Add entries to model
 					List<SyncTaskEntry> ses = task.getEntries();
