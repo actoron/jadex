@@ -12,6 +12,10 @@
 		<version> 2.3-SNAPSHOT </version>
 		<relativePath>../jadex-android-parent/</relativePath>
 	</parent>
+	
+	<properties>
+		<emulator.timeout>100000</emulator.timeout>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -109,7 +113,7 @@
 						<!-- name of the avd to deploy to and run the instrumentation on -->
 						<avd>22</avd>
 						<!-- wait time for the emulator to start -->
-						<wait>100000</wait>
+						<wait>${emulator.timeout}</wait>
 						<!-- additional options to run the emulator with -->
 						<options>-partition-size 128 -wipe-data</options>
 					</emulator>
