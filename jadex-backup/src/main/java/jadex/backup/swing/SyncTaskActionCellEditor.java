@@ -33,7 +33,7 @@ public class SyncTaskActionCellEditor	extends DefaultCellEditor	implements Table
 	 */
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 	{
-		return getTableCellEditorComponent(table, value, selected, row, column);
+		return getComponent(table, value, selected, row, true);
 	}
 	
 	//-------- TableCellEditor interface --------
@@ -42,6 +42,16 @@ public class SyncTaskActionCellEditor	extends DefaultCellEditor	implements Table
 	 *  Component for editing the table cell.
 	 */
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean selected, int row, int column)
+	{
+		return getComponent(table, value, selected, row, false);
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get a renderer or editor component.
+	 */
+	public Component	getComponent(JTable table, Object value, boolean selected, int row, boolean renderer)
 	{
 		Object	type	= table.getValueAt(row, 1);
 		String[]	actions;
@@ -74,8 +84,8 @@ public class SyncTaskActionCellEditor	extends DefaultCellEditor	implements Table
 		}
 		
 		box.setSelectedItem(value);
-		box.setForeground(selected ? table.getSelectionForeground() : table.getForeground());
-		box.setBackground(selected ? table.getSelectionBackground() : table.getBackground());		
+		box.setForeground(renderer && selected ? table.getSelectionForeground() : table.getForeground());
+		box.setBackground(renderer && selected ? table.getSelectionBackground() : table.getBackground());		
 		return box;
 	}
 }
