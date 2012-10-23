@@ -100,12 +100,18 @@ public class AndroidContextManager
 	{
 		if (contextProvidingActivity == null)
 		{
-			informContextDestroy(lastContext);
-			System.out.println("Context destroy");
+			if (lastContext != null) {
+				synchronized (lastContext) {
+					informContextDestroy(lastContext);
+					System.out.println("Context destroy");
+				}
+			}
 		} else
 		{
-			informContextCreate(lastContext);
-			System.out.println("Context create");
+			synchronized (contextProvidingActivity) {
+				informContextCreate(contextProvidingActivity);
+				System.out.println("Context create");
+			}
 		}
 		lastContext = contextProvidingActivity;
 	}

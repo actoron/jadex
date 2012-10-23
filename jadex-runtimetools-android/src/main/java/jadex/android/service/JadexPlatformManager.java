@@ -49,13 +49,13 @@ public class JadexPlatformManager
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
 	
-	public static JadexPlatformManager instance;
+	private static JadexPlatformManager instance = new JadexPlatformManager();
 	
 	public static JadexPlatformManager getInstance() {
 		return instance;
 	}
 
-	public JadexPlatformManager()
+	private JadexPlatformManager()
 	{
 		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
 		instance = this;
@@ -137,7 +137,7 @@ public class JadexPlatformManager
 				}
 				kernelString.append("\"");
 				
-				final String defOptions = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -wspublish false" + " -rspublish false" + " -android true" + " -kernels "
+				final String defOptions = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -awareness false" + " -wspublish false" + " -rspublish false" + " -android true" + " -kernels "
 						+ kernelString.toString() + " -binarymessages true" +
 						" -conf jadex.platform.PlatformAgent" +
 						// " -tcptransport false" +
@@ -212,7 +212,7 @@ public class JadexPlatformManager
 		Log.d("jadex-android", "Platform shutdown completed: " + platformID.toString());
 	}
 	
-	protected String getRandomPlatformID()
+	public String getRandomPlatformID()
 	{
 		StringBuilder sb = new StringBuilder(AndroidContextManager.getInstance().getUniqueDeviceName());
 		UUID randomUUID = UUID.randomUUID();

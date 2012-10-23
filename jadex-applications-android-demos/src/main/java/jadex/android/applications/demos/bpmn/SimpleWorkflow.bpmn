@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_rxRa0U29EeGhL9ZmcZLCEw" iD="_rxRa0E29EeGhL9ZmcZLCEw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zIVvAE29EeGhL9ZmcZLCEw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zIVvAU29EeGhL9ZmcZLCEw" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KoKI0E5VEeG--_UHL-4VXw" key="description" value="Simple Workflow Test"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ECKFME5VEeG--_UHL-4VXw" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyYE5VEeG--_UHL-4VXw" key="dimension" value="1:7"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyYU5VEeG--_UHL-4VXw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyYk5VEeG--_UHL-4VXw" key="complexColumns" value="false:false:false:false:false:false:true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyY05VEeG--_UHL-4VXw" key="0:0" value="androidContext"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyZE5VEeG--_UHL-4VXw" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyZU5VEeG--_UHL-4VXw" key="0:2" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6gyZk5VEeG--_UHL-4VXw" key="0:3" value="The android application context"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6hZcE5VEeG--_UHL-4VXw" key="0:4" value="android.content.Context"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6hZcU5VEeG--_UHL-4VXw" key="0:5" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6hZck5VEeG--_UHL-4VXw" key="0:6" value="jadex_arguments_table_Initial-Value_16889276-0f11-44eb-b150-18953625469c_complex"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ECKsQk5VEeG--_UHL-4VXw" source="jadex_arguments_table_Initial-Value_16889276-0f11-44eb-b150-18953625469c_complex"/>
+  <pools xmi:type="bpmn:Pool" xmi:id="_ryEFAU29EeGhL9ZmcZLCEw" iD="_ryEFAE29EeGhL9ZmcZLCEw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ryEsEU29EeGhL9ZmcZLCEw" iD="_ryEsEE29EeGhL9ZmcZLCEw" outgoingEdges="_0tnqEFYpEeGXrobMFNo4qg" name="How are you ?" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uizuUE29EeGhL9ZmcZLCEw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ui0VYE29EeGhL9ZmcZLCEw" key="class" value="jadex.android.applications.demos.bpmn.tasks.ShowActivityWithResultTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TWpN0E5TEeG--_UHL-4VXw" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2O1IFY_EeGJfpw9hz-5Ow" key="dimension" value="3:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2O1IVY_EeGJfpw9hz-5Ow" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2O1IlY_EeGJfpw9hz-5Ow" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2PcMFY_EeGJfpw9hz-5Ow" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2PcMVY_EeGJfpw9hz-5Ow" key="0:1" value="androidContext"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2PcMlY_EeGJfpw9hz-5Ow" key="0:2" value="android.content.Context"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2PcM1Y_EeGJfpw9hz-5Ow" key="0:3" value="androidContext"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2PcNFY_EeGJfpw9hz-5Ow" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QDQFY_EeGJfpw9hz-5Ow" key="1:1" value="activityClass"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QDQVY_EeGJfpw9hz-5Ow" key="1:2" value="java.lang.Class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QDQlY_EeGJfpw9hz-5Ow" key="1:3" value="jadex.android.applications.demos.bpmn.QuestionActivity.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QDQ1Y_EeGJfpw9hz-5Ow" key="2:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QDRFY_EeGJfpw9hz-5Ow" key="2:1" value="attributes"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QDRVY_EeGJfpw9hz-5Ow" key="2:2" value="java.util.HashMap"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2QqUFY_EeGJfpw9hz-5Ow" key="2:3" value="jadex.commons.SUtil.createHashMap(new Object[] {&quot;question&quot;, &quot;choices&quot;}, new Object[] {&quot;How are you doing ?&quot;, new String[] {&quot;Fine&quot;, &quot;Worried&quot;}})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_tKgd-FYpEeGXrobMFNo4qg" iD="_tKgd8FYpEeGXrobMFNo4qg" incomingEdges="_8iuDcVY8EeGyHKgzTbb6-g" name="Fine" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tKgd-VYpEeGXrobMFNo4qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tKgd-lYpEeGXrobMFNo4qg" key="class" value="jadex.android.applications.demos.bpmn.tasks.ShowActivityTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tKgd-1YpEeGXrobMFNo4qg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5oq4FY_EeGJfpw9hz-5Ow" key="dimension" value="3:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5pR8FY_EeGJfpw9hz-5Ow" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5pR8VY_EeGJfpw9hz-5Ow" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5pR8lY_EeGJfpw9hz-5Ow" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5pR81Y_EeGJfpw9hz-5Ow" key="0:1" value="androidContext"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5pR9FY_EeGJfpw9hz-5Ow" key="0:2" value="android.content.Context"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5pR9VY_EeGJfpw9hz-5Ow" key="0:3" value="androidContext"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5p5AFY_EeGJfpw9hz-5Ow" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5p5AVY_EeGJfpw9hz-5Ow" key="1:1" value="activityClass"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5p5AlY_EeGJfpw9hz-5Ow" key="1:2" value="java.lang.Class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5p5A1Y_EeGJfpw9hz-5Ow" key="1:3" value="jadex.android.applications.demos.bpmn.AnswerActivity.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5p5BFY_EeGJfpw9hz-5Ow" key="2:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5p5BVY_EeGJfpw9hz-5Ow" key="2:1" value="attributes"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5qgEFY_EeGJfpw9hz-5Ow" key="2:2" value="java.util.HashMap"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I5qgEVY_EeGJfpw9hz-5Ow" key="2:3" value="jadex.commons.SUtil.createHashMap(new Object[] {&quot;answer&quot;}, new Object[] {&quot;Glad to hear that.&quot;})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_tjAi4FY8EeGyHKgzTbb6-g" iD="_ti_70FY8EeGyHKgzTbb6-g" outgoingEdges="_8iuDcVY8EeGyHKgzTbb6-g _84TR4VY8EeGyHKgzTbb6-g" incomingEdges="_0tnqEFYpEeGXrobMFNo4qg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_wEBuKFY8EeGyHKgzTbb6-g" iD="_wEBuIFY8EeGyHKgzTbb6-g" incomingEdges="_84TR4VY8EeGyHKgzTbb6-g" name="Worried" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wEBuKVY8EeGyHKgzTbb6-g" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wEBuKlY8EeGyHKgzTbb6-g" key="class" value="jadex.android.applications.demos.bpmn.tasks.ShowActivityTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wEBuK1Y8EeGyHKgzTbb6-g" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgG5cFY_EeGJfpw9hz-5Ow" key="dimension" value="3:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgHggFY_EeGJfpw9hz-5Ow" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgHggVY_EeGJfpw9hz-5Ow" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgHgglY_EeGJfpw9hz-5Ow" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgHgg1Y_EeGJfpw9hz-5Ow" key="0:1" value="androidContext"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgHghFY_EeGJfpw9hz-5Ow" key="0:2" value="android.content.Context"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIHkFY_EeGJfpw9hz-5Ow" key="0:3" value="androidContext"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIHkVY_EeGJfpw9hz-5Ow" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIHklY_EeGJfpw9hz-5Ow" key="1:1" value="activityClass"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIHk1Y_EeGJfpw9hz-5Ow" key="1:2" value="java.lang.Class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIHlFY_EeGJfpw9hz-5Ow" key="1:3" value="jadex.android.applications.demos.bpmn.AnswerActivity.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIHlVY_EeGJfpw9hz-5Ow" key="2:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIuoFY_EeGJfpw9hz-5Ow" key="2:1" value="attributes"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIuoVY_EeGJfpw9hz-5Ow" key="2:2" value="java.util.HashMap"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KgIuolY_EeGJfpw9hz-5Ow" key="2:3" value="jadex.commons.SUtil.createHashMap(new Object[] {&quot;answer&quot;}, new Object[] {&quot;Sorry to hear that.&quot;})"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_0tnqEFYpEeGXrobMFNo4qg" iD="_0tnDAFYpEeGXrobMFNo4qg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8iuDcVY8EeGyHKgzTbb6-g" iD="_8iuDcFY8EeGyHKgzTbb6-g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mNGP0FY9EeGJfpw9hz-5Ow" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mNHd8FY9EeGJfpw9hz-5Ow" key="condition" value="attributes.get(&quot;answer&quot;).equals(&quot;Fine&quot;)"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_84TR4VY8EeGyHKgzTbb6-g" iD="_84TR4FY8EeGyHKgzTbb6-g" conditionType="Default" isDefault="true"/>
+  </pools>
+</bpmn:BpmnDiagram>

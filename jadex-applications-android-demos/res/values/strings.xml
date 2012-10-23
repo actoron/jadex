@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, JadexAndroidHelloWorldActivity!</string>
+    <string name="hello">This is the jadex-android demo application. Choose a demo to run.</string>
     <string name="starting">Starting Jadex Platform...</string>
     <string name="started">Platform started:  </string>
-    <string name="app_name">JadexAndroidHelloWorld</string>
+    <string name="app_name">Jadex Android Demos</string>
+    <string name="main_launchBPMNDemo">Launch BPMN Demo</string>
+    <string name="main_launchBenchmarkDemo">Launch Benchmark Demo</string>
+    <string name="main_launchEventDemo">Launch Event Demo</string>
+    
+    <string name="event_demoDescription">This Activity demonstrates the usage of messages and "events", which allow simple communication between agent and activity.
+        If you press the button below, a message is sent to the agent and then an event is thrown back to the activity.</string>
+    <string name="event_pingAgentButton">pingAgentButton</string>
+    
+     <string name="bpmn_demoDescription">This Activity demonstrates the usage BPMN-Workflows in Jadex-Android.
+         Please wait until the platform is started.</string>
 </resources>

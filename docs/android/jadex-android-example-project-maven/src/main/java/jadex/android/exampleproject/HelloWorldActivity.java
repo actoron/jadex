@@ -39,6 +39,15 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	/** Handler to allow agents to create Toasts */
 	public static Handler uiHandler;
 
+	/**
+	 * Constructor to set jadex platform parameters. 
+	 */
+	public HelloWorldActivity()
+	{
+		super();
+		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
+	}
+
 	/** Called when the activity is first created. */
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -158,11 +167,10 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	};
 
 	@Override
-	protected IFuture<IExternalAccess> onPlatformStart(IJadexPlatformBinder platformService)
+	protected void onPlatformStarting()
 	{
+		super.onPlatformStarting();
 		textView.setText(R.string.starting);
-		// custom startup: include only micro kernel
-		return platformService.startJadexPlatform(new String[]{JadexPlatformManager.KERNEL_MICRO});
 	}
 
 	@Override

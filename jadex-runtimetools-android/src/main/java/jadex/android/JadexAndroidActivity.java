@@ -2,6 +2,7 @@ package jadex.android;
 
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.service.IJadexPlatformBinder;
+import jadex.android.service.JadexPlatformManager;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -30,11 +31,15 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Window;
 
 /**
  * This is an Android Activity Class which provides needed Functionality and
- * comfort Features for Jadex Android Activities. It MUST be extended by every
- * Jadex-Android Activity.
+ * comfort Features for Jadex Android Activities. It uses the {@link JadexPlatformService}
+ * internally, but takes care about service binding.
+ * 
+ * To have that Jadex Platform started at Activity startup, use the Extra
+ * EXTRA_PLATFORM_AUTOSTART with boolean value <code>true</code>.
  * 
  * @author Julian Kalinowski
  */
@@ -49,33 +54,75 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	private Intent serviceIntent;
 	private IJadexPlatformBinder platformService;
 	protected IComponentIdentifier platformId;
-	private boolean autostart;
+	
+	private boolean platformAutostart;
+	private String[] platformKernels;
+	private String platformOptions;
+	private String platformName;
+
+	/**
+	 * Constructor
+	 */
+	public JadexAndroidActivity()
+	{
+		super();
+		platformAutostart = false;
+		platformKernels = JadexPlatformManager.DEFAULT_KERNELS;
+		platformOptions = "";
+		platformName = JadexPlatformManager.getInstance().getRandomPlatformID();
+	}
 	
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		autostart = getIntent().getBooleanExtra(EXTRA_PLATFORM_AUTOSTART, false);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		serviceIntent = new Intent(this, JadexPlatformService.class);
 		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
 	}
-
+	
 	protected void onDestroy()
 	{
 		super.onDestroy();
 		unbindService(this);
 	}
 
-	// /**
-	// * Returns the External Access Object of the Jadex Platform.
-	// *
-	// * @return {@link IExternalAccess}
-	// */
-	// public IExternalAccess getExternalPlatformAccess() throws
-	// JadexAndroidPlatformNotStartedError
-	// {
-	// checkIfJadexIsRunning("getExternalPlatformAccess()");
-	// return jadexAndroidContext.getExternalPlattformAccess();
-	// }
+	/**
+	 * Sets the autostart parameter for this jadex platform.
+	 * If true, the platform will be started during onCreate.
+	 * @param autostart
+	 */
+	protected void setPlatformAutostart(boolean autostart) {
+		if (!isJadexPlatformRunning()) {
+			this.platformAutostart = autostart;
+		} else {
+			throw new IllegalStateException("Cannot set autostart, platform already running!");
+		}
+	}
+	
+	/**
+	 * Sets the Kernels.
+	 * See {@link JadexPlatformManager} Constants for available Kernels.
+	 * @param kernels
+	 */
+	protected void setPlatformKernels(String ... kernels) {
+		this.platformKernels = kernels;
+	}
+	
+	/**
+	 * Sets platform options.
+	 * @param options
+	 */
+	protected void setPlatformOptions(String options) {
+		this.platformOptions = options;
+	}
+	
+	/**
+	 * Sets the name of the platform that is started by this activity.
+	 * @param name
+	 */
+	protected void setPlatformName(String name) {
+		this.platformName = name;
+	}
 
 	protected boolean isJadexPlatformRunning()
 	{
@@ -210,7 +257,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
 		platformService = (IJadexPlatformBinder) service;
-		if (autostart) {
+		if (platformAutostart) {
 			startPlatform();
 		}
 	}
@@ -229,22 +276,12 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		platformService.shutdownJadexPlatform(platformID);
 	}
 	
-
-	/**
-	 * Starts the jadex Platform.
-	 * Override to use your own options (use platformService.startJadexPlatform()).
-	 * @param platformService
-	 * @return external access of the running platform
-	 */
-	protected IFuture<IExternalAccess> onPlatformStart(IJadexPlatformBinder platformService)
-	{
-		return platformService.startJadexPlatform();
-	}
-	
 	/**
 	 * Called right before the platform startup.
 	 */
-	protected void onPlatformStarting() {}
+	protected void onPlatformStarting() {
+		setProgressBarIndeterminateVisibility(true);
+	}
 	
 	/**
 	 * Called right after the platform is started.
@@ -253,12 +290,22 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	protected void onPlatformStarted(IExternalAccess result)
 	{
 		this.platformId = result.getComponentIdentifier();
+		runOnUiThread(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				setProgressBarIndeterminateVisibility(false);
+			}
+		});
 	}
 	
-	protected void startPlatform()
+	final protected void startPlatform()
 	{
 		onPlatformStarting();
-		IFuture<IExternalAccess> platform = onPlatformStart(platformService);
+		IFuture<IExternalAccess> platform = platformService.startJadexPlatform(platformKernels, platformName, platformOptions);
+		
 		platform.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
 

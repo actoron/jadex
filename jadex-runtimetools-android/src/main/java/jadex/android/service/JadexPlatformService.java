@@ -19,7 +19,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.PlatformAgent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +94,7 @@ public class JadexPlatformService extends Service
 	public void onCreate()
 	{
 		super.onCreate();
-		jadexPlatformManager = new JadexPlatformManager();
+		jadexPlatformManager = JadexPlatformManager.getInstance();
 		AndroidContextManager.getInstance().setAndroidContext(this);
 		// jadexAndroidContext.addContextChangeListener(this);
 	}

@@ -1,11 +1,9 @@
 package jadex.android.controlcenter;
 
-import jadex.android.AndroidContextManager;
 import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
 import jadex.android.controlcenter.settings.ISettings;
 import jadex.android.controlcenter.settings.ServiceConnectingPreferenceActivity;
-import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -32,7 +30,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
@@ -47,21 +44,22 @@ import android.widget.ListView;
 
 /**
  * A Simple Control Center for Jadex-Android. Provides Access to configurable
- * Components and Services. Because Android doesn't provide a way to set Option
- * Menus for Child PreferenceScreens, this Activity is instantiated once for
- * every child PreferenceScreen that is displayed. It then displays the child
- * PreferenceScreen and delegates calls to the child Settings Implementation.
- * 
- * (See
- * http://stackoverflow.com/questions/5032141/adding-menus-to-child-preference
- * -screens)
+ * Components and Services.
  * 
  * Can be instanciated by creating an Intent an passing the ComponentIdentifier
  * of the Platform to be configured as Extra with the Key:
  * JadexAndroidControlCenter.EXTRA_PLATFORMID
  */
+// Because Android doesn't provide a way to set Option
+// Menus for Child PreferenceScreens, this Activity is instantiated once for
+// every child PreferenceScreen that is displayed. It then displays the child
+// PreferenceScreen and delegates calls to the child Settings Implementation.
+// 
+//(See
+// http://stackoverflow.com/questions/5032141/adding-menus-to-child-preference-screens)
 public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivity
 {
+	
 
 	private static final String EXTRA_PLATFORMID = "platformId";
 	private static final String EXTRA_SHOWCHILDPREFSCREEN = "showChildPrefScreen";
