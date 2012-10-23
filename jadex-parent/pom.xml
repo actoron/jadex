@@ -67,19 +67,26 @@
 		<url>http://jadex.svn.sourceforge.net/viewvc/jadex/</url>
 	</scm>
 
-	<distributionManagement>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-		<snapshotRepository>
-			<id>jadex-public-snapshots</id>
-			<name>Jadex Snapshot Repository</name>
-			<url>http://localhost/nexus/content/repositories/snapshots/</url>
-			<uniqueVersion>false</uniqueVersion>
-		</snapshotRepository>
-	</distributionManagement>
+	
+	<!-- We need this profile as workaround for including .apks in maven assemblies -->
+	<profiles>
+		<profile>
+			<id>deploy</id>
+			<distributionManagement>
+				<repository>
+					<id>sonatype-nexus-staging</id>
+					<name>Nexus Release Repository</name>
+					<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+				<snapshotRepository>
+					<id>jadex-public-snapshots</id>
+					<name>Jadex Snapshot Repository</name>
+					<url>http://localhost/nexus/content/repositories/snapshots/</url>
+					<uniqueVersion>false</uniqueVersion>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 
 	<build>
 		<resources>
