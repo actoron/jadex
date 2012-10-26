@@ -50,20 +50,23 @@ public class RotationTask extends AbstractTask
 			double tangle = targetdir.getDirectionAsDouble();
 			if(Math.abs(rangle-tangle)>0.1)
 			{
+				double	delta_rot	= 0.005;	// per millis, i.e. 0.001 = 2/speed seconds for full circle.
+				double	delta_mov	= 0.0005;	// per millis, i.e. 0.001 = original speed, 0.0005 = half original speed
+				
 				double f = rangle>tangle? -1: 1;
 				double d = Math.abs(rangle-tangle);
-				rangle = d<Math.PI? rangle+0.1*f: rangle-0.1*f;
+				rangle = d<Math.PI? rangle+progress*delta_rot*speed*f: rangle-progress*delta_rot*speed*f;
 				
 				double x = Math.cos(rangle);
 				double y = Math.sin(rangle);
 				IVector2 newdir = new Vector2Double(x,y);
 				obj.setProperty(PROPERTY_ROTATION, newdir);
 				
-				double	maxdist	= progress*speed*0.001;
+				double	maxdist	= delta_mov / delta_rot;
 				double dist = ((Space2D)space).getDistance(loc, destination).getAsDouble();
-				if(dist>maxdist || Math.random()>0.7)
+				if(dist>maxdist /*|| Math.random()>0.7*/)
 				{
-					IVector2 newloc	= newdir.copy().normalize().multiply(speed*0.05).add(loc);
+					IVector2 newloc	= newdir.copy().normalize().multiply(progress*speed*delta_mov).add(loc);
 					((Space2D)space).setPosition(obj.getId(), newloc);
 				}
 			}
