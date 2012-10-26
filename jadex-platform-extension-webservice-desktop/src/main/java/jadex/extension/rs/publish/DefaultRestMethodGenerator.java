@@ -280,7 +280,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	 */
 	public Class<?> guessRestType(Method method)
 	{
-	    // Retrieve = GET (!hasparams && hasret)
+	    // Retrieve = GET (hasparams && hasret)
 	    // Update = POST (hasparams && hasret)
 	    // Create = PUT  return is pointer to new resource (hasparams? && hasret)
 	    // Delete = DELETE (hasparams? && hasret?)
@@ -294,17 +294,22 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 		boolean hasret = !rettype.equals(Void.class) && !rettype.equals(void.class);
 		
 		// GET or POST if has both
-		if(hasparams && hasret)
+		if(hasret)
 		{
-			if(hasStringConvertableParameters(method, rettype, paramtypes))
+			if(hasparams)
 			{
-				ret = GET.class;
-			}
-			else
-			{
-				ret = POST.class;
+				if(hasStringConvertableParameters(method, rettype, paramtypes))
+				{
+					ret = GET.class;
+				}
+				else
+				{
+					ret = POST.class;
+				}
 			}
 		}
+		
+		// todo: other types?
 		
 //		System.out.println("rest-type: "+ret.getName()+" "+method.getName()+" "+hasparams+" "+hasret);
 		

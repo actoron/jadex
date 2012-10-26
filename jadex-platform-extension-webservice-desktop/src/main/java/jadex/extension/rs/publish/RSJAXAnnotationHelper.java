@@ -3,6 +3,9 @@ package jadex.extension.rs.publish;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+/**
+ * 
+ */
 public class RSJAXAnnotationHelper
 {
 	
