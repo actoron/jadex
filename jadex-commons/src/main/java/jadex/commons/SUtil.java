@@ -1482,7 +1482,8 @@ public class SUtil
 		if(classloader == null)
 			classloader = SUtil.class.getClassLoader();
 
-		List cps = SCollection.createArrayList();
+		Set<URL> cps = new LinkedHashSet<URL>(); 
+				
 		StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 		while(stok.hasMoreTokens())
 		{
@@ -1490,7 +1491,7 @@ public class SUtil
 			{
 				String entry = stok.nextToken();
 				File file = new File(entry);
-				cps.add(file.toURI().toURL());
+				cps.add(file.getCanonicalFile().toURI().toURL());
 				
 				// Code below does not work for paths with spaces in it.
 				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
@@ -1509,6 +1510,9 @@ public class SUtil
 				// Hack!!! Print warning?
 				// e.printStackTrace();
 			}
+			catch(IOException e)
+			{
+			}
 		}
 
 		if(classloader instanceof URLClassLoader)
@@ -1519,7 +1523,7 @@ public class SUtil
 		}
 		
 		cps.addAll(collectClasspathURLs(classloader));
-		return cps;
+		return new ArrayList<URL>(cps);
 	}
 	
 	/**
