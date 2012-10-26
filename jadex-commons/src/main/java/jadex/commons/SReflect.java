@@ -1202,7 +1202,15 @@ public class SReflect
 	}
 	
 	/**
-	 * 
+	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
+	 */
+	public static Class<?>[] scanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter)
+	{
+		return scanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter);
+	}
+	
+	/**
+	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
 	public static Class<?>[] scanForClasses(URL[] urls, ClassLoader classloader, IFilter filefilter, IFilter classfilter)
 	{
@@ -1238,7 +1246,7 @@ public class SReflect
 	}
 
 	/**
-	 * 
+	 *  Scan for files in a given list of urls.
 	 */
 	public static String[] scanForFiles(URL[] urls, IFilter filter)
 	{
@@ -1294,7 +1302,7 @@ public class SReflect
 	}
 	
 	/**
-	 * 
+	 *  Scan directories.
 	 */
 	public static void scanDir(URL[] urls, File file, IFilter filter, List<String> results, List<String> donedirs)
 	{

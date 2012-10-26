@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -1469,53 +1470,51 @@ public class SUtil
 	// return ret;
 	// }
 
-//	/**
-//	 * Get the current classpath as a list of URLs
-//	 */
-//	public static List<URL> getClasspathURLs(ClassLoader classloader)
-//	{
-//		if(classloader == null)
-//			classloader = SUtil.class.getClassLoader();
-//
-//		List cps = SCollection.createArrayList();
-//		StringTokenizer stok = new StringTokenizer(
-//				System.getProperty("java.class.path"),
-//				System.getProperty("path.separator"));
-//		while(stok.hasMoreTokens())
-//		{
-//			try
-//			{
-//				String entry = stok.nextToken();
-//				File file = new File(entry);
-//				cps.add(file.toURI().toURL());
-//				
-//				// Code below does not work for paths with spaces in it.
-//				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
-////				if(file.isDirectory()
-////						&& !entry
-////								.endsWith(System.getProperty("file.separator")))
-////				{
-////					// Normalize, that directories end with "/".
-////					entry += System.getProperty("file.separator");
-////				}
-////				cps.add(new URL("file:///" + entry));
-//			}
-//			catch(MalformedURLException e)
-//			{
-//				// Maybe invalid classpath entries --> just ignore.
-//				// Hack!!! Print warning?
-//				// e.printStackTrace();
-//			}
-//		}
-//
-//		if(classloader instanceof URLClassLoader)
-//		{
-//			URL[] urls = ((URLClassLoader)classloader).getURLs();
-//			for(int i = 0; i < urls.length; i++)
-//				cps.add(urls[i]);
-//		}
-//		return cps;
-//	}
+	/**
+	 * Get the current classpath as a list of URLs
+	 */
+	public static List<URL> getClasspathURLs(ClassLoader classloader)
+	{
+		if(classloader == null)
+			classloader = SUtil.class.getClassLoader();
+
+		List cps = SCollection.createArrayList();
+		StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
+		while(stok.hasMoreTokens())
+		{
+			try
+			{
+				String entry = stok.nextToken();
+				File file = new File(entry);
+				cps.add(file.toURI().toURL());
+				
+				// Code below does not work for paths with spaces in it.
+				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+//				if(file.isDirectory()
+//						&& !entry
+//								.endsWith(System.getProperty("file.separator")))
+//				{
+//					// Normalize, that directories end with "/".
+//					entry += System.getProperty("file.separator");
+//				}
+//				cps.add(new URL("file:///" + entry));
+			}
+			catch(MalformedURLException e)
+			{
+				// Maybe invalid classpath entries --> just ignore.
+				// Hack!!! Print warning?
+				// e.printStackTrace();
+			}
+		}
+
+		if(classloader instanceof URLClassLoader)
+		{
+			URL[] urls = ((URLClassLoader)classloader).getURLs();
+			for(int i = 0; i < urls.length; i++)
+				cps.add(urls[i]);
+		}
+		return cps;
+	}
 
 	/**
 	 * Calculate the cartesian product of parameters. Example: names = {"a",

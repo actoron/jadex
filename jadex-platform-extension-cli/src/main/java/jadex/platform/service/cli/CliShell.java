@@ -42,17 +42,22 @@ public class CliShell extends ACliShell
 	/** The prompt. */
 	protected String prompt;
 	
+	// todo: use rid?
+	/** The class loader. */
+	protected ClassLoader cl;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new cli.
 	 */
-	public CliShell(Object context, String prompt, Tuple2<String, Integer> sessionid)
+	public CliShell(Object context, String prompt, Tuple2<String, Integer> sessionid, ClassLoader cl)
 	{
 		super(sessionid);
 		this.commands = new LinkedHashMap<String, ICliCommand>();
 		this.context = new CliContext(this, context);
 		this.prompt = prompt;
+		this.cl = cl;
 	}
 	
 	//-------- methods --------
@@ -72,13 +77,13 @@ public class CliShell extends ACliShell
 		else
 		{
 			URL[] urls = null;
-			ClassLoader cl = getClass().getClassLoader();
-			if(cl instanceof URLClassLoader)
-			{
-				urls = ((URLClassLoader)cl).getURLs();
-			}
+//			ClassLoader cl = getClass().getClassLoader();
+//			if(cl instanceof URLClassLoader)
+//			{
+//				urls = ((URLClassLoader)cl).getURLs();
+//			}
 			
-			Class<?>[] cmds = SReflect.scanForClasses(urls, cl, new IFilter()
+			Class<?>[] cmds = SReflect.scanForClasses(cl, new IFilter()
 			{
 				public boolean filter(Object obj)
 				{
