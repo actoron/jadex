@@ -46,7 +46,7 @@ public class RotationTask extends AbstractTask
 		{
 			IVector2 targetdir = destination.copy().subtract(loc).normalize();
 
-			double	delta_rot	= 0.005;	// per millis, i.e. 0.001 = 2/speed seconds for full circle.
+			double	delta_rot	= 0.005;	// per millis, i.e. 0.001 = 1/speed seconds for half circle.
 			double	delta_mov	= 0.0005;	// per millis, i.e. 0.001 = original speed, 0.0005 = half original speed
 			
 			double rangle = rot.getDirectionAsDouble();
