@@ -46,13 +46,13 @@ public class RotationTask extends AbstractTask
 		{
 			IVector2 targetdir = destination.copy().subtract(loc).normalize();
 
+			double	delta_rot	= 0.005;	// per millis, i.e. 0.001 = 2/speed seconds for full circle.
+			double	delta_mov	= 0.0005;	// per millis, i.e. 0.001 = original speed, 0.0005 = half original speed
+			
 			double rangle = rot.getDirectionAsDouble();
 			double tangle = targetdir.getDirectionAsDouble();
-			if(Math.abs(rangle-tangle)>0.1)
+			if(Math.abs(rangle-tangle)>progress*delta_rot*speed)
 			{
-				double	delta_rot	= 0.005;	// per millis, i.e. 0.001 = 2/speed seconds for full circle.
-				double	delta_mov	= 0.0005;	// per millis, i.e. 0.001 = original speed, 0.0005 = half original speed
-				
 				double f = rangle>tangle? -1: 1;
 				double d = Math.abs(rangle-tangle);
 				rangle = d<Math.PI? rangle+progress*delta_rot*speed*f: rangle-progress*delta_rot*speed*f;
@@ -72,6 +72,11 @@ public class RotationTask extends AbstractTask
 			}
 			else
 			{
+				double x = Math.cos(tangle);
+				double y = Math.sin(tangle);
+				IVector2 newdir = new Vector2Double(x,y);
+				obj.setProperty(PROPERTY_ROTATION, newdir);
+				
 				setFinished(space, obj, true);
 			}
 		}
