@@ -38,16 +38,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -1513,7 +1517,155 @@ public class SUtil
 			for(int i = 0; i < urls.length; i++)
 				cps.add(urls[i]);
 		}
+		
+		cps.addAll(collectClasspathURLs(classloader));
 		return cps;
+	}
+	
+	/**
+	 *  Get other contained (but not directly managed) urls from parent classloaders.
+	 *  @return The set of urls.
+	 */
+	public static Set<URL>	collectClasspathURLs(ClassLoader baseloader)
+	{
+		Set<URL> ret = new LinkedHashSet<URL>();
+		SUtil.collectClasspathURLs(baseloader, ret, new HashSet<String>());
+		return ret;
+	}
+	
+	/**
+	 *  Collect all URLs belonging to a class loader.
+	 */
+	protected static void	collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
+	{
+		assert classloader!=null;
+		
+		if(classloader.getParent()!=null)
+		{
+			collectClasspathURLs(classloader.getParent(), set, jarnames);
+		}
+		
+		if(classloader instanceof URLClassLoader)
+		{
+			URL[] urls = ((URLClassLoader)classloader).getURLs();
+			for(int i=0; i<urls.length; i++)
+			{
+				String	name	= SUtil.getFile(urls[i]).getName();
+				if(name.endsWith(".jar"))
+				{
+					String jarname	= getJarName(name);
+					jarnames.add(jarname);
+				}
+			}
+			
+			for(int i = 0; i < urls.length; i++)
+			{
+				set.add(urls[i]);
+				collectManifestURLs(urls[i], set, jarnames);
+			}
+		}
+	}
+	
+	/**
+	 *  Get the name of a jar file without extension and version info.
+	 */
+	public static String	getJarName(String filename)
+	{
+		String	ret	= filename;
+		int	slash	= filename.lastIndexOf('/');
+		if(slash!=-1)
+		{
+			ret	= ret.substring(slash+1);
+		}
+		Scanner	s	= new Scanner(ret);
+		s.findWithinHorizon("(.*?)(-[0-9]+\\.|\\.jar)", 0);
+		ret	= s.match().group(1);
+//		System.out.println("jar: "+filename+" is "+ret);
+		s.close();
+		return ret;
+	}
+	
+	/**
+	 *  Collect all URLs as specified in a manifest.
+	 */
+	public static void	collectManifestURLs(URL url, Set<URL> set, Set<String> jarnames)
+	{
+		File	file	= SUtil.urlToFile(url.toString());
+		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
+		{
+			JarFile jarfile = null;
+	        try 
+	        {
+	            jarfile	= new JarFile(file);
+	            Manifest manifest = jarfile.getManifest();
+	            if(manifest!=null)
+	            {
+	                String	classpath	= manifest.getMainAttributes().getValue(new Attributes.Name("Class-Path"));
+	                if(classpath!=null)
+	                {
+	                	StringTokenizer	tok	= new StringTokenizer(classpath, " ");
+	            		while(tok.hasMoreElements())
+	            		{
+	            			String path = tok.nextToken();
+	            			File	urlfile;
+	            			
+	            			// Search in directory of original jar (todo: also search in local dir!?)
+	            			urlfile = new File(file.getParentFile(), path);
+	            			
+	            			// Try as absolute path
+	            			if(!urlfile.exists())
+	            			{
+	            				urlfile	= new File(path);
+	            			}
+	            			
+	            			// Try as url
+	            			if(!urlfile.exists())
+	            			{
+	            				urlfile	= SUtil.urlToFile(path);
+	            			}
+	
+	            			if(urlfile!=null && urlfile.exists())
+	            			{
+		            			try
+			                	{
+		            				if(urlfile.getName().endsWith(".jar"))
+		            				{
+		            					String jarname	= getJarName(urlfile.getName());
+		            					jarnames.add(jarname);
+		            				}
+		            				URL depurl = urlfile.toURI().toURL();
+		            				set.add(depurl);
+		            				collectManifestURLs(depurl, set, jarnames);
+		            			}
+		                    	catch (Exception e)
+		                    	{
+		                    		//component.getLogger().warning("Error collecting manifest URLs for "+urlfile+": "+e);
+		                    	}
+	                    	}
+	            			else if(!path.endsWith(".jar") || !jarnames.contains(getJarName(path)))
+	            			{
+	            				//component.getLogger().warning("Jar not found: "+file+", "+path);
+	            			}
+	               		}
+	                }
+	            }
+		    }
+		    catch(Exception e)
+		    {
+				//component.getLogger().warning("Error collecting manifest URLs for "+url+": "+e);
+		    }
+	        finally
+	        {
+	        	try
+	        	{
+	        		if(jarfile!=null)
+	        			jarfile.close();
+	        	}
+	        	catch(Exception e)
+	        	{
+	        	}
+	        }
+		}
 	}
 
 	/**

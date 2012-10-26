@@ -76,13 +76,12 @@ public class CliShell extends ACliShell
 		}
 		else
 		{
-			URL[] urls = null;
+			//URL[] urls = null;
 //			ClassLoader cl = getClass().getClassLoader();
 //			if(cl instanceof URLClassLoader)
 //			{
 //				urls = ((URLClassLoader)cl).getURLs();
 //			}
-			
 			Class<?>[] cmds = SReflect.scanForClasses(cl, new IFilter()
 			{
 				public boolean filter(Object obj)
