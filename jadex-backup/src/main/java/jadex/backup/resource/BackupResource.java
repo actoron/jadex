@@ -274,7 +274,7 @@ public class BackupResource
 		else
 		{
 			// When not changed: add new time stamps to meta information
-			local.updateVTimes(fi);
+			local.updateVTimes(fi, true);
 			props.setProperty(local.getLocation(), local.getVTime());
 			save();
 			
@@ -332,7 +332,7 @@ public class BackupResource
 			if(ofi!=null)
 			{
 				ofi.bumpVTime(getLocalId(), orig.lastModified(), null);
-				ofi.updateVTimes(remotefi);
+				ofi.updateVTimes(remotefi, true);
 				props.setProperty(ofi.getLocation(), ofi.getVTime());
 			}
 			else
@@ -379,7 +379,7 @@ public class BackupResource
 			if(ofi!=null)
 			{
 				ofi.bumpVTime(getLocalId(), orig.lastModified(), null);
-				ofi.updateVTimes(remotefi);
+				ofi.updateVTimes(remotefi, true);
 				props.setProperty(ofi.getLocation(), ofi.getVTime());
 			}
 			else
@@ -419,7 +419,7 @@ public class BackupResource
 			
 			// Mark local file info as current with respect to remote version.
 			ofi.setVTime(getLocalId(), orig.lastModified());	// Do not bump as file remained the same (todo: should be checked by hash code anyways)
-			ofi.updateVTimes(remotefi);
+			ofi.updateVTimes(remotefi, false);
 			props.setProperty(ofi.getLocation(), ofi.getVTime());
 			save();
 		}

@@ -229,8 +229,10 @@ public class FileInfo
 	 *  Update the vector times of this file info
 	 *  with vector times of another file info,
 	 *  if the absolute values are larger or the same but valid instead of invalid.
+	 *  @param fi	The remote file info, from which which times should be taken.
+	 *  @param valid	Set new valid times as valid (e.g. for update or copy) or all new times as invalid (for override).
 	 */
-	public void	updateVTimes(FileInfo fi)
+	public void	updateVTimes(FileInfo fi, boolean valid)
 	{
 		if(!location.equals(fi.getLocation()))
 		{
@@ -245,7 +247,7 @@ public class FileInfo
 			if(Math.abs(getVTime(node))<Math.abs(fi.getVTime(node))
 				|| Math.abs(getVTime(node))==fi.getVTime(node))
 			{
-				setVTime(node, fi.getVTime(node));
+				setVTime(node, valid ? fi.getVTime(node) : -Math.abs(fi.getVTime(node)));
 			}
 		}		
 	}
