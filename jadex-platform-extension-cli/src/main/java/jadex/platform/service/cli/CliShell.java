@@ -13,9 +13,9 @@ import jadex.commons.future.IFuture;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.jar.JarEntry;
 
 
 /**
@@ -96,6 +96,10 @@ public class CliShell extends ACliShell
 					else if(obj instanceof String)
 					{
 						name = ((String)obj);
+					}
+					else if(obj instanceof JarEntry)
+					{
+						name = ((JarEntry) obj).getName();
 					}
 					
 					if(name!=null)
