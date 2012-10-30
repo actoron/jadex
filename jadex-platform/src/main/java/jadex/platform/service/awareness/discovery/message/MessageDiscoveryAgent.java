@@ -82,6 +82,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 						// If platform removed, force task to ping (and probably fail) on next execution.
 						else if(announcements.containsKey(di.getComponentIdentifier()))
 						{
+//							System.out.println("set to null: "+di.getComponentIdentifier());
 							announcements.put(di.getComponentIdentifier(), new Long(0));
 						}
 					}
@@ -129,6 +130,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 		long	old	= announcements.containsKey(cid) ? announcements.get(cid).longValue() : Long.MIN_VALUE;
 		if(old!=-1 && time>old)
 		{
+//			System.out.println("set to time: "+cid+", "+time);
 			announcements.put(cid, new Long(time));
 		}
 
@@ -184,6 +186,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 				}
 				else
 				{
+//					System.out.println("wait: "+cid+", "+(valid-System.currentTimeMillis()));
 					performAnnouncements(cid);					
 				}
 				

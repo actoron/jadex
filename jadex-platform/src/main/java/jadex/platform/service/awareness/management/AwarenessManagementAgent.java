@@ -335,8 +335,20 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				changedaddrs	= !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
 				
 				dif.setComponentIdentifier(sender);
-				dif.setTime(getClockTime());
-				dif.setDelay(info.getDelay());
+				// Hack!!! Only update times when longer valid.
+				if(dif.getDelay()!=-1)
+				{
+					if(info.getDelay()==-1 || getClockTime()+info.getDelay()>dif.getTime()+dif.getDelay())
+					{
+						dif.setTime(getClockTime());
+						dif.setDelay(info.getDelay());
+					}
+				}
+				else
+				{
+					// Allow users to keep track of recency of platform info.
+					dif.setTime(getClockTime());
+				}
 				dif.setRemoteExcluded(remoteexcluded);
 			}
 			

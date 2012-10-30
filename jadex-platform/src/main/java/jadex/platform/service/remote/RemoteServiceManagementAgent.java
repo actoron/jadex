@@ -125,9 +125,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
 	{
-		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
+//		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
 //		System.out.println("RMS "+getComponentIdentifier()+" received message from "+msg.get(SFipa.SENDER)
-//			+": "+tmp.substring(0, Math.min(tmp.length(), 80)));
+//			+": "+tmp.substring(0, Math.min(tmp.length(), 400)));
 		
 		// Handle pings for message awareness (hack that rms does this?)
 		if((SFipa.QUERY_IF.equals(msg.get(SFipa.PERFORMATIVE)) 

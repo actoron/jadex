@@ -103,6 +103,8 @@ if(infos.length>0)
 <p>
 	For redundancy and load balancing reasons there are several public relay servers available as stated below.
 	You can also host you own relay server by deploying the relay web application in a servlet container such as Tomcat. 
+	More information about the Jadex infrastructure can be found at the
+	<a href="http://www.activecomponents.org/bin/view/Infrastructure/Overview">infrastructure overview</a>.
 </p>
 <table style="margin-left: 30px">
 	<tr>
@@ -133,6 +135,16 @@ if(infos.length>0)
 		</td>
 		<td style="border: 0; padding: 0; text-align: center">
 			<img src="resources/Garfield.png"/>
+		</td>
+	</tr>
+	<tr>
+		<td style="border: 0; padding: 0">
+			o<SPAN class="wikilink">
+				<A href="http://toaster.activecomponents.org/relay"><SPAN class="wikigeneratedlinkcontent">http://toaster.activecomponents.org/relay</SPAN></A>
+			</SPAN>
+		</td>
+		<td style="border: 0; padding: 0; text-align: center">
+			<img src="resources/jadex-toaster.png"/>
 		</td>
 	</tr>
 </table>
