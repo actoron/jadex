@@ -4,16 +4,23 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <ScrollView
+    
+    <ListView 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+        android:id="@+id/chat_listView">
+    </ListView>
+<!--     <ScrollView -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_weight="1" > -->
 
-        <TextView
-            android:id="@+id/agntTextView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
-    </ScrollView>
+<!--         <TextView -->
+<!--             android:id="@+id/agntTextView" -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="fill_parent" /> -->
+<!--     </ScrollView> -->
 
     <TableLayout
         android:layout_width="fill_parent"

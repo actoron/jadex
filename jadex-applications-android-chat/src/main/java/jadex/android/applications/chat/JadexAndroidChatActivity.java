@@ -1,6 +1,6 @@
 package jadex.android.applications.chat;
 
-import jadex.android.applications.chat.AndroidChatService.ChatMessageListener;
+import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.commons.ChangeEvent;
@@ -15,16 +15,19 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 /**
  * Activity (screen) for the jadex android benchmark app. Starts the platform
  * and allows launching the different benchmarks.
  */
-public class JadexAndroidChatActivity extends Activity implements ServiceConnection, ChatMessageListener
+public class JadexAndroidChatActivity extends Activity implements ServiceConnection, ChatEventListener
 {
 	// -------- attributes --------
 
@@ -35,7 +38,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	private ISubscriptionIntermediateFuture<ChatEvent> subscription;
 
 	/** The text view for showing results. */
-	private TextView textView;
+	private ListView listView;
 
 	private Button sendButton;
 
@@ -53,6 +56,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.chat);
 
 		sendButton = (Button) findViewById(R.id.send);
@@ -62,26 +66,17 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 
 		sendButton.setOnClickListener(onSendMessageClickListener);
 
-		textView = (TextView) findViewById(R.id.agntTextView);
-		SUtil.addSystemOutListener(new IChangeListener<String>()
-		{
-			public void changeOccurred(final ChangeEvent<String> event)
-			{
-				runOnUiThread(new Runnable()
-				{
-					public void run()
-					{
-						textView.append(event.getValue() + "\n");
-					}
-				});
-			}
-		});
+		listView = (ListView) findViewById(R.id.chat_listView);
+		chatEventAdapter = new ChatEventArrayAdapter(this);
+		listView.setAdapter(chatEventAdapter);
+		
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
+		setProgressBarIndeterminateVisibility(true);
 		bindService(new Intent(this, AndroidChatService.class), this, BIND_AUTO_CREATE);
 	}
 
@@ -106,7 +101,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 		{
 			sendButton.setEnabled(false);
 			messageEditText.setEnabled(false);
-
+			setProgressBarIndeterminateVisibility(true);
 			service.sendMessage(messageEditText.getText().toString()).addResultListener(new DefaultResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
@@ -118,6 +113,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 							messageEditText.setText("");
 							sendButton.setEnabled(true);
 							messageEditText.setEnabled(true);
+							setProgressBarIndeterminateVisibility(false);
 						}
 					});
 				}
@@ -133,6 +129,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 						{
 							messageEditText.setEnabled(true);
 							messageEditText.setEnabled(true);
+							setProgressBarIndeterminateVisibility(false);
 						}
 					});
 				}
@@ -141,17 +138,26 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 		}
 	};
 
+	private ChatEventArrayAdapter chatEventAdapter;
+
 	public void onServiceConnected(ComponentName comp, IBinder binder)
 	{
 		this.service = (IAndroidChatService) binder;
-		this.service.setMessageListener(this);
-		setConnected(true);
+		this.service.setChatEventListener(this);
 	}
 
-	private void setConnected(boolean b)
+	private void setConnected(final boolean b)
 	{
-		sendButton.setEnabled(b);
-		messageEditText.setEnabled(b);
+		runOnUiThread(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				sendButton.setEnabled(b);
+				messageEditText.setEnabled(b);
+			}
+		});
 		this.connected = b;
 	}
 
@@ -162,17 +168,30 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	}
 
 	@Override
-	public void messageReceived(String sender, String message)
+	public void eventReceived(final ChatEvent event)
 	{
-		final StringBuilder buf = new StringBuilder();
-		buf.append("[").append(sender).append("]: ").append(message).append("\n");
 		runOnUiThread(new Runnable()
 		{
 			
 			@Override
 			public void run()
 			{
-				textView.append(buf.toString());
+				chatEventAdapter.add(event);
+			}
+		});
+	}
+	
+	@Override
+	public void chatConnected()
+	{
+		setConnected(true);
+		runOnUiThread(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				setProgressBarIndeterminateVisibility(false);
 			}
 		});
 	}
