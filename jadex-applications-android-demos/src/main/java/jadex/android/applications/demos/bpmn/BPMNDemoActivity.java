@@ -8,9 +8,12 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import android.os.Bundle;
 
+/**
+ * This Activity shows a sample BPMN Workflow beeing executed using Jadex.
+ */
 public class BPMNDemoActivity extends JadexAndroidActivity
 {
-	
+	/** Constructor */
 	public BPMNDemoActivity()
 	{
 		super();

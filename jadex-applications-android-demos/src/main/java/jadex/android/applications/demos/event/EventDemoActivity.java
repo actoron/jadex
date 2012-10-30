@@ -19,13 +19,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EventActivity extends JadexAndroidActivity
+/**
+ * This Activity shows how to communicate with agents via Events.
+ */
+public class EventDemoActivity extends JadexAndroidActivity
 {
+	//-------- attributes --------
 	private Button pingAgentButton;
 	private TextView descriptionTextView;
 	protected IComponentIdentifier agentIdentifier;
 
-	public EventActivity()
+	//-------- constructor --------
+	
+	public EventDemoActivity()
 	{
 		super();
 		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
@@ -33,6 +39,8 @@ public class EventActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 	}
 
+	//-------- methods --------
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -61,7 +69,7 @@ public class EventActivity extends JadexAndroidActivity
 
 					public void run()
 					{
-						Toast makeText = Toast.makeText(EventActivity.this, event.getMessage(), Toast.LENGTH_SHORT);
+						Toast makeText = Toast.makeText(EventDemoActivity.this, event.getMessage(), Toast.LENGTH_SHORT);
 						makeText.show();
 					}
 				});

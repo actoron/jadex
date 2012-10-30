@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:id="@+id/benchmark_creation"
+                  android:title="Micro Creation" />
+            <item android:id="@+id/benchmark_puzzle"
+                  android:title="Puzzle" />
+            <item android:id="@+id/benchmark_nocodec"
+                  android:title="Message No Codec" />
+            <item android:id="@+id/benchmark_codec"
+                  android:title="Message Codec" />
+            <item android:id="@+id/benchmark_remote"
+                  android:title="Message Remote" />
+            <item android:id="@+id/benchmark_remotecodec"
+                  android:title="Message Remote Codec" />
+</menu>

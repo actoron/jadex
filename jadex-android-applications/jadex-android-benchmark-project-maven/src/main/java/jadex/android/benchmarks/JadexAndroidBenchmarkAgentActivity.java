@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -63,7 +64,7 @@ import android.widget.TextView;
  *  Activity (screen) for the jadex android benchmark app.
  *  Starts the platform and allows launching the different benchmarks.
  */
-public class JadexAndroidBenchmarkAgentActivity extends JadexAndroidActivity
+public class JadexAndroidBenchmarkAgentActivity extends Activity
 {
 	//-------- attributes --------
 	

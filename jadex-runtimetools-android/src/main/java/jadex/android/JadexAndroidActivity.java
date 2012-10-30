@@ -132,6 +132,11 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 			return false;
 		}
 	}
+	
+	protected IExternalAccess getPlatformAccess() {
+		checkIfJadexIsRunning("getPlatformAccess()");
+		return platformService.getExternalPlatformAccess(platformId);
+	}
 
 	protected boolean isJadexPlatformRunning(IComponentIdentifier platformId)
 	{
@@ -237,8 +242,8 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}
 	}
-
-	private IFuture<IMessageService> getMS()
+	
+	protected IFuture<IMessageService> getMS()
 	{
 		return platformService.getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<IMessageService>()
 		{
@@ -248,6 +253,22 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 				Future<IMessageService> ret = new Future<IMessageService>();
 				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 						ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
+
+				return ret;
+			}
+		});
+	}
+	
+	protected IFuture<IComponentManagementService> getCMS()
+	{
+		return platformService.getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<IComponentManagementService>()
+		{
+			@Classname("create-component")
+			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
+			{
+				Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
+				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+						ia.createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
 
 				return ret;
 			}

@@ -14,11 +14,12 @@
 			</intent-filter>
 		</activity>
 		<activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter"></activity>
+		<service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
+		<activity android:name=".event.EventDemoActivity"></activity>
+		<activity android:name=".benchmark.BenchmarkDemoActivity"></activity>
+		<activity android:name=".bpmn.BPMNDemoActivity"></activity>
 		<activity android:name=".bpmn.QuestionActivity"></activity>
 		<activity android:name=".bpmn.AnswerActivity"></activity>
-		<activity android:name=".event.EventActivity"></activity>
-		<service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
-		<activity android:name=".bpmn.BPMNDemoActivity"></activity>
 	</application>
 	
 </manifest>
