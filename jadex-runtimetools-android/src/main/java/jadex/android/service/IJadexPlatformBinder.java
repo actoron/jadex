@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.IFuture;
 
 /**
@@ -31,6 +32,12 @@ public interface IJadexPlatformBinder
 	 * Retrieves the CMS of the Platform with the given ID.
 	 */
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID);
+	
+	/**
+	 * Retrieves the MS of the Platform with the given ID.
+	 */
+	public IFuture<IMessageService> getMS(IComponentIdentifier platformID);
+
 
 	// ---------- starting / stopping ----------
 

@@ -13,6 +13,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -100,6 +101,26 @@ public class JadexPlatformManager
 			}
 		});
 	}
+	
+	/**
+	 * Retrieves the MS of the Platform with the given ID.
+	 */
+	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
+	{
+		return getExternalPlatformAccess(platformID).scheduleStep(new IComponentStep<IMessageService>()
+		{
+			@Classname("create-component")
+			public IFuture<IMessageService> execute(IInternalAccess ia)
+			{
+				Future<IMessageService> ret = new Future<IMessageService>();
+				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+						ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
+
+				return ret;
+			}
+		});
+	}
+	
 
 //	public IFuture<IExternalAccess> startJadexPlatform()
 //	{

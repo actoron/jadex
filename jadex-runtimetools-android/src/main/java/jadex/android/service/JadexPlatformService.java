@@ -34,7 +34,19 @@ import android.os.IBinder;
 public class JadexPlatformService extends Service
 {
 
-	protected JadexPlatformManager jadexPlatformManager;
+	private JadexPlatformManager jadexPlatformManager;
+	
+	private String[] platformKernels;
+	private String platformOptions;
+	private boolean platformAutostart;
+	private String platformName;
+
+	private IComponentIdentifier platformId;
+	
+	public JadexPlatformService()
+	{
+		jadexPlatformManager = JadexPlatformManager.getInstance();
+	}
 
 	@Override
 	public IBinder onBind(Intent intent)
@@ -74,28 +86,15 @@ public class JadexPlatformService extends Service
 
 		};
 	}
-
-	protected IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
-	{
-		onPlatformStarting();
-		IFuture<IExternalAccess> fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
-		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
-		{
-			@Override
-			public void resultAvailable(IExternalAccess result)
-			{
-				JadexPlatformService.this.onPlatformStarted(result);
-			}
-		});
-		return fut;
-	}
-
+	
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		jadexPlatformManager = JadexPlatformManager.getInstance();
 		AndroidContextManager.getInstance().setAndroidContext(this);
+		if (platformAutostart) {
+			startPlatform();
+		}
 		// jadexAndroidContext.addContextChangeListener(this);
 	}
 
@@ -107,7 +106,60 @@ public class JadexPlatformService extends Service
 		AndroidContextManager.getInstance().setAndroidContext(null);
 		// jadexAndroidContext.removeContextChangeListener(this);
 	}
-
+	
+	/**
+	 * Sets the autostart parameter for this jadex platform.
+	 * If true, the platform will be started during onCreate.
+	 * @param autostart
+	 */
+	protected void setPlatformAutostart(boolean autostart) {
+		if (platformId != null || !jadexPlatformManager.isPlatformRunning(platformId)) {
+			this.platformAutostart = autostart;
+		} else {
+			throw new IllegalStateException("Cannot set autostart, platform already running!");
+		}
+	}
+	
+	/**
+	 * Sets the Kernels.
+	 * See {@link JadexPlatformManager} Constants for available Kernels.
+	 * @param kernels
+	 */
+	protected void setPlatformKernels(String ... kernels) {
+		this.platformKernels = kernels;
+	}
+	
+	/**
+	 * Sets platform options.
+	 * @param options
+	 */
+	protected void setPlatformOptions(String options) {
+		this.platformOptions = options;
+	}
+	
+	/**
+	 * Sets the name of the platform that is started by this activity.
+	 * @param name
+	 */
+	protected void setPlatformName(String name) {
+		this.platformName = name;
+	}
+	
+	final protected IFuture<IExternalAccess> startPlatform()
+	{
+		return startJadexPlatform(platformKernels, platformName, platformOptions);
+	}
+	
+	protected void stopPlatforms()
+	{
+		jadexPlatformManager.shutdownJadexPlatforms();
+	}
+	
+	protected IExternalAccess getPlatformAccess(IComponentIdentifier platformId) {
+		checkIfPlatformIsRunning(platformId, "getPlatformAccess");
+		return jadexPlatformManager.getExternalPlatformAccess(platformId);
+	}
+	
 	/**
 	 * Start a new micro agent on a given platform.
 	 * 
@@ -193,6 +245,7 @@ public class JadexPlatformService extends Service
 	 */
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
+		this.platformId = platform.getComponentIdentifier();
 	}
 
 	/**
@@ -225,7 +278,7 @@ public class JadexPlatformService extends Service
 
 		final Future<Void> ret = new Future<Void>();
 
-		getMS(platform).addResultListener(new DefaultResultListener<IMessageService>()
+		jadexPlatformManager.getMS(platform).addResultListener(new DefaultResultListener<IMessageService>()
 		{
 			public void resultAvailable(IMessageService ms)
 			{
@@ -236,7 +289,24 @@ public class JadexPlatformService extends Service
 
 		return ret;
 	}
-
+	
+	//---------------- helper ----------------
+	
+	final private IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+	{
+		onPlatformStarting();
+		IFuture<IExternalAccess> fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
+		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
+		{
+			@Override
+			public void resultAvailable(IExternalAccess result)
+			{
+				JadexPlatformService.this.onPlatformStarted(result);
+			}
+		});
+		return fut;
+	}
+	
 	private void checkIfPlatformIsRunning(final IComponentIdentifier platformId, String caller)
 	{
 		if (!jadexPlatformManager.isPlatformRunning(platformId))
@@ -245,19 +315,4 @@ public class JadexPlatformService extends Service
 		}
 	}
 
-	private IFuture<IMessageService> getMS(final IComponentIdentifier platformId)
-	{
-		return jadexPlatformManager.getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<IMessageService>()
-		{
-			@Classname("create-component")
-			public IFuture<IMessageService> execute(IInternalAccess ia)
-			{
-				Future<IMessageService> ret = new Future<IMessageService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-						ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
-
-				return ret;
-			}
-		});
-	}
 }

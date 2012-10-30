@@ -245,34 +245,12 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	
 	protected IFuture<IMessageService> getMS()
 	{
-		return platformService.getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<IMessageService>()
-		{
-			@Classname("create-component")
-			public IFuture<IMessageService> execute(IInternalAccess ia)
-			{
-				Future<IMessageService> ret = new Future<IMessageService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-						ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
-
-				return ret;
-			}
-		});
+		return platformService.getMS(platformId);
 	}
 	
 	protected IFuture<IComponentManagementService> getCMS()
 	{
-		return platformService.getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<IComponentManagementService>()
-		{
-			@Classname("create-component")
-			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
-			{
-				Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-						ia.createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
-
-				return ret;
-			}
-		});
+		return platformService.getCMS(platformId);
 	}
 
 	public void onServiceConnected(ComponentName name, IBinder service)

@@ -22,6 +22,15 @@ public class JadexPlatformService	extends jadex.android.service.JadexPlatformSer
 	
 	//-------- Android methods --------
 	
+	public JadexPlatformService()
+	{
+		String options = "-componentfactory jadex.micro.MicroAgentFactory" + " -conf jadex.platform.PlatformAgent" + " -niotcptransport false"
+				+ " -saveonexit false";
+		
+		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
+		setPlatformOptions(options);
+	}
+	
 	/**
 	 *  Called when an activity binds to the service.
 	 */
@@ -70,22 +79,6 @@ public class JadexPlatformService	extends jadex.android.service.JadexPlatformSer
 	
 	//-------- IJadexPlatformService interface --------
 	
-	/**
-	 *  Get the jadex platform.
-	 */
-	private IFuture<IExternalAccess>	startPlatform()
-	{
-		// Start the platform
-		System.out.println("Starting Jadex Platform...");
-
-		String options = "-componentfactory jadex.micro.MicroAgentFactory" + " -conf jadex.platform.PlatformAgent" + " -niotcptransport false"
-				+ " -saveonexit false";
-		
-		
-		
-		return startJadexPlatform(new String[]
-		{ JadexPlatformManager.KERNEL_MICRO }, null, options);
-	}
 	
 	@Override
 	protected void onPlatformStarted(IExternalAccess platform)

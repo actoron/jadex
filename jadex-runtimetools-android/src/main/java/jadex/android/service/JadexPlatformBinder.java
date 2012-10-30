@@ -3,6 +3,7 @@ package jadex.android.service;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.IFuture;
 
 /**
@@ -13,7 +14,7 @@ public abstract class JadexPlatformBinder extends JadexEventBinder implements IJ
 	//-------- attributes --------
 	
 	/** The Jadex Context Holder */
-	private JadexPlatformManager jadexAndroidContext;
+	private JadexPlatformManager manager;
 
 	/**
 	 * Constructor
@@ -21,32 +22,38 @@ public abstract class JadexPlatformBinder extends JadexEventBinder implements IJ
 	 */
 	public JadexPlatformBinder(JadexPlatformManager context)
 	{
-		this.jadexAndroidContext = context;
+		this.manager = context;
 	}
 	
 	public IExternalAccess getExternalPlatformAccess(IComponentIdentifier platformID)
 	{
-		return jadexAndroidContext.getExternalPlatformAccess(platformID);
+		return manager.getExternalPlatformAccess(platformID);
 	}
 
 	public boolean isPlatformRunning(IComponentIdentifier platformID)
 	{
-		return jadexAndroidContext.isPlatformRunning(platformID);
+		return manager.isPlatformRunning(platformID);
 	}
 
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
 	{
-		return jadexAndroidContext.getCMS(platformID);
+		return manager.getCMS(platformID);
+	}
+	
+	@Override
+	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
+	{
+		return manager.getMS(platformID);
 	}
 	
 	public void shutdownJadexPlatforms()
 	{
-		jadexAndroidContext.shutdownJadexPlatforms();
+		manager.shutdownJadexPlatforms();
 	}
 
 	public void shutdownJadexPlatform(IComponentIdentifier platformID)
 	{
-		jadexAndroidContext.shutdownJadexPlatform(platformID);
+		manager.shutdownJadexPlatform(platformID);
 	}
 	
 }
