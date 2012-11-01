@@ -118,11 +118,13 @@ public class RGoal extends RProcessableElement
 			{
 //				MGoal mgoal = (MGoal)getModelElement();
 				
-				// If adopted or active
-				if(getLifecycleState().equals(GOALLIFECYCLESTATE_ADOPTED)
-					|| getLifecycleState().equals(GOALLIFECYCLESTATE_ACTIVE))
+				if(getLifecycleState().equals(GOALLIFECYCLESTATE_ADOPTED))
 				{
 					setLifecycleState(GOALLIFECYCLESTATE_ACTIVE);
+				}
+				
+				if(getLifecycleState().equals(GOALLIFECYCLESTATE_ACTIVE))
+				{
 					ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(RGoal.this));
 				}
 				else

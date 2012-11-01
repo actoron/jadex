@@ -49,6 +49,7 @@ public class SelectCandidatesAction implements IAction<Void>
 		List<Object> cands = element.getApplicablePlanList().selectCandidates();
 		if(cands!=null && !cands.isEmpty())
 		{
+			element.setState(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED);
 			for(Object cand: cands)
 			{
 				if(cand instanceof MPlan)

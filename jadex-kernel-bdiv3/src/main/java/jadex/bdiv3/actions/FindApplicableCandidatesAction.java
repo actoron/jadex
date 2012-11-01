@@ -46,8 +46,17 @@ public class FindApplicableCandidatesAction implements IAction<Void>
 		
 		APL apl = element.getApplicablePlanList();
 		apl.build(rcapa);
-		IAction<Void> action = new SelectCandidatesAction(element);
-		ia.getExternalAccess().scheduleStep(action);
+		if(apl.isEmpty())
+		{
+			element.setState(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES);
+			ia.getExternalAccess().scheduleStep(element.createReasoningStep(ia));
+		}
+		else
+		{
+			element.setState(RProcessableElement.PROCESSABLEELEMENT_APLAVAILABLE);
+			IAction<Void> action = new SelectCandidatesAction(element);
+			ia.getExternalAccess().scheduleStep(action);
+		}
 		
 		return IFuture.DONE;
 	}

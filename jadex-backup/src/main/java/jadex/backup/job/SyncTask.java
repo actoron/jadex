@@ -2,7 +2,6 @@ package jadex.backup.job;
 
 
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +10,6 @@ import java.util.List;
  */
 public class SyncTask extends Task
 {
-    public static final SimpleDateFormat sdf 
-    	= new SimpleDateFormat("hh:mm MM dd yyyy");
-
 	/** The sync source. */
 	protected String source;
 	

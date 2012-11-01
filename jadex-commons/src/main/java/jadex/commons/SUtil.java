@@ -30,6 +30,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -88,6 +89,10 @@ public class SUtil
 	/** A Null value. */
 	public static final String		NULL					= "NULL";
 
+	/** Simple date format. */
+    public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm MM dd yyyy");
+
+	
 	/**
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
@@ -96,7 +101,7 @@ public class SUtil
 
 	/** Holds the single characters. */
 	protected static String			seps;
-
+	
 
 	/** An empty enumeration. */
 	public static final Enumeration	EMPTY_ENUMERATION	= new Enumeration()

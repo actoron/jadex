@@ -12,6 +12,22 @@ import jadex.bridge.IInternalAccess;
  */
 public abstract class RProcessableElement extends RElement
 {
+	/** The processable element state unprocessed. */
+	public static final String	PROCESSABLEELEMENT_UNPROCESSED	= "unprocessed";
+
+	/** The processable element state apl available. */
+	public static final String	PROCESSABLEELEMENT_APLAVAILABLE	= "aplavailable";
+	
+	/** The processable element state meta-level reasoning. */
+	public static final String	PROCESSABLEELEMENT_METALEVELREASONING	= "metalevelreasoning";
+	
+	/** The processable element state no candidates. */
+	public static final String	PROCESSABLEELEMENT_NOCANDIDATES	= "nocandidates";
+
+	/** The processable element state candidate selected. */
+	public static final String	PROCESSABLEELEMENT_CANDIDATESSELECTED	= "candidatesselected";
+
+	
 	/** The pojo element. */
 	protected Object pojoelement;
 	
@@ -21,6 +37,9 @@ public abstract class RProcessableElement extends RElement
 	/** The tried plans. */
 	protected List<Object> triedplans;
 	
+	/** The state. */
+	protected String state;
+	
 	/**
 	 *  Create a new element.
 	 */
@@ -28,6 +47,7 @@ public abstract class RProcessableElement extends RElement
 	{
 		super(modelelement);
 		this.pojoelement = pojoelement;
+		this.state = PROCESSABLEELEMENT_UNPROCESSED;
 	}
 
 	/**
@@ -96,6 +116,24 @@ public abstract class RProcessableElement extends RElement
 	public void setTriedPlans(List<Object> triedplans)
 	{
 		this.triedplans = triedplans;
+	}
+
+	/**
+	 *  Get the state.
+	 *  @return The state.
+	 */
+	public String getState()
+	{
+		return state;
+	}
+
+	/**
+	 *  Set the state.
+	 *  @param state The state to set.
+	 */
+	public void setState(String state)
+	{
+		this.state = state;
 	}
 
 	/**

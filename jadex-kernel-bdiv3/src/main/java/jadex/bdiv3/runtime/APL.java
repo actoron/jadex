@@ -154,13 +154,13 @@ public class APL
 	
 	//-------- helper methods --------
 
-//	/**
-//	 * 
-//	 */
-//	public boolean isEmpty()
-//	{
-//		return candidates==null? true: candidates.isEmpty();
-//	}
+	/**
+	 * 
+	 */
+	public boolean isEmpty()
+	{
+		return candidates==null? true: candidates.isEmpty();
+	}
 	
 	/**
 	 * 

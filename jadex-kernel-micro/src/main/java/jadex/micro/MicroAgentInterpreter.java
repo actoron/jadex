@@ -266,7 +266,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{
 					SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
 					fetcher.setValue("$value", val);
-					val = SJavaParser.evaluateExpression(convert, fetcher);
+					val = SJavaParser.evaluateExpression(convert, getModel().getAllImports(), fetcher, getClassLoader());
 				}
 				field.setAccessible(true);
 				field.set(agent, val);
@@ -689,7 +689,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{
 					SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
 					fetcher.setValue("$value", val);
-					val = SJavaParser.evaluateExpression(convback, fetcher);
+					val = SJavaParser.evaluateExpression(convback, getModel().getAllImports(), fetcher, getClassLoader());
 				}
 				
 				setResultValue(name, val);
