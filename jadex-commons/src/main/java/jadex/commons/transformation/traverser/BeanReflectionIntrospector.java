@@ -127,7 +127,12 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 							catch(NoSuchFieldException e)
 							{
 							}
-							
+							if(!exclude)
+							{
+								exclude = getter.isAnnotationPresent(Exclude.class)
+									|| setter.isAnnotationPresent(Exclude.class);
+							}
+
 							if(!exclude)
 							{
 								ret.put(property_java_name, createBeanProperty(property_java_name, 

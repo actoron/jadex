@@ -2,14 +2,19 @@ package jadex.platform.service.cron;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
+import jadex.bridge.service.annotation.Service;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *  The cron agent is an agent based implementation
@@ -21,24 +26,25 @@ import jadex.micro.annotation.Arguments;
  *  
  *  *    *    *            *     *
  *  Min  Hour Day of Month Month Mo-Fr   
+ *  0-59 0-23 1-31         1-12  0-6
+ *  
+ *  Specification allows for:
+ *  - wildcard: * (any value)
+ *  - value: 1
+ *  - values: 2,3,4
+ *  - range: 1-5
+ *  - steps: *\/5 (every 5)
+ *  - combined patterns: p1|p2|p3 
  */
-@Arguments(
-{
-	@Argument(name="pattern", clazz=String.class, defaultvalue="\"* * * * *\""),
-	@Argument(name="job", clazz=ICommand.class)
-})
 @Agent
-public class CronAgent
+@Service
+@ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
+public class CronAgent implements ICronService
 {
 	//-------- attributes --------
 	
-	/** The pattern. */
-	@AgentArgument(convert="new TimePattern($value)")
-	protected TimePattern pattern;
-	
-	/** The job. */
-	@AgentArgument
-	protected ICommand job;
+	/** The cron jobs (id -> job). */
+	protected Map<String, CronJob> jobs;
 	
 	/** The agent. */
 	@Agent
@@ -58,22 +64,19 @@ public class CronAgent
 			{
 				// check pattern
 				long time = System.currentTimeMillis();
-				if(pattern.match(time))
+				
+				if(jobs!=null)
 				{
-					// schedule job on subagent?!
-					if(job!=null)
+					CronJob[] cjs = (CronJob[])jobs.values().toArray(new CronJob[jobs.size()]);
+					for(CronJob cj: cjs)
 					{
-						job.execute(new Long(time));
-					}
-					else
-					{
-						System.out.println("no job to schedule");
+						if(cj.getFilter().filter(time))
+						{
+							// schedule job on subagent?!
+							cj.getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)));
+						}
 					}
 				}
-//				else
-//				{
-//					System.out.println("no job");
-//				}
 				
 				// wait
 				long cur = System.currentTimeMillis();
@@ -93,5 +96,37 @@ public class CronAgent
 		};
 		
 		agent.scheduleStep(check);
+	}
+	
+	/**
+	 *  Add a schedule job.
+	 *  @param job The cron job.
+	 */
+	public IFuture<Void> addJob(CronJob job)
+	{
+		if(job.getFilter()==null || job.getCommand()==null)
+			return new Future<Void>(new IllegalArgumentException("Job filter and command must not null: "+job));
+		
+		if(jobs==null)
+		{
+			jobs = new LinkedHashMap<String, CronJob>();
+		}
+		jobs.put(job.getId(), job);
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Remove a schedule job.
+	 *  @param jobid The job id.
+	 */
+	public IFuture<Void> removeJob(String jobid)
+	{
+		if(jobs!=null)
+		{
+			jobs.remove(jobid);
+		}
+		
+		return IFuture.DONE;
 	}
 }

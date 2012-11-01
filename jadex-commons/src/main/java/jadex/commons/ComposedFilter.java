@@ -7,7 +7,7 @@ import java.util.Arrays;
  *  A filter checks if an object matches
  *  the given subfilters.
  */
-public class ComposedFilter implements IFilter,	Serializable
+public class ComposedFilter<T> implements IFilter<T>,	Serializable
 {
 	//-------- constants --------
 
@@ -36,7 +36,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedFilter(IFilter[] filters)
+	public ComposedFilter(IFilter<T>[] filters)
 	{
 		this(filters, AND);
 	}
@@ -46,9 +46,9 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  @param filters The filters.
 	 *  @param operator The operator.
 	 */
-	public ComposedFilter(IFilter[] filters, int operator)
+	public ComposedFilter(IFilter<T>[] filters, int operator)
 	{
-		this.filters	= filters.clone();
+		this.filters	= filters!=null? filters.clone(): null;
 		this.operator	= operator;
 	}
 
@@ -60,7 +60,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  @return True, if the filter matches.
 	 * @throws Exception
 	 */
-	public boolean filter(Object object)
+	public boolean filter(T object)
 	{
 		boolean ret	= false;
 		if(operator==AND)
@@ -102,7 +102,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  Get the filters.
 	 *  @return the filters.
 	 */
-	public IFilter[] getFilters()
+	public IFilter<T>[] getFilters()
 	{
 		return filters;
 	}
@@ -111,7 +111,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  Set the filters.
 	 *  @param filters The filters to set.
 	 */
-	public void setFilters(IFilter[] filters)
+	public void setFilters(IFilter<T>[] filters)
 	{
 		this.filters = filters.clone();
 	}
@@ -120,7 +120,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 *  Add a filter.
 	 *  @param filter The filter.
 	 */
-	public void addFilter(IFilter filter)
+	public void addFilter(IFilter<T> filter)
 	{
 		IFilter[] copy = new IFilter[filters==null? 1: filters.length+1];
 		if(filters!=null)

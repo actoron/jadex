@@ -1,9 +1,6 @@
 package jadex.bridge.service.types.library;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.LocalResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
@@ -98,6 +95,13 @@ public interface ILibraryService
 	 */
 	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url);
 
+	/** 
+	 *  Get the top-level resource identifier.
+	 *  @param url The url.
+	 *  @return The corresponding resource identifier.
+	 */
+	public IFuture<IResourceIdentifier> getTopLevelResourceIdentifier();
+	
 	/**
 	 *  Add a top level url. A top level url will
 	 *  be available for all subordinated resources. 

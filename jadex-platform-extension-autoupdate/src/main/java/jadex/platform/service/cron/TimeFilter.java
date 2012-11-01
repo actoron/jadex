@@ -6,23 +6,34 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
- * 
+ *  Filter for testing if a time point matches one specific pattern.
  */
 public class TimeFilter implements IFilter<Long>
 {
+	//-------- attributes --------
+	
 	/** The filters. */
 	protected IFilter<Integer>[] filters;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new time filter.
+	 *  @param filters The filters.
 	 */
 	public TimeFilter(IFilter<Integer>[] filters)
 	{
+		if(filters==null)
+			System.out.println("here");
 		this.filters = filters;
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Test if timepoint matches filter.
+	 *  @param time The time.
+	 *  @return True, if ok.
 	 */
 	public boolean filter(Long time)
 	{

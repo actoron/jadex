@@ -285,6 +285,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		return ret;
 	}
 	
+	/** 
+	 *  Get the top-level resource identifier.
+	 *  @param url The url.
+	 *  @return The corresponding resource identifier.
+	 */
+	public IFuture<IResourceIdentifier> getTopLevelResourceIdentifier()
+	{
+		return new Future<IResourceIdentifier>(rootloader.getResourceIdentifier());
+	}
+	
 	/**
 	 *  Get all resource identifiers (does not include urls of parent loader).
 	 *  @return The list of resource identifiers.

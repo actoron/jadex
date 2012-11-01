@@ -4,8 +4,8 @@ import jadex.commons.ComposedFilter;
 import jadex.commons.ConstantFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Exclude;
 
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +14,7 @@ import java.util.StringTokenizer;
 /**
  *  Create a new time pattern.
  */
-public class TimePattern
+public class TimePatternFilter extends ComposedFilter<Long>
 {
 	//-------- attributes --------
 	
@@ -24,76 +24,55 @@ public class TimePattern
 	/** The pattern. */
 	protected String pattern;
 	
-	/** The filter. */
-	protected IFilter<Long> filter;
-	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new TimePatternFilter. 
+	 */
+	public TimePatternFilter()
+	{
+		super(null);
+	}
 	
 	/**
 	 *  Create a new time pattern.
 	 *  @param pattern The pattern.
 	 */
-	public TimePattern(String pattern)
+	public TimePatternFilter(String pattern)
 	{
+		super(parsePattern(pattern), OR);
 		this.pattern = pattern;
-		parsePattern(pattern);
 	}
-	
+
 	//-------- methods --------
 	
 	/**
-	 *  Test if the pattern matches the
-	 *  given time.
-	 *  @param time The time in millis.
-	 *  @return True, if matched.
+	 *  Get the pattern.
+	 *  @return The pattern.
 	 */
-	public boolean match(long time)
+	public String getPattern()
 	{
-		return filter.filter(new Long(time));
+		return pattern;
+	}
+
+	/**
+	 *  Set the pattern.
+	 *  @param pattern The pattern to set.
+	 */
+	public void setPattern(String pattern)
+	{
+		this.pattern = pattern;
+		setFilters(parsePattern(pattern));
 	}
 	
 	/**
-	 *  Parse the time pattern.
+	 *  Get the filters.
+	 *  @return the filters.
 	 */
-	public void parsePattern(String pattern)
+	@Exclude
+	public IFilter<Long>[] getFilters()
 	{
-		if(pattern.indexOf("|")!=-1)
-		{
-			StringTokenizer stok = new StringTokenizer(pattern, "|");
-			
-			IFilter<Long>[] fil = new IFilter[stok.countTokens()];
-			for(int i=0; stok.hasMoreTokens(); i++)
-			{
-				String tok = stok.nextToken();
-				fil[i] = parseOnePattern(tok);
-				filter = new ComposedFilter(fil, ComposedFilter.OR);
-			}
-		}
-		else
-		{
-			filter = parseOnePattern(pattern);
-		}
-	}
-	
-	/**
-	 *  Parse one pattern (not a combined one with |)
-	 *  @param tok The token.
-	 *  @return The filter. 
-	 */
-	protected IFilter<Long> parseOnePattern(String tok)
-	{
-		StringTokenizer stok = new StringTokenizer(tok);
-		if(stok.countTokens()!=5)
-			throw new RuntimeException("Invalid pattern: "+tok);
-		
-		IFilter<Integer>[] fil = new IFilter[5];
-		fil[0] = createFilter(stok.nextToken().trim(), 0, 59);
-		fil[1] = createFilter(stok.nextToken(), 0, 23);
-		fil[2] = createFilter(stok.nextToken(), 1, 31);
-		fil[3] = createFilter(stok.nextToken(), 1, 12);
-		fil[4] = createFilter(stok.nextToken(), 0, 6); // todo: add 7 for sunday 
-		
-		return new TimeFilter(fil);
+		return super.getFilters();
 	}
 	
 	/**
@@ -115,7 +94,7 @@ public class TimePattern
 		while(cur<=end)
 		{
 			cur = gc.getTimeInMillis();
-			if(match(cur))
+			if(filter(new Long(cur)))
 			{
 				ret = cur;
 				break;
@@ -130,6 +109,53 @@ public class TimePattern
 			throw new RuntimeException("No timepoint found");
 		
 		return ret;
+	}
+
+	/**
+	 *  Parse the time pattern.
+	 */
+	public static IFilter<Long>[] parsePattern(String pattern)
+	{
+		IFilter<Long>[] ret = null;
+		
+		if(pattern.indexOf("|")!=-1)
+		{
+			StringTokenizer stok = new StringTokenizer(pattern, "|");
+			
+			ret = new IFilter[stok.countTokens()];
+			for(int i=0; stok.hasMoreTokens(); i++)
+			{
+				String tok = stok.nextToken();
+				ret[i] = parseOnePattern(tok);
+			}
+		}
+		else
+		{
+			ret = new IFilter[]{parseOnePattern(pattern)};
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Parse one pattern (not a combined one with |)
+	 *  @param tok The token.
+	 *  @return The filter. 
+	 */
+	protected static IFilter<Long> parseOnePattern(String tok)
+	{
+		StringTokenizer stok = new StringTokenizer(tok);
+		if(stok.countTokens()!=5)
+			throw new RuntimeException("Invalid pattern: "+tok);
+		
+		IFilter<Integer>[] fil = new IFilter[5];
+		fil[0] = createFilter(stok.nextToken().trim(), 0, 59);
+		fil[1] = createFilter(stok.nextToken(), 0, 23);
+		fil[2] = createFilter(stok.nextToken(), 1, 31);
+		fil[3] = createFilter(stok.nextToken(), 1, 12);
+		fil[4] = createFilter(stok.nextToken(), 0, 6); // todo: add 7 for sunday 
+		
+		return new TimeFilter(fil);
 	}
 	
 	/**
@@ -239,8 +265,8 @@ public class TimePattern
 		{
 			"* * * * *", // every minute - ok
 			"*/5 * * * *", // every 5 mins - ok
-			"*/5 * * * *|*/3 * * * *", // every 5 mins - ok
-			"3-18/5 * * * *", // every 5 mins from 3 - ok
+			"*/5 * * * *|*/3 * * * *", // every 5 3 mins - ok
+			"3-18/5 * * * *", // every 5 mins from 3, 8, 13,18 - ok
 			"*/5 */2 * * *", // every 5 mins every 2 hours - ok
 			"*/15 9-15 * * *", // every 15 mins from 9-15 - ok
 			"*/20 12 1-3,15,20-22 * *", // every 20 mins in 12 hour 
@@ -261,7 +287,7 @@ public class TimePattern
 		for(String pattern: patterns)
 		{
 			System.out.println("Testing pattern: "+pattern);
-			TimePattern tp = new TimePattern(pattern);
+			TimePatternFilter tp = new TimePatternFilter(pattern);
 			long cur = start;
 			for(int i=0; i<10; i++)
 			{

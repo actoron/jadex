@@ -7,9 +7,9 @@
     
     The @Publish annotation requires the publishing type (e.g. web service),
     the id (e.g. a web service url) and the service type, i.e. interface to
-    be specified.
+    be specified.<br/><br/>
     
-    The service is published at:
+    The service is published at:<br/>
 	<a href="http://localhost:8080/wanking1/">http://localhost:8080/wanking1/</a>
 -->
 <componenttype xmlns="http://jadex.sourceforge.net/jadex"

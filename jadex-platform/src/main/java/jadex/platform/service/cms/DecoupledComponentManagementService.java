@@ -302,8 +302,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 
 		final IComponentIdentifier creator = ServiceCall.getCurrentInvocation().getCaller();
 
-//		if(modelname.indexOf("jadex/micro/testcases/securetrans/ProviderAgent.class")!=-1)
-//			System.out.println("create: "+modelname);
+		if(modelname.indexOf("Hello")!=-1)
+			System.out.println("create: "+modelname);
 		
 //		final DebugException	de	= new DebugException();
 	

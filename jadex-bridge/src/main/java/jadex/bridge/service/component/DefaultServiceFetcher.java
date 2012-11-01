@@ -84,7 +84,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class	type	= info.getType().getType();
 		
-//		if(info.getType().toString().indexOf("IDis")!=-1)
+//		System.out.println(info.getType().getTypeName().toString());
+//		if(info.getType().getTypeName().indexOf("ICro")!=-1)
 //			System.out.println("diss" );
 		
 		final Future<T> ret = new Future<T>();
@@ -139,8 +140,18 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						SServiceProvider.getService(provider, type, binding.getScope())
 							.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding)
 						{
+//							public void customResultAvailable(Object result)
+//							{
+//								System.out.println("type ra: "+type);
+//								if(info.getType().getTypeName().indexOf("ICro")!=-1)
+//									System.out.println("diss" );
+//								super.customResultAvailable(result);
+//							}
 							public void exceptionOccurred(Exception exception)
 							{
+//								System.out.println("type ex: "+type);
+//								if(info.getType().getTypeName().indexOf("ICro")!=-1)
+//									System.out.println("diss" );
 								createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
