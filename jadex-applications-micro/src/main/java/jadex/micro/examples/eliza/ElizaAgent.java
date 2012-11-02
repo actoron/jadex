@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.commons.LazyResource;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -65,6 +66,7 @@ public class ElizaAgent
 		this.conversations	= new HashMap<IComponentIdentifier, Tuple2<ElizaParse,Long>>();
 		
 		chat.setNickName("Eliza");
+		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.
 		try
 		{
 			chat.setImage(new LazyResource(ElizaAgent.class, "images/eliza.png").getData());
