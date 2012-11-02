@@ -580,7 +580,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		
 		final Future<Void> fut = new Future<Void>();
 		IFuture<Void>	ret	= fut;
 		

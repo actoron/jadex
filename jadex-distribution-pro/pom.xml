@@ -35,17 +35,12 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-cli</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-relay-standalone</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-autoupdate</artifactId>
+			<artifactId>jadex-platform-extension-management</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

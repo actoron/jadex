@@ -47,6 +47,7 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
@@ -511,23 +512,67 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// Start initial steps (if any).
 		super.startBehavior();
 		
-		// Use step in case agent is started as suspended.
-		// Todo: Better to create steps directly as they immediately appear in debugger!? 
-//		scheduleStep(new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-				// Create initial thread(s). 
-				List startevents	= model.getStartActivities(pool, lane);
-				for(int i=0; startevents!=null && i<startevents.size(); i++)
-				{
-					ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
-					context.addThread(thread);
-				}
-				started = true;
-//				return IFuture.DONE;
-//			}
-//		});
+		// Check if triggered by external event
+        Tuple2<String, Object> trigger = (Tuple2<String, Object>)getArguments().get(MBpmnModel.TRIGGER);
+        // Create initial thread(s).
+        List startevents = model.getStartActivities(null, null);
+        for(int i=0; startevents!=null && i<startevents.size(); i++)
+        {
+            MActivity mact = (MActivity)startevents.get(i);
+            if(trigger!=null && MBpmnModel.EVENT_START_TIMER.equals(trigger.getFirstEntity()))
+            {
+                Boolean b = Boolean.TRUE;
+                try
+                {
+                    String val = (String)mact.getParsedPropertyValue("duration");
+                    Class<?> cl = SReflect.findClass("jadex.platform.service.cron.TimePatternFilter", null, getClassLoader());
+                    Object o = cl.newInstance();
+                    Method m = cl.getMethod("setPattern", new Class[]{String.class});
+                    m.invoke(o, new Object[]{val});
+                    m = cl.getMethod("filter", new Class[]{Object.class});
+                    b = (Boolean)m.invoke(o, new Object[]{trigger.getSecondEntity()});
+                }
+                catch(Exception e)
+                {
+                }
+                if(b.booleanValue())
+                {
+                    ProcessThread    thread    = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+                    context.addThread(thread);
+                }
+            }
+            else //if(MBpmnModel.EVENT_START_EMPTY.equals(mact.getActivityType())
+                //|| MBpmnModel.TASK.equals(mact.getActivityType())
+                //|| MBpmnModel.SUBPROCESS.equals(mact.getActivityType()))
+            {
+                ProcessThread    thread    = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+                context.addThread(thread);
+            }
+//            else
+//            {
+//                System.out.println("Not starting act: "+mact);
+//            }
+        } 
+        
+        started = true;
+		
+//		// Use step in case agent is started as suspended.
+//		// Todo: Better to create steps directly as they immediately appear in debugger!? 
+////		scheduleStep(new IComponentStep<Void>()
+////		{
+////			public IFuture<Void> execute(IInternalAccess ia)
+////			{
+//				// Create initial thread(s). 
+//				List startevents	= model.getStartActivities(pool, lane);
+//				for(int i=0; startevents!=null && i<startevents.size(); i++)
+//				{
+//					ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+//					context.addThread(thread);
+//				}
+//				started = true;
+////				return IFuture.DONE;
+////			}
+////		});
 	}
 	
 	/**
