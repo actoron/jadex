@@ -3,6 +3,8 @@ package jadex.platform.service.cron;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.cron.CronJob;
+import jadex.bridge.service.types.cron.ICronService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

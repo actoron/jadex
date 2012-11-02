@@ -60,7 +60,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The (standard) Library service name. */
 	public static final String LIBRARY_SERVICE = "library_service";
 	
-	/** The pseudo system classpath top-level rid. */
+	/** The pseudo system classpath rid. */
 	public static IResourceIdentifier SYSTEMCPRID;
 	
 	static
@@ -99,6 +99,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	
 	/** The delegation root loader. */
 	protected DelegationURLClassLoader rootloader;
+	protected IResourceIdentifier rootrid;
+	// root rid is not set in rootloader as it is not a valid file url
 
 	/** The added links. */
 	protected Set<Tuple2<IResourceIdentifier, IResourceIdentifier>> addedlinks;
@@ -286,13 +288,13 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	/** 
-	 *  Get the top-level resource identifier.
+	 *  Get the root resource identifier.
 	 *  @param url The url.
 	 *  @return The corresponding resource identifier.
 	 */
-	public IFuture<IResourceIdentifier> getTopLevelResourceIdentifier()
+	public IResourceIdentifier getRootResourceIdentifier()
 	{
-		return new Future<IResourceIdentifier>(rootloader.getResourceIdentifier());
+		return rootrid;
 	}
 	
 	/**
@@ -499,7 +501,10 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final List<URL> res = new ArrayList<URL>();
 				for(int i=0; i<result.size(); i++)
 				{
-					res.add(result.get(i).getLocalIdentifier().getUrl());
+					if(!rootrid.equals(result.get(i)))
+					{
+						res.add(result.get(i).getLocalIdentifier().getUrl());
+					}
 				}
 				
 				res.addAll(getInternalNonManagedURLs());
@@ -529,7 +534,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<ClassLoader> ret = new Future<ClassLoader>();
 		
-		if(rid==null)
+		if(rid==null || rid.equals(rootloader.getResourceIdentifier()))
 		{
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
@@ -797,7 +802,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(rid==null)
 			throw new IllegalArgumentException("Must not null: "+rid);
 				
-		DelegationURLClassLoader pacl = parid==null? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
+		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
 		pacl.addDelegateClassLoader(cl);
 		if(cl.addParentClassLoader(pacl))
@@ -826,7 +831,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		if(rid==null)
 			throw new IllegalArgumentException("Must not null: "+rid);
 
-		DelegationURLClassLoader pacl = parid==null? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
+		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
 		pacl.removeDelegateClassLoader(cl);
 		if(cl.removeParentClassLoader(pacl))
@@ -926,6 +931,18 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	@ServiceStart
 	public IFuture<Void>	startService()
 	{
+		try
+		{
+			this.rootrid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier(), new URL("http://ROOTRID")), null);
+			this.rootloader.setResourceIdentifier(rootrid);
+//			this.classloaders.put(rootrid, rootloader);
+		}
+		catch(Exception e)
+		{
+			// should not happen
+			e.printStackTrace();
+		}
+		
 		final Future<Void>	urlsdone	= new Future<Void>();
 		if(initurls!=null)
 		{

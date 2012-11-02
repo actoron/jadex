@@ -3,7 +3,7 @@ package jadex.platform.service.cron;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -16,6 +16,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.service.cron.jobs.CliJob;
 import jadex.platform.service.cron.jobs.CreateComponentJob;
 
 @RequiredServices(
@@ -53,17 +54,15 @@ public class UserAgent
 				{
 					public void customResultAvailable(ILibraryService libs)
 					{
-						libs.getTopLevelResourceIdentifier()
-							.addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
-						{
-							public void customResultAvailable(IResourceIdentifier rid) 
-							{
-								CreationInfo ci = new CreationInfo(rid);
-								crons.addJob(new CreateComponentJob(new TimePatternFilter("* * * * *"), null,
-//									"jadex/platform/service/cron/CronAgent.class"));
-									"jadex/micro/examples/helloworld/HelloWorldAgent.class", ci));
-							}
-						});
+						// job that creates a hello world agent every minute
+						IResourceIdentifier rid = libs.getRootResourceIdentifier();
+						CreationInfo ci = new CreationInfo(rid);
+						crons.addJob(new CreateComponentJob(new TimePatternFilter("* * * * *"), null,
+//							"jadex/platform/service/cron/CronAgent.class"));
+							"jadex/micro/examples/helloworld/HelloWorldAgent.class", ci));
+						
+						// job that lists the platforms every minute
+						crons.addJob(new CliJob(new TimePatternFilter("* * * * *"), new String[]{"lp", "lc"}));
 					}
 				});
 			}

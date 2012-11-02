@@ -100,7 +100,7 @@ public interface ILibraryService
 	 *  @param url The url.
 	 *  @return The corresponding resource identifier.
 	 */
-	public IFuture<IResourceIdentifier> getTopLevelResourceIdentifier();
+	public IResourceIdentifier getRootResourceIdentifier();
 	
 	/**
 	 *  Add a top level url. A top level url will

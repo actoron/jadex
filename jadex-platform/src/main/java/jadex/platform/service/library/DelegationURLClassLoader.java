@@ -230,6 +230,15 @@ public class DelegationURLClassLoader extends URLClassLoader
 	}
 	
 	/**
+	 *  Set the rid.
+	 *  @param rid The rid to set.
+	 */
+	public void setResourceIdentifier(IResourceIdentifier rid)
+	{
+		this.rid = rid;
+	}
+
+	/**
 	 *  Get all managed resource identifiers inlcuding all subdependencies.
 	 *  @return The resource identifiers.
 	 */

@@ -24,7 +24,8 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 //		Number dur = (Number)getPropertyValue(activity, instance, thread, "duration");
-		Number dur = (Number)thread.getPropertyValue("duration", activity);
+		Object d = thread.getPropertyValue("duration", activity); // does not wait if initial cron time pattern was specified "* * * * *"
+		Number dur = d instanceof Number? (Number)d: null;
 		Boolean tmp = (Boolean)thread.getPropertyValue("tick", activity);
 		boolean tick = tmp!=null? tmp.booleanValue(): false;
 		long duration = dur==null? tick? TICK_TIMER: -1: dur.longValue(); 

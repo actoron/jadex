@@ -1,4 +1,4 @@
-package jadex.platform.service.cron;
+package jadex.bridge.service.types.cron;
 
 import jadex.commons.future.IFuture;
 

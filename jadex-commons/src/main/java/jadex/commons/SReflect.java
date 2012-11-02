@@ -1251,12 +1251,12 @@ public class SReflect
 	public static String[] scanForFiles(URL[] urls, IFilter filter)
 	{
 		List<String>	ret	= new ArrayList<String>();
-		try
+		for(int i=0; i<urls.length; i++)
 		{
-			for(int i=0; i<urls.length; i++)
+//			System.out.println("Scanning: "+entry);
+//			System.out.println("url: "+urls[i].toURI());
+			try
 			{
-//				System.out.println("Scanning: "+entry);
-//				System.out.println("url: "+urls[i].toURI());
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
@@ -1292,10 +1292,11 @@ public class SReflect
 //					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
 				}
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
+			catch(Exception e)
+			{
+				System.out.println("scan problem with: "+urls[i]);
+//				e.printStackTrace();
+			}
 		}
 		
 		return ret.toArray(new String[ret.size()]);

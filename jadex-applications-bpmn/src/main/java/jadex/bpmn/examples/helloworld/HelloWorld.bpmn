@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AYO3chZIEd-yC473XtaJZQ" key="Package" value="jadex.bpmn.examples.helloworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yhMSsBaVEd-YccbjZenQqQ" key="Description" value="&lt;h3>HelloWorld Process&lt;/h3>The HelloWorld example starts a process, which prints a welcome message and then terminates."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jR0lpwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wfOvYCTwEeKCHsqNbb_z5Q" key="suspend" value="false"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_1cEzRxZEEd-yC473XtaJZQ" iD="_1cEzRhZEEd-yC473XtaJZQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_1cOkQRZEEd-yC473XtaJZQ" iD="_1cOkQBZEEd-yC473XtaJZQ" outgoingEdges="_fEUmwRZHEd-yC473XtaJZQ" incomingEdges="_WwWlcRZHEd-yC473XtaJZQ" name="Print Hello" activityType="Task">
