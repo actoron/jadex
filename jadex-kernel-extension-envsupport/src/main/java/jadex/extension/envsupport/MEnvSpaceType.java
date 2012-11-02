@@ -831,6 +831,10 @@ public class MEnvSpaceType
 						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 						
 						Double radius = (Double)getProperty(args, "radius");
+						if(radius==null)
+						{
+							radius = 1.0;
+						}
 						Double height = (Double)getProperty(args, "height");
 						String texturepath = (String)getProperty(args, "texturepath");
 						if(texturepath==null)
@@ -914,6 +918,10 @@ public class MEnvSpaceType
 						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 						
 						Double radius = (Double)getProperty(args, "radius");
+						if(radius==null)
+						{
+							radius = 1.0;
+						}
 						Integer samples = (Integer)getProperty(args, "samples");
 						if(samples==null)
 						{
