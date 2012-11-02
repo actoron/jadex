@@ -42,7 +42,7 @@
 	<rootPathEntries>
 		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="11" __len="1">
 			<entries>
-				<p1:String __ID="12">target\classes</p1:String>
+				<p1:String __ID="12">target/classes</p1:String>
 			</entries>
 		</p1:String__1>
 	</rootPathEntries>
@@ -56,8 +56,8 @@
 			<type __ID="10">mpanel</type>
 		</p0:properties>
 		<p0:properties __ID="11">
-			<p0:property __ID="12" type="model">target\classes\tutorial\HelloAgent.class</p0:property>
-			<p0:property __ID="13" type="ridurl">target\classes</p0:property>
+			<p0:property __ID="12" type="model">target/classes/tutorial/HelloAgent.class</p0:property>
+			<p0:property __ID="13" type="ridurl">file:target/classes</p0:property>
 			<p0:property __ID="14" type="globalrid"></p0:property>
 			<p0:property __ID="15" type="startsuspended">false</p0:property>
 			<p0:property __ID="16" type="autogenerate">false</p0:property>

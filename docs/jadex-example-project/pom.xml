@@ -58,9 +58,9 @@
 		 -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<!-- <artifactId>jadex-distribution-standard</artifactId> -->
+			<artifactId>jadex-distribution-standard</artifactId>
 			<!-- <artifactId>jadex-distribution-minimal</artifactId> -->
-			<artifactId>jadex-distribution-pro</artifactId>
+			<!-- <artifactId>jadex-distribution-pro</artifactId> -->
 			<version>${jadex.version}</version>
 		</dependency>
 		
