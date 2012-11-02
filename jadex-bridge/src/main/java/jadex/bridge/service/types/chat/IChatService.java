@@ -23,6 +23,9 @@ public interface IChatService
 	/** The user typing a message. */
 	public static final String	STATE_TYPING	= "typing";
 	
+	/** The user is currently away from the chat. */
+	public static final String	STATE_AWAY	= "away";
+	
 	/** The state for a disconnected user. */
 	public static final String	STATE_DEAD	= "dead";
 	
@@ -37,6 +40,11 @@ public interface IChatService
 	 *  Get the user image.
 	 */
 	public IFuture<byte[]>	getImage();
+	
+	/**
+	 *  Get the current status.
+	 */
+	public IFuture<String>	getStatus();
 	
 	/**
 	 *  Post a message

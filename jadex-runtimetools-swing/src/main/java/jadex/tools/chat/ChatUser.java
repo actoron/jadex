@@ -2,12 +2,13 @@ package jadex.tools.chat;
 
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.chat.IChatService;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.GrayFilter;
@@ -25,6 +26,7 @@ public class ChatUser
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
+		"overlay_away",		SGUI.makeIcon(ChatPanel.class, "images/overlay_away.png"),
 		"overlay_typing",	SGUI.makeIcon(ChatPanel.class, "images/overlay_typing.png"),
 		"overlay_sending",	SGUI.makeIcon(ChatPanel.class, "images/overlay_sending.png"),
 		"default_avatar",	SGUI.makeIcon(ChatPanel.class, "images/user_anon.png")
@@ -35,11 +37,14 @@ public class ChatUser
 	/** The chat user. */
 	protected IComponentIdentifier	cid;
 	
-	/** The chat service (if already found). */
-	protected IChatService	chat;
+//	/** The chat service (if already found). */
+//	protected IChatService	chat;
 	
 	/** The typing flag. */
 	protected boolean	typing;
+	
+	/** The away flag. */
+	protected boolean	away;
 	
 	/** The open message ids. */
 	protected Set<Integer>	messages;
@@ -81,17 +86,24 @@ public class ChatUser
 			ret	= new ImageIcon(GrayFilter.createDisabledImage(image));
 		}
 		
-		if(typing && !messages.isEmpty())
+		List<Icon>	ics	= new ArrayList<Icon>();
+		ics.add(ret);
+		if(away)
 		{
-			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_typing"), icons.getIcon("overlay_sending")});
+			ics.add(icons.getIcon("overlay_away"));
 		}
-		else if(typing)
+		if(typing)
 		{
-			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_typing")});
+			ics.add(icons.getIcon("overlay_typing"));
 		}
-		else if(!messages.isEmpty())
+		if(!messages.isEmpty())
 		{
-			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_sending")});
+			ics.add(icons.getIcon("overlay_sending"));
+		}
+		
+		if(icons.size()>1)
+		{
+			ret	= new CombiIcon(ics.toArray(new Icon[ics.size()]));
 		}
 		
 		return ret;
@@ -111,6 +123,22 @@ public class ChatUser
 	public boolean isTyping()
 	{
 		return typing;
+	}
+	
+	/**
+	 *  Set the away state.
+	 */
+	public void	setAway(boolean away)
+	{
+		this.away	= away;
+	}
+	
+	/**
+	 *  Get the away state.
+	 */
+	public boolean isAway()
+	{
+		return away;
 	}
 
 	/**
@@ -139,24 +167,24 @@ public class ChatUser
 		return "unknown".equals(nick);
 	}
 	
-	/**
-	 *  Get the chat.
-	 *  @return the chat.
-	 */
-	public IChatService getChatService()
-	{
-		return chat;
-	}
-
-	/**
-	 *  renamed to not be bean conform
-	 *  Set the chat.
-	 *  @param chat The chat to set.
-	 */
-	public void setChatService(IChatService chat)
-	{
-		this.chat = chat;
-	}
+//	/**
+//	 *  Get the chat.
+//	 *  @return the chat.
+//	 */
+//	public IChatService getChatService()
+//	{
+//		return chat;
+//	}
+//
+//	/**
+//	 *  renamed to not be bean conform
+//	 *  Set the chat.
+//	 *  @param chat The chat to set.
+//	 */
+//	public void setChatService(IChatService chat)
+//	{
+//		this.chat = chat;
+//	}
 
 	/**
 	 *  Test if image is unknown.

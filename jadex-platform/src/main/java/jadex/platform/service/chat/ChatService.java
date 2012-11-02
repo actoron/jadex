@@ -27,6 +27,7 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -81,6 +82,9 @@ public class ChatService implements IChatService, IChatGuiService
 	/** The local nick name. */
 	protected String nick;
 	
+	/** The current status (idle, typing, away). */
+	protected String status;
+	
 	/** The currently managed file transfers. */
 	protected Map<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>	transfers;
 	protected Map<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>	transfers2;
@@ -104,6 +108,7 @@ public class ChatService implements IChatService, IChatGuiService
 		if(!running)
 		{
 			running	= true;
+			status	= STATE_AWAY;	// Changes to idle only when a gui is connected.
 			
 			final PropProvider pp = new PropProvider();
 			agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -304,6 +309,14 @@ public class ChatService implements IChatService, IChatGuiService
 	}
 	
 	/**
+	 *  Get the current status.
+	 */
+	public IFuture<String>	getStatus()
+	{
+		return new Future<String>(status);
+	}
+	
+	/**
 	 *  Send a file.
 	 *  
 	 *  @param nick The sender's nick name.
@@ -439,6 +452,13 @@ public class ChatService implements IChatService, IChatGuiService
 	public IIntermediateFuture<IChatService> findUsers()
 	{
 		IIntermediateFuture<IChatService> ret	= agent.getServiceContainer().getRequiredServices("chatservices");
+//		ret.addResultListener(new DefaultResultListener<Collection<IChatService>>()
+//		{
+//			public void resultAvailable(Collection<IChatService> result)
+//			{
+//				System.out.println("Found chat users: "+result);
+//			}
+//		});
 		return ret;
 	}
 	
@@ -593,13 +613,17 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Post a status change.
 	 *  @param status The new status or null for no change.
-	 *  @param image The new avatar iamge or null for no change.
+	 *  @param image The new avatar image or null for no change.
 	 */
 	public IIntermediateFuture<IChatService> status(final String status, final byte[] image, IComponentIdentifier[] receivers)
 	{
 		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
+		if(status!=null)
+		{
+			this.status	= status;
+		}
 		
-		if(receivers.length>0)
+		if(receivers!=null && receivers.length>0)
 		{
 			boolean foundself = false;
 			

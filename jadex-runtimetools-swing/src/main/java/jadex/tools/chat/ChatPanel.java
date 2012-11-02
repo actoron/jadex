@@ -207,6 +207,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** The typing state. */
 	protected boolean	typing;
 
+	/** The away state. */
+	protected boolean	away;
+
 	/** The download table. */
 	protected JTable dtable;
 	
@@ -221,6 +224,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The refresh timer. */
 	protected Timer refreshtimer;
+	
+	/** The away timer. */
+	protected Timer awaytimer;
 	
 	/** The split panel on left hand side. */
 	protected JSplitPanel listpan;
@@ -963,11 +969,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					
 					public void update()
 					{
+						setAway(false);
 						boolean	newtyping	= tf.getText().length()!=0;
 						if(newtyping!=typing)
 						{
 							typing	= newtyping;
-							postStatus(typing ? IChatService.STATE_TYPING : IChatService.STATE_IDLE, null);
+							postStatus();
 						}
 					}			
 				});
@@ -1116,10 +1123,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-//							System.out.println("state change: "+ce.getComponentIdentifier()+" "+ce.getNick()+" "+ce.getImage());
+//							System.out.println("state change: "+ce.getComponentIdentifier()+", "+ce.getNick()+", "+ce.getImage()+", "+ce.getValue());
 							setUserState(ce.getComponentIdentifier(),
 								!IChatService.STATE_DEAD.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
 								IChatService.STATE_TYPING.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
+								IChatService.STATE_AWAY.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
 								ce.getNick(), ce.getImage());
 						}
 						else if(ChatEvent.TYPE_FILE.equals(ce.getType()))
@@ -1193,6 +1201,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void	updateRefreshTimer()
 	{
+		setAway(!usertable.isShowing());
+		
 		if(usertable.isShowing() && autorefresh && refreshtimer==null)
 		{
 //			System.out.println("enabling refresh timer");
@@ -1231,7 +1241,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							{
 								for(ChatUser cu: known)
 								{
-									setUserState(cu.getComponentIdentifier(), Boolean.FALSE, null, null, null);
+									setUserState(cu.getComponentIdentifier(), Boolean.FALSE, null, null, null, null);
 								}
 							}
 						});
@@ -1250,131 +1260,91 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	}
 	
 	/**
-	 * 
+	 *  Change the status to away and post a change, if necessary.
 	 */
-	protected void updateChatUser(IComponentIdentifier cid, IChatService cs)
+	protected void setAway(boolean away)
 	{
-		ChatUser	cu	= usermodel.getUser(cid);
-		if(cu==null)
+		if(away!=this.away)
 		{
-			createChatUser(cid, cs);
-		}
-		else
-		{
-			updateExistingChatUser(cu);
+			this.away	= away;
+			postStatus();
+		
+			if(awaytimer!=null)
+			{
+				awaytimer.stop();
+			}
+			
+			if(!away)
+			{
+				if(awaytimer==null)
+				{
+					awaytimer	= new Timer(300000, new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							setAway(true);
+						}
+					});
+					awaytimer.setRepeats(false);
+				}
+				
+				awaytimer.start();
+			}
 		}
 	}
 	
 	/**
 	 * 
 	 */
-	protected void createChatUser(final IComponentIdentifier cid, final IChatService chat)
+	protected void updateChatUser(final IComponentIdentifier cid, IChatService cs)
 	{
-		setUserState(cid, Boolean.TRUE, null, null, null);
+		setUserState(cid, Boolean.TRUE, null, null, null, null);
+		ChatUser	cu	= usermodel.getUser(cid);
 		
-		chat.getNickName().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
+		if(cu==null || cu.isNickUnknown())
 		{
-			public void resultAvailable(final String nick)
+			cs.getNickName().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
 			{
-				chat.getImage().addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
+				public void resultAvailable(final String nick)
 				{
-					public void resultAvailable(byte[] img)
-					{
-						setUserState(cid, Boolean.TRUE, null, nick, img);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				}));
+					setUserState(cid, Boolean.TRUE, null, null, nick, null);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			}));
+		}
+		
+		if(cu==null || cu.isAvatarUnknown())
+		{
+			cs.getImage().addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
+			{
+				public void resultAvailable(final byte[] img)
+				{
+					setUserState(cid, Boolean.TRUE, null, null, null, img);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			}));
+		}
+		
+		cs.getStatus().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
+		{
+			public void resultAvailable(final String status)
+			{
+				setUserState(cid, Boolean.TRUE,
+					IChatService.STATE_TYPING.equals(status) ? Boolean.TRUE : Boolean.FALSE,
+					IChatService.STATE_AWAY.equals(status) ? Boolean.TRUE : Boolean.FALSE,
+					null, null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 			}
 		}));
-	}
-	
-	/**
-	 * 
-	 */
-	protected void updateExistingChatUser(final ChatUser cu)
-	{
-		setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, null, null);
-		if(cu.isNickUnknown())
-		{
-			getChatService(cu).addResultListener(new IResultListener<IChatService>()
-			{
-				public void resultAvailable(IChatService cs)
-				{
-					cs.getNickName().addResultListener(new SwingResultListener<String>(new IResultListener<String>()
-					{
-						public void resultAvailable(final String nick)
-						{
-							setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, nick, null);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					}));
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-		}
-		
-		if(cu.isAvatarUnknown())
-		{
-			getChatService(cu).addResultListener(new IResultListener<IChatService>()
-			{
-				public void resultAvailable(IChatService cs)
-				{
-					cs.getImage().addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
-					{
-						public void resultAvailable(final byte[] img)
-						{
-							setUserState(cu.getComponentIdentifier(), Boolean.TRUE, null, null, img);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					}));
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	protected IFuture<IChatService> getChatService(final ChatUser cu)
-	{
-		if(cu.getChatService()!=null)
-		{
-			return new Future<IChatService>(cu.getChatService());
-		}
-		else
-		{
-			final Future<IChatService> ret = new Future<IChatService>();
-			IFuture<IChatService> fut = SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), cu.getComponentIdentifier(), IChatService.class);
-			fut.addResultListener(new DelegationResultListener<IChatService>(ret)
-			{
-				public void customResultAvailable(IChatService cs)
-				{
-					cu.setChatService(cs);
-					super.customResultAvailable(cs);
-				}
-			});
-			return ret;
-		}
 	}
 	
 	/**
@@ -1394,6 +1364,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		if(refreshtimer!=null)
 		{
 			refreshtimer.stop();
+		}
+		if(awaytimer!=null)
+		{
+			awaytimer.stop();
 		}
 		if(icontimer!=null)
 		{
@@ -1498,22 +1472,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Post the local state to available chatters
 	 */
-	public IFuture<Void>	postStatus(String status, byte[] image)
+	public IFuture<Void>	postStatus()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		String	status	= typing ? IChatService.STATE_TYPING
+			: away ? IChatService.STATE_AWAY : IChatService.STATE_IDLE;
 		
-		int[] sels = usertable.getSelectedRows();
-		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
-		if(sels.length>0)
-		{
-			for(int i=0; i<sels.length; i++)
-			{
-				ChatUser	cu	= (ChatUser)usertable.getModel().getValueAt(sels[i], 0);
-				recs[i] = cu.getComponentIdentifier();
-			}
-		}
-
-		getService().status(status, image, recs).addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		// Empty cid array for backwards compatibility.
+		getService().status(status, null, new IComponentIdentifier[0]).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
 			public void intermediateResultAvailable(final IChatService chat)
 			{
@@ -1554,7 +1520,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				notifyChatEvent(sendfailure ? NOTIFICATION_MSG_FAILED : NOTIFICATION_NEW_MSG, cid, text, false);
 				
-				setUserState(cid, Boolean.TRUE, null, null, null);
+				setUserState(cid, Boolean.TRUE, null, null, null, null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -1567,7 +1533,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier cid, final Boolean online, final Boolean typing, final String nickname, final byte[] image)
+	public void	setUserState(final IComponentIdentifier cid, final Boolean online, final Boolean typing,  final Boolean away, final String nickname, final byte[] image)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -1595,6 +1561,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				}
 				else
 				{
+					if(away!=null)
+					{
+						cu.setAway(away.booleanValue());
+					}
 					if(typing!=null)
 					{
 						cu.setTyping(typing.booleanValue());
