@@ -3,6 +3,7 @@ package jadex.platform.service.cron.bpmn;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -13,6 +14,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.ICommand;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -23,6 +25,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -51,25 +54,54 @@ import java.util.Map;
 @ProvidedServices(@ProvidedService(type=IStartService.class, implementation=@Implementation(expression="$pojoagent")))
 public class StartAgent implements IStartService
 {
-	
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
+
+	/** The remove commands. */
+	protected Map<Tuple2<String, IResourceIdentifier>, Runnable> remcoms;
 	
 	//-------- methods --------
+	
+	/**
+	 * 
+	 */
+	@AgentCreated
+	public IFuture<Void> init()
+	{
+		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, Runnable>();
+		return IFuture.DONE;
+	}
 	
 	/**
 	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
-	{
-		IStartService sts = (IStartService)agent.getServiceContainer().getProvidedService(IStartService.class);
+	{		
+		final long dur = 10000;
+		
+		final IStartService sts = (IStartService)agent.getServiceContainer().getProvidedService(IStartService.class);
 		sts.addBpmnModel("jadex/bpmn/testcases/TimerEventStart.bpmn", null).addResultListener(new DefaultResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("monitoring TimerEventStart.bpmn");
+				System.out.println("monitoring "+dur/1000+"s TimerEventStart.bpmn");
+				
+				agent.waitFor(dur, new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						sts.removeBpmnModel("jadex/bpmn/testcases/TimerEventStart.bpmn", null).addResultListener(new DefaultResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								System.out.println("monitoring ended");
+							}
+						});
+						return IFuture.DONE;
+					}
+				});
 			}
 		});
 	}
@@ -99,6 +131,19 @@ public class StartAgent implements IStartService
 						{
 							public void customResultAvailable(final ICronService crons)
 							{
+								Runnable remcom = new Runnable()
+								{
+									public void run()
+									{
+										crons.removeJob(cj.getId()).addResultListener(new DefaultResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+											}
+										});
+									}
+								};
+								remcoms.put(new Tuple2<String, IResourceIdentifier>(model, urid), remcom);
 								crons.addJob(cj).addResultListener(new DelegationResultListener<Void>(ret));
 							}
 						});
@@ -113,9 +158,22 @@ public class StartAgent implements IStartService
 	/**
 	 *  Remove a bpmn model.
 	 */
-	public IFuture<Void> removeBpmnModel()
+	public IFuture<Void> removeBpmnModel(final String model, final IResourceIdentifier urid)
 	{
-		return new Future<Void>(new UnsupportedOperationException());
+		Future<Void> ret = new Future<Void>();
+		
+		Runnable remcom = remcoms.remove(new Tuple2<String, IResourceIdentifier>(model, urid));
+		if(remcom!=null)
+		{
+			remcom.run();
+			ret.setResult(null);
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Not found: "+model+" "+urid));
+		}
+		
+		return ret;
 	}
 	
 	/**
