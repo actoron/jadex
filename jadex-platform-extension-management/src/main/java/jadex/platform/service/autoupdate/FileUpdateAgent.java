@@ -153,7 +153,7 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						long	comp	= o2.lastModified()-o1.lastModified();
 						int	ret	= comp>0 ? 1 : comp<0 ? -1 : 0;
-						agent.getLogger().info("comp: "+o1+", "+o2+", "+ret);
+//						agent.getLogger().info("comp: "+o1+", "+o2+", "+ret);
 						return ret;
 					}
 				});
