@@ -481,67 +481,13 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== Cli extension modules and assembly ======== -->
-		
-		<profile>
-		    <id>jadex-cli</id>
-	        <activation>
-	            <file>
-	                <exists>jadex-platform-extension-cli</exists>
-	            </file>
-	        </activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sources-cli</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<!-- .zip is appended automatically to the final name. -->
-									<finalName>sources-cli</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-clisrczip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>make-assembly-cli</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<!-- .zip is appended automatically to the final name. -->
-									<finalName>jadex-cli-addon-${project.version}</finalName>
-									<outputDirectory>target/pro-addons</outputDirectory>
-								    <descriptors>
-										<descriptor>src/main/assembly/dist-assembly-cli.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-	        <modules>
-	        	<module>jadex-parent-pro</module>
-				<module>jadex-platform-extension-cli</module>
-		    </modules>
-		</profile>
-		
 		<!-- ======== Auto update modules and assembly ======== -->
 		
 		<profile>
-		    <id>jadex-autoupdate</id>
+		    <id>jadex-management</id>
 	        <activation>
 	            <file>
-	                <exists>jadex-platform-extension-autoupdate</exists>
+	                <exists>jadex-platform-extension-management</exists>
 	            </file>
 	        </activation>
 			<build>
