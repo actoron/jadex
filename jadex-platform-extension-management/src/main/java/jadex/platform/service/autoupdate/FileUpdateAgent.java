@@ -159,7 +159,7 @@ public class FileUpdateAgent extends UpdateAgent
 				});
 				findDistDirs(new File(scandir), res);
 				
-				agent.getLogger().info("scanning: "+res);
+//				agent.getLogger().info("scanning: "+res);
 				
 				long foundver = 0;
 				if(res.size()>0)
@@ -170,7 +170,7 @@ public class FileUpdateAgent extends UpdateAgent
 						public boolean accept(File dir, String name)
 						{
 							boolean	ret	= name.toLowerCase().matches(includefiles);
-							agent.getLogger().info("match dist file: "+ret+", "+name+", "+dir.getAbsolutePath());
+//							agent.getLogger().info("match dist file: "+ret+", "+name+", "+dir.getAbsolutePath());
 							return ret;
 						}
 					});
