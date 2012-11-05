@@ -497,31 +497,31 @@
 						<artifactId>maven-assembly-plugin</artifactId>
 						<executions>
  							<execution>
-								<id>sources-autoupdate</id>
+								<id>sources-management</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
 								<configuration>
 									<!-- .zip is appended automatically to the final name. -->
-									<finalName>sources-autoupdate</finalName>
+									<finalName>sources-management</finalName>
 									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-autoupdatesrczip.xml</descriptor>
+										<descriptor>src/main/assembly/dist-assembly-mgmtsrczip.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
 							<execution>
-								<id>make-assembly-autoupdate</id>
+								<id>make-assembly-management</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
 								<configuration>
 									<!-- .zip is appended automatically to the final name. -->
-									<finalName>jadex-autoupdate-addon-${project.version}</finalName>
+									<finalName>jadex-management-addon-${project.version}</finalName>
 									<outputDirectory>target/pro-addons</outputDirectory>
 								    <descriptors>
-										<descriptor>src/main/assembly/dist-assembly-autoupdate.xml</descriptor>
+										<descriptor>src/main/assembly/dist-assembly-mgmt.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
@@ -531,7 +531,7 @@
 			</build>
 	        <modules>
 	        	<module>jadex-parent-pro</module>
-				<module>jadex-platform-extension-autoupdate</module>
+				<module>jadex-platform-extension-management</module>
 		    </modules>
 		</profile>
 		

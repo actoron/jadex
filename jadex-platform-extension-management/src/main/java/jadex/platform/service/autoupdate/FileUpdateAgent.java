@@ -151,7 +151,10 @@ public class FileUpdateAgent extends UpdateAgent
 				{
 					public int compare(File o1, File o2)
 					{
-						return (int)(o2.lastModified()-o1.lastModified());
+						long	comp	= o2.lastModified()-o1.lastModified();
+						int	ret	= comp>0 ? 1 : comp<0 ? -1 : 0;
+						agent.getLogger().info("comp: "+o1+", "+o2+", "+ret);
+						return ret;
 					}
 				});
 				findDistDirs(new File(scandir), res);

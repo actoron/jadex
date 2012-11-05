@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 
-	<id>sources-autoupdate</id>
+	<id>sources-management</id>
 
 	<formats>
 		<format>zip</format>
@@ -14,7 +14,7 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
-				<include>*:*-autoupdate</include>
+				<include>*:*-management</include>
 			</includes>
 		    <sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
@@ -34,11 +34,11 @@
 	
 	<files>
 		<file>
-			<source>src/main/assembly/dist-assembly-autoupdate.xml</source>
+			<source>src/main/assembly/dist-assembly-mgmt.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>
-			<source>src/main/assembly/dist-assembly-autoupdatesrczip.xml</source>
+			<source>src/main/assembly/dist-assembly-mgmtsrczip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<!-- <file>

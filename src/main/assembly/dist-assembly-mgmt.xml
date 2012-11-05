@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 
-	<id>distribution-cli</id>
+	<id>distribution-autoupdate</id>
 
 	<formats>
 		<!-- <format>dir</format> -->
@@ -15,7 +15,7 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
-				<include>*:*-cli</include>
+				<include>*:*-management</include>
 			</includes>
 			<binaries>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
@@ -31,7 +31,7 @@
 			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file> -->
 		<file>
-			<source>target/sources-cli.zip</source>
+			<source>target/sources-management.zip</source>
 			<outputDirectory>jadex-${version}/</outputDirectory>
 		</file>
 	</files>
