@@ -1,30 +1,20 @@
 package jadex.webservice.examples.rs.hello;
 import jadex.base.Starter;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.net.BindException;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 import junit.framework.TestCase;
 
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
-import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.test.framework.JerseyTest;
 
 
 /**
