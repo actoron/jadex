@@ -19,7 +19,6 @@ import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -43,6 +42,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.UnparsedExpression;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -52,6 +52,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -331,7 +332,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				Object	step;
 				if(upes[i].getValue()!=null)
 				{
-					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getClassLoader());
+					step	= SJavaParser.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getClassLoader());
 				}
 				else
 				{
@@ -378,7 +379,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				Object	step	= null;
 				if(upes[i].getValue()!=null)
 				{
-					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getClassLoader());
+					step	= SJavaParser.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getClassLoader());
 				}
 				else
 				{
@@ -671,7 +672,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			UnparsedExpression[]	upes	= ci.getArguments();
 			for(int i=0; i<upes.length; i++)
 			{
-				addArgument(upes[i].getName(), UnparsedExpression.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
+				addArgument(upes[i].getName(), SJavaParser.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
 				done.add(upes[i].getName());
 			}
 		}
@@ -681,7 +682,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			if(!done.contains(margs[i].getName()))
 			{
 				addArgument(margs[i].getName(),
-					UnparsedExpression.getParsedValue(margs[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
+					SJavaParser.getParsedValue(margs[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
 			}
 		}
 		
@@ -692,7 +693,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			UnparsedExpression[]	upes	= ci.getResults();
 			for(int i=0; i<upes.length; i++)
 			{
-				addDefaultResult(upes[i].getName(), UnparsedExpression.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
+				addDefaultResult(upes[i].getName(), SJavaParser.getParsedValue(upes[i], model.getAllImports(), getFetcher(), getClassLoader()));
 				done.add(upes[i].getName());
 			}
 		}
@@ -704,7 +705,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			if(!done.contains(res[i].getName()) && res[i].getDefaultValue().getValue()!=null)
 			{
 				addDefaultResult(res[i].getName(), 
-					UnparsedExpression.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
+					SJavaParser.getParsedValue(res[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));
 			}
 		}
 
@@ -1210,7 +1211,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					// todo: other Class imports, how can be found out?
 					try
 					{
-						ser = UnparsedExpression.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
+						ser = SJavaParser.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
 //								System.out.println("added: "+ser+" "+model.getName());
 					}
 					catch(RuntimeException e)

@@ -15,7 +15,7 @@ public class BeanProperty
 	protected String name;
 
 	/** The type. */
-	protected Class	type;
+	protected Class<?>	type;
 
 	/** The getter. */
 	protected Method getter;
@@ -191,7 +191,14 @@ public class BeanProperty
 		IBeanAccessorDelegate accdel = delegateprovider!=null ? delegateprovider.getDelegate(object.getClass()) : null;
 		if(accdel!=null)
 		{
-			ret = accdel.getPropertyValue(object, name);
+			try
+			{
+				ret = accdel.getPropertyValue(object, name);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		
 		else if (getGetter() != null)

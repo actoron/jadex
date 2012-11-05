@@ -70,6 +70,4 @@ public class Rulebase implements IRulebase
 	{
 		return rules!=null? rules.get(event): null;
 	}
-
-	
 }

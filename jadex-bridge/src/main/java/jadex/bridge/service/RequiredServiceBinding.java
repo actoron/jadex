@@ -3,8 +3,8 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.commons.UnparsedExpression;
 
 /**
  *  Required service binding information.

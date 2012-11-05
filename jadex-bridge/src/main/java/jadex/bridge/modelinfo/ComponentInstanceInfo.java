@@ -2,6 +2,7 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.commons.SUtil;
+import jadex.commons.UnparsedExpression;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -16,7 +16,7 @@ import java.util.Collection;
 /**
  *  The create command is used to create a component via the cms.
  */
-public class CreateCommand implements ICommand<Tuple2<IInternalAccess, Long>>
+public class CreateCommand implements ICommand<IInternalAccess>
 {
 	/** The name. */
 	protected String name;
@@ -46,9 +46,9 @@ public class CreateCommand implements ICommand<Tuple2<IInternalAccess, Long>>
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public void execute(final Tuple2<IInternalAccess, Long> args)
+	public void execute(final IInternalAccess ia)
 	{
-		final IInternalAccess ia = args.getFirstEntity();
+//		final IInternalAccess ia = args.getFirstEntity();
 		SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(ia.createResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
@@ -58,7 +58,7 @@ public class CreateCommand implements ICommand<Tuple2<IInternalAccess, Long>>
 				{
 					public void resultAvailable(IComponentIdentifier cid)
 					{
-						System.out.println("created: "+cid+" at: "+args.getSecondEntity());
+						System.out.println("created: "+cid);//+" at: "+args.getSecondEntity());
 					}
 				}));
 			}

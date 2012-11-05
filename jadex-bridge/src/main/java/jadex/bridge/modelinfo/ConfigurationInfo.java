@@ -4,6 +4,7 @@ package jadex.bridge.modelinfo;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.UnparsedExpression;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,5 @@
 package jadex.webservice.examples.rs.hello;
 import jadex.base.Starter;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ResourceIdentifier;
@@ -8,6 +7,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.ClassInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.rs.publish.DefaultRestServicePublishService;

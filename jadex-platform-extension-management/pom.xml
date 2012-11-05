@@ -40,6 +40,11 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-rules-eca</artifactId>
+			<version>${project.version}</version>
 		</dependency>				
 	</dependencies>
 

@@ -15,7 +15,6 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.AbstractErrorReportBuilder;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
@@ -28,17 +27,18 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.commons.ClassInfo;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.UnparsedExpression;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
@@ -625,7 +625,7 @@ public class BpmnXMLReader
 							}
 							try
 							{
-								Class	clazz	= SReflect.findClass(proptext, dia.getModelInfo().getAllImports(), context.getClassLoader());
+								Class<?>	clazz	= SReflect.findClass(proptext, dia.getModelInfo().getAllImports(), context.getClassLoader());
 								act.setClazz(clazz);
 							}
 							catch(ClassNotFoundException cnfe)
@@ -679,7 +679,7 @@ public class BpmnXMLReader
 								
 								try
 								{
-									Class clazz = SReflect.findClass(clazzname, dia.getModelInfo().getAllImports(), context.getClassLoader());
+									Class<?> clazz = SReflect.findClass(clazzname, dia.getModelInfo().getAllImports(), context.getClassLoader());
 									IParsedExpression exp = null;
 									if(val!=null && val.length()>0)
 									{
@@ -723,7 +723,7 @@ public class BpmnXMLReader
 					}
 					// new jadex properties handling
 					// we accept ALL "_properties_table"
-					else if (anno.getSource().toLowerCase().endsWith("_properties_table"))
+					else if(anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
 						MultiColumnTableEx table = parseBpmnMultiColumTable(anno.getDetails(), annos);
 						
@@ -756,8 +756,7 @@ public class BpmnXMLReader
 						{
 							for (int j = 0; j < details.size(); j++)
 							{
-								MAnnotationDetail detail = (MAnnotationDetail) details
-										.get(j);
+								MAnnotationDetail detail = (MAnnotationDetail) details.get(j);
 
 								String key = detail.getKey();
 								String value = detail.getValue();

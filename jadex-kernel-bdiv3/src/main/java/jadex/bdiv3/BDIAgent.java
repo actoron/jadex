@@ -11,10 +11,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.rules.eca.Condition;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.IEvent;
+import jadex.rules.eca.IRule;
+import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
@@ -71,9 +72,9 @@ public class BDIAgent extends MicroAgent
 					}
 				}
 				Rule rule = new Rule("goal_"+goal, 
-					new Condition(goal, m), new IAction()
+					new MethodCondition(goal, m), new IAction()
 				{
-					public void execute(IEvent event, Object context)
+					public void execute(IEvent event, IRule rule, Object context)
 					{
 						System.out.println("Goal succeeded: "+rgoal);
 						

@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 /**
  * 
  */
-public class Condition implements ICondition
+public class MethodCondition implements ICondition
 {
 	/** The object. */
 	protected Object object;
@@ -16,7 +16,7 @@ public class Condition implements ICondition
 	/**
 	 * 
 	 */
-	public Condition(Object object, Method method)
+	public MethodCondition(Object object, Method method)
 	{
 		this.object = object;
 		this.method = method;

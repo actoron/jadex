@@ -11,7 +11,6 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -22,6 +21,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.UnparsedExpression;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -29,6 +29,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -592,7 +593,7 @@ public class Starter
 					val	= arg.getDefaultValue(); 
 				 }
 			}
-			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
+			val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
 //			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
 		}
 		else if(val instanceof String)
@@ -628,7 +629,7 @@ public class Starter
 			{
 				val	= arg.getDefaultValue();
 			}
-			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
+			val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
 //			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
 			configname	= val!=null ? val.toString() : null;
 		}

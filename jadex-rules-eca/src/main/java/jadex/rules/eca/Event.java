@@ -36,11 +36,29 @@ public class Event implements IEvent
 	}
 
 	/**
+	 *  Set the type.
+	 *  @param type The type to set.
+	 */
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+
+	/**
 	 *  Get the content.
 	 *  @return the content.
 	 */
 	public Object getContent()
 	{
 		return content;
+	}
+	
+	/**
+	 *  Set the content.
+	 *  @param content The content to set.
+	 */
+	public void setContent(Object content)
+	{
+		this.content = content;
 	}
 }

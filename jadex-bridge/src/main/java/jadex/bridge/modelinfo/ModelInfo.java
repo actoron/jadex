@@ -6,6 +6,8 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.DebugException;
 import jadex.commons.SUtil;
+import jadex.commons.UnparsedExpression;
+import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -371,7 +373,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public Object	getProperty(String name, ClassLoader cl)
 	{
 		// Todo: caching of parsed values?
-		return UnparsedExpression.getProperty(getProperties(), name, getAllImports(), null, cl);
+		return SJavaParser.getProperty(getProperties(), name, getAllImports(), null, cl);
 	}
 
 //	/**

@@ -4,7 +4,6 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -12,10 +11,12 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
+import jadex.commons.UnparsedExpression;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.javaparser.SJavaParser;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -276,8 +277,8 @@ public class PlatformsTest extends TestCase
 			{
 				assertTrue(type+" '"+name+"' should be expression (inconsistent model loaders?): "+model.getFilename(), val instanceof UnparsedExpression);
 				
-				defval	= ((UnparsedExpression)defval).parseExpression(defmodel.getAllImports(), getClass().getClassLoader());
-				val	= ((UnparsedExpression)val).parseExpression(model.getAllImports(), getClass().getClassLoader());
+				defval	= SJavaParser.parseExpression((UnparsedExpression)defval, defmodel.getAllImports(), getClass().getClassLoader());
+				val	= SJavaParser.parseExpression((UnparsedExpression)val, model.getAllImports(), getClass().getClassLoader());
 			}
 			assertEquals(type+" '"+name+"' default value differs: "+model.getFilename(), defval, val);
 		}

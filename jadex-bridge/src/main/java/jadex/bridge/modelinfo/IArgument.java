@@ -1,6 +1,7 @@
 package jadex.bridge.modelinfo;
 
-import jadex.bridge.ClassInfo;
+import jadex.commons.ClassInfo;
+import jadex.commons.UnparsedExpression;
 
 
 /**

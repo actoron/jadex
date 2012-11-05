@@ -36,7 +36,6 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -49,6 +48,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -131,7 +131,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		activityhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateMessageActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_MULTIPLE, new EventIntermediateMultipleActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new EventIntermediateNotificationHandler());
+//		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new EventIntermediateNotificationHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_SIGNAL, new EventIntermediateNotificationHandler());
 			
 		// Intermediate events.
@@ -513,7 +514,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		super.startBehavior();
 		
 		// Check if triggered by external event
-        Tuple2<String, Object> trigger = (Tuple2<String, Object>)getArguments().get(MBpmnModel.TRIGGER);
+		// eventtype, mactname, event
+        Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getArguments().get(MBpmnModel.TRIGGER);
         // Create initial thread(s).
         List startevents = model.getStartActivities(null, null);
         for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -521,6 +523,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             MActivity mact = (MActivity)startevents.get(i);
             if(trigger!=null && MBpmnModel.EVENT_START_TIMER.equals(trigger.getFirstEntity()))
             {
+            	// Must perform time pattern check via reflection to avoid dependency
                 Boolean b = Boolean.TRUE;
                 try
                 {
@@ -530,7 +533,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
                     Method m = cl.getMethod("setPattern", new Class[]{String.class});
                     m.invoke(o, new Object[]{val});
                     m = cl.getMethod("filter", new Class[]{Object.class});
-                    b = (Boolean)m.invoke(o, new Object[]{trigger.getSecondEntity()});
+                    b = (Boolean)m.invoke(o, new Object[]{trigger.getThirdEntity()});
                 }
                 catch(Exception e)
                 {
@@ -538,14 +541,25 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
                 if(b.booleanValue())
                 {
                     ProcessThread    thread    = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+                    thread.setParameterValue("$event", trigger.getThirdEntity());
                     context.addThread(thread);
                 }
             }
+            else if(trigger!=null && MBpmnModel.EVENT_START_RULE.equals(trigger.getFirstEntity()))
+            {
+            	// Was rule for that start event?
+            	if(trigger.getSecondEntity().endsWith(mact.getName()))
+            	{
+            		ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+            		thread.setParameterValue("$event", trigger.getThirdEntity());
+            		context.addThread(thread);
+            	}
+            }	
             else //if(MBpmnModel.EVENT_START_EMPTY.equals(mact.getActivityType())
                 //|| MBpmnModel.TASK.equals(mact.getActivityType())
                 //|| MBpmnModel.SUBPROCESS.equals(mact.getActivityType()))
             {
-                ProcessThread    thread    = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+                ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
                 context.addThread(thread);
             }
 //            else

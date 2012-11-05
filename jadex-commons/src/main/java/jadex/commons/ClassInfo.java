@@ -1,6 +1,5 @@
-package jadex.bridge;
+package jadex.commons;
 
-import jadex.commons.SReflect;
 
 /**
  *  The class info struct serves for saving class information.

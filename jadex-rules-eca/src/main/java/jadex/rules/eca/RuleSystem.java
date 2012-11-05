@@ -44,7 +44,7 @@ public class RuleSystem
 	/** The Java beans property change listeners. */
 	protected Map<Object, PropertyChangeListener> pcls;
 	
-	/** The context. */
+	/** The context for rule action execution. */
 	protected Object context;
 	
 	//-------- constructors --------
@@ -80,6 +80,7 @@ public class RuleSystem
 		final Map<String, Rule> rules = new HashMap<String, Rule>();
 		
 		// Analyze the dynamic or static methods of the object (static if object is a class)
+		// todo: what about using constructors of classes
 		if(!(object instanceof Class))
 		{
 			while(!clazz.equals(Object.class))
@@ -175,7 +176,9 @@ public class RuleSystem
 	}
 
 	/**
-	 * 
+	 *  Inspects a method for
+	 *  - condition annotation
+	 *  - action annotation
 	 */
 	protected void analyzeMethod(Method method, Object object, Map<Method, IResultCommand> eventcreators,
 		Map<String, Rule> rules)
@@ -220,7 +223,7 @@ public class RuleSystem
 			
 			rule.setEvents(events);
 			
-			rule.setCondition(new jadex.rules.eca.Condition(object, m));
+			rule.setCondition(new jadex.rules.eca.MethodCondition(object, m));
 		}
 		else if(method.isAnnotationPresent(Action.class))
 		{
@@ -235,7 +238,7 @@ public class RuleSystem
 				rules.put(name, rule);
 			}
 			
-			rule.setAction(new jadex.rules.eca.Action(object, m));
+			rule.setAction(new jadex.rules.eca.MethodAction(object, m));
 		}
 	}
 		
@@ -374,9 +377,9 @@ public class RuleSystem
 				for(int i=0; i<rules.size(); i++)
 				{
 					IRule rule = rules.get(i);
-					if(rule.getCondition().evaluate(event))
+					if(rule.getCondition()==null || rule.getCondition().evaluate(event))
 					{
-						rule.getAction().execute(event, context);
+						rule.getAction().execute(event, rule, context);
 					}
 				}
 			}
@@ -395,27 +398,41 @@ public class RuleSystem
 	}
 	
 	/**
-	 * 
+	 *  Add an event.
 	 */
 	public void addEvent(IEvent event)
 	{
 		events.add(event);
 	}
-	
 }
 
+/**
+ *  Creates a new event based on a field name and value.
+ */
 class FetchFieldCommand implements IResultCommand
 {
+	/** The object. */
 	protected Object object;
 	
+	/** The name. */
 	protected String name;
 	
+	/**
+	 *  Create a new FetchFieldCommand.
+	 */
 	public FetchFieldCommand(Object object, String name)
 	{
 		this.object = object;
 		this.name = name;
 	}
 
+	/**
+	 *  Execute the command.
+	 *  
+	 *  Fetches the field value and return an event with
+	 *  type = field name
+	 *  content = field value
+	 */
 	public Object execute(Object args)
 	{
 		try

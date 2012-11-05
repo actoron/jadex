@@ -3,7 +3,7 @@ package jadex.application;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.UnparsedExpression;
 import jadex.component.ComponentXMLReader;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;

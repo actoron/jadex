@@ -89,7 +89,7 @@ public class MNamedIdElement extends MAnnotationElement
 	 */
 	public Object getParsedPropertyValue(String name)
 	{
-		Object val	= getPropertyValue("duration");
+		Object val	= getPropertyValue(name);
 		if(val instanceof IParsedExpression)
 		{
 			//	System.out.println("here: "+ret);

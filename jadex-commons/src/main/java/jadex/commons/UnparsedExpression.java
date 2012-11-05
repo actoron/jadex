@@ -1,9 +1,5 @@
-package jadex.bridge.modelinfo;
+package jadex.commons;
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.IValueFetcher;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SJavaParser;
 
 import java.util.Map;
 
@@ -28,7 +24,7 @@ public class UnparsedExpression
 	protected String language;
 	
 	/** The parsed expression (cached for speed, but not transmitted). */
-	protected IParsedExpression	parsed;
+	protected Object parsed;
 	
 	//-------- constructors --------
 
@@ -136,50 +132,22 @@ public class UnparsedExpression
 	}
 	
 	/**
-	 *  Parse the expression.
-	 *  The result is cached for later accesses.
+	 *  Get the parsed.
+	 *  @return The parsed.
 	 */
-	public IParsedExpression	parseExpression(String[] imports, ClassLoader classloader)
+	public Object getParsed()
 	{
-		// todo: language
-		if(parsed==null && value!=null)
-		{
-			parsed	= SJavaParser.parseExpression(value, imports, classloader);
-		}
 		return parsed;
 	}
-	
-	//-------- static helpers --------
-	
+
 	/**
-	 *  Get a parsed property.
-	 *  Handles properties, which may be parsed or unparsed,
-	 *  and always returns a parsed property value.
-	 *  @param	name	The property name.  
-	 *  @return The property value or null if property not defined.
+	 *  Set the parsed.
+	 *  @param parsed The parsed to set.
+	 *  // changed name to exclude from transfer
 	 */
-	public static Object	getProperty(Map<String, Object> properties, String name, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
+	public void setParsedExp(Object parsed)
 	{
-		return getParsedValue(properties!=null ? properties.get(name) : null, imports, fetcher, classloader);
-	}
-	
-	/**
-	 *  Get a parsed value.
-	 *  Handles values, which may be parsed or unparsed,
-	 *  and always returns a parsed value.
-	 *  @param	value	The value.  
-	 *  @return The parsed and evaluated value.
-	 */
-	public static Object	getParsedValue(Object value, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
-	{
-		if(value instanceof UnparsedExpression)
-		{
-			// todo: language
-			UnparsedExpression	upe	= (UnparsedExpression)value;
-			IParsedExpression	pe	= upe.parseExpression(imports, classloader);
-			value	= pe!=null ? pe.getValue(fetcher) : null;
-		}
-		return value;
+		this.parsed = parsed;
 	}
 
 	/**

@@ -135,7 +135,7 @@ public class Tuple	implements Cloneable, java.io.Serializable
 	 *  Convert this tuple to a string representation.
 	 *  @return	A string representation of this tuple.
 	 */
-	public String	toString()
+	public String toString()
 	{
 		return "Tuple"+SUtil.arrayToString(entities);
 	}
@@ -146,7 +146,7 @@ public class Tuple	implements Cloneable, java.io.Serializable
 	 *  Clone this tuple.
 	 *  @return A shallow copy of this tuple.
 	 */
-	public Object	clone()
+	public Object clone()
 	{
 		return new Tuple((Object[])entities.clone());
 	}

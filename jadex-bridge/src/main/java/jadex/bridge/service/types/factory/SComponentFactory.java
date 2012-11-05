@@ -17,14 +17,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 
-import java.awt.BorderLayout;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 
 

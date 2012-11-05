@@ -1,7 +1,6 @@
 package jadex.extension.rs.publish;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -22,6 +21,7 @@ import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
@@ -63,7 +63,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.glassfish.grizzly.Grizzly;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
@@ -74,7 +73,6 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.multipart.FormDataParam;
-import com.sun.jersey.server.impl.container.grizzly.GrizzlyContainer;
 
 /**
  *  The default web service publish service.
@@ -174,7 +172,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			{
 				for(int i=0; i<pi.getProperties().size(); i++)
 				{
-					Object val = UnparsedExpression.getParsedValue(pi.getProperties().get(i), null, component.getFetcher(), component.getClassLoader());
+					Object val = SJavaParser.getParsedValue(pi.getProperties().get(i), null, component.getFetcher(), component.getClassLoader());
 					mapprops.put(pi.getProperties().get(i).getName(), val);
 				}
 			}

@@ -1,6 +1,6 @@
 package jadex.bridge.service;
 
-import jadex.bridge.ClassInfo;
+import jadex.commons.ClassInfo;
 
 
 /**

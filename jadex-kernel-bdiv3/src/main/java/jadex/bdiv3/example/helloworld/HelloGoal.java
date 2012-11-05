@@ -2,6 +2,7 @@ package jadex.bdiv3.example.helloworld;
 
 import jadex.bdiv3.annotation.Goal;
 import jadex.rules.eca.IEvent;
+import jadex.rules.eca.IRule;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
 import jadex.rules.eca.annotations.Event;
@@ -40,7 +41,7 @@ public class HelloGoal
 	}
 	
 	@Action("creation")
-	protected static void action(IEvent event, Object context)
+	protected static void action(IEvent event, IRule rule, Object context)
 	{
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)context;
 		HelloWorldBDI agent = (HelloWorldBDI)context;

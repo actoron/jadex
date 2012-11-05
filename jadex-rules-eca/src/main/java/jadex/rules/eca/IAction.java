@@ -8,6 +8,8 @@ public interface IAction
 	/**
 	 *  Execute the action.
 	 *  @param event The event.
+	 *  @param rule The rule this action belongs to.
+	 *  @param context The user context.
 	 */
-	public void execute(IEvent event, Object context);
+	public void execute(IEvent event, IRule rule, Object context);
 }
