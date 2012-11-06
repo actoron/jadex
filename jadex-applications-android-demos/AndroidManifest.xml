@@ -20,6 +20,7 @@
 		<activity android:name=".bpmn.BPMNDemoActivity"></activity>
 		<activity android:name=".bpmn.QuestionActivity"></activity>
 		<activity android:name=".bpmn.AnswerActivity"></activity>
+		<activity android:name=".bdi.BDIDemoActivity"></activity>
 	</application>
 	
 </manifest>

@@ -6,13 +6,15 @@
     <string name="started">Platform started:  </string>
     <string name="app_name">Jadex Android Demos</string>
     <string name="main_launchBPMNDemo">Launch BPMN Demo</string>
+    <string name="main_launchBDIDemo">Launch BDI Demo</string>
     <string name="main_launchBenchmarkDemo">Launch Benchmark Demo</string>
     <string name="main_launchEventDemo">Launch Event Demo</string>
     <string name="event_demoDescription">This Activity demonstrates the usage of messages and "events", which allow simple communication between agent and activity.
         If you press the button below, a message is sent to the agent and then an event is thrown back to the activity.</string>
     <string name="event_pingAgentButton">pingAgentButton</string>
-    <string name="bpmn_demoDescription">This Activity demonstrates the usage BPMN-Workflows in Jadex-Android.
+    <string name="bpmn_demoDescription">This Activity demonstrates the usage of BPMN-Workflows in Jadex-Android.
          Please wait until the platform is started.</string>
     <string name="benchmark_openMenuButton">Choose Benchmark</string>
-
+    <string name="bdi_demoDescription">This Activity demonstrates the usage of BDI Agents in Jadex-Android.
+         Please wait until the platform is started.</string>
 </resources>

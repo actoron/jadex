@@ -165,6 +165,10 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 
 		return ret;
 	}
+	
+	protected IFuture<IComponentIdentifier> startBDIAgent(final String name, final String modelPath) {
+		return startBPMNAgent(name, modelPath);
+	}
 
 	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath)
 	{
@@ -300,6 +304,16 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		});
 	}
 	
+	/**
+	 * Starts the Jadex Platform.
+	 * To set Parameters, use setPlatformKernels(), setPlatformOptions() or setPlatformName() before
+	 * calling this Method.
+	 * 
+	 * Will be automatically called when setPlatformAutostart(true) was called in the Constructor.
+	 * 
+	 * The Lifecycle methods onPlatformStarting() and onPlatformStarted() will be executed
+	 * during Startup.
+	 */
 	final protected void startPlatform()
 	{
 		onPlatformStarting();

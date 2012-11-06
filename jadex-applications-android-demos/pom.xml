@@ -35,6 +35,12 @@
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -67,12 +73,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -93,7 +93,6 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<version>3.3.0</version>
 				<configuration>
 					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
 					<assetsDirectory>${project.basedir}/assets</assetsDirectory>

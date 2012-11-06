@@ -43,7 +43,8 @@ public class JadexPlatformManager
 	public static final String KERNEL_MICRO = "micro";
 	public static final String KERNEL_BPMN = "bpmn";
 	public static final String KERNEL_BDI = "bdi";
-
+	public static final String KERNEL_BDIBPMN = "bdibpmn";
+	
 	public static final String[] DEFAULT_KERNELS = new String[]
 	{ KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN };
 

@@ -1,5 +1,6 @@
 package jadex.android.applications.demos;
 
+import jadex.android.applications.demos.bdi.BDIDemoActivity;
 import jadex.android.applications.demos.benchmark.BenchmarkDemoActivity;
 import jadex.android.applications.demos.bpmn.BPMNDemoActivity;
 import jadex.android.applications.demos.event.EventDemoActivity;
@@ -21,6 +22,7 @@ public class DemoChooserActivity extends Activity
 	private Button launchBPMNButton;
 	private Button launchBenchmarkButton;
 	private Button launchEventButton;
+	private Button launchBDIButton;
 
 	protected IComponentIdentifier lastComponentIdentifier;
 
@@ -33,6 +35,9 @@ public class DemoChooserActivity extends Activity
 
 		launchBPMNButton = (Button) findViewById(R.id.main_launchBPMNDemoButton);
 		launchBPMNButton.setOnClickListener(buttonListener);
+		
+		launchBDIButton = (Button) findViewById(R.id.main_launchBDIDemoButton);
+		launchBDIButton.setOnClickListener(buttonListener);
 
 		launchBenchmarkButton = (Button) findViewById(R.id.main_launchBenchmarkDemoButton);
 		launchBenchmarkButton.setOnClickListener(buttonListener);
@@ -49,6 +54,9 @@ public class DemoChooserActivity extends Activity
 			if (view == launchBPMNButton)
 			{
 				Intent i = new Intent(DemoChooserActivity.this, BPMNDemoActivity.class);
+				startActivity(i);
+			} else if (view == launchBDIButton) {
+				Intent i = new Intent(DemoChooserActivity.this, BDIDemoActivity.class);
 				startActivity(i);
 			} else if (view == launchBenchmarkButton)
 			{

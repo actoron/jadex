@@ -125,6 +125,20 @@ public interface IJadexPlatformBinder
 	 */
 	public IFuture<IComponentIdentifier> startBPMNAgent(final IComponentIdentifier platformId, final String name, final String modelPath);
 
+	/**
+	 * Start a new BDI agent on a given platform.
+	 * 
+	 * @param platformId
+	 *            Identifier of the jadex platform
+	 * @param name
+	 *            name of the newly created agent
+	 * @param modelPath
+	 *            Path to the bpmn model file of the new agent
+	 * @return ComponendIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startBDIAgent(final IComponentIdentifier platformId, final String name, final String modelPath);
+
+	
 	// ---------- Event-stuff ----------
 
 	public void registerEventListener(String eventName, IEventReceiver<?> rec);
