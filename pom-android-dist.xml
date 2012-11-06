@@ -145,8 +145,7 @@
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
-				<!-- need to decouple UI for BDIBPMN in android -->
-<!-- 				<module>jadex-kernel-bdibpmn</module> -->
+				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-platform</module>
 				<module>jadex-platform-extension-webservice</module>
 
