@@ -17,9 +17,9 @@
 			<excludes>
 			  	<!-- Exclude backup modules. -->
 				<exclude>*:*-backup</exclude>
-			  	<!-- Exclude auto update. -->
-				<exclude>*:*-autoupdate</exclude>
-							    <!-- Exclude maven dependency manager. -->
+			  	<!-- Exclude management extension. -->
+				<exclude>*:*-management</exclude>
+				<!-- Exclude maven dependency manager. -->
 				<exclude>*:*-maven</exclude>
 			    <!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
@@ -29,8 +29,6 @@
 				<exclude>*:*-webservice*</exclude>
 				<!-- Exclude all secure transport modules -->
 				<exclude>*:*-securetransport</exclude>
-				<!-- Exclude all cli modules -->
-				<exclude>*:*-cli</exclude>
 				<!-- Exclude relay standalone module -->
 				<exclude>*:*-relay-standalone</exclude>
 			</excludes>

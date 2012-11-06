@@ -69,6 +69,7 @@
 		
 
 		<module>jadex-rules</module>
+		<module>jadex-rules-eca</module>
 		<module>jadex-rules-applications</module>
 		<module>jadex-rules-tools</module>
 
