@@ -7,8 +7,8 @@ import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
 import jadex.rules.eca.annotations.RuleObject;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

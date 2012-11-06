@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  A condition that a plan can wait for.

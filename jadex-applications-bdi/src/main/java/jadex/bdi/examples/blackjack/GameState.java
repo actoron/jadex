@@ -8,7 +8,7 @@ package jadex.bdi.examples.blackjack;
 
 import jadex.commons.SimplePropertyChangeSupport;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Java class for concept GameState of blackjack_beans ontology.
  */
-public class GameState implements java.beans.BeanInfo
+public class GameState implements jadex.commons.beans.BeanInfo
 {
 	//-------- constants ----------
 
@@ -213,13 +213,13 @@ public class GameState implements java.beans.BeanInfo
 	/**
 	 * The property descriptors, constructed on first access.
 	 */
-	private java.beans.PropertyDescriptor[] pds = null;
+	private jadex.commons.beans.PropertyDescriptor[] pds = null;
 
 	/**
 	 * Get the bean descriptor.
 	 * @return The bean descriptor.
 	 */
-	public java.beans.BeanDescriptor getBeanDescriptor()
+	public jadex.commons.beans.BeanDescriptor getBeanDescriptor()
 	{
 		return null;
 	}
@@ -228,15 +228,15 @@ public class GameState implements java.beans.BeanInfo
 	 * Get the property descriptors.
 	 * @return The property descriptors.
 	 */
-	public java.beans.PropertyDescriptor[] getPropertyDescriptors()
+	public jadex.commons.beans.PropertyDescriptor[] getPropertyDescriptors()
 	{
 		if(pds==null)
 		{
 			try
 			{
-				pds = new java.beans.PropertyDescriptor[]{
-					new java.beans.PropertyDescriptor("dealer", this.getClass(), "getDealer", "setDealer")
-					, new java.beans.IndexedPropertyDescriptor("players", this.getClass(),
+				pds = new jadex.commons.beans.PropertyDescriptor[]{
+					new jadex.commons.beans.PropertyDescriptor("dealer", this.getClass(), "getDealer", "setDealer")
+					, new jadex.commons.beans.IndexedPropertyDescriptor("players", this.getClass(),
 							"getPlayers", "setPlayers", "getPlayer", "setPlayer")
 				};
 			}
@@ -261,7 +261,7 @@ public class GameState implements java.beans.BeanInfo
 	 * Get the event set descriptors.
 	 * @return The event set descriptors.
 	 */
-	public java.beans.EventSetDescriptor[] getEventSetDescriptors()
+	public jadex.commons.beans.EventSetDescriptor[] getEventSetDescriptors()
 	{
 		return null;
 	}
@@ -279,7 +279,7 @@ public class GameState implements java.beans.BeanInfo
 	 * Get the method descriptors.
 	 * @return The method descriptors.
 	 */
-	public java.beans.MethodDescriptor[] getMethodDescriptors()
+	public jadex.commons.beans.MethodDescriptor[] getMethodDescriptors()
 	{
 		return null;
 	}
@@ -288,7 +288,7 @@ public class GameState implements java.beans.BeanInfo
 	 * Get additional bean info.
 	 * @return Get additional bean info.
 	 */
-	public java.beans.BeanInfo[] getAdditionalBeanInfo()
+	public jadex.commons.beans.BeanInfo[] getAdditionalBeanInfo()
 	{
 		return null;
 	}

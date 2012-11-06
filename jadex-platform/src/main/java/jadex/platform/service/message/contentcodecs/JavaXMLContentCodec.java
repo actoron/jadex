@@ -1,9 +1,9 @@
 package jadex.platform.service.message.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
-import java.beans.ExceptionListener;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
+import jadex.commons.beans.ExceptionListener;
+import jadex.commons.beans.XMLDecoder;
+import jadex.commons.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;

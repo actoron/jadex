@@ -11,30 +11,30 @@ package jadex.bdi.examples.blackjack;
 /**
  *  Java beaninfo class for concept Player of blackjack_beans ontology.
  */
-public class PlayerBeanInfo extends java.beans.SimpleBeanInfo
+public class PlayerBeanInfo extends jadex.commons.beans.SimpleBeanInfo
 {
 	//-------- bean related methods --------
 
 	/** The property descriptors, constructed on first access. */
-	private java.beans.PropertyDescriptor[] pds = null;
+	private jadex.commons.beans.PropertyDescriptor[] pds = null;
 
 	/**
 	 *  Get the property descriptors.
 	 *  @return The property descriptors.
 	 */
-	public java.beans.PropertyDescriptor[] getPropertyDescriptors() {
+	public jadex.commons.beans.PropertyDescriptor[] getPropertyDescriptors() {
 		if(pds==null) {
 			try {
-				pds = new java.beans.PropertyDescriptor[]{
-					 new java.beans.PropertyDescriptor("colorvalue", Player.class, "getColorValue", "setColorValue")
-					, new java.beans.PropertyDescriptor("name", Player.class, "getName", "setName")
-					, new java.beans.PropertyDescriptor("strategyname", Player.class, "getStrategyName", "setStrategyName")
-					, new java.beans.PropertyDescriptor("account", Player.class, "getAccount", "setAccount")
-					, new java.beans.PropertyDescriptor("playingstate", Player.class, "getState", "setState")
-					, new java.beans.IndexedPropertyDescriptor("cards", Player.class,
+				pds = new jadex.commons.beans.PropertyDescriptor[]{
+					 new jadex.commons.beans.PropertyDescriptor("colorvalue", Player.class, "getColorValue", "setColorValue")
+					, new jadex.commons.beans.PropertyDescriptor("name", Player.class, "getName", "setName")
+					, new jadex.commons.beans.PropertyDescriptor("strategyname", Player.class, "getStrategyName", "setStrategyName")
+					, new jadex.commons.beans.PropertyDescriptor("account", Player.class, "getAccount", "setAccount")
+					, new jadex.commons.beans.PropertyDescriptor("playingstate", Player.class, "getState", "setState")
+					, new jadex.commons.beans.IndexedPropertyDescriptor("cards", Player.class,
 						"getCards", "setCards", "getCard", "setCard")
-					, new java.beans.PropertyDescriptor("bet", Player.class, "getBet", "setBet")
-					, new java.beans.PropertyDescriptor("cardCnt", Player.class, "getCardCnt", null)
+					, new jadex.commons.beans.PropertyDescriptor("bet", Player.class, "getBet", "setBet")
+					, new jadex.commons.beans.PropertyDescriptor("cardCnt", Player.class, "getCardCnt", null)
 				};
 			}
 			catch(Exception e) {

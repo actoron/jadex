@@ -15,8 +15,8 @@ import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVWeakIdGenerator.OAVExternalObjectId;
 import jadex.rules.state.javaimpl.OAVWeakIdGenerator.OAVInternalObjectId;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

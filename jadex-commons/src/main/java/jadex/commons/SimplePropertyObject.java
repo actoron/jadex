@@ -1,6 +1,6 @@
 package jadex.commons;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;

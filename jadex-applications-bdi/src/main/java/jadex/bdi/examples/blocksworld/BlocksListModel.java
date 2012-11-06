@@ -1,8 +1,8 @@
 package jadex.bdi.examples.blocksworld;
 
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 
 import javax.swing.DefaultListModel;
 

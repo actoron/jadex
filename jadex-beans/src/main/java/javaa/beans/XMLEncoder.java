@@ -160,7 +160,7 @@ public class XMLEncoder extends Encoder {
 				out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 				out.println("<java version=\""
 						+ System.getProperty("java.version")
-						+ "\" class=\"java.beans.XMLDecoder\">");
+						+ "\" class=\"jadex.commons.beans.XMLDecoder\">");
 				hasXmlHeader = true;
 			}
 

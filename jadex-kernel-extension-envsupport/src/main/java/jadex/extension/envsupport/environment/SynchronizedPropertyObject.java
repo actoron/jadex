@@ -3,7 +3,7 @@ package jadex.extension.envsupport.environment;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.commons.meta.TypedPropertyObject;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;

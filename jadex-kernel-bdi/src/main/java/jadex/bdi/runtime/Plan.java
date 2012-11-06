@@ -12,8 +12,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
 
 import java.util.Collection;
 

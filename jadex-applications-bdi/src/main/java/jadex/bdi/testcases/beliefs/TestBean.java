@@ -3,7 +3,7 @@ package jadex.bdi.testcases.beliefs;
 import jadex.commons.SReflect;
 import jadex.commons.SimplePropertyChangeSupport;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  The test bean has an attribute that fires a

@@ -2,8 +2,8 @@ package antworld;
 
 import jadex.extension.envsupport.environment.ObjectEvent;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 
 public class GravitationListener implements PropertyChangeListener {
 

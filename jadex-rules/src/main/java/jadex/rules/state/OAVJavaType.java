@@ -3,11 +3,11 @@ package jadex.rules.state;
 import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 
-import java.beans.BeanInfo;
-import java.beans.IndexedPropertyDescriptor;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import jadex.commons.beans.BeanInfo;
+import jadex.commons.beans.IndexedPropertyDescriptor;
+import jadex.commons.beans.IntrospectionException;
+import jadex.commons.beans.Introspector;
+import jadex.commons.beans.PropertyDescriptor;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

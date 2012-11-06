@@ -1,7 +1,7 @@
 package jadex.web.examples.puzzle;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

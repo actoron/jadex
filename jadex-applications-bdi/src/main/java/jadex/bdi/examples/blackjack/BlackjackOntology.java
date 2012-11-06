@@ -17,14 +17,14 @@ public class BlackjackOntology
 
 	static
 	{
-		String[] sp = java.beans.Introspector.getBeanInfoSearchPath();
+		String[] sp = jadex.commons.beans.Introspector.getBeanInfoSearchPath();
 		String[] nsp = new String[sp.length+1];
 		System.arraycopy(sp, 0, nsp, 0, sp.length);
 		nsp[nsp.length-1] = "jadex.examples.blackjack";
 		// Use try/catch for applets / webstart, etc.
 		try
 		{
-			java.beans.Introspector.setBeanInfoSearchPath(nsp);
+			jadex.commons.beans.Introspector.setBeanInfoSearchPath(nsp);
 		}
 		catch(SecurityException e)
 		{

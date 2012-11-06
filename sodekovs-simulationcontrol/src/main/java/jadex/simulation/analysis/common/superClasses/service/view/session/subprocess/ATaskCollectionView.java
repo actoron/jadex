@@ -16,7 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import jadex.commons.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +102,7 @@ public class ATaskCollectionView extends JPanel implements IAListener
 						JScrollPane listScroller = new JScrollPane(list);
 						listScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 						listScroller.setPreferredSize(new Dimension(250, 150));
-						listScroller.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Ausführungen"));
+						listScroller.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Ausfï¿½hrungen"));
 						JPanel leftPanel = new JPanel(new GridBagLayout());
 						leftPanel.add(listScroller,
 								new GridBagConstraints(0, 1, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -146,10 +146,10 @@ public class ATaskCollectionView extends JPanel implements IAListener
 						((JSplitPane) generalComp).setLeftComponent(leftPanel);
 
 						generalTaskProperties = new TaskProperties();
-						generalTaskProperties.getTextField("Activitätsname").setText(activity.getName());
+						generalTaskProperties.getTextField("Activitï¿½tsname").setText(activity.getName());
 //						System.out.println(activity);
 //						System.out.println(activity.getClazz());
-						generalTaskProperties.getTextField("Activitätsklasse").setText(activity.getClazz().getName().toString());
+						generalTaskProperties.getTextField("Activitï¿½tsklasse").setText(activity.getClazz().getName().toString());
 						// generalTaskProperties.getTextField("Viewerklasse").setText("Noch nicht bekannt");
 
 						taskProperties = generalTaskProperties;
@@ -183,7 +183,7 @@ public class ATaskCollectionView extends JPanel implements IAListener
 	{
 		synchronized (mutex)
 		{
-			final String name = "Ausführung " + task.getTaskNumber();
+			final String name = "Ausfï¿½hrung " + task.getTaskNumber();
 			displayedTasks.put(name, view);
 			SwingUtilities.invokeLater(new Runnable()
 			{
@@ -204,13 +204,13 @@ public class ATaskCollectionView extends JPanel implements IAListener
 	public void update(ATaskEvent event)
 	{
 		final IATask task = (IATask) event.getSource();
-		if (event.getCommand().equals(AConstants.TASK_LÄUFT))
+		if (event.getCommand().equals(AConstants.TASK_Lï¿½UFT))
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					String name = "Ausführung " + task.getTaskNumber();
+					String name = "Ausfï¿½hrung " + task.getTaskNumber();
 					if (!((DefaultListModel) list.getModel()).contains(name))
 					{
 						((DefaultListModel) list.getModel()).addElement(name);

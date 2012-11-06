@@ -1,6 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.util.List;
 
 /**

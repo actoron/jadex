@@ -1,7 +1,7 @@
 package jadex.rules.test.rulesystem;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
 
 /**
  *  The test bean has an attribute that fires a

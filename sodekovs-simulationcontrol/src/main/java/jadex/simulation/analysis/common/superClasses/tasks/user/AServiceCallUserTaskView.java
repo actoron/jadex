@@ -11,7 +11,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import jadex.commons.beans.PropertyVetoException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -31,7 +31,7 @@ public class AServiceCallUserTaskView extends ATaskView implements IATaskView
 	public IFuture startGUI()
 	{
 		final Future ret = new Future();
-		final JButton button = new JButton("Ausführung fortsetzten");
+		final JButton button = new JButton("Ausfï¿½hrung fortsetzten");
 		button.addActionListener(new ActionListener()
 		{
 			

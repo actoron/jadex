@@ -3,7 +3,7 @@ package jadex.rules.test.rulesystem;
 import jadex.commons.SimplePropertyChangeSupport;
 
 import java.awt.Color;
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  A block in the blocks-world.

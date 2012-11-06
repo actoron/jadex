@@ -7,7 +7,7 @@ import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 
 import java.awt.Color;
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 

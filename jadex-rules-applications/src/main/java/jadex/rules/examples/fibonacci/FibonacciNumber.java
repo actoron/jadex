@@ -1,7 +1,7 @@
 package jadex.rules.examples.fibonacci;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
 
 /**
  *  The fibonacci number java representation.

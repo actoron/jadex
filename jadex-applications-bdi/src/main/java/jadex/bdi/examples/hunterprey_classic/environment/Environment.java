@@ -18,7 +18,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;

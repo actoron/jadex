@@ -4,7 +4,7 @@ import jadex.commons.IPropertyObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
-import java.beans.PropertyDescriptor;
+import jadex.commons.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
  

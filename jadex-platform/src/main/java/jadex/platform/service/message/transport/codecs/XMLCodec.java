@@ -2,9 +2,9 @@ package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
 
-import java.beans.ExceptionListener;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
+import jadex.commons.beans.ExceptionListener;
+import jadex.commons.beans.XMLDecoder;
+import jadex.commons.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

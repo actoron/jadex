@@ -2,7 +2,7 @@ package jadex.rules.state;
 
 import jadex.commons.SReflect;
 
-import java.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.common.superClasses.service.view.session.subprocess;
 
 import java.awt.Dimension;
-import java.beans.PropertyVetoException;
+import jadex.commons.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;

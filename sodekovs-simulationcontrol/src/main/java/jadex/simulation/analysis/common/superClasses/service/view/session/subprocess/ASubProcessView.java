@@ -23,7 +23,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.beans.PropertyVetoException;
+import jadex.commons.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -148,13 +148,13 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 		synchronized (mutex)
 		{
 			final IATask task = (IATask) ((ATaskEvent)event).getSource();
-			if (event.getCommand().equals(AConstants.TASK_LÄUFT))
+			if (event.getCommand().equals(AConstants.TASK_Lï¿½UFT))
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						graphPanel.setTaskStatus(task.getActivity(), AConstants.TASK_LÄUFT);					}
+						graphPanel.setTaskStatus(task.getActivity(), AConstants.TASK_Lï¿½UFT);					}
 				});
 			}
 			else if (event.getCommand().equals(AConstants.TASK_BEENDET))

@@ -65,13 +65,13 @@ public class GameResult
 	//-------- bean related methods --------
 
 	/** The property descriptors, constructed on first access. */
-	private java.beans.PropertyDescriptor[] pds = null;
+	private jadex.commons.beans.PropertyDescriptor[] pds = null;
 
 	/**
 	 *  Get the bean descriptor.
 	 *  @return The bean descriptor.
 	 */
-	public java.beans.BeanDescriptor getBeanDescriptor()
+	public jadex.commons.beans.BeanDescriptor getBeanDescriptor()
 	{
 		return null;
 	}
@@ -80,14 +80,14 @@ public class GameResult
 	 *  Get the property descriptors.
 	 *  @return The property descriptors.
 	 */
-	public java.beans.PropertyDescriptor[] getPropertyDescriptors()
+	public jadex.commons.beans.PropertyDescriptor[] getPropertyDescriptors()
 	{
 		if(pds == null)
 		{
 			try
 			{
-				pds = new java.beans.PropertyDescriptor[]{new java.beans.PropertyDescriptor("won", this.getClass(), "isWon", "setWon"),
-						new java.beans.PropertyDescriptor("money", this.getClass(), "getMoney", "setMoney")};
+				pds = new jadex.commons.beans.PropertyDescriptor[]{new jadex.commons.beans.PropertyDescriptor("won", this.getClass(), "isWon", "setWon"),
+						new jadex.commons.beans.PropertyDescriptor("money", this.getClass(), "getMoney", "setMoney")};
 			}
 			catch(Exception e)
 			{
@@ -110,7 +110,7 @@ public class GameResult
 	 *  Get the event set descriptors.
 	 *  @return The event set descriptors.
 	 */
-	public java.beans.EventSetDescriptor[] getEventSetDescriptors()
+	public jadex.commons.beans.EventSetDescriptor[] getEventSetDescriptors()
 	{
 		return null;
 	}
@@ -128,7 +128,7 @@ public class GameResult
 	 *  Get the method descriptors.
 	 *  @return The method descriptors.
 	 */
-	public java.beans.MethodDescriptor[] getMethodDescriptors()
+	public jadex.commons.beans.MethodDescriptor[] getMethodDescriptors()
 	{
 		return null;
 	}
@@ -137,7 +137,7 @@ public class GameResult
 	 *  Get additional bean info.
 	 *  @return Get additional bean info.
 	 */
-	public java.beans.BeanInfo[] getAdditionalBeanInfo()
+	public jadex.commons.beans.BeanInfo[] getAdditionalBeanInfo()
 	{
 		return null;
 	}
