@@ -589,6 +589,23 @@
 		    </modules>
 		</profile>
 		
+		<!-- ======== Android Modules ======== -->
+		
+		<profile>
+			<id>jadex-android</id>
+			<modules>
+				<module>jadex-android-parent</module>
+				<module>jadex-android-antlr</module>
+				<module>jadex-android-xmlpull</module>
+				<module>jadex-runtimetools-android</module>
+				<module>jadex-platform-extension-webservice-android</module>
+				<module>jadex-applications-android-demos</module>
+				<module>jadex-applications-android-chat</module>
+				<module>jadex-android-integration-test</module>
+				<module>docs/android/jadex-android-example-project-maven</module>
+			</modules>
+		</profile>
+		
 		<!-- ======== Minimal distribution ======== -->
 		
 		<profile>

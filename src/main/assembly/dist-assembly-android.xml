@@ -12,6 +12,7 @@
 	<includeBaseDirectory>true</includeBaseDirectory>
 
 	<moduleSets>
+		<!-- ======== Compiled Libraries (jars) ======== -->
 		<moduleSet>
 			<excludes>
 				<exclude>net.sourceforge.jadex:jadex-applications-android-demos</exclude>
@@ -44,10 +45,11 @@
 			</sources>
 
 		</moduleSet>
+		<!-- ======== Compiled Applications (apks) ======== -->
 		<moduleSet>
 			<includes>
 				<include>net.sourceforge.jadex:jadex-applications-android-demos</include>
-<!-- 				<include>net.sourceforge.jadex:jadex-android-example-project-maven</include> -->
+				<include>net.sourceforge.jadex:jadex-applications-android-chat</include>
 			</includes>
 			<binaries>
 				<includes>

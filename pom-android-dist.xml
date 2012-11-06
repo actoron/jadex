@@ -132,7 +132,7 @@
 				</plugins>
 			</build>
 			<modules>
-				<!-- Additional Jadex modules -->
+				<!-- Additional Jadex modules to include in dist -->
 				<module>jadex-parent</module>
 				<module>jadex-commons</module>
 				<module>jadex-bridge</module>
@@ -150,12 +150,11 @@
 				<module>jadex-platform</module>
 				<module>jadex-platform-extension-webservice</module>
 
-				<!-- skipped in assembly -->
 				<module>jadex-applications-android-demos</module>
+				<module>jadex-applications-android-chat</module>
 
 				<!-- Modules required for integration test -->
 				<module>jadex-android-integration-test</module>
-				<!-- skipped in assembly -->
 				<module>docs/android/jadex-android-example-project-maven</module>
 			</modules>
 		</profile>
