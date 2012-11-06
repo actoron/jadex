@@ -24,6 +24,7 @@
 						<outputDirectory>sources/${module.artifactId}</outputDirectory>
 						<includes>
 							<include>src/**</include>
+							<include>res/**</include>
 							<include>lib/**</include>
 							<include>docs/**</include>
 							<include>**/pom.xml</include>
@@ -63,7 +64,7 @@
 		</file>
 		
 		<file>
-			<source>docs/readme-building.txt</source>
+			<source>docs/android/readme-building.txt</source>
 			<outputDirectory>sources</outputDirectory>
 		</file>
 				
@@ -93,32 +94,12 @@
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 		<file>
-			<source>docs/jadex.bat</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
-			<source>docs/jadex_no_awareness.bat</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
-			<source>docs/jadex.sh</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
-			<source>docs/jadex_no_awareness.sh</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
-			<source>docs/howtostart.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
 			<source>docs/xs3p.xsl</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 		<file>
-			<source>docs/readme-building.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<source>docs/android/readme-building.txt</source>
+			<outputDirectory>sources/docs/android</outputDirectory>
 		</file>
 
 		<file>
