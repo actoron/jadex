@@ -27,7 +27,6 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;

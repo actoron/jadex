@@ -67,7 +67,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				Future<?> fut = new Future();
 				Throwable	t	= e instanceof InvocationTargetException
 					? ((InvocationTargetException)e).getTargetException() : e;
-				fut.setException(t instanceof Exception ? (Exception)t : e);
+				fut.setException(t instanceof Exception ? (Exception)t : new RuntimeException(t));
 				sic.setResult(fut);
 			}
 			else
