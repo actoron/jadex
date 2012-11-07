@@ -2,8 +2,8 @@ package jadex.javaparser;
 
 import java.util.Map;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
-import jadex.commons.UnparsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 /**

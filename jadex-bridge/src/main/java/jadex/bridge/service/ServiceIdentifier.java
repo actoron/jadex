@@ -1,8 +1,8 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.ClassInfo;
 
 
 /**

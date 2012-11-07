@@ -59,6 +59,10 @@ public class TCPInputConnection
 				count += bytes_read;
 			}
 		}
+		else
+		{
+			System.out.println("0-message");
+		}
 		
 		return ret;
 	}

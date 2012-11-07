@@ -1,5 +1,7 @@
-package jadex.commons;
+package jadex.bridge.modelinfo;
 
+
+import jadex.bridge.ClassInfo;
 
 import java.util.Map;
 

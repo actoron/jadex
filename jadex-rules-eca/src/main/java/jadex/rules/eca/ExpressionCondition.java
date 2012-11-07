@@ -1,7 +1,7 @@
 package jadex.rules.eca;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
-import jadex.commons.UnparsedExpression;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;

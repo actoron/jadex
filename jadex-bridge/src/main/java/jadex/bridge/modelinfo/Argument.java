@@ -1,7 +1,6 @@
 package jadex.bridge.modelinfo;
 
 import jadex.commons.Tuple2;
-import jadex.commons.UnparsedExpression;
 
 import java.util.Collection;
 

@@ -1,7 +1,7 @@
 package jadex.bridge.service;
 
-import jadex.commons.ClassInfo;
-import jadex.commons.UnparsedExpression;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 import java.util.ArrayList;
 import java.util.List;

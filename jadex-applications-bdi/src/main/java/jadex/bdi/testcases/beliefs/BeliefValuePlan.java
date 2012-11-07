@@ -2,8 +2,8 @@ package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
-import jadex.commons.UnparsedExpression;
 import jadex.javaparser.SJavaParser;
 
 import java.util.HashMap;

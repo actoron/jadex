@@ -1,4 +1,6 @@
-package jadex.commons;
+package jadex.bridge;
+
+import jadex.commons.SReflect;
 
 
 /**

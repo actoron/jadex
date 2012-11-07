@@ -87,6 +87,11 @@ public class NIOTCPInputConnection
 				bytes[3]	= rb.get();
 				msg_len = SUtil.bytesToInt(bytes);
 				msg = new byte[msg_len];
+				
+				if(msg_len==0)
+				{
+					System.out.println("0-message");					
+				}
 			}
 		}
 
