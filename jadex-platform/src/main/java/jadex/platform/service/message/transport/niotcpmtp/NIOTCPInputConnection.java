@@ -70,7 +70,9 @@ public class NIOTCPInputConnection
 
 		// Write data from channel into the buffer.
 		if(sc.read(wb) == -1)
+		{
 			throw new IOException("Channel closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
+		}
 
 		// First try to determine the message size if unknown (-1)
 		// Read next msg header
@@ -88,10 +90,11 @@ public class NIOTCPInputConnection
 				msg_len = SUtil.bytesToInt(bytes);
 				msg = new byte[msg_len];
 				
-				if(msg_len==0)
-				{
-					System.out.println("0-message");					
-				}
+//				if(msg_len==0)
+//				{
+//					System.out.println("0-message");					
+//					throw new IOException("Connection closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
+//				}
 			}
 		}
 

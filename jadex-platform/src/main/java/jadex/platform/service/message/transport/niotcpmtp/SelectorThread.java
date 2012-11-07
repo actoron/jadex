@@ -6,8 +6,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.streams.StreamSendTask;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -351,7 +349,7 @@ public class SelectorThread implements Runnable
 			}
 			catch(Exception e)
 			{ 
-				logger.warning("NIOTCP receiving error while reading data: "+con+", "+e);
+//				logger.warning("NIOTCP receiving error while reading data: "+con+", "+e);
 	//			e.printStackTrace();
 				con.close();
 				key.cancel();
@@ -498,7 +496,7 @@ public class SelectorThread implements Runnable
 			}
 			writetasks.remove(sc);
 			
-			logger.info("NIOTCP receiving error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
+//			logger.info("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}

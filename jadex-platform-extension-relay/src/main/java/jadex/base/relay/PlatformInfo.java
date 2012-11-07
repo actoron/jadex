@@ -345,6 +345,8 @@ public class PlatformInfo
 		this.hostname	= hostname;
 //		this.connect_time	= new Date();
 		
+		setAwarenessInfo(null);
+		
 //		StatsDB.getDB().save(this);
 	}
 	
