@@ -12,18 +12,25 @@ public interface IRulebase
 	 *  Add a new rule.
 	 *  @param rule The rule.
 	 */
-	public void addRule(IRule rule);
+	public void addRule(IRule<?> rule);
 	
 	/**
 	 *  Remove a rule.
 	 *  @param rule The rule.
 	 */
-	public void removeRule(IRule rule);
+	public void removeRule(IRule<?> rule);
 	
 	/**
 	 *  Get all rules that are relevant for an event type.
 	 *  @param event The event type.
 	 *  @return The rules.
 	 */
-	public List<IRule> getRules(String event);
+	public List<IRule<?>> getRules(String event);
+	
+	/**
+	 *  Get the rule.
+	 *  @param event The rule name.
+	 *  @return The rule.
+	 */
+	public IRule<?> getRule(String name);
 }

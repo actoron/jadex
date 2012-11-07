@@ -3,6 +3,7 @@ package jadex.commons.transformation.binaryserializer;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -36,10 +37,18 @@ public class TupleCodec extends AbstractCodec
 	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Tuple ret = null;
-		if (clazz.equals(Tuple2.class))
+		if(clazz.equals(Tuple3.class))
+		{
+			ret = new Tuple3(null, null, null);
+		}
+		else if (clazz.equals(Tuple2.class))
+		{
 			ret = new Tuple2(null, null);
+		}
 		else
+		{
 			ret =  new Tuple(null);
+		}
 		return ret;
 	}
 	

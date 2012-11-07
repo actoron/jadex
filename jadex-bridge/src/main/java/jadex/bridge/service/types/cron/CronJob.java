@@ -1,10 +1,11 @@
 package jadex.bridge.service.types.cron;
 
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.IFuture;
 
 /**
  *  The cron job consists of:
@@ -12,7 +13,7 @@ import jadex.commons.Tuple2;
  *  - a time pattern filter
  *  - a command
  */
-public class CronJob
+public class CronJob<T>
 {
 	//-------- attributes --------
 	
@@ -23,7 +24,7 @@ public class CronJob
 	protected IFilter<Long> filter;
 	
 	/** The command. */
-	protected ICommand<Tuple2<IInternalAccess, Long>> command;
+	protected IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command;
 	 
 	//-------- constructors --------
 	
@@ -37,7 +38,7 @@ public class CronJob
 	/**
 	 *  Create a new cron job.
 	 */
-	public CronJob(IFilter<Long> filter, ICommand<Tuple2<IInternalAccess, Long>> command)
+	public CronJob(IFilter<Long> filter, IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command)
 	{
 		this.id = SUtil.createUniqueId("cronjob");
 		this.filter = filter;
@@ -86,7 +87,7 @@ public class CronJob
 	 *  Get the command.
 	 *  @return The command.
 	 */
-	public ICommand<Tuple2<IInternalAccess, Long>> getCommand()
+	public IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> getCommand()
 	{
 		return command;
 	}
@@ -95,7 +96,7 @@ public class CronJob
 	 *  Set the command.
 	 *  @param command The command to set.
 	 */
-	public void setCommand(ICommand<Tuple2<IInternalAccess, Long>> command)
+	public void setCommand(IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command)
 	{
 		this.command = command;
 	}

@@ -53,6 +53,7 @@ public class Traverser
 		processors.add(new LogRecordProcessor());
 		processors.add(new DateProcessor());
 		processors.add(new UUIDProcessor());
+		processors.add(new TupleProcessor());
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
 	}

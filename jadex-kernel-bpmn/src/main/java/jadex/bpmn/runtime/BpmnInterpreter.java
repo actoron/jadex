@@ -548,7 +548,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             else if(trigger!=null && MBpmnModel.EVENT_START_RULE.equals(trigger.getFirstEntity()))
             {
             	// Was rule for that start event?
-            	if(trigger.getSecondEntity().endsWith(mact.getName()))
+            	if(trigger.getSecondEntity().endsWith(mact.getId()))
             	{
             		ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
             		thread.setParameterValue("$event", trigger.getThirdEntity());

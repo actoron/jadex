@@ -5,12 +5,13 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.cron.CronJob;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -21,7 +22,7 @@ import java.util.Iterator;
 /**
  *  Job that allows executing cli command and scripts.
  */
-public class CliJob extends CronJob
+public class CliJob extends CronJob<String>
 {
 	/**
 	 *  Create a new Ccli job. 
@@ -49,7 +50,7 @@ public class CliJob extends CronJob
 	/**
 	 *  The create command is used to execute a command line or script.
 	 */
-	public static class CliCommand implements ICommand<Tuple2<IInternalAccess, Long>>
+	public static class CliCommand implements IResultCommand<IFuture<String>, Tuple2<IInternalAccess, Long>>
 	{
 		/** The command. */
 		protected String[] commands;
@@ -66,23 +67,33 @@ public class CliJob extends CronJob
 		 *  Execute the command.
 		 *  @param args The argument(s) for the call.
 		 */
-		public void execute(final Tuple2<IInternalAccess, Long> args)
+		public IFuture<String> execute(final Tuple2<IInternalAccess, Long> args)
 		{
+			final Future<String> ret = new Future<String>();
 			final IInternalAccess ia = args.getFirstEntity();
 			SServiceProvider.getService(ia.getServiceContainer(), ICliService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(ia.createResultListener(new DefaultResultListener<ICliService>()
 			{
 				public void resultAvailable(ICliService clis)
 				{
-					executeCommands(clis, Arrays.asList(commands).iterator());
+					final StringBuffer buf = new StringBuffer();
+					executeCommands(clis, Arrays.asList(commands).iterator(), buf).addResultListener(
+						new ExceptionDelegationResultListener<Void, String>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							ret.setResult(buf.toString());
+						}
+					});
 				}
 			}));
+			return ret;
 		}
 		
 		/**
 		 *  Execute a number of commands.
 		 */
-		protected IFuture<Void> executeCommands(final ICliService cliser, final Iterator<String> cmds)
+		protected IFuture<Void> executeCommands(final ICliService cliser, final Iterator<String> cmds, final StringBuffer buf)
 		{
 			final Future<Void> ret = new Future<Void>();
 			
@@ -98,13 +109,15 @@ public class CliJob extends CronJob
 					{
 						System.out.println("Executing command: "+cmd);
 						System.out.println(result);
-						executeCommands(cliser, cmds).addResultListener(new DelegationResultListener<Void>(ret));
+						buf.append("Executing command: "+cmd).append(cmd).append(result);
+						executeCommands(cliser, cmds, buf).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 						System.out.println("Executing command: "+cmd);
 						System.out.println(exception);
-						executeCommands(cliser, cmds).addResultListener(new DelegationResultListener<Void>(ret));
+						buf.append("Executing command: "+cmd).append(cmd).append(exception);
+						executeCommands(cliser, cmds, buf).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}

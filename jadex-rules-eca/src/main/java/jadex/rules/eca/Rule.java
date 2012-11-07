@@ -10,7 +10,7 @@ import java.util.List;
  *  - condition, lhs of the rule
  *  - action, rhs of the rule
  */
-public class Rule implements IRule
+public class Rule<T> implements IRule<T>
 {
 	//-------- attributes --------
 	
@@ -24,7 +24,7 @@ public class Rule implements IRule
 	protected ICondition condition;
 	
 	/** The action. */
-	protected IAction action;
+	protected IAction<T> action;
 
 	//-------- constructors --------
 
@@ -47,7 +47,7 @@ public class Rule implements IRule
 	/**
 	 * 
 	 */
-	public Rule(String name, ICondition condition, IAction action)
+	public Rule(String name, ICondition condition, IAction<T> action)
 	{
 		this.name = name;
 		this.condition = condition;
@@ -66,6 +66,15 @@ public class Rule implements IRule
 	}
 	
 	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
 	 *  Get the condition.
 	 *  @return The condition.
 	 */
@@ -73,7 +82,7 @@ public class Rule implements IRule
 	{
 		return condition;
 	}
-
+	
 	/**
 	 *  Set the condition.
 	 *  @param condition The condition to set.
@@ -87,7 +96,7 @@ public class Rule implements IRule
 	 *  Get the action.
 	 *  @return The action.
 	 */
-	public IAction getAction()
+	public IAction<T> getAction()
 	{
 		return action;
 	}
@@ -96,7 +105,7 @@ public class Rule implements IRule
 	 *  Set the action.
 	 *  @param action The action to set.
 	 */
-	public void setAction(IAction action)
+	public void setAction(IAction<T> action)
 	{
 		this.action = action;
 	}

@@ -5,6 +5,7 @@ import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.xml.AccessInfo;
@@ -110,6 +111,7 @@ public class JavaWriter
 	 *	- java.lang.Character
 	 *	- jadex.commons.Tuple
 	 *	- jadex.commons.Tuple2
+	 *  - jadex.commons.Tuple3
 	 *  - java.util.UUID
 	 */
 	public static Set<TypeInfo> getTypeInfos()
@@ -678,7 +680,15 @@ public class JavaWriter
 				new SubobjectInfo(new AccessInfo("firstEntity")),
 				new SubobjectInfo(new AccessInfo("secondEntity"))
 			}));
-			typeinfos.add(ti_tuple2);		
+			typeinfos.add(ti_tuple2);	
+			
+			TypeInfo ti_tuple3	= new TypeInfo(null, new ObjectInfo(Tuple3.class), new MappingInfo(null, new SubobjectInfo[]
+			{
+				new SubobjectInfo(new AccessInfo("firstEntity")),
+				new SubobjectInfo(new AccessInfo("secondEntity")),
+				new SubobjectInfo(new AccessInfo("thirdEntity"))
+			}));
+			typeinfos.add(ti_tuple3);	
 			
 			// java.util.UUID
 			TypeInfo ti_uuid = new TypeInfo(null, new ObjectInfo(UUID.class), 

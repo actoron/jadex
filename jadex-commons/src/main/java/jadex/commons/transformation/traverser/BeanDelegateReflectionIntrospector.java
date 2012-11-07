@@ -62,7 +62,8 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 			pool.insertClassPath(new ClassClassPath(clazz));
 			try
 			{
-				String accname = clazz.getPackage().getName() + "." + clazz.getSimpleName() + "AccessorDelegate";
+//				String accname = clazz.getPackage().getName() + "." + clazz.getSimpleName() + "AccessorDelegate";
+				String accname = SReflect.getClassName(clazz)+"AccessorDelegate";
 				CtClass dclazz = pool.makeClass(accname);
 				CtClass dinterface = pool.get(IBeanAccessorDelegate.class.getName());
 				dclazz.addInterface(dinterface);

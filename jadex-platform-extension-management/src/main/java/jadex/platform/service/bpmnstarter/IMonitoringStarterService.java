@@ -3,9 +3,11 @@ package jadex.platform.service.bpmnstarter;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  This monitoring service can be used to start bpmn processes
@@ -19,7 +21,8 @@ public interface IMonitoringStarterService
 	 *  @param model The bpmn model
 	 *  @param rid The resource identifier (null for all platform jar resources).
 	 */
-	public IFuture<Void> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid);
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<MonitoringStarterEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid);
 	
 	/**
 	 *  Remove a bpmn model.
@@ -33,4 +36,9 @@ public interface IMonitoringStarterService
 	 *  @return The currently observed bpmn models.
 	 */
 	public IIntermediateFuture<Tuple2<String, IResourceIdentifier>> getBpmnModels();
+	
+//	/**
+//	 *  Subscribe to events of the monitoring starter.
+//	 */
+//	public IIntermediateFuture<MonitoringStarterEvent> subscribe();
 }

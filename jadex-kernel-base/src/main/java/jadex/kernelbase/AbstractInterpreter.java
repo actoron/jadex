@@ -170,7 +170,10 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			results	= new HashMap<String, Object>();
 		results.put(name, value);
 		
-		resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
+		if(resultlistener!=null)
+		{
+			resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
+		}
 	}
 	
 	/**

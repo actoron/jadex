@@ -53,7 +53,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.Method;
@@ -122,6 +121,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public abstract Map<String, Object> getResults();
 
+	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public abstract void setResultValue(String name, Object value);
+	
 	/**
 	 *  Can be called on the component thread only.
 	 * 
@@ -687,6 +693,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		
 		// Init the results with default values.
+		
+		// Hack?! add component identifier to result as long as we don't have better future type for results
+		// could one somehow use the CallLocal for that purpose instead?
+		setResultValue(IComponentIdentifier.RESULTCID, getComponentIdentifier());
+		
 		done	= new HashSet<String>();
 		if(ci!=null)
 		{

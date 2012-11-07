@@ -10,7 +10,7 @@ import java.util.List;
  *  - condition, lhs of the rule
  *  - action, rhs of the rule
  */
-public interface IRule
+public interface IRule<T>
 {
 	/**
 	 *  Get the rule name.
@@ -34,6 +34,6 @@ public interface IRule
 	 *  Get the action of the rule.
 	 *  @return The action.
 	 */
-	public IAction getAction();
+	public IAction<T> getAction();
 
 }

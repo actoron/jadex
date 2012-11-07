@@ -4,6 +4,7 @@ import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.xml.AccessInfo;
@@ -20,8 +21,8 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
-import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
@@ -113,6 +114,7 @@ public class JavaReader
 	 *	- java.lang.Character
 	 *	- jadex.commons.Tuple
 	 *	- jadex.commons.Tuple2
+	 *	- jadex.commons.Tuple3
 	 *  - java.util.UUID
 	 */
 	public static Set<TypeInfo> getTypeInfos()
@@ -780,6 +782,27 @@ public class JavaReader
 				new SubobjectInfo(new AccessInfo("secondEntity", "secondEntity", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}));
 			typeinfos.add(ti_tuple2);
+			
+			TypeInfo ti_tuple3	= new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.commons", "Tuple3")}),
+				new ObjectInfo(HashMap.class, new IPostProcessor()
+			{
+				public Object postProcess(IContext context, Object object)
+				{
+					Map<String, Object>	map	= (Map<String, Object>) object;
+					return new Tuple3<Object, Object, Object>(map.get("firstEntity"), map.get("secondEntity"), map.get("thirdEntity"));
+				}
+				
+				public int getPass()
+				{
+					return 0;
+				}
+			}), new MappingInfo(null, new SubobjectInfo[]
+			{
+				new SubobjectInfo(new AccessInfo("firstEntity", "firstEntity", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo("secondEntity", "secondEntity", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo("thirdEntity", "thirdEntity", null, null, new BeanAccessInfo(AccessInfo.THIS)))
+			}));
+			typeinfos.add(ti_tuple3);
 			
 			TypeInfo ti_uuid	= new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "UUID")}),
 				new ObjectInfo(new IBeanObjectCreator()

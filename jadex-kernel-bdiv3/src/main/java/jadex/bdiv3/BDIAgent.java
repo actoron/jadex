@@ -72,14 +72,15 @@ public class BDIAgent extends MicroAgent
 					}
 				}
 				Rule rule = new Rule("goal_"+goal, 
-					new MethodCondition(goal, m), new IAction()
+					new MethodCondition(goal, m), new IAction<Void>()
 				{
-					public void execute(IEvent event, IRule rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule rule, Object context)
 					{
 						System.out.println("Goal succeeded: "+rgoal);
 						
 						// todo: call rgoal.finished()? succeeded or set lifecycle state directly?
 						//rgoal.
+						return IFuture.DONE;
 					}
 				});
 				rule.setEvents(events);

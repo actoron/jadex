@@ -6,9 +6,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collection;
@@ -16,7 +19,7 @@ import java.util.Collection;
 /**
  *  The create command is used to create a component via the cms.
  */
-public class CreateCommand implements ICommand<IInternalAccess>
+public class CreateCommand implements IResultCommand<IFuture<IComponentIdentifier>, IInternalAccess>
 {
 	/** The name. */
 	protected String name;
@@ -29,7 +32,7 @@ public class CreateCommand implements ICommand<IInternalAccess>
 	
 	/** The result listener. */
 	protected IResultListener<Collection<Tuple2<String, Object>>> resultlistener;
-
+	
 	/**
 	 *  Create a new CreateCommand. 
 	 */
@@ -46,23 +49,29 @@ public class CreateCommand implements ICommand<IInternalAccess>
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public void execute(final IInternalAccess ia)
+	public IFuture<IComponentIdentifier> execute(final IInternalAccess ia)
 	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
 //		final IInternalAccess ia = args.getFirstEntity();
 		SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(ia.createResultListener(new DefaultResultListener<IComponentManagementService>()
+			.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, model, info, resultlistener).addResultListener(ia.createResultListener(new DefaultResultListener<IComponentIdentifier>()
-				{
-					public void resultAvailable(IComponentIdentifier cid)
-					{
-						System.out.println("created: "+cid);//+" at: "+args.getSecondEntity());
-					}
-				}));
+				cms.createComponent(name, model, info, resultlistener).addResultListener(
+					ia.createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
+//				{
+//					public void resultAvailable(IComponentIdentifier cid)
+//					{
+//						System.out.println("created: "+cid);//+" at: "+args.getSecondEntity());
+//						ret
+//					}
+//				}));
 			}
 		}));
+		
+		return ret;
 	}
 
 	/**

@@ -5,6 +5,9 @@ import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector
 import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
+/**
+ *  todo: comment me!
+ */
 public class BeanIntrospectorFactory 
 {
 	private BeanIntrospectorFactory() 

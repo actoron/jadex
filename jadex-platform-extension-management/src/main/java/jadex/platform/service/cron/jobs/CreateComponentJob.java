@@ -1,5 +1,6 @@
 package jadex.platform.service.cron.jobs;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.commons.IFilter;
@@ -13,7 +14,7 @@ import java.util.Collection;
  *  In order to create it at a remote platform the parent
  *  cid must be set in the creation info.
  */
-public class CreateComponentJob extends CronJob
+public class CreateComponentJob extends CronJob<IComponentIdentifier>
 {
 	/**
 	 *  Create a new CreateComponentJob. 

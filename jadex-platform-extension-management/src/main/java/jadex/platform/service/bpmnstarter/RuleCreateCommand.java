@@ -1,10 +1,12 @@
 package jadex.platform.service.bpmnstarter;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.cron.jobs.CreateCommand;
 import jadex.rules.eca.IEvent;
@@ -17,7 +19,7 @@ import java.util.Collection;
  *  
  *  Wraps a create command in a rule engine friendly version.
  */
-public class RuleCreateCommand implements ICommand<Tuple3<IEvent, IRule, Object>>
+public class RuleCreateCommand implements IResultCommand<IFuture<IComponentIdentifier>, Tuple3<IEvent, IRule<?>, Object>>
 {
 	/** The name. */
 	protected CreateCommand command;
@@ -43,9 +45,9 @@ public class RuleCreateCommand implements ICommand<Tuple3<IEvent, IRule, Object>
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public void execute(final Tuple3<IEvent, IRule, Object> args)
+	public IFuture<IComponentIdentifier> execute(final Tuple3<IEvent, IRule<?>, Object> args)
 	{
-		command.execute((IInternalAccess)args.getThirdEntity());
+		return command.execute((IInternalAccess)args.getThirdEntity());
 	}
 
 	/**

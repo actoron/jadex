@@ -3,12 +3,18 @@ package jadex.rules.eca;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
 import jadex.rules.eca.annotations.RuleObject;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +34,7 @@ import java.util.Map;
 public class RuleSystem
 {
 	/** The argument types for property change listener adding/removal (cached for speed). */
-	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
+	protected static Class<?>[]	PCL	= new Class[]{PropertyChangeListener.class};
 	
 	//-------- attributes --------
 	
@@ -39,7 +45,7 @@ public class RuleSystem
 	protected IRulebase rulebase;
 	
 	/** The rules generated for an object. */
-	protected IdentityHashMap<Object, Tuple2<Object, IRule[]>> rules;
+	protected IdentityHashMap<Object, Tuple2<Object, IRule<?>[]>> rules;
 
 	/** The Java beans property change listeners. */
 	protected Map<Object, PropertyChangeListener> pcls;
@@ -57,7 +63,7 @@ public class RuleSystem
 		this.context = context;
 		this.events = new ArrayList<IEvent>();
 		this.rulebase = new Rulebase();
-		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule[]>>(); // objects may change
+		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule<?>[]>>(); // objects may change
 	}
 
 	//-------- methods --------
@@ -76,8 +82,8 @@ public class RuleSystem
 		
 //		addPropertyChangeListener(object);
 		
-		final Map<Method, IResultCommand> eventcreators = new HashMap<Method, IResultCommand>();
-		final Map<String, Rule> rules = new HashMap<String, Rule>();
+		final Map<Method, IResultCommand<?,?>> eventcreators = new HashMap<Method, IResultCommand<?,?>>();
+		final Map<String, Rule<?>> rules = new HashMap<String, Rule<?>>();
 		
 		// Analyze the dynamic or static methods of the object (static if object is a class)
 		// todo: what about using constructors of classes
@@ -98,7 +104,7 @@ public class RuleSystem
 		}
 		else
 		{
-			Method[] methods = ((Class)object).getDeclaredMethods();
+			Method[] methods = ((Class<?>)object).getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
 				if(Modifier.isStatic(methods[i].getModifiers()))
@@ -109,9 +115,9 @@ public class RuleSystem
 		}
 		
 		// Add rules to rulebase
-		for(Iterator<Rule> it=rules.values().iterator(); it.hasNext(); )
+		for(Iterator<Rule<?>> it=rules.values().iterator(); it.hasNext(); )
 		{
-			Rule rule = it.next();
+			Rule<?> rule = it.next();
 			if(rule.getAction()==null || rule.getCondition()==null 
 				|| rule.getEvents()==null || rule.getEvents().size()==0)
 			{
@@ -180,8 +186,8 @@ public class RuleSystem
 	 *  - condition annotation
 	 *  - action annotation
 	 */
-	protected void analyzeMethod(Method method, Object object, Map<Method, IResultCommand> eventcreators,
-		Map<String, Rule> rules)
+	protected void analyzeMethod(Method method, Object object, Map<Method, IResultCommand<?,?>> eventcreators,
+		Map<String, Rule<?>> rules)
 	{
 		if(method.isAnnotationPresent(jadex.rules.eca.annotations.Event.class))
 		{
@@ -196,7 +202,7 @@ public class RuleSystem
 			final String name = cond.value();
 			final Method m = method;
 
-			Rule rule = rules.get(name);
+			Rule<?> rule = rules.get(name);
 			if(rule==null)
 			{
 				rule = new Rule(name);
@@ -231,14 +237,14 @@ public class RuleSystem
 			final String name = cond.value();
 			final Method m = method;
 			
-			Rule rule = rules.get(name);
+			Rule<?> rule = rules.get(name);
 			if(rule==null)
 			{
 				rule = new Rule(name);
 				rules.put(name, rule);
 			}
 			
-			rule.setAction(new jadex.rules.eca.MethodAction(object, m));
+			rule.setAction(new MethodAction(object, m));
 		}
 	}
 		
@@ -248,10 +254,10 @@ public class RuleSystem
 	public void unobserveObject(final Object object)
 	{
 //		removePropertyChangeListener(object);
-		Tuple2<Object, IRule[]> tup = rules.remove(object);
+		Tuple2<Object, IRule<?>[]> tup = rules.remove(object);
 		if(tup!=null)
 		{
-			IRule[] rls = tup.getSecondEntity();
+			IRule<?>[] rls = tup.getSecondEntity();
 			for(int i=0; i<rls.length; i++)
 			{
 				rulebase.removeRule(rls[i]);
@@ -259,7 +265,7 @@ public class RuleSystem
 		}
 		
 		// Recusrively call unobserve object on all direct monitored fields.
-		Class clazz = object.getClass();
+		Class<?> clazz = object.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for(int i=0; i<fields.length; i++)
 		{
@@ -366,24 +372,84 @@ public class RuleSystem
 	 *  - evaluate the conditions of these conditions
 	 *  - fire actions of triggered rules.
 	 */
-	public void processEvent()
+	public IIntermediateFuture<RuleEvent> processEvent()
 	{
+		final IntermediateFuture<RuleEvent> ret = new IntermediateFuture<RuleEvent>();
+		
 		if(events.size()>0)
 		{
 			IEvent event = events.remove(0);
-			List<IRule> rules = rulebase.getRules(event.getType());
+			List<IRule<?>> rules = rulebase.getRules(event.getType());
+			
 			if(rules!=null)
 			{
-				for(int i=0; i<rules.size(); i++)
+				processRules(rules.iterator(), event, ret).addResultListener(new IResultListener<Void>()
 				{
-					IRule rule = rules.get(i);
-					if(rule.getCondition()==null || rule.getCondition().evaluate(event))
+					public void resultAvailable(Void result)
 					{
-						rule.getAction().execute(event, rule, context);
+						ret.setFinished();
 					}
-				}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			else
+			{
+				ret.setFinished();
 			}
 		}
+		else
+		{
+			ret.setFinished();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> processRules(final Iterator<IRule<?>> it, final IEvent event, final IntermediateFuture<RuleEvent> res)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(it.hasNext())
+		{
+			final IRule rule = it.next();
+			if(rule.getCondition()==null || rule.getCondition().evaluate(event))
+			{
+				IFuture<Object> fut = (IFuture<Object>)rule.getAction().execute(event, rule, context);
+				
+				fut.addResultListener(new IResultListener<Object>()
+				{
+					public void resultAvailable(Object result) 
+					{
+						RuleEvent ev = new RuleEvent(rule.getName(), result);
+						res.addIntermediateResult(ev);
+						processRules(it, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						processRules(it, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+			else
+			{
+				processRules(it, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -409,7 +475,7 @@ public class RuleSystem
 /**
  *  Creates a new event based on a field name and value.
  */
-class FetchFieldCommand implements IResultCommand
+class FetchFieldCommand implements IResultCommand<IEvent, Object>
 {
 	/** The object. */
 	protected Object object;
@@ -433,7 +499,7 @@ class FetchFieldCommand implements IResultCommand
 	 *  type = field name
 	 *  content = field value
 	 */
-	public Object execute(Object args)
+	public IEvent execute(Object args)
 	{
 		try
 		{

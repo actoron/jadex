@@ -1,17 +1,19 @@
 package jadex.platform.service.cron.jobs;
 
-import java.util.Collection;
-
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.util.Collection;
 
 /**
  *  The create command is used to create a component via the cms.
  */
-public class CronCreateCommand implements ICommand<Tuple2<IInternalAccess, Long>>
+public class CronCreateCommand implements IResultCommand<IFuture<IComponentIdentifier>, Tuple2<IInternalAccess, Long>>
 {
 	/** The name. */
 	protected CreateCommand command;
@@ -37,9 +39,9 @@ public class CronCreateCommand implements ICommand<Tuple2<IInternalAccess, Long>
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public void execute(final Tuple2<IInternalAccess, Long> args)
+	public IFuture<IComponentIdentifier> execute(final Tuple2<IInternalAccess, Long> args)
 	{
-		command.execute(args.getFirstEntity());
+		return command.execute(args.getFirstEntity());
 	}
 
 	/**

@@ -1,9 +1,11 @@
 package jadex.rules.eca;
 
+import jadex.commons.future.IFuture;
+
 /**
  *  Interface for the action part of a rule.
  */
-public interface IAction
+public interface IAction<T>
 {
 	/**
 	 *  Execute the action.
@@ -11,5 +13,5 @@ public interface IAction
 	 *  @param rule The rule this action belongs to.
 	 *  @param context The user context.
 	 */
-	public void execute(IEvent event, IRule rule, Object context);
+	public IFuture<T> execute(IEvent event, IRule<T> rule, Object context);
 }

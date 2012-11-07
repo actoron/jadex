@@ -3,6 +3,9 @@ package jadex.bridge.modelinfo;
 import jadex.commons.Tuple2;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  Simple default implementation for an argument.
@@ -101,6 +104,22 @@ public class Argument	extends UnparsedExpression	implements IArgument
 					break;
 				}
 			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Convert arguments to argument map.
+	 */
+	public static Map<String, Object> convertArguments(Collection<Tuple2<String, Object>> results)
+	{
+		Map<String, Object> ret = new HashMap<String, Object>();
+		
+		for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
+		{
+			Tuple2<String, Object> tup = it.next();
+			ret.put(tup.getFirstEntity(), tup.getSecondEntity());
 		}
 		
 		return ret;

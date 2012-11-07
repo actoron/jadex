@@ -7,6 +7,9 @@ public interface IComponentIdentifier
 {
 	//-------- constants --------
 	
+	/** The constant to fetch the component id out of the results of a component. */
+	public static final String RESULTCID = "__internal__component__identifier";
+	
 	/** The currently executing component (if any). */
 	public static final ThreadLocal<IComponentIdentifier>	LOCAL	= new ThreadLocal<IComponentIdentifier>();
 	

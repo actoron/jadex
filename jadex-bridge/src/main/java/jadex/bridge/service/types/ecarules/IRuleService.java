@@ -1,8 +1,12 @@
 package jadex.bridge.service.types.ecarules;
 
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
+import jadex.rules.eca.RuleEvent;
 
 /**
  * 
@@ -15,18 +19,23 @@ public interface IRuleService
 	 *  accordingly.
 	 *  @param event The event.
 	 */
-	public IFuture<Void> addEvent(IEvent event);
+	public IIntermediateFuture<RuleEvent> addEvent(IEvent event);
 	
 	/**
 	 *  Add a new rule.
 	 *  @param rule The rule.
 	 */
-	public IFuture<Void> addRule(IRule rule);
+	public IFuture<Void> addRule(IRule<?> rule);
 	
 	/**
 	 *  Remove a rule.
 	 *  @param rule The rule.
 	 */
-	public IFuture<Void> removeRule(IRule rule);
+	public IFuture<Void> removeRule(IRule<?> rule);
 	
+	/**
+	 *  Subscribe to rule executions.
+	 */
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<RuleEvent> subscribe();
 }

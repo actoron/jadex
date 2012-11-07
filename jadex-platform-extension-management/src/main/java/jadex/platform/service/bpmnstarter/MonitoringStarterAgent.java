@@ -3,8 +3,10 @@ package jadex.platform.service.bpmnstarter;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -16,14 +18,18 @@ import jadex.bridge.service.types.ecarules.IRuleService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -43,9 +49,12 @@ import jadex.rules.eca.ExpressionCondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
+import jadex.rules.eca.RuleEvent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -139,9 +148,10 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 	 *  @param model The bpmn model
 	 *  @param rid The resource identifier (null for all platform jar resources).
 	 */
-	public IFuture<Void> addBpmnModel(final String model, final IResourceIdentifier urid)
+	public ISubscriptionIntermediateFuture<MonitoringStarterEvent> addBpmnModel(final String model, final IResourceIdentifier urid)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final SubscriptionIntermediateFuture<MonitoringStarterEvent> ret = new SubscriptionIntermediateFuture<MonitoringStarterEvent>();
+//		final Future<Void> ret = new Future<Void>();
 			
 		final Tuple2<String, IResourceIdentifier> key = new Tuple2<String, IResourceIdentifier>(model, urid);
 
@@ -165,7 +175,31 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 							// Search timer, rule start events in model 
 							List<MActivity> startevents = amodel.getStartActivities(null, null);
 							StringBuffer timing = new StringBuffer();
-							final List<IRule> rules = new ArrayList<IRule>();
+							final List<IRule<IComponentIdentifier>> rules = new ArrayList<IRule<IComponentIdentifier>>();
+							
+							final IIntermediateResultListener<IComponentIdentifier> createlis = new IntermediateDefaultResultListener<IComponentIdentifier>()
+							{
+								public void intermediateResultAvailable(IComponentIdentifier cid)
+								{
+									// send instance created event
+									ret.addIntermediateResultIfUndone(new MonitoringStarterEvent(MonitoringStarterEvent.INSTANCE_CREATED, cid, null));
+								}
+							};
+							
+							final IResultListener<Collection<Tuple2<String, Object>>> dellis = new IResultListener<Collection<Tuple2<String, Object>>>()
+							{
+								public void resultAvailable(Collection<Tuple2<String,Object>> results) 
+								{
+									// send instance terminated event 
+									Map<String, Object> res = Argument.convertArguments(results);
+									ret.addIntermediateResultIfUndone(new MonitoringStarterEvent(MonitoringStarterEvent.INSTANCE_TERMINATED, 
+										(IComponentIdentifier)res.get(IComponentIdentifier.RESULTCID), res));
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							};
 							
 							for(int i=0; startevents!=null && i<startevents.size(); i++)
 							{
@@ -183,13 +217,13 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 									String val = (String)mact.getParsedPropertyValue("notifier");
 									if(val!=null)
 									{
-										Rule rule = new Rule(key.toString()+" "+mact.getId());
+										Rule<IComponentIdentifier> rule = new Rule<IComponentIdentifier>(key.toString()+" "+i+" "+mact.getId());
 										String type = val;
 										String cond = null;
 										int idx = val.indexOf(";");
 										if(idx!=-1)
 										{
-											type = val.substring(0, idx-1);
+											type = val.substring(0, idx);
 											cond = val.substring(idx+1);
 										}
 										
@@ -202,34 +236,46 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 											UnparsedExpression up = new UnparsedExpression(null, Boolean.class, cond, null);
 											rule.setCondition(new ExpressionCondition(up, null)); // todo: fetcher?
 										}
-										rule.setAction(new CommandAction(createRuleCreateCommand(rid, model)));
+										rule.setAction(new CommandAction<IComponentIdentifier>(createRuleCreateCommand(rid, model, dellis)));
 										rules.add(rule);
 									}
 								}
 							}
 							
 							// if has found some timer start
-							CronJob cj = null;
+							CronJob<IComponentIdentifier> cj = null;
 							if(timing.length()>0)
 							{
-								cj = new CronJob(new TimePatternFilter(timing.toString()),
-									createCronCreateCommand(rid, model));
+								// kill listener for cron jobs
+								cj = new CronJob<IComponentIdentifier>(new TimePatternFilter(timing.toString()),
+									createCronCreateCommand(rid, model, dellis));
 							}
+							
 							// add observed flag if no jobs
 							if(cj==null && rules.size()==0)
 							{
 								remcoms.put(key, null);
 							}
-							addCronJob(cj, key).addResultListener(new DelegationResultListener<Void>(ret)
+							
+							addCronJob(cj, key, createlis).addResultListener(new ExceptionDelegationResultListener<Void, Collection<MonitoringStarterEvent>>(ret)
 							{
 								public void customResultAvailable(Void result)
 								{
-									CounterResultListener<Void> lis = new CounterResultListener<Void>(rules.size(), 
-										new DelegationResultListener<Void>(ret));
-									for(IRule rule :rules)
+									// add rule listener if at least one rule
+									addRuleListener(rules, key, ret).addResultListener(new ExceptionDelegationResultListener<Void, Collection<MonitoringStarterEvent>>(ret)
 									{
-										addRuleJob(rule, key).addResultListener(lis);
-									}
+										public void customResultAvailable(Void result)
+										{
+											addRuleJobs(rules.iterator(), key).addResultListener(new ExceptionDelegationResultListener<Void, Collection<MonitoringStarterEvent>>(ret)
+											{
+												public void customResultAvailable(Void result)
+												{
+													// first event to state that monitoring is complete
+													ret.addIntermediateResult(new MonitoringStarterEvent(MonitoringStarterEvent.ADDED, null, null));
+												}
+											});
+										}
+									});
 								}
 							});
 						}
@@ -241,6 +287,58 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 				});
 			}
 		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> addRuleListener(List<IRule<IComponentIdentifier>> rules, final Tuple2<String, IResourceIdentifier> key,
+		final SubscriptionIntermediateFuture<MonitoringStarterEvent> res)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(rules.size()>0)
+		{
+			IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
+			fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
+			{
+				public void customResultAvailable(final IRuleService rules)
+				{
+					final ISubscriptionIntermediateFuture<RuleEvent> fut = rules.subscribe();
+					addRemoveCommand(new Runnable()
+					{
+						public void run()
+						{
+							fut.terminate();
+						}
+					}, key);
+					fut.addResultListener(new IntermediateDefaultResultListener<RuleEvent>()
+					{
+						public void intermediateResultAvailable(RuleEvent re) 
+						{
+							// first event is subscribe() finished
+							if(re!=null)
+							{
+								// send instance created event
+								res.addIntermediateResultIfUndone(new MonitoringStarterEvent(MonitoringStarterEvent.INSTANCE_CREATED, (IComponentIdentifier)re.getResult(), null));
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							res.setExceptionIfUndone(exception);
+						}
+					});
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}
@@ -269,8 +367,8 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 				{
 					run.run();
 				}
-				ret.setResult(null);
 			}
+			ret.setResult(null);
 		}
 		
 		return ret;
@@ -289,18 +387,19 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 	/**
 	 *  Add a cron job to the cron service.
 	 */
-	protected IFuture<Void> addCronJob(final CronJob cj, final Tuple2<String, IResourceIdentifier> key)
+	protected IFuture<Void> addCronJob(final CronJob<IComponentIdentifier> cj, final Tuple2<String, IResourceIdentifier> key,
+		final IIntermediateResultListener<IComponentIdentifier> lis)
 	{
 		if(cj==null)
 			return IFuture.DONE;
 			
 		final Future<Void> ret = new Future<Void>();
-		IFuture<ICronService> fut = agent.getServiceContainer().getRequiredService("crons");
-		fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Void>(ret)
+		IFuture<ICronService<IComponentIdentifier>> fut = agent.getServiceContainer().getRequiredService("crons");
+		fut.addResultListener(new ExceptionDelegationResultListener<ICronService<IComponentIdentifier>, Void>(ret)
 		{
-			public void customResultAvailable(final ICronService crons)
+			public void customResultAvailable(final ICronService<IComponentIdentifier> crons)
 			{
-				Runnable remcom = new Runnable()
+				Runnable com = new Runnable()
 				{
 					public void run()
 					{
@@ -312,23 +411,58 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 						});
 					}
 				};
-				List<Runnable> coms = remcoms.get(key);
-				if(coms==null)
-				{
-					coms = new ArrayList<Runnable>();
-					remcoms.put(key, coms);
-				}
-				coms.add(remcom);
-				crons.addJob(cj).addResultListener(new DelegationResultListener<Void>(ret));
+				addRemoveCommand(com, key);
+				// Cron servive provides subscription future which notifies results of cron job executions
+				// listener that notifies when new instances are created
+				crons.addJob(cj).addResultListener(lis);
 			}
 		});
 		return ret;
 	}
 	
 	/**
+	 * 
+	 */
+	protected void addRemoveCommand(Runnable com, Tuple2<String, IResourceIdentifier> key)
+	{
+		List<Runnable> coms = remcoms.get(key);
+		if(coms==null)
+		{
+			coms = new ArrayList<Runnable>();
+			remcoms.put(key, coms);
+		}
+		coms.add(com);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> addRuleJobs(final Iterator<IRule<IComponentIdentifier>> it, final Tuple2<String, IResourceIdentifier> key)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(it.hasNext())
+		{
+			addRuleJob(it.next(), key).addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					addRuleJobs(it, key).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Add a rule to the rule engine.
 	 */
-	protected IFuture<Void> addRuleJob(final IRule rule, final Tuple2<String, IResourceIdentifier> key)
+	protected IFuture<Void> addRuleJob(final IRule<?> rule, final Tuple2<String, IResourceIdentifier> key)
 	{
 		final Future<Void> ret = new Future<Void>();
 		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
@@ -336,7 +470,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 		{
 			public void customResultAvailable(final IRuleService rules)
 			{
-				Runnable remcom = new Runnable()
+				Runnable com = new Runnable()
 				{
 					public void run()
 					{
@@ -344,23 +478,13 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 						{
 							public void resultAvailable(Void result)
 							{
-								System.out.println("removed rule: "+rule);
+//								System.out.println("removed rule: "+rule);
 							}
 						});
 					}
 				};
-				List<Runnable> coms = remcoms.get(key);
-				if(coms==null)
-				{
-					coms = new ArrayList<Runnable>();
-					remcoms.put(key, coms);
-				}
-				coms.add(remcom);
+				addRemoveCommand(com, key);
 				rules.addRule(rule).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
 			}
 		});
 		return ret;
@@ -369,16 +493,16 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 	/**
 	 *  Create a new cron create component command.
 	 */
-	protected static CronCreateCommand createCronCreateCommand(IResourceIdentifier rid, String model)
+	protected static CronCreateCommand createCronCreateCommand(IResourceIdentifier rid, String model, IResultListener<Collection<Tuple2<String, Object>>> killis)
 	{
 		CronCreateCommand ret = null;
 		
 		// add implicit triggering event 
 		CreationInfo ci = new CreationInfo(rid);
-		ret = new CronCreateCommand(null, model, ci, null)
+		ret = new CronCreateCommand(null, model, ci, killis)
 		{
 			@Classname("CronCreateCommand")
-			public void execute(Tuple2<IInternalAccess, Long> args)
+			public IFuture<IComponentIdentifier> execute(Tuple2<IInternalAccess, Long> args)
 			{
 				Map<String, Object> vs = getCommand().getInfo().getArguments();
 				if(vs==null)
@@ -388,7 +512,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 				}
 				// One could put in the activity name but how to determine then if multiple timers match?
 				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_TIMER, null, args.getSecondEntity()));
-				super.execute(args);
+				return super.execute(args);
 			}
 		};
 		
@@ -398,17 +522,17 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 	/**
 	 *  Create a new rule create component command.
 	 */
-	protected static RuleCreateCommand createRuleCreateCommand(IResourceIdentifier rid, String model)
+	protected static RuleCreateCommand createRuleCreateCommand(IResourceIdentifier rid, String model, IResultListener<Collection<Tuple2<String, Object>>> killis)
 	{
 		RuleCreateCommand ret = null;
 		
 		// add implicit triggering event 
 		CreationInfo ci = new CreationInfo(rid);
 		
-		ret = new RuleCreateCommand(null, model, ci, null)
+		ret = new RuleCreateCommand(null, model, ci, killis)
 		{
 			@Classname("RuleCreateCommand")
-			public void execute(Tuple3<IEvent, IRule, Object> args)
+			public IFuture<IComponentIdentifier> execute(Tuple3<IEvent, IRule<?>, Object> args)
 			{
 				Map<String, Object> vs = getCommand().getInfo().getArguments();
 				if(vs==null)
@@ -417,7 +541,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 					getCommand().getInfo().setArguments(vs);
 				}
 				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getSecondEntity().getName(), args.getFirstEntity()));
-				super.execute(args);
+				return super.execute(args);
 			}
 		};
 		
