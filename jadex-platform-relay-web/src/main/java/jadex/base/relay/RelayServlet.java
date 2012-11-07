@@ -22,9 +22,6 @@ public class RelayServlet extends HttpServlet
 	/** The relay handler. */
 	protected RelayHandler	handler;
 	
-	/** The peer list. */
-	protected PeerList	peers;
-	
 	//-------- constructors --------
 
 	/**
@@ -33,7 +30,6 @@ public class RelayServlet extends HttpServlet
 	public void init() throws ServletException
 	{
 		this.handler	= new RelayHandler();
-		this.peers	= new PeerList();
 	}
 	
 	/**
@@ -42,7 +38,6 @@ public class RelayServlet extends HttpServlet
 	public void destroy()
 	{
 		this.handler.dispose();
-		this.peers.dispose();
 	}
 	
 	//-------- methods --------
@@ -106,11 +101,9 @@ public class RelayServlet extends HttpServlet
 				else if("/servers".equals(request.getServletPath()))
 				{
 					String	peerurl	= request.getParameter("peerurl");
-					if(peerurl!=null)
-					{
-						peers.addPeer(peerurl, false);
-					}
-					request.setAttribute("peers", peers.getURLs(request));					
+					String	requesturl	= request.getRequestURL().toString();
+					String	serverurls	= handler.handleServersRequest(requesturl, peerurl);
+					request.setAttribute("peers", serverurls);					
 					view	= "/WEB-INF/jsp/servers.jsp";
 				}
 				else

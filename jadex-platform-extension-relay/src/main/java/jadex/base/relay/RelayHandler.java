@@ -1,6 +1,7 @@
 package jadex.base.relay;
 
 import jadex.base.service.message.transport.MessageEnvelope;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.ICodec;
@@ -12,6 +13,7 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.platform.service.message.MapSendTask;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 import jadex.xml.bean.JavaReader;
 
@@ -76,6 +78,9 @@ public class RelayHandler
 	/** The available codecs for awareness infos (cached for speed). */
 	protected Map<Byte, ICodec>	codecs;
 	
+	/** The peer list. */
+	protected PeerList	peers;	
+	
 	//-------- constructors --------
 
 	/**
@@ -87,6 +92,7 @@ public class RelayHandler
 		this.platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
+		this.peers	= new PeerList();
 	}
 	
 	/**
@@ -115,6 +121,7 @@ public class RelayHandler
 			}
 		}
 		StatsDB.getDB().shutdown();
+		this.peers.dispose();
 	}
 	
 	//-------- methods --------
@@ -322,6 +329,21 @@ public class RelayHandler
 		return platforms.values().toArray(new PlatformInfo[0]);
 	}
 	
+	/**
+	 *  Get the available servers as comma-separated list of URLs.
+	 *  Also updates the known peers, if necessary.
+	 *  @param requesturl	Public URL of this relay server as known from the received request.
+	 *  @param peerurl	URL of a remote peer if sent as part of the request (or null).
+	 */
+	public String	handleServersRequest(String requesturl, String peerurl)
+	{
+		if(peerurl!=null)
+		{
+			peers.addPeer(peerurl, false);
+		}
+		return peers.getURLs(requesturl);
+	}
+	
 	//-------- helper methods --------	
 
 	/**
@@ -340,7 +362,7 @@ public class RelayHandler
 			platform.setPreferredCodecs(pcodecs);
 		}
 		
-		if(platform!=null || AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
+//		if(platform!=null || AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
 		{
 			byte[]	propinfo	= null;
 			byte[]	nopropinfo	= null;
@@ -423,6 +445,31 @@ public class RelayHandler
 							// Queue closed, because platform just disconnected.
 						}
 					}
+					
+					// Send awareness info to peer relay servers. (todo: send asynchronously?)
+					PeerEntry[] apeers = peers.getPeers();
+					for(PeerEntry peer: apeers)
+					{
+						if(peer.isConnected())
+						{
+							if(propinfo==null)
+							{
+								byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
+								propinfo	= new byte[data.length+4];
+								System.arraycopy(SUtil.intToBytes(data.length), 0, propinfo, 0, 4);
+								System.arraycopy(data, 0, propinfo, 4, data.length);
+							}
+							try
+							{
+								System.out.println("Sending awareness to peer: "+peer.getURL());
+								new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier("__relay"), new byte[][]{propinfo});
+							}
+							catch(IOException e)
+							{
+								System.out.println("Error sending awareness to peer: "+e);
+							}
+						}
+					}					
 				}
 			}
 		}

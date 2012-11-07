@@ -68,11 +68,13 @@ public class StandaloneRelay
 						
 						if(get && "/servers".equals(path))
 						{
+							String	serverurls	= handler.handleServersRequest("http://"+host+path, null);
+							
 							PrintStream	out	= new PrintStream(client.getOutputStream());
 							out.print("HTTP/1.0 200 OK\r\n");
 							out.print("Content-type: text/plain\r\n");
 							out.println("\r\n");
-							out.println("http://"+host+"/");
+							out.println(serverurls);
 							out.flush();
 							client.close();
 						}

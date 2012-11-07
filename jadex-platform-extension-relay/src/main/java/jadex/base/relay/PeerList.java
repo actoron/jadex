@@ -16,8 +16,6 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  *  The peer list actively manages the list of
  *  connected peer relay servers.
@@ -128,14 +126,14 @@ public class PeerList
 	 *  Get the known relay urls.
 	 *  If no urls are known, the request url is returned.
 	 */
-	public String	getURLs(HttpServletRequest request)
+	public String	getURLs(String request)
 	{
 		String	ret;
 		
 		// Fallback, when no peers specified.
 		if("".equals(url))
 		{
-			ret	= request.getRequestURL().toString();
+			ret	= request;
 			if(ret.endsWith("/servers"))
 			{
 				ret	= RelayConnectionManager.relayAddress(ret.substring(0, ret.length()-7));
@@ -146,7 +144,7 @@ public class PeerList
 		else
 		{
 			ret	= url;
-			PeerEntry[]	apeers	= peers.values().toArray(new PeerEntry[0]);
+			PeerEntry[] apeers = getPeers();
 			for(PeerEntry peer: apeers)
 			{
 				if(peer.isConnected())
@@ -156,6 +154,14 @@ public class PeerList
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 *  Get the currently connected peers.
+	 */
+	public PeerEntry[] getPeers()
+	{
+		return peers.values().toArray(new PeerEntry[0]);
 	}
 	
 	/**
