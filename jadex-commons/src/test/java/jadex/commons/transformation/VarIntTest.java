@@ -3,6 +3,9 @@ package jadex.commons.transformation;
 import jadex.commons.transformation.binaryserializer.VarInt;
 import junit.framework.TestCase;
 
+/**
+ *  comment me!
+ */
 public class VarIntTest extends TestCase
 {
 	/** Corner case values. */

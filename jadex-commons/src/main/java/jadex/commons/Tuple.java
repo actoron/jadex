@@ -1,5 +1,7 @@
 package jadex.commons;
 
+import java.net.URL;
+
 
 /**
  *  A tuple is a list of entities.
@@ -149,6 +151,40 @@ public class Tuple	implements Cloneable, java.io.Serializable
 	public Object clone()
 	{
 		return new Tuple((Object[])entities.clone());
+	}
+	
+	/**
+	 * 
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		String s1 = "file:/C:/projects/jadex/jadex-applications-micro/target/classes/";
+		String s2 = "file:/C:/projects/jadex/jadex-applications-micro/target/test-classes/";
+		
+		URL u1 = new URL(s1);
+		URL u2 = new URL(s2);
+		
+		String sufc = "classes";
+		String suftc = "test-classes";
+		if(s1.endsWith(sufc))
+			s1 = s1 + "/";
+		if(s2.endsWith(suftc))
+			s2 = s2 + "/";
+		sufc = "classes/";
+		suftc = "test-classes/";
+		
+		if(s2.endsWith(suftc))
+		{
+			if(s1.endsWith(sufc) && u1.getProtocol().equals("file") && u2.getProtocol().equals("file"))
+			{
+				String st1 = s1.substring(0, s1.lastIndexOf(sufc));
+				String st2 = s1.substring(0, s2.lastIndexOf(suftc));
+				if(st1.equals(st2))
+				{
+					System.out.println("url: "+u1.getPath());
+				}
+			}
+		}
 	}
 }
 

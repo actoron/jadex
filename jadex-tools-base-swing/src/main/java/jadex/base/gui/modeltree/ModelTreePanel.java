@@ -484,17 +484,76 @@ public class ModelTreePanel extends FileTreePanel
 						{
 							public void customResultAvailable(final ILibraryService ls)
 							{
-								// todo: workspace=true?
-								ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+								ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, Tuple2<URL, IResourceIdentifier>>(ret)
 								{
-									public void customResultAvailable(IResourceIdentifier rid)
+									public void customResultAvailable(List<IResourceIdentifier> rids)
 									{
-										ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-										exception.printStackTrace();
-										super.exceptionOccurred(exception);
+//										System.out.println("rids are: "+rids);
+										
+										// this ugly piece of code checks if test-classes are added
+										// in this case it searched if the original package was also added
+										// and if yes it is added as dependency to the test-package
+										// this makes the necessary classes available for the test case
+										
+										String suftc = "test-classes";
+										String s2 = url.toString();
+										if(s2.endsWith(suftc))
+											s2 = s2 + "/";
+										suftc = "test-classes/";
+										
+										IResourceIdentifier tmp = null;
+										if(s2.endsWith(suftc) && url.getProtocol().equals("file"))
+										{
+											String st2 = s2.substring(0, s2.lastIndexOf(suftc));
+											for(IResourceIdentifier rid: rids)
+											{
+												URL u1 = rid.getLocalIdentifier().getUrl();
+												String s1 = u1.toString();
+												String sufc = "classes";
+												if(s1.endsWith(sufc))
+													s1 = s1 + "/";
+												sufc = "classes/";
+												
+												if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
+												{
+													String st1 = s1.substring(0, s1.lastIndexOf(sufc));
+													if(st1.equals(st2))
+													{
+														tmp = rid;
+//														System.out.println("url: "+u1.getPath());
+														break;
+													}
+												}
+											}
+										}
+										final IResourceIdentifier deprid = tmp;
+										
+										// todo: workspace=true?
+										ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+										{
+											public void customResultAvailable(IResourceIdentifier rid)
+											{
+												if(deprid!=null)
+												{
+													ls.addResourceIdentifier(rid, deprid, true).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+													{
+														public void customResultAvailable(IResourceIdentifier rid)
+														{
+															ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+														}
+													});
+												}
+												else
+												{
+													ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+												}
+											}
+											public void exceptionOccurred(Exception exception)
+											{
+												exception.printStackTrace();
+												super.exceptionOccurred(exception);
+											}
+										});
 									}
 								});
 							}

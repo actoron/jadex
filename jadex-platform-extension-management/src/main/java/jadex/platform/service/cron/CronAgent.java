@@ -6,7 +6,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;

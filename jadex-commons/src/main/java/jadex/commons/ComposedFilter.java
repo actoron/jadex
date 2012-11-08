@@ -24,7 +24,7 @@ public class ComposedFilter<T> implements IFilter<T>,	Serializable
 	//-------- attributes ---------
 
 	/** The filters */
-	protected IFilter[] filters;
+	protected IFilter<T>[] filters;
 
 	/** The operator. */
 	protected int operator;
