@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -71,17 +72,21 @@ public class MicroCreationTest extends TestCase
 			Tuple2<String, Object> tup = it.next();
 //			String	key	= it.next();
 //			Tuple	value	= (Tuple)results.get(key);
-			try
+			// Collect benchmark results (name/value tuple)
+			if(tup.getSecondEntity() instanceof Tuple)
 			{
-				FileWriter	fw	= new FileWriter(new File("../"+tup.getFirstEntity()+".properties"));
-				Properties	props	=	new Properties();
-				props.setProperty("YVALUE", ""+((Tuple)tup.getSecondEntity()).get(0));
-				props.store(fw, null);
-				fw.close();
-			}
-			catch(IOException e)
-			{
-				System.out.println("Warning: could not save value: "+e);
+				try
+				{
+					FileWriter	fw	= new FileWriter(new File("../"+tup.getFirstEntity()+".properties"));
+					Properties	props	=	new Properties();
+					props.setProperty("YVALUE", ""+((Tuple)tup.getSecondEntity()).get(0));
+					props.store(fw, null);
+					fw.close();
+				}
+				catch(IOException e)
+				{
+					System.out.println("Warning: could not save value: "+e);
+				}
 			}
 		}
 		
