@@ -9,8 +9,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import jadex.commons.beans.PropertyVetoException;
-import java.util.UUID;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;

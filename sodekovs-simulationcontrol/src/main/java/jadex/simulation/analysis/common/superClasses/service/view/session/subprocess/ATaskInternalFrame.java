@@ -1,12 +1,6 @@
 package jadex.simulation.analysis.common.superClasses.service.view.session.subprocess;
 
-import java.awt.Dimension;
-import jadex.commons.beans.PropertyVetoException;
-
-import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 public class ATaskInternalFrame extends JInternalFrame
 {

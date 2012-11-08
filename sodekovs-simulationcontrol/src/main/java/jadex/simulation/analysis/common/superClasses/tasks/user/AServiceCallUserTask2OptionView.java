@@ -2,7 +2,6 @@ package jadex.simulation.analysis.common.superClasses.tasks.user;
 
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.simulation.analysis.common.data.parameter.ASummaryParameter;
 import jadex.simulation.analysis.common.superClasses.tasks.ATaskView;
 import jadex.simulation.analysis.common.superClasses.tasks.IATask;
 import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
@@ -13,10 +12,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import jadex.commons.beans.PropertyVetoException;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;

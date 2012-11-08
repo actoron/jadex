@@ -4,7 +4,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAListener;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
-import jadex.simulation.analysis.common.superClasses.tasks.ATaskView;
 import jadex.simulation.analysis.common.superClasses.tasks.IATask;
 import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
 import jadex.simulation.analysis.common.superClasses.tasks.TaskProperties;
@@ -16,7 +15,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import jadex.commons.beans.PropertyVetoException;
+import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -204,13 +203,13 @@ public class ATaskCollectionView extends JPanel implements IAListener
 	public void update(ATaskEvent event)
 	{
 		final IATask task = (IATask) event.getSource();
-		if (event.getCommand().equals(AConstants.TASK_Lï¿½UFT))
+		if (event.getCommand().equals(AConstants.TASK_LÄUFT))
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					String name = "Ausfï¿½hrung " + task.getTaskNumber();
+					String name = "Ausführung " + task.getTaskNumber();
 					if (!((DefaultListModel) list.getModel()).contains(name))
 					{
 						((DefaultListModel) list.getModel()).addElement(name);
