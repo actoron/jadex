@@ -81,7 +81,7 @@ public class ComponentTestSuite extends TestSuite
 			"-autoshutdown", "false",
 			"-opengl", "false",
 			"-cli", "false",
-//			"-deftimeout", "-1",
+			"-deftimeout", "-1",
 			"-printpass", "false"
 		}, path, root, excludes, timeout, broken, start);
 	}

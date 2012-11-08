@@ -146,14 +146,16 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	
 	/**
 	 *  Get the results of the component (considering it as a functionality).
-	 *  Note: The method cannot make use of the asynchrnonous result listener
+	 *  Note: The method cannot make use of the asynchronous result listener
 	 *  mechanism, because the it is called when the component is already
 	 *  terminated (i.e. no invokerLater can be used).
 	 *  @return The results map (name -> value). 
 	 */
 	public Map<String, Object> getResults()
 	{
-		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
+		// Todo: should be unmodifiable?
+//		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
+		return results!=null? results: Collections.EMPTY_MAP;
 	}
 	
 	/**
