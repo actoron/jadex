@@ -149,11 +149,12 @@
 					<env:object3d width=".03" height=".03" depth=".03" x="-0.5" y="0.0" z="0.5" rotation="$deg180y" modelpath="jadex3d/models/buildings/mixed/jadexflag.j3o" hasLightMaterials="true" shadowtype="Cast">
 							<env:animation name="Wave" channel="chan01" loop="true"/>
 					</env:object3d>			
-				
-					<env:text3d  width="2" height="2" depth="1" rotation="$deg90y" x="0" y="4" z="0" text="$textda$" color="#FFFFFFFF" ></env:text3d>
-					<env:text3d  width="2" height="2" depth="1" rotation="$deg270y" x="0" y="4" z="0" text="$textda$" color="#FFFFFFFF" ></env:text3d>
-					<!--Box for Ore -->
-				
+					<!-- TODO: text schein schrott zu sein
+					<env:text3d  width="2" height="2" depth="1" rotation="$deg90y" x="0" y="4" z="0" text="$object.getProperty("text")" color="#FFFFFFFF" ></env:text3d>
+					<env:text3d  width="2" height="2" depth="1" rotation="$deg270y" x="0" y="4" z="0" text="$object.getProperty("text")" color="#FFFFFFFF" ></env:text3d>
+					 -->
+					 
+					<!-- Box for Ore -->
 					<env:dome size="oresize" x="-2" y="0.15" z="2"  color="#FFFFFFFF" radius="1" samples="32" planes="16" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
 									<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 						</env:dome>
