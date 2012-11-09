@@ -1,0 +1,1072 @@
+package jadex.bpmn.editor.gui;
+
+import jadex.bpmn.editor.gui.stylesheets.EventShape;
+import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
+import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.CompositeContext;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+/**
+ *  Class for providing images, either stored or generated, with a cache.
+ *
+ */
+public class ImageProvider
+{
+	/** Thick frame type. */
+	public static final int THICK_FRAME_TYPE  = 0;
+	
+	/** Thin frame type. */
+	public static final int THIN_FRAME_TYPE   = 1;
+	
+	/** Double frame type. */
+	public static final int DOUBLE_FRAME_TYPE = 2;
+	
+	/** Rhombus base shape. */
+	public static final Shape SHAPE_RHOMBUS;
+	
+	/** Rounded rectangle base shape */
+	public static final Shape SHAPE_ROUNDED_RECTANGLE;
+	
+	/** Rounded rectangle base shape */
+	public static final Shape SHAPE_RECTANGLE;
+	
+	/** Ellipse base shape */
+	public static final Shape SHAPE_ELLIPSE;
+	
+	/** Darkening factor for non-highlighted icons */
+	protected static final float NON_HIGHLIGHT_DARKENING_FACTOR = 0.85f;
+	
+	/** The base icon size. */
+	protected static final int BASE_ICON_SIZE = 128;
+	
+	/** The activation shift. */
+	protected static final int ACTIVATION_SHIFT = BASE_ICON_SIZE >>> 4;
+	
+	/** The button size. */
+	protected static final int BUTTON_SIZE = BASE_ICON_SIZE - ACTIVATION_SHIFT;
+	
+	/** The image symbol inset factor. */
+	protected static final double IMAGE_SYMBOL_INSET_FACTOR = 0.15;
+	
+	/** The shadow size. */
+	protected static final int SHADOW_SIZE = ACTIVATION_SHIFT >>> 1;
+	
+	/** The frame thickness. */
+	protected static final int FRAME_THICKNESS = BUTTON_SIZE / 12;
+	
+	/** The frame thickness factor for thin frames. */
+	protected static final int THIN_FRAME_THICKNESS = FRAME_THICKNESS / 3;
+	
+	/** The glass effect shrink factor. */
+	protected static final double GLASS_SHRINK = 0.7;
+	
+	/** The gui directory */
+	protected static final String GUI_DIR = ImageProvider.class.getPackage().getName().replaceAll("\\.", "/");
+	
+	/** The image directory */
+	protected static final String IMAGE_DIR = GUI_DIR + "/images/";
+	
+	/** The font directory */
+	protected static final String FONT_DIR = GUI_DIR + "/fonts/";
+	
+	protected static final ConvolveOp BLUR_FILTER_X;
+	protected static final ConvolveOp BLUR_FILTER_Y;
+	static
+	{
+		int dia = BUTTON_SIZE / 12 + 1;
+		int rad = (dia - 1) / 2;
+        float[] data = new float[dia];
+        
+        float sig = rad / 3.0f;
+        float sig22 = 2.0f * sig * sig;
+        float sigroot = (float) Math.sqrt(sig22 * Math.PI);
+        float sum = 0.0f;
+        
+        for (int i = -rad; i <= rad; ++i)
+        {
+            float dist = i * i;
+            int index = i + rad;
+            data[index] = (float) Math.exp(-dist / sig22) / sigroot;
+            sum += data[index];
+        }
+        
+        for (int i = 0; i < data.length; i++)
+        {
+            data[i] /= sum;
+        }        
+        
+        Kernel kernel = new Kernel(dia, 1, data);
+        BLUR_FILTER_X = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        kernel = new Kernel(1, dia, data);
+        BLUR_FILTER_Y = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        
+	}
+	
+	static
+	{
+		double bs2 = BUTTON_SIZE * 0.5;
+		GeneralPath gp = new GeneralPath();
+		gp.moveTo(0, bs2);
+		gp.lineTo(bs2, BUTTON_SIZE);
+		gp.lineTo(BUTTON_SIZE, bs2);
+		gp.lineTo(bs2, 0);
+		gp.closePath();
+		SHAPE_RHOMBUS = gp;
+		
+		SHAPE_ROUNDED_RECTANGLE = new RoundRectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE, BASE_ICON_SIZE >>> 1, BASE_ICON_SIZE >>> 1);
+		
+		SHAPE_ELLIPSE = new Ellipse2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
+		
+		SHAPE_RECTANGLE = new Rectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
+	}
+	
+	/** The image cache. */
+	protected Map<Object, Image> imagecache = Collections.synchronizedMap(new HashMap<Object, Image>());
+	
+	/** The generated image cache. */
+	protected Map<String, Image> genimagecache = Collections.synchronizedMap(new HashMap<String, Image>());
+	
+	/** The rendered text cache. */
+	protected Map<String, Image> textimagecache = Collections.synchronizedMap(new HashMap<String, Image>());
+	
+	/** The icon font used. */
+	protected Font iconfont;
+	
+	public ImageProvider()
+	{
+		try
+		{
+			InputStream fontis = this.getClass().getClassLoader().getResourceAsStream(FONT_DIR + "VeraBd.ttf");
+			Font font = Font.createFont(Font.TRUETYPE_FONT, fontis);
+			iconfont = font.deriveFont(144.0f);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Generates a generic flat image icon set in the order off, on, highlight.
+	 *  
+	 *  @param iconsize The icon size.
+	 * 	@param symbol Symbol name or text.
+	 *  @param bgcolor Color of the icon
+	 *  @return The generated icons.
+	 */
+	public Icon[] generateGenericFlatImageIconSet(int iconsize, String symbol)
+	{
+		Image offimage = imagecache.get(new Tuple3<String, Integer, String>("flat_off", iconsize, symbol));
+		Image onimage = imagecache.get(new Tuple3<String, Integer, String>("flat_on", iconsize, symbol));
+		Image highimage = imagecache.get(new Tuple3<String, Integer, String>("flat_high", iconsize, symbol));
+		if (offimage == null || onimage == null || highimage == null)
+		{
+			Image symimg = getSymbol(symbol, new Rectangle(BASE_ICON_SIZE, BASE_ICON_SIZE));
+			BufferedImage darksymimg = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = darksymimg.createGraphics();
+			g.setComposite(new ModulateComposite(new Color(0.8f, 0.8f, 0.8f, 1.0f), true));
+			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.dispose();
+			
+			offimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = ((BufferedImage) offimage).createGraphics();
+			g.setComposite(AlphaComposite.SrcOver);
+			g.drawImage(darksymimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.dispose();
+			offimage = offimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+			
+			onimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = ((BufferedImage) onimage).createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.150f));
+			//g.setColor(Color.BLACK);
+			g.fillRect(0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE);
+			g.setComposite(AlphaComposite.SrcOver);
+			g.setColor(Color.WHITE);
+			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.dispose();
+			onimage = onimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+			
+			highimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = ((BufferedImage) highimage).createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.setColor(Color.WHITE);
+			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.dispose();
+			highimage = highimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+			
+			imagecache.put(new Tuple3<String, Integer, String>("flat_off", iconsize, symbol), offimage);
+			imagecache.put(new Tuple3<String, Integer, String>("flat_on", iconsize, symbol), onimage);
+			imagecache.put(new Tuple3<String, Integer, String>("flat_high", iconsize, symbol), highimage);
+		}
+		
+		Icon[] ret = new Icon[3];
+		ret[0] = new ImageIcon(offimage);
+		ret[1] = new ImageIcon(onimage);
+		ret[2] = new ImageIcon(highimage);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Generates a generic image icon set in the order off, on, highlight.
+	 *  
+	 *  @param iconsize The icon size.
+	 *  @param baseshape The base shape.
+	 * 	@param symbol Symbol name or text.
+	 *  @param bgcolor Color of the icon.
+	 *  @return The generated icons.
+	 */
+	public Icon[] generateGenericImageIconSet(int iconsize, Shape baseshape, String symbol, Color bgcolor)
+	{
+		Icon[] ret = new Icon[3];
+		ret[0] = generateGenericImageIcon(iconsize, baseshape, symbol, bgcolor, false, false);
+		ret[1] = generateGenericImageIcon(iconsize, baseshape, symbol, bgcolor, true, true);
+		ret[2] = generateGenericImageIcon(iconsize, baseshape, symbol, bgcolor, true, false);
+		return ret;
+	}
+	
+	/**
+	 *  Generates a generic image icon set in the order off, on, highlight.
+	 *  
+	 *  @param iconsize The icon size.
+	 *  @param baseshape The base shape.
+	 *  @param frametype The type of frame.
+	 * 	@param symbol Symbol name or text.
+	 *  @param bgcolor Color of the icon.
+	 *  @return The generated icons.
+	 */
+	public Icon[] generateGenericImageIconSet(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor)
+	{
+		Icon[] ret = new Icon[3];
+		ret[0] = generateGenericImageIcon(iconsize, baseshape, frametype, symbol, bgcolor, false, false);
+		ret[1] = generateGenericImageIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, true);
+		ret[2] = generateGenericImageIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, false);
+		return ret;
+	}
+	
+	/**
+	 *  Generates a generic image icon.
+	 *  
+	 *  @param iconsize The icon size.
+	 *  @param baseshape The base shape.
+	 * 	@param symbol Symbol name or text.
+	 *  @param bgcolor Color of the icon.
+	 *  @param high Highlight the icon if true.
+	 *  @param shift Shift (for pressed status) if true.
+	 *  @return The generated image icon.
+	 */
+	public ImageIcon generateGenericImageIcon(int iconsize, Shape baseshape, String symbol, Color bgcolor, boolean high, boolean shift)
+	{
+		return generateGenericImageIcon(iconsize, baseshape, THICK_FRAME_TYPE, symbol, bgcolor, high, shift);
+	}
+	
+	/**
+	 *  Generates a generic image icon.
+	 *  
+	 *  @param iconsize The icon size.
+	 *  @param baseshape The base shape.
+	 *  @param frametype The type of frame.
+	 * 	@param symbol Symbol name or text.
+	 *  @param bgcolor Color of the icon
+	 *  @param high Highlight the icon if true.
+	 *  @param shift Shift (for pressed status) if true.
+	 *  @return The generated image icon.
+	 */
+	public ImageIcon generateGenericImageIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor, boolean high, boolean shift)
+	{
+		Image symimg = getSymbol(symbol, new Rectangle(BUTTON_SIZE, BUTTON_SIZE));
+		Image frame = generateGenericFrame(frametype, baseshape);
+		Image glass = generateGenericGlass(baseshape);
+		Image bgshape = generateGenericBackground(baseshape);
+		Image shadow = null;
+		if (!shift)
+		{
+			shadow = generateGenericShadow(baseshape);
+		}
+		
+		return compositeImageIcon(iconsize, symimg, bgshape, frame, glass, shadow, bgcolor, high);
+	}
+	
+	/**
+	 *  Composites an image icon out of multiple images.
+	 *  
+	 *  @param symbol The symbol image.
+	 *  @param bgshape The background shape image.
+	 *  @param frame The shaped frame image.
+	 *  @param glass The glass effect image.
+	 *  @param shadow The shadow effect image, composite pressed (shifted) image if null.
+	 *  @param bgcolor The color of the icon.
+	 *  @param high Highlight the icon if true.
+	 *  @return The image icon.
+	 */
+	private ImageIcon compositeImageIcon(int iconsize, Image symbol, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high)
+	{
+		BufferedImage ret = null;
+		BufferedImage tmpimg = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = tmpimg.createGraphics();
+		g.setComposite(new ModulateComposite(bgcolor, high));
+		g.drawImage(bgshape, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.dispose();
+		bgshape = tmpimg;
+		
+		Image full = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		g = ((BufferedImage) full).createGraphics();
+		g.setComposite(AlphaComposite.SrcOver);
+		
+		int x = 0;
+		int y = 0;
+		if (shadow == null)
+		{
+			x = ACTIVATION_SHIFT;
+			y = ACTIVATION_SHIFT;
+		}
+		else
+		{
+			g.drawImage(shadow, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		}
+		
+		g.drawImage(bgshape, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.drawImage(frame, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.drawImage(glass, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.drawImage(symbol, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.dispose();
+		bgshape = null;
+		
+		full = full.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+		ret = new BufferedImage(iconsize, iconsize, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		g = ret.createGraphics();
+		g.setComposite(AlphaComposite.Src);
+		g.drawImage(full, 0, 0, iconsize, iconsize, null);
+		g.dispose();
+		return new ImageIcon(ret);
+	}
+	
+	/**
+	 *  Generates a generic button background for a base shape.
+	 *  
+	 *  @param baseshape The base shape.
+	 *  @return The background image.
+	 */
+	private Image generateGenericBackground(Shape baseshape)
+	{
+		BufferedImage ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = ((BufferedImage) ret).createGraphics();
+		
+		g.setColor(Color.WHITE);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g.fill(baseshape);
+		g.dispose();
+		
+		return ret;
+	}
+	
+	/**
+	 *  Generates a generic button frame for a base shape.
+	 *  
+	 *  @param frametype The frame type.
+	 *  @param baseshape The base shape.
+	 *  @return The frame image.
+	 */
+	private Image generateGenericFrame(int frametype, Shape baseshape)
+	{
+		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple3<String, Integer, Shape>("frame", frametype, baseshape));
+		
+		if (ret == null)
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			
+			Area framearea = new Area(baseshape);
+			
+			if (THICK_FRAME_TYPE == frametype)
+			{
+				AffineTransform st = new AffineTransform();
+				double sf = (double) (BUTTON_SIZE - (FRAME_THICKNESS << 1)) / BUTTON_SIZE;
+				st.translate(FRAME_THICKNESS, FRAME_THICKNESS);
+				st.scale(sf, sf);
+				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+			}
+			else if (THIN_FRAME_TYPE == frametype)
+			{
+				AffineTransform st = new AffineTransform();
+				double fs = THIN_FRAME_THICKNESS;
+				double sf = (double) (BUTTON_SIZE - (fs * 2.0)) / BUTTON_SIZE;
+				st.translate(fs, fs);
+				st.scale(sf, sf);
+				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+			}
+			else if (DOUBLE_FRAME_TYPE == frametype)
+			{
+				AffineTransform st = new AffineTransform();
+				double fs = THIN_FRAME_THICKNESS;
+				double sf = (double) (BUTTON_SIZE - (fs * 2.0)) / BUTTON_SIZE;
+				st.translate(fs, fs);
+				st.scale(sf, sf);
+				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+				
+				st = new AffineTransform();
+				sf = (double) (BUTTON_SIZE - (fs * 6.0)) / BUTTON_SIZE;
+				st.translate(fs * 3.0, fs * 3.0);
+				st.scale(sf, sf);
+				framearea.add(new Area(st.createTransformedShape(baseshape)));
+				
+				st = new AffineTransform();
+				sf = (double) (BUTTON_SIZE - (fs * 8.0)) / BUTTON_SIZE;
+				st.translate(fs * 4.0, fs * 4.0);
+				st.scale(sf, sf);
+				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
+			}
+			
+			g.setColor(Color.BLACK);
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.fill(framearea);
+			g.dispose();
+			
+			imagecache.put(new Tuple3<String, Integer, Shape>("frame", frametype, baseshape), ret);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Generates a generic button shadow for a base shape.
+	 *  
+	 *  @param baseshape The base shape.
+	 *  @return The shadow image.
+	 */
+	private Image generateGenericShadow(Shape baseshape)
+	{
+		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple2<String, Shape>("shadow", baseshape));
+		if (ret == null)
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ret.createGraphics();
+			g.setColor(Color.DARK_GRAY);
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			
+			AffineTransform st = new AffineTransform();
+			st.translate(SHADOW_SIZE, SHADOW_SIZE);
+			
+			g.fill(st.createTransformedShape(baseshape));
+			g.dispose();
+			
+			imagecache.put(new Tuple2<String, Shape>("shadow", baseshape), ret);
+		}
+		
+		ret = blur(ret);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Generates a generic button glass effect for a base shape.
+	 *  
+	 *  @param baseshape The base shape.
+	 *  @return The glass effect image.
+	 */
+	private Image generateGenericGlass(Shape baseshape)
+	{
+		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple2<String, Shape>("glass", baseshape));
+		
+		if (ret == null)
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			Shape glassarea = new Area(baseshape);
+			((Area) glassarea).subtract(new Area(new Rectangle2D.Double(0.0, BUTTON_SIZE * 0.5, BUTTON_SIZE, BUTTON_SIZE * 0.5)));
+			
+			AffineTransform st = new AffineTransform();
+			st.translate((BUTTON_SIZE - GLASS_SHRINK * BUTTON_SIZE) * 0.5,
+						 (BUTTON_SIZE - GLASS_SHRINK * BUTTON_SIZE) * 0.5);
+			st.scale(GLASS_SHRINK, GLASS_SHRINK);
+			
+			glassarea = st.createTransformedShape(glassarea);
+			Rectangle2D bounds = glassarea.getBounds2D();
+			GradientPaint paint = new GradientPaint((float) bounds.getX(), (float) bounds.getY(), new Color(1.0f, 1.0f, 1.0f, 1.0f),
+													(float) bounds.getX(), (float) bounds.getHeight(), new Color(1.0f, 1.0f, 1.0f, 0.0f));
+			g.setPaint(paint);
+			g.fill(glassarea);
+			g.dispose();
+			
+			ret = blur(ret);
+			
+			imagecache.put(new Tuple2<String, Shape>("glass", baseshape), ret);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Blurs the image.
+	 *  
+	 *  @param img Image to blur.
+	 *  @return Blurred image.
+	 */
+	private BufferedImage blur(BufferedImage img)
+	{
+		BufferedImage tmp = new BufferedImage(img.getWidth() << 1, img.getHeight() << 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = tmp.createGraphics();
+		int w2 = img.getWidth() >>> 1;
+		int h2 = img.getHeight() >>> 1;
+		g.drawImage(img, w2, h2, img.getWidth() + w2, img.getHeight() + h2, 0, 0, img.getWidth(), img.getHeight(), null);
+		g.dispose();
+		
+		tmp = BLUR_FILTER_X.filter(tmp, null);
+		tmp = BLUR_FILTER_Y.filter(tmp, null);
+		
+		img = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		g = img.createGraphics();
+		g.drawImage(tmp, 0, 0, img.getWidth(), img.getHeight(), w2, h2, img.getWidth() + w2, img.getHeight() + h2, null);
+		g.dispose();
+		return img;
+	}
+	
+	/**
+	 *  Generates an symbol.
+	 *  
+	 *  @param name Name of the symbol.
+	 *  @return The symbol.
+	 */
+	private Image generateSymbol(String name, Rectangle buttonarea)
+	{
+		BufferedImage ret = null;
+		
+		if ("GW_+".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			
+			g.setColor(Color.BLACK);
+			g.fill(GatewayShape.getAndShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("add_+".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			double offset = BASE_ICON_SIZE * 0.1;
+			double s2 = BASE_ICON_SIZE * 0.5;
+			GeneralPath gp = new GeneralPath();
+			gp.moveTo(offset, s2 - offset);
+			gp.lineTo(offset, s2 + offset);
+			gp.lineTo(BASE_ICON_SIZE - offset, s2 + offset);
+			gp.lineTo(BASE_ICON_SIZE - offset, s2 - offset);
+			gp.closePath();
+			gp.moveTo(s2 + offset, offset);
+			gp.lineTo(s2 - offset, offset);
+			gp.lineTo(s2 - offset, BASE_ICON_SIZE - offset);
+			gp.lineTo(s2 + offset, BASE_ICON_SIZE - offset);
+			gp.closePath();
+			g.setColor(new Color(126, 229, 80));
+			g.fill(gp);
+		}
+		else if ("remove_-".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			double offset = BASE_ICON_SIZE * 0.1;
+			double s2 = BASE_ICON_SIZE * 0.5;
+			GeneralPath gp = new GeneralPath();
+			gp.moveTo(offset, s2 - offset);
+			gp.lineTo(offset, s2 + offset);
+			gp.lineTo(BASE_ICON_SIZE - offset, s2 + offset);
+			gp.lineTo(BASE_ICON_SIZE - offset, s2 - offset);
+			gp.closePath();
+			g.setColor(new Color(126, 229, 80));
+			g.fill(gp);
+		}
+		else if ("GW_X".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			
+			g.setColor(Color.BLACK);
+			g.fill(GatewayShape.getXorShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("GW_O".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			
+			g.setColor(Color.BLACK);
+			g.fill(GatewayShape.getOrShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("Pool".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			int basex = (int) Math.round(buttonarea.width * 0.25);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
+			g.drawLine(basex, buttonarea.y, basex, buttonarea.height);
+			Image txt = generateTextImage("P", 1.0f, buttonarea);
+			basex >>>= 1;
+			g.drawImage(txt, basex, buttonarea.y, BASE_ICON_SIZE, BASE_ICON_SIZE, 0, 0, BASE_ICON_SIZE - basex, BASE_ICON_SIZE, null);
+			g.dispose();
+		}
+		else if ("Lane".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			int basex = (int) Math.round(buttonarea.width * 0.25);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
+			g.drawLine(basex, buttonarea.y, basex, buttonarea.height);
+			Image txt = generateTextImage("L", 1.0f, buttonarea);
+			basex >>>= 1;
+			g.drawImage(txt, basex, buttonarea.y, BASE_ICON_SIZE, BASE_ICON_SIZE, 0, 0, BASE_ICON_SIZE - basex, BASE_ICON_SIZE, null);
+			g.dispose();
+		}
+		else if ("letter".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.draw(EventShape.getLetterShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("invletter".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			Shape letter = EventShape.getLetterShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+			g.setColor(Color.BLACK);
+			g.fill(letter);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.setComposite(AlphaComposite.Src);
+			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+			g.draw(letter);
+		}
+		else if ("clock".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.draw(EventShape.getClockShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("page".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.draw(EventShape.getPageShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("triangle".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.draw(EventShape.getTriangleShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("invtriangle".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			Shape triangle = EventShape.getTriangleShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+			g.setColor(Color.BLACK);
+			g.fill(triangle);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.setComposite(AlphaComposite.Src);
+			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+			g.draw(triangle);
+		}
+		else if ("pentagon".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.draw(EventShape.getPentagonShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+		}
+		else if ("invpentagon".equals(name))
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			Shape pentagon = EventShape.getPentagonShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+			g.setColor(Color.BLACK);
+			g.fill(pentagon);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.setComposite(AlphaComposite.Src);
+			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+			g.draw(pentagon);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Renders text as image.
+	 *  
+	 *  @param text The text.
+	 *  @return The image.
+	 */
+	private Image generateTextImage(String text, float scaling, Rectangle buttonarea)
+	{
+		Image ret = textimagecache.get(text);
+		
+		if (ret == null)
+		{
+			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setColor(Color.BLACK);
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			
+			Font font = iconfont.deriveFont(BASE_ICON_SIZE * 0.5625f * scaling);
+			Shape s = font.createGlyphVector(g.getFontRenderContext(), text).
+					getOutline(0f, 0f);
+			Rectangle b = s.getBounds();
+			
+			g.translate(buttonarea.width * 0.5 - b.getWidth() * 0.5 - b.getX() + buttonarea.x, buttonarea.height * 0.5 - b.getHeight() * 0.5 - b.getY() + buttonarea.y);
+			g.fill(s);
+			g.dispose();
+			
+			textimagecache.put(text, ret);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Loads an image.
+	 *  
+	 *  @param name Name of the image.
+	 *  @return The image.
+	 */
+	private Image loadImage(String name)
+	{
+		Image ret = null;
+		try
+		{
+			ret = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + name));
+		}
+		catch (Exception e)
+		{
+			//throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Loads a symbol.
+	 *  
+	 *  @param name Name of the symbol.
+	 *  @return The symbol.
+	 */
+	private Image loadSymbol(String name, Rectangle buttonarea)
+	{
+		Image ret = loadImage(name);
+		
+		if (ret != null)
+		{
+			double imgsymlen = buttonarea.width * (1.0 - IMAGE_SYMBOL_INSET_FACTOR * 2.0);
+			double sf = imgsymlen / Math.max(ret.getWidth(null), ret.getHeight(null));
+			ret = ret.getScaledInstance((int) Math.round(sf * ret.getWidth(null)), (int) Math.round(sf * ret.getHeight(null)), Image.SCALE_AREA_AVERAGING);
+			BufferedImage tmp = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = tmp.createGraphics();
+			int w = ret.getWidth(null);
+			int h = ret.getHeight(null);
+			int dx = buttonarea.x + ((buttonarea.width - w) >>> 1);
+			int dy = buttonarea.y + ((buttonarea.height - h) >>> 1);
+			g.drawImage(ret, dx, dy, dx + w, dy + h, 0, 0, w, h, null);
+			g.dispose();
+			ret = tmp;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Loads or generates a symbol.
+	 *  
+	 *  @param name Name of the symbol.
+	 *  @return The symbol.
+	 */
+	private Image getSymbol(String name, Rectangle buttonarea)
+	{
+		Image ret = imagecache.get(name);
+		
+		if (ret == null)
+		{
+			ret = generateSymbol(name, buttonarea);
+		
+			if (ret == null)
+			{
+				ret = loadSymbol(name + ".png", buttonarea);
+			}
+			if (ret == null)
+			{
+				ret = loadSymbol(name + ".jpg", buttonarea);
+			}
+			if (ret == null)
+			{
+				ret = loadSymbol(name + ".gif", buttonarea);
+			}
+			
+			if (ret == null)
+			{
+				ret = generateTextImage(name, 1.0f / (float) Math.sqrt(name.length()), buttonarea);
+			}
+			
+			imagecache.put(name, ret);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Gets a specific image icon.
+	 *  
+	 *  @param filename name of the image file.
+	 *  @return Image icon.
+	 */
+	/*public ImageIcon getImageIcon(String filename)
+	{
+		BufferedImage ret = null;
+		try
+		{
+			Image orig = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + filename));
+			orig = orig.getScaledInstance(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, Image.SCALE_AREA_AVERAGING);
+			ret = new BufferedImage(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ret.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(orig, 0, 0, GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, null);
+			g.dispose();
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		return new ImageIcon(ret);
+	}*/
+	
+	/**
+	 *  Composite for modulation.
+	 *
+	 */
+	protected static class ModulateComposite implements Composite
+	{
+		/** Modulation color */
+		protected Color modcolor;
+		
+		/** Highlight amplification*/
+		protected boolean high;
+		
+		/**
+		 *  Creates a new Composite.
+		 *  
+		 *  @param modcolor The modulation color.
+		 *  @param high Highlight amplification flag.
+		 */
+		public ModulateComposite(Color modcolor, boolean high)
+		{
+			this.modcolor = modcolor;
+			this.high = high;
+		}
+		
+		/**
+		 *  Create the context.
+		 */
+		public CompositeContext createContext(ColorModel srcColorModel,
+				ColorModel dstColorModel, RenderingHints hints)
+		{
+			return new ModulationContextAccel(srcColorModel, dstColorModel);
+		}
+		
+		/**
+		 *  Regular "correct" modulation context.
+		 *
+		 */
+		protected class ModulationContext implements CompositeContext
+		{
+			/** Source color model. */
+			protected ColorModel srcColorModel;
+			
+			/** Destination color model. */
+			protected ColorModel dstColorModel;
+			
+			/**
+			 *  Creates the context.
+			 *  
+			 *  @param srcColorModel Source color model.
+			 *  @param dstColorModel Destination color model.
+			 */
+			public ModulationContext(ColorModel srcColorModel, ColorModel dstColorModel)
+			{
+				this.srcColorModel = srcColorModel;
+				this.dstColorModel = dstColorModel;
+			}
+			
+			/**
+			 *  Composes the image.
+			 */
+			public void compose(Raster src, Raster dstIn, WritableRaster dstOut)
+			{
+				float[] clrPx = modcolor.getComponents(null);
+				
+				int maxX = Math.min(src.getWidth(), dstIn.getWidth());
+				int maxY = Math.min(src.getHeight(), dstIn.getHeight());
+				float[] tmpPx = new float[4];
+				for (int y = 0; y < maxY; ++y)
+				{
+					for (int x = 0; x < maxX; ++x)
+					{
+						Object inPixel = src.getDataElements(x, y, null);
+						tmpPx = srcColorModel.getNormalizedComponents(inPixel, tmpPx, 0);
+						
+						tmpPx[0] *= clrPx[0];
+						tmpPx[1] *= clrPx[1];
+						tmpPx[2] *= clrPx[2];
+						tmpPx[3] *= clrPx[3];
+						
+						if (!high)
+						{
+							for (int i = 0; i < 3; ++i)
+							{
+								tmpPx[i] *= NON_HIGHLIGHT_DARKENING_FACTOR;
+							}
+						}
+						
+						Object outPixel = dstColorModel.getDataElements(tmpPx, 0, null);
+						dstOut.setDataElements(x, y, outPixel);
+					}
+				}
+			}
+			
+			/**
+			 *  Disposes context.
+			 */
+			public void dispose()
+			{
+				srcColorModel = null;
+				dstColorModel = null;
+			}
+		}
+		
+		/**
+		 *  Accelerated modulation context, based on some assumptions
+		 *  (4 color components, each 8 bits, etc.).
+		 *
+		 */
+		protected class ModulationContextAccel implements CompositeContext
+		{
+			/** Source color model. */
+			protected ColorModel srcColorModel;
+			
+			/** Destination color model. */
+			protected ColorModel dstColorModel;
+			
+			/**
+			 *  Creates the context.
+			 *  
+			 *  @param srcColorModel Source color model.
+			 *  @param dstColorModel Destination color model.
+			 */
+			public ModulationContextAccel(ColorModel srcColorModel, ColorModel dstColorModel)
+			{
+				this.srcColorModel = srcColorModel;
+				this.dstColorModel = dstColorModel;
+			}
+			
+			/**
+			 *  Composes the image.
+			 */
+			public void compose(Raster src, Raster dstIn, WritableRaster dstOut)
+			{
+				float[] clrPx = modcolor.getComponents(null);
+				
+				int maxX = Math.min(src.getWidth(), dstIn.getWidth());
+				int maxY = Math.min(src.getHeight(), dstIn.getHeight());
+				
+				float amp = 1.0f;
+				if (!high)
+				{
+					amp = NON_HIGHLIGHT_DARKENING_FACTOR;
+				}
+				
+				for (int y = 0; y < maxY; ++y)
+				{
+					for (int x = 0; x < maxX; ++x)
+					{
+						//System.out.println(dstOut.getDataBuffer().getClass());
+						Object inPixel = src.getDataElements(x, y, null);
+						byte[] bPixel = (byte[]) inPixel;
+						bPixel[0] = (byte) (((bPixel[0] & 0xFF) / 255.0f) * clrPx[0] * amp * 255.0f);
+						bPixel[1] = (byte) (((bPixel[1] & 0xFF) / 255.0f) * clrPx[1] * amp * 255.0f);
+						bPixel[2] = (byte) (((bPixel[2] & 0xFF) / 255.0f) * clrPx[2] * amp * 255.0f);
+						bPixel[3] = (byte) (((bPixel[3] & 0xFF) / 255.0f) * clrPx[3] * 255.0f);
+						dstOut.setDataElements(x, y, bPixel);
+					}
+				}
+			}
+			
+			/**
+			 *  Disposes context.
+			 */
+			public void dispose()
+			{
+				srcColorModel = null;
+				dstColorModel = null;
+			}
+		}
+	}
+}
