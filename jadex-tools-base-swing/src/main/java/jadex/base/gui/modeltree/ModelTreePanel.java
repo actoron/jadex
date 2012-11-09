@@ -507,21 +507,24 @@ public class ModelTreePanel extends FileTreePanel
 											String st2 = s2.substring(0, s2.lastIndexOf(suftc));
 											for(IResourceIdentifier rid: rids)
 											{
-												URL u1 = rid.getLocalIdentifier().getUrl();
-												String s1 = u1.toString();
-												String sufc = "classes";
-												if(s1.endsWith(sufc))
-													s1 = s1 + "/";
-												sufc = "classes/";
-												
-												if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
+												if(rid.getLocalIdentifier()!=null)
 												{
-													String st1 = s1.substring(0, s1.lastIndexOf(sufc));
-													if(st1.equals(st2))
+													URL u1 = rid.getLocalIdentifier().getUrl();
+													String s1 = u1.toString();
+													String sufc = "classes";
+													if(s1.endsWith(sufc))
+														s1 = s1 + "/";
+													sufc = "classes/";
+													
+													if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
 													{
-														tmp = rid;
-//														System.out.println("url: "+u1.getPath());
-														break;
+														String st1 = s1.substring(0, s1.lastIndexOf(sufc));
+														if(st1.equals(st2))
+														{
+															tmp = rid;
+	//														System.out.println("url: "+u1.getPath());
+															break;
+														}
 													}
 												}
 											}
