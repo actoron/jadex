@@ -1,13 +1,11 @@
 package jadex.bdiv3.runtime;
 
-import java.lang.reflect.Method;
-
-import jadex.bdiv3.actions.IAction;
-import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
+
+import java.lang.reflect.Method;
 
 /**
  * 
@@ -25,7 +23,7 @@ public class MethodPlanBody implements IPlanBody
 	
 	
 	/**
-	 * @param body
+	 * 
 	 */
 	public MethodPlanBody(IInternalAccess ia, RPlan rplan, Method body)
 	{

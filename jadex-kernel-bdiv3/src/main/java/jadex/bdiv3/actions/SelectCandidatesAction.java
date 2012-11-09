@@ -6,8 +6,10 @@ import java.util.List;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.IPlanBody;
 import jadex.bdiv3.runtime.MethodPlanBody;
+import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,7 +17,7 @@ import jadex.commons.future.IFuture;
 /**
  * 
  */
-public class SelectCandidatesAction implements IAction<Void>
+public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 {
 	/** The element. */
 	protected RProcessableElement element;
@@ -32,9 +34,21 @@ public class SelectCandidatesAction implements IAction<Void>
 	 *  Test if the action is valid.
 	 *  @return True, if action is valid.
 	 */
-	public IFuture<Boolean> isValid()
+	public boolean isValid()
 	{
-		return new Future<Boolean>(true);
+		boolean ret = true;
+		
+		if(element instanceof RGoal)
+		{
+			RGoal rgoal = (RGoal)element;
+			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+		}
+			
+		if(!ret)
+			System.out.println("not valid: "+this+" "+element);
+		
+		return ret;
 	}
 	
 	/**
@@ -60,7 +74,7 @@ public class SelectCandidatesAction implements IAction<Void>
 					rplan.setBody(body);
 					rplan.setReason(element);
 					rplan.setDispatchedElement(element);
-					IAction<Void> action = new ExecutePlanStepAction(element, rplan);
+					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(element, rplan);
 					ia.getExternalAccess().scheduleStep(action);
 					ret.setResult(null);
 				}
@@ -69,7 +83,7 @@ public class SelectCandidatesAction implements IAction<Void>
 					// dispatch to running plan
 					RPlan rplan = (RPlan)cand;
 					rplan.setDispatchedElement(element);
-					IAction<Void> action = new ExecutePlanStepAction(element, rplan);
+					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(element, rplan);
 					ia.getExternalAccess().scheduleStep(action);
 					ret.setResult(null);
 				}

@@ -132,10 +132,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			rulesystem.processAllEvents();
 		}
 		
-		
 		if(steps!=null && steps.size()>0)
 		{
-			System.out.println("steps: "+steps.size()+" "+SUtil.arrayToString(steps.get(0)));
+			System.out.println("steps: "+steps.size()+" "+((Object[])steps.get(0))[0]);
 		}
 		return super.executeStep();
 	}

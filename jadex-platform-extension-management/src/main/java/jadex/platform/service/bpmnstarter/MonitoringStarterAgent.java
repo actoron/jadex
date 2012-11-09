@@ -466,6 +466,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 	{
 		final Future<Void> ret = new Future<Void>();
 		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
+		final String rulename = rule.getName();
 		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
 		{
 			public void customResultAvailable(final IRuleService rules)
@@ -474,7 +475,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 				{
 					public void run()
 					{
-						rules.removeRule(rule).addResultListener(new DefaultResultListener<Void>()
+						rules.removeRule(rulename).addResultListener(new DefaultResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{

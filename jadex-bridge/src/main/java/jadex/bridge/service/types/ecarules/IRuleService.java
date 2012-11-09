@@ -31,7 +31,7 @@ public interface IRuleService
 	 *  Remove a rule.
 	 *  @param rule The rule.
 	 */
-	public IFuture<Void> removeRule(IRule<?> rule);
+	public IFuture<Void> removeRule(String rulename);
 	
 	/**
 	 *  Subscribe to rule executions.

@@ -11,7 +11,7 @@ import jadex.commons.future.IFuture;
 /**
  * 
  */
-public class AdoptGoalAction implements IConditionalComponentStep<Void>
+public class DropGoalAction implements IConditionalComponentStep<Void>
 {
 	/** The goal. */
 	protected RGoal goal;
@@ -19,7 +19,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	/**
 	 *  Create a new action.
 	 */
-	public AdoptGoalAction(RGoal goal)
+	public DropGoalAction(RGoal goal)
 	{
 		this.goal = goal;
 	}
@@ -44,10 +44,9 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 		try
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			// todo: observe class and goal itself!
-			goal.observeGoal(ia);
-			ip.getCapability().addGoal(goal);
-			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_ACTIVE);
+			goal.unobserveGoal(ia);
+			ip.getCapability().removeGoal(goal);
+			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPED);
 			ret.setResult(null);
 		}
 		catch(Exception e)

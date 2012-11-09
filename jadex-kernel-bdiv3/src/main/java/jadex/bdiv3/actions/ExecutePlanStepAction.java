@@ -1,18 +1,13 @@
 package jadex.bdiv3.actions;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.IPlanBody;
-import jadex.bdiv3.runtime.PlanFailureException;
+import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.micro.IPojoMicroAgent;
-
-import java.lang.reflect.Method;
 
 // todo: use IPlan (and plan executor abstract to be able to execute plans as subcomponents)
 // todo: allow using multi-step plans
@@ -20,7 +15,7 @@ import java.lang.reflect.Method;
 /**
  * 
  */
-public class ExecutePlanStepAction implements IAction<Void>
+public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 {
 	/** The element. */
 	protected RProcessableElement element;
@@ -41,9 +36,21 @@ public class ExecutePlanStepAction implements IAction<Void>
 	 *  Test if the action is valid.
 	 *  @return True, if action is valid.
 	 */
-	public IFuture<Boolean> isValid()
+	public boolean isValid()
 	{
-		return new Future<Boolean>(true);
+		boolean ret = true;
+		
+		if(element instanceof RGoal)
+		{
+			RGoal rgoal = (RGoal)element;
+			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+		}
+			
+		if(!ret)
+			System.out.println("not valid: "+this+" "+element);
+		
+		return ret;
 	}
 	
 	/**

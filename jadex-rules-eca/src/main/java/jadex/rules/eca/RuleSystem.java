@@ -260,7 +260,7 @@ public class RuleSystem
 			IRule<?>[] rls = tup.getSecondEntity();
 			for(int i=0; i<rls.length; i++)
 			{
-				rulebase.removeRule(rls[i]);
+				rulebase.removeRule(rls[i].getName());
 			}
 		}
 		

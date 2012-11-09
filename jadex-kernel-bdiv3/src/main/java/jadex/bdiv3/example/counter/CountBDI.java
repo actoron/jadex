@@ -20,7 +20,7 @@ public class CountBDI
 	@AgentBody
 	public void body()
 	{
-		agent.adoptGoal(new CountGoal(10));
+		agent.adoptGoal(new CountGoal(10, 5));
 		System.out.println("body end: "+getClass().getName());
 	}
 	

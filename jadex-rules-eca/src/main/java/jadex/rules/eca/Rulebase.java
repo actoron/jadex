@@ -13,8 +13,11 @@ public class Rulebase implements IRulebase
 {
 	//-------- attributes --------
 	
-	/** The rules. */
-	protected Map<String, List<IRule<?>>>rules;
+	/** The rules per name. */
+	protected Map<String, IRule<?>> rules;
+	
+	/** The rules (Event name -> {rules}). */
+	protected Map<String, List<IRule<?>>>evrules;
 
 	//-------- methods --------
 	
@@ -25,16 +28,24 @@ public class Rulebase implements IRulebase
 	public void addRule(IRule<?> rule)
 	{
 		if(rules==null)
-			rules = new HashMap<String, List<IRule<?>>>();
+			rules = new HashMap<String, IRule<?>>();
+		if(evrules==null)
+			evrules = new HashMap<String, List<IRule<?>>>();
+		
+		if(rules.containsKey(rule.getName()))
+			throw new IllegalArgumentException("Rule names must be unique: "+rule.getName());
+		
+		rules.put(rule.getName(), rule);
+		
 		List<String> events = rule.getEvents();
 		for(int i=0; i<events.size(); i++)
 		{
 			String event = events.get(i);
-			List<IRule<?>> rs = rules.get(event);
+			List<IRule<?>> rs = evrules.get(event);
 			if(rs==null)
 			{
 				rs = new ArrayList<IRule<?>>();
-				rules.put(event, rs);
+				evrules.put(event, rs);
 			}
 			rs.add(rule);
 		}
@@ -44,19 +55,27 @@ public class Rulebase implements IRulebase
 	 *  Remove a rule.
 	 *  @param rule The rule.
 	 */
-	public void removeRule(IRule<?> rule)
+	public void removeRule(String ruleid)
 	{
+		IRule<?> rule = null;
 		if(rules!=null)
+		{
+			rule = rules.remove(ruleid);
+			if(rule==null)
+				throw new RuntimeException("Rule not contained: "+ruleid);
+		}
+		
+		if(evrules!=null)
 		{
 			List<String> events = rule.getEvents();
 			for(int i=0; i<events.size(); i++)
 			{
 				String event = events.get(i);
-				List<IRule<?>> rs = rules.get(event);
+				List<IRule<?>> rs = evrules.get(event);
 				rs.remove(rule);
 				if(rs.size()==0)
 				{
-					rules.remove(event);
+					evrules.remove(event);
 				}
 			}
 		}
@@ -69,7 +88,7 @@ public class Rulebase implements IRulebase
 	 */
 	public List<IRule<?>> getRules(String event)
 	{
-		return rules!=null? rules.get(event): null;
+		return evrules!=null? evrules.get(event): null;
 	}
 	
 	/**
@@ -81,10 +100,10 @@ public class Rulebase implements IRulebase
 	{
 		IRule<?> ret = null;
 		
-		if(rules!=null)
+		if(evrules!=null)
 		{
 			// todo: optimize me and save rules additionally in rule list
-			Iterator<List<IRule<?>>> rrls = rules.values().iterator();
+			Iterator<List<IRule<?>>> rrls = evrules.values().iterator();
 			for(; rrls.hasNext() && ret==null;)
 			{
 				List<IRule<?>> rls = rrls.next(); 

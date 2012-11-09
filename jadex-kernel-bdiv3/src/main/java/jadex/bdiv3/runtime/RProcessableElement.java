@@ -1,11 +1,13 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.actions.FindApplicableCandidatesAction;
+import jadex.bdiv3.model.MProcessableElement;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import jadex.bdiv3.model.MProcessableElement;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
+import java.util.Set;
 
 /**
  * 
@@ -27,6 +29,15 @@ public abstract class RProcessableElement extends RElement
 	/** The processable element state candidate selected. */
 	public static final String	PROCESSABLEELEMENT_CANDIDATESSELECTED	= "candidatesselected";
 
+	public static Set<String> PROCESSABLEELEMENT_STATES = SUtil.createHashSet(new String[]
+	{
+		PROCESSABLEELEMENT_UNPROCESSED,
+		PROCESSABLEELEMENT_APLAVAILABLE,
+		PROCESSABLEELEMENT_METALEVELREASONING,
+		PROCESSABLEELEMENT_NOCANDIDATES,
+		PROCESSABLEELEMENT_CANDIDATESSELECTED,
+		null
+	});
 	
 	/** The pojo element. */
 	protected Object pojoelement;
@@ -47,7 +58,7 @@ public abstract class RProcessableElement extends RElement
 	{
 		super(modelelement);
 		this.pojoelement = pojoelement;
-		this.state = PROCESSABLEELEMENT_UNPROCESSED;
+//		this.state = PROCESSABLEELEMENT_UNPROCESSED;
 	}
 
 	/**
@@ -135,21 +146,52 @@ public abstract class RProcessableElement extends RElement
 	{
 		this.state = state;
 	}
+	
+	/**
+	 * 
+	 */
+	public void setState(IInternalAccess ia, String state)
+	{
+		if(!PROCESSABLEELEMENT_STATES.contains(state))
+			throw new IllegalArgumentException("Invalid state: "+state);
+			
+		setState(state);
+		
+		if(PROCESSABLEELEMENT_UNPROCESSED.equals(state))
+		{
+			ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this));
+		}
+//		else if(PROCESSABLEELEMENT_APLAVAILABLE.equals(state))
+//		{
+//			ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+//		}
+//		else if(PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(state))
+//		{
+//			ia.getExternalAccess().scheduleStep(new ExecutePlanStepAction(this, rplan));
+//		}
+//		else if(PROCESSABLEELEMENT_NOCANDIDATES.equals(state))
+//		{
+//			
+//		}
+//		PROCESSABLEELEMENT_METALEVELREASONING
+		
+	}
 
 	/**
 	 * 
 	 */
 	public void planFinished(IInternalAccess ia, RPlan rplan)
 	{
-		// potentially remove candidate
-		addTriedPlan(rplan.getCandidate());
-		apl.planFinished(rplan);
-		// create reasoning step depending on the processable element type
-		ia.getExternalAccess().scheduleStep(createReasoningStep(ia));
+		if(rplan!=null)
+		{
+			// potentially remove candidate
+			addTriedPlan(rplan.getCandidate());
+			apl.planFinished(rplan);
+		}
 	}
 	
-	/**
-	 * 
-	 */
-	public abstract IComponentStep<Void> createReasoningStep(IInternalAccess ia);
+//	/**
+//	 * 
+//	 */
+//	public abstract void reason(IInternalAccess ia);
 }

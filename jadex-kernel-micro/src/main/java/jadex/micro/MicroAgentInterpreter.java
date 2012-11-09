@@ -5,6 +5,7 @@ import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -490,8 +491,20 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				// Correct to execute them in try catch?!
 				try
 				{
-					IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
-					FutureFunctionality.connectDelegationFuture(future, res);
+					boolean done = false;
+					if(step[0] instanceof IConditionalComponentStep)
+					{
+						if(!((IConditionalComponentStep<?>)step[0]).isValid())
+						{
+							future.setException(new RuntimeException("Step invalid: "+step[0]));
+							done = true;
+						}
+					}
+					if(!done)
+					{
+						IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
+						FutureFunctionality.connectDelegationFuture(future, res);
+					}
 				}
 				catch(RuntimeException e)
 				{

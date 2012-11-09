@@ -4,7 +4,9 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.APL;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.RCapability;
+import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RProcessableElement;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -12,7 +14,7 @@ import jadex.commons.future.IFuture;
 /**
  * 
  */
-public class FindApplicableCandidatesAction implements IAction<Void>
+public class FindApplicableCandidatesAction implements IConditionalComponentStep<Void>
 {
 	/** The processable element. */
 	protected RProcessableElement element;
@@ -29,9 +31,21 @@ public class FindApplicableCandidatesAction implements IAction<Void>
 	 *  Test if the action is valid.
 	 *  @return True, if action is valid.
 	 */
-	public IFuture<Boolean> isValid()
+	public boolean isValid()
 	{
-		return new Future<Boolean>(true);
+		boolean ret = true;
+		
+		if(element instanceof RGoal)
+		{
+			RGoal rgoal = (RGoal)element;
+			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+		}
+			
+		if(!ret)
+			System.out.println("not valid: "+this+" "+element);
+		
+		return ret;
 	}
 	
 	/**
@@ -49,17 +63,15 @@ public class FindApplicableCandidatesAction implements IAction<Void>
 		if(apl.isEmpty())
 		{
 			element.setState(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES);
-			ia.getExternalAccess().scheduleStep(element.createReasoningStep(ia));
+			element.planFinished(ia, null);
+//			element.reason(ia);
 		}
 		else
 		{
 			element.setState(RProcessableElement.PROCESSABLEELEMENT_APLAVAILABLE);
-			IAction<Void> action = new SelectCandidatesAction(element);
-			ia.getExternalAccess().scheduleStep(action);
+			ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
 		}
 		
 		return IFuture.DONE;
 	}
-	
-	
 }

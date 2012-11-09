@@ -18,7 +18,7 @@ public interface IRulebase
 	 *  Remove a rule.
 	 *  @param rule The rule.
 	 */
-	public void removeRule(IRule<?> rule);
+	public void removeRule(String ruleid);
 	
 	/**
 	 *  Get all rules that are relevant for an event type.

@@ -1777,9 +1777,9 @@ public class SUtil
 	 * @param values The values.
 	 * @return The map.
 	 */
-	public static Set<Object> createHashSet(Object[] values)
+	public static <T> Set<T> createHashSet(T[] values)
 	{
-		Set<Object> ret = new HashSet<Object>();
+		Set<T> ret = new HashSet<T>();
 		for(int i = 0; i < values.length; i++)
 		{
 			ret.add(values[i]);
