@@ -1,14 +1,7 @@
 package jadex.bdiv3.runtime;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.DropGoalAction;
-import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
@@ -16,11 +9,18 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -98,6 +98,10 @@ public class RGoal extends RProcessableElement
 	
 	/** The observing rules. */
 	protected List<String> rulenames;
+	
+	/** The goal listeners. */
+	protected List<IResultListener<Void>> listeners;
+
 	
 	/**
 	 *  Create a new rgoal. 
@@ -272,7 +276,20 @@ public class RGoal extends RProcessableElement
 		}
 		else if(GOALLIFECYCLESTATE_DROPPED.equals(lifecyclestate))
 		{
-			
+			if(listeners!=null)
+			{
+				for(IResultListener<Void> lis: listeners)
+				{
+					if(isSucceeded())
+					{
+						lis.resultAvailable(null);
+					}
+					else if(isFailed())
+					{
+						lis.exceptionOccurred(exception);
+					}
+				}
+			}
 		}
 	}
 	
@@ -332,6 +349,14 @@ public class RGoal extends RProcessableElement
 	{
 		return RGoal.GOALPROCESSINGSTATE_FAILED.equals(processingstate);
 	}
+	
+	/**
+	 * 
+	 */
+	public boolean isFinished()
+	{
+		return isSucceeded() || isFailed();
+	}
 
 	/**
 	 * 
@@ -365,7 +390,7 @@ public class RGoal extends RProcessableElement
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
-						System.out.println("Goal succeeded: "+this);
+						System.out.println("Goal target triggered: "+RGoal.this);
 //						rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
 						setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
 						
@@ -399,7 +424,7 @@ public class RGoal extends RProcessableElement
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
-						System.out.println("Goal dropping triggered: "+this);
+						System.out.println("Goal dropping triggered: "+RGoal.this);
 //						rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
 						setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_FAILED);
 						return IFuture.DONE;
@@ -440,56 +465,45 @@ public class RGoal extends RProcessableElement
 			}
 		}
 	}
-	
-//	/**
-//	 * 
-//	 */
-//	public void reason(IInternalAccess ia)
-//	{
-//		ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-////				MGoal mgoal = (MGoal)getModelElement();
-//				
-//				if(GOALLIFECYCLESTATE_ADOPTED.equals(getLifecycleState()))
-//				{
-//					setLifecycleState(GOALLIFECYCLESTATE_ACTIVE);
-//				}
-//				
-//				// If active the processing state becomes interesting
-//				if(GOALLIFECYCLESTATE_ACTIVE.equals(getLifecycleState()))
-//				{
-//					if(GOALPROCESSINGSTATE_IDLE.equals(getProcessingState()))
-//					{
-//						
-//					}
-//					else if(GOALPROCESSINGSTATE_INPROCESS.equals(getProcessingState()))
-//					{
-//						
-//					}
-//					else if(GOALPROCESSINGSTATE_PAUSED.equals(getProcessingState()))
-//					{
-//						
-//					}
-//					else if(GOALPROCESSINGSTATE_FAILED.equals(getProcessingState()))
-//					{
-//						
-//					}
-//					else if(GOALPROCESSINGSTATE_SUCCEEDED.equals(getProcessingState()))
-//					{
-//						
-//					}
-//					ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(RGoal.this));
-//				}
-//				else
-//				{
-//					System.out.println("goal state: "+getLifecycleState());
-//				}
-//				
-//				return IFuture.DONE;
-//			}
-//		});
-//	}
 
+	/**
+	 * 
+	 */
+	public void addGoalListener(IResultListener<Void> listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList<IResultListener<Void>>();
+		
+		if(isSucceeded())
+		{
+			listener.resultAvailable(null);
+		}
+		else if(isFailed())
+		{
+			listener.exceptionOccurred(exception);
+		}
+		else
+		{
+			listeners.add(listener);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeGoalListener(IResultListener<Void> listener)
+	{
+		if(listeners!=null)
+			listeners.remove(listener);
+	}
+	
+	/** 
+	 * 
+	 */
+	public String toString()
+	{
+		return "RGoal(lifecyclestate=" + lifecyclestate + ", processingstate="
+			+ processingstate + ", state=" + state + ", id=" + id + ")";
+	}
+	
 }

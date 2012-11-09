@@ -2,7 +2,6 @@ package jadex.rules.eca;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -100,22 +99,9 @@ public class Rulebase implements IRulebase
 	{
 		IRule<?> ret = null;
 		
-		if(evrules!=null)
+		if(rules!=null)
 		{
-			// todo: optimize me and save rules additionally in rule list
-			Iterator<List<IRule<?>>> rrls = evrules.values().iterator();
-			for(; rrls.hasNext() && ret==null;)
-			{
-				List<IRule<?>> rls = rrls.next(); 
-				for(int i=0; i<rls.size() && ret==null; i++)
-				{
-					IRule<?> rl = rls.get(i);
-					if(rl.getName().equals(name))
-					{
-						ret = rl;
-					}
-				}
-			}
+			ret = rules.get(name);
 		}
 		
 		return ret;

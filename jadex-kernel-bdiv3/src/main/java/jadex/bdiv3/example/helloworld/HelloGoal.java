@@ -45,7 +45,7 @@ public class HelloGoal
 	{
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)context;
 		HelloWorldBDI agent = (HelloWorldBDI)context;
-		agent.getAgent().adoptGoal(new HelloGoal((String)event.getContent()));
+		agent.getAgent().dispatchGoalAndWait(new HelloGoal((String)event.getContent()));
 	}
 	
 //	@GoalContext / @GoalDrop / @GoalRecur

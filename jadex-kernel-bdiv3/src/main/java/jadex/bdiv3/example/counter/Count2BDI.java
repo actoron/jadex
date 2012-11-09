@@ -47,7 +47,7 @@ public class Count2BDI
 	@AgentBody
 	public void body()
 	{
-		agent.adoptGoal(new Count2Goal(10));
+		agent.dispatchGoalAndWait(new Count2Goal(10));
 		System.out.println("body end: "+getClass().getName());
 	}
 	

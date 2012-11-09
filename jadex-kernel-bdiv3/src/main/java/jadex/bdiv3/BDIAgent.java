@@ -1,31 +1,21 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.actions.AdoptGoalAction;
-import jadex.bdiv3.annotation.GoalDropCondition;
-import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.RCapability;
 import jadex.bdiv3.runtime.RGoal;
-import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
-import jadex.rules.eca.IAction;
-import jadex.rules.eca.IEvent;
-import jadex.rules.eca.IRule;
-import jadex.rules.eca.MethodCondition;
-import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Base class for application agents.
@@ -41,12 +31,32 @@ public class BDIAgent extends MicroAgent
 		return ((BDIAgentInterpreter)getInterpreter()).getCapability();
 	}
 	
+//	/**
+//	 *  Adopt a new goal.
+//	 *  @param goal The goal.
+//	 */
+//	public void adoptGoal(final Object goal)
+//	{
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+//		ip.getRuleSystem().observeObject(goal);
+//
+//		BDIModel bdim = ip.getBDIModel();
+//		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass());
+//		if(mgoal==null)
+//			throw new RuntimeException("Unknown goal type: "+goal);
+//		final RGoal rgoal = new RGoal(mgoal, goal);
+//
+////		System.out.println("adopt goal");
+//		ip.scheduleStep(new AdoptGoalAction(rgoal));
+//	}
+	
 	/**
-	 *  Adopt a new goal.
-	 *  @param goal The goal.
+	 * 
 	 */
-	public void adoptGoal(final Object goal)
+	public <T> IFuture<T> dispatchGoalAndWait(final T goal)
 	{
+		final Future<T> ret = new Future<T>();
+		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		ip.getRuleSystem().observeObject(goal);
 
@@ -55,9 +65,18 @@ public class BDIAgent extends MicroAgent
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(mgoal, goal);
+		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ret.setResult(goal);
+			}
+		});
 
 //		System.out.println("adopt goal");
 		ip.scheduleStep(new AdoptGoalAction(rgoal));
+	
+		return ret;
 	}
 		
 	/**
