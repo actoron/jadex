@@ -4,6 +4,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 import jadex.commons.beans.BeanInfo;
 import jadex.commons.beans.IntrospectionException;
 import jadex.commons.beans.Introspector;
@@ -157,6 +158,18 @@ public class SObjectInspector
 			{
 			}
 		}
+		
+		// Hack. 
+//		if(ret==null)
+//		{
+//			try
+//			{
+//				ret = SJavaParser.parseExpression(name, null, null);
+//			}
+//			catch(Exception e)
+//			{
+//			}
+//		}
 		
 		if(ret instanceof IParsedExpression)
 		{

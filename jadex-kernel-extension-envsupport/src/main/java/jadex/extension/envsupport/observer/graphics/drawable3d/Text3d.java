@@ -1,8 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
-import jadex.extension.envsupport.observer.graphics.IViewport;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.javaparser.IParsedExpression;
 
 /**

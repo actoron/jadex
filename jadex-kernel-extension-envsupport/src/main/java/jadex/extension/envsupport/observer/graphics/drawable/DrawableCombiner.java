@@ -153,6 +153,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		if(prop instanceof String)
 		{
 			String name = (String)prop;
+				
 			ret = getProperty(name);
 			if(ret instanceof IParsedExpression)
 			{
