@@ -149,23 +149,57 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 	 */
 	public Object getBoundValue(Object obj, Object prop, IViewport viewport)
 	{
+//		Object ret = prop;
+//		if(prop instanceof String)
+//		{
+//			String name = (String)prop;
+//				
+//			ret = getProperty(name);
+//			if(ret instanceof IParsedExpression)
+//			{
+//				SimpleValueFetcher fetcher = new SimpleValueFetcher(viewport.getPerspective().getObserverCenter().getSpace().getFetcher());
+//				fetcher.setValue("$drawable", this);
+//				fetcher.setValue("$object", obj);
+//				fetcher.setValue("$perspective", viewport.getPerspective());
+//				ret = ((IParsedExpression)ret).getValue(fetcher);
+//			}
+//			
+//			if(ret==null)
+//				ret = SObjectInspector.getProperty(obj, name);
+//		}
+//		return ret;
+		
 		Object ret = prop;
-		if(prop instanceof String)
+		
+		if(prop instanceof IParsedExpression)
 		{
-			String name = (String)prop;
-				
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(viewport.getPerspective().getObserverCenter().getSpace().getFetcher());
+			fetcher.setValue("$drawable", this);
+			fetcher.setValue("$object", obj);
+			fetcher.setValue("$perspective", viewport.getPerspective());
+			
+			if("rotate45".equals(prop))
+			{
+				System.out.println("fhhjug");
+			}
+			
+			String name = ((IParsedExpression)prop).getExpressionText();//(String)prop;
 			ret = getProperty(name);
+			
 			if(ret instanceof IParsedExpression)
 			{
-				SimpleValueFetcher fetcher = new SimpleValueFetcher(viewport.getPerspective().getObserverCenter().getSpace().getFetcher());
-				fetcher.setValue("$drawable", this);
-				fetcher.setValue("$object", obj);
-				fetcher.setValue("$perspective", viewport.getPerspective());
 				ret = ((IParsedExpression)ret).getValue(fetcher);
 			}
 			
 			if(ret==null)
+			{
+				ret = ((IParsedExpression)prop).getValue(fetcher);
+			}
+			
+			if(ret==null)
+			{
 				ret = SObjectInspector.getProperty(obj, name);
+			}
 		}
 		return ret;
 	}	
