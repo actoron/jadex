@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import java.util.Map;
 
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
@@ -83,6 +84,12 @@ public interface IExternalAccess //extends IRemotable
 	 *  @return The children.
 	 */
 	public IFuture<IComponentIdentifier[]> getChildren();
+	
+	/**
+	 *  Create a subcomponent.
+	 *  @param component The instance info.
+	 */
+	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component);
 	
 	/**
 	 *  Kill the component.

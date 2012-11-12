@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
@@ -53,7 +54,6 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="startabletype">
-				<!-- When adding something here, also add to BDI schema! -->
 				<xs:all>
 					<xs:element name="imports" type="imports" minOccurs="0"/>
 					<xs:element name="arguments" type="arguments" minOccurs="0"/>
@@ -223,7 +223,6 @@ In this section, specifications for extensions as required
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="startabletype">
-				<!-- When adding something here, also add to BDI schema! -->
 				<xs:all>
 					<xs:element name="arguments" type="configarguments" minOccurs="0"/>
 					<xs:element name="components" type="configcomponents" minOccurs="0"/>
@@ -424,45 +423,36 @@ In this section, specifications for extensions as required
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="interceptor" type="jadex:interceptortype"
-				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="interceptor" type="jadex:interceptortype" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="creationinfo" type="jadex:creationinfo" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="optional" />
-		<xs:attribute name="scope" use="optional"
-			default="application">
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="scope" use="optional" default="application">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="local" />
-					<xs:enumeration value="component" />
-					<xs:enumeration value="application" />
-					<xs:enumeration value="platform" />
-					<xs:enumeration value="global" />
-					<xs:enumeration value="upwards" />
-					<xs:enumeration value="parent" />
+					<xs:enumeration value="local"/>
+					<xs:enumeration value="component"/>
+					<xs:enumeration value="application"/>
+					<xs:enumeration value="platform"/>
+					<xs:enumeration value="global"/>
+					<xs:enumeration value="upwards"/>
+					<xs:enumeration value="parent"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="componentname" type="xs:string"
-			use="optional" />
-		<xs:attribute name="componenttype" type="xs:string"
-			use="optional" />
-		<xs:attribute name="dynamic" type="xs:boolean" use="optional"
-			default="false" />
-		<xs:attribute name="create" type="xs:boolean" use="optional"
-			default="false" />
-		<xs:attribute name="recover" type="xs:boolean" use="optional"
-			default="false" />
-		<xs:attribute name="proxytype" use="optional"
-			default="decoupled">
+		<xs:attribute name="componentname" type="xs:string" use="optional"/>
+		<xs:attribute name="componenttype" type="xs:string" use="optional"/>
+		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="create" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="recover" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="proxytype" use="optional" default="decoupled">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="decoupled" />
-					<xs:enumeration value="raw" />
+					<xs:enumeration value="decoupled"/>
+					<xs:enumeration value="raw"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="creationtype" type="xs:string"></xs:attribute>
-		<xs:attribute name="creationname" type="xs:string"></xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="describabletype"/>
 	<xs:complexType name="requiredserviceref">
@@ -507,5 +497,27 @@ In this section, specifications for extensions as required
 		<xs:attribute name="publishtype" type="xs:string" use="optional" default='"ws"'/>
 		<xs:attribute name="publishid" type="xs:string" use="required"/>
 		<xs:attribute name="mapping" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="creationinfo">
+		<xs:complexContent>
+			<xs:restriction base="jadex:component">
+				<xs:sequence>
+					<xs:element name="arguments" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Argument values to be supplied, when creating the agent.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence minOccurs="0">
+								<xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
 	</xs:complexType>
 </xs:schema>

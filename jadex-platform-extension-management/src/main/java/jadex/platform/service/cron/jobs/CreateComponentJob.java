@@ -6,6 +6,7 @@ import jadex.bridge.service.types.cron.CronJob;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
+import jadex.platform.service.cron.TimePatternFilter;
 
 import java.util.Collection;
 
@@ -26,34 +27,34 @@ public class CreateComponentJob extends CronJob<IComponentIdentifier>
 	/**
 	 *  Create a new CreateComponentJob. 
 	 */
-	public CreateComponentJob(IFilter<Long> filter, String model)
+	public CreateComponentJob(String pattern, String model)
 	{
-		super(filter, new CronCreateCommand(null, model, null, null));
+		super(pattern, new TimePatternFilter(pattern), new CronCreateCommand(null, model, null, null));
 	}
 	
 	/**
 	 *  Create a new CreateComponentJob. 
 	 */
-	public CreateComponentJob(IFilter<Long> filter, String name, String model)
+	public CreateComponentJob(String pattern, String name, String model)
 	{
-		super(filter, new CronCreateCommand(name, model, null, null));
+		super(pattern, new TimePatternFilter(pattern), new CronCreateCommand(name, model, null, null));
 	}
 	
 	/**
 	 *  Create a new CreateComponentJob. 
 	 */
-	public CreateComponentJob(IFilter<Long> filter, String name, String model, CreationInfo ci)
+	public CreateComponentJob(String pattern, String name, String model, CreationInfo ci)
 	{
-		super(filter, new CronCreateCommand(name, model, ci, null));
+		super(pattern, new TimePatternFilter(pattern), new CronCreateCommand(name, model, ci, null));
 	}
 	
 	/**
 	 *  Create a new CreateComponentJob. 
 	 */
-	public CreateComponentJob(IFilter<Long> filter, String name, String model, CreationInfo ci,
+	public CreateComponentJob(String pattern, IFilter<Long> filter, String name, String model, CreationInfo ci,
 		IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
-		super(filter, new CronCreateCommand(name, model, ci, resultlistener));
+		super(pattern, filter, new CronCreateCommand(name, model, ci, resultlistener));
 	}
 }
 

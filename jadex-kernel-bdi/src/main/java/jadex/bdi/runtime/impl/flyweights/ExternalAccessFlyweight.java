@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.base.Starter;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -7,6 +8,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -185,6 +187,45 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	public IFuture getChildren()
 	{
 		return getInterpreter().getAgentAdapter().getChildrenIdentifiers();
+	}
+	
+	/**
+	 *  Create a subcomponent.
+	 *  @param component The instance info.
+	 */
+	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						getInterpreter().createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getAgentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			getInterpreter().createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+		}
+		
+		return ret;
 	}
 	
 	/**

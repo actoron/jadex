@@ -20,6 +20,9 @@ public class CronJob<T>
 	/** The id. */
 	protected String id;
 	
+	/** The time pattern. */
+	protected String pattern;
+	
 	/** The filter. */
 	protected IFilter<Long> filter;
 	
@@ -38,14 +41,33 @@ public class CronJob<T>
 	/**
 	 *  Create a new cron job.
 	 */
-	public CronJob(IFilter<Long> filter, IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command)
+	public CronJob(String pattern, IFilter<Long> filter, IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command)
 	{
 		this.id = SUtil.createUniqueId("cronjob");
+		this.pattern = pattern;
 		this.filter = filter;
 		this.command = command;
 	}
 
 	//-------- methods --------
+	
+	/**
+	 *  Get the pattern.
+	 *  @return The pattern.
+	 */
+	public String getPattern()
+	{
+		return pattern;
+	}
+
+	/**
+	 *  Set the pattern.
+	 *  @param pattern The pattern to set.
+	 */
+	public void setPattern(String pattern)
+	{
+		this.pattern = pattern;
+	}
 	
 	/**
 	 *  Get the id.

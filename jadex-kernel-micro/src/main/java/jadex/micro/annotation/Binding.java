@@ -75,16 +75,20 @@ public @interface Binding
 //	 */
 //	public String componentfilename() default "";
 
-	/**
-	 *  The creation name.
-	 */
-	public String creationname() default "";
-
+//	/**
+//	 *  The creation name.
+//	 */
+//	public String creationname() default "";
+//	
+//	/**
+//	 *  The creation type.
+//	 */
+//	public String creationtype() default "";
 	
 	/**
-	 *  The creation type.
+	 *  The creation info (cannot use @Component as no cycles are allowed in annotations). 
 	 */
-	public String creationtype() default "";
+	public CreationInfo creationinfo() default @CreationInfo;
 	
 	/**
 	 *  The search scope.

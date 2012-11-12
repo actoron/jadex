@@ -358,6 +358,13 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("number"))
 			}, null)));
 		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "creationinfo")), new ObjectInfo(ComponentInstanceInfo.class),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("type", "typeName")),
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+				new AttributeInfo(new AccessInfo("number"))
+			}, null)));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
@@ -393,12 +400,15 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "binding")}), new AccessInfo(new QName(uri, "binding"), "defaultBinding")),
 			}), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "binding")), new ObjectInfo(RequiredServiceBinding.class), 
-			new MappingInfo(null, new AttributeInfo[]{
+			new MappingInfo(null, null, null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
-				new AttributeInfo(new AccessInfo("creationname", "creationName")),
-				new AttributeInfo(new AccessInfo("creationtype", "creationType")),
-			})));
+//				new AttributeInfo(new AccessInfo("creationname", "creationName")),
+//				new AttributeInfo(new AccessInfo("creationtype", "creationType")),
+			},
+			new SubobjectInfo[]{
+				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "creationinfo")}), new AccessInfo(new QName(uri, "creationinfo"), "creationInfo"))}
+			)));
 		
 //		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
 //			new MappingInfo(null, null, "value", new AttributeInfo[]{

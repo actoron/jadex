@@ -2,10 +2,15 @@ package jadex.platform.service.cron;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -13,10 +18,16 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,11 +53,24 @@ import java.util.Map;
  *  - combined patterns: p1|p2|p3 
  */
 @Agent
+@Arguments(
+{
+	@Argument(name="realtime", clazz=boolean.class, defaultvalue="true", description="Realtime means using system clock, otherwise Jadex clock is used (allows for simulation)"),
+	@Argument(name="lookahead", clazz=long.class, defaultvalue="1000L*60*60*24*365*2", description="Maximum lookahead for the next timepoint in time patterns (default=2 years)")
+})
 @Service
 @ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
+@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 public class CronAgent<T> implements ICronService<T>
 {
 	//-------- attributes --------
+
+	/** Argument if realtime should be used. */
+	@AgentArgument
+	protected boolean realtime;
+	
+	@AgentArgument
+	protected long lookahead;
 	
 	/** The cron jobs (id -> job). */
 	protected Map<String, Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>> jobs;
@@ -63,58 +87,69 @@ public class CronAgent<T> implements ICronService<T>
 	@AgentBody
 	public void body()
 	{
-		IComponentStep<Void> check = new IComponentStep<Void>()
+		if(realtime)
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			IComponentStep<Void> check = new IComponentStep<Void>()
 			{
-				// check pattern
-				long time = System.currentTimeMillis();
-				
-				if(jobs!=null)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>[] cjs = (Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>[])jobs.values()
-						.toArray(new Tuple2[jobs.size()]);
-					for(final Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>> tup: cjs)
+					// check pattern
+					long time = System.currentTimeMillis();
+					
+					if(jobs!=null)
 					{
-						if(tup.getFirstEntity().getFilter().filter(time))
+						Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>[] cjs = (Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>[])jobs.values()
+							.toArray(new Tuple2[jobs.size()]);
+						for(final Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>> tup: cjs)
 						{
-							// schedule job on subagent?!
-							tup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)))
-								.addResultListener(new IResultListener<T>()
+							if(tup.getFirstEntity().getFilter().filter(time))
 							{
-								public void resultAvailable(T result)
+								// schedule job on subagent?!
+								tup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)))
+									.addResultListener(new IResultListener<T>()
 								{
-									tup.getSecondEntity().addIntermediateResultIfUndone(result);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									// or ignore?
-									tup.getSecondEntity().setExceptionIfUndone(exception);
-								}
-							});
+									public void resultAvailable(T result)
+									{
+										tup.getSecondEntity().addIntermediateResultIfUndone(result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										// or ignore?
+										tup.getSecondEntity().setExceptionIfUndone(exception);
+									}
+								});
+							}
 						}
 					}
+					
+					// wait
+					long cur = System.currentTimeMillis();
+					long min = ((cur/60000)+1)*60000; // next minute
+					long sleep = (min - cur);
+					if(sleep>0)
+					{
+						agent.waitFor(sleep, this);
+					}
+					else
+					{
+						agent.scheduleStep(this);
+					}
+					
+					return IFuture.DONE;
 				}
-				
-				// wait
-				long cur = System.currentTimeMillis();
-				long min = ((cur/60000)+1)*60000; // next minute
-				long sleep = (min - cur);
-				if(sleep>0)
-				{
-					agent.waitFor(sleep, this);
-				}
-				else
-				{
-					agent.scheduleStep(this);
-				}
-				
-				return IFuture.DONE;
-			}
-		};
+			};
+			
+			agent.scheduleStep(check);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void startRealtimeCheck()
+	{
 		
-		agent.scheduleStep(check);
 	}
 	
 	/**
@@ -144,6 +179,55 @@ public class CronAgent<T> implements ICronService<T>
 					jobs.remove(job.getId());
 				}
 			});
+			
+			// create check behavior and determine next trigger timepoint for job with lookahead
+			if(!realtime)
+			{
+				IComponentStep<Void> check = new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						// quitting jobs that have been removed
+						if(jobs.containsKey(job.getId()))
+						{
+							final IComponentStep<Void> self = this;
+							IFuture<IClockService> fut = agent.getRequiredService("clockser");
+							fut.addResultListener(new DefaultResultListener<IClockService>()
+							{
+								public void resultAvailable(IClockService clockser)
+								{
+									long start = clockser.getTime();
+									long end = start+lookahead;
+									
+									TimePatternFilter tpf = null;
+									if(job.getFilter() instanceof TimePatternFilter)
+									{
+										tpf = (TimePatternFilter)job.getFilter();
+									}
+									else
+									{
+										tpf = new TimePatternFilter(job.getPattern());
+									}
+									
+									try
+									{
+										long next = tpf.getNextTimepoint(start, end);
+										long wait = next-start;
+										agent.waitFor(wait, self);
+									}
+									catch(Exception e)
+									{
+										System.out.println("No next timepoint found for: "+tpf.getPattern()+" with lookahead: "+lookahead);
+									}
+								}
+							});
+						}
+						
+						return IFuture.DONE;
+					}
+				};
+				agent.scheduleStep(check);
+			}
 		}
 		
 		return ret;

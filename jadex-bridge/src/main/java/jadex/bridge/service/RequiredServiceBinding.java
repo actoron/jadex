@@ -3,6 +3,7 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
@@ -22,11 +23,14 @@ public class RequiredServiceBinding
 	/** The component type, i.e. the model name used for searching. */
 	protected String componenttype;
 
-	/** The component creation name. */
-	protected String creationname;
+	/** Information about the component to create. */
+	protected ComponentInstanceInfo creationinfo;
+	
+//	/** The component creation name. */
+//	protected String creationname;
 
-	/** The component creation type. */
-	protected String creationtype;
+//	/** The component creation type. */
+//	protected String creationtype;
 	
 	/** The component filename. */
 //	protected String componentfilename;
@@ -72,7 +76,7 @@ public class RequiredServiceBinding
 	public RequiredServiceBinding(String name, String scope, boolean dynamic)
 	{
 		this(name, null, null, dynamic, scope, false, false, null, 
-			BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
+			BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null);
 	}
 
 	/**
@@ -80,7 +84,7 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String componentname,
 		String componenttype, boolean dynamic, String scope, boolean create, boolean recover,
-		UnparsedExpression[] interceptors, String proxytype, String creationtype, String creationname)
+		UnparsedExpression[] interceptors, String proxytype, ComponentInstanceInfo component)//String creationtype, String creationname)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -90,8 +94,9 @@ public class RequiredServiceBinding
 		this.create = create;
 		this.recover = recover;
 		this.proxytype = proxytype;
-		this.creationtype = creationtype;
-		this.creationname = creationname;
+		this.creationinfo = component;
+//		this.creationtype = creationtype;
+//		this.creationname = creationname;
 		if(interceptors!=null)
 		{
 			for(int i=0; i<interceptors.length; i++)
@@ -109,11 +114,29 @@ public class RequiredServiceBinding
 	{
 		this(orig.getName(), orig.getComponentName(), orig.getComponentType(), 
 			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover(), 
-			orig.getInterceptors(), orig.getProxytype(), orig.getCreationType(), orig.getCreationName());
+			orig.getInterceptors(), orig.getProxytype(), orig.getCreationInfo());//orig.getCreationType(), orig.getCreationName());
 	}
 
 	//-------- methods --------
 	
+	/**
+	 *  Get the creationinfo.
+	 *  @return The creationinfo.
+	 */
+	public ComponentInstanceInfo getCreationInfo()
+	{
+		return creationinfo;
+	}
+
+	/**
+	 *  Set the creationinfo.
+	 *  @param creationinfo The creationinfo to set.
+	 */
+	public void setCreationInfo(ComponentInstanceInfo creationinfo)
+	{
+		this.creationinfo = creationinfo;
+	}
+
 	/**
 	 *  Get the name.
 	 *  @return the name.
@@ -122,7 +145,7 @@ public class RequiredServiceBinding
 	{
 		return name;
 	}
-
+	
 	/**
 	 *  Set the name.
 	 *  @param name The name to set.
@@ -288,41 +311,41 @@ public class RequiredServiceBinding
 		this.proxytype = proxytype;
 	}
 	
-	/**
-	 *  Get the creationname.
-	 *  @return The creationname.
-	 */
-	public String getCreationName()
-	{
-		return creationname;
-	}
-
-	/**
-	 *  Set the creationname.
-	 *  @param creationname The creationname to set.
-	 */
-	public void setCreationName(String creationname)
-	{
-		this.creationname = creationname;
-	}
-
-	/**
-	 *  Get the creationtype.
-	 *  @return The creationtype.
-	 */
-	public String getCreationType()
-	{
-		return creationtype;
-	}
-
-	/**
-	 *  Set the creationtype.
-	 *  @param creationtype The creationtype to set.
-	 */
-	public void setCreationType(String creationtype)
-	{
-		this.creationtype = creationtype;
-	}
+//	/**
+//	 *  Get the creationname.
+//	 *  @return The creationname.
+//	 */
+//	public String getCreationName()
+//	{
+//		return creationname;
+//	}
+//
+//	/**
+//	 *  Set the creationname.
+//	 *  @param creationname The creationname to set.
+//	 */
+//	public void setCreationName(String creationname)
+//	{
+//		this.creationname = creationname;
+//	}
+//
+//	/**
+//	 *  Get the creationtype.
+//	 *  @return The creationtype.
+//	 */
+//	public String getCreationType()
+//	{
+//		return creationtype;
+//	}
+//
+//	/**
+//	 *  Set the creationtype.
+//	 *  @param creationtype The creationtype to set.
+//	 */
+//	public void setCreationType(String creationtype)
+//	{
+//		this.creationtype = creationtype;
+//	}
 
 	/**
 	 *  Get the string representation.
@@ -331,7 +354,8 @@ public class RequiredServiceBinding
 	{
 		return " scope=" + scope + ", dynamic="+ dynamic + ", create=" + create + ", recover=" 
 			+ recover+ ", componentname=" + componentname + ", componenttype="+ componenttype
-			+" , creationtype="+creationtype+" , creationname="+creationname;
+			+" , creationcomp="+creationinfo;//+" , creationname="+creationname;
+//			+" , creationtype="+creationtype+" , creationname="+creationname;
 	}
 
 	

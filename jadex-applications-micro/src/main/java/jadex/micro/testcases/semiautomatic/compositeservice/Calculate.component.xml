@@ -19,7 +19,9 @@
 	<services>
 		<providedservice class="IAddService">
 			<implementation>
-				<binding componentname="calculator" componenttype="Calculator" create="true"/>		
+				<binding componentname="calculator" create="true">
+					<creationinfo type="Calculator"/>
+				</binding>		
 			</implementation>
 		</providedservice>
 	</services>

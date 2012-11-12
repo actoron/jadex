@@ -2,13 +2,9 @@ package jadex.platform.service.bpmnstarter;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.ecarules.IRuleService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -20,6 +16,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -31,8 +28,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javassist.compiler.ProceedHandler;
-
 /**
  *  Agent that tests the rule and timer monitoring of initial events in bpmn processes.
  */
@@ -41,7 +36,7 @@ import javassist.compiler.ProceedHandler;
 	@RequiredService(name="libs", type=ILibraryService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="mons", type=IMonitoringStarterService.class, 
-		binding=@Binding(create=true, creationtype="monagent")),
+		binding=@Binding(create=true, creationinfo=@CreationInfo(type="monagent"))),
 	@RequiredService(name="rules", type=IRuleService.class)
 })
 @ComponentTypes(@ComponentType(name="monagent", filename="jadex/platform/service/bpmnstarter/MonitoringStarterAgent.class"))

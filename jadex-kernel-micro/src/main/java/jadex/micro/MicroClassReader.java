@@ -36,6 +36,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
@@ -585,41 +586,7 @@ public class MicroClassReader
 						Component[] comps = configs[i].components();
 						for(int j=0; j<comps.length; j++)
 						{
-							ComponentInstanceInfo comp = new ComponentInstanceInfo();
-							
-							comp.setSuspend(comps[j].suspend());
-							comp.setMaster(comps[j].master());
-							comp.setDaemon(comps[j].daemon());
-							comp.setAutoShutdown(comps[j].autoshutdown());
-							
-							if(comps[j].name().length()>0)
-								comp.setName(comps[j].name());
-							if(comps[j].type().length()>0)
-								comp.setTypeName(comps[j].type());
-							if(comps[j].configuration().length()>0)
-								comp.setConfiguration(comps[j].configuration());
-							if(comps[j].number().length()>0)
-								comp.setNumber(comps[j].number());
-							
-							NameValue[] args = comps[j].arguments();
-							if(args.length>0)
-							{
-								UnparsedExpression[] exps = createUnparsedExpressions(args);
-								comp.setArguments(exps);
-							}
-							
-							Binding[] binds = comps[j].bindings();
-							if(binds.length>0)
-							{
-								RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
-								for(int k=0; k<binds.length; k++)
-								{
-									bds[k] = createBinding(binds[k]);
-								}
-								comp.setBindings(bds);
-							}
-							
-							configinfo.addComponentInstance(comp);
+							configinfo.addComponentInstance(createComponentInstanceInfo(comps[j]));
 						}
 					}
 				}
@@ -744,7 +711,80 @@ public class MicroClassReader
 		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
 			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
-			bd.proxytype(), bd.creationtype().length()==0? null: bd.creationtype(), bd.creationname().length()==0? null: bd.creationname());
+			bd.proxytype(), bd.creationinfo().type().length()>0? createComponentInstanceInfo(bd.creationinfo()): null);
+	}
+	
+	/**
+	 *  Create component instance info from component annotation.
+	 */
+	protected ComponentInstanceInfo createComponentInstanceInfo(Component comp)
+	{
+		ComponentInstanceInfo ret = new ComponentInstanceInfo();
+		
+		ret.setSuspend(comp.suspend());
+		ret.setMaster(comp.master());
+		ret.setDaemon(comp.daemon());
+		ret.setAutoShutdown(comp.autoshutdown());
+		
+		if(comp.name().length()>0)
+			ret.setName(comp.name());
+		if(comp.type().length()>0)
+			ret.setTypeName(comp.type());
+		if(comp.configuration().length()>0)
+			ret.setConfiguration(comp.configuration());
+		if(comp.number().length()>0)
+			ret.setNumber(comp.number());
+		
+		NameValue[] args = comp.arguments();
+		if(args.length>0)
+		{
+			UnparsedExpression[] exps = createUnparsedExpressions(args);
+			ret.setArguments(exps);
+		}
+		
+		Binding[] binds = comp.bindings();
+		if(binds.length>0)
+		{
+			RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
+			for(int k=0; k<binds.length; k++)
+			{
+				bds[k] = createBinding(binds[k]);
+			}
+			ret.setBindings(bds);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create component instance info from creation info annotation.
+	 */
+	protected ComponentInstanceInfo createComponentInstanceInfo(CreationInfo comp)
+	{
+		ComponentInstanceInfo ret = new ComponentInstanceInfo();
+		
+		ret.setSuspend(comp.suspend());
+		ret.setMaster(comp.master());
+		ret.setDaemon(comp.daemon());
+		ret.setAutoShutdown(comp.autoshutdown());
+		
+		if(comp.name().length()>0)
+			ret.setName(comp.name());
+		if(comp.type().length()>0)
+			ret.setTypeName(comp.type());
+		if(comp.configuration().length()>0)
+			ret.setConfiguration(comp.configuration());
+		if(comp.number().length()>0)
+			ret.setNumber(comp.number());
+		
+		NameValue[] args = comp.arguments();
+		if(args.length>0)
+		{
+			UnparsedExpression[] exps = createUnparsedExpressions(args);
+			ret.setArguments(exps);
+		}
+		
+		return ret;
 	}
 	
 	/**

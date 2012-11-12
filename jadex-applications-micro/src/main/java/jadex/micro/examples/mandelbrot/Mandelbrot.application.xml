@@ -28,7 +28,9 @@
 	<services>
 		<providedservice class="IGenerateService">
 			<implementation>
-				<binding componenttype="Generator" create="true"/>
+				<binding create="true">
+					<creationinfo type="Generator"/>
+				</binding>
 			</implementation>
 		</providedservice>
 		<!-- <providedservice class="ICalculateService">
@@ -36,7 +38,9 @@
 		</providedservice> -->
 		<providedservice class="IDisplayService">
 			<implementation>
-				<binding componenttype="Display" create="true"/>
+				<binding create="true">
+					<creationinfo type="Display"/>
+				</binding>
 			</implementation>
 		</providedservice>
 		

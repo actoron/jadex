@@ -6,6 +6,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
@@ -214,11 +215,51 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.getChildren(type).addResultListener(new DelegationResultListener(ret));
+			interpreter.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 		}
 		
 		return ret;
 	}
+	
+	/**
+	 *  Create a subcomponent.
+	 *  @param component The instance info.
+	 */
+	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						interpreter.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			interpreter.createChild(component).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+		}
+		
+		return ret;
+	}
+
 	
 	/**
 	 *  Get the file name of a component type.

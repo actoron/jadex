@@ -36,6 +36,7 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.xml.bean.JavaWriter;
@@ -61,9 +62,9 @@ import java.util.Map;
 {	
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationtype="emailagent")),
+	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="emailagent"))),
 	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationtype="daemon"))
+	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="daemon")))
 })
 @Arguments(
 {

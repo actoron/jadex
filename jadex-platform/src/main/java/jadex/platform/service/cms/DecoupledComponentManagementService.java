@@ -1870,7 +1870,13 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				if(ii!=null)
 				{
 //					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
-					if(!internal && (ii.getAdapter()==null || !ServiceCall.getCurrentInvocation().getCaller().equals(cid)))
+					IComponentIdentifier caller = ServiceCall.getCurrentInvocation().getCaller();
+					if(internal || (ii.getAdapter()!=null && caller!=null && cid.equals(caller.getParent())))
+					{
+//						System.out.println("getExternalAccess: not delayed");
+						adapter = ii.getAdapter();
+					}
+					else
 					{
 //							System.out.println("getExternalAccess: delayed");
 						delayed = true;
@@ -1889,11 +1895,6 @@ public class DecoupledComponentManagementService implements IComponentManagement
 								}
 							}
 						}));
-					}
-					else
-					{
-//						System.out.println("getExternalAccess: not delayed");
-						adapter = ii.getAdapter();
 					}
 				}
 			}

@@ -989,6 +989,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		if(config!=null)
 		{
+			final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
 			ConfigurationInfo conf = model.getConfiguration(config);
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
 			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
@@ -1008,7 +1009,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					// might depend on each other (e.g. bdi factory must be there for jcc)).
 					
 					final IComponentManagementService ces = (IComponentManagementService)result;
-					createComponent(components, ces, model, 0, ret);
+					createComponent(components, ces, model, 0, ret, cids);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -1458,18 +1459,20 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Create subcomponents.
 	 */
-	public void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut)
+	public void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
 		if(i<components.length)
 		{
 			int num = getNumber(components[i], model);
-			IResultListener crl = new CollectionResultListener(num, false, createResultListener(new DelegationResultListener(fut)
+			IResultListener<IComponentIdentifier> crl = new CollectionResultListener<IComponentIdentifier>(num, false, 
+				createResultListener(new ExceptionDelegationResultListener<Collection<IComponentIdentifier>, Void>(fut)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Collection<IComponentIdentifier> result)
 				{
-					createComponent(components, cms, model, i+1, fut);
+					cids.addAll(result);
+					createComponent(components, cms, model, i+1, fut, cids);
 				}
 			}));
 			for(int j=0; j<num; j++)
@@ -1497,6 +1500,41 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			fut.setResult(null);
 		}
+	}
+	
+	/**
+	 *  Create a subcomponent.
+	 */
+	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
+				Future<Void> fut = new Future<Void>();
+				fut.addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						if(cids.size()>0)
+						{
+							ret.setResult(cids.get(0));
+						}
+						else
+						{
+							ret.setException(new RuntimeException("Component not created: "+component));
+						}
+					}
+				});
+				createComponent(new ComponentInstanceInfo[]{component}, cms, getModel(), 0, fut, cids);
+			}
+		}));
+			
+		return ret;
 	}
 	
 	/**

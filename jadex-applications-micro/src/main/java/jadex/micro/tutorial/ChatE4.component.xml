@@ -23,7 +23,10 @@
 					</arguments>
 					<requiredservices>
 						<!--  <binding name="regservice" componentname="reg" scope="parent"/>	-->
-						<binding name="regservice" componentname="reg" componenttype="registry" scope="parent" create="true"/>	
+						<!--  <binding name="regservice" componentname="reg" componenttype="registry" scope="parent" create="true"/> -->
+						<binding name="regservice" componentname="reg" scope="parent" create="true">
+							<creationinfo name="reg" type="registry"/>
+						</binding>
 					</requiredservices>
 				</component>
 				<component name="chatter2" type="chatagent">
@@ -32,7 +35,10 @@
 					</arguments>
 					<requiredservices>
 						<!-- <binding name="regservice" componentname="reg" scope="parent"/> -->	
-						<binding name="regservice" componentname="reg" componenttype="registry" scope="parent" create="true"/>	
+						<!-- <binding name="regservice" componentname="reg" componenttype="registry" scope="parent" create="true"/> -->
+						<binding name="regservice" componentname="reg" scope="parent" create="true">
+							<creationinfo name="reg" type="registry"/>
+						</binding>	
 					</requiredservices>
 				</component>
 			</components>

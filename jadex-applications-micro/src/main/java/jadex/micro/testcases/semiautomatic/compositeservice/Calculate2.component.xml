@@ -30,8 +30,12 @@
 						<!-- <requiredservice name="addservice">
 							<binding componenttype="Adder" create="true" scope="parent"
 						</requiredservice>	-->		
-						<binding name="addservice" componenttype="Adder" create="true" scope="parent"/>			
-						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
+						<binding name="addservice" create="true" scope="parent">
+							<creationinfo type="Adder"/>
+						</binding>			
+						<binding name="subservice" create="true" scope="parent">
+							<creationinfo type="Subtractor"/>
+						</binding>			
 					</requiredservices>
 				</component>
 			</components>
@@ -59,9 +63,13 @@
 			<components>
 				<component name="calculator" type="Calculator">
 					<requiredservices>
-						<binding name="addservice" componentname="adder" componenttype="Adder" create="true" scope="parent" recover="true"/>			
+						<binding name="addservice" componentname="adder"  create="true" scope="parent" recover="true">
+							<creationinfo type="Adder"/>
+						</binding>			
 						<!-- <binding name="addservice" componenttype="CorruptAdder" create="true" scope="parent"/>	 -->		
-						<binding name="subservice" componenttype="Subtractor" create="true" scope="parent"/>			
+						<binding name="subservice" create="true" scope="parent">
+							<creationinfo type="Subtractor"/>
+						</binding>			
 					</requiredservices>
 				</component>
 				<component name="adder" type="CorruptAdder"/>

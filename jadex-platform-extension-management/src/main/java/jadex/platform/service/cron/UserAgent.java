@@ -24,7 +24,8 @@ import jadex.platform.service.cron.jobs.CreateComponentJob;
 	@RequiredService(name="libs", type=ILibraryService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="crons", type=ICronService.class, 
-		binding=@Binding(create=true, creationtype="cronagent"))
+		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="cronagent")))
+//		binding=@Binding(create=true, creationtype="cronagent"))
 })
 @ComponentTypes(@ComponentType(name="cronagent", filename="jadex/platform/service/cron/CronAgent.class"))
 @Agent
@@ -57,12 +58,13 @@ public class UserAgent
 						// job that creates a hello world agent every minute
 						IResourceIdentifier rid = libs.getRootResourceIdentifier();
 						CreationInfo ci = new CreationInfo(rid);
-						crons.addJob(new CreateComponentJob(new TimePatternFilter("* * * * *"), null,
+						String pattern = "* * * * *";
+						crons.addJob(new CreateComponentJob(pattern, null,
 //							"jadex/platform/service/cron/CronAgent.class"));
 							"jadex/micro/examples/helloworld/HelloWorldAgent.class", ci));
 						
 						// job that lists the platforms every minute
-						crons.addJob(new CliJob(new TimePatternFilter("* * * * *"), new String[]{"lp", "lc"}));
+						crons.addJob(new CliJob("* * * * *", new String[]{"lp", "lc"}));
 					}
 				});
 			}

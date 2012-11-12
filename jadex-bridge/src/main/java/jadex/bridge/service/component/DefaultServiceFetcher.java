@@ -6,6 +6,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.ComponentInstanceInfo;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
@@ -18,6 +21,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.IValueFetcher;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -30,11 +34,14 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  The default service fetcher realizes the default 
@@ -104,6 +111,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					// Search component.
 					if(binding.getComponentName()!=null)
 					{
+//						System.out.println("searching: "+binding.getComponentName());
 						// Search service by component name.
 						getExternalAccessByName(provider, info, binding).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 						{
@@ -112,6 +120,11 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 									.addResultListener(new StoreDelegationResultListener<T>(ret, provider, info, binding));
 							}
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								System.out.println("not found: "+binding.getComponentName()+" "+exception);
+//								super.exceptionOccurred(exception);
+//							}
 						});
 					}
 					else if(binding.getComponentType()!=null)
@@ -418,6 +431,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			public void exceptionOccurred(Exception exception)
 			{
 				// No component found with cid -> create.
+//				System.out.println("creating: "+binding.getComponentName());
 				createComponent(provider, info, binding).addResultListener(new DelegationResultListener(ret));
 //				{
 //					public void exceptionOccurred(Exception exception)
@@ -613,64 +627,51 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Create component and get external access for component.
 	 */
-	protected IFuture createComponent(final IServiceProvider provider, final RequiredServiceInfo info, 
+	protected IFuture<IExternalAccess> createComponent(final IServiceProvider provider, final RequiredServiceInfo info, 
 		final RequiredServiceBinding binding)
 	{
-		final Future ret = new Future();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 //		final IComponentIdentifier parent = pa!=null? pa: (IComponentIdentifier)provider.getId();
 		
-		if(binding.isCreate() && binding.getCreationType()!=null)
+		if(binding.isCreate() && binding.getCreationInfo()!=null)
 		{
 //			System.out.println("Create comp: "+provider+", "+binding.getComponentType());
-			getParentAccess(provider, info, binding).addResultListener(new DelegationResultListener(ret)
+			getParentAccess(provider, info, binding).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(final IExternalAccess exta)
 				{
-					final IExternalAccess exta = (IExternalAccess)result;
-			
 					SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-						.addResultListener(new DelegationResultListener(ret)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IComponentManagementService cms)
 						{
-							final IComponentManagementService cms = (IComponentManagementService)result;
-							exta.getFileName(binding.getCreationType()).addResultListener(new DelegationResultListener(ret)
+							exta.createChild(binding.getCreationInfo())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(IComponentIdentifier cid)
 								{
-									final String filename = (String)result;
-//									System.out.println("file: "+filename+" "+binding.getComponentType());
-									CreationInfo ci = new CreationInfo(exta.getComponentIdentifier());
-									cms.createComponent(binding.getCreationName(), filename, ci, null)
-										.addResultListener(new DelegationResultListener(ret)
+									getExternalAccess(provider, cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									if(exception instanceof ComponentCreationException && ComponentCreationException.REASON_COMPONENT_EXISTS.equals(
+										((ComponentCreationException)exception).getReason()))
 									{
-										public void customResultAvailable(Object result)
+//										super.exceptionOccurred(exception);
+										getExternalAccess(provider, (IComponentIdentifier)((ComponentCreationException)exception).getInfo())
+										.addResultListener(new DelegationResultListener(ret)
 										{
-											IComponentIdentifier cid = (IComponentIdentifier)result;
-											getExternalAccess(provider, cid).addResultListener(new DelegationResultListener(ret));
-										}
-										public void exceptionOccurred(Exception exception)
-										{
-//											exception.printStackTrace();
-											if(exception instanceof ComponentCreationException && ComponentCreationException.REASON_COMPONENT_EXISTS.equals(
-												((ComponentCreationException)exception).getReason()))
+											public void exceptionOccurred(Exception exception) 
 											{
-//												super.exceptionOccurred(exception);
-												getExternalAccess(provider, (IComponentIdentifier)((ComponentCreationException)exception).getInfo())
-													.addResultListener(new DelegationResultListener(ret)
-													{
-														public void exceptionOccurred(Exception exception) 
-														{
-															exception.printStackTrace();
-														};
-													});
-											}
-											else
-											{
-												super.exceptionOccurred(exception);
-											}
-										}
-									});
+												exception.printStackTrace();
+											};
+										});
+									}
+									else
+									{
+										super.exceptionOccurred(exception);
+									}
 								}
 							});
 						}
@@ -681,6 +682,39 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		else
 		{
 			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType().getTypeName()+", no component creation possible"));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments as a map of name-value pairs.
+	 */
+	public Map<String, Object> getArguments(ComponentInstanceInfo component, String[] imports, IValueFetcher fetcher, ClassLoader cl)
+	{
+		Map<String, Object> ret = null;		
+		UnparsedExpression[] arguments = component.getArguments();
+		UnparsedExpression argumentsexp = component.getArgumentsExpression();
+		
+		if(arguments.length>0)
+		{
+			ret = new HashMap<String, Object>();
+
+			for(int i=0; i<arguments.length; i++)
+			{
+				// todo: language
+				if(arguments[i].getValue()!=null && arguments[i].getValue().length()>0)
+				{
+					Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), imports, fetcher, cl);
+					ret.put(arguments[i].getName(), val);
+				}
+			}
+		}
+		else if(argumentsexp!=null && argumentsexp.getValue()!=null && argumentsexp.getValue().length()>0)
+		{
+			// todo: language
+			ret = (Map<String, Object>)SJavaParser.evaluateExpression(argumentsexp.getValue(), imports, fetcher, cl);
 		}
 		
 		return ret;

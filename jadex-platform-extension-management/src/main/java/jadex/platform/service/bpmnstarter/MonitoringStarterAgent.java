@@ -69,9 +69,9 @@ import java.util.Map;
 	@RequiredService(name="libs", type=ILibraryService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="crons", type=ICronService.class, 
-		binding=@Binding(create=true, creationtype="cronagent")),
+		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="cronagent"))),
 	@RequiredService(name="rules", type=IRuleService.class, 
-		binding=@Binding(create=true, creationtype="ruleagent"))
+		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="ruleagent")))
 })
 @ComponentTypes(
 {
@@ -247,7 +247,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 							if(timing.length()>0)
 							{
 								// kill listener for cron jobs
-								cj = new CronJob<IComponentIdentifier>(new TimePatternFilter(timing.toString()),
+								cj = new CronJob<IComponentIdentifier>(timing.toString(), new TimePatternFilter(timing.toString()),
 									createCronCreateCommand(rid, model, dellis));
 							}
 							

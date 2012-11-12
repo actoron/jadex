@@ -1445,7 +1445,7 @@ public class BpmnXMLReader
 							
 							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, 
 								scope, create, recover, null, proxytype==null || proxytype.length()==0? 
-									BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype, null, null);
+									BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype, null);
 							bindings.put(name, binding);
 						}
 

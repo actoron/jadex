@@ -15,6 +15,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.platform.service.cron.TimePatternFilter;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -34,17 +35,25 @@ public class CliJob extends CronJob<String>
 	/**
 	 *  Create a new Ccli job. 
 	 */
-	public CliJob(IFilter<Long> filter, String com)
+	public CliJob(String pattern, String com)
 	{
-		this(filter, new String[]{com});
+		this(pattern, new TimePatternFilter(pattern), new String[]{com});
 	}
 	
 	/**
 	 *  Create a new Ccli job. 
 	 */
-	public CliJob(IFilter<Long> filter, String[] com)
+	public CliJob(String pattern, String[] com)
 	{
-		super(filter, new CliCommand(com));
+		super(pattern, new TimePatternFilter(pattern), new CliCommand(com));
+	}
+	
+	/**
+	 *  Create a new Ccli job. 
+	 */
+	public CliJob(String pattern, IFilter<Long> filter, String[] com)
+	{
+		super(pattern, filter, new CliCommand(com));
 	}
 
 	/**
