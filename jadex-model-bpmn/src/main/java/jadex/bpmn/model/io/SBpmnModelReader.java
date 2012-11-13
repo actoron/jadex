@@ -13,6 +13,7 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.Tuple2;
+import jadex.javaparser.SJavaParser;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -49,12 +50,24 @@ public class SBpmnModelReader
 	}
 	
 	/**
-	 *  Loads the model from a file.
+	 *  Loads the model from a file without parsing expressions.
 	 *  
 	 *  @param file The model file.
 	 *  @param vreader The visual model reader, may be null.
 	 */
 	public static final MBpmnModel readModel(File file, IBpmnVisualModelReader vreader) throws Exception
+	{
+		return readModel(file, vreader, null);
+	}
+	
+	/**
+	 *  Loads the model from a file.
+	 *  
+	 *  @param file The model file.
+	 *  @param vreader The visual model reader, may be null.
+	 *  @param cl The class loader for parsing expressions, may be null.
+	 */
+	public static final MBpmnModel readModel(File file, IBpmnVisualModelReader vreader, ClassLoader cl) throws Exception
 	{
 		BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file));
 		XMLInputFactory fac = XMLInputFactory.newInstance(); 
@@ -65,6 +78,9 @@ public class SBpmnModelReader
 		LinkedList<String> contentstack = new LinkedList<String>();
 		
 		MBpmnModel ret = new MBpmnModel();
+		ret.setClassLoader(cl);
+		ret.setFilename(file.getPath());
+		ret.setName(file.getName().substring(0, file.getName().length() - 6));
 		Map<String, MIdElement> bpmnelementmap = new HashMap<String, MIdElement>();
 		Map<String, MLane> lanemap = new HashMap<String, MLane>();
 		Map<String, String> laneparents = new HashMap<String, String>();
@@ -213,6 +229,8 @@ public class SBpmnModelReader
 			buffer.put("lastobject", currentpool);
 			buffer.put("pool", currentpool);
 		}*/
+		ClassLoader cl = model.getClassLoader();
+		
 		if ("lane".equals(tag.getLocalPart()))
 		{
 			MLane lane = new MLane();
@@ -329,7 +347,7 @@ public class SBpmnModelReader
 			String dur = (String) buffer.remove("duration");
 			if (dur != null)
 			{
-				evt.setPropertyValue("duration", new UnparsedExpression("duration", "java.lang.Number", dur, null));
+				evt.setPropertyValue("duration", parseExp(new UnparsedExpression("duration", "java.lang.Number", dur, null),model.getModelInfo().getAllImports(), cl));
 			}
 			
 			evt.setActivityType(acttype);
@@ -387,7 +405,7 @@ public class SBpmnModelReader
 			String cond = (String) buffer.remove("condition");
 			if (cond != null)
 			{
-				edge.setCondition(new UnparsedExpression("", "java.lang.Boolean", cond, null));
+				edge.setCondition(parseExp(new UnparsedExpression("", "java.lang.Boolean", cond, null), model.getModelInfo().getAllImports(), cl));
 			}
 			
 			Map<String, String> mappings = (Map<String, String>) buffer.remove("parametermappings");
@@ -398,6 +416,7 @@ public class SBpmnModelReader
 					String name = entry.getKey();
 					String expstring = entry.getValue();
 					UnparsedExpression exp = new UnparsedExpression(name, "java.lang.Object", expstring, null);
+					parseExp(exp, model.getModelInfo().getAllImports(), cl);
 					UnparsedExpression iexp	= null;
 					
 					if(name.endsWith("]") && name.indexOf("[")!=-1)
@@ -405,6 +424,7 @@ public class SBpmnModelReader
 						String	itext	= name.substring(name.indexOf("[")+1, name.length()-1);
 						name = name.substring(0, name.indexOf("["));
 						iexp = new UnparsedExpression(name, "java.lang.Object", itext, null);
+						parseExp(iexp, model.getModelInfo().getAllImports(), cl);
 					}
 					edge.addParameterMapping(entry.getKey(), exp, iexp);
 				}
@@ -480,6 +500,8 @@ public class SBpmnModelReader
 												   String content,
 												   Map<String, Object> buffer)
 	{
+		ClassLoader cl = model.getClassLoader();
+		
 		if ("description".equals(tag.getLocalPart()))
 		{
 			if ("extension".equals(tagstack.get(1)))
@@ -499,7 +521,11 @@ public class SBpmnModelReader
 		{
 			buffer.put(tag.getLocalPart(), content);
 		}
-		else if ("value".equals(tag.getLocalPart()))
+		else if ("modelname".equals(tag.getLocalPart()))
+		{
+			model.setName(content);
+		}
+		else if ("parameter".equals(tag.getLocalPart()))
 		{
 			List<MParameter> params = (List<MParameter>) buffer.get("parameters");
 			if (params == null)
@@ -509,7 +535,9 @@ public class SBpmnModelReader
 			}
 			ClassInfo clazz = new ClassInfo(attrs.get("type"));
 			String name = attrs.get("name");
-			MParameter param = new MParameter(attrs.get("direction"), clazz, name, new UnparsedExpression(name, clazz.getTypeName(), content, null));
+			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
+			parseExp(exp, model.getModelInfo().getAllImports(), cl);
+			MParameter param = new MParameter(attrs.get("direction"), clazz, name, exp);
 			params.add(param);
 		}
 		else if ("argumentvalues".equals(tag.getLocalPart()))
@@ -627,7 +655,7 @@ public class SBpmnModelReader
 				String name = attrs.get("name");
 				ClassInfo clazz = new ClassInfo(attrs.get("type"));
 				UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), (String) buffer.remove("value"), null);
-				
+				parseExp(exp, model.getModelInfo().getAllImports(), cl);
 				model.addContextVariable(name, clazz, exp, null);
 			}
 			else if ("configuration".equals(tag.getLocalPart()))
@@ -668,6 +696,7 @@ public class SBpmnModelReader
 					exp.setName(entry.getKey());
 					exp.setClazz(model.getModelInfo().getArgument(exp.getName()).getClazz());
 					exp.setValue(entry.getValue());
+					parseExp(exp, model.getModelInfo().getAllImports(), cl);
 					conf.addArgument(exp);
 				}
 				
@@ -678,6 +707,7 @@ public class SBpmnModelReader
 					exp.setName(entry.getKey());
 					exp.setClazz(model.getModelInfo().getResult(exp.getName()).getClazz());
 					exp.setValue(entry.getValue());
+					parseExp(exp, model.getModelInfo().getAllImports(), cl);
 					conf.addResult(exp);
 				}
 				
@@ -688,6 +718,7 @@ public class SBpmnModelReader
 					exp.setName(entry.getKey());
 					exp.setClazz(model.getContextVariableClass(entry.getKey()));
 					exp.setValue(entry.getValue());
+					parseExp(exp, model.getModelInfo().getAllImports(), cl);
 					model.setContextVariableExpression(entry.getKey(), conf.getName(), exp);
 				}
 				
@@ -754,5 +785,22 @@ public class SBpmnModelReader
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Parses the expression if possible.
+	 *  
+	 *  @param exp The expression.
+	 *  @param imports The imports.
+	 *  @param cl The class loader.
+	 *  @return Parsed expression or unparsed if class loader is unavailable.
+	 */
+	protected static final UnparsedExpression parseExp(UnparsedExpression exp, String[] imports, ClassLoader cl)
+	{
+		if (cl != null)
+		{
+			SJavaParser.parseExpression(exp, imports, cl);
+		}
+		return exp;
 	}
 }

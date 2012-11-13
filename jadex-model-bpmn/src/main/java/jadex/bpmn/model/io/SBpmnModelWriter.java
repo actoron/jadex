@@ -128,7 +128,9 @@ public class SBpmnModelWriter
 		out.print(indent);
 		out.println("xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"");
 		out.print(indent);
-		out.println("xmlns:semantic=\"http://www.omg.org/spec/BPMN/20100524/MODEL\">");
+		out.println("xmlns:semantic=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
+		out.print(indent);
+		out.println("xmlns:jadex=\"http://www.activecomponents.org/bpmnextensions\">");
 	}
 	
 	/**
@@ -141,6 +143,15 @@ public class SBpmnModelWriter
 	{
 		out.print(getIndent(1));
 		out.println("<semantic:extension>");
+		
+		String name = mmodel.getModelInfo().getName();
+		if (name != null && name.length() > 0)
+		{
+			out.print(getIndent(2));
+			out.print("<jadex:modelname>");
+			out.print(name);
+			out.println("</jadex:modelname>");
+		}
 		
 		String desc = mmodel.getModelInfo().getDescription();
 		if (desc != null && desc.length() > 0)
@@ -732,7 +743,7 @@ public class SBpmnModelWriter
 						out.print(((UnparsedExpression) activity.getPropertyValue("duration")).getValue());
 						out.println("</semantic:timeDuration>");
 						out.print(getIndent(3));
-						out.print("</semantic:timerEventDefinition>");
+						out.println("</semantic:timerEventDefinition>");
 					}
 					else
 					{

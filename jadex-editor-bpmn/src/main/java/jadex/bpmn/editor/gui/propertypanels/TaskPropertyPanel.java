@@ -27,24 +27,25 @@ import javax.swing.JTabbedPane;
 public class TaskPropertyPanel extends BasePropertyPanel
 {
 	/** Standard task classes. */
-	protected static final String[] STANDARD_CLASSES = { "jadex.bpmn.runtime.task.PrintTask.class",
-														 "jadex.bpmn.runtime.task.InvokeMethodTask.class",
-														 "jadex.bpmn.runtime.task.CreateComponentTask.class",
-														 "jadex.bpmn.runtime.task.DestroyComponentTask.class",
-														 "jadex.bpmn.runtime.task.StoreResultsTask.class",
-														 "jadex.bpmn.runtime.task.UserInteractionTask.class",
+	protected static final String[] STANDARD_CLASSES = { "",
+														 "jadex.bpmn.runtime.task.PrintTask",
+														 "jadex.bpmn.runtime.task.InvokeMethodTask",
+														 "jadex.bpmn.runtime.task.CreateComponentTask",
+														 "jadex.bpmn.runtime.task.DestroyComponentTask",
+														 "jadex.bpmn.runtime.task.StoreResultsTask",
+														 "jadex.bpmn.runtime.task.UserInteractionTask",
 														 
-														 "jadex.bdibpmn.task.DispatchGoalTask.class",
-														 "jadex.bdibpmn.task.WaitForGoalTask.class",
-														 "jadex.bdibpmn.task.DispatchInternalEventTask.class",
-														 "jadex.bdibpmn.task.WriteBeliefTask.class",
-														 "jadex.bdibpmn.task.WriteParameterTask.class",
+														 "jadex.bdibpmn.task.DispatchGoalTask",
+														 "jadex.bdibpmn.task.WaitForGoalTask",
+														 "jadex.bdibpmn.task.DispatchInternalEventTask",
+														 "jadex.bdibpmn.task.WriteBeliefTask",
+														 "jadex.bdibpmn.task.WriteParameterTask",
 														 
-														 "jadex.bdibpmn.task.CreateSpaceObjectTaskTask.class",
-														 "jadex.bdibpmn.task.WaitForSpaceObjectTaskTask.class",
-														 "jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class",
+														 "jadex.bdibpmn.task.CreateSpaceObjectTaskTask",
+														 "jadex.bdibpmn.task.WaitForSpaceObjectTaskTask",
+														 "jadex.bdibpmn.task.RemoveSpaceObjectTaskTask",
 
-														 "jadex.wfms.client.task.WorkitemTask.class"
+														 "jadex.wfms.client.task.WorkitemTask"
 													   };
 	
 	/** The task. */

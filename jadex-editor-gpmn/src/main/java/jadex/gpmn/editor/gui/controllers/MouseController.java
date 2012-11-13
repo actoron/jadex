@@ -207,6 +207,11 @@ public class MouseController extends MouseAdapter
 		setTargetScale(scale > 4.0? 4.0: scale);
 	}
 	
+	/**
+	 *  Sets the target scale.
+	 *  
+	 *  @param scale The scale.
+	 */
 	protected void setTargetScale(double scale)
 	{
 		targetscale = scale;

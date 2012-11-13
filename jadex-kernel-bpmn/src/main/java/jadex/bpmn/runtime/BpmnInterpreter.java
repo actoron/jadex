@@ -22,6 +22,7 @@ import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
@@ -31,6 +32,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -601,12 +603,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			if(!variables.containsKey(name))	// Don't overwrite arguments.
 			{
 				Object	value	= null;
-				IParsedExpression	exp	= model.getContextVariableExpression(name, getConfiguration());
+				UnparsedExpression	exp	= model.getContextVariableExpression(name, getConfiguration());
 				if(exp!=null)
 				{
 					try
 					{
-						value = exp.getValue(getFetcher());
+						value = ((IParsedExpression) exp.getParsed()).getValue(getFetcher());
 					}
 					catch(RuntimeException e)
 					{
@@ -1377,12 +1379,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					
 					MActivity act = new MActivity();
 					act.setName("External Step Activity: "+(cnt++));
-					act.setClazz(ExecuteStepTask.class);
-					act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
+					act.setClazz(new ClassInfo(ExecuteStepTask.class));
+					act.addParameter(new MParameter(MParameter.DIRECTION_IN, new ClassInfo(Object[].class), "step", null));
 					act.setActivityType(MBpmnModel.TASK);
 					MSequenceEdge edge = new MSequenceEdge();
 					edge.setTarget(act);
-					edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
+					UnparsedExpression exp = new UnparsedExpression(null, (Class<?>) null, "step", null);
+					SJavaParser.parseExpression(exp, null, null);
+//					edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
+					edge.addParameterMapping("step", exp, null);
 					act.addIncomingSequenceEdge(edge);
 					MPool pl = pool!=null? model.getPool(pool): (MPool)model.getPools().get(0);
 					act.setPool(pl);

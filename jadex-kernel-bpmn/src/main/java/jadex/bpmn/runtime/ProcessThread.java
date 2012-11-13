@@ -8,11 +8,13 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.handler.SplitInfo;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.IndexMap;
 import jadex.javaparser.IParsedExpression;
 
 import java.lang.reflect.Array;
@@ -23,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -488,6 +489,18 @@ public class ProcessThread	implements ITaskContext
 				throw new RuntimeException("Error parsing property: "+instance+", "+this+", "+name+", "+ret, e);
 			}
 		}
+		else if (ret instanceof UnparsedExpression)
+		{
+			try
+			{
+//				System.out.println("here: "+ret);
+				ret = ((IParsedExpression)((UnparsedExpression) ret).getParsed()).getValue(new ProcessThreadValueFetcher(this, true, instance.getFetcher()));
+			}
+			catch(RuntimeException e)
+			{
+				throw new RuntimeException("Error parsing property: "+instance+", "+this+", "+name+", "+ret, e);
+			}
+		}
 		return ret;
 	}
 	
@@ -617,7 +630,7 @@ public class ProcessThread	implements ITaskContext
 			Set	indexparams	= null;
 			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
 			{
-				Map mappings = getLastEdge().getParameterMappings();
+				IndexMap mappings = getLastEdge().getParameterMappings();
 				if(mappings!=null)
 				{
 					IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getFetcher());
@@ -625,8 +638,11 @@ public class ProcessThread	implements ITaskContext
 					{
 						boolean	found	= false;
 						String	name	= (String)it.next();
-						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
-						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
+//						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
+//						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
+						IParsedExpression exp = (IParsedExpression)((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(name)).getFirstEntity().getParsed();
+						UnparsedExpression uiexp = ((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(name)).getSecondEntity();
+						IParsedExpression iexp = uiexp != null? (IParsedExpression) uiexp.getParsed() : null;
 						Object value;
 						Object index;
 						try
@@ -702,7 +718,7 @@ public class ProcessThread	implements ITaskContext
 			Set before = data!=null? new HashSet(data.keySet()): Collections.EMPTY_SET;
 			before.remove(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);	// Hack!!! Keep future available locally for thread.
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getFetcher());
-			Map params = getActivity().getParameters();
+			IndexMap params = getActivity().getParameters();
 			if(params!=null)
 			{
 				for(Iterator it=params.values().iterator(); it.hasNext(); )
@@ -730,7 +746,7 @@ public class ProcessThread	implements ITaskContext
 					{
 						try
 						{
-							setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
+							setParameterValue(param.getName(), param.getInitialValue()==null? null: ((IParsedExpression) param.getInitialValue().getParsed()).getValue(fetcher));
 							before.remove(param.getName());
 						}
 						catch(RuntimeException e)

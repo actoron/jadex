@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_JrKV0daWEd6h5vUosCYrnw" iD="_JrKV0NaWEd6h5vUosCYrnw">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_YTkwsdaWEd6h5vUosCYrnw" iD="_YTkwsNaWEd6h5vUosCYrnw" name="import jadex.wfms.client.task.WorkitemTask;"/>
+  <pools xmi:type="bpmn:Pool" xmi:id="_JrvkodaWEd6h5vUosCYrnw" iD="_JrvkoNaWEd6h5vUosCYrnw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JrxZ0daWEd6h5vUosCYrnw" iD="_JrxZ0NaWEd6h5vUosCYrnw" outgoingEdges="_UOZrEdaWEd6h5vUosCYrnw" incomingEdges="_S6qyUdaWEd6h5vUosCYrnw" name="ProduceFrame&#xA;class = WorkitemTask" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_PTi6oNaWEd6h5vUosCYrnw" iD="_PTiTkNaWEd6h5vUosCYrnw" outgoingEdges="_S6qyUdaWEd6h5vUosCYrnw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_RE-cAdaWEd6h5vUosCYrnw" iD="_RE-cANaWEd6h5vUosCYrnw" incomingEdges="_UOZrEdaWEd6h5vUosCYrnw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_S6qyUdaWEd6h5vUosCYrnw" iD="_S6qyUNaWEd6h5vUosCYrnw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_UOZrEdaWEd6h5vUosCYrnw" iD="_UOZrENaWEd6h5vUosCYrnw"/>
+  </pools>
+</bpmn:BpmnDiagram>

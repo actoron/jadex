@@ -1,14 +1,16 @@
 package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.mxgraph.util.mxEvent;
@@ -67,13 +69,29 @@ public class DeletionController implements mxIEventListener
 				for (Object obj : pools)
 				{
 					MPool mpool = (MPool) obj;
-					if (mpool.getSequenceEdges().contains(vedge))
+					if (mpool.getSequenceEdges().contains(medge))
 					{
 						mpool.removeSequenceEdge(medge);
 						break;
 					}
 				}
+				medge.getSource().removeOutgoingSequenceEdge(medge);
+				medge.getTarget().removeIncomingSequenceEdge(medge);
 			}
+//			else if (cells[i] instanceof VActivity)
+//			{
+//				VActivity vact = (VActivity) cells[i];
+//				MActivity mact = (MActivity) vact.getBpmnElement();
+//				
+//				for (int j = 0; j < vact.getEdgeCount(); ++j)
+//				{
+//					VEdge edge = (VEdge) vact.getEdgeAt(j);
+//					if (edge instanceof VSequenceEdge)
+//					{
+//						
+//					}
+//				}
+//			}
 		}
 	}
 }

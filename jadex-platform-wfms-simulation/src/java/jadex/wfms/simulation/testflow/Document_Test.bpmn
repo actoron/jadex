@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_Oj6ZoPrWEd6bL_mZ_sUg-g" iD="_Oj5ykPrWEd6bL_mZ_sUg-g">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_WovywfrWEd6bL_mZ_sUg-g" iD="_WovywPrWEd6bL_mZ_sUg-g" name="import jadex.wfms.client.task.WorkitemTask;&#xA;import jadex.wfms.parametertypes.*"/>
+  <pools xmi:type="bpmn:Pool" xmi:id="_OkV3cPrWEd6bL_mZ_sUg-g" iD="_OkVQYPrWEd6bL_mZ_sUg-g" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_nB9c4frWEd6bL_mZ_sUg-g" iD="_nB9c4PrWEd6bL_mZ_sUg-g" outgoingEdges="_3e6-kfrWEd6bL_mZ_sUg-g" lanes="_glcFYfrWEd6bL_mZ_sUg-g" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ppAXofrWEd6bL_mZ_sUg-g" iD="_ppAXoPrWEd6bL_mZ_sUg-g" outgoingEdges="_BcNuIfrXEd6bL_mZ_sUg-g" incomingEdges="_3e6-kfrWEd6bL_mZ_sUg-g" name="Acquire_Document&#xA;class = WorkitemTask&#xA;out Document input_document" lanes="_glcFYfrWEd6bL_mZ_sUg-g"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_qymc8frWEd6bL_mZ_sUg-g" iD="_qymc8PrWEd6bL_mZ_sUg-g" outgoingEdges="_MiSqsfrXEd6bL_mZ_sUg-g" incomingEdges="_keKkAfuSEd6sJaMXp8SEpw" name="Retrieve_Document&#xA;class = WorkitemTask&#xA;in Document output_document" lanes="_glcFYfrWEd6bL_mZ_sUg-g"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_MRsC4frXEd6bL_mZ_sUg-g" iD="_MRsC4PrXEd6bL_mZ_sUg-g" incomingEdges="_MiSqsfrXEd6bL_mZ_sUg-g" lanes="_glcFYfrWEd6bL_mZ_sUg-g" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_UbqwwfuSEd6sJaMXp8SEpw" iD="_UbqwwPuSEd6sJaMXp8SEpw" outgoingEdges="_keKkAfuSEd6sJaMXp8SEpw" incomingEdges="_BcNuIfrXEd6bL_mZ_sUg-g" name="Process_Document&#xA;class = WorkitemTask&#xA;inout Document document" lanes="_glcFYfrWEd6bL_mZ_sUg-g"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_3e6-kfrWEd6bL_mZ_sUg-g" iD="_3e6-kPrWEd6bL_mZ_sUg-g"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BcNuIfrXEd6bL_mZ_sUg-g" iD="_BcNuIPrXEd6bL_mZ_sUg-g" name="document = input_document"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_MiSqsfrXEd6bL_mZ_sUg-g" iD="_MiSqsPrXEd6bL_mZ_sUg-g"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_keKkAfuSEd6sJaMXp8SEpw" iD="_keKkAPuSEd6sJaMXp8SEpw" name="output_document = document"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_glcFYfrWEd6bL_mZ_sUg-g" iD="_glcFYPrWEd6bL_mZ_sUg-g" name="DefaultRole" activities="_nB9c4frWEd6bL_mZ_sUg-g _qymc8frWEd6bL_mZ_sUg-g _ppAXofrWEd6bL_mZ_sUg-g _MRsC4frXEd6bL_mZ_sUg-g _UbqwwfuSEd6sJaMXp8SEpw"/>
+  </pools>
+</bpmn:BpmnDiagram>

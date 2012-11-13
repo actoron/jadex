@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
@@ -42,7 +43,7 @@ public class BpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				BetterFileChooser fc = new BetterFileChooser();
-				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn");
+				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
 				int result = fc.showOpenDialog(getParent());
@@ -54,9 +55,9 @@ public class BpmnMenuBar extends JMenuBar
 						BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
 						
 						File file = fc.getSelectedFile();
-						if (!file.getName().endsWith(".bpmn"))
+						if (!file.getName().endsWith(".bpmn2"))
 						{
-							file = new File(file.getAbsolutePath() + ".bpmn");
+							file = new File(file.getAbsolutePath() + ".bpmn2");
 						}
 						MBpmnModel mmodel = SBpmnModelReader.readModel(file, vreader);
 						graph.getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
@@ -70,6 +71,8 @@ public class BpmnMenuBar extends JMenuBar
 						modelcontainer.getGraphComponent().refresh();
 						modelcontainer.setFile(file);
 						modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+						
+						new DeletionController(modelcontainer);
 					}
 					catch (Exception e1)
 					{
@@ -85,7 +88,7 @@ public class BpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				BetterFileChooser fc = new BetterFileChooser();
-				FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn)", "bpmn");
+				FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn2)", "bpmn2");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
 				fc.setAcceptAllFileFilterUsed(false);

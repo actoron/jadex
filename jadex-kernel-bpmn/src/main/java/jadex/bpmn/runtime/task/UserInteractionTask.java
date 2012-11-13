@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.SReflect;
+import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -25,7 +26,6 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -85,7 +85,7 @@ public class UserInteractionTask implements ITask
 				final JOptionPane	pane;
 				JComponent	message;
 				MActivity	task	= context.getModelElement();
-				Map	parameters	= task.getParameters();
+				IndexMap	parameters	= task.getParameters();
 				
 				if(parameters!=null && !parameters.isEmpty())
 				{
@@ -103,7 +103,7 @@ public class UserInteractionTask implements ITask
 						final MParameter param = (MParameter)it.next();
 						Object	value	= context.getParameterValue(param.getName());
 						JComponent	comp;
-						if(SReflect.getWrappedType(param.getClazz()).equals(Boolean.class))
+						if(SReflect.getWrappedType(param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports())).equals(Boolean.class))
 						{
 							final JCheckBox	cb	= new JCheckBox();
 							cb.setSelected(value instanceof Boolean && ((Boolean)value).booleanValue());

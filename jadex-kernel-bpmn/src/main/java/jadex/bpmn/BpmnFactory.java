@@ -41,7 +41,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	
 	/** The supported component types (file extensions).
 	 *  Convention used by platform config panel. */
-	public static final String[]	FILETYPES	= new String[]{".bpmn"};
+	public static final String[]	FILETYPES	= new String[]{".bpmn", ".bpmn2"};
 	
 	/** The micro agent file type. */
 	public static final String	FILETYPE_BPMNPROCESS = "BPMN Process";
@@ -219,7 +219,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(".bpmn")? Boolean.TRUE: Boolean.FALSE);
+		return new Future<Boolean>(model.endsWith(".bpmn") || model.endsWith(".bpmn2")? Boolean.TRUE: Boolean.FALSE);
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<Boolean>(model.endsWith(".bpmn")? Boolean.TRUE: Boolean.FALSE);
+		return new Future<Boolean>(model.endsWith(".bpmn") || model.endsWith(".bpmn2")? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
@@ -272,7 +272,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<String>(model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null);
+		return new Future<String>(model.endsWith(".bpmn") || model.endsWith(".bpmn2") ? FILETYPE_BPMNPROCESS: null);
 	}
 	
 	/**

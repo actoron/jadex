@@ -41,7 +41,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 			{
 				// Take first out edge that is satisfied and not the default edge (without condition)
 				MSequenceEdge edge = (MSequenceEdge)outgoing.get(i);
-				IParsedExpression exp = edge.getCondition();
+				IParsedExpression exp = (IParsedExpression) edge.getParsedCondition();
 				if(exp!=null)
 				{
 					if(edge.isDefault())

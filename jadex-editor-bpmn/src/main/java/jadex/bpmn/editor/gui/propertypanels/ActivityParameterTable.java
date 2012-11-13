@@ -142,7 +142,7 @@ public class ActivityParameterTable extends JTable
 				default:
 					return param.getName();
 				case 2:
-					return param.getClazz();
+					return param.getClazz().getTypeName();
 				case 3:
 					return param.getInitialValue().getValue();
 			}

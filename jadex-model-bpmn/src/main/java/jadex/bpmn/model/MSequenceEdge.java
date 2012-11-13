@@ -3,6 +3,7 @@ package jadex.bpmn.model;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
+import jadex.javaparser.IParsedExpression;
 
 /**
  *  A sequence edge is a control flow edge between activities.
@@ -122,6 +123,15 @@ public class MSequenceEdge extends MAssociationTarget
 	public UnparsedExpression getCondition()
 	{
 		return this.condition;
+	}
+	
+	/**
+	 *  Get the parsed condition.
+	 *  @return The parsed condition.
+	 */
+	public IParsedExpression getParsedCondition()
+	{
+		return condition != null? (IParsedExpression) condition.getParsed() : null;
 	}
 	
 	/**

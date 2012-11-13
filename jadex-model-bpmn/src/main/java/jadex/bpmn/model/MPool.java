@@ -44,6 +44,14 @@ public class MPool extends MAssociationTarget
 	{
 		if(activities==null)
 			activities = new ArrayList();
+		for (Object act : activities)
+		{
+			if (((MActivity) act).getId().equals(activity.getId()))
+			{
+				Thread.dumpStack();
+				System.out.println("Duplicate Item:" +act);
+			}
+		}
 		activities.add(activity);		
 	}
 	

@@ -11,6 +11,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -79,7 +80,7 @@ public class CreateComponentTask implements ITask
 				if(args==null)
 				{
 					args = new HashMap();
-					Map params = context.getActivity().getParameters();
+					IndexMap params = context.getActivity().getParameters();
 					if(params!=null)
 					{
 						for(Iterator it=params.values().iterator(); it.hasNext(); )
@@ -100,12 +101,15 @@ public class CreateComponentTask implements ITask
 					{
 						addResult(result.getFirstEntity(), result.getSecondEntity());
 						
-						for(int i=0; i<resultmapping.length/2; i++)
+						if (resultmapping != null)
 						{
-							if(resultmapping[i].equals(result.getFirstEntity()))
+							for(int i=0; i<resultmapping.length/2; i++)
 							{
-								context.setParameterValue(resultmapping[i+1], result.getSecondEntity());
-								break;
+								if(resultmapping[i].equals(result.getFirstEntity()))
+								{
+									context.setParameterValue(resultmapping[i+1], result.getSecondEntity());
+									break;
+								}
 							}
 						}
 						

@@ -32,7 +32,7 @@ public class GatewayORActivityHandler	extends AbstractGatewayActivityHandler	 im
 		for(int i=0; i<outgoing.size(); i++)
 		{
 			MSequenceEdge edge = (MSequenceEdge)outgoing.get(i);
-			IParsedExpression exp = edge.getCondition();
+			IParsedExpression exp = edge.getParsedCondition();
 			boolean follow = true;
 			if(exp!=null)
 			{

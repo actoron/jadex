@@ -90,8 +90,6 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				return;
 			}
 			
-			vnode.setBpmnElement(e);
-			
 			mxGeometry geo = (mxGeometry) buffer.remove("bounds");
 			if (geo != null)
 			{
@@ -119,6 +117,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 					}
 					children.add(vnode);
 				}
+				vnode.setBpmnElement(e);
 			}
 			else if (e instanceof MPool)
 			{
@@ -136,6 +135,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 						graph.getModel().endUpdate();
 					}
 				}
+				vnode.setBpmnElement(e);
 			}
 			else if (e instanceof MLane)
 			{
@@ -157,6 +157,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 					}
 					children.add(vnode);
 				}
+				vnode.setBpmnElement(e);
 			}
 			
 			vmap.put(bpmnid, vnode);

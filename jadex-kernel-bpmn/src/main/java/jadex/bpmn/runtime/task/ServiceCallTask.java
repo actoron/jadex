@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.SReflect;
+import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,7 +15,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Call a service.
@@ -57,7 +57,7 @@ public class ServiceCallTask implements ITask
 		// Collect arguments and settings.
 		final List	args	= new ArrayList();
 		final List	argtypes	= new ArrayList();
-		Map	mparams	= context.getActivity().getParameters();
+		IndexMap	mparams	= context.getActivity().getParameters();
 		for(Iterator it=mparams.values().iterator(); it.hasNext(); )
 		{
 			MParameter	param	= (MParameter)it.next();
@@ -77,7 +77,7 @@ public class ServiceCallTask implements ITask
 			else if(MParameter.DIRECTION_IN.equals(param.getDirection()))
 			{
 				args.add(context.getParameterValue(param.getName()));
-				argtypes.add(param.getClazz());
+				argtypes.add(param.getClazz().getType(process.getClassLoader(), process.getModel().getAllImports()));
 			}
 			else if(MParameter.DIRECTION_INOUT.equals(param.getDirection()))
 			{
@@ -86,7 +86,7 @@ public class ServiceCallTask implements ITask
 				
 				resultparam	= param.getName();
 				args.add(context.getParameterValue(param.getName()));
-				argtypes.add(param.getClazz());
+				argtypes.add(param.getClazz().getType(process.getClassLoader(), process.getModel().getAllImports()));
 			}
 			else if(MParameter.DIRECTION_OUT.equals(param.getDirection()))
 			{

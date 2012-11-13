@@ -23,6 +23,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.IParsedExpression;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -312,7 +313,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 											fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
 										try
 										{
-											thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
+											thread.setParameterValue(param.getName(), ((IParsedExpression) param.getInitialValue().getParsed()).getValue(fetcher));
 										}
 										catch(RuntimeException e)
 										{

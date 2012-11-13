@@ -65,33 +65,36 @@ public class VActivity extends VNamedNode
 	public void setParent(mxICell parent)
 	{
 		MActivity mactivity = (MActivity) getBpmnElement();
-		if (getParent() != null)
+		if (mactivity != null)
 		{
-			VNode oldparent = (VNode) getParent();
-			if (oldparent instanceof VLane)
+			if (getParent() != null)
 			{
-				((MLane) ((VLane) oldparent).getBpmnElement()).removeActivity(mactivity);
-				mactivity.setLane(null);
-				mactivity.setPool(null);
+				VNode oldparent = (VNode) getParent();
+				if (oldparent instanceof VLane)
+				{
+					((MLane) ((VLane) oldparent).getBpmnElement()).removeActivity(mactivity);
+					mactivity.setLane(null);
+					mactivity.setPool(null);
+				}
+				else
+				{
+					((MPool) ((VPool) oldparent).getBpmnElement()).removeActivity(mactivity);
+					mactivity.setPool(null);
+				}
 			}
-			else
+			if (parent != null)
 			{
-				((MPool) ((VPool) oldparent).getBpmnElement()).removeActivity(mactivity);
-				mactivity.setPool(null);
-			}
-		}
-		if (parent != null)
-		{
-			if (parent instanceof VLane)
-			{
-				((MLane) ((VLane) parent).getBpmnElement()).addActivity(mactivity);
-				mactivity.setLane((MLane) ((VLane) parent).getBpmnElement());
-				mactivity.setPool((MPool) ((VLane) parent).getPool().getBpmnElement());
-			}
-			else
-			{
-				((MPool) ((VPool) parent).getBpmnElement()).addActivity(mactivity);
-				mactivity.setPool((MPool) ((VPool) parent).getBpmnElement());
+				if (parent instanceof VLane)
+				{
+					((MLane) ((VLane) parent).getBpmnElement()).addActivity(mactivity);
+					mactivity.setLane((MLane) ((VLane) parent).getBpmnElement());
+					mactivity.setPool((MPool) ((VLane) parent).getPool().getBpmnElement());
+				}
+				else
+				{
+					((MPool) ((VPool) parent).getBpmnElement()).addActivity(mactivity);
+					mactivity.setPool((MPool) ((VPool) parent).getBpmnElement());
+				}
 			}
 		}
 		super.setParent(parent);

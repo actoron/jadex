@@ -28,11 +28,11 @@ public class InvokeMethodTask extends AbstractTask
 		
 		// Collect parameters.
 		List params = new ArrayList();
-		List paramclasses = new ArrayList();
+		List<Class> paramclasses = new ArrayList();
 		if(context.hasParameterValue("param"))
 		{
 			params.add(context.getParameterValue("param"));
-			paramclasses.add(((MParameter)context.getModelElement().getParameters().get("param")).getClazz());
+			paramclasses.add(((MParameter)context.getModelElement().getParameters().get("param")).getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()));
 		}
 		for(int i=0; ; i++)
 		{

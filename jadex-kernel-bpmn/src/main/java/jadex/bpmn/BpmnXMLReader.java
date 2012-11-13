@@ -42,6 +42,7 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
@@ -598,17 +599,24 @@ public class BpmnXMLReader
 						StringTokenizer stok2 = new StringTokenizer(prop, " \t=");
 						String paramdir = stok2.nextToken();
 						String paramclazzname = stok2.nextToken();
+						
 						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getModelInfo().getAllImports(), context.getClassLoader());
 						if(paramclazz==null)
 							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname);//+", "+SUtil.arrayToString(dia.getAllImports()));
+						
 						String paramname = stok2.nextToken();
-						IParsedExpression paramexp = null;
+						
+//						IParsedExpression paramexp = null;
+						UnparsedExpression paramexp = null;
 						if(stok2.hasMoreTokens())
 						{
 							String proptext = prop.substring(idx+1).trim();
-							paramexp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//							paramexp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+							paramexp = new UnparsedExpression(paramname, paramclazz, proptext, null);
+							SJavaParser.parseExpression(paramexp, dia.getModelInfo().getAllImports(), context.getClassLoader());
 						}
-						MParameter param = new MParameter(paramdir, paramclazz, paramname, paramexp);
+						
+						MParameter param = new MParameter(paramdir, new ClassInfo(paramclazz), paramname, paramexp);
 						act.addParameter(param);
 					}
 					else if(idx!=-1)
@@ -623,15 +631,16 @@ public class BpmnXMLReader
 							{
 								proptext	= proptext.substring(0, proptext.length()-6);
 							}
-							try
-							{
-								Class<?>	clazz	= SReflect.findClass(proptext, dia.getModelInfo().getAllImports(), context.getClassLoader());
-								act.setClazz(clazz);
-							}
-							catch(ClassNotFoundException cnfe)
-							{
-								throw new RuntimeException(cnfe);
-							}
+//							try
+//							{
+//								Class<?>	clazz	= SReflect.findClass(proptext, dia.getModelInfo().getAllImports(), context.getClassLoader());
+//								act.setClazz(clazz);
+//							}
+//							catch(ClassNotFoundException cnfe)
+//							{
+//								throw new RuntimeException(cnfe);
+//							}
+							act.setClazz(new ClassInfo(proptext));
 						}
 						else if(act	instanceof MSubProcess && propname.equals("parallel"))
 						{
@@ -677,22 +686,15 @@ public class BpmnXMLReader
 								String clazzname = (String) table.get(row).getColumnValueAt(2);	// class
 								String val = (String) table.get(row).getColumnValueAt(3) != "" ? (String) table.get(row).getColumnValueAt(3) : null;		// value
 								
-								try
+								UnparsedExpression exp = null;
+								if(val!=null && val.length()>0)
 								{
-									Class<?> clazz = SReflect.findClass(clazzname, dia.getModelInfo().getAllImports(), context.getClassLoader());
-									IParsedExpression exp = null;
-									if(val!=null && val.length()>0)
-									{
-										exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
-									}
-									MParameter param = new MParameter(dir, clazz, name, exp);
-									act.addParameter(param);
-	//								System.out.println("Parameter: "+param);
+//									exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+									exp = new UnparsedExpression(name, clazzname, val, null);
+									SJavaParser.parseExpression(exp, dia.getModelInfo().getAllImports(), context.getClassLoader());
 								}
-								catch(ClassNotFoundException cnfe)
-								{
-									throw new RuntimeException(cnfe);
-								}
+								MParameter param = new MParameter(dir, new ClassInfo(clazzname), name, exp);
+								act.addParameter(param);
 							}
 							
 							// Parameters of event handlers have 2 elements = are treated as properties?! 
@@ -779,18 +781,21 @@ public class BpmnXMLReader
 											String name = stok2.nextToken();
 											String clazzname = stok2.nextToken();
 											String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
-
+											
+											
 											try
 											{
 												Class clazz = SReflect.findClass(clazzname, dia.getModelInfo().getAllImports(),
 													context.getClassLoader());
-												IParsedExpression exp = null;
+												UnparsedExpression exp = null;
 												if(val != null && val.length() > 0)
 												{
-													exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(),
-														null, context.getClassLoader());
+//													exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(),
+//														null, context.getClassLoader());
+													exp = new UnparsedExpression(name, clazz, val, null);
+													SJavaParser.parseExpression(exp, dia.getModelInfo().getAllImports(), context.getClassLoader());
 												}
-												MParameter param = new MParameter(dir, clazz, name, exp);
+												MParameter param = new MParameter(dir, new ClassInfo(clazz), name, exp);
 												act.addParameter(param);
 												// System.out.println("Parameter: "+param);
 											}
@@ -841,7 +846,7 @@ public class BpmnXMLReader
 											{
 												Class clazz = SReflect.findClass(value, dia.getModelInfo().getAllImports(),
 													context.getClassLoader());
-												act.setClazz(clazz);
+												act.setClazz(new ClassInfo(clazz));
 											}
 											catch (ClassNotFoundException cnfe)
 											{
@@ -1090,14 +1095,19 @@ public class BpmnXMLReader
 							String propname = (String) table.get(row).getColumnValueAt(0);
 							String proptext = (String) table.get(row).getColumnValueAt(1);
 
-							IParsedExpression exp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
-							IParsedExpression iexp	= null;
+//							IParsedExpression exp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//							IParsedExpression iexp	= null;
+							UnparsedExpression exp = new UnparsedExpression(propname, Object.class, proptext, null);
+							SJavaParser.parseExpression(exp, dia.getModelInfo().getAllImports(), context.getClassLoader());
+							UnparsedExpression iexp	= null;
 
 							if(propname.endsWith("]") && propname.indexOf("[")!=-1)
 							{
 								String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
 								propname	= propname.substring(0, propname.indexOf("["));
-								iexp	= parser.parseExpression(itext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//								iexp	= parser.parseExpression(itext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+								iexp	= new UnparsedExpression(propname, Object.class, itext, null);
+								SJavaParser.parseExpression(iexp, dia.getModelInfo().getAllImports(), context.getClassLoader());
 							}
 
 							edge.addParameterMapping(propname, exp, iexp);
@@ -1134,15 +1144,20 @@ public class BpmnXMLReader
 											String propname = stok2.nextToken();
 											String proptext = stok2.nextToken();
 
-											IParsedExpression exp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(),
-												null, context.getClassLoader());
-											IParsedExpression iexp = null;
+//											IParsedExpression exp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(),
+//												null, context.getClassLoader());
+//											IParsedExpression iexp = null;
+											UnparsedExpression exp = new UnparsedExpression(propname, Object.class, proptext, null);
+											SJavaParser.parseExpression(exp, dia.getModelInfo().getAllImports(), context.getClassLoader());
+											UnparsedExpression iexp	= null;
 
 											if (propname.endsWith("]") && propname.indexOf("[") != -1)
 											{
 												String itext = propname.substring(propname.indexOf("[") + 1,propname.length() - 1);
 												propname = propname.substring(0,propname.indexOf("["));
-												iexp = parser.parseExpression(itext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+												iexp	= new UnparsedExpression(propname, Object.class, itext, null);
+												SJavaParser.parseExpression(iexp, dia.getModelInfo().getAllImports(), context.getClassLoader());
+//												iexp = parser.parseExpression(itext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
 											}
 
 											edge.addParameterMapping(propname, exp, iexp);
@@ -1155,7 +1170,9 @@ public class BpmnXMLReader
 
 								if ("condition".equals(key) && value != null && value.length() > 0)
 								{
-									IParsedExpression cond = parser.parseExpression(value, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//									IParsedExpression cond = parser.parseExpression(value, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+									UnparsedExpression cond = new UnparsedExpression(null, (Class<?>) null, value, null);
+									SJavaParser.parseExpression(cond, dia.getModelInfo().getAllImports(), context.getClassLoader());
 									edge.setCondition(cond);
 
 									// System.out.println("Condition: "+key+" "+value);
@@ -1190,14 +1207,19 @@ public class BpmnXMLReader
 						{
 							String	propname = prop.substring(0, idx).trim();
 							String	proptext = prop.substring(idx+1).trim();
-							IParsedExpression exp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
-							IParsedExpression iexp	= null;
+//							IParsedExpression exp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//							IParsedExpression iexp	= null;
+							UnparsedExpression exp = new UnparsedExpression(propname, Object.class, proptext, null);
+							SJavaParser.parseExpression(exp, dia.getModelInfo().getAllImports(), context.getClassLoader());
+							UnparsedExpression iexp	= null;
 	
 							if(propname.endsWith("]") && propname.indexOf("[")!=-1)
 							{
 								String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
 								propname	= propname.substring(0, propname.indexOf("["));
-								iexp	= parser.parseExpression(itext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//								iexp	= parser.parseExpression(itext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+								iexp	= new UnparsedExpression(propname, Object.class, itext, null);
+								SJavaParser.parseExpression(iexp, dia.getModelInfo().getAllImports(), context.getClassLoader());
 							}
 	
 							edge.addParameterMapping(propname, exp, iexp);
@@ -1215,14 +1237,18 @@ public class BpmnXMLReader
 					if(lineone!=null && linetwo!=null)
 					{
 						edge.setName(lineone);
-						IParsedExpression cond = parser.parseExpression(linetwo, 
-							dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//						IParsedExpression cond = parser.parseExpression(linetwo, 
+//							dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+						UnparsedExpression cond = new UnparsedExpression(null, (Class<?>) null, linetwo, null);
+						SJavaParser.parseExpression(cond, dia.getModelInfo().getAllImports(), context.getClassLoader());
 						edge.setCondition(cond);
 					}
 					else if(lineone!=null)
 					{
-						IParsedExpression cond = parser.parseExpression(lineone, 
-							dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+//						IParsedExpression cond = parser.parseExpression(lineone, 
+//							dia.getModelInfo().getAllImports(), null, context.getClassLoader());
+						UnparsedExpression cond = new UnparsedExpression(null, (Class<?>) null, lineone, null);
+						SJavaParser.parseExpression(cond, dia.getModelInfo().getAllImports(), context.getClassLoader());
 						edge.setCondition(cond);
 					}
 				}
@@ -1444,8 +1470,8 @@ public class BpmnXMLReader
 							// todo: interceptors, proxytype
 							
 							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, 
-								scope, create, recover, null, proxytype==null || proxytype.length()==0? 
-									BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype, null);
+									scope, create, recover, null, proxytype==null || proxytype.length()==0? 
+										BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype, null);
 							bindings.put(name, binding);
 						}
 
@@ -1517,12 +1543,14 @@ public class BpmnXMLReader
 							}
 							if(!argi && !resu)
 							{
-								IParsedExpression exp = null;
+								UnparsedExpression exp = null;
 								if(val!=null && val.length()>0)
 								{
-									exp = parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+//									exp = parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader());
+									exp = new UnparsedExpression(name, typename, val, null);
+									SJavaParser.parseExpression(exp, model.getModelInfo().getAllImports(), context.getClassLoader());
 								}
-								model.addContextVariable(name, SReflect.findClass0(typename, model.getModelInfo().getAllImports(), context.getClassLoader()), exp, inivals);
+								model.addContextVariable(name, new ClassInfo(SReflect.findClass0(typename, model.getModelInfo().getAllImports(), context.getClassLoader())), exp, inivals);
 							}
 						
 //							System.out.println("Argument: "+arg);
@@ -1798,7 +1826,7 @@ public class BpmnXMLReader
 										String desc = stok2.nextToken();
 										String typename = stok2.nextToken();
 										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
-										IParsedExpression exp = null;
+										UnparsedExpression exp = null;
 	
 //										// context variable
 //										Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
@@ -1827,7 +1855,7 @@ public class BpmnXMLReader
 										}
 										if(!argi && !resu)
 										{
-											model.addContextVariable(name, arg.getClazz().getType(getClass().getClassLoader(), model.getModelInfo().getAllImports()), exp, null);
+											model.addContextVariable(name, new ClassInfo(arg.getClazz().getType(getClass().getClassLoader(), model.getModelInfo().getAllImports())), exp, null);
 										}
 	//									System.out.println("Argument: "+arg);
 									}
@@ -1953,13 +1981,15 @@ public class BpmnXMLReader
 							if(clazz!=null)
 							{
 								String name = stok2.nextToken();
-								IParsedExpression exp = null;
+								UnparsedExpression exp = null;
 								if(init!=null)
 								{
-									exp = parser.parseExpression(init, mi.getAllImports(), null, context.getClassLoader());
+//									exp = parser.parseExpression(init, mi.getAllImports(), null, context.getClassLoader());
+									exp = new UnparsedExpression(name, clazz, init, null);
+									SJavaParser.parseExpression(exp, mi.getAllImports(), context.getClassLoader());
 								}
 								
-								model.addContextVariable(name, clazz, exp, null);
+								model.addContextVariable(name, new ClassInfo(clazz), exp, null);
 							}
 						}
 					}

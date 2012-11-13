@@ -102,7 +102,7 @@ public class DefaultStepHandler implements IStepHandler
 						}
 					}
 				}
-			
+				
 				outside	= context.getParent()==null;
 				if(next==null && !outside)
 				{

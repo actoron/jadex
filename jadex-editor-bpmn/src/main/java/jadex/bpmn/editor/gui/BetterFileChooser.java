@@ -24,9 +24,10 @@ public class BetterFileChooser extends JFileChooser
 	public void approveSelection()
 	{
 	    File file = getSelectedFile();
+	    File altfile = new File(file.getAbsolutePath() + ".bpmn2");
 	    
 	    // Add overwrite dialog.
-	    if(getDialogType() == JFileChooser.SAVE_DIALOG && file.exists())
+	    if(getDialogType() == JFileChooser.SAVE_DIALOG && (file.exists() || altfile.exists()))
 	    {
 	        int result = JOptionPane.showConfirmDialog(this,file.getAbsolutePath() + " already exists.\n Do you want to replace it?","Save",JOptionPane.YES_NO_CANCEL_OPTION);
 	        switch(result)

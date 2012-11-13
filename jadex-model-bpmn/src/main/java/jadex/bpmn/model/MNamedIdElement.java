@@ -1,6 +1,8 @@
 package jadex.bpmn.model;
 
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
+import jadex.javaparser.IParsedExpression;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -80,6 +82,25 @@ public class MNamedIdElement extends MAnnotationElement
 		if(properties!=null)
 			ret = properties.get(name);
 		return ret;
+	}
+	
+	/**
+	 *  Get a property value from the model.
+	 *  @param name The name.
+	 */
+	public Object getParsedPropertyValue(String name)
+	{
+		Object val	= getPropertyValue(name);
+		if (val instanceof IParsedExpression)
+		{
+			val = ((IParsedExpression) val).getValue(null);
+		}
+		else if(val instanceof UnparsedExpression)
+		{
+			//	System.out.println("here: "+ret);
+			val = ((IParsedExpression) ((UnparsedExpression)val).getParsed()).getValue(null);
+		}
+		return val;
 	}
 	
 	/**

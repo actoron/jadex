@@ -22,7 +22,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		if (thread.isCanceled())
 			return;
 		
-		Class taskimpl = activity.getClazz();
+		Class taskimpl = activity.getClazz() != null? activity.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()) : null;
 		if(taskimpl!=null)
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
@@ -42,6 +42,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						if(!thread.isCanceled())
 						{
 							thread.setException(exception);

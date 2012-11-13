@@ -88,7 +88,7 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 	
 	public EditorWindow()
 	{
-		super("Jadex GPMN Editor");// + VERSION);
+		super("Jadex GPMN Editor");
 		
 		EventQueue.invokeLater(new Runnable()
 		{
