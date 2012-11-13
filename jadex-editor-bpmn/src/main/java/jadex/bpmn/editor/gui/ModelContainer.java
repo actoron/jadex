@@ -1,9 +1,11 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
 import jadex.bpmn.model.MBpmnModel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -439,6 +442,31 @@ public class ModelContainer
 	public ImageProvider getImageProvider()
 	{
 		return imageprovider;
+	}
+	
+	/**
+	 *  Handles unsaved model deletions.
+	 *  
+	 *  @param parent Parent component.
+	 *  @param modelcontainer The model container.
+	 */
+	public boolean checkUnsaved(Component parent)
+	{
+		boolean ret = true;
+		if (isDirty())
+		{
+			int result = JOptionPane.showConfirmDialog(parent, "The model contains unsaved changes, proceed anyway?", BpmnEditor.APP_NAME, JOptionPane.YES_NO_OPTION);
+	        switch(result)
+	        {
+	            case JOptionPane.NO_OPTION:
+	                ret = false;
+	            case JOptionPane.CLOSED_OPTION:
+	                ret = false;
+	            case JOptionPane.YES_OPTION:
+	            default:
+	        }
+		}
+		return ret;
 	}
 
 	/** Attempts to find the project root. */

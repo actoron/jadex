@@ -8,6 +8,9 @@ import jadex.bpmn.editor.gui.BpmnEditorWindow;
  */
 public class BpmnEditor
 {
+	/** The name of the application. */
+	public static final String APP_NAME = "Jadex BPMN Editor";
+	
 	/**
 	 *  Starts the BPMN editor.
 	 *  

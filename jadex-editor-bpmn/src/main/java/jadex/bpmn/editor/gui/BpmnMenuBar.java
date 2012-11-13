@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
@@ -20,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -37,99 +39,14 @@ public class BpmnMenuBar extends JMenuBar
 		this.modelcontainer = container;
 		
 		JMenu filemenu = new JMenu("File");
-		JMenuItem newitem = new JMenuItem("");
-		JMenuItem openitem = new JMenuItem(new AbstractAction("Open...")
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				BetterFileChooser fc = new BetterFileChooser();
-				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
-				fc.addChoosableFileFilter(filter);
-				fc.setFileFilter(filter);
-				int result = fc.showOpenDialog(getParent());
-				if (JFileChooser.APPROVE_OPTION == result)
-				{
-					try
-					{
-						BpmnGraph graph = new BpmnGraph(modelcontainer.getGraph().getStylesheet());
-						BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
-						
-						File file = fc.getSelectedFile();
-						if (!file.getName().endsWith(".bpmn2"))
-						{
-							file = new File(file.getAbsolutePath() + ".bpmn2");
-						}
-						MBpmnModel mmodel = SBpmnModelReader.readModel(file, vreader);
-						graph.getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
-						
-						modelcontainer.setBpmnModel(mmodel);
-						modelcontainer.setGraph(graph);
-						modelcontainer.getGraphComponent().setGraph(graph);
-						modelcontainer.setDirty(false);
-						
-						
-						modelcontainer.getGraphComponent().refresh();
-						modelcontainer.setFile(file);
-						modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
-						
-						new DeletionController(modelcontainer);
-					}
-					catch (Exception e1)
-					{
-						e1.printStackTrace();
-					}
-				}
-			}
-		});
-		JMenuItem saveitem = new JMenuItem();
-		JMenuItem saveasitem = new JMenuItem();
-		saveasitem.setAction(new AbstractAction("Save As...")
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				BetterFileChooser fc = new BetterFileChooser();
-				FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn2)", "bpmn2");
-				fc.addChoosableFileFilter(filter);
-				fc.setFileFilter(filter);
-				fc.setAcceptAllFileFilterUsed(false);
-				
-				if (modelcontainer.getFile() != null)
-				{
-					fc.setSelectedFile(modelcontainer.getFile());
-				}
-				
-				int result = fc.showSaveDialog(getParent());
-				if (JFileChooser.APPROVE_OPTION == result)
-				{
-					try
-					{
-						FileNameExtensionFilter ef = (FileNameExtensionFilter) fc.getFileFilter();
-						String ext = "." + ef.getExtensions()[0];
-						File file = fc.getSelectedFile();
-						if (!file.getName().endsWith(ext))
-						{
-							file = new File(file.getAbsolutePath() + ext);
-						}
-						SBpmnModelWriter.writeModel(file, modelcontainer.getBpmnModel(), new BpmnVisualModelWriter(modelcontainer.getGraph()));
-						modelcontainer.setDirty(false);
-					}
-					catch (IOException e1)
-					{
-						e1.printStackTrace();
-					}
-				}
-			}
-		});
-		JMenuItem exportitem = new JMenuItem();
-		JMenuItem exititem = new JMenuItem();
-		filemenu.add(newitem);
-		filemenu.add(openitem);
+		
+		filemenu.add(createNewMenuItem());
+		filemenu.add(createOpenMenuItem());
 		filemenu.addSeparator();
-		filemenu.add(saveitem);
-		filemenu.add(saveasitem);
-		filemenu.add(exportitem);
+		filemenu.add(createSaveMenuItem());
+		filemenu.add(createSaveAsMenuItem());
 		filemenu.addSeparator();
-		filemenu.add(exititem);
+		filemenu.add(createExitMenuItem());
 		add(filemenu);
 		
 		
@@ -189,5 +106,215 @@ public class BpmnMenuBar extends JMenuBar
 			iconmenu.add(isbutton);
 		}
 		viewmenu.add(iconmenu);
+	}
+	
+	/**
+	 *  Creates the "New" menu item.
+	 *  
+	 *  @return The menu item.
+	 */
+	protected JMenuItem createNewMenuItem()
+	{
+		JMenuItem newitem = new JMenuItem(new AbstractAction("New")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				BpmnGraph graph = new BpmnGraph(modelcontainer.getGraph().getStylesheet());
+				MBpmnModel model = new MBpmnModel();
+				initializeNewModel(graph, model);
+			}
+		});
+		
+		return newitem;
+	}
+	
+	/**
+	 *  Creates the "Open" menu item.
+	 *  
+	 *  @return The menu item.
+	 */
+	protected JMenuItem createOpenMenuItem()
+	{
+		JMenuItem openitem = new JMenuItem(new AbstractAction("Open...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				BetterFileChooser fc = new BetterFileChooser();
+				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
+				fc.addChoosableFileFilter(filter);
+				fc.setFileFilter(filter);
+				int result = fc.showOpenDialog(getParent());
+				if (JFileChooser.APPROVE_OPTION == result)
+				{
+					try
+					{
+						BpmnGraph graph = new BpmnGraph(modelcontainer.getGraph().getStylesheet());
+						BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
+						
+						File file = fc.getSelectedFile();
+						if (!file.getName().endsWith(".bpmn2"))
+						{
+							file = new File(file.getAbsolutePath() + ".bpmn2");
+						}
+						MBpmnModel mmodel = SBpmnModelReader.readModel(file, vreader);
+						
+						initializeNewModel(graph, mmodel);
+						modelcontainer.setFile(file);
+					}
+					catch (Exception e1)
+					{
+						displayIOError(e1);
+					}
+				}
+			}
+		});
+		
+		return openitem;
+	}
+	
+	/**
+	 *  Creates the "Save" menu item.
+	 *  
+	 *  @return The menu item.
+	 */
+	protected JMenuItem createSaveMenuItem()
+	{
+		JMenuItem saveitem = new JMenuItem(new AbstractAction("Save")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (modelcontainer.getFile() == null)
+				{
+					try
+					{
+						SBpmnModelWriter.writeModel(modelcontainer.getFile(), modelcontainer.getBpmnModel(), new BpmnVisualModelWriter(modelcontainer.getGraph()));
+						modelcontainer.setDirty(false);
+					}
+					catch (IOException e1)
+					{
+						displayIOError(e1);
+					}
+				}
+				else
+				{
+					saveWithDialog();
+				}
+			}
+		});
+		
+		return saveitem;
+	}
+	
+	/**
+	 *  Creates the "Save as" menu item.
+	 *  
+	 *  @return The menu item.
+	 */
+	protected JMenuItem createSaveAsMenuItem()
+	{
+		JMenuItem saveasitem = new JMenuItem(new AbstractAction("Save As...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				saveWithDialog();
+			}
+		});
+		
+		return saveasitem;
+	}
+	
+	/**
+	 *  Creates the "Exit" menu item.
+	 *  
+	 *  @return The menu item.
+	 */
+	protected JMenuItem createExitMenuItem()
+	{
+		JMenuItem exititem = new JMenuItem(new AbstractAction("Exit")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (modelcontainer.checkUnsaved(getParent()))
+				{
+					System.exit(0);
+				}
+			}
+		});
+		
+		return exititem;
+	}
+	
+	/**
+	 *  Saves a model by asking the user for a file.
+	 */
+	protected void saveWithDialog()
+	{
+		BetterFileChooser fc = new BetterFileChooser();
+		FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn2)", "bpmn2");
+		fc.addChoosableFileFilter(filter);
+		fc.setFileFilter(filter);
+		fc.setAcceptAllFileFilterUsed(false);
+		
+		if (modelcontainer.getFile() != null)
+		{
+			fc.setSelectedFile(modelcontainer.getFile());
+		}
+		
+		int result = fc.showSaveDialog(getParent());
+		if (JFileChooser.APPROVE_OPTION == result)
+		{
+			try
+			{
+				FileNameExtensionFilter ef = (FileNameExtensionFilter) fc.getFileFilter();
+				String ext = "." + ef.getExtensions()[0];
+				File file = fc.getSelectedFile();
+				if (!file.getName().endsWith(ext))
+				{
+					file = new File(file.getAbsolutePath() + ext);
+				}
+				SBpmnModelWriter.writeModel(file, modelcontainer.getBpmnModel(), new BpmnVisualModelWriter(modelcontainer.getGraph()));
+				modelcontainer.setDirty(false);
+			}
+			catch (IOException e1)
+			{
+				displayIOError(e1);
+			}
+		}
+	}
+	
+	/**
+	 *  Displays an error message after a failed IO operation.
+	 *  
+	 *  @param e The error.
+	 */
+	protected void displayIOError(Exception e)
+	{
+		JOptionPane.showMessageDialog(getParent(),
+			    e.getMessage(),
+			    BpmnEditor.APP_NAME,
+			    JOptionPane.ERROR_MESSAGE);
+		//e1.printStackTrace();
+	}
+	
+	/**
+	 *  Initializes a new model with the required controllers.
+	 *  
+	 *  @param graph New graph.
+	 *  @param model New BPMN model.
+	 */
+	protected void initializeNewModel(BpmnGraph graph, MBpmnModel model)
+	{
+		graph.getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
+		
+		modelcontainer.setBpmnModel(model);
+		modelcontainer.setGraph(graph);
+		modelcontainer.getGraphComponent().setGraph(graph);
+		modelcontainer.setDirty(false);
+		
+		
+		modelcontainer.getGraphComponent().refresh();
+		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
+		
+		new DeletionController(modelcontainer);
 	}
 }

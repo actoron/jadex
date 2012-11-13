@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.EdgeCreationController;
 import jadex.bpmn.editor.gui.controllers.KeyboardController;
@@ -22,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.WindowConstants;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
@@ -43,13 +45,15 @@ public class BpmnEditorWindow extends JFrame
 	 */
 	public BpmnEditorWindow()
 	{
-		super("Jadex BPMN Editor");
+		super(BpmnEditor.APP_NAME);
 		
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				getContentPane().setLayout(new BorderLayout());
+				
+				setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				
 				viewpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 				viewpane.setOneTouchExpandable(true);
@@ -58,7 +62,11 @@ public class BpmnEditorWindow extends JFrame
 				{
 					public void windowClosing(WindowEvent e)
 					{
-						System.exit(0);
+						if (modelcontainer.checkUnsaved(getParent()))
+						{
+							BpmnEditorWindow.this.dispose();
+							System.exit(0);
+						}
 					}
 				});
 				
