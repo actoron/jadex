@@ -3,12 +3,9 @@ package jadex.android.applications.demos.bdi;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import android.os.Bundle;
 

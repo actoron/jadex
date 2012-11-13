@@ -35,11 +35,16 @@
             android:layout_height="wrap_content"
             android:text="@string/main_launchBenchmarkDemo" />
         
-                <Button
-            android:id="@+id/main_launchEventDemo"
+        <Button
+            android:id="@+id/main_launchEventDemoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_launchEventDemo" />
+        <Button
+            android:id="@+id/main_launchRestDemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_launchRestDemo" />
     </LinearLayout>
 
 </LinearLayout>

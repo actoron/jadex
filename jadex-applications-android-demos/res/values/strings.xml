@@ -9,6 +9,7 @@
     <string name="main_launchBDIDemo">Launch BDI Demo</string>
     <string name="main_launchBenchmarkDemo">Launch Benchmark Demo</string>
     <string name="main_launchEventDemo">Launch Event Demo</string>
+    <string name="main_launchRestDemo">Launch Rest Demo</string>
     <string name="event_demoDescription">This Activity demonstrates the usage of messages and "events", which allow simple communication between agent and activity.
         If you press the button below, a message is sent to the agent and then an event is thrown back to the activity.</string>
     <string name="event_pingAgentButton">pingAgentButton</string>
@@ -17,4 +18,11 @@
     <string name="benchmark_openMenuButton">Choose Benchmark</string>
     <string name="bdi_demoDescription">This Activity demonstrates the usage of BDI Agents in Jadex-Android.
          Please wait until the platform is started.</string>
+    <string name="rest_demoDescription">This Activity uses a Jadex Component to encapsulate a call to the Google Chart REST API.</string>
+     
+    <string name="rest_getChartButtonLabel">Get Chart</string>
+    <string name="rest_startChartProviderButtonLabel">Start Chart Provider</string>
+    <string name="rest_height">Height: </string>
+    <string name="rest_width">Width: </string>
+    <string name="rest_addDataItemButtonLabel">Add Data</string>
 </resources>

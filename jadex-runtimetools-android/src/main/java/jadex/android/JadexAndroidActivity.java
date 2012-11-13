@@ -147,6 +147,12 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		}
 	}
 
+	/**
+	 * Starts a Micro Agent.
+	 * @param name Name of the Micro Agent created
+	 * @param clazz Class which defines the Micro Agent
+	 * @return IFuture<IComponentIdentifier>
+	 */
 	protected IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
 	{
 		checkIfJadexIsRunning("startMicroAgent()");
@@ -166,13 +172,35 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		return ret;
 	}
 	
+	/**
+	 * Starts a Component.
+	 * @param name Name of the Component created
+	 * @param modelPath Path to the Component XML definition file
+	 * @return IFuture<IComponentIdentifier>
+	 */
 	protected IFuture<IComponentIdentifier> startBDIAgent(final String name, final String modelPath) {
-		return startBPMNAgent(name, modelPath);
+		return startComponent(name, modelPath);
 	}
-
-	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath)
+	
+	/**
+	 * Starts a Component.
+	 * @param name Name of the Component created
+	 * @param modelPath Path to the Component XML definition file
+	 * @return IFuture<IComponentIdentifier>	 
+	 */
+	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath) {
+		return startComponent(name, modelPath);
+	}
+	
+	/**
+	 * Starts a Component.
+	 * @param name Name of the Component created
+	 * @param modelPath Path to the Component XML definition file
+	 * @return IFuture<IComponentIdentifier>
+	 */
+	protected IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
 	{
-		checkIfJadexIsRunning("startBPMNAgent()");
+		checkIfJadexIsRunning("startComponent()");
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		platformService.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{

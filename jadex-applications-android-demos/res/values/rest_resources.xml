@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="chartType">
+        <item>Bar Chart</item>
+        <item>Line Chart</item>
+        <item>Pie Chart</item>
+    </string-array>
+</resources>
