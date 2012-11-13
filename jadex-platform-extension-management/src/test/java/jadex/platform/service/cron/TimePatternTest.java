@@ -13,7 +13,6 @@ import junit.framework.TestCase;
  */
 public class TimePatternTest extends TestCase
 {
-	
 	/**
 	 *  Main for testing.
 	 */

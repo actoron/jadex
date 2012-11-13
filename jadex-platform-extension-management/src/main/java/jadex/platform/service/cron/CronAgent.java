@@ -9,11 +9,10 @@ import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.MicroAgent;
@@ -23,7 +22,10 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -61,7 +63,12 @@ import java.util.Map;
 @Service
 @ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-public class CronAgent<T> implements ICronService<T>
+@Configurations(
+{
+	@Configuration(name="realtime clock"),
+	@Configuration(name="platform clock", arguments=@NameValue(name="realtime", value="false"))
+})
+public class CronAgent implements ICronService
 {
 	//-------- attributes --------
 
@@ -73,7 +80,7 @@ public class CronAgent<T> implements ICronService<T>
 	protected long lookahead;
 	
 	/** The cron jobs (id -> job). */
-	protected Map<String, Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>> jobs;
+	protected Map<String, Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>> jobs;
 	
 	/** The agent. */
 	@Agent
@@ -98,19 +105,19 @@ public class CronAgent<T> implements ICronService<T>
 					
 					if(jobs!=null)
 					{
-						Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>[] cjs = (Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>[])jobs.values()
+						Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>[] cjs = (Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>[])jobs.values()
 							.toArray(new Tuple2[jobs.size()]);
-						for(final Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>> tup: cjs)
+						for(final Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> tup: cjs)
 						{
 							if(tup.getFirstEntity().getFilter().filter(time))
 							{
 								// schedule job on subagent?!
-								tup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)))
-									.addResultListener(new IResultListener<T>()
+								IFuture<Object> res = (IFuture<Object>)tup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)));
+								res.addResultListener(new IResultListener<Object>()
 								{
-									public void resultAvailable(T result)
+									public void resultAvailable(Object result)
 									{
-										tup.getSecondEntity().addIntermediateResultIfUndone(result);
+										((IntermediateFuture<Object>)tup.getSecondEntity()).addIntermediateResultIfUndone(result);
 									}
 									
 									public void exceptionOccurred(Exception exception)
@@ -145,18 +152,10 @@ public class CronAgent<T> implements ICronService<T>
 	}
 	
 	/**
-	 * 
-	 */
-	protected void startRealtimeCheck()
-	{
-		
-	}
-	
-	/**
 	 *  Add a schedule job.
 	 *  @param job The cron job.
 	 */
-	public ISubscriptionIntermediateFuture<T> addJob(final CronJob<T> job)
+	public <T> ISubscriptionIntermediateFuture<T> addJob(final CronJob<T> job)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
@@ -168,9 +167,10 @@ public class CronAgent<T> implements ICronService<T>
 		{
 			if(jobs==null)
 			{
-				jobs = new LinkedHashMap<String, Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>>();
+				jobs = new LinkedHashMap<String, Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>>();
 			}
-			jobs.put(job.getId(), new Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>>(job, ret));
+			jobs.put(job.getId(), new Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>
+				((CronJob<Object>)job, (SubscriptionIntermediateFuture<Object>)ret));
 		
 			ret.setTerminationCommand(new TerminationCommand()
 			{
@@ -213,6 +213,7 @@ public class CronAgent<T> implements ICronService<T>
 									{
 										long next = tpf.getNextTimepoint(start, end);
 										long wait = next-start;
+										System.out.println("waiting for: "+wait);
 										agent.waitFor(wait, self);
 									}
 									catch(Exception e)
@@ -241,7 +242,7 @@ public class CronAgent<T> implements ICronService<T>
 	{
 		if(jobs!=null)
 		{
-			Tuple2<CronJob<T>, SubscriptionIntermediateFuture<T>> tup = jobs.remove(jobid);
+			Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>> tup = jobs.remove(jobid);
 			tup.getSecondEntity().setFinishedIfUndone();
 		}
 		

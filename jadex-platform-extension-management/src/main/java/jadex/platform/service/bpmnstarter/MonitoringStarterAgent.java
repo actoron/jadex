@@ -394,10 +394,10 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 			return IFuture.DONE;
 			
 		final Future<Void> ret = new Future<Void>();
-		IFuture<ICronService<IComponentIdentifier>> fut = agent.getServiceContainer().getRequiredService("crons");
-		fut.addResultListener(new ExceptionDelegationResultListener<ICronService<IComponentIdentifier>, Void>(ret)
+		IFuture<ICronService> fut = agent.getServiceContainer().getRequiredService("crons");
+		fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Void>(ret)
 		{
-			public void customResultAvailable(final ICronService<IComponentIdentifier> crons)
+			public void customResultAvailable(final ICronService crons)
 			{
 				Runnable com = new Runnable()
 				{

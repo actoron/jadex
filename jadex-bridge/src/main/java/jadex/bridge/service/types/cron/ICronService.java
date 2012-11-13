@@ -7,14 +7,14 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 /**
  *  Interface for adding and removing cron jobs.
  */
-public interface ICronService<T>
+public interface ICronService
 {
 	/**
 	 *  Add a schedule job.
 	 *  @param job The cron job.
 	 */
 	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<T> addJob(CronJob<T> job);
+	public <T> ISubscriptionIntermediateFuture<T> addJob(CronJob<T> job);
 	
 	/**
 	 *  Remove a schedule job.
