@@ -250,6 +250,21 @@
 				</dependency>
 	        </dependencies>
 	    </profile>
+	    <profile>
+	        <id>management</id>
+	        <activation>
+	            <file>
+	                <exists>../jadex-platform-extension-management</exists>
+	            </file>
+	        </activation>
+	        <dependencies>
+	          	<dependency>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-extension-management</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+	        </dependencies>
+	    </profile>
 	</profiles>
 	
 </project>
