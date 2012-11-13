@@ -12,6 +12,7 @@
 	<!-- ======== common plugin configurations ======== -->
 
 	<build>
+		<finalName>jadex-android-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -30,108 +31,146 @@
 					<archiverConfig>
 						<duplicateBehavior>skip</duplicateBehavior>
 					</archiverConfig>
+					<skip>true</skip>
 				</configuration>
+				<executions>
+					<execution>
+						<id>jadex-android-example-project</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>jadex-android-example-projects</finalName>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+					<execution>
+						<id>sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>sources</finalName>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-assembly-androidsrczip.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-assembly-android.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+								println "Generating .jar.properties files ...";
+								def arr = "${project.modules}";
+								def ln = System.getProperty('line.separator')
+
+								arr = arr[1 .. -2].replaceAll("\
+								","").replaceFirst(",docs/.*","").tokenize(',');
+								arr.each() {
+								module ->
+									def moduleName = module.trim();
+									def jarFileName = "./" + moduleName + "/target/" + moduleName +\
+									"-${project.version}.jar";
+									def propertiesFileName = jarFileName + ".properties" 
+									def f = new File(jarFileName);
+									print "checking " + moduleName + "... "; 
+									<![CDATA[
+									if (f.exists()) {
+										f = new File(propertiesFileName);
+										f.asWritable().write("src=sources.zip");	
+										println "generated properties file.";
+									} else {
+										println "no jar.";
+									}
+									]]>
+									};
+							</source>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
 
-	<!-- ======== Modules to include in deploy/dist ======== -->
-
-	<modules>
-		<module>jadex-android-parent</module>
-		<module>jadex-android-antlr</module>
-		<module>jadex-android-xmlpull</module>
-		<module>jadex-runtimetools-android</module>
-		<module>jadex-platform-extension-webservice-android</module>
-	</modules>
+	<!-- ======== Modules to include in every profile ======== -->
 
 	<profiles>
-		<!-- ======== Profile for dist assembly ======== -->
 		<profile>
-			<id>dist</id>
+			<id>deploy</id>
+			<modules>
+				<module>jadex-android-parent</module>
+				<module>jadex-android-antlr</module>	
+				<module>jadex-android-xmlpull</module>
+				<module>jadex-runtimetools-android</module>
+				<module>jadex-platform-extension-webservice-android</module>
+			</modules>
+		</profile>
+	
+		<profile>
+			<id>dist-minimal</id>
+			<modules>
+				<module>jadex-android-parent</module>
+				<module>jadex-runtimetools-android</module>
+		
+				<!-- Additional Jadex modules to include in dist -->
+				<module>jadex-parent</module>
+				<module>jadex-commons</module>
+				<module>jadex-bridge</module>
+				<module>jadex-javaparser</module>
+				<module>jadex-xml</module>
+				<module>jadex-rules-eca</module>
+				<module>jadex-kernel-base</module>
+				<module>jadex-kernel-micro</module>
+				<module>jadex-platform</module>
+			</modules>
 			<build>
-				<finalName>jadex-android-${project.version}</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>jadex-android-example-project</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>jadex-android-example-projects</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>sources</finalName>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-androidsrczip.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<descriptors>
-										<descriptor>src/main/assembly/dist-assembly-android.xml</descriptor>
-									</descriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>groovy-maven-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>execute</goal>
-								</goals>
-								<configuration>
-									<source>
-									println "Generating .jar.properties files ...";
-									def arr = "${project.modules}";
-									def ln = System.getProperty('line.separator')
-									
-									arr = arr[1 .. -2].replaceAll(" ","").replaceFirst(",docs/.*","").tokenize(',');
-									arr.each() {
-										module ->
-										def fileName = "./" + module + "/target/" + module + "-${project.version}.jar.properties";
-										def f = new File(fileName);
-										<![CDATA[
-										if (f.getParentFile().exists() && f.getParentFile().isDirectory()) {
-											f.asWritable().write("src=sources.zip");	
-											println fileName;
-										}
-										]]>
-									};
-									</source>
-								</configuration>
-							</execution>
-						</executions>
+						<configuration>
+							<skip>false</skip>
+							<finalName>jadex-android-minimal-${project.version}</finalName>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<!-- ======== Profile for dist assembly ======== -->
+		<profile>
+			<id>dist</id>
 			<modules>
+				<module>jadex-android-parent</module>
+				<module>jadex-android-antlr</module>	
+				<module>jadex-android-xmlpull</module>
+				<module>jadex-runtimetools-android</module>
+				<module>jadex-platform-extension-webservice-android</module>
 				<!-- Additional Jadex modules to include in dist -->
 				<module>jadex-parent</module>
 				<module>jadex-commons</module>
@@ -152,6 +191,17 @@
 				<module>jadex-applications-android-demos</module>
 				<module>jadex-applications-android-chat</module>
 			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		
 		<!-- ======== integration test ======== -->
@@ -162,19 +212,11 @@
 				<file><exists>jadex-android-integration-test</exists></file>
 			</activation>
 			<modules>
-				<!-- Modules required for integration test -->
+<!-- 				Modules required for integration test -->
 				<module>jadex-android-integration-test</module>
 				<module>docs/android/jadex-android-example-project-maven</module>
 			</modules>
 		</profile>
 		
-		<!-- ======== Minimal distribution ======== -->
-		
-		<profile>
-		    <id>android-distribution-minimal</id>
-<!--  	        <modules> -->
-<!-- 				<module>jadex-distribution-minimal</module> -->
-<!-- 		    </modules> -->
-		</profile>
 	</profiles>
 </project>
