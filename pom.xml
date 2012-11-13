@@ -52,7 +52,6 @@
 		<module>jadex-kernel-application</module>
 		<module>jadex-kernel-bdi</module>
 		<module>jadex-kernel-micro</module>
-		<module>jadex-model-bpmn</module>
 		<module>jadex-kernel-bpmn</module>
 		<module>jadex-kernel-bdibpmn</module>
 		<module>jadex-kernel-gpmn</module>
