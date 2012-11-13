@@ -423,67 +423,71 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
 						
-			boolean found = false;
 			Class serclass = service.getClass();
-			while(!Object.class.equals(serclass) && !found)
+			// Do not try to call isAnnotationPresent for Proxy on Android
+			// see http://code.google.com/p/android/issues/detail?id=24846
+			if (!(SReflect.isAndroid() && (service instanceof Proxy))) 
 			{
-				Field[] fields = serclass.getDeclaredFields();
-				for(int i=0; i<fields.length; i++)
+				while(!Object.class.equals(serclass))
 				{
-					if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
+					Field[] fields = serclass.getDeclaredFields();
+					for(int i=0; i<fields.length; i++)
 					{
-						ServiceIdentifier si = (ServiceIdentifier)fields[i].getAnnotation(ServiceIdentifier.class);
-						if(si.value().equals(Object.class) || si.value().equals(type))
+						if(fields[i].isAnnotationPresent(ServiceIdentifier.class))
 						{
-							if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
+							ServiceIdentifier si = (ServiceIdentifier)fields[i].getAnnotation(ServiceIdentifier.class);
+							if(si.value().equals(Object.class) || si.value().equals(type))
+							{
+								if(SReflect.isSupertype(IServiceIdentifier.class, fields[i].getType()))
+								{
+									try
+									{
+										fields[i].setAccessible(true);
+										fields[i].set(service, mgmntservice.getServiceIdentifier());
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+								}
+								else
+								{
+									System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
+								}
+							}
+						}
+						
+						if(fields[i].isAnnotationPresent(ServiceComponent.class))
+						{
+							Object val = null;
+							if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
+							{
+								val = ia;
+							}
+							else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
+							{
+								val = ia.getExternalAccess();
+							}
+							else
+							{
+								System.out.println("Field cannot store component: "+fields[i].getName()+" "+fields[i].getType());
+							}
+							if(val!=null)
 							{
 								try
 								{
 									fields[i].setAccessible(true);
-									fields[i].set(service, mgmntservice.getServiceIdentifier());
+									fields[i].set(service, val);
 								}
 								catch(Exception e)
 								{
 									e.printStackTrace();
 								}
 							}
-							else
-							{
-								System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
-							}
 						}
 					}
-					
-					if(fields[i].isAnnotationPresent(ServiceComponent.class))
-					{
-						Object val = null;
-						if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
-						{
-							val = ia;
-						}
-						else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
-						{
-							val = ia.getExternalAccess();
-						}
-						else
-						{
-							System.out.println("Field cannot store component: "+fields[i].getName()+" "+fields[i].getType());
-						}
-						if(val!=null)
-						{
-							try
-							{
-								fields[i].setAccessible(true);
-								fields[i].set(service, val);
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-							}
-						}
-					}
+					serclass = serclass.getSuperclass();
 				}
-				serclass = serclass.getSuperclass();
 			}
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);

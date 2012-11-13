@@ -8,8 +8,6 @@ import jadex.extension.rs.annotations.Produces;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 
-import java.awt.Color;
-
 import org.springframework.http.MediaType;
 
 
@@ -33,7 +31,7 @@ public interface IRSChartService
 		@ParameterMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
 		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Integer[] colors);
 
 	/**
 	 *  Get a line chart.
@@ -47,7 +45,7 @@ public interface IRSChartService
 		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
 		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Integer[] colors);
 	
 	/**
 	 *  Get a pie chart.
@@ -61,7 +59,7 @@ public interface IRSChartService
 		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
 		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Integer[] colors);
 
 	
 	//-------- alternatives --------

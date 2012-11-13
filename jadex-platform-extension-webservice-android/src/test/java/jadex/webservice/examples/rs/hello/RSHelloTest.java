@@ -3,6 +3,7 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 
@@ -54,6 +55,9 @@ public class RSHelloTest extends TestCase
 
 	public void setUp() throws Exception
 	{
+		SReflectSub sReflectSub = new SReflectSub();
+		sReflectSub.setIsAndroid(false);
+		
 		hello = new Hello();
 		System.out.println("Starting grizzly...");
 		ResourceConfig rc;
@@ -102,5 +106,11 @@ public class RSHelloTest extends TestCase
 
 		assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);
+	}
+	
+	private class SReflectSub extends SReflect {
+		public void setIsAndroid(Boolean b) {
+			isandroid = b;
+		}
 	}
 }

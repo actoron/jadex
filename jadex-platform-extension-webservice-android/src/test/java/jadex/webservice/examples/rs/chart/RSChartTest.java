@@ -1,12 +1,16 @@
 package jadex.webservice.examples.rs.chart;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import android.graphics.Color;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-
-import java.awt.Color;
 
 import junit.framework.TestCase;
 
@@ -16,6 +20,7 @@ public class RSChartTest extends TestCase
 	
 	protected void setUp() throws Exception
 	{
+		new SReflectSub().setIsAndroid(false);
 		ThreadSuspendable sus = new ThreadSuspendable();
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
@@ -32,7 +37,7 @@ public class RSChartTest extends TestCase
 		IFuture<IChartService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IChartService.class);
 		IChartService hs = fut.get(sus);
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
-		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Color[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);
+		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);
 		
 		
 //		RestTemplate rt = new RestTemplate();
@@ -57,4 +62,9 @@ public class RSChartTest extends TestCase
 		System.out.println("Response: " + result);
 	}
 	
+	private class SReflectSub extends SReflect {
+		public void setIsAndroid(Boolean b) {
+			isandroid = b;
+		}
+	}
 }
