@@ -15,6 +15,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
@@ -124,12 +125,17 @@ public class CliEmailAgent
 							{
 								receivedCommandEmail(eml).addResultListener(new DefaultResultListener<Email>()
 								{
-									public void resultAvailable(Email rep)
+									public void resultAvailable(final Email rep)
 									{
-										emailser.sendEmail(rep, account).addResultListener(new DefaultResultListener<Void>()
+										emailser.sendEmail(rep, account).addResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void result)
 											{
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												System.out.println("Exception while sending email: "+rep+" "+exception);
 											}
 										});
 									}
@@ -142,6 +148,13 @@ public class CliEmailAgent
 
 							public void customResultAvailable(Collection<Email> result)
 							{
+							}
+							
+							// not push exception to body ret
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof FutureTerminatedException)
+									System.out.println("email subscription ended");
 							}
 						});
 					}

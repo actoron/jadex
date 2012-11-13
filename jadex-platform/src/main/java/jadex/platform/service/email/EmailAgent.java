@@ -109,12 +109,10 @@ public class EmailAgent implements IEmailService
 	{
 		if(subscriptions!=null)
 		{
-			for(Iterator<SubscriptionIntermediateFuture<Email>> 
-				it = subscriptions.keySet().iterator(); it.hasNext(); )
+			SubscriptionIntermediateFuture<Email>[] subs = subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[subscriptions.size()]);
+			for(int i=0; i<subs.length; i++)
 			{
-				SubscriptionIntermediateFuture<Email> fut = it.next();
-				fut.terminate();
-				it.remove();
+				subs[i].terminate(); // removes itself on terminate
 			}
 		}
 		
