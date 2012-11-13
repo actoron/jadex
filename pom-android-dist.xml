@@ -8,6 +8,10 @@
 	<packaging>pom</packaging>
 	<version> 2.3-SNAPSHOT </version>
 	<name>jadex-android-dist</name>
+	
+	<properties>
+		<assembly.skip>false</assembly.skip>
+	</properties>
 
 	<!-- ======== common plugin configurations ======== -->
 
@@ -31,7 +35,7 @@
 					<archiverConfig>
 						<duplicateBehavior>skip</duplicateBehavior>
 					</archiverConfig>
-					<skip>true</skip>
+					<skipAssembly>${assembly.skip}</skipAssembly>
 				</configuration>
 				<executions>
 					<execution>
@@ -123,6 +127,9 @@
 	<profiles>
 		<profile>
 			<id>deploy</id>
+			<properties>
+				<assembly.skip>true</assembly.skip>
+			</properties>
 			<modules>
 				<module>jadex-android-parent</module>
 				<module>jadex-android-antlr</module>	
@@ -149,18 +156,6 @@
 				<module>jadex-kernel-micro</module>
 				<module>jadex-platform</module>
 			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<skip>false</skip>
-							<finalName>jadex-android-minimal-${project.version}</finalName>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<!-- ======== Profile for dist assembly ======== -->
 		<profile>
@@ -191,17 +186,6 @@
 				<module>jadex-applications-android-demos</module>
 				<module>jadex-applications-android-chat</module>
 			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<skip>false</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		
 		<!-- ======== integration test ======== -->
@@ -212,7 +196,7 @@
 				<file><exists>jadex-android-integration-test</exists></file>
 			</activation>
 			<modules>
-<!-- 				Modules required for integration test -->
+				<!-- Modules required for integration test -->
 				<module>jadex-android-integration-test</module>
 				<module>docs/android/jadex-android-example-project-maven</module>
 			</modules>
