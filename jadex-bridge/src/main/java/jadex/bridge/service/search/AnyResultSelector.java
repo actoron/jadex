@@ -5,7 +5,7 @@ import jadex.commons.IRemoteFilter;
 /**
  *  Select first service to be returned as result of service search.
  */
-public class AnyResultSelector extends BasicResultSelector
+public class AnyResultSelector<T> extends BasicResultSelector<T>
 {
 	//-------- constructors --------
 	

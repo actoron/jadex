@@ -6,6 +6,9 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+/**
+ * 
+ */
 @Service
 public class MandelbrotService implements IMandelbrotService
 {

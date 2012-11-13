@@ -33,7 +33,7 @@ import java.util.Set;
 public class CreateComponentTask implements ITask
 {
 	/** Future called when the component is created to allow compensation (i.e. killing the component). */
-	protected Future creationfuture = new Future();
+	protected Future<IComponentIdentifier> creationfuture = new Future<IComponentIdentifier>();
 	
 	static Set<String> reserved;
 	static
@@ -76,10 +76,10 @@ public class CreateComponentTask implements ITask
 				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
 				RequiredServiceBinding[] bindings = context.getParameterValue("bindings")!=null? (RequiredServiceBinding[])context.getParameterValue("bindings"): null;
 				
-				Map args = (Map)context.getParameterValue("arguments");
+				Map<String, Object> args = (Map<String, Object>)context.getParameterValue("arguments");
 				if(args==null)
 				{
-					args = new HashMap();
+					args = new HashMap<String, Object>();
 					IndexMap params = context.getActivity().getParameters();
 					if(params!=null)
 					{
@@ -101,7 +101,7 @@ public class CreateComponentTask implements ITask
 					{
 						addResult(result.getFirstEntity(), result.getSecondEntity());
 						
-						if (resultmapping != null)
+						if(resultmapping!=null)
 						{
 							for(int i=0; i<resultmapping.length/2; i++)
 							{
@@ -191,12 +191,22 @@ public class CreateComponentTask implements ITask
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
 						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings, null), lis)
 					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));
-
-				if(!wait)
+				
+				creationfuture.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
-					ret.setResult(null);
-//					listener.resultAvailable(this, null);
-				}
+					public void customResultAvailable(IComponentIdentifier cid)
+					{
+						// If should not wait notify that was created
+						if(!wait)
+							ret.setResult(null);
+					}
+				}));
+
+//				if(!wait)
+//				{
+//					ret.setResult(null);
+////					listener.resultAvailable(this, null);
+//				}
 			}
 		}));
 		
@@ -207,20 +217,26 @@ public class CreateComponentTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final BpmnInterpreter instance)
 	{
-		final Future ret = new Future();
-		creationfuture.addResultListener(instance.createResultListener(new IResultListener()
+		final Future<Void> ret = new Future<Void>();
+		creationfuture.addResultListener(instance.createResultListener(new IResultListener<IComponentIdentifier>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
+				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, 
+					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener<IComponentManagementService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IComponentManagementService cms)
 					{
-						IComponentManagementService	cms	= (IComponentManagementService)result;
-						cms.destroyComponent(id).addResultListener(new DelegationResultListener(ret));
+						IFuture<Map<String, Object>> fut = cms.destroyComponent(cid);
+						fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> result)
+							{
+								ret.setResult(null);
+							}
+						});
 					}
 					
 					public void exceptionOccurred(Exception exception)

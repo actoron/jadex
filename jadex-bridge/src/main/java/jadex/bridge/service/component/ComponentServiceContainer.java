@@ -23,6 +23,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.IFilter;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -79,25 +80,6 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	//-------- interface methods --------
 	
 	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
-	{
-		if(shutdowned)
-			return new Future<T>(new ComponentTerminatedException(id));
-		if(info.getMultiplexType()!=null)
-		{
-			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader()));
-			return new Future<T>(ms);
-		}
-		
-		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind);
-		
-		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
-	}
-	
-	/**
 	 *  Get a multi service.
 	 *  @param reqname The required service name.
 	 *  @param multitype The interface of the multi service.
@@ -109,15 +91,70 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	}
 	
 	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
+	{
+		return getRequiredService(info, binding, false, null);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	{
+		return getRequiredService(info, binding, rebind, null);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
+	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+		if(info.getMultiplexType()!=null)
+		{
+			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader()));
+			return new Future<T>(ms);
+		}
+		
+		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind, filter);
+		
+		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
+	{
+		return getRequiredServices(info, binding, false, null);
+	}
+	
+	/**
 	 *  Get required services.
 	 *  @return The services.
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
+		return getRequiredServices(info, binding, rebind, null);
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
+	{
 		if(shutdowned)
 			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 
-		IIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind);
+		IIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind, filter);
 		
 		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}

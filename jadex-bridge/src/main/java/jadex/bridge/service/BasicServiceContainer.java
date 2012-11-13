@@ -13,6 +13,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -75,7 +76,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param clazz The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+	public IIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
 		if(shutdowned)
 		{
@@ -658,28 +659,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	}
 	
 	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
-	{
-		if(shutdowned)
-			return new Future<IService>(new ComponentTerminatedException(id));
-		return getRequiredService(info, binding, false);
-	}
-	
-	/**
-	 *  Get required services.
-	 *  @return The services.
-	 */
-	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
-	{
-		if(shutdowned)
-			return new IntermediateFuture<IService>(new ComponentTerminatedException(id));
-		return getRequiredServices(info, binding, false);
-	}
-	
-	/**
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.
@@ -707,10 +686,64 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 		if(shutdowned)
 			return new Future<T>(new ComponentTerminatedException(id));
+		return getRequiredService(info, binding, false, null);
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
+	{
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+		return getRequiredServices(info, binding, false, null);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IFilter<T> filter)
+	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+		IFuture<T> ret = getRequiredService(info, binding, false, filter);
+		return ret;
+//		return getRequiredService(info, binding, false, filter);
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, IFilter<T> filter)
+	{
+		return getRequiredServices(info, binding, false, filter);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
+	{
+		return getRequiredService(name, rebind, null);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IFilter<T> filter)
+	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+		
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
@@ -721,7 +754,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		else
 		{
 			RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
-			return getRequiredService(info, binding, rebind);
+			return getRequiredService(info, binding, rebind, filter);
 		}
 	}
 	
@@ -730,6 +763,15 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @return The services.
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
+	{
+		return getRequiredServices(name, rebind, null);
+	}
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IFilter<T> filter)
 	{
 		if(shutdowned)
 			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
@@ -744,7 +786,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		else
 		{
 			RequiredServiceBinding binding = info.getDefaultBinding();//getRequiredServiceBinding(name);
-			return getRequiredServices(info, binding, rebind);
+			return getRequiredServices(info, binding, rebind, filter);
 		}
 	}
 	
@@ -752,7 +794,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
 	{
 		if(info==null)
 		{
@@ -764,14 +806,14 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new Future<T>(new ComponentTerminatedException(id));
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
-		return fetcher.getService(info, binding, rebind);
+		return fetcher.getService(info, binding, rebind, filter);
 	}
 	
 	/**
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
 	{
 		if(info==null)
 		{
@@ -783,7 +825,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
-		return fetcher.getServices(info, binding, rebind);
+		return fetcher.getServices(info, binding, rebind, filter);
 	}
 	
 	/**

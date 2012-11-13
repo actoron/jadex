@@ -5,7 +5,7 @@ package jadex.bridge.service.search;
 /**
  *  Select service by id.
  */
-public class IdResultSelector extends BasicResultSelector
+public class IdResultSelector<T> extends BasicResultSelector<T>
 {
 	//-------- attributes --------
 	

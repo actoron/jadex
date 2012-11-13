@@ -7,6 +7,7 @@ import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.IFilter;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
 import jadex.commons.future.CounterResultListener;
@@ -66,7 +67,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+	public IIntermediateFuture<IService> getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
 		
@@ -444,6 +445,16 @@ public class CacheServiceContainer	implements IServiceContainer
 	}
 
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	public IFuture getRequiredService(String name, boolean rebind, IFilter filter)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public IIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
 	{
 		throw new UnsupportedOperationException();
 	}

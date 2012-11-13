@@ -144,9 +144,11 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 //				exception.printStackTrace();
 //			}
 //		});
-		// todo: problem, search delivers failed service as result again
 		
-		fetcher.getService(info, binding, false)
+		// todo: problem, search delivers failed service as result again
+		// -> remember sids and use filter for that purpose!
+		
+		fetcher.getService(info, binding, false, null)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result) 

@@ -3,6 +3,7 @@ package jadex.bridge.service.search;
 import jadex.bridge.service.IService;
 import jadex.commons.ComposedFilter;
 import jadex.commons.ComposedRemoteFilter;
+import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple;
 import jadex.commons.future.DelegationResultListener;
@@ -22,11 +23,11 @@ import java.util.Map;
 /**
  *  Select one or more services according to a filter.
  */
-public class BasicResultSelector implements IResultSelector
+public class BasicResultSelector<T> implements IResultSelector
 {
 	//-------- attributes --------
 	
-	/** The type. */
+	/** The remote filter. */
 	protected IRemoteFilter filter;
 	
 	/** The one result flag. */
@@ -65,9 +66,23 @@ public class BasicResultSelector implements IResultSelector
 	 */
 	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote)
 	{
-		this.filter = filter;
+		this(filter, oneresult, false, null);
+	}
+	
+	/**
+	 *  Create a type result listener.
+	 */
+	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote, final IFilter<T> sfilter)
+	{
 		this.oneresult = oneresult;
 		this.remote = remote;
+		this.filter = sfilter==null? filter: new ComposedRemoteFilter(new IRemoteFilter[]{new IRemoteFilter()
+		{
+			public jadex.commons.future.IFuture<Boolean> filter(Object obj) 
+			{
+				return new Future<Boolean>(sfilter.filter((T)obj)? Boolean.TRUE: Boolean.FALSE);
+			}
+		}, filter}, ComposedFilter.AND);
 	}
 	
 	//-------- methods --------
@@ -77,7 +92,7 @@ public class BasicResultSelector implements IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public IFuture<List<IService>> selectServices(Map servicemap)
+	public IFuture<List<IService>> selectServices(Map<Class<?>, Collection<IService>> servicemap)
 	{
 		final Future<List<IService>> ret = new Future<List<IService>>();
 		
@@ -193,13 +208,13 @@ public class BasicResultSelector implements IResultSelector
 	/**
 	 *  Get all services of the map as linear collection.
 	 */
-	public IService[] generateServiceArray(Map servicemap)
+	public IService[] generateServiceArray(Map<Class<?>, Collection<IService>> servicemap)
 	{
 		List<IService> ret = new ArrayList<IService>();
 		Object[] keys = servicemap.keySet().toArray();
 		for(int i=0; i<keys.length; i++)
 		{
-			Collection coll = (Collection)servicemap.get(keys[i]);
+			Collection<IService> coll = servicemap.get(keys[i]);
 			if(coll!=null)
 			{
 				Object[] vals = coll.toArray();
@@ -239,7 +254,7 @@ public class BasicResultSelector implements IResultSelector
 	 *  @param results	The collection of selected services.
 	 *  @return True, if the search should be stopped.
 	 */
-	public boolean	isFinished(Collection results)
+	public boolean	isFinished(Collection<IService> results)
 	{
 		return oneresult && results.size()>0;
 	}

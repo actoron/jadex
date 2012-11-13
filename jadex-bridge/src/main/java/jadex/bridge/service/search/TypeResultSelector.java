@@ -1,6 +1,7 @@
 package jadex.bridge.service.search;
 
 import jadex.bridge.service.IService;
+import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple;
 
@@ -11,12 +12,12 @@ import java.util.Map;
 /**
  *  Select first service to be returned as result of service search.
  */
-public class TypeResultSelector extends BasicResultSelector
+public class TypeResultSelector<T> extends BasicResultSelector<T>
 {
 	//-------- attributes --------
 		
 	/** The type. */
-	protected Class type;
+	protected Class<?> type;
 	
 	//-------- constructors --------
 	
@@ -30,7 +31,7 @@ public class TypeResultSelector extends BasicResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public TypeResultSelector(Class type)
+	public TypeResultSelector(Class<?> type)
 	{
 		this(type, true);
 	}
@@ -38,7 +39,7 @@ public class TypeResultSelector extends BasicResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public TypeResultSelector(Class type, boolean oneresult)
+	public TypeResultSelector(Class<?> type, boolean oneresult)
 	{
 		this(type, oneresult, false);
 	}
@@ -46,20 +47,29 @@ public class TypeResultSelector extends BasicResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public TypeResultSelector(Class type, boolean oneresult, boolean remote)
+	public TypeResultSelector(Class<?> type, boolean oneresult, boolean remote)
 	{
-		super(IRemoteFilter.ALWAYS, oneresult, remote);
+		this(type, oneresult, false, null);
+	}
+	
+	/**
+	 *  Create a type result listener.
+	 */
+	public TypeResultSelector(Class<?> type, boolean oneresult, boolean remote, IFilter<T> filter)
+	{
+		super(IRemoteFilter.ALWAYS, oneresult, remote, filter);
 		this.type = type;
 	}
 	
 	//-------- methods --------
-	
+
+
 	/**
 	 *  Get all services of the map as linear collection.
 	 */
-	public IService[] generateServiceArray(Map servicemap)
+	public IService[] generateServiceArray(Map<Class<?>, Collection<IService>> servicemap)	
 	{
-		Collection tmp = (Collection)servicemap.get(type);
+		Collection<IService> tmp = servicemap.get(type);
 		return tmp==null? IService.EMPTY_SERVICES: (IService[])tmp.toArray(new IService[0]);
 	}
 	
@@ -78,7 +88,7 @@ public class TypeResultSelector extends BasicResultSelector
 	 *  Get the type.
 	 *  @return the type.
 	 */
-	public Class getType()
+	public Class<?> getType()
 	{
 		return type;
 	}
@@ -87,7 +97,7 @@ public class TypeResultSelector extends BasicResultSelector
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class type)
+	public void setType(Class<?> type)
 	{
 		this.type = type;
 	}

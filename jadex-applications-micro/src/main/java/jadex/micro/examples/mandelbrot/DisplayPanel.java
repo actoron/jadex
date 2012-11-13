@@ -139,6 +139,7 @@ public class DisplayPanel extends JComponent
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 					}
 				});
 				
@@ -984,7 +985,6 @@ public class DisplayPanel extends JComponent
 			{
 				public void resultAvailable(IGenerateService gs)
 				{
-	//				IGenerateService	gs	= (IGenerateService)result;
 					gs.generateArea(ad).addResultListener(new SwingDefaultResultListener<AreaData>()
 					{
 						public void customResultAvailable(AreaData result)

@@ -2035,24 +2035,27 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<IComponentIdentifier> getParent(final IComponentIdentifier cid)
 	{
-		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
+//		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		
-		if(isRemoteComponent(cid))
-		{
-			getRemoteCMS(cid).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-			{
-				public void customResultAvailable(IComponentManagementService rcms)
-				{
-					rcms.getParent(cid).addResultListener(createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
-				}
-			}));
-		}
-		else
-		{
-			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
-			ret.setResult(desc!=null? desc.getName().getParent(): null);
-		}
-		return ret;
+//		if(isRemoteComponent(cid))
+//		{
+//			getRemoteCMS(cid).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getParent(cid).addResultListener(createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
+//				}
+//			}));
+//		}
+//		else
+//		{
+//			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+//			ret.setResult(desc!=null? desc.getName().getParent(): null);
+//		}
+		
+//		return ret;
+	
+		return new Future<IComponentIdentifier>(cid.getParent());
 	}
 	
 	/**

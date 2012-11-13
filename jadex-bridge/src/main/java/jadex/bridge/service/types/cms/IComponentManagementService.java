@@ -161,6 +161,7 @@ public interface IComponentManagementService //extends IService
 	 *  Get the parent component of a component.
 	 *  @param cid The component identifier.
 	 *  @return The parent component identifier.
+	 *  @deprecated Use cid.getParent() instead
 	 */
 	public IFuture<IComponentIdentifier> getParent(IComponentIdentifier cid);
 	

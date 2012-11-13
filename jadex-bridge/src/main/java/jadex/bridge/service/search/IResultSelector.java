@@ -17,7 +17,7 @@ public interface IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public IFuture<List<IService>> selectServices(Map<Class<?>, IService> services);
+	public IFuture<List<IService>> selectServices(Map<Class<?>, Collection<IService>> services);
 	
 //	/**
 //	 *  Get the result.

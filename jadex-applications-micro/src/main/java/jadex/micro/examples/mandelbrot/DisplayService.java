@@ -33,7 +33,7 @@ public class DisplayService implements IDisplayService
 	 */
 	public IFuture<Void> displayResult(AreaData result)
 	{
-//		System.out.println("displayRes");
+//		System.out.println("displayRes: "+agent.getComponentIdentifier());
 //		agent.getPanel().setResults(result);
 		String id = result.getDisplayId();
 		if(id!=null)

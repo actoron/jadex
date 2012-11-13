@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  *  Result selector for finding a component factory. 
  */
-public class ComponentFactorySelector extends BasicResultSelector
+public class ComponentFactorySelector<T> extends BasicResultSelector<T>
 {	
 	//-------- constructors --------
 	
@@ -41,9 +41,9 @@ public class ComponentFactorySelector extends BasicResultSelector
 	/**
 	 *  Get all services of the map as linear collection.
 	 */
-	public IService[] generateServiceArray(Map servicemap)
+	public IService[] generateServiceArray(Map<Class<?>, Collection<IService>> servicemap)
 	{
-		Collection tmp = (Collection)servicemap.get(IComponentFactory.class);
+		Collection<IService> tmp = servicemap.get(IComponentFactory.class);
 		return tmp==null? IService.EMPTY_SERVICES: (IService[])tmp.toArray(new IService[tmp.size()]);
 	}
 }

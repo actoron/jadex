@@ -4,6 +4,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.IIntermediateFuture;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public interface ISearchManager
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
 	public IIntermediateFuture<IService> searchServices(IServiceProvider provider, IVisitDecider decider, 
-		IResultSelector selector, Map services);
+		IResultSelector selector, Map<Class<?>, Collection<IService>> services);
 
 	/**
 	 *  Get the cache key.

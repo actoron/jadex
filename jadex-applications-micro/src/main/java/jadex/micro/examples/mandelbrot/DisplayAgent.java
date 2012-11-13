@@ -61,7 +61,6 @@ public class DisplayAgent extends MicroAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		// Hack!!! Swing code not on swing thread!?
 		IFuture<IMandelbrotService> fut = getRequiredService("mandelservice");
 		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
 		{

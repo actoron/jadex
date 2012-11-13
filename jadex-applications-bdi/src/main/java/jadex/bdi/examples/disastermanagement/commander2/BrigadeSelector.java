@@ -18,7 +18,7 @@ public class BrigadeSelector implements IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public IFuture<List<IService>> selectServices(Map<Class<?>, IService> services)// context
+	public IFuture<List<IService>> selectServices(Map<Class<?>, Collection<IService>> services)// context
 	{
 		// IGoal	goal	= context.get("$goal");
 		return null;

@@ -10,6 +10,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -195,6 +196,16 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope)
 	{
+		return getService(provider, type, scope, (IFilter<T>)null);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope, final IFilter<T> filter)
+	{
 //		if(type.toString().indexOf("IComponentM")!=-1 && scope.equals("upwards"))
 //			System.out.println("here22");
 		
@@ -212,7 +223,7 @@ public class SServiceProvider
 		try
 		{
 			provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-				new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+				new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
 					.addResultListener(new IIntermediateResultListener<IService>()
 			{
 				public void intermediateResultAvailable(IService result)
@@ -424,6 +435,16 @@ public class SServiceProvider
 	 */
 	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope)
 	{
+		return getServices(provider, type, scope, null);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope, IFilter<T> filter)
+	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
@@ -439,7 +460,7 @@ public class SServiceProvider
 		{
 			provider.getServices(getSearchManager(true, scope), 
 				getVisitDecider(false, scope),
-				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
 					.addResultListener(new IntermediateDelegationResultListener(ret));
 	//				{
 	//					public void customResultAvailable(Object source, Object result)
