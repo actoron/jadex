@@ -45,6 +45,7 @@
 		<module>../jadex-bridge</module>
 		<module>../jadex-platform</module>
 		<module>../jadex-nuggets</module>
+		<module>../jadex-model-bpmn</module>
 
 		<module>../jadex-kernel-base</module>
 		<module>../jadex-kernel-component</module>
@@ -432,6 +433,7 @@
 				<module>jadex-bridge</module>
 				<module>jadex-platform</module>
 				<module>jadex-nuggets</module>
+				<module>jadex-model-bpmn</module>
 
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-component</module>
