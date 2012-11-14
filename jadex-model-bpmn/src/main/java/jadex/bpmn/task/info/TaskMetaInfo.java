@@ -1,10 +1,13 @@
-package jadex.bpmn.runtime.task;
+package jadex.bpmn.task.info;
+
+import jadex.commons.transformation.annotations.IncludeFields;
 
 /**
  *  Meta information about a task.
  *  Should contain a description of what the task is useful for
  *  and which parameters it has.
  */
+@IncludeFields
 public class TaskMetaInfo
 {
 	//-------- attributes --------
@@ -16,6 +19,13 @@ public class TaskMetaInfo
 	protected ParameterMetaInfo[] parammetainfos;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a task meta info.
+	 */
+	public TaskMetaInfo()
+	{
+	}
 	
 	/**
 	 *  Create a task meta info.
@@ -36,6 +46,16 @@ public class TaskMetaInfo
 	{
 		return description;
 	}
+	
+	/**
+	 *  Sets the description.
+	 *
+	 *  @param description The description.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 
 	/**
 	 *  Get the parameters.
@@ -45,7 +65,14 @@ public class TaskMetaInfo
 	{
 		return this.parammetainfos;
 	}
-	
-	
-	
+
+	/**
+	 *  Set the parameters.
+	 *
+	 *  @param parammetainfos The parameters.
+	 */
+	public void setParameterMetaInfos(ParameterMetaInfo[] parammetainfos)
+	{
+		this.parammetainfos = parammetainfos;
+	}
 }

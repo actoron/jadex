@@ -4,6 +4,8 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;

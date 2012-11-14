@@ -9,12 +9,16 @@ import jadex.bpmn.model.MPool;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 
+/**
+ *  Visual representation of an activity.
+ *
+ */
 public class VActivity extends VNamedNode
 {
 	/**
-	 * Creates a new activity.
+	 *  Creates a new activity.
 	 * 
-	 * @param graph The graph where this element is used.
+	 *  @param graph The graph where this element is used.
 	 */
 	public VActivity(mxGraph graph)
 	{

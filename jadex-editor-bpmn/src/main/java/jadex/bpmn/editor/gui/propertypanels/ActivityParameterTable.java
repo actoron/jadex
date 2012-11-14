@@ -52,6 +52,14 @@ public class ActivityParameterTable extends JTable
 	{
 		String name = BasePropertyPanel.createFreeName("name", new BasePropertyPanel.IndexMapContains(getBpmnActivity().getParameters()));
 		MParameter param = new MParameter(MParameter.DIRECTION_INOUT, new ClassInfo(""), name, new UnparsedExpression(name, "", "", null));
+		addParameter(param);
+	}
+	
+	/**
+	 *  Adds a parameter.
+	 */
+	public void addParameter(MParameter param)
+	{
 		int row = getRowCount();
 		getBpmnActivity().addParameter(param);
 		((ParameterTableModel) getModel()).fireTableRowsInserted(row, row);

@@ -36,6 +36,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxKeyboardHandler;
@@ -95,6 +96,8 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 			public void run()
 			{
 				getContentPane().setLayout(new BorderLayout());
+				
+				setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				
 				viewpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 				viewpane.setOneTouchExpandable(true);

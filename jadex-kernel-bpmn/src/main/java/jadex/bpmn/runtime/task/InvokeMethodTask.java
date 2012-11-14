@@ -3,6 +3,8 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

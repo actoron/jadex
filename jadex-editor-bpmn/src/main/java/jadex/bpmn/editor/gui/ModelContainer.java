@@ -40,6 +40,9 @@ public class ModelContainer
 	/** Edit mode for adding tasks. */
 	public static final String EDIT_MODE_TASK = MBpmnModel.TASK;
 	
+	/** Edit mode for adding tasks. */
+	public static final String EDIT_MODE_SUBPROCESS = MBpmnModel.SUBPROCESS;
+	
 	/** Edit mode for adding xor-gateways. */
 	public static final String EDIT_MODE_GW_XOR = MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE;
 	
@@ -120,15 +123,7 @@ public class ModelContainer
 		ACTIVITY_MODES.add(EDIT_MODE_GW_XOR);
 		ACTIVITY_MODES.add(EDIT_MODE_GW_AND);
 		ACTIVITY_MODES.add(EDIT_MODE_GW_OR);
-		/*ACTIVITY_MODES.add(EDIT_MODE_EVENT_START_EMPTY);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_INTERMEDIATE_EMPTY);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_END_EMPTY);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_START_MESSAGE);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_END_MESSAGE);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_START_TIMER);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_INTERMEDIATE_TIMER);
-		ACTIVITY_MODES.add(EDIT_MODE_EVENT_INTERMEDIATE_TIMER);*/
+		ACTIVITY_MODES.add(EDIT_MODE_SUBPROCESS);
 	}
 	
 	/** Mapping activity edit modes to activity types */

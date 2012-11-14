@@ -1,4 +1,7 @@
-package jadex.bpmn.runtime.task;
+package jadex.bpmn.task.info;
+
+import jadex.bridge.ClassInfo;
+
 
 /**
  *  Meta information for a parameter.
@@ -22,7 +25,7 @@ public class ParameterMetaInfo
 	protected String direction;
 	
 	/** The clazz. */
-	protected Class clazz;
+	protected ClassInfo clazz;
 	
 	/** The name. */
 	protected String name;
@@ -38,10 +41,17 @@ public class ParameterMetaInfo
 	/**
 	 *  Create a new parameter meta info.
 	 */
+	public ParameterMetaInfo()
+	{
+	}
+	
+	/**
+	 *  Create a new parameter meta info.
+	 */
 	public ParameterMetaInfo(String direction, Class clazz, String name, String initialval, String description)
 	{
 		this.direction = direction;
-		this.clazz = clazz;
+		this.clazz = new ClassInfo(clazz);
 		this.name = name;
 		this.initialval = initialval;
 		this.description = description;
@@ -62,7 +72,7 @@ public class ParameterMetaInfo
 	 *  Get the clazz.
 	 *  @return The clazz.
 	 */
-	public Class getClazz()
+	public ClassInfo getClazz()
 	{
 		return this.clazz;
 	}
@@ -92,6 +102,58 @@ public class ParameterMetaInfo
 	public String getDescription()
 	{
 		return this.description;
+	}
+	
+	
+
+	/**
+	 *  Sets the direction.
+	 *
+	 *  @param direction The direction.
+	 */
+	public void setDirection(String direction)
+	{
+		this.direction = direction;
+	}
+
+	/**
+	 *  Sets the clazz.
+	 *
+	 *  @param clazz The clazz.
+	 */
+	public void setClazz(ClassInfo clazz)
+	{
+		this.clazz = clazz;
+	}
+
+	/**
+	 *  Sets the name.
+	 *
+	 *  @param name The name.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 *  Sets the initialval.
+	 *
+	 *  @param initialval The initialval.
+	 */
+	public void setInitialValue(String initialval)
+	{
+		this.initialval = initialval;
+	}
+
+	/**
+	 *  Sets the description.
+	 *
+	 *  @param description The description.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 
 	/**

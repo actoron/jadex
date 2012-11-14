@@ -2,6 +2,8 @@ package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentStep;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

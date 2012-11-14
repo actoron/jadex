@@ -106,6 +106,21 @@ public class BpmnMenuBar extends JMenuBar
 			iconmenu.add(isbutton);
 		}
 		viewmenu.add(iconmenu);
+		
+		JMenu helpmenu = new JMenu("Help");
+		add(helpmenu);
+		
+		JMenuItem aboutitem = new JMenuItem(new AbstractAction("About " + BpmnEditor.APP_NAME)
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(getParent(),
+					    BpmnEditor.APP_NAME + " Version " + BpmnEditor.VERSION,
+					    BpmnEditor.APP_NAME,
+					    JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		helpmenu.add(aboutitem);
 	}
 	
 	/**

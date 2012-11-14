@@ -10,10 +10,12 @@ import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 
 import java.awt.Dimension;
@@ -180,11 +182,28 @@ public class MouseController extends MouseAdapter
 					return;
 				}
 				
-				MActivity mactivity = new MActivity();
+				MActivity mactivity = null;
+				if (ModelContainer.EDIT_MODE_SUBPROCESS.equals(mode))
+				{
+					mactivity = new MSubProcess();
+					mactivity.setClazz(new ClassInfo(""));
+				}
+				else
+				{
+					mactivity = new MActivity();
+				}
 				mactivity.setId(modelcontainer.getIdGenerator().generateId());
 				mactivity.setActivityType(ModelContainer.ACTIVITY_MODES_TO_TYPES.containsKey(mode) ? ModelContainer.ACTIVITY_MODES_TO_TYPES.get(mode) : mode);
 				
-				VActivity vactivity = new VActivity(modelcontainer.getGraph());
+				VActivity vactivity = null;
+				if (ModelContainer.EDIT_MODE_SUBPROCESS.equals(mode))
+				{
+					vactivity = new VSubProcess(modelcontainer.getGraph());
+				}
+				else
+				{
+					vactivity = new VActivity(modelcontainer.getGraph());
+				}
 				vactivity.setBpmnElement(mactivity);
 				
 				Point p = getPointForEvent(cell, e);
@@ -233,6 +252,17 @@ public class MouseController extends MouseAdapter
 		else if (MouseEvent.BUTTON2 == e.getButton())
 		{
 			setTargetScale(1.0);
+		}
+	}
+	
+	/**
+	 *  Called when the mouse is pressed.
+	 */
+	public void mousePressed(MouseEvent e)
+	{
+		if (MouseEvent.BUTTON3 == e.getButton())
+		{
+			modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
 		}
 	}
 	

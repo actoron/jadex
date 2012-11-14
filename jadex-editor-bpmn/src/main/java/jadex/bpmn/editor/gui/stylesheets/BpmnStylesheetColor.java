@@ -42,6 +42,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 	/** BPMN Task Color */
 	public static final String TASK_COLOR = "#61a7e3";
 	
+	/** BPMN Sub-Process Color */
+	public static final String SUBPROCESS_COLOR = "#30bf9f";
+	
 	/** BPMN Gateway Color */
 	public static final String GATEWAY_COLOR = "#ff81ac";
 	
@@ -65,6 +68,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 	static
 	{
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_TASK, new Dimension(160, 100));
+		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(320, 200));
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_XOR, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_AND, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_OR, new Dimension(60, 60));
@@ -161,8 +165,14 @@ public class BpmnStylesheetColor extends mxStylesheet
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
 		
 		style = new HashMap<String, Object>(style);
+		style.put(mxConstants.STYLE_FILLCOLOR, SUBPROCESS_COLOR);
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.TRUE);
+		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, style);
+		
+		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_SHAPE, MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.FALSE);
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RHOMBUS);
 		style.put(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_BOTTOM);
 		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);

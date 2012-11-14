@@ -1,9 +1,14 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 
 import java.awt.BorderLayout;
@@ -11,10 +16,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -26,28 +37,6 @@ import javax.swing.JTabbedPane;
  */
 public class TaskPropertyPanel extends BasePropertyPanel
 {
-	/** Standard task classes. */
-	protected static final String[] STANDARD_CLASSES = { "",
-														 "jadex.bpmn.runtime.task.PrintTask",
-														 "jadex.bpmn.runtime.task.InvokeMethodTask",
-														 "jadex.bpmn.runtime.task.CreateComponentTask",
-														 "jadex.bpmn.runtime.task.DestroyComponentTask",
-														 "jadex.bpmn.runtime.task.StoreResultsTask",
-														 "jadex.bpmn.runtime.task.UserInteractionTask",
-														 
-														 "jadex.bdibpmn.task.DispatchGoalTask",
-														 "jadex.bdibpmn.task.WaitForGoalTask",
-														 "jadex.bdibpmn.task.DispatchInternalEventTask",
-														 "jadex.bdibpmn.task.WriteBeliefTask",
-														 "jadex.bdibpmn.task.WriteParameterTask",
-														 
-														 "jadex.bdibpmn.task.CreateSpaceObjectTaskTask",
-														 "jadex.bdibpmn.task.WaitForSpaceObjectTaskTask",
-														 "jadex.bdibpmn.task.RemoveSpaceObjectTaskTask",
-
-														 "jadex.wfms.client.task.WorkitemTask"
-													   };
-	
 	/** The task. */
 	protected VActivity task;
 	
@@ -69,7 +58,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		tabpane.addTab("Task", column);
 		
 		JLabel label = new JLabel("Class");
-		JComboBox cbox = new JComboBox(STANDARD_CLASSES);
+		String[] tasknames = BpmnEditor.TASK_INFOS.keySet().toArray(new String[BpmnEditor.TASK_INFOS.size()]);
+		Arrays.sort(tasknames);
+		JComboBox cbox = new JComboBox(tasknames);
 		
 		cbox.setEditable(true);
 		if (getBpmnTask().getClazz() != null)
@@ -77,21 +68,43 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			cbox.setSelectedItem(getBpmnTask().getClazz().getTypeName());
 		}
 		
+		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[] { "second_fill" }, new Object[] { GridBagConstraints.HORIZONTAL }));
+		
+		final JEditorPane descarea = new JEditorPane("text/html", "");
+		final JScrollPane descpane = new JScrollPane(descarea);
+		
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx = 0;
+		gc.gridy = y;
+		gc.gridwidth = 2;
+		gc.weightx = 1.0;
+		gc.weighty = 1.0;
+		gc.anchor = GridBagConstraints.SOUTH;
+		gc.fill = GridBagConstraints.BOTH;
+		column.add(descpane, gc);
+		
+		final ActivityParameterTable atable = new ActivityParameterTable(container, task);
+		
+		processTaskInfos((String) cbox.getSelectedItem(), descarea);
+		
 		cbox.addActionListener(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				getBpmnTask().setClazz(new ClassInfo((String) ((JComboBox)e.getSource()).getSelectedItem()));
+				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
+				getBpmnTask().setClazz(new ClassInfo(taskname));
+				
+				processTaskInfos(taskname, descarea);
+				processTaskParameters(taskname, atable);
 			}
 		});
-		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[] { "second_fill" }, new Object[] { GridBagConstraints.HORIZONTAL }));
 		
-		addVerticalFiller(column, y);
+		//addVerticalFiller(column, y);
 		
-		final ActivityParameterTable atable = new ActivityParameterTable(container, task);
+		
 		JPanel parameterpanel = new JPanel(new GridBagLayout());
 		
-		GridBagConstraints gc = new GridBagConstraints();
+		gc = new GridBagConstraints();
 		gc.gridy = 1;
 		gc.gridheight = 2;
 		gc.weightx = 1.0;
@@ -137,5 +150,134 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	protected MActivity getBpmnTask()
 	{
 		return (MActivity) task.getBpmnElement();
+	}
+	
+	/**
+	 *  Processes the task infos.
+	 *  
+	 *  @param taskname The task name.
+	 *  @param descarea The description area.
+	 *  @param atable The parameter table.
+	 */
+	protected void processTaskInfos(String taskname, JEditorPane descarea)
+	{
+		TaskMetaInfo info = BpmnEditor.TASK_INFOS.get(taskname);
+		descarea.setEditable(true);
+		if (info != null)
+		{
+			String shortname = taskname;
+			if (shortname.contains("."))
+			{
+				shortname = shortname.substring(shortname.lastIndexOf(".") + 1);
+			}
+			StringBuilder text = new StringBuilder();
+			text.append("<html>");
+			text.append("<head>");
+			text.append("</head>");
+			text.append("<body>");
+			text.append("<h2>");
+			text.append(shortname);
+			text.append("</h2>");
+			text.append("<p>");
+			text.append(info.getDescription());
+			text.append("</p>\n");
+			
+			ParameterMetaInfo[] pmis = info.getParameterMetaInfos();
+			if (pmis != null && pmis.length > 0)
+			{
+				text.append("<ul>\n");
+				for (int i = 0; i < pmis.length; ++i)
+				{
+					text.append("<li><b>");
+					text.append(pmis[i].getName());
+					text.append("</b> - ");
+					text.append(pmis[i].getDescription());
+					text.append("</li>\n");
+				}
+				text.append("</ul>\n");
+			}
+			
+			text.append("</body>");
+			text.append("</html>");
+			
+			descarea.setText(text.toString());
+			descarea.setCaretPosition(0);
+		}
+		else
+		{
+			descarea.setText("<html><head></head><body></body></html>");
+		}
+		descarea.setEditable(false);
+	}
+	
+	/**
+	 *  Processes the task parameters to match the selected task class.
+	 *  
+	 *  @param taskname The selected task.
+	 *  @param atable The activity parameter table.
+	 */
+	protected void processTaskParameters(String taskname, ActivityParameterTable atable)
+	{
+		TaskMetaInfo info = BpmnEditor.TASK_INFOS.get(taskname);
+		
+		if (info != null)
+		{
+			ParameterMetaInfo[] pmis = info.getParameterMetaInfos();
+			if (pmis != null && pmis.length > 0)
+			{
+				Set<String> validparams = new HashSet<String>();
+				MActivity mact = (MActivity) task.getBpmnElement();
+				for (int i = 0; i < pmis.length; ++i)
+				{
+					validparams.add(pmis[i].getName());
+					if (mact.hasParameter(pmis[i].getName()))
+					{
+						int ind = -1;
+						for (int j = 0; j < mact.getParameters().size(); ++j)
+						{
+							if (pmis[i].getName().equals(mact.getParameters().getKey(j)))
+							{
+								ind = j;
+								break;
+							}
+						}
+						MParameter param = (MParameter) mact.getParameters().get(ind);
+						atable.removeParameters(new int[] { ind });
+						param.setClazz(new ClassInfo(pmis[i].getClazz().getTypeName()));
+						param.setDirection(pmis[i].getDirection());
+						atable.addParameter(param);
+					}
+					else
+					{
+						String name = pmis[i].getName();
+						ClassInfo clazz = new ClassInfo(pmis[i].getClazz().getTypeName());
+						String value = pmis[i].getInitialValue() != null? pmis[i].getInitialValue() : "";
+						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), value, null);
+						MParameter param = new MParameter(pmis[i].getDirection(),
+														  clazz,
+														  name,
+														  inival);
+						atable.addParameter(param);
+					}
+				}
+				
+				List<Integer> lind = new ArrayList<Integer>();
+				for (int i = 0; i < mact.getParameters().size(); ++i)
+				{
+					Object pname = mact.getParameters().getKey(i);
+					if (!validparams.contains(pname))
+					{
+						lind.add(i);
+					}
+				}
+				
+				int[] ind = new int[lind.size()];
+				for (int i = 0; i < ind.length; ++i)
+				{
+					ind[i] = lind.get(i).intValue();
+				}
+				atable.removeParameters(ind);
+			}
+		}
 	}
 }

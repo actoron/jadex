@@ -4,8 +4,8 @@ import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 
 /**
  *  Write our print used memory for benchmark agent.

@@ -3,8 +3,8 @@ package jadex.bdibpmn.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 
