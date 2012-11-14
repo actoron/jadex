@@ -5,8 +5,6 @@ import jadex.bpmn.annotation.TaskParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
 
 import java.io.Serializable;
 import java.util.HashMap;

@@ -44,6 +44,7 @@ public class MicroTest	extends ComponentTestSuite
 			"messagequeue/replicated/User",
 			"messagequeue\\replicated\\User",
 			"ServicePrey",
+			"ChatE3Agent",
 			
 			// Todo: fix race condition between shutdown and autocreate
 			"mandelbrot",
