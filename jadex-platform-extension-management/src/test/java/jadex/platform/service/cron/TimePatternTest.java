@@ -388,18 +388,25 @@ public class TimePatternTest extends TestCase
 	/**
 	 *  Simulate time progress and record matches.
 	 */
-	protected long[] simulate(String pattern)
+	public long[] simulate(String pattern)
+	{
+		Tuple2<Long, Long> tup = createStartAndEnd();
+		long start = tup.getFirstEntity().longValue();
+		long end = tup.getSecondEntity().longValue();
+		return simulate(pattern, start, end);
+	}
+	
+	/**
+	 *  Simulate time progress and record matches.
+	 */
+	public static long[] simulate(String pattern, long start, long end)
 	{
 //		System.out.println("Testing pattern: "+pattern);
 		TimePatternFilter tp = new TimePatternFilter(pattern);
 
 		int num = 10;
 		long[] ret = new long[num];
-		
-		Tuple2<Long, Long> tup = createStartAndEnd();
-		long start = tup.getFirstEntity().longValue();
-		long end = tup.getSecondEntity().longValue();
-		
+				
 		long cur = start;
 		// find num (10) matches
 		for(int i=0; i<num; i++)

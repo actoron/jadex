@@ -8,6 +8,9 @@ import jadex.commons.IChangeListener;
  *  Interface a for clock. Provides general methods for
  *  working with a clock such as starting, stopping, resetting,
  *  getting and setting the current time (stop time?).
+ *  
+ *  todo: do we want to support setTime() (how to handle timer, ticktimers i.e. keep their
+ *  time or keep their deltas compared to the current time)
  */
 public interface IClock
 {

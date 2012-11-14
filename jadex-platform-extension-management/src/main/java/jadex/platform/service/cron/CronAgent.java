@@ -7,8 +7,10 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -169,8 +171,9 @@ public class CronAgent implements ICronService
 			{
 				jobs = new LinkedHashMap<String, Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>>();
 			}
-			jobs.put(job.getId(), new Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>
-				((CronJob<Object>)job, (SubscriptionIntermediateFuture<Object>)ret));
+			final Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>> jobtup = new Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>
+				((CronJob<Object>)job, (SubscriptionIntermediateFuture<Object>)ret);
+			jobs.put(job.getId(), jobtup);
 		
 			ret.setTerminationCommand(new TerminationCommand()
 			{
@@ -185,6 +188,7 @@ public class CronAgent implements ICronService
 			{
 				IComponentStep<Void> check = new IComponentStep<Void>()
 				{
+					long last = -1;
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						// quitting jobs that have been removed
@@ -196,9 +200,29 @@ public class CronAgent implements ICronService
 							{
 								public void resultAvailable(IClockService clockser)
 								{
-									long start = clockser.getTime();
+									final long cur = clockser.getTime();
+
+									// Execute job if pattern triggered
+									if(last!=-1)
+									{
+										executeJob(jobtup, cur).addResultListener(new DefaultResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+												determineNext(cur);
+											}
+										});
+									}
+									else
+									{
+										determineNext(cur);
+									}
+								}
+								
+								protected void determineNext(long start)
+								{
 									long end = start+lookahead;
-									
+
 									TimePatternFilter tpf = null;
 									if(job.getFilter() instanceof TimePatternFilter)
 									{
@@ -212,9 +236,21 @@ public class CronAgent implements ICronService
 									try
 									{
 										long next = tpf.getNextTimepoint(start, end);
+										if(next==last)
+										{
+											next = tpf.getNextTimepoint(start+60000, end);
+										}
+										last = next;
 										long wait = next-start;
-										System.out.println("waiting for: "+wait);
-										agent.waitFor(wait, self);
+//										System.out.println("waiting for: "+wait);
+										if(wait>0)
+										{
+											agent.waitFor(wait, self);
+										}
+										else
+										{
+											agent.scheduleStep(self);
+										}
 									}
 									catch(Exception e)
 									{
@@ -247,5 +283,33 @@ public class CronAgent implements ICronService
 		}
 		
 		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> executeJob(final Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>> jobtup, long time)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		// schedule job on subagent?!
+		IFuture<Object> res = (IFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)));
+		res.addResultListener(new IResultListener<Object>()
+		{
+			public void resultAvailable(Object result)
+			{
+				((IntermediateFuture<Object>)jobtup.getSecondEntity()).addIntermediateResultIfUndone(result);
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// or ignore?
+				jobtup.getSecondEntity().setExceptionIfUndone(exception);
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 }

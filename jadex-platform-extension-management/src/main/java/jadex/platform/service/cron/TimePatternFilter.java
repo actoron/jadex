@@ -75,6 +75,42 @@ public class TimePatternFilter extends ComposedFilter<Long>
 		return super.getFilters();
 	}
 	
+//	/**
+//	 *  Get the next matching time point or
+//	 *  raise an exception in none is in the range.
+//	 *  @param start The start time.
+//	 *  @param end The end time.
+//	 *  @return The time.
+//	 */
+//	public long getNextTimepoint(long start, long end)
+//	{
+//		long ret = -1;
+//		long cur = (start/60000)*60000; // round to full min
+//		
+//		GregorianCalendar gc = new GregorianCalendar();
+//		gc.setTimeInMillis(start);
+////		c.setTimeZone(zone);
+//		
+//		while(cur<=end)
+//		{
+//			cur = gc.getTimeInMillis();
+//			if(filter(new Long(cur)))
+//			{
+//				ret = cur;
+//				break;
+//			}
+//			else
+//			{
+//				gc.add(GregorianCalendar.MINUTE, 1);
+//			}
+//		}
+//		
+//		if(ret==-1)
+//			throw new RuntimeException("No timepoint found");
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Get the next matching time point or
 	 *  raise an exception in none is in the range.
@@ -86,9 +122,11 @@ public class TimePatternFilter extends ComposedFilter<Long>
 	{
 		long ret = -1;
 		long cur = (start/60000)*60000; // round to full min
+		if(start>cur)
+			cur += 60000;
 		
 		GregorianCalendar gc = new GregorianCalendar();
-		gc.setTimeInMillis(start);
+		gc.setTimeInMillis(cur);
 //		c.setTimeZone(zone);
 		
 		while(cur<=end)

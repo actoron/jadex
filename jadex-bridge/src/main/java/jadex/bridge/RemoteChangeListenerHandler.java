@@ -43,7 +43,7 @@ public abstract class RemoteChangeListenerHandler
 	
 	/** Maximum number of events per delay period. */
 	// todo: make configurable.
-	protected static final int MAX_EVENTS	= 5;
+	protected static final int MAX_EVENTS	= 400;
 	
 	//-------- attributes --------
 	
@@ -165,6 +165,9 @@ public abstract class RemoteChangeListenerHandler
 		startTimer();
 	}
 	
+	/**
+	 * 
+	 */
 	protected void startTimer()
 	{
 		if(!started && instance!=null &&

@@ -176,7 +176,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		catch(Exception e)
 		{
 			setStatusText("Plugin error: "+plclass);
-			ret.setResult(null);
+			ret.setResultIfUndone(null);
 		}
 		
 		return ret;

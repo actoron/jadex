@@ -80,6 +80,8 @@ public class ContextPanel extends JPanel
 	 */
 	public void	updateView(SimulationState state)
 	{
+//		System.out.println("update view: "+state);
+		
 		boolean	startenabled	= !state.executing;
 		boolean	pauseenabled	= state.executing;
 		boolean	stepenabled	= !state.executing && state.clockok
@@ -194,8 +196,8 @@ public class ContextPanel extends JPanel
 						}
 						else
 						{
-							simservice.addChangeListener(rccl);
-							simservice.getClockService().addChangeListener(rccl);
+							simservice.removeChangeListener(rccl);
+							simservice.getClockService().removeChangeListener(rccl);
 //							System.out.println("deregister listener: "+id);
 						}
 						return IFuture.DONE;
@@ -261,6 +263,12 @@ public class ContextPanel extends JPanel
 		public boolean equals(Object obj)
 		{
 			return obj instanceof ClockState;
+		}
+
+		public String toString()
+		{
+			return "SimulationState [executing=" + executing + ", clocktype="
+					+ clocktype + ", clockok=" + clockok + "]";
 		}
 	}
 	

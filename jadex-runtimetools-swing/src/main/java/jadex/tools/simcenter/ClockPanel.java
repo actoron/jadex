@@ -484,10 +484,11 @@ public class ClockPanel	extends JPanel
 				{
 					try
 					{
+//						System.out.println("elementChanged");
 						boolean	executing	= ((Boolean)result).booleanValue();
 						IClockService	cs	= simservice.getClockService();
 						elementChanged("clock", new ClockState(cs.getClockType(), cs.getTime(), cs.getTick(), cs.getStarttime(),
-								cs.getDelta(), IClock.TYPE_CONTINUOUS.equals(cs.getClockType()) ? cs.getDilation() : 0, !executing));
+							cs.getDelta(), IClock.TYPE_CONTINUOUS.equals(cs.getClockType()) ? cs.getDilation() : 0, !executing));
 					}
 					catch(Exception e)
 					{
