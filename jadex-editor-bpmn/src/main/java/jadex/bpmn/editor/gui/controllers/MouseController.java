@@ -34,6 +34,7 @@ import javax.swing.Timer;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraphView;
 
@@ -45,12 +46,6 @@ public class MouseController extends MouseAdapter
 {
 	/** Access to the models. */
 	protected ModelContainer modelcontainer;
-	
-	/** Access to the controllers. */
-	//protected IControllerAccess controlleraccess;
-	
-	/** Access to view. */
-	//protected IViewAccess viewaccess;
 	
 	/** Timer for animated zoom operations. */
 	protected Timer zoomtimer;
@@ -176,7 +171,8 @@ public class MouseController extends MouseAdapter
 						return;
 					}
 				}
-				else if (!(cell instanceof VLane))
+				else if (!((cell instanceof VLane) ||
+						((cell instanceof VSubProcess) && !((VSubProcess) cell).isCollapsed())))
 				{
 					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
 					return;
@@ -216,6 +212,14 @@ public class MouseController extends MouseAdapter
 													 ds.width,
 													 ds.height));
 				
+				if (vactivity instanceof VSubProcess)
+				{
+					vactivity.getGeometry().setAlternateBounds(new mxRectangle(p.getX() - ds.width * 0.5,
+														 p.getY() - ds.height * 0.5,
+														 ds.width * 0.5,
+														 ds.height * 0.5));
+				}
+				
 				if (ModelContainer.EDIT_MODE_TASK.equals(mode))
 				{
 					vactivity.setValue("Task");
@@ -227,21 +231,26 @@ public class MouseController extends MouseAdapter
 				}
 				
 				
-				if (cell instanceof VPool)
-				{
-					MPool mpool = (MPool) ((VNode) cell).getBpmnElement();
-					mactivity.setPool(mpool);
-				}
-				else
-				{
-					//((MLane) ((VNode) cell).getBpmnElement()).addActivity(mactivity);
-					MPool mpool = (MPool) ((VLane) cell).getPool().getBpmnElement();
-					mactivity.setPool(mpool);
-				}
+//				if (cell instanceof VPool)
+//				{
+//					MPool mpool = (MPool) ((VNode) cell).getBpmnElement();
+//					mactivity.setPool(mpool);
+//				}
+//				else
+//				{
+//					//((MLane) ((VNode) cell).getBpmnElement()).addActivity(mactivity);
+//					MPool mpool = (MPool) ((VLane) cell).getPool().getBpmnElement();
+//					mactivity.setPool(mpool);
+//				}
 				
 				modelcontainer.getGraph().getModel().beginUpdate();
 				modelcontainer.getGraph().addCell(vactivity, (VNode) cell);
 				modelcontainer.getGraph().getModel().endUpdate();
+				
+				if (!ModelContainer.EDIT_MODE_TASK.equals(mode))
+				{
+					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+				}
 			}
 			else if (cell == null)
 			{

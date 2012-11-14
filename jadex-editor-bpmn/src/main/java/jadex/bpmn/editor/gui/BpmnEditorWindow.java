@@ -2,7 +2,6 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
-import jadex.bpmn.editor.gui.controllers.EdgeCreationController;
 import jadex.bpmn.editor.gui.controllers.KeyboardController;
 import jadex.bpmn.editor.gui.controllers.MouseController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
@@ -75,7 +74,7 @@ public class BpmnEditorWindow extends JFrame
 				modelcontainer = new ModelContainer();
 				
 				BpmnStylesheetColor colorsheet = new BpmnStylesheetColor();
-				BpmnGraph graph = new BpmnGraph(colorsheet);
+				BpmnGraph graph = new BpmnGraph(modelcontainer, colorsheet);
 				
 				MBpmnModel bpmnmodel = new MBpmnModel();
 				modelcontainer.setBpmnModel(bpmnmodel);
@@ -90,7 +89,6 @@ public class BpmnEditorWindow extends JFrame
 				graphcomponent.setBackground(Color.WHITE);
 				graphcomponent.setOpaque(true);
 				graphcomponent.setTextAntiAlias(true);
-				
 				modelcontainer.setGraphComponent(graphcomponent);
 				
 				BpmnToolbar bpmntoolbar = new BpmnToolbar(GuiConstants.DEFAULT_ICON_SIZE, modelcontainer);
@@ -104,9 +102,12 @@ public class BpmnEditorWindow extends JFrame
 				
 				new KeyboardController(graphcomponent, modelcontainer);
 				
-				EdgeCreationController edgecreationcontroller = new EdgeCreationController(modelcontainer);
-				graphcomponent.getConnectionHandler().addListener(mxEvent.CONNECT,
-						edgecreationcontroller);
+//				EdgeCreationController edgecreationcontroller = new EdgeCreationController(modelcontainer);
+//				graphcomponent.getConnectionHandler().addListener(mxEvent.CONNECT,
+//						edgecreationcontroller);
+				
+				
+				
 				/*graph.addListener(mxEvent.MOVE_CELLS, new mxIEventListener()
 				{
 					public void invoke(Object sender, mxEventObject evt)

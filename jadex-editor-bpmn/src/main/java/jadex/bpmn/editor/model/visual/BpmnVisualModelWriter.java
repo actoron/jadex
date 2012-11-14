@@ -67,8 +67,8 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			out.println("\"/>");
 			
 			//FIXME: Necessary?
-			out.print(SBpmnModelWriter.getIndent(4));
-			out.println("<bpmndi:BPMNLabel/>");
+//			out.print(SBpmnModelWriter.getIndent(4));
+//			out.println("<bpmndi:BPMNLabel/>");
 			
 			out.print(SBpmnModelWriter.getIndent(3));
 			out.println("</bpmndi:BPMNShape>");
@@ -100,8 +100,8 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			}
 			
 			//FIXME: Necessary?
-			out.print(SBpmnModelWriter.getIndent(4));
-			out.println("<bpmndi:BPMNLabel/>");
+//			out.print(SBpmnModelWriter.getIndent(4));
+//			out.println("<bpmndi:BPMNLabel/>");
 			
 			out.print(SBpmnModelWriter.getIndent(3));
 			out.println("</bpmndi:BPMNEdge>");

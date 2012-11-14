@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.MBpmnModel;
@@ -61,7 +62,10 @@ public class BpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
-				modelcontainer.getGraph().setStylesheet((mxStylesheet) button.getClientProperty("sheet"));
+				mxStylesheet sheet = (mxStylesheet) button.getClientProperty("sheet");
+				System.out.println(sheet);
+				modelcontainer.getGraph().setStylesheet(sheet);
+				modelcontainer.getGraph().refresh();
 			}
 		};
 		JRadioButtonMenuItem colorview = new JRadioButtonMenuItem(styleaction);
@@ -73,11 +77,13 @@ public class BpmnMenuBar extends JMenuBar
 		colorview.setText("Color");
 		stylegroup.add(colorview);
 		stylemenu.add(colorview);
-		/*final JRadioButtonMenuItem grayview = new JRadioButtonMenuItem(styleaction);
-		grayview.putClientProperty("sheet", IViewAccess.GS_STYLESHEET);
-		grayview.setText("Grayscale");
-		stylegroup.add(grayview);
-		stylemenu.add(grayview);*/
+		
+		JRadioButtonMenuItem sgrayview = new JRadioButtonMenuItem(styleaction);
+		sgrayview.putClientProperty("sheet", new BpmnStylesheetSimpleGrayscale());
+		sgrayview.setText("Simple Grayscale");
+		stylegroup.add(sgrayview);
+		stylemenu.add(sgrayview);
+		
 		viewmenu.add(stylemenu);
 		
 		/** Icon sizes */
@@ -134,9 +140,9 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BpmnGraph graph = new BpmnGraph(modelcontainer.getGraph().getStylesheet());
+				BpmnGraph graph = new BpmnGraph(modelcontainer, modelcontainer.getGraph().getStylesheet());
 				MBpmnModel model = new MBpmnModel();
-				initializeNewModel(graph, model);
+				initializeNewModel(modelcontainer, graph, model);
 			}
 		});
 		
@@ -163,7 +169,7 @@ public class BpmnMenuBar extends JMenuBar
 				{
 					try
 					{
-						BpmnGraph graph = new BpmnGraph(modelcontainer.getGraph().getStylesheet());
+						BpmnGraph graph = new BpmnGraph(modelcontainer, modelcontainer.getGraph().getStylesheet());
 						BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
 						
 						File file = fc.getSelectedFile();
@@ -173,7 +179,7 @@ public class BpmnMenuBar extends JMenuBar
 						}
 						MBpmnModel mmodel = SBpmnModelReader.readModel(file, vreader);
 						
-						initializeNewModel(graph, mmodel);
+						initializeNewModel(modelcontainer, graph, mmodel);
 						modelcontainer.setFile(file);
 					}
 					catch (Exception e1)
@@ -317,13 +323,12 @@ public class BpmnMenuBar extends JMenuBar
 	 *  @param graph New graph.
 	 *  @param model New BPMN model.
 	 */
-	protected void initializeNewModel(BpmnGraph graph, MBpmnModel model)
+	protected static void initializeNewModel(ModelContainer modelcontainer, BpmnGraph graph, MBpmnModel model)
 	{
 		graph.getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
 		
 		modelcontainer.setBpmnModel(model);
 		modelcontainer.setGraph(graph);
-		modelcontainer.getGraphComponent().setGraph(graph);
 		modelcontainer.setDirty(false);
 		
 		

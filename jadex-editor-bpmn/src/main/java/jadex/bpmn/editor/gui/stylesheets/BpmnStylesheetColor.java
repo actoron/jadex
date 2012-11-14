@@ -43,7 +43,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 	public static final String TASK_COLOR = "#61a7e3";
 	
 	/** BPMN Sub-Process Color */
-	public static final String SUBPROCESS_COLOR = "#30bf9f";
+	public static final String SUBPROCESS_COLOR = "#b0c9f1";
 	
 	/** BPMN Gateway Color */
 	public static final String GATEWAY_COLOR = "#ff81ac";
@@ -83,28 +83,71 @@ public class BpmnStylesheetColor extends mxStylesheet
 		//mxGraphics2DCanvas.putShape(VLane.class.getSimpleName(), new PoolLaneShape(false));
 		mxGraphics2DCanvas.putShape(mxConstants.SHAPE_SWIMLANE, new mxSwimlaneShape()
 		{
+			/**
+			 *  Paints the shape.
+			 */
 			public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 			{
+				int start = (int) Math.round(mxUtils.getInt(state.getStyle(),
+						mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE)
+						* canvas.getScale());
+
 				Rectangle tmp = state.getRectangle();
+
 				if (mxUtils
 						.isTrue(state.getStyle(), mxConstants.STYLE_HORIZONTAL, true))
 				{
 					if (configureGraphics(canvas, state, true))
 					{
-						canvas.fillShape(new Rectangle(tmp.x, tmp.y, tmp.width, tmp.height));
+						canvas.fillShape(new Rectangle(tmp.x, tmp.y, tmp.width, Math
+								.min(tmp.height, start)));
+						canvas.fillShape(new Rectangle(tmp.x, tmp.y + start, tmp.width,
+								tmp.height - start));
+					}
+
+					if (configureGraphics(canvas, state, false))
+					{
+						if (state.getCell() instanceof VPool)
+						{
+							canvas.getGraphics().drawRect(tmp.x, tmp.y, tmp.width,
+									Math.min(tmp.height, start));
+							canvas.getGraphics().drawRect(tmp.x, tmp.y + start, tmp.width,
+									tmp.height - start);
+						}
+						else
+						{
+							canvas.getGraphics().drawRect(tmp.x, tmp.y, tmp.width, tmp.height);
+						}
 					}
 				}
 				else
 				{
 					if (configureGraphics(canvas, state, true))
 					{
-						canvas.fillShape(new Rectangle(tmp.x, tmp.y, tmp.width, tmp.height));
+						canvas.fillShape(new Rectangle(tmp.x, tmp.y, Math.min(
+								tmp.width, start), tmp.height));
+						canvas.fillShape(new Rectangle(tmp.x + start, tmp.y,
+								tmp.width - start, tmp.height));
+					}
+
+					if (configureGraphics(canvas, state, false))
+					{
+						if (state.getCell() instanceof VPool)
+						{
+							canvas.getGraphics().drawRect(tmp.x, tmp.y,
+									Math.min(tmp.width, start), tmp.height);
+							canvas.getGraphics().drawRect(tmp.x + start, tmp.y,
+									tmp.width - start, tmp.height);
+						}
+						else
+						{
+							canvas.getGraphics().drawRect(tmp.x, tmp.y, tmp.width, tmp.height);
+						}
 					}
 				}
-				
-				super.paintShape(canvas, state);
 			}
 		});
+		
 		mxGraphics2DCanvas.putShape(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayShape(GatewayShape.GATEWAY_SHAPE_TYPE_XOR));
 		mxGraphics2DCanvas.putShape(MBpmnModel.GATEWAY_PARALLEL, new GatewayShape(GatewayShape.GATEWAY_SHAPE_TYPE_AND));
 		mxGraphics2DCanvas.putShape(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, new GatewayShape(GatewayShape.GATEWAY_SHAPE_TYPE_OR));
@@ -162,6 +205,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
+		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
 		
 		style = new HashMap<String, Object>(style);

@@ -1,13 +1,16 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.gui.controllers.EdgeController;
+import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
 import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VLane;
-import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+
+import javax.swing.ImageIcon;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxConnectionHandler;
@@ -17,7 +20,6 @@ import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Graph component for editing GPMN models.
@@ -33,26 +35,59 @@ public class BpmnGraphComponent extends mxGraphComponent
 	 *  
 	 *  @param graph The graph.
 	 */
-	public BpmnGraphComponent(mxGraph graph)
+	public BpmnGraphComponent(BpmnGraph graph)
 	{
 		super(graph);
 	}
 	
+	/**
+	 *  Returns the folding icon bounds.
+	 */
+	public Rectangle getFoldingIconBounds(mxCellState state, ImageIcon icon)
+	{
+		if (state.getCell() instanceof VSubProcess)
+		{
+			double scale = getGraph().getView().getScale();
+			
+			int w = (int) Math.max(8, icon.getIconWidth() * scale * 2);
+			int h = (int) Math.max(8, icon.getIconHeight() * scale * 2);
+			int x = (int) Math.round(state.getX() + state.getWidth() * 0.5 - w * 0.5);
+			int y = (int) Math.round(state.getY() + state.getHeight() - h * 1.25);
+			
+			
+			return new Rectangle(x, y, w, h);
+		}
+
+		return super.getFoldingIconBounds(state, icon);
+	}
+	
+	/**
+	 * Returns true if the given event is a panning event.
+	 */
 	public boolean isPanningEvent(MouseEvent event)
 	{
 		return (event != null && MouseEvent.BUTTON3 == event.getButton());
 	}
 	
+	/**
+	 *  Creates the panning handler.
+	 */
 	protected mxPanningHandler createPanningHandler()
 	{
 		return new BpmnPanningHandler();
 	}
 	
+	/**
+	 *  Creates the graph controller.
+	 */
 	protected mxGraphHandler createGraphHandler()
 	{
-		return new BpmnGraphHandler(this);
+		return new GraphOperationsController(this);
 	}
 	
+	/**
+	 *  Creates the cell editor.
+	 */
 	protected mxICellEditor createCellEditor()
 	{
 		mxCellEditor ret = new mxCellEditor(this)
@@ -74,7 +109,7 @@ public class BpmnGraphComponent extends mxGraphComponent
 	
 	protected mxConnectionHandler createConnectionHandler()
 	{
-		return super.createConnectionHandler();
+		return new EdgeController(this);
 	}
 	
 	protected mxGraphControl createGraphControl()
@@ -115,6 +150,8 @@ public class BpmnGraphComponent extends mxGraphComponent
 				int bottom = r.y + ((dy > 0) ? 0 : r.height) - dy;
 				
 				boolean extend = ((right > 0) && (bottom > 0));
+				System.out.println(dx + " " + right + " " + extend);
+				System.out.println(dy + " " + bottom);
 
 				graphComponent.getGraphControl().scrollRectToVisible(
 						new Rectangle(right, bottom, 0, 0), extend);
@@ -147,91 +184,17 @@ public class BpmnGraphComponent extends mxGraphComponent
 		
 		public void setPreferredSize(Dimension preferredSize)
 		{
-			if (preferredSize.width > getPreferredSize().width &&
+			if (preferredSize.width > getPreferredSize().width ||
 				preferredSize.height > getPreferredSize().height)
 			{
-				super.setPreferredSize(preferredSize);
+				super.setPreferredSize(new Dimension(Math.max(preferredSize.width, getPreferredSize().width),
+													 Math.max(preferredSize.height, getPreferredSize().height)));
 			}
 		}
 		
 		public void doExtendComponent(Rectangle rect)
 		{
 			super.extendComponent(rect);
-		}
-	}
-	
-	protected class BpmnGraphHandler extends mxGraphHandler
-	{
-		public BpmnGraphHandler(mxGraphComponent graphComponent)
-		{
-			super(graphComponent);
-		}
-		
-		protected void moveCells(Object[] cells, double dx, double dy,
-				Object target, MouseEvent e)
-		{
-			boolean movecells = true;
-			for (int i = 0; i < cells.length; ++i)
-			{
-				if (cells[i] instanceof VActivity)
-				{
-					if (!(target instanceof VLane || target instanceof VPool))
-					{
-						movecells = false;
-						break;
-					}
-					else
-					{
-						VPool targetpool = null;
-						if (target instanceof VLane)
-						{
-							targetpool = ((VLane) target).getPool();
-						}
-						else
-						{
-							targetpool = (VPool) target;
-							if (targetpool.hasLanes())
-							{
-								movecells = false;
-								break;
-							}
-						}
-						MActivity mactivity = (MActivity) ((VActivity) cells[i]).getBpmnElement();
-						
-						// Only allow cross-pool activity transfers if no sequence edges are connected
-						if (!targetpool.getBpmnElement().equals(mactivity.getPool()) &&
-							((mactivity.getOutgoingSequenceEdges() != null && mactivity.getOutgoingSequenceEdges().size() > 0) ||
-							(mactivity.getIncomingSequenceEdges() != null && mactivity.getIncomingSequenceEdges().size() > 0)))
-						{
-							//TODO: Add message?
-							movecells = false;
-							break;
-						}
-					}
-				}
-				else if (cells[i] instanceof VLane)
-				{
-					VLane vlane = (VLane) cells[i];
-					if (vlane.getPool() != target)
-					{
-						movecells = false;
-						break;
-					}
-				}
-				else if (cells[i] instanceof VPool)
-				{
-					if (target != cells[i] && target != null)
-					{
-						movecells = false;
-						break;
-					}
-				}
-			}
-			
-			if (movecells)
-			{
-				super.moveCells(cells, dx, dy, target, e);
-			}
 		}
 	}
 }

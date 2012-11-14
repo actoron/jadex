@@ -17,7 +17,7 @@ import java.util.Map;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int VERSION = 1;
+	public static final int VERSION = 2;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";

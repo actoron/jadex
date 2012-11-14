@@ -6,6 +6,7 @@ import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.io.IBpmnVisualModelReader;
 
 import java.util.ArrayList;
@@ -71,7 +72,11 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			MIdElement e = emap.get(bpmnid);
 			VNamedNode vnode = null;
 			
-			if (e instanceof MActivity)
+			if (e instanceof MSubProcess)
+			{
+				vnode = new VSubProcess(graph);
+			}
+			else if (e instanceof MActivity)
 			{
 				vnode = new VActivity(graph);
 			}
@@ -99,7 +104,17 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			if (e instanceof MActivity)
 			{
 				MActivity act = (MActivity) e;
-				VNode parent = act.getLane() != null? (VNode) vmap.get(act.getLane().getId()) : (VNode) vmap.get(act.getPool().getId());
+				VNode parent = null;
+				Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
+				if (spem.containsKey(act.getId()))
+				{
+					parent = (VNode) vmap.get(spem.get(act.getId()).getId());
+				}
+				
+				if (parent == null)
+				{
+					parent = act.getLane() != null? (VNode) vmap.get(act.getLane().getId()) : (VNode) vmap.get(act.getPool().getId());
+				}
 				
 				if (parent != null)
 				{
@@ -187,7 +202,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			}
 			
 			graph.getModel().beginUpdate();
-			graph.addCell(vedge);
+			graph.addCell(vedge, vedge.getSource().getParent());
 			graph.getModel().endUpdate();
 			
 		}

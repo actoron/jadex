@@ -5,6 +5,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MSubProcess;
 
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
@@ -80,6 +81,13 @@ public class VActivity extends VNamedNode
 					mactivity.setLane(null);
 					mactivity.setPool(null);
 				}
+				else if (oldparent instanceof VSubProcess)
+				{
+					MSubProcess msp = ((MSubProcess) ((VSubProcess) oldparent).getBpmnElement());
+					msp.removeActivity(mactivity);
+					mactivity.setLane(null);
+					mactivity.setPool(null);
+				}
 				else
 				{
 					((MPool) ((VPool) oldparent).getBpmnElement()).removeActivity(mactivity);
@@ -93,6 +101,13 @@ public class VActivity extends VNamedNode
 					((MLane) ((VLane) parent).getBpmnElement()).addActivity(mactivity);
 					mactivity.setLane((MLane) ((VLane) parent).getBpmnElement());
 					mactivity.setPool((MPool) ((VLane) parent).getPool().getBpmnElement());
+				}
+				else if (parent instanceof VSubProcess)
+				{
+					MSubProcess msp = ((MSubProcess) ((VSubProcess) parent).getBpmnElement());
+					msp.addActivity(mactivity);
+					mactivity.setPool(msp.getPool());
+					mactivity.setLane(msp.getLane());
 				}
 				else
 				{
