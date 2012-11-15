@@ -51,6 +51,26 @@ public class MCapability extends MElement
 	}
 	
 	/**
+	 *  Test if a belief is contained.
+	 */
+	public boolean hasBelief(String name)
+	{
+		boolean ret = false;
+		
+		if(beliefs!=null && name!=null)
+		{
+			for(MBelief bel: beliefs)
+			{
+				ret = name.equals(bel.getName());
+				if(ret)
+					break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the goals.
 	 *  @return The goals.
 	 */
