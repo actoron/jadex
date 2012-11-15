@@ -18,11 +18,19 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.MicroClassReader;
+import jadex.micro.MicroModel;
+import jadex.micro.annotation.Agent;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.List;
 
 /**
  *  Reads micro agent classes and generates a model from metainfo and annotations.
@@ -37,7 +45,22 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	public BDIClassReader()
 	{
-		this.gen = new JavassistBDIClassGenerator();
+//		this.gen = new JavassistBDIClassGenerator();
+		this.gen = new ASMBDIClassGenerator();
+	}
+	
+	/**
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
+	 */
+	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	{
+		// use dummy classloader that will not be visisble outside
+		List<URL> urls = SUtil.getClasspathURLs(classloader);
+		DummyClassLoader cl = new DummyClassLoader((URL[])urls.toArray(new URL[urls.size()]), null, classloader);
+		return super.read(model, imports, cl, rid, root);
 	}
 	
 	/**
@@ -45,6 +68,8 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	protected BDIModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
 	{
+		classloader = ((DummyClassLoader)classloader).getOriginal();
+		
 		ModelInfo modelinfo = new ModelInfo();
 		BDIModel ret = new BDIModel(modelinfo, new MCapability(cma.getName()));
 		
@@ -52,7 +77,8 @@ public class BDIClassReader extends MicroClassReader
 		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
 			name = name.substring(0, name.lastIndexOf(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
-		modelinfo.setName(name+"BDI");
+//		modelinfo.setName(name+"BDI");
+		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
 //		modelinfo.setFilename(model);
 		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
@@ -60,7 +86,7 @@ public class BDIClassReader extends MicroClassReader
 		modelinfo.setStartable(true);
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
 		modelinfo.setResourceIdentifier(rid);
-		ret.setClassloader(classloader);
+		ret.setClassloader(classloader); // use parent
 		
 		if(rid==null)
 		{
@@ -148,15 +174,15 @@ public class BDIClassReader extends MicroClassReader
 		// Create enhanced class if not already present.
 		
 //		String origclname = cma.getPackage().getName()+"."+micromodel.getModelInfo().getName();
-		String clname = cma.getName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST;
+		String clname = cma.getName();//+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST;
 		try
 		{
-			classloader.loadClass(clname);
+			classloader.getParent().loadClass(clname);
 			return;
 		}
 		catch(ClassNotFoundException e)
 		{
-			gen.generateBDIClass(cma, micromodel, classloader);
+			gen.generateBDIClass(cma, micromodel, classloader.getParent());
 		}
 	}
 }
