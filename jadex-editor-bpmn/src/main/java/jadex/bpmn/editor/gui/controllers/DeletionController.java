@@ -1,12 +1,9 @@
 package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
-import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;

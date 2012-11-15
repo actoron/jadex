@@ -150,8 +150,6 @@ public class BpmnGraphComponent extends mxGraphComponent
 				int bottom = r.y + ((dy > 0) ? 0 : r.height) - dy;
 				
 				boolean extend = ((right > 0) && (bottom > 0));
-				System.out.println(dx + " " + right + " " + extend);
-				System.out.println(dy + " " + bottom);
 
 				graphComponent.getGraphControl().scrollRectToVisible(
 						new Rectangle(right, bottom, 0, 0), extend);

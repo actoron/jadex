@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 
 import java.awt.Color;
@@ -7,6 +8,8 @@ import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Icon;
 
@@ -242,7 +245,8 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		
 		toolgroup.setSelected(toolgroup.getElements().nextElement().getModel(), true);
 		
-		System.out.println("Icon generation time: " + (System.currentTimeMillis() - ts));
+		Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Icon generation time: " + String.valueOf(System.currentTimeMillis() - ts));
+		//System.out.println("Icon generation time: " + (System.currentTimeMillis() - ts));
 	}
 	
 	/*protected void addBpmnTools()

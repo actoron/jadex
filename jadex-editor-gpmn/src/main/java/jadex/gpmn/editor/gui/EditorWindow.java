@@ -451,11 +451,11 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 		return foldcontroller;
 	}
 	
-	public static void main(String[] args)
-	{
-		new EditorWindow();
-	}
-	
+	/**
+	 *  Adds tools.
+	 *  
+	 *  @param editingtools The tool bar.
+	 */
 	protected void addTools(JToolBar editingtools)
 	{
 		ImageProvider imgprovider = new ImageProvider();

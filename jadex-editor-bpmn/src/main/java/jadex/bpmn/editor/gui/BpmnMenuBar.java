@@ -63,7 +63,6 @@ public class BpmnMenuBar extends JMenuBar
 			{
 				JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
 				mxStylesheet sheet = (mxStylesheet) button.getClientProperty("sheet");
-				System.out.println(sheet);
 				modelcontainer.getGraph().setStylesheet(sheet);
 				modelcontainer.getGraph().refresh();
 			}

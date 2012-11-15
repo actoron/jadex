@@ -95,7 +95,6 @@ public class BpmnGraph extends mxGraph
 				&& ((isSplitEnabled() && isSplitTarget(cell, cells)) || (!model
 						.isEdge(cell) && (isSwimlane(cell) || cell instanceof VSubProcess || (model
 						.getChildCount(cell) > 0 && !isCellCollapsed(cell)))));
-		System.out.println(cell + " " + ret);
 		return ret;
 	}
 

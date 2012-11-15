@@ -54,6 +54,10 @@ public class BpmnEditorWindow extends JFrame
 				
 				setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				
+				JSplitPane statuspane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+				statuspane.setOneTouchExpandable(true);
+				statuspane.setBottomComponent(new StatusArea());
+				
 				viewpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 				viewpane.setOneTouchExpandable(true);
 				
@@ -69,7 +73,8 @@ public class BpmnEditorWindow extends JFrame
 					}
 				});
 				
-				getContentPane().add(viewpane, BorderLayout.CENTER);
+				statuspane.setTopComponent(viewpane);
+				getContentPane().add(statuspane, BorderLayout.CENTER);
 				
 				modelcontainer = new ModelContainer();
 				
@@ -155,6 +160,8 @@ public class BpmnEditorWindow extends JFrame
 						(int) (sd.height * GuiConstants.GRAPH_PROPERTY_RATIO));
 				setLocationRelativeTo(null);
 				setVisible(true);
+				statuspane.setResizeWeight(1.0);
+				statuspane.setDividerLocation(1.0);
 				viewpane.setResizeWeight(GuiConstants.GRAPH_PROPERTY_RATIO);
 				viewpane.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
 			}

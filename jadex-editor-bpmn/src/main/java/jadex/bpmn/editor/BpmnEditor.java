@@ -9,6 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *  Class for starting the BPMN editor.
@@ -17,10 +19,16 @@ import java.util.Map;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int VERSION = 2;
+	public static final int VERSION = 3;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
+	
+	/** Log level for status area. */
+	public static final Level STATUS_AREA_LOG_LEVEL = Level.INFO;
+	
+	/** Main Logger. */
+	public static final Logger LOGGER = Logger.getLogger(APP_NAME);
 	
 	/** Standard task classes. */
 	protected static final String[] FALLBACK_TASK_NAMES = { "jadex.bpmn.runtime.task.PrintTask",
@@ -92,6 +100,7 @@ public class BpmnEditor
 	 */
 	public static void main(String[] args)
 	{
+		LOGGER.setUseParentHandlers(false);
 		new BpmnEditorWindow();
 	}
 }

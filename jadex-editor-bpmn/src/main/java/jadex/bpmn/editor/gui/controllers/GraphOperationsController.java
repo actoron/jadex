@@ -38,8 +38,17 @@ public class GraphOperationsController extends mxGraphHandler
 	protected void moveCells(Object[] cells, double dx, double dy,
 			Object target, MouseEvent e)
 	{
-		super.moveCells(cells, dx, dy, target, e);
-		((BpmnGraph) graphComponent.getGraph()).getModelContainer().setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+		String error = SValidation.getMoveValidationError(cells, target);
+		if (error == null)
+		{
+			super.moveCells(cells, dx, dy, target, e);
+			((BpmnGraph) graphComponent.getGraph()).getModelContainer().setDirty(true);
+			((BpmnGraph) graphComponent.getGraph()).getModelContainer().setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+		}
+		else
+		{
+			//Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, error);
+		}
 	}
 	
 	/**
