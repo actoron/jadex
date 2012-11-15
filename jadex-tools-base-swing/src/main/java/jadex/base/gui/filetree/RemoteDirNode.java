@@ -13,6 +13,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
@@ -56,7 +57,7 @@ public class RemoteDirNode extends RemoteFileNode
 	 */
 	protected void	searchChildren()
 	{
-		listFiles().addResultListener(new IResultListener()
+		listFiles().addResultListener(new SwingResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -113,7 +114,7 @@ public class RemoteDirNode extends RemoteFileNode
 			{
 				// use logger to print warning?
 			}
-		});
+		}));
 	}
 	
 	/**
