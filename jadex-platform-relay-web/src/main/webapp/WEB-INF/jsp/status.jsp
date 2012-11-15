@@ -147,6 +147,16 @@ if(infos.length>0)
 			<img src="resources/jadex-toaster.png"/>
 		</td>
 	</tr>
+	<tr>
+		<td style="border: 0; padding: 0">
+			o<SPAN class="wikilink">
+				<A href="http://www2.activecomponents.org/relay"><SPAN class="wikigeneratedlinkcontent">http://www2.activecomponents.org/relay</SPAN></A>
+			</SPAN>
+		</td>
+		<td style="border: 0; padding: 0; text-align: center">
+			<img src="resources/alex-OptiPlex-755.png"/>
+		</td>
+	</tr>
 </table>
 <!-- 
 <span style="display: inline-block">
