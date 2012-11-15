@@ -66,9 +66,9 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected BDIModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	protected BDIModel read(String model, Class cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root)
 	{
-		classloader = ((DummyClassLoader)classloader).getOriginal();
+		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		
 		ModelInfo modelinfo = new ModelInfo();
 		BDIModel ret = new BDIModel(modelinfo, new MCapability(cma.getName()));
@@ -95,9 +95,9 @@ public class BDIClassReader extends MicroClassReader
 		}
 		modelinfo.setResourceIdentifier(rid);
 		
-		fillMicroModelFromAnnotations(ret, model, cma, classloader);
+		fillMicroModelFromAnnotations(ret, model, cma, cl);
 		
-		fillBDIModelFromAnnotations(ret, model, cma, classloader);
+		fillBDIModelFromAnnotations(ret, model, cma, cl);
 		
 		return ret;
 	}

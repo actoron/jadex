@@ -1,6 +1,7 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.model.BDIModel;
+import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
 
 import java.io.PrintWriter;

@@ -1398,6 +1398,19 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
+	protected Class<?>[] getClassArray(Class<?>[] clazzes, ClassLoader cl)
+	{
+		Class<?>[] ret = new Class[clazzes.length];
+		for(int i=0; i<clazzes.length; i++)
+		{
+			ret[i] = getClass(clazzes[i], cl);
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
 	protected Annotation getProxyAnnotation(final Annotation an, final ClassLoader cl)
 	{
 		Annotation ret = null;
@@ -1415,7 +1428,10 @@ public class MicroClassReader
 			{
 				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 				{
-					Object ret = method.invoke(an, args);
+					Object[] nargs = args==null? new Object[0]: args;
+					Class[] cls = method.getParameterTypes();
+//					an.getClass().getMethod(method.getName(), )
+					Object ret = method.invoke(an, nargs);
 					
 					if(ret instanceof Annotation)
 					{
