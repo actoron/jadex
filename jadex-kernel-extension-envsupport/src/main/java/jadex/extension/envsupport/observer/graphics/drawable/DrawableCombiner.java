@@ -178,11 +178,6 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 			fetcher.setValue("$object", obj);
 			fetcher.setValue("$perspective", viewport.getPerspective());
 			
-			if("rotate45".equals(prop))
-			{
-				System.out.println("fhhjug");
-			}
-			
 			String name = ((IParsedExpression)prop).getExpressionText();//(String)prop;
 			ret = getProperty(name);
 			
