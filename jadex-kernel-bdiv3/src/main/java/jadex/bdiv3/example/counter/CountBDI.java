@@ -9,16 +9,24 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
+/**
+ *  Simple agent with inline count goal.
+ */
 @Agent
 //@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 public class CountBDI
 {
+	/** The agent. */
 	@Agent
 	protected BDIAgent agent;
 	
+	/** The counter belief. */
 	@Belief
 	private int counter;
 	
+	/**
+	 *  The agent body.
+	 */
 	@AgentBody
 	public void body()
 	{
@@ -47,6 +55,9 @@ public class CountBDI
 		System.out.println("body end: "+getClass().getName());
 	}
 	
+	/**
+	 *  Inline plan method that reacts on count goal.
+	 */
 	@Plan(trigger=@Trigger(goals=CountGoal.class))
 	protected IFuture<Void> inc(CountGoal goal)
 	{

@@ -15,15 +15,21 @@ import jadex.micro.annotation.AgentBody;
 import jadex.rules.eca.annotations.Event;
 
 /**
- *  Does not work as javassist does not support inner classes :-(
+ *  Simple agent with inline count goal.
  */
 @Agent
 public class Count2BDI
 {
+	/**
+	 *  Goal with target and drop condition.
+	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
 	public class Count2Goal
 	{
+		/** The target value. */
 		protected int target;
+		
+		/** The drop value. */
 		protected int drop;
 		
 		/**
@@ -35,6 +41,9 @@ public class Count2BDI
 			this.drop = drop;
 		}
 		
+		/**
+		 *  Called whenever the counter belief changes.
+		 */
 		@GoalTargetCondition
 		protected boolean target(@Event("counter") int cnt)
 		{
@@ -42,6 +51,9 @@ public class Count2BDI
 			return cnt==target;
 		}
 		
+		/**
+		 *  Called whenever the counter belief changes.
+		 */
 		@GoalDropCondition
 		protected boolean drop(@Event("counter") int cnt)
 		{
@@ -49,12 +61,17 @@ public class Count2BDI
 		}
 	}
 	
+	/** The agent. */
 	@Agent
 	protected BDIAgent agent;
 	
+	/** The counter belief. */
 	@Belief
 	private int counter;
 	
+	/**
+	 *  The agent body.
+	 */
 	@AgentBody
 	public void body()
 	{
@@ -83,6 +100,9 @@ public class Count2BDI
 		System.out.println("body end: "+getClass().getName());
 	}
 	
+	/**
+	 *  Inline plan method that reacts on count goal.
+	 */
 	@Plan(trigger=@Trigger(goals=CountGoal.class))
 	protected IFuture<Void> inc(CountGoal goal)
 	{

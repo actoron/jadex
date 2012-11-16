@@ -7,12 +7,15 @@ import jadex.bdiv3.model.MGoal;
 import jadex.rules.eca.annotations.Event;
 
 /**
- * 
+ *  Goal with target and drop condition.
  */
 @Goal(excludemode=MGoal.EXCLUDE_NEVER)
 public class CountGoal
 {
+	/** The target value. */
 	protected int target;
+	
+	/** The drop value. */
 	protected int drop;
 	
 	/**
