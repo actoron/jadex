@@ -106,7 +106,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		List<MGoal> goals = ((BDIModel)model).getCapability().getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
-			rulesystem.observeObject(goals.get(i).getTarget());
+			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
 		}
 		
 		return ret;

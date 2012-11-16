@@ -54,7 +54,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public Class<?> generateBDIClass(final String clname, final BDIModel model, ClassLoader cl)
+	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl)
 	{
 		Class<?> ret = null;
 		try
@@ -94,9 +94,10 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	//							mv.visitIntInsn(BIPUSH, 25);
 								
 								System.out.println("vis: "+opcode+" "+owner+" "+name+" "+desc);
+								System.out.println(Type.getType(desc).getClassName());
 								
 								// possibly transform basic value
-//								if(SReflect.isBasicType(Type.getType(desc).getClass()))
+								if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
 									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
 								
 								// fetch bdi agent value from field
@@ -210,6 +211,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 //	 */
 	public static void main(String[] args) throws Exception
 	{
+//		System.out.println(int.class.getName());
+		
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 //		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
 		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
@@ -272,6 +275,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	//							mv.visitIntInsn(BIPUSH, 25);
 								
 								System.out.println("vis: "+opcode+" "+owner+" "+name+" "+desc);
+								System.out.println(Type.getType(desc).getClass());
 								
 								if(SReflect.isBasicType(Type.getType(desc).getClass()))
 									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");

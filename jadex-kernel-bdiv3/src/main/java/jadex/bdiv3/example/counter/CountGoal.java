@@ -27,6 +27,9 @@ public class CountGoal
 		this.drop = drop;
 	}
 	
+	/**
+	 *  Called whenever the counter belief changes.
+	 */
 	@GoalTargetCondition
 	protected boolean target(@Event("counter") int cnt)
 	{
@@ -34,6 +37,9 @@ public class CountGoal
 		return cnt==target;
 	}
 	
+	/**
+	 *  Called whenever the counter belief changes.
+	 */
 	@GoalDropCondition
 	protected boolean drop(@Event("counter") int cnt)
 	{

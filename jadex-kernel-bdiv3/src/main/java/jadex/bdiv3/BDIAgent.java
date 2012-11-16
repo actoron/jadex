@@ -58,7 +58,7 @@ public class BDIAgent extends MicroAgent
 		final Future<T> ret = new Future<T>();
 		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-		ip.getRuleSystem().observeObject(goal);
+//		ip.getRuleSystem().observeObject(goal);
 
 		BDIModel bdim = ip.getBDIModel();
 		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
