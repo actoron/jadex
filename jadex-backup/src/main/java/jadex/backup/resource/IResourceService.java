@@ -2,6 +2,7 @@ package jadex.backup.resource;
 
 import jadex.bridge.IInputConnection;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 /**
  *  A service for a querying a remote resource.
@@ -43,7 +44,7 @@ public interface IResourceService
 	 *  @return	A list of file infos for files and subdirectories.
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<FileInfo[]>	getDirectoryContents(FileInfo dir);
+	public IIntermediateFuture<FileInfo>	getDirectoryContents(FileInfo dir);
 	
 	/**
 	 *  Get the contents of a file.

@@ -1,6 +1,7 @@
 package jadex.backup.job.processing;
 
 import jadex.backup.job.SyncJob;
+import jadex.backup.job.SyncProfile;
 import jadex.backup.job.SyncTask;
 import jadex.backup.job.SyncTaskEntry;
 import jadex.backup.job.Task;
@@ -247,18 +248,12 @@ public class SyncJobProcessingAgent
 			{
 //				System.out.println(result);
 				SyncTaskEntry entry = null;
-				if(BackupResource.FILE_REMOTE_ADDED.equals(result.getType())
-					|| BackupResource.FILE_REMOTE_MODIFIED.equals(result.getType()))
+				
+				// Todo: user-editable policies for default action sets (e.g. skip conflicts vs. copy on conflict)
+				List<String>	actions	= SyncProfile.ALLOWED_ACTIONS.get(result.getType());
+				if(actions.size()>1)
 				{
-					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), SyncTaskEntry.ACTION_UPDATE);
-				}
-				else if(BackupResource.FILE_CONFLICT.equals(result.getType()))
-				{
-					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), SyncTaskEntry.ACTION_COPY);
-				}
-				else if(BackupResource.FILE_LOCAL_MODIFIED.equals(result.getType()))
-				{
-					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), SyncTaskEntry.ACTION_SKIP);
+					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), actions.get(0));
 				}
 										
 				if(entry!=null)
@@ -463,16 +458,15 @@ public class SyncJobProcessingAgent
 		
 		ITerminableIntermediateFuture<BackupEvent>	fut	= null;
 		
-		if(SyncTaskEntry.ACTION_UPDATE.equals(entry.getAction())
-			|| SyncTaskEntry.ACTION_REVERT.equals(entry.getAction()))
+		if(SyncProfile.isUpdate(entry.getAction()))
 		{
 			fut	= localresser.updateFromRemote(resser, entry.getLocalFileInfo(), entry.getRemoteFileInfo());
 		}
-		else if(SyncTaskEntry.ACTION_OVERRIDE.equals(entry.getAction()))
+		else if(SyncProfile.isOverride(entry.getAction()))
 		{
 			fut	= localresser.overrideRemoteChange(resser, entry.getLocalFileInfo(), entry.getRemoteFileInfo());
 		}
-		else if(SyncTaskEntry.ACTION_COPY.equals(entry.getAction()))
+		else if(SyncProfile.isCopy(entry.getAction()))
 		{
 			fut	= localresser.updateAsCopy(resser, entry.getLocalFileInfo(), entry.getRemoteFileInfo());
 		}

@@ -8,23 +8,6 @@ import jadex.commons.SUtil;
  */
 public class SyncTaskEntry
 {
-	//-------- constants --------
-	
-	/** The update action. */
-	public static final String	ACTION_UPDATE	= "update";
-	
-	/** The override action. */
-	public static final String	ACTION_OVERRIDE	= "override";
-	
-	/** The copy action. */
-	public static final String	ACTION_COPY	= "copy";
-	
-	/** The revert action. */
-	public static final String	ACTION_REVERT	= "revert";
-	
-	/** The skip action. */
-	public static final String	ACTION_SKIP	= "skip";
-	
 	//-------- attributes --------
 	
 	/** The id. */

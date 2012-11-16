@@ -22,6 +22,9 @@ public class FileInfo
 	/** True, if the file is a directory. */
 	protected boolean	directory;
 	
+	/** True, if the file or directory exists. */
+	protected boolean	exists;
+	
 	/** The file size. */
 	protected long	size;
 	
@@ -48,6 +51,7 @@ public class FileInfo
 	{
 		this.location	= location;
 		this.directory	= directory;
+		this.exists	= parseExists(vtime);
 		this.size	= size;
 		this.vtimes	= parseVTime(vtime);
 	}
@@ -70,6 +74,24 @@ public class FileInfo
 	public void setLocation(String location)
 	{
 		this.location = location;
+	}
+	
+	/**
+	 *  Get the existing state.
+	 *  @return True, if the file or directory exists.
+	 */
+	public boolean isExisting()
+	{
+		return exists;
+	}
+
+	/**
+	 *  Set the existing state.
+	 *  @param exists True, if the file or directory exists.
+	 */
+	public void setExisting(boolean exists)
+	{
+		this.exists = exists;
 	}
 	
 	/**
@@ -111,7 +133,7 @@ public class FileInfo
 	 */
 	public String	getVTime()
 	{
-		return vtimesToString(vtimes, hash);
+		return vtimesToString(vtimes, hash, exists);
 	}
 	
 	/**
@@ -157,9 +179,9 @@ public class FileInfo
 	 *  @param time	The time.
 	 *  @param hash	The new hash.
 	 */
-	public void	bumpVTime(String node, long time, String hash)
+	public void	bumpVTime(String node, long time, String hash, boolean exists)
 	{
-		boolean	change	= this.hash==null || !this.hash.equals(hash);
+		boolean	change	= this.hash==null || !this.hash.equals(hash) || exists!=this.exists;
 
 		// on change -> invalidate other times and update hash.
 		if(change)
@@ -174,6 +196,7 @@ public class FileInfo
 			}
 			
 			this.hash	= hash;
+			this.exists	= exists;
 		}
 		
 		setVTime(node, time);
@@ -255,6 +278,14 @@ public class FileInfo
 	//-------- helper methods --------
 	
 	/**
+	 *  Get the existing state.
+	 */
+	protected static boolean	parseExists(String vtime)
+	{
+		return !vtime.startsWith("D.");
+	}
+	
+	/**
 	 *  Get the hash if any.
 	 */
 	protected static String	parseHash(String vtime)
@@ -262,7 +293,7 @@ public class FileInfo
 		String	ret	= null;
 		if(vtime.indexOf('.')<vtime.indexOf('@'))
 		{
-			ret	= vtime.substring(0, vtime.indexOf('.'));
+			ret	= vtime.substring(vtime.startsWith("D.") ? 2 : 0, vtime.indexOf('.'));
 		}
 		return ret;
 	}
@@ -290,9 +321,15 @@ public class FileInfo
 	/**
 	 *  Get the vector time as string.
 	 */
-	protected static String	vtimesToString(Map<String, Long> vtimes, String hash)
+	protected static String	vtimesToString(Map<String, Long> vtimes, String hash, boolean exists)
 	{
 		StringBuffer	buf	= new StringBuffer();
+		
+		if(!exists)
+		{
+			buf.append("D.");
+		}
+		
 		for(String key: vtimes.keySet())
 		{
 			if(buf.length()>0)

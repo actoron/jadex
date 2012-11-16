@@ -104,7 +104,7 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("Local file has changed: "+localfi.getLocation()));
 		}
-		else
+		else if(remotefi.isExisting())
 		{
 			downloadFile(remote, remotefi, ret)
 				.addResultListener(new ExceptionDelegationResultListener<File, Collection<BackupEvent>>(ret)
@@ -120,11 +120,23 @@ public class LocalResourceService	implements ILocalResourceService
 						}
 						catch(Exception e)
 						{
-							exceptionOccurred(e);
+							ret.setExceptionIfUndone(e);
 						}
 					}
 				}
 			});
+		}
+		else
+		{
+			try
+			{
+				getResource().updateFromRemote(localfi, remotefi, null);
+				ret.setFinishedIfUndone();
+			}
+			catch(Exception e)
+			{
+				ret.setExceptionIfUndone(e);
+			}
 		}
 
 		return ret;		
@@ -196,7 +208,7 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("Local file has changed: "+localfi.getLocation()));
 		}
-		else
+		else if(remotefi.isExisting())
 		{
 			downloadFile(remote, remotefi, ret)
 				.addResultListener(new ExceptionDelegationResultListener<File, Collection<BackupEvent>>(ret)
@@ -212,11 +224,23 @@ public class LocalResourceService	implements ILocalResourceService
 						}
 						catch(Exception e)
 						{
-							exceptionOccurred(e);
+							ret.setExceptionIfUndone(e);
 						}
 					}
 				}
 			});
+		}
+		else
+		{
+			try
+			{
+				getResource().updateAsCopy(localfi, remotefi, null);
+				ret.setFinishedIfUndone();
+			}
+			catch(Exception e)
+			{
+				ret.setExceptionIfUndone(e);
+			}			
 		}
 
 		return ret;		
@@ -279,9 +303,9 @@ public class LocalResourceService	implements ILocalResourceService
 				{
 					// Currently only recurses into directory contents (todo: directory update i.e. deletion of files)
 					ret.addIntermediateResultIfUndone(new BackupEvent(BackupResource.FILE_UNCHANGED, top.getFileInfo())); // todo: dir events?
-					remote.getDirectoryContents(top.getFileInfo()).addResultListener(new IResultListener<FileInfo[]>()
+					remote.getDirectoryContents(top.getFileInfo()).addResultListener(new IResultListener<Collection<FileInfo>>()
 					{
-						public void resultAvailable(FileInfo[] result)
+						public void resultAvailable(Collection<FileInfo> result)
 						{
 							final StackElement	top	= stack.get(stack.size()-1);
 							
@@ -302,20 +326,11 @@ public class LocalResourceService	implements ILocalResourceService
 				}
 				else
 				{
-					try
-					{
-						Tuple2<FileInfo, String> state = getResource().getState(top.getFileInfo());
-						ret.addIntermediateResultIfUndone(new BackupEvent(state.getSecondEntity(), state.getFirstEntity(), top.getFileInfo(), 0));
-						doScan(remote, ret, stack);
-					}
-					catch(Exception e)
-					{
-						ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.ERROR, null, top.getFileInfo(), e));
-						doScan(remote, ret, stack);
-					}
+					Tuple2<FileInfo, String> state = getResource().getState(top.getFileInfo());
+					ret.addIntermediateResultIfUndone(new BackupEvent(state.getSecondEntity(), state.getFirstEntity(), top.getFileInfo(), 0));
+					doScan(remote, ret, stack);
 				}
 			}		
-
 		}		
 	}
 	

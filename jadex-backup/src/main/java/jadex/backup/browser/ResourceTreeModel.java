@@ -13,6 +13,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,10 +191,13 @@ public class ResourceTreeModel	implements TreeModel
 					// Hack!!! Block swing thread until results are available
 					if(fi.isDirectory())
 					{
-						FileInfo[]	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
+						Collection<FileInfo>	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
 						for(FileInfo tmp : list)
 						{
-							ret.add(new Tuple2<FileInfo, IResourceService>(tmp, remote));
+							if(tmp.isExisting())
+							{
+								ret.add(new Tuple2<FileInfo, IResourceService>(tmp, remote));
+							}
 						}
 					}
 				}

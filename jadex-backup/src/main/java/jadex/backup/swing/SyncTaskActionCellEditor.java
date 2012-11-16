@@ -1,10 +1,9 @@
 package jadex.backup.swing;
 
-import jadex.backup.job.SyncTaskEntry;
-import jadex.backup.resource.BackupResource;
-import jadex.commons.SUtil;
+import jadex.backup.job.SyncProfile;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -53,28 +52,9 @@ public class SyncTaskActionCellEditor	extends DefaultCellEditor	implements Table
 	 */
 	public Component	getComponent(JTable table, Object value, boolean selected, int row, boolean renderer)
 	{
-		Object	type	= table.getValueAt(row, 1);
-		String[]	actions;
-		if(BackupResource.FILE_REMOTE_MODIFIED.equals(type))
-		{
-			actions	= new String[]{SyncTaskEntry.ACTION_UPDATE, SyncTaskEntry.ACTION_SKIP, SyncTaskEntry.ACTION_COPY, SyncTaskEntry.ACTION_OVERRIDE};
-		}
-		else if(BackupResource.FILE_REMOTE_ADDED.equals(type))
-		{
-			actions	= new String[]{SyncTaskEntry.ACTION_UPDATE, SyncTaskEntry.ACTION_SKIP};
-		}
-		else if(BackupResource.FILE_LOCAL_MODIFIED.equals(type))
-		{
-			actions	= new String[]{SyncTaskEntry.ACTION_SKIP, SyncTaskEntry.ACTION_REVERT, SyncTaskEntry.ACTION_COPY};
-		}
-		else if(BackupResource.FILE_CONFLICT.equals(type))
-		{
-			actions	= new String[]{SyncTaskEntry.ACTION_COPY, SyncTaskEntry.ACTION_SKIP, SyncTaskEntry.ACTION_UPDATE, SyncTaskEntry.ACTION_OVERRIDE};
-		}
-		else
-		{
-			actions	= SUtil.EMPTY_STRING_ARRAY;
-		}
+		String	type	= (String)table.getValueAt(row, 1);
+
+		List<String>	actions	= SyncProfile.ALLOWED_ACTIONS.get(type);
 		
 		JComboBox	box	= (JComboBox)getComponent();
 		box.removeAllItems();

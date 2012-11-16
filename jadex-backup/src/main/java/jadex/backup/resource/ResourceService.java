@@ -7,15 +7,13 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *  Local (i.e. user-oriented) interface to a resource. 
@@ -80,7 +78,7 @@ public class ResourceService	implements IResourceService
 	 */
 	public IFuture<FileInfo>	getFileInfo(String file)
 	{
-		return new Future<FileInfo>(rpa.getResource().getFileInfo(rpa.getResource().getFile(file)));
+		return new Future<FileInfo>(rpa.getResource().getFileInfo(file));
 	}
 	
 	/**
@@ -89,45 +87,9 @@ public class ResourceService	implements IResourceService
 	 *  @return	A list of file infos for files and subdirectories.
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<FileInfo[]>	getDirectoryContents(FileInfo dir)
+	public IIntermediateFuture<FileInfo>	getDirectoryContents(FileInfo dir)
 	{
-		Future<FileInfo[]>	ret	= new Future<FileInfo[]>();
-		try
-		{
-			File	fdir	= rpa.getResource().getFile(dir.getLocation());
-			if(!fdir.isDirectory())
-			{
-				throw new IllegalArgumentException("Not a directory: "+dir.getLocation());
-			}
-			String[]	list = fdir.list(new FilenameFilter()
-			{
-				public boolean accept(File dir, String name)
-				{
-					return !".jadexbackup".equals(name);
-				}
-			});
-			if(list==null)
-			{
-				throw new IOException("Could not read directory: "+dir.getLocation());
-			}
-			
-			if(rpa.getResource().getFileInfo(rpa.getResource().getFile(dir.getLocation())).isNewerThan(dir))
-			{
-				throw new RuntimeException("Local resource has changed: "+dir.getLocation());
-			}
-			
-			List<FileInfo>	aret	= new ArrayList<FileInfo>();
-			for(String file: list)
-			{
-				aret.add(rpa.getResource().getFileInfo(new File(fdir, file)));
-			}
-			ret.setResult(aret.toArray(new FileInfo[aret.size()]));
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
-		return ret;
+		return new IntermediateFuture<FileInfo>(rpa.getResource().getDirectoryContents(dir));
 	}
 	
 	/**
@@ -142,7 +104,7 @@ public class ResourceService	implements IResourceService
 		try
 		{
 			File	f	= rpa.getResource().getFile(file.getLocation());
-			if(!f.exists() || rpa.getResource().getFileInfo(f).isNewerThan(file))
+			if(!f.exists() || rpa.getResource().getFileInfo(file.getLocation()).isNewerThan(file))
 			{
 				throw new RuntimeException("Local resource has changed: "+file.getLocation());
 			}
