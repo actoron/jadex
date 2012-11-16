@@ -11,6 +11,7 @@ import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -70,7 +71,22 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				{
 					MPlan mplan = (MPlan)cand;
 					RPlan rplan = new RPlan((MPlan)cand, cand);
-					IPlanBody body = new MethodPlanBody(ia, rplan, (Method)mplan.getBody());
+					
+					// todo: move this code somehow
+					String mname = (String)mplan.getBody();
+					Class<?> cl = SReflect.findClass0(mplan.getName(), null, ia.getClassLoader());
+					Method[] ms = cl.getDeclaredMethods();
+					Method mbody = null;
+					for(Method m: ms)
+					{
+						if(m.getName().equals(mname))
+						{
+							mbody = m;
+							break;
+						}
+					}
+					
+					IPlanBody body = new MethodPlanBody(ia, rplan, mbody);
 					rplan.setBody(body);
 					rplan.setReason(element);
 					rplan.setDispatchedElement(element);

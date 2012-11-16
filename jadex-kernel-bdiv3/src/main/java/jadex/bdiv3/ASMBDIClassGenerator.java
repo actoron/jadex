@@ -3,7 +3,9 @@ package jadex.bdiv3;
 import jadex.bdiv3.model.BDIModel;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -11,15 +13,14 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.TraceClassVisitor;
+import org.kohsuke.asm4.ClassReader;
+import org.kohsuke.asm4.ClassVisitor;
+import org.kohsuke.asm4.ClassWriter;
+import org.kohsuke.asm4.MethodVisitor;
+import org.kohsuke.asm4.Opcodes;
+import org.kohsuke.asm4.Type;
+import org.kohsuke.asm4.util.ASMifier;
+import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
  * 
@@ -53,7 +54,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public Class<?> generateBDIClass(Class<?> cma, final BDIModel micromodel, ClassLoader cl)
+	public Class<?> generateBDIClass(final String clname, final BDIModel model, ClassLoader cl)
 	{
 		Class<?> ret = null;
 		try
@@ -61,12 +62,14 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	//		String clname = cma.getName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST;
 			
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-	//		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
-			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
+			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
+//			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
 	//		CheckClassAdapter cc = new CheckClassAdapter(tcv);
 			
 	//		final String classname = "lars/Lars";
 	//		final String supername = "jadex/bdiv3/MyTestClass";
+			
+			final String iclname = clname.replace(".", "/");
 			
 			ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, tcv)
 			{
@@ -84,7 +87,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 					{
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
-							if(Opcodes.PUTFIELD==opcode)
+							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name))
 							{
 								// is already on stack (object + value)
 	//							mv.visitVarInsn(ALOAD, 0);
@@ -92,11 +95,23 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								
 								System.out.println("vis: "+opcode+" "+owner+" "+name+" "+desc);
 								
-								if(SReflect.isBasicType(Type.getType(desc).getClass()))
+								// possibly transform basic value
+//								if(SReflect.isBasicType(Type.getType(desc).getClass()))
 									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
-								visitLdcInsn(name);
+								
+								// fetch bdi agent value from field
 								visitVarInsn(Opcodes.ALOAD, 0);
-								visitMethodInsn(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/MyTestClass", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V");
+								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+								visitInsn(Opcodes.SWAP);
+								
+								// add field name	
+								visitLdcInsn(name);
+								
+								// add this
+								visitVarInsn(Opcodes.ALOAD, 0);
+								
+								// invoke method
+								visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(BDIAgent.class), "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V");
 							}
 							else
 							{
@@ -108,15 +123,35 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				
 				public void visitEnd()
 				{
-					visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(String.class), null, null);
+					visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(BDIAgent.class), null, null);
 					super.visitEnd();
 				}
 			};
 			
-			ClassReader cr = new ClassReader(cma.getName());
-			cr.accept(cv, 0);
-			byte[] data = cw.toByteArray();
-			ret = toClass(cma.getName(), data, cl, null);
+			InputStream is = null;
+			try
+			{
+				is = SUtil.getResource(clname.replace('.', '/') + ".class", cl);
+				ClassReader cr = new ClassReader(is);
+				cr.accept(cv, 0);
+				byte[] data = cw.toByteArray();
+				ret = toClass(clname, data, cl, null);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					if(is!=null)
+						is.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 		catch(Exception e)
 		{

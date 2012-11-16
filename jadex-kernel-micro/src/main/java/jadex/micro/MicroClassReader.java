@@ -236,7 +236,7 @@ public class MicroClassReader
 		boolean compdone = false;
 		boolean breaksdone = false;
 		
-		while(cma!=null && !cma.equals(Object.class) && !cma.equals(MicroAgent.class))
+		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(MicroAgent.class, cl)))
 		{
 			// Description is set only once from upper most element.
 			if(isAnnotationPresent(cma, Description.class, cl) && modelinfo.getDescription()==null)
@@ -370,6 +370,8 @@ public class MicroClassReader
 				
 				for(int i=0; i<vals.length; i++)
 				{
+					try
+					{
 					RequiredServiceBinding binding = createBinding(vals[i].binding());
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
 						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding);
@@ -382,6 +384,11 @@ public class MicroClassReader
 					else
 					{
 						rsers.put(vals[i].name(), rsis);
+					}
+					}
+					catch(ClassCastException e)
+					{
+						e.printStackTrace();
 					}
 				}
 			}
@@ -603,27 +610,27 @@ public class MicroClassReader
 			Field[] fields = cma.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
 			{
-				if(fields[i].isAnnotationPresent(Agent.class))
+				if(isAnnotationPresent(fields[i], Agent.class, cl))
 				{
 					micromodel.addAgentInjection(fields[i]);
 				}
-				else if(fields[i].isAnnotationPresent(AgentService.class))
+				else if(isAnnotationPresent(fields[i], AgentService.class, cl))
 				{
-					AgentService ser = (AgentService)fields[i].getAnnotation(AgentService.class);
+					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
 					String name = ser.name().length()>0? ser.name(): fields[i].getName();
 					micromodel.addServiceInjection(name, fields[i]);
 				}
 				else
 				{
-					if(fields[i].isAnnotationPresent(AgentArgument.class))
+					if(isAnnotationPresent(fields[i], AgentArgument.class, cl))
 					{
-						AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+						AgentArgument arg = getAnnotation(fields[i], AgentArgument.class, cl);
 						String name = arg.value().length()>0? arg.value(): fields[i].getName();
 						micromodel.addArgumentInjection(name, fields[i], arg.convert());
 					}
-					if(fields[i].isAnnotationPresent(AgentResult.class))
+					if(isAnnotationPresent(fields[i], AgentResult.class, cl))
 					{
-						AgentResult res = (AgentResult)fields[i].getAnnotation(AgentResult.class);
+						AgentResult res = getAnnotation(fields[i], AgentResult.class, cl);
 						String name = res.value().length()>0? res.value(): fields[i].getName();
 						if(micromodel.getResultInjection(name)==null)
 						{
@@ -639,7 +646,7 @@ public class MicroClassReader
 				for(int i=0; i<methods.length; i++)
 				{
 					final Method method = methods[i];
-					if(methods[i].isAnnotationPresent(AgentBreakpoint.class))
+					if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
 					{
 						micromodel.setBreakpointMethod(method);
 					}
@@ -1358,18 +1365,52 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected Annotation getAnnotation(Class<?> clazz, Class<? extends Annotation> anclazz, ClassLoader cl)
+	protected boolean isAnnotationPresent(Field f, Class<? extends Annotation> anclazz, ClassLoader cl)
 	{
-		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
-		return getProxyAnnotation(clazz.getAnnotation((Class<? extends Annotation>)getClass(anclazz, cl)), cl2);
+		return f.isAnnotationPresent((Class<? extends Annotation>)getClass(anclazz, cl));
 	}
 	
 	/**
 	 * 
 	 */
-	protected Annotation getAnnotation(Class<?> clazz, Class<? extends Annotation> anclazz, ClassLoader cl1, ClassLoader cl2)
+	protected boolean isAnnotationPresent(Method m, Class<? extends Annotation> anclazz, ClassLoader cl)
 	{
-		return getProxyAnnotation(clazz.getAnnotation((Class<? extends Annotation>)getClass(anclazz, cl1)), cl2);
+		return m.isAnnotationPresent((Class<? extends Annotation>)getClass(anclazz, cl));
+	}
+	
+	/**
+	 * 
+	 */
+	protected <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
+	{
+		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
+		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
+	}
+	
+	/**
+	 * 
+	 */
+	protected <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
+	{
+		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
+		return getProxyAnnotation(f.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
+	}
+	
+	/**
+	 * 
+	 */
+	protected <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
+	{
+		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
+		return getProxyAnnotation(m.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
+	}
+	
+	/**
+	 * 
+	 */
+	protected <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
+	{
+		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl1)), cl2);
 	}
 	
 	/**
@@ -1409,51 +1450,66 @@ public class MicroClassReader
 	}
 	
 	/**
-	 * 
+	 *  Gets proxy annotation that can be invoked by corresponding classloader.
+	 * @return 
 	 */
-	protected Annotation getProxyAnnotation(final Annotation an, final ClassLoader cl)
+	protected <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
 	{
-		Annotation ret = null;
+		T ret = null;
 		
-		try
+		if(isClassLoaderCompatible(an.getClass(), cl))
 		{
-			Class<?>[] in = an.getClass().getInterfaces();
-			Class<?>[] nin = new Class[in.length];
-			for(int i=0; i<in.length; i++)
-			{
-				nin[i] = getClass(in[i], cl);
-			}
-			
-			ret = (Annotation)Proxy.newProxyInstance(cl, nin, new InvocationHandler()
-			{
-				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-				{
-					Object[] nargs = args==null? new Object[0]: args;
-					Class[] cls = method.getParameterTypes();
-//					an.getClass().getMethod(method.getName(), )
-					Object ret = method.invoke(an, nargs);
-					
-					if(ret instanceof Annotation)
-					{
-						ret = getProxyAnnotation(an, cl);
-					}
-					else if(ret.getClass().isArray() && ret.getClass().getComponentType().isAnnotation())
-					{
-						int len =  Array.getLength(ret);
-						Object nret = Array.newInstance(ret.getClass().getComponentType(), len);
-						for(int i=0; i<len; i++)
-						{
-							Array.set(nret, i, getProxyAnnotation((Annotation)Array.get(ret, i), cl));
-						}
-					}
-					return ret;
-				}
-			});
+			ret = an;
 		}
-		catch(Exception e)
+		else
 		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			System.out.println("reloading: "+an);
+			
+			try
+			{
+				Class<?>[] in = an.getClass().getInterfaces();
+				Class<?>[] nin = new Class[in.length];
+				for(int i=0; i<in.length; i++)
+				{
+					nin[i] = getClass(in[i], cl);
+				}
+				
+				ret = (T)Proxy.newProxyInstance(cl, nin, new InvocationHandler()
+				{
+					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+					{
+						Object[] nargs = args==null? new Object[0]: args;
+						Class[] cls = method.getParameterTypes();
+						Method m = an.getClass().getMethod(method.getName(), getClassArray(method.getParameterTypes(), cl));
+						Object ret = m.invoke(an, nargs);
+						
+						if(ret!=null && !isClassLoaderCompatible(ret.getClass(), cl))
+						{
+							if(ret instanceof Annotation)
+							{
+								ret = getProxyAnnotation((Annotation)ret, cl);
+							}
+							else if(ret.getClass().isArray() && ret.getClass().getComponentType().isAnnotation())
+							{
+								int len =  Array.getLength(ret);
+								Class<?> arclazz = MicroClassReader.this.getClass(ret.getClass().getComponentType(), cl);
+								Object nret = Array.newInstance(arclazz, len);
+								for(int i=0; i<len; i++)
+								{
+									Array.set(nret, i, getProxyAnnotation((Annotation)Array.get(ret, i), cl));
+								}
+								ret = nret;
+							}
+						}
+						return ret;
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
 		}
 		
 		return ret;
@@ -1492,5 +1548,36 @@ public class MicroClassReader
 		{
 			this.orig = orig;
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isClassLoaderCompatible(Class<?> clazz, ClassLoader cl)
+	{
+		ClassLoader clcl = clazz.getClassLoader();
+		boolean ret = clcl==null || clcl.equals(cl);
+		if(!ret)
+		{
+			ClassLoader tst = cl.getParent();
+			while(tst!=null && !ret)
+			{
+				ret = clcl.equals(tst);
+				tst = tst.getParent();
+			}
+			if(!ret)
+			{
+				try
+				{
+					Method m = cl.getClass().getMethod("isClassLoaderCompatible", new Class[]{Class.class});
+					ret = ((Boolean)m.invoke(cl, new Object[]{clazz})).booleanValue();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		return ret;
 	}
 }

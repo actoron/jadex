@@ -1,19 +1,22 @@
 package jadex.bdiv3.model;
 
+import jadex.commons.SReflect;
+
 /**
  * 
  */
 public class MClassBasedElement extends MProcessableElement
 {
 	/** The target. */
-	protected Class<?> target;
+	protected String target;
+	protected Class<?> targetclass;
 	
 	/**
 	 *  Create a new belief.
 	 */
-	public MClassBasedElement(Class<?> target, boolean posttoall, boolean randomselection, String excludemode)
+	public MClassBasedElement(String target, boolean posttoall, boolean randomselection, String excludemode)
 	{
-		super(target.getName(), posttoall, randomselection, excludemode);
+		super(target, posttoall, randomselection, excludemode);
 		this.target = target;
 	}
 
@@ -21,16 +24,29 @@ public class MClassBasedElement extends MProcessableElement
 	 *  Get the target.
 	 *  @return The target.
 	 */
-	public Class<?> getTarget()
+	public String getTarget()
 	{
 		return target;
+	}
+	
+	/**
+	 *  Get the target.
+	 *  @return The target.
+	 */
+	public Class<?> getTargetClass(ClassLoader cl)
+	{
+		if(targetclass==null)
+		{
+			targetclass = SReflect.findClass0(target, null, cl);
+		}
+		return targetclass;
 	}
 
 	/**
 	 *  Set the target.
 	 *  @param target The target to set.
 	 */
-	public void setTarget(Class<?> target)
+	public void setTarget(String target)
 	{
 		this.target = target;
 	}

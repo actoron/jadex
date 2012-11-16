@@ -302,6 +302,7 @@ public class SReflect
 					}
 					catch(Throwable e)
 					{
+//						e.printStackTrace();
 						// Catch anything as sometimes strange errors appear
 						// E.g. (http://pastebin.com/6xkRhJqG)
 						// Exception in thread "AWT-EventQueue-0" java.lang.InternalError: Unable to find plugin native libraries

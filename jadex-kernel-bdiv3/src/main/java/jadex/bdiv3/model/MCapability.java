@@ -102,7 +102,7 @@ public class MCapability extends MElement
 	 *  Get the goal for a pojo type.
 	 *  @return The goal.
 	 */
-	public MGoal getGoal(Class<?> pojotype)
+	public MGoal getGoal(String pojotype)
 	{
 		MGoal ret = null;
 		if(goals!=null)

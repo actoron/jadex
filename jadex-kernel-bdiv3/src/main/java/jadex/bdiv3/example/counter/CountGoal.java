@@ -27,6 +27,7 @@ public class CountGoal
 	@GoalTargetCondition
 	protected boolean target(@Event("counter") int cnt)
 	{
+		System.out.println("check target: "+cnt);
 		return cnt==target;
 	}
 	

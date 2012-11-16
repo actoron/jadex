@@ -18,7 +18,7 @@
 	</description>
 	
 	<properties>
-		<jersey.version>1.11</jersey.version>
+		<jersey.version>1.14</jersey.version>
 	</properties>
 
 	<dependencies>

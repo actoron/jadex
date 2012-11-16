@@ -8,7 +8,7 @@ public class MMessageEvent extends MClassBasedElement
 	/**
 	 *  Create a new message event.
 	 */
-	public MMessageEvent(Class<?> target)
+	public MMessageEvent(String target)
 	{
 		super(target, false, false, null);
 	}

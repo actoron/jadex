@@ -71,8 +71,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			Field[] fields = model.getAgentInjections();
 			for(int i=0; i<fields.length; i++)
 			{
-				if(fields[i].isAnnotationPresent(Agent.class))
-				{
+//				if(fields[i].isAnnotationPresent(Agent.class))
+//				{
 					try
 					{
 						// todo: cannot use fields as they are from the 'not enhanced' class
@@ -84,7 +84,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						getLogger().warning("Agent injection failed: "+e);
 					}
-				}
+//				}
 			}
 			
 			// Additionally inject agent to hidden agent field

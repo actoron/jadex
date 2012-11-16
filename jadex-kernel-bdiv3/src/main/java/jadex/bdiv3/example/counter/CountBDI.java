@@ -25,7 +25,7 @@ public class CountBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchGoalAndWait(new CountGoal(10, 5));
+//		agent.dispatchGoalAndWait(new CountGoal(10, 5))
 //			.addResultListener(new DefaultResultListener<CountGoal>()
 //		{
 //			public void resultAvailable(CountGoal goal)
@@ -34,14 +34,14 @@ public class CountBDI
 //			}
 //		});
 		
-		agent.dispatchGoalAndWait(new CountGoal(5, 10));
-//			.addResultListener(new DefaultResultListener<CountGoal>()
-//		{
-//			public void resultAvailable(CountGoal goal)
-//			{
-//				System.out.println("My goal succeeded: "+goal);
-//			}
-//		});
+		agent.dispatchGoalAndWait(new CountGoal(5, 10))
+			.addResultListener(new DefaultResultListener<CountGoal>()
+		{
+			public void resultAvailable(CountGoal goal)
+			{
+				System.out.println("My goal succeeded: "+goal);
+			}
+		});
 		
 		System.out.println("body end: "+getClass().getName());
 	}

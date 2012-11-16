@@ -10,5 +10,5 @@ public interface IBDIClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public Class<?> generateBDIClass(Class<?> cma, BDIModel micromodel, ClassLoader cl);
+	public Class<?> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
 }

@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;

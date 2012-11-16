@@ -19,17 +19,11 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.MicroClassReader;
 import jadex.micro.MicroModel;
-import jadex.micro.annotation.Agent;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.List;
 
 /**
@@ -104,8 +98,9 @@ public class BDIClassReader extends MicroClassReader
 	
 	/**
 	 *  Fill the model details using annotation.
+	 *  // called with dummy classloader (that was used to load cma first time)
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel micromodel, String model, final Class<?> cma, ClassLoader classloader)
+	protected void fillBDIModelFromAnnotations(BDIModel micromodel, String model, final Class<?> cma, ClassLoader cl)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -116,13 +111,13 @@ public class BDIClassReader extends MicroClassReader
 //		List<Class> goals = new ArrayList<Class>();
 //		List<Method> plans = new ArrayList<Method>();
 		
-		Class<?> cl = cma;
-		while(cl!=null && !cl.equals(Object.class) && !cl.equals(BDIAgent.class))
+		Class<?> clazz = cma;
+		while(clazz!=null && !clazz.equals(Object.class) && !clazz.equals(getClass(BDIAgent.class, cl)))
 		{
-			Field[] fields = cl.getDeclaredFields();
+			Field[] fields = clazz.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
 			{
-				if(fields[i].isAnnotationPresent(Belief.class))
+				if(isAnnotationPresent(fields[i], Belief.class, cl))
 				{
 //					System.out.println("found belief: "+fields[i].getName());
 					micromodel.getCapability().addBelief(new MBelief(fields[i]));
@@ -131,20 +126,20 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			Method[] methods = cl.getDeclaredMethods();
+			Method[] methods = clazz.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
-				if(methods[i].isAnnotationPresent(Plan.class))
+				if(isAnnotationPresent(methods[i], Plan.class, cl))
 				{
 //					System.out.println("found plan: "+methods[i].getName());
 					MTrigger tr = new MTrigger();
-					Plan p = methods[i].getAnnotation(Plan.class);
+					Plan p = getAnnotation(methods[i], Plan.class, cl);
 					Trigger trigger = p.trigger();
 					Class<?>[] gs = trigger.goals();
 					for(int j=0; j<gs.length; j++)
 					{
-						Goal ga = gs[j].getAnnotation(Goal.class);
-						MGoal mgoal = new MGoal(gs[j], ga.posttoall(), ga.randomselection(), ga.excludemode(), 
+						Goal ga = getAnnotation(gs[j], Goal.class, cl);
+						MGoal mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
 							ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay());
 						tr.addGoal(mgoal);
 						
@@ -153,7 +148,7 @@ public class BDIClassReader extends MicroClassReader
 							micromodel.getCapability().addGoal(mgoal);
 						}
 					}
-					MPlan mplan = new MPlan(methods[i].getName(), methods[i], tr, p.priority());
+					MPlan mplan = new MPlan(clazz.getName(), methods[i].getName(),  tr, p.priority());
 					micromodel.getCapability().addPlan(mplan);
 				}
 			}
@@ -168,21 +163,13 @@ public class BDIClassReader extends MicroClassReader
 //				}
 //			}
 			
-			cl = cl.getSuperclass();
+			clazz = clazz.getSuperclass();
 		}
 
 		// Create enhanced class if not already present.
 		
-//		String origclname = cma.getPackage().getName()+"."+micromodel.getModelInfo().getName();
-		String clname = cma.getName();//+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST;
-		try
-		{
-			classloader.getParent().loadClass(clname);
-			return;
-		}
-		catch(ClassNotFoundException e)
-		{
-			gen.generateBDIClass(cma, micromodel, classloader.getParent());
-		}
+		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
+		Class<?> genclazz = gen.generateBDIClass(cma.getName(), micromodel, classloader);
+		System.out.println("genclazz: "+genclazz);
 	}
 }

@@ -34,7 +34,7 @@ public class MGoal extends MClassBasedElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MGoal(Class<?> target, boolean posttoall, boolean randomselection, String excludemode,
+	public MGoal(String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay)
 	{
 		super(target, posttoall, randomselection, excludemode);

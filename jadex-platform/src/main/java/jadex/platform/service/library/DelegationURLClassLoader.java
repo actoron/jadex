@@ -358,6 +358,14 @@ public class DelegationURLClassLoader extends URLClassLoader
 		
 		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+	protected ClassLoader getBaseClassLoader()
+	{
+		return basecl;
+	}
 
 	/**
 	 *  Find the resource.
@@ -388,6 +396,53 @@ public class DelegationURLClassLoader extends URLClassLoader
 		}
 		
 		return Collections.enumeration(res);
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isClassLoaderCompatible(Class<?> clazz)
+	{
+		ClassLoader clcl = clazz.getClassLoader();
+		boolean ret = clcl.equals(this);
+		if(!ret)
+		{
+			Set<ClassLoader> res = new HashSet<ClassLoader>();
+			getAllParentLoaders(this, res);
+			ret = res.contains(clcl);
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void getAllParentLoaders(ClassLoader cl, Set<ClassLoader> cls)
+	{
+		cls.add(cl);
+		if(cl.getParent()!=null && !cls.contains(cl.getParent()))
+		{
+			cls.add(cl.getParent());
+			getAllParentLoaders(cl.getParent(), cls);
+		}
+		if(cl instanceof DelegationURLClassLoader)
+		{
+			DelegationURLClassLoader dcl = (DelegationURLClassLoader)cl;
+			ClassLoader bcl = dcl.getBaseClassLoader();
+			if(bcl!=null && !cls.contains(bcl))
+			{
+				cls.add(bcl);
+				getAllParentLoaders(bcl, cls);
+			}
+			for(DelegationURLClassLoader tst: dcl.getParentClassLoaders())
+			{
+				if(!cls.contains(tst))
+				{
+					cls.add(tst);
+					getAllParentLoaders(tst, cls);
+				}
+			}
+		}
 	}
 
 	/**
