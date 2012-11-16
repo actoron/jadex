@@ -145,16 +145,7 @@ public class SObjectInspector
 					}
 				}
 			}
-			catch (IntrospectionException e)
-			{
-			}
-			catch (IllegalArgumentException e)
-			{
-			}
-			catch (IllegalAccessException e)
-			{
-			}
-			catch (InvocationTargetException e)
+			catch(Exception e)
 			{
 			}
 		}

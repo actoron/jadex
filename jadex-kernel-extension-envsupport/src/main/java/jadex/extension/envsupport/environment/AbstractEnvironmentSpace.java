@@ -2595,7 +2595,22 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		if(fetcher==null)
 		{
-			this.fetcher = new SimpleValueFetcher();
+			this.fetcher = new SimpleValueFetcher()
+			{
+				public Object fetchValue(String name)
+				{
+					Object ret = null;
+					if(getPropertyNames().contains(name))
+					{
+						ret = getProperty(name);
+					}
+					else
+					{
+						ret = super.fetchValue(name);
+					}
+					return ret;
+				}
+			};
 			fetcher.setValue("$space", this);
 		}
 		return this.fetcher;

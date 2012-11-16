@@ -136,17 +136,14 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	{
 		Object ret = prop;
 		
+		System.out.println("getBV: "+prop);
+		
 		if(prop instanceof IParsedExpression)
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher(viewport.getPerspective().getObserverCenter().getSpace().getFetcher());
 			fetcher.setValue("$drawable", this);
 			fetcher.setValue("$object", obj);
 			fetcher.setValue("$perspective", viewport.getPerspective());
-			
-			if("rotate45".equals(prop))
-			{
-				System.out.println("fhhjug");
-			}
 			
 			String name = ((IParsedExpression)prop).getExpressionText();//(String)prop;
 			ret = getProperty(name);
@@ -166,6 +163,11 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 				ret = SObjectInspector.getProperty(obj, name);
 			}
 		}
+		else if(prop instanceof String)
+		{
+			ret = SObjectInspector.getProperty(obj, (String)prop);
+		}
+		
 		return ret;
 	}	
 	

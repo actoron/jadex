@@ -201,6 +201,11 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 				ret = SObjectInspector.getProperty(obj, name);
 			}
 		}
+		else if(prop instanceof String)
+		{
+			ret = SObjectInspector.getProperty(obj, (String)prop);
+		}
+		
 		return ret;
 	}	
 	
