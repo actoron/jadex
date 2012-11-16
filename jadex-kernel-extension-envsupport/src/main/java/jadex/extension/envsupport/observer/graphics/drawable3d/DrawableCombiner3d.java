@@ -136,8 +136,6 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	{
 		Object ret = prop;
 		
-		System.out.println("getBV: "+prop);
-		
 		if(prop instanceof IParsedExpression)
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher(viewport.getPerspective().getObserverCenter().getSpace().getFetcher());
