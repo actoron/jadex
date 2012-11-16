@@ -4,16 +4,13 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
+//@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 public class CountBDI
 {
 	@Agent
@@ -25,7 +22,20 @@ public class CountBDI
 	@AgentBody
 	public void body()
 	{
-//		agent.dispatchGoalAndWait(new CountGoal(10, 5))
+		agent.dispatchGoalAndWait(new CountGoal(10, 5))
+			.addResultListener(new IResultListener<CountGoal>()
+		{
+			public void resultAvailable(CountGoal goal)
+			{
+				System.out.println("My goal succeeded: "+goal);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("My goal failed: "+exception);
+			}
+		});
+		
+//		agent.dispatchGoalAndWait(new CountGoal(5, 10))
 //			.addResultListener(new DefaultResultListener<CountGoal>()
 //		{
 //			public void resultAvailable(CountGoal goal)
@@ -33,15 +43,6 @@ public class CountBDI
 //				System.out.println("My goal succeeded: "+goal);
 //			}
 //		});
-		
-		agent.dispatchGoalAndWait(new CountGoal(5, 10))
-			.addResultListener(new DefaultResultListener<CountGoal>()
-		{
-			public void resultAvailable(CountGoal goal)
-			{
-				System.out.println("My goal succeeded: "+goal);
-			}
-		});
 		
 		System.out.println("body end: "+getClass().getName());
 	}

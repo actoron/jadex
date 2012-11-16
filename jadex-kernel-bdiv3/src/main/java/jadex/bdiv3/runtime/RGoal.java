@@ -357,6 +357,24 @@ public class RGoal extends RProcessableElement
 	{
 		return isSucceeded() || isFailed();
 	}
+	
+	/**
+	 *  Get the exception.
+	 *  @return The exception.
+	 */
+	public Exception getException()
+	{
+		return exception;
+	}
+
+	/**
+	 *  Set the exception.
+	 *  @param exception The exception to set.
+	 */
+	public void setException(Exception exception)
+	{
+		this.exception = exception;
+	}
 
 	/**
 	 * 
@@ -369,7 +387,7 @@ public class RGoal extends RProcessableElement
 		ip.getRuleSystem().observeObject(getPojoElement());
 		
 		Method[] ms = getPojoElement().getClass().getDeclaredMethods();
-		for(Method m: ms)
+		for(final Method m: ms)
 		{
 			if(m.isAnnotationPresent(GoalTargetCondition.class))
 			{			
@@ -426,6 +444,7 @@ public class RGoal extends RProcessableElement
 					{
 						System.out.println("Goal dropping triggered: "+RGoal.this);
 //						rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
+						setException(new GoalFailureException("drop condition: "+m.getName()));
 						setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_FAILED);
 						return IFuture.DONE;
 					}
