@@ -1131,6 +1131,9 @@ public class SUtil
 	 */
 	public synchronized static ResourceInfo getResourceInfo0(String name, ClassLoader classloader)
 	{
+		if(name.indexOf("Hello")!=-1)
+			System.out.println("hihi");
+		
 		ResourceInfo ret = null;
 		File file;
 
@@ -1148,8 +1151,7 @@ public class SUtil
 				{
 					try
 					{
-						ret = new ResourceInfo(file.getCanonicalPath(), null,
-								file.lastModified());
+						ret = new ResourceInfo(file.getCanonicalPath(), null, file.lastModified());
 					}
 					catch(IOException e)
 					{
@@ -1217,7 +1219,7 @@ public class SUtil
 								try
 								{
 									ret = new ResourceInfo(file.getCanonicalPath(),
-											null, file.lastModified());
+										null, file.lastModified());
 								}
 								catch(IOException e)
 								{
@@ -1258,7 +1260,7 @@ public class SUtil
 					try
 					{
 						url = classloader.getResource(name.startsWith("/")
-								? name.substring(1) : name);
+							? name.substring(1) : name);
 						URLConnection con = url.openConnection();
 						con.setDefaultUseCaches(false); // See Java Bug ID 4386865
 						for(int i=0; ret==null && i<RESOURCEINFO_MAPPERS.length; i++)
@@ -1282,8 +1284,7 @@ public class SUtil
 			{
 				URL url = new URL(name);
 				URLConnection con = url.openConnection();
-				ret = new ResourceInfo(name, con.getInputStream(),
-						con.getLastModified());
+				ret = new ResourceInfo(name, con.getInputStream(), con.getLastModified());
 			}
 			catch(IOException le)
 			{

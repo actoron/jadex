@@ -82,6 +82,8 @@ public class BDIClassReader extends MicroClassReader
 		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader); // use parent
 		
+//		System.out.println("filename: "+modelinfo.getFilename());
+		
 		if(rid==null)
 		{
 			URL url = cma.getProtectionDomain().getCodeSource().getLocation();
@@ -170,6 +172,6 @@ public class BDIClassReader extends MicroClassReader
 		
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		Class<?> genclazz = gen.generateBDIClass(cma.getName(), micromodel, classloader);
-		System.out.println("genclazz: "+genclazz);
+//		System.out.println("genclazz: "+genclazz);
 	}
 }
