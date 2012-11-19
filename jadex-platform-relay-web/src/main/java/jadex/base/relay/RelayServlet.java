@@ -135,6 +135,8 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		System.out.println("post: "+request.getServletPath()+", "+request.getRemoteHost());
+		
 //		String	s;
 //		s	= request.getContextPath();
 //		s	= request.getPathInfo();
@@ -154,6 +156,7 @@ public class RelayServlet extends HttpServlet
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			// Set content length to avoid error page being sent.
 			response.setStatus(404);
 			response.setContentLength(0);

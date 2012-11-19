@@ -1131,9 +1131,6 @@ public class SUtil
 	 */
 	public synchronized static ResourceInfo getResourceInfo0(String name, ClassLoader classloader)
 	{
-		if(name.indexOf("Hello")!=-1)
-			System.out.println("hihi");
-		
 		ResourceInfo ret = null;
 		File file;
 

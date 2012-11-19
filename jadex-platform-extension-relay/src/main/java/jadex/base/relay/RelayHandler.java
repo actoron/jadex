@@ -447,22 +447,25 @@ public class RelayHandler
 				// Distribute awareness info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
 				if(platform!=null)
 				{
+					byte[]	peerinfo	= null;
 					PeerEntry[] apeers = peers.getPeers();
 					for(PeerEntry peer: apeers)
 					{
 						if(peer.isConnected())
 						{
-							if(propinfo==null)
+							if(peerinfo==null)
 							{
-								byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
-								propinfo	= new byte[data.length+4];
-								System.arraycopy(SUtil.intToBytes(data.length), 0, propinfo, 0, 4);
-								System.arraycopy(data, 0, propinfo, 4, data.length);
+								Map<String, Object>	message	= new HashMap<String, Object>();
+								message.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
+								message.put(SFipa.CONTENT, awainfo);
+								MessageEnvelope	msg	= new MessageEnvelope(message, null, null);
+								peerinfo	= MapSendTask.encodeMessage(msg, pcodecs, getClass().getClassLoader());
 							}
+							
 							try
 							{
 								System.out.println("Sending awareness to peer: "+peer.getURL());
-								new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier("__relay"), new byte[][]{propinfo});
+								new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier("__relay"), new byte[][]{peerinfo});
 							}
 							catch(IOException e)
 							{
