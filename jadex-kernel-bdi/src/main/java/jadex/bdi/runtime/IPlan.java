@@ -56,6 +56,11 @@ public interface IPlan	extends IParameterElement
 	 */
 	public void abortPlan();
 	
+	/**
+	 *  Start plan processing.
+	 */
+	public void startPlan();
+	
 	//-------- listeners --------
 	
 	/**

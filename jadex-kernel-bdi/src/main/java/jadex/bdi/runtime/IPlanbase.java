@@ -1,5 +1,7 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.model.IMPlan;
+
 
 /**
  *  The programmers interface for a plan base.
@@ -21,6 +23,11 @@ public interface IPlanbase extends IElement
 	 */
 	public IPlan[] getPlans(String type);
 
+	/**
+	 *  Create a plan instance.
+	 */
+	public IPlan createPlan(IMPlan mplan);
+	
 	/**
 	 *  Get a plan by name.
 	 *  @param name	The plan name.

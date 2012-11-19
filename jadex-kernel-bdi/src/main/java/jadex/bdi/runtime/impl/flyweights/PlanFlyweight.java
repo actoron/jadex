@@ -162,6 +162,27 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 		}
 	}
 	
+	/**
+	 *  Start plan processing.
+	 */
+	public void startPlan()
+	{
+		if(getInterpreter().getComponentAdapter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					PlanRules.adoptPlan(getState(), getScope(), getHandle());
+				}
+			};
+		}
+		else
+		{
+			PlanRules.adoptPlan(getState(), getScope(), getHandle());
+		}
+	}
+	
 	//-------- listeners --------
 	
 	/**

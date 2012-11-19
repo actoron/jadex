@@ -1,14 +1,20 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import java.util.Collection;
+
 import jadex.bdi.model.IMElement;
+import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MPlanFlyweight;
 import jadex.bdi.model.impl.flyweights.MPlanbaseFlyweight;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
@@ -121,6 +127,34 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	{
 		throw new UnsupportedOperationException();
 	}*/
+	
+	/**
+	 *  Create a plan instance.
+	 */
+	public IPlan createPlan(final IMPlan mplan)
+	{
+		if(getInterpreter().getComponentAdapter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+//					Collection	bindings = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.mplancandidate_has_bindings);
+					Object plan = PlanRules.instantiatePlan(getState(), getScope(), ((MPlanFlyweight)mplan).getHandle(), null, null, null, null, null);
+//					getState().setAttributeValue(getHandle(), OAVBDIRuntimeModel.mplancandidate_has_plan, plan);
+					object = PlanFlyweight.getPlanFlyweight(getState(), getScope(), plan);
+				}
+			};
+			return (IPlan)invoc.object;
+		}
+		else
+		{
+//			Collection	bindings = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.mplancandidate_has_bindings);
+			Object plan = PlanRules.instantiatePlan(getState(), getScope(), ((MPlanFlyweight)mplan).getHandle(), null, null, null, null, null);
+//			getState().setAttributeValue(getHandle(), OAVBDIRuntimeModel.mplancandidate_has_plan, plan);
+			return PlanFlyweight.getPlanFlyweight(getState(), getScope(), plan);
+		}
+	}
 	
 	//-------- listeners --------
 	
