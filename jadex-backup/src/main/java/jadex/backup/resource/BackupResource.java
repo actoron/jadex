@@ -293,7 +293,7 @@ public class BackupResource
 	 */
 	public boolean isCurrent(String location, FileInfo fi)
 	{
-		FileInfo	current	= getFileInfo(location);
+		FileInfo current = getFileInfo(location);
 		return current==null && fi==null || current!=null && fi!=null && current.getVTime(getLocalId())==fi.getVTime(getLocalId());
 	}
 

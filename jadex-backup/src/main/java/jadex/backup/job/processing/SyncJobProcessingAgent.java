@@ -7,7 +7,6 @@ import jadex.backup.job.SyncTaskEntry;
 import jadex.backup.job.Task;
 import jadex.backup.job.management.IJobManagementService;
 import jadex.backup.resource.BackupEvent;
-import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.ILocalResourceService;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
@@ -33,6 +32,8 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -65,6 +66,10 @@ import java.util.Map;
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="rps", type=IResourceService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+})
+@ComponentTypes(
+{
+	@ComponentType(name="rpa", filename="jadex/backup/resource/ResourceProviderAgent.class")
 })
 public class SyncJobProcessingAgent
 {
@@ -112,7 +117,7 @@ public class SyncJobProcessingAgent
 				args.put("id", job.getGlobalResource());
 				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 				ci.setArguments(args);
-				cms.createComponent(null, "jadex/backup/resource/ResourceProviderAgent.class", ci, null)
+				cms.createComponent(null, "rpa", ci, null)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
@@ -150,6 +155,7 @@ public class SyncJobProcessingAgent
 								
 				final Future<Void> ret = new Future<Void>();
 				
+				// search remote resource services (if none available)
 				if(resservices.size()==0)
 				{
 					agent.getServiceContainer().searchServices(IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL)
@@ -197,6 +203,7 @@ public class SyncJobProcessingAgent
 					ret.setResult(null);
 				}
 				
+				// start sync with first partner
 				ret.addResultListener(new IResultListener<Void>() 
 				{
 					public void resultAvailable(Void result)
@@ -242,6 +249,7 @@ public class SyncJobProcessingAgent
 		
 		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
 		
+		// Scan for changes wrt a specific remote resource
 		resser.scanForChanges(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
 		{
 			public void intermediateResultAvailable(BackupEvent result)

@@ -33,6 +33,7 @@ public interface IResourceService
 	
 	/**
 	 *  Get information about a local file or directory.
+	 *  One can use "/" for file info about root.
 	 *  @param file	The resource path of the file.
 	 *  @return	The file info with all known time stamps.
 	 */

@@ -1,6 +1,6 @@
 <assembly>
 
-	<id>xmldist</id>
+	<id>editorbpmndist</id>
 	
 	<formats>
 		<format>zip</format>
@@ -10,15 +10,14 @@
 
 	<moduleSets>
 		<moduleSet>
-
 			<includeSubModules>true</includeSubModules>
 
-			<binaries>
+			<!--  <binaries>
 				<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}
 				</outputFileNameMapping>
-				<outputDirectory>.</outputDirectory>
+				<outputDirectory>lib</outputDirectory>
 				<unpack>false</unpack>
-			</binaries>
+			</binaries> -->
 
 			<sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
@@ -54,12 +53,12 @@
 
 	<files>
 		<file>
-			<source>docs/readme.txt</source>
+			<source>jadex-editor-bpmn/target/jadex-editor-bpmn-${project.version}-jar-with-dependencies.jar</source>
 			<outputDirectory>/</outputDirectory>
-			<filtered>true</filtered>
+			<destName>jadex-editor-bpmn-${project.version}.jar</destName>
 		</file>
 		<file>
-			<source>docs/xml-readme.txt</source>
+			<source>docs/readme.txt</source>
 			<outputDirectory>/</outputDirectory>
 			<filtered>true</filtered>
 		</file>
@@ -69,29 +68,19 @@
 		</file>
 		
 		<file>
-			<source>pom-xml-dist.xml</source>
+			<source>pom-editor-bpmn-dist.xml</source>
 			<outputDirectory>sources</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
-		<file>
-			<source>docs/readme-building.txt</source>
-			<outputDirectory>sources</outputDirectory>
-		</file>
-<!-- 
-		<file>
-			<source>target/xml_guide.pdf</source>
-			<outputDirectory>/</outputDirectory>
-		</file>
-		 -->
 			
 		<!-- ======== files required for building the distribution ======== -->
 		
 		<file>
-		    <source>src/main/assembly/dist-assembly-xml.xml</source>
+		    <source>src/main/assembly/dist-assembly-editor-bpmn.xml</source>
 		    <outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>
-			<source>pom-xml-dist.xml</source>
+			<source>pom-editor-bpmn-dist.xml</source>
 			<outputDirectory>sources</outputDirectory>
 		</file>
 		<file>
@@ -99,17 +88,9 @@
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 		<file>
-			<source>docs/xml-readme.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>
-		<file>
 			<source>docs/license.txt</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
-		<file>
-			<source>docs/readme-building.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
-		</file>						
 	</files>
 
 </assembly>

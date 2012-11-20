@@ -1,7 +1,6 @@
 package jadex.backup.job.processing;
 
 import jadex.backup.job.Job;
-import jadex.backup.job.Task;
 
 /**
  * 
