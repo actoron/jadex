@@ -1,9 +1,9 @@
 package jadex.android.applications.demos.rest;
 
-import java.util.ArrayList;
-
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
+import jadex.android.applications.demos.rest.view.ChartDataRowAdapter;
+import jadex.android.applications.demos.rest.view.RestImageActivity;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -13,16 +13,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -35,7 +32,7 @@ import android.widget.Toast;
  */
 public class RestDemoActivity extends JadexAndroidActivity
 {
-	
+
 	private Button getChartButton;
 	private Button addDataButton;
 	private Spinner chartTypeSpinner;
@@ -44,13 +41,13 @@ public class RestDemoActivity extends JadexAndroidActivity
 	private SeekBar widthBar;
 	private TextView heightText;
 	private TextView widthText;
-	
-	private final int maxWidth = 600;
-	private final int maxHeight = 800;
-	
-	private DataItemArrayAdapter dataItemAdapter;
-	private ImageView imageView;
-	
+
+	private ChartDataRowAdapter dataItemAdapter;
+
+	/** Google Limits. **/
+	private static final int MAX_RESOLUTION = 300000;
+	private static final int MAX_LENGTH_WIDTH = 1000;
+
 	/** Constructor */
 	public RestDemoActivity()
 	{
@@ -59,7 +56,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO, JadexPlatformManager.KERNEL_COMPONENT);
 		setPlatformName("restDemoPlatform");
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -73,26 +70,43 @@ public class RestDemoActivity extends JadexAndroidActivity
 		widthBar = (SeekBar) findViewById(R.id.rest_width);
 		heightText = (TextView) findViewById(R.id.rest_height_text);
 		widthText = (TextView) findViewById(R.id.rest_width_text);
-		imageView = (ImageView) findViewById(R.id.rest_imageView);
-		
+
 		getChartButton.setEnabled(false);
 		getChartButton.setOnClickListener(buttonClickListener);
-		
+
 		heightBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 		widthBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
-		
-		heightBar.setMax(maxHeight);
-		widthBar.setMax(maxWidth);
-		
-		heightBar.setProgress(100);
-		widthBar.setProgress(250);
 
-		dataItemAdapter = new DataItemArrayAdapter(this);
+		final DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		heightBar.setMax(Math.max(dm.heightPixels, MAX_LENGTH_WIDTH));
+		widthBar.setMax(Math.max(dm.widthPixels, MAX_LENGTH_WIDTH));
+
+		heightBar.setProgress(600);
+		widthBar.setProgress(500);
+
+		dataItemAdapter = new ChartDataRowAdapter(this);
 		dataListView.setAdapter(dataItemAdapter);
-		
+
+		// add initial data line
+		ChartDataRow item = new ChartDataRow();
+		item.setLabel("a");
+		item.setColor(Color.BLUE);
+		item.setData(new double[]
+		{ 1, 8, 13, 5, 20 });
+		dataItemAdapter.add(item);
+
 		addDataButton.setOnClickListener(buttonClickListener);
 	}
-	
+
+	private void showImage(byte[] imageArr)
+	{
+		Intent i = new Intent(this, RestImageActivity.class);
+		i.putExtra(RestImageActivity.EXTRA_IMAGE, imageArr);
+		startActivity(i);
+	}
+
 	@Override
 	protected void onPlatformStarted(IExternalAccess result)
 	{
@@ -102,13 +116,12 @@ public class RestDemoActivity extends JadexAndroidActivity
 			@Override
 			public void run()
 			{
-				startComponent("ChartProviderComponent", "jadex/android/applications/demos/rest/ChartProvider.component.xml")
-				.addResultListener(componentCreatedResultListener);
+				startComponent("ChartProviderComponent", "jadex/android/applications/demos/rest/ChartProvider.component.xml").addResultListener(
+						componentCreatedResultListener);
 			}
 		});
 	}
-	
-	
+
 	private IResultListener<IComponentIdentifier> componentCreatedResultListener = new DefaultResultListener<IComponentIdentifier>()
 	{
 		public void resultAvailable(final IComponentIdentifier bdiId)
@@ -126,11 +139,12 @@ public class RestDemoActivity extends JadexAndroidActivity
 
 	private OnClickListener buttonClickListener = new OnClickListener()
 	{
-		
+
 		@Override
 		public void onClick(View v)
 		{
-			if (v == getChartButton) {
+			if (v == getChartButton)
+			{
 				runOnUiThread(new Runnable()
 				{
 					@Override
@@ -141,75 +155,125 @@ public class RestDemoActivity extends JadexAndroidActivity
 					}
 				});
 				final Future<byte[]> fut = new Future<byte[]>();
-				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), IChartService.class)
-					.addResultListener(new DefaultResultListener<IChartService>()
-				{
-	
-					@Override
-					public void resultAvailable(IChartService cs)
-					{
-						int height = heightBar.getProgress();
-						int width = widthBar.getProgress();
-						double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
-						IFuture<byte[]> lineChart = cs.getLineChart(width, height, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW});
-						lineChart.addResultListener(new DelegationResultListener<byte[]>(fut));
-					}
-					
-				});
-				
+				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), IChartService.class).addResultListener(
+						new DefaultResultListener<IChartService>()
+						{
+
+							@Override
+							public void resultAvailable(IChartService cs)
+							{
+								int count = dataItemAdapter.getCount();
+
+								int height = heightBar.getProgress();
+								int width = widthBar.getProgress();
+								double[][] data = new double[count][];
+								String[] labels = new String[count];
+								Integer[] colors = new Integer[count];
+
+								for (int i = 0; i < count; i++)
+								{
+									ChartDataRow item = dataItemAdapter.getItem(i);
+									data[i] = item.getData();
+									labels[i] = item.getLabel();
+									colors[i] = item.getColor();
+								}
+								IFuture<byte[]> chart;
+
+								switch (chartTypeSpinner.getSelectedItemPosition())
+								{
+								case 0: // bar
+									chart = cs.getBarChart(width, height, data, labels, colors);
+									break;
+								case 1: // line
+									chart = cs.getLineChart(width, height, data, labels, colors);
+									break;
+								default: // pie
+									chart = cs.getPieChart(width, height, data, labels, colors);
+									break;
+								}
+
+								chart.addResultListener(new DelegationResultListener<byte[]>(fut));
+							}
+
+						});
+
 				fut.addResultListener(new DefaultResultListener<byte[]>()
 				{
-	
+
 					@Override
 					public void resultAvailable(final byte[] result)
 					{
-						final Bitmap image = BitmapFactory.decodeByteArray(result, 0, result.length);
-						final DisplayMetrics dm = new DisplayMetrics();
-						getWindowManager().getDefaultDisplay().getMetrics(dm);
 						runOnUiThread(new Runnable()
 						{
-							
+
 							@Override
 							public void run()
 							{
 								setProgressBarIndeterminate(false);
 								getChartButton.setEnabled(true);
-						        imageView.setMinimumHeight(dm.heightPixels);
-						        imageView.setMinimumWidth(dm.widthPixels);
-								imageView.setImageBitmap(image);
+								showImage(result);
 							}
+
 						});
 					}
+
+					public void exceptionOccurred(final Exception exception)
+					{
+						runOnUiThread(new Runnable()
+						{
+
+							@Override
+							public void run()
+							{
+								Toast.makeText(RestDemoActivity.this, exception.toString(), Toast.LENGTH_LONG).show();
+							}
+						});
+					};
 				});
-			} else if (v == addDataButton) {
-				dataItemAdapter.add(new DataItem());
+
+			} else if (v == addDataButton)
+			{
+				ChartDataRow item = new ChartDataRow();
+				item.setLabel("x");
+				item.setColor(Color.RED);
+				dataItemAdapter.add(item);
 			}
 		}
 	};
-	
-	// ---------------- Input/Form handling -------------------
-	
+
+	// ---------------- Input handling for seekBars -------------------
+
 	private OnSeekBarChangeListener onSeekBarChangeListener = new OnSeekBarChangeListener()
 	{
-		
+
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar)
 		{
 			seekBar.setSecondaryProgress(seekBar.getProgress());
 		}
-		
+
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar)
 		{
 		}
-		
+
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 		{
-			if (seekBar == heightBar) {
-				heightText.setText(""+progress);
-			} else if (seekBar == widthBar) {
-				widthText.setText(""+progress);
+			if (seekBar == heightBar)
+			{
+				if (progress * widthBar.getProgress() > MAX_RESOLUTION)
+				{
+					widthBar.setProgress(MAX_RESOLUTION / progress);
+				}
+				heightText.setText("" + progress);
+			} else if (seekBar == widthBar)
+			{
+				if (progress * heightBar.getProgress() > MAX_RESOLUTION)
+				{
+					heightBar.setProgress(MAX_RESOLUTION / progress);
+				}
+				widthText.setText("" + progress);
 			}
 		}
 	};

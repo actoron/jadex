@@ -1,35 +1,45 @@
 package jadex.android.applications.demos.rest;
 
-public class DataItem
+public class ChartDataRow
 {
 	private String label;
 	private int color;
-	private int[] data;
-	
+	private double[] data;
+
+	public ChartDataRow()
+	{
+		label = "";
+		data = new double[0];
+	}
+
 	public String getLabel()
 	{
 		return label;
 	}
+
 	public void setLabel(String label)
 	{
 		this.label = label;
 	}
+
 	public int getColor()
 	{
 		return color;
 	}
+
 	public void setColor(int color)
 	{
 		this.color = color;
 	}
-	public int[] getData()
+
+	public double[] getData()
 	{
 		return data;
 	}
-	public void setData(int[] data)
+
+	public void setData(double[] data)
 	{
 		this.data = data;
 	}
-	
-	
+
 }
