@@ -15,7 +15,6 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
@@ -344,27 +343,15 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_plans, scope[0])) {
 				// IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
 				PlanbaseFlyweight base = (PlanbaseFlyweight) PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
-//				IPlan p = base.createPlan(elementId);
+
 				
 				IMPlan mplan = ((IMPlanbase)base.getModelElement()).getPlan("startplan");
-				IPlan plan = ((IPlanbase) base).createPlan(mplan); 
-				
-//				IMPlan p2 = ((IMPlanbase)base).getPlan("test");
-//				((IMPlanbase)base).
-//				IMPlan myPlan = PlanbaseFlyweight.get
-//				base.get
-				
-//				IMPlan mplan = ((PlanbaseFlyweight) base).getModelElement()).getPlan("startplan");
-//				IPlan plan = getPlanbase().createPlan(mplan);
-//				plan.startPlan();
+				IPlan plan = base.createPlan(mplan);
 
-
-				// TODO: Continue here!!!!
-				// IPlan p = base. createPlan(elementId);
-				// for (ParameterMapping pm : ae.getParameter_mappings()) {
-				// g.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
-				// }
-				// base.dispatchTopLevelGoal(g);
+				for (ParameterMapping pm : ae.getParameter_mappings()) {
+					plan.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
+				}
+				plan.startPlan();
 
 			} else {
 				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
