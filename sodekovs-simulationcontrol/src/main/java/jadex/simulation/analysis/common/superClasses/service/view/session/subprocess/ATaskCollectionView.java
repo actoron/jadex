@@ -1,6 +1,7 @@
 package jadex.simulation.analysis.common.superClasses.service.view.session.subprocess;
 
 import jadex.bpmn.model.MActivity;
+import jadex.commons.beans.PropertyVetoException;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAListener;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
@@ -15,7 +16,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,8 +60,8 @@ public class ATaskCollectionView extends JPanel implements IAListener
 			{
 				public void run()
 			{
-				synchronized (mutex)
-					{
+//				synchronized (mutex)
+//					{
 
 						// specialComp = dummy;
 						// specialComp.setPreferredSize(new Dimension(750, 750));
@@ -128,15 +128,15 @@ public class ATaskCollectionView extends JPanel implements IAListener
 									frame.setSize(new Dimension(500, 500));
 //									frame.setLocation(100, 100);
 									parent.add(frame);
-									try
-									{
-										frame.setMaximum(true);
-										frame.setSelected(true);
-									}
-									catch (PropertyVetoException e1)
-									{
-										// omit
-									}
+//									try
+//									{
+//										frame.setMaximum(true);
+//										frame.setSelected(true);
+//									}
+//									catch (PropertyVetoException e1)
+//									{
+//										// omit
+//									}
 								}
 							}
 						});
@@ -148,7 +148,7 @@ public class ATaskCollectionView extends JPanel implements IAListener
 						generalTaskProperties.getTextField("Activitï¿½tsname").setText(activity.getName());
 //						System.out.println(activity);
 //						System.out.println(activity.getClazz());
-						generalTaskProperties.getTextField("Activitï¿½tsklasse").setText(activity.getClazz().getName().toString());
+						generalTaskProperties.getTextField("Activitï¿½tsklasse").setText(activity.getClazz().getTypeName().toString());
 						// generalTaskProperties.getTextField("Viewerklasse").setText("Noch nicht bekannt");
 
 						taskProperties = generalTaskProperties;
@@ -163,7 +163,7 @@ public class ATaskCollectionView extends JPanel implements IAListener
 						// add(specialComp, new GridBagConstraints(0, 1, GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0,
 						// 0));
 					}
-				}
+//				}
 			});
 		}
 	}
@@ -203,13 +203,13 @@ public class ATaskCollectionView extends JPanel implements IAListener
 	public void update(ATaskEvent event)
 	{
 		final IATask task = (IATask) event.getSource();
-		if (event.getCommand().equals(AConstants.TASK_LÄUFT))
+		if (event.getCommand().equals(AConstants.TASK_LAEUFT))
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					String name = "Ausführung " + task.getTaskNumber();
+					String name = "Ausfï¿½hrung " + task.getTaskNumber();
 					if (!((DefaultListModel) list.getModel()).contains(name))
 					{
 						((DefaultListModel) list.getModel()).addElement(name);

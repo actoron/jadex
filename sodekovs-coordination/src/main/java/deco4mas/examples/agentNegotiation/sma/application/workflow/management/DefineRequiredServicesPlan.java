@@ -70,7 +70,9 @@ public class DefineRequiredServicesPlan extends Plan {
 			for (MActivity task : taskList) {
 
 				MParameter taskParam = ((MParameter) task.getParameters().get("serviceType"));
-				ServiceType taskType = (ServiceType) taskParam.getInitialValue().getValue(new SimpleValueFetcher());
+//				ServiceType taskType = (ServiceType) taskParam.getInitialValue().getValue(new SimpleValueFetcher());
+				//HACK!!
+				ServiceType taskType = null;
 
 				Boolean newService = true;
 				// add all new services

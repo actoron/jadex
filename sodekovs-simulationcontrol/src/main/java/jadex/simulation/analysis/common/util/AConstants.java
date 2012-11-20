@@ -37,7 +37,7 @@ public class AConstants
 
     
     public static String TASK_NIE_GESTARTET = "Task nie gestartet";
-	public static String TASK_LÄUFT = "Task aktiv";
+	public static String TASK_LAEUFT = "Task aktiv";
 	public static String TASK_USER = "Task user interaction";
 	public static String TASK_BEENDET = "Task inaktiv";
 	public static String TASK_ABBRUCH = "Task abgebrochen";

@@ -3,6 +3,8 @@
  */
 package deco4mas.distributed.coordinate.interpreter.coordination_information;
 
+import jadex.bdi.model.IMPlan;
+import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;
@@ -15,7 +17,6 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
-import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
@@ -342,8 +343,21 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_plans, scope[0])) {
 				// IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
-				IPlanbase base = PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
-				// IGoal g = base.createGoal(elementId);
+				PlanbaseFlyweight base = (PlanbaseFlyweight) PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
+//				IPlan p = base.createPlan(elementId);
+				
+				IMPlan mplan = ((IMPlanbase)base.getModelElement()).getPlan("startplan");
+				IPlan plan = ((IPlanbase) base).createPlan(mplan); 
+				
+//				IMPlan p2 = ((IMPlanbase)base).getPlan("test");
+//				((IMPlanbase)base).
+//				IMPlan myPlan = PlanbaseFlyweight.get
+//				base.get
+				
+//				IMPlan mplan = ((PlanbaseFlyweight) base).getModelElement()).getPlan("startplan");
+//				IPlan plan = getPlanbase().createPlan(mplan);
+//				plan.startPlan();
+
 
 				// TODO: Continue here!!!!
 				// IPlan p = base. createPlan(elementId);

@@ -5,6 +5,7 @@ import jadex.extension.envsupport.environment.ObjectEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+
 public class GravitationListener implements PropertyChangeListener {
 
 	public final static String FEELS_GRAVITATION ="feels_gravitation"; 

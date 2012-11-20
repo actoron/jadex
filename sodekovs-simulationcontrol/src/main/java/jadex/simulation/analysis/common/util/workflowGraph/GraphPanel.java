@@ -330,7 +330,7 @@ public class GraphPanel extends mxGraphComponent
 	{
 		graph.getModel().beginUpdate();
 		mxCell cell = (mxCell) vertex.get(activity);
-		if (status.equals(AConstants.TASK_LÄUFT))
+		if (status.equals(AConstants.TASK_LAEUFT))
 		{
 			graph.getModel().setStyle(cell, "BPMN - Task" + "_run");
 		} else if (status.equals(AConstants.TASK_USER))

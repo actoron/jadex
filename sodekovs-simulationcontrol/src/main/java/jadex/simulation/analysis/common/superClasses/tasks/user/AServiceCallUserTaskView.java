@@ -11,7 +11,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import jadex.commons.beans.PropertyVetoException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,14 +40,14 @@ public class AServiceCallUserTaskView extends ATaskView implements IATaskView
 			{
 				ret.setResult(displayedTask);
 				button.setEnabled(false);
-				try
-				{
-					parent.setClosed(true);
-				}
-				catch (PropertyVetoException e1)
-				{
-
-				}
+//				try
+//				{
+//					parent.setClosed(true);
+//				}
+//				catch (PropertyVetoException e1)
+//				{
+//
+//				}
 			}
 		});
 		button.setPreferredSize(new Dimension(100, 20));

@@ -7,6 +7,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.beans.PropertyVetoException;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
@@ -23,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,15 +107,15 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 					  
 					frame.add(basicPanel);
 					add(frame);
-					try
-					{
-						frame.setMaximum(true);
-						frame.setSelected(true);
-					}
-					catch (PropertyVetoException e1)
-					{
-						// omit
-					}
+//					try
+//					{
+//						frame.setMaximum(true);
+//						frame.setSelected(true);
+//					}
+//					catch (PropertyVetoException e1)
+//					{
+//						// omit
+//					}
 				}
 			});
 		}
@@ -147,13 +147,13 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 		synchronized (mutex)
 		{
 			final IATask task = (IATask) ((ATaskEvent)event).getSource();
-			if (event.getCommand().equals(AConstants.TASK_LÄUFT))
+			if (event.getCommand().equals(AConstants.TASK_LAEUFT))
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						graphPanel.setTaskStatus(task.getActivity(), AConstants.TASK_LÄUFT);					}
+						graphPanel.setTaskStatus(task.getActivity(), AConstants.TASK_LAEUFT);					}
 				});
 			}
 			else if (event.getCommand().equals(AConstants.TASK_BEENDET))

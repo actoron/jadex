@@ -41,7 +41,7 @@ public class ATaskView implements IATaskView
 				if (taskObject.getActivity() != null)
 				{
 					properties.getTextField("Activitätsname").setText(taskObject.getActivity().getName());
-					properties.getTextField("Activitätsklasse").setText(taskObject.getActivity().getClazz().getName().toString());
+					properties.getTextField("Activitätsklasse").setText(taskObject.getActivity().getClazz().getTypeName().toString());
 
 					properties.revalidate();
 					properties.repaint();
@@ -72,9 +72,9 @@ public class ATaskView implements IATaskView
 		{
 			public void run()
 			{
-				if (event.getCommand().equals(AConstants.TASK_LÄUFT))
+				if (event.getCommand().equals(AConstants.TASK_LAEUFT))
 				{
-					properties.getTextField("Status").setText(AConstants.TASK_LÄUFT);
+					properties.getTextField("Status").setText(AConstants.TASK_LAEUFT);
 				} else if (event.getCommand().equals(AConstants.TASK_BEENDET))
 				{
 					properties.getTextField("Status").setText(AConstants.TASK_BEENDET);

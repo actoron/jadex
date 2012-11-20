@@ -2,8 +2,8 @@ package jadex.simulation.analysis.process.optimisation.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
@@ -17,8 +17,6 @@ import jadex.simulation.analysis.common.superClasses.tasks.ATask;
 import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
-
-import java.util.UUID;
 
 public class OptimisationConfigTask extends ATask
 {

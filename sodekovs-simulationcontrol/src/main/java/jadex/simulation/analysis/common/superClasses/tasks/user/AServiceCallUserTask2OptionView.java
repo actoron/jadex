@@ -2,6 +2,7 @@ package jadex.simulation.analysis.common.superClasses.tasks.user;
 
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.simulation.analysis.common.data.parameter.ASummaryParameter;
 import jadex.simulation.analysis.common.superClasses.tasks.ATaskView;
 import jadex.simulation.analysis.common.superClasses.tasks.IATask;
 import jadex.simulation.analysis.common.superClasses.tasks.IATaskView;
@@ -12,9 +13,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import jadex.commons.beans.PropertyVetoException;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -65,11 +67,11 @@ public class AServiceCallUserTask2OptionView extends ATaskView implements IATask
 				{
 					ret.setResult(Boolean.TRUE);
 					button.setEnabled(false);
-					try
-					{
-						parent.setClosed(true);
-					}
-					catch (PropertyVetoException e1){}
+//					try
+//					{
+//						parent.setClosed(true);
+//					}
+//					catch (PropertyVetoException e1){}
 			}
 				});
 				final JButton button2 = new JButton("Cancel");
@@ -81,11 +83,11 @@ public class AServiceCallUserTask2OptionView extends ATaskView implements IATask
 				{
 					ret.setResult(Boolean.FALSE);
 					button.setEnabled(false);
-					try
-					{
-						parent.setClosed(true);
-					}
-					catch (PropertyVetoException e1){}
+//					try
+//					{
+//						parent.setClosed(true);
+//					}
+//					catch (PropertyVetoException e1){}
 			}
 				});
 

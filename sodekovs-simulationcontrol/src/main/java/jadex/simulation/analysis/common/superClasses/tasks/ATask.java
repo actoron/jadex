@@ -46,7 +46,7 @@ public class ATask extends AObservable implements IATask
 		this.context = context;
 		this.instance = instance;
 		((ASubProcessView) instance.getContextVariable("subProcessView")).registerTask(this, view);
-		notify(new ATaskEvent(this, context, instance, AConstants.TASK_LÄUFT));
+		notify(new ATaskEvent(this, context, instance, AConstants.TASK_LAEUFT));
 		return new Future(null);
 	}
 

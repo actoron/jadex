@@ -2,8 +2,8 @@ package jadex.simulation.analysis.process.analyse.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,7 +16,6 @@ import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.highLevel.IAGeneralExecuteService;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class GeneralExecuteTask extends ATask
 {

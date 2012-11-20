@@ -2,8 +2,8 @@ package jadex.simulation.analysis.process.analyse.tasks;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bpmn.runtime.task.ParameterMetaInfo;
-import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,7 +18,6 @@ import jadex.simulation.analysis.service.simulation.allocation.IAAllocateExperim
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.util.UUID;
 
 import javax.swing.JComponent;
 
@@ -47,7 +46,7 @@ public class VisualiseExperimentTask extends ATask
 	}
 	
 	/**
-	 * Get the meta information about the task.
+	 * Get the meta information about the task.SW
 	 */
 	public static TaskMetaInfo getMetaInfo()
 	{
