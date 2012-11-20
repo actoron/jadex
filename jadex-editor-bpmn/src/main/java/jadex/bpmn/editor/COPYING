@@ -16,7 +16,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 
 ====================================================================
 
-Jadex GPMN Editor uses the JGraphX library for its GUI for which the
+Jadex BPMN Editor uses the JGraphX library for its GUI for which the
 following applies:
 
 Copyright (c) 2001-2009, JGraph Ltd
