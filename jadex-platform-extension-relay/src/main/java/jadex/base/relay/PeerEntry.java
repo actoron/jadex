@@ -26,6 +26,9 @@ public class PeerEntry
 	/** The awareness infos received from the peer (platform id->awa info). */
 	protected Map<String, AwarenessInfo>	awainfos;
 	
+	/** Have initial awareness infos been sent already? */
+	protected boolean	sent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -50,6 +53,14 @@ public class PeerEntry
 	}
 	
 	/**
+	 *  Set the sent state of the peer.
+	 */
+	public void	setSent(boolean sent)
+	{
+		this.sent	= sent;
+	}
+	
+	/**
 	 *  Set the connection state of the peer.
 	 */
 	public void	setConnected(boolean connected)
@@ -59,6 +70,11 @@ public class PeerEntry
 			System.out.println("Peer "+(connected?"online":"offline")+": "+url);
 		}
 		this.connected	= connected;
+		if(!connected)
+		{
+			// Resend current awareness infos on next reconnect.
+			sent	= false;
+		}
 	}
 	
 	/**
@@ -67,6 +83,14 @@ public class PeerEntry
 	public boolean	isConnected()
 	{
 		return connected;
+	}
+
+	/**
+	 *  Check if awareness infos have bneen sent.
+	 */
+	public boolean	isSent()
+	{
+		return sent;
 	}
 
 	/**

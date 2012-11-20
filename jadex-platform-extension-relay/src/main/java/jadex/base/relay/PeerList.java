@@ -175,8 +175,9 @@ public class PeerList
 	/**
 	 *  Add a peer that requested a connection.
 	 */
-	public void	addPeer(String peerurl, boolean initial)
+	public PeerEntry	addPeer(String peerurl, boolean initial)
 	{
+		PeerEntry	peer;
 		if("".equals(url))
 		{
 			throw new RuntimeException("No peer connections allowed, if local URL not set.");
@@ -184,9 +185,10 @@ public class PeerList
 		else
 		{
 			peerurl	= RelayConnectionManager.relayAddress(peerurl);
-			if(!url.equals(peerurl) && !peers.containsKey(peerurl))
+			peer	= peers.get(peerurl);
+			if(!url.equals(peerurl) && peer==null)
 			{
-				final PeerEntry	peer	= new PeerEntry(peerurl, initial);
+				peer	= new PeerEntry(peerurl, initial);
 				peers.put(peerurl, peer);
 				RelayHandler.getLogger().info("Peer added: "+peer.getURL());
 	
@@ -206,6 +208,7 @@ public class PeerList
 				timer.schedule(new PeerTimerTask(peer), 0);		
 			}
 		}
+		return peer;
 	}
 
 	public PeerEntry getPeer(String url)

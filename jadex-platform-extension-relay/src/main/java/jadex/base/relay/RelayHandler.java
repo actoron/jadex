@@ -346,7 +346,36 @@ public class RelayHandler
 	{
 		if(peerurl!=null)
 		{
-			peers.addPeer(peerurl, false);
+			PeerEntry	peer	= peers.addPeer(peerurl, false);
+
+			// Send own awareness infos to new or updated peer.
+			if(peer!=null && !peer.isSent())
+			{
+				peer.setSent(true);
+				
+				for(PlatformInfo pi: getCurrentPlatforms())
+				{
+					AwarenessInfo	awainfo	= pi.getAwarenessInfo();
+					if(awainfo!=null)
+					{
+						Map<String, Object>	message	= new HashMap<String, Object>();
+						message.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
+						message.put(SFipa.CONTENT, awainfo);
+						MessageEnvelope	msg	= new MessageEnvelope(message, null, null);
+						byte[]	peerinfo	= MapSendTask.encodeMessage(msg, pi.getPreferredCodecs(), getClass().getClassLoader());
+								
+						try
+						{
+							System.out.println("Sending awareness to peer: "+peer.getURL());
+							new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+						}
+						catch(IOException e)
+						{
+							System.out.println("Error sending awareness to peer: "+e);
+						}					
+					}
+				}				
+			}
 		}
 		return peers.getURLs(requesturl);
 	}
