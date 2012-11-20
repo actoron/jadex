@@ -171,7 +171,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 									System.out.println("***space properties are null");
 								}
 								if (space.getProperty("REAL_START_TIME_OF_SIMULATION") == null) {
-									System.out.println("***space REAL_START_TIME_OF_SIMULATION is null");
+//									System.out.println("***space REAL_START_TIME_OF_SIMULATION is null");
 								} else {
 									//Make sure the property "REAL_START_TIME_OF_SIMULATION" is set!
 									// Execute the data consumers.

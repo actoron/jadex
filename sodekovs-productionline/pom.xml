@@ -94,11 +94,11 @@
 			<artifactId>tspaces2</artifactId>
 			<version>2.1.2</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applib-bdi</artifactId>
 			<version>2.3-SNAPSHOT</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-bdi</artifactId>
@@ -148,13 +148,13 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-swing</artifactId>
 			<version>2.3-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>

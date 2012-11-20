@@ -86,16 +86,16 @@
 	</build>
 
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applib-bdi</artifactId>
-			<version>2.3-SNAPSHOT</version>
+			<version>2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-swing</artifactId>
-			<version>2.3-SNAPSHOT</version>
-		</dependency>
+			<version>2.1</version>
+		</dependency>-->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>sodekovs-util</artifactId>
