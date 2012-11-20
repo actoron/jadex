@@ -84,9 +84,14 @@
 					</properties>
 				</mechanism_configuration>				
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEFSET">
+					 <!-- <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEFSET">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
+						</parameter_mappings>
+					</agent_element> -->
+					<agent_element element="latest_target" agent_id="Sentry" type="BDI_PLAN">
+						<parameter_mappings>
+							<mapping ref="produce_ore_plan" name="latest_target"/>
 						</parameter_mappings>
 					</agent_element>
 				</to>
