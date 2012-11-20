@@ -1,8 +1,8 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.bpmn.model.io.IBpmnVisualModelWriter;
+import jadex.bpmn.model.io.SBpmnModelWriter;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.List;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
 
 /**
  *  A writer for the visual part of BPMN models.
@@ -52,6 +53,11 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			out.print(SBpmnModelWriter.getIndent(3));
 			out.print("<bpmndi:BPMNShape bpmnElement=\"");
 			out.print(node.getBpmnElement().getId());
+			if (node instanceof VSubProcess || node instanceof VExternalSubProcess)
+			{
+				out.print("\" isExpanded=\"");
+				out.print(!node.isCollapsed());
+			}
 			out.println("\">");
 			
 			mxGeometry geo = node.getGeometry();
@@ -65,6 +71,21 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			out.print("\" y=\"");
 			out.print(geo.getY());
 			out.println("\"/>");
+			
+			mxRectangle alt = geo.getAlternateBounds();
+			if (alt != null)
+			{
+				out.print(SBpmnModelWriter.getIndent(4));
+				out.print("<dc:Bounds height=\"");
+				out.print(alt.getHeight());
+				out.print("\" width=\"");
+				out.print(alt.getWidth());
+				out.print("\" x=\"");
+				out.print(alt.getX());
+				out.print("\" y=\"");
+				out.print(alt.getY());
+				out.println("\"/>");
+			}
 			
 			//FIXME: Necessary?
 //			out.print(SBpmnModelWriter.getIndent(4));

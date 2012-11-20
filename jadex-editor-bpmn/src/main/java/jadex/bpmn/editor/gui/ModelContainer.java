@@ -43,6 +43,9 @@ public class ModelContainer
 	/** Edit mode for adding tasks. */
 	public static final String EDIT_MODE_SUBPROCESS = MBpmnModel.SUBPROCESS;
 	
+	/** Edit mode for adding tasks. */
+	public static final String EDIT_MODE_EXTERNAL_SUBPROCESS = MBpmnModel.SUBPROCESS + "External";
+	
 	/** Edit mode for adding xor-gateways. */
 	public static final String EDIT_MODE_GW_XOR = MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE;
 	
@@ -124,6 +127,7 @@ public class ModelContainer
 		ACTIVITY_MODES.add(EDIT_MODE_GW_AND);
 		ACTIVITY_MODES.add(EDIT_MODE_GW_OR);
 		ACTIVITY_MODES.add(EDIT_MODE_SUBPROCESS);
+		ACTIVITY_MODES.add(EDIT_MODE_EXTERNAL_SUBPROCESS);
 	}
 	
 	/** Mapping activity edit modes to activity types */
@@ -135,6 +139,7 @@ public class ModelContainer
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL_THROWING, MBpmnModel.EVENT_INTERMEDIATE_SIGNAL);
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_END_SIGNAL_THROWING, MBpmnModel.EVENT_END_SIGNAL);
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE_THROWING, MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EXTERNAL_SUBPROCESS, MBpmnModel.SUBPROCESS);
 	}
 	
 	/** The mode file. */

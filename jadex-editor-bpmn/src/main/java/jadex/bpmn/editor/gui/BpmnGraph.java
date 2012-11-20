@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.controllers.SValidation;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -61,6 +62,24 @@ public class BpmnGraph extends mxGraph
 				return null;
 			}
 		};
+	}
+	
+	/**
+	 * Returns true if the given cell is expandable. This implementation
+	 * returns true if the cell has at least one child and its style
+	 * does not specify mxConstants.STYLE_FOLDABLE to be 0.
+	 *
+	 * @param cell <mxCell> whose expandable state should be returned.
+	 * @return Returns true if the given cell is expandable.
+	 */
+	public boolean isCellFoldable(Object cell, boolean collapse)
+	{
+		boolean ret = super.isCellFoldable(cell, collapse);
+		if (cell instanceof VExternalSubProcess || cell instanceof VSubProcess)
+		{
+			ret = true;
+		}
+		return ret;
 	}
 	
 	/*protected mxGraphView createGraphView()

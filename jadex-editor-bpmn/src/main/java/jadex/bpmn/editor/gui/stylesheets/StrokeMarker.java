@@ -8,7 +8,7 @@ import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 
 /**
- *  Marker for "stroked" edge look.
+ *  Marker for "strike-through" edge look of default edges.
  *
  */
 public class StrokeMarker implements mxIMarker

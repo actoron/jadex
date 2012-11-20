@@ -7,6 +7,7 @@ import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VPool;
@@ -34,7 +35,6 @@ import javax.swing.Timer;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraphView;
 
@@ -70,18 +70,122 @@ public class MouseController extends MouseAdapter
 	}
 	
 	/**
+	 *  Creates an activity.
+	 */
+	public void createActivity(String mode, Object targetcell, Point targetpoint)
+	{
+		if (targetcell instanceof VPool)
+		{
+			if (((VPool) targetcell).hasLanes())
+			{
+				modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+				return;
+			}
+		}
+		else if (!((targetcell instanceof VLane) ||
+				((targetcell instanceof VSubProcess) && !((VSubProcess) targetcell).isCollapsed())))
+		{
+			modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+			return;
+		}
+		
+		MActivity mactivity = null;
+		if (mode != null && mode.startsWith(ModelContainer.EDIT_MODE_SUBPROCESS))
+		{
+			mactivity = new MSubProcess();
+			mactivity.setClazz(new ClassInfo(""));
+		}
+		else
+		{
+			mactivity = new MActivity();
+		}
+		mactivity.setId(modelcontainer.getIdGenerator().generateId());
+		mactivity.setActivityType(ModelContainer.ACTIVITY_MODES_TO_TYPES.containsKey(mode) ? ModelContainer.ACTIVITY_MODES_TO_TYPES.get(mode) : mode);
+		
+		VActivity vactivity = null;
+		if (ModelContainer.EDIT_MODE_SUBPROCESS.equals(mode))
+		{
+			vactivity = new VSubProcess(modelcontainer.getGraph());
+		}
+		else if (ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS.equals(mode))
+		{
+			mactivity.setName("External Sub-Process");
+			mactivity.setPropertyValue("file", "");
+			vactivity = new VExternalSubProcess(modelcontainer.getGraph());
+			vactivity.setCollapsed(true);
+		}
+		else
+		{
+			vactivity = new VActivity(modelcontainer.getGraph());
+		}
+		vactivity.setBpmnElement(mactivity);
+		
+		Point p = targetpoint;
+		
+		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mode) ?
+					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mode) :
+					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
+		vactivity.setGeometry(new mxGeometry(p.getX() - ds.width * 0.5,
+											 p.getY() - ds.height * 0.5,
+											 ds.width,
+											 ds.height));
+		
+		if (BpmnStylesheetColor.COLLAPSED_SIZES.containsKey(mode))
+		{
+			Dimension ads = BpmnStylesheetColor.COLLAPSED_SIZES.get(mode);
+			vactivity.getGeometry().setAlternateBounds(
+				new mxGeometry(p.getX() - ads.width * 0.5,
+					 		   p.getY() - ads.height * 0.5,
+					 		   ads.width,
+					 		   ads.height));
+		}
+		
+		if (ModelContainer.EDIT_MODE_TASK.equals(mode))
+		{
+			vactivity.setValue("Task");
+			mactivity.setClazz(new ClassInfo(""));
+		}
+		else if (mode.endsWith(ModelContainer.THROWING_EVENT))
+		{
+			mactivity.setThrowing(true);
+		}
+		
+		
+//		if (cell instanceof VPool)
+//		{
+//			MPool mpool = (MPool) ((VNode) cell).getBpmnElement();
+//			mactivity.setPool(mpool);
+//		}
+//		else
+//		{
+//			//((MLane) ((VNode) cell).getBpmnElement()).addActivity(mactivity);
+//			MPool mpool = (MPool) ((VLane) cell).getPool().getBpmnElement();
+//			mactivity.setPool(mpool);
+//		}
+		
+		modelcontainer.getGraph().getModel().beginUpdate();
+		modelcontainer.getGraph().addCell(vactivity, (VNode) targetcell);
+		modelcontainer.getGraph().getModel().endUpdate();
+		
+		if (!ModelContainer.EDIT_MODE_TASK.equals(mode))
+		{
+			modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+		}
+	}
+	
+	/**
 	 *  Called when the mouse is clicked.
 	 */
 	public void mouseClicked(MouseEvent e)
 	{
 		if (MouseEvent.BUTTON1 == e.getButton())
 		{
+			Point p = modelcontainer.getGraphComponent().getPointForEvent(e).getPoint();
 			String mode = modelcontainer.getEditMode();
 			
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
 			if (cell == null && ModelContainer.EDIT_MODE_POOL.equals(mode))
 			{
-				Point p = modelcontainer.getGraphComponent().getPointForEvent(e).getPoint();
 				VPool vpool = new VPool(modelcontainer.getGraph());
 				vpool.setGeometry(new mxGeometry(p.getX(), p.getY(), BpmnStylesheetColor.DEFAULT_POOL_WIDTH, BpmnStylesheetColor.DEFAULT_POOL_HEIGHT));
 				MPool mpool = new MPool();
@@ -162,95 +266,7 @@ public class MouseController extends MouseAdapter
 			}
 			else if (ModelContainer.ACTIVITY_MODES.contains(mode) || mode.contains("Event"))
 			{
-				
-				if (cell instanceof VPool)
-				{
-					if (((VPool) cell).hasLanes())
-					{
-						modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
-						return;
-					}
-				}
-				else if (!((cell instanceof VLane) ||
-						((cell instanceof VSubProcess) && !((VSubProcess) cell).isCollapsed())))
-				{
-					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
-					return;
-				}
-				
-				MActivity mactivity = null;
-				if (ModelContainer.EDIT_MODE_SUBPROCESS.equals(mode))
-				{
-					mactivity = new MSubProcess();
-					mactivity.setClazz(new ClassInfo(""));
-				}
-				else
-				{
-					mactivity = new MActivity();
-				}
-				mactivity.setId(modelcontainer.getIdGenerator().generateId());
-				mactivity.setActivityType(ModelContainer.ACTIVITY_MODES_TO_TYPES.containsKey(mode) ? ModelContainer.ACTIVITY_MODES_TO_TYPES.get(mode) : mode);
-				
-				VActivity vactivity = null;
-				if (ModelContainer.EDIT_MODE_SUBPROCESS.equals(mode))
-				{
-					vactivity = new VSubProcess(modelcontainer.getGraph());
-				}
-				else
-				{
-					vactivity = new VActivity(modelcontainer.getGraph());
-				}
-				vactivity.setBpmnElement(mactivity);
-				
-				Point p = getPointForEvent(cell, e);
-				
-				Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mode) ?
-							   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mode) :
-							   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
-				vactivity.setGeometry(new mxGeometry(p.getX() - ds.width * 0.5,
-													 p.getY() - ds.height * 0.5,
-													 ds.width,
-													 ds.height));
-				
-				if (vactivity instanceof VSubProcess)
-				{
-					vactivity.getGeometry().setAlternateBounds(new mxRectangle(p.getX() - ds.width * 0.5,
-														 p.getY() - ds.height * 0.5,
-														 ds.width * 0.5,
-														 ds.height * 0.5));
-				}
-				
-				if (ModelContainer.EDIT_MODE_TASK.equals(mode))
-				{
-					vactivity.setValue("Task");
-					mactivity.setClazz(new ClassInfo(""));
-				}
-				else if (mode.endsWith(ModelContainer.THROWING_EVENT))
-				{
-					mactivity.setThrowing(true);
-				}
-				
-				
-//				if (cell instanceof VPool)
-//				{
-//					MPool mpool = (MPool) ((VNode) cell).getBpmnElement();
-//					mactivity.setPool(mpool);
-//				}
-//				else
-//				{
-//					//((MLane) ((VNode) cell).getBpmnElement()).addActivity(mactivity);
-//					MPool mpool = (MPool) ((VLane) cell).getPool().getBpmnElement();
-//					mactivity.setPool(mpool);
-//				}
-				
-				modelcontainer.getGraph().getModel().beginUpdate();
-				modelcontainer.getGraph().addCell(vactivity, (VNode) cell);
-				modelcontainer.getGraph().getModel().endUpdate();
-				
-				if (!ModelContainer.EDIT_MODE_TASK.equals(mode))
-				{
-					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
-				}
+				createActivity(mode, cell, p);
 			}
 			else if (cell == null)
 			{
@@ -322,21 +338,6 @@ public class MouseController extends MouseAdapter
 						center.setY(0.5 - ((0.5 - center.getY()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
 					}
 					
-					/*if (Math.min(scale, targetscale) / Math.max(scale, targetscale) > GuiConstants.ZOOM_ANIMATION_FINAL_RATIO)
-					{
-						// lock in on final scale
-						scale = targetscale;
-						zoomtimer.stop();
-						zoomtimer = null;
-						System.out.println(System.currentTimeMillis() - ts);
-					}
-					else
-					{
-						// take a step
-						//double ds = ((targetscale - scale) * GuiConstants.ZOOM_ANIMATION_STEP_RATIO);
-						double ds = (targetscale - scale) 
-						scale = scale + ds;
-					}*/
 					double steps = GuiConstants.ANIMATION_FPS / 2.0;
 					if (zoomstep > steps)
 					{
@@ -348,14 +349,10 @@ public class MouseController extends MouseAdapter
 					}
 					else
 					{
-						// take a step
-						//double ds = ((targetscale - scale) * GuiConstants.ZOOM_ANIMATION_STEP_RATIO);
 						scale = (targetscale - zoomdist) + (zoomdist * (Math.log(zoomstep++) / Math.log(steps)));
 					}
 					
 					double rat = scale / oldscale;
-					//gc.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-					//gc.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 					JScrollBar vbar = gc.getVerticalScrollBar();
 					JScrollBar hbar = gc.getHorizontalScrollBar();
 					
@@ -377,28 +374,10 @@ public class MouseController extends MouseAdapter
 					((BpmnGraphControl) gc.getGraphControl()).doSetPreferredSize(grapharea);
 					((BpmnGraphControl) gc.getGraphControl()).doSetMinimumSize(grapharea);
 					gc.getGraphControl().revalidate();
-					//System.out.println("PS: " + gc.getGraphControl().getMinimumSize() + " " + rat);
-					//gc.setPreferredSize(grapharea);
-					
-					//gc.extendComponent(grapharea);
 					
 					int px = (int) Math.round(hbar.getModel().getValue() * rat + hbar.getModel().getExtent() * (rat - 1.0) * center.getX());
 					int py = (int) Math.round(vbar.getModel().getValue() * rat + vbar.getModel().getExtent() * (rat - 1.0) * center.getY());
 					
-					
-					
-					//vbar.getModel().setMaximum(grapharea.width);
-					//hbar.getModel().setMaximum(grapharea.height);
-					
-					/*view.setEventsEnabled(true);
-					view.revalidate();
-					//view.fireEvent(new mxEventObject(mxEvent.SCALE, "scale", scale, "previousScale", oldscale));
-					view.fireEvent(new mxEventObject(mxEvent.SCALE_AND_TRANSLATE, "scale",
-							scale, "previousScale", oldscale, "translate", translate,
-							"previousTranslate", previousTranslate));*/
-					
-					//gc.getGraphControl().setPreferredSize(new Dimension(grapharea.width, grapharea.height));
-					//gc.getGraphControl().setMinimumSize(new Dimension(grapharea.width, grapharea.height));
 					hbar.getModel().setValue(Math.max(0, px));
 					vbar.getModel().setValue(Math.max(0, py));
 					

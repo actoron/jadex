@@ -3,12 +3,19 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.gui.controllers.EdgeController;
 import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
@@ -30,6 +37,12 @@ public class BpmnGraphComponent extends mxGraphComponent
 	/** Cell addition handler. */
 	protected mxIEventListener cellsaddedhandler;
 	
+	/** Collapse Image Icon. */
+	protected ImageIcon collapseimageicon;
+	
+	/** Uncollapse Image Icon. */
+	protected ImageIcon uncollapseimageicon;
+	
 	/**
 	 *  Creates a new graph component.
 	 *  
@@ -38,6 +51,71 @@ public class BpmnGraphComponent extends mxGraphComponent
 	public BpmnGraphComponent(BpmnGraph graph)
 	{
 		super(graph);
+		
+		int width = 16;
+		int height = 16;
+		double dx = width / 16.0;
+		double dy = width / 16.0;
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = img.createGraphics();
+		GeneralPath gp = new GeneralPath();
+		gp.moveTo(dx * 2.0, height * 0.5 - dy);
+		gp.lineTo(width * 0.5 - dx, height * 0.5 - dy);
+		gp.lineTo(width * 0.5 - dx, dy * 2.0);
+		gp.lineTo(width * 0.5 + dx, dy * 2.0);
+		gp.lineTo(width * 0.5 + dx, height * 0.5 - dy);
+		gp.lineTo(width - dx * 2.0, height * 0.5 - dy);
+		gp.lineTo(width - dx * 2.0, height * 0.5 + dy);
+		gp.lineTo(width * 0.5 + dx, height * 0.5 + dy);
+		gp.lineTo(width * 0.5 + dx, height - dy * 2.0);
+		gp.lineTo(width * 0.5 - dx, height - dy * 2.0);
+		gp.lineTo(width * 0.5 - dx, height * 0.5 + dy);
+		gp.lineTo(dx * 2.0, height * 0.5 + dy);
+		gp.closePath();
+		g.setColor(Color.BLACK);
+		g.fill(gp);
+		Area frame = new Area(new Rectangle2D.Double(0, 0, width, height));
+		frame.subtract(new Area(new Rectangle2D.Double(dx, dy , width - dx - dx, height - dy - dy)));
+		g.fill(frame);
+		g.dispose();
+		uncollapseimageicon = new ImageIcon(img);
+		
+		img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		g = img.createGraphics();
+		gp = new GeneralPath();
+		gp.moveTo(dx * 2.0, height * 0.5 - dy);
+		gp.lineTo(width - dx * 2.0, height * 0.5 - dy);
+		gp.lineTo(width - dx * 2.0, height * 0.5 + dy);
+		gp.lineTo(dx * 2.0, height * 0.5 + dy);
+		gp.closePath();
+		g.setColor(Color.BLACK);
+		g.fill(gp);
+		g.fill(frame);
+		g.dispose();
+		collapseimageicon = new ImageIcon(img);
+	}
+	
+	/**
+	 * Returns the icon used to display the collapsed state of the specified
+	 * cell state. This returns null for all edges.
+	 */
+	public ImageIcon getFoldingIcon(mxCellState state)
+	{
+		if (state.getCell() instanceof VSubProcess || state.getCell() instanceof VExternalSubProcess)
+		{
+			if (graph.isCellCollapsed(state.getCell()))
+			{
+				return uncollapseimageicon;
+			}
+			else
+			{
+				return collapseimageicon;
+			}
+		}
+		else
+		{
+			return super.getFoldingIcon(state);
+		}
 	}
 	
 	/**
@@ -45,12 +123,12 @@ public class BpmnGraphComponent extends mxGraphComponent
 	 */
 	public Rectangle getFoldingIconBounds(mxCellState state, ImageIcon icon)
 	{
-		if (state.getCell() instanceof VSubProcess)
+		if (state.getCell() instanceof VSubProcess || state.getCell() instanceof VExternalSubProcess)
 		{
 			double scale = getGraph().getView().getScale();
 			
-			int w = (int) Math.max(8, icon.getIconWidth() * scale * 2);
-			int h = (int) Math.max(8, icon.getIconHeight() * scale * 2);
+			int w = (int) Math.max(8, icon.getIconWidth() * scale);
+			int h = (int) Math.max(8, icon.getIconHeight() * scale);
 			int x = (int) Math.round(state.getX() + state.getWidth() * 0.5 - w * 0.5);
 			int y = (int) Math.round(state.getY() + state.getHeight() - h * 1.25);
 			

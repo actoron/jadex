@@ -18,6 +18,7 @@ import javax.xml.namespace.QName;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
 
 /**
  *  Reader for the visual BPMN model.
@@ -59,12 +60,25 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 	{
 		if ("Bounds".equals(tag.getLocalPart()))
 		{
-			mxGeometry geo = new mxGeometry();
-			geo.setWidth(Double.parseDouble(attrs.get("width")));
-			geo.setHeight(Double.parseDouble(attrs.get("height")));
-			geo.setX(Double.parseDouble(attrs.get("x")));
-			geo.setY(Double.parseDouble(attrs.get("y")));
-			buffer.put("bounds", geo);
+			if (buffer.containsKey("bounds"))
+			{
+				mxRectangle alt = new mxRectangle();
+				alt.setWidth(Double.parseDouble(attrs.get("width")));
+				alt.setHeight(Double.parseDouble(attrs.get("height")));
+				alt.setX(Double.parseDouble(attrs.get("x")));
+				alt.setY(Double.parseDouble(attrs.get("y")));
+				mxGeometry geo = (mxGeometry) buffer.get("bounds");
+				geo.setAlternateBounds(alt);
+			}
+			else
+			{
+				mxGeometry geo = new mxGeometry();
+				geo.setWidth(Double.parseDouble(attrs.get("width")));
+				geo.setHeight(Double.parseDouble(attrs.get("height")));
+				geo.setX(Double.parseDouble(attrs.get("x")));
+				geo.setY(Double.parseDouble(attrs.get("y")));
+				buffer.put("bounds", geo);
+			}
 		}
 		else if ("BPMNShape".equals(tag.getLocalPart()))
 		{
@@ -74,7 +88,14 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			
 			if (e instanceof MSubProcess)
 			{
-				vnode = new VSubProcess(graph);
+				if (((MSubProcess) e).hasPropertyValue("file"))
+				{
+					vnode = new VExternalSubProcess(graph);
+				}
+				else
+				{
+					vnode = new VSubProcess(graph);
+				}
 			}
 			else if (e instanceof MActivity)
 			{
@@ -93,6 +114,12 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			{
 				System.err.println("Unknown Element ID: " + bpmnid);
 				return;
+			}
+			
+			String exp = attrs.get("isExpanded");
+			if (exp != null)
+			{
+				vnode.setCollapsed(!Boolean.parseBoolean(exp));
 			}
 			
 			mxGeometry geo = (mxGeometry) buffer.remove("bounds");

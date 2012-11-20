@@ -78,8 +78,12 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_TASK, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.TASK_COLOR),
 				"Task"));
 		
-		sym = "SP";
+		sym = "ISP";
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
+				"Task"));
+		
+		sym = "ESP";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
 				"Task"));
 		
 		sym = "GW_X";

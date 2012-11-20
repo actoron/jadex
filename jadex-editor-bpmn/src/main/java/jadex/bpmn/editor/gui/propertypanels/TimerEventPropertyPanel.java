@@ -3,7 +3,6 @@ package jadex.bpmn.editor.gui.propertypanels;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
 import javax.swing.JLabel;

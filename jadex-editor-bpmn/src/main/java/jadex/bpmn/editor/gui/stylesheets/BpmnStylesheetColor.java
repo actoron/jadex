@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.stylesheets;
 
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -45,6 +46,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 	/** BPMN Sub-Process Color */
 	public static final String SUBPROCESS_COLOR = "#b0c9f1";
 	
+	/** BPMN External Sub-Process Color */
+	public static final String EXTERNAL_SUBPROCESS_COLOR = "#b0f1d3";
+	
 	/** BPMN Gateway Color */
 	public static final String GATEWAY_COLOR = "#ff81ac";
 	
@@ -68,13 +72,22 @@ public class BpmnStylesheetColor extends mxStylesheet
 	static
 	{
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_TASK, new Dimension(160, 100));
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(320, 200));
+		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(480, 200));
+		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_XOR, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_AND, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_OR, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_START", new Dimension(40, 40));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_INTERMEDIATE", new Dimension(40, 40));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_END", new Dimension(40, 40));
+	}
+	
+	/** Collapsed Sizes */
+	public static final Map<String, Dimension> COLLAPSED_SIZES = new HashMap<String, Dimension>();
+	static
+	{
+		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(160, 100));
+		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, COLLAPSED_SIZES.get(ModelContainer.EDIT_MODE_SUBPROCESS));
 	}
 	
 	static
@@ -209,13 +222,24 @@ public class BpmnStylesheetColor extends mxStylesheet
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
 		
 		style = new HashMap<String, Object>(style);
-		style.put(mxConstants.STYLE_FILLCOLOR, SUBPROCESS_COLOR);
+		style.put(mxConstants.STYLE_FILLCOLOR, EXTERNAL_SUBPROCESS_COLOR);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.TRUE);
-		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, style);
+		putCellStyle(VExternalSubProcess.class.getSimpleName(), style);
 		
 		style = new HashMap<String, Object>(style);
+		style.put(mxConstants.STYLE_FILLCOLOR, SUBPROCESS_COLOR);
+		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
+		style.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_LEFT);
+		style.put(mxConstants.STYLE_SPACING, 10);
+		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, style);
+		
+		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.FALSE);
+		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
+		style.put(mxConstants.STYLE_FONTSIZE, 16);
+		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RHOMBUS);
 		style.put(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_BOTTOM);
@@ -223,6 +247,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
 		style.put(mxConstants.STYLE_SPACING_TOP, 4);
 		style.put(mxConstants.STYLE_FILLCOLOR, GATEWAY_COLOR);
+		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, style);
 		
 		style = new HashMap<String, Object>(style);

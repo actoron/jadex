@@ -874,32 +874,6 @@ public class ImageProvider
 	}
 	
 	/**
-	 *  Gets a specific image icon.
-	 *  
-	 *  @param filename name of the image file.
-	 *  @return Image icon.
-	 */
-	/*public ImageIcon getImageIcon(String filename)
-	{
-		BufferedImage ret = null;
-		try
-		{
-			Image orig = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + filename));
-			orig = orig.getScaledInstance(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, Image.SCALE_AREA_AVERAGING);
-			ret = new BufferedImage(GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-			Graphics2D g = ret.createGraphics();
-			g.setComposite(AlphaComposite.Src);
-			g.drawImage(orig, 0, 0, GuiConstants.ICON_SIZE, GuiConstants.ICON_SIZE, null);
-			g.dispose();
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-		return new ImageIcon(ret);
-	}*/
-	
-	/**
 	 *  Composite for modulation.
 	 *
 	 */
