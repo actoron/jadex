@@ -5,6 +5,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -16,9 +18,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Binding;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import android.content.Intent;
 import android.os.Binder;
@@ -87,7 +92,28 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 					listener = null;
 				}
 			}
+
+			@Override
+			public List<ChatUser> getUsers()
+			{
+				return AndroidChatService.this.getUsers();
+			}
+
+			@Override
+			public IFuture<Void> sendFile(String path, ChatUser user)
+			{
+				return AndroidChatService.this.sendFile(path, user);
+			}
 		};
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		if (subscription != null) {
+			subscription.terminate();
+		}
 	}
 
 	private IFuture<Void> subscribe()
@@ -177,5 +203,27 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 					}
 				});
 		return fut;
+	}
+	
+	public List<ChatUser> getUsers() {
+		List<ChatUser> result;
+		
+		ThreadSuspendable sus = new ThreadSuspendable();
+		Collection<IChatService> chatServices = chatgui.findUsers().get(sus);
+		
+		result = new ArrayList<ChatUser>();
+		
+		for (IChatService iChatService : chatServices)
+		{
+			String nickName = iChatService.getNickName().get(sus);
+			IServiceIdentifier sid = ((IService) iChatService).getServiceIdentifier();
+			result.add(new ChatUser(nickName, sid));
+		}
+		
+		return result;
+	}
+	
+	public IFuture<Void> sendFile(String path, ChatUser user) {
+		return chatgui.sendFile(path, user.getSid().getProviderId());
 	}
 }

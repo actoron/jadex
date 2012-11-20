@@ -3,9 +3,6 @@ package jadex.android.applications.chat;
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import android.app.Activity;
@@ -15,13 +12,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  * Activity (screen) for the jadex android benchmark app. Starts the platform
@@ -30,12 +25,6 @@ import android.widget.TextView;
 public class JadexAndroidChatActivity extends Activity implements ServiceConnection, ChatEventListener
 {
 	// -------- attributes --------
-
-	/** The chat gui service. */
-	private IChatGuiService chatgui;
-
-	/** The chat subscription. */
-	private ISubscriptionIntermediateFuture<ChatEvent> subscription;
 
 	/** The text view for showing results. */
 	private ListView listView;
@@ -69,7 +58,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 		listView = (ListView) findViewById(R.id.chat_listView);
 		chatEventAdapter = new ChatEventArrayAdapter(this);
 		listView.setAdapter(chatEventAdapter);
-		
+
 	}
 
 	@Override
@@ -84,15 +73,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	protected void onPause()
 	{
 		super.onPause();
-		unbindService(this);
-	}
-
-	/**
-	 * Cleanup on exit.
-	 */
-	protected void onDestroy()
-	{
-		subscription.terminate();
+		unbindService(this); // remove this to stay connected
 	}
 
 	OnClickListener onSendMessageClickListener = new OnClickListener()
@@ -150,7 +131,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	{
 		runOnUiThread(new Runnable()
 		{
-			
+
 			@Override
 			public void run()
 			{
@@ -172,7 +153,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	{
 		runOnUiThread(new Runnable()
 		{
-			
+
 			@Override
 			public void run()
 			{
@@ -180,14 +161,14 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 			}
 		});
 	}
-	
+
 	@Override
 	public void chatConnected()
 	{
 		setConnected(true);
 		runOnUiThread(new Runnable()
 		{
-			
+
 			@Override
 			public void run()
 			{
@@ -195,103 +176,6 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 			}
 		});
 	}
-	
-	
-//	Intent intent = getIntent();
-//	if (intent != null && Intent.ACTION_SEND.equals(intent.getAction()))
-//	{
-//		System.out.println("Intent: " + intent);
-//		System.out.println("Type: " + intent.getType());
-//		Bundle extras = intent.getExtras();
-//		if (extras != null)
-//		{
-//			String text = (String) extras.get(Intent.EXTRA_TEXT);
-//			Uri uri = (Uri) extras.get(Intent.EXTRA_STREAM);
-//			System.out.println("Text: " + text);
-//			System.out.println("Uri: " + uri);
-//
-//			// Convert the image URI to the direct
-//			// file system path of the image file
-//			String[] proj = new String[]
-//			{ MediaStore.Images.Media.DATA };
-//			Cursor cursor = managedQuery(uri, proj, // Which
-//													// columns
-//													// to
-//													// return
-//					null, // WHERE clause; which
-//							// rows to return (all
-//							// rows)
-//					null, // WHERE clause selection
-//							// arguments (none)
-//					null); // Order-by clause
-//							// (ascending by name)
-//			int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//			cursor.moveToFirst();
-//			final String path = cursor.getString(column_index);
-//			System.out.println("Path: " + path);
-//
-//			chatgui.findUsers().addResultListener(new IResultListener<Collection<IChatService>>()
-//			{
-//				public void exceptionOccurred(Exception exception)
-//				{
-//				}
-//
-//				public void resultAvailable(final Collection<IChatService> results)
-//				{
-//					runOnUiThread(new Runnable()
-//					{
-//						public void run()
-//						{
-//							AlertDialog.Builder builder = new AlertDialog.Builder(JadexAndroidChatActivity.this);
-//							builder.setTitle("Choose send target");
-//							List<CharSequence> items = new ArrayList<CharSequence>();
-//							for (IChatService chat : results)
-//							{
-//								items.add(((IService) chat).getServiceIdentifier().getProviderId().getName());
-//							}
-//							builder.setSingleChoiceItems(items.toArray(new CharSequence[items.size()]), -1,
-//									new DialogInterface.OnClickListener()
-//									{
-//										public void onClick(DialogInterface dialog, int which)
-//										{
-//											dialog.dismiss();
-//											if (which != -1)
-//											{
-//												IChatService chat = new ArrayList<IChatService>(results).get(which);
-//												System.out.println("Sending to: " + chat);
-//												chatgui.sendFile(path, ((IService) chat).getServiceIdentifier().getProviderId())
-//														.addResultListener(new IResultListener<Void>()
-//														{
-//															public void resultAvailable(Void result)
-//															{
-//																System.out.println("Transfer started.");
-//															}
-//
-//															public void exceptionOccurred(Exception exception)
-//															{
-//																System.out.println("Transfer failed to initialize: " + exception);
-//															}
-//														});
-//											}
-//										}
-//									});
-//							AlertDialog alert = builder.create();
-//							alert.show();
-//						}
-//					});
-//				}
-//			});
-//		}
-//	}
-//}
-//
-//public void exceptionOccurred(Exception exception)
-//{
-//	// No chat service.
-//	System.out.println("Not connected to chat: " + exception);
-//}
-//});
-//}
 
 	// -------- helper methods --------
 
