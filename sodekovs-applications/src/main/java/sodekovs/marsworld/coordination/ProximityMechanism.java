@@ -10,7 +10,6 @@ import jadex.extension.envsupport.math.Vector1Double;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +30,7 @@ public class ProximityMechanism extends CoordinationMechanism {
 	/** The application environment used for proximity calculation */
 	protected ContinuousSpace2D appSpace = null;
 	
+	/** The number of published events */
 	protected Integer eventNumber = null;
 
 	public ProximityMechanism(CoordinationSpace space) {
@@ -39,23 +39,17 @@ public class ProximityMechanism extends CoordinationMechanism {
 		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		
-		// If it's a distributed application, then it has a contextID.
-		HashMap<String, Object> appArgs = (HashMap<String, Object>) this.applicationInterpreter.getArguments();
-		this.coordinationContextID = (String) appArgs.get("CoordinationContextID");
-		
 		this.eventNumber = 0;
 	}
 
 	@Override
 	public void start() {
-		// TODO Auto-generated method stub
-		
+		// nothing to be done here		
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-		
+		// nothing to be done here		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -64,6 +58,7 @@ public class ProximityMechanism extends CoordinationMechanism {
 		CoordinationInfo ci = (CoordinationInfo) obj;
 		// extract the space object from the coordination info
 		ISpaceObject sp = (ISpaceObject) ci.getValueByName("value");
+//		System.out.println("###ProximityMechanism received: " + sp);		
 		// get the position
 		IVector2 pos = (IVector2) sp.getProperty("position");
 		// get the max distance as specified by the mechanism configuration
@@ -88,7 +83,5 @@ public class ProximityMechanism extends CoordinationMechanism {
 		}		
 		
 		space.publishCoordinationEvent(obj, receiver, getRealisationName(), ++eventNumber);
-		
-		System.out.println("###ProximityMechanism received: " + sp);		
 	}
 }
