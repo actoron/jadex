@@ -295,7 +295,7 @@ public class RelayHandler
 	public void handleAwareness(InputStream in) throws Exception
 	{
 		// Read target id.
-		readString(in);
+		String	id	= readString(in);
 		
 		// Read total message length.
 		byte[]	len	= readData(in, 4);
@@ -318,6 +318,13 @@ public class RelayHandler
 		{
 			info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 		}
+		
+		PeerEntry	peer	= peers.getPeer(id);
+		if(peer!=null)
+		{
+			peer.updateAwarenessInfo(info);
+		}
+		
 		sendAwarenessInfos(info, pcodecs);
 	}
 	
@@ -424,11 +431,11 @@ public class RelayHandler
 					// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
 					if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
 					{
-						awainfo2	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId());
+						awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
 						awainfo2.setProperties(null);
 					}
 					
-					byte[]	data2	= MapSendTask.encodeMessage(awainfo2, p2.getPreferredCodecs(), getClass().getClassLoader());
+					byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
 					byte[]	info2	= new byte[data2.length+4];
 					System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
 					System.arraycopy(data2, 0, info2, 4, data2.length);
@@ -442,39 +449,76 @@ public class RelayHandler
 					{
 						// Queue closed, because platform just disconnected.
 					}
-				}
-					
-				// Distribute awareness info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
-				if(platform!=null)
+				}					
+			}
+		}
+
+		// Send awareness infos from connected peers.
+		if(initial)
+		{
+			PeerEntry[] apeers = peers.getPeers();
+			for(PeerEntry peer: apeers)
+			{
+				if(peer.isConnected())
 				{
-					byte[]	peerinfo	= null;
-					PeerEntry[] apeers = peers.getPeers();
-					for(PeerEntry peer: apeers)
+					AwarenessInfo[]	infos	= peer.getAwarenessInfos();
+					for(AwarenessInfo awainfo2: infos)
 					{
-						if(peer.isConnected())
+						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+						if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
 						{
-							if(peerinfo==null)
-							{
-								Map<String, Object>	message	= new HashMap<String, Object>();
-								message.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
-								message.put(SFipa.CONTENT, awainfo);
-								MessageEnvelope	msg	= new MessageEnvelope(message, null, null);
-								peerinfo	= MapSendTask.encodeMessage(msg, pcodecs, getClass().getClassLoader());
-							}
-							
-							try
-							{
-								System.out.println("Sending awareness to peer: "+peer.getURL());
-								new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier("__relay"), new byte[][]{peerinfo});
-							}
-							catch(IOException e)
-							{
-								System.out.println("Error sending awareness to peer: "+e);
-							}
+							awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
+							awainfo2.setProperties(null);
 						}
-					}					
+						
+						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
+						byte[]	info2	= new byte[data2.length+4];
+						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
+						System.arraycopy(data2, 0, info2, 4, data2.length);
+						
+						try
+						{
+//								System.out.println("queing awareness info to:"+id);
+							map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+						}
+						catch(Exception e)
+						{
+							// Queue closed, because platform just disconnected.
+						}
+					}
 				}
 			}
+		}
+
+		// Distribute awareness info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
+		if(platform!=null)
+		{
+			byte[]	peerinfo	= null;
+			PeerEntry[] apeers = peers.getPeers();
+			for(PeerEntry peer: apeers)
+			{
+				if(peer.isConnected())
+				{
+					if(peerinfo==null)
+					{
+						Map<String, Object>	message	= new HashMap<String, Object>();
+						message.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
+						message.put(SFipa.CONTENT, awainfo);
+						MessageEnvelope	msg	= new MessageEnvelope(message, null, null);
+						peerinfo	= MapSendTask.encodeMessage(msg, pcodecs, getClass().getClassLoader());
+					}
+					
+					try
+					{
+						System.out.println("Sending awareness to peer: "+peer.getURL());
+						new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+					}
+					catch(IOException e)
+					{
+						System.out.println("Error sending awareness to peer: "+e);
+					}
+				}
+			}					
 		}
 	}
 	

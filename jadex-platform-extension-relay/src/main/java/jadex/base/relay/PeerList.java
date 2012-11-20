@@ -123,6 +123,14 @@ public class PeerList
 	//-------- methods --------
 	
 	/**
+	 *  Get the public url of this relay, if known.
+	 */
+	public String	getUrl()
+	{
+		return url;
+	}
+	
+	/**
 	 *  Get the known relay urls.
 	 *  If no urls are known, the request url is returned.
 	 */
@@ -198,6 +206,11 @@ public class PeerList
 				timer.schedule(new PeerTimerTask(peer), 0);		
 			}
 		}
+	}
+
+	public PeerEntry getPeer(String url)
+	{
+		return peers.get(url);
 	}
 	
 	//-------- helper classes --------

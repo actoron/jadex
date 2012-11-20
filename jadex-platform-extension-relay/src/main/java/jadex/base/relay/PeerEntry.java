@@ -1,8 +1,14 @@
 package jadex.base.relay;
 
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 
 /**
- *  Object holding information about a peer.
+ *  Object holding information about a peer relay server.
  */
 public class PeerEntry
 {
@@ -17,6 +23,9 @@ public class PeerEntry
 	/** Is this peer connected? */
 	protected boolean	connected;
 	
+	/** The awareness infos received from the peer (platform id->awa info). */
+	protected Map<String, AwarenessInfo>	awainfos;
+	
 	//-------- constructors --------
 	
 	/**
@@ -26,7 +35,8 @@ public class PeerEntry
 	{
 		this.url	= url;
 		this.initial	= initial;
-		System.out.println("New peer: "+url);
+		this.awainfos	= Collections.synchronizedMap(new LinkedHashMap<String, AwarenessInfo>());
+//		System.out.println("New peer: "+url);
 	}
 	
 	//-------- methods --------
@@ -66,5 +76,29 @@ public class PeerEntry
 	public boolean isInitial()
 	{
 		return initial;
+	}
+	
+	/**
+	 *  Update the awareness info.
+	 *  If the platform is offline, the info is removed.
+	 */
+	public void	updateAwarenessInfo(AwarenessInfo awainfo)
+	{
+		if(AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
+		{
+			awainfos.remove(awainfo.getSender().getName());
+		}
+		else
+		{
+			awainfos.put(awainfo.getSender().getName(), awainfo);
+		}
+	}
+	
+	/**
+	 *  Get the awareness infos received from the peer.
+	 */
+	public AwarenessInfo[]	getAwarenessInfos()
+	{
+		return awainfos.values().toArray(new AwarenessInfo[0]);
 	}
 }
