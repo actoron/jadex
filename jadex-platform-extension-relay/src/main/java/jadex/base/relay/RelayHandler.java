@@ -333,7 +333,16 @@ public class RelayHandler
 	 */
 	public PlatformInfo[]	getCurrentPlatforms()
 	{
+		// Fetch array to avoid concurrency problems
 		return platforms.values().toArray(new PlatformInfo[0]);
+	}
+	
+	/**
+	 *  Get the current peers.
+	 */
+	public PeerEntry[]	getCurrentPeers()
+	{
+		return peers.getPeers();
 	}
 	
 	/**

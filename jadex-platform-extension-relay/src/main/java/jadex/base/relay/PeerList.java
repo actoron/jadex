@@ -169,6 +169,7 @@ public class PeerList
 	 */
 	public PeerEntry[] getPeers()
 	{
+		// Fetch array to avoid concurrency problems
 		return peers.values().toArray(new PeerEntry[0]);
 	}
 	

@@ -108,8 +108,8 @@ public class RelayServlet extends HttpServlet
 				}
 				else
 				{
-					// Fetch array to avoid concurrency problems
 					request.setAttribute("platforms", handler.getCurrentPlatforms());
+					request.setAttribute("peers", handler.getCurrentPeers());
 					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
