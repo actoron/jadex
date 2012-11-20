@@ -20,6 +20,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -70,7 +71,8 @@ public class RestDemoActivity extends JadexAndroidActivity
 		widthBar = (SeekBar) findViewById(R.id.rest_width);
 		heightText = (TextView) findViewById(R.id.rest_height_text);
 		widthText = (TextView) findViewById(R.id.rest_width_text);
-
+		labelText = (EditText) findViewById(R.id.rest_labelText);
+		
 		getChartButton.setEnabled(false);
 		getChartButton.setOnClickListener(buttonClickListener);
 
@@ -91,7 +93,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 
 		// add initial data line
 		ChartDataRow item = new ChartDataRow();
-		item.setLabel("a");
+		labelText.setText("a,b,c,d,e");
 		item.setColor(Color.BLUE);
 		item.setData(new double[]
 		{ 1, 8, 13, 5, 20 });
@@ -150,8 +152,8 @@ public class RestDemoActivity extends JadexAndroidActivity
 					@Override
 					public void run()
 					{
-						setProgressBarIndeterminate(false);
-						getChartButton.setEnabled(true);
+						setProgressBarIndeterminate(true);
+						getChartButton.setEnabled(false);
 					}
 				});
 				final Future<byte[]> fut = new Future<byte[]>();
@@ -167,14 +169,13 @@ public class RestDemoActivity extends JadexAndroidActivity
 								int height = heightBar.getProgress();
 								int width = widthBar.getProgress();
 								double[][] data = new double[count][];
-								String[] labels = new String[count];
+								String[] labels = labelText.getText().toString().replaceAll("[^\\w,]*", "").split(",");
 								Integer[] colors = new Integer[count];
 
 								for (int i = 0; i < count; i++)
 								{
 									ChartDataRow item = dataItemAdapter.getItem(i);
 									data[i] = item.getData();
-									labels[i] = item.getLabel();
 									colors[i] = item.getColor();
 								}
 								IFuture<byte[]> chart;
@@ -210,8 +211,8 @@ public class RestDemoActivity extends JadexAndroidActivity
 							public void run()
 							{
 								setProgressBarIndeterminate(false);
-								getChartButton.setEnabled(true);
 								showImage(result);
+								getChartButton.setEnabled(true);
 							}
 
 						});
@@ -234,7 +235,6 @@ public class RestDemoActivity extends JadexAndroidActivity
 			} else if (v == addDataButton)
 			{
 				ChartDataRow item = new ChartDataRow();
-				item.setLabel("x");
 				item.setColor(Color.RED);
 				dataItemAdapter.add(item);
 			}
@@ -277,5 +277,6 @@ public class RestDemoActivity extends JadexAndroidActivity
 			}
 		}
 	};
+	private EditText labelText;
 
 }

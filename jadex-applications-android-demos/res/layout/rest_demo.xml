@@ -13,8 +13,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_weight="1"
+        android:orientation="vertical"
         android:weightSum="1" >
 
         <Spinner
@@ -54,12 +54,10 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/tableRow2"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" >
 
                 <TextView
-                    android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/rest_height"
@@ -79,6 +77,25 @@
             </TableRow>
         </TableLayout>
 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dip"
+                android:text="@string/rest_labelLabel"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/rest_labelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,20 +103,14 @@
             android:text="@string/rest_dataRowsLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <ScrollView
+        <ListView
+            android:id="@+id/rest_dataList"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:fillViewport="true" >
-
-            <ListView
-                android:id="@+id/rest_dataList"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:divider="@android:color/darker_gray"
-                android:dividerHeight="2.0sp" >
-            </ListView>
-        </ScrollView>
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="2.0sp" >
+        </ListView>
     </LinearLayout>
 
     <LinearLayout

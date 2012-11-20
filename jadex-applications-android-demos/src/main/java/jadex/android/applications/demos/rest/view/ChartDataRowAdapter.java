@@ -43,7 +43,6 @@ public class ChartDataRowAdapter extends ArrayAdapter<ChartDataRow>
 			viewHolder.item = item;
 			viewHolder.btnColor = (Button) convertView.findViewById(R.id.rest_dataItem_color);
 			viewHolder.editTextData = (EditText) convertView.findViewById(R.id.rest_dataItem_data);
-			viewHolder.editTextLabel = (EditText) convertView.findViewById(R.id.rest_dataItem_label);
 			convertView.setTag(viewHolder);
 
 			// ---------------- Input handling single data items
@@ -66,25 +65,6 @@ public class ChartDataRowAdapter extends ArrayAdapter<ChartDataRow>
 				public void afterTextChanged(Editable s)
 				{
 					viewHolder.item.setData(stringToDataArray(s.toString()));
-				}
-			});
-			viewHolder.editTextLabel.addTextChangedListener(new TextWatcher()
-			{
-
-				@Override
-				public void onTextChanged(CharSequence s, int start, int before, int count)
-				{
-				}
-
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count, int after)
-				{
-				}
-
-				@Override
-				public void afterTextChanged(Editable s)
-				{
-					viewHolder.item.setLabel(s.toString());
 				}
 			});
 			viewHolder.btnColor.setOnClickListener(new OnClickListener()
@@ -142,7 +122,6 @@ public class ChartDataRowAdapter extends ArrayAdapter<ChartDataRow>
 		viewHolder.item = item;
 
 		viewHolder.btnColor.setTextColor(item.getColor());
-		viewHolder.editTextLabel.setText(item.getLabel());
 		String dataString = dataArrayToString(item.getData());
 		viewHolder.editTextData.setText(dataString);
 
@@ -168,7 +147,7 @@ public class ChartDataRowAdapter extends ArrayAdapter<ChartDataRow>
 		if (s.length() > 0)
 		{
 			String dataString = s.toString();
-			dataString = dataString.replaceAll("[^0-9,.]*", "");
+			dataString = dataString.replaceAll("[^0-9,\\.]*", "");
 			String[] dataArr = dataString.split(",");
 			double[] data = new double[dataArr.length];
 			for (int i = 0; i < data.length; i++)
@@ -199,7 +178,6 @@ public class ChartDataRowAdapter extends ArrayAdapter<ChartDataRow>
 		ChartDataRow item;
 		Button btnColor;
 		EditText editTextData;
-		EditText editTextLabel;
 	}
 
 }

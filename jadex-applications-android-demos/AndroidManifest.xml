@@ -21,7 +21,7 @@
 		<activity android:name=".bpmn.QuestionActivity"></activity>
 		<activity android:name=".bpmn.AnswerActivity"></activity>
 		<activity android:name=".bdi.BDIDemoActivity"></activity>
-		<activity android:name=".rest.RestDemoActivity"></activity>
+		<activity android:name=".rest.RestDemoActivity" android:windowSoftInputMode="adjustPan"></activity>
 		<activity android:name=".rest.view.RestImageActivity"></activity>
 	</application>
 	

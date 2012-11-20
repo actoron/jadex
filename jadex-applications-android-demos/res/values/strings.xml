@@ -26,7 +26,7 @@
     <string name="rest_width">Width: </string>
     <string name="rest_addDataItemButtonLabel">Add Data</string>
     <string name="rest_dataRowsLabel">Data Rows</string>
-    <string name="rest_labelLabel">Label:</string>
+    <string name="rest_labelLabel">Labels:</string>
     <string name="rest_dataLabel">"Data: "</string>
     
     <string name="yes">Yes</string>
