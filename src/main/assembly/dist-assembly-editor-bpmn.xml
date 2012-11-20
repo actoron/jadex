@@ -57,13 +57,17 @@
 			<outputDirectory>/</outputDirectory>
 			<destName>jadex-editor-bpmn-${project.version}.jar</destName>
 		</file>
-		<file>
+		<!-- <file>
 			<source>docs/readme.txt</source>
 			<outputDirectory>/</outputDirectory>
 			<filtered>true</filtered>
+		</file> -->
+		<file>
+			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt</source>
+			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
-			<source>docs/license.txt</source>
+			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		
