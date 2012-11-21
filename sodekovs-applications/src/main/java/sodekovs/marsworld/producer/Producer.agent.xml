@@ -49,19 +49,7 @@
 		<!-- The 2D Space where the agent is situated. -->
 		<!-- <beliefsetref name="space">
 			<concrete ref="move.environment"/>
-		</beliefsetref> -->	
-		
-		<!-- TMP? The latest detected target. Will be published to sentry agent using the the CoordSpace. -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_target" class="ISpaceObject"/>
-		
-		<!-- TMP? The latest target that has been analyzed by the sentry. Is is pushed into the producer using the the CoordSpace. -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_analyzed_target" class="ISpaceObject"/>
-		
-		<!-- TMP? The latest target that has been produced by the producer. It will be published to the CoordSpace in order to inform the carry agent(s). -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_produced_target" class="ISpaceObject"/>
+		</beliefsetref> -->				
 				
 		<!-- HACK FOR MASDynamics!!!!! -->
 		<!--   mycoordspace -->
@@ -88,10 +76,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="producer_plan">
-			<body class="ProducerPlan"/>
-			<trigger>
-				<factadded ref="latest_analyzed_target"/>
-			</trigger>
+			<body class="ProducerPlan"/>			
 		</plan>
 
 		<!-- Produce ore at a target. -->
@@ -116,6 +101,24 @@
 	</plans>
 
 	<events>
+		<!-- Only used for MASDynamics. -->
+		<!-- Receive target from sentry. -->
+		 <internalevent name="latestAnalyzedTargetEvent">
+			<parameter name="latest_analyzed_target" class="ISpaceObject"/>
+		</internalevent>
+		
+		<!-- Call Carry. -->
+		<internalevent name="callCarryEvent">
+			<parameter name="latest_produced_target" class="ISpaceObject"/>
+		</internalevent>
+		
+		<!-- Call Sentry. -->
+		<internalevent name="callSentryEvent">
+			<parameter name="latest_target" class="ISpaceObject"/>
+		</internalevent>
+		
+		
+	
 		<!-- Message event for produce ore task allocation. -->
 		<!-- <messageevent name="request_production" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">

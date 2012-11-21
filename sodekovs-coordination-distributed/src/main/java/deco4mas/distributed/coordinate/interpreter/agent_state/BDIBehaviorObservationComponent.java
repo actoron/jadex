@@ -20,6 +20,7 @@ import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -27,9 +28,11 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.rules.state.IOAVState;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import deco.distributed.lang.dynamics.AgentElementType;
 import deco.distributed.lang.dynamics.MASDynamics;
@@ -107,14 +110,14 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 
-//				TODO: Distinguish between beliefSet removed, changed and added: Currently only "added" is supported.
+				// TODO: Distinguish between beliefSet removed, changed and added: Currently only "added" is supported.
 				public void factRemoved(AgentEvent ae) {
-//					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+					// checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 
-//				TODO: Distinguish between beliefSet removed, changed and added: Currently only "added" is supported.
+				// TODO: Distinguish between beliefSet removed, changed and added: Currently only "added" is supported.
 				public void factChanged(AgentEvent ae) {
-//					checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
+					// checkAndPublishIfApplicable(ae, AgentElementType.BDI_BELIEFSET);
 				}
 			});
 		} else {
@@ -166,16 +169,17 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 			base.addPlanListener(agentElement.getElement_id(), new IPlanListener() {
 
 				public void planAdded(AgentEvent ae) {
-//					System.out.println("BDIBehObsComp# Activated planAdded listener.");
-					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);					
+					// System.out.println("BDIBehObsComp# Activated planAdded listener.");
+					// ae.getSource().
+					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
 				}
 
-				//TODO: Distinguish between plan finish and added in the MasDynamics. Currently only "plan added" is supported. 
+				// TODO: Distinguish between plan finish and added in the MasDynamics. Currently only "plan added" is supported.
 				public void planFinished(AgentEvent ae)
 
 				{
-//					System.out.println("BDIBehObsComp# Activated planFinished listener.");
-//					checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
+					// System.out.println("BDIBehObsComp# Activated planFinished listener.");
+					// checkAndPublishIfApplicable(ae, AgentElementType.BDI_PLAN);
 				}
 			});
 		} else {
@@ -197,6 +201,9 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 			base.addInternalEventListener(agentElement.getElement_id(), new IInternalEventListener() {
 
 				public void internalEventOccurred(AgentEvent ae) {
+					// InternalEventFlyweight ev = (InternalEventFlyweight) ae.getSource();
+					// Object ob = (ISpaceObject) ev.getParameter("latest_analyzed_target").getValue();
+
 					checkAndPublishIfApplicable(ae, AgentElementType.INTERNAL_EVENT);
 				}
 			});
@@ -247,7 +254,8 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 					// Check whether role is active.
 					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, ae, agentElementType, bia);
 					if (parameterDataMappings != null) {
-						publishEvent(ae.getValue(), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName, bia);
+						// publishEvent(ae.getValue(), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName, bia);
+						publishEvent(getValue(ae, agentElementType,parameterDataMappings), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName, bia);
 					} else {
 						System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
 					}
@@ -255,5 +263,30 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 				return IFuture.DONE;
 			}
 		});
+	}
+
+	private Object getValue(final AgentEvent ae, final AgentElementType agentElementType, final HashMap<String, Object> parameterDataMappings) {
+		Object value = null;
+
+		if (agentElementType.equals(AgentElementType.BDI_BELIEF)) {
+			value = ae.getValue();
+		} else if (agentElementType.equals(AgentElementType.BDI_BELIEFSET)) {
+			value = ae.getValue();
+		} else if (agentElementType.equals(AgentElementType.BDI_GOAL)) {
+			//TODO: Not tested yet!!!
+			value = ae.getValue();
+		} else if (agentElementType.equals(AgentElementType.BDI_PLAN)) {
+ 			//HACK: Gets only the "first" parameter that is used as "value". Is not working for multiple parameters.
+ 			Iterator<String> it  = parameterDataMappings.keySet().iterator();
+ 			String key = it.next();
+			value = parameterDataMappings.get(key);
+		}else if(agentElementType.equals(AgentElementType.INTERNAL_EVENT)){
+// 			InternalEventFlyweight event   =  (InternalEventFlyweight) ae.getSource();
+ 			//HACK: Gets only the "first" parameter that is used as "value". Is not working for multiple parameters.
+ 			Iterator<String> it  = parameterDataMappings.keySet().iterator();
+ 			String key = it.next();
+			value = parameterDataMappings.get(key); 			
+ 		}
+		return value;
 	}
 }

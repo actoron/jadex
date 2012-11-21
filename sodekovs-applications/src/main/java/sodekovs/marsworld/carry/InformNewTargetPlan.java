@@ -1,6 +1,7 @@
 package sodekovs.marsworld.carry;
 
 
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -41,8 +42,13 @@ public class InformNewTargetPlan extends Plan
 		Object[] myTargets = getBeliefbase().getBeliefSet("move.my_targets").getFacts();
 		ISpaceObject latestTarget = (ISpaceObject) myTargets[myTargets.length-1];
 		System.out.println("#NewInfTarget-Carry# Currently detected target: " + latestTarget);
+		
+		IInternalEvent ievent = createInternalEvent("callSentryEvent");
+		ievent.getParameter("latest_target").setValue(latestTarget);		
+		dispatchInternalEvent(ievent);
+		
 		//putting latest target to belief that is observed for MasDyn			
-		this.getBeliefbase().getBeliefSet("latest_target").addFact(latestTarget);
+//		this.getBeliefbase().getBeliefSet("latest_target").addFact(latestTarget);
 		/*****************************************************/
 
 //		System.out.println("Informing sentries: "+getScope().getAgentName());

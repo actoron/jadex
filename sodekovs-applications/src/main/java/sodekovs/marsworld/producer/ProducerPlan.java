@@ -1,6 +1,7 @@
 package sodekovs.marsworld.producer;
 
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -58,10 +59,15 @@ public class ProducerPlan extends Plan {
 			
 			
 			// Wait for a request, i.e. corresponding belief is changed
-			waitForFactAdded("latest_analyzed_target");
-			ISpaceObject[] targets = (ISpaceObject[]) getBeliefbase().getBeliefSet("latest_analyzed_target").getFacts();
-			ISpaceObject latestTarget = targets[targets.length-1];
-			System.out.println("#ProcuderPlan# Received latest analyzed target:  " + latestTarget);
+//			waitForFactAdded("latest_analyzed_target");
+//			ISpaceObject[] targets = (ISpaceObject[]) getBeliefbase().getBeliefSet("latest_analyzed_target").getFacts();
+//			ISpaceObject latestTarget = targets[targets.length-1];
+//			System.out.println("#ProcuderPlan# Received latest analyzed target:  " + latestTarget);
+			
+			//Waiting for internal event, which is dispatched after MASDynamics has transmitted the latest_analyzed_target (from the sentry)
+			IInternalEvent event = waitForInternalEvent("latestAnalyzedTargetEvent");
+			ISpaceObject latestTarget = (ISpaceObject) event.getParameter("latest_analyzed_target").getValue();
+			System.out.println("#ProducerPlan# Received latest analyzed target:  " + latestTarget);
 
 //			// Call Carry agent before. Does it save time?
 //			// Confer WalkingStrategyEnum for Mapping of int values to semantics.
@@ -81,7 +87,11 @@ public class ProducerPlan extends Plan {
 			// System.out.println("Calling Carry Agent....");
 //			callCarryAgent(target);
 			
-			getBeliefbase().getBeliefSet("latest_produced_target").addFact(latestTarget);
+//			getBeliefbase().getBeliefSet("latest_produced_target").addFact(latestTarget);
+			
+			IInternalEvent ievent = createInternalEvent("callCarryEvent");
+			ievent.getParameter("latest_produced_target").setValue(latestTarget);		
+			dispatchInternalEvent(ievent);
 
 		}
 	}

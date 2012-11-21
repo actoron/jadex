@@ -1,6 +1,7 @@
 package sodekovs.marsworld.carry;
 
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
@@ -36,9 +37,16 @@ public class CarryPlan extends Plan {
 			// ISpaceObject target = env.getSpaceObject(ot.getId());
 
 			// Wait for a request, i.e. corresponding belief is changed
-			waitForFactAdded("latest_produced_target");
-			ISpaceObject[] targets = (ISpaceObject[]) getBeliefbase().getBeliefSet("latest_produced_target").getFacts();
-			ISpaceObject latestTarget = targets[targets.length-1];
+//			waitForFactAdded("latest_produced_target");
+//			ISpaceObject[] targets = (ISpaceObject[]) getBeliefbase().getBeliefSet("latest_produced_target").getFacts();
+//			ISpaceObject latestTarget = targets[targets.length-1];
+//			System.out.println("#CarryPlan# Received latest produced target:  " + latestTarget);
+			
+			
+
+			//Waiting for internal event, which is dispatched after MASDynamics has transmitted the latest_produced_target (from the producer)
+			IInternalEvent event = waitForInternalEvent("latestProducedTargetEvent");
+			ISpaceObject latestTarget = (ISpaceObject) event.getParameter("latest_produced_target").getValue();
 			System.out.println("#CarryPlan# Received latest produced target:  " + latestTarget);
 
 			// Producing ore here.

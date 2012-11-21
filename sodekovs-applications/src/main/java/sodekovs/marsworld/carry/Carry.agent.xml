@@ -53,15 +53,7 @@
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())
 			</fact>
-		</belief>
-		
-		<!-- TMP? The latest detected target. Will be published to sentry agent using the the CoordSpace. -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_target" class="ISpaceObject"/>
-		
-		<!-- TMP? The latest target that has been produced by the producer. It will be pushed into this agent by the CoordSpace. -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_produced_target" class="ISpaceObject"/>
+		</belief>	
 		
 	</beliefs>
 
@@ -82,10 +74,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="carry_plan">
-			<body class="CarryPlan"/>
-			<trigger>
-				<factadded ref="latest_produced_target"/>
-			</trigger>
+			<body class="CarryPlan"/>			
 		</plan>
 
 		<!-- Carry ore to the homebase. -->
@@ -110,6 +99,18 @@
 	</plans>
 
 	<events>
+	
+		<!-- Only used for MASDynamics. -->
+		<!-- Receive target from producer. -->
+		 <internalevent name="latestProducedTargetEvent">
+			<parameter name="latest_produced_target" class="ISpaceObject"/>
+		</internalevent>
+		
+		<!-- Call Sentry. -->
+		<internalevent name="callSentryEvent">
+			<parameter name="latest_target" class="ISpaceObject"/>
+		</internalevent>
+		
 		<!-- Message event for carry ore task allocation. -->
 		<!-- <messageevent name="request_carry" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">

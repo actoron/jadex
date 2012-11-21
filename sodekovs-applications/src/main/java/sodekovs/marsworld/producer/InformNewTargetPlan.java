@@ -1,5 +1,6 @@
 package sodekovs.marsworld.producer;
 
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -39,9 +40,14 @@ public class InformNewTargetPlan extends Plan {
 		ISpaceObject latestTarget = (ISpaceObject) myTargets[myTargets.length-1];
 				
 		System.out.println("#InfNewTarget-Producer# Currently detected target: " + latestTarget);
+		
+		IInternalEvent ievent = createInternalEvent("callSentryEvent");
+		ievent.getParameter("latest_target").setValue(latestTarget);		
+		dispatchInternalEvent(ievent);
+		
 		// putting latest target to belief that is observed for MasDyn
 		// Object t = target.getId();
-		this.getBeliefbase().getBeliefSet("latest_target").addFact(latestTarget);
+//		this.getBeliefbase().getBeliefSet("latest_target").addFact(latestTarget);
 		/*****************************************************/
 
 	}

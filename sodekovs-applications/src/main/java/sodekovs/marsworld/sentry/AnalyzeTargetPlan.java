@@ -1,25 +1,19 @@
 package sodekovs.marsworld.sentry;
 
+import jadex.bdi.model.IMPlan;
+import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.fipa.SFipa;
-import jadex.extension.agr.AGRSpace;
-import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import sodekovs.marsworld.RequestProduction;
 
 /**
  * Inform the sentry agent about a new target.
@@ -51,6 +45,7 @@ public class AnalyzeTargetPlan extends Plan {
 			// System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");w
 			if (((Number) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue() > 0)
 				callProducerAgent(target);
+						
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Fails for one agent, when two agents try to analyze the same target at once.
@@ -94,8 +89,17 @@ public class AnalyzeTargetPlan extends Plan {
 		//Setting parameter for MasDynamics		
 		System.out.println("#AnalyzeTargetPlan-Sentry# Latest analyzed target: " + target);
 		//putting latest target to belief that is observed for MasDyn			
-		this.getBeliefbase().getBeliefSet("latest_analyzed_target").addFact(target);
+//		this.getBeliefbase().getBeliefSet("latest_analyzed_target").addFact(target);
 		/*****************************************************/
+		
+//		IMPlan mplan = ((IMPlanbase)getPlanbase().getModelElement()).getPlan("callProducerAgentPlan");		
+//		IPlan plan = getPlanbase().createPlan(mplan);
+//		plan.getParameter("latest_analyzed_target").setValue(target);
+//		plan.startPlan(); 
+		
+		IInternalEvent ievent = createInternalEvent("callProducerEvent");
+		ievent.getParameter("latest_analyzed_target").setValue(target);		
+		dispatchInternalEvent(ievent);
 	}
 
 //	private IComponentIdentifier getClosestProducerAgent() {

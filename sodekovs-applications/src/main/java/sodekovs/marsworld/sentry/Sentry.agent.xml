@@ -60,14 +60,7 @@
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
-		
-		<!-- TMP? The latest detected target. Serves as CoordinationEndpoint. CoordSpace pushes the latest targets, that have been identified by Producers/Carriers, into Sentry hereby. -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_target" class="ISpaceObject"/>
-		
-		<!-- TMP? The latest analyzed detected target. Will be published to producer agent using the the CoordSpace. -->
-		<!-- HACK: Has to be beliefset because it has better listeners than a belief (only "factChangend") -->
-		<beliefset name="latest_analyzed_target" class="ISpaceObject"/>		
+	
 	</beliefs>
 
   	<goals>
@@ -145,23 +138,31 @@
 		</plan>
 
 			
-		<!-- TMP: Plan for MasDny until IPlan works properply -->
-		<!-- Inform sentries about new targets. -->
-		<plan name="addTargetPlan">
-			<body class="AddTargetPlan"/>
-			<!-- Inform whenever a new fact is added to the belief  latest_target. -->
-			<trigger>
-				<factadded ref="latest_target"/>
-			</trigger>
+		<!-- Informs sentries about new targets. -->
+		<plan name="addTargetPlan">			
+			<body class="AddTargetPlan"/>						
 		</plan>
 		
 		<!-- TMP: Counter. -->
 		<plan name="tmpCounterPlan">
 			<body class="CounterPlan"/>			
 		</plan>
-	</plans>
+				
+	</plans> 
 
 	<events>
+	
+	<!-- Only used for MASDynamics. -->
+	<!-- Call Producer. -->
+	 <internalevent name="callProducerEvent">
+			<parameter name="latest_analyzed_target" class="ISpaceObject"/>
+	</internalevent>
+	
+	<!-- Receive new target from Producer or Carry. -->
+	<internalevent name="latestTargetEvent">
+			<parameter name="latest_target" class="ISpaceObject"/>
+	</internalevent>
+	 
 		<!-- Other agents inform the sentries about discovered
 			potential ore resources.-->
 		<!-- <messageevent name="target_inform" type="fipa" direction="receive">
@@ -189,6 +190,7 @@
 			</goals>
 			<plans>
 			<initialplan ref="tmpCounterPlan"/>
+			<initialplan ref="addTargetPlan"/>
 			</plans>			
 		</configuration>
 	</configurations>

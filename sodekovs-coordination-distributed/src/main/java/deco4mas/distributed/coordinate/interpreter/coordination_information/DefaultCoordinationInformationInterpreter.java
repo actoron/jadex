@@ -217,9 +217,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 																} else if (elementType.equals(AgentElementType.BDI_GOAL.toString())) {
 																	processBDIGoal(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
 																} else if (elementType.equals(AgentElementType.BDI_PLAN.toString())) {
-																	processBDIPlan(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
-																	System.out.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  " + elementId + " for "
-																			+ exta.getComponentIdentifier().getName() + " Currently unable to process IPlan due limits of used jadex-version");
+																	processBDIPlan(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);																	
 																} else if (elementType.equals(AgentElementType.INTERNAL_EVENT.toString())) {
 																	processBDIInternalEvent(dci, bia, elementId, exta, coordinationSpaceObj, ae, receivedParamDataMappings);
 																} else if (elementType.equals(AgentElementType.MICRO_STEP.toString())) {
@@ -275,7 +273,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 				}
 				base.dispatchInternalEvent(ie);
 			} else {
-				throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
+				throw new RuntimeException("No such event: " + scope[0] + " in " + scope[1]);
 			}
 		}
 	}
@@ -345,11 +343,11 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 				PlanbaseFlyweight base = (PlanbaseFlyweight) PlanbaseFlyweight.getPlanbaseFlyweight(state, scope[1]);
 
 				
-				IMPlan mplan = ((IMPlanbase)base.getModelElement()).getPlan("startplan");
+				IMPlan mplan = ((IMPlanbase)base.getModelElement()).getPlan(elementId);
 				IPlan plan = base.createPlan(mplan);
 
-				for (ParameterMapping pm : ae.getParameter_mappings()) {
-					plan.getParameter(pm.getLocalName()).setValue(receivedParamDataMappings.get(pm.getRef()));
+				for (ParameterMapping pm : ae.getParameter_mappings()) {					
+					plan.getParameter(pm.getLocalName()).setValue(coordinationSpaceObj.getProperty(Constants.VALUE));
 				}
 				plan.startPlan();
 
