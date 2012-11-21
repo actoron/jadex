@@ -203,7 +203,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if (modelcontainer.getFile() == null)
+				if (modelcontainer.getFile() != null)
 				{
 					try
 					{

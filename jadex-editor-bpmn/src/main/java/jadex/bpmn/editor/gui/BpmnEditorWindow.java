@@ -8,6 +8,7 @@ import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.gui.JSplitPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,11 +55,12 @@ public class BpmnEditorWindow extends JFrame
 				
 				setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				
-				JSplitPane statuspane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+				//JSplitPane statuspane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+				JSplitPane statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 				statuspane.setOneTouchExpandable(true);
 				statuspane.setBottomComponent(new StatusArea());
 				
-				viewpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+				viewpane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 				viewpane.setOneTouchExpandable(true);
 				
 				addWindowListener(new WindowAdapter()
@@ -148,6 +150,7 @@ public class BpmnEditorWindow extends JFrame
 				modelcontainer.setPropertypanelcontainer(propertypanelcontainer);
 				graph.getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
 				
+				
 				/* Menu */
 				JMenuBar menubar = new BpmnMenuBar(modelcontainer);
 				setJMenuBar(menubar);
@@ -160,9 +163,9 @@ public class BpmnEditorWindow extends JFrame
 						(int) (sd.height * GuiConstants.GRAPH_PROPERTY_RATIO));
 				setLocationRelativeTo(null);
 				setVisible(true);
-				statuspane.setResizeWeight(1.0);
+				//statuspane.setResizeWeight(1.0);
 				statuspane.setDividerLocation(1.0);
-				viewpane.setResizeWeight(GuiConstants.GRAPH_PROPERTY_RATIO);
+				//viewpane.setResizeWeight(GuiConstants.GRAPH_PROPERTY_RATIO);
 				viewpane.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
 			}
 		});

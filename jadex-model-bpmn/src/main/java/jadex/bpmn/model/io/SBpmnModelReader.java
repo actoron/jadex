@@ -7,6 +7,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -85,6 +86,8 @@ public class SBpmnModelReader
 		Map<String, MLane> lanemap = new HashMap<String, MLane>();
 		Map<String, String> laneparents = new HashMap<String, String>();
 		Map<String, Object> buffer = new HashMap<String, Object>();
+		buffer.put("subprocessstack", new LinkedList<MSubProcess>());
+		buffer.put("subprocesselementmap", new HashMap<String, MSubProcess>());
 		
 		buffer.put("unresolvedsequencesources", new HashMap<String, MSequenceEdge>());
 		buffer.put("unresolvedsequencetargets", new HashMap<String, MSequenceEdge>());
@@ -128,6 +131,11 @@ public class SBpmnModelReader
 	    		{
 	    			handlePool(ret, attrs, bpmnelementmap, buffer);
 	    		}
+		    	else if ("subProcess".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
+		    	{
+		    		LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
+		    		sps.push(new MSubProcess());
+		    	}
 		    }
 		    else if (reader.getEventType() == XMLStreamConstants.CHARACTERS)
 		    {
@@ -261,7 +269,16 @@ public class SBpmnModelReader
 		}
 		else if (ACT_TYPE_MAPPING.containsKey(tag.getLocalPart()))
 		{
-			MActivity act = new MActivity();
+			MActivity act;
+			if (MBpmnModel.SUBPROCESS.equals(ACT_TYPE_MAPPING.get(tag.getLocalPart())))
+			{
+				LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
+				act = sps.pop();
+			}
+			else
+			{
+				act = new MActivity();
+			}
 			
 			if (attrs.containsKey("name"))
 			{
@@ -298,8 +315,7 @@ public class SBpmnModelReader
 			
 			connectActivityEdges(act, buffer, emap);
 			
-			MPool pool = (MPool) buffer.get("pool");
-			insertActivity(act, pool, lanemap, emap);
+			insertActivity(act, buffer, lanemap, emap);
 		}
 		else if (tag.getLocalPart() != null && tag.getLocalPart().contains("Event") && !tag.getLocalPart().contains("Definition"))
 		{
@@ -354,8 +370,7 @@ public class SBpmnModelReader
 			
 			connectActivityEdges(evt, buffer, emap);
 			
-			MPool pool = (MPool) buffer.get("pool");
-			insertActivity(evt, pool, lanemap, emap);
+			insertActivity(evt, buffer, lanemap, emap);
 		}
 		else if (tag.getLocalPart() != null && tag.getLocalPart().endsWith("EventDefinition"))
 		{
@@ -439,7 +454,16 @@ public class SBpmnModelReader
 				tgt.addIncomingSequenceEdge(edge);
 			}
 			
-			((MPool) buffer.get("pool")).addSequenceEdge(edge);
+			LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
+			if (sps.isEmpty())
+			{
+				((MPool) buffer.get("pool")).addSequenceEdge(edge);
+			}
+			else
+			{
+				sps.peek().addSequenceEdge(edge);
+			}
+			
 			emap.put(edge.getId(), edge);
 		}
 		else if ("conditionExpression".equals(tag.getLocalPart()))
@@ -524,6 +548,10 @@ public class SBpmnModelReader
 		else if ("modelname".equals(tag.getLocalPart()))
 		{
 			model.setName(content);
+		}
+		else if ("subprocessref".equals(tag.getLocalPart()))
+		{
+			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("file", content.trim());
 		}
 		else if ("parameter".equals(tag.getLocalPart()))
 		{
@@ -731,24 +759,39 @@ public class SBpmnModelReader
 	 *  Inserts an activity into the model and maps.
 	 *  
 	 *  @param act The activity.
-	 *  @param pool The current pool.
+	 *  @param buffer The buffer.
 	 *  @param lanemap The lane map.
 	 *  @param emap The element map.
 	 */
-	protected static final void insertActivity(MActivity act, MPool pool, Map<String, MLane> lanemap, Map<String, MIdElement> emap)
+	protected static final void insertActivity(MActivity act, Map<String, Object> buffer, Map<String, MLane> lanemap, Map<String, MIdElement> emap)
 	{
+		MPool pool = (MPool) buffer.get("pool");
 		MLane lane = lanemap.get(act.getId());
-		if (lane != null)
+		
+		LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
+		if (!sps.isEmpty())
 		{
-			lane.addActivity(act);
 			act.setPool(pool);
 			act.setLane(lane);
+			sps.peek().addActivity(act);
+			Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
+			spem.put(act.getId(), sps.peek());
 		}
 		else
 		{
-			pool.addActivity(act);
-			act.setPool(pool);
+			if (lane != null)
+			{
+				lane.addActivity(act);
+				act.setPool(pool);
+				act.setLane(lane);
+			}
+			else
+			{
+				pool.addActivity(act);
+				act.setPool(pool);
+			}
 		}
+		
 		emap.put(act.getId(), act);
 	}
 	

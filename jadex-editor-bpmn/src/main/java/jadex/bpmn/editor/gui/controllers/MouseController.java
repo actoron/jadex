@@ -120,7 +120,7 @@ public class MouseController extends MouseAdapter
 		}
 		vactivity.setBpmnElement(mactivity);
 		
-		Point p = targetpoint;
+		Point p = adjustPoint(targetcell, targetpoint);
 		
 		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mode) ?
 					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mode) :
@@ -392,9 +392,14 @@ public class MouseController extends MouseAdapter
 		}
 	}
 	
-	protected Point getPointForEvent(Object parent, MouseEvent e)
+	/**
+	 *  Adjusts a point for relative positioning.
+	 *  
+	 */
+	protected Point adjustPoint(Object parent, Point point)
 	{
-		mxPoint p = modelcontainer.getGraphComponent().getPointForEvent(e);
+		//mxPoint p = modelcontainer.getGraphComponent().getPointForEvent(e);
+		mxPoint p = new mxPoint(point);
 		
 		mxCellState pstate = modelcontainer.getGraph().getView().getState(parent);
 		if (pstate != null)

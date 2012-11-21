@@ -6,6 +6,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -47,6 +48,7 @@ public class SBpmnModelWriter
 	static
 	{
 		ACT_TYPE_MAPPING.put(MBpmnModel.TASK, "task");
+		ACT_TYPE_MAPPING.put(MBpmnModel.SUBPROCESS, "subProcess");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_PARALLEL, "parallelGateway");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, "exclusiveGateway");
 		ACT_TYPE_MAPPING.put(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, "inclusiveGateway");
@@ -576,12 +578,12 @@ public class SBpmnModelWriter
 				}
 				
 				List<MActivity> activities = getPoolActivities(pool);
-				writeActivitySemantics(out, activities);
+				writeActivitySemantics(out, activities, 2);
 				
 				List<MSequenceEdge> seqedges = pool.getSequenceEdges();
 				if (seqedges != null)
 				{
-					writeSequenceEdgeSemantics(out, seqedges);
+					writeSequenceEdgeSemantics(out, seqedges, 2);
 				}
 				
 				out.println(getIndent(1) + "</semantic:process>");
@@ -650,11 +652,11 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param activities The activities.
 	 */
-	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities)
+	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, int baseind)
 	{
 		for (MActivity activity : activities)
 		{
-			out.print(getIndent(2) + "<semantic:");
+			out.print(getIndent(baseind) + "<semantic:");
 			String mappedacttype = ACT_TYPE_MAPPING.get(activity.getActivityType());
 			
 			boolean event = false;
@@ -706,7 +708,7 @@ public class SBpmnModelWriter
 			{
 				for (MSequenceEdge edge : edges)
 				{
-					out.print(getIndent(3) + "<semantic:incoming>");
+					out.print(getIndent(baseind + 1) + "<semantic:incoming>");
 					out.print(edge.getId());
 					out.println("</semantic:incoming>");
 				}
@@ -717,7 +719,7 @@ public class SBpmnModelWriter
 			{
 				for (MSequenceEdge edge : edges)
 				{
-					out.print(getIndent(3) + "<semantic:outgoing>");
+					out.print(getIndent(baseind + 1) + "<semantic:outgoing>");
 					out.print(edge.getId());
 					out.println("</semantic:outgoing>");
 				}
@@ -727,22 +729,22 @@ public class SBpmnModelWriter
 			{
 				if (activity.getActivityType().contains("Message"))
 				{
-					out.print(getIndent(3));
+					out.print(getIndent(baseind + 1));
 					out.println("<semantic:messageEventDefinition/>");
 				}
 				else if (activity.getActivityType().contains("Timer"))
 				{
-					out.print(getIndent(3));
+					out.print(getIndent(baseind + 1));
 					out.print("<semantic:timerEventDefinition");
 					if (activity.hasPropertyValue("duration") &&
 					   ((UnparsedExpression) activity.getPropertyValue("duration")).getValue().length() > 0)
 					{
 						out.println(">");
-						out.print(getIndent(4));
+						out.print(getIndent(baseind + 2));
 						out.print("<semantic:timeDuration>");
 						out.print(((UnparsedExpression) activity.getPropertyValue("duration")).getValue());
 						out.println("</semantic:timeDuration>");
-						out.print(getIndent(3));
+						out.print(getIndent(baseind + 1));
 						out.println("</semantic:timerEventDefinition>");
 					}
 					else
@@ -752,32 +754,57 @@ public class SBpmnModelWriter
 				}
 				else if (activity.getActivityType().contains("Rule"))
 				{
-					out.print(getIndent(3));
+					out.print(getIndent(baseind + 1));
 					out.println("<semantic:conditionalEventDefinition/>");
 				}
 				else if (activity.getActivityType().contains("Signal"))
 				{
-					out.print(getIndent(3));
+					out.print(getIndent(baseind + 1));
 					out.println("<semantic:signalEventDefinition/>");
 				}
 				else if (activity.getActivityType().contains("Error"))
 				{
-					out.print(getIndent(3));
+					out.print(getIndent(baseind + 1));
 					out.println("<semantic:errorEventDefinition/>");
 				}
 			}
 			
-			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType());
-			boolean hastaskclass = istask && activity.getClazz() != null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
-			boolean hastaskparams = MBpmnModel.TASK.equals(activity.getActivityType()) && activity.getParameters() != null && activity.getParameters().size() > 0;
-			
-			if (hastaskclass || hastaskparams)
+			boolean issubproc = MBpmnModel.SUBPROCESS.equals(activity.getActivityType());
+			String procref = null;
+			if (issubproc)
 			{
-				out.println(getIndent(3) + "<semantic:extensionElements>");
+				MSubProcess subproc = (MSubProcess) activity;
+				if (subproc.hasPropertyValue("file"))
+				{
+					procref = (String) subproc.getPropertyValue("file");
+				}
+				else
+				{
+					List<MActivity> subactivities = subproc.getActivities();
+					if (subactivities != null && subactivities.size() > 0)
+					{
+						writeActivitySemantics(out, subactivities, baseind + 1);
+					}
+					
+					List<MSequenceEdge> subseqedges = subproc.getSequenceEdges();
+					if (subseqedges != null && subseqedges.size() > 0)
+					{
+						writeSequenceEdgeSemantics(out, subseqedges, baseind + 1);
+					}
+				}
+			}
+			
+			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
+			boolean hastaskclass = istask && activity.getClazz() != null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
+			boolean hastaskparams = istask && activity.getParameters() != null && activity.getParameters().size() > 0;
+			
+			if (hastaskclass || hastaskparams || procref != null)
+			{
+				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
 				
 				if (hastaskclass)
 				{
-					out.print(getIndent(4) + "<jadex:taskclass>");
+					out.print(getIndent(baseind + 2) + "<jadex:taskclass>");
 					out.print(activity.getClazz().getTypeName());
 					out.println("</jadex:taskclass>");
 				}
@@ -788,7 +815,7 @@ public class SBpmnModelWriter
 					for (int i = 0; i < params.size(); ++i)
 					{
 						MParameter param = (MParameter) params.get(i);
-						out.print(getIndent(4) + "<jadex:parameter direction=\"");
+						out.print(getIndent(baseind + 2) + "<jadex:parameter direction=\"");
 						out.print(param.getDirection());
 						out.print("\" name=\"");
 						out.print(param.getName());
@@ -810,10 +837,17 @@ public class SBpmnModelWriter
 					}
 				}
 				
-				out.println(getIndent(3) + "</semantic:extensionElements>");
+				if (procref != null)
+				{
+					out.print(getIndent(baseind + 2) + "<jadex:subprocessref>");
+					out.print(procref);
+					out.println("</jadex:subprocessref>");
+				}
+				
+				out.println(getIndent(baseind + 1) + "</semantic:extensionElements>");
 			}
 			
-			out.print(getIndent(2) + "</semantic:");
+			out.print(getIndent(baseind) + "</semantic:");
 			out.print(mappedacttype);
 			out.println(">");
 		}
@@ -825,11 +859,11 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param seqedges The sequence edges.
 	 */
-	protected static final void writeSequenceEdgeSemantics(PrintStream out, List<MSequenceEdge> seqedges)
+	protected static final void writeSequenceEdgeSemantics(PrintStream out, List<MSequenceEdge> seqedges, int baseind)
 	{
 		for (MSequenceEdge edge : seqedges)
 		{
-			out.print(getIndent(2) + "<semantic:sequenceFlow sourceRef=\"");
+			out.print(getIndent(baseind) + "<semantic:sequenceFlow sourceRef=\"");
 			out.print(edge.getSource().getId());
 			out.print("\" targetRef=\"");
 			out.print(edge.getTarget().getId());
@@ -842,7 +876,7 @@ public class SBpmnModelWriter
 				String cond = edge.getCondition().getValue();
 				if (cond != null && cond.length() > 0)
 				{
-					out.print(getIndent(3) + "<semantic:conditionExpression>");
+					out.print(getIndent(baseind + 1) + "<semantic:conditionExpression>");
 					out.print(cond);
 					out.println("</semantic:conditionExpression>");
 				}
@@ -851,21 +885,21 @@ public class SBpmnModelWriter
 			IndexMap mappings = edge.getParameterMappings();
 			if (mappings != null && mappings.size() > 0)
 			{
-				out.println(getIndent(3) + "<semantic:extensionElements>");
+				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
 				
 				for (int i = 0; i < mappings.size(); ++i)
 				{
-					out.print(getIndent(4) + "<jadex:parametermapping name=\"");
+					out.print(getIndent(baseind + 2) + "<jadex:parametermapping name=\"");
 					out.print(mappings.getKey(i));
 					out.print("\">");
 					out.print(((Tuple2<UnparsedExpression, UnparsedExpression>) mappings.get(i)).getFirstEntity().getValue());
 					out.println("</jadex:parametermapping>");
 				}
 				
-				out.println(getIndent(3) + "</semantic:extensionElements>");
+				out.println(getIndent(baseind + 1) + "</semantic:extensionElements>");
 			}
 			
-			out.println(getIndent(2) + "</semantic:sequenceFlow>");
+			out.println(getIndent(baseind) + "</semantic:sequenceFlow>");
 		}
 	}
 	
