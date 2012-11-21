@@ -23,10 +23,10 @@ public class PeerEntry
 	/** Is this peer connected? */
 	protected boolean	connected;
 	
-	/** The awareness infos received from the peer (platform id->awa info). */
-	protected Map<String, AwarenessInfo>	awainfos;
+	/** The platform infos received from the peer (platform id->info). */
+	protected Map<String, PlatformInfo>	infos;
 	
-	/** Have initial awareness infos been sent already? */
+	/** Have initial platform infos been sent already? */
 	protected boolean	sent;
 	
 	//-------- constructors --------
@@ -38,7 +38,7 @@ public class PeerEntry
 	{
 		this.url	= url;
 		this.initial	= initial;
-		this.awainfos	= Collections.synchronizedMap(new LinkedHashMap<String, AwarenessInfo>());
+		this.infos	= Collections.synchronizedMap(new LinkedHashMap<String, PlatformInfo>());
 //		System.out.println("New peer: "+url);
 	}
 	
@@ -103,26 +103,27 @@ public class PeerEntry
 	}
 	
 	/**
-	 *  Update the awareness info.
+	 *  Update the platform info.
 	 *  If the platform is offline, the info is removed.
 	 */
-	public void	updateAwarenessInfo(AwarenessInfo awainfo)
+	public void	updatePlatformInfo(PlatformInfo info)
 	{
-		if(AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
+		if(info.getDisconnectDate()!=null || info.getAwarenessInfo()!=null
+			&& AwarenessInfo.STATE_OFFLINE.equals(info.getAwarenessInfo().getState()))
 		{
-			awainfos.remove(awainfo.getSender().getName());
+			infos.remove(info.getId());
 		}
 		else
 		{
-			awainfos.put(awainfo.getSender().getName(), awainfo);
+			infos.put(info.getId(), info);
 		}
 	}
 	
 	/**
-	 *  Get the awareness infos received from the peer.
+	 *  Get the platform infos received from the peer.
 	 */
-	public AwarenessInfo[]	getAwarenessInfos()
+	public PlatformInfo[]	getPlatformInfos()
 	{
-		return awainfos.values().toArray(new AwarenessInfo[0]);
+		return infos.values().toArray(new PlatformInfo[0]);
 	}
 }

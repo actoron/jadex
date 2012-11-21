@@ -6,6 +6,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.transformation.annotations.Exclude;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -76,6 +77,17 @@ public class PlatformInfo
 	protected Map<String, String>	properties;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a platform info.
+	 */
+	public PlatformInfo()
+	{
+		// bean constructor.
+		
+		// dummy db id to avoid saving remote platform infos
+		this.dbid	= new Integer(-1);
+	}
 	
 	/**
 	 *  Create a platform info.
@@ -285,6 +297,7 @@ public class PlatformInfo
 	/**
 	 *  Get the db id
 	 */
+	@Exclude
 	public Integer	getDBId()
 	{
 		return dbid;
@@ -376,6 +389,7 @@ public class PlatformInfo
 	/**
 	 *  Set db id
 	 */
+	@Exclude
 	public void	setDBId(Integer dbid)
 	{
 		this.dbid	= dbid;
@@ -417,9 +431,26 @@ public class PlatformInfo
 	}
 
 	/**
+	 *  Set the host ip.
+	 */
+	public void setHostIP(String hostip)
+	{
+		this.hostip	= hostip;
+	}
+
+	/**
+	 *  Set the host name.
+	 */
+	public void setHostName(String hostname)
+	{
+		this.hostname	= hostname;
+	}
+
+	/**
 	 *  Get the preferred codecs.
 	 *  The relay server will send awareness infos to the platform using this codecs.
 	 */
+	@Exclude
 	public ICodec[] getPreferredCodecs()
 	{
 		return pcodecs;
@@ -429,6 +460,7 @@ public class PlatformInfo
 	 *  Set the preferred codecs.
 	 *  The relay server will send awareness infos to the platform using this codecs.
 	 */
+	@Exclude
 	public void setPreferredCodecs(ICodec[] pcodecs)
 	{
 		this.pcodecs	= pcodecs;

@@ -212,11 +212,6 @@ public class PeerList
 		return peer;
 	}
 
-	public PeerEntry getPeer(String url)
-	{
-		return peers.get(url);
-	}
-	
 	//-------- helper classes --------
 	
 	/**

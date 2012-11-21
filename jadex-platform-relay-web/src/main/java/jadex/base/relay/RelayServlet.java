@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -108,8 +111,13 @@ public class RelayServlet extends HttpServlet
 				}
 				else
 				{
-					request.setAttribute("platforms", handler.getCurrentPlatforms());
-					request.setAttribute("peers", handler.getCurrentPeers());
+					List<PlatformInfo>	infos	= new ArrayList<PlatformInfo>();
+					infos.addAll(Arrays.asList(handler.getCurrentPlatforms()));
+					for(PeerEntry peer: handler.getCurrentPeers())
+					{
+						infos.addAll(Arrays.asList(peer.getPlatformInfos()));						
+					}
+					request.setAttribute("platforms", infos.toArray(new PlatformInfo[0]));
 					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
@@ -146,6 +154,10 @@ public class RelayServlet extends HttpServlet
 		try
 		{
 			if("/awareness".equals(request.getServletPath()) || "/awareness/".equals(request.getServletPath()))	// new code always adds slash.
+			{
+				handler.handleAwareness(request.getInputStream());
+			}
+			else if("/platforminfos".equals(request.getServletPath()) || "/platforminfos/".equals(request.getServletPath()))	// new code always adds slash.
 			{
 				handler.handleAwareness(request.getInputStream());
 			}

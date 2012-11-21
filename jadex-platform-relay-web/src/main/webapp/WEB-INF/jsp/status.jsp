@@ -100,28 +100,7 @@ if(infos.length>0)
 <p>Currently there are no platforms connected to this relay.</p>
 <p>You can check the <a href="history">connection history</a> for more information.</p>
 
-<% } 
-
-if(peers.length>0)
-{ %>
-
-	<H2>Platforms Connected to Other Relays</H2>	
-<%
-	for(PeerEntry peer: peers)
-	{ %>
-		<H3><%= peer.getURL() %></H3>
-		<UL>
-	<%
-		for(AwarenessInfo awainfo: peer.getAwarenessInfos())
-		{
-			%>
-			<li><%= awainfo.getSender().getName() %> </li>
-			<%
-		}
-		%>
-		</UL>
-<%	}
-} %>
+<% } %>
 
 <H2>Alternative Relay Servers</H2>
 <p>

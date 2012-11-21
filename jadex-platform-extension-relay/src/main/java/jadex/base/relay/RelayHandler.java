@@ -78,6 +78,9 @@ public class RelayHandler
 	/** The available codecs for awareness infos (cached for speed). */
 	protected Map<Byte, ICodec>	codecs;
 	
+	/** The default codecs (used for relay-to-relay communication). */
+	protected ICodec[]	defcodecs;
+	
 	/** The peer list. */
 	protected PeerList	peers;	
 	
@@ -92,6 +95,7 @@ public class RelayHandler
 		this.platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 		CodecFactory	cfac	= new CodecFactory();
 		this.codecs	= cfac.getAllCodecs();
+		this.defcodecs	= cfac.getDefaultCodecs();
 		this.peers	= new PeerList();
 	}
 	
@@ -290,11 +294,11 @@ public class RelayHandler
 	}
 	
 	/**
-	 *  Called when an awareness info is received.
+	 *  Called when an awareness info is received from a connected platform.
 	 */
 	public void handleAwareness(InputStream in) throws Exception
 	{
-		// Read target id.
+		// Read dummy target id.
 		String	id	= readString(in);
 		
 		// Read total message length.
@@ -318,14 +322,36 @@ public class RelayHandler
 		{
 			info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 		}
-		
-		PeerEntry	peer	= peers.getPeer(id);
-		if(peer!=null)
-		{
-			peer.updateAwarenessInfo(info);
-		}
-		
+				
 		sendAwarenessInfos(info, pcodecs);
+	}
+	
+	/**
+	 *  Called when platform infos are received from a peer relay server.
+	 */
+	public void handlePlatforms(InputStream in) throws Exception
+	{
+		// Read target id (= peer url).
+		String	id	= readString(in);
+		
+		// Read total message length.
+		byte[]	len	= readData(in, 4);
+		int	length	= SUtil.bytesToInt(len);
+		
+		// Read message and extract platform info content.
+		byte[] buffer = readData(in, length-1);
+		PlatformInfo[]	infos	= (PlatformInfo[])MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
+		
+		PeerEntry	peer	= peers.addPeer(id, false);
+		for(PlatformInfo info: infos)
+		{
+			peer.updatePlatformInfo(info);
+			if(info.getAwarenessInfo()!=null)
+			{
+				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs);
+			}
+		}
 	}
 	
 	/**
@@ -362,31 +388,27 @@ public class RelayHandler
 			{
 				peer.setSent(true);
 				
-				for(PlatformInfo pi: getCurrentPlatforms())
-				{
-					AwarenessInfo	awainfo	= pi.getAwarenessInfo();
-					if(awainfo!=null)
-					{
-						Map<String, Object>	message	= new HashMap<String, Object>();
-						message.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
-						message.put(SFipa.CONTENT, awainfo);
-						MessageEnvelope	msg	= new MessageEnvelope(message, null, null);
-						byte[]	peerinfo	= MapSendTask.encodeMessage(msg, pi.getPreferredCodecs(), getClass().getClassLoader());
-								
-						try
-						{
-							System.out.println("Sending awareness to peer: "+peer.getURL());
-							new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-						}
-						catch(IOException e)
-						{
-							System.out.println("Error sending awareness to peer: "+e);
-						}					
-					}
-				}				
 			}
 		}
 		return peers.getURLs(requesturl);
+	}
+	
+	/**
+	 *  Send platform infos to a peer relay server.
+	 */
+	public void	sendPlatformInfos(PeerEntry peer, PlatformInfo[] infos)
+	{
+		byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
+				
+		try
+		{
+			System.out.println("Sending platform infos to peer: "+peer.getURL());
+			new RelayConnectionManager().postMessage(peer.getURL()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+		}
+		catch(IOException e)
+		{
+			System.out.println("Error sending platform infos to peer: "+e);
+		}					
 	}
 	
 	//-------- helper methods --------	
@@ -499,29 +521,33 @@ public class RelayHandler
 			{
 				if(peer.isConnected())
 				{
-					AwarenessInfo[]	infos	= peer.getAwarenessInfos();
-					for(AwarenessInfo awainfo2: infos)
+					PlatformInfo[]	infos	= peer.getPlatformInfos();
+					for(PlatformInfo pi: infos)
 					{
-						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
-						if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
+						if(pi.getAwarenessInfo()!=null)
 						{
-							awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
-							awainfo2.setProperties(null);
-						}
-						
-						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
-						byte[]	info2	= new byte[data2.length+4];
-						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
-						System.arraycopy(data2, 0, info2, 4, data2.length);
-						
-						try
-						{
-//								System.out.println("queing awareness info to:"+id);
-							map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
-						}
-						catch(Exception e)
-						{
-							// Queue closed, because platform just disconnected.
+							AwarenessInfo	awainfo2	= pi.getAwarenessInfo();
+							// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+							if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
+							{
+								awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
+								awainfo2.setProperties(null);
+							}
+							
+							byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
+							byte[]	info2	= new byte[data2.length+4];
+							System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
+							System.arraycopy(data2, 0, info2, 4, data2.length);
+							
+							try
+							{
+	//								System.out.println("queing awareness info to:"+id);
+								map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+							}
+							catch(Exception e)
+							{
+								// Queue closed, because platform just disconnected.
+							}
 						}
 					}
 				}
