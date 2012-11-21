@@ -213,8 +213,8 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 							SimpleEntry<String, String> entry = new SimpleEntry<String, String>(key, result.getProperties().get(key));
 							ctm.getData().add(entry);
 						}
-						ctm.fireTableDataChanged();
 					}
+					ctm.fireTableDataChanged();
 				}
 			});
 		}
@@ -369,12 +369,14 @@ public class CoordinationPanel extends JPanel implements IServiceViewerPanel {
 			int row = e.getFirstRow();
 			int column = e.getColumn();
 			ConfigurationTableModel ctm = (ConfigurationTableModel) e.getSource();
-			SimpleEntry<String, String> entry = ctm.getData().get(row);
-			if (column == 1) {
-				ICoordinationSpaceService css = getSelectedCoordinationSpaceService();
-				String realization = getSelectedMechanismRealization();
+			if (ctm.getData() != null && !ctm.getData().isEmpty()) {
+				SimpleEntry<String, String> entry = ctm.getData().get(row);
+				if (column == 1) {
+					ICoordinationSpaceService css = getSelectedCoordinationSpaceService();
+					String realization = getSelectedMechanismRealization();
 
-				css.changeCoordinationMechanismConfiguration(realization, entry.getKey(), entry.getValue());
+					css.changeCoordinationMechanismConfiguration(realization, entry.getKey(), entry.getValue());
+				}
 			}
 		}
 
