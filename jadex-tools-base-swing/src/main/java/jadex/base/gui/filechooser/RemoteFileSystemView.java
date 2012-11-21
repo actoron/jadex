@@ -1,14 +1,12 @@
 package jadex.base.gui.filechooser;
 
-import jadex.bridge.IComponentStep;
+import jadex.base.SRemoteFileChooser;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +21,7 @@ import javax.swing.filechooser.FileView;
 /**
  *  Remote file system view.
  *  Is programmed asynchronously, i.e. delivers always
- *  what is has and then initiates a background search for
+ *  what it has and then initiates a background search for
  *  retrieving current values. When values arrive a refresh
  *  operation is used to update the chooser.
  */
@@ -73,27 +71,8 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		exta.scheduleStep(new IComponentStep<Object[]>()
-		{
-			@Classname("init")
-			public IFuture<Object[]> execute(IInternalAccess ia)
-			{
-				Object[]	ret	= new Object[4];
-				FileSystemView view = FileSystemView.getFileSystemView();
-				ret[0]	= FileData.convertToRemoteFiles(File.listRoots());
-				ret[1]	= new FileData(view.getHomeDirectory());
-				ret[2]	= new FileData(view.getDefaultDirectory());
-				
-				String	path	= new File(".").getAbsolutePath();
-				if(path.endsWith("."))
-				{
-					path	= path.substring(0, path.length()-1);
-				}
-				ret[3]	= new FileData(new File(path));					
-				
-				return new Future<Object[]>(ret);
-			}
-		}).addResultListener(new SwingExceptionDelegationResultListener<Object[], Void>(ret)
+		SRemoteFileChooser.init(exta)
+			.addResultListener(new SwingExceptionDelegationResultListener<Object[], Void>(ret)
 		{
 			public void customResultAvailable(Object[] res)
 			{
@@ -436,17 +415,8 @@ public class RemoteFileSystemView extends FileSystemView
 		
 		if(ret==null)
 		{
-			exta.scheduleStep(new IComponentStep<FileData[]>()
-			{
-				@Classname("getRoots")
-				public IFuture<FileData[]> execute(IInternalAccess ia)
-				{
-//					FileSystemView view = FileSystemView.getFileSystemView();
-//					File[] roots = view.getRoots();
-					File[] roots = File.listRoots();
-					return new Future<FileData[]>(FileData.convertToRemoteFiles(roots));
-				}
-			}).addResultListener(new SwingDefaultResultListener<FileData[]>()
+			SRemoteFileChooser.getRoots(exta)
+				.addResultListener(new SwingDefaultResultListener<FileData[]>()
 			{
 				public void customResultAvailable(FileData[] remfiles)
 				{
@@ -473,16 +443,8 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		if(homedir==null)
 		{
-			exta.scheduleStep(new IComponentStep<FileData>()
-			{
-				@Classname("getHomeDirectory")
-				public IFuture<FileData> execute(IInternalAccess ia)
-				{
-					FileSystemView view = FileSystemView.getFileSystemView();
-					File ret = view.getHomeDirectory();
-					return new Future<FileData>(ret!=null? new FileData(ret): null);
-				}
-			}).addResultListener(new SwingDefaultResultListener<FileData>()
+			SRemoteFileChooser.getHomeDirectory(exta)
+				.addResultListener(new SwingDefaultResultListener<FileData>()
 			{
 				public void customResultAvailable(FileData file)
 				{
@@ -507,19 +469,8 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		if(currentdir==null)
 		{
-			exta.scheduleStep(new IComponentStep<FileData>()
-			{
-				@Classname("getCurrentDirectory")
-				public IFuture<FileData> execute(IInternalAccess ia)
-				{
-					String	path	= new File(".").getAbsolutePath();
-					if(path.endsWith("."))
-					{
-						path	= path.substring(0, path.length()-1);
-					}
-					return new Future<FileData>(new FileData(new File(path)));					
-				}
-			}).addResultListener(new SwingDefaultResultListener<FileData>()
+			SRemoteFileChooser.getCurrentDirectory(exta)
+				.addResultListener(new SwingDefaultResultListener<FileData>()
 			{
 				public void customResultAvailable(FileData file)
 				{
@@ -545,16 +496,8 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		if(defaultdir==null)
 		{
-			exta.scheduleStep(new IComponentStep<FileData>()
-			{
-				@Classname("getDefaultDirectory")
-				public IFuture<FileData> execute(IInternalAccess ia)
-				{
-					FileSystemView view = FileSystemView.getFileSystemView();
-					File ret = view.getDefaultDirectory();
-					return new Future<FileData>(ret!=null? new FileData(ret): null);
-				}
-			}).addResultListener(new SwingDefaultResultListener<FileData>()
+			SRemoteFileChooser.getDefaultDirectory(exta)
+				.addResultListener(new SwingDefaultResultListener<FileData>()
 			{
 				public void customResultAvailable(FileData file)
 				{
@@ -649,27 +592,8 @@ public class RemoteFileSystemView extends FileSystemView
 		if(ret==null)
 		{
 			final FileData mydir = new FileData(dir);
-			exta.scheduleStep(new IComponentStep<FileData[]>()
-			{
-				@Classname("getFiles")
-				public IFuture<FileData[]> execute(IInternalAccess ia)
-				{
-					File dir = new File(mydir.getPath());
-					File[] files;
-					if(dir.exists())
-					{
-						FileSystemView view = FileSystemView.getFileSystemView();
-						files = view.getFiles(dir, useFileHiding);
-//						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
-					}
-					else
-					{
-//						System.out.println("file does not exist: "+dir);
-						files = new File[0];
-					}
-					return new Future<FileData[]>(FileData.convertToRemoteFiles(files));
-				}
-			}).addResultListener(new SwingDefaultResultListener<FileData[]>()
+			SRemoteFileChooser.getFiles(exta, mydir, useFileHiding)
+				.addResultListener(new SwingDefaultResultListener<FileData[]>()
 			{
 				public void customResultAvailable(FileData[] remfiles)
 				{
@@ -711,16 +635,8 @@ public class RemoteFileSystemView extends FileSystemView
 		if(parent==null)
 		{
 			final String path = dir.getAbsolutePath();
-			exta.scheduleStep(new IComponentStep<FileData>()
-			{
-				@Classname("getParentDirectory")
-				public IFuture<FileData> execute(IInternalAccess ia)
-				{
-					FileSystemView view = FileSystemView.getFileSystemView();
-					File parent = view.getParentDirectory(new File(path)); // todo: useFileHandling
-					return new Future<FileData>(parent!=null? new FileData(parent): null);
-				}
-			}).addResultListener(new SwingDefaultResultListener<FileData>()
+			SRemoteFileChooser.getParentDirectory(exta, path)
+				.addResultListener(new SwingDefaultResultListener<FileData>()
 			{
 				public void customResultAvailable(FileData remfile)
 				{

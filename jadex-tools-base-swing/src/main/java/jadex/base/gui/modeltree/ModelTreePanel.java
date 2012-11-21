@@ -1,5 +1,6 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -9,7 +10,6 @@ import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RootNode;
-import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -25,15 +25,11 @@ import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
 import java.net.URL;
@@ -175,32 +171,7 @@ public class ModelTreePanel extends FileTreePanel
 						// Save settings if wanted
 						if(msg!=null && msg.isRemember())
 							autodelete = true;
-						
-						getExternalAccess().scheduleStep(new IComponentStep<Void>()
-						{
-							@Classname("removeURL")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								final Future	ret	= new Future();
-								SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new DelegationResultListener<ILibraryService>(ret)
-								{
-									public void customResultAvailable(ILibraryService ls)
-									{
-										try
-										{
-											ls.removeURL(null, SUtil.toURL(path));
-											ret.setResult(null);
-										}
-										catch(Exception ex)
-										{
-											ret.setException(ex);
-										}
-									}
-								});
-								return ret;
-							}
-						});
+						SRemoteGui.removeURL(exta, path);
 					}
 					else if(JOptionPane.NO_OPTION == choice)
 					{
@@ -241,7 +212,7 @@ public class ModelTreePanel extends FileTreePanel
 					IResourceIdentifier rid = getRootEntry(((IFileNode)node).getFilePath());
 					if(rid!=null && rid.getGlobalIdentifier()!=null)
 					{
-						overlay	= ModelTreePanel.this.icons.getIcon("gid");
+						overlay	= ModelTreePanel.icons.getIcon("gid");
 					}
 				}
 				return overlay;
@@ -322,15 +293,8 @@ public class ModelTreePanel extends FileTreePanel
 										filenames.add(filename);
 									}
 									
-									exta.scheduleStep(new IComponentStep<Integer>()
-									{
-										@Classname("findchild")
-										public IFuture<Integer> execute(IInternalAccess ia)
-										{
-											int ret = SUtil.indexOfFilename(toremove, filenames);
-											return new Future<Integer>(new Integer(ret));
-										}
-									}).addResultListener(new DefaultResultListener<Integer>()
+									SRemoteGui.findChild(exta, toremove, filenames)
+										.addResultListener(new DefaultResultListener<Integer>()
 									{
 										public void resultAvailable(Integer result)
 										{
@@ -409,57 +373,48 @@ public class ModelTreePanel extends FileTreePanel
 			{
 				final IResourceIdentifier rid = ((RIDNode)node).getResourceIdentifier();
 				
-				exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
+				SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 				{
-					@Classname("addrid")
-					public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
+					public void customResultAvailable(final ILibraryService ls)
 					{
-						final Future<IResourceIdentifier>	ret	= new Future<IResourceIdentifier>();
-						IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-						libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
+						// todo: workspace=false?
+						ls.addResourceIdentifier(null, rid, true).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
 						{
-							public void customResultAvailable(final ILibraryService ls)
+							public void customResultAvailable(IResourceIdentifier rid) 
 							{
-								// todo: workspace=false?
-								ls.addResourceIdentifier(null, rid, true).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+								// Todo: remove entries on remove.
+								try
+								{
+									// Hack!!! Shouldn't use file when remote!?
+									System.out.println("adding root: "+rid);
+									File f = new File(rid.getLocalIdentifier().getUrl().toURI());
+//									addRootEntry(f.toURI().toURL(), f.getAbsolutePath(), rid);
+									RIDNode rn = (RIDNode)node;
+									rn.setFile(f);
+									addRootEntry(f.toURI().toURL(), rn.getFilePath() , rid);
+									
+									ModelTreePanel.super.addNode(node);
+								}
+								catch(Exception e)
+								{
+//									e.printStackTrace();
+									customExceptionOccurred(e);
+								}
+							}
+							
+							public void customExceptionOccurred(final Exception exception)
+							{
+								localexta.scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										ia.getLogger().warning(exception.toString());
+										return IFuture.DONE;
+									}
+								});					
 							}
 						});
-						
-						return ret;
-					}
-				}).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
-				{
-					public void customResultAvailable(IResourceIdentifier rid) 
-					{
-						// Todo: remove entries on remove.
-						try
-						{
-							System.out.println("adding root: "+rid);
-							File f = new File(rid.getLocalIdentifier().getUrl().toURI());
-//							addRootEntry(f.toURI().toURL(), f.getAbsolutePath(), rid);
-							RIDNode rn = (RIDNode)node;
-							rn.setFile(f);
-							addRootEntry(f.toURI().toURL(), rn.getFilePath() , rid);
-							
-							ModelTreePanel.super.addNode(node);
-						}
-						catch(Exception e)
-						{
-//							e.printStackTrace();
-							customExceptionOccurred(e);
-						}
-					}
-					
-					public void customExceptionOccurred(final Exception exception)
-					{
-						localexta.scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								ia.getLogger().warning(exception.toString());
-								return IFuture.DONE;
-							}
-						});					
 					}
 				});
 			}
@@ -472,99 +427,8 @@ public class ModelTreePanel extends FileTreePanel
 						: filepath.endsWith("!") ? filepath.substring(4, filepath.length()-1) : filepath.substring(4)
 					: filepath.startsWith("file:") ? filepath : "file:"+filepath;
 				
-				exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
-				{
-					@Classname("addurl")
-					public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
-					{
-						final URL	url	= SUtil.toURL(filename);
-						final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
-						IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-						libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
-						{
-							public void customResultAvailable(final ILibraryService ls)
-							{
-								ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, Tuple2<URL, IResourceIdentifier>>(ret)
-								{
-									public void customResultAvailable(List<IResourceIdentifier> rids)
-									{
-//										System.out.println("rids are: "+rids);
-										
-										// this ugly piece of code checks if test-classes are added
-										// in this case it searched if the original package was also added
-										// and if yes it is added as dependency to the test-package
-										// this makes the necessary classes available for the test case
-										
-										String suftc = "test-classes";
-										String s2 = url.toString();
-										if(s2.endsWith(suftc))
-											s2 = s2 + "/";
-										suftc = "test-classes/";
-										
-										IResourceIdentifier tmp = null;
-										if(s2.endsWith(suftc) && url.getProtocol().equals("file"))
-										{
-											String st2 = s2.substring(0, s2.lastIndexOf(suftc));
-											for(IResourceIdentifier rid: rids)
-											{
-												if(rid.getLocalIdentifier()!=null)
-												{
-													URL u1 = rid.getLocalIdentifier().getUrl();
-													String s1 = u1.toString();
-													String sufc = "classes";
-													if(s1.endsWith(sufc))
-														s1 = s1 + "/";
-													sufc = "classes/";
-													
-													if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
-													{
-														String st1 = s1.substring(0, s1.lastIndexOf(sufc));
-														if(st1.equals(st2))
-														{
-															tmp = rid;
-	//														System.out.println("url: "+u1.getPath());
-															break;
-														}
-													}
-												}
-											}
-										}
-										final IResourceIdentifier deprid = tmp;
-										
-										// todo: workspace=true?
-										ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
-										{
-											public void customResultAvailable(IResourceIdentifier rid)
-											{
-												if(deprid!=null)
-												{
-													ls.addResourceIdentifier(rid, deprid, true).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
-													{
-														public void customResultAvailable(IResourceIdentifier rid)
-														{
-															ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-														}
-													});
-												}
-												else
-												{
-													ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-												}
-											}
-											public void exceptionOccurred(Exception exception)
-											{
-												exception.printStackTrace();
-												super.exceptionOccurred(exception);
-											}
-										});
-									}
-								});
-							}
-						});
-						
-						return ret;
-					}
-				}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
+				SRemoteGui.addURL(exta, filename)
+					.addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
 				{
 					public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
 					{
@@ -694,57 +558,7 @@ public class ModelTreePanel extends FileTreePanel
 	 */
 	public static IFuture<IResourceIdentifier> createResourceIdentifier(IExternalAccess exta, final String filename)
 	{
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		
-//		ret.addResultListener(new IResultListener<IResourceIdentifier>()
-//		{
-//			public void resultAvailable(IResourceIdentifier result)
-//			{
-//				System.out.println("try loading with:"+result);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//			}
-//		});
-		
-//		System.out.println("rid a:"+filename);
-//		System.out.println("platform access: "+jcc.getPlatformAccess().getComponentIdentifier().getName());
-//		System.out.println("local access: "+jcc.getJCCAccess().getComponentIdentifier().getName());
-		
-		exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
-		{
-			@Classname("createRid")
-			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
-			{
-				final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-				
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
-				{
-					public void customResultAvailable(ILibraryService ls)
-					{
-						// Must be done on remote site as SUtil.toURL() uses new File()
-						final URL url = SUtil.toURL(filename);
-//						System.out.println("url: "+filename);
-						ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
-					}
-				}));
-				
-				return ret;
-			}
-		}).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
-		
-//		
-//		ret.addResultListener(new DefaultResultListener<IResourceIdentifier>()
-//		{
-//			public void resultAvailable(IResourceIdentifier result)
-//			{
-//				System.out.println("rid b:"+result);
-//			}
-//		});
-		
-		return ret;
+		return SRemoteGui.createResourceIdentifier(exta, filename, null);
 	}
 	
 	protected abstract class ModelTreeAbstraction implements ITreeAbstraction

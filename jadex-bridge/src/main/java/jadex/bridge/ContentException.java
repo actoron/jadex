@@ -14,6 +14,7 @@ public class ContentException extends RuntimeException
 	public ContentException(String msg)
 	{
 		super(msg);
+		System.out.println(this);
 	}
 	
 	/**
@@ -22,5 +23,6 @@ public class ContentException extends RuntimeException
 	public ContentException(String msg, Throwable cause)
 	{
 		super(msg, cause);
+		System.out.println(this);
 	}
 }

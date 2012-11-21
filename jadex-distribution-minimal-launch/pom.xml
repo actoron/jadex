@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jadex-distribution-minimal-launch</artifactId>
+	<packaging>jar</packaging>
+	<name>jadex-distribution-minimal-launch</name>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-parent</artifactId>
+		<version> 2.3-SNAPSHOT </version>
+		<relativePath>../jadex-parent/pom.xml</relativePath>
+	</parent>
+
+	<description>
+		The Jadex launch package facilitates
+		executing the Jadex minimal platform.
+	</description>
+	<!-- 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+        		<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<useUniqueVersions>false</useUniqueVersions>
+							<mainClass>jadex.base.Starter</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+ -->
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-distribution-minimal</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	
+</project>

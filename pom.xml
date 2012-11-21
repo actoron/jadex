@@ -608,6 +608,20 @@
 			</modules>
 		</profile>
 		
+		<!-- ======== Minimal launch config ======== -->
+		
+		<profile>
+		    <id>jadex-distribution-minimal-launch</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-distribution-minimal-launch</exists>
+	            </file>
+	        </activation>
+ 	        <modules>
+				<module>jadex-distribution-minimal-launch</module>
+		    </modules>
+		</profile>
+		
 		<!-- ======== Minimal distribution ======== -->
 		
 		<profile>
@@ -622,7 +636,7 @@
 		    </modules>
 		</profile>
 		
-		<!-- ======== Standard distribution ======== -->
+				<!-- ======== Standard distribution ======== -->
 		
 		<profile>
 		    <id>jadex-distribution-standard</id>

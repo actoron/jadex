@@ -14,21 +14,17 @@ import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -36,7 +32,6 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -260,48 +255,16 @@ public class ComponentTreePanel extends JSplitPane
 							{
 								final IComponentIdentifier cid = (IComponentIdentifier)result;
 								
-								access.scheduleStep(new IComponentStep<Void>()
+								killComponent(access, cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 								{
-									@Classname("proxykill")
-									public IFuture<Void>	execute(IInternalAccess ia)
+									public void	customResultAvailable(Object o)
 									{
-										SServiceProvider.getService(ia.getServiceContainer(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//										ia.getRequiredService("rms")
-											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+										if(sel.getParent()!=null)
 										{
-											public void customResultAvailable(Object result)
-											{
-												IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-												
-												rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-												{
-													public void customResultAvailable(Object result)
-													{
-														final IComponentManagementService rcms = (IComponentManagementService)result;
-														rcms.destroyComponent(cid);
-														if(sel.getParent()!=null)
-														{
-															((AbstractTreeNode)sel.getParent()).removeChild(sel);
-														}
-														
-														// Hack!!! Result will not be received when remote comp is platform. 
-		//													.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-		//												{
-		//													public void customResultAvailable(Object source, Object result)
-		//													{
-		//														if(sel.getParent()!=null)
-		//														{
-		//															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-		//														}
-		//													}
-		//												});
-													}
-												});
-											}
-										});
-										return IFuture.DONE;
+											((AbstractTreeNode)sel.getParent()).removeChild(sel);
+										}										
 									}
-								});								
+								});
 							}
 						});
 					}
@@ -849,18 +812,8 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		});
 
-		access.scheduleStep(new IComponentStep<IComponentManagementService>()
-		{
-			@Classname("init")
-			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
-			{
-				final Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				ia.getRequiredService("cms")
-					.addResultListener(new DelegationResultListener(ret));
-				return ret;
-			}
-		}).addResultListener(new DefaultResultListener<IComponentManagementService>()
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService result)
 			{
@@ -1236,6 +1189,31 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		}
+		return ret;
+	}
+
+	
+	/**
+	 *  Kill a proxy
+	 */
+	protected static IFuture<Void>	killComponent(IExternalAccess access, final IComponentIdentifier cid)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.destroyComponent(cid)
+					.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+				{
+					public void customResultAvailable(Map<String, Object> result)
+					{
+						ret.setResult(null);
+					}
+				});
+			}
+		});
 		return ret;
 	}
 }

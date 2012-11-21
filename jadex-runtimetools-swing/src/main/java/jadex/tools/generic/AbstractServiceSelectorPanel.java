@@ -1,17 +1,11 @@
 package jadex.tools.generic;
 
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,37 +46,8 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		// Hack!!! Search locally at (potentially remote) platform, as scope global is set to platform when transferring search request.
 		final Class<IService>	type	= (Class<IService>)servicetype;
 		final String	scope	= isRemote() ? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM;
-		platform.scheduleStep(new IComponentStep<Collection<IService>>()
-		{
-			@Classname("search-services")
-//			public IFuture<Collection<IService>> execute(IInternalAccess ia)
-			public IIntermediateFuture<IService> execute(IInternalAccess ia)
-			{
-				IIntermediateFuture<IService> fut = SServiceProvider.getServices(ia.getServiceContainer(), type, scope);
-				
-//				fut.addResultListener(new IIntermediateResultListener<IService>()
-//				{
-//					public void resultAvailable(Collection<IService> result)
-//					{
-//						System.out.println("ra: "+result);
-//					}
-//					public void intermediateResultAvailable(IService result)
-//					{
-//						System.out.println("found: "+result);
-//					}
-//					public void finished()
-//					{
-//						System.out.println("fini");
-//					}
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						System.out.println("ex: "+exception);
-//					}
-//				});
-				
-				return fut;
-			}
-		}).addResultListener(new SwingIntermediateResultListener<IService>(new IIntermediateResultListener<IService>()
+		SServiceProvider.getServices(platform.getServiceProvider(), type, scope)
+			.addResultListener(new SwingIntermediateResultListener<IService>(new IIntermediateResultListener<IService>()
 		{
 			boolean first = true;
 			public void intermediateResultAvailable(IService result)

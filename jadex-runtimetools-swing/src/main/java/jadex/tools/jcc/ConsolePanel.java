@@ -1,22 +1,15 @@
 package jadex.tools.jcc;
 
-import jadex.bridge.IComponentStep;
+import jadex.base.SRemoteGui;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -139,39 +132,7 @@ public class ConsolePanel extends JPanel
 					history.remove(history.size()-1);
 				hpos[0] = 0;
 				in.setText("");
-				platformaccess.scheduleImmediate(new IComponentStep<Void>()
-				{
-					@Classname("redir")
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						SServiceProvider.getService(ia.getServiceContainer(), IDaemonThreadPoolService.class)
-							.addResultListener(ia.createResultListener(new IResultListener<IDaemonThreadPoolService>()
-						{
-							public void resultAvailable(IDaemonThreadPoolService tp)
-							{
-								proceed(tp);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								proceed(null);
-							}
-							
-							protected void proceed(IThreadPool tp)
-							{
-								try
-								{
-									SUtil.getOutForSystemIn(tp).write(txt.getBytes());
-								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-								}
-							}
-						}));
-						return IFuture.DONE;
-					}
-				});
+				SRemoteGui.redirectInput(platformaccess, txt);
 			}
 		});
 		in.addKeyListener(new KeyListener()
@@ -303,18 +264,8 @@ public class ConsolePanel extends JPanel
 			onoff.setToolTipText("Turn on the console");
 			if(!label.getText().endsWith(" (off)"))
 				label.setText(label.getText()+" (off)");
-			
-			platformaccess.scheduleImmediate(new IComponentStep<Void>()
-			{
-				@Classname("removeListener")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					ConsoleListener	cl	= new ConsoleListener(id, ia, null);
-					SUtil.removeSystemOutListener(cl);
-					SUtil.removeSystemErrListener(cl);
-					return IFuture.DONE;
-				}
-			});
+
+			SRemoteGui.removeConsoleListener(platformaccess, id);
 		}
 		else
 		{
@@ -362,17 +313,7 @@ public class ConsolePanel extends JPanel
 				}
 			};
 			
-			platformaccess.scheduleImmediate(new IComponentStep<Void>()
-			{
-				@Classname("installListener")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					ConsoleListener	cl	= new ConsoleListener(id, ia, rcl);
-					SUtil.addSystemOutListener(cl);
-					SUtil.addSystemErrListener(cl);
-					return IFuture.DONE;
-				}
-			});
+			SRemoteGui.addConsoleListener(platformaccess, id, rcl);
 			
 			onoff.setIcon(icons.getIcon("off"));
 			onoff.setToolTipText("Turn off the console");
@@ -399,74 +340,7 @@ public class ConsolePanel extends JPanel
 			setConsoleEnabled(false);
 		sdout.close();
 		sderr.close();
-	}
-	
-	//-------- helper classes --------
-	
-	public static class	ConsoleListener	extends RemoteChangeListenerHandler	implements IChangeListener
-	{
-		//-------- constants --------
-		
-		/** The limit of characters sent in one event. */
-		public static final int LIMIT	= 1;//4096;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a console listener.
-		 */
-		public ConsoleListener(String id, IInternalAccess instance, IRemoteChangeListener rcl)
-		{
-			super(id, instance, rcl);
-		}
-		
-		//-------- IChangeListener interface --------
-		
-		/**
-		 *  Called when a change occurs.
-		 *  @param event The event.
-		 */
-		public void changeOccurred(final ChangeEvent event)
-		{
-			instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					// Merge new output with last output, if not yet sent.
-					boolean	merged	= false;
-					ArrayList	list	= (ArrayList)occurred.get(event.getType()); 
-					if(list!=null && !list.isEmpty())
-					{
-						String	val	= (String)list.get(list.size()-1);
-						if(val.length()<LIMIT)
-						{
-							val	+= "\n"+event.getValue();
-							list.set(list.size()-1, val);
-							merged	= true;
-						}
-					}
-					
-					if(!merged)
-						occurrenceAppeared(event.getType(), event.getValue());
-					
-					return IFuture.DONE;
-				}
-			});
-		}
-		
-		//-------- RemoteChangeListenerHandler methods --------
-		
-		/**
-		 *  Remove local listeners.
-		 */
-		protected void dispose()
-		{
-			super.dispose();
-			
-			SUtil.removeSystemOutListener(this);
-			SUtil.removeSystemErrListener(this);
-		}
-	}
+	}	
 }
 
 

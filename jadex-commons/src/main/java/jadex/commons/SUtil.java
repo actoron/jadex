@@ -28,7 +28,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1839,7 +1838,7 @@ public class SUtil
 	/**
 	 * 
 	 */
-	private static void testIntByteConversion()
+	protected static void testIntByteConversion()
 	{
 		Random	rnd	= new Random(123);	
 		for(int i=1; i<10000000; i++)

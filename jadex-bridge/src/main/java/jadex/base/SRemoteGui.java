@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
@@ -17,20 +18,28 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.factory.SComponentFactory;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *  Helper class for GUI code to be executed on remote
@@ -254,5 +263,287 @@ public class SRemoteGui
 				return new Future<FileData>(new FileData(new File(SUtil.convertPathToRelative(path))));
 			}
 		});		
+	}
+	
+	/**
+	 *  Add a URL to the lib service.
+	 */
+	public static IFuture<Tuple2<URL, IResourceIdentifier>>	addURL(IExternalAccess access, final String filename)
+	{
+		return access.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
+		{
+			@Classname("addurl")
+			public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
+			{
+				final URL	url	= SUtil.toURL(filename);
+				final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
+				ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+				{
+					public void customResultAvailable(final ILibraryService ls)
+					{
+						ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, Tuple2<URL, IResourceIdentifier>>(ret)
+						{
+							public void customResultAvailable(List<IResourceIdentifier> rids)
+							{
+//								System.out.println("rids are: "+rids);
+								
+								// this ugly piece of code checks if test-classes are added
+								// in this case it searched if the original package was also added
+								// and if yes it is added as dependency to the test-package
+								// this makes the necessary classes available for the test case
+								
+								String suftc = "test-classes";
+								String s2 = url.toString();
+								if(s2.endsWith(suftc))
+									s2 = s2 + "/";
+								suftc = "test-classes/";
+								
+								IResourceIdentifier tmp = null;
+								if(s2.endsWith(suftc) && url.getProtocol().equals("file"))
+								{
+									String st2 = s2.substring(0, s2.lastIndexOf(suftc));
+									for(IResourceIdentifier rid: rids)
+									{
+										if(rid.getLocalIdentifier()!=null)
+										{
+											URL u1 = rid.getLocalIdentifier().getUrl();
+											String s1 = u1.toString();
+											String sufc = "classes";
+											if(s1.endsWith(sufc))
+												s1 = s1 + "/";
+											sufc = "classes/";
+											
+											if(s1.endsWith(sufc) && u1.getProtocol().equals("file"))
+											{
+												String st1 = s1.substring(0, s1.lastIndexOf(sufc));
+												if(st1.equals(st2))
+												{
+													tmp = rid;
+//														System.out.println("url: "+u1.getPath());
+													break;
+												}
+											}
+										}
+									}
+								}
+								final IResourceIdentifier deprid = tmp;
+								
+								// todo: workspace=true?
+								ls.addURL(null, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+								{
+									public void customResultAvailable(IResourceIdentifier rid)
+									{
+										if(deprid!=null)
+										{
+											ls.addResourceIdentifier(rid, deprid, true).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+											{
+												public void customResultAvailable(IResourceIdentifier rid)
+												{
+													ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+												}
+											});
+										}
+										else
+										{
+											ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+										}
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+//										exception.printStackTrace();
+										super.exceptionOccurred(exception);
+									}
+								});
+							}
+						});
+					}
+				});
+				
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Remove a URL from the lib service.
+	 */
+	public static IFuture<Void>	removeURL(IExternalAccess access, final String path)
+	{
+		return access.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("removeURL")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final Future<Void>	ret	= new Future<Void>();
+				ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+				{
+					public void customResultAvailable(ILibraryService ls)
+					{
+						try
+						{
+							ls.removeURL(null, SUtil.toURL(path));
+							ret.setResult(null);
+						}
+						catch(Exception ex)
+						{
+							ret.setException(ex);
+						}
+					}
+				});
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Find an entry in a list of URLs.
+	 *  Tests canonical paths on the remote system.
+	 */
+	public static IFuture<Integer>	findChild(IExternalAccess access, final String toremove, final List<String> filenames)
+	{
+		return access.scheduleStep(new IComponentStep<Integer>()
+		{
+			@Classname("findchild")
+			public IFuture<Integer> execute(IInternalAccess ia)
+			{
+				int ret = SUtil.indexOfFilename(toremove, filenames);
+				return new Future<Integer>(new Integer(ret));
+			}
+		});
+	}
+	public static void redirectInput(IExternalAccess access, final String txt)
+	{
+		access.scheduleImmediate(new IComponentStep<Void>()
+		{
+			@Classname("redir")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				SServiceProvider.getService(ia.getServiceContainer(), IDaemonThreadPoolService.class)
+					.addResultListener(ia.createResultListener(new IResultListener<IDaemonThreadPoolService>()
+				{
+					public void resultAvailable(IDaemonThreadPoolService tp)
+					{
+						proceed(tp);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						proceed(null);
+					}
+					
+					protected void proceed(IThreadPool tp)
+					{
+						try
+						{
+							SUtil.getOutForSystemIn(tp).write(txt.getBytes());
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}));
+				return IFuture.DONE;
+			}
+		});		
+	}
+	
+	public static void addConsoleListener(IExternalAccess platformaccess, final String id, final IRemoteChangeListener rcl)
+	{
+		platformaccess.scheduleImmediate(new IComponentStep<Void>()
+		{
+			@Classname("installListener")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ConsoleListener	cl	= new ConsoleListener(id, ia, rcl);
+				SUtil.addSystemOutListener(cl);
+				SUtil.addSystemErrListener(cl);
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	public static void removeConsoleListener(IExternalAccess platformaccess, final String id)
+	{
+		platformaccess.scheduleImmediate(new IComponentStep<Void>()
+		{
+			@Classname("removeListener")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ConsoleListener	cl	= new ConsoleListener(id, ia, null);
+				SUtil.removeSystemOutListener(cl);
+				SUtil.removeSystemErrListener(cl);
+				return IFuture.DONE;
+			}
+		});
+	}
+
+	//-------- helper classes --------
+	
+	public static class	ConsoleListener	extends RemoteChangeListenerHandler	implements IChangeListener
+	{
+		//-------- constants --------
+		
+		/** The limit of characters sent in one event. */
+		public static final int LIMIT	= 1;//4096;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a console listener.
+		 */
+		public ConsoleListener(String id, IInternalAccess instance, IRemoteChangeListener rcl)
+		{
+			super(id, instance, rcl);
+		}
+		
+		//-------- IChangeListener interface --------
+		
+		/**
+		 *  Called when a change occurs.
+		 *  @param event The event.
+		 */
+		public void changeOccurred(final ChangeEvent event)
+		{
+			instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					// Merge new output with last output, if not yet sent.
+					boolean	merged	= false;
+					ArrayList	list	= (ArrayList)occurred.get(event.getType()); 
+					if(list!=null && !list.isEmpty())
+					{
+						String	val	= (String)list.get(list.size()-1);
+						if(val.length()<LIMIT)
+						{
+							val	+= "\n"+event.getValue();
+							list.set(list.size()-1, val);
+							merged	= true;
+						}
+					}
+					
+					if(!merged)
+						occurrenceAppeared(event.getType(), event.getValue());
+					
+					return IFuture.DONE;
+				}
+			});
+		}
+		
+		//-------- RemoteChangeListenerHandler methods --------
+		
+		/**
+		 *  Remove local listeners.
+		 */
+		protected void dispose()
+		{
+			super.dispose();
+			
+			SUtil.removeSystemOutListener(this);
+			SUtil.removeSystemErrListener(this);
+		}
 	}
 }
