@@ -159,7 +159,7 @@ public class RelayServlet extends HttpServlet
 			}
 			else if("/platforminfos".equals(request.getServletPath()) || "/platforminfos/".equals(request.getServletPath()))	// new code always adds slash.
 			{
-				handler.handleAwareness(request.getInputStream());
+				handler.handlePlatforms(request.getInputStream());
 			}
 			else
 			{

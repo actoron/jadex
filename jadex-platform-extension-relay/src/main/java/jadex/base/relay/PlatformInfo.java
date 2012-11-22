@@ -382,7 +382,10 @@ public class PlatformInfo
 		if(awainfo!=null)
 		{
 			setProperties(awainfo.getProperties());
-			StatsDB.getDB().save(this);
+			if(dbid==null || dbid.intValue()!=-1)
+			{
+				StatsDB.getDB().save(this);
+			}
 		}
 	}
 	
