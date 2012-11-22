@@ -283,13 +283,14 @@ public class RelayHandler
 				catch(Exception e)
 				{
 					// timeout or platform just disconnected
+					e.printStackTrace();
 				}
 			}
 		}
 		
 		if(!sent)
 		{
-			throw new RuntimeException("message not sent");
+			throw new RuntimeException("message not sent: "+targetid+", "+targetpi);
 		}
 	}
 	
@@ -299,7 +300,7 @@ public class RelayHandler
 	public void handleAwareness(InputStream in) throws Exception
 	{
 		// Read dummy target id.
-		String	id	= readString(in);
+		readString(in);
 		
 		// Read total message length.
 		byte[]	len	= readData(in, 4);
@@ -387,7 +388,7 @@ public class RelayHandler
 			if(peer!=null && !peer.isSent())
 			{
 				peer.setSent(true);
-				
+				sendPlatformInfos(peer, getCurrentPlatforms());
 			}
 		}
 		return peers.getURLs(requesturl);
@@ -554,7 +555,7 @@ public class RelayHandler
 			}
 		}
 
-		// Distribute awareness info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
+		// Distribute platform info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
 		if(platform!=null)
 		{
 			byte[]	peerinfo	= null;
@@ -563,24 +564,7 @@ public class RelayHandler
 			{
 				if(peer.isConnected())
 				{
-					if(peerinfo==null)
-					{
-						Map<String, Object>	message	= new HashMap<String, Object>();
-						message.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
-						message.put(SFipa.CONTENT, awainfo);
-						MessageEnvelope	msg	= new MessageEnvelope(message, null, null);
-						peerinfo	= MapSendTask.encodeMessage(msg, pcodecs, getClass().getClassLoader());
-					}
-					
-					try
-					{
-						System.out.println("Sending awareness to peer: "+peer.getURL());
-						new RelayConnectionManager().postMessage(peer.getURL()+"awareness", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-					}
-					catch(IOException e)
-					{
-						System.out.println("Error sending awareness to peer: "+e);
-					}
+					sendPlatformInfos(peer, new PlatformInfo[]{platform});
 				}
 			}					
 		}
