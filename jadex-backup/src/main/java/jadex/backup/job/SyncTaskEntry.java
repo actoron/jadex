@@ -1,6 +1,6 @@
 package jadex.backup.job;
 
-import jadex.backup.resource.FileInfo;
+import jadex.backup.resource.FileMetaInfo;
 import jadex.commons.SUtil;
 
 /**
@@ -17,10 +17,10 @@ public class SyncTaskEntry
 	protected String taskid;
 	
 	/** The local file info. */
-	protected FileInfo localfi;
+	protected FileMetaInfo localfi;
 	
 	/** The remote file info. */
-	protected FileInfo remotefi;
+	protected FileMetaInfo remotefi;
 	
 	/** The type. */
 	protected String type;
@@ -41,7 +41,7 @@ public class SyncTaskEntry
 	/**
 	 * 
 	 */
-	public SyncTaskEntry(Task task, FileInfo localfi, FileInfo remotefi, String type, String action)
+	public SyncTaskEntry(Task task, FileMetaInfo localfi, FileMetaInfo remotefi, String type, String action)
 	{
 		this.taskid = task.getId();
 		this.id = SUtil.createUniqueId("entry");
@@ -86,7 +86,7 @@ public class SyncTaskEntry
 	 *  Get the local file info.
 	 *  @return The file info.
 	 */
-	public FileInfo getLocalFileInfo()
+	public FileMetaInfo getLocalFileInfo()
 	{
 		return localfi;
 	}
@@ -95,7 +95,7 @@ public class SyncTaskEntry
 	 *  Set the local file info.
 	 *  @param fi The file info to set.
 	 */
-	public void setLocalFileInfo(FileInfo fi)
+	public void setLocalFileInfo(FileMetaInfo fi)
 	{
 		this.localfi = fi;
 	}
@@ -104,7 +104,7 @@ public class SyncTaskEntry
 	 *  Get the remote file info.
 	 *  @return The file info.
 	 */
-	public FileInfo getRemoteFileInfo()
+	public FileMetaInfo getRemoteFileInfo()
 	{
 		return remotefi;
 	}
@@ -113,7 +113,7 @@ public class SyncTaskEntry
 	 *  Set the remote file info.
 	 *  @param fi The file info to set.
 	 */
-	public void setRemoteFileInfo(FileInfo fi)
+	public void setRemoteFileInfo(FileMetaInfo fi)
 	{
 		this.localfi = fi;
 	}

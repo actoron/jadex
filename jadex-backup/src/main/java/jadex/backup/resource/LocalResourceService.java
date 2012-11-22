@@ -65,9 +65,9 @@ public class LocalResourceService	implements ILocalResourceService
 		}
 		else
 		{
-			remote.getFileInfo("/").addResultListener(new ExceptionDelegationResultListener<FileInfo, Collection<BackupEvent>>(ret)
+			remote.getFileInfo("/").addResultListener(new ExceptionDelegationResultListener<FileMetaInfo, Collection<BackupEvent>>(ret)
 			{
-				public void customResultAvailable(FileInfo result)
+				public void customResultAvailable(FileMetaInfo result)
 				{
 					List<StackElement>	stack	= new ArrayList<StackElement>();
 					stack.add(new StackElement(result));
@@ -88,7 +88,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 *  @return Status events while the file is being downloaded.
 	 *  @throws Exception, e.g. when local or remote file have changed after the last scan.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent> updateFromRemote(IResourceService remote, final FileInfo localfi, final FileInfo remotefi)
+	public ITerminableIntermediateFuture<BackupEvent> updateFromRemote(IResourceService remote, final FileMetaInfo localfi, final FileMetaInfo remotefi)
 	{
 		final TerminableIntermediateFuture<BackupEvent>	ret	= new TerminableIntermediateFuture<BackupEvent>(); 
 		
@@ -96,13 +96,13 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("Resource id differs: "+remote.getResourceId())); 
 		}
-		else if(localfi!=null && !localfi.getLocation().equals(remotefi.getLocation()))
+		else if(localfi!=null && !localfi.getPath().equals(remotefi.getPath()))
 		{
-			ret.setException(new RuntimeException("File location differs: "+localfi.getLocation())); 
+			ret.setException(new RuntimeException("File location differs: "+localfi.getPath())); 
 		}
-		else if(!getResource().isCurrent(remotefi.getLocation(), localfi))
+		else if(!getResource().isCurrent(remotefi.getPath(), localfi))
 		{
-			ret.setException(new RuntimeException("Local file has changed: "+localfi.getLocation()));
+			ret.setException(new RuntimeException("Local file has changed: "+localfi.getPath()));
 		}
 		else if(remotefi.isExisting())
 		{
@@ -153,7 +153,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 *  @return Status events of the override operation.
 	 *  @throws Exception when local or remote file have changed after the last scan.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent> overrideRemoteChange(IResourceService remote, FileInfo localfi, FileInfo remotefi)
+	public ITerminableIntermediateFuture<BackupEvent> overrideRemoteChange(IResourceService remote, FileMetaInfo localfi, FileMetaInfo remotefi)
 	{
 		final TerminableIntermediateFuture<BackupEvent>	ret	= new TerminableIntermediateFuture<BackupEvent>(); 
 		
@@ -161,9 +161,9 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("Resource id differs: "+remote.getResourceId())); 
 		}
-		else if(localfi!=null && !localfi.getLocation().equals(remotefi.getLocation()))
+		else if(localfi!=null && !localfi.getPath().equals(remotefi.getPath()))
 		{
-			ret.setException(new RuntimeException("File location differs: "+localfi.getLocation())); 
+			ret.setException(new RuntimeException("File location differs: "+localfi.getPath())); 
 		}
 		else
 		{
@@ -192,7 +192,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 *  @return Status events while the file is being downloaded.
 	 *  @throws Exception, e.g. when local or remote file have changed after the last scan.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent> updateAsCopy(IResourceService remote, final FileInfo localfi, final FileInfo remotefi)
+	public ITerminableIntermediateFuture<BackupEvent> updateAsCopy(IResourceService remote, final FileMetaInfo localfi, final FileMetaInfo remotefi)
 	{
 		final TerminableIntermediateFuture<BackupEvent>	ret	= new TerminableIntermediateFuture<BackupEvent>(); 
 		
@@ -200,13 +200,13 @@ public class LocalResourceService	implements ILocalResourceService
 		{
 			ret.setException(new RuntimeException("Resource id differs: "+remote.getResourceId())); 
 		}
-		else if(localfi!=null && !localfi.getLocation().equals(remotefi.getLocation()))
+		else if(localfi!=null && !localfi.getPath().equals(remotefi.getPath()))
 		{
-			ret.setException(new RuntimeException("File location differs: "+localfi.getLocation())); 
+			ret.setException(new RuntimeException("File location differs: "+localfi.getPath())); 
 		}
-		else if(!getResource().isCurrent(remotefi.getLocation(), localfi))
+		else if(!getResource().isCurrent(remotefi.getPath(), localfi))
 		{
-			ret.setException(new RuntimeException("Local file has changed: "+localfi.getLocation()));
+			ret.setException(new RuntimeException("Local file has changed: "+localfi.getPath()));
 		}
 		else if(remotefi.isExisting())
 		{
@@ -251,11 +251,10 @@ public class LocalResourceService	implements ILocalResourceService
 	/**
 	 *  Get the managed resource. 
 	 */
-	protected BackupResource	getResource()
+	protected IBackupResource	getResource()
 	{
 		return ((ResourceProviderAgent)((IPojoMicroAgent)agent).getPojoAgent()).getResource();
 	}
-	
 	
 	/**
 	 *  Incrementally scan a remote resource for changes.
@@ -299,17 +298,17 @@ public class LocalResourceService	implements ILocalResourceService
 			{
 				top.setSubfiles(new ArrayList<StackElement>());
 				// Always update (hack?)
-				if(top.getFileInfo().isDirectory())
+				if(top.getFileInfo().getData().isDirectory())
 				{
 					// Currently only recurses into directory contents (todo: directory update i.e. deletion of files)
-					ret.addIntermediateResultIfUndone(new BackupEvent(BackupResource.FILE_UNCHANGED, top.getFileInfo())); // todo: dir events?
-					remote.getDirectoryContents(top.getFileInfo()).addResultListener(new IResultListener<Collection<FileInfo>>()
+					ret.addIntermediateResultIfUndone(new BackupEvent(IBackupResource.FILE_UNCHANGED, top.getFileInfo())); // todo: dir events?
+					remote.getDirectoryContents(top.getFileInfo()).addResultListener(new IResultListener<Collection<FileMetaInfo>>()
 					{
-						public void resultAvailable(Collection<FileInfo> result)
+						public void resultAvailable(Collection<FileMetaInfo> result)
 						{
 							final StackElement	top	= stack.get(stack.size()-1);
 							
-							for(FileInfo fi: result)
+							for(FileMetaInfo fi: result)
 							{
 								top.getSubfiles().add(new StackElement(fi));
 							}
@@ -326,7 +325,7 @@ public class LocalResourceService	implements ILocalResourceService
 				}
 				else
 				{
-					Tuple2<FileInfo, String> state = getResource().getState(top.getFileInfo());
+					Tuple2<FileMetaInfo, String> state = getResource().getState(top.getFileInfo());
 					ret.addIntermediateResultIfUndone(new BackupEvent(state.getSecondEntity(), state.getFirstEntity(), top.getFileInfo(), 0));
 					doScan(remote, ret, stack);
 				}
@@ -341,7 +340,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 *  @param ret	The intermediate future to post download events.
 	 *  @return The temporary location where the file was downloaded to.
 	 */
-	protected IFuture<File>	downloadFile(final IResourceService remote, final FileInfo remotefi, final TerminableIntermediateFuture<BackupEvent> ret)
+	protected IFuture<File>	downloadFile(final IResourceService remote, final FileMetaInfo remotefi, final TerminableIntermediateFuture<BackupEvent> ret)
 	{
 		final Future<File>	fut	= new Future<File>(); 
 		remote.getFileContents(remotefi).addResultListener(new ExceptionDelegationResultListener<IInputConnection, Collection<BackupEvent>>(ret)
@@ -352,7 +351,7 @@ public class LocalResourceService	implements ILocalResourceService
 				{
 					try
 					{
-						final File	tmp	= getResource().getTempLocation(remotefi.getLocation(), remote);
+						final File	tmp	= getResource().getTempLocation(remotefi.getPath(), remote);
 						FileOutputStream	fos	= new FileOutputStream(tmp);
 						final ISubscriptionIntermediateFuture<Long>	write	= icon.writeToOutputStream(fos, agent.getExternalAccess());
 						write.addResultListener(new IntermediateExceptionDelegationResultListener<Long, Collection<BackupEvent>>(ret)
@@ -369,7 +368,7 @@ public class LocalResourceService	implements ILocalResourceService
 								{
 									if(time==0 || System.currentTimeMillis()-time>1000)
 									{
-										ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.DOWNLOAD_STATE, null, remotefi, new Double(result.doubleValue()/remotefi.getSize())));
+										ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.DOWNLOAD_STATE, null, remotefi, new Double(result.doubleValue()/remotefi.getData().getSize())));
 										time = System.currentTimeMillis();
 									}
 								}

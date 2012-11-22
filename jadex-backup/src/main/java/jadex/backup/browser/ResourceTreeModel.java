@@ -1,6 +1,6 @@
 package jadex.backup.browser;
 
-import jadex.backup.resource.FileInfo;
+import jadex.backup.resource.FileMetaInfo;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -95,7 +95,7 @@ public class ResourceTreeModel	implements TreeModel
 	 */
 	public boolean isLeaf(Object node)
 	{
-		return node instanceof Tuple2 && !((FileInfo)((Tuple2<?,?>)node).getFirstEntity()).isDirectory();
+		return node instanceof Tuple2 && !((FileMetaInfo)((Tuple2<?,?>)node).getFirstEntity()).getData().isDirectory();
 	}
 	
 	/**
@@ -146,19 +146,19 @@ public class ResourceTreeModel	implements TreeModel
 			// To find top-level nodes start global resource search.
 			if(ROOT.equals(node))
 			{
-				final List<Tuple2<FileInfo, IResourceService>>	found	= new ArrayList<Tuple2<FileInfo, IResourceService>>();
+				final List<Tuple2<FileMetaInfo, IResourceService>>	found	= new ArrayList<Tuple2<FileMetaInfo, IResourceService>>();
 				IIntermediateFuture<IResourceService>	fut	= SServiceProvider.getServices(ea.getServiceProvider(), IResourceService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 				fut.addResultListener(new IntermediateDefaultResultListener<IResourceService>()
 				{
 					public void intermediateResultAvailable(final IResourceService remote)
 					{
-						remote.getFileInfo("/").addResultListener(new DefaultResultListener<FileInfo>()
+						remote.getFileInfo("/").addResultListener(new DefaultResultListener<FileMetaInfo>()
 						{
-							public void resultAvailable(FileInfo fi)
+							public void resultAvailable(FileMetaInfo fi)
 							{
 								synchronized(found)
 								{
-									found.add(new Tuple2<FileInfo, IResourceService>(fi, remote));
+									found.add(new Tuple2<FileMetaInfo, IResourceService>(fi, remote));
 								}
 							}
 						});
@@ -184,19 +184,19 @@ public class ResourceTreeModel	implements TreeModel
 			{
 				ret	= new ArrayList<Object>();
 				final Tuple2<?,?>	res	= (Tuple2<?,?>)node;
-				FileInfo	fi	= (FileInfo)res.getFirstEntity();
+				FileMetaInfo	fi	= (FileMetaInfo)res.getFirstEntity();
 				IResourceService	remote	= (IResourceService)res.getSecondEntity();
 				try
 				{
 					// Hack!!! Block swing thread until results are available
-					if(fi.isDirectory())
+					if(fi.getData().isDirectory())
 					{
-						Collection<FileInfo>	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
-						for(FileInfo tmp : list)
+						Collection<FileMetaInfo>	list	= remote.getDirectoryContents(fi).get(new ThreadSuspendable(), 3000);
+						for(FileMetaInfo tmp : list)
 						{
 							if(tmp.isExisting())
 							{
-								ret.add(new Tuple2<FileInfo, IResourceService>(tmp, remote));
+								ret.add(new Tuple2<FileMetaInfo, IResourceService>(tmp, remote));
 							}
 						}
 					}

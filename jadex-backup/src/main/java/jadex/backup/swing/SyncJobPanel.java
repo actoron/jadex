@@ -189,7 +189,7 @@ public class SyncJobPanel extends JPanel
 							}
 							else if(column==2)
 							{
-								ret = obj.getRemoteFileInfo().getLocation();
+								ret = obj.getRemoteFileInfo().getPath();
 							}
 							else if(column==3)
 							{
@@ -352,7 +352,7 @@ public class SyncJobPanel extends JPanel
 								if(entry!=null)
 								{
 									entry.setDone(ev.getDone());
-									System.out.println("updated done: "+entry.getRemoteFileInfo().getLocation()+" "+ev.getDone());
+									System.out.println("updated done: "+entry.getRemoteFileInfo().getPath()+" "+ev.getDone());
 									break;
 								}
 							}

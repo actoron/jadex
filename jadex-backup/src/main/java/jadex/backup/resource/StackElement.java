@@ -10,7 +10,7 @@ public class StackElement
 	//-------- attributes --------
 	
 	/** The remote file info. */
-	protected FileInfo	fi;
+	protected FileMetaInfo	fi;
 	
 	/** The list of children to be processed (for directories). */
 	protected List<StackElement>	subfiles;
@@ -23,7 +23,7 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(FileInfo fi)
+	public StackElement(FileMetaInfo fi)
 	{
 		this.fi	= fi;
 	}
@@ -33,7 +33,7 @@ public class StackElement
 	/**
 	 *  Get the file info.
 	 */
-	public FileInfo getFileInfo()
+	public FileMetaInfo getFileInfo()
 	{
 		return fi;
 	}
@@ -77,6 +77,6 @@ public class StackElement
 	 */
 	public String toString()
 	{
-		return fi.getLocation();
+		return fi.getPath();
 	}
 }

@@ -25,10 +25,10 @@ public class BackupEvent
 	protected String	type;
 	
 	/** The local file info. */
-	protected FileInfo localfi;
+	protected FileMetaInfo localfi;
 	
 	/** The remote file info. */
-	protected FileInfo remotefi;
+	protected FileMetaInfo remotefi;
 	
 //	/** The current progress state of the file (0..1) or -1 if atomic event. */
 	protected Object details;
@@ -46,7 +46,7 @@ public class BackupEvent
 	/**
 	 *  Create a new backup event.
 	 */
-	public BackupEvent(String type, FileInfo remotefi)
+	public BackupEvent(String type, FileMetaInfo remotefi)
 	{
 		this(type, null, remotefi, null);
 	}
@@ -54,7 +54,7 @@ public class BackupEvent
 	/**
 	 *  Create a new backup event.
 	 */
-	public BackupEvent(String type, FileInfo localfi, FileInfo remotefi, Object details)
+	public BackupEvent(String type, FileMetaInfo localfi, FileMetaInfo remotefi, Object details)
 	{
 		this.type	= type;
 		this.localfi	= localfi;
@@ -75,7 +75,7 @@ public class BackupEvent
 	/**
 	 *  Get the file.
 	 */
-	public FileInfo getLocalFile()
+	public FileMetaInfo getLocalFile()
 	{
 		return localfi;
 	}
@@ -83,7 +83,7 @@ public class BackupEvent
 	/**
 	 *  Get the remote file.
 	 */
-	public FileInfo getRemoteFile()
+	public FileMetaInfo getRemoteFile()
 	{
 		return remotefi;
 	}
@@ -99,7 +99,7 @@ public class BackupEvent
 	/**
 	 *  Set the file.
 	 */
-	public void setLocalFile(FileInfo fi)
+	public void setLocalFile(FileMetaInfo fi)
 	{
 		this.localfi = fi;
 	}
@@ -107,7 +107,7 @@ public class BackupEvent
 	/**
 	 *  Set the remote file.
 	 */
-	public void setRemoteFile(FileInfo fi)
+	public void setRemoteFile(FileMetaInfo fi)
 	{
 		this.remotefi = fi;
 	}
@@ -132,7 +132,7 @@ public class BackupEvent
 
 	public String toString()
 	{
-		return "BackupEvent [type=" + type + ", file=" + (remotefi!=null ? remotefi.getLocation() : "null") + ", details="+ details + "]";
+		return "BackupEvent [type=" + type + ", file=" + (remotefi!=null ? remotefi.getPath() : "null") + ", details="+ details + "]";
 	}
 
 //	public String toString()

@@ -7,78 +7,101 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-
 /**
- *  Public meta information about a file in a resource
- *  used for transfer between resource providers and clients.
+ * 
  */
-public class FileInfo
+public class FileMetaInfo
 {
-	//-------- attributes --------
-	
 	/** The file location relative to the resource root (using '/' as separator char). */
-	protected String	location;
-	
-	/** True, if the file is a directory. */
-	protected boolean	directory;
+	protected FileData	data;
 	
 	/** True, if the file or directory exists. */
 	protected boolean	exists;
-	
-	/** The file size. */
-	protected long	size;
 	
 	/** The cached vector times as map (transferred as string "platform1@time1.platform2@time2..."). */
 	protected Map<String, Long>	vtimes;
 	
 	/** The cached hash code if any (transferred in base 64 at start of vtime string "hash.platform1@time1..."). */
-	protected String	hash;
+	protected String hash;
 	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a file info.
+	 *  Create a file meta info.
 	 */
-	public FileInfo()
+	public FileMetaInfo()
 	{
 		// bean constructor.
 	}
 	
 	/**
-	 *  Create a file info.
+	 *  Create a file meta info.
 	 */
-	public FileInfo(String location, boolean directory, long size, String vtime)
+	public FileMetaInfo(FileData data, String vtime)
 	{
-		this.location	= location;
-		this.directory	= directory;
+		this.data	= data;
 		this.exists	= parseExists(vtime);
-		this.size	= size;
 		this.vtimes	= parseVTime(vtime);
 	}
 	
 	//-------- bean accessors --------
 	
 	/**
-	 *  Get the location.
-	 *  @return the location.
+	 *  Get the file name. 
 	 */
-	public String getLocation()
+	public String getName()
 	{
-		return location;
-	}
-
-	/**
-	 *  Set the location.
-	 *  @param location The location to set.
-	 */
-	public void setLocation(String location)
-	{
-		this.location = location;
+		String path = data.getPath();
+		String ret = path;
+		int idx = path.lastIndexOf("/");
+		if(idx>0 || (idx==0 && path.length()>1))
+		{
+			ret = path.substring(idx+1, path.length());
+		}
+		return ret;
 	}
 	
 	/**
-	 *  Get the existing state.
-	 *  @return True, if the file or directory exists.
+	 * 
+	 */
+	public String getPath()
+	{
+		return data.getPath();
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get a part of the vector time.
+	 *  @param node	The platform.
+	 *  @return The time (negative for an outdated time stamp).
+	 */
+	public long	getVTime(String node)
+	{
+		return vtimes.containsKey(node) ? vtimes.get(node).longValue() : 0;
+	}
+	
+	/**
+	 *  Get the data.
+	 *  @return The data.
+	 */
+	public FileData getData()
+	{
+		return data;
+	}
+
+	/**
+	 *  Set the data.
+	 *  @param data The data to set.
+	 */
+	public void setData(FileData data)
+	{
+		this.data = data;
+	}
+
+	/**
+	 *  Get the exists.
+	 *  @return The exists.
 	 */
 	public boolean isExisting()
 	{
@@ -86,46 +109,12 @@ public class FileInfo
 	}
 
 	/**
-	 *  Set the existing state.
-	 *  @param exists True, if the file or directory exists.
+	 *  Set the exists.
+	 *  @param exists The exists to set.
 	 */
 	public void setExisting(boolean exists)
 	{
 		this.exists = exists;
-	}
-	
-	/**
-	 *  Get the directory.
-	 *  @return the directory.
-	 */
-	public boolean isDirectory()
-	{
-		return directory;
-	}
-
-	/**
-	 *  Set the directory.
-	 *  @param directory The directory to set.
-	 */
-	public void setDirectory(boolean directory)
-	{
-		this.directory = directory;
-	}
-	
-	/**
-	 *  Get the file size.
-	 */
-	public long	getSize()
-	{
-		return size;
-	}
-	
-	/**
-	 *  Set the file size.
-	 */
-	public void	setSize(long size)
-	{
-		this.size	= size;
 	}
 
 	/**
@@ -144,34 +133,42 @@ public class FileInfo
 		this.vtimes	= parseVTime(vtime);
 	}
 	
+//	/**
+//	 *  Get the vtimes.
+//	 *  @return The vtimes.
+//	 */
+//	public Map<String, Long> getVtimes()
+//	{
+//		return vtimes;
+//	}
+//
+//	/**
+//	 *  Set the vtimes.
+//	 *  @param vtimes The vtimes to set.
+//	 */
+//	public void setVtimes(Map<String, Long> vtimes)
+//	{
+//		this.vtimes = vtimes;
+//	}
+
 	/**
-	 *  Get the hash code if any.
+	 *  Get the hash.
+	 *  @return The hash.
 	 */
 	public String getHash()
 	{
 		return hash;
 	}
-	
+
 	/**
-	 *  Set the hash code.
+	 *  Set the hash.
+	 *  @param hash The hash to set.
 	 */
 	public void setHash(String hash)
 	{
 		this.hash = hash;
 	}
 
-	//-------- methods --------
-	
-	/**
-	 *  Get a part of the vector time.
-	 *  @param node	The platform.
-	 *  @return The time (negative for an outdated time stamp).
-	 */
-	public long	getVTime(String node)
-	{
-		return vtimes.containsKey(node) ? vtimes.get(node).longValue() : 0;
-	}
-	
 	/**
 	 *  Update a part of the vector time and 
 	 *  invalidate other stored times if hash values differ.
@@ -220,18 +217,18 @@ public class FileInfo
 	 *  
 	 *  @param target	The target file info.
 	 */
-	protected boolean	isNewerThan(FileInfo fi)
+	public boolean isNewerThan(FileMetaInfo fmi)
 	{
-		if(!location.equals(fi.getLocation()))
+		if(!data.getPath().equals(fmi.getData().getPath()))
 		{
-			throw new IllegalArgumentException("Location differs: "+fi.getLocation());
+			throw new IllegalArgumentException("Location differs: "+fmi.getData().getPath());
 		}
 		
 		// Local file has not changed wrt remote when
 		// 1: hash values are equal (currently only tested for directories)
 		// 2: a locally valid time stamp is found for which a greater or equal time stamp exists remotely as valid or invalid
 		
-		boolean	changed	= getHash()==null || !getHash().equals(fi.getHash());
+		boolean	changed	= getHash()==null || !getHash().equals(fmi.getHash());
 		if(changed)
 		{
 			for(Iterator<String> it=vtimes.keySet().iterator(); changed && it.hasNext(); )
@@ -240,7 +237,7 @@ public class FileInfo
 				// No match (changed stays true) when:
 				// locally invalid or abs value is larger.
 				long	local	= getVTime(node);
-				long	remote	= fi.getVTime(node);
+				long	remote	= fmi.getVTime(node);
 				changed	= local<=0 || local>Math.abs(remote);
 			}
 		}
@@ -255,11 +252,11 @@ public class FileInfo
 	 *  @param fi	The remote file info, from which which times should be taken.
 	 *  @param valid	Set new valid times as valid (e.g. for update or copy) or all new times as invalid (for override).
 	 */
-	public void	updateVTimes(FileInfo fi, boolean valid)
+	public void	updateVTimes(FileMetaInfo fi, boolean valid)
 	{
-		if(!location.equals(fi.getLocation()))
+		if(!data.getPath().equals(fi.getPath()))
 		{
-			throw new IllegalArgumentException("Location differs: "+fi.getLocation());
+			throw new IllegalArgumentException("Location differs: "+fi.getPath());
 		}
 		
 		Set<String>	nodes	= new HashSet<String>(vtimes.keySet());

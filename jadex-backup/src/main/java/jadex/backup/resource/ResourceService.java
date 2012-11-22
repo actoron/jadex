@@ -76,9 +76,9 @@ public class ResourceService	implements IResourceService
 	 *  @param file	The resource path of the file.
 	 *  @return	The file info with all known time stamps or null if the file does no longer exist.
 	 */
-	public IFuture<FileInfo>	getFileInfo(String file)
+	public IFuture<FileMetaInfo>	getFileInfo(String file)
 	{
-		return new Future<FileInfo>(rpa.getResource().getFileInfo(file));
+		return new Future<FileMetaInfo>(rpa.getResource().getFileInfo(file));
 	}
 	
 	/**
@@ -87,9 +87,9 @@ public class ResourceService	implements IResourceService
 	 *  @return	A list of file infos for files and subdirectories.
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IIntermediateFuture<FileInfo>	getDirectoryContents(FileInfo dir)
+	public IIntermediateFuture<FileMetaInfo>	getDirectoryContents(FileMetaInfo dir)
 	{
-		return new IntermediateFuture<FileInfo>(rpa.getResource().getDirectoryContents(dir));
+		return new IntermediateFuture<FileMetaInfo>(rpa.getResource().getDirectoryContents(dir));
 	}
 	
 	/**
@@ -98,19 +98,18 @@ public class ResourceService	implements IResourceService
 	 *  @return	A list of plain file names (i.e. without path).
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<IInputConnection>	getFileContents(FileInfo file)
+	public IFuture<IInputConnection>	getFileContents(FileMetaInfo file)
 	{
 		Future<IInputConnection>	ret	= new Future<IInputConnection>();
 		try
 		{
-			File	f	= rpa.getResource().getFile(file.getLocation());
-			if(!f.exists() || rpa.getResource().getFileInfo(file.getLocation()).isNewerThan(file))
+			if(rpa.getResource().getFileInfo(file.getPath()).isNewerThan(file))
 			{
-				throw new RuntimeException("Local resource has changed: "+file.getLocation());
+				throw new RuntimeException("Local resource has changed: "+file.getPath());
 			}
 
 			ServiceOutputConnection	soc	= new ServiceOutputConnection();
-			soc.writeFromInputStream(new FileInputStream(rpa.getResource().getFile(file.getLocation())), agent.getExternalAccess());
+			soc.writeFromInputStream(rpa.getResource().getFileData(file.getPath()), agent.getExternalAccess());
 			ret.setResult(soc.getInputConnection());
 		}
 		catch(Exception e)

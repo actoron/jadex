@@ -37,7 +37,7 @@ public interface IResourceService
 	 *  @param file	The resource path of the file.
 	 *  @return	The file info with all known time stamps.
 	 */
-	public IFuture<FileInfo>	getFileInfo(String file);
+	public IFuture<FileMetaInfo>	getFileInfo(String file);
 	
 	/**
 	 *  Get the contents of a directory.
@@ -45,7 +45,7 @@ public interface IResourceService
 	 *  @return	A list of file infos for files and subdirectories.
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IIntermediateFuture<FileInfo>	getDirectoryContents(FileInfo dir);
+	public IIntermediateFuture<FileMetaInfo>	getDirectoryContents(FileMetaInfo dir);
 	
 	/**
 	 *  Get the contents of a file.
@@ -53,5 +53,5 @@ public interface IResourceService
 	 *  @return	A list of plain file names (i.e. without path).
 	 *  @throws Exception if the supplied file info is outdated.
 	 */
-	public IFuture<IInputConnection>	getFileContents(FileInfo dir);
+	public IFuture<IInputConnection>	getFileContents(FileMetaInfo dir);
 }

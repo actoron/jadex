@@ -7,6 +7,7 @@ import jadex.backup.job.SyncTaskEntry;
 import jadex.backup.job.Task;
 import jadex.backup.job.management.IJobManagementService;
 import jadex.backup.resource.BackupEvent;
+import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.ILocalResourceService;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
@@ -40,6 +41,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -112,27 +114,37 @@ public class SyncJobProcessingAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("dir", job.getLocalResource());
-				args.put("id", job.getGlobalResource());
-				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
-				ci.setArguments(args);
-				cms.createComponent(null, "rpa", ci, null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				try
 				{
-					public void customResultAvailable(IComponentIdentifier cid) 
+					Map<String, Object> args = new HashMap<String, Object>();
+//					args.put("dir", job.getLocalResource());
+//					args.put("id", job.getGlobalResource());
+
+					args.put("resource", new BackupResource(job.getGlobalResource(), new File(job.getLocalResource()), agent.getComponentIdentifier()));
+					
+					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
+					ci.setArguments(args);
+					cms.createComponent(null, "rpa", ci, null)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
-						agent.getServiceContainer().getService(ILocalResourceService.class, cid)
-							.addResultListener(new ExceptionDelegationResultListener<ILocalResourceService, Void>(ret)
+						public void customResultAvailable(IComponentIdentifier cid) 
 						{
-							public void customResultAvailable(ILocalResourceService result)
+							agent.getServiceContainer().getService(ILocalResourceService.class, cid)
+								.addResultListener(new ExceptionDelegationResultListener<ILocalResourceService, Void>(ret)
 							{
-								resser = result;
-								ret.setResult(null);
-							}
-						});
-					}
-				});
+								public void customResultAvailable(ILocalResourceService result)
+								{
+									resser = result;
+									ret.setResult(null);
+								}
+							});
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		});
 		

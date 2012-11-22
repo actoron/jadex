@@ -1,6 +1,6 @@
 package jadex.backup.job;
 
-import jadex.backup.resource.BackupResource;
+import jadex.backup.resource.IBackupResource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,18 +57,18 @@ public class SyncProfile
 	static
 	{
 		Map<String, List<String>>	actions	= new LinkedHashMap<String, List<String>>();
-		actions.put(BackupResource.FILE_UNCHANGED, Arrays.asList(new String[]{ACTION_SKIP}));
-		actions.put(BackupResource.FILE_LOCAL_MODIFIED, Arrays.asList(new String[]{ACTION_SKIP, ACTION_REVERT, ACTION_COPY}));
-		actions.put(BackupResource.FILE_REMOTE_MODIFIED, Arrays.asList(new String[]{ACTION_UPDATE, ACTION_SKIP, ACTION_COPY, ACTION_OVERRIDE}));
-		actions.put(BackupResource.FILE_CONFLICT, Arrays.asList(new String[]{ACTION_COPY, ACTION_SKIP, ACTION_UPDATE, ACTION_OVERRIDE}));
+		actions.put(IBackupResource.FILE_UNCHANGED, Arrays.asList(new String[]{ACTION_SKIP}));
+		actions.put(IBackupResource.FILE_LOCAL_MODIFIED, Arrays.asList(new String[]{ACTION_SKIP, ACTION_REVERT, ACTION_COPY}));
+		actions.put(IBackupResource.FILE_REMOTE_MODIFIED, Arrays.asList(new String[]{ACTION_UPDATE, ACTION_SKIP, ACTION_COPY, ACTION_OVERRIDE}));
+		actions.put(IBackupResource.FILE_CONFLICT, Arrays.asList(new String[]{ACTION_COPY, ACTION_SKIP, ACTION_UPDATE, ACTION_OVERRIDE}));
 		
-		actions.put(BackupResource.FILE_LOCAL_ADDED, Arrays.asList(new String[]{ACTION_SKIP, ACTION_DELETE}));
-		actions.put(BackupResource.FILE_REMOTE_DELETED, Arrays.asList(new String[]{ACTION_DELETE, ACTION_SKIP, ACTION_OVERRIDE, ACTION_COPY}));
-		actions.put(BackupResource.FILE_REMOTE_DELETED_CONFLICT, Arrays.asList(new String[]{ACTION_COPY, ACTION_SKIP, ACTION_DELETE, ACTION_OVERRIDE}));
+		actions.put(IBackupResource.FILE_LOCAL_ADDED, Arrays.asList(new String[]{ACTION_SKIP, ACTION_DELETE}));
+		actions.put(IBackupResource.FILE_REMOTE_DELETED, Arrays.asList(new String[]{ACTION_DELETE, ACTION_SKIP, ACTION_OVERRIDE, ACTION_COPY}));
+		actions.put(IBackupResource.FILE_REMOTE_DELETED_CONFLICT, Arrays.asList(new String[]{ACTION_COPY, ACTION_SKIP, ACTION_DELETE, ACTION_OVERRIDE}));
 
-		actions.put(BackupResource.FILE_LOCAL_DELETED, Arrays.asList(new String[]{ACTION_SKIP, ACTION_REVERT}));
-		actions.put(BackupResource.FILE_REMOTE_ADDED, Arrays.asList(new String[]{ACTION_UPDATE, ACTION_SKIP, ACTION_OVERRIDE}));
-		actions.put(BackupResource.FILE_LOCAL_DELETED_CONFLICT, Arrays.asList(new String[]{ACTION_UPDATE, ACTION_SKIP, ACTION_OVERRIDE}));
+		actions.put(IBackupResource.FILE_LOCAL_DELETED, Arrays.asList(new String[]{ACTION_SKIP, ACTION_REVERT}));
+		actions.put(IBackupResource.FILE_REMOTE_ADDED, Arrays.asList(new String[]{ACTION_UPDATE, ACTION_SKIP, ACTION_OVERRIDE}));
+		actions.put(IBackupResource.FILE_LOCAL_DELETED_CONFLICT, Arrays.asList(new String[]{ACTION_UPDATE, ACTION_SKIP, ACTION_OVERRIDE}));
 		ALLOWED_ACTIONS	= Collections.unmodifiableMap(actions);
 	}
 	

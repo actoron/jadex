@@ -36,7 +36,7 @@ public interface ILocalResourceService
 	 *  @return Status events while the file is being downloaded.
 	 *  @throws Exception, e.g. when local or remote file have changed after the last scan.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent> updateFromRemote(IResourceService remote, FileInfo localfi, FileInfo remotefi);
+	public ITerminableIntermediateFuture<BackupEvent> updateFromRemote(IResourceService remote, FileMetaInfo localfi, FileMetaInfo remotefi);
 	
 	/**
 	 *  Ignore the remote change and set the local file state as being newer.
@@ -48,7 +48,7 @@ public interface ILocalResourceService
 	 *  @return Status events of the override operation.
 	 *  @throws Exception when local or remote file have changed after the last scan.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent> overrideRemoteChange(IResourceService remote, FileInfo localfi, FileInfo remotefi);
+	public ITerminableIntermediateFuture<BackupEvent> overrideRemoteChange(IResourceService remote, FileMetaInfo localfi, FileMetaInfo remotefi);
 	
 	/**
 	 *  Copy the local file before downloading the remote version.
@@ -61,5 +61,5 @@ public interface ILocalResourceService
 	 *  @return Status events while the file is being downloaded.
 	 *  @throws Exception, e.g. when local or remote file have changed after the last scan.
 	 */
-	public ITerminableIntermediateFuture<BackupEvent> updateAsCopy(IResourceService remote, FileInfo localfi, FileInfo remotefi);
+	public ITerminableIntermediateFuture<BackupEvent> updateAsCopy(IResourceService remote, FileMetaInfo localfi, FileMetaInfo remotefi);
 }
