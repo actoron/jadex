@@ -16,6 +16,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -23,6 +25,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -32,7 +36,7 @@ import com.mxgraph.util.mxEvent;
 public class BpmnEditorWindow extends JFrame
 {
 	/** The pane containing the graph and the property view. */
-	protected JSplitPane viewpane;
+	protected JSplitPanel viewpane;
 	
 	/** The group of styles. */
 	//protected ButtonGroup stylegroup;
@@ -56,7 +60,7 @@ public class BpmnEditorWindow extends JFrame
 				setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				
 				//JSplitPane statuspane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-				JSplitPane statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+				final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 				statuspane.setOneTouchExpandable(true);
 				statuspane.setBottomComponent(new StatusArea());
 				
@@ -109,23 +113,6 @@ public class BpmnEditorWindow extends JFrame
 				
 				new KeyboardController(graphcomponent, modelcontainer);
 				
-//				EdgeCreationController edgecreationcontroller = new EdgeCreationController(modelcontainer);
-//				graphcomponent.getConnectionHandler().addListener(mxEvent.CONNECT,
-//						edgecreationcontroller);
-				
-				
-				
-				/*graph.addListener(mxEvent.MOVE_CELLS, new mxIEventListener()
-				{
-					public void invoke(Object sender, mxEventObject evt)
-					{
-						System.out.println(Arrays.toString(evt.getProperties().keySet().toArray()));
-						System.out.println(evt.getProperty("target"));
-						evt.consume();
-					}
-				});*/
-				
-				
 				new mxRubberband(graphcomponent);
 				
 				viewpane.setTopComponent(graphcomponent);
@@ -163,10 +150,27 @@ public class BpmnEditorWindow extends JFrame
 						(int) (sd.height * GuiConstants.GRAPH_PROPERTY_RATIO));
 				setLocationRelativeTo(null);
 				setVisible(true);
-				//statuspane.setResizeWeight(1.0);
+				getContentPane().doLayout();
 				statuspane.setDividerLocation(1.0);
-				//viewpane.setResizeWeight(GuiConstants.GRAPH_PROPERTY_RATIO);
+				statuspane.repaint();
 				viewpane.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
+				viewpane.repaint();
+				
+				// Buggy Swing Bugness
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						getContentPane().doLayout();
+						statuspane.repaint();
+						statuspane.setDividerLocation(statuspane.getHeight());
+						statuspane.setDividerLocation(1.0);
+						statuspane.repaint();
+						viewpane.repaint();
+						viewpane.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
+						viewpane.repaint();
+					}
+				});
 			}
 		});
 	}

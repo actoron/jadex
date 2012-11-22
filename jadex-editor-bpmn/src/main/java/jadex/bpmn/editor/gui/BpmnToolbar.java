@@ -58,127 +58,8 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		long ts = System.currentTimeMillis();
 		
 		ImageProvider imgprovider = modelcontainer.getImageProvider();
-		int row = 0;
 		
-		List<IconGenerationTask> tasks = new ArrayList<IconGenerationTask>();
-		
-		String sym = "selectsym";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_SELECTION, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.SELECT_COLOR),
-				"Select"));
-		
-		sym = "Pool";
-		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_POOL, ImageProvider.SHAPE_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.POOL_COLOR),
-				"Pool"));
-		
-		sym = "Lane";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_LANE, ImageProvider.SHAPE_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.LANE_COLOR),
-				"Lane"));
-		
-		sym = "Task";
-		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_TASK, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.TASK_COLOR),
-				"Task"));
-		
-		sym = "ISP";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
-				"Task"));
-		
-		sym = "ESP";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
-				"Task"));
-		
-		sym = "GW_X";
-		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_GW_XOR, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
-				"XOR-Gateway"));
-		
-		sym = "GW_+";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_GW_AND, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
-				"AND-Gateway"));
-		
-		sym = "GW_O";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_GW_OR, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
-				"OR-Gateway"));
-		
-		++row;
-		
-		sym = " ";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_EMPTY, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
-				"Empty Start Event"));
-		
-		sym = "letter";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
-				"Message Start Event"));
-		
-		sym = "clock";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_TIMER, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
-				"Timer Start Event"));
-		
-		sym = "page";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_RULE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
-				"Rule Start Event"));
-		
-		sym = "triangle";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_SIGNAL, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
-				"Signal Start Event"));
-		
-		sym = "pentagon";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_MULTIPLE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
-				"Multiple Start Event"));
-		
-		sym = " ";
-		tasks.add(new IconGenerationTask(imgprovider, true , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_EMPTY, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Empty Intermediate Event"));
-		
-		sym = "letter";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Message Intermediate Event"));
-		
-		sym = "invletter";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE_THROWING, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Throwing Message Intermediate Event"));
-		
-		sym = "clock";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_TIMER, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Timer Intermediate Event"));
-		
-		sym = "page";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_RULE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Rule Intermediate Event"));
-		
-		sym = "triangle";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Signal Intermediate Event"));
-		
-		sym = "invtriangle";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL_THROWING, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Throwing Signal Intermediate Event"));
-		
-		sym = "pentagon";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Multiple Intermediate Event"));
-		
-		sym = "invpentagon";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE_THROWING, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Throwing Multiple Intermediate Event"));
-		
-		sym = " ";
-		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_EVENT_END_EMPTY, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
-				"Empty End Event"));
-		
-//		sym = "letter";
-//		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_MESSAGE, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
-//				"Message End Event"));
-		
-		sym = "invletter";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_MESSAGE_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
-				"Throwing Message End Event"));
-		
-//		sym = "triangle";
-//		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_SIGNAL, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
-//				"Signal End Event"));
-		
-		sym = "invtriangle";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_SIGNAL_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
-				"Throwing Signal End Event"));
+		List<IconGenerationTask> tasks = getTaskList(imgprovider, iconsize);
 		
 		final IconGenerationTask[] todo = tasks.toArray(new IconGenerationTask[tasks.size()]);
 		
@@ -415,27 +296,155 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		System.out.println("Icon generation time: " + (System.currentTimeMillis() - ts));
 	}*/
 	
-	protected class IconGenerationTask implements Runnable
+	public static List<IconGenerationTask> getTaskList(ImageProvider imgprovider, int iconsize)
 	{
-		protected ImageProvider imgprovider;
-		protected String mode;
-		protected int row;
-		protected boolean separator;
+		List<IconGenerationTask> tasks = new ArrayList<IconGenerationTask>();
 		
-		protected Shape baseshape;
-		protected int frametype;
-		protected String sym;
-		protected Color color;
-		protected String tooltip;
+		int row = 0;
 		
-		protected Icon[] iconset;
+		String sym = "selectsym";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_SELECTION, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.SELECT_COLOR),
+				"Select", iconsize));
 		
-		public IconGenerationTask(ImageProvider imgprovider, boolean separator, int row, String mode, Shape baseshape, String symbol, Color color, String tooltip)
+		sym = "Pool";
+		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_POOL, ImageProvider.SHAPE_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.POOL_COLOR),
+				"Pool", iconsize));
+		
+		sym = "Lane";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_LANE, ImageProvider.SHAPE_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.LANE_COLOR),
+				"Lane", iconsize));
+		
+		sym = "Task";
+		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_TASK, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.TASK_COLOR),
+				"Task", iconsize));
+		
+		sym = "ISP";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
+				"Internal Sub-Process", iconsize));
+		
+		sym = "ESP";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
+				"External Sub-Process", iconsize));
+		
+		sym = "GW_X";
+		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_GW_XOR, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
+				"XOR-Gateway", iconsize));
+		
+		sym = "GW_+";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_GW_AND, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
+				"AND-Gateway", iconsize));
+		
+		sym = "GW_O";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_GW_OR, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
+				"OR-Gateway", iconsize));
+		
+		++row;
+		
+		sym = " ";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_EMPTY, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
+				"Empty Start Event", iconsize));
+		
+		sym = "letter";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
+				"Message Start Event", iconsize));
+		
+		sym = "clock";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_TIMER, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
+				"Timer Start Event", iconsize));
+		
+		sym = "page";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_RULE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
+				"Rule Start Event", iconsize));
+		
+		sym = "triangle";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_SIGNAL, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
+				"Signal Start Event", iconsize));
+		
+		sym = "pentagon";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_START_MULTIPLE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.START_EVENT_COLOR),
+				"Multiple Start Event", iconsize));
+		
+		sym = " ";
+		tasks.add(new IconGenerationTask(imgprovider, true , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_EMPTY, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Empty Intermediate Event", iconsize));
+		
+		sym = "letter";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Message Intermediate Event", iconsize));
+		
+		sym = "invletter";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE_THROWING, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Throwing Message Intermediate Event", iconsize));
+		
+		sym = "clock";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_TIMER, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Timer Intermediate Event", iconsize));
+		
+		sym = "page";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_RULE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Rule Intermediate Event", iconsize));
+		
+		sym = "triangle";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Signal Intermediate Event", iconsize));
+		
+		sym = "invtriangle";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL_THROWING, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Throwing Signal Intermediate Event", iconsize));
+		
+		sym = "pentagon";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Multiple Intermediate Event", iconsize));
+		
+		sym = "invpentagon";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE_THROWING, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Throwing Multiple Intermediate Event", iconsize));
+		
+		sym = " ";
+		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_EVENT_END_EMPTY, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+				"Empty End Event", iconsize));
+		
+//		sym = "letter";
+//		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_MESSAGE, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+//				"Message End Event", iconsize));
+		
+		sym = "invletter";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_MESSAGE_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+				"Throwing Message End Event", iconsize));
+		
+//		sym = "triangle";
+//		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_SIGNAL, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+//				"Signal End Event", iconsize));
+		
+		sym = "invtriangle";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_SIGNAL_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+				"Throwing Signal End Event", iconsize));
+		
+		return tasks;
+	}
+	
+	public static class IconGenerationTask implements Runnable
+	{
+		public ImageProvider imgprovider;
+		public String mode;
+		public int row;
+		public boolean separator;
+		
+		public Shape baseshape;
+		public int frametype;
+		public String sym;
+		public Color color;
+		public String tooltip;
+		public int iconsize;
+		
+		public Icon[] iconset;
+		
+		public IconGenerationTask(ImageProvider imgprovider, boolean separator, int row, String mode, Shape baseshape, String symbol, Color color, String tooltip, int iconsize)
 		{
-			this(imgprovider, separator, row, mode, baseshape, ImageProvider.THICK_FRAME_TYPE, symbol, color, tooltip);
+			this(imgprovider, separator, row, mode, baseshape, ImageProvider.THICK_FRAME_TYPE, symbol, color, tooltip, iconsize);
 		}
 		
-		public IconGenerationTask(ImageProvider imgprovider, boolean separator, int row, String mode, Shape baseshape, int frametype, String symbol, Color color, String tooltip)
+		public IconGenerationTask(ImageProvider imgprovider, boolean separator, int row, String mode, Shape baseshape, int frametype, String symbol, Color color, String tooltip, int iconsize)
 		{
 			this.imgprovider = imgprovider;
 			this.mode = mode;
@@ -446,11 +455,12 @@ public class BpmnToolbar extends AbstractEditingToolbar
 			this.sym = symbol;
 			this.tooltip = tooltip;
 			this.color = color;
+			this.iconsize = iconsize;
 		}
 		
 		public void run()
 		{
-			iconset = imgprovider.generateGenericImageIconSet(iconsize, baseshape, frametype, sym, color);
+			iconset = imgprovider.generateGenericButtonIconSet(iconsize, baseshape, frametype, sym, color);
 		}
 		
 		public Icon[] getIconSet()

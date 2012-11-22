@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
+import jadex.bpmn.editor.gui.EdgeDragContextMenu;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -11,8 +12,11 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
+import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxConnectPreview;
@@ -23,6 +27,9 @@ import com.mxgraph.view.mxGraph;
 
 public class EdgeController extends mxConnectionHandler
 {
+	/** Really commit flag. */
+	protected boolean reallycommit = false;
+	
 	public EdgeController(BpmnGraphComponent graphcomponent)
 	{
 		super(graphcomponent);
@@ -81,12 +88,50 @@ public class EdgeController extends mxConnectionHandler
 		return ret;
 	}
 	
+	public void mouseReleased(final MouseEvent e)
+	{
+		if (connectPreview != null && connectPreview.getPreviewState() != null && ((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(false) == null)
+		{
+			graphComponent.getGraph().getModel().beginUpdate();
+			final EdgeDragContextMenu[] edcmc = new EdgeDragContextMenu[1];
+			ActionListener actionlistener = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e1)
+				{
+					if (e1 != null)
+					{
+						EdgeDragContextMenu edcm = edcmc[0];
+						((mxCell) connectPreview.getPreviewState().getCell()).setTarget(edcm.getTarget());
+					}
+					reallycommit = true;
+					EdgeController.super.mouseReleased(e);
+					graphComponent.getGraph().getModel().endUpdate();
+					reallycommit = false;
+					
+					
+				}
+			};
+			EdgeDragContextMenu edcm = new EdgeDragContextMenu(((BpmnGraph) graphComponent.getGraph()).getModelContainer(),
+					((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true),
+					e.getPoint(),
+					actionlistener);
+			edcmc[0] = edcm;
+			edcm.show(graphComponent, (int) e.getX(), (int) e.getY());			
+		}
+		else
+		{
+			super.mouseReleased(e);
+		}
+	}
+	
 	protected class BpmnConnectPreview extends mxConnectPreview
 	{
 		public BpmnConnectPreview(mxGraphComponent graphcomponent)
 		{
 			super(graphcomponent);
 		}
+		
+		
 		
 		public Object stop(boolean commit, MouseEvent e)
 		{
@@ -114,15 +159,15 @@ public class EdgeController extends mxConnectionHandler
 					}
 					
 					cell = createConnection(src, trg);
-
-					if (commit)
+					
+					if (commit || reallycommit)
 					{
 						result = graph.addCell(cell, ((mxICell) src).getParent(), null, src, trg);
 					}
 
 					fireEvent(new mxEventObject(mxEvent.STOP, "event", e, "commit",
 							commit, "cell", (commit) ? result : null));
-
+					
 					// Clears the state before the model commits
 					if (previewState != null)
 					{

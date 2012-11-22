@@ -10,6 +10,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.CompositeContext;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
@@ -72,7 +73,7 @@ public class ImageProvider
 	protected static final int BASE_ICON_SIZE = 128;
 	
 	/** The activation shift. */
-	protected static final int ACTIVATION_SHIFT = BASE_ICON_SIZE >>> 4;
+	protected static final int ACTIVATION_SHIFT = BASE_ICON_SIZE >>> 3;
 	
 	/** The button size. */
 	protected static final int BUTTON_SIZE = BASE_ICON_SIZE - ACTIVATION_SHIFT;
@@ -193,7 +194,7 @@ public class ImageProvider
 		Image highimage = imagecache.get(new Tuple3<String, Integer, String>("flat_high", iconsize, symbol));
 		if (offimage == null || onimage == null || highimage == null)
 		{
-			Image symimg = getSymbol(symbol, new Rectangle(BASE_ICON_SIZE, BASE_ICON_SIZE));
+			Image symimg = getSymbol(symbol, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE));
 			BufferedImage darksymimg = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = darksymimg.createGraphics();
 			g.setComposite(new ModulateComposite(new Color(0.8f, 0.8f, 0.8f, 1.0f), true));
@@ -241,7 +242,7 @@ public class ImageProvider
 	}
 	
 	/**
-	 *  Generates a generic image icon set in the order off, on, highlight.
+	 *  Generates a generic button icon set in the order off, on, highlight.
 	 *  
 	 *  @param iconsize The icon size.
 	 *  @param baseshape The base shape.
@@ -249,17 +250,17 @@ public class ImageProvider
 	 *  @param bgcolor Color of the icon.
 	 *  @return The generated icons.
 	 */
-	public Icon[] generateGenericImageIconSet(int iconsize, Shape baseshape, String symbol, Color bgcolor)
+	public Icon[] generateGenericButtonIconSet(int iconsize, Shape baseshape, String symbol, Color bgcolor)
 	{
 		Icon[] ret = new Icon[3];
-		ret[0] = generateGenericImageIcon(iconsize, baseshape, symbol, bgcolor, false, false);
-		ret[1] = generateGenericImageIcon(iconsize, baseshape, symbol, bgcolor, true, true);
-		ret[2] = generateGenericImageIcon(iconsize, baseshape, symbol, bgcolor, true, false);
+		ret[0] = generateGenericButtonIcon(iconsize, baseshape, symbol, bgcolor, false, false);
+		ret[1] = generateGenericButtonIcon(iconsize, baseshape, symbol, bgcolor, true, true);
+		ret[2] = generateGenericButtonIcon(iconsize, baseshape, symbol, bgcolor, true, false);
 		return ret;
 	}
 	
 	/**
-	 *  Generates a generic image icon set in the order off, on, highlight.
+	 *  Generates a generic button icon set in the order off, on, highlight.
 	 *  
 	 *  @param iconsize The icon size.
 	 *  @param baseshape The base shape.
@@ -268,17 +269,17 @@ public class ImageProvider
 	 *  @param bgcolor Color of the icon.
 	 *  @return The generated icons.
 	 */
-	public Icon[] generateGenericImageIconSet(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor)
+	public Icon[] generateGenericButtonIconSet(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor)
 	{
 		Icon[] ret = new Icon[3];
-		ret[0] = generateGenericImageIcon(iconsize, baseshape, frametype, symbol, bgcolor, false, false);
-		ret[1] = generateGenericImageIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, true);
-		ret[2] = generateGenericImageIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, false);
+		ret[0] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, bgcolor, false, false);
+		ret[1] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, true);
+		ret[2] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, false);
 		return ret;
 	}
 	
 	/**
-	 *  Generates a generic image icon.
+	 *  Generates a generic button icon.
 	 *  
 	 *  @param iconsize The icon size.
 	 *  @param baseshape The base shape.
@@ -288,13 +289,13 @@ public class ImageProvider
 	 *  @param shift Shift (for pressed status) if true.
 	 *  @return The generated image icon.
 	 */
-	public ImageIcon generateGenericImageIcon(int iconsize, Shape baseshape, String symbol, Color bgcolor, boolean high, boolean shift)
+	public ImageIcon generateGenericButtonIcon(int iconsize, Shape baseshape, String symbol, Color bgcolor, boolean high, boolean shift)
 	{
-		return generateGenericImageIcon(iconsize, baseshape, THICK_FRAME_TYPE, symbol, bgcolor, high, shift);
+		return generateGenericButtonIcon(iconsize, baseshape, THICK_FRAME_TYPE, symbol, bgcolor, high, shift);
 	}
 	
 	/**
-	 *  Generates a generic image icon.
+	 *  Generates a generic button icon.
 	 *  
 	 *  @param iconsize The icon size.
 	 *  @param baseshape The base shape.
@@ -305,19 +306,44 @@ public class ImageProvider
 	 *  @param shift Shift (for pressed status) if true.
 	 *  @return The generated image icon.
 	 */
-	public ImageIcon generateGenericImageIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor, boolean high, boolean shift)
+	public ImageIcon generateGenericButtonIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor, boolean high, boolean shift)
 	{
-		Image symimg = getSymbol(symbol, new Rectangle(BUTTON_SIZE, BUTTON_SIZE));
-		Image frame = generateGenericFrame(frametype, baseshape);
-		Image glass = generateGenericGlass(baseshape);
-		Image bgshape = generateGenericBackground(baseshape);
+		Dimension size = new Dimension(BUTTON_SIZE, BUTTON_SIZE);
+		Image symimg = getSymbol(symbol, size);
+		Image frame = generateGenericFrame(frametype, baseshape, size);
+		Image glass = generateGenericGlass(baseshape, size);
+		Image bgshape = generateGenericBackground(baseshape, size);
 		Image shadow = null;
 		if (!shift)
 		{
-			shadow = generateGenericShadow(baseshape);
+			shadow = generateGenericShadow(baseshape, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE));
 		}
 		
-		return compositeImageIcon(iconsize, symimg, bgshape, frame, glass, shadow, bgcolor, high);
+		return compositeImageIcon(new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE), new Dimension(iconsize, iconsize), symimg, bgshape, frame, glass, shadow, bgcolor, high);
+	}
+	
+	/**
+	 *  Generates a flat version of a button icon.
+	 *  
+	 *  @param iconsize The icon size.
+	 *  @param baseshape The base shape.
+	 *  @param frametype The type of frame.
+	 * 	@param symbol Symbol name or text.
+	 *  @param bgcolor Color of the icon
+	 *  @param high Highlight the icon if true.
+	 *  @param shift Shift (for pressed status) if true.
+	 *  @return The generated image icon.
+	 */
+	public ImageIcon generateFlatButtonIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor)
+	{
+		Dimension basesize = new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE);
+		Dimension size = new Dimension(iconsize, iconsize);
+		Image symimg = getSymbol(symbol, basesize);
+		Image frame = generateGenericFrame(frametype, baseshape, basesize);
+		Image glass = generateGenericGlass(baseshape, basesize);
+		Image bgshape = generateGenericBackground(baseshape, basesize);
+		
+		return compositeImageIcon(basesize, size, symimg, bgshape, frame, glass, null, bgcolor, true);
 	}
 	
 	/**
@@ -332,17 +358,17 @@ public class ImageProvider
 	 *  @param high Highlight the icon if true.
 	 *  @return The image icon.
 	 */
-	private ImageIcon compositeImageIcon(int iconsize, Image symbol, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high)
+	private ImageIcon compositeImageIcon(Dimension basesize, Dimension iconsize, Image symbol, Image bgshape, Image frame, Image glass, Image shadow, Color bgcolor, boolean high)
 	{
 		BufferedImage ret = null;
-		BufferedImage tmpimg = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		BufferedImage tmpimg = new BufferedImage(basesize.width, basesize.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics2D g = tmpimg.createGraphics();
 		g.setComposite(new ModulateComposite(bgcolor, high));
-		g.drawImage(bgshape, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.drawImage(bgshape, 0, 0, bgshape.getWidth(null), bgshape.getHeight(null), null);
 		g.dispose();
 		bgshape = tmpimg;
 		
-		Image full = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Image full = new BufferedImage(basesize.width, basesize.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		g = ((BufferedImage) full).createGraphics();
 		g.setComposite(AlphaComposite.SrcOver);
 		
@@ -355,22 +381,29 @@ public class ImageProvider
 		}
 		else
 		{
-			g.drawImage(shadow, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.drawImage(shadow, x, y, shadow.getWidth(null), shadow.getHeight(null), null);
 		}
 		
-		g.drawImage(bgshape, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
-		g.drawImage(frame, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
-		g.drawImage(glass, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
-		g.drawImage(symbol, x, y, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+		g.drawImage(bgshape, x, y, bgshape.getWidth(null), bgshape.getHeight(null), null);
+		g.drawImage(frame, x, y, frame.getWidth(null), frame.getHeight(null), null);
+		g.drawImage(glass, x, y, glass.getWidth(null), glass.getHeight(null), null);
+		g.drawImage(symbol, x, y, symbol.getWidth(null), symbol.getHeight(null), null);
 		g.dispose();
 		bgshape = null;
 		
-		full = full.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
-		ret = new BufferedImage(iconsize, iconsize, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		g = ret.createGraphics();
-		g.setComposite(AlphaComposite.Src);
-		g.drawImage(full, 0, 0, iconsize, iconsize, null);
-		g.dispose();
+		if (basesize.width != iconsize.width || basesize.height != iconsize.height)
+		{
+			full = full.getScaledInstance(iconsize.width, iconsize.height, Image.SCALE_AREA_AVERAGING);
+			ret = new BufferedImage(iconsize.width, iconsize.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = ret.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(full, 0, 0, iconsize.width, iconsize.height, null);
+			g.dispose();
+		}
+		else
+		{
+			ret = (BufferedImage) full;
+		}
 		return new ImageIcon(ret);
 	}
 	
@@ -380,9 +413,9 @@ public class ImageProvider
 	 *  @param baseshape The base shape.
 	 *  @return The background image.
 	 */
-	private Image generateGenericBackground(Shape baseshape)
+	private Image generateGenericBackground(Shape baseshape, Dimension size)
 	{
-		BufferedImage ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		BufferedImage ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics2D g = ((BufferedImage) ret).createGraphics();
 		
 		g.setColor(Color.WHITE);
@@ -399,15 +432,16 @@ public class ImageProvider
 	 *  
 	 *  @param frametype The frame type.
 	 *  @param baseshape The base shape.
+	 *  @param size The size of the image.
 	 *  @return The frame image.
 	 */
-	private Image generateGenericFrame(int frametype, Shape baseshape)
+	private Image generateGenericFrame(int frametype, Shape baseshape, Dimension size)
 	{
 		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple3<String, Integer, Shape>("frame", frametype, baseshape));
 		
 		if (ret == null)
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
 			Area framearea = new Area(baseshape);
@@ -415,7 +449,7 @@ public class ImageProvider
 			if (THICK_FRAME_TYPE == frametype)
 			{
 				AffineTransform st = new AffineTransform();
-				double sf = (double) (BUTTON_SIZE - (FRAME_THICKNESS << 1)) / BUTTON_SIZE;
+				double sf = (double) (Math.max(size.width, size.height) - (FRAME_THICKNESS << 1)) / Math.max(size.width, size.height);
 				st.translate(FRAME_THICKNESS, FRAME_THICKNESS);
 				st.scale(sf, sf);
 				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
@@ -424,7 +458,7 @@ public class ImageProvider
 			{
 				AffineTransform st = new AffineTransform();
 				double fs = THIN_FRAME_THICKNESS;
-				double sf = (double) (BUTTON_SIZE - (fs * 2.0)) / BUTTON_SIZE;
+				double sf = (double) (Math.max(size.width, size.height) - (fs * 2.0)) / Math.max(size.width, size.height);
 				st.translate(fs, fs);
 				st.scale(sf, sf);
 				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
@@ -433,19 +467,19 @@ public class ImageProvider
 			{
 				AffineTransform st = new AffineTransform();
 				double fs = THIN_FRAME_THICKNESS;
-				double sf = (double) (BUTTON_SIZE - (fs * 2.0)) / BUTTON_SIZE;
+				double sf = (double) (Math.max(size.width, size.height) - (fs * 2.0)) / Math.max(size.width, size.height);
 				st.translate(fs, fs);
 				st.scale(sf, sf);
 				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
 				
 				st = new AffineTransform();
-				sf = (double) (BUTTON_SIZE - (fs * 6.0)) / BUTTON_SIZE;
+				sf = (double) (Math.max(size.width, size.height) - (fs * 6.0)) / Math.max(size.width, size.height);
 				st.translate(fs * 3.0, fs * 3.0);
 				st.scale(sf, sf);
 				framearea.add(new Area(st.createTransformedShape(baseshape)));
 				
 				st = new AffineTransform();
-				sf = (double) (BUTTON_SIZE - (fs * 8.0)) / BUTTON_SIZE;
+				sf = (double) (Math.max(size.width, size.height) - (fs * 8.0)) / Math.max(size.width, size.height);
 				st.translate(fs * 4.0, fs * 4.0);
 				st.scale(sf, sf);
 				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
@@ -469,12 +503,12 @@ public class ImageProvider
 	 *  @param baseshape The base shape.
 	 *  @return The shadow image.
 	 */
-	private Image generateGenericShadow(Shape baseshape)
+	private Image generateGenericShadow(Shape baseshape, Dimension size)
 	{
 		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple2<String, Shape>("shadow", baseshape));
 		if (ret == null)
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ret.createGraphics();
 			g.setColor(Color.DARK_GRAY);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -500,20 +534,20 @@ public class ImageProvider
 	 *  @param baseshape The base shape.
 	 *  @return The glass effect image.
 	 */
-	private Image generateGenericGlass(Shape baseshape)
+	private Image generateGenericGlass(Shape baseshape, Dimension size)
 	{
 		BufferedImage ret = (BufferedImage) imagecache.get(new Tuple2<String, Shape>("glass", baseshape));
 		
 		if (ret == null)
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			Shape glassarea = new Area(baseshape);
-			((Area) glassarea).subtract(new Area(new Rectangle2D.Double(0.0, BUTTON_SIZE * 0.5, BUTTON_SIZE, BUTTON_SIZE * 0.5)));
+			((Area) glassarea).subtract(new Area(new Rectangle2D.Double(0.0, size.height * 0.5, size.width, size.height * 0.5)));
 			
 			AffineTransform st = new AffineTransform();
-			st.translate((BUTTON_SIZE - GLASS_SHRINK * BUTTON_SIZE) * 0.5,
-						 (BUTTON_SIZE - GLASS_SHRINK * BUTTON_SIZE) * 0.5);
+			st.translate((size.width - GLASS_SHRINK * size.width) * 0.5,
+						 (size.height - GLASS_SHRINK * size.height) * 0.5);
 			st.scale(GLASS_SHRINK, GLASS_SHRINK);
 			
 			glassarea = st.createTransformedShape(glassarea);
@@ -563,116 +597,119 @@ public class ImageProvider
 	 *  @param name Name of the symbol.
 	 *  @return The symbol.
 	 */
-	private Image generateSymbol(String name, Rectangle buttonarea)
+	private Image generateSymbol(String name, Dimension size)
 	{
 		BufferedImage ret = null;
 		
 		if ("GW_+".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
 			g.setColor(Color.BLACK);
-			g.fill(GatewayShape.getAndShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.fill(GatewayShape.getAndShape(0, 0, size.width, size.width));
 		}
 		else if ("add_+".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
-			double offset = BASE_ICON_SIZE * 0.1;
-			double s2 = BASE_ICON_SIZE * 0.5;
+			double offsetx = size.width * 0.1;
+			double offsety = size.height * 0.1;
+			double sx2 = size.width * 0.5;
+			double sy2 = size.height * 0.5;
 			GeneralPath gp = new GeneralPath();
-			gp.moveTo(offset, s2 - offset);
-			gp.lineTo(offset, s2 + offset);
-			gp.lineTo(BASE_ICON_SIZE - offset, s2 + offset);
-			gp.lineTo(BASE_ICON_SIZE - offset, s2 - offset);
+			gp.moveTo(offsetx, sy2 - offsety);
+			gp.lineTo(offsetx, sy2 + offsety);
+			gp.lineTo(size.width - offsetx, sy2 + offsety);
+			gp.lineTo(size.width - offsetx, sy2 - offsety);
 			gp.closePath();
-			gp.moveTo(s2 + offset, offset);
-			gp.lineTo(s2 - offset, offset);
-			gp.lineTo(s2 - offset, BASE_ICON_SIZE - offset);
-			gp.lineTo(s2 + offset, BASE_ICON_SIZE - offset);
+			gp.moveTo(sx2 + offsetx, offsety);
+			gp.lineTo(sx2 - offsetx, offsety);
+			gp.lineTo(sx2 - offsetx, size.height - offsety);
+			gp.lineTo(sx2 + offsetx, size.height - offsety);
 			gp.closePath();
 			g.setColor(new Color(126, 229, 80));
 			g.fill(gp);
 		}
 		else if ("remove_-".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
-			double offset = BASE_ICON_SIZE * 0.1;
-			double s2 = BASE_ICON_SIZE * 0.5;
+			double offsetx = size.width * 0.1;
+			double offsety = size.height * 0.1;
+			double sy2 = size.height * 0.5;
 			GeneralPath gp = new GeneralPath();
-			gp.moveTo(offset, s2 - offset);
-			gp.lineTo(offset, s2 + offset);
-			gp.lineTo(BASE_ICON_SIZE - offset, s2 + offset);
-			gp.lineTo(BASE_ICON_SIZE - offset, s2 - offset);
+			gp.moveTo(offsetx, sy2 - offsety);
+			gp.lineTo(offsetx, sy2 + offsety);
+			gp.lineTo(size.width - offsetx, sy2 + offsety);
+			gp.lineTo(size.width - offsetx, sy2 - offsety);
 			gp.closePath();
 			g.setColor(new Color(126, 229, 80));
 			g.fill(gp);
 		}
 		else if ("GW_X".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
 			g.setColor(Color.BLACK);
-			g.fill(GatewayShape.getXorShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.fill(GatewayShape.getXorShape(0, 0, size.width, size.height));
 		}
 		else if ("GW_O".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
 			g.setColor(Color.BLACK);
-			g.fill(GatewayShape.getOrShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.fill(GatewayShape.getOrShape(0, 0, size.width, size.height));
 		}
 		else if ("Pool".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
-			int basex = (int) Math.round(buttonarea.width * 0.25);
+			int basex = (int) Math.round(size.width * 0.25);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
-			g.drawLine(basex, buttonarea.y, basex, buttonarea.height);
-			Image txt = generateTextImage("P", 1.0f, buttonarea);
+			g.drawLine(basex, 0, basex, size.height);
+			Image txt = generateTextImage("P", 1.0f, size);
 			basex >>>= 1;
-			g.drawImage(txt, basex, buttonarea.y, BASE_ICON_SIZE, BASE_ICON_SIZE, 0, 0, BASE_ICON_SIZE - basex, BASE_ICON_SIZE, null);
+			g.drawImage(txt, basex, 0, size.width, size.height, 0, 0, size.width - basex, size.height, null);
 			g.dispose();
 		}
 		else if ("Lane".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
-			int basex = (int) Math.round(buttonarea.width * 0.25);
+			int basex = (int) Math.round(size.width * 0.25);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
-			g.drawLine(basex, buttonarea.y, basex, buttonarea.height);
-			Image txt = generateTextImage("L", 1.0f, buttonarea);
+			g.drawLine(basex, 0, basex, size.height);
+			Image txt = generateTextImage("L", 1.0f, size);
 			basex >>>= 1;
-			g.drawImage(txt, basex, buttonarea.y, BASE_ICON_SIZE, BASE_ICON_SIZE, 0, 0, BASE_ICON_SIZE - basex, BASE_ICON_SIZE, null);
+			g.drawImage(txt, basex, 0, size.width, size.height, 0, 0, size.width - basex, size.height, null);
 			g.dispose();
 		}
 		else if ("letter".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.draw(EventShape.getLetterShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.draw(EventShape.getLetterShape(0, 0, size.width, size.height));
 		}
 		else if ("invletter".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			Shape letter = EventShape.getLetterShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+			Shape letter = EventShape.getLetterShape(0, 0, size.width, size.height);
 			g.setColor(Color.BLACK);
 			g.fill(letter);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -682,41 +719,41 @@ public class ImageProvider
 		}
 		else if ("clock".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.draw(EventShape.getClockShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.draw(EventShape.getClockShape(0, 0, size.width, size.height));
 		}
 		else if ("page".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.draw(EventShape.getPageShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.draw(EventShape.getPageShape(0, 0, size.width, size.height));
 		}
 		else if ("triangle".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.draw(EventShape.getTriangleShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.draw(EventShape.getTriangleShape(0, 0, size.width, size.height));
 		}
 		else if ("invtriangle".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			Shape triangle = EventShape.getTriangleShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+			Shape triangle = EventShape.getTriangleShape(0, 0, size.width, size.height);
 			g.setColor(Color.BLACK);
 			g.fill(triangle);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -726,21 +763,21 @@ public class ImageProvider
 		}
 		else if ("pentagon".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.draw(EventShape.getPentagonShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+			g.draw(EventShape.getPentagonShape(0, 0, size.width, size.height));
 		}
 		else if ("invpentagon".equals(name))
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			Shape pentagon = EventShape.getPentagonShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+			Shape pentagon = EventShape.getPentagonShape(0, 0, size.width, size.height);
 			g.setColor(Color.BLACK);
 			g.fill(pentagon);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -752,19 +789,208 @@ public class ImageProvider
 		return ret;
 	}
 	
+//	private Image generateSymbol(String name, Rectangle buttonarea)
+//	{
+//		BufferedImage ret = null;
+//		
+//		if ("GW_+".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			
+//			g.setColor(Color.BLACK);
+//			g.fill(GatewayShape.getAndShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("add_+".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			double offset = BASE_ICON_SIZE * 0.1;
+//			double s2 = BASE_ICON_SIZE * 0.5;
+//			GeneralPath gp = new GeneralPath();
+//			gp.moveTo(offset, s2 - offset);
+//			gp.lineTo(offset, s2 + offset);
+//			gp.lineTo(BASE_ICON_SIZE - offset, s2 + offset);
+//			gp.lineTo(BASE_ICON_SIZE - offset, s2 - offset);
+//			gp.closePath();
+//			gp.moveTo(s2 + offset, offset);
+//			gp.lineTo(s2 - offset, offset);
+//			gp.lineTo(s2 - offset, BASE_ICON_SIZE - offset);
+//			gp.lineTo(s2 + offset, BASE_ICON_SIZE - offset);
+//			gp.closePath();
+//			g.setColor(new Color(126, 229, 80));
+//			g.fill(gp);
+//		}
+//		else if ("remove_-".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			double offset = BASE_ICON_SIZE * 0.1;
+//			double s2 = BASE_ICON_SIZE * 0.5;
+//			GeneralPath gp = new GeneralPath();
+//			gp.moveTo(offset, s2 - offset);
+//			gp.lineTo(offset, s2 + offset);
+//			gp.lineTo(BASE_ICON_SIZE - offset, s2 + offset);
+//			gp.lineTo(BASE_ICON_SIZE - offset, s2 - offset);
+//			gp.closePath();
+//			g.setColor(new Color(126, 229, 80));
+//			g.fill(gp);
+//		}
+//		else if ("GW_X".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			
+//			g.setColor(Color.BLACK);
+//			g.fill(GatewayShape.getXorShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("GW_O".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			
+//			g.setColor(Color.BLACK);
+//			g.fill(GatewayShape.getOrShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("Pool".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			int basex = (int) Math.round(buttonarea.width * 0.25);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
+//			g.drawLine(basex, buttonarea.y, basex, buttonarea.height);
+//			Image txt = generateTextImage("P", 1.0f, buttonarea);
+//			basex >>>= 1;
+//			g.drawImage(txt, basex, buttonarea.y, BASE_ICON_SIZE, BASE_ICON_SIZE, 0, 0, BASE_ICON_SIZE - basex, BASE_ICON_SIZE, null);
+//			g.dispose();
+//		}
+//		else if ("Lane".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			int basex = (int) Math.round(buttonarea.width * 0.25);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
+//			g.drawLine(basex, buttonarea.y, basex, buttonarea.height);
+//			Image txt = generateTextImage("L", 1.0f, buttonarea);
+//			basex >>>= 1;
+//			g.drawImage(txt, basex, buttonarea.y, BASE_ICON_SIZE, BASE_ICON_SIZE, 0, 0, BASE_ICON_SIZE - basex, BASE_ICON_SIZE, null);
+//			g.dispose();
+//		}
+//		else if ("letter".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.draw(EventShape.getLetterShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("invletter".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			Shape letter = EventShape.getLetterShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+//			g.setColor(Color.BLACK);
+//			g.fill(letter);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.setComposite(AlphaComposite.Src);
+//			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+//			g.draw(letter);
+//		}
+//		else if ("clock".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.draw(EventShape.getClockShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("page".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.draw(EventShape.getPageShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("triangle".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.draw(EventShape.getTriangleShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("invtriangle".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			Shape triangle = EventShape.getTriangleShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+//			g.setColor(Color.BLACK);
+//			g.fill(triangle);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.setComposite(AlphaComposite.Src);
+//			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+//			g.draw(triangle);
+//		}
+//		else if ("pentagon".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			g.setColor(Color.BLACK);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.draw(EventShape.getPentagonShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height));
+//		}
+//		else if ("invpentagon".equals(name))
+//		{
+//			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			Shape pentagon = EventShape.getPentagonShape(buttonarea.x, buttonarea.y, buttonarea.width, buttonarea.height);
+//			g.setColor(Color.BLACK);
+//			g.fill(pentagon);
+//			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			g.setComposite(AlphaComposite.Src);
+//			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
+//			g.draw(pentagon);
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Renders text as image.
 	 *  
 	 *  @param text The text.
 	 *  @return The image.
 	 */
-	private Image generateTextImage(String text, float scaling, Rectangle buttonarea)
+	private Image generateTextImage(String text, float scaling, Dimension size)
 	{
 		Image ret = textimagecache.get(text);
 		
 		if (ret == null)
 		{
-			ret = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setColor(Color.BLACK);
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -775,7 +1001,7 @@ public class ImageProvider
 					getOutline(0f, 0f);
 			Rectangle b = s.getBounds();
 			
-			g.translate(buttonarea.width * 0.5 - b.getWidth() * 0.5 - b.getX() + buttonarea.x, buttonarea.height * 0.5 - b.getHeight() * 0.5 - b.getY() + buttonarea.y);
+			g.translate(size.width * 0.5 - b.getWidth() * 0.5 - b.getX(), size.height * 0.5 - b.getHeight() * 0.5 - b.getY());
 			g.fill(s);
 			g.dispose();
 			
@@ -812,21 +1038,23 @@ public class ImageProvider
 	 *  @param name Name of the symbol.
 	 *  @return The symbol.
 	 */
-	private Image loadSymbol(String name, Rectangle buttonarea)
+	private Image loadSymbol(String name, Dimension size)
 	{
 		Image ret = loadImage(name);
 		
 		if (ret != null)
 		{
-			double imgsymlen = buttonarea.width * (1.0 - IMAGE_SYMBOL_INSET_FACTOR * 2.0);
+			double imgsymlen = Math.max(size.width, size.height) * (1.0 - IMAGE_SYMBOL_INSET_FACTOR * 2.0);
 			double sf = imgsymlen / Math.max(ret.getWidth(null), ret.getHeight(null));
 			ret = ret.getScaledInstance((int) Math.round(sf * ret.getWidth(null)), (int) Math.round(sf * ret.getHeight(null)), Image.SCALE_AREA_AVERAGING);
-			BufferedImage tmp = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			BufferedImage tmp = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = tmp.createGraphics();
 			int w = ret.getWidth(null);
 			int h = ret.getHeight(null);
-			int dx = buttonarea.x + ((buttonarea.width - w) >>> 1);
-			int dy = buttonarea.y + ((buttonarea.height - h) >>> 1);
+//			int dx = buttonarea.x + ((buttonarea.width - w) >>> 1);
+//			int dy = buttonarea.y + ((buttonarea.height - h) >>> 1);
+			int dx = (size.width - w) >>> 1;
+			int dy = (size.height - h) >>> 1;
 			g.drawImage(ret, dx, dy, dx + w, dy + h, 0, 0, w, h, null);
 			g.dispose();
 			ret = tmp;
@@ -841,30 +1069,30 @@ public class ImageProvider
 	 *  @param name Name of the symbol.
 	 *  @return The symbol.
 	 */
-	private Image getSymbol(String name, Rectangle buttonarea)
+	private Image getSymbol(String name, Dimension size)
 	{
 		Image ret = imagecache.get(name);
 		
 		if (ret == null)
 		{
-			ret = generateSymbol(name, buttonarea);
+			ret = generateSymbol(name, size);
 		
 			if (ret == null)
 			{
-				ret = loadSymbol(name + ".png", buttonarea);
+				ret = loadSymbol(name + ".png", size);
 			}
 			if (ret == null)
 			{
-				ret = loadSymbol(name + ".jpg", buttonarea);
+				ret = loadSymbol(name + ".jpg", size);
 			}
 			if (ret == null)
 			{
-				ret = loadSymbol(name + ".gif", buttonarea);
+				ret = loadSymbol(name + ".gif", size);
 			}
 			
 			if (ret == null)
 			{
-				ret = generateTextImage(name, 1.0f / (float) Math.sqrt(name.length()), buttonarea);
+				ret = generateTextImage(name, 1.0f / (float) Math.sqrt(name.length()), size);
 			}
 			
 			imagecache.put(name, ret);
@@ -903,7 +1131,7 @@ public class ImageProvider
 		public CompositeContext createContext(ColorModel srcColorModel,
 				ColorModel dstColorModel, RenderingHints hints)
 		{
-			return new ModulationContextAccel(srcColorModel, dstColorModel);
+			return new ModulationContext(srcColorModel, dstColorModel);
 		}
 		
 		/**

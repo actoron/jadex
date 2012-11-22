@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int VERSION = 6;
+	public static final int BUILD = 7;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";

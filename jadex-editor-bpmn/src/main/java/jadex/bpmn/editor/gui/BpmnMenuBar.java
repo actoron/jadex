@@ -120,7 +120,7 @@ public class BpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				JOptionPane.showMessageDialog(getParent(),
-					    BpmnEditor.APP_NAME + " Version " + BpmnEditor.VERSION,
+					    BpmnEditor.APP_NAME + " Build " + BpmnEditor.BUILD,
 					    BpmnEditor.APP_NAME,
 					    JOptionPane.INFORMATION_MESSAGE);
 			}
