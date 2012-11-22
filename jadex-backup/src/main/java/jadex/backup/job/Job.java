@@ -1,5 +1,6 @@
 package jadex.backup.job;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 
 import java.util.ArrayList;
@@ -142,6 +143,14 @@ public abstract class Job
 	 *  Get the view.
 	 */
 	public Object getView(IExternalAccess ea, boolean editable)
+	{
+		return null;
+	}
+	
+	/**
+	 *  Get the resource.
+	 */
+	public Object getResource(IComponentIdentifier cid)
 	{
 		return null;
 	}

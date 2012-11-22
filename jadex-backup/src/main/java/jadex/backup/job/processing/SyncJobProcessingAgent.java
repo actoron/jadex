@@ -120,8 +120,8 @@ public class SyncJobProcessingAgent
 //					args.put("dir", job.getLocalResource());
 //					args.put("id", job.getGlobalResource());
 
-					args.put("resource", new BackupResource(job.getGlobalResource(), new File(job.getLocalResource()), agent.getComponentIdentifier()));
-					
+					args.put("resource", job.getResource(agent.getComponentIdentifier()));
+							
 					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
 					ci.setArguments(args);
 					cms.createComponent(null, "rpa", ci, null)

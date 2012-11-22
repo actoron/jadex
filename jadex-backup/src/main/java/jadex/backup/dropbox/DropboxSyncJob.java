@@ -1,5 +1,6 @@
-package jadex.backup.job;
+package jadex.backup.dropbox;
 
+import jadex.backup.job.Job;
 import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.IBackupResource;
 import jadex.backup.swing.SyncJobPanel;
@@ -8,36 +9,35 @@ import jadex.bridge.IExternalAccess;
 
 import java.io.File;
 
-
 /**
- *  Job to sync resources.
+ *  Job to sync resources with dropbox folder.
  */
-public class SyncJob extends Job
+public class DropboxSyncJob extends Job
 {
 	//-------- attributes --------
-	
-	/** The local source. */ 
-	protected String lres;
-	
+		
 	/** The global resource. */
 	protected String gres;
+	
+	/** The . */ 
+	protected String lres;
+
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new job.
 	 */
-	public SyncJob()
+	public DropboxSyncJob()
 	{
 	}
 	
 	/**
 	 *  Create a new job.
 	 */
-	public SyncJob(String id, String name, String lres, String gres)
+	public DropboxSyncJob(String id, String name, String gres)
 	{
 		super(id, name);
-		this.lres = lres;
 		this.gres = gres;
 	}
 	
@@ -104,7 +104,7 @@ public class SyncJob extends Job
 	 */
 	public Object getView(final IExternalAccess ea, boolean editable)
 	{
-		return new SyncJobPanel(ea, editable, this);
+		return null;//new SyncJobPanel(ea, editable, this);
 	}
 	
 	/**
@@ -135,3 +135,4 @@ public class SyncJob extends Job
 			+ ", name=" + name + ", active=" + active + "]";
 	}
 }
+
