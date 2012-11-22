@@ -73,9 +73,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 				}
 				else
 				{
-					System.out.println(task.mode);
 					ImageIcon icon = imgprov.generateFlatButtonIcon(16, task.baseshape, task.frametype, task.sym, task.color);
-					System.out.println(icon);
 					Tuple3<String, String, Icon> item = new Tuple3<String, String, Icon>(task.mode, task.tooltip, icon);
 					defitems.add(item);
 				}
