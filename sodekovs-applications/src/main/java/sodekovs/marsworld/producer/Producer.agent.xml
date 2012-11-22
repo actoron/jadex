@@ -18,6 +18,7 @@
 		<import>jadex.extension.envsupport.math.*</import>		
 		<import>sodekovs.marsworld.*</import>
 		<import>sodekovs.marsworld.movement.*</import>
+		<import>sodekovs.marsworld.coordination.*</import>
 		<import>deco4mas.distributed.coordinate.environment.*</import>		
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
@@ -104,17 +105,17 @@
 		<!-- Only used for MASDynamics. -->
 		<!-- Receive target from sentry. -->
 		 <internalevent name="latestAnalyzedTargetEvent">
-			<parameter name="latest_analyzed_target" class="ISpaceObject"/>
+			<parameter name="latest_analyzed_target" class="CoordinationSpaceData"/>
 		</internalevent>
 		
 		<!-- Call Carry. -->
 		<internalevent name="callCarryEvent">
-			<parameter name="latest_produced_target" class="ISpaceObject"/>
+			<parameter name="latest_produced_target" class="CoordinationSpaceData"/>
 		</internalevent>
 		
 		<!-- Call Sentry. -->
 		<internalevent name="callSentryEvent">
-			<parameter name="latest_target" class="ISpaceObject"/>
+			<parameter name="latest_target" class="CoordinationSpaceData"/>
 		</internalevent>
 		
 		

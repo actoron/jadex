@@ -19,6 +19,7 @@
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>sodekovs.marsworld.movement.*</import>
+		<import>sodekovs.marsworld.coordination.*</import>
 		<import>deco4mas.distributed.coordinate.environment.*</import>
 		<import>jadex.commons.future.*</import>	
 	</imports>
@@ -155,12 +156,12 @@
 	<!-- Only used for MASDynamics. -->
 	<!-- Call Producer. -->
 	 <internalevent name="callProducerEvent">
-			<parameter name="latest_analyzed_target" class="ISpaceObject"/>
+			<parameter name="latest_analyzed_target" class="CoordinationSpaceData"/>
 	</internalevent>
 	
 	<!-- Receive new target from Producer or Carry. -->
 	<internalevent name="latestTargetEvent">
-			<parameter name="latest_target" class="ISpaceObject"/>
+			<parameter name="latest_target" class="CoordinationSpaceData"/>
 	</internalevent>
 	 
 		<!-- Other agents inform the sentries about discovered

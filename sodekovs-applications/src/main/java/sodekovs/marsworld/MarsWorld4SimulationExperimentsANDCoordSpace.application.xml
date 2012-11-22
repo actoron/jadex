@@ -329,7 +329,69 @@
 				<component type="Carry" number="$args.NumberOfCarries" />			
 			</components>
 		</configuration>
-		
+	
+	<configuration name="StandardConfiguation - No Sentry">
+			<extensions>
+			<!-- The CoordinationSpace -->
+			<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
+			
+				<!-- <env:envspace name="my2dspace" type="2dspace"> -->
+				<env:envspace name="my2dspace" type="2dspace" width="1"
+					height="1">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="space">$space</env:property>
+							<env:property name="missiontime">7000000 +$properties.clock.getTime()</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
+							<env:property name="ore">20</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.05, 0.7)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.5, 0.6)</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.7, 0.4)</env:property>
+							<env:property name="ore">10</env:property>
+							<!-- <env:property name="ore">$args.al</env:property> -->
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
+							<env:property name="ore">25</env:property>
+						</env:object>
+
+						<!-- TMP-HACK! -->
+						<env:object type="experimentID">
+							<env:property name="experimentID">$args.Experiment_id</env:property>
+						</env:object>
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
+						</env:object>
+
+					</env:objects>
+
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all"
+							perspective="icons">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+			<components>
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />			
+			</components>
+		</configuration>	
+			
 	<configuration name="StandardConfiguation - Sentry only">
 			<extensions>
 			<!-- The CoordinationSpace -->
@@ -391,5 +453,4 @@
 			</components>
 		</configuration>
 	</configurations>
-
 </applicationtype>

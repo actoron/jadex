@@ -1,19 +1,19 @@
 package sodekovs.marsworld.sentry;
 
-import jadex.bdi.model.IMPlan;
-import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import sodekovs.marsworld.coordination.CoordinationSpaceData;
 
 /**
  * Inform the sentry agent about a new target.
@@ -97,8 +97,11 @@ public class AnalyzeTargetPlan extends Plan {
 //		plan.getParameter("latest_analyzed_target").setValue(target);
 //		plan.startPlan(); 
 		
+		IVector2 position = (IVector2) target.getProperty("position");
+		CoordinationSpaceData data = new CoordinationSpaceData(position.getXAsDouble(), position.getYAsDouble());
+		
 		IInternalEvent ievent = createInternalEvent("callProducerEvent");
-		ievent.getParameter("latest_analyzed_target").setValue(target);		
+		ievent.getParameter("latest_analyzed_target").setValue(data);		
 		dispatchInternalEvent(ievent);
 	}
 

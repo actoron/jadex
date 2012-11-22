@@ -4,6 +4,10 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
+import sodekovs.marsworld.coordination.CoordinationSpaceData;
 
 /**
  * The main plan for the Producer Agent. <br>
@@ -66,8 +70,8 @@ public class ProducerPlan extends Plan {
 			
 			//Waiting for internal event, which is dispatched after MASDynamics has transmitted the latest_analyzed_target (from the sentry)
 			IInternalEvent event = waitForInternalEvent("latestAnalyzedTargetEvent");
-			ISpaceObject latestTarget = (ISpaceObject) event.getParameter("latest_analyzed_target").getValue();
-			System.out.println("#ProducerPlan# Received latest analyzed target:  " + latestTarget);
+			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_analyzed_target").getValue();
+			System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
 
 //			// Call Carry agent before. Does it save time?
 //			// Confer WalkingStrategyEnum for Mapping of int values to semantics.
@@ -79,6 +83,10 @@ public class ProducerPlan extends Plan {
 //			target.
 			
 			// Producing ore here.
+			ContinuousSpace2D env = (ContinuousSpace2D)getBeliefbase().getBelief("move.environment").getFact();
+			IVector2 position = new Vector2Double(data.getX(), data.getY());
+			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+			
 			IGoal produce_ore = createGoal("produce_ore");
 			produce_ore.getParameter("target").setValue(latestTarget);
 			dispatchSubgoalAndWait(produce_ore);
@@ -90,7 +98,7 @@ public class ProducerPlan extends Plan {
 //			getBeliefbase().getBeliefSet("latest_produced_target").addFact(latestTarget);
 			
 			IInternalEvent ievent = createInternalEvent("callCarryEvent");
-			ievent.getParameter("latest_produced_target").setValue(latestTarget);		
+			ievent.getParameter("latest_produced_target").setValue(data);		
 			dispatchInternalEvent(ievent);
 
 		}
