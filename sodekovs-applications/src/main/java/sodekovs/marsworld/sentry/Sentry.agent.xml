@@ -27,7 +27,6 @@
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="Movement" />
-		<!-- <capability name="transcap" file="jadex/bdi/tutorial/TranslationD1.capability.xml"/>-->
 	</capabilities>
 
 	<beliefs>
@@ -35,7 +34,6 @@
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>
-			
 		
 		<!--  Test for evaluation! -->
 		<belief name="myPos" class="Vector2Double" evaluationmode="push">
@@ -57,7 +55,7 @@
  			<fact class="IFuture">$scope.getParentAccess().getExtension("mycoordspace")</fact>
  		</belief>
 
-		<!-- Missionend belief is used in drop condition of analyze target goal.-->
+		<!-- Missionend belief is used in drop condition of analyze target goal. -->
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
@@ -68,18 +66,19 @@
 		<!-- Analyze a target.-->
 		<achievegoal name="analyze_target" retry="false">
 			<!-- The parameter target is bound to one
-				of the facts in the belief my_targets.-->
+				of the facts in the belief my_targets. -->
 			<parameter name="target" class="ISpaceObject">
-<!-- 					// Hack!!! Condition can also match target object from message
-					// $beliefbase.environment.getTarget($target.getId())
- -->
+				<!--
+				// Hack!!! Condition can also match target object from message
+				// $beliefbase.environment.getTarget($target.getId())
+				 -->
 				<value>
 					$target
 				</value>
 			</parameter>
 			<unique/>
 			<!-- Create a new goal when a target was added
-				and the mission is going on.-->
+				and the mission is going on. -->
 			<creationcondition language="jcl">
 				//!$beliefbase.missionend &amp;&amp;
 				ISpaceObject $target &amp;&amp;
@@ -140,8 +139,14 @@
 
 			
 		<!-- Informs sentries about new targets. -->
-		<plan name="addTargetPlan">			
-			<body class="AddTargetPlan"/>						
+		<plan name="addTargetPlan">	
+		    <parameter name="target" class="CoordinationSpaceData">
+		        <internaleventmapping ref="latestTargetEvent.latest_target"/>
+		    </parameter>		
+			<body class="AddTargetPlan"/>
+			<trigger>
+			    <internalevent ref="latestTargetEvent"/>
+			</trigger>					
 		</plan>
 		
 		<!-- TMP: Counter. -->
@@ -163,24 +168,6 @@
 	<internalevent name="latestTargetEvent">
 			<parameter name="latest_target" class="CoordinationSpaceData"/>
 	</internalevent>
-	 
-		<!-- Other agents inform the sentries about discovered
-			potential ore resources.-->
-		<!-- <messageevent name="target_inform" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-			<match>((ISpaceObject)$content).getType().equals("target")</match>
-		</messageevent>
-
-		<messageevent name="request_producer" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
- 			</parameter>
-		</messageevent> -->
 	</events>
 
 	<configurations>
@@ -190,8 +177,7 @@
 				<initialgoal cref="move.walk_around"/>				
 			</goals>
 			<plans>
-			<initialplan ref="tmpCounterPlan"/>
-			<initialplan ref="addTargetPlan"/>
+				<initialplan ref="tmpCounterPlan"/>
 			</plans>			
 		</configuration>
 	</configurations>

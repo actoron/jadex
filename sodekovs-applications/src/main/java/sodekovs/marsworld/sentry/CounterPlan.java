@@ -2,6 +2,7 @@ package sodekovs.marsworld.sentry;
 
 import jadex.bdi.runtime.Plan;
 
+@SuppressWarnings("serial")
 public class CounterPlan extends Plan{
 
 	@Override
@@ -15,5 +16,4 @@ public class CounterPlan extends Plan{
 		waitFor(1000);
 		}
 	}
-
 }

@@ -18,10 +18,12 @@ import sodekovs.marsworld.coordination.CoordinationSpaceData;
 /**
  * Inform the sentry agent about a new target.
  */
+@SuppressWarnings("serial")
 public class AnalyzeTargetPlan extends Plan {
 	/**
 	 * The plan body.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void body() {
 		ISpaceObject target = (ISpaceObject) getParameter("target").getValue();
 
@@ -42,10 +44,9 @@ public class AnalyzeTargetPlan extends Plan {
 			space.addTaskListener(taskid, myself.getId(), res);
 
 			res.waitForResult();
-			// System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");w
 			if (((Number) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue() > 0)
 				callProducerAgent(target);
-						
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Fails for one agent, when two agents try to analyze the same target at once.
@@ -53,64 +54,18 @@ public class AnalyzeTargetPlan extends Plan {
 	}
 
 	/**
-	 * Sending a location to the Producer Agent. Therefore it has first to be looked up in the DF.
+	 * Sending a location to the Producer Agent using DeCoMAS.
 	 * 
 	 * @param target
 	 */
 	private void callProducerAgent(ISpaceObject target) {
-		// System.out.println("Calling some Production Agent...");
-		
-//		if (producers != null && producers.length > 0) {
-//			int sel = (int) (Math.random() * producers.length); // todo: Select not randomly
-//			// System.out.println("Found agents: "+producers.length+" selected: "+sel);
-//
-//			RequestProduction rp = new RequestProduction(target);
-//			IMessageEvent mevent = createMessageEvent("request_producer");
-//			//send to closest producer?
-//			//Confer WalkingStrategyEnum for Mapping of int values to semantics.
-////			int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
-//			int walkingStrategyProperty = (Integer) ((IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
-//			if (walkingStrategyProperty == 2) {
-////				mevent.getParameterSet(SFipa.RECEIVERS).addValue(new ArrayList<IComponentIdentifier>().add(getClosestProducerAgent()));				
-//				mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestProducerAgent());
-//			}else{
-//				mevent.getParameterSet(SFipa.RECEIVERS).addValue(producers[sel]);				
-//			}
-//
-//			mevent.getParameter(SFipa.CONTENT).setValue(rp);
-////			System.out.println("#Sentr.AnaTargPlan#");
-//			sendMessage(mevent);
-			// System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());
-//		}
-		
-		/*****************************************************/		
-		//NEW_NEW_NEW_NEW_NEW_NEW
-		//HACK: is not send to closest....
-		//Setting parameter for MasDynamics		
 		System.out.println("#AnalyzeTargetPlan-Sentry# Latest analyzed target: " + target);
-		//putting latest target to belief that is observed for MasDyn			
-//		this.getBeliefbase().getBeliefSet("latest_analyzed_target").addFact(target);
-		/*****************************************************/
-		
-//		IMPlan mplan = ((IMPlanbase)getPlanbase().getModelElement()).getPlan("callProducerAgentPlan");		
-//		IPlan plan = getPlanbase().createPlan(mplan);
-//		plan.getParameter("latest_analyzed_target").setValue(target);
-//		plan.startPlan(); 
-		
+
 		IVector2 position = (IVector2) target.getProperty("position");
 		CoordinationSpaceData data = new CoordinationSpaceData(position.getXAsDouble(), position.getYAsDouble());
-		
+
 		IInternalEvent ievent = createInternalEvent("callProducerEvent");
-		ievent.getParameter("latest_analyzed_target").setValue(data);		
+		ievent.getParameter("latest_analyzed_target").setValue(data);
 		dispatchInternalEvent(ievent);
 	}
-
-//	private IComponentIdentifier getClosestProducerAgent() {
-//		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParentAccess()).getExtension("my2dspace").get(this);		
-//		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
-//		ISpaceObject nearestProducer = space.getNearestObject(myPos, null, "producer");
-//
-//		return space.getOwner(nearestProducer.getId()).getName();
-//
-//	}
 }

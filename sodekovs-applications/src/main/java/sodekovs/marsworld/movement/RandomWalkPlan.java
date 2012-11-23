@@ -2,12 +2,9 @@ package sodekovs.marsworld.movement;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
 import java.util.HashMap;
@@ -15,8 +12,8 @@ import java.util.HashMap;
 /**
  * Wander around randomly.
  */
+@SuppressWarnings("serial")
 public class RandomWalkPlan extends Plan {
-	// -------- constructors --------
 
 	/**
 	 * Create a new plan.
@@ -25,18 +22,16 @@ public class RandomWalkPlan extends Plan {
 		// getLogger().info("Created: "+this+" for goal "+getRootGoal());
 	}
 
-	// -------- methods --------
-
 	/**
 	 * The plan body.
 	 */
 	public void body() {
 		IVector2 dest = ((Space2D) getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
 
-		//Check, whether agent should walk randomly with or without remembering already visited positions.
-		//Confer WalkingStrategyEnum for Mapping of int values to semantics.
+		// Check, whether agent should walk randomly with or without remembering already visited positions.
+		// Confer WalkingStrategyEnum for Mapping of int values to semantics.
 		int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
-		if (walkingStrategyProperty> 0) {
+		if (walkingStrategyProperty > 0) {
 			dest = checkPosIfVisitedAlreay(dest);
 		}
 
@@ -51,6 +46,7 @@ public class RandomWalkPlan extends Plan {
 	 * 
 	 * @param dest
 	 */
+	@SuppressWarnings("rawtypes")
 	private IVector2 checkPosIfVisitedAlreay(IVector2 dest) {
 
 		Space2D space = ((Space2D) getBeliefbase().getBelief("environment").getFact());
@@ -103,12 +99,6 @@ public class RandomWalkPlan extends Plan {
 
 		double squareSum = (xDiff * xDiff) + (yDiff * yDiff);
 
-		// double check res:
-		Space2D space = ((Space2D) getBeliefbase().getBelief("environment").getFact());
-		IVector2 vec = new Vector2Double(xPos, yPos);
-		IVector1 one = space.getDistance(vec, destination);
-
-		// System.out.println("#checkIfVisited# Res: " + Math.sqrt(squareSum) + "<=" + vision + "; res by distance: " + one + ";--- vision: " + new Vector1Double(vision));
 		return Math.sqrt(squareSum) <= vision;
 	}
 
@@ -117,23 +107,6 @@ public class RandomWalkPlan extends Plan {
 
 		for (int i = 0; i < copy.length; i++) {
 			ret[i] = copy[i];
-		}
-		return ret;
-	}
-
-	/**
-	 * Copy a HashMap
-	 * 
-	 * @param org
-	 * @param positionsKeyArray
-	 * @return
-	 */
-	private HashMap copyHashMap(HashMap org, Object[] positionsKeyArray) {
-		HashMap ret = new HashMap();
-
-		for (int i = 0; i < positionsKeyArray.length; i++) {
-			String s = (String) org.get(positionsKeyArray[i]);
-			ret.put(positionsKeyArray[i], s);
 		}
 		return ret;
 	}

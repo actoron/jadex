@@ -47,10 +47,7 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 		
-		<!-- HACK FOR MASDynamics!!!!! -->
-		<!--   mycoordspace -->
 		<!-- Environment. DO NOT CHANGE the name "env".-->
-		<!-- Environment. -->
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())
 			</fact>
@@ -75,7 +72,13 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="carry_plan">
-			<body class="CarryPlan"/>			
+		    <parameter name="target" class="CoordinationSpaceData">
+		        <internaleventmapping ref="latestProducedTargetEvent.latest_produced_target"/>
+		    </parameter>
+			<body class="CarryPlan"/>
+			<trigger>
+			    <internalevent ref="latestProducedTargetEvent"/>
+			</trigger>		
 		</plan>
 
 		<!-- Carry ore to the homebase. -->
@@ -111,24 +114,6 @@
 		<internalevent name="callSentryEvent">
 			<parameter name="latest_target" class="CoordinationSpaceData"/>
 		</internalevent>
-		
-		<!-- Message event for carry ore task allocation. -->
-		<!-- <messageevent name="request_carry" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<match>$content instanceof RequestCarry</match>
-		</messageevent> -->
-
-		<!-- Message event for informing sentries about new targets. -->
-		<!--<messageevent name="inform_target" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
- 			</parameter>
-		</messageevent> -->
 	</events>
 
 	<configurations>
@@ -137,10 +122,6 @@
 				<!-- Create a goal for walking around. -->
 				<initialgoal cref="move.walk_around"/>
 			</goals>
-			<plans>
-				<initialplan ref="carry_plan"/>
-			</plans>
 		</configuration>
 	</configurations>
-
 </agent>

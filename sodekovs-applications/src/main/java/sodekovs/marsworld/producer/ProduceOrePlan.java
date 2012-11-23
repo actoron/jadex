@@ -15,17 +15,18 @@ import java.util.Map;
 /**
  *  Inform the sentry agent about a new target.
  */
+@SuppressWarnings("serial")
 public class ProduceOrePlan extends Plan
 {
 	/**
 	 *  The plan body.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void body()
 	{
 		ISpaceObject target = (ISpaceObject)getParameter("target").getValue();
 
 		// Move to the target.
-//		System.out.println("Provider moving to target!");
 		IGoal go_target = createGoal("move.move_dest");
 		go_target.getParameter("destination").setValue(target.getProperty(Space2D.PROPERTY_POSITION));
 		dispatchSubgoalAndWait(go_target);
@@ -40,6 +41,5 @@ public class ProduceOrePlan extends Plan
 		Object taskid	= space.createObjectTask(ProduceOreTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
-//		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
 	}
 }

@@ -47,15 +47,7 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 		
-		<!-- The 2D Space where the agent is situated. -->
-		<!-- <beliefsetref name="space">
-			<concrete ref="move.environment"/>
-		</beliefsetref> -->				
-				
-		<!-- HACK FOR MASDynamics!!!!! -->
-		<!--   mycoordspace -->
 		<!-- Environment. DO NOT CHANGE the name "env".-->
-		<!-- Environment. -->
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())</fact>
 		</belief>
@@ -77,7 +69,13 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="producer_plan">
-			<body class="ProducerPlan"/>			
+		    <parameter name="target" class="CoordinationSpaceData">
+		        <internaleventmapping ref="latestAnalyzedTargetEvent.latest_analyzed_target"/>
+		    </parameter>
+			<body class="ProducerPlan"/>
+			<trigger>
+			    <internalevent ref="latestAnalyzedTargetEvent"/>
+			</trigger>			
 		</plan>
 
 		<!-- Produce ore at a target. -->
@@ -117,36 +115,6 @@
 		<internalevent name="callSentryEvent">
 			<parameter name="latest_target" class="CoordinationSpaceData"/>
 		</internalevent>
-		
-		
-	
-		<!-- Message event for produce ore task allocation. -->
-		<!-- <messageevent name="request_production" type="fipa" direction="receive">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<match>$content instanceof RequestProduction</match>
-		</messageevent> -->
-		
-		<!-- Message event for informing sentries about new targets. -->
-		<!--<messageevent name="inform_target" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
- 			</parameter>
-		</messageevent> -->
-
-		<!-- Message event for carry ore task allocation. -->
-		<!--<messageevent name="request_carries" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.REQUEST</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
- 			</parameter>
-		</messageevent> -->
 	</events>
 	
 	<configurations>
@@ -155,9 +123,6 @@
 				<!-- Create a goal for walking around. -->
 				<initialgoal cref="move.walk_around"/>
 			</goals>
-			<plans>
-				<initialplan ref="producer_plan"/>
-			</plans>
 		</configuration>
 	</configurations>
 </agent>

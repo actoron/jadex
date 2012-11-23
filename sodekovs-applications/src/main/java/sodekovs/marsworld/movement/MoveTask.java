@@ -24,7 +24,6 @@ import java.util.Set;
  * Move an object towards a destination.
  */
 public class MoveTask extends AbstractTask {
-	// -------- constants --------
 
 	/** The destination property. */
 	public static final String PROPERTY_TYPENAME = "move";
@@ -41,8 +40,6 @@ public class MoveTask extends AbstractTask {
 	/** The vision property of the moving object (radius in units). */
 	public static final String PROPERTY_VISION = "vision";
 
-	// -------- IObjectTask methods --------
-
 	/**
 	 * Executes the task. Handles exceptions. Subclasses should implement doExecute() instead.
 	 * 
@@ -53,6 +50,7 @@ public class MoveTask extends AbstractTask {
 	 * @param progress
 	 *            The time that has passed according to the environment executor.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void execute(final IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock) {
 		IVector2 destination = (IVector2) getProperty(PROPERTY_DESTINATION);
 		final IBDIExternalAccess agent = (IBDIExternalAccess) getProperty(PROPERTY_SCOPE);
@@ -66,16 +64,15 @@ public class MoveTask extends AbstractTask {
 		((Space2D) space).setPosition(obj.getId(), newloc);
 
 		// Check, whether agent should walk randomly with or without remembering already visited positions.
-		//Confer WalkingStrategyEnum for Mapping of int values to semantics.
-		int walkingStrategyProperty =(Integer) space.getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
-		if (walkingStrategyProperty> 0) {
+		// Confer WalkingStrategyEnum for Mapping of int values to semantics.
+		int walkingStrategyProperty = (Integer) space.getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+		if (walkingStrategyProperty > 0) {
 
 			// ************************Hack for Agents: *******************************
 			final IVector2 newLocation = newloc.copy();
 			final DecimalFormat decimalFormat = new DecimalFormat("#0.0000");
 			agent.scheduleStep(new IComponentStep<Void>() {
 				public IFuture<Void> execute(IInternalAccess ia) {
-					IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 					ISpaceObject[] homebases = ((ISpaceObject[]) ((Space2D) space).getSpaceObjectsByType("homebase"));
 					HashMap map = (HashMap) homebases[0].getProperty("visitedPos");
 					synchronized (map) {
@@ -96,7 +93,6 @@ public class MoveTask extends AbstractTask {
 			});
 			// *******************************
 		}
-		
 
 		// Process vision at new location.
 		double vision = ((Number) obj.getProperty(PROPERTY_VISION)).doubleValue();
