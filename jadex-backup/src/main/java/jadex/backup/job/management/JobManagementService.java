@@ -313,6 +313,7 @@ public class JobManagementService implements IJobManagementService
 		catch(Exception e)
 		{
 			System.out.println("Error loading backup configuration: "+e);
+			ret.setResult(null);
 		}
 		finally
 		{

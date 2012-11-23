@@ -19,8 +19,6 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Arguments({
 	@Argument(name="resource", clazz=IBackupResource.class, description="The backup resource."),
-//	@Argument(name="dir", clazz=String.class, description="The directory to publish."),
-//	@Argument(name="id", clazz=String.class, description="The unique id of the global resource.")
 })
 @ProvidedServices({
 	@ProvidedService(type=IResourceService.class, implementation=@Implementation(ResourceService.class)),
@@ -36,14 +34,6 @@ public class ResourceProviderAgent
 	@Agent
 	protected IInternalAccess	component;
 	
-//	/** The directory to publish as resource. */
-//	@AgentArgument
-//	protected String	dir;
-	
-//	/** The global resource id. */
-//	@AgentArgument
-//	protected String	id;
-	
 	/** The resource meta information. */
 	@AgentArgument
 	protected IBackupResource	resource;
@@ -56,17 +46,9 @@ public class ResourceProviderAgent
 	@AgentCreated
 	public IFuture<Void>	start()
 	{
-//		if(dir==null)
-//		{
-//			return new Future<Void>(new IllegalArgumentException("Dir nulls."));
-//		}
-//		if(id==null)
-//		{
-//			return new Future<Void>(new IllegalArgumentException("Id nulls."));
-//		}
 		if(resource==null)
 		{
-			return new Future<Void>(new IllegalArgumentException("Id nulls."));
+			return new Future<Void>(new IllegalArgumentException("Ressource nulls."));
 		}
 		
 		return IFuture.DONE;

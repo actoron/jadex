@@ -261,7 +261,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected void	doScan(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack)
 	{
-//		System.out.println("+++do update: "+rpa.getResource().getResourceId()+", "+rpa.getResource().getLocalId()+", "+remote.getLocalId()+", "+stack);
+		System.out.println("+++do update: "+getResource().getResourceId()+", "+getResource().getLocalId()+", "+remote.getLocalId()+", "+stack);
 		
 		// All done.
 		if(stack.isEmpty() || ret.isDone())
@@ -301,7 +301,7 @@ public class LocalResourceService	implements ILocalResourceService
 				if(top.getFileInfo().getData().isDirectory())
 				{
 					// Currently only recurses into directory contents (todo: directory update i.e. deletion of files)
-					ret.addIntermediateResultIfUndone(new BackupEvent(IBackupResource.FILE_UNCHANGED, top.getFileInfo())); // todo: dir events?
+					ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_STATE, top.getFileInfo(), null, IBackupResource.FILE_UNCHANGED)); // todo: dir events?
 					remote.getDirectoryContents(top.getFileInfo()).addResultListener(new IResultListener<Collection<FileMetaInfo>>()
 					{
 						public void resultAvailable(Collection<FileMetaInfo> result)
@@ -317,6 +317,7 @@ public class LocalResourceService	implements ILocalResourceService
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							System.out.println("exo: "+exception);
 							ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.ERROR, null, top.getFileInfo(), exception));
 							doScan(remote, ret, stack);
 						}
@@ -326,7 +327,7 @@ public class LocalResourceService	implements ILocalResourceService
 				else
 				{
 					Tuple2<FileMetaInfo, String> state = getResource().getState(top.getFileInfo());
-					ret.addIntermediateResultIfUndone(new BackupEvent(state.getSecondEntity(), state.getFirstEntity(), top.getFileInfo(), 0));
+					ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.FILE_STATE, state.getFirstEntity(), top.getFileInfo(), state.getSecondEntity()));
 					doScan(remote, ret, stack);
 				}
 			}		

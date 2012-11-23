@@ -1,5 +1,6 @@
 package jadex.backup.swing;
 
+import jadex.backup.dropbox.DropboxSyncJob;
 import jadex.backup.job.Job;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.management.IJobManagementService;
@@ -146,7 +147,7 @@ public class JobsPanel extends JPanel
 		});
 		
 		final JPanel newjobp = new JPanel(new GridBagLayout());
-		final JComboBox jobtypecb = new JComboBox(new Class[]{SyncJob.class});
+		final JComboBox jobtypecb = new JComboBox(new Class[]{SyncJob.class, DropboxSyncJob.class});
 		jobtypecb.setRenderer(new DefaultListCellRenderer()
 		{
 			public Component getListCellRendererComponent(JList list, Object value,

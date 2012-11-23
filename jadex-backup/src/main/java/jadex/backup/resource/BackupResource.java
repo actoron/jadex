@@ -186,7 +186,7 @@ public class BackupResource implements IBackupResource
 		{
 			File	file	= getFile(location);
 			FileMetaInfo ret = new FileMetaInfo(new FileData(location, file.isDirectory(), file.exists(), file.isDirectory() ? 0 : file.length(), file.lastModified()),
-				props.containsKey(location) ? props.getProperty(location) : "");
+				props.containsKey(location) ? props.getProperty(location) : null);
 			
 			// Known file? -> check if update needed based on last modified or...
 			// ...change in file existence? -> store at current time
@@ -245,7 +245,9 @@ public class BackupResource implements IBackupResource
 	{
 		// (hack? only for files)
 		FileMetaInfo	local	= getFileInfo(fi.getPath());
-		String ret	= STATE_CHANGES.get(new Tuple(new Object[]{fi.isNewerThan(local), local.isNewerThan(fi), fi.isExisting(), local.isExisting()}));
+		Tuple tup = new Tuple(new Object[]{fi.isNewerThan(local), local.isNewerThan(fi), fi.isExisting(), local.isExisting()});
+		System.out.println("getState: "+fi.getPath());
+		String ret	= STATE_CHANGES.get(tup);
 		
 		if(FILE_UNCHANGED.equals(ret))
 		{
@@ -255,7 +257,10 @@ public class BackupResource implements IBackupResource
 			save();
 		}
 		
-//		System.out.println("state: "+ret+", "+fi.getLocation());
+		if(ret==null)
+			System.out.println("guuuuuuuuuuuuuuuuuuurke");
+		
+		System.out.println("state: "+ret+", "+fi.getPath());
 		
 		return new Tuple2<FileMetaInfo, String>(local, ret);
 	}
@@ -551,4 +556,5 @@ public class BackupResource implements IBackupResource
 		}
 		return null;
 	}
+	
 }

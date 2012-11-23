@@ -11,7 +11,6 @@ import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -62,8 +61,8 @@ public class DropboxBackupResource implements IBackupResource
 		this.props	= new Properties();
 		
 		// Try to find the ".jadexbackup" folder 
-		FileData fd = DropboxTest.getFileData(api, ".jadexbackup/resource.properties");
-		if(fd!=null)
+		FileData fd = DropboxTest.getFileData(api, "/.jadexbackup/resource.properties");
+		if(fd!=null && fd.isExisting())
 		{
 			byte[] data = DropboxTest.getFileContent(api, fd.getPath());
 			ByteArrayInputStream is = new ByteArrayInputStream(data);
@@ -172,7 +171,7 @@ public class DropboxBackupResource implements IBackupResource
 		try
 		{
 			FileData file = DropboxTest.getFileData(api, path);
-			FileMetaInfo ret = new FileMetaInfo(file, props.containsKey(path)? props.getProperty(path): "");
+			FileMetaInfo ret = new FileMetaInfo(file, props.containsKey(path)? props.getProperty(path): null);
 			
 			// Known file? -> check if update needed based on last modified or...
 			// ...change in file existence? -> store at current time
@@ -439,22 +438,22 @@ public class DropboxBackupResource implements IBackupResource
 	 */
 	protected void	save()
 	{
-		try
-		{
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			props.store(os, "Jadex Backup meta information.");
-			byte[] data = os.toByteArray(); // todo: avoid using byte[] holding complete file in mem
-			ByteArrayInputStream is = new ByteArrayInputStream(data);
-			DropboxTest.putFileData(api, "/.jadexbackup/resource.properties", is, data.length);
-		}
-		catch(RuntimeException e)
-		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+//		try
+//		{
+//			ByteArrayOutputStream os = new ByteArrayOutputStream();
+//			props.store(os, "Jadex Backup meta information.");
+//			byte[] data = os.toByteArray(); // todo: avoid using byte[] holding complete file in mem
+//			ByteArrayInputStream is = new ByteArrayInputStream(data);
+//			DropboxTest.putFileData(api, "/.jadexbackup/resource.properties", is, data.length);
+//		}
+//		catch(RuntimeException e)
+//		{
+//			throw e;
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
 	}
 	
 //	/**

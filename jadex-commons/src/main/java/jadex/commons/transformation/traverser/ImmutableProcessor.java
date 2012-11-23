@@ -25,7 +25,7 @@ public class ImmutableProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return object instanceof Enum || object instanceof URL || object instanceof URI || 
-			object instanceof Level || object instanceof InetAddress;
+			object instanceof Level || object instanceof InetAddress || object instanceof Exception;
 	}
 //	SReflect.isSupertype(Enum.class, object.getClass())
 	

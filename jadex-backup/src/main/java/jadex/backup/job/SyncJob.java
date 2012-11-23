@@ -12,15 +12,12 @@ import java.io.File;
 /**
  *  Job to sync resources.
  */
-public class SyncJob extends Job
+public class SyncJob extends AbstractSyncJob
 {
 	//-------- attributes --------
 	
 	/** The local source. */ 
 	protected String lres;
-	
-	/** The global resource. */
-	protected String gres;
 	
 	//-------- constructors --------
 	
@@ -36,9 +33,8 @@ public class SyncJob extends Job
 	 */
 	public SyncJob(String id, String name, String lres, String gres)
 	{
-		super(id, name);
+		super(id, name, gres);
 		this.lres = lres;
-		this.gres = gres;
 	}
 	
 	//-------- methods --------
@@ -61,44 +57,6 @@ public class SyncJob extends Job
 		this.lres = lres;
 	}
 
-	/**
-	 *  Get the globalResource.
-	 *  @return The globalResource.
-	 */
-	public String getGlobalResource()
-	{
-		return gres;
-	}
-
-	/**
-	 *  Set the globalResource.
-	 *  @param globalResource The globalResource to set.
-	 */
-	public void setGlobalResource(String globalResource)
-	{
-		this.gres = globalResource;
-	}
-	
-//	/**
-//	 *  Get the details about a job.
-//	 *  @return The details.
-//	 */
-//	public String getDetails()
-//	{
-//		StringBuffer ret = new StringBuffer(lres);
-//		if(gres!=null)
-//			ret.append(", id: ").append(gres);
-//		return ret.toString();
-//	}
-	
-	/**
-	 *  Get the agent type.
-	 */
-	public String getAgentType()
-	{
-		return "jadex/backup/job/processing/SyncJobProcessingAgent.class";
-	}
-	
 	/**
 	 *  Get the view.
 	 */

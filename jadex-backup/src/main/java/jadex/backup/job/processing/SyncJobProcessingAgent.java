@@ -1,5 +1,6 @@
 package jadex.backup.job.processing;
 
+import jadex.backup.job.AbstractSyncJob;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.SyncProfile;
 import jadex.backup.job.SyncTask;
@@ -7,7 +8,6 @@ import jadex.backup.job.SyncTaskEntry;
 import jadex.backup.job.Task;
 import jadex.backup.job.management.IJobManagementService;
 import jadex.backup.resource.BackupEvent;
-import jadex.backup.resource.BackupResource;
 import jadex.backup.resource.ILocalResourceService;
 import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
@@ -41,7 +41,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -55,7 +54,7 @@ import java.util.Map;
 @Agent
 @Arguments(
 {
-	@Argument(name="job", clazz=SyncJob.class, description="The job that is executed by the agent."),
+	@Argument(name="job", clazz=AbstractSyncJob.class, description="The job that is executed by the agent."),
 	@Argument(name="autoupdate", clazz=boolean.class, defaultvalue="false", description="Automatically update files or let user manually decide.")
 })
 @ProvidedServices(
@@ -83,7 +82,7 @@ public class SyncJobProcessingAgent
 	
 	/** The job. */
 	@AgentArgument
-	protected SyncJob job;
+	protected AbstractSyncJob job;
 	
 	/** Perform automatic updates (or just collect changes and let user decide). */
 	@AgentArgument
@@ -117,9 +116,6 @@ public class SyncJobProcessingAgent
 				try
 				{
 					Map<String, Object> args = new HashMap<String, Object>();
-//					args.put("dir", job.getLocalResource());
-//					args.put("id", job.getGlobalResource());
-
 					args.put("resource", job.getResource(agent.getComponentIdentifier()));
 							
 					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
@@ -157,12 +153,14 @@ public class SyncJobProcessingAgent
 	@AgentBody
 	public void body()
 	{
-		final long delay = 60000;
+		final long delay = 20000;
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("start step...");
+
 				final IComponentStep<Void> self = this;
 								
 				final Future<Void> ret = new Future<Void>();
@@ -220,25 +218,33 @@ public class SyncJobProcessingAgent
 				{
 					public void resultAvailable(Void result)
 					{
-						startSync().addResultListener(new IResultListener<Void>()
-						{ 
-							public void resultAvailable(Void result)
-							{
-								System.out.println("waiting...");
-								agent.waitForDelay(delay, self);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								System.out.println("waiting...");
-								agent.waitForDelay(delay, self);
-							}
-						});	
+						if(job instanceof SyncJob)
+						{
+							startSync().addResultListener(new IResultListener<Void>()
+							{ 
+								public void resultAvailable(Void result)
+								{
+									System.out.println("waiting...");
+									agent.waitForDelay(delay, self);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("waiting...");
+									agent.waitForDelay(delay, self);
+								}
+							});	
+						}
+						else
+						{
+							System.out.println("waiting...");
+							agent.waitForDelay(delay, self);
+						}
 					}	
 					
 					public void exceptionOccurred(Exception exception) 
 					{
-						System.out.println("waiting...");
+						System.out.println("waiting... (no sync partner): "+agent.getComponentIdentifier());
 						agent.waitForDelay(delay, self);
 					}
 				});
@@ -266,36 +272,40 @@ public class SyncJobProcessingAgent
 		{
 			public void intermediateResultAvailable(BackupEvent result)
 			{
-//				System.out.println(result);
+				System.out.println("backupevent: "+result);
+				
 				SyncTaskEntry entry = null;
 				
 				// Todo: user-editable policies for default action sets (e.g. skip conflicts vs. copy on conflict)
-				List<String>	actions	= SyncProfile.ALLOWED_ACTIONS.get(result.getType());
-				if(actions.size()>1)
+				if(BackupEvent.FILE_STATE.equals(result.getType()))
 				{
-					entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), result.getType(), actions.get(0));
-				}
-										
-				if(entry!=null)
-				{
-					if(!autoupdate)
+					List<String>	actions	= SyncProfile.ALLOWED_ACTIONS.get(result.getDetails());
+					if(actions.size()>1)
 					{
-//						changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
-						task.addSyncEntry(entry);
+						entry	= new SyncTaskEntry(task, result.getLocalFile(), result.getRemoteFile(), (String)result.getDetails(), actions.get(0));
 					}
-					else
+											
+					if(entry!=null)
 					{
-						performAction(resser, remresser, entry).addResultListener(new IResultListener<Void>()
+						if(!autoupdate)
 						{
-							public void resultAvailable(Void result)
+	//						changelist.add(new Tuple2<String, FileInfo>(result.getType(), result.getFile()));
+							task.addSyncEntry(entry);
+						}
+						else
+						{
+							performAction(resser, remresser, entry).addResultListener(new IResultListener<Void>()
 							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						});
+								public void resultAvailable(Void result)
+								{
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+								}
+							});
+						}
 					}
 				}
 			}
@@ -532,7 +542,7 @@ public class SyncJobProcessingAgent
 	 *  Get the job.
 	 *  @return The job.
 	 */
-	public SyncJob getJob()
+	public AbstractSyncJob getJob()
 	{
 		return job;
 	}

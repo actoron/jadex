@@ -17,6 +17,9 @@ public class BackupEvent
 //	public static final String FILE_UPDATE_ERROR = "file_update_error";
 	
 	public static final String ERROR = "error";
+	
+	public static final String FILE_STATE = "file_state";
+
 
 
 	//-------- attributes --------
@@ -56,7 +59,7 @@ public class BackupEvent
 	 */
 	public BackupEvent(String type, FileMetaInfo localfi, FileMetaInfo remotefi, Object details)
 	{
-		this.type	= type;
+		setType(type);
 		this.localfi	= localfi;
 		this.remotefi	= remotefi;
 		this.details = details;
@@ -71,6 +74,16 @@ public class BackupEvent
 	{
 		return type;
 	}
+	
+	/**
+	 *  Set the type.
+	 */
+	public void setType(String type)
+	{
+		if(type==null || !(DOWNLOAD_STATE.equals(type) || ERROR.equals(type) || FILE_STATE.equals(type)))
+			throw new IllegalArgumentException("Unknown type: "+type);
+		this.type = type;
+	}
 
 	/**
 	 *  Get the file.
@@ -81,27 +94,19 @@ public class BackupEvent
 	}
 	
 	/**
-	 *  Get the remote file.
-	 */
-	public FileMetaInfo getRemoteFile()
-	{
-		return remotefi;
-	}
-	
-	/**
-	 *  Set the type.
-	 */
-	public void setType(String type)
-	{
-		this.type = type;
-	}
-
-	/**
 	 *  Set the file.
 	 */
 	public void setLocalFile(FileMetaInfo fi)
 	{
 		this.localfi = fi;
+	}
+	
+	/**
+	 *  Get the remote file.
+	 */
+	public FileMetaInfo getRemoteFile()
+	{
+		return remotefi;
 	}
 	
 	/**
@@ -130,6 +135,9 @@ public class BackupEvent
 		this.details = details;
 	}
 
+	/**
+	 * 
+	 */
 	public String toString()
 	{
 		return "BackupEvent [type=" + type + ", file=" + (remotefi!=null ? remotefi.getPath() : "null") + ", details="+ details + "]";

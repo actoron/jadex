@@ -209,23 +209,40 @@ public class DropboxTest
 		}
 	}	
 	
+//	/**
+//	 * 
+//	 */
+//	public static FileData getFileData(DropboxAPI<WebAuthSession> api, String path)
+//	{
+//		try
+//		{
+//			return createFileData(api.metadata(path, 0, null, false, null));
+//		}
+//		catch(RuntimeException e)
+//		{
+//			throw e;
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//	}	
+	
 	/**
 	 * 
 	 */
 	public static FileData getFileData(DropboxAPI<WebAuthSession> api, String path)
 	{
+		FileData ret = null;
 		try
 		{
-			return createFileData(api.metadata(path, 0, null, false, null));
-		}
-		catch(RuntimeException e)
-		{
-			throw e;
+			ret = createFileData(api.metadata(path, 0, null, false, null));
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			ret = new FileData(path, false, false, 0, 0);
 		}
+		return ret;
 	}	
 	
 	/**

@@ -33,10 +33,19 @@ public class FileData //implements IFile
 	/**
 	 * 
 	 */
+	public FileData(String path)
+	{
+		this.path = path;
+	}
+	
+	/**
+	 * 
+	 */
 	public FileData(String path, boolean directory, boolean exists, long size, long lastmodified)
 	{
 		this.path = path;
 		this.directory = directory;
+		this.exists = exists;
 		this.size = size;
 		this.lastmodified = lastmodified;
 	}

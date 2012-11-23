@@ -138,6 +138,7 @@ public class BeanProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
+				System.out.println("beanproc ex: "+object+" "+c);
 				throw new RuntimeException(e);
 			}
 		}

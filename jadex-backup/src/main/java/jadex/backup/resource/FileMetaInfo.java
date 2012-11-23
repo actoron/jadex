@@ -206,6 +206,8 @@ public class FileMetaInfo
 	 */
 	public void	setVTime(String node, long time)
 	{
+		if(time==0)
+			System.out.println("herere");
 		vtimes.put(node, new Long(time));
 	}
 	
@@ -228,7 +230,8 @@ public class FileMetaInfo
 		// 1: hash values are equal (currently only tested for directories)
 		// 2: a locally valid time stamp is found for which a greater or equal time stamp exists remotely as valid or invalid
 		
-		boolean	changed	= getHash()==null || !getHash().equals(fmi.getHash());
+		boolean	changed	= (getHash()==null && vtimes.size()>0)
+			|| (getHash()!=null && !getHash().equals(fmi.getHash()));
 		if(changed)
 		{
 			for(Iterator<String> it=vtimes.keySet().iterator(); changed && it.hasNext(); )
@@ -279,7 +282,7 @@ public class FileMetaInfo
 	 */
 	protected static boolean	parseExists(String vtime)
 	{
-		return !vtime.startsWith("D.");
+		return vtime!=null && !vtime.startsWith("D.");
 	}
 	
 	/**
@@ -301,16 +304,20 @@ public class FileMetaInfo
 	protected static Map<String, Long>	parseVTime(String vtime)
 	{
 		Map<String, Long>	vtimes	= new LinkedHashMap<String, Long>();
-		StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
-		String	last	= null;
-		while(stok.hasMoreTokens())
+
+		if(vtime!=null)
 		{
-			String	next	= stok.nextToken();
-			if("@".equals(next) && stok.hasMoreTokens())
+			StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
+			String	last	= null;
+			while(stok.hasMoreTokens())
 			{
-				vtimes.put(last, new Long(Long.parseLong(stok.nextToken())));
+				String	next	= stok.nextToken();
+				if("@".equals(next) && stok.hasMoreTokens())
+				{
+					vtimes.put(last, new Long(Long.parseLong(stok.nextToken())));
+				}
+				last	= next;
 			}
-			last	= next;
 		}
 		return vtimes;
 	}
