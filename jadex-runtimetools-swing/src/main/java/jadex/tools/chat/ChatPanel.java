@@ -83,7 +83,6 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -109,7 +108,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.UIDefaults;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -401,7 +399,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //						this.setCaretPosition(getText().length());
 //					}
 				};
-				StyledDocument doc = chatarea.getStyledDocument();
+//				StyledDocument doc = chatarea.getStyledDocument();
 //				((AbstractDocument)doc).setDocumentFilter(new DocumentFilter()
 //				{
 //					public void insertString(FilterBypass fb, int offset,
@@ -726,6 +724,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								{
 									read+=fis.read(data, read, data.length-read);
 								}
+								fis.close();
 
 								double twh = 40.0;
 								BufferedImage src = ImageIO.read(new ByteArrayInputStream(data));
@@ -925,7 +924,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						dia.getContentPane().add(pan, BorderLayout.CENTER);
 //						dia.setLocation(SGUI.calculateMiddlePosition(SGUI.getWindowParent(panel), dia));
 						dia.setUndecorated(true);
-						Border bl = BorderFactory.createLineBorder(Color.black);
+//						Border bl = BorderFactory.createLineBorder(Color.black);
 //						((JComponent)dia).setBorder(bl);
 						dia.addWindowFocusListener(new WindowFocusListener()
 						{
@@ -1884,50 +1883,57 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 *  Play the notification sound for the selected event.
 	 *  @param type	The notification event.
 	 */
-	protected void playSound(String type, boolean verbose)
+	protected void playSound(final String type, final boolean verbose)
 	{
-		try
+		// Hack to avoid freeze on OpenJDK
+		new Thread(new Runnable()
 		{
-			String filename = getNotificationSound(type);
-			URL	url	= this.getClass().getResource(filename);
-			if(url==null)
+			public void run()
 			{
-				File f = new File(filename);
-				if(f.exists())
-					url = f.toURI().toURL();
-			}
-			// Cannot use stream due to jar starter bug.
-			AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
-			AudioFormat	format	= ais.getFormat();
-			DataLine.Info	info	= new DataLine.Info(Clip.class, format);
-			Clip	clip	= (Clip)AudioSystem.getLine(info);
-			// OpenJDK hangs below :-(
-			clip.open(ais);
-			clip.addLineListener(new LineListener()
-			{
-				public void update(LineEvent event)
+				try
 				{
-					if(event.getType()==LineEvent.Type.STOP)
+					String filename = getNotificationSound(type);
+					URL	url	= this.getClass().getResource(filename);
+					if(url==null)
 					{
-						// Close the clip after it finished playing.
-						event.getLine().close();
+						File f = new File(filename);
+						if(f.exists())
+							url = f.toURI().toURL();
+					}
+					// Cannot use stream due to jar starter bug.
+					AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
+					AudioFormat	format	= ais.getFormat();
+					DataLine.Info	info	= new DataLine.Info(Clip.class, format);
+					Clip	clip	= (Clip)AudioSystem.getLine(info);
+					// OpenJDK hangs below :-(
+					clip.open(ais);
+					clip.addLineListener(new LineListener()
+					{
+						public void update(LineEvent event)
+						{
+							if(event.getType()==LineEvent.Type.STOP)
+							{
+								// Close the clip after it finished playing.
+								event.getLine().close();
+							}
+						}
+					});
+					clip.start();
+//					while(clip.isRunning())
+//					{
+//						Thread.yield();
+//					}
+				}
+				catch(Throwable e)	// AssertionError in org.classpath.icedtea.pulseaudio.Stream.disconnect(Stream.java:557) grrr...
+				{
+					if(verbose)
+					{
+						System.err.println("Couldn't play notification sound '"+type+"': "+e);
+						e.printStackTrace();
 					}
 				}
-			});
-			clip.start();
-//			while(clip.isRunning())
-//			{
-//				Thread.yield();
-//			}
-		}
-		catch(Throwable e)	// AssertionError in org.classpath.icedtea.pulseaudio.Stream.disconnect(Stream.java:557) grrr...
-		{
-			if(verbose)
-			{
-				System.err.println("Couldn't play notification sound '"+type+"': "+e);
-				e.printStackTrace();
 			}
-		}
+		}).start();
 	}
 	
 	/**
