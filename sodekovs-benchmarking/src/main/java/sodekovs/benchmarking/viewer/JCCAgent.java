@@ -10,12 +10,10 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.tools.awareness.AwarenessComponentPlugin;
-import jadex.tools.convcenter.ConversationPlugin;
+import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
-import jadex.tools.deployer.DeployerPlugin;
-import jadex.tools.dfbrowser.DFServicePlugin;
 import jadex.tools.jcc.ControlCenter;
-import jadex.tools.libtool.LibraryServicePlugin;
+import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
 import jadex.tools.testcenter.TestCenterPlugin;
@@ -46,14 +44,26 @@ public class JCCAgent extends MicroAgent {
 		Future<Void> ret = new Future<Void>();
 		this.cc = new ControlCenter();
 		cc.init(getExternalAccess(),
-				new String[] { StarterPlugin.class.getName(),
-						// StarterServicePlugin.class.getName(),
-						DFServicePlugin.class.getName(), ConversationPlugin.class.getName(), "jadex.tools.comanalyzer.ComanalyzerPlugin", TestCenterPlugin.class.getName(),
-						// JadexdocPlugin.class.getName(),
-						SimulationServicePlugin.class.getName(), DebuggerPlugin.class.getName(),
-						// RuleProfilerPlugin.class.getName(),
-						LibraryServicePlugin.class.getName(), AwarenessComponentPlugin.class.getName(), ComponentViewerPlugin.class.getName(), BenchmarkingPlugin.class.getName(),
-						CoordinationPlugin.class.getName(), DeployerPlugin.class.getName() }, saveonexit).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+				new String[] { 
+			StarterPlugin.class.getName(),
+			ChatPlugin.class.getName(),
+//			StarterServicePlugin.class.getName(),
+//			DFServicePlugin.class.getName(),
+//			ConversationPlugin.class.getName(),
+//			"jadex.tools.comanalyzer.ComanalyzerPlugin",
+			TestCenterPlugin.class.getName(),
+//			JadexdocPlugin.class.getName(),
+			SimulationServicePlugin.class.getName(),
+			DebuggerPlugin.class.getName(),
+//			RuleProfilerPlugin.class.getName(),
+//			LibraryServicePlugin.class.getName(),
+			AwarenessComponentPlugin.class.getName(),
+			ComponentViewerPlugin.class.getName(),
+			SecurityServicePlugin.class.getName(),
+//			DeployerPlugin.class.getName(),
+			BenchmarkingPlugin.class.getName(),
+			CoordinationPlugin.class.getName()
+				}, saveonexit).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 		return ret;
 	}
 
