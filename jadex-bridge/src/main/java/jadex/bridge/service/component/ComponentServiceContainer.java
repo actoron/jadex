@@ -22,7 +22,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IFilter;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -38,6 +37,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -308,25 +308,23 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
-		adapter.getChildrenIdentifiers().addResultListener(new IResultListener()
+		adapter.getChildrenIdentifiers().addResultListener(new IResultListener<IComponentIdentifier[]>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IComponentIdentifier[] children)
 			{
-				if(result!=null)
+				if(children!=null)
 				{
-					IComponentIdentifier[] childs = (IComponentIdentifier[])result;
 //					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
-					final IResultListener lis = new CollectionResultListener(
-						childs.length, true, new DelegationResultListener(ret));
-					for(int i=0; i<childs.length; i++)
+					final IResultListener<IServiceProvider> lis = new CollectionResultListener<IServiceProvider>(
+						children.length, true, new DelegationResultListener<Collection<IServiceProvider>>(ret));
+					for(int i=0; i<children.length; i++)
 					{
 						if(cms!=null)
 						{
-							cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
+							cms.getExternalAccess(children[i]).addResultListener(new IResultListener<IExternalAccess>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(IExternalAccess exta)
 								{
-									IExternalAccess exta = (IExternalAccess)result;
 									lis.resultAvailable(exta.getServiceProvider());
 								}
 								
@@ -344,7 +342,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				else
 				{
-					ret.setResult(Collections.EMPTY_LIST);
+					List<IServiceProvider>	res	= Collections.emptyList();
+					ret.setResult(res);
 				}
 			}
 			public void exceptionOccurred(Exception exception)
