@@ -66,10 +66,13 @@ public class DeletionController implements mxIEventListener
 				for (Object obj : pools)
 				{
 					MPool mpool = (MPool) obj;
-					if (mpool.getSequenceEdges().contains(medge))
+					if (mpool.getSequenceEdges() != null)
 					{
-						mpool.removeSequenceEdge(medge);
-						break;
+						if (mpool.getSequenceEdges().contains(medge))
+						{
+							mpool.removeSequenceEdge(medge);
+							break;
+						}
 					}
 				}
 				medge.getSource().removeOutgoingSequenceEdge(medge);

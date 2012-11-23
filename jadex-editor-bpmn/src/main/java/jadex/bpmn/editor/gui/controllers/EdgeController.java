@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.EdgeDragContextMenu;
@@ -15,6 +16,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
@@ -51,7 +54,14 @@ public class EdgeController extends mxConnectionHandler
 			{
 				ret = SValidation.getSequenceEdgeValidationError(source, target);
 			}
-					
+			
+			
+		}
+		
+		if (ret != null && ret.length() > 0)
+		{
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, ret);
+			ret = "";
 		}
 		
 		return ret;

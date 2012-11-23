@@ -1,10 +1,13 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.TransferHandler;
 
@@ -47,7 +50,10 @@ public class GraphOperationsController extends mxGraphHandler
 		}
 		else
 		{
-			//Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, error);
+			if (error.length() > 0)
+			{	
+				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, error);
+			}
 		}
 	}
 	
