@@ -5,6 +5,7 @@ import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
@@ -29,6 +30,7 @@ import javax.swing.Timer;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraphView;
 
 /**
@@ -166,6 +168,51 @@ public class MouseController extends MouseAdapter
 		else if (MouseEvent.BUTTON2 == e.getButton())
 		{
 			setTargetScale(1.0);
+		}
+		else if (MouseEvent.BUTTON3 == e.getButton() && e.getClickCount() == 2)
+		{
+			Object cells[] = modelcontainer.getGraph().getSelectionCells();
+			if (cells != null)
+			{
+				for (Object obj : cells)
+				{
+					if (obj instanceof VActivity)
+					{
+						VActivity vactivity = (VActivity) obj;
+						String at = ((MActivity) vactivity.getBpmnElement()).getActivityType();
+						Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(at) ?
+								   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(at) :
+								   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
+						
+						Dimension ads = null;
+						if (BpmnStylesheetColor.COLLAPSED_SIZES.containsKey(vactivity.getStyle()) ||
+							BpmnStylesheetColor.COLLAPSED_SIZES.containsKey(at))
+						{
+							ads = (BpmnStylesheetColor.COLLAPSED_SIZES.get(at) != null?
+								   BpmnStylesheetColor.COLLAPSED_SIZES.get(at) :
+								   BpmnStylesheetColor.COLLAPSED_SIZES.get(vactivity.getStyle()));
+						}
+						
+						if (ads != null && vactivity.isCollapsed())
+						{
+							Dimension tmp = ds;
+							ds = ads;
+							ads = tmp;
+						}
+						
+						vactivity.getGeometry().setWidth(ds.width);
+						vactivity.getGeometry().setHeight(ds.height);
+						if (ads != null)
+						{
+							mxRectangle alt = vactivity.getGeometry().getAlternateBounds();
+							vactivity.getGeometry().setAlternateBounds(new mxRectangle(alt.getX(), alt.getY(),
+																					   ads.width, ads.height));
+						}
+						
+						modelcontainer.getGraph().refreshCellView(vactivity);
+					}
+				}
+			}
 		}
 	}
 	

@@ -71,12 +71,12 @@ public class BpmnStylesheetColor extends mxStylesheet
 	public static final Map<String, Dimension> DEFAULT_ACTIVITY_SIZES = new HashMap<String, Dimension>();
 	static
 	{
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_TASK, new Dimension(160, 100));
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(480, 200));
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, new Dimension(160, 100));
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_XOR, new Dimension(60, 60));
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_AND, new Dimension(60, 60));
-		DEFAULT_ACTIVITY_SIZES.put(ModelContainer.EDIT_MODE_GW_OR, new Dimension(60, 60));
+		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.TASK, new Dimension(160, 100));
+		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, new Dimension(480, 200));
+		DEFAULT_ACTIVITY_SIZES.put(VExternalSubProcess.class.getSimpleName(), new Dimension(160, 100));
+		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new Dimension(60, 60));
+		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_PARALLEL, new Dimension(60, 60));
+		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_START", new Dimension(40, 40));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_INTERMEDIATE", new Dimension(40, 40));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_END", new Dimension(40, 40));

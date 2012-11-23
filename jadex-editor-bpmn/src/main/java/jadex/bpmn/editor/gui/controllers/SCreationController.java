@@ -78,17 +78,20 @@ public class SCreationController
 		
 		Point p = adjustPoint(modelcontainer, targetcell, targetpoint);
 		
-		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mode) ?
-					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mode) :
+		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mactivity.getActivityType()) ?
+					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mactivity.getActivityType()) :
 					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
 		vactivity.setGeometry(new mxGeometry(p.getX() - ds.width * 0.5,
 											 p.getY() - ds.height * 0.5,
 											 ds.width,
 											 ds.height));
 		
-		if (BpmnStylesheetColor.COLLAPSED_SIZES.containsKey(mode))
+		if (BpmnStylesheetColor.COLLAPSED_SIZES.containsKey(vactivity.getStyle()) ||
+			BpmnStylesheetColor.COLLAPSED_SIZES.containsKey(mactivity.getActivityType()))
 		{
-			Dimension ads = BpmnStylesheetColor.COLLAPSED_SIZES.get(mode);
+			Dimension ads = (Dimension) (BpmnStylesheetColor.COLLAPSED_SIZES.get(vactivity.getStyle()) != null?
+				BpmnStylesheetColor.COLLAPSED_SIZES.get(vactivity.getStyle()) :
+				BpmnStylesheetColor.COLLAPSED_SIZES.get(mactivity.getActivityType()));
 			vactivity.getGeometry().setAlternateBounds(
 				new mxGeometry(p.getX() - ads.width * 0.5,
 					 		   p.getY() - ads.height * 0.5,

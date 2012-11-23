@@ -110,10 +110,35 @@ public class BpmnGraph extends mxGraph
 	 */
 	public boolean isValidDropTarget(Object cell, Object[] cells)
 	{
+		if (cells == null)
+		{
+			Thread.dumpStack();
+		}
+		
 		boolean ret = cell != null
-				&& ((isSplitEnabled() && isSplitTarget(cell, cells)) || (!model
-						.isEdge(cell) && (isSwimlane(cell) || cell instanceof VSubProcess || (model
-						.getChildCount(cell) > 0 && !isCellCollapsed(cell)))));
+				&& ((isSplitEnabled() && isSplitTarget(cell, cells)) ||
+						(!model.isEdge(cell) && (isSwimlane(cell) ||
+						(model.getChildCount(cell) > 0 && !isCellCollapsed(cell)))));
+		
+		/* Special case for subprocesses */
+		if (cell instanceof VSubProcess && cells != null)
+		{
+			boolean nomatch = true;
+			for (int i = 0; i < cells.length; ++i)
+			{
+				if (cells[i].equals(cell))
+				{
+					nomatch = false;
+					break;
+				}
+			}
+			
+			if (nomatch)
+			{
+				ret = (isSplitEnabled() && isSplitTarget(cell, cells)) ||
+						(!model.isEdge(cell) && !isCellCollapsed(cell));
+			}
+		}
 		return ret;
 	}
 

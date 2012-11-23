@@ -7,14 +7,17 @@ import jadex.bpmn.model.MBpmnModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -157,6 +160,9 @@ public class ModelContainer
 	/** The project root. */
 	protected File projectroot;
 	
+	/** The project classloader. */
+	protected ClassLoader projectclassloader;
+	
 	/** The edit mode tool bar. */
 	protected AbstractEditingToolbar editingtoolbar;
 	
@@ -281,6 +287,15 @@ public class ModelContainer
 	public void setProjectRoot(File root)
 	{
 		projectroot = root;
+		try
+		{
+			projectclassloader = new URLClassLoader(new URL[] { root.toURI().toURL() });
+		}
+		catch (MalformedURLException e)
+		{
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING,
+				"Indentified project root, unable to generate classloader: " + e.getMessage());
+		}
 	}
 	
 	/**
@@ -315,53 +330,63 @@ public class ModelContainer
 	}
 	
 	/**
-	 *  Returns all available Java classes in the project.
+	 *  Gets the project class loader.
 	 *  
-	 *  @return Array of class names, null if unknown.
+	 *  @return The project class loader.
 	 */
-	public String[] getProjectClasses()
+	public ClassLoader getProjectClassLoader()
 	{
-		String[] ret = null;
-		if (projectroot != null)
-		{
-			List<String> list = searchForClasses(projectroot);
-			ret = list.toArray(new String[list.size()]);
-		}
-		return ret;
+		return projectclassloader;
 	}
 	
-	/**
-	 *  Recursive search for class files.
-	 */
-	public List<String> searchForClasses(File dir)
-	{
-		List<String> ret = new ArrayList<String>();
-		
-		File[] files = dir.listFiles();
-		
-		for (int i = 0; i < files.length; ++i)
-		{
-			File file = files[i];
-			if (file.isDirectory() && !file.getName().equals(".") && !file.getName().equals(".."))
-			{
-				ret.addAll(searchForClasses(file));
-			}
-			else if (file.getAbsolutePath().endsWith(".java") ||
-					 file.getAbsolutePath().endsWith(".class"))
-			{
-				String classname = file.getAbsolutePath().substring(projectroot.getAbsolutePath().length());
-				while (classname.startsWith(File.separator))
-				{
-					classname = classname.substring(1);
-				}
-				classname = classname.substring(0, classname.lastIndexOf('.'));
-				classname = classname.replaceAll(File.separator, ".");
-				ret.add(classname);
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Returns all available Java classes in the project.
+//	 *  
+//	 *  @return Array of class names, null if unknown.
+//	 */
+//	public String[] getProjectClasses()
+//	{
+//		String[] ret = null;
+//		if (projectroot != null)
+//		{
+//			List<String> list = searchForClasses(projectroot);
+//			ret = list.toArray(new String[list.size()]);
+//		}
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Recursive search for class files.
+//	 */
+//	public List<String> searchForClasses(File dir)
+//	{
+//		List<String> ret = new ArrayList<String>();
+//		
+//		File[] files = dir.listFiles();
+//		
+//		for (int i = 0; i < files.length; ++i)
+//		{
+//			File file = files[i];
+//			if (file.isDirectory() && !file.getName().equals(".") && !file.getName().equals(".."))
+//			{
+//				ret.addAll(searchForClasses(file));
+//			}
+//			else if (file.getAbsolutePath().endsWith(".java") ||
+//					 file.getAbsolutePath().endsWith(".class"))
+//			{
+//				String classname = file.getAbsolutePath().substring(projectroot.getAbsolutePath().length());
+//				while (classname.startsWith(File.separator))
+//				{
+//					classname = classname.substring(1);
+//				}
+//				classname = classname.substring(0, classname.lastIndexOf('.'));
+//				classname = classname.replaceAll(File.separator, ".");
+//				ret.add(classname);
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Gets the edit mode.
@@ -473,6 +498,10 @@ public class ModelContainer
 	protected void findProjectRoot()
 	{
 		String pkg = model.getModelInfo().getPackage();
+		if (pkg == null || pkg.length() == 0)
+		{
+			return;
+		}
 		String filepath = file.getAbsolutePath();
 		int ind = filepath.lastIndexOf(File.separator);
 		if (ind >= 0)

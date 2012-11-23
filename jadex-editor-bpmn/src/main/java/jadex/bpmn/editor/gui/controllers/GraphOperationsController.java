@@ -80,6 +80,10 @@ public class GraphOperationsController extends mxGraphHandler
 				Object cell = super.getCell(e);
 				Object[] cells = (isLocal) ? graph.getSelectionCells()
 						: dragCells;
+				
+				//FIXME: Bug?
+				cells = cells != null? cells : graph.getSelectionCells();
+				
 				cell = graph.getDropTarget(cells, e.getPoint(), cell);
 
 				// Checks if parent is dropped into child

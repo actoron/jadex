@@ -23,6 +23,7 @@ import com.mxgraph.swing.handler.mxConnectPreview;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 public class EdgeController extends mxConnectionHandler
@@ -126,12 +127,19 @@ public class EdgeController extends mxConnectionHandler
 	
 	protected class BpmnConnectPreview extends mxConnectPreview
 	{
+		/** Time stamp of drag start. */
+		protected long timestamp;
+		
 		public BpmnConnectPreview(mxGraphComponent graphcomponent)
 		{
 			super(graphcomponent);
 		}
 		
-		
+		public void start(MouseEvent e, mxCellState startState, String style)
+		{
+			timestamp = System.currentTimeMillis();
+			super.start(e, startState, style);
+		}
 		
 		public Object stop(boolean commit, MouseEvent e)
 		{
