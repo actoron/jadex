@@ -71,6 +71,11 @@ public class ServiceMechanism extends CoordinationMechanism {
 							}
 						}
 					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception) {
+						exception.printStackTrace();
+					}
 				});
 	}
 
