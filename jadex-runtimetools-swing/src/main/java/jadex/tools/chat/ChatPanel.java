@@ -1901,6 +1901,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			AudioFormat	format	= ais.getFormat();
 			DataLine.Info	info	= new DataLine.Info(Clip.class, format);
 			Clip	clip	= (Clip)AudioSystem.getLine(info);
+			// OpenJDK hangs below :-(
 			clip.open(ais);
 			clip.addLineListener(new LineListener()
 			{
