@@ -34,6 +34,14 @@
 		</plugins>
 	</build>
 	
+	<repositories>
+		<repository>
+			<id>project</id>
+			<name>Maven Project Repository</name>
+			<url>file:///${basedir}/lib</url>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -49,6 +57,12 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-tools-base-swing</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.dropbox.client2</groupId>
+		    <artifactId>dropbox-client</artifactId>
+			<version>1.5.1</version>
 		</dependency>
 	</dependencies>
 

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -388,7 +389,7 @@ public class RelayHandler
 			if(peer!=null && !peer.isSent())
 			{
 				peer.setSent(true);
-				sendPlatformInfos(peer, getCurrentPlatforms());
+				sendPlatformInfos(peer, getCurrentPlatforms(), null);
 			}
 		}
 		return peers.getURLs(requesturl);
@@ -397,9 +398,12 @@ public class RelayHandler
 	/**
 	 *  Send platform infos to a peer relay server.
 	 */
-	public void	sendPlatformInfos(PeerEntry peer, PlatformInfo[] infos)
+	public byte[]	sendPlatformInfos(PeerEntry peer, PlatformInfo[] infos, byte[] peerinfo)
 	{
-		byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
+		if(peerinfo==null)
+		{
+			peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
+		}
 				
 		try
 		{
@@ -410,6 +414,8 @@ public class RelayHandler
 		{
 			System.out.println("Error sending platform infos to peer: "+e);
 		}					
+		
+		return peerinfo;
 	}
 	
 	//-------- helper methods --------	
@@ -556,18 +562,24 @@ public class RelayHandler
 		}
 
 		// Distribute platform info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
-		if(platform!=null)
+		if(platform==null)
 		{
-			byte[]	peerinfo	= null;
-			PeerEntry[] apeers = peers.getPeers();
-			for(PeerEntry peer: apeers)
-			{
-				if(peer.isConnected())
-				{
-					sendPlatformInfos(peer, new PlatformInfo[]{platform});
-				}
-			}					
+			System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
+			platform	= new PlatformInfo();
+			platform.setId(awainfo.getSender().getName());
+			platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.
+			awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+			platform.setAwarenessInfo(awainfo);
 		}
+		PeerEntry[] apeers = peers.getPeers();
+		byte[]	peerinfo	= null;
+		for(PeerEntry peer: apeers)
+		{
+			if(peer.isConnected())
+			{
+				peerinfo	= sendPlatformInfos(peer, new PlatformInfo[]{platform}, peerinfo);
+			}
+		}					
 	}
 	
 	/**
