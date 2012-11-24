@@ -212,7 +212,7 @@ public class DropboxSyncJobPanel extends JPanel
 					};
 					reqt.setModel(tm);
 					
-					SyncTaskActionCellEditor	editor	= new SyncTaskActionCellEditor();
+					SyncTaskActionCellEditor editor	= new SyncTaskActionCellEditor();
 					TableColumn actioncol = reqt.getColumnModel().getColumn(0);
 					actioncol.setCellEditor(editor);
 					actioncol.setCellRenderer(editor);

@@ -218,8 +218,9 @@ public class SyncJobProcessingAgent
 				{
 					public void resultAvailable(Void result)
 					{
-						if(job instanceof SyncJob)
-						{
+						// Comment out to test only update of SyncJob 
+//						if(job instanceof SyncJob)
+//						{
 							startSync().addResultListener(new IResultListener<Void>()
 							{ 
 								public void resultAvailable(Void result)
@@ -234,12 +235,12 @@ public class SyncJobProcessingAgent
 									agent.waitForDelay(delay, self);
 								}
 							});	
-						}
-						else
-						{
-							System.out.println("waiting...");
-							agent.waitForDelay(delay, self);
-						}
+//						}
+//						else
+//						{
+//							System.out.println("waiting...");
+//							agent.waitForDelay(delay, self);
+//						}
 					}	
 					
 					public void exceptionOccurred(Exception exception) 

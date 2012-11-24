@@ -178,6 +178,10 @@ public class FileMetaInfo
 	 */
 	public void	bumpVTime(String node, long time, String hash, boolean exists)
 	{
+		// Do not save unknown time as vector time.
+		if(time==0)
+			return;
+		
 		boolean	change	= this.hash==null || !this.hash.equals(hash) || exists!=this.exists;
 
 		// on change -> invalidate other times and update hash.
@@ -207,8 +211,12 @@ public class FileMetaInfo
 	public void	setVTime(String node, long time)
 	{
 		if(time==0)
-			System.out.println("herere");
-		vtimes.put(node, new Long(time));
+			throw new IllegalArgumentException("Time must not null: "+node);
+		
+//		if(time==0)
+//			System.out.println("herere");
+//		else
+			vtimes.put(node, new Long(time));
 	}
 	
 	

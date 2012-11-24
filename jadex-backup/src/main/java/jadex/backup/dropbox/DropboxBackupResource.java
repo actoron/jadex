@@ -377,13 +377,6 @@ public class DropboxBackupResource implements IBackupResource
 				ofi.updateVTimes(remotefi, true);
 				props.setProperty(ofi.getPath(), ofi.getVTime());
 				save();
-	
-				// Update meta information to reflect new current state.
-				// todo: file hash code.
-				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : System.currentTimeMillis(), null, orig.isExisting());
-				ofi.updateVTimes(remotefi, true);
-				props.setProperty(ofi.getPath(), ofi.getVTime());
-				save();
 			}
 			catch(RuntimeException e)
 			{
