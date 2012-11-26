@@ -5,10 +5,7 @@ import jadex.bdiv3.annotation.BeliefCollection;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.PlanFailureException;
 import jadex.bdiv3.runtime.RPlan;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 

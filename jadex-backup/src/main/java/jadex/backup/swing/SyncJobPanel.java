@@ -214,10 +214,12 @@ public class SyncJobPanel extends JPanel
 					};
 					reqt.setModel(tm);
 					
+					// Swing does not allow using the same object for renderer and editor :-(
 					SyncTaskActionCellEditor	editor	= new SyncTaskActionCellEditor();
+					SyncTaskActionCellEditor	rend	= new SyncTaskActionCellEditor();
 					TableColumn actioncol = reqt.getColumnModel().getColumn(0);
 					actioncol.setCellEditor(editor);
-					actioncol.setCellRenderer(editor);
+					actioncol.setCellRenderer(rend);
 					reqt.setRowHeight(editor.getComponent().getMinimumSize().height);
 					
 					// Add entries to model

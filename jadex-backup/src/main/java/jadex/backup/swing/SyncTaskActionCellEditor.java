@@ -3,6 +3,7 @@ package jadex.backup.swing;
 import jadex.backup.job.SyncProfile;
 
 import java.awt.Component;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -42,6 +43,9 @@ public class SyncTaskActionCellEditor	extends DefaultCellEditor	implements Table
 	 */
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean selected, int row, int column)
 	{
+		// Initialize editor delegate by super impl.
+//		super.getTableCellEditorComponent(table, value, selected, row, column);
+		
 		return getComponent(table, value, selected, row, false);
 	}
 	
@@ -57,13 +61,23 @@ public class SyncTaskActionCellEditor	extends DefaultCellEditor	implements Table
 		List<String>	actions	= SyncProfile.ALLOWED_ACTIONS.get(type);
 		
 		JComboBox	box	= (JComboBox)getComponent();
+//		ActionListener[] lis = box.getActionListeners();
+//		for(ActionListener l: lis)
+//		{
+//			box.removeActionListener(l);
+//		}
 		box.removeAllItems();
 		for(String action: actions)
 		{
 			box.addItem(action);
 		}
-		
 		box.setSelectedItem(value);
+//		for(ActionListener l: lis)
+//		{
+//			box.addActionListener(l);
+//		}
+		
+//		System.out.println("sel item: "+box+" "+value);
 		box.setForeground(renderer && selected ? table.getSelectionForeground() : table.getForeground());
 		box.setBackground(renderer && selected ? table.getSelectionBackground() : table.getBackground());		
 		return box;
