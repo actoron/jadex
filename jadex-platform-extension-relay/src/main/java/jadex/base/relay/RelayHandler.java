@@ -65,7 +65,7 @@ public class RelayHandler
 		}
 		SYSTEMDIR	= dir;
 		
-		getLogger().info("Relay settings directory: "+SYSTEMDIR.getAbsolutePath());
+		getLogger().info("Relay settings directory (change with $RELAY_HOME): "+SYSTEMDIR.getAbsolutePath());
 	}
 	
 	//-------- attributes --------
@@ -248,7 +248,7 @@ public class RelayHandler
 			{
 //				System.out.println("Sending offline info: "+id);
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-				sendAwarenessInfos(awainfo, platform.getPreferredCodecs());
+				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true);
 			}
 	//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 			for(int i=0; i<items.size(); i++)
@@ -325,7 +325,7 @@ public class RelayHandler
 			info = (AwarenessInfo)BinarySerializer.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), null, null, getClass().getClassLoader(), null);
 		}
 				
-		sendAwarenessInfos(info, pcodecs);
+		sendAwarenessInfos(info, pcodecs, true);
 	}
 	
 	/**
@@ -351,7 +351,7 @@ public class RelayHandler
 			peer.updatePlatformInfo(info);
 			if(info.getAwarenessInfo()!=null)
 			{
-				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs);
+				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
 			}
 		}
 	}
@@ -409,6 +409,7 @@ public class RelayHandler
 		{
 			System.out.println("Sending platform infos to peer: "+peer.getURL());
 			new RelayConnectionManager().postMessage(peer.getURL()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+			System.out.println("Sent platform infos.");
 		}
 		catch(IOException e)
 		{
@@ -423,13 +424,13 @@ public class RelayHandler
 	/**
 	 *  Send awareness messages for a new or changed awareness info.
 	 */
-	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs)
+	protected void	sendAwarenessInfos(AwarenessInfo awainfo, ICodec[] pcodecs, boolean local)
 	{
 //		System.out.println("sending awareness infos: "+awainfo.getSender().getPlatformName()+", "+platforms.size());
 		// Update platform awareness info.
 		String	id	= awainfo.getSender().getPlatformName();
 		PlatformInfo	platform	= platforms.get(id);
-		boolean	initial	= platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
+		boolean	initial	= local && platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
 		if(platform!=null)
 		{
 			platform.setAwarenessInfo(awainfo);
@@ -562,24 +563,27 @@ public class RelayHandler
 		}
 
 		// Distribute platform info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
-		if(platform==null)
+		if(local)
 		{
-			System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
-			platform	= new PlatformInfo();
-			platform.setId(awainfo.getSender().getName());
-			platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.
-			awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-			platform.setAwarenessInfo(awainfo);
-		}
-		PeerEntry[] apeers = peers.getPeers();
-		byte[]	peerinfo	= null;
-		for(PeerEntry peer: apeers)
-		{
-			if(peer.isConnected())
+			if(platform==null)
 			{
-				peerinfo	= sendPlatformInfos(peer, new PlatformInfo[]{platform}, peerinfo);
+				System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
+				platform	= new PlatformInfo();
+				platform.setId(awainfo.getSender().getName());
+				platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.
+				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+				platform.setAwarenessInfo(awainfo);
 			}
-		}					
+			PeerEntry[] apeers = peers.getPeers();
+			byte[]	peerinfo	= null;
+			for(PeerEntry peer: apeers)
+			{
+				if(peer.isConnected())
+				{
+					peerinfo	= sendPlatformInfos(peer, new PlatformInfo[]{platform}, peerinfo);
+				}
+			}
+		}
 	}
 	
 	/**
