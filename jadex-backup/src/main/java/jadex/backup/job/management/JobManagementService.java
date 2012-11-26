@@ -162,6 +162,7 @@ public class JobManagementService implements IJobManagementService
 		final Future<Void> ret = new Future<Void>();
 		
 		IExternalAccess ea = jobagents.remove(jobid);
+		
 		System.out.println("killing: "+ea+" "+jobid);
 		if(ea!=null)
 		{
@@ -170,6 +171,7 @@ public class JobManagementService implements IJobManagementService
 				public void customResultAvailable(Map<String, Object> result)
 				{
 					Job job = jobs.remove(jobid);
+					saveSettings(cfgfile);
 					publishEvent(new JobManagementEvent(JobManagementEvent.JOB_REMOVED, job));
 					ret.setResult(null);
 				}

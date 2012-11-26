@@ -1,5 +1,6 @@
 package jadex.backup.job.processing;
 
+import jadex.backup.dropbox.DropboxSyncJob;
 import jadex.backup.job.AbstractSyncJob;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.SyncProfile;
@@ -218,9 +219,9 @@ public class SyncJobProcessingAgent
 				{
 					public void resultAvailable(Void result)
 					{
-						// Comment out to test only update of SyncJob 
-//						if(job instanceof SyncJob)
-//						{
+						// Comment out to test only update of specific SyncJob type
+						if(job instanceof DropboxSyncJob)
+						{
 							startSync().addResultListener(new IResultListener<Void>()
 							{ 
 								public void resultAvailable(Void result)
@@ -235,12 +236,12 @@ public class SyncJobProcessingAgent
 									agent.waitForDelay(delay, self);
 								}
 							});	
-//						}
-//						else
-//						{
-//							System.out.println("waiting...");
-//							agent.waitForDelay(delay, self);
-//						}
+						}
+						else
+						{
+							System.out.println("waiting...");
+							agent.waitForDelay(delay, self);
+						}
 					}	
 					
 					public void exceptionOccurred(Exception exception) 
