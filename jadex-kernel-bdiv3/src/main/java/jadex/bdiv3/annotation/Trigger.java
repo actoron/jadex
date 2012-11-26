@@ -16,4 +16,10 @@ public @interface Trigger
 	 *  The description.
 	 */
 	public Class<?>[] goals() default {};
+	
+	/**
+	 *  The description.
+	 */
+	public String[] factaddeds() default {};
+
 }
