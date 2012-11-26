@@ -1,9 +1,7 @@
 package jadex.bdiv3.actions;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.IPlanBody;
 import jadex.bdiv3.runtime.MethodPlanBody;
 import jadex.bdiv3.runtime.RGoal;
@@ -11,9 +9,11 @@ import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * 
@@ -70,26 +70,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				if(cand instanceof MPlan)
 				{
 					MPlan mplan = (MPlan)cand;
-					RPlan rplan = new RPlan((MPlan)cand, cand);
-					
-					// todo: move this code somehow
-					String mname = (String)mplan.getBody();
-					Class<?> cl = SReflect.findClass0(mplan.getName(), null, ia.getClassLoader());
-					Method[] ms = cl.getDeclaredMethods();
-					Method mbody = null;
-					for(Method m: ms)
-					{
-						if(m.getName().equals(mname))
-						{
-							mbody = m;
-							break;
-						}
-					}
-					
-					IPlanBody body = new MethodPlanBody(ia, rplan, mbody);
-					rplan.setBody(body);
-					rplan.setReason(element);
-					rplan.setDispatchedElement(element);
+					RPlan rplan = RPlan.createRPlan(mplan, element, ia);
+//					RPlan rplan = new RPlan((MPlan)cand, cand);
 					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(element, rplan);
 					ia.getExternalAccess().scheduleStep(action);
 					ret.setResult(null);

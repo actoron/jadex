@@ -1,11 +1,14 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.BeliefCollection;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.FieldInfo;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MBeliefCollection;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
@@ -60,7 +63,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected BDIModel read(String model, Class cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root)
+	protected BDIModel read(String model, Class<?> cma, ClassLoader cl, IResourceIdentifier rid, IComponentIdentifier root)
 	{
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		
@@ -122,9 +125,15 @@ public class BDIClassReader extends MicroClassReader
 				if(isAnnotationPresent(fields[i], Belief.class, cl))
 				{
 //					System.out.println("found belief: "+fields[i].getName());
-					micromodel.getCapability().addBelief(new MBelief(fields[i]));
+					micromodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i])));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
+				}
+				else if(isAnnotationPresent(fields[i], BeliefCollection.class, cl))
+				{
+//					System.out.println("found belief coll: "+fields[i].getName());
+					BeliefCollection bc = getAnnotation(fields[i], BeliefCollection.class, cl);
+					micromodel.getCapability().addBelief(new MBeliefCollection(new FieldInfo(fields[i]), bc.implementation().getName()));
 				}
 			}
 			
@@ -150,7 +159,17 @@ public class BDIClassReader extends MicroClassReader
 							micromodel.getCapability().addGoal(mgoal);
 						}
 					}
-					MPlan mplan = new MPlan(clazz.getName(), methods[i].getName(),  tr, p.priority());
+					String[] fas = trigger.factaddeds();
+					for(int j=0; j<fas.length; j++)
+					{
+						tr.addFactAdded(fas[j]);
+					}
+					String[] frs = trigger.factremoveds();
+					for(int j=0; j<frs.length; j++)
+					{
+						tr.addFactRemoved(frs[j]);
+					}
+					MPlan mplan = new MPlan(clazz.getName(), new jadex.bdiv3.model.MethodInfo(methods[i]),  tr, p.priority());
 					micromodel.getCapability().addPlan(mplan);
 				}
 			}

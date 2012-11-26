@@ -40,22 +40,51 @@ public class MethodPlanBody implements IPlanBody
 	{
 		try
 		{
+//			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
+//				new Object[]{rplan.getReason().getPojoElement()});
+			
+			final Object reason = rplan.getReason();
+			Object pojope = null;
+			if(reason instanceof RProcessableElement)
+				pojope = ((RProcessableElement)reason).getPojoElement();
+			
+			// Guess parameters
+			Class<?>[] ptypes = body.getParameterTypes();
+			Object[] params = new Object[ptypes.length];
+			
+			for(int i=0; i<ptypes.length; i++)
+			{
+				if(SReflect.isSupertype(reason.getClass(), ptypes[i]))
+				{
+					params[i] = reason;
+				}
+				else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))
+				{
+					params[i] = pojope;
+				}
+				else if(SReflect.isSupertype(RPlan.class, ptypes[i]))
+				{
+					params[i] = rplan;
+				}
+			}
+			
 			body.setAccessible(true);
-			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
-				new Object[]{rplan.getReason().getPojoElement()});
+			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, params);
 			if(res instanceof IFuture)
 			{
 				((IFuture)res).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						rplan.getReason().planFinished(ia, rplan);
+						if(reason instanceof RProcessableElement)
+							((RProcessableElement)reason).planFinished(ia, rplan);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						rplan.setException(exception);
-						rplan.getReason().planFinished(ia, rplan);
+						if(reason instanceof RProcessableElement)
+							((RProcessableElement)reason).planFinished(ia, rplan);
 					}
 				});
 			}
@@ -63,7 +92,8 @@ public class MethodPlanBody implements IPlanBody
 		catch(Exception e)
 		{
 			rplan.setException(e);
-			rplan.getReason().planFinished(ia, rplan);
+			if(rplan.getReason() instanceof RProcessableElement)
+				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
 		}
 		
 		return IFuture.DONE;

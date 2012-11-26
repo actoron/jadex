@@ -1,6 +1,12 @@
 package jadex.bdiv3.runtime;
 
+import java.lang.reflect.Method;
+
+import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MethodInfo;
+import jadex.bridge.IConditionalComponentStep;
+import jadex.bridge.IInternalAccess;
 
 /**
  * 
@@ -42,10 +48,10 @@ public class RPlan extends RElement
 	
 	
 	/** The plan has a reason. */
-	public RProcessableElement reason;
+	public Object reason;
 
 	/** The plan has a dispatched element (current goal/event). */
-	public RProcessableElement dispatchedelement;
+	public Object dispatchedelement;
 	
 //	/** The plan has subgoals attribute (hack!!! redundancy to goal_has_parentplan). */
 //	public static OAVAttributeType plan_has_subgoals;
@@ -76,6 +82,20 @@ public class RPlan extends RElement
 	
 	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
 	protected Object candidate;
+	
+	/**
+	 * 
+	 */
+	public static RPlan createRPlan(MPlan mplan, Object reason, IInternalAccess ia)
+	{
+		RPlan rplan = new RPlan((MPlan)mplan, mplan);
+		Method mbody = ((MethodInfo)mplan.getBody()).getMethod(ia.getClassLoader());
+		IPlanBody body = new MethodPlanBody(ia, rplan, mbody);
+		rplan.setBody(body);
+		rplan.setReason(reason);
+		rplan.setDispatchedElement(reason);
+		return rplan;
+	}
 	
 	/**
 	 *  Create a new plan.
@@ -126,7 +146,7 @@ public class RPlan extends RElement
 	 *  Get the reason.
 	 *  @return The reason.
 	 */
-	public RProcessableElement getReason()
+	public Object getReason()
 	{
 		return reason;
 	}
@@ -135,7 +155,7 @@ public class RPlan extends RElement
 	 *  Set the reason.
 	 *  @param reason The reason to set.
 	 */
-	public void setReason(RProcessableElement reason)
+	public void setReason(Object reason)
 	{
 		this.reason = reason;
 	}
@@ -144,7 +164,7 @@ public class RPlan extends RElement
 	 *  Get the dispatchedelement.
 	 *  @return The dispatchedelement.
 	 */
-	public RProcessableElement getDispatchedElement()
+	public Object getDispatchedElement()
 	{
 		return dispatchedelement;
 	}
@@ -153,7 +173,7 @@ public class RPlan extends RElement
 	 *  Set the dispatchedelement.
 	 *  @param dispatchedelement The dispatchedelement to set.
 	 */
-	public void setDispatchedElement(RProcessableElement dispatchedelement)
+	public void setDispatchedElement(Object dispatchedelement)
 	{
 		this.dispatchedelement = dispatchedelement;
 	}

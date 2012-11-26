@@ -5,6 +5,14 @@ package jadex.rules.eca;
  */
 public interface ICondition
 {
+	public static ICondition TRUE_CONDITION = new ICondition()
+	{
+		public boolean evaluate(IEvent event)
+		{
+			return true;
+		}
+	};
+	
 	/**
 	 *  Evaluation the condition.
 	 *  @param event The event.

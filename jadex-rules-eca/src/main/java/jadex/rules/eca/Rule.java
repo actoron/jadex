@@ -1,5 +1,6 @@
 package jadex.rules.eca;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -127,5 +128,15 @@ public class Rule<T> implements IRule<T>
 	{
 		return events;
 	}
-
+	
+	/**
+	 *  Set the event types.
+	 *  @param events The event types.
+	 */
+	public void addEvent(String event)
+	{
+		if(events==null)
+			events = new ArrayList<String>();
+		events.add(event);
+	}
 }

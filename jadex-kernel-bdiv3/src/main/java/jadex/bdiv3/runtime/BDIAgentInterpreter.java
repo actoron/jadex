@@ -1,26 +1,38 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.PojoBDIAgent;
+import jadex.bdiv3.actions.ExecutePlanStepAction;
+import jadex.bdiv3.annotation.BeliefCollection;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MBeliefCollection;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MTrigger;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
-import jadex.commons.SUtil;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
-import jadex.micro.annotation.Agent;
+import jadex.rules.eca.IAction;
+import jadex.rules.eca.ICondition;
+import jadex.rules.eca.IEvent;
+import jadex.rules.eca.IRule;
+import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 
@@ -55,6 +67,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	protected MicroAgent createAgent(Class agentclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret = null;
+		BDIModel bdim = (BDIModel)model;
 		
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
@@ -100,13 +113,96 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				getLogger().warning("Hidden agent injection failed: "+e);
 			}
 		}
-
+		
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
+		
+		// Inject belief collections.
+		Object target = ret instanceof PojoBDIAgent? ((PojoBDIAgent)ret).getPojoAgent(): ret;
+		List<MBelief> mbels = bdim.getCapability().getBeliefs();
+		for(MBelief mbel: mbels)
+		{
+			if(mbel instanceof MBeliefCollection)
+			{
+				try
+				{
+					Field f = mbel.getTarget().getField(getClassLoader());
+					f.setAccessible(true);
+					Collection<?> c = (Collection<?>)f.get(target);
+					if(c==null)
+					{
+						String impl = ((MBeliefCollection)mbel).getImplClassName();
+						Class<?> implcl = SReflect.findClass(impl, null, getClassLoader());
+						c = (Collection<?>)implcl.newInstance();
+					}
+					if(c instanceof List)
+					{
+						String bname = mbel.getName();
+						f.set(target, new ListWrapper((List<?>)c, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
+					}
+				}
+				catch(RuntimeException e)
+				{
+					throw e;
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
+		// Observe goal types
 		List<MGoal> goals = ((BDIModel)model).getCapability().getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
+			// todo: explicit bdi creation rule
 			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
+		}
+		
+		// Observe plan types
+		List<MPlan> mplans = ((BDIModel)model).getCapability().getPlans();
+		for(int i=0; i<mplans.size(); i++)
+		{
+			final MPlan mplan = mplans.get(i);
+			
+			IAction<Void> createplan = new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					int idx = event.getType().indexOf(".");
+					String evtype = event.getType().substring(0, idx);
+					String belname = event.getType().substring(idx+1);
+					RPlan rplan = RPlan.createRPlan(mplan, new ChangeEvent(evtype, belname, event.getContent()), getInternalAccess());
+					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(null, rplan);
+					getInternalAccess().getExternalAccess().scheduleStep(action);
+					return IFuture.DONE;
+				}
+			};
+			
+			MTrigger trigger = mplan.getTrigger();
+			
+			List<String> fas = trigger.getFactAddeds();
+			if(fas!=null && fas.size()>0)
+			{
+				Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
+				for(String fa: fas)
+				{
+					rule.addEvent("factadded."+fa);
+				}
+				rulesystem.getRulebase().addRule(rule);
+			}
+
+			List<String> frs = trigger.getFactRemoveds();
+			if(frs!=null && frs.size()>0)
+			{
+				Rule<Void> rule = new Rule<Void>("create_plan_factremoved_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
+				for(String fr: frs)
+				{
+					rule.addEvent("factremoved."+fr);
+				}
+				rulesystem.getRulebase().addRule(rule);
+			}
 		}
 		
 		return ret;

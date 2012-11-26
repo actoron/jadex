@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -15,6 +16,10 @@ public class MTrigger
 	protected List<MMessageEvent> messageevents;
 	
 	protected List<MGoal> goals;
+	
+	protected List<String> factaddeds;
+	
+	protected List<String> factremoveds;
 	
 	/**
 	 * 
@@ -83,15 +88,41 @@ public class MTrigger
 //	 */
 //	public IMTriggerReference[]	getGoalFinisheds();
 	
-//	/**
-//	 *  Get the fact added triggers (belief set names).
-//	 */
-//	public String[]	getFactAddeds();
-//	
-//	/**
-//	 *  Get the fact added triggers (belief set names).
-//	 */
-//	public String[]	getFactRemoveds();
+	/**
+	 * 
+	 */
+	public void addFactAdded(String fact)
+	{
+		if(factaddeds==null)
+			this.factaddeds = new ArrayList<String>();
+		factaddeds.add(fact);
+	}
+	
+	/**
+	 * 
+	 */
+	public void addFactRemoved(String fact)
+	{
+		if(factremoveds==null)
+			this.factremoveds = new ArrayList<String>();
+		factremoveds.add(fact);
+	}
+	
+	/**
+	 *  Get the fact added triggers (belief set names).
+	 */
+	public List<String>	getFactAddeds()
+	{
+		return factaddeds==null? Collections.EMPTY_LIST: factaddeds;
+	}
+	
+	/**
+	 *  Get the fact removed triggers (belief set names).
+	 */
+	public List<String>	getFactRemoveds()
+	{
+		return factremoveds==null? Collections.EMPTY_LIST: factremoveds;
+	}
 //	
 //	/**
 //	 *  Get the fact added triggers (belief set names).

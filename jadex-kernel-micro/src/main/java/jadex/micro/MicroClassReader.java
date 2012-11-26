@@ -101,7 +101,7 @@ public class MicroClassReader
 	/**
 	 *  Load the model.
 	 */
-	protected MicroModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	protected MicroModel read(String model, Class<?> cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
 	{		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
 		
@@ -251,10 +251,10 @@ public class MicroClassReader
 			{
 				String[] tmp = ((Imports)getAnnotation(cma, Imports.class, cl)).value();
 //				String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
-				Set imports = (Set)toset.get("imports");
+				Set<String> imports = (Set<String>)toset.get("imports");
 				if(imports==null)
 				{
-					imports = new LinkedHashSet();
+					imports = new LinkedHashSet<String>();
 					toset.put("imports", imports);
 				}
 				for(int i=0; i<tmp.length; i++)
@@ -265,10 +265,10 @@ public class MicroClassReader
 			
 			// Add package of current class to imports.
 			// Is a little hack because getAllImports() of ModelInfo add package again.
-			Set imports = (Set)toset.get("imports");
+			Set<String> imports = (Set<String>)toset.get("imports");
 			if(imports==null)
 			{
-				imports = new LinkedHashSet();
+				imports = new LinkedHashSet<String>();
 				toset.put("imports", imports);
 			}
 			

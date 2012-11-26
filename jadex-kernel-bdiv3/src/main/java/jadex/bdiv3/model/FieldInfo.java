@@ -1,0 +1,104 @@
+package jadex.bdiv3.model;
+
+import jadex.commons.SReflect;
+
+import java.lang.reflect.Field;
+
+/**
+ * 
+ */
+public class FieldInfo
+{
+	/** The field name. */
+	protected String name;
+	
+	/** The class name. */
+	protected String classname;
+	
+	/** The field (cached). */
+	protected Field field;
+
+	/**
+	 *  Create a new FieldInfo. 
+	 */
+	public FieldInfo()
+	{
+	}
+	/**
+	 *  Create a new FieldInfo. 
+	 */
+	public FieldInfo(Field field)
+	{
+		this.name = field.getName();
+		this.classname = field.getDeclaringClass().getName();
+	}
+	
+	/**
+	 *  Create a new FieldInfo. 
+	 */
+	public FieldInfo(String name, String classname)
+	{
+		this.name = name;
+		this.classname = classname;
+	}
+
+	/**
+	 * 
+	 */
+	public Field getField(ClassLoader cl)
+	{
+		try
+		{
+			if(field==null)
+			{
+				Class<?> cla = SReflect.findClass(classname, null, cl);
+				field = cla.getDeclaredField(name);
+			}
+			return field;
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 *  Get the classname.
+	 *  @return The classname.
+	 */
+	public String getClassName()
+	{
+		return classname;
+	}
+
+	/**
+	 *  Set the classname.
+	 *  @param classname The classname to set.
+	 */
+	public void setClassName(String classname)
+	{
+		this.classname = classname;
+	}
+}

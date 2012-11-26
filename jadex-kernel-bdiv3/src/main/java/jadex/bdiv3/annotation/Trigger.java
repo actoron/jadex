@@ -13,13 +13,18 @@ import java.lang.annotation.Target;
 public @interface Trigger
 {
 	/**
-	 *  The description.
+	 *  Goal types to react on.
 	 */
 	public Class<?>[] goals() default {};
 	
 	/**
-	 *  The description.
+	 *  The fact added belief name.
 	 */
 	public String[] factaddeds() default {};
+	
+	/**
+	 *  The fact removed belief name.
+	 */
+	public String[] factremoveds() default {};
 
 }

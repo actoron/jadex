@@ -1,6 +1,5 @@
 package jadex.bdiv3.model;
 
-import java.lang.reflect.Field;
 
 /**
  *  Belief model.
@@ -8,12 +7,12 @@ import java.lang.reflect.Field;
 public class MBelief extends MElement
 {
 	/** The target. */
-	protected Field target;
+	protected FieldInfo target;
 	
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(Field target)
+	public MBelief(FieldInfo target)
 	{
 		super(target.getName());
 		this.target = target;
@@ -23,7 +22,7 @@ public class MBelief extends MElement
 	 *  Get the target.
 	 *  @return The target.
 	 */
-	public Field getTarget()
+	public FieldInfo getTarget()
 	{
 		return target;
 	}
@@ -32,7 +31,7 @@ public class MBelief extends MElement
 	 *  Set the target.
 	 *  @param target The target to set.
 	 */
-	public void setTarget(Field target)
+	public void setTarget(FieldInfo target)
 	{
 		this.target = target;
 	}

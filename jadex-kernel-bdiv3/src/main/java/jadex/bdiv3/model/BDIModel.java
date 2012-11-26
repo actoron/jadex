@@ -8,6 +8,7 @@ import jadex.micro.MicroModel;
  */
 public class BDIModel extends MicroModel
 {
+	/** The capability. */
 	protected MCapability mcapa;
 
 	/**

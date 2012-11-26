@@ -8,7 +8,9 @@ import jadex.bdiv3.model.MMessageEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * 
+ */
 public class WaitAbstraction
 {	
 	/** The model elements. */
@@ -26,8 +28,6 @@ public class WaitAbstraction
 	{
 		addModelElement(mevent);
 	}
-
-	
 	
 //	/**
 //	 *  Add a message event reply.
