@@ -69,29 +69,29 @@ if(peers.length>0)
 				if(i+cnt<9)
 				{
 					// Add labelled markers for first 1..9 entries
-					markers.append("&markers=label:");
+					markers.append("&markers=size:mid|label:");
 					markers.append(i+cnt+1);
 					markers.append("|color:");
 					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
 					markers.append("|");
 					markers.append(infos2[i].getPosition());
-					positions.add(infos[i].getPosition());
+					positions.add(infos2[i].getPosition());
 				}
 				else if(i+cnt==9)
 				{
 					// Add unlabelled markers for each unique position of remaining entries
-					markers.append("&markers=|color:");
+					markers.append("&markers=size:mid|color:");
 					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
 					markers.append("|");
 					markers.append(infos2[i].getPosition());
 					positions.add(infos2[i].getPosition());
 				}
-				else if(!positions.contains(infos[i].getPosition()))
+				else if(!positions.contains(infos2[i].getPosition()))
 				{
 					// Add unlabelled markers for each unique position of remaining entries
 					markers.append("|");
-					markers.append(infos[i].getPosition());
-					positions.add(infos[i].getPosition());
+					markers.append(infos2[i].getPosition());
+					positions.add(infos2[i].getPosition());
 				}
 			}
 		}
