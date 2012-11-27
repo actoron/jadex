@@ -1,4 +1,4 @@
-package jadex.bdiv3.example.helloworld;
+package jadex.bdiv3.example.wrapper;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
@@ -9,20 +9,19 @@ import jadex.bdiv3.runtime.RPlan;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * 
  */
 @Agent
-public class BeliefListBDI
+public class BeliefSetBDI
 {
 	@Agent
 	protected BDIAgent agent;
 	
-	@Belief(implementation=ArrayList.class)
-	private List<String> names;
+	@Belief
+	protected Set<String> names;
 	
 	/**
 	 * 
@@ -30,11 +29,9 @@ public class BeliefListBDI
 	@AgentBody
 	public void body()
 	{
-		System.out.println("body start: "+this);
 		names.add("a");
 		names.add("b");
-		names.add("c");
-		System.out.println("body end: "+this);
+		names.add("a");
 	}
 	
 	// todo: plan creation condition?!

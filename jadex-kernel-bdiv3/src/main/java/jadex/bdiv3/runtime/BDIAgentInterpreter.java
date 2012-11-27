@@ -7,6 +7,9 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3.runtime.wrappers.MapWrapper;
+import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -65,7 +68,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Create the agent.
 	 */
-	protected MicroAgent createAgent(Class agentclass, MicroModel model) throws Exception
+	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret = null;
 		BDIModel bdim = (BDIModel)model;
@@ -138,7 +141,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					}
 					else
 					{
-						Class<?> cl = f.getClass();
+						Class<?> cl = f.getType();
 						if(SReflect.isSupertype(List.class, cl))
 						{
 							val = new ArrayList();
@@ -156,18 +159,18 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					f.set(target, new ListWrapper((List<?>)val, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
+					f.set(target, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
-//				else if(val instanceof Set)
-//				{
-//					String bname = mbel.getName();
-//					f.set(target, new SetWrapper((Set<?>)val, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
-//				}
-//				else if(val instanceof Map)
-//				{
-//					String bname = mbel.getName();
-//					f.set(target, new MapWrapper((Set<?>)val, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
-//				}
+				else if(val instanceof Set)
+				{
+					String bname = mbel.getName();
+					f.set(target, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+				}
+				else if(val instanceof Map)
+				{
+					String bname = mbel.getName();
+					f.set(target, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+				}
 			}
 			catch(RuntimeException e)
 			{
@@ -215,7 +218,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 				for(String fa: fas)
 				{
-					rule.addEvent("factadded."+fa);
+					rule.addEvent(ChangeEvent.FACTADDED+"."+fa);
 				}
 				rulesystem.getRulebase().addRule(rule);
 			}
@@ -226,7 +229,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>("create_plan_factremoved_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 				for(String fr: frs)
 				{
-					rule.addEvent("factremoved."+fr);
+					rule.addEvent(ChangeEvent.FACTREMOVED+"."+fr);
 				}
 				rulesystem.getRulebase().addRule(rule);
 			}

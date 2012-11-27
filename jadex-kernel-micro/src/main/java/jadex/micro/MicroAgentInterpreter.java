@@ -141,7 +141,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Create the agent.
 	 */
-	protected MicroAgent createAgent(Class microclass, MicroModel model) throws Exception
+	protected MicroAgent createAgent(Class<?> microclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret = null;
 		

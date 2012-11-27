@@ -125,7 +125,7 @@ public class BDIClassReader extends MicroClassReader
 //					System.out.println("found belief: "+fields[i].getName());
 					Belief bel = getAnnotation(fields[i], Belief.class, cl);
 					micromodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
-						bel.implementation().equals(Object.class.getName())? null: bel.implementation().getName()));
+						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName()));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
 				}

@@ -1574,7 +1574,7 @@ public class MicroClassReader
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 			}
 		}

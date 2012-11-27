@@ -5,10 +5,23 @@ package jadex.bdiv3.runtime;
  */
 public class ChangeEvent
 {
+	/** Event type that a fact has been added. */
+	public static final String FACTADDED = "factadded";
+	
+	/** Event type that a fact has been removed. */
+	public static final String FACTREMOVED = "factremoved";
+
+	/** Event type that a fact has been added. */
+	public static final String FACTCHANGED = "factchanged";
+
+	
+	/** The event type. */
 	protected String type;
 	
+	/** The event source. */
 	protected Object source;
 	
+	/** The event value. */
 	protected Object value;
 
 	/**
