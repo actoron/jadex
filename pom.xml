@@ -51,6 +51,7 @@
 		<module>jadex-kernel-component</module>
 		<module>jadex-kernel-application</module>
 		<module>jadex-kernel-bdi</module>
+		<module>jadex-kernel-bdiv3</module>
 		<module>jadex-kernel-micro</module>
 		<module>jadex-kernel-bpmn</module>
 		<module>jadex-kernel-bdibpmn</module>
