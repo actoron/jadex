@@ -47,7 +47,7 @@ public class PeerEntry
 	/**
 	 *  Get the peer url.
 	 */
-	public String	getURL()
+	public String	getUrl()
 	{
 		return url;
 	}

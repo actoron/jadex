@@ -1,3 +1,4 @@
+<%@page import="jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager"%>
 <%@page import="jadex.bridge.service.types.awareness.AwarenessInfo"%>
 <%@page session="false"%>
 <jsp:include page="header.jsp">
@@ -10,13 +11,16 @@
 <%
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
 	PeerEntry[]	peers	= (PeerEntry[])request.getAttribute("peers");
+	String	url	= (String)request.getAttribute("url");
+	boolean	empty	= infos.length==0;
+	StringBuffer markers	= new StringBuffer();
+	String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
+	Set<String> positions	= new HashSet<String>();
 %>
 
 <%
 if(infos.length>0)
 {
-	StringBuffer markers	= new StringBuffer();
-	Set<String> positions	= new HashSet<String>();
 	for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
 	{
 		if(infos[i].getPosition()!=null)
@@ -24,16 +28,20 @@ if(infos.length>0)
 			if(i<9)
 			{
 				// Add labelled markers for first 1..9 entries
-				markers.append("&markers=");
-				markers.append("label:");
+				markers.append("&markers=label:");
 				markers.append(i+1);
+				markers.append("|color:");
+				markers.append(colors[url.hashCode()%colors.length]);
 				markers.append("|");
 				markers.append(infos[i].getPosition());
+				positions.add(infos[i].getPosition());
 			}
 			else if(i==9)
 			{
 				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("&markers=");
+				markers.append("&markers=color:");
+				markers.append(colors[url.hashCode()%colors.length]);
+				markers.append("|");
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
 			}
@@ -46,54 +54,160 @@ if(infos.length>0)
 			}
 		}
 	}
-	if(markers.length()>0)
-	{ %>
-		<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%= markers %>"/>
-<%	} %>
+}
 
-<table>
-	<tr>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
-		<th>Platform</th>
-		<th>Host</th>
-		<th>Location</th>
-		<th>Connected Since</th>
-		<th>Received Messages</th>
-		<th>Avg. Transfer Rate</th>
-	</tr>
-	
-	<%
-		for(int i=0; i<infos.length; i++)
-		{%>
-			<tr class="<%= i%2==0 ? "even" : "odd" %>" title="<%= infos[i].toString() %>">
+if(peers.length>0)
+{
+	int	cnt	= infos.length;
+	for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
+	{
+		PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
+		for(int i=0; i<infos2.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+		{
+			if(infos2[i].getPosition()!=null)
+			{
+				if(i+cnt<9)
+				{
+					// Add labelled markers for first 1..9 entries
+					markers.append("&markers=label:");
+					markers.append(i+cnt+1);
+					markers.append("|color:");
+					markers.append(colors[peers[j].getUrl().hashCode()%colors.length]);
+					markers.append("|");
+					markers.append(infos2[i].getPosition());
+					positions.add(infos[i].getPosition());
+				}
+				else if(i+cnt==9)
+				{
+					// Add unlabelled markers for each unique position of remaining entries
+					markers.append("&markers=|color:");
+					markers.append(colors[peers[j].getUrl().hashCode()%colors.length]);
+					markers.append("|");
+					markers.append(infos2[i].getPosition());
+					positions.add(infos2[i].getPosition());
+				}
+				else if(!positions.contains(infos[i].getPosition()))
+				{
+					// Add unlabelled markers for each unique position of remaining entries
+					markers.append("|");
+					markers.append(infos[i].getPosition());
+					positions.add(infos[i].getPosition());
+				}
+			}
+		}
+		cnt	+= infos2.length;
+	}
+}
+
+if(markers.length()>0)
+{
+%>
+	<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%=markers%>"/>
+<%
+}
+
+if(!empty)
+{
+%>
+
+	<table>
+		<tr>
+			<th rowspan="2">&nbsp;</th>
+			<th rowspan="2">&nbsp;</th>
+			<th rowspan="2">Platform</th>
+			<th rowspan="2">Host</th>
+			<th rowspan="2">Location</th>
+			<th rowspan="2">Connected Since</th>
+			<th>Received Messages</th>
+			<th>Avg. Transfer Rate</th>
+		</tr>
+		<tr>
+			<th colspan="2">Relay</th>
+		</tr>
+		
+		<%
+			for(int i=0; i<infos.length; i++)
+			{
+		%>
+			<tr class="<%=i%2==0 ? "even" : "odd"%>" title="<%=infos[i].toString()%>">
 				<td>
-					<%= i+1 %>
+					<%=i+1%>
 					</td>
 				<td>
-					<% if(infos[i].getCountryCode()!=null) {%>
-						<img src="<%= request.getContextPath() %>/resources/flags/flag-<%= infos[i].getCountryCode() %>.png"/>
-					<% } %>
-					<% if(infos[i].getScheme()!=null && infos[i].getScheme().endsWith("s")) {%>
-						<img src="<%= request.getContextPath() %>/resources/lock.png"/>
-					<% } %>
+					<%
+						if(infos[i].getCountryCode()!=null) {
+					%>
+						<img src="<%=request.getContextPath()%>/resources/flags/flag-<%=infos[i].getCountryCode()%>.png"/>
+					<%
+						}
+					%>
+					<%
+						if(infos[i].getScheme()!=null && infos[i].getScheme().endsWith("s")) {
+					%>
+						<img src="<%=request.getContextPath()%>/resources/lock.png"/>
+					<%
+						}
+					%>
 					</td>
 				<td>
-					<%= infos[i].getId() %> </td>
+					<%=infos[i].getId()%> </td>
 				<td>
-					<%= infos[i].getHostName() %></td>
+					<%=infos[i].getHostName()%></td>
 				<td>
-					<%= infos[i].getLocation() %></td>
+					<%=infos[i].getLocation()%></td>
 				<td>
-					<%= infos[i].getConnectTime() %></td>
+					<%=infos[i].getConnectTime()%></td>
 				<td class="number">
-					<%= infos[i].getMessageCount() %> (<%= infos[i].getByteCount() %>)</td>
+					<%=infos[i].getMessageCount()%> (<%=infos[i].getByteCount()%>)</td>
 				<td class="number">
-					<%= infos[i].getTransferRate() %></td>
+					<%=infos[i].getTransferRate()%></td>
 			</tr>
-	<%	} %>
-
-</table>
+	<%
+		}
+		
+		int cnt	= infos.length;
+		for(int j=0; j<peers.length; j++)
+		{
+			PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
+	
+			for(int i=0; i<infos2.length; i++)
+			{%>
+				<tr class="<%=(i+cnt)%2==0 ? "even" : "odd"%>" title="<%=infos2[i].toString()%>">
+					<td>
+						<%=i+cnt+1%>
+						</td>
+					<td>
+						<%
+							if(infos2[i].getCountryCode()!=null) {
+						%>
+							<img src="<%=request.getContextPath()%>/resources/flags/flag-<%=infos2[i].getCountryCode()%>.png"/>
+						<%
+							}
+						%>
+						<%
+							if(infos2[i].getScheme()!=null && infos2[i].getScheme().endsWith("s")) {
+						%>
+							<img src="<%=request.getContextPath()%>/resources/lock.png"/>
+						<%
+							}
+						%>
+						</td>
+					<td>
+						<%=infos2[i].getId()%> </td>
+					<td>
+						<%=infos2[i].getHostName()%></td>
+					<td>
+						<%=infos2[i].getLocation()%></td>
+					<td>
+						<%=infos2[i].getConnectTime()%></td>
+					<td colspan="2">
+						<a href="<%= RelayConnectionManager.httpAddress(peers[j].getUrl()) %>">
+						<%=  RelayConnectionManager.httpAddress(peers[j].getUrl()) %></a></td>
+				</tr>
+		<%	}
+		} %>
+	
+	</table>
 
 <% } else { %>
 

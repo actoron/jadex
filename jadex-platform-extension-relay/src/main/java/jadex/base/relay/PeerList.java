@@ -157,7 +157,7 @@ public class PeerList
 			{
 				if(peer.isConnected())
 				{
-					ret	+= ", "+peer.getURL();
+					ret	+= ", "+peer.getUrl();
 				}
 			}
 		}
@@ -191,7 +191,7 @@ public class PeerList
 			{
 				peer	= new PeerEntry(peerurl, initial);
 				peers.put(peerurl, peer);
-				RelayHandler.getLogger().info("Peer added: "+peer.getURL());
+				RelayHandler.getLogger().info("Peer added: "+peer.getUrl());
 	
 				// Create timer on demand.
 				if(timer==null)
@@ -244,7 +244,7 @@ public class PeerList
 			try
 			{
 				// Try to connect and add new peers, if any.
-				String	servers	= conman.getPeerServers(peer.getURL(), url);
+				String	servers	= conman.getPeerServers(peer.getUrl(), url);
 				peer.setConnected(true);
 				for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
 				{
@@ -266,8 +266,8 @@ public class PeerList
 			}
 			else
 			{
-				peers.remove(peer.getURL());
-				RelayHandler.getLogger().info("Peer removed: "+peer.getURL());
+				peers.remove(peer.getUrl());
+				RelayHandler.getLogger().info("Peer removed: "+peer.getUrl());
 			}
 		}
 	}

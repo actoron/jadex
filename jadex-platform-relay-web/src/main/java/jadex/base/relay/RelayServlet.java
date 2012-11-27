@@ -113,11 +113,13 @@ public class RelayServlet extends HttpServlet
 				{
 					List<PlatformInfo>	infos	= new ArrayList<PlatformInfo>();
 					infos.addAll(Arrays.asList(handler.getCurrentPlatforms()));
-					for(PeerEntry peer: handler.getCurrentPeers())
-					{
-						infos.addAll(Arrays.asList(peer.getPlatformInfos()));						
-					}
+//					for(PeerEntry peer: handler.getCurrentPeers())
+//					{
+//						infos.addAll(Arrays.asList(peer.getPlatformInfos()));
+//					}
 					request.setAttribute("platforms", infos.toArray(new PlatformInfo[0]));
+					request.setAttribute("peers", handler.getCurrentPeers());
+					request.setAttribute("url", handler.getUrl()!=null ? handler.getUrl() : request.getRequestURL().toString());
 					request.setAttribute("refresh", "30");
 					view	= "/WEB-INF/jsp/status.jsp";
 				}
@@ -163,7 +165,7 @@ public class RelayServlet extends HttpServlet
 			}
 			else if(request.getServletPath().startsWith("/platforminfo"))
 			{
-				handler.handlePlatforms(request.getInputStream());
+				handler.handlePlatform(request.getInputStream());
 			}
 			else
 			{

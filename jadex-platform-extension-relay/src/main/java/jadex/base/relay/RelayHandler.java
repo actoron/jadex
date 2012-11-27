@@ -131,6 +131,15 @@ public class RelayHandler
 	
 	//-------- methods --------
 	
+
+	/**
+	 *  Get the public url of the relay, if known.
+	 */
+	public String	getUrl()
+	{
+		return peers.getUrl();
+	}
+	
 	/**
 	 *  Called when a platform registers itself at the relay. 
 	 *  Initializes required data structures, such that messages can be queued.
@@ -459,9 +468,9 @@ public class RelayHandler
 					{
 						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader());
 					}
-//					System.out.println("Sending platform info to peer: "+peer.getURL());
-					new RelayConnectionManager().postMessage(peer.getURL()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-//					System.out.println("Sent platform info.");
+					System.out.println("Sending platform info to peer: "+peer.getUrl());
+					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+					System.out.println("Sent platform info.");
 				}
 			}
 		}
@@ -478,10 +487,10 @@ public class RelayHandler
 	{
 		try
 		{
-//			System.out.println("Sending platform infos to peer: "+peer.getURL());
+			System.out.println("Sending platform infos to peer: "+peer.getUrl());
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
-			new RelayConnectionManager().postMessage(peer.getURL()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-//			System.out.println("Sent platform infos.");
+			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+			System.out.println("Sent platform infos.");
 		}
 		catch(IOException e)
 		{
