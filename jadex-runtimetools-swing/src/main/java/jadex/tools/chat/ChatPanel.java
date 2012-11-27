@@ -1211,7 +1211,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					if(autorefresh)
 					{
-	//					System.out.println("refresh");
+//						System.out.println("refresh");
 						final Set<ChatUser>	known	= new HashSet<ChatUser>(usermodel.getUsers());
 						
 						getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
@@ -1534,6 +1534,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void	setUserState(final IComponentIdentifier cid, final Boolean online, final Boolean typing,  final Boolean away, final String nickname, final byte[] image)
 	{
+//		System.out.println("setUserState "+cid+", "+online);
+		
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -1542,51 +1544,55 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				boolean	isnew	= false;
 				boolean	isdead	= false;
 				ChatUser	cu	= usermodel.getUser(cid);
-				if(cu==null)
+				if(cu==null && (online==null || online.booleanValue()))
 				{
+//					System.out.println("create User "+cid+", "+online);
 					cu	= new ChatUser(cid);
 					usermodel.addUser(cid, cu);
 					isnew	= true;
 				}
 				
-				if(online!=null)
+				if(cu!=null)
 				{
-					isdead	= cu.setOffline(!online.booleanValue());
-				}
-				
-				if(isdead)
-				{
-					usermodel.removeUser(cid);
-				}
-				else
-				{
-					if(away!=null)
+					if(online!=null)
 					{
-						cu.setAway(away.booleanValue());
-					}
-					if(typing!=null)
-					{
-						cu.setTyping(typing.booleanValue());
-					}
-					if(nickname!=null)
-					{
-						cu.setNick(nickname);
-					}
-					if(image!=null)
-					{
-						cu.setAvatar(new ImageIcon(image));
+						isdead	= cu.setOffline(!online.booleanValue());
 					}
 					
-					if(isnew)
+					if(isdead)
 					{
-						notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, false);
+						usermodel.removeUser(cid);
 					}
+					else
+					{
+						if(away!=null)
+						{
+							cu.setAway(away.booleanValue());
+						}
+						if(typing!=null)
+						{
+							cu.setTyping(typing.booleanValue());
+						}
+						if(nickname!=null)
+						{
+							cu.setNick(nickname);
+						}
+						if(image!=null)
+						{
+							cu.setAvatar(new ImageIcon(image));
+						}
+						
+						if(isnew)
+						{
+							notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, false);
+						}
+					}
+					
+					((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
+					usertable.getParent().invalidate();
+					usertable.getParent().doLayout();
+					usertable.repaint();
 				}
-				
-				((DefaultTableModel)usertable.getModel()).fireTableDataChanged();
-				usertable.getParent().invalidate();
-				usertable.getParent().doLayout();
-				usertable.repaint();
 			}
 		});
 	}
