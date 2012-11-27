@@ -1,12 +1,18 @@
 package jadex.android.applications.chat;
 
+import java.io.FileInputStream;
+
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
+import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -124,7 +130,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	public void onServiceConnected(ComponentName comp, IBinder binder)
 	{
 		this.service = (IAndroidChatService) binder;
-		this.service.setChatEventListener(this);
+		this.service.addChatEventListener(this);
 	}
 
 	private void setConnected(final boolean b)
@@ -151,7 +157,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	@Override
 	public void eventReceived(final ChatEvent event)
 	{
-		if (event.getType() == ChatEvent.TYPE_MESSAGE) 
+		if (event.getType().equals(ChatEvent.TYPE_MESSAGE))
 		{
 			runOnUiThread(new Runnable()
 			{
@@ -161,6 +167,40 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 					chatEventAdapter.add(event);
 				}
 			});
+		} else if (event.getType().equals(ChatEvent.TYPE_FILE))
+		{
+			final TransferInfo ti = (TransferInfo) event.getValue();
+			if (ti.getState().equals(TransferInfo.STATE_WAITING))
+			{
+				runOnUiThread(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						Builder builder = new AlertDialog.Builder(JadexAndroidChatActivity.this);
+						builder.setTitle("Incoming Filetransfer");
+						builder.setMessage(event.getNick() + " wants to send you " + ti.getFileName() + ".\n" + "Do you want to download this file?");
+						builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								startActivity(new Intent(JadexAndroidChatActivity.this, TransferActivity.class));
+							}
+
+						});
+						builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+							}
+						});
+						builder.create().show();
+					}
+				});
+			}
 		}
 	}
 

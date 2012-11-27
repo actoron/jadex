@@ -31,29 +31,41 @@ public class ChatEventArrayAdapter extends ArrayAdapter<ChatEvent>
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
-		View itemView;
+		ChatEventViewHolder viewHolder;
 		if (convertView == null)
 		{
+			viewHolder = new ChatEventViewHolder();
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			itemView = inflater.inflate(R.layout.chatlistitem, parent, false);
+			convertView = inflater.inflate(R.layout.chatlistitem, parent, false);
+			
+			viewHolder.userTextView = (TextView) convertView.findViewById(R.id.chatlistitem_user);
+			viewHolder.messageTextView = (TextView) convertView.findViewById(R.id.chatlistitem_message);
+			viewHolder.dateTextView = (TextView) convertView.findViewById(R.id.chatlistitem_date);
+			
+			convertView.setTag(viewHolder);
 		} else
 		{
-			itemView = convertView;
-		}
-		TextView userTextView = (TextView) itemView.findViewById(R.id.chatlistitem_user);
-		TextView messageTextView = (TextView) itemView.findViewById(R.id.chatlistitem_message);
-		TextView dateTextView = (TextView) itemView.findViewById(R.id.chatlistitem_date);
-		ChatEvent item = getItem(position);
-		userTextView.setText(item.getNick());
-		messageTextView.setText(item.getValue().toString());
-		dateTextView.setText(timeFormatter.format(cal.getTime()));
-		if (item.isPrivateMessage()) {
-			userTextView.setTextColor(Color.RED);
-		} else {
-			userTextView.setTextColor(Color.WHITE);
+			viewHolder = (ChatEventViewHolder) convertView.getTag();
 		}
 		
-		return itemView;
+		ChatEvent item = getItem(position);
+		viewHolder.userTextView.setText(item.getNick());
+		viewHolder.messageTextView.setText(item.getValue().toString());
+		viewHolder.dateTextView.setText(timeFormatter.format(cal.getTime()));
+		if (item.isPrivateMessage()) {
+			viewHolder.userTextView.setTextColor(Color.RED);
+		} else {
+			viewHolder.userTextView.setTextColor(Color.WHITE);
+		}
+		
+		return convertView;
+	}
+	
+	private static class ChatEventViewHolder {
+		TextView userTextView;
+		TextView messageTextView;
+		TextView dateTextView;
+		
 	}
 
 }
