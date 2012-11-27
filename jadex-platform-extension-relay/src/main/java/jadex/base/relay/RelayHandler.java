@@ -25,10 +25,12 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -346,13 +348,49 @@ public class RelayHandler
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
 		PeerEntry	peer	= peers.addPeer(id, false);
-		for(PlatformInfo info: infos)
+		
+		// Full update after reconnection
+		if(infos.length>1)
 		{
-			peer.updatePlatformInfo(info);
-			if(info.getAwarenessInfo()!=null)
+			// Remember previously connected platforms.
+			Map<String, PlatformInfo>	old	= new LinkedHashMap<String, PlatformInfo>();
+			for(PlatformInfo info: peer.getPlatformInfos())
 			{
-				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
+				if(info.getAwarenessInfo()!=null)
+				{
+					old.put(info.getId(), info);
+				}
 			}
+			peer.clearPlatformInfos();
+			
+			// Send infos for currently connected platforms
+			for(PlatformInfo info: infos)
+			{
+				peer.updatePlatformInfo(info);
+				if(info.getAwarenessInfo()!=null)
+				{
+					sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
+					old.remove(info.getId());
+				}
+			}
+			
+			// Send offline infos for remaining previous platforms.
+			for(PlatformInfo info: old.values())
+			{
+				AwarenessInfo	awainfo	= info.getAwarenessInfo();
+				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+				sendAwarenessInfos(awainfo, pcodecs, false);
+			}
+		}
+		
+		// Single platform update while still connected
+		else if(infos.length==1)
+		{
+			peer.updatePlatformInfo(infos[0]);
+			if(infos[0].getAwarenessInfo()!=null)
+			{
+				sendAwarenessInfos(infos[0].getAwarenessInfo(), pcodecs, false);
+			}			
 		}
 	}
 	

@@ -126,4 +126,13 @@ public class PeerEntry
 	{
 		return infos.values().toArray(new PlatformInfo[0]);
 	}
+	
+	/**
+	 *  Clear the list of platform infos.
+	 */
+	public void	clearPlatformInfos()
+	{
+		infos.clear();
+	}
+
 }
