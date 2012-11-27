@@ -205,6 +205,7 @@ if(!empty)
 						<%=  RelayConnectionManager.httpAddress(peers[j].getUrl()) %></a></td>
 				</tr>
 		<%	}
+			cnt	+= infos2.length;
 		} %>
 	
 	</table>
