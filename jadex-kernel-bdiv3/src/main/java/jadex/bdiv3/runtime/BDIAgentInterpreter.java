@@ -2,10 +2,8 @@ package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
-import jadex.bdiv3.annotation.BeliefCollection;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.model.MBeliefCollection;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
@@ -30,9 +28,12 @@ import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -122,33 +123,59 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		List<MBelief> mbels = bdim.getCapability().getBeliefs();
 		for(MBelief mbel: mbels)
 		{
-			if(mbel instanceof MBeliefCollection)
+			try
 			{
-				try
+				Field f = mbel.getTarget().getField(getClassLoader());
+				f.setAccessible(true);
+				Object val = f.get(target);
+				if(val==null)
 				{
-					Field f = mbel.getTarget().getField(getClassLoader());
-					f.setAccessible(true);
-					Collection<?> c = (Collection<?>)f.get(target);
-					if(c==null)
+					String impl = mbel.getImplClassName();
+					if(impl!=null)
 					{
-						String impl = ((MBeliefCollection)mbel).getImplClassName();
 						Class<?> implcl = SReflect.findClass(impl, null, getClassLoader());
-						c = (Collection<?>)implcl.newInstance();
+						val = implcl.newInstance();
 					}
-					if(c instanceof List)
+					else
 					{
-						String bname = mbel.getName();
-						f.set(target, new ListWrapper((List<?>)c, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
+						Class<?> cl = f.getClass();
+						if(SReflect.isSupertype(List.class, cl))
+						{
+							val = new ArrayList();
+						}
+						else if(SReflect.isSupertype(Set.class, cl))
+						{
+							val = new HashSet();
+						}
+						else if(SReflect.isSupertype(Map.class, cl))
+						{
+							val = new HashMap();
+						}
 					}
 				}
-				catch(RuntimeException e)
+				if(val instanceof List)
 				{
-					throw e;
+					String bname = mbel.getName();
+					f.set(target, new ListWrapper((List<?>)val, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
 				}
-				catch(Exception e)
-				{
-					throw new RuntimeException(e);
-				}
+//				else if(val instanceof Set)
+//				{
+//					String bname = mbel.getName();
+//					f.set(target, new SetWrapper((Set<?>)val, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
+//				}
+//				else if(val instanceof Map)
+//				{
+//					String bname = mbel.getName();
+//					f.set(target, new MapWrapper((Set<?>)val, rulesystem, "factadded."+bname, "factremoved."+bname, "factchanged."+bname));
+//				}
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
 			}
 		}
 

@@ -1,7 +1,7 @@
 package jadex.bdiv3.example.helloworld;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.BeliefCollection;
+import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -21,7 +21,7 @@ public class BeliefListBDI
 	@Agent
 	protected BDIAgent agent;
 	
-	@BeliefCollection(implementation=ArrayList.class)
+	@Belief(implementation=ArrayList.class)
 	private List<String> names;
 	
 	/**

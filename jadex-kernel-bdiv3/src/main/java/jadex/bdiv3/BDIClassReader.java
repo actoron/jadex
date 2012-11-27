@@ -1,14 +1,12 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.annotation.Belief;
-import jadex.bdiv3.annotation.BeliefCollection;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.FieldInfo;
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.model.MBeliefCollection;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
@@ -125,15 +123,11 @@ public class BDIClassReader extends MicroClassReader
 				if(isAnnotationPresent(fields[i], Belief.class, cl))
 				{
 //					System.out.println("found belief: "+fields[i].getName());
-					micromodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i])));
+					Belief bel = getAnnotation(fields[i], Belief.class, cl);
+					micromodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
+						bel.implementation().equals(Object.class.getName())? null: bel.implementation().getName()));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
-				}
-				else if(isAnnotationPresent(fields[i], BeliefCollection.class, cl))
-				{
-//					System.out.println("found belief coll: "+fields[i].getName());
-					BeliefCollection bc = getAnnotation(fields[i], BeliefCollection.class, cl);
-					micromodel.getCapability().addBelief(new MBeliefCollection(new FieldInfo(fields[i]), bc.implementation().getName()));
 				}
 			}
 			
