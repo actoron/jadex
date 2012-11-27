@@ -13,6 +13,8 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.ClassVisitor;
@@ -58,6 +60,11 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl)
 	{
 		Class<?> ret = null;
+		
+//		System.out.println("Generating with cl: "+cl+" "+clname);
+		
+		final List<String> iclasses = new ArrayList<String>();
+		
 		try
 		{
 	//		String clname = cma.getName()+BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST;
@@ -123,6 +130,13 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 					};
 				}
 				
+				public void visitInnerClass(String name, String outerName, String innerName, int access)
+				{
+//					System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
+					iclasses.add(name);
+					super.visitInnerClass(name, outerName, innerName, access);//Opcodes.ACC_PUBLIC); does not work
+				}
+				
 				public void visitEnd()
 				{
 					visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(BDIAgent.class), null, null);
@@ -137,7 +151,22 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				ClassReader cr = new ClassReader(is);
 				cr.accept(cv, 0);
 				byte[] data = cw.toByteArray();
-				ret = toClass(clname, data, cl, null);
+				
+				// Need to load all inner classes as well because otherwise
+				// they could be loaded by a parent class loader 
+				// -> class cannot access inner class as they are 
+				// then considered belonging to other packages
+			
+				Class<?> icl = null;
+				for(String name: iclasses)
+				{
+//					System.out.println("loading: "+cl+" "+name);
+					icl = cl.loadClass(name.replace("/", "."));
+				}
+				
+				ClassLoader ncl = icl==null? cl: icl.getClassLoader();
+				
+				ret = toClass(clname, data, ncl, null);
 			}
 			catch(Exception e)
 			{

@@ -1,13 +1,13 @@
 package jadex.micro;
 
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.commons.FieldInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,16 +21,16 @@ import java.util.Map;
 public class MicroModel extends CacheableKernelModel
 {
 	/** The agent injection targets. */
-	protected List<Field> agentinjections;
+	protected List<FieldInfo> agentinjections;
 
 	/** The argument injection targets. */
-	protected Map argumentinjections;
+	protected Map<String, Tuple2<FieldInfo, String>> argumentinjections;
 
 	/** The result injection targets. */
-	protected Map<String, Tuple3<Field, String, String>> resultinjections;
+	protected Map<String, Tuple3<FieldInfo, String, String>> resultinjections;
 	
 	/** The service injection targets. */
-	protected Map serviceinjections;
+	protected Map<String, FieldInfo> serviceinjections;
 	
 	/** The breakpoint method. */
 	protected Method bpmethod;
@@ -50,10 +50,10 @@ public class MicroModel extends CacheableKernelModel
 	 *  Add an injection field.
 	 *  @param field The field. 
 	 */
-	public void addAgentInjection(Field field)
+	public void addAgentInjection(FieldInfo field)
 	{
 		if(agentinjections==null)
-			agentinjections = new ArrayList<Field>();
+			agentinjections = new ArrayList<FieldInfo>();
 		agentinjections.add(field);
 	}
 	
@@ -61,9 +61,9 @@ public class MicroModel extends CacheableKernelModel
 	 *  Get the agent injection fields.
 	 *  @return The fields.
 	 */
-	public Field[] getAgentInjections()
+	public FieldInfo[] getAgentInjections()
 	{
-		return agentinjections==null? new Field[0]: (Field[])agentinjections.toArray(new Field[agentinjections.size()]);
+		return agentinjections==null? new FieldInfo[0]: (FieldInfo[])agentinjections.toArray(new FieldInfo[agentinjections.size()]);
 	}
 	
 	/**
@@ -71,21 +71,21 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addArgumentInjection(String name, Field field, String convert)
+	public void addArgumentInjection(String name, FieldInfo field, String convert)
 	{
 		if(argumentinjections==null)
 			argumentinjections = new MultiCollection();
-		argumentinjections.put(name, new Tuple2<Field, String>(field, convert!=null && convert.length()==0? null: convert));
+		argumentinjections.put(name, new Tuple2<FieldInfo, String>(field, convert!=null && convert.length()==0? null: convert));
 	}
 	
 	/**
 	 *  Get the argument injection fields.
 	 *  @return The fields.
 	 */
-	public Tuple2<Field, String>[] getArgumentInjections(String name)
+	public Tuple2<FieldInfo, String>[] getArgumentInjections(String name)
 	{
 		Collection col = argumentinjections==null? null: (Collection)argumentinjections.get(name);
-		return col==null? new Tuple2[0]: (Tuple2<Field, String>[])col.toArray(new Tuple2[col.size()]);
+		return col==null? new Tuple2[0]: (Tuple2<FieldInfo, String>[])col.toArray(new Tuple2[col.size()]);
 	}
 	
 	/**
@@ -103,11 +103,11 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addResultInjection(String name, Field field, String convert, String convback)
+	public void addResultInjection(String name, FieldInfo field, String convert, String convback)
 	{
 		if(resultinjections==null)
-			resultinjections = new HashMap<String, Tuple3<Field, String, String>>();
-		resultinjections.put(name, new Tuple3<Field, String, String>(field, 
+			resultinjections = new HashMap<String, Tuple3<FieldInfo, String, String>>();
+		resultinjections.put(name, new Tuple3<FieldInfo, String, String>(field, 
 			convert!=null && convert.length()==0? null: convert,
 			convback!=null && convback.length()==0? null: convback));
 	}
@@ -116,9 +116,9 @@ public class MicroModel extends CacheableKernelModel
 	 *  Get the result injection field.
 	 *  @return The fields.
 	 */
-	public Tuple3<Field, String, String> getResultInjection(String name)
+	public Tuple3<FieldInfo, String, String> getResultInjection(String name)
 	{
-		return resultinjections==null? null: (Tuple3<Field, String, String>)resultinjections.get(name);
+		return resultinjections==null? null: (Tuple3<FieldInfo, String, String>)resultinjections.get(name);
 	}
 	
 	/**
@@ -136,7 +136,7 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addServiceInjection(String name, Field field)
+	public void addServiceInjection(String name, FieldInfo field)
 	{
 		if(serviceinjections==null)
 			serviceinjections = new MultiCollection();
@@ -147,10 +147,10 @@ public class MicroModel extends CacheableKernelModel
 	 *  Get the service injection fields.
 	 *  @return The fields.
 	 */
-	public Field[] getServiceInjections(String name)
+	public FieldInfo[] getServiceInjections(String name)
 	{
 		Collection col = serviceinjections==null? null: (Collection)serviceinjections.get(name);
-		return col==null? new Field[0]: (Field[])col.toArray(new Field[col.size()]);
+		return col==null? new FieldInfo[0]: (FieldInfo[])col.toArray(new FieldInfo[col.size()]);
 	}
 	
 	/**

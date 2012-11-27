@@ -4,8 +4,6 @@ import jadex.bridge.IConnection;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -46,8 +44,6 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 		super.init(interpreter);
 		this.agent = agent;
 	}
-	
-	//-------- interface methods --------
 	
 	//-------- interface methods --------
 	

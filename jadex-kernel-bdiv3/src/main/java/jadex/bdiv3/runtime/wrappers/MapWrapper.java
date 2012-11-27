@@ -28,7 +28,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 	
 	/** The change event name. */
 	protected String changeevent;
-	
+
 	/**
 	 *  Create a new collection wrapper.
 	 */

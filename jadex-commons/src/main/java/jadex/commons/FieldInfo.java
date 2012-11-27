@@ -1,6 +1,5 @@
-package jadex.bdiv3.model;
+package jadex.commons;
 
-import jadex.commons.SReflect;
 
 import java.lang.reflect.Field;
 
@@ -51,6 +50,7 @@ public class FieldInfo
 		{
 			if(field==null)
 			{
+//				System.out.println("field: "+cl+" "+classname+" "+name);
 				Class<?> cla = SReflect.findClass(classname, null, cl);
 				field = cla.getDeclaredField(name);
 			}

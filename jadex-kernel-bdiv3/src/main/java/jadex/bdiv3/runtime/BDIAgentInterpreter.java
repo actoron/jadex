@@ -15,6 +15,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -23,6 +24,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
+import jadex.micro.PojoMicroAgent;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -70,14 +72,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model) throws Exception
 	{
-		MicroAgent ret = null;
+		MicroAgent ret;
 		BDIModel bdim = (BDIModel)model;
 		
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
 		{
 			ret = (MicroAgent)agent;
-			ret.init(this);
+			ret.init(BDIAgentInterpreter.this);
 		}
 		else // if pojoagent
 		{
@@ -85,17 +87,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			pa.init(this, agent);
 			ret = pa;
 
-			Field[] fields = model.getAgentInjections();
+			FieldInfo[] fields = model.getAgentInjections();
 			for(int i=0; i<fields.length; i++)
 			{
 //				if(fields[i].isAnnotationPresent(Agent.class))
 //				{
 					try
 					{
-						// todo: cannot use fields as they are from the 'not enhanced' class
-						Field field = agent.getClass().getDeclaredField(fields[i].getName());
-						field.setAccessible(true);
-						field.set(agent, ret);
+						Field f = fields[i].getField(getClassLoader());
+						f.setAccessible(true);
+						f.set(agent, ret);
 					}
 					catch(Exception e)
 					{
@@ -103,8 +104,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					}
 //				}
 			}
-			
-			// Additionally inject agent to hidden agent field
+		}
+		
+		// Additionally inject agent to hidden agent field
+		if(!(agent instanceof MicroAgent))
+		{
 			try
 			{
 				// todo: cannot use fields as they are from the 'not enhanced' class
@@ -122,7 +126,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		this.rulesystem = new RuleSystem(agent);
 		
 		// Inject belief collections.
-		Object target = ret instanceof PojoBDIAgent? ((PojoBDIAgent)ret).getPojoAgent(): ret;
 		List<MBelief> mbels = bdim.getCapability().getBeliefs();
 		for(MBelief mbel: mbels)
 		{
@@ -130,7 +133,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				Field f = mbel.getTarget().getField(getClassLoader());
 				f.setAccessible(true);
-				Object val = f.get(target);
+				Object val = f.get(agent);
 				if(val==null)
 				{
 					String impl = mbel.getImplClassName();
@@ -159,17 +162,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					f.set(target, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					f.set(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					f.set(target, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					f.set(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					f.set(target, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					f.set(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
 			}
 			catch(RuntimeException e)
@@ -258,10 +261,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			rulesystem.processAllEvents();
 		}
 		
-		if(steps!=null && steps.size()>0)
-		{
-			System.out.println("steps: "+steps.size()+" "+((Object[])steps.get(0))[0]);
-		}
+//		if(steps!=null && steps.size()>0)
+//		{
+//			System.out.println("steps: "+steps.size()+" "+((Object[])steps.get(0))[0]);
+//		}
 		return super.executeStep();
 	}
 	

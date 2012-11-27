@@ -18,6 +18,7 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -157,21 +158,22 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			pa.init(this, agent);
 			ret = pa;
 
-			Field[] fields = model.getAgentInjections();
+			FieldInfo[] fields = model.getAgentInjections();
 			for(int i=0; i<fields.length; i++)
 			{
-				if(fields[i].isAnnotationPresent(Agent.class))
-				{
+//				if(fields[i].isAnnotationPresent(Agent.class))
+//				{
 					try
 					{
-						fields[i].setAccessible(true);
-						fields[i].set(agent, ret);
+						Field f = fields[i].getField(getClassLoader());
+						f.setAccessible(true);
+						f.set(agent, ret);
 					}
 					catch(Exception e)
 					{
 						getLogger().warning("Agent injection failed: "+e);
 					}
-				}
+//				}
 			}
 		}
 		return ret;
@@ -194,13 +196,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					Object val = getArguments().get(names[i]);
 					
 //					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
-					final Tuple2<Field, String>[] infos = model.getArgumentInjections(names[i]);
+					final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
 					
 					try
 					{
 						for(int j=0; j<infos.length; j++)
 						{
-							Field field = infos[j].getFirstEntity();
+							Field field = infos[j].getFirstEntity().getField(getClassLoader());
 							String convert = infos[j].getSecondEntity();
 //							System.out.println("seting arg: "+names[i]+" "+val);
 							setFieldValue(val, field, convert);
@@ -227,11 +229,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					if(getResults().containsKey(names[i]))
 					{
 						Object val = getResults().get(names[i]);
-						final Tuple3<Field, String, String> info = model.getResultInjection(names[i]);
+						final Tuple3<FieldInfo, String, String> info = model.getResultInjection(names[i]);
 						
 						try
 						{
-							Field field = info.getFirstEntity();
+							Field field = info.getFirstEntity().getField(getClassLoader());
 							String convert = info.getSecondEntity();
 //							System.out.println("seting res: "+names[i]+" "+val);
 							setFieldValue(val, field, convert);
@@ -295,7 +297,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	
 			for(int i=0; i<sernames.length; i++)
 			{
-				final Field[] fields = model.getServiceInjections(sernames[i]);
+				final FieldInfo[] fields = model.getServiceInjections(sernames[i]);
 				final Future<Void> fut = new Future<Void>();
 				fut.addResultListener(lis);
 				getServiceContainer().getRequiredService(sernames[i])
@@ -307,8 +309,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						{
 							for(int j=0; j<fields.length; j++)
 							{
-								fields[j].setAccessible(true);
-								fields[j].set(agent, result);
+								fields[j].getField(getClassLoader()).setAccessible(true);
+								fields[j].getField(getClassLoader()).set(agent, result);
 							}
 							fut.setResult(null);
 						}
@@ -688,8 +690,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		for(String name: micromodel.getResultInjectionNames())
 		{
-			Tuple3<Field, String, String> inj = micromodel.getResultInjection(name);
-			Field field = inj.getFirstEntity();
+			Tuple3<FieldInfo, String, String> inj = micromodel.getResultInjection(name);
+			Field field = inj.getFirstEntity().getField(getClassLoader());
 			String convback = inj.getThirdEntity();
 			
 			try

@@ -18,6 +18,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Value;
+import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -612,13 +613,13 @@ public class MicroClassReader
 			{
 				if(isAnnotationPresent(fields[i], Agent.class, cl))
 				{
-					micromodel.addAgentInjection(fields[i]);
+					micromodel.addAgentInjection(new FieldInfo(fields[i]));
 				}
 				else if(isAnnotationPresent(fields[i], AgentService.class, cl))
 				{
 					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
 					String name = ser.name().length()>0? ser.name(): fields[i].getName();
-					micromodel.addServiceInjection(name, fields[i]);
+					micromodel.addServiceInjection(name, new FieldInfo(fields[i]));
 				}
 				else
 				{
@@ -626,7 +627,7 @@ public class MicroClassReader
 					{
 						AgentArgument arg = getAnnotation(fields[i], AgentArgument.class, cl);
 						String name = arg.value().length()>0? arg.value(): fields[i].getName();
-						micromodel.addArgumentInjection(name, fields[i], arg.convert());
+						micromodel.addArgumentInjection(name, new FieldInfo(fields[i]), arg.convert());
 					}
 					if(isAnnotationPresent(fields[i], AgentResult.class, cl))
 					{
@@ -634,7 +635,7 @@ public class MicroClassReader
 						String name = res.value().length()>0? res.value(): fields[i].getName();
 						if(micromodel.getResultInjection(name)==null)
 						{
-							micromodel.addResultInjection(name, fields[i], res.convert(), res.convertback());
+							micromodel.addResultInjection(name, new FieldInfo(fields[i]), res.convert(), res.convertback());
 						}
 					}
 				}

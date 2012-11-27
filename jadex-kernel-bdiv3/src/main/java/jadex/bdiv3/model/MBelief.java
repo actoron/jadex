@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.commons.FieldInfo;
+
 
 /**
  *  Belief model.
