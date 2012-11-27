@@ -31,7 +31,7 @@ if(infos.length>0)
 				markers.append("&markers=label:");
 				markers.append(i+1);
 				markers.append("|color:");
-				markers.append(colors[url.hashCode()%colors.length]);
+				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
 				markers.append("|");
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
@@ -40,7 +40,7 @@ if(infos.length>0)
 			{
 				// Add unlabelled markers for each unique position of remaining entries
 				markers.append("&markers=color:");
-				markers.append(colors[url.hashCode()%colors.length]);
+				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
 				markers.append("|");
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
@@ -72,7 +72,7 @@ if(peers.length>0)
 					markers.append("&markers=label:");
 					markers.append(i+cnt+1);
 					markers.append("|color:");
-					markers.append(colors[peers[j].getUrl().hashCode()%colors.length]);
+					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
 					markers.append("|");
 					markers.append(infos2[i].getPosition());
 					positions.add(infos[i].getPosition());
@@ -81,7 +81,7 @@ if(peers.length>0)
 				{
 					// Add unlabelled markers for each unique position of remaining entries
 					markers.append("&markers=|color:");
-					markers.append(colors[peers[j].getUrl().hashCode()%colors.length]);
+					markers.append(colors[Math.abs(peers[j].getUrl().hashCode())%colors.length]);
 					markers.append("|");
 					markers.append(infos2[i].getPosition());
 					positions.add(infos2[i].getPosition());

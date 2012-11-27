@@ -220,7 +220,7 @@ public class SyncJobProcessingAgent
 					public void resultAvailable(Void result)
 					{
 						// Comment out to test only update of specific SyncJob type
-						if(job instanceof DropboxSyncJob)
+//						if(job instanceof DropboxSyncJob)
 						{
 							startSync().addResultListener(new IResultListener<Void>()
 							{ 
@@ -237,11 +237,11 @@ public class SyncJobProcessingAgent
 								}
 							});	
 						}
-						else
-						{
-							System.out.println("waiting...");
-							agent.waitForDelay(delay, self);
-						}
+//						else
+//						{
+//							System.out.println("waiting...");
+//							agent.waitForDelay(delay, self);
+//						}
 					}	
 					
 					public void exceptionOccurred(Exception exception) 
