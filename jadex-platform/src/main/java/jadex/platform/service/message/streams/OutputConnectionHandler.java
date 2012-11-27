@@ -10,12 +10,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.PropertiesPanel;
 import jadex.platform.service.message.MessageService;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,10 +20,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
 
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
+//import javax.swing.JPanel;
+//import javax.swing.JTextField;
+//import javax.swing.Timer;
 
 /**
  *  The output connection handler. 
@@ -531,7 +526,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		
 		queuecnt++;
 //		System.out.println("queue: "+queuecnt);
-		final int	seqno	= task.getSequenceNumber();
+//		final int	seqno	= task.getSequenceNumber();
 		task.getFuture().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
@@ -865,66 +860,66 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	protected JPanel createPanel()
-	{
-		JPanel ret = new JPanel(new BorderLayout());
-		JPanel p1 = super.createPanel();
-		JPanel p2 = new OutputConnectionPanel();
-		ret.add(p1, BorderLayout.NORTH);
-		ret.add(p2, BorderLayout.CENTER);
-		return ret;
-	}
+//	/**
+//	 * 
+//	 */
+//	protected JPanel createPanel()
+//	{
+//		JPanel ret = new JPanel(new BorderLayout());
+//		JPanel p1 = super.createPanel();
+//		JPanel p2 = new OutputConnectionPanel();
+//		ret.add(p1, BorderLayout.NORTH);
+//		ret.add(p2, BorderLayout.CENTER);
+//		return ret;
+//	}
 	
-	/**
-	 * 
-	 */
-	public class OutputConnectionPanel extends JPanel
-	{
-		/**
-		 * 
-		 */
-		public OutputConnectionPanel()
-		{
-			PropertiesPanel pp = new PropertiesPanel("Output properties");
-			final JTextField tfsent = pp.createTextField("sent");
-			final JTextField tftosend = pp.createTextField("tosend");
-			final JTextField tfseq = pp.createTextField("seqnumber");
-			final JTextField tfqueuecnt = pp.createTextField("queuecnt");
-			final JTextField tfmpmaxsize = pp.createTextField("mpmaxsize");
-			final JTextField tfmpsize = pp.createTextField("mpsize");
-			final JTextField tfstop = pp.createTextField("stop");
-			
-			final int[] cnt = new int[3];
-			final JTextField tfwaiting = pp.createTextField("waiting");
-			
-			Timer t = new Timer(100, new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					tfsent.setText(""+sent.size());
-					tftosend.setText(""+tosend.size());
-					tfseq.setText(""+seqnumber);
-					tfqueuecnt.setText(""+queuecnt);
-					tfmpmaxsize.setText(""+mpmaxsize);
-					tfmpsize.setText(""+mpsize);
-					tfstop.setText(""+stopflag);
-					if(!isSendAllowed())
-						cnt[0]++;
-					if(sent.size()>=maxsend)
-						cnt[1]++;
-					if(queuecnt>=maxqueued)
-						cnt[2]++;
-					tfwaiting.setText(""+cnt[0]+" "+cnt[1]+" "+cnt[2]);
-				}
-			});
-			t.start();
-			
-			setLayout(new BorderLayout());
-			add(pp, BorderLayout.CENTER);
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	public class OutputConnectionPanel extends JPanel
+//	{
+//		/**
+//		 * 
+//		 */
+//		public OutputConnectionPanel()
+//		{
+//			PropertiesPanel pp = new PropertiesPanel("Output properties");
+//			final JTextField tfsent = pp.createTextField("sent");
+//			final JTextField tftosend = pp.createTextField("tosend");
+//			final JTextField tfseq = pp.createTextField("seqnumber");
+//			final JTextField tfqueuecnt = pp.createTextField("queuecnt");
+//			final JTextField tfmpmaxsize = pp.createTextField("mpmaxsize");
+//			final JTextField tfmpsize = pp.createTextField("mpsize");
+//			final JTextField tfstop = pp.createTextField("stop");
+//			
+//			final int[] cnt = new int[3];
+//			final JTextField tfwaiting = pp.createTextField("waiting");
+//			
+//			Timer t = new Timer(100, new ActionListener()
+//			{
+//				public void actionPerformed(ActionEvent e)
+//				{
+//					tfsent.setText(""+sent.size());
+//					tftosend.setText(""+tosend.size());
+//					tfseq.setText(""+seqnumber);
+//					tfqueuecnt.setText(""+queuecnt);
+//					tfmpmaxsize.setText(""+mpmaxsize);
+//					tfmpsize.setText(""+mpsize);
+//					tfstop.setText(""+stopflag);
+//					if(!isSendAllowed())
+//						cnt[0]++;
+//					if(sent.size()>=maxsend)
+//						cnt[1]++;
+//					if(queuecnt>=maxqueued)
+//						cnt[2]++;
+//					tfwaiting.setText(""+cnt[0]+" "+cnt[1]+" "+cnt[2]);
+//				}
+//			});
+//			t.start();
+//			
+//			setLayout(new BorderLayout());
+//			add(pp, BorderLayout.CENTER);
+//		}
+//	}
 	
 }

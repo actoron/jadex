@@ -113,6 +113,10 @@ public class StandaloneRelay
 								{
 									handler.handlePlatforms(new CounterInputStream(bin, contentlength));
 								}
+								else if(path.startsWith("/platforminfo"))
+								{
+									handler.handlePlatform(new CounterInputStream(bin, contentlength));
+								}
 								else
 								{
 									handler.handleMessage(new CounterInputStream(bin, contentlength), "http");	// Hack!!! https?									

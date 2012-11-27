@@ -25,12 +25,10 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -331,6 +329,32 @@ public class RelayHandler
 	}
 	
 	/**
+	 *  Called when a single platform info is received from a peer relay server.
+	 */
+	public void handlePlatform(InputStream in) throws Exception
+	{
+		// Read target id (= peer url).
+		String	id	= readString(in);
+		
+		// Read total message length.
+		byte[]	len	= readData(in, 4);
+		int	length	= SUtil.bytesToInt(len);
+		
+		// Read message and extract platform info content.
+		byte[] buffer = readData(in, length-1);
+		PlatformInfo	info	= (PlatformInfo)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
+		
+		PeerEntry	peer	= peers.addPeer(id, false);
+		
+		peer.updatePlatformInfo(info);
+		if(info.getAwarenessInfo()!=null)
+		{
+			sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
+		}			
+	}
+	
+	/**
 	 *  Called when platform infos are received from a peer relay server.
 	 */
 	public void handlePlatforms(InputStream in) throws Exception
@@ -349,48 +373,34 @@ public class RelayHandler
 		
 		PeerEntry	peer	= peers.addPeer(id, false);
 		
-		// Full update after reconnection
-		if(infos.length>1)
+		// Remember previously connected platforms.
+		Map<String, PlatformInfo>	old	= new LinkedHashMap<String, PlatformInfo>();
+		for(PlatformInfo info: peer.getPlatformInfos())
 		{
-			// Remember previously connected platforms.
-			Map<String, PlatformInfo>	old	= new LinkedHashMap<String, PlatformInfo>();
-			for(PlatformInfo info: peer.getPlatformInfos())
+			if(info.getAwarenessInfo()!=null)
 			{
-				if(info.getAwarenessInfo()!=null)
-				{
-					old.put(info.getId(), info);
-				}
+				old.put(info.getId(), info);
 			}
-			peer.clearPlatformInfos();
-			
-			// Send infos for currently connected platforms
-			for(PlatformInfo info: infos)
+		}
+		peer.clearPlatformInfos();
+		
+		// Send infos for currently connected platforms
+		for(PlatformInfo info: infos)
+		{
+			peer.updatePlatformInfo(info);
+			if(info.getAwarenessInfo()!=null)
 			{
-				peer.updatePlatformInfo(info);
-				if(info.getAwarenessInfo()!=null)
-				{
-					sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
-					old.remove(info.getId());
-				}
-			}
-			
-			// Send offline infos for remaining previous platforms.
-			for(PlatformInfo info: old.values())
-			{
-				AwarenessInfo	awainfo	= info.getAwarenessInfo();
-				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-				sendAwarenessInfos(awainfo, pcodecs, false);
+				sendAwarenessInfos(info.getAwarenessInfo(), pcodecs, false);
+				old.remove(info.getId());
 			}
 		}
 		
-		// Single platform update while still connected
-		else if(infos.length==1)
+		// Send offline infos for remaining previous platforms.
+		for(PlatformInfo info: old.values())
 		{
-			peer.updatePlatformInfo(infos[0]);
-			if(infos[0].getAwarenessInfo()!=null)
-			{
-				sendAwarenessInfos(infos[0].getAwarenessInfo(), pcodecs, false);
-			}			
+			AwarenessInfo	awainfo	= info.getAwarenessInfo();
+			awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+			sendAwarenessInfos(awainfo, pcodecs, false);
 		}
 	}
 	
@@ -427,34 +437,56 @@ public class RelayHandler
 			if(peer!=null && !peer.isSent())
 			{
 				peer.setSent(true);
-				sendPlatformInfos(peer, getCurrentPlatforms(), null);
+				sendPlatformInfos(peer, getCurrentPlatforms());
 			}
 		}
 		return peers.getURLs(requesturl);
 	}
 	
 	/**
-	 *  Send platform infos to a peer relay server.
+	 *  Send a single platform info to all peer relay servers.
 	 */
-	public byte[]	sendPlatformInfos(PeerEntry peer, PlatformInfo[] infos, byte[] peerinfo)
+	public void	sendPlatformInfo(PlatformInfo info)
 	{
-		if(peerinfo==null)
-		{
-			peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
-		}
-				
 		try
 		{
-			System.out.println("Sending platform infos to peer: "+peer.getURL());
-			new RelayConnectionManager().postMessage(peer.getURL()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-			System.out.println("Sent platform infos.");
+			byte[]	peerinfo	= null;
+			for(PeerEntry peer: peers.getPeers())
+			{
+				if(peer.isConnected())
+				{
+					if(peerinfo==null)
+					{
+						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader());
+					}
+//					System.out.println("Sending platform info to peer: "+peer.getURL());
+					new RelayConnectionManager().postMessage(peer.getURL()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+//					System.out.println("Sent platform info.");
+				}
+			}
 		}
 		catch(IOException e)
 		{
 			System.out.println("Error sending platform infos to peer: "+e);
 		}					
-		
-		return peerinfo;
+	}
+	
+	/**
+	 *  Send platform infos to a peer relay server.
+	 */
+	public void	sendPlatformInfos(PeerEntry peer, PlatformInfo[] infos)
+	{
+		try
+		{
+//			System.out.println("Sending platform infos to peer: "+peer.getURL());
+			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
+			new RelayConnectionManager().postMessage(peer.getURL()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
+//			System.out.println("Sent platform infos.");
+		}
+		catch(IOException e)
+		{
+			System.out.println("Error sending platform infos to peer: "+e);
+		}					
 	}
 	
 	//-------- helper methods --------	
@@ -612,15 +644,7 @@ public class RelayHandler
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
 				platform.setAwarenessInfo(awainfo);
 			}
-			PeerEntry[] apeers = peers.getPeers();
-			byte[]	peerinfo	= null;
-			for(PeerEntry peer: apeers)
-			{
-				if(peer.isConnected())
-				{
-					peerinfo	= sendPlatformInfos(peer, new PlatformInfo[]{platform}, peerinfo);
-				}
-			}
+			sendPlatformInfo(platform);
 		}
 	}
 	

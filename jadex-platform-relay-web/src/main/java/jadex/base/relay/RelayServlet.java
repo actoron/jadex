@@ -153,11 +153,15 @@ public class RelayServlet extends HttpServlet
 //		s	= request.getRequestURL().toString();
 		try
 		{
-			if("/awareness".equals(request.getServletPath()) || "/awareness/".equals(request.getServletPath()))	// new code always adds slash.
+			if(request.getServletPath().startsWith("/awareness"))
 			{
 				handler.handleAwareness(request.getInputStream());
 			}
-			else if("/platforminfos".equals(request.getServletPath()) || "/platforminfos/".equals(request.getServletPath()))	// new code always adds slash.
+			else if(request.getServletPath().startsWith("/platforminfos"))
+			{
+				handler.handlePlatforms(request.getInputStream());
+			}
+			else if(request.getServletPath().startsWith("/platforminfo"))
 			{
 				handler.handlePlatforms(request.getInputStream());
 			}
