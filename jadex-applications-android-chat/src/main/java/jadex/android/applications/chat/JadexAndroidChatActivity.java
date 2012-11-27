@@ -151,15 +151,17 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	@Override
 	public void eventReceived(final ChatEvent event)
 	{
-		runOnUiThread(new Runnable()
+		if (event.getType() == ChatEvent.TYPE_MESSAGE) 
 		{
-
-			@Override
-			public void run()
+			runOnUiThread(new Runnable()
 			{
-				chatEventAdapter.add(event);
-			}
-		});
+				@Override
+				public void run()
+				{
+					chatEventAdapter.add(event);
+				}
+			});
+		}
 	}
 
 	@Override

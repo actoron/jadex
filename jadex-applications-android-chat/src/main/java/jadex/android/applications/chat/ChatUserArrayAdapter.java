@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ChatUserListAdapter extends ArrayAdapter<ChatUser>
+public class ChatUserArrayAdapter extends ArrayAdapter<ChatUser>
 {
 
 	private Context context;
 
-	public ChatUserListAdapter(Context context)
+	public ChatUserArrayAdapter(Context context)
 	{
 		super(context, R.layout.chatuseritem);
 		this.context = context;
@@ -28,6 +28,7 @@ public class ChatUserListAdapter extends ArrayAdapter<ChatUser>
 			convertView = inflater.inflate(R.layout.chatuseritem, parent, false);
 			viewHolder = new UserViewHolder();
 			viewHolder.txtNickName = (TextView) convertView.findViewById(R.id.chatuseritem_txtnickname);
+			viewHolder.txtPlatformName = (TextView) convertView.findViewById(R.id.chatuseritem_txtplatform);
 			convertView.setTag(viewHolder);
 		} else
 		{
@@ -36,6 +37,7 @@ public class ChatUserListAdapter extends ArrayAdapter<ChatUser>
 
 		ChatUser user = getItem(position);
 		viewHolder.txtNickName.setText(user.getNickName());
+		viewHolder.txtPlatformName.setText(user.getSid().getProviderId().getPlatformName());
 
 		return convertView;
 	}
@@ -43,6 +45,7 @@ public class ChatUserListAdapter extends ArrayAdapter<ChatUser>
 	private static class UserViewHolder
 	{
 		TextView txtNickName;
+		TextView txtPlatformName;
 	}
 
 }

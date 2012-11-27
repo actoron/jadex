@@ -134,12 +134,9 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 								{
 									public void intermediateResultAvailable(ChatEvent ce)
 									{
-										if (ChatEvent.TYPE_MESSAGE.equals(ce.getType()))
+										if (listener != null)
 										{
-											if (listener != null)
-											{
-												listener.eventReceived(ce);
-											}
+											listener.eventReceived(ce);
 										}
 									}
 								});
