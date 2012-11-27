@@ -12,7 +12,6 @@
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
 	PeerEntry[]	peers	= (PeerEntry[])request.getAttribute("peers");
 	String	url	= (String)request.getAttribute("url");
-	boolean	empty	= infos.length==0;
 	StringBuffer markers	= new StringBuffer();
 	String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
 	Set<String> positions	= new HashSet<String>();
@@ -55,10 +54,10 @@ if(infos.length>0)
 		}
 	}
 }
+int	cnt	= infos.length;
 
 if(peers.length>0)
 {
-	int	cnt	= infos.length;
 	for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
 	{
 		PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
@@ -106,7 +105,7 @@ if(markers.length()>0)
 <%
 }
 
-if(!empty)
+if(cnt>0)
 {
 %>
 
@@ -165,7 +164,7 @@ if(!empty)
 	<%
 		}
 		
-		int cnt	= infos.length;
+		cnt	= infos.length;
 		for(int j=0; j<peers.length; j++)
 		{
 			PlatformInfo[]	infos2	= peers[j].getPlatformInfos();
