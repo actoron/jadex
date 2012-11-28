@@ -26,6 +26,11 @@
 		<!-- Kernels -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-model-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
