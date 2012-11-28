@@ -151,7 +151,7 @@ public class MCapability extends MElement
 	 */
 	public List<MPlan> getPlans()
 	{
-		return plans==null? Collections.EMPTY_LIST: null;
+		return plans==null? Collections.EMPTY_LIST: plans;
 	}
 
 	/**

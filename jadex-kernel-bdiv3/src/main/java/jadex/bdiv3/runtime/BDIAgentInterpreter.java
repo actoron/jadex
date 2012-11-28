@@ -35,6 +35,7 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -174,17 +175,60 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				for(UnparsedExpression uexp: igoals)
 				{
-					MGoal mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+					MGoal mgoal = null;
 					Object goal = null;
+					
+					// Create goal if expression available
 					if(uexp.getValue()!=null && uexp.getValue().length()>0)
 					{
 						goal = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
 					}
-					else
+					
+					Class<?> gcl = null;
+					if(uexp.getClazz()!=null)
+					{
+						gcl = uexp.getClazz().getType(getClassLoader(), getModel().getAllImports());
+					}
+					if(gcl==null)
+					{
+						// try to fetch via name
+						mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+						if(mgoal==null && uexp.getName().indexOf(".")==-1)
+						{
+							// try with package
+							mgoal = bdimodel.getCapability().getGoal(getModel().getPackage()+"."+uexp.getName());
+						}
+						if(mgoal!=null)
+						{
+							gcl = mgoal.getTargetClass(getClassLoader());
+						}
+					}
+					if(mgoal==null)
+					{
+						mgoal = bdimodel.getCapability().getGoal(gcl.getName());
+					}
+					if(goal==null)
 					{
 						try
 						{
-							goal = mgoal.getTargetClass(getClassLoader()).newInstance();
+							Class<?> agcl = agent.getClass();
+							Constructor<?>[] cons = gcl.getDeclaredConstructors();
+							for(Constructor<?> c: cons)
+							{
+								Class<?>[] params = c.getParameterTypes();
+								if(params.length==0)
+								{
+									// perfect found empty con
+									goal = gcl.newInstance();
+									break;
+								}
+								else if(params.length==1 && params[0].equals(agcl))
+								{
+									// found (first level) inner class constructor
+									goal = c.newInstance(new Object[]{agent});
+									break;
+								}
+							}
 						}
 						catch(RuntimeException e)
 						{

@@ -93,17 +93,20 @@ public class APL
 			{
 				precandidates = new ArrayList<MPlan>();
 				List<MPlan> mplans = ((MCapability)capa.getModelElement()).getPlans();
-				for(int i=0; i<mplans.size(); i++)
+				if(mplans!=null)
 				{
-					MPlan mplan = mplans.get(i);
-					MTrigger mtrigger = mplan.getTrigger();
-					if(element instanceof RGoal)
+					for(int i=0; i<mplans.size(); i++)
 					{
-						List<MGoal> mgoals = mtrigger.getGoals();
-						if(mgoals!=null && mgoals.contains(element.getModelElement()))
+						MPlan mplan = mplans.get(i);
+						MTrigger mtrigger = mplan.getTrigger();
+						if(element instanceof RGoal)
 						{
-							precandidates.add(mplan);
-							candidates.add(mplan);
+							List<MGoal> mgoals = mtrigger.getGoals();
+							if(mgoals!=null && mgoals.contains(element.getModelElement()))
+							{
+								precandidates.add(mplan);
+								candidates.add(mplan);
+							}
 						}
 					}
 				}

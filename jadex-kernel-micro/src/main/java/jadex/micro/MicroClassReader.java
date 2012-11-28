@@ -291,7 +291,7 @@ public class MicroClassReader
 					// Todo: clazz, language
 					if(!props.containsKey(vals[i].name()))
 					{
-						props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].value(), null) );
+						props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz().getName(), vals[i].value(), null) );
 					}
 				}
 			}
@@ -1286,7 +1286,7 @@ public class MicroClassReader
 			ret = new UnparsedExpression[values.length];
 			for(int i=0; i<values.length; i++)
 			{
-				ret[i] = new UnparsedExpression(null, values[i].clazz(), values[i].value(), null);
+				ret[i] = new UnparsedExpression(null, values[i].clazz().getName(), values[i].value(), null);
 			}
 		}
 		return ret;
@@ -1303,7 +1303,7 @@ public class MicroClassReader
 			ret = new UnparsedExpression[values.length];
 			for(int i=0; i<values.length; i++)
 			{
-				ret[i] = new UnparsedExpression(values[i].name(), values[i].clazz(), values[i].value(), null);
+				ret[i] = new UnparsedExpression(values[i].name(), values[i].clazz().getName(), values[i].value(), null);
 			}
 		}
 		return ret;
@@ -1320,7 +1320,7 @@ public class MicroClassReader
 			ret = new ArrayList<UnparsedExpression>();
 			for(int i=0; i<values.length; i++)
 			{
-				ret.add(new UnparsedExpression(values[i].name(), values[i].clazz(), values[i].value(), null));
+				ret.add(new UnparsedExpression(values[i].name(), values[i].clazz().getName(), values[i].value(), null));
 			}
 		}
 		return ret;

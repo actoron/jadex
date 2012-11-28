@@ -220,12 +220,15 @@ public class BDIClassReader extends MicroClassReader
 						MConfiguration bdiconf = new MConfiguration(configs[i].name());
 						bdiconfs.add(bdiconf);
 							
+						List<UnparsedExpression> ibels = createUnparsedExpressionsList(configs[i].initialbeliefs());
+						if(ibels!=null)
+							bdiconf.setInitialGoals(ibels);
 						List<UnparsedExpression> iplans = createUnparsedExpressionsList(configs[i].initialplans());
 						if(iplans!=null)
 							bdiconf.setInitialPlans(iplans);
 						List<UnparsedExpression> igoals = createUnparsedExpressionsList(configs[i].initialgoals());
 						if(igoals!=null)
-							bdiconf.setInitialPlans(igoals);
+							bdiconf.setInitialGoals(igoals);
 						
 						// Need to repeat the code as annotation is different :-(
 						
@@ -240,12 +243,12 @@ public class BDIClassReader extends MicroClassReader
 						NameValue[] argvals = configs[i].arguments();
 						for(int j=0; j<argvals.length; j++)
 						{
-							configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz(), argvals[j].value(), null));
+							configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz().getName(), argvals[j].value(), null));
 						}
 						NameValue[] resvals = configs[i].results();
 						for(int j=0; j<resvals.length; j++)
 						{
-							configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz(), resvals[j].value(), null));
+							configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz().getName(), resvals[j].value(), null));
 						}
 						
 						ProvidedService[] provs = configs[i].providedservices();
@@ -260,7 +263,7 @@ public class BDIClassReader extends MicroClassReader
 								interceptors = new UnparsedExpression[inters.length];
 								for(int k=0; k<inters.length; k++)
 								{
-									interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+									interceptors[k] = new UnparsedExpression(null, inters[k].clazz().getName(), inters[k].value(), null);
 								}
 							}
 							RequiredServiceBinding bind = createBinding(im.binding());
