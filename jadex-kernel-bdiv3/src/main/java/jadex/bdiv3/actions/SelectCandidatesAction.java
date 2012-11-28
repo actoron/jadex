@@ -71,9 +71,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				{
 					MPlan mplan = (MPlan)cand;
 					RPlan rplan = RPlan.createRPlan(mplan, element, ia);
-//					RPlan rplan = new RPlan((MPlan)cand, cand);
-					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(element, rplan);
-					ia.getExternalAccess().scheduleStep(action);
+					RPlan.adoptPlan(rplan, ia);
 					ret.setResult(null);
 				}
 				else if(cand instanceof RPlan)
@@ -81,8 +79,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					// dispatch to running plan
 					RPlan rplan = (RPlan)cand;
 					rplan.setDispatchedElement(element);
-					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(element, rplan);
-					ia.getExternalAccess().scheduleStep(action);
+					RPlan.adoptPlan(rplan, ia);
 					ret.setResult(null);
 				}
 				else

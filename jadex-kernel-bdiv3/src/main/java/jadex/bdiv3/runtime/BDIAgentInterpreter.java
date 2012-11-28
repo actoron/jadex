@@ -4,6 +4,7 @@ import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
@@ -12,6 +13,7 @@ import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
@@ -21,6 +23,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
@@ -73,7 +76,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret;
-		BDIModel bdim = (BDIModel)model;
 		
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
@@ -124,9 +126,98 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
+
+		return ret;
+	}
+	
+	/**
+	 *  Start the component behavior.
+	 */
+	public void startBehavior()
+	{
+		super.startBehavior();
 		
+		Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
+		
+		// Init bdi configuration
+		String confname = getConfiguration();
+		if(confname!=null)
+		{
+			MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
+			
+			// Set initial belief values
+			List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
+			if(ibels!=null)
+			{
+				for(UnparsedExpression uexp: ibels)
+				{
+					try
+					{
+						MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
+						Object val = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
+						mbel.getTarget().getField(getClassLoader()).set(agent, val);
+					}
+					catch(RuntimeException e)
+					{
+						throw e;
+					}
+					catch(Exception e)
+					{
+						throw new RuntimeException(e);
+					}
+				}
+			}
+			
+			// Create initial goals
+			List<UnparsedExpression> igoals = mconf.getInitialGoals();
+			if(igoals!=null)
+			{
+				for(UnparsedExpression uexp: igoals)
+				{
+					MGoal mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+					Object goal = null;
+					if(uexp.getValue()!=null && uexp.getValue().length()>0)
+					{
+						goal = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
+					}
+					else
+					{
+						try
+						{
+							goal = mgoal.getTargetClass(getClassLoader()).newInstance();
+						}
+						catch(RuntimeException e)
+						{
+							throw e;
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+					RGoal rgoal = new RGoal(mgoal, goal);
+					RGoal.adoptGoal(rgoal, getInternalAccess());
+				}
+			}
+			
+			// Create initial plans
+			List<UnparsedExpression> iplans = mconf.getInitialPlans();
+			if(iplans!=null)
+			{
+				for(UnparsedExpression uexp: iplans)
+				{
+					MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
+					// todo: allow Java plan constructor calls
+//							Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
+				
+					RPlan rplan = RPlan.createRPlan(mplan, null, getInternalAccess());
+					RPlan.adoptPlan(rplan, getInternalAccess());
+				}
+			}
+		}
+				
 		// Inject belief collections.
-		List<MBelief> mbels = bdim.getCapability().getBeliefs();
+		List<MBelief> mbels = bdimodel.getCapability().getBeliefs();
 		for(MBelief mbel: mbels)
 		{
 			try
@@ -186,7 +277,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 
 		// Observe goal types
-		List<MGoal> goals = ((BDIModel)model).getCapability().getGoals();
+		List<MGoal> goals = bdimodel.getCapability().getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
 			// todo: explicit bdi creation rule
@@ -194,7 +285,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		// Observe plan types
-		List<MPlan> mplans = ((BDIModel)model).getCapability().getPlans();
+		List<MPlan> mplans = bdimodel.getCapability().getPlans();
 		for(int i=0; i<mplans.size(); i++)
 		{
 			final MPlan mplan = mplans.get(i);
@@ -207,8 +298,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					String evtype = event.getType().substring(0, idx);
 					String belname = event.getType().substring(idx+1);
 					RPlan rplan = RPlan.createRPlan(mplan, new ChangeEvent(evtype, belname, event.getContent()), getInternalAccess());
-					IConditionalComponentStep<Void> action = new ExecutePlanStepAction(null, rplan);
-					getInternalAccess().getExternalAccess().scheduleStep(action);
+					RPlan.adoptPlan(rplan, getInternalAccess());
 					return IFuture.DONE;
 				}
 			};
@@ -238,7 +328,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 		}
 		
-		return ret;
 	}
 	
 	/**

@@ -98,6 +98,15 @@ public class RPlan extends RElement
 	}
 	
 	/**
+	 * 
+	 */
+	public static void adoptPlan(RPlan rplan, IInternalAccess ia)
+	{
+		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
+		ia.getExternalAccess().scheduleStep(action);
+	}
+	
+	/**
 	 *  Create a new plan.
 	 */
 	public RPlan(MPlan mplan, Object candidate)

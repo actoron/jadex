@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,11 +9,13 @@ import java.util.List;
  */
 public class MCapability extends MElement
 {
-	protected List<MBelief> beliefs = new ArrayList<MBelief>();
+	protected List<MBelief> beliefs;;
 
-	protected List<MGoal> goals = new ArrayList<MGoal>();
+	protected List<MGoal> goals;;
 	
-	protected List<MPlan> plans = new ArrayList<MPlan>();
+	protected List<MPlan> plans;;
+	
+	protected List<MConfiguration> configurations;
 	
 	/**
 	 *  Create a capability.
@@ -28,7 +31,7 @@ public class MCapability extends MElement
 	 */
 	public List<MBelief> getBeliefs()
 	{
-		return beliefs;
+		return beliefs==null? Collections.EMPTY_LIST: beliefs;
 	}
 
 	/**
@@ -71,12 +74,35 @@ public class MCapability extends MElement
 	}
 	
 	/**
+	 *  Get a belief.
+	 */
+	public MBelief getBelief(String name)
+	{
+		MBelief ret = null;
+		
+		if(beliefs!=null && name!=null)
+		{
+			for(MBelief bel: beliefs)
+			{
+				if(name.equals(bel.getName()))
+				{
+					ret = bel;
+					break;
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	
+	/**
 	 *  Get the goals.
 	 *  @return The goals.
 	 */
 	public List<MGoal> getGoals()
 	{
-		return goals;
+		return goals==null? Collections.EMPTY_LIST: goals;
 	}
 
 	/**
@@ -99,17 +125,17 @@ public class MCapability extends MElement
 	}
 	
 	/**
-	 *  Get the goal for a pojo type.
+	 *  Get the goal for its name.
 	 *  @return The goal.
 	 */
-	public MGoal getGoal(String pojotype)
+	public MGoal getGoal(String name)
 	{
 		MGoal ret = null;
 		if(goals!=null)
 		{
 			for(MGoal goal: goals)
 			{
-				if(goal.getTarget().equals(pojotype))
+				if(goal.getName().equals(name))
 				{
 					ret = goal;
 					break;
@@ -125,7 +151,7 @@ public class MCapability extends MElement
 	 */
 	public List<MPlan> getPlans()
 	{
-		return plans;
+		return plans==null? Collections.EMPTY_LIST: null;
 	}
 
 	/**
@@ -145,5 +171,75 @@ public class MCapability extends MElement
 		if(plans==null)
 			plans = new ArrayList<MPlan>();
 		plans.add(plan);
+	}
+	
+	/**
+	 *  Get the plan for its name.
+	 *  @return The plan.
+	 */
+	public MPlan getPlan(String name)
+	{
+		MPlan ret = null;
+		if(plans!=null)
+		{
+			for(MPlan plan: plans)
+			{
+				if(plan.getName().equals(name))
+				{
+					ret = plan;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get the configurations.
+	 *  @return The configurations.
+	 */
+	public List<MConfiguration> getConfigurations()
+	{
+		return configurations==null? Collections.EMPTY_LIST: configurations;
+	}
+
+	/**
+	 *  Set the configurations.
+	 *  @param configurations The configurations to set.
+	 */
+	public void setConfigurations(List<MConfiguration> configurations)
+	{
+		this.configurations = configurations;
+	}
+	
+	/**
+	 *  Add a configuration.
+	 */
+	public void addConfiguration(MConfiguration config)
+	{
+		if(configurations==null)
+			configurations = new ArrayList<MConfiguration>();
+		configurations.add(config);
+	}
+	
+	/**
+	 *  Get the configurations.
+	 *  @return The configurations.
+	 */
+	public MConfiguration getConfiguration(String name)
+	{
+		MConfiguration ret = null;
+		if(configurations!=null)
+		{
+			for(MConfiguration conf: configurations)
+			{
+				if(conf.getName().equals(name))
+				{
+					ret = conf;
+					break;
+				}
+			}
+		}
+		return ret;
 	}
 }

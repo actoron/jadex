@@ -25,5 +25,5 @@ public @interface NameValue
 	/**
 	 *  The value as a class.
 	 */
-	public Class clazz() default Object.class;
+	public Class<?> clazz() default Object.class;
 }

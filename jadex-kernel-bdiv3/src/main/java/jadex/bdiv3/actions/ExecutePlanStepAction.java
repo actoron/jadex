@@ -17,8 +17,8 @@ import jadex.commons.future.IFuture;
  */
 public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 {
-	/** The element. */
-	protected RProcessableElement element;
+//	/** The element. */
+//	protected RProcessableElement element;
 	
 	/** The plan. */
 	protected RPlan rplan;
@@ -26,9 +26,9 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	/**
 	 *  Create a new action.
 	 */
-	public ExecutePlanStepAction(RProcessableElement element, RPlan rplan)
+	public ExecutePlanStepAction(RPlan rplan)
 	{
-		this.element = element;
+//		this.element = element;
 		this.rplan = rplan;
 	}
 	
@@ -40,6 +40,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	{
 		boolean ret = true;
 		
+		Object element = rplan.getReason();
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;

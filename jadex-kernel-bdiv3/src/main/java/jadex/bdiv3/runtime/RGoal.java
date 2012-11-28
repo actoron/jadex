@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.annotation.GoalDropCondition;
@@ -102,7 +103,6 @@ public class RGoal extends RProcessableElement
 	/** The goal listeners. */
 	protected List<IResultListener<Void>> listeners;
 
-	
 	/**
 	 *  Create a new rgoal. 
 	 */
@@ -111,6 +111,15 @@ public class RGoal extends RProcessableElement
 		super(mgoal, goal);
 		this.lifecyclestate = GOALLIFECYCLESTATE_NEW;
 		this.processingstate = GOALPROCESSINGSTATE_IDLE;
+	}
+
+	/**
+	 * 
+	 */
+	public static void adoptGoal(RGoal rgoal, IInternalAccess ia)
+	{
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	}
 	
 	/**

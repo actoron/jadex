@@ -78,7 +78,7 @@ public class BDIAgent extends MicroAgent
 	
 		return ret;
 	}
-		
+	
 	/**
 	 *  Method that is called automatically when a belief 
 	 *  is written as field access.

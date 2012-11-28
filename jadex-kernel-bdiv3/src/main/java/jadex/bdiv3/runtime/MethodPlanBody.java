@@ -54,7 +54,7 @@ public class MethodPlanBody implements IPlanBody
 			
 			for(int i=0; i<ptypes.length; i++)
 			{
-				if(SReflect.isSupertype(reason.getClass(), ptypes[i]))
+				if(reason!=null && SReflect.isSupertype(reason.getClass(), ptypes[i]))
 				{
 					params[i] = reason;
 				}

@@ -1310,6 +1310,24 @@ public class MicroClassReader
 	}
 	
 	/**
+	 *  Create unparsed expressions.
+	 */
+	protected List<UnparsedExpression> createUnparsedExpressionsList(NameValue[] values)
+	{
+		List<UnparsedExpression>  ret = null;
+		if(values.length>0)
+		{
+			ret = new ArrayList<UnparsedExpression>();
+			for(int i=0; i<values.length; i++)
+			{
+				ret.add(new UnparsedExpression(values[i].name(), values[i].clazz(), values[i].value(), null));
+			}
+		}
+		return ret;
+	}
+	
+	
+	/**
 	 * Get the mirco agent class.
 	 */
 	// todo: make use of cache
