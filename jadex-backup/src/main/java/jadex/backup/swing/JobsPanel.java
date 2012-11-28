@@ -1,14 +1,13 @@
 package jadex.backup.swing;
 
-import jadex.backup.dropbox.DropboxSyncJob;
 import jadex.backup.job.Job;
-import jadex.backup.job.SyncJob;
 import jadex.backup.job.management.IJobManagementService;
 import jadex.backup.job.management.JobManagementEvent;
 import jadex.base.gui.idtree.IdTableModel;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -29,7 +28,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.jar.JarEntry;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListCellRenderer;
@@ -147,7 +149,46 @@ public class JobsPanel extends JPanel
 		});
 		
 		final JPanel newjobp = new JPanel(new GridBagLayout());
-		final JComboBox jobtypecb = new JComboBox(new Class[]{SyncJob.class, DropboxSyncJob.class});
+		
+		Class<?>[] jobcls = SReflect.scanForClasses(null, new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				boolean ret = false;
+				String name =null;
+				if(obj instanceof File)
+				{
+					name = ((File)obj).getName();
+				}
+				else if(obj instanceof String)
+				{
+					name = ((String)obj);
+				}
+				else if(obj instanceof JarEntry)
+				{
+					name = ((JarEntry) obj).getName();
+				}
+				
+				if(name!=null)
+				{
+					ret = name.endsWith(".class") && name.indexOf("Job")!=-1;
+				}
+				
+				return ret;
+			}
+		}, 
+		new IFilter<Class<?>>()
+		{
+			public boolean filter(Class<?> cl)
+			{
+				return !cl.isInterface() && !Modifier.isAbstract(cl.getModifiers()) 
+					&& Job.class.isAssignableFrom(cl);
+			}
+		});
+
+		// todo: allow refresh for adding new job types just by adding jar at runtime
+		final JComboBox jobtypecb = new JComboBox(jobcls);
+		
 		jobtypecb.setRenderer(new DefaultListCellRenderer()
 		{
 			public Component getListCellRendererComponent(JList list, Object value,

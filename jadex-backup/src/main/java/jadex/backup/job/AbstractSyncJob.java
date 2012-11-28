@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * 
  */
-public class AbstractSyncJob extends Job
+public abstract class AbstractSyncJob extends Job
 {
 	//-------- attributes --------
 	
