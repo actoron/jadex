@@ -217,11 +217,13 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
-		Long to = (Long)getNonFunctionalProperty(Timeout.TIMEOUT);
-		if(to!=null && to.longValue()>0)
-		{
-			CallStack.setInvocationProperties(to, null);
-		}
+		Map<String, Object> props = getNonFunctionalProperties();
+		CallStack.createInvocation(props);
+//		Long to = (Long)getNonFunctionalProperty(Timeout.TIMEOUT);
+//		if(to!=null && to.longValue()>0)
+//		{
+//			CallStack.setInvocationProperties(to, null);
+//		}
 		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();

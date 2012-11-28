@@ -1,10 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *  Helper class to deal with service calls
@@ -23,7 +24,8 @@ public abstract class CallStack	extends ServiceCall
 	 */
 	public CallStack()
 	{
-		super(null, 0, false);
+//		super(null, 0, false, null);
+		super(null, null);
 		throw new RuntimeException("Class should not be instantiated.");
 	}
 	
@@ -36,7 +38,8 @@ public abstract class CallStack	extends ServiceCall
 	 *  @param realtime	The flag to indicate real time timeouts.
 	 *  @param adapter	The adapter of the caller (for back-scheduling of result).
 	 */
-	protected static void	push(IComponentIdentifier caller, long timeout, boolean realtime)
+//	protected static void	push(IComponentIdentifier caller, long timeout, boolean realtime)
+	protected static void	push(IComponentIdentifier caller, Map<String, Object> props)
 	{
 		ServiceCall	previous	= ServiceCall.getCurrentInvocation();
 		if(previous!=null)
@@ -49,7 +52,8 @@ public abstract class CallStack	extends ServiceCall
 			}
 			stack.add(previous);
 		}
-		ServiceCall.CALLS.set(ServiceCall.createServiceCall(caller, timeout, realtime? Boolean.TRUE: Boolean.FALSE));
+//		ServiceCall.CALLS.set(ServiceCall.createServiceCall(caller, timeout, realtime? Boolean.TRUE: Boolean.FALSE, null));
+		ServiceCall.CALLS.set(ServiceCall.createServiceCall(caller, props));
 	}
 	
 	/**

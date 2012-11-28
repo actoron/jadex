@@ -112,14 +112,11 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		// Get the secure transmission
 		boolean sec = pi.isSecure(method);
 		
-		Map<String, Object> nf = null;
+		Map<String, Object> nf = invoc!=null? invoc.getProperties(): new HashMap<String, Object>();
 		if(sec)
 		{
-			nf = new HashMap<String, Object>();
 			nf.put(SecureTransmission.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
 		}
-		if(nf==null)
-			nf = new HashMap<String, Object>();
 		nf.put(Timeout.TIMEOUT, new Long(to));
 		final Map<String, Object> nonfunc = nf; 
 		

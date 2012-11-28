@@ -193,7 +193,11 @@ public class InitiatorAgent extends TestAgent
 				final long start = System.currentTimeMillis();
 				if(to!=-1)
 				{
-					ServiceCall.setInvocationProperties(to, true);
+//					ServiceCall.setInvocationProperties(to, true);
+					ServiceCall call = ServiceCall.createInvocation();
+					call.setTimeout(to);
+					call.setRealtime(Boolean.TRUE);
+					call.setProperty("extra", "somval");
 				}
 				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{

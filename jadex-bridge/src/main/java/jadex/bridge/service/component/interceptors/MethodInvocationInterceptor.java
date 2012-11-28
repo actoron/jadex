@@ -9,6 +9,8 @@ import jadex.commons.future.IFuture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Calls a methods on an object and returns the result.
@@ -47,7 +49,11 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			{
 				long to = BasicServiceContainer.getMethodTimeout(
 					sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
-				CallStack.push(IComponentIdentifier.LOCAL.get(), to, realtime);
+				Map<String, Object> props = new HashMap<String, Object>();
+				props.put(ServiceCall.TIMEOUT, new Long(to));
+				props.put(ServiceCall.REALTIME, realtime? Boolean.TRUE: Boolean.FALSE);
+				CallStack.push(IComponentIdentifier.LOCAL.get(), props);
+//				CallStack.push(IComponentIdentifier.LOCAL.get(), to, realtime);
 				setcaller	= true;
 			}			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
