@@ -191,6 +191,7 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 
 		<td><a href="<%= url %>"><%= url %></a></td>
 		<td><%= loc %></td>
+		<td>true</td>
 		<td><%= infos.length %></td>
 	</tr>
 	
