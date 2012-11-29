@@ -1,10 +1,13 @@
 package jadex.base.relay;
 
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
@@ -227,5 +230,12 @@ public class GeoIPService
 				}
 			}
 		}
+	}
+	
+	public static void	main(String[] args) throws MalformedURLException
+	{
+		String	address	= "relay-http://www2.activecomponents.org/relay";
+		String	host	= new URL(RelayConnectionManager.httpAddress(address)).getHost();
+		System.out.println(host+": "+getGeoIPService().getLocation(host));
 	}
 }

@@ -1,7 +1,10 @@
 package jadex.base.relay;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -134,5 +137,47 @@ public class PeerEntry
 	{
 		infos.clear();
 	}
+	
+	/**
+	 *  Get the host name of the peer server.
+	 */
+	public String	getHost()
+	{
+		String	ret	= null;
+		try
+		{
+			ret	= new URL(RelayConnectionManager.httpAddress(url)).getHost();
+		}
+		catch(MalformedURLException e)
+		{
+			RelayHandler.getLogger().warning(""+e);
+		}
+		return ret;
+	}
 
+	/**
+	 *  Get the location (i.e. city, region, country).
+	 *  Dynamically resolved by GeoIP, if available.
+	 */
+	public String	getLocation()
+	{
+		return GeoIPService.getGeoIPService().getLocation(getHost());
+	}
+	
+	/**
+	 *  Get the country code (e.g. de, us, ...).
+	 *  Dynamically resolved by GeoIP, if available.
+	 */
+	public String	getCountryCode()
+	{
+		return GeoIPService.getGeoIPService().getCountryCode(getHost());
+	}
+	
+	/**
+	 *  Get the location as latitude,longitude.
+	 */
+	public String	getPosition()
+	{
+		return GeoIPService.getGeoIPService().getPosition(getHost());
+	}
 }

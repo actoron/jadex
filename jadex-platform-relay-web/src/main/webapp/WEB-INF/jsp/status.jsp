@@ -1,3 +1,4 @@
+<%@page import="java.net.URL"%>
 <%@page import="jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager"%>
 <%@page import="jadex.bridge.service.types.awareness.AwarenessInfo"%>
 <%@page session="false"%>
@@ -11,13 +12,68 @@
 <%
 	PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
 	PeerEntry[]	peers	= (PeerEntry[])request.getAttribute("peers");
-	String	url	= (String)request.getAttribute("url");
+	String	url	= RelayConnectionManager.httpAddress((String)request.getAttribute("url"));
+	String	host	= new URL(url).getHost();
 	StringBuffer markers	= new StringBuffer();
 	String[]	colors	= new String[]{"black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"};
 	Set<String> positions	= new HashSet<String>();
 %>
 
 <%
+// Add labelled marker A for own location.
+String	pos	= GeoIPService.getGeoIPService().getPosition(host);
+if(pos!=null)
+{
+	markers.append("&markers=label:");
+	markers.append('A');
+	markers.append("|color:");
+	markers.append(colors[Math.abs(url.hashCode())%colors.length]);
+	markers.append("|");
+	markers.append(pos);
+	positions.add(pos);
+}
+
+// Add markers for relay servers
+if(peers.length>0)
+{
+	for(int i=0; i<peers.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
+	{
+		if(peers[i].getPosition()!=null)
+		{
+			if(i<25)
+			{
+				// Add labelled markers for first B..Z entries
+				markers.append("&markers=label:");
+				markers.append((char)('B'+i));
+				markers.append("|color:");
+				markers.append(colors[Math.abs(peers[i].getUrl().hashCode())%colors.length]);
+				markers.append("|");
+				markers.append(peers[i].getPosition());
+				positions.add(peers[i].getPosition());
+			}
+			else if(i==25)
+			{
+				// Add unlabelled markers for each unique position of remaining entries
+				markers.append("&markers=color:");
+				markers.append(colors[Math.abs(peers[i].getUrl().hashCode())%colors.length]);
+				markers.append("|");
+				markers.append(peers[i].getPosition());
+				positions.add(peers[i].getPosition());
+			}
+			else if(!positions.contains(infos[i].getPosition()))
+			{
+				// Add unlabelled markers for each unique position of remaining entries
+				markers.append("|");
+				markers.append(peers[i].getPosition());
+				positions.add(peers[i].getPosition());
+			}
+		}
+	}
+}
+
+positions.clear();
+
+// Add markers for locally connected platforms
 if(infos.length>0)
 {
 	for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
@@ -27,7 +83,7 @@ if(infos.length>0)
 			if(i<9)
 			{
 				// Add labelled markers for first 1..9 entries
-				markers.append("&markers=label:");
+				markers.append("&markers=size:mid|label:");
 				markers.append(i+1);
 				markers.append("|color:");
 				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
@@ -38,7 +94,7 @@ if(infos.length>0)
 			else if(i==9)
 			{
 				// Add unlabelled markers for each unique position of remaining entries
-				markers.append("&markers=color:");
+				markers.append("&markers=size:mid|color:");
 				markers.append(colors[Math.abs(url.hashCode())%colors.length]);
 				markers.append("|");
 				markers.append(infos[i].getPosition());
@@ -56,6 +112,7 @@ if(infos.length>0)
 }
 int	cnt	= infos.length;
 
+// Add markers for remotely connected platforms
 if(peers.length>0)
 {
 	for(int j=0; j<peers.length && markers.length()+250<2048; j++)	// hack!!! make sure url length stays below 2048 character limit. 
@@ -105,10 +162,71 @@ if(markers.length()>0)
 <%
 }
 
+String	cc	= GeoIPService.getGeoIPService().getCountryCode(host);
+String	loc	= GeoIPService.getGeoIPService().getLocation(host);
+%>
+
+<table>
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th>Relay</th>
+		<th>Location</th>
+		<th># of Platforms</th>
+	</tr>
+	
+	<tr>
+		<td>A</td>
+		<td>
+			<%
+				if(cc!=null)
+				{
+			%>
+					<img src="<%=request.getContextPath()%>/resources/flags/flag-<%= cc %>.png"/>
+			<%
+				}
+			%>
+		</td>
+
+		<td><a href="<%= url %>"><%= url %></a></td>
+		<td><%= loc %></td>
+		<td><%= infos.length %></td>
+	</tr>
+	
+	<%
+		for(int i=0; i<peers.length; i++)
+		{
+	%>
+		<tr>
+			<td>
+				<%= (char)('B'+i) %>
+				</td>
+			<td>
+				<%
+					if(peers[i].getCountryCode()!=null)
+					{
+				%>
+						<img src="<%=request.getContextPath()%>/resources/flags/flag-<%=peers[i].getCountryCode()%>.png"/>
+				<%
+					}
+				%>
+			</td>
+			<td>
+				<a href="<%= RelayConnectionManager.httpAddress(peers[i].getUrl()) %>">
+					<%=  RelayConnectionManager.httpAddress(peers[i].getUrl()) %></a>
+			</td>
+			<td><%= peers[i].getLocation() %></td>
+			<td><%= peers[i].getPlatformInfos().length %></td>
+		</tr>
+	<%
+		}
+	%>
+</table>
+
+<%
 if(cnt>0)
 {
 %>
-
 	<table>
 		<tr>
 			<th rowspan="2">&nbsp;</th>
