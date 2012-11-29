@@ -5,6 +5,8 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.ICodec;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
@@ -98,6 +100,33 @@ public class RelayHandler
 		this.codecs	= cfac.getAllCodecs();
 		this.defcodecs	= cfac.getDefaultCodecs();
 		this.peers	= new PeerList();
+		
+		peers.addChangeListener(new IChangeListener<PeerEntry>()
+		{
+			public void changeOccurred(ChangeEvent<PeerEntry> event)
+			{
+				if("added".equals(event.getType()))
+				{
+					RelayHandler.getLogger().info("Peer added: "+event.getValue().getUrl());
+				}
+				else if("offline".equals(event.getType()) || "removed".equals(event.getType()))
+				{
+					RelayHandler.getLogger().info("Peer removed: "+event.getValue().getUrl());
+
+					// Send offline infos for previous platforms.
+					for(PlatformInfo info: event.getValue().getPlatformInfos())
+					{
+						if(info.getAwarenessInfo()!=null)
+						{
+							AwarenessInfo	awainfo	= info.getAwarenessInfo();
+							awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+							sendAwarenessInfos(awainfo, defcodecs, false);
+						}
+					}
+					event.getValue().clearPlatformInfos();
+				}
+			}
+		});
 	}
 	
 	/**

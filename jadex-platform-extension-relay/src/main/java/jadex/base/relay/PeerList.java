@@ -1,5 +1,7 @@
 package jadex.base.relay;
 
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 import java.io.File;
@@ -8,8 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -49,6 +53,9 @@ public class PeerList
 	
 	/** The connection manager. */
 	protected RelayConnectionManager	conman;
+	
+	/** Change listeners. */
+	protected List<IChangeListener<PeerEntry>>	listeners;	
 
 	//-------- constructors --------
 	
@@ -58,6 +65,7 @@ public class PeerList
 	public PeerList()
 	{
 		this.peers	= Collections.synchronizedMap(new HashMap<String, PeerEntry>());
+		this.listeners	= Collections.synchronizedList(new ArrayList<IChangeListener<PeerEntry>>());
 		this.conman	= new RelayConnectionManager();
 		
 		Properties	props	= new Properties();
@@ -191,7 +199,7 @@ public class PeerList
 			{
 				peer	= new PeerEntry(peerurl, initial);
 				peers.put(peerurl, peer);
-				RelayHandler.getLogger().info("Peer added: "+peer.getUrl());
+				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "added", peer));
 	
 				// Create timer on demand.
 				if(timer==null)
@@ -210,6 +218,34 @@ public class PeerList
 			}
 		}
 		return peer;
+	}
+	
+	/**
+	 *  Add a change listener.
+	 */
+	public void	addChangeListener(IChangeListener<PeerEntry> lis)
+	{
+		listeners.add(lis);
+	}
+
+	/**
+	 *  Remove a change listener.
+	 */
+	public void	removeChangeListener(IChangeListener<PeerEntry> lis)
+	{
+		listeners.remove(lis);
+	}
+	
+	/**
+	 *  inform listeners about an event.
+	 */
+	protected void	informListeners(ChangeEvent<PeerEntry> event)
+	{
+		IChangeListener<PeerEntry>[]	alis	= listeners.toArray(new IChangeListener[0]);
+		for(IChangeListener<PeerEntry> lis: alis)
+		{
+			lis.changeOccurred(event);
+		}
 	}
 
 	//-------- helper classes --------
@@ -259,15 +295,17 @@ public class PeerList
 			if(peer.isConnected())
 			{
 				timer.schedule(new PeerTimerTask(peer), DELAY_ONLINE);
+				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "online", peer));
 			}
 			else if(peer.isInitial())
 			{
-				timer.schedule(new PeerTimerTask(peer), DELAY_OFFLINE);					
+				timer.schedule(new PeerTimerTask(peer), DELAY_OFFLINE);
+				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "offline", peer));
 			}
 			else
 			{
 				peers.remove(peer.getUrl());
-				RelayHandler.getLogger().info("Peer removed: "+peer.getUrl());
+				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "removed", peer));
 			}
 		}
 	}

@@ -172,6 +172,7 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 		<th>&nbsp;</th>
 		<th>Relay</th>
 		<th>Location</th>
+		<th>Connected</th>
 		<th># of Platforms</th>
 	</tr>
 	
@@ -216,6 +217,7 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 					<%=  RelayConnectionManager.httpAddress(peers[i].getUrl()) %></a>
 			</td>
 			<td><%= peers[i].getLocation() %></td>
+			<td><%= peers[i].isConnected() %></td>
 			<td><%= peers[i].getPlatformInfos().length %></td>
 		</tr>
 	<%
