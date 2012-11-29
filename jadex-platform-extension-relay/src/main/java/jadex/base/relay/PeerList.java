@@ -244,7 +244,7 @@ public class PeerList
 			try
 			{
 				// Try to connect and add new peers, if any.
-				String	servers	= conman.getPeerServers(peer.getUrl(), url);
+				String	servers	= conman.getPeerServers(peer.getUrl(), url, !peer.isConnected());
 				peer.setConnected(true);
 				for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
 				{

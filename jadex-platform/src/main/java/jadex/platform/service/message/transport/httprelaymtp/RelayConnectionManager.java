@@ -105,17 +105,18 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	 */
 	public String	getServers(String address)	throws IOException
 	{
-		return getPeerServers(address, null);
+		return getPeerServers(address, null, false);
 	}
 
 	/**
 	 *  Get known servers from a peer server.
 	 *  @param peeraddress	The remote server address.
 	 *  @param ownaddress	The local server address supplied for mutual connection (may be null if not connecting to peer).
+	 *  @param initial	True, when peer connects initially (only sent when ownaddress!=null).
 	 *  @return The comma separated server list.
 	 *  @throws IOException on connection failures
 	 */
-	public String	getPeerServers(String peeraddress, String ownaddress)	throws IOException
+	public String	getPeerServers(String peeraddress, String ownaddress, boolean initial)	throws IOException
 	{
 		String	ret;
 		HttpURLConnection	con	= null;
@@ -124,7 +125,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 		try
 		{
 			con	= openConnection(peeraddress+"servers"
-				+(ownaddress!=null ? "?peerurl="+URLEncoder.encode(ownaddress, "UTF-8") : ""));
+				+(ownaddress!=null ? "?peerurl="+URLEncoder.encode(ownaddress, "UTF-8")+"&initial="+initial : ""));
 			if(con.getContentType()!=null && con.getContentType().startsWith("text/plain"))
 			{
 				ret	= new Scanner(con.getInputStream()).useDelimiter("\\A").next();

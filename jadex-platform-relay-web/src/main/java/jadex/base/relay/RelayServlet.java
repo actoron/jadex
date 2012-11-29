@@ -103,9 +103,10 @@ public class RelayServlet extends HttpServlet
 				}
 				else if("/servers".equals(request.getServletPath()))
 				{
-					String	peerurl	= request.getParameter("peerurl");
 					String	requesturl	= request.getRequestURL().toString();
-					String	serverurls	= handler.handleServersRequest(requesturl, peerurl);
+					String	peerurl	= request.getParameter("peerurl");
+					String	initial	= request.getParameter("initial");
+					String	serverurls	= handler.handleServersRequest(requesturl, peerurl, "true".equals(initial));
 					request.setAttribute("peers", serverurls);					
 					view	= "/WEB-INF/jsp/servers.jsp";
 				}

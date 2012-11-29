@@ -435,15 +435,18 @@ public class RelayHandler
 	 *  Also updates the known peers, if necessary.
 	 *  @param requesturl	Public URL of this relay server as known from the received request.
 	 *  @param peerurl	URL of a remote peer if sent as part of the request (or null).
+	 *  @param initial	Initial flag if sent as part of the request (or false).
 	 */
-	public String	handleServersRequest(String requesturl, String peerurl)
+	public String	handleServersRequest(String requesturl, String peerurl, boolean initial)
 	{
 		if(peerurl!=null)
 		{
 			PeerEntry	peer	= peers.addPeer(peerurl, false);
 
 			// Send own awareness infos to new or updated peer.
-			if(peer!=null && !peer.isSent())
+			// initial = true when remote server recovers from failure
+			// is sent = false when this server recovers from failure
+			if(initial || peer!=null && !peer.isSent())
 			{
 				peer.setSent(true);
 				sendPlatformInfos(peer, getCurrentPlatforms());
