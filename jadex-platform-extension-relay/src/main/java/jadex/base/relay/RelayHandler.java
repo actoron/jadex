@@ -690,7 +690,7 @@ public class RelayHandler
 			{
 				if(platform==null)
 				{
-					System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
+//					System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
 					platform	= new PlatformInfo();
 					platform.setId(awainfo.getSender().getName());
 					platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.

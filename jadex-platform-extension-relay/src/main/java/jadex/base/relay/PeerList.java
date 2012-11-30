@@ -34,6 +34,9 @@ public class PeerList
 	/** The property for the peer server urls (comma separated). */
 	public static final String	PROPERTY_PEERS	= "initial_peers";
 	
+	/** The property for the debug flag. */
+	public static final String	PROPERTY_DEBUG	= "debug";
+	
 	/** Delay between two pings when a peer is connected. */
 	public static final long	DELAY_ONLINE	= 30000;
 	
@@ -55,7 +58,10 @@ public class PeerList
 	protected RelayConnectionManager	conman;
 	
 	/** Change listeners. */
-	protected List<IChangeListener<PeerEntry>>	listeners;	
+	protected List<IChangeListener<PeerEntry>>	listeners;
+
+	/**	Flag to enable debug text being generated (set debug=true in peer.properties). */
+	protected boolean	debug;
 
 	//-------- constructors --------
 	
@@ -89,11 +95,13 @@ public class PeerList
 			{
 				props.setProperty(PROPERTY_URL, "");
 				props.setProperty(PROPERTY_PEERS, "");
+				props.setProperty(PROPERTY_DEBUG, "false");
 				OutputStream	fos	= new FileOutputStream(propsfile);
 				props.store(fos, " Relay peer properties.\n"
 					+" Specify settings below to enable load balancing and exchanging awareness information with other relay servers.\n"
 					+" Use '"+PROPERTY_URL+"' for this relay's own public URL.\n"
-					+" Use '"+PROPERTY_PEERS+"' for a comma separated list of peer server urls.");
+					+" Use '"+PROPERTY_PEERS+"' for a comma separated list of peer server urls.\n"
+					+" Use '"+PROPERTY_DEBUG+"=true' for enabling debugging output in html tooltips of peer relay table.");
 				fos.close();
 			}
 			catch(Exception e)
@@ -114,6 +122,8 @@ public class PeerList
 				addPeer(stok.nextToken().trim(), true);
 			}
 		}
+		
+		debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
 	}
 	
 	/**
@@ -214,7 +224,7 @@ public class PeerList
 			peer	= peers.get(peerurl);
 			if(!url.equals(peerurl) && peer==null)
 			{
-				peer	= new PeerEntry(peerurl, initial);
+				peer	= new PeerEntry(peerurl, initial, debug);
 				peers.put(peerurl, peer);
 				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "added", peer));
 	

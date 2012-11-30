@@ -33,20 +33,24 @@ public class PeerEntry
 	/** Have initial platform infos been sent already? */
 	protected boolean	sent;
 	
+	/**	Flag to enable debug text being generated (set debug=true in peer.properties). */
+	protected boolean	debug;
+	
 	/** Debug information as multi-line xml text. */
-	protected String	debug;
+	protected String	debugtext;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new peer entry.
 	 */
-	public PeerEntry(String url, boolean initial)
+	public PeerEntry(String url, boolean initial, boolean debug)
 	{
 		this.url	= url;
 		this.initial	= initial;
 		this.infos	= Collections.synchronizedMap(new LinkedHashMap<String, PlatformInfo>());
-		this.debug	= "";
+		this.debug	= debug;
+		this.debugtext	= "";
 //		System.out.println("New peer: "+url);
 	}
 	
@@ -195,7 +199,7 @@ public class PeerEntry
 	 */
 	public String	getDebugText()
 	{
-		return debug;
+		return debugtext;
 	}
 	
 	/**
@@ -203,7 +207,10 @@ public class PeerEntry
 	 */
 	public synchronized void	addDebugText(String msg)
 	{
-		debug += new Date().toString()+": "+msg+"&#xD;";
+		if(debug)
+		{
+			debugtext += new Date().toString()+": "+msg+"&#xD;";
+		}
 	}
 
 	/**
