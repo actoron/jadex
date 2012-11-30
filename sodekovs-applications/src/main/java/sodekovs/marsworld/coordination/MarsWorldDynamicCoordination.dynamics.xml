@@ -33,6 +33,12 @@
 			<role_occupation name="target_produced_receiver" multiple="false">
 				<agent id="Carry" />										
 			</role_occupation>
+			<!-- The roles required for the convergence mechanism -->
+			<role_occupation name="converagent">
+			    <agent id="Producer"/>
+			    <agent id="Carry"/>
+			    <agent id="Sentry"/>
+			</role_occupation>
 		</role_occupations>
 	</system_properties>
 
@@ -99,6 +105,16 @@
 				<tos>
 					<to>target_produced_receiver</to>
 				</tos>
+			</deco_link>
+			
+			<!-- The convergence link -->
+			<deco_link realization="convergence" type="POSITIVE" name="convergence" spaces="mycoordspace">
+			    <froms>
+			        <from>converagent</from>
+			    </froms>
+			    <tos>
+			        <to>converagent</to>
+			    </tos>
 			</deco_link>
 		</deco_links>
 
@@ -278,7 +294,77 @@
 					</agent_element>
 				</to>
 				<active>false</active>
-			</realization>											
+			</realization>
+			
+			<!-- Realization of the convergence link -->
+			<realization id="convergence">
+			    <from>
+			        <agent_element element="no_msg_received" agent_id="Carry" type="CONVERGENCE_BDI_BELIEF_VALUE" value="10">
+			            <parameter_mappings>
+			                <mapping ref="no_msg_received" name="no_msg_received"/>
+			            </parameter_mappings>
+			        </agent_element>
+			        <agent_element element="no_msg_received" agent_id="Producer" type="CONVERGENCE_BDI_BELIEF_VALUE" value="10">
+			            <parameter_mappings>
+			                <mapping ref="no_msg_received" name="no_msg_received"/>
+			            </parameter_mappings>
+			        </agent_element>
+			        <agent_element element="no_msg_received" agent_id="Sentry" type="CONVERGENCE_BDI_BELIEF_VALUE" value="10">
+			            <parameter_mappings>
+			                <mapping ref="no_msg_received" name="no_msg_received"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </from>
+			    <mechanism_configuration mechanism_id="sodekovs.marsworld.coordination.ConvergenceMechanism" agent_type="JADEX">
+			        <properties>
+			            <entry>
+			                <key>ADAPTION</key>
+			                <value></value>
+			            </entry>
+			            <entry>
+			                <key>ANSWERS</key>
+			                <value>2</value>
+			            </entry>
+			            <entry>
+			                <key>QUORUM</key>
+			                <value>0.66</value>
+			            </entry>
+			            <entry>
+			                <key>DECISION_TIMEOUT</key>
+			                <value>10000</value>
+			            </entry>
+			            <entry>
+			                <key>DECISION_DELAY</key>
+			                <value>1000</value>
+			            </entry>
+			            <entry>
+			                <key>BLOCK_MEDIUM</key>
+			                <value>false</value>
+			            </entry>
+			            <entry>
+			                <key>RESET_INITIATOR</key>
+			                <value>false</value>
+			            </entry>
+			    	</properties>
+			    </mechanism_configuration>
+			    <to>
+			        <agent_element element="convergence_event" agent_id="Carry" type="CONVERGENCE_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="convergence_event" name="convergence_event"/>
+			            </parameter_mappings>
+			        </agent_element>
+			        <agent_element element="convergence_event" agent_id="Producer" type="CONVERGENCE_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="convergence_event" name="convergence_event"/>
+			            </parameter_mappings>
+			        </agent_element>
+			        <agent_element element="convergence_event" agent_id="Sentry" type="CONVERGENCE_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="convergence_event" name="convergence_event"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </to>			    
+			</realization>			
 		</deco-link-realizations>
 	</causalities>
 </MASDynamic>
