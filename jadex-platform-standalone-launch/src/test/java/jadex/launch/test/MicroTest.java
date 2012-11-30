@@ -24,6 +24,7 @@ public class MicroTest	extends ComponentTestSuite
 			new String[]
 		{
 			// Broken tests (todo: fix!!!)
+			"authenticate",	// Test not yet finished
 			"StreamUser",	// Agent should be refactored as junit test to start two platforms with ssl true, if available
 			"securetrans",	// Agent should be refactored as junit test to start two platforms with ssl true, if available
 			
