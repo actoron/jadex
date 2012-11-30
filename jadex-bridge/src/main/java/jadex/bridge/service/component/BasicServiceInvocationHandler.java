@@ -14,7 +14,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
+//import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
@@ -512,7 +512,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess()));
+//			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess()));
 			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor());
 			if(!(service instanceof IService))
 			{
