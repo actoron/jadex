@@ -45,7 +45,12 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-rules-eca</artifactId>
 			<version>${project.version}</version>
-		</dependency>				
+		</dependency>
+		<dependency>
+		    <groupId>commons-daemon</groupId>
+		    <artifactId>commons-daemon</artifactId>
+		    <version>1.0.10</version><!-- todo: update to 1.0.11 when available for compatibility with binary executables -->
+		</dependency>
 	</dependencies>
 
 

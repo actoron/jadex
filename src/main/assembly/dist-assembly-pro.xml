@@ -40,6 +40,12 @@
 		</moduleSet>
 	</moduleSets>
 
+	<fileSets>
+	    <fileSet>
+	        <directory>jadex-platform-extension-management/win</directory>
+	        <outputDirectory>jadex-${version}/win</outputDirectory>
+	    </fileSet>
+	</fileSets>
 	<files>
 		<!-- Hack!!! Manually copying junit jar (required by jadex.platform.base.ComponentTest)
 		   - due to Maven assembly bug: http://jira.codehaus.org/browse/MASSEMBLY-558 -->
