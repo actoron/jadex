@@ -182,6 +182,23 @@ public class PeerList
 	}
 	
 	/**
+	 *  Test if the given platform is connected to some peer.
+	 */
+	public boolean	checkPlatform(String id)
+	{
+		boolean	found	= false;
+		for(PeerEntry peer: peers.values().toArray(new PeerEntry[0]))
+		{
+			if(peer.checkPlatform(id))
+			{
+				found	= true;
+				break;
+			}
+		}
+		return found;
+	}
+	
+	/**
 	 *  Add a peer that requested a connection.
 	 */
 	public PeerEntry	addPeer(String peerurl, boolean initial)
@@ -277,9 +294,11 @@ public class PeerList
 		 */
 		public void run()
 		{
+			boolean	connected	= peer.isConnected();
 			try
 			{
 				// Try to connect and add new peers, if any.
+//				peer.addDebugText("Pinging peer");
 				String	servers	= conman.getPeerServers(peer.getUrl(), url, !peer.isConnected());
 				peer.setConnected(true);
 				for(StringTokenizer stok=new StringTokenizer(servers, ","); stok.hasMoreTokens(); )
@@ -289,18 +308,25 @@ public class PeerList
 			}
 			catch(IOException e)
 			{
+				peer.addDebugText("Exception pinging peer: "+e);
 				peer.setConnected(false);
 			}
 			
 			if(peer.isConnected())
 			{
 				timer.schedule(new PeerTimerTask(peer), DELAY_ONLINE);
-				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "online", peer));
+				if(connected!=peer.isConnected())
+				{
+					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "online", peer));
+				}
 			}
 			else if(peer.isInitial())
 			{
 				timer.schedule(new PeerTimerTask(peer), DELAY_OFFLINE);
-				informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "offline", peer));
+				if(connected!=peer.isConnected())
+				{
+					informListeners(new ChangeEvent<PeerEntry>(PeerList.this, "offline", peer));
+				}
 			}
 			else
 			{

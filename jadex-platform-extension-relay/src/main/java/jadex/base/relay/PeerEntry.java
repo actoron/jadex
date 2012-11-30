@@ -6,6 +6,7 @@ import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionMana
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,6 +33,9 @@ public class PeerEntry
 	/** Have initial platform infos been sent already? */
 	protected boolean	sent;
 	
+	/** Debug information as multi-line xml text. */
+	protected String	debug;
+	
 	//-------- constructors --------
 	
 	/**
@@ -42,6 +46,7 @@ public class PeerEntry
 		this.url	= url;
 		this.initial	= initial;
 		this.infos	= Collections.synchronizedMap(new LinkedHashMap<String, PlatformInfo>());
+		this.debug	= "";
 //		System.out.println("New peer: "+url);
 	}
 	
@@ -61,6 +66,7 @@ public class PeerEntry
 	public void	setSent(boolean sent)
 	{
 		this.sent	= sent;
+		addDebugText("set sent to "+sent);
 	}
 	
 	/**
@@ -70,7 +76,7 @@ public class PeerEntry
 	{
 		if(this.connected!=connected)
 		{
-			System.out.println("Peer "+(connected?"online":"offline")+": "+url);
+			addDebugText("Peer "+(connected?"online":"offline"));
 		}
 		this.connected	= connected;
 		if(!connected)
@@ -114,10 +120,12 @@ public class PeerEntry
 		if(info.getDisconnectDate()!=null || info.getAwarenessInfo()!=null
 			&& AwarenessInfo.STATE_OFFLINE.equals(info.getAwarenessInfo().getState()))
 		{
+			addDebugText("Remove platform "+info.getId());
 			infos.remove(info.getId());
 		}
 		else
 		{
+			addDebugText("Add/update platform "+info.getId());
 			infos.put(info.getId(), info);
 		}
 	}
@@ -135,6 +143,7 @@ public class PeerEntry
 	 */
 	public void	clearPlatformInfos()
 	{
+		addDebugText("Clear platforms");
 		infos.clear();
 	}
 	
@@ -179,5 +188,29 @@ public class PeerEntry
 	public String	getPosition()
 	{
 		return GeoIPService.getGeoIPService().getPosition(getHost());
+	}
+	
+	/**
+	 *  Get the debug text.
+	 */
+	public String	getDebugText()
+	{
+		return debug;
+	}
+	
+	/**
+	 *  Add a debug message.
+	 */
+	public synchronized void	addDebugText(String msg)
+	{
+		debug += new Date().toString()+": "+msg+"&#xD;";
+	}
+
+	/**
+	 *  Check if a platform is connected to this peer.
+	 */
+	public boolean checkPlatform(String id)
+	{
+		return infos.containsKey(id);
 	}
 }

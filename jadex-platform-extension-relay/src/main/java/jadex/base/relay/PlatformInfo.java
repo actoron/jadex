@@ -369,6 +369,7 @@ public class PlatformInfo
 	public void	disconnect()
 	{
 		this.disconnect_time	= new Date();
+//		System.out.println("disco1: "+getId()+", "+disconnect_time);
 		
 		StatsDB.getDB().save(this);
 	}
@@ -423,6 +424,7 @@ public class PlatformInfo
 	public void setDisconnectDate(Date distime)
 	{
 		this.disconnect_time	= distime;
+//		System.out.println("disco2: "+getId()+", "+disconnect_time);
 	}
 	
 	/**

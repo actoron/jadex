@@ -146,7 +146,7 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		System.out.println("post: "+request.getServletPath()+", "+request.getRemoteHost());
+//		System.out.println("post: "+request.getServletPath()+", "+request.getRemoteHost());
 		
 //		String	s;
 //		s	= request.getContextPath();

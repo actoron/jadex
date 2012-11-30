@@ -105,25 +105,33 @@ public class RelayHandler
 		{
 			public void changeOccurred(ChangeEvent<PeerEntry> event)
 			{
-				if("added".equals(event.getType()))
+				if("online".equals(event.getType()))
 				{
 					RelayHandler.getLogger().info("Peer added: "+event.getValue().getUrl());
+					if(!event.getValue().isSent())
+					{
+						event.getValue().setSent(true);
+						sendPlatformInfos(event.getValue(), getCurrentPlatforms());
+					}
 				}
 				else if("offline".equals(event.getType()) || "removed".equals(event.getType()))
 				{
 					RelayHandler.getLogger().info("Peer removed: "+event.getValue().getUrl());
 
 					// Send offline infos for previous platforms.
-					for(PlatformInfo info: event.getValue().getPlatformInfos())
+					PlatformInfo[]	infos	= event.getValue().getPlatformInfos();
+					event.getValue().clearPlatformInfos();
+					event.getValue().setSent(false);
+					for(PlatformInfo info: infos)
 					{
-						if(info.getAwarenessInfo()!=null)
+						// Test if platform is already connected to another peer.
+						if(info.getAwarenessInfo()!=null && !peers.checkPlatform(info.getId()))
 						{
 							AwarenessInfo	awainfo	= info.getAwarenessInfo();
 							awainfo.setState(AwarenessInfo.STATE_OFFLINE);
 							sendAwarenessInfos(awainfo, defcodecs, false);
 						}
 					}
-					event.getValue().clearPlatformInfos();
 				}
 			}
 		});
@@ -322,7 +330,7 @@ public class RelayHandler
 				catch(Exception e)
 				{
 					// timeout or platform just disconnected
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 			}
 		}
@@ -464,7 +472,7 @@ public class RelayHandler
 	 *  Also updates the known peers, if necessary.
 	 *  @param requesturl	Public URL of this relay server as known from the received request.
 	 *  @param peerurl	URL of a remote peer if sent as part of the request (or null).
-	 *  @param initial	Initial flag if sent as part of the request (or false).
+	 *  @param initial	True when remote peer recovers from failure (or false).
 	 */
 	public String	handleServersRequest(String requesturl, String peerurl, boolean initial)
 	{
@@ -472,10 +480,8 @@ public class RelayHandler
 		{
 			PeerEntry	peer	= peers.addPeer(peerurl, false);
 
-			// Send own awareness infos to new or updated peer.
-			// initial = true when remote server recovers from failure
-			// is sent = false when this server recovers from failure
-			if(initial || peer!=null && !peer.isSent())
+			// Send own awareness infos to new peer.
+			if(initial)
 			{
 				peer.setSent(true);
 				sendPlatformInfos(peer, getCurrentPlatforms());
@@ -500,15 +506,15 @@ public class RelayHandler
 					{
 						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader());
 					}
-					System.out.println("Sending platform info to peer: "+peer.getUrl());
+					peer.addDebugText("Sending platform info to peer "+info.getId());
 					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-					System.out.println("Sent platform info.");
+					peer.addDebugText("Sent platform info to peer "+info.getId());
 				}
 			}
 		}
 		catch(IOException e)
 		{
-			System.out.println("Error sending platform infos to peer: "+e);
+			getLogger().warning("Error sending platform infos to peer: "+e);
 		}					
 	}
 	
@@ -519,14 +525,14 @@ public class RelayHandler
 	{
 		try
 		{
-			System.out.println("Sending platform infos to peer: "+peer.getUrl());
+//			System.out.println("Sending platform infos to peer: "+peer.getUrl());
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
 			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-			System.out.println("Sent platform infos.");
+//			System.out.println("Sent platform infos.");
 		}
 		catch(IOException e)
 		{
-			System.out.println("Error sending platform infos to peer: "+e);
+			getLogger().warning("Error sending platform infos to peer: "+e);
 		}					
 	}
 	
@@ -541,151 +547,158 @@ public class RelayHandler
 		// Update platform awareness info.
 		String	id	= awainfo.getSender().getPlatformName();
 		PlatformInfo	platform	= platforms.get(id);
-		boolean	initial	= local && platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
-		if(platform!=null)
-		{
-			platform.setAwarenessInfo(awainfo);
-			platform.setPreferredCodecs(pcodecs);
-		}
 		
-		byte[]	propinfo	= null;
-		byte[]	nopropinfo	= null;
-		
-		Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
-		for(int i=0; i<entries.length; i++)
+		// Ignore remote platforms if also connected local
+		// (e.g. remote relay is down, platform reconnects at local relay,
+		// afterwards local detects remote is down and wants to send offline info for already reconnected platform)
+		if(platform==null || local)
 		{
-			// Send awareness to other platforms with awareness on.
-			PlatformInfo	p2	= platforms.get(entries[i].getKey());
-			AwarenessInfo	awainfo2	= p2!=null ? p2.getAwarenessInfo() : null;
-			if(awainfo2!=null && !id.equals(entries[i].getKey()))
+			boolean	initial	= local && platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
+			if(platform!=null)
 			{
-				try
+				platform.setAwarenessInfo(awainfo);
+				platform.setPreferredCodecs(pcodecs);
+			}
+			
+			byte[]	propinfo	= null;
+			byte[]	nopropinfo	= null;
+			
+			Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
+			for(int i=0; i<entries.length; i++)
+			{
+				// Send awareness to other platforms with awareness on.
+				PlatformInfo	p2	= platforms.get(entries[i].getKey());
+				AwarenessInfo	awainfo2	= p2!=null ? p2.getAwarenessInfo() : null;
+				if(awainfo2!=null && !id.equals(entries[i].getKey()))
 				{
-					// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
-					if(awainfo2.getProperties()==null && nopropinfo==null)
-					{
-						AwarenessInfo	awanoprop	= awainfo;
-						if(awainfo.getProperties()!=null)
-						{
-							awanoprop	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId());
-							awanoprop.setProperties(null);
-						}
-						
-						byte[]	data	= MapSendTask.encodeMessage(awanoprop, pcodecs, getClass().getClassLoader());
-						nopropinfo	= new byte[data.length+4];
-						System.arraycopy(SUtil.intToBytes(data.length), 0, nopropinfo, 0, 4);
-						System.arraycopy(data, 0, nopropinfo, 4, data.length);
-						
-						if(awainfo.getProperties()==null)
-						{
-							propinfo	= nopropinfo;
-						}
-
-					}
-					else if(awainfo2.getProperties()!=null && propinfo==null)
-					{
-						byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
-						propinfo	= new byte[data.length+4];
-						System.arraycopy(SUtil.intToBytes(data.length), 0, propinfo, 0, 4);
-						System.arraycopy(data, 0, propinfo, 4, data.length);
-						
-						if(awainfo.getProperties()==null)
-						{
-							nopropinfo	= propinfo;
-						}
-
-					}
-					
-//						System.out.println("queing awareness info to:"+entries[i].getKey());
-					entries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(awainfo2.getProperties()==null ? nopropinfo : propinfo)));
-				}
-				catch(Exception e)
-				{
-					// Queue closed, because platform just disconnected.
-				}
-				
-				// Send other awareness infos to newly connected platform.
-				if(initial)
-				{
-					// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
-					if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
-					{
-						awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
-						awainfo2.setProperties(null);
-					}
-					
-					byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
-					byte[]	info2	= new byte[data2.length+4];
-					System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
-					System.arraycopy(data2, 0, info2, 4, data2.length);
-					
 					try
 					{
-//							System.out.println("queing awareness info to:"+id);
-						map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+						if(awainfo2.getProperties()==null && nopropinfo==null)
+						{
+							AwarenessInfo	awanoprop	= awainfo;
+							if(awainfo.getProperties()!=null)
+							{
+								awanoprop	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId());
+								awanoprop.setProperties(null);
+							}
+							
+							byte[]	data	= MapSendTask.encodeMessage(awanoprop, pcodecs, getClass().getClassLoader());
+							nopropinfo	= new byte[data.length+4];
+							System.arraycopy(SUtil.intToBytes(data.length), 0, nopropinfo, 0, 4);
+							System.arraycopy(data, 0, nopropinfo, 4, data.length);
+							
+							if(awainfo.getProperties()==null)
+							{
+								propinfo	= nopropinfo;
+							}
+	
+						}
+						else if(awainfo2.getProperties()!=null && propinfo==null)
+						{
+							byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
+							propinfo	= new byte[data.length+4];
+							System.arraycopy(SUtil.intToBytes(data.length), 0, propinfo, 0, 4);
+							System.arraycopy(data, 0, propinfo, 4, data.length);
+							
+							if(awainfo.getProperties()==null)
+							{
+								nopropinfo	= propinfo;
+							}
+	
+						}
+						
+	//						System.out.println("queing awareness info to:"+entries[i].getKey());
+						entries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(awainfo2.getProperties()==null ? nopropinfo : propinfo)));
 					}
 					catch(Exception e)
 					{
 						// Queue closed, because platform just disconnected.
 					}
-				}					
-			}
-		}
-
-		// Send awareness infos from connected peers.
-		if(initial)
-		{
-			PeerEntry[] apeers = peers.getPeers();
-			for(PeerEntry peer: apeers)
-			{
-				if(peer.isConnected())
-				{
-					PlatformInfo[]	infos	= peer.getPlatformInfos();
-					for(PlatformInfo pi: infos)
+					
+					// Send other awareness infos to newly connected platform.
+					if(initial)
 					{
-						if(pi.getAwarenessInfo()!=null)
+						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+						if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
 						{
-							AwarenessInfo	awainfo2	= pi.getAwarenessInfo();
-							// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
-							if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
+							awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
+							awainfo2.setProperties(null);
+						}
+						
+						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
+						byte[]	info2	= new byte[data2.length+4];
+						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
+						System.arraycopy(data2, 0, info2, 4, data2.length);
+						
+						try
+						{
+	//							System.out.println("queing awareness info to:"+id);
+							map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+						}
+						catch(Exception e)
+						{
+							// Queue closed, because platform just disconnected.
+						}
+					}					
+				}
+			}
+	
+			// Send awareness infos from connected peers.
+			if(initial)
+			{
+				PeerEntry[] apeers = peers.getPeers();
+				for(PeerEntry peer: apeers)
+				{
+					if(peer.isConnected())
+					{
+						PlatformInfo[]	infos	= peer.getPlatformInfos();
+						for(PlatformInfo pi: infos)
+						{
+							if(pi.getAwarenessInfo()!=null)
 							{
-								awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
-								awainfo2.setProperties(null);
-							}
-							
-							byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
-							byte[]	info2	= new byte[data2.length+4];
-							System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
-							System.arraycopy(data2, 0, info2, 4, data2.length);
-							
-							try
-							{
-	//								System.out.println("queing awareness info to:"+id);
-								map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
-							}
-							catch(Exception e)
-							{
-								// Queue closed, because platform just disconnected.
+								AwarenessInfo	awainfo2	= pi.getAwarenessInfo();
+								// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
+								if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
+								{
+									awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
+									awainfo2.setProperties(null);
+								}
+								
+								byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
+								byte[]	info2	= new byte[data2.length+4];
+								System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
+								System.arraycopy(data2, 0, info2, 4, data2.length);
+								
+								try
+								{
+		//								System.out.println("queing awareness info to:"+id);
+									map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+								}
+								catch(Exception e)
+								{
+									// Queue closed, because platform just disconnected.
+								}
 							}
 						}
 					}
 				}
 			}
-		}
-
-		// Distribute platform info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
-		if(local)
-		{
-			if(platform==null)
+	
+			// Distribute platform info to peer relay servers, if locally connected platform. (todo: send asynchronously?)
+			if(local)
 			{
-				System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
-				platform	= new PlatformInfo();
-				platform.setId(awainfo.getSender().getName());
-				platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.
-				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-				platform.setAwarenessInfo(awainfo);
+				if(platform==null)
+				{
+					System.out.println("noplatform: "+awainfo.getState()+", "+awainfo.getSender());
+					platform	= new PlatformInfo();
+					platform.setId(awainfo.getSender().getName());
+					platform.setDisconnectDate(new Date());	// set disconnected date to indicate removed platform.
+					awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+					platform.setAwarenessInfo(awainfo);
+				}
+				sendPlatformInfo(platform);
 			}
-			sendPlatformInfo(platform);
 		}
 	}
 	

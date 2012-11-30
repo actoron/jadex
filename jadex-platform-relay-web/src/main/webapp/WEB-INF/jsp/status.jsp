@@ -199,7 +199,7 @@ String	loc	= GeoIPService.getGeoIPService().getLocation(host);
 		for(int i=0; i<peers.length; i++)
 		{
 	%>
-		<tr>
+		<tr title="<%= peers[i].getDebugText() %>">
 			<td>
 				<%= (char)('B'+i) %>
 				</td>
