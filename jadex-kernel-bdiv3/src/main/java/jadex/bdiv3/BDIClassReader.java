@@ -230,7 +230,7 @@ public class BDIClassReader extends MicroClassReader
 						if(igoals!=null)
 							bdiconf.setInitialGoals(igoals);
 						
-						// Need to repeat the code as annotation is different :-(
+						// Need to repeat the code as annotation type BDIConfiguration is different :-(
 						
 						ConfigurationInfo configinfo = new ConfigurationInfo(configs[i].name());
 						confs.put(configs[i].name(), configinfo);

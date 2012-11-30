@@ -1,6 +1,7 @@
 package jadex.micro.testcases.authenticate;
 
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.annotation.Authenticated;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -25,13 +26,13 @@ public class ProviderAgent implements ITestService
 	 *  Call a method that must use a secure
 	 *  transport under the hood.
 	 */
+//	@Authenticated("Lars-PC")
+	@Authenticated("VSISSTAFF18")
 	public IFuture<Void> method(String msg)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		System.out.println("Called method: "+msg+" "+sc.getTimeout()
 			+" "+sc.isRealtime()+" "+sc.getProperties());
-		Future<Void> ret = new Future<Void>();
-		return ret;
-//		return IFuture.DONE;
+		return IFuture.DONE;
 	}
 }

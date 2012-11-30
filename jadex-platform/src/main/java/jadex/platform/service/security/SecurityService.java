@@ -31,8 +31,17 @@ import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;
+import java.security.Key;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 @Service
 public class SecurityService implements ISecurityService
@@ -97,6 +108,9 @@ public class SecurityService implements ISecurityService
 	/** The currently valid digests. (secret -> timestamp, digest)*/
 	protected Map<String, Tuple2<Long, byte[]>> digests;
 
+	
+	/** The keystore. */
+	protected KeyStore keystore;
 	
 	//-------- setup --------
 	
@@ -793,7 +807,152 @@ public class SecurityService implements ISecurityService
 		
 		return IFuture.DONE;
 	}
-
+	
+	
+	/**
+	 * 
+	 */
+	protected KeyStore getKeyStore()
+	{
+		if(keystore==null)
+		{
+			// Fetch keystore and possible auto-generate self-signed certificate
+			String name = component.getComponentIdentifier().getPlatformPrefix();
+			this.keystore = SSecurity.getKeystore(storepath, storepass, keypass, name);
+		}
+		
+		return keystore;
+	}
+	
+	/**
+	 *  Sign a byte[] with the platform key that is stored in the
+	 *  keystore under the platform prefix name.
+	 */
+	public IFuture<byte[]> signCall(byte[] content)
+	{
+		Future<byte[]> ret = new Future<byte[]>();
+		
+		try
+		{
+//			Provider[] provs = java.security.Security.getProviders();
+//			System.out.println("prov: "+SUtil.arrayToString(provs));
+//			java.security.Security.addProvider(new BouncyCastleProvider());
+//			provs = java.security.Security.getProviders();
+//			System.out.println("prov: "+SUtil.arrayToString(provs));
+			
+			String name = component.getComponentIdentifier().getPlatformPrefix();
+			Key key = getKeyStore().getKey(name, keypass.toCharArray());
+			Certificate cert = getKeyStore().getCertificate(name);
+			Signature eng = Signature.getInstance(getAlgorithm(cert));
+			byte[] signed = SSecurity.signContent((PrivateKey)key, eng, content);
+		    ret.setResult(signed);
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Verify an authenticated service call.
+	 *  @param content The content that should be checked.
+	 *  @param signed The desired output hash.
+	 *  @param name The callers name (used to find the certificate and public key). 
+	 */
+	public IFuture<Void> verifyCall(final byte[] content, final byte[] signed, final String name)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		getCertificate(name).addResultListener(new ExceptionDelegationResultListener<Certificate, Void>(ret)
+		{
+			public void customResultAvailable(Certificate cert)
+			{
+				try
+				{
+					if(!getKeyStore().containsAlias(name))
+						getKeyStore().setCertificateEntry(name, cert);
+					if(verifyCall(content, signed, cert))
+					{
+						ret.setResult(null);
+					}
+					else
+					{
+						ret.setException(new SecurityException("Authentication exception."));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					ret.setException(e);
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Internal verify method that just checks if f-pubkey(content)=signed.
+	 */
+	protected boolean verifyCall(byte[] content, byte[] signed, Certificate cert)
+	{
+		boolean ret = false;
+		
+		try
+		{
+			Signature eng = Signature.getInstance(getAlgorithm(cert));
+			ret = SSecurity.verifyContent(cert.getPublicKey(), eng, content, signed);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Certificate> getCertificate(String name)
+	{
+		Future<Certificate> ret = new Future<Certificate>();
+			
+		try
+		{
+			// todo: fetch cert from other platforms if unknown!
+			
+			Certificate cert = getKeyStore().getCertificate(name);
+			ret.setResult(cert);
+			
+			
+			// Internal format using
+			// byte[] enc = cert.getEncoded();
+		
+//			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+//		    Certificate cert = cf.generateCertificate(is);
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getAlgorithm(Certificate cert)
+	{
+		String ret = "MD5WithRSA"; // todo: how to find out if not X509
+		if(cert instanceof X509Certificate)
+			ret = ((X509Certificate)cert).getSigAlgName();
+		return ret;
+	}
+	
 	//-------- static part --------
 	
 	/**
@@ -802,10 +961,19 @@ public class SecurityService implements ISecurityService
 	public static byte[]	buildDigest(long timestamp, String secret)
 	{
 //		System.out.println("build digest: "+timestamp+" "+secret);
+		byte[]	input	= (byte[])SUtil.joinArrays(secret.getBytes(), SUtil.longToBytes(timestamp));
+		return buildDigest(input);
+	}
+	
+	/**
+	 *  Build the digest given the timestamp and password.
+	 */
+	public static byte[]	buildDigest(byte[] input)
+	{
+//		System.out.println("build digest: "+timestamp+" "+secret);
 		try
 		{
 			MessageDigest	md	= MessageDigest.getInstance("SHA-384");
-			byte[]	input	= (byte[])SUtil.joinArrays(secret.getBytes(), SUtil.longToBytes(timestamp));
 			byte[]	output	= md.digest(input);
 			return output;
 		}

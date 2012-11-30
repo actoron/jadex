@@ -463,6 +463,20 @@ public class ServiceInvocationContext
 //	}
 	
 	/**
+	 *  Get the real target object.
+	 *  Returns domain service in case of service info.
+	 */
+	public Object getTargetObject()
+	{
+		Object ret = getObject();
+		if(ret instanceof ServiceInfo)
+		{
+			ret = ((ServiceInfo)object).getDomainService();
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the caller adapter.
 	 */
 	public IComponentAdapter	getCallerAdapter()
@@ -470,6 +484,15 @@ public class ServiceInvocationContext
 		return this.calleradapter;
 	}
 	
+	/**
+	 *  Get the caller.
+	 *  @return The caller.
+	 */
+	public IComponentIdentifier getCaller()
+	{
+		return caller;
+	}
+
 	/**
 	 *  String representation.
 	 */

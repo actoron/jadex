@@ -70,7 +70,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.parameterelement_has_parameters);
+					Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters);
 					IMParameter[] ret = new IMParameter[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -87,7 +87,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.parameterelement_has_parameters);
+			Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters);
 			IMParameter[] ret = new IMParameter[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -142,7 +142,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.parameterelement_has_parametersets);
+					Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.parameterelement_has_parametersets);
 					IMParameterSet[] ret = new IMParameterSet[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -159,7 +159,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValues(getScope(), OAVBDIMetaModel.parameterelement_has_parametersets);
+			Collection elems = (Collection)getState().getAttributeValues(getHandle(), OAVBDIMetaModel.parameterelement_has_parametersets);
 			IMParameterSet[] ret = new IMParameterSet[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{

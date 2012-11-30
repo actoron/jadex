@@ -11,6 +11,8 @@ import java.io.File;
 
 /**
  *  Job to sync resources.
+ *  
+ *  todo: allow file filter (names, date, size)
  */
 public class SyncJob extends AbstractSyncJob
 {

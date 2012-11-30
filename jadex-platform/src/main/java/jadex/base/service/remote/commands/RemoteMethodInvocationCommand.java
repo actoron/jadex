@@ -50,7 +50,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	protected String methodname;
 	
 	/** The parameter types. */
-	protected Class[] parametertypes;
+	protected Class<?>[] parametertypes;
 	
 	/** The parameter values. */
 	protected Object[] parametervalues;
@@ -219,17 +219,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		
 		Map<String, Object> props = getNonFunctionalProperties();
 		CallStack.createInvocation(props);
-//		Long to = (Long)getNonFunctionalProperty(Timeout.TIMEOUT);
-//		if(to!=null && to.longValue()>0)
-//		{
-//			CallStack.setInvocationProperties(to, null);
-//		}
 		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
 		IComponentIdentifier.LOCAL.set(caller);
 		IComponentAdapter.LOCAL.set(null);	// No adapter for remote component.
+		
 		invokeMethod(ret, rsms);
+		
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		IComponentAdapter.LOCAL.set(ada);
 		

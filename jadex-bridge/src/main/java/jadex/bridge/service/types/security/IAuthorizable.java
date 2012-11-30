@@ -1,9 +1,8 @@
 package jadex.bridge.service.types.security;
 
-import java.util.List;
-
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Reference;
+
+import java.util.List;
 
 
 /**
@@ -26,6 +25,8 @@ public interface IAuthorizable
 	
 	/**
 	 *  Get the digest content.
+	 *  Could be part or the whole message depending on
+	 *  security level that should be enforced.
 	 */
 	public String getDigestContent();
 	
@@ -50,7 +51,8 @@ public interface IAuthorizable
 	
 	/**
 	 *  The authentication data.
-	 *  The data is calculated by building an MD5 hash from the target platform password and the timestamp.
+	 *  The data is calculated by building an MD5 hash from the target platform password, optionally message
+	 *  content (=digest content) and the timestamp.
 	 *  MD5 is fast, produces only small digests to reduce network traffic and can still be considered secure
 	 *  for short periods of time.
 	 */

@@ -1,6 +1,6 @@
 package jadex.micro.testcases.authenticate;
 
-import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.annotation.Authenticated;
 import jadex.commons.future.IFuture;
 
 /**
@@ -11,6 +11,6 @@ public interface ITestService
 	/**
 	 * 
 	 */
-//	@Autenticated("Lars-PC")
+	@Authenticated
 	public IFuture<Void> method(String msg);
 }

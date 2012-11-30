@@ -21,11 +21,11 @@
 			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 		</dependency>            
-		<dependency>
+		<!-- <dependency>
 			<groupId>bouncycastle</groupId>
 			<artifactId>bcprov-jdk15</artifactId>
 			<version>140</version>
-		</dependency>            
+		</dependency>   -->          
 	</dependencies>
 
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->

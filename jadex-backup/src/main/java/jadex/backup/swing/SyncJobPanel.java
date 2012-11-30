@@ -75,7 +75,15 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.TreePath;
 
 /**
- * 
+ *  todo: add overview for user in form
+ *  bytes to transfer
+ *  x files added  
+ *  y files newer
+ *  z files deleted
+ *  
+ *  allow showing file categories (only new files, etc)
+ *  
+ *  show progress in terms of bytes (not only files)
  */
 public class SyncJobPanel extends JPanel
 {

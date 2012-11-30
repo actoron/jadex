@@ -4,7 +4,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.SecureTransmission;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -159,4 +158,21 @@ public interface ISecurityService
 	 *  @param dur The request validity duration.
 	 */
 	public IFuture<Void>	preprocessRequest(IAuthorizable request, IComponentIdentifier target);
+
+	//-------- service call authentication --------
+	
+	/**
+	 *  Sign a byte[] with the platform key that is stored in the
+	 *  keystore under the platform prefix name.
+	 */
+	public IFuture<byte[]> signCall(byte[] content);
+	
+	/**
+	 *  Verify an authenticated service call.
+	 *  @param content The content that should be checked.
+	 *  @param signed The desired output hash.
+	 *  @param name The callers name (used to find the certificate and public key). 
+	 */
+	public IFuture<Void> verifyCall(final byte[] content, final byte[] signed, final String name);
+
 }

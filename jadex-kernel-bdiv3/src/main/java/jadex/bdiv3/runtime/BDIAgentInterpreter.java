@@ -1,7 +1,6 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.PojoBDIAgent;
-import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfiguration;
@@ -11,7 +10,6 @@ import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
-import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -27,7 +25,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
-import jadex.micro.PojoMicroAgent;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -177,15 +174,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				{
 					MGoal mgoal = null;
 					Object goal = null;
+					Class<?> gcl = null;
 					
 					// Create goal if expression available
 					if(uexp.getValue()!=null && uexp.getValue().length()>0)
 					{
 						goal = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
+						gcl = goal.getClass();
 					}
 					
-					Class<?> gcl = null;
-					if(uexp.getClazz()!=null)
+					if(gcl==null && uexp.getClazz()!=null)
 					{
 						gcl = uexp.getClazz().getType(getClassLoader(), getModel().getAllImports());
 					}
@@ -239,6 +237,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							throw new RuntimeException(e);
 						}
 					}
+					
+					if(mgoal==null || goal==null)
+						throw new RuntimeException("Could not create initial goal: ");
+					
 					RGoal rgoal = new RGoal(mgoal, goal);
 					RGoal.adoptGoal(rgoal, getInternalAccess());
 				}

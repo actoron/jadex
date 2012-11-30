@@ -1,4 +1,4 @@
-package jadex.platform.service.message.transport.ssltcpmtp;
+package jadex.platform.service.security;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,15 +6,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
 
 
@@ -23,6 +29,12 @@ import org.bouncycastle.x509.X509V1CertificateGenerator;
  */
 public class SSecurity
 {
+	static
+	{
+		BouncyCastleProvider bc = new BouncyCastleProvider();
+		java.security.Security.addProvider(bc);
+	}
+	
 	/**
 	 *  Get keystore from a given file.
 	 */
@@ -71,11 +83,15 @@ public class SSecurity
     	{
 	    	ks.load(null, null); // Must be called. 
 	    	
-	    	KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");  
-	 	    keyPairGenerator.initialize(1024);  
+//	    	RSAKeyPairGenerator r = new RSAKeyPairGenerator();
+//	    	r.init(new KeyGenerationParameters(new SecureRandom(), 1024));
+//	    	AsymmetricCipherKeyPair keys = r.generateKeyPair();
+	    	
+	    	KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");  
+	 	    gen.initialize(1024);  
 	 	    
 //	 	    System.out.println("Generating key pair, this may take a short while.");
-	 	    KeyPair keys = keyPairGenerator.generateKeyPair();
+	 	    KeyPair keys = gen.generateKeyPair();
 //	 	    System.out.println("Key generation finished.");
 	 	    
 		    Certificate c = generateCertificate("CN=CKS Self Signed Cert", keys, 1000, "MD5WithRSA");
@@ -141,6 +157,7 @@ public class SSecurity
 //		return cert;
 //	}   
 	
+	
 	/** 
 	 * Create a self-signed X.509 Certificate
 	 * @param dn the X.509 Distinguished Name, eg "CN=Test, L=London, C=GB"
@@ -169,7 +186,104 @@ public class SSecurity
 		
 		return cert;
 	}   
+	
+//	/**
+//	 * 
+//	 */
+//	public static void generateKeyPair(String name, KeyStore ks)
+//	{
+//		try
+//		{
+//			java.security.Security.addProvider(new BouncyCastleProvider());
+//		    KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
+//		    generator.initialize(1024, new FixedRand());
+//	 
+//		    KeyPair pair = generator.generateKeyPair();
+//		    Key pubKey = pair.getPublic();
+//		    Key privKey = pair.getPrivate();
+//		    
+//		    if(ks!=null)
+//		    {
+//		    	ks.setEntry(name, new KeyStore.PrivateKeyEntry(pair.getPrivate(), chain),
+//		    			new KeyStore.PasswordProtection(privateKeyEntryPassword.toCharArray())
+//		    			);
+//
+//		    }
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//	}
+	
+//	/**
+//	 * 
+//	 */
+//	private static class FixedRand extends SecureRandom 
+//	{
+//        MessageDigest sha;
+//        byte[] state;
+// 
+//        FixedRand() 
+//        {
+//            try
+//            {
+//                this.sha = MessageDigest.getInstance("SHA-1");
+//                this.state = sha.digest();
+//            }
+//            catch(NoSuchAlgorithmException e)
+//            {
+//                throw new RuntimeException("can't find SHA-1!");
+//            }
+//        }
+// 
+//        public void nextBytes(byte[] bytes)
+//        {
+//            int    off = 0;
+//            sha.update(state);
+// 
+//            while (off < bytes.length)
+//            {               
+//                state = sha.digest();
+//                if (bytes.length - off > state.length)
+//                {
+//                    System.arraycopy(state, 0, bytes, off, state.length);
+//                }
+//                else
+//                {
+//                    System.arraycopy(state, 0, bytes, off, bytes.length - off);
+//                }
+// 
+//                off += state.length;
+//                sha.update(state);
+//            }
+//        }
+//    }
 
+	/**
+     * 
+     */
+    public static byte[] signContent(PrivateKey key, Signature engine, byte[] content) 
+    	throws InvalidKeyException, SignatureException 
+    {
+    	engine.initSign(key);
+    	engine.update(content); // clone ?
+    	byte[] sig = engine.sign();// clone() ?
+    	return sig;
+    }
+	
+	/**
+	 *  
+     */
+    public static boolean verifyContent(PublicKey key, Signature engine, byte[] content, byte[] sig) 
+    	throws InvalidKeyException, SignatureException 
+    {
+    	engine.initVerify(key);
+    	engine.update(content); // clone() ?
+    	return engine.verify(sig); // clone() ?
+    }
+
+	
 	/**
 	 *  Main for testing.
 	 */

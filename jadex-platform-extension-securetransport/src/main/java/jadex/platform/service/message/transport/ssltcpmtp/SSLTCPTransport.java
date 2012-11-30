@@ -9,6 +9,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.message.transport.tcpmtp.TCPTransport;
+import jadex.platform.service.security.SSecurity;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -128,7 +129,8 @@ public class SSLTCPTransport extends TCPTransport
 				
 				// possibly create a new keystore on disk
 //				System.out.println("Using keystore: "+storepath+" "+storepass+" "+keypass);
-				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, "jadex");
+//				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, "jadex");
+				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, container.getId().getPlatformPrefix());
 				
 				kmf.init(ks, keypass.toCharArray());
 				

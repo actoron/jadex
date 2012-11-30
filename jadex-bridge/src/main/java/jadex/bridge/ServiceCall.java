@@ -52,6 +52,7 @@ public class ServiceCall
 	{
 		this.caller	= caller;
 		this.properties = new HashMap<String, Object>();
+		properties.put(TIMEOUT, new Long(-1)); // todo: refactor that
 		
 		if(props!=null)
 			properties.putAll(props);

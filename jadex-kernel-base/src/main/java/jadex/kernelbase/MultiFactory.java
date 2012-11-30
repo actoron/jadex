@@ -736,6 +736,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		final Future ret = new Future();
 		SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
+			public void exceptionOccurred(Exception exception)
+			{
+				super.exceptionOccurred(exception);
+			}
+			
 			public void customResultAvailable(Object result)
 			{
 				final Collection factories = ((Collection)result);
@@ -896,6 +901,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								final IModelInfo	info	= (IModelInfo)result;
 								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
+									public void exceptionOccurred(
+											Exception exception)
+									{
+										super.exceptionOccurred(exception);
+									}
+									
 									public void customResultAvailable(Object result)
 									{
 //										System.out.println("Starting kernel3: " + kernelmodel);

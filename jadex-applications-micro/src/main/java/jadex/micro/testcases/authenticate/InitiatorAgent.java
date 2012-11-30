@@ -6,14 +6,16 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.CallStack;
+import jadex.bridge.service.annotation.Authenticated;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -65,7 +67,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno, true)
+		performTest(agent.getComponentIdentifier().getRoot(), testno)
 			.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
@@ -89,7 +91,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, false)
+				performTest(platform.getComponentIdentifier(), testno)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -116,7 +118,7 @@ public class InitiatorAgent extends TestAgent
 	 *  Create provider agent
 	 *  Call methods on it
 	 */
-	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final boolean hassectrans)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -126,7 +128,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				TestReport tr = new TestReport("#"+testno, "Tests if timeout works.");
+				TestReport tr = new TestReport("#"+testno, "Tests if authentication works.");
 				tr.setReason(exception.getMessage());
 				super.resultAvailable(tr);
 			}
@@ -136,12 +138,12 @@ public class InitiatorAgent extends TestAgent
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
-		createComponent("jadex/micro/testcases/timeout/ProviderAgent.class", root, reslis)
+		createComponent("jadex/micro/testcases/authenticate/ProviderAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
+				callService(cid, testno).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -157,79 +159,54 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	protected IFuture<TestReport> callService(IComponentIdentifier cid, int testno, final long to)
+	protected IFuture<TestReport> callService(final IComponentIdentifier cid, int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		final TestReport tr = new TestReport("#"+testno, "Test if timeout works "+(to==-1? "without ": "with "+to)+" timeout.");
+		final TestReport tr = new TestReport("#"+testno, "Test if authentication works.");
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
-		
-//		fut.addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				System.out.println("res: "+result+" "+SUtil.arrayToString(result.getClass().getInterfaces()));
-//				try
-//				{
-//					ITestService ts = (ITestService)result;
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				exception.printStackTrace();
-//			}
-//		});
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				// create a service call meta object and set the timeout
-				final long start = System.currentTimeMillis();
-				if(to!=-1)
+				IFuture<ISecurityService> fut = agent.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				fut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
 				{
-//					ServiceCall.setInvocationProperties(to, true);
-					ServiceCall call = ServiceCall.createInvocation();
-					call.setTimeout(to);
-					call.setRealtime(Boolean.TRUE);
-					call.setProperty("extra", "somval");
-				}
-				ts.method("test1").addResultListener(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
+					public void customResultAvailable(ISecurityService ss)
 					{
-						tr.setFailed("No timeout occurred");
-						ret.setResult(tr);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(CallStack.getInvocation()!=null)
+						String classname = ITestService.class.getName();
+						String methodname = "method";
+						Object[] args = new Object[]{"test1"};
+						Object[] t = new Object[]{agent.getComponentIdentifier().getPlatformPrefix(), classname, methodname, args};
+						final byte[] content = BinarySerializer.objectToByteArray(t, null);
+						
+						ss.signCall(content).addResultListener(new ExceptionDelegationResultListener<byte[], TestReport>(ret)
 						{
-							tr.setFailed("User inocation data still available: "+CallStack.getInvocation());
-						}
-						else if(exception instanceof TimeoutException)
-						{
-							long diff = System.currentTimeMillis() - (start+to);
-							if(diff>=0 && diff<2000) // 2 secs max overdue delay?
+							public void customResultAvailable(byte[] signed)
 							{
-								tr.setSucceeded(true);
+								System.out.println("Signed: "+SUtil.arrayToString(signed));
+								
+								// create a service call meta object and set the timeout
+								ServiceCall call = ServiceCall.createInvocation();
+								call.setProperty(Authenticated.AUTHENTICATED, signed);
+								ts.method("test1").addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+										tr.setSucceeded(true);
+										ret.setResult(tr);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										tr.setFailed("Exception occurred: "+exception);
+										ret.setResult(tr);
+									}
+								});
 							}
-							else
-							{
-								tr.setFailed("Timeout difference too high: "+diff);
-							}
-						}
-						else
-						{
-							tr.setFailed("No timeout occurred");
-						}
-						ret.setResult(tr);
+						});
 					}
 				});
 			}

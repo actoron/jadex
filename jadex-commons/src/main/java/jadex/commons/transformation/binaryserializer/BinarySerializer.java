@@ -104,6 +104,20 @@ public class BinarySerializer
 	 *  @param classloader The class loader used.
 	 *  @return Encoded byte array.
 	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader)
+	{
+		return objectToByteArray(val, null, null, classloader);
+	}
+	
+	/**
+	 *  Convert an object to an encoded byte array.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Encoded byte array.
+	 */
 	public static byte[] objectToByteArray(Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
 	{
 		EncodingContext context = new EncodingContext(val, usercontext, preprocessors, classloader);
