@@ -69,13 +69,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="producer_plan">
-		    <parameter name="target" class="CoordinationSpaceData">
-		        <internaleventmapping ref="latestAnalyzedTargetEvent.latest_analyzed_target"/>
-		    </parameter>
 			<body class="ProducerPlan"/>
-			<trigger>
-			    <internalevent ref="latestAnalyzedTargetEvent"/>
-			</trigger>			
 		</plan>
 
 		<!-- Produce ore at a target. -->
@@ -123,6 +117,9 @@
 				<!-- Create a goal for walking around. -->
 				<initialgoal cref="move.walk_around"/>
 			</goals>
+			<plans>
+			    <initialplan ref="producer_plan"/>
+			</plans>
 		</configuration>
 	</configurations>
 </agent>

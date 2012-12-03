@@ -72,13 +72,7 @@
 	<plans>
 		<!-- The main plan handling action requests. -->
 		<plan name="carry_plan">
-		    <parameter name="target" class="CoordinationSpaceData">
-		        <internaleventmapping ref="latestProducedTargetEvent.latest_produced_target"/>
-		    </parameter>
-			<body class="CarryPlan"/>
-			<trigger>
-			    <internalevent ref="latestProducedTargetEvent"/>
-			</trigger>		
+		    <body class="CarryPlan"/>
 		</plan>
 
 		<!-- Carry ore to the homebase. -->
@@ -122,6 +116,9 @@
 				<!-- Create a goal for walking around. -->
 				<initialgoal cref="move.walk_around"/>
 			</goals>
+			<plans>
+			    <initialplan ref="carry_plan"/>
+			</plans>
 		</configuration>
 	</configurations>
 </agent>

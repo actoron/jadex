@@ -1,5 +1,6 @@
 package sodekovs.marsworld.sentry;
 
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -24,15 +25,19 @@ public class AddTargetPlan extends Plan {
 	 * The plan body.
 	 */
 	public void body() {
-		CoordinationSpaceData data = (CoordinationSpaceData) getParameter("target").getValue();
+		while (true) {
+			IInternalEvent event = waitForInternalEvent("latestTargetEvent");
 
-		ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
-		IVector2 position = new Vector2Double(data.getX(), data.getY());
-		ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_target").getValue();
 
-		if (latestTarget != null && !getBeliefbase().getBeliefSet("my_targets").containsFact(latestTarget)) {
-			System.out.println("#Sentry-NewAddTargetPlan# Found a new target: " + latestTarget);
-			getBeliefbase().getBeliefSet("my_targets").addFact(latestTarget);
+			ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+			IVector2 position = new Vector2Double(data.getX(), data.getY());
+			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+
+			if (latestTarget != null && !getBeliefbase().getBeliefSet("my_targets").containsFact(latestTarget)) {
+				System.out.println("#Sentry-NewAddTargetPlan# Found a new target: " + latestTarget);
+				getBeliefbase().getBeliefSet("my_targets").addFact(latestTarget);
+			}
 		}
 	}
 }

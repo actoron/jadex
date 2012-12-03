@@ -140,13 +140,7 @@
 			
 		<!-- Informs sentries about new targets. -->
 		<plan name="addTargetPlan">	
-		    <parameter name="target" class="CoordinationSpaceData">
-		        <internaleventmapping ref="latestTargetEvent.latest_target"/>
-		    </parameter>		
 			<body class="AddTargetPlan"/>
-			<trigger>
-			    <internalevent ref="latestTargetEvent"/>
-			</trigger>					
 		</plan>
 		
 		<!-- TMP: Counter. -->
@@ -178,6 +172,7 @@
 			</goals>
 			<plans>
 				<initialplan ref="tmpCounterPlan"/>
+				<initialplan ref="addTargetPlan"/>
 			</plans>			
 		</configuration>
 	</configurations>

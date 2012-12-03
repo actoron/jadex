@@ -30,20 +30,24 @@ public class ProducerPlan extends Plan {
 	 * Method body.
 	 */
 	public void body() {
-		CoordinationSpaceData data = (CoordinationSpaceData) getParameter("target").getValue();
-		System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
+		while (true) {
+			IInternalEvent event = waitForInternalEvent("latestAnalyzedTargetEvent");
+			
+			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_analyzed_target").getValue();
+			System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
 
-		// Producing ore here.
-		ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
-		IVector2 position = new Vector2Double(data.getX(), data.getY());
-		ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+			// Producing ore here.
+			ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+			IVector2 position = new Vector2Double(data.getX(), data.getY());
+			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
 
-		IGoal produce_ore = createGoal("produce_ore");
-		produce_ore.getParameter("target").setValue(latestTarget);
-		dispatchSubgoalAndWait(produce_ore);
+			IGoal produce_ore = createGoal("produce_ore");
+			produce_ore.getParameter("target").setValue(latestTarget);
+			dispatchSubgoalAndWait(produce_ore);
 
-		IInternalEvent ievent = createInternalEvent("callCarryEvent");
-		ievent.getParameter("latest_produced_target").setValue(data);
-		dispatchInternalEvent(ievent);
+			IInternalEvent ievent = createInternalEvent("callCarryEvent");
+			ievent.getParameter("latest_produced_target").setValue(data);
+			dispatchInternalEvent(ievent);
+		}
 	}
 }

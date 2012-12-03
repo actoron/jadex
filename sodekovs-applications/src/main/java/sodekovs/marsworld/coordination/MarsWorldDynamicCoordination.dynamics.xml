@@ -315,7 +315,7 @@
 			            </parameter_mappings>
 			        </agent_element>
 			    </from>
-			    <mechanism_configuration mechanism_id="sodekovs.marsworld.coordination.ConvergenceMechanism" agent_type="JADEX">
+			    <mechanism_configuration mechanism_id="deco4mas.distributed.mechanism.convergence.ConvergenceMechanism" agent_type="JADEX">
 			        <properties>
 			            <entry>
 			                <key>ADAPTION</key>

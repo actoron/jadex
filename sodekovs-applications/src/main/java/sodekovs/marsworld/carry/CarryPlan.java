@@ -1,6 +1,7 @@
 package sodekovs.marsworld.carry;
 
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -28,16 +29,20 @@ public class CarryPlan extends Plan {
 	 * Method body.
 	 */
 	public void body() {
-		CoordinationSpaceData data = (CoordinationSpaceData) getParameter("target").getValue();
-		System.out.println("#CarryPlan# Received latest produced target:  " + data);
+		while (true) {
+			IInternalEvent event = waitForInternalEvent("latestProducedTargetEvent");
+			
+			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_produced_target").getValue();
+			System.out.println("#CarryPlan# Received latest produced target:  " + data);
 
-		ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
-		IVector2 position = new Vector2Double(data.getX(), data.getY());
-		ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+			ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+			IVector2 position = new Vector2Double(data.getX(), data.getY());
+			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
 
-		// Producing ore here.
-		IGoal carry_ore = createGoal("carry_ore");
-		carry_ore.getParameter("target").setValue(latestTarget);
-		dispatchSubgoalAndWait(carry_ore);
+			// Producing ore here.
+			IGoal carry_ore = createGoal("carry_ore");
+			carry_ore.getParameter("target").setValue(latestTarget);
+			dispatchSubgoalAndWait(carry_ore);
+		}
 	}
 }
