@@ -42,8 +42,11 @@ public class GuiConstants
 	/** The base icon size. */
 	public static final int BASE_ICON_SIZE = 256;
 	
-	/** The icon size used. */
-	public static final int ICON_SIZE = 24;
+	/** The default icon size used. */
+	public static final int DEFAULT_ICON_SIZE = 32;
+	
+	/** The available icon sizes. */
+	public static final int[] ICON_SIZES = new int[] { 16, 24, 32, 48, 64, 96, 128 };
 	
 	/** Amplification factor for highlighted icons */
 	public static final float HIGHLIGHT_AMP = 1.15f;

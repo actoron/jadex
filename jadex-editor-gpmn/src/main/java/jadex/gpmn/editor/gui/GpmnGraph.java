@@ -1,5 +1,8 @@
 package jadex.gpmn.editor.gui;
 
+import jadex.gpmn.editor.gui.controllers.EdgeReconnectController;
+import jadex.gpmn.editor.gui.controllers.SelectionController;
+import jadex.gpmn.editor.gui.controllers.ValueChangeController;
 import jadex.gpmn.editor.model.visual.VElement;
 
 import com.mxgraph.util.mxEvent;
@@ -15,7 +18,7 @@ public class GpmnGraph extends mxGraph
 	/**
 	 *  Creates the graph.
 	 */
-	public GpmnGraph(IControllerAccess access, mxStylesheet sheet)
+	public GpmnGraph(ModelContainer container, mxStylesheet sheet)
 	{
 		setAllowDanglingEdges(false);
 		setAllowLoops(false);
@@ -23,12 +26,12 @@ public class GpmnGraph extends mxGraph
 		setCellsCloneable(false);
 		setAllowNegativeCoordinates(false);
 		
-		getModel().addListener(mxEvent.EXECUTE, access.getValueChangeController());
-		getSelectionModel().addListener(mxEvent.CHANGE, access.getSelectionController());
+		getModel().addListener(mxEvent.EXECUTE, new ValueChangeController(container));
+		getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(container));
 		
-		addListener(mxEvent.CONNECT_CELL, access.getEdgeReconnectController());
+		addListener(mxEvent.CONNECT_CELL, new EdgeReconnectController(container));
 		
-		addListener(mxEvent.CELLS_FOLDED, access.getFoldController());
+		addListener(mxEvent.CELLS_FOLDED, container.getFoldController());
 		
 		setStylesheet(sheet);
 	}

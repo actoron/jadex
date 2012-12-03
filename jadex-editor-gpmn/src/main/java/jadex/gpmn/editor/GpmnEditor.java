@@ -1,6 +1,9 @@
 package jadex.gpmn.editor;
 
-import jadex.gpmn.editor.gui.EditorWindow;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import jadex.gpmn.editor.gui.GpmnEditorWindow;
 
 /**
  *  GPMN editor main class.
@@ -9,7 +12,16 @@ import jadex.gpmn.editor.gui.EditorWindow;
 public class GpmnEditor
 {
 	/** Current version. */
-	public static final int VERSION = 1;
+	public static final int BUILD = 3;
+	
+	/** The name of the application. */
+	public static final String APP_NAME = "Jadex GPMN Editor";
+	
+	/** Log level for status area. */
+	public static final Level STATUS_AREA_LOG_LEVEL = Level.INFO;
+	
+	/** Main Logger. */
+	public static final Logger LOGGER = Logger.getLogger(APP_NAME);
 	
 	/**
 	 *  Main method.
@@ -18,6 +30,6 @@ public class GpmnEditor
 	 */
 	public static void main(String[] args)
 	{
-		new EditorWindow();
+		new GpmnEditorWindow();
 	}
 }

@@ -1,8 +1,6 @@
 package jadex.gpmn.editor.gui.controllers;
 
 import jadex.gpmn.editor.gui.GuiConstants;
-import jadex.gpmn.editor.gui.IControllerAccess;
-import jadex.gpmn.editor.gui.IViewAccess;
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
@@ -44,12 +42,6 @@ public class MouseController extends MouseAdapter
 	/** Access to the models. */
 	protected ModelContainer modelcontainer;
 	
-	/** Access to the controllers. */
-	protected IControllerAccess controlleraccess;
-	
-	/** Access to view. */
-	protected IViewAccess viewaccess;
-	
 	/** Timer for animated zoom operations. */
 	protected Timer zoomtimer;
 	
@@ -61,11 +53,9 @@ public class MouseController extends MouseAdapter
 	 * 
 	 *  @param container Access to the models.
 	 */
-	public MouseController(ModelContainer container, IControllerAccess controlleraccess, IViewAccess viewaccess)
+	public MouseController(ModelContainer container)
 	{
 		this.modelcontainer = container;
-		this.controlleraccess = controlleraccess;
-		this.viewaccess = viewaccess;
 	}
 	
 	public void mousePressed(MouseEvent e)
@@ -73,8 +63,8 @@ public class MouseController extends MouseAdapter
 		if (MouseEvent.BUTTON1 == e.getButton())
 		{
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
-			String mode = viewaccess.getEditMode();
-			if (IViewAccess.CONTROL_POINT_MODE.equals(mode))
+			String mode = modelcontainer.getEditMode();
+			if (ModelContainer.CONTROL_POINT_MODE.equals(mode))
 			{
 				if (cell == modelcontainer.getGraph().getSelectionCell() &&
 					modelcontainer.getGraph().getSelectionCount() == 1 &&
@@ -107,7 +97,7 @@ public class MouseController extends MouseAdapter
 					SGuiHelper.refreshCellView(modelcontainer.getGraph(), (VEdge) cell);
 					modelcontainer.setDirty(true);
 					
-					viewaccess.getToolGroup().setSelected(viewaccess.getSelectTool().getModel(), true);
+					modelcontainer.setEditMode(ModelContainer.SELECT_MODE);
 				}
 			}
 		}
@@ -122,9 +112,9 @@ public class MouseController extends MouseAdapter
 		{
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
 			
-			String mode = viewaccess.getEditMode();
+			String mode = modelcontainer.getEditMode();
 			
-			if (IViewAccess.NODE_CREATION_MODES.contains(mode) &&
+			if (ModelContainer.NODE_CREATION_MODES.contains(mode) &&
 				cell == null && mode != null &&
 				modelcontainer.getGraph().getSelectionModel().getCell() == null)
 			{
@@ -139,7 +129,7 @@ public class MouseController extends MouseAdapter
 			else if (cell instanceof VVEdgeMarker)
 			{
 				VVirtualActivationEdge virtedge = (VVirtualActivationEdge) ((VVEdgeMarker) cell).getParent();
-				controlleraccess.getFoldController().unfoldActivationPlan(virtedge);
+				modelcontainer.getFoldController().unfoldActivationPlan(virtedge);
 			}
 		}
 		else if (MouseEvent.BUTTON2 == e.getButton())
@@ -150,9 +140,9 @@ public class MouseController extends MouseAdapter
 		{
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
 			
-			String mode = viewaccess.getEditMode();
+			String mode = modelcontainer.getEditMode();
 			
-			if (IViewAccess.CONTROL_POINT_MODE.equals(mode))
+			if (ModelContainer.CONTROL_POINT_MODE.equals(mode))
 			{
 				if (cell== modelcontainer.getGraph().getSelectionCell() &&
 					modelcontainer.getGraph().getSelectionCount() == 1 &&
@@ -184,7 +174,7 @@ public class MouseController extends MouseAdapter
 					}
 				}
 			}
-			viewaccess.getToolGroup().setSelected(viewaccess.getSelectTool().getModel(), true);
+			modelcontainer.setEditMode(ModelContainer.SELECT_MODE);
 		}
 	}
 	
@@ -284,22 +274,22 @@ public class MouseController extends MouseAdapter
 			ret = new VGoal(bgoal,
 							new mxPoint(p.getX() - (GuiConstants.DEFAULT_GOAL_WIDTH >>> 1),
 										p.getY() - (GuiConstants.DEFAULT_GOAL_HEIGHT >>> 1)));
-			if (IViewAccess.ACHIEVE_GOAL_MODE.equals(editmode))
+			if (ModelContainer.ACHIEVE_GOAL_MODE.equals(editmode))
 				bgoal.setGoalType(ModelConstants.ACHIEVE_GOAL_TYPE);
-			else if (IViewAccess.PERFORM_GOAL_MODE.equals(editmode))
+			else if (ModelContainer.PERFORM_GOAL_MODE.equals(editmode))
 				bgoal.setGoalType(ModelConstants.PERFORM_GOAL_TYPE);
-			else if (IViewAccess.MAINTAIN_GOAL_MODE.equals(editmode))
+			else if (ModelContainer.MAINTAIN_GOAL_MODE.equals(editmode))
 				bgoal.setGoalType(ModelConstants.MAINTAIN_GOAL_TYPE);
-			else if (IViewAccess.QUERY_GOAL_MODE.equals(editmode))
+			else if (ModelContainer.QUERY_GOAL_MODE.equals(editmode))
 				bgoal.setGoalType(ModelConstants.QUERY_GOAL_TYPE);
 		}
 		else if (editmode.startsWith("Plan"))
 		{
 			IPlan mplan = null;
 			
-			if (IViewAccess.REF_PLAN_MODE.equals(editmode))
+			if (ModelContainer.REF_PLAN_MODE.equals(editmode))
 				mplan = (IRefPlan) modelcontainer.getGpmnModel().createNode(IRefPlan.class);
-			else if (IViewAccess.ACTIVATION_PLAN_MODE.equals(editmode))
+			else if (ModelContainer.ACTIVATION_PLAN_MODE.equals(editmode))
 				mplan = (IActivationPlan) modelcontainer.getGpmnModel().createNode(IActivationPlan.class);
 			
 			ret = new VPlan(mplan, p.getX() - (GuiConstants.DEFAULT_PLAN_WIDTH >>> 1),

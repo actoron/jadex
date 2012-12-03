@@ -1,6 +1,5 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IViewAccess;
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SPropertyPanelFactory;
 import jadex.gpmn.editor.model.visual.SequentialMarker;
@@ -19,16 +18,12 @@ public class SelectionController implements mxIEventListener
 	/** The model container. */
 	protected ModelContainer modelcontainer;
 	
-	/** Access to the view. */
-	protected IViewAccess viewaccess;
-	
 	/**
 	 *  Creates the controller.
 	 */
-	public SelectionController(ModelContainer modelcontainer, IViewAccess viewaccess)
+	public SelectionController(ModelContainer modelcontainer)
 	{
 		this.modelcontainer = modelcontainer;
-		this.viewaccess = viewaccess;
 	}
 	
 	/**
@@ -61,21 +56,21 @@ public class SelectionController implements mxIEventListener
 				}
 			}
 			
-			if (nodes && !IViewAccess.SELECT_MODE.equals(viewaccess.getToolGroup().getSelection().getActionCommand()))
+			if (nodes && !ModelContainer.SELECT_MODE.equals(modelcontainer.getEditMode()))
 			{
-				viewaccess.getToolGroup().setSelected(viewaccess.getSelectTool().getModel(), true);
+				modelcontainer.setEditMode(ModelContainer.SELECT_MODE);
 			}
 		}
 		else if (evt.getProperty(removed) != null && modelcontainer.getGraph().getSelectionCount() == 0)
 		{
 			//TODO: Correct?.
-			viewaccess.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer));
+			modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 			//viewaccess.setPropertPanel(SPropertyPanelFactory.EMPTY_PANEL);
 		}
 		
 		if (modelcontainer.getGraph().getSelectionCount() == 1)
 		{
-			viewaccess.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer));
+			modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(modelcontainer));
 		}
 	}
 }

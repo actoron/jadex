@@ -1,6 +1,5 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IControllerAccess;
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
@@ -28,14 +27,10 @@ public class EdgeReconnectController implements mxIEventListener
 	/** The model container. */
 	protected ModelContainer modelcontainer;
 	
-	/** Access to controllers. */
-	protected IControllerAccess controlleraccess;
-	
 	/** Creates a new edge reconnect controller. */
-	public EdgeReconnectController(ModelContainer container, IControllerAccess access)
+	public EdgeReconnectController(ModelContainer container)
 	{
 		this.modelcontainer = container;
-		this.controlleraccess = access;
 	}
 	
 	public void invoke(Object sender, mxEventObject evt)
@@ -157,7 +152,7 @@ public class EdgeReconnectController implements mxIEventListener
 				VGoal tgoal = (VGoal) vedge.getTarget();
 				
 				// Remove virtual edges.
-				controlleraccess.desynchModels();
+				modelcontainer.desynchModels();
 				graph.getModel().beginUpdate();
 				List<VVirtualActivationEdge> group = vedge.getEdgeGroup();
 				VVirtualActivationEdge[] grouparray = group.toArray(new VVirtualActivationEdge[group.size()]);
@@ -172,7 +167,7 @@ public class EdgeReconnectController implements mxIEventListener
 					}
 				}
 				graph.getModel().endUpdate();
-				controlleraccess.synchModels();
+				modelcontainer.synchModels();
 				
 				// Handle previous source of the edge.
 				IActivationPlan prevmaplan = (IActivationPlan) aplan.getPlan().getModel().copyNode(aplan.getPlan());
@@ -225,14 +220,14 @@ public class EdgeReconnectController implements mxIEventListener
 				
 				//System.out.println("Delete Array: " + Arrays.toString(delelements.toArray()));
 				
-				controlleraccess.desynchModels();
+				modelcontainer.desynchModels();
 				graph.getModel().beginUpdate();
 				graph.addCells(newelements.toArray());
 				graph.removeCells(delelements.toArray());
 				graph.getModel().setVisible(prevaplan, false);
 				graph.getModel().setVisible(termaplan, false);
 				graph.getModel().endUpdate();
-				controlleraccess.synchModels();
+				modelcontainer.synchModels();
 			}
 			
 		}
@@ -253,13 +248,13 @@ public class EdgeReconnectController implements mxIEventListener
 					}
 				}
 				
-				controlleraccess.desynchModels();
+				modelcontainer.desynchModels();
 				graph.getModel().beginUpdate();
 				graph.removeCells(new Object[] { actedge });
 				actedge.setTarget(term);
 				graph.addCell(actedge);
 				graph.getModel().endUpdate();
-				controlleraccess.synchModels();
+				modelcontainer.synchModels();
 			}
 			else
 			{
@@ -269,7 +264,7 @@ public class EdgeReconnectController implements mxIEventListener
 				VGoal sgoal = (VGoal) vedge.getSource();
 				
 				// Remove virtual edges.
-				controlleraccess.desynchModels();
+				modelcontainer.desynchModels();
 				graph.getModel().beginUpdate();
 				
 				List<mxGeometry> centerpoints = new ArrayList<mxGeometry>();
@@ -297,7 +292,7 @@ public class EdgeReconnectController implements mxIEventListener
 					}
 				}
 				graph.getModel().endUpdate();
-				controlleraccess.synchModels();
+				modelcontainer.synchModels();
 				
 				centerpoints.add(sgoal.getGeometry());
 				

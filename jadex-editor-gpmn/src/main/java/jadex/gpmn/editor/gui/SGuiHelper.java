@@ -3,7 +3,6 @@ package jadex.gpmn.editor.gui;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.CompositeContext;
-import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -13,46 +12,45 @@ import java.util.Enumeration;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
-import javax.swing.ImageIcon;
-import javax.swing.JToggleButton;
-import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import com.mxgraph.layout.mxOrganicLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
 /** Helper methods for the GUI. */
 public class SGuiHelper
 {
-	public static final JToggleButton createTool(ImageProvider imgprovider, String mode, Color color, String imagebasename, String tooltip, boolean circular, boolean symbolic)
-	{
-		JToggleButton tool = new JToggleButton();
-		tool.getModel().setActionCommand(mode);
-		tool.setContentAreaFilled(false);
-		
-		ImageIcon onicon = null;
-		if (circular)
-		{
-			onicon = imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, true, true);
-			tool.setIcon(imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, false, false));
-			tool.setRolloverIcon(imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, true, false));
-		}
-		else
-		{
-			onicon = imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, true, true);
-			tool.setIcon(imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, false, false));
-			tool.setRolloverIcon(imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, true, false));
-		}
-		tool.setPressedIcon(onicon);
-		tool.setSelectedIcon(onicon);
-		
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
-		tool.setMargin(new Insets(0, 0, 0, 0));
-		tool.setToolTipText(tooltip);
-		return tool;
-	}
+//	public static final JToggleButton createTool(ImageProvider imgprovider, String mode, Color color, String imagebasename, String tooltip, boolean circular, boolean symbolic)
+//	{
+//		JToggleButton tool = new JToggleButton();
+//		tool.getModel().setActionCommand(mode);
+//		tool.setContentAreaFilled(false);
+//		
+//		ImageIcon onicon = null;
+//		if (circular)
+//		{
+//			onicon = imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, true, true);
+//			tool.setIcon(imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, false, false));
+//			tool.setRolloverIcon(imgprovider.generateCircularImageIcon(imagebasename, color, symbolic, true, false));
+//		}
+//		else
+//		{
+//			onicon = imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, true, true);
+//			tool.setIcon(imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, false, false));
+//			tool.setRolloverIcon(imgprovider.generateRectangularImageIcon(imagebasename, color, symbolic, true, false));
+//		}
+//		tool.setPressedIcon(onicon);
+//		tool.setSelectedIcon(onicon);
+//		
+//		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
+//		tool.setMargin(new Insets(0, 0, 0, 0));
+//		tool.setToolTipText(tooltip);
+//		return tool;
+//	}
 	
 	/**
 	 *  Text extraction from the Java "Document" class is braindead,
@@ -157,6 +155,26 @@ public class SGuiHelper
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Applies a circle layout to the model.
+	 *  
+	 *  @param modelcontainer The model container.
+	 */
+	public static final void applyOrganicLayout(ModelContainer modelcontainer)
+	{
+		mxOrganicLayout layout = new mxOrganicLayout(modelcontainer.getGraph());
+		Object root = ((mxCell) modelcontainer.getGraph().getModel().getRoot()).getChildAt(0);
+		int count = modelcontainer.getGraph().getChildVertices(root).length;
+		int len = count * GuiConstants.DEFAULT_GOAL_WIDTH;
+		modelcontainer.getGraph().getView().setGraphBounds(new mxRectangle(0.0, 0.0, len, len));
+		layout.setAverageNodeArea(0.0);
+		layout.setOptimizeNodeDistribution(true);
+		layout.setNodeDistributionCostFactor(10000000.0);
+		layout.setEdgeCrossingCostFactor(60000.0);
+		layout.execute(modelcontainer.getGraph().getDefaultParent());
+		modelcontainer.setDirty(true);
 	}
 	
 	/**

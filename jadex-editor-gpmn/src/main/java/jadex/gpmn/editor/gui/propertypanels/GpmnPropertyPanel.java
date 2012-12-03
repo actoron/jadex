@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -41,7 +42,7 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 		super(container);
 		setLayout(new BorderLayout());
 		
-		ImageProvider imgprovider = new ImageProvider();
+		ImageProvider imgprovider = container.getImageProvider();
 		
 		JTabbedPane tabpane = new JTabbedPane();
 		add(tabpane);
@@ -89,9 +90,14 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 				model.addParameter();
 			}
 		});
-		addbutton.setIcon(imgprovider.getImageIcon("plus_unpressed.png"));
-		addbutton.setPressedIcon(imgprovider.getImageIcon("plus_pressed.png"));
-		addbutton.setRolloverIcon(imgprovider.getImageIcon("plus_high.png"));
+		int iconsize = 32;
+//		addbutton.setIcon(imgprovider.getImageIcon("plus_unpressed.png"));
+//		addbutton.setPressedIcon(imgprovider.getImageIcon("plus_pressed.png"));
+//		addbutton.setRolloverIcon(imgprovider.getImageIcon("plus_high.png"));
+		Icon[] icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "add_+");
+		addbutton.setIcon(icons[0]);
+		addbutton.setPressedIcon(icons[1]);
+		addbutton.setRolloverIcon(icons[2]);
 		addbutton.setContentAreaFilled(false);
 		addbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		addbutton.setMargin(new Insets(0, 0, 0, 0));
@@ -112,13 +118,14 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		});
-		removebutton.setIcon(imgprovider.getImageIcon("minus_unpressed.png"));
-		removebutton.setPressedIcon(imgprovider.getImageIcon("minus_pressed.png"));
-		removebutton.setRolloverIcon(imgprovider.getImageIcon("minus_high.png"));
+		icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "remove_-");
+		removebutton.setIcon(icons[0]);
+		removebutton.setPressedIcon(icons[1]);
+		removebutton.setRolloverIcon(icons[2]);
 		removebutton.setContentAreaFilled(false);
 		removebutton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		removebutton.setMargin(new Insets(0, 0, 0, 0));
-		removebutton.setToolTipText("Add Parameter");
+		removebutton.setToolTipText("Remove Parameter");
 		buttonpanel.add(removebutton);
 		
 		JPanel contextpanel = new JPanel(new GridBagLayout());

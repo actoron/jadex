@@ -1,6 +1,5 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IControllerAccess;
 import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
@@ -26,14 +25,10 @@ public class FoldController implements mxIEventListener
 	/** The model container. */
 	protected ModelContainer modelcontainer;
 	
-	/** Access to controllers. */
-	protected IControllerAccess controlleraccess;
-	
 	/** Creates a new fold controller. */
-	public FoldController(ModelContainer container, IControllerAccess access)
+	public FoldController(ModelContainer container)
 	{
 		this.modelcontainer = container;
-		this.controlleraccess = access;
 	}
 	
 	/** 
@@ -108,13 +103,13 @@ public class FoldController implements mxIEventListener
 		List<VVirtualActivationEdge> group = startedge.getEdgeGroup();
 		
 		// Remove virtual edges and restore visual cells.
-		controlleraccess.desynchModels();
+		modelcontainer.desynchModels();
 		mxGraph graph = modelcontainer.getGraph();
 		graph.getModel().beginUpdate();
 		graph.removeCells(group.toArray());
 		graph.getModel().setVisible(startedge.getPlan(), true);
 		graph.foldCells(false, false, new Object[] { startedge.getPlan() });
 		graph.getModel().endUpdate();
-		controlleraccess.synchModels();
+		modelcontainer.synchModels();
 	}
 }
