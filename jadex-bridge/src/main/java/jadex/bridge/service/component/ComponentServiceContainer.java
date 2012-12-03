@@ -310,11 +310,11 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 							{
 								public void customResultAvailable(T result)
 								{
-//									// Todo: fix transmission of service call properties (e.g. timeout) when both
-//									// required and provided service proxy are present (-> testcases.timeout.Initiator)
-//									ret.setResult(result);
-									ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-											adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+									// Todo: fix transmission of service call properties (e.g. timeout) when both
+									// required and provided service proxy are present (-> testcases.timeout.Initiator)
+									ret.setResult(result);
+//									ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+//											adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 								}
 							});
 						}
@@ -334,11 +334,11 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					{
 						public void customResultAvailable(T result)
 						{
-//							// Todo: fix transmission of service call properties (e.g. timeout) when both
-//							// required and provided service proxy are present (-> testcases.timeout.Initiator)
-//							ret.setResult(result);
-							ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-								adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+							// Todo: fix transmission of service call properties (e.g. timeout) when both
+							// required and provided service proxy are present (-> testcases.timeout.Initiator)
+							ret.setResult(result);
+//							ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+//								adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 						}
 					});
 				}
