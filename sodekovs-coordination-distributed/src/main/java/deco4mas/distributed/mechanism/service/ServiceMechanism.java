@@ -56,7 +56,7 @@ public class ServiceMechanism extends CoordinationMechanism {
 	public void perceiveCoordinationEvent(Object obj) {
 		final CoordinationInfo ci = (CoordinationInfo) obj;
 
-		SServiceProvider.getServices(applicationInterpreter.getServiceProvider(), ICoordinationService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+		SServiceProvider.getServices(applicationInterpreter.getServiceProvider(), ICoordinationService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new DefaultResultListener<Collection<ICoordinationService>>() {
 
 					@Override

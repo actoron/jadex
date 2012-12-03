@@ -116,6 +116,22 @@ public class MechanismConfiguration {
 	 * @param key
 	 * @return
 	 */
+	public Long getLongProperty(String key) {
+		
+		if (hasProperty(key)) {
+			String property_value = getProperty(key);
+			return new Long(property_value);
+		}
+		
+		else return null;
+	}
+	
+	/**
+	 * Fetch a parameter by name (ignoreCase).
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public Integer getIntegerProperty(String key) {
 		
 		if (hasProperty(key)) {
