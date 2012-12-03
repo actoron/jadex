@@ -5,7 +5,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

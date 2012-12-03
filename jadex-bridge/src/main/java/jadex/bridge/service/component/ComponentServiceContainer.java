@@ -22,6 +22,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -159,14 +160,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
-	/**
-	 *  Get a service of a specific component.
-	 */
-	public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
-	{
-		IFuture<T>	fut	= super.getService(type, cid);
-		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
-	}
+//	/**
+//	 *  Get a service of a specific component.
+//	 */
+//	public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
+//	{
+//		IFuture<T>	fut	= super.getService(type, cid);
+//		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
+//	}
 	
 	/**
 	 *  Get one service of a type.
@@ -278,6 +279,66 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			}
 		});
 		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
+	}
+	
+	/**
+	 *  Get one service of a type from a specific component.
+	 *  @param type The class.
+	 *  @param cid The component identifier of the target component.
+	 *  @return The corresponding service.
+	 */
+	public <T> IFuture<T> getService(final Class<T> type, final IComponentIdentifier cid)
+	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+
+		final Future<T> ret = new Future<T>();
+		// Local?
+		if(cid.getPlatformName().equals(id.getPlatformName()))
+		{
+			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+			{
+				public void customResultAvailable(IComponentManagementService cms)
+				{
+					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+					{
+						public void customResultAvailable(IExternalAccess ea)
+						{
+							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
+								.addResultListener(new DelegationResultListener<T>(ret)
+							{
+								public void customResultAvailable(T result)
+								{
+									ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+										adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(ret)
+			{
+				public void customResultAvailable(IRemoteServiceManagementService rms)
+				{
+					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL)
+						.addResultListener(new DelegationResultListener<T>(ret)
+					{
+						public void customResultAvailable(T result)
+						{
+							ret.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+								adapter, (IService)result, null, new RequiredServiceInfo(type), null));
+						}
+					});
+				}
+			});
+		}
+		return ret;
 	}
 	
 	/**

@@ -194,7 +194,7 @@ public class InitiatorAgent extends TestAgent
 				if(to!=-1)
 				{
 //					ServiceCall.setInvocationProperties(to, true);
-					ServiceCall call = ServiceCall.createInvocation();
+					ServiceCall call = ServiceCall.getInvocation();
 					call.setTimeout(to);
 					call.setRealtime(Boolean.TRUE);
 					call.setProperty("extra", "somval");

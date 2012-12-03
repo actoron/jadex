@@ -14,7 +14,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-//import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
+import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+//import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
 
 /**
  *  Basic service invocation interceptor.
@@ -331,7 +332,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
+		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
 		boolean realtime, IResourceIdentifier rid)
 	{
 		IInternalService	ret;
@@ -382,7 +383,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class type, Object service)
+	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class<?> type, Object service)
 	{
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)
@@ -414,7 +415,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				// Otherwise take interface if there is only one
 				else
 				{
-					Class[] types = service.getClass().getInterfaces();
+					Class<?>[] types = service.getClass().getInterfaces();
 					if(types.length!=1)
 						throw new RuntimeException("Unknown service interface: "+SUtil.arrayToString(types));
 					type = types[0];
@@ -424,7 +425,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
 						
-			Class serclass = service.getClass();
+			Class<?> serclass = service.getClass();
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
 			if (!(SReflect.isAndroid() && (service instanceof Proxy))) 
@@ -512,7 +513,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-//			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess()));
+			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess(), false));
 			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor());
 			if(!(service instanceof IService))
 			{
@@ -523,7 +524,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy, realtime));
 			}
-			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ia.getExternalAccess(), null,*/));
+			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 		}
 		
 		if(ics!=null)
@@ -564,10 +565,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service, adapter.getLogger());
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess(), true));
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
-				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, adapter,*/));
+				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{

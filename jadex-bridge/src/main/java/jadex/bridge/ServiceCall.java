@@ -109,9 +109,9 @@ public class ServiceCall
 	 *  @param timeout The timeout.
 	 *  @param realtime The realtime flag.
 	 */
-	public static ServiceCall createInvocation()
+	public static ServiceCall getInvocation()
 	{
-		return createInvocation(null);
+		return getInvocation(null);
 	}
 	
 	/**
@@ -119,10 +119,14 @@ public class ServiceCall
 	 *  @param timeout The timeout.
 	 *  @param realtime The realtime flag.
 	 */
-	public static ServiceCall createInvocation(Map<String, Object> props)
+	public static ServiceCall getInvocation(Map<String, Object> props)
 	{
-		ServiceCall ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), props);
-		INVOCATIONS.set(ret);
+		ServiceCall ret = INVOCATIONS.get();
+		if(ret==null)
+		{
+			ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), props);
+			INVOCATIONS.set(ret);
+		}
 		return ret;
 	}
 	

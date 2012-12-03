@@ -479,51 +479,51 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //	protected Map bindings;
 
 	
-	/**
-	 *  Get one service of a type from a specific component.
-	 *  @param type The class.
-	 *  @param cid The component identifier of the target component.
-	 *  @return The corresponding service.
-	 */
-	public <T> IFuture<T> getService(final Class<T> type, final IComponentIdentifier cid)
-	{
-		if(shutdowned)
-			return new Future<T>(new ComponentTerminatedException(id));
-
-		final Future<T> ret = new Future<T>();
-		// Local?
-		if(cid.getPlatformName().equals(id.getPlatformName()))
-		{
-			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
-			{
-				public void customResultAvailable(IComponentManagementService cms)
-				{
-					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
-					{
-						public void customResultAvailable(IExternalAccess ea)
-						{
-							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
-								.addResultListener(new DelegationResultListener<T>(ret));
-						}
-					});
-				}
-			});
-		}
-		else
-		{
-			SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(ret)
-			{
-				public void customResultAvailable(IRemoteServiceManagementService rms)
-				{
-					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL)
-						.addResultListener(new DelegationResultListener<T>(ret));
-				}
-			});
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get one service of a type from a specific component.
+//	 *  @param type The class.
+//	 *  @param cid The component identifier of the target component.
+//	 *  @return The corresponding service.
+//	 */
+//	public <T> IFuture<T> getService(final Class<T> type, final IComponentIdentifier cid)
+//	{
+//		if(shutdowned)
+//			return new Future<T>(new ComponentTerminatedException(id));
+//
+//		final Future<T> ret = new Future<T>();
+//		// Local?
+//		if(cid.getPlatformName().equals(id.getPlatformName()))
+//		{
+//			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService cms)
+//				{
+//					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+//					{
+//						public void customResultAvailable(IExternalAccess ea)
+//						{
+//							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
+//								.addResultListener(new DelegationResultListener<T>(ret));
+//						}
+//					});
+//				}
+//			});
+//		}
+//		else
+//		{
+//			SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(ret)
+//			{
+//				public void customResultAvailable(IRemoteServiceManagementService rms)
+//				{
+//					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL)
+//						.addResultListener(new DelegationResultListener<T>(ret));
+//				}
+//			});
+//		}
+//		return ret;
+//	}
 
 	/**
 	 *  Get provided (declared) service.

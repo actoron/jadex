@@ -166,51 +166,84 @@ public class InitiatorAgent extends TestAgent
 		final TestReport tr = new TestReport("#"+testno, "Test if authentication works.");
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
-		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				IFuture<ISecurityService> fut = agent.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				fut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
+				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{
-					public void customResultAvailable(ISecurityService ss)
+					public void resultAvailable(Void result)
 					{
-						String classname = ITestService.class.getName();
-						String methodname = "method";
-						Object[] args = new Object[]{"test1"};
-						Object[] t = new Object[]{agent.getComponentIdentifier().getPlatformPrefix(), classname, methodname, args};
-						final byte[] content = BinarySerializer.objectToByteArray(t, null);
-						
-						ss.signCall(content).addResultListener(new ExceptionDelegationResultListener<byte[], TestReport>(ret)
-						{
-							public void customResultAvailable(byte[] signed)
-							{
-								System.out.println("Signed: "+SUtil.arrayToString(signed));
-								
-								// create a service call meta object and set the timeout
-								ServiceCall call = ServiceCall.createInvocation();
-								call.setProperty(Authenticated.AUTHENTICATED, signed);
-								ts.method("test1").addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										tr.setSucceeded(true);
-										ret.setResult(tr);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										tr.setFailed("Exception occurred: "+exception);
-										ret.setResult(tr);
-									}
-								});
-							}
-						});
+						tr.setSucceeded(true);
+						ret.setResult(tr);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						tr.setFailed("Exception occurred: "+exception);
+						ret.setResult(tr);
 					}
 				});
 			}
 		});
 		return ret;
 	}
+	
+//	/**
+//	 *  Call the service methods.
+//	 */
+//	protected IFuture<TestReport> callService(final IComponentIdentifier cid, int testno)
+//	{
+//		final Future<TestReport> ret = new Future<TestReport>();
+//		
+//		final TestReport tr = new TestReport("#"+testno, "Test if authentication works.");
+//		
+//		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
+//		
+//		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
+//		{
+//			public void customResultAvailable(final ITestService ts)
+//			{
+//				IFuture<ISecurityService> fut = agent.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//				fut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
+//				{
+//					public void customResultAvailable(ISecurityService ss)
+//					{
+//						String classname = ITestService.class.getName();
+//						String methodname = "method";
+//						Object[] args = new Object[]{"test1"};
+//						Object[] t = new Object[]{agent.getComponentIdentifier().getPlatformPrefix(), classname, methodname, args};
+//						final byte[] content = BinarySerializer.objectToByteArray(t, null);
+//						
+//						ss.signCall(content).addResultListener(new ExceptionDelegationResultListener<byte[], TestReport>(ret)
+//						{
+//							public void customResultAvailable(byte[] signed)
+//							{
+//								System.out.println("Signed: "+SUtil.arrayToString(signed));
+//								
+//								// create a service call meta object and set the timeout
+//								ServiceCall call = ServiceCall.getInvocation();
+//								call.setProperty(Authenticated.AUTHENTICATED, signed);
+//								ts.method("test1").addResultListener(new IResultListener<Void>()
+//								{
+//									public void resultAvailable(Void result)
+//									{
+//										tr.setSucceeded(true);
+//										ret.setResult(tr);
+//									}
+//									
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										tr.setFailed("Exception occurred: "+exception);
+//										ret.setResult(tr);
+//									}
+//								});
+//							}
+//						});
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
 }
