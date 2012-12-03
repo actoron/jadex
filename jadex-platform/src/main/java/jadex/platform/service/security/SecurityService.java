@@ -353,6 +353,10 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void> shutdown()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		
+		// Save keystore on disk
+		
+		// Save settings
 		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
@@ -956,91 +960,19 @@ public class SecurityService implements ISecurityService
 				}
 				else
 				{
-					final int threshold = 1;
-					final IComponentIdentifier cid = new ComponentIdentifier(name);
-					
-					// Try to fetch certificate from other platforms
-					SServiceProvider.getServices(component.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-						.addResultListener(new IIntermediateResultListener<ISecurityService>()
+					aquireCertificate(name).addResultListener(new DelegationResultListener<Certificate>(ret)
 					{
-						protected int ongoing;
-						protected boolean finished;
-						protected List<Certificate> certs = new ArrayList<Certificate>();
-						
-						public void intermediateResultAvailable(ISecurityService ss)
+						public void customResultAvailable(Certificate cert)
 						{
-							ongoing++;
-							
-							if(!((IService)ss).getServiceIdentifier().equals(sid))
+							try
 							{
-								ss.getPlatformCertificate(cid).addResultListener(new IResultListener<Certificate>()
-								{
-									public void resultAvailable(Certificate cert)
-									{
-										certs.add(cert);
-										if(certs.size()>=threshold && !ret.isDone())
-										{
-											try
-											{
-												byte[] enc = certs.get(0).getEncoded();
-												boolean ok = true;
-												for(int i=1; i<certs.size() && ok; i++)
-												{
-													if(!Arrays.equals(enc, certs.get(i).getEncoded()))
-													{
-														ret.setException(new SecurityException("Received different certificates for: "+name));
-														ok = false;
-													}
-												}
-												if(ok)
-												{
-													ret.setResult(certs.get(0));
-												}
-											}
-											catch(Exception e)
-											{
-												ret.setException(new SecurityException("Certificate encoding error: "+name));
-											}
-										}
-										ongoing--;
-										checkFinish();
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										// ignore failures of getCertificate calls
-										ongoing--;
-										checkFinish();
-									}
-								});
+								// Store certificate in store
+								getKeyStore().setCertificateEntry(name, cert);
+								super.customResultAvailable(cert);
 							}
-						}
-						
-						public void finished()
-						{
-							finished = true;
-							checkFinish();
-						}
-						
-						public void resultAvailable(Collection<ISecurityService> result)
-						{
-							for(ISecurityService ss: result)
+							catch(Exception e)
 							{
-								intermediateResultAvailable(ss);
-							}
-							finished();
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							finished();
-						}
-						
-						protected void checkFinish()
-						{
-							if(ongoing==0 && finished && !ret.isDone())
-							{
-								ret.setExceptionIfUndone(new SecurityException("Unable to retrieve certificate: "+name));
+								super.exceptionOccurred(e);
 							}
 						}
 					});
@@ -1051,6 +983,105 @@ public class SecurityService implements ISecurityService
 		{
 			ret.setException(e);
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Certificate> aquireCertificate(final String name)
+	{
+		final Future<Certificate> ret = new Future<Certificate>();
+
+		final int threshold = 1;
+		final IComponentIdentifier cid = new ComponentIdentifier(name);
+		
+		// Try to fetch certificate from other platforms
+		SServiceProvider.getServices(component.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			.addResultListener(new IIntermediateResultListener<ISecurityService>()
+		{
+			protected int ongoing;
+			protected boolean finished;
+			protected List<Certificate> certs = new ArrayList<Certificate>();
+			
+			public void intermediateResultAvailable(ISecurityService ss)
+			{
+				ongoing++;
+				
+				if(!((IService)ss).getServiceIdentifier().equals(sid))
+				{
+					ss.getPlatformCertificate(cid).addResultListener(new IResultListener<Certificate>()
+					{
+						public void resultAvailable(Certificate cert)
+						{
+							certs.add(cert);
+							if(certs.size()>=threshold && !ret.isDone())
+							{
+								try
+								{
+									byte[] enc = certs.get(0).getEncoded();
+									boolean ok = true;
+									for(int i=1; i<certs.size() && ok; i++)
+									{
+										if(!Arrays.equals(enc, certs.get(i).getEncoded()))
+										{
+											ret.setException(new SecurityException("Received different certificates for: "+name));
+											ok = false;
+										}
+									}
+									if(ok)
+									{
+										ret.setResult(certs.get(0));
+									}
+								}
+								catch(Exception e)
+								{
+									ret.setException(new SecurityException("Certificate encoding error: "+name));
+								}
+							}
+							ongoing--;
+							checkFinish();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// ignore failures of getCertificate calls
+							ongoing--;
+							checkFinish();
+						}
+					});
+				}
+			}
+			
+			public void finished()
+			{
+				finished = true;
+				checkFinish();
+			}
+			
+			public void resultAvailable(Collection<ISecurityService> result)
+			{
+				for(ISecurityService ss: result)
+				{
+					intermediateResultAvailable(ss);
+				}
+				finished();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				finished();
+			}
+			
+			protected void checkFinish()
+			{
+				if(ongoing==0 && finished && !ret.isDone())
+				{
+					ret.setExceptionIfUndone(new SecurityException("Unable to retrieve certificate: "+name));
+				}
+			}
+		});
 		
 		return ret;
 	}

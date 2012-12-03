@@ -35,7 +35,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -75,7 +78,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 	protected JTextField tfstorepath;
 	
 	/** The keystore password. */
-	protected  JTextField tfstorepass;
+	protected JTextField tfstorepass;
 	
 	/** The key password. */
 	protected JTextField tfkeypass;
@@ -91,7 +94,8 @@ public class SecuritySettings	implements IServiceViewerPanel
 		final Future<Void>	ret	= new Future<Void>();
 		
 		this.secservice	= (ISecurityService)service;
-		this.inner	= new JPanel(new BorderLayout());
+//		this.inner	= new JPanel(new BorderLayout());
+		this.inner	= new JTabbedPane();
 
 		cbusepass	= new JCheckBox("Use password");
 		final JLabel	lbpass	= new JLabel("Password");
@@ -159,6 +163,9 @@ public class SecuritySettings	implements IServiceViewerPanel
 			}
 		});
 		
+		JTable ktt = new JTable();
+		
+		
 		// The local password settings.
 		JPanel	plocal	= new JPanel(new GridBagLayout());
 		plocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Password Settings"));
@@ -166,7 +173,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 		gbc.insets	= new Insets(0, 3, 0, 3);
 		gbc.weightx	= 0;
 		gbc.weighty	= 0;
-		gbc.anchor	= GridBagConstraints.WEST;
+		gbc.anchor	= GridBagConstraints.NORTHWEST;
 		gbc.fill	= GridBagConstraints.VERTICAL;
 		gbc.gridy	= 0;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
@@ -180,29 +187,36 @@ public class SecuritySettings	implements IServiceViewerPanel
 		plocal.add(cbshowchars, gbc);
 		gbc.gridy++;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill	= GridBagConstraints.NONE;
 		plocal.add(cbtrulan, gbc);
+//		plocal.add(new JButton(), gbc);
 		
 		JPanel slocal	= new JPanel(new GridBagLayout());
 		slocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Keystore Settings"));
 		int x=0;
 		int y=0;
+		Insets in = new Insets(2, 2, 2, 2);
 		slocal.add(new JLabel("Key store location: "), new GridBagConstraints(x++, y, 1, 1, 0, 0, 
-			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
-		slocal.add(tfstorepath, new GridBagConstraints(x++, y, 1, 1, 1, 1, 
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
+		slocal.add(tfstorepath, new GridBagConstraints(x++, y, 1, 1, 1, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
 		slocal.add(bustpa, new GridBagConstraints(x++, y, 1, 1, 0, 0, 
-			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
 //		x=0;
 		slocal.add(new JLabel("Key store password:"), new GridBagConstraints(x++, y, 1, 1, 0, 0, 
-			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
-		slocal.add(tfstorepass, new GridBagConstraints(x++, y, 1, 1, 1, 1, 
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
+		slocal.add(tfstorepass, new GridBagConstraints(x++, y, 1, 1, 1, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
 		slocal.add(new JLabel("Key password:"), new GridBagConstraints(x++, y, 1, 1, 0, 0, 
-			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
-		slocal.add(tfkeypass, new GridBagConstraints(x++, y, 1, 1, 1, 1, 
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,2,0,2), 0, 0));
-		slocal.add(bustoreset, new GridBagConstraints(x++, y, 1, 1, 0, 0, 
-			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0,2,0,2), 0, 0));
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
+		slocal.add(tfkeypass, new GridBagConstraints(x++, y, 1, 1, 1, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
+		slocal.add(bustoreset, new GridBagConstraints(x++, y++, 1, 1, 0, 0, 
+			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
+		slocal.add(new JScrollPane(ktt), new GridBagConstraints(0, y, 8, 1, 1, 1, 
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
 				
 		ICommand paddrem = new ICommand()
 		{
@@ -248,14 +262,18 @@ public class SecuritySettings	implements IServiceViewerPanel
 //		sp2.add(plocal);
 //		sp2.add(slocal);
 		
-		JPanel no = new JPanel(new BorderLayout());
-		no.add(plocal, BorderLayout.NORTH);
-		no.add(slocal, BorderLayout.SOUTH);
+//		JPanel no = new JPanel(new BorderLayout());
+//		no.add(plocal, BorderLayout.NORTH);
+//		no.add(slocal, BorderLayout.SOUTH);
 		
 		// Overall layout.
-		inner.add(no, BorderLayout.NORTH);
-		inner.add(sp, BorderLayout.CENTER);
-		
+//		inner.add(no, BorderLayout.NORTH);
+//		inner.add(sp, BorderLayout.CENTER);
+		((JTabbedPane)inner).addTab("Password", plocal);
+		((JTabbedPane)inner).addTab("Keystore", slocal);
+		((JTabbedPane)inner).addTab("Remote Passwords", ppp);
+		((JTabbedPane)inner).addTab("Network Names", npp);
+			
 		// Gui listeners.
 		buapply.setEnabled(false);
 		cbusepass.addChangeListener(new ChangeListener()
