@@ -211,6 +211,9 @@ public class RelayHandler
 			queue	= 	new ArrayBlockingQueue<Message>();
 		}
 		map.put(id, queue);
+		
+		// Inform peers about connected platform.
+		sendPlatformInfo(info);
 				
 //		// Set cache header to avoid interference of proxies (e.g. vodafone umts)
 //		response.setHeader("Cache-Control", "no-cache, no-transform");
@@ -514,7 +517,14 @@ public class RelayHandler
 		}
 		catch(IOException e)
 		{
-			getLogger().warning("Error sending platform infos to peer: "+e);
+			for(PeerEntry peer: peers.getPeers())
+			{
+				if(peer.isConnected())
+				{
+					peer.addDebugText("Error sending platform info to peer: "+peer.getUrl()+"platforminfo, "+e);
+				}
+			}
+			getLogger().warning("Error sending platform info to peer: "+e);
 		}					
 	}
 	
@@ -527,13 +537,13 @@ public class RelayHandler
 		{
 			peer.addDebugText("Sending platform infos to peer: "+infos.length);
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
-			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peer.getUrl()), new byte[][]{peerinfo});
+			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
 			peer.addDebugText("Sent platform infos.");
 		}
 		catch(IOException e)
 		{
-			peer.addDebugText("Error sending platform infos to peer: "+e);
-			getLogger().warning("Error sending platform infos to peer: "+e);
+			peer.addDebugText("Error sending platform infos to peer: "+peer.getUrl()+"platforminfos, "+e);
+			getLogger().warning("Error sending platform infos to peer: "+peer.getUrl()+"platforminfos, "+e);
 		}					
 	}
 	
