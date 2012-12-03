@@ -1,11 +1,10 @@
 package jadex.commons.transformation.traverser;
 
 
-import jadex.commons.Tuple;
-
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -24,8 +23,9 @@ public class ImmutableProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof Enum || object instanceof URL || object instanceof URI || 
-			object instanceof Level || object instanceof InetAddress || object instanceof Exception;
+		return object instanceof Enum || object instanceof URL || object instanceof URI 
+			|| object instanceof Level || object instanceof InetAddress || object instanceof Exception
+			|| object instanceof Certificate;
 	}
 //	SReflect.isSupertype(Enum.class, object.getClass())
 	

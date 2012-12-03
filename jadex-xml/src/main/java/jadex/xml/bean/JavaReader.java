@@ -27,9 +27,11 @@ import jadex.xml.reader.XMLReaderFactory;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -116,6 +118,7 @@ public class JavaReader
 	 *	- jadex.commons.Tuple2
 	 *	- jadex.commons.Tuple3
 	 *  - java.util.UUID
+	 *  - java.security.Certifcate
 	 */
 	public static Set<TypeInfo> getTypeInfos()
 	{
@@ -484,6 +487,23 @@ public class JavaReader
 			));
 			typeinfos.add(ti_enum);
 			
+			// java.security.Certificate
+			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.security", "Certificate")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						// Hack! How to find out certificate type, which others could be used?
+						CertificateFactory cf = CertificateFactory.getInstance("X509");
+						return cf.generateCertificate(new ByteArrayInputStream(Base64.decode(((String)rawattributes.get("data")).getBytes())));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
+				}
+			));
+			typeinfos.add(ti_cert);
+			
 			// Shortcut notations for simple array types
 			
 			// boolean/Boolean Array
@@ -820,7 +840,8 @@ public class JavaReader
 			}));
 			typeinfos.add(ti_uuid);
 			
-			if (!SReflect.isAndroid()) {
+			if(!SReflect.isAndroid()) 
+			{
 				typeinfos.addAll(STypeInfosAWT.getReaderTypeInfos());
 			}
 		}

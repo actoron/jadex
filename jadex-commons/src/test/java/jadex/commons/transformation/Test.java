@@ -121,6 +121,7 @@ public abstract class Test extends TestCase
 				testTuple();
 				testTuple2();
 				testTimestamp();
+//				testCertificate(); // todo
 				
 				testBean();
 				testBeanWithPublicFields();
@@ -1002,6 +1003,15 @@ public abstract class Test extends TestCase
 	{
 		Tuple2<String, String>	obj	= new Tuple2<String, String>("hello", "world");
 		doWriteAndRead(obj);
+	}
+	
+	/**
+	 *  Test reading / writing tuple2.
+	 */
+	public void	testCertificate() throws Exception
+	{
+		// todo: ? how to avoid dependencies to impl
+		throw new UnsupportedOperationException();
 	}
 	
 	/**

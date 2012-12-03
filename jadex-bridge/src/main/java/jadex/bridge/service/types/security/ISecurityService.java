@@ -6,6 +6,7 @@ import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.future.IFuture;
 
+import java.security.cert.Certificate;
 import java.util.Map;
 
 /**
@@ -174,5 +175,12 @@ public interface ISecurityService
 	 *  @param name The callers name (used to find the certificate and public key). 
 	 */
 	public IFuture<Void> verifyCall(final byte[] content, final byte[] signed, final String name);
+	
+	/**
+	 *  Get the certificate of a platform.
+	 *  @param cid The platform component identifier (null for own certificate).
+	 *  @return The certificate.
+	 */
+	public IFuture<Certificate> getPlatformCertificate(IComponentIdentifier cid);
 
 }

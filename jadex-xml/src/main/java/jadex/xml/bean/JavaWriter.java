@@ -24,6 +24,7 @@ import jadex.xml.writer.XMLWriterFactory;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.security.cert.Certificate;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
@@ -273,6 +274,14 @@ public class JavaWriter
 				null
 			));
 			typeinfos.add(ti_inetaddr);
+			
+			// java.security.Certificate
+			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName("typeinfo:java.net", "Certificate")), new ObjectInfo(Certificate.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("data", null))},
+				null
+			));
+			typeinfos.add(ti_cert);
 			
 			// java.lang.Class
 			IObjectStringConverter oclconv = new IObjectStringConverter()

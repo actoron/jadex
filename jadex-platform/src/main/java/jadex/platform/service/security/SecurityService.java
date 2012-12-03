@@ -6,13 +6,17 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -27,6 +31,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaWriter;
 
@@ -36,14 +41,12 @@ import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -51,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 @Service
 public class SecurityService implements ISecurityService
@@ -67,6 +68,10 @@ public class SecurityService implements ISecurityService
 	/** The component. */
 	@ServiceComponent
 	protected IInternalAccess	component;
+	
+	/** The service id. */
+	@ServiceIdentifier
+	protected IServiceIdentifier sid;
 	
 	/** Flag to enable / disable password protection. */
 	protected boolean	usepass;
@@ -894,6 +899,17 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
+	 *  Get the certificate of a platform.
+	 *  @param cid The platform component identifier (null for own certificate).
+	 *  @return The certificate.
+	 */
+	public IFuture<Certificate> getPlatformCertificate(IComponentIdentifier cid)
+	{
+		return getCertificate(cid.getPlatformPrefix());
+	}
+
+	
+	/**
 	 *  Internal verify method that just checks if f-pubkey(content)=signed.
 	 */
 	protected boolean verifyCall(byte[] content, byte[] signed, Certificate cert)
@@ -916,23 +932,120 @@ public class SecurityService implements ISecurityService
 	/**
 	 * 
 	 */
-	protected IFuture<Certificate> getCertificate(String name)
+	protected IFuture<Certificate> getCertificate(final String name)
 	{
-		Future<Certificate> ret = new Future<Certificate>();
+		final Future<Certificate> ret = new Future<Certificate>();
 			
 		try
 		{
-			// todo: fetch cert from other platforms if unknown!
+			Certificate cert = null;
 			
-			Certificate cert = getKeyStore().getCertificate(name);
-			ret.setResult(cert);
-			
-			
-			// Internal format using
-			// byte[] enc = cert.getEncoded();
-		
-//			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-//		    Certificate cert = cf.generateCertificate(is);
+			// null can be used for own platform name
+			String prefix = component.getComponentIdentifier().getPlatformPrefix();
+			if(name==null || prefix.equals(name))
+			{
+				cert = getKeyStore().getCertificate(prefix);
+				ret.setResult(cert); // should never be null
+			}
+			else
+			{
+				cert = getKeyStore().getCertificate(name);
+				if(cert!=null)
+				{
+					ret.setResult(cert);
+				}
+				else
+				{
+					final int threshold = 1;
+					final IComponentIdentifier cid = new ComponentIdentifier(name);
+					
+					// Try to fetch certificate from other platforms
+					SServiceProvider.getServices(component.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+						.addResultListener(new IIntermediateResultListener<ISecurityService>()
+					{
+						protected int ongoing;
+						protected boolean finished;
+						protected List<Certificate> certs = new ArrayList<Certificate>();
+						
+						public void intermediateResultAvailable(ISecurityService ss)
+						{
+							ongoing++;
+							
+							if(!((IService)ss).getServiceIdentifier().equals(sid))
+							{
+								ss.getPlatformCertificate(cid).addResultListener(new IResultListener<Certificate>()
+								{
+									public void resultAvailable(Certificate cert)
+									{
+										certs.add(cert);
+										if(certs.size()>=threshold && !ret.isDone())
+										{
+											try
+											{
+												byte[] enc = certs.get(0).getEncoded();
+												boolean ok = true;
+												for(int i=1; i<certs.size() && ok; i++)
+												{
+													if(!Arrays.equals(enc, certs.get(i).getEncoded()))
+													{
+														ret.setException(new SecurityException("Received different certificates for: "+name));
+														ok = false;
+													}
+												}
+												if(ok)
+												{
+													ret.setResult(certs.get(0));
+												}
+											}
+											catch(Exception e)
+											{
+												ret.setException(new SecurityException("Certificate encoding error: "+name));
+											}
+										}
+										ongoing--;
+										checkFinish();
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										// ignore failures of getCertificate calls
+										ongoing--;
+										checkFinish();
+									}
+								});
+							}
+						}
+						
+						public void finished()
+						{
+							finished = true;
+							checkFinish();
+						}
+						
+						public void resultAvailable(Collection<ISecurityService> result)
+						{
+							for(ISecurityService ss: result)
+							{
+								intermediateResultAvailable(ss);
+							}
+							finished();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							finished();
+						}
+						
+						protected void checkFinish()
+						{
+							if(ongoing==0 && finished && !ret.isDone())
+							{
+								ret.setExceptionIfUndone(new SecurityException("Unable to retrieve certificate: "+name));
+							}
+						}
+					});
+				}
+			}
 		}
 		catch(Exception e)
 		{

@@ -57,7 +57,8 @@ public class STypeInfosAWT
 				{
 					byte[] buf = SGUI.imageToStandardBytes((Image) val, "image/png");
 					return new String(Base64.encode(buf));
-				} catch (Exception e)
+				} 
+				catch (Exception e)
 				{
 					// todo: use context report
 					throw new RuntimeException(e);
@@ -77,10 +78,10 @@ public class STypeInfosAWT
 
 		// Image
 		TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), new ObjectInfo(Image.class), new MappingInfo(null,
-				new AttributeInfo[]
-				{ new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
-						new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
-						new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, oclconv)) }, null));
+			new AttributeInfo[]{ 
+			new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
+			new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
+			new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, oclconv)) }, null));
 		typeinfos.add(ti_image);
 
 		// java.awt.Rectangle
