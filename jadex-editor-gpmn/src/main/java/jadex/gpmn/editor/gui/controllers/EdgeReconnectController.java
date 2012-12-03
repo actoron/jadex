@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.controllers;
 
 import jadex.gpmn.editor.gui.IControllerAccess;
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
@@ -26,13 +26,13 @@ import com.mxgraph.view.mxGraph;
 public class EdgeReconnectController implements mxIEventListener
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** Access to controllers. */
 	protected IControllerAccess controlleraccess;
 	
 	/** Creates a new edge reconnect controller. */
-	public EdgeReconnectController(IModelContainer container, IControllerAccess access)
+	public EdgeReconnectController(ModelContainer container, IControllerAccess access)
 	{
 		this.modelcontainer = container;
 		this.controlleraccess = access;

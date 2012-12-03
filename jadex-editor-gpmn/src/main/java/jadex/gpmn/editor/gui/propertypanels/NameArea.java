@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.model.visual.VElement;
 
 import java.awt.Color;
@@ -20,7 +20,7 @@ import javax.swing.event.DocumentEvent;
 public class NameArea extends JTextArea
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** The element. */
 	protected VElement velement;
@@ -30,7 +30,7 @@ public class NameArea extends JTextArea
 	 *  @param container The model container.
 	 *  @param visualelement The element.
 	 */
-	public NameArea(IModelContainer container, VElement visualelement)
+	public NameArea(ModelContainer container, VElement visualelement)
 	{
 		this.modelcontainer = container;
 		this.velement = visualelement;

@@ -1,6 +1,6 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IEdge;
 import jadex.gpmn.editor.model.gpmn.INode;
@@ -15,10 +15,10 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 public class DeletionController implements mxIEventListener
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** Creates a new edge reconnect controller. */
-	public DeletionController(IModelContainer container)
+	public DeletionController(ModelContainer container)
 	{
 		this.modelcontainer = container;
 	}

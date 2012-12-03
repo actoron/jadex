@@ -2,8 +2,8 @@ package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.BetterFileChooser;
 import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.ImageProvider;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 
 import java.awt.BorderLayout;
@@ -36,7 +36,7 @@ public class GpmnPropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param graph The graph.
 	 */
-	public GpmnPropertyPanel(IModelContainer container)
+	public GpmnPropertyPanel(ModelContainer container)
 	{
 		super(container);
 		setLayout(new BorderLayout());

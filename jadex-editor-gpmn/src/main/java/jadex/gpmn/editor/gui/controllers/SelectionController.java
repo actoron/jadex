@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.IViewAccess;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SPropertyPanelFactory;
 import jadex.gpmn.editor.model.visual.SequentialMarker;
 import jadex.gpmn.editor.model.visual.VGoal;
@@ -17,7 +17,7 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 public class SelectionController implements mxIEventListener
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** Access to the view. */
 	protected IViewAccess viewaccess;
@@ -25,7 +25,7 @@ public class SelectionController implements mxIEventListener
 	/**
 	 *  Creates the controller.
 	 */
-	public SelectionController(IModelContainer modelcontainer, IViewAccess viewaccess)
+	public SelectionController(ModelContainer modelcontainer, IViewAccess viewaccess)
 	{
 		this.modelcontainer = modelcontainer;
 		this.viewaccess = viewaccess;

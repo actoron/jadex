@@ -1,6 +1,6 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.visual.VEdge;
@@ -19,10 +19,10 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 public class ValueChangeController implements mxIEventListener
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** Creates a new edge creation controller. */
-	public ValueChangeController(IModelContainer container)
+	public ValueChangeController(ModelContainer container)
 	{
 		this.modelcontainer = container;
 	}

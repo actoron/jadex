@@ -1,6 +1,6 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
@@ -33,7 +33,7 @@ public class VirtualActivationEdgePropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public VirtualActivationEdgePropertyPanel(IModelContainer container, VVirtualActivationEdge vedge)
+	public VirtualActivationEdgePropertyPanel(ModelContainer container, VVirtualActivationEdge vedge)
 	{
 		super(container);
 		this.edge = vedge;

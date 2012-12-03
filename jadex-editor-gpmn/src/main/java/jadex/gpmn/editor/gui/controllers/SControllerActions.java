@@ -4,8 +4,8 @@ import jadex.gpmn.editor.gui.BetterFileChooser;
 import jadex.gpmn.editor.gui.GpmnGraph;
 import jadex.gpmn.editor.gui.GuiConstants;
 import jadex.gpmn.editor.gui.IControllerAccess;
-import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.IViewAccess;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SPropertyPanelFactory;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 import jadex.gpmn.editor.model.gpmn.IModelCodec;
@@ -46,7 +46,7 @@ public class SControllerActions
 	 *  @param sheet The style sheet.
 	 *  @return The controller.
 	 */
-	public static final void setStyle(IModelContainer container, mxStylesheet sheet)
+	public static final void setStyle(ModelContainer container, mxStylesheet sheet)
 	{
 		container.getGraph().setStylesheet(sheet);
 		container.getGraph().refresh();
@@ -58,7 +58,7 @@ public class SControllerActions
 	 *  @param parent Parent component.
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void exit(Component parent, IModelContainer modelcontainer)
+	public static final void exit(Component parent, ModelContainer modelcontainer)
 	{
 		if (checkUnsaved(parent, modelcontainer))
 		{
@@ -77,7 +77,7 @@ public class SControllerActions
 	public static final void newModel(Component parent,
 									  IViewAccess viewaccess,
 									  IControllerAccess controlleraccess,
-									  IModelContainer modelcontainer)
+									  ModelContainer modelcontainer)
 	{
 		if (checkUnsaved(parent, modelcontainer))
 		{
@@ -102,7 +102,7 @@ public class SControllerActions
 	public static final void openModel(Component parent,
 									  IViewAccess viewaccess,
 									  IControllerAccess controlleraccess,
-									  IModelContainer modelcontainer)
+									  ModelContainer modelcontainer)
 	{
 		BetterFileChooser fc = new BetterFileChooser();
 		FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file", "gpmn");
@@ -156,7 +156,7 @@ public class SControllerActions
 	 *  @param parent Parent component.
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void saveModel(Component parent, IModelContainer modelcontainer)
+	public static final void saveModel(Component parent, ModelContainer modelcontainer)
 	{
 		File file = modelcontainer.getFile();
 		if (file == null)
@@ -184,7 +184,7 @@ public class SControllerActions
 	 *  @param parent Parent component.
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void saveAsModel(Component parent, IModelContainer modelcontainer)
+	public static final void saveAsModel(Component parent, ModelContainer modelcontainer)
 	{
 		BetterFileChooser fc = new BetterFileChooser();
 		FileFilter filter = new FileNameExtensionFilter("GPMN intermediate model file (*.gpmn)", "gpmn");
@@ -241,7 +241,7 @@ public class SControllerActions
 	 *  @param controlleraccess Controller access.
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void exportModel(Component parent, IModelContainer modelcontainer)
+	public static final void exportModel(Component parent, ModelContainer modelcontainer)
 	{
 		BetterFileChooser fc = new BetterFileChooser();
 		FileFilter filter = new FileNameExtensionFilter("EPS file", "eps");
@@ -312,7 +312,7 @@ public class SControllerActions
 	 *  
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void applyCircleLayout(IModelContainer modelcontainer)
+	public static final void applyCircleLayout(ModelContainer modelcontainer)
 	{
 		mxCircleLayout layout = new mxCircleLayout(modelcontainer.getGraph());
 		layout.execute(modelcontainer.getGraph().getDefaultParent());
@@ -324,7 +324,7 @@ public class SControllerActions
 	 *  
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void applyTreeLayout(IModelContainer modelcontainer)
+	public static final void applyTreeLayout(ModelContainer modelcontainer)
 	{
 		mxCompactTreeLayout layout = new mxCompactTreeLayout(modelcontainer.getGraph());
 		layout.setEdgeRouting(false);
@@ -339,7 +339,7 @@ public class SControllerActions
 	 *  
 	 *  @param modelcontainer The model container.
 	 */
-	public static final void applyOrganicLayout(IModelContainer modelcontainer)
+	public static final void applyOrganicLayout(ModelContainer modelcontainer)
 	{
 		mxOrganicLayout layout = new mxOrganicLayout(modelcontainer.getGraph());
 		Object root = ((mxCell) modelcontainer.getGraph().getModel().getRoot()).getChildAt(0);
@@ -357,7 +357,7 @@ public class SControllerActions
 	/**
 	 *  Handles unsaved model deletions.
 	 */
-	protected static final boolean checkUnsaved(Component parent, IModelContainer modelcontainer)
+	protected static final boolean checkUnsaved(Component parent, ModelContainer modelcontainer)
 	{
 		boolean ret = true;
 		if (modelcontainer.isDirty())

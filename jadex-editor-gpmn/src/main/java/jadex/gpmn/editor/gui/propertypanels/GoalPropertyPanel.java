@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
 import jadex.gpmn.editor.model.gpmn.IPlanEdge;
@@ -42,7 +42,7 @@ public class GoalPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public GoalPropertyPanel(IModelContainer container, VGoal vgoal)
+	public GoalPropertyPanel(ModelContainer container, VGoal vgoal)
 	{
 		super(container);
 		this.goal = vgoal;

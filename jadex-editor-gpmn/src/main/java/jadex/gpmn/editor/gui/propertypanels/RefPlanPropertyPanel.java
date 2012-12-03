@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.DocumentAdapter;
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.visual.VPlan;
@@ -32,7 +32,7 @@ public class RefPlanPropertyPanel extends BasePropertyPanel
 	/**
 	 *  Creates a new goal property panel.
 	 */
-	public RefPlanPropertyPanel(IModelContainer container, VPlan vplan)
+	public RefPlanPropertyPanel(ModelContainer container, VPlan vplan)
 	{
 		super(container);
 		this.plan = vplan;

@@ -58,7 +58,7 @@ public class EditorWindow extends JFrame implements IControllerAccess, IViewAcce
 	protected JSplitPane viewpane;
 	
 	/** The model container */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** The group of tools. */
 	protected ButtonGroup toolgroup;

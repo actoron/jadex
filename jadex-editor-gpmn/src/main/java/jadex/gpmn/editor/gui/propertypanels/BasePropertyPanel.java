@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.propertypanels;
 
 import jadex.gpmn.editor.gui.GpmnGraph;
-import jadex.gpmn.editor.gui.IModelContainer;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.model.gpmn.IGpmnModel;
 
 import java.awt.Dimension;
@@ -26,13 +26,13 @@ import javax.swing.border.Border;
 public class BasePropertyPanel extends JPanel
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/**
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public BasePropertyPanel(IModelContainer container)
+	public BasePropertyPanel(ModelContainer container)
 	{
 		this.modelcontainer = container;
 	}

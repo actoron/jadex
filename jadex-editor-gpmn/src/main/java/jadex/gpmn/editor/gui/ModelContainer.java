@@ -10,7 +10,7 @@ import java.util.StringTokenizer;
 
 import com.mxgraph.swing.mxGraphComponent;
 
-public class ModelContainer implements IModelContainer
+public class ModelContainer
 {
 	/** The mode file. */
 	protected File file;

@@ -1,7 +1,7 @@
 package jadex.gpmn.editor.gui.controllers;
 
-import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.IViewAccess;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationEdge;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
@@ -27,13 +27,13 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 public class EdgeCreationController implements mxIEventListener
 {
 	/** The model container. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** Access to controllers. */
 	protected IViewAccess viewaccess;
 	
 	/** Creates a new edge creation controller. */
-	public EdgeCreationController(IModelContainer container, IViewAccess access)
+	public EdgeCreationController(ModelContainer container, IViewAccess access)
 	{
 		this.modelcontainer = container;
 		this.viewaccess = access;

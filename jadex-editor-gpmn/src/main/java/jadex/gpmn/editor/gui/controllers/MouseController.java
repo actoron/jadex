@@ -2,13 +2,13 @@ package jadex.gpmn.editor.gui.controllers;
 
 import jadex.gpmn.editor.gui.GuiConstants;
 import jadex.gpmn.editor.gui.IControllerAccess;
-import jadex.gpmn.editor.gui.IModelContainer;
 import jadex.gpmn.editor.gui.IViewAccess;
+import jadex.gpmn.editor.gui.ModelContainer;
 import jadex.gpmn.editor.gui.SGuiHelper;
 import jadex.gpmn.editor.model.gpmn.IActivationPlan;
-import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.gpmn.IGoal;
 import jadex.gpmn.editor.model.gpmn.IPlan;
+import jadex.gpmn.editor.model.gpmn.IRefPlan;
 import jadex.gpmn.editor.model.gpmn.ModelConstants;
 import jadex.gpmn.editor.model.visual.VEdge;
 import jadex.gpmn.editor.model.visual.VGoal;
@@ -42,7 +42,7 @@ import com.mxgraph.view.mxGraphView;
 public class MouseController extends MouseAdapter
 {
 	/** Access to the models. */
-	protected IModelContainer modelcontainer;
+	protected ModelContainer modelcontainer;
 	
 	/** Access to the controllers. */
 	protected IControllerAccess controlleraccess;
@@ -61,7 +61,7 @@ public class MouseController extends MouseAdapter
 	 * 
 	 *  @param container Access to the models.
 	 */
-	public MouseController(IModelContainer container, IControllerAccess controlleraccess, IViewAccess viewaccess)
+	public MouseController(ModelContainer container, IControllerAccess controlleraccess, IViewAccess viewaccess)
 	{
 		this.modelcontainer = container;
 		this.controlleraccess = controlleraccess;
