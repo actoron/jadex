@@ -38,7 +38,7 @@ if(peers.length>0)
 {
 	for(int i=0; i<peers.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
 	{
-		if(peers[i].getPosition()!=null)
+		if(peers[i].getPosition()!=null && !positions.contains(peers[i].getPosition()))
 		{
 			if(i<25)
 			{
@@ -60,7 +60,7 @@ if(peers.length>0)
 				markers.append(peers[i].getPosition());
 				positions.add(peers[i].getPosition());
 			}
-			else if(!positions.contains(infos[i].getPosition()))
+			else
 			{
 				// Add unlabelled markers for each unique position of remaining entries
 				markers.append("|");
@@ -78,7 +78,7 @@ if(infos.length>0)
 {
 	for(int i=0; i<infos.length && markers.length()+250<2048; i++)	// hack!!! make sure url length stays below 2048 character limit. 
 	{
-		if(infos[i].getPosition()!=null)
+		if(infos[i].getPosition()!=null && !positions.contains(infos[i].getPosition()))
 		{
 			if(i<9)
 			{
@@ -100,7 +100,7 @@ if(infos.length>0)
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
 			}
-			else if(!positions.contains(infos[i].getPosition()))
+			else
 			{
 				// Add unlabelled markers for each unique position of remaining entries
 				markers.append("|");

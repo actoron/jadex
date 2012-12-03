@@ -525,13 +525,14 @@ public class RelayHandler
 	{
 		try
 		{
-//			System.out.println("Sending platform infos to peer: "+peer.getUrl());
+			peer.addDebugText("Sending platform infos to peer: "+infos.length);
 			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
-			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
-//			System.out.println("Sent platform infos.");
+			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peer.getUrl()), new byte[][]{peerinfo});
+			peer.addDebugText("Sent platform infos.");
 		}
 		catch(IOException e)
 		{
+			peer.addDebugText("Error sending platform infos to peer: "+e);
 			getLogger().warning("Error sending platform infos to peer: "+e);
 		}					
 	}

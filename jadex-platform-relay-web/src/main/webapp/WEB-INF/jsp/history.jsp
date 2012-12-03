@@ -20,7 +20,7 @@ if(infos.length>0)
 	{
 		if(infos[i].getPosition()!=null)
 		{
-			if(i<9)
+			if(i<9 && !positions.contains(infos[i].getPosition()))
 			{
 				// Add labelled markers for first 1..9 entries
 				markers.append("&markers=");
@@ -36,7 +36,7 @@ if(infos.length>0)
 				markers.append(infos[i].getPosition());
 				positions.add(infos[i].getPosition());
 			}
-			else if(!positions.contains(infos[i].getPosition()))
+			else
 			{
 				// Add unlabelled markers for each unique position of remaining entries
 				markers.append("|");
