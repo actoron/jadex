@@ -1,4 +1,4 @@
-Thetwo scripts allow installing Jadex Pro as Windows service.
+The two scripts allow installing Jadex Pro as Windows service.
 Use install_service.bat to install and start the service.
 Use delete_service.bat to stop and uninstall the service.
 

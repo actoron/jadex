@@ -110,6 +110,8 @@ public class PeerList
 			}
 		}
 		
+		debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
+		
 		// Todo: check that specified url is valid and connects to this server.
 		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
 			? RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL)) : "";
@@ -122,8 +124,6 @@ public class PeerList
 				addPeer(stok.nextToken().trim(), true);
 			}
 		}
-		
-		debug	= "true".equals(props.getProperty(PROPERTY_DEBUG));
 	}
 	
 	/**
