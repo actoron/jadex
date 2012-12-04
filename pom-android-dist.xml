@@ -179,6 +179,7 @@
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bpmn</module>
+				<module>jadex-model-bpmn</module>
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-platform</module>
 				<module>jadex-platform-extension-webservice</module>
