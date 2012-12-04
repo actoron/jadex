@@ -57,6 +57,14 @@ public abstract class CallAccess	extends ServiceCall
 	{
 		return INVOCATIONS.get();
 	}
+	
+	/**
+	 *  Reset the invocation data for the next service call.
+	 */
+	public static void	setNextInvocation(ServiceCall call)
+	{
+		INVOCATIONS.set(call);
+	}
 
 	/**
 	 *  Reset the invocation data for the next service call.

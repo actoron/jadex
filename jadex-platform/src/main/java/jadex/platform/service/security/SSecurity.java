@@ -1,5 +1,7 @@
 package jadex.platform.service.security;
 
+import jadex.commons.SUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,17 +9,24 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.security.interfaces.DSAKey;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.RSAKey;
 import java.util.Date;
 
+import javax.crypto.interfaces.DHKey;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -62,15 +71,45 @@ public class SSecurity
 			{
 				if(fis!=null)
 					fis.close();
-				if(!loaded)
+				if(!loaded || !ks.containsAlias(alias))
 					initKeystore(ks, storepath, storepass, keypass, alias);
 			}
 			return ks;
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Get keystore from a given file.
+	 */
+	public static void saveKeystore(KeyStore keystore, String storepath, String storepass)
+	{
+		FileOutputStream fos = null;
+		try
+		{
+			fos = new FileOutputStream(storepath);
+			keystore.store(fos, storepass.toCharArray());
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			if(fos!=null)
+			{
+				try
+				{
+					fos.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 	}
 	
@@ -99,21 +138,15 @@ public class SSecurity
 		    ks.setKeyEntry(alias, keys.getPrivate(), keypass.toCharArray(),  
 		    	new java.security.cert.Certificate[]{c});  
 		    
-		    FileOutputStream output = null;
-		    try
-		    {
-		    	output = new FileOutputStream(storepath);
-		    	ks.store(output, storepass.toCharArray());
-		    }
-		    finally
-		    {
-		    	if(output!=null)
-		    		output.close();
-		    }
+		    saveKeystore(ks, storepath, storepass);
     	}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -282,7 +315,49 @@ public class SSecurity
     	engine.update(content); // clone() ?
     	return engine.verify(sig); // clone() ?
     }
+    
+    /**
+	 * Get the digest of a message as a formatted String.
+	 */
+	public static String getHexMessageDigest(byte[] data, String type)
+	{
+		try
+		{
+			MessageDigest mdig = MessageDigest.getInstance(type);
+			byte[] fp = mdig.digest(data);
+			return SUtil.hex(fp, ":", 1);
+		}
+		catch(NoSuchAlgorithmException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Get the key length.
+	 */
+	public static int getKeyLength(Key key)
+	{
+		int ret = -1;
+		
+		if(key instanceof RSAKey)
+		{
+			ret = ((RSAKey)key).getModulus().bitLength();
+		}
+		else if(key instanceof DSAKey)
+		{
+			ret = ((DSAKey)key).getParams().getP().bitLength();
+		}
+		else if(key instanceof DHKey)
+		{
+			ret = ((DHKey)key).getParams().getP().bitLength();
+		}
+//		else if(key instanceof ECKey)
+//		{
+//		}
 
+		return ret;
+	}
 	
 	/**
 	 *  Main for testing.

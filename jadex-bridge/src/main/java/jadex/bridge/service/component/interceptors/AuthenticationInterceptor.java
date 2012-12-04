@@ -109,7 +109,7 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 	/**
 	 *  Check the authentication.
 	 */
-	protected IFuture<Void> createAuthentication(ServiceInvocationContext context)
+	protected IFuture<Void> createAuthentication(final ServiceInvocationContext context)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -131,8 +131,7 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 						System.out.println("Signed: "+SUtil.arrayToString(signed));
 						
 						// get service call meta object and set the timeout
-						ServiceCall call = ServiceCall.getInvocation();
-						call.setProperty(Authenticated.AUTHENTICATED, signed);		
+						context.getServiceCall().setProperty(Authenticated.AUTHENTICATED, signed);		
 						ret.setResult(null);
 					}
 				});

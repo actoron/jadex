@@ -9,6 +9,8 @@ import jadex.commons.future.IFuture;
 import java.security.cert.Certificate;
 import java.util.Map;
 
+import javax.swing.KeyStroke;
+
 /**
  *  The security service is responsible for
  *  validating (remote) requests.
@@ -25,6 +27,10 @@ import java.util.Map;
 })
 public interface ISecurityService
 {
+	public static final String CERTIFICATE = "certificate";
+	public static final String TRUSTED_CERTIFICATE = "trusted_certificate";
+	public static final String KEYPAIR = "keypair";
+	
 	//-------- password management --------
 	
 	/**
@@ -182,5 +188,18 @@ public interface ISecurityService
 	 *  @return The certificate.
 	 */
 	public IFuture<Certificate> getPlatformCertificate(IComponentIdentifier cid);
+	
+	/**
+	 *  Get info about the current keystore that is used.
+	 */
+	@SecureTransmission
+	public IFuture<Map<String, KeyStoreEntry>> getKeystoreDetails();
+	
+	/**
+	 *  Remove a key store entry.
+	 *  @param String alias The alias name.
+	 */
+	@SecureTransmission
+	public IFuture<Void> removeKeyStoreEntry(String alias);
 
 }

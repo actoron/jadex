@@ -20,6 +20,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Base64;
 import jadex.commons.IPropertiesProvider;
@@ -47,6 +48,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -54,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
 
 @Service
 public class SecurityService implements ISecurityService
@@ -130,7 +133,8 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, String[] networknames, String[] networkpasses)
+	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
+		String[] networknames, String[] networkpasses)
 	{
 		this.platformpasses	= new LinkedHashMap<String, String>();
 		this.networkpasses	= new LinkedHashMap<String, String>();
@@ -355,6 +359,8 @@ public class SecurityService implements ISecurityService
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Save keystore on disk
+		if(keystore!=null)
+			SSecurity.saveKeystore(keystore, storepath, storepass);
 		
 		// Save settings
 		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -382,6 +388,21 @@ public class SecurityService implements ISecurityService
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the keystore.
+	 */
+	protected KeyStore getKeyStore()
+	{
+		if(keystore==null)
+		{
+			// Fetch keystore and possible auto-generate self-signed certificate
+			String name = component.getComponentIdentifier().getPlatformPrefix();
+			this.keystore = SSecurity.getKeystore(storepath, storepass, keypass, name);
+		}
+		
+		return keystore;
 	}
 	
 	//-------- password management --------
@@ -621,6 +642,10 @@ public class SecurityService implements ISecurityService
 			this.storepass = storepass;
 		if(keypass!=null)
 			this.keypass = keypass;
+		
+		// reset keystore
+		this.keystore = null;
+		
 		return IFuture.DONE;
 	}
 
@@ -817,22 +842,6 @@ public class SecurityService implements ISecurityService
 		return IFuture.DONE;
 	}
 	
-	
-	/**
-	 * 
-	 */
-	protected KeyStore getKeyStore()
-	{
-		if(keystore==null)
-		{
-			// Fetch keystore and possible auto-generate self-signed certificate
-			String name = component.getComponentIdentifier().getPlatformPrefix();
-			this.keystore = SSecurity.getKeystore(storepath, storepass, keypass, name);
-		}
-		
-		return keystore;
-	}
-	
 	/**
 	 *  Sign a byte[] with the platform key that is stored in the
 	 *  keystore under the platform prefix name.
@@ -911,7 +920,77 @@ public class SecurityService implements ISecurityService
 	{
 		return getCertificate(cid.getPlatformPrefix());
 	}
+	
+	/**
+	 *  Get info about the current keystore that is used.
+	 */
+	public IFuture<Map<String, KeyStoreEntry>> getKeystoreDetails()
+	{
+		Future<Map<String, KeyStoreEntry>> ret = new Future<Map<String, KeyStoreEntry>>();
+		Map<String, KeyStoreEntry> res = new HashMap<String, KeyStoreEntry>();
+		
+		try
+		{
+			KeyStore ks = getKeyStore();
+			Enumeration<String> en = ks.aliases();
+			while(en.hasMoreElements())
+			{
+				String alias = en.nextElement();
+			
+				KeyStoreEntry kse = new KeyStoreEntry();
+				
+				if(ks.isCertificateEntry(alias))
+				{
+					kse.setType(ISecurityService.CERTIFICATE);
+					kse.setDetails(ks.getCertificateChain(alias));
+//					kse.setDetails(ks.getCertificate(alias));
+				}
+				else if(!ks.isKeyEntry(alias) && ks.getCertificateChain(alias)!=null 
+					&& ks.getCertificateChain(alias).length!=0)
+				{
+					kse.setType(ISecurityService.TRUSTED_CERTIFICATE);
+					kse.setDetails(ks.getCertificateChain(alias));
+				}
+				else 
+				{
+					kse.setType(ISecurityService.KEYPAIR);
+					Certificate[] certs = ks.getCertificateChain(alias);
+					kse.setDetails(certs);
+				}
 
+				kse.setAlias(alias);
+				kse.setDate(ks.getCreationDate(alias).getTime());
+				
+				res.put(alias, kse);
+			}
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		ret.setResult(res);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove a key store entry.
+	 *  @param String alias The alias name.
+	 */
+	public IFuture<Void> removeKeyStoreEntry(String alias)
+	{
+		try
+		{
+			KeyStore ks = getKeyStore();
+			ks.deleteEntry(alias);
+			return IFuture.DONE;
+		}
+		catch(Exception e)
+		{
+			return new Future<Void>(e);
+		}
+	}
 	
 	/**
 	 *  Internal verify method that just checks if f-pubkey(content)=signed.

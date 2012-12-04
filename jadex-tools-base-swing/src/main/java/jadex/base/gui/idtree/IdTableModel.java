@@ -193,6 +193,22 @@ public class IdTableModel<T, E>	extends DefaultTableModel
 		refresh();
 	}
 	
+	/**
+	 *  Remove all objects.
+	 */
+	public void removeAll()
+	{
+		table.clearSelection();
+		
+		int size = obs.size();
+		obs.clear();
+		
+		if(size>0)
+			fireTableRowsDeleted(0, size-1);
+		
+		refresh();
+	}
+	
 	public void setValueAt(Object val, int row, int column)
 	{
 	}

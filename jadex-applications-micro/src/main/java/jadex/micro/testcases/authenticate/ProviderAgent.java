@@ -18,14 +18,10 @@ import jadex.micro.annotation.ProvidedServices;
 @Service
 public class ProviderAgent implements ITestService
 {
-//	@Agent
-//	protected MicroAgent agent;
-	
 	/**
 	 *  Call a method that must use a secure
 	 *  transport under the hood.
 	 */
-//	@Authenticated("Lars-PC")
 	@Authenticated("VSISSTAFF17")
 	public IFuture<Void> method(String msg)
 	{

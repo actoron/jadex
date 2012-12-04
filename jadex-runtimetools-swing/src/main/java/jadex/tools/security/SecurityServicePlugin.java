@@ -41,7 +41,7 @@ public class SecurityServicePlugin extends AbstractServicePlugin
 	public IFuture<IAbstractViewerPanel> createServicePanel(IService service)
 	{
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
-		final SecuritySettings ss = new SecuritySettings();
+		final SecuritySettingsPanel ss = new SecuritySettingsPanel();
 		ss.init(getJCC(), service).addResultListener(new ExceptionDelegationResultListener<Void, IAbstractViewerPanel>(ret)
 		{
 			public void customResultAvailable(Void result)

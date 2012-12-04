@@ -152,7 +152,8 @@ public class ServiceInvocationContext
 		this.calleradapter	= IComponentAdapter.LOCAL.get();
 		
 		ServiceCall	call	= CallAccess.getNextInvocation();
-		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
+//		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
+		Map<String, Object> props = call!=null ? call.getProperties() : new HashMap<String, Object>();
 		if(!props.containsKey(ServiceCall.TIMEOUT))
 		{
 			props.put(ServiceCall.TIMEOUT, new Long(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			

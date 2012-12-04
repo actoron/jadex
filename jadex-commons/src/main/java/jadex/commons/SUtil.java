@@ -89,7 +89,7 @@ public class SUtil
 	public static final String		NULL					= "NULL";
 
 	/** Simple date format. */
-    public static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm MM dd yyyy");
+    public static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
 	
 	/**
@@ -3015,6 +3015,29 @@ public class SUtil
 	public static String hex(char ch) 
 	{
 		return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
+	}
+	
+	/**
+	 *  Convert a byte array to a string representation.
+	 */
+	public static String hex(byte[] data)
+	{
+		return hex(data, null, 1);
+	}
+	
+	/**
+	 *  Convert a byte array to a string representation.
+	 */
+	public static String hex(byte[] data, String delim, int block)
+	{
+		StringBuffer ret = new StringBuffer();
+		for(int i=0; i<data.length; i++) 
+		{
+		    ret.append(String.format("%02X", data[i]));
+		    if(delim!=null && i+1<data.length && (i+1)%block==0)
+		    	ret.append(delim);
+		}
+		return ret.toString();
 	}
 	
 	/**

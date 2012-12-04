@@ -45,11 +45,12 @@ public class ServiceCall
 	protected ServiceCall(IComponentIdentifier caller, Map<String, Object> props)
 	{
 		this.caller	= caller;
-		this.properties = new HashMap<String, Object>();
-		properties.put(TIMEOUT, new Long(-1)); // todo: refactor that
+		this.properties = props!=null? props: new HashMap<String, Object>();
+		if(!properties.containsKey(TIMEOUT))
+			properties.put(TIMEOUT, new Long(-1)); // todo: refactor that
 		
-		if(props!=null)
-			properties.putAll(props);
+//		if(props!=null)
+//			properties.putAll(props);
 		
 //		System.err.println("call: "+this);
 //		Thread.dumpStack();
