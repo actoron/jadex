@@ -44,8 +44,9 @@ public class LoadOreTask extends AbstractTask {
 
 		IVector2 loc = (IVector2) obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2 tloc = (IVector2) target.getProperty(Space2D.PROPERTY_POSITION);
-		if (!loc.equals(tloc))
-			throw new RuntimeException("Not at location: " + obj + ", " + target);
+		double r = 0.05;
+		if(loc.getDistance(tloc).getAsDouble()>r)
+			throw new RuntimeException("Not at location: "+obj+", "+target);
 
 		String targetcapprop = load ? ProduceOreTask.PROPERTY_CAPACITY : AnalyzeTargetTask.PROPERTY_ORE;
 

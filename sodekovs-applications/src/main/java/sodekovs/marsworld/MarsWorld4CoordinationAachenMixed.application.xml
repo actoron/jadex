@@ -23,6 +23,7 @@
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>		
 		<import>sodekovs.marsworld.carry.*</import>
+		<import>sodekovs.marsworld.microcarry.*</import>
 		<import>sodekovs.marsworld.producer.*</import>
 		<import>sodekovs.marsworld.sentry.*</import>
 		<import>sodekovs.marsworld.movement.*</import>		
@@ -55,7 +56,7 @@
 	 
 	<extensiontypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">					
-				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/marsworld/coordination/MarsWorldCoordinationAachen.dynamics.xml"</env:property>				
+				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/marsworld/coordination/MarsWorldCoordinationAachenMixed.dynamics.xml"</env:property>				
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
@@ -64,6 +65,9 @@
 
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D"
 			width="1" height="1">
+			<env:property name="targetradius" class="double">0.05</env:property>
+			<env:property name="border">Space2D.BORDER_STRICT</env:property>
+		    
 			<env:objecttypes>
 				<env:objecttype name="target">
 					<env:property name="ore">0</env:property>
@@ -80,7 +84,7 @@
 					<env:property name="speed">0.1</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
-				<env:objecttype name="carry">
+				<env:objecttype name="microcarry">
 					<env:property name="vision">0.07</env:property>
 					<env:property name="speed">0.15</env:property>
 					<env:property name="ore">0</env:property>
@@ -128,14 +132,15 @@
 					objecttype="sentry" />
 				<env:avatarmapping componenttype="Producer"
 					objecttype="producer" />
-				<env:avatarmapping componenttype="Carry"
-					objecttype="carry" />
+				<env:avatarmapping componenttype="MicroCarry"
+					objecttype="microcarry" />
 				<env:avatarmapping componenttype="ClientSimulator"
 					objecttype="clientSimulator" />
 			</env:avatarmappings>
 
 			<env:tasktypes>
 				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="micromove" class="MicroMoveTask"/>
 				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
 				<env:tasktype name="produce" class="ProduceOreTask" />
 				<env:tasktype name="load" class="LoadOreTask" />
@@ -212,7 +217,7 @@
 					</env:drawable>
 
 					<!-- Carry -->
-					<env:drawable objecttype="carry" width="0.07" height="0.07">
+					<env:drawable objecttype="microcarry" width="0.07" height="0.07">
 						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
 						<env:ellipse layer="1" size="visionsize" abssize="true"
 							color="#FAFA1E32" />
@@ -255,8 +260,8 @@
 			filename="sodekovs/marsworld/sentry/Sentry.agent.xml" />
 		<componenttype name="Producer"
 			filename="sodekovs/marsworld/producer/Producer.agent.xml" />
-		<componenttype name="Carry"
-			filename="sodekovs/marsworld/carry/Carry.agent.xml" />
+		<componenttype name="MicroCarry"
+			filename="sodekovs/marsworld/microcarry/MicroCarryAgent.class" />
 		<componenttype name="ClientSimulator"
 			filename="jadex/simulation/client/ClientSimulator.agent.xml" />
 	</componenttypes>
@@ -329,7 +334,7 @@
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />
 				<component type="Producer" number="$args.NumberOfProducers" />
-				<component type="Carry" number="$args.NumberOfCarries" />			
+				<component type="MicroCarry" number="$args.NumberOfCarries" />			
 			</components>
 		</configuration>
 	
@@ -391,7 +396,7 @@
 			</extensions>
 			<components>
 				<component type="Producer" number="$args.NumberOfProducers" />
-				<component type="Carry" number="$args.NumberOfCarries" />			
+				<component type="MicroCarry" number="$args.NumberOfCarries" />			
 			</components>
 		</configuration>	
 			
