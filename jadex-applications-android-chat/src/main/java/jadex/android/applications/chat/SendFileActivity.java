@@ -5,24 +5,15 @@ import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.platform.service.cms.IntermediateResultListener;
-
-import java.io.FileInputStream;
-import java.util.List;
-
-import org.h2.value.Transfer;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,12 +23,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class SendFileActivity extends Activity implements ServiceConnection, ChatEventListener
 {
