@@ -15,14 +15,15 @@
 		<activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter"/>
 		<service android:name="AndroidChatService" android:label="AndroidChatService"/>
 		
-		<activity android:name="JadexAndroidChatActivity">
+		<activity android:name=".JadexAndroidChatActivity"
+		    android:launchMode="singleTask">
 		    <intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		
-		<activity android:name="SendFileActivity">
+		<activity android:name=".filetransfer.SendFileActivity">
 		    <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
@@ -37,7 +38,13 @@
             </intent-filter>
 		</activity>
 		
-		<activity android:name="TransferActivity"/>
+		<activity android:name=".filetransfer.TransferActivity"
+		    android:launchMode="singleTask">
+<!-- 		    android:parentActivityName="JadexAndroidChatActivity"> -->
+ 		    <meta-data 
+		        android:name="android.support.PARENT_ACTIVITY"
+		        android:value=".JadexAndroidChatActivity"/>
+		    </activity>
 	</application>
 	
 </manifest>

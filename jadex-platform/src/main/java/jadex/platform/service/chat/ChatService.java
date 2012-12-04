@@ -1201,6 +1201,8 @@ public class ChatService implements IChatService, IChatGuiService
 			if(ret!=null)
 			{
 				ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
+			} else {
+				e.printStackTrace();
 			}
 		}
 	}

@@ -1,7 +1,7 @@
-package jadex.android.applications.chat;
+package jadex.android.applications.chat.filetransfer;
 
-import java.text.DateFormat;
-
+import jadex.android.applications.chat.R;
+import jadex.android.applications.chat.filetransfer.TransferInfoItemWidget.TransferInfoViewHolder;
 import jadex.bridge.service.types.chat.TransferInfo;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -47,59 +47,10 @@ public class TransferInfoArrayAdapter extends ArrayAdapter<TransferInfo>
 		}
 
 		TransferInfo ti = getItem(position);
-		
-		int totalSize = (int) (ti.getSize()/sizeDisplayFactor);
-		int doneSize = (int) (ti.getDone()/sizeDisplayFactor);
-		int speed = (int) (ti.getSpeed()/sizeDisplayFactor);
-		
-		viewHolder.txtEta.setText(getETA(ti));
-		viewHolder.progressBar.setMax(totalSize);
-		viewHolder.progressBar.setProgress(doneSize);
-		viewHolder.txtFileName.setText(ti.getFileName());
-		viewHolder.txtPeer.setText(ti.getOther().getLocalName());
-		viewHolder.txtSize.setText(""+totalSize);
-		viewHolder.txtSpeed.setText(""+speed);
-		viewHolder.txtState.setText(ti.getState());
-		viewHolder.txtUpDown.setText(ti.isDownload() ? "v" : "^");
-		
+
+		viewHolder.updateFrom(ti);
+
 		return convertView;
 	}
-	
-	private String getETA(TransferInfo ti) {
-		String ret;
-		if(TransferInfo.STATE_TRANSFERRING.equals(ti.getState()))
-		{
-			long	time	= (long)((ti.getSize()-ti.getDone())/ti.getSpeed());
-			long	hrs	= time / 3600;
-			long	min	= time % 3600 / 60;
-			long	sec	= time % 60;
-			ret	= hrs + ":" + (min<10 ? "0"+min : min) + ":" + (sec<10 ? "0"+sec : sec);
-		}
-		else if(ti.getTimeout()>0)
-		{
-			long	time	= (ti.getTimeout()-System.currentTimeMillis())/1000;
-			ret	= time>0 ? Long.toString(time) : "0";
-		}
-		else
-		{
-			ret	= "";
-		}
-		return ret;
-	}
-	
-	private static class TransferInfoViewHolder {
-
-		public TextView txtUpDown;
-		public TextView txtState;
-		public TextView txtSpeed;
-		public TextView txtSize;
-		public ProgressBar progressBar;
-		public TextView txtPeer;
-		public TextView txtFileName;
-		public TextView txtEta;
-		
-	}
-	
-	
 
 }

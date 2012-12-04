@@ -1,5 +1,6 @@
 package jadex.android.applications.chat;
 
+import jadex.android.applications.chat.filetransfer.TransferActivity;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -24,16 +25,30 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Binding;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.widget.Toast;
 
 /**
@@ -54,9 +69,17 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 
 	private Handler uiHandler;
 
+	private Map<String, TransferInfo> transfers;
+
+	private Map<String, Integer> transferNotifications;
+
+	private Queue<ChatEvent> newMessages;
+
+	private NotificationHelper notificationHelper;
+
 	public interface ChatEventListener
 	{
-		public void eventReceived(ChatEvent ce);
+		public boolean eventReceived(ChatEvent ce);
 
 		public void chatConnected();
 	}
@@ -67,11 +90,22 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 	{
 		super();
 		listeners = new HashSet<AndroidChatService.ChatEventListener>();
+		transfers = new HashMap<String, TransferInfo>();
+		
+		newMessages = new LinkedList<ChatEvent>();
+
 		setPlatformAutostart(true);
 		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
 		setPlatformOptions("-awareness true -niotcptransport false");
 
 		uiHandler = new Handler();
+	}
+
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		notificationHelper = new NotificationHelper(this);
 	}
 
 	/**
@@ -95,6 +129,17 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 			public void addChatEventListener(ChatEventListener l)
 			{
 				listeners.add(l);
+				if (isConnected()) {
+					l.chatConnected();
+				}
+				for (ChatEvent ce : newMessages.toArray(new ChatEvent[newMessages.size()]))
+				{
+					boolean eventReceived = l.eventReceived(ce);
+					if (eventReceived)
+					{
+						newMessages.remove(ce);
+					}
+				}
 			}
 
 			@Override
@@ -121,6 +166,35 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 				return AndroidChatService.this.getTransfers();
 			}
 
+			@Override
+			public IFuture<Void> acceptFileTransfer(TransferInfo ti)
+			{
+				return AndroidChatService.this.acceptFileTransfer(ti);
+			}
+
+			@Override
+			public IFuture<Void> rejectFileTransfer(TransferInfo ti)
+			{
+				return AndroidChatService.this.rejectFileTransfer(ti);
+			}
+
+			@Override
+			public IFuture<Void> cancelFileTransfer(TransferInfo ti)
+			{
+				return AndroidChatService.this.cancelFileTransfer(ti);
+			}
+
+			@Override
+			public boolean isConnected()
+			{
+				return (AndroidChatService.this.platform != null);
+			}
+			
+			@Override
+			public void shutdown() {
+				AndroidChatService.this.stopPlatforms();
+				stopSelf();
+			}
 		};
 	}
 
@@ -132,6 +206,7 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 		{
 			subscription.terminate();
 		}
+		notificationHelper.discardAll();
 	}
 
 	private IFuture<Void> subscribe()
@@ -152,7 +227,7 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 								{
 									public void intermediateResultAvailable(ChatEvent ce)
 									{
-										publishEvent(ce);
+										informChatEvent(ce);
 									}
 
 								});
@@ -198,13 +273,35 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 		}
 	}
 
-	private void publishEvent(ChatEvent ce)
+	private void informChatEvent(ChatEvent ce)
 	{
+		boolean eventProcessed = false;
 		for (ChatEventListener l : listeners)
 		{
-			l.eventReceived(ce);
+			eventProcessed = l.eventReceived(ce) || eventProcessed;
+		}
+		processEvent(ce, eventProcessed);
+	}
+
+	private void processEvent(ChatEvent ce, boolean alreadyProcessed)
+	{
+		if (ce.getType().equals(ChatEvent.TYPE_FILE))
+		{
+			TransferInfo ti = (TransferInfo) ce.getValue();
+			notificationHelper.createOrUpdateFileNotification(ti, ce.getNick());
+
+		} else if (ce.getType().equals(ChatEvent.TYPE_MESSAGE) && !alreadyProcessed)
+		{
+			newMessages.offer(ce);
+			String m = (String) ce.getValue();
+			notificationHelper.showMessageNotification(m, ce.getNick(), newMessages.size());
+
+		} else
+		{
+			// state change
 		}
 	}
+
 
 	// ----------- IAndroidChatService methods -----------
 
@@ -311,6 +408,54 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 	private IFuture<Void> sendFile(String path, ChatUser user)
 	{
 		return chatgui.sendFile(path, user.getSid().getProviderId());
+	}
+
+	private IFuture<Void> acceptFileTransfer(TransferInfo ti)
+	{
+		setDownloadPath(ti);
+		return chatgui.acceptFile(ti.getId(), ti.getFilePath());
+	}
+
+	private IFuture<Void> rejectFileTransfer(TransferInfo ti)
+	{
+		return chatgui.rejectFile(ti.getId());
+	}
+
+	private IFuture<Void> cancelFileTransfer(TransferInfo ti)
+	{
+		return chatgui.cancelTransfer(ti.getId());
+	}
+	
+	// ----- HELPER --------
+
+	private static void setDownloadPath(TransferInfo ti)
+	{
+		File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+		if (!downloadDir.exists())
+		{
+			downloadDir.mkdir();
+		}
+
+		String fName = new File(downloadDir, ti.getFileName()).getAbsolutePath();
+		if (new File(fName).exists())
+		{
+
+			Pattern p = Pattern.compile("(.*?)(\\(\\d+\\))?(\\.\\w*)?");
+			do
+			{
+				Matcher m = p.matcher(fName);
+				if (m.matches())
+				{// group 1 is the prefix, group 2 is the number, group 3 is the
+					// suffix
+					fName = m.group(1) + (m.group(2) == null ? "(1)" : "(" + (Integer.parseInt(m.group(2).replaceAll("\\D", "")) + 1) + ")")
+							+ (m.group(3) == null ? "" : m.group(3));
+				}
+			} while (new File(fName).exists());// repeat until a new filename is
+												// generated
+		}
+
+		ti.setFilePath(fName);
 	}
 
 }

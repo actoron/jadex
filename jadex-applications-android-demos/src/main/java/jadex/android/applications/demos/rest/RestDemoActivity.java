@@ -113,15 +113,8 @@ public class RestDemoActivity extends JadexAndroidActivity
 	protected void onPlatformStarted(IExternalAccess result)
 	{
 		super.onPlatformStarted(result);
-		runOnUiThread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				startComponent("ChartProviderComponent", "jadex/android/applications/demos/rest/ChartProvider.component.xml").addResultListener(
-						componentCreatedResultListener);
-			}
-		});
+		startComponent("ChartProviderComponent", "jadex/android/applications/demos/rest/ChartProvider.component.xml").addResultListener(
+				componentCreatedResultListener);
 	}
 
 	private IResultListener<IComponentIdentifier> componentCreatedResultListener = new DefaultResultListener<IComponentIdentifier>()

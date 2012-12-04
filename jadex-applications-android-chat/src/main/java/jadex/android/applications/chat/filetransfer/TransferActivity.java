@@ -1,15 +1,24 @@
-package jadex.android.applications.chat;
+package jadex.android.applications.chat.filetransfer;
 
+import jadex.android.applications.chat.AndroidChatService;
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
+import jadex.android.applications.chat.IAndroidChatService;
+import jadex.android.applications.chat.JadexAndroidChatActivity;
+import jadex.android.applications.chat.R;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.TransferInfo;
+import jadex.commons.future.DefaultResultListener;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -23,6 +32,11 @@ import android.widget.Button;
 public class TransferActivity extends ListActivity implements ServiceConnection, ChatEventListener
 {
 
+	public static final String EXTRA_KEY_TRANSFERINFO = "EXTRA_TRANSFERINFO";
+	public static final String EXTRA_KEY_OTHERNICK = "OTHERNICK";
+	public static final String EXTRA_KEY_METHOD = "EXTRA_METHOD";
+	public static final String EXTRA_METHOD_CREATE = "accept";
+	
 	private IAndroidChatService service;
 	private TransferInfoArrayAdapter adapter;
 	private Button refreshButton;
@@ -63,18 +77,27 @@ public class TransferActivity extends ListActivity implements ServiceConnection,
 	{
 		service = (IAndroidChatService) binder;
 		service.addChatEventListener(this);
-		refreshTransfers();
 	}
 
 	@Override
 	public void onServiceDisconnected(ComponentName name)
 	{
+		service.removeMessageListener(this);
 		service = null;
 	}
 
 	@Override
 	public void chatConnected()
 	{
+		String method = getIntent().getStringExtra(EXTRA_KEY_METHOD);
+		if (method != null) {
+			if (EXTRA_METHOD_CREATE.equals(method)) {
+				TransferInfo ti = (TransferInfo) getIntent().getSerializableExtra(EXTRA_KEY_TRANSFERINFO);
+				String nick = getIntent().getStringExtra(EXTRA_KEY_OTHERNICK);
+				showAcceptFileDialog(ti, nick);
+			}
+		}
+
 		new Thread(new Runnable()
 		{
 			
@@ -87,9 +110,11 @@ public class TransferActivity extends ListActivity implements ServiceConnection,
 	}
 	
 	@Override
-	public void eventReceived(ChatEvent ce)
+	public boolean eventReceived(ChatEvent ce)
 	{
+		boolean eventProcessed = false;
 		if (ce.getType().equals(ChatEvent.TYPE_FILE)) {
+			eventProcessed = true;
 			TransferInfo ti = (TransferInfo) ce.getValue();
 			TransferInfo existingTi = transfers.get(ti.getId());
 			if (existingTi != null) {
@@ -107,10 +132,13 @@ public class TransferActivity extends ListActivity implements ServiceConnection,
 						adapter.notifyDataSetInvalidated();
 					}
 				});
+			} else if (ti.getState().equals(TransferInfo.STATE_WAITING)) {
+				showAcceptFileDialog(ti, ce.getNick());
 			} else {
 				refreshTransfers();
 			}
 		}
+		return eventProcessed;
 	}
 
 	protected void refreshTransfers()
@@ -132,6 +160,67 @@ public class TransferActivity extends ListActivity implements ServiceConnection,
 			}
 		});
 	}
+	
+	private void showAcceptFileDialog(final TransferInfo ti, String nick)
+	{
+		if (ti.getState().equals(TransferInfo.STATE_WAITING))
+		{
+			final Builder builder = new AlertDialog.Builder(TransferActivity.this);
+			builder.setTitle("Incoming Filetransfer");
+			builder.setMessage(nick + " wants to send you " + ti.getFileName() + ".\n" + "Do you want to download this file?");
+			builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					service.acceptFileTransfer(ti).addResultListener(new DefaultResultListener<Void>()
+					{
+
+						@Override
+						public void resultAvailable(Void result)
+						{
+							runOnUiThread(new Runnable()
+							{
+
+								@Override
+								public void run()
+								{
+//									refreshTransfers();
+								}
+							});
+						}
+
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							super.exceptionOccurred(exception);
+						}
+
+					});
+				}
+
+			});
+			builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					service.rejectFileTransfer(ti);
+				}
+			});
+			
+			runOnUiThread(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					builder.create().show();
+				}
+			});
+		}
+	}
+
 	
 	private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener()
 	{

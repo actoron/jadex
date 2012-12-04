@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.chat;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import jadex.bridge.IComponentIdentifier;
@@ -8,7 +9,7 @@ import jadex.commons.SUtil;
 /**
  *  Information about a requested, ongoing or completed file transfer.
  */
-public class TransferInfo
+public class TransferInfo implements Serializable
 {
 	//-------- constants --------
 	

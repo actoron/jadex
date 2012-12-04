@@ -3,6 +3,8 @@ package jadex.android.applications.chat;
 import java.io.FileInputStream;
 
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
+import jadex.android.applications.chat.filetransfer.SendFileActivity;
+import jadex.android.applications.chat.filetransfer.TransferActivity;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.TransferInfo;
@@ -17,6 +19,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -64,7 +68,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 		listView = (ListView) findViewById(R.id.chat_listView);
 		chatEventAdapter = new ChatEventArrayAdapter(this);
 		listView.setAdapter(chatEventAdapter);
-
+		startService(new Intent(this, AndroidChatService.class));
 	}
 
 	@Override
@@ -79,9 +83,39 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	protected void onPause()
 	{
 		super.onPause();
-		unbindService(this); // remove this to stay connected
+		if (service != null) {
+			service.removeMessageListener(this);
+		}
+		unbindService(this);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		menu.add(Menu.NONE,0,Menu.NONE,"Shutdown Chat").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(Menu.NONE,1,Menu.NONE,"Show Transfers").setIcon(android.R.drawable.ic_menu_share);
+		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		case 0:
+			service.shutdown();
+			finish();	
+			break;
+		case 1:
+			startActivity(new Intent(this, TransferActivity.class));
+			break;
+		default:
+			break;
+		}
+		
+		return true;
+	}
+	
 	OnClickListener onSendMessageClickListener = new OnClickListener()
 	{
 		public void onClick(View v)
@@ -141,6 +175,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 			@Override
 			public void run()
 			{
+				setProgressBarIndeterminateVisibility(false);
 				sendButton.setEnabled(b);
 				messageEditText.setEnabled(b);
 			}
@@ -155,10 +190,12 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	}
 
 	@Override
-	public void eventReceived(final ChatEvent event)
+	public boolean eventReceived(final ChatEvent event)
 	{
+		boolean processed = false;
 		if (event.getType().equals(ChatEvent.TYPE_MESSAGE))
 		{
+			processed = true;
 			runOnUiThread(new Runnable()
 			{
 				@Override
@@ -167,56 +204,14 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 					chatEventAdapter.add(event);
 				}
 			});
-		} else if (event.getType().equals(ChatEvent.TYPE_FILE))
-		{
-			final TransferInfo ti = (TransferInfo) event.getValue();
-			if (ti.getState().equals(TransferInfo.STATE_WAITING))
-			{
-				runOnUiThread(new Runnable()
-				{
-
-					@Override
-					public void run()
-					{
-						Builder builder = new AlertDialog.Builder(JadexAndroidChatActivity.this);
-						builder.setTitle("Incoming Filetransfer");
-						builder.setMessage(event.getNick() + " wants to send you " + ti.getFileName() + ".\n" + "Do you want to download this file?");
-						builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-								startActivity(new Intent(JadexAndroidChatActivity.this, TransferActivity.class));
-							}
-
-						});
-						builder.setNegativeButton("No", new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-							}
-						});
-						builder.create().show();
-					}
-				});
-			}
-		}
+		} 
+		return processed;
 	}
 
 	@Override
 	public void chatConnected()
 	{
 		setConnected(true);
-		runOnUiThread(new Runnable()
-		{
-
-			@Override
-			public void run()
-			{
-				setProgressBarIndeterminateVisibility(false);
-			}
-		});
 	}
 
 	// -------- helper methods --------
