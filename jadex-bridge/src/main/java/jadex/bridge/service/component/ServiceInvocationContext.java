@@ -1,6 +1,9 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.service.BasicServiceContainer;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -112,6 +115,9 @@ public class ServiceInvocationContext
 	/** The stack of used interceptors. */
 	protected List used;
 	
+	/** The service call. */
+	protected ServiceCall	call;
+	
 	/** The caller component. */
 	protected IComponentIdentifier caller;
 	
@@ -121,15 +127,19 @@ public class ServiceInvocationContext
 	/** The platform identifier. */
 	protected IComponentIdentifier platform;
 	
+	/** The flag if local timeouts should be realtime. */
+	protected boolean realtime;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
-	public ServiceInvocationContext(Object proxy, IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform)
+	public ServiceInvocationContext(Object proxy, Method method, IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, boolean realtime)
 	{
 		this.platform = platform;
 		this.proxy = proxy;
+		this.realtime	= realtime;
 		this.object = new ArrayList();
 		this.method = new ArrayList();
 		this.arguments = new ArrayList();
@@ -140,6 +150,18 @@ public class ServiceInvocationContext
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
 		this.calleradapter	= IComponentAdapter.LOCAL.get();
+		
+		ServiceCall	call	= CallAccess.getNextInvocation();
+		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
+		if(!props.containsKey(ServiceCall.TIMEOUT))
+		{
+			props.put(ServiceCall.TIMEOUT, new Long(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			
+		}
+		if(!props.containsKey(ServiceCall.REALTIME))
+		{
+			props.put(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
+		}
+		this.call	= CallAccess.createServiceCall(caller, props);
 	}
 	
 	/**
@@ -147,6 +169,8 @@ public class ServiceInvocationContext
 	 */
 	public ServiceInvocationContext(ServiceInvocationContext context)
 	{
+		this.call	= context.call;
+		this.realtime	= context.realtime;
 		this.platform = context.platform;
 		this.proxy = context.proxy;
 		this.object = new ArrayList(context.object);
@@ -499,6 +523,11 @@ public class ServiceInvocationContext
 	public String toString()
 	{
 		return "ServiceInvocationContext(method="+method+", caller="+caller+")";
+	}
+
+	public ServiceCall	getServiceCall()
+	{
+		return call;
 	}
 }
 

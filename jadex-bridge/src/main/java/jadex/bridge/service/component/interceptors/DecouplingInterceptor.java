@@ -87,9 +87,6 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The argument copy allowed flag. */
 	protected boolean copy;
 	
-	/** The realtime local timeout flag. */
-	protected boolean realtime;
-	
 	/** The marshal service. */
 	protected IMarshalService marshal;
 	
@@ -101,12 +98,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingInterceptor(IExternalAccess ea, IComponentAdapter adapter, boolean copy, boolean realtime)
+	public DecouplingInterceptor(IExternalAccess ea, IComponentAdapter adapter, boolean copy)
 	{
 		this.ea = ea;
 		this.adapter = adapter;
 		this.copy = copy;
-		this.realtime = realtime;
 //		System.out.println("copy: "+copy);
 	}
 	
@@ -237,32 +233,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 //			|| sic.getMethod().getReturnType().equals(void.class);
 
-		ServiceCall sc = CallStack.getInvocation();
-		long to = sc!=null? sc.getTimeout(): BasicServiceContainer.getMethodTimeout(
-			sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
-		boolean rt = sc!=null && sc.getRealtime()!=null? rt = sc.getRealtime().booleanValue(): realtime;
-		
-		Map<String, Object> props = sc!=null? new HashMap<String, Object>(sc.getProperties()): new HashMap<String, Object>();
-		props.put(ServiceCall.TIMEOUT, new Long(to));
-		props.put(ServiceCall.REALTIME, rt? Boolean.TRUE: Boolean.FALSE);
-		
-		// Remove meta info about current invocation if call is local
-		// In remote case it is removed in remote invocation handler
-		if(!callrem)
-		{
-			CallStack.removeInvocation();
-		}
 		
 		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
-//			CallStack.push(IComponentIdentifier.LOCAL.get(), to, rt);
-			CallStack.push(IComponentIdentifier.LOCAL.get(), props);
 //			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 
 //				new CopyReturnValueResultListener(ret, sic)));
-			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
-			CallStack.pop();
+			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		else
 		{
@@ -270,8 +248,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				System.out.println("decouple: "+Thread.currentThread());
 //			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, rt))
 //				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
-			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), props))
-				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
+			ea.scheduleStep(new InvokeMethodStep(sic))
+				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		
 		return ret;
@@ -383,23 +361,15 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		/** The service invocation context. */
 		protected ServiceInvocationContext	sic;
 		
-		/** The timeout. */
-		protected long timeout;
-		
-		/** The realtime. */
-		protected boolean realtime;
-		
 		//-------- constructors --------
 		
 		/**
 		 *  Create a result listener.
 		 */
-		protected CopyReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic, long timeout, boolean realtime)
+		protected CopyReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic)
 		{
 			super(future);
 			this.sic = sic;
-			this.timeout = timeout;
-			this.realtime = realtime;
 		}
 		
 		//-------- IResultListener interface --------
@@ -525,9 +495,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
-//					long to = BasicServiceContainer.getMethodTimeout(
-//						sic.getObject().getClass().getInterfaces(), method, sic.isRemoteCall());
-//					System.out.println("local timeout is: "+to+" "+method.getName());
+					long	timeout	= sic.getServiceCall().getTimeout();
+					boolean	realtime	= sic.getServiceCall().getRealtime();
+					
 					if(timeout>=0)
 					{
 						if(fut instanceof IIntermediateFuture)
@@ -603,22 +573,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	public static class InvokeMethodStep implements IComponentStep<Void>
 	{
 		protected ServiceInvocationContext sic;
-		protected IComponentIdentifier caller;
-		protected IComponentAdapter adapter;
-		protected Map<String, Object> props;
-//		protected long timeout;
-//		protected boolean realtime;
 
 		/**
 		 *  Create an invoke method step.
 		 */
-		public InvokeMethodStep(ServiceInvocationContext sic, IComponentIdentifier caller, Map<String, Object> props)//long timeout, boolean realtime)
+		public InvokeMethodStep(ServiceInvocationContext sic)
 		{
 			this.sic = sic;
-			this.caller = caller;
-			this.props = props;
-//			this.timeout	= timeout;
-//			this.realtime	= realtime;
 		}
 
 		/**
@@ -628,8 +589,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{					
 			IFuture<Void> ret;
 			
-//			CallStack.push(caller, timeout, realtime);
-			CallStack.push(caller, props);
+			CallAccess.setServiceCall(sic.getServiceCall());
 			
 			try
 			{
@@ -642,7 +602,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				ret	= new Future<Void>(e);
 			}
 			
-			CallStack.pop();
+			CallAccess.resetServiceCall();
 			
 			return ret;
 		}

@@ -1212,7 +1212,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
 					rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-					getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader());
+					getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader(), isRealtime());
 				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 			else

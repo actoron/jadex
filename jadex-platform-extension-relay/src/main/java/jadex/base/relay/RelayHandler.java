@@ -299,6 +299,10 @@ public class RelayHandler
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
 				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true);
 			}
+			else
+			{
+				sendPlatformInfo(info);
+			}
 	//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 			for(int i=0; i<items.size(); i++)
 			{

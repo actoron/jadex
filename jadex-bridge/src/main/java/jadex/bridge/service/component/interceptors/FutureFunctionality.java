@@ -201,9 +201,9 @@ public class FutureFunctionality
 	/**
 	 * 
 	 */
-	public static Future getDelegationFuture(Class<?> clazz, final FutureFunctionality func)
+	public static Future<?> getDelegationFuture(Class<?> clazz, final FutureFunctionality func)
 	{
-		Future ret = null;
+		Future<?> ret = null;
 		
 		if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, clazz))
 		{

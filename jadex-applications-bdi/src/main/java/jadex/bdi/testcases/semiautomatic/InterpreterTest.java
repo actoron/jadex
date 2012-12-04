@@ -116,7 +116,7 @@ class ComponentAdapter implements IComponentAdapter
 	
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
-		container = new ComponentServiceContainer(this, "platform", null);
+		container = new ComponentServiceContainer(this, "platform", null, false);
 		// Todo: move test to somewhere more useful? (jadex-launch?)
 		// Todo: actually test something useful...
 //		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);

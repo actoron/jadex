@@ -78,7 +78,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The parameter copy allowed flag. */
 	protected boolean copy;
 
-	/** The flag is local timeouts should be realtime. */
+	/** The flag if local timeouts should be realtime. */
 	protected boolean realtime;
 	
 	/** The result listener. */
@@ -436,7 +436,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	public IServiceContainer createServiceContainer()
 	{
 		assert container==null;
-		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess());
+		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime());
 	}
 	
 	/**

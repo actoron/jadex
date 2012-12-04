@@ -4,10 +4,11 @@ import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.component.interceptors.CallStack;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
@@ -217,20 +218,18 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
-		Map<String, Object> props = getNonFunctionalProperties();
-		CallStack.getInvocation(props);
-		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
 		IComponentIdentifier.LOCAL.set(caller);
 		IComponentAdapter.LOCAL.set(null);	// No adapter for remote component.
+		Map<String, Object> props = getNonFunctionalProperties();
+		
+		ServiceCall.getInvocation(props);
 		
 		invokeMethod(ret, rsms);
 		
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		IComponentAdapter.LOCAL.set(ada);
-		
-		CallStack.removeInvocation();
 		
 		return ret;
 	}

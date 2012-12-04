@@ -1,38 +1,16 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Calls a methods on an object and returns the result.
  */
 public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 {
-	//-------- attributes --------
-	
-	/** The realtime timeout flag. */
-	protected boolean	realtime;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a method invocation interceptor.
-	 */
-	public MethodInvocationInterceptor()
-	{
-		// Todo real time!?
-		this.realtime	= false;
-	}
-	
 	//-------- methods --------
 	
 	/**
@@ -43,24 +21,10 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 	{
 		try
 		{
-			boolean	setcaller	= false;
-			if(!Proxy.isProxyClass(sic.getObject().getClass()) && ServiceCall.getCurrentInvocation()==null)
-				// && sic.getMethod().getName().indexOf("Area")!=-1)
-			{
-				long to = BasicServiceContainer.getMethodTimeout(
-					sic.getObject().getClass().getInterfaces(), sic.getMethod(), sic.isRemoteCall());
-				Map<String, Object> props = new HashMap<String, Object>();
-				props.put(ServiceCall.TIMEOUT, new Long(to));
-				props.put(ServiceCall.REALTIME, realtime? Boolean.TRUE: Boolean.FALSE);
-				CallStack.push(IComponentIdentifier.LOCAL.get(), props);
-//				CallStack.push(IComponentIdentifier.LOCAL.get(), to, realtime);
-				setcaller	= true;
-			}			
+			CallAccess.setServiceCall(sic.getServiceCall());
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
-			if(setcaller)
-			{
-				CallStack.pop();
-			}
+			CallAccess.resetNextInvocation();
+			CallAccess.resetServiceCall();
 			sic.setResult(res);
 		}
 		catch(Exception e)

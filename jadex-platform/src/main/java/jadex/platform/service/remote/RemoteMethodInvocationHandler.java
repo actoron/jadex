@@ -12,7 +12,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.component.interceptors.CallStack;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -96,18 +95,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
 	
-//		if(method.getName().indexOf("schedule")!=-1)
-//		System.out.println("step: "+method.getName());
-		
 		ProxyInfo pi = pr.getProxyInfo();
 		
 		// Get the current service invocation 
-		ServiceCall invoc = CallStack.getInvocation();
-		CallStack.removeInvocation();
+		ServiceCall invoc = ServiceCall.getCurrentInvocation();
 		
 		// Get method timeout
 		final long to = invoc!=null && invoc.getTimeout()!=-1? invoc.getTimeout(): pi.getMethodTimeout(method);
 		// The reatime property is not necessary, as currently message are sent with realtime timeouts always  
+		
+//		if(method.getName().indexOf("schedule")!=-1)
+//		System.out.println("step: "+method.getName()+", "+invoc);
 		
 		// Get the secure transmission
 		boolean sec = pi.isSecure(method);

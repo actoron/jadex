@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.bridge.service.annotation.Timeout;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,13 +34,6 @@ public class ServiceCall
 	/** The calling component. */
 	protected IComponentIdentifier	caller;
 	
-//	/** The timeout value (if any). */
-//	protected long	timeout;
-//	
-//	/** The flag indicating if the timeout is given as system time (true)
-//	 *  or platform time (false). */
-//	protected Boolean realtime;
-	
 	/** The service call properties. */
 	protected Map<String, Object> properties;
 	
@@ -56,20 +50,9 @@ public class ServiceCall
 		
 		if(props!=null)
 			properties.putAll(props);
-	}
-	
-	/**
-	 *  Create a service call.
-	 */
-	protected static ServiceCall createServiceCall(IComponentIdentifier caller, 
-		long timeout, Boolean realtime, Map<String, Object> props)
-	{
-		if(props==null)
-			props = new HashMap<String, Object>();
-		props.put(TIMEOUT, new Long(timeout));
-		if(realtime!=null)
-			props.put(REALTIME, realtime);
-		return createServiceCall(caller, props);
+		
+//		System.err.println("call: "+this);
+//		Thread.dumpStack();
 	}
 	
 	/**
@@ -126,6 +109,10 @@ public class ServiceCall
 		{
 			ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), props);
 			INVOCATIONS.set(ret);
+		}
+		else if(props!=null)
+		{
+			ret.properties.putAll(props);
 		}
 		return ret;
 	}

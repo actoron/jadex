@@ -47,7 +47,7 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	 */
 	public RemoteServiceContainer(IComponentIdentifier remotecid, IComponentAdapter adapter, IInternalAccess instance)
 	{
-		super(adapter, "remote", instance);
+		super(adapter, "remote", instance, true);
 		this.adapter = adapter;
 		this.componentid = remotecid;
 	}

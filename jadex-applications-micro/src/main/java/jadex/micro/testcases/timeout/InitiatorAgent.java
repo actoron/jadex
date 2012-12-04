@@ -6,7 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.CallStack;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -198,7 +198,8 @@ public class InitiatorAgent extends TestAgent
 					call.setTimeout(to);
 					call.setRealtime(Boolean.TRUE);
 					call.setProperty("extra", "somval");
-				}
+				}				
+				
 				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
@@ -209,9 +210,10 @@ public class InitiatorAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(CallStack.getInvocation()!=null)
+						ServiceCall	next	= CallAccess.getNextInvocation();
+						if(next!=null)
 						{
-							tr.setFailed("User inocation data still available: "+CallStack.getInvocation());
+							tr.setFailed("User invocation data still available: "+next);
 						}
 						else if(exception instanceof TimeoutException)
 						{

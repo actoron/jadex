@@ -67,15 +67,19 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The result. */
 	protected Object result;
 	
+	/** The realtime flag for call timeouts. */
+	protected boolean	realtime;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new required service fetcher.
 	 */
-	public DefaultServiceFetcher(IServiceProvider provider, IExternalAccess access)
+	public DefaultServiceFetcher(IServiceProvider provider, IExternalAccess access, boolean realtime)
 	{
 		this.access	= access;
 		this.provider = provider;
+		this.realtime	= realtime;
 	}
 	
 	//-------- methods --------
@@ -813,7 +817,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							{
 //								System.out.println("createProxy 2:"+service);
 								return new Future<T>((T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, 
-									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding));
+									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime));
 							}
 						});
 						fut.addResultListener(new DelegationResultListener<T>(ret));

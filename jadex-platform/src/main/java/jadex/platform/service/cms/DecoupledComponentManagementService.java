@@ -1870,7 +1870,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				if(ii!=null)
 				{
 //					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
-					IComponentIdentifier caller = ServiceCall.getCurrentInvocation().getCaller();
+					IComponentIdentifier caller = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getCaller() : null;
 					if(internal || (ii.getAdapter()!=null && caller!=null && cid.equals(caller.getParent())))
 					{
 //						System.out.println("getExternalAccess: not delayed");
