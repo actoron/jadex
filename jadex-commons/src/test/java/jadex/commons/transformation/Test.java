@@ -1005,14 +1005,14 @@ public abstract class Test extends TestCase
 		doWriteAndRead(obj);
 	}
 	
-	/**
-	 *  Test reading / writing tuple2.
-	 */
-	public void	testCertificate() throws Exception
-	{
-		// todo: ? how to avoid dependencies to impl
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Test reading / writing tuple2.
+//	 */
+//	public void	testCertificate() throws Exception
+//	{
+//		// todo: ? how to avoid dependencies to impl
+//		throw new UnsupportedOperationException();
+//	}
 	
 	/**
 	 *  Get some bean.
