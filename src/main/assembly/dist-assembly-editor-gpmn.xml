@@ -1,6 +1,6 @@
 <assembly>
 
-	<id>editorbpmndist</id>
+	<id>editorgpmndist</id>
 	
 	<formats>
 		<format>zip</format>
@@ -53,9 +53,9 @@
 
 	<files>
 		<file>
-			<source>jadex-editor-bpmn/target/jadex-editor-bpmn-${project.version}-jar-with-dependencies.jar</source>
+			<source>jadex-editor-gpmn/target/jadex-editor-gpmn-${project.version}-jar-with-dependencies.jar</source>
 			<outputDirectory>/</outputDirectory>
-			<destName>jadex-editor-bpmn-${project.version}.jar</destName>
+			<destName>jadex-editor-gpmn-${project.version}.jar</destName>
 		</file>
 		<!-- <file>
 			<source>docs/readme.txt</source>
@@ -63,16 +63,16 @@
 			<filtered>true</filtered>
 		</file> -->
 		<file>
-			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt</source>
+			<source>jadex-editor-gpmn/src/main/java/jadex/gpmn/editor/gpl-3.0.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
-			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING</source>
+			<source>jadex-editor-gpmn/src/main/java/jadex/gpmn/editor/COPYING</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		
 		<file>
-			<source>pom-editor-bpmn-dist.xml</source>
+			<source>pom-editor-gpmn-dist.xml</source>
 			<outputDirectory>sources</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
@@ -80,19 +80,19 @@
 		<!-- ======== files required for building the distribution ======== -->
 		
 		<file>
-		    <source>src/main/assembly/dist-assembly-editor-bpmn.xml</source>
+		    <source>src/main/assembly/dist-assembly-editor-gpmn.xml</source>
 		    <outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>
-			<source>pom-editor-bpmn-dist.xml</source>
+			<source>pom-editor-gpmn-dist.xml</source>
 			<outputDirectory>sources</outputDirectory>
 		</file>
 		<file>
-			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt</source>
+			<source>jadex-editor-gpmn/src/main/java/jadex/gpmn/editor/gpl-3.0.txt</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 		<file>
-			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING</source>
+			<source>jadex-editor-gpmn/src/main/java/jadex/gpmn/editor/COPYING</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
 	</files>
