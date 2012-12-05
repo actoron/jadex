@@ -132,10 +132,20 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			{
 				MActivity act = (MActivity) e;
 				VNode parent = null;
-				Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
-				if (spem.containsKey(act.getId()))
+				
+				if (act.isEventHandler())
 				{
-					parent = (VNode) vmap.get(spem.get(act.getId()).getId());
+					Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
+					parent = (VNode) vmap.get(ehpm.get(act.getId()));
+				}
+				
+				if (parent == null)
+				{
+					Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
+					if (spem.containsKey(act.getId()))
+					{
+						parent = (VNode) vmap.get(spem.get(act.getId()).getId());
+					}
 				}
 				
 				if (parent == null)

@@ -6,13 +6,9 @@ import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MLane;
-import jadex.bpmn.model.MPool;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -20,14 +16,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JScrollBar;
 import javax.swing.Timer;
 
-import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
@@ -77,87 +70,17 @@ public class MouseController extends MouseAdapter
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
 			if (cell == null && ModelContainer.EDIT_MODE_POOL.equals(mode))
 			{
-				VPool vpool = new VPool(modelcontainer.getGraph());
-				vpool.setGeometry(new mxGeometry(p.getX(), p.getY(), BpmnStylesheetColor.DEFAULT_POOL_WIDTH, BpmnStylesheetColor.DEFAULT_POOL_HEIGHT));
-				MPool mpool = new MPool();
-				mpool.setId(modelcontainer.getIdGenerator().generateId());
-				mpool.setName("Pool");
-				modelcontainer.getBpmnModel().addPool(mpool);
-				vpool.setBpmnElement(mpool);
-				
-				modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
-				
-				modelcontainer.getGraph().getModel().beginUpdate();
-				modelcontainer.getGraph().addCell(vpool);
-				modelcontainer.getGraph().getModel().endUpdate();
-				modelcontainer.setDirty(true);
+				SCreationController.createPool(modelcontainer, p);
 			}
 			else if (ModelContainer.EDIT_MODE_LANE.equals(mode) &&
 					(cell instanceof VPool || cell instanceof VLane))
 			{
-				// Special treatment for lanes, only add to pools, do not add to pools with stuff in it.
-				VPool vpool = null;
-				if (cell instanceof VPool)
-				{
-					vpool = (VPool) cell;
-				}
-				else
-				{
-					vpool = (VPool) ((VLane) cell).getParent();
-				}
-				
-				VLane vlane = new VLane(modelcontainer.getGraph());
-				vlane.setGeometry(new mxGeometry(0, 0, BpmnStylesheetColor.DEFAULT_POOL_WIDTH, BpmnStylesheetColor.DEFAULT_POOL_HEIGHT));
-				MLane mlane = new MLane();
-				mlane.setName("Lane");
-				mlane.setId(modelcontainer.getIdGenerator().generateId());
-				((MPool) vpool.getBpmnElement()).addLane(mlane);
-				vlane.setBpmnElement(mlane);
-				
-				boolean moveelements = (!vpool.hasLanes()) && vpool.getChildCount() > 0;
-				
-				modelcontainer.getGraph().getModel().beginUpdate();
-				
-				modelcontainer.getGraph().addCell(vlane, vpool);
-				if (moveelements)
-				{
-					// Move pool elements to new lane.
-					List<VElement> movablechildren = new ArrayList<VElement>();
-					for (int i = 0; i < vpool.getChildCount(); ++i)
-					{
-						if (!(vpool.getChildAt(i) instanceof VLane))
-						{
-							movablechildren.add((VElement) vpool.getChildAt(i));
-						}
-					}
-					
-					MPool mpool = (MPool) vpool.getBpmnElement();
-					VElement[] movele = movablechildren.toArray(new VElement[movablechildren.size()]);
-					for (int i = 0; i < movele.length; ++i)
-					{
-						MIdElement melement = movele[i].getBpmnElement();
-						if (melement instanceof MActivity)
-						{
-							mpool.removeActivity((MActivity) melement);
-							mlane.addActivity((MActivity) melement);
-						}
-						
-						modelcontainer.getGraph().moveCells(new Object[] { movele[i] }, 0, 0, false, vlane, null);
-					}
-					
-					/*modelcontainer.getGraph().removeCells(movele);
-					modelcontainer.getGraph().addCells(movele, vlane);*/
-				}
-				
-				modelcontainer.getGraph().getModel().endUpdate();
-				//modelcontainer.getGraph().getStacklayout().execute(modelcontainer.getGraph().getDefaultParent());
-				modelcontainer.getGraphComponent().refresh();
-				
-				modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+				SCreationController.createLane(modelcontainer, cell);
 			}
 			else if (ModelContainer.ACTIVITY_MODES.contains(mode) || mode.contains("Event"))
 			{
 				SCreationController.createActivity(modelcontainer, mode, cell, p);
+				modelcontainer.getGraphComponent().doLayout();
 			}
 			else if (cell == null)
 			{
@@ -210,6 +133,7 @@ public class MouseController extends MouseAdapter
 						}
 						
 						modelcontainer.getGraph().refreshCellView(vactivity);
+						modelcontainer.setDirty(true);
 					}
 				}
 			}

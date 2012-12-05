@@ -29,25 +29,38 @@ import com.mxgraph.util.mxEventObject;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
+/**
+ *  Edge controller for creating and managing edges.
+ *
+ */
 public class EdgeController extends mxConnectionHandler
 {
-	/** Really commit flag. */
+	/** Really commit flag. Hack? */
 	protected boolean reallycommit = false;
 	
+	/**
+	 *  Creates the edge controller.
+	 *  @param graphcomponent The graph component.
+	 */
 	public EdgeController(BpmnGraphComponent graphcomponent)
 	{
 		super(graphcomponent);
 	}
 	
+	/**
+	 *  Creates the preview.
+	 */
 	protected mxConnectPreview createConnectPreview()
 	{
 		return new BpmnConnectPreview(graphComponent);
 	}
 	
+	/**
+	 *  Validates a connection.
+	 */
 	public String validateConnection(Object source, Object target)
 	{
 		String ret = super.validateConnection(source, target);
-		
 		if (ret == null)
 		{
 			if ((source instanceof VActivity && target instanceof VActivity))
@@ -67,6 +80,13 @@ public class EdgeController extends mxConnectionHandler
 		return ret;
 	}
 	
+	/**
+	 *  Creates a connection.
+	 *  
+	 *  @param src Source object.
+	 *  @param tgt Target object.
+	 *  @return Created edge.
+	 */
 	public mxICell createConnection(Object src, Object tgt)
 	{
 		ModelContainer modelcontainer = ((BpmnGraph) graphComponent.getGraph()).getModelContainer();
@@ -75,6 +95,12 @@ public class EdgeController extends mxConnectionHandler
 		mxICell target = (mxICell) tgt;
 		if (source instanceof VActivity && target instanceof VActivity)
 		{
+			if (src.equals(tgt) &&
+				System.currentTimeMillis() - ((BpmnConnectPreview) connectPreview).timestamp < 2000)
+			{
+				((BpmnGraph) graphComponent.getGraph()).refreshCellView((mxICell) src);
+				return null;
+			}
 			MSequenceEdge medge = new MSequenceEdge();
 			medge.setId(modelcontainer.getIdGenerator().generateId());
 			
@@ -99,6 +125,9 @@ public class EdgeController extends mxConnectionHandler
 		return ret;
 	}
 	
+	/**
+	 *  Called when mouse is released.
+	 */
 	public void mouseReleased(final MouseEvent e)
 	{
 		if (connectPreview != null && connectPreview.getPreviewState() != null && ((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(false) == null)
@@ -135,22 +164,37 @@ public class EdgeController extends mxConnectionHandler
 		}
 	}
 	
+	/**
+	 *  Edge creation preview.
+	 *
+	 */
 	protected class BpmnConnectPreview extends mxConnectPreview
 	{
 		/** Time stamp of drag start. */
 		protected long timestamp;
 		
+		/**
+		 *  Creates a new preview.
+		 *  @param graphcomponent The graph component.
+		 */
 		public BpmnConnectPreview(mxGraphComponent graphcomponent)
 		{
 			super(graphcomponent);
 		}
 		
-		public void start(MouseEvent e, mxCellState startState, String style)
+		/**
+		 *  Updates mouse position.
+		 */
+		public void update(MouseEvent e, mxCellState targetState, double x,
+				double y)
 		{
+			super.update(e, targetState, x, y);
 			timestamp = System.currentTimeMillis();
-			super.start(e, startState, style);
 		}
 		
+		/**
+		 *  Stops operation.
+		 */
 		public Object stop(boolean commit, MouseEvent e)
 		{
 			Object result = (sourceState != null) ? sourceState.getCell() : null;

@@ -45,7 +45,14 @@ public class VActivity extends VNamedNode
 				}
 				else if (at.startsWith("EventIntermediate"))
 				{
-					ret += "_INTERMEDIATE";
+					if (((MActivity) getBpmnElement()).isEventHandler())
+					{
+						ret += "_BOUNDARY";
+					}
+					else
+					{
+						ret += "_INTERMEDIATE";
+					}
 				}
 				else
 				{
@@ -75,7 +82,14 @@ public class VActivity extends VNamedNode
 			if (getParent() != null)
 			{
 				VNode oldparent = (VNode) getParent();
-				if (oldparent instanceof VLane)
+				if (mactivity.isEventHandler())
+				{
+					MActivity mparent = (MActivity) ((VActivity) oldparent).getBpmnElement();
+					mparent.removeEventHandler(mactivity);
+					mactivity.setLane(null);
+					mactivity.setPool(null);
+				}
+				else if (oldparent instanceof VLane)
 				{
 					((MLane) ((VLane) oldparent).getBpmnElement()).removeActivity(mactivity);
 					mactivity.setLane(null);
@@ -96,7 +110,14 @@ public class VActivity extends VNamedNode
 			}
 			if (parent != null)
 			{
-				if (parent instanceof VLane)
+				if (mactivity.isEventHandler())
+				{
+					MActivity mparent = (MActivity) ((VActivity) parent).getBpmnElement();
+					mparent.addEventHandler(mactivity);
+					mactivity.setPool(mparent.getPool());
+					mactivity.setLane(mactivity.getLane());
+				}
+				else if (parent instanceof VLane)
 				{
 					((MLane) ((VLane) parent).getBpmnElement()).addActivity(mactivity);
 					mactivity.setLane((MLane) ((VLane) parent).getBpmnElement());

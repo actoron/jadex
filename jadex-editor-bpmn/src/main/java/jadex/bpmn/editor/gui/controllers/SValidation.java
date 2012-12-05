@@ -63,8 +63,8 @@ public class SValidation
 						return "Activities transferred between pools cannot have sequence edges."; 
 					}
 					
-					if (msubproc.getActivities() != null &&
-						!msubproc.getActivities().contains(mactivity) &&
+					if (!(msubproc.getActivities() != null &&
+						msubproc.getActivities().contains(mactivity)) &&
 						sedgecount > 0)
 					{
 						return "Activities transferred into sub-processes cannot have sequence edges.";
@@ -109,6 +109,10 @@ public class SValidation
 		{
 			error = "Sequence edges can only connect activities.";
 		}
+		else if (((MActivity) ((VActivity) target).getBpmnElement()).isEventHandler())
+		{
+			error = "Event handlers can only be sources for sequence edges.";
+		}
 		else
 		{
 			VActivity sa = (VActivity) source;
@@ -134,6 +138,16 @@ public class SValidation
 			
 			mxICell sparent = sa.getParent();
 			mxICell tparent = ta.getParent();
+			
+			if (((MActivity) ((VActivity) source).getBpmnElement()).isEventHandler())
+			{
+				if (sparent.equals(ta))
+				{
+					//FIXME: allow loops
+					return "";
+				}
+				sparent = sparent.getParent();
+			}
 			
 			if (error == null && (sparent instanceof VSubProcess || tparent instanceof VSubProcess) && !sparent.equals(tparent))
 			{

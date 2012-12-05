@@ -61,6 +61,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 	/** BPMN End Event Color */
 	public static final String END_EVENT_COLOR = "#e76363";
 	
+	/** BPMN End Event Color */
+	public static final String BOUNDARY_EVENT_COLOR = "#eaef53";
+	
 	/** Default Pool Width */
 	public static final int DEFAULT_POOL_WIDTH = 1000;
 	
@@ -79,6 +82,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_START", new Dimension(40, 40));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_INTERMEDIATE", new Dimension(40, 40));
+		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_BOUNDARY", new Dimension(30, 30));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_END", new Dimension(40, 40));
 	}
 	
@@ -219,6 +223,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
 		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
 		
 		style = new HashMap<String, Object>(style);
@@ -268,7 +273,17 @@ public class BpmnStylesheetColor extends mxStylesheet
 		putCellStyle(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_INTERMEDIATE", style);
 		
 		style = new HashMap<String, Object>(style);
+		style.put(mxConstants.STYLE_FILLCOLOR, BOUNDARY_EVENT_COLOR);
+		style.put(mxConstants.STYLE_MOVABLE, 0);
+		style.put(mxConstants.STYLE_RESIZABLE, 0);
+//		style.put(mxConstants.STYLE_ROUTING_CENTER_Y, 0.5);
+		putCellStyle(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_BOUNDARY", style);
+		
+		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, END_EVENT_COLOR);
+		style.remove(mxConstants.STYLE_MOVABLE);
+		style.remove(mxConstants.STYLE_RESIZABLE);
+		style.remove(mxConstants.STYLE_ROUTING_CENTER_Y);
 		putCellStyle(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_END", style);
 		
 		style = new HashMap<String, Object>();
@@ -280,7 +295,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
 		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
-		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_SIDETOSIDE);
+//		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ORTHOGONAL);
+//		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_SIDETOSIDE);
+		style.put(mxConstants.STYLE_EDGE, new SequenceEdgeStyleFunction());
 		//style.put(mxConstants.STYLE_LOOP, mxConstants.EDGESTYLE_LOOP);
 		putCellStyle(VSequenceEdge.class.getSimpleName(), style);
 		
@@ -288,5 +305,26 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STARTARROW, StrokeMarker.class.getSimpleName());
 		style.put(mxConstants.STYLE_STARTSIZE, 18);
 		putCellStyle(VSequenceEdge.class.getSimpleName() + "_DEFAULT", style);
+	}
+	
+	public Map<String, Object> getCellStyle(String name,
+			Map<String, Object> defaultStyle)
+	{
+		Map<String, Object> ret = super.getCellStyle(name, defaultStyle); 
+		if (VSequenceEdge.class.getSimpleName().equals(name))
+		{
+			ret = new HashMap<String, Object>(ret)
+			{
+				public Object get(Object key)
+				{
+					if (mxConstants.STYLE_EDGE.equals(key))
+					{
+						System.out.println();
+					}
+					return super.get(key);
+				}
+			};
+		}
+		return ret;
 	}
 }

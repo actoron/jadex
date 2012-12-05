@@ -756,10 +756,6 @@ public class ImageProvider
 			Shape triangle = EventShape.getTriangleShape(0, 0, size.width, size.height);
 			g.setColor(Color.BLACK);
 			g.fill(triangle);
-			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.setComposite(AlphaComposite.Src);
-			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-			g.draw(triangle);
 		}
 		else if ("pentagon".equals(name))
 		{
@@ -780,10 +776,26 @@ public class ImageProvider
 			Shape pentagon = EventShape.getPentagonShape(0, 0, size.width, size.height);
 			g.setColor(Color.BLACK);
 			g.fill(pentagon);
+		}
+		else if ("bolt".equals(name))
+		{
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-			g.setComposite(AlphaComposite.Src);
-			g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.0f));
-			g.draw(pentagon);
+			g.draw(EventShape.getBoltShape(0, 0, size.width, size.height));
+		}
+		else if ("invbolt".equals(name))
+		{
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			Shape bolt = EventShape.getBoltShape(0, 0, size.width, size.height);
+			g.setColor(Color.BLACK);
+			g.fill(bolt);
 		}
 		
 		return ret;

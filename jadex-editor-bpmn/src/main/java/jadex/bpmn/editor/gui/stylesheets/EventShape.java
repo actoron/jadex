@@ -23,8 +23,12 @@ import com.mxgraph.view.mxCellState;
 
 public class EventShape extends mxEllipseShape
 {
+	/** Inner circle ratio for creating double/fat circles. */
 	protected static final double INNER_CIRCLE_RATIO = 0.075;
 	
+	/**
+	 *  Sine value lookups for clock shape.
+	 */
 	protected static final double[] CLOCK_SIN_TABLE = new double[12];
 	static
 	{
@@ -34,7 +38,14 @@ public class EventShape extends mxEllipseShape
 		}
 	}
 	
+	/**
+	 *  Sine value lookups for pentagon shape.
+	 */
 	protected static final double[] PENTAGON_SIN_TABLE = new double[5];
+	
+	/**
+	 *  Cosine value lookups for pentagon shape.
+	 */
 	protected static final double[] PENTAGON_COS_TABLE = new double[5];
 	static
 	{
@@ -51,6 +62,9 @@ public class EventShape extends mxEllipseShape
 	/** Constant for triangle calculation. */
 	protected static final double SQRT33 = 3.0 / Math.sqrt(3) * 0.5;
 	
+	/**
+	 *  Paints the shape.
+	 */
 	public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
 	{
 		super.paintShape(canvas, state);
@@ -91,21 +105,29 @@ public class EventShape extends mxEllipseShape
 		}
 		
 		Shape symbol = null;
+		boolean simple = true;
 		if (eventtype.endsWith("Message"))
 		{
 			symbol = getLetterShape(x, y, w, h);
+			simple = false;
 		}
 		else if (eventtype.endsWith("Timer"))
 		{
 			symbol = getClockShape(x, y, w, h);
+			simple = false;
 		}
 		else if (eventtype.endsWith("Rule"))
 		{
 			symbol = getPageShape(x, y, w, h);
+			simple = false;
 		}
 		else if (eventtype.endsWith("Signal"))
 		{
 			symbol = getTriangleShape(x, y, w, h);
+		}
+		else if (eventtype.endsWith("Error"))
+		{
+			symbol = getBoltShape(x, y, w, h);
 		}
 		else if (eventtype.endsWith("Multiple"))
 		{
@@ -120,11 +142,19 @@ public class EventShape extends mxEllipseShape
 			
 			if (mactivity.isThrowing())
 			{
-				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-				g.fill(symbol);
-				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g.setColor(mxUtils.getColor(state.getStyle(), mxConstants.STYLE_FILLCOLOR, Color.WHITE));
-				g.draw(symbol);
+				if (simple)
+				{
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g.fill(symbol);
+				}
+				else
+				{
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+					g.fill(symbol);
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g.setColor(mxUtils.getColor(state.getStyle(), mxConstants.STYLE_FILLCOLOR, Color.WHITE));
+					g.draw(symbol);
+				}
 				
 			}
 			else
@@ -138,6 +168,15 @@ public class EventShape extends mxEllipseShape
 		g.dispose();
 	}
 	
+	/**
+	 *  Creates a letter shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
 	public static final Shape getLetterShape(double x, double y, double w, double h)
 	{
 		
@@ -158,18 +197,18 @@ public class EventShape extends mxEllipseShape
 		gp.lineTo(lx + lw, ly);
 		gp.closePath();
 		
-		/*gp.moveTo(lx, ly);
-		gp.lineTo(lx, ly + lh);
-		gp.lineTo(lx + lw, ly + lh);
-		gp.lineTo(lx + lw, ly);
-		gp.lineTo(lx + lw * 0.5, ly + lh / 3.0);
-		gp.lineTo(lx, ly);
-		gp.lineTo(lx + lw, ly);
-		gp.closePath();*/
-		
 		return gp;
 	}
 	
+	/**
+	 *  Creates a clock shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
 	public static final Shape getClockShape(double x, double y, double w, double h)
 	{
 		
@@ -216,6 +255,15 @@ public class EventShape extends mxEllipseShape
 		return gp;
 	}
 	
+	/**
+	 *  Creates a page shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
 	public static final Shape getPageShape(double x, double y, double w, double h)
 	{
 		
@@ -243,6 +291,15 @@ public class EventShape extends mxEllipseShape
 		return gp;
 	}
 	
+	/**
+	 *  Creates a triangle shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
 	public static final Shape getTriangleShape(double x, double y, double w, double h)
 	{
 		
@@ -266,6 +323,15 @@ public class EventShape extends mxEllipseShape
 		return gp;
 	}
 	
+	/**
+	 *  Creates a pentagon shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
 	public static final Shape getPentagonShape(double x, double y, double w, double h)
 	{
 		GeneralPath gp = new GeneralPath();
@@ -285,6 +351,42 @@ public class EventShape extends mxEllipseShape
 		{
 			gp.lineTo(x + w2 - PENTAGON_SIN_TABLE[i] * w2, y + h2 - PENTAGON_COS_TABLE[i] * h2);
 		}
+		gp.closePath();
+		
+		return gp;
+	}
+	
+	/**
+	 *  Creates a lightning bolt shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
+	public static final Shape getBoltShape(double x, double y, double w, double h)
+	{
+		GeneralPath gp = new GeneralPath();
+		
+		double sf = 0.55;
+		double w2 = w;
+		double h2 = h;
+		w *= sf;
+		h *= sf;
+		x += (w2 - w) * 0.5;
+		y += (h2 - h) * 0.5;
+		double w3 = w / 3;
+		double w23 = w3 + w3;
+		double ybottom = y + h;
+		double maxthick = h * 0.4;
+		
+		gp.moveTo(x, ybottom);
+		gp.lineTo(x + w3, y);
+		gp.lineTo(x + w23, ybottom - maxthick);
+		gp.lineTo(x + w, y);
+		gp.lineTo(x + w23, ybottom);
+		gp.lineTo(x + w3, y + maxthick);
 		gp.closePath();
 		
 		return gp;

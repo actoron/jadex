@@ -578,7 +578,7 @@ public class SBpmnModelWriter
 				}
 				
 				List<MActivity> activities = getPoolActivities(pool);
-				writeActivitySemantics(out, activities, 2);
+				writeActivitySemantics(out, activities, null, 2);
 				
 				List<MSequenceEdge> seqedges = pool.getSequenceEdges();
 				if (seqedges != null)
@@ -652,7 +652,7 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param activities The activities.
 	 */
-	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, int baseind)
+	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind)
 	{
 		for (MActivity activity : activities)
 		{
@@ -665,7 +665,11 @@ public class SBpmnModelWriter
 				event = true;
 				if (activity.getActivityType().contains("Intermediate"))
 				{
-					if(activity.isThrowing())
+					if (activity.isEventHandler())
+					{
+						mappedacttype = "boundaryEvent";
+					}
+					else if(activity.isThrowing())
 					{
 						mappedacttype += "ThrowEvent";
 					}
@@ -699,6 +703,12 @@ public class SBpmnModelWriter
 						break;
 					}
 				}
+			}
+			
+			if (activity.isEventHandler())
+			{
+				out.print("\" attachedToRef=\"");
+				out.print(evthandlerref);
 			}
 			
 			out.println("\">");
@@ -783,7 +793,7 @@ public class SBpmnModelWriter
 					List<MActivity> subactivities = subproc.getActivities();
 					if (subactivities != null && subactivities.size() > 0)
 					{
-						writeActivitySemantics(out, subactivities, baseind + 1);
+						writeActivitySemantics(out, subactivities, null, baseind + 1);
 					}
 					
 					List<MSequenceEdge> subseqedges = subproc.getSequenceEdges();
@@ -850,6 +860,11 @@ public class SBpmnModelWriter
 			out.print(getIndent(baseind) + "</semantic:");
 			out.print(mappedacttype);
 			out.println(">");
+			
+			if (activity.getEventHandlers() != null && activity.getEventHandlers().size() > 0)
+			{
+				writeActivitySemantics(out, activity.getEventHandlers(), activity.getId(), baseind);
+			}
 		}
 	}
 	

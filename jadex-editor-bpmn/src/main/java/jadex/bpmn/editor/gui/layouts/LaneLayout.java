@@ -1,4 +1,4 @@
-package jadex.bpmn.editor.gui;
+package jadex.bpmn.editor.gui.layouts;
 
 import com.mxgraph.layout.mxStackLayout;
 import com.mxgraph.view.mxGraph;

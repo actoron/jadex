@@ -1,11 +1,17 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.controllers.SValidation;
+import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
+import jadex.bpmn.editor.gui.layouts.LaneLayout;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
@@ -46,22 +52,8 @@ public class BpmnGraph extends mxGraph
 		
 		setStylesheet(sheet);
 		
-		new mxLayoutManager(this)
-		{
-			protected mxStackLayout lanelayout = new LaneLayout(graph);
-			
-			public mxIGraphLayout getLayout(Object parent)
-			{
-				if (parent instanceof VPool &&
-					graph.getModel().getChildCount(parent) > 0 &&
-					graph.getModel().getChildAt(parent, 0) instanceof VLane)
-				{
-					return lanelayout;
-				}
-				
-				return null;
-			}
-		};
+//		final BpmnLayoutManager layoutmanager = 
+		new BpmnLayoutManager(this);
 	}
 	
 	/**
@@ -110,19 +102,13 @@ public class BpmnGraph extends mxGraph
 	 */
 	public boolean isValidDropTarget(Object cell, Object[] cells)
 	{
-		if (cells == null)
-		{
-			Thread.dumpStack();
-		}
+		boolean ret = false;
 		
-		boolean ret = cell != null
-				&& ((isSplitEnabled() && isSplitTarget(cell, cells)) ||
-						(!model.isEdge(cell) && (isSwimlane(cell) ||
-						(model.getChildCount(cell) > 0 && !isCellCollapsed(cell)))));
-		
-		/* Special case for subprocesses */
+		/* Special case for internal subprocesses,
+		 * they are a potential parent but not for themselves. */
 		if (cell instanceof VSubProcess && cells != null)
 		{
+			
 			boolean nomatch = true;
 			for (int i = 0; i < cells.length; ++i)
 			{
@@ -139,6 +125,21 @@ public class BpmnGraph extends mxGraph
 						(!model.isEdge(cell) && !isCellCollapsed(cell));
 			}
 		}
+		else if (cell instanceof VActivity &&
+				 ((VActivity) cell).getBpmnElement() != null &&
+				 MBpmnModel.TASK.equals(((MActivity) ((VActivity) cell).getBpmnElement()).getActivityType()))
+		{
+			/* Tasks are never drop targets, even if they contain children, they will be all event handlers. */
+			ret = false;
+		}
+		else
+		{
+			ret = cell != null
+					&& ((isSplitEnabled() && isSplitTarget(cell, cells)) ||
+							(!model.isEdge(cell) && (isSwimlane(cell) ||
+							(model.getChildCount(cell) > 0 && !isCellCollapsed(cell)))));
+		}
+		
 		return ret;
 	}
 
@@ -184,5 +185,55 @@ public class BpmnGraph extends mxGraph
 		}
 		
 		return error;
+	}
+	
+	/**
+	 *  The layout manager.
+	 *
+	 */
+	protected static class BpmnLayoutManager extends mxLayoutManager
+	{
+		/** Layout for lanes. */
+		protected mxStackLayout lanelayout;
+		
+		/** Layout for event handlers. */
+		protected EventHandlerLayout evtlayout; 
+		
+		/**
+		 *  Creates new layout manager.
+		 *  @param graph The graph.
+		 */
+		public BpmnLayoutManager(mxGraph graph)
+		{
+			super(graph);
+			this.lanelayout = new LaneLayout(graph);
+			this.evtlayout = new EventHandlerLayout(graph);
+		}
+		
+		/**
+		 *  Gets the layout.
+		 */
+		protected mxIGraphLayout getLayout(Object parent)
+		{
+			if (parent instanceof VPool &&
+				graph.getModel().getChildCount(parent) > 0 &&
+				graph.getModel().getChildAt(parent, 0) instanceof VLane)
+			{
+				return lanelayout;
+			}
+			
+			if (parent instanceof VElement &&
+				((VElement) parent).getBpmnElement() instanceof MActivity)
+			{
+				MActivity mparent = (MActivity) ((VElement) parent).getBpmnElement();
+				if (MBpmnModel.TASK.equals(mparent.getActivityType()) ||
+					MBpmnModel.SUBPROCESS.equals(mparent.getActivityType()))
+				{
+					return evtlayout;
+				}
+			}
+			
+			return null;
+		}
 	}
 }

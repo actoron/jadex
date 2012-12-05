@@ -58,6 +58,15 @@ public class GraphOperationsController extends mxGraphHandler
 	}
 	
 	/**
+	 *  Fold cells.
+	 */
+	protected void fold(Object cell)
+	{
+		graphComponent.doLayout();
+		super.fold(cell);
+	}
+	
+	/**
 	 *  Creates the marker.
 	 */
 	protected mxCellMarker createMarker()
@@ -116,6 +125,8 @@ public class GraphOperationsController extends mxGraphHandler
 				return cell;
 			}
 			
+			/**
+			 */
 			protected boolean isValidState(mxCellState state)
 			{
 				return SValidation.getMoveValidationError(cells, state.getCell()) == null;

@@ -61,11 +61,17 @@ public class ModelContainer
 	/** Flag for throwing events */
 	public static final String THROWING_EVENT = "Throwing";
 	
+	/** Flag for boundary events */
+	public static final String BOUNDARY_EVENT = "Boundary";
+	
 	/** Edit mode for adding empty start events. */
 	public static final String EDIT_MODE_EVENT_START_EMPTY = MBpmnModel.EVENT_START_EMPTY;
 	
 	/** Edit mode for adding empty intermediate events. */
 	public static final String EDIT_MODE_EVENT_INTERMEDIATE_EMPTY = MBpmnModel.EVENT_INTERMEDIATE_EMPTY;
+	
+	/** Edit mode for adding error intermediate events. */
+	public static final String EDIT_MODE_EVENT_INTERMEDIATE_ERROR = MBpmnModel.EVENT_INTERMEDIATE_ERROR;
 	
 	/** Edit mode for adding empty end events. */
 	public static final String EDIT_MODE_EVENT_END_EMPTY = MBpmnModel.EVENT_END_EMPTY;
@@ -112,6 +118,9 @@ public class ModelContainer
 	/** Edit mode for adding throwing signal end events. */
 	public static final String EDIT_MODE_EVENT_END_SIGNAL_THROWING = MBpmnModel.EVENT_END_SIGNAL + THROWING_EVENT;
 	
+	/** Edit mode for adding error end events. */
+	public static final String EDIT_MODE_EVENT_END_ERROR_THROWING = MBpmnModel.EVENT_END_ERROR + THROWING_EVENT;
+	
 	/** Edit mode for adding multiple start events. */
 	public static final String EDIT_MODE_EVENT_START_MULTIPLE = MBpmnModel.EVENT_START_MULTIPLE;
 	
@@ -120,6 +129,21 @@ public class ModelContainer
 	
 	/** Edit mode for adding rule intermediate events. */
 	public static final String EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE_THROWING = MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE + THROWING_EVENT;
+	
+	/** Edit mode for adding error boundary events. */
+	public static final String EDIT_MODE_EVENT_BOUNDARY_ERROR = MBpmnModel.EVENT_INTERMEDIATE_ERROR + BOUNDARY_EVENT;
+	
+	/** Edit mode for adding message boundary events. */
+	public static final String EDIT_MODE_EVENT_BOUNDARY_MESSAGE = MBpmnModel.EVENT_INTERMEDIATE_MESSAGE + BOUNDARY_EVENT;
+	
+	/** Edit mode for adding timer boundary events. */
+	public static final String EDIT_MODE_EVENT_BOUNDARY_TIMER = MBpmnModel.EVENT_INTERMEDIATE_TIMER + BOUNDARY_EVENT;
+	
+	/** Edit mode for adding rule boundary events. */
+	public static final String EDIT_MODE_EVENT_BOUNDARY_RULE = MBpmnModel.EVENT_INTERMEDIATE_RULE + BOUNDARY_EVENT;
+	
+	/** Edit mode for adding signal boundary events. */
+	public static final String EDIT_MODE_EVENT_BOUNDARY_SIGNAL = MBpmnModel.EVENT_INTERMEDIATE_SIGNAL + BOUNDARY_EVENT;
 	
 	/** Modes for adding activities. */
 	public static final Set<String> ACTIVITY_MODES = new HashSet<String>();
@@ -141,7 +165,13 @@ public class ModelContainer
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_END_MESSAGE_THROWING, MBpmnModel.EVENT_END_MESSAGE);
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL_THROWING, MBpmnModel.EVENT_INTERMEDIATE_SIGNAL);
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_END_SIGNAL_THROWING, MBpmnModel.EVENT_END_SIGNAL);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_END_ERROR_THROWING, MBpmnModel.EVENT_END_ERROR);
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE_THROWING, MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_BOUNDARY_ERROR, MBpmnModel.EVENT_INTERMEDIATE_ERROR);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_BOUNDARY_MESSAGE, MBpmnModel.EVENT_INTERMEDIATE_MESSAGE);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_BOUNDARY_TIMER, MBpmnModel.EVENT_INTERMEDIATE_TIMER);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_BOUNDARY_RULE, MBpmnModel.EVENT_INTERMEDIATE_RULE);
+		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EVENT_BOUNDARY_SIGNAL, MBpmnModel.EVENT_INTERMEDIATE_SIGNAL);
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EXTERNAL_SUBPROCESS, MBpmnModel.SUBPROCESS);
 	}
 	

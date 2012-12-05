@@ -368,6 +368,10 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, true , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_EMPTY, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
 				"Empty Intermediate Event", iconsize));
 		
+		sym = "bolt";
+		tasks.add(new IconGenerationTask(imgprovider, false , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_ERROR, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+				"Error Intermediate Event", iconsize));
+		
 		sym = "letter";
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
 				"Message Intermediate Event", iconsize));
@@ -419,6 +423,32 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		sym = "invtriangle";
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_SIGNAL_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
 				"Throwing Signal End Event", iconsize));
+		
+		sym = "invbolt";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_ERROR_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+				"Throwing Error End Event", iconsize));
+		
+		++row;
+		
+		sym = "bolt";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_ERROR, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
+				"Error Boundary Event", iconsize));
+		
+		sym = "letter";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
+				"Message Boundary Event", iconsize));
+		
+		sym = "clock";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_TIMER, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
+				"Timer Boundary Event", iconsize));
+		
+		sym = "page";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_RULE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
+				"Rule Boundary Event", iconsize));
+		
+		sym = "triangle";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_SIGNAL, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
+				"Signal Boundary Event", iconsize));
 		
 		return tasks;
 	}

@@ -2,6 +2,8 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.BpmnToolbar.IconGenerationTask;
 import jadex.bpmn.editor.gui.controllers.SCreationController;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MActivity;
 import jadex.commons.Tuple3;
 
 import java.awt.Point;
@@ -56,7 +58,8 @@ public class EdgeDragContextMenu extends JPopupMenu
 				if (task.mode.startsWith("EventStart") ||
 					ModelContainer.EDIT_MODE_POOL.equals(task.mode) ||
 					ModelContainer.EDIT_MODE_LANE.equals(task.mode) ||
-					ModelContainer.EDIT_MODE_SELECTION.equals(task.mode))
+					ModelContainer.EDIT_MODE_SELECTION.equals(task.mode) ||
+					task.mode.endsWith(ModelContainer.BOUNDARY_EVENT))
 				{
 				}
 				else if (task.mode.startsWith("EventIntermediate"))
@@ -90,9 +93,16 @@ public class EdgeDragContextMenu extends JPopupMenu
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				mxICell parent = ((mxICell) source).getParent();
+				
+				if (source instanceof VActivity && ((MActivity) ((VActivity) source).getBpmnElement()).isEventHandler())
+				{
+					parent = parent.getParent();
+				}
+				
 				target = SCreationController.createActivity(modelcontainer,
 												   ((JMenuItem) e.getSource()).getName(),
-												   ((mxICell) source).getParent(),
+												   parent,
 												   loc);
 				actionlistener.actionPerformed(e);
 			}
@@ -128,99 +138,6 @@ public class EdgeDragContextMenu extends JPopupMenu
 			eemenu.add(mitem);
 		}
 		add(eemenu);
-		
-//		JMenuItem item = new JMenuItem(action);
-//		item.setText("Task");
-//		item.setName(ModelContainer.EDIT_MODE_TASK);
-//		add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("XOR-Gateway");
-//		item.setName(ModelContainer.EDIT_MODE_GW_XOR);
-//		add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("AND-Gateway");
-//		item.setName(ModelContainer.EDIT_MODE_GW_AND);
-//		add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("OR-Gateway");
-//		item.setName(ModelContainer.EDIT_MODE_GW_OR);
-//		add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Internal Sub-Process");
-//		item.setName(ModelContainer.EDIT_MODE_SUBPROCESS);
-//		add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("External Sub-Process");
-//		item.setName(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS);
-//		add(item);
-//		
-//		JMenu evtmenu = new JMenu("Events");
-//		add(evtmenu);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Empty Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_EMPTY);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Empty End Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_END_EMPTY);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Catching Message Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Throwing Message Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE_THROWING);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Message End Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_END_MESSAGE_THROWING);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Timer Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_TIMER);
-//		evtmenu.add(item);
-//
-//		item = new JMenuItem(action);
-//		item.setText("Rule Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_RULE);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Catching Signal Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Throwing Signal Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_SIGNAL_THROWING);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Signal End Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_END_SIGNAL_THROWING);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Catching Multiple Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE);
-//		evtmenu.add(item);
-//		
-//		item = new JMenuItem(action);
-//		item.setText("Throwing Multiple Intermediate Event");
-//		item.setName(ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MULTIPLE_THROWING);
-//		evtmenu.add(item);
 		
 		addPopupMenuListener(new PopupMenuListener()
 		{

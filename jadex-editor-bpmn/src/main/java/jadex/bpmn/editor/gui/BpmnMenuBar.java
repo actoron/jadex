@@ -309,6 +309,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected void displayIOError(Exception e)
 	{
+		e.printStackTrace();
 		JOptionPane.showMessageDialog(getParent(),
 			    e.getMessage(),
 			    BpmnEditor.APP_NAME,

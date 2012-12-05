@@ -88,6 +88,7 @@ public class SBpmnModelReader
 		Map<String, Object> buffer = new HashMap<String, Object>();
 		buffer.put("subprocessstack", new LinkedList<MSubProcess>());
 		buffer.put("subprocesselementmap", new HashMap<String, MSubProcess>());
+		buffer.put("eventhandlerparentmap", new HashMap<String, String>());
 		
 		buffer.put("unresolvedsequencesources", new HashMap<String, MSequenceEdge>());
 		buffer.put("unresolvedsequencetargets", new HashMap<String, MSequenceEdge>());
@@ -344,6 +345,13 @@ public class SBpmnModelReader
 			else
 			{
 				acttype += "Intermediate";
+				
+				if (tag.getLocalPart().startsWith("boundary"))
+				{
+					evt.setEventHandler(true);
+					Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
+					ehpm.put(evt.getId(), attrs.get("attachedToRef"));
+				}
 			}
 			
 			List<Tuple2<String, String>> evttypes = (List<Tuple2<String, String>>) buffer.remove("evttypes");
@@ -768,27 +776,37 @@ public class SBpmnModelReader
 		MPool pool = (MPool) buffer.get("pool");
 		MLane lane = lanemap.get(act.getId());
 		
-		LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
-		if (!sps.isEmpty())
+		if (act.isEventHandler())
 		{
 			act.setPool(pool);
 			act.setLane(lane);
-			sps.peek().addActivity(act);
-			Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
-			spem.put(act.getId(), sps.peek());
+			Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
+			((MActivity) emap.get(ehpm.get(act.getId()))).addEventHandler(act);
 		}
 		else
 		{
-			if (lane != null)
+			LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
+			if (!sps.isEmpty())
 			{
-				lane.addActivity(act);
 				act.setPool(pool);
 				act.setLane(lane);
+				sps.peek().addActivity(act);
+				Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
+				spem.put(act.getId(), sps.peek());
 			}
 			else
 			{
-				pool.addActivity(act);
-				act.setPool(pool);
+				if (lane != null)
+				{
+					lane.addActivity(act);
+					act.setPool(pool);
+					act.setLane(lane);
+				}
+				else
+				{
+					pool.addActivity(act);
+					act.setPool(pool);
+				}
 			}
 		}
 		
