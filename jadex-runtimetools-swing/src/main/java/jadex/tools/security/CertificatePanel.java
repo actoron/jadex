@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
@@ -134,6 +135,6 @@ public class CertificatePanel extends JPanel
 		}
 		
 		this.setLayout(new BorderLayout());
-		this.add(tp, BorderLayout.CENTER);
+		this.add(new JScrollPane(tp), BorderLayout.CENTER);
 	}
 }

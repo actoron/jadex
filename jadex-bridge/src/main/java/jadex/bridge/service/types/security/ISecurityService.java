@@ -7,6 +7,7 @@ import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.future.IFuture;
 
 import java.security.cert.Certificate;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.KeyStroke;
@@ -192,14 +193,28 @@ public interface ISecurityService
 	/**
 	 *  Get info about the current keystore that is used.
 	 */
-	@SecureTransmission
 	public IFuture<Map<String, KeyStoreEntry>> getKeystoreDetails();
 	
 	/**
 	 *  Remove a key store entry.
 	 *  @param String alias The alias name.
 	 */
-	@SecureTransmission
 	public IFuture<Void> removeKeyStoreEntry(String alias);
+	
+	//-------- certificate acquisition mechanism methods --------
+	
+	/**
+	 *  Get the supported certificate acquisition mechanism infos.
+	 */
+	public IFuture<List<MechanismInfo>> getAcquisitionMechanisms();
+	
+	/**
+	 *  Set a mechanism parameter.
+	 */
+	public IFuture<Void> setAcquisitionMechanismParameterValue(Class<?> type, String name, Object value);
 
+	/**
+	 *  Set the acquisition mechanism.
+	 */
+	public IFuture<Void> setAcquisitionMechanism(Class<?> type);
 }

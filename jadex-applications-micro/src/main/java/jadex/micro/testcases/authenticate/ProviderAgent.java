@@ -11,7 +11,7 @@ import jadex.micro.annotation.ProvidedServices;
 
 
 /**
- * 
+ *  Agent implementing the test service.
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
@@ -22,7 +22,7 @@ public class ProviderAgent implements ITestService
 	 *  Call a method that must use a secure
 	 *  transport under the hood.
 	 */
-	@Authenticated("VSISSTAFF17")
+	@Authenticated({"VSISSTAFF17", "Lars-PC"})
 	public IFuture<Void> method(String msg)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();

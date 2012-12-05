@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
@@ -16,11 +15,11 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
+import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Base64;
 import jadex.commons.IPropertiesProvider;
@@ -32,7 +31,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaWriter;
 
@@ -47,7 +45,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,6 +117,12 @@ public class SecurityService implements ISecurityService
 	/** The keystore. */
 	protected KeyStore keystore;
 	
+	/** The list of key aquire mechanisms. */
+	protected List<AAcquisitionMechanism> mechanisms;
+	
+	/** The currently selected mechanism. */
+	protected int selmech;
+	
 	//-------- setup --------
 	
 	/**
@@ -127,14 +130,23 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(Boolean.TRUE, true, Boolean.FALSE, null, null);
+		this(Boolean.TRUE, true, Boolean.FALSE, null, null, null);
+	}
+
+	/**
+	 *  Create a security service.
+	 */
+	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
+		String[] networknames, String[] networkpasses)
+	{
+		this(usepass, printpass, trustedlan, networknames, networkpasses, null);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
 	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
-		String[] networknames, String[] networkpasses)
+		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms)
 	{
 		this.platformpasses	= new LinkedHashMap<String, String>();
 		this.networkpasses	= new LinkedHashMap<String, String>();
@@ -156,6 +168,24 @@ public class SecurityService implements ISecurityService
 		this.storepath = "./keystore";
 		this.storepass = "keystore";
 		this.keypass = "keystore";
+		this.mechanisms = new ArrayList<AAcquisitionMechanism>();
+		if(mechanisms!=null)
+		{
+			for(AAcquisitionMechanism mech: mechanisms)
+			{
+				mech.init(this);
+				this.mechanisms.add(mech);
+			}
+		}
+		else
+		{
+			AAcquisitionMechanism mech = new DecentralizedAcquisitionMechanism();
+			mech.init(this);
+			this.mechanisms.add(mech);
+			mech = new TTPAcquisitionMechanism();
+			mech.init(this);
+			this.mechanisms.add(mech);
+		}
 	}
 	
 	/**
@@ -200,6 +230,9 @@ public class SecurityService implements ISecurityService
 										password	= UUID.randomUUID().toString().substring(0, 12);
 			//							usepass	= true;
 									}
+
+									if(props!=null)
+										selmech = props.getIntProperty("selected_mechanism"); 
 									
 									final IExternalAccess	access	= component.getExternalAccess();
 									
@@ -275,6 +308,7 @@ public class SecurityService implements ISecurityService
 													Properties	ret	= new Properties();
 													ret.addProperty(new Property("usepass", ""+usepass));
 													ret.addProperty(new Property("password", password));
+													ret.addProperty(new Property("selected_mechanism", ""+selmech));
 													if(platformpasses!=null)
 													{
 														for(String platform: platformpasses.keySet())
@@ -1071,98 +1105,14 @@ public class SecurityService implements ISecurityService
 	 */
 	protected IFuture<Certificate> aquireCertificate(final String name)
 	{
-		final Future<Certificate> ret = new Future<Certificate>();
-
-		final int threshold = 1;
-		final IComponentIdentifier cid = new ComponentIdentifier(name);
-		
-		// Try to fetch certificate from other platforms
-		SServiceProvider.getServices(component.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			.addResultListener(new IIntermediateResultListener<ISecurityService>()
+		if(selmech>-1)
 		{
-			protected int ongoing;
-			protected boolean finished;
-			protected List<Certificate> certs = new ArrayList<Certificate>();
-			
-			public void intermediateResultAvailable(ISecurityService ss)
-			{
-				ongoing++;
-				
-				if(!((IService)ss).getServiceIdentifier().equals(sid))
-				{
-					ss.getPlatformCertificate(cid).addResultListener(new IResultListener<Certificate>()
-					{
-						public void resultAvailable(Certificate cert)
-						{
-							certs.add(cert);
-							if(certs.size()>=threshold && !ret.isDone())
-							{
-								try
-								{
-									byte[] enc = certs.get(0).getEncoded();
-									boolean ok = true;
-									for(int i=1; i<certs.size() && ok; i++)
-									{
-										if(!Arrays.equals(enc, certs.get(i).getEncoded()))
-										{
-											ret.setException(new SecurityException("Received different certificates for: "+name));
-											ok = false;
-										}
-									}
-									if(ok)
-									{
-										ret.setResult(certs.get(0));
-									}
-								}
-								catch(Exception e)
-								{
-									ret.setException(new SecurityException("Certificate encoding error: "+name));
-								}
-							}
-							ongoing--;
-							checkFinish();
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// ignore failures of getCertificate calls
-							ongoing--;
-							checkFinish();
-						}
-					});
-				}
-			}
-			
-			public void finished()
-			{
-				finished = true;
-				checkFinish();
-			}
-			
-			public void resultAvailable(Collection<ISecurityService> result)
-			{
-				for(ISecurityService ss: result)
-				{
-					intermediateResultAvailable(ss);
-				}
-				finished();
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				finished();
-			}
-			
-			protected void checkFinish()
-			{
-				if(ongoing==0 && finished && !ret.isDone())
-				{
-					ret.setExceptionIfUndone(new SecurityException("Unable to retrieve certificate: "+name));
-				}
-			}
-		});
-		
-		return ret;
+			return mechanisms.get(selmech).acquireCertificate(name);
+		}
+		else
+		{
+			return new Future<Certificate>(new SecurityException("No certificate and aquiring disabled."));
+		}
 	}
 	
 	/**
@@ -1176,8 +1126,103 @@ public class SecurityService implements ISecurityService
 		return ret;
 	}
 	
-	//-------- static part --------
+	/**
+	 *  Get the component.
+	 *  @return The component.
+	 */
+	public IInternalAccess getComponent()
+	{
+		return component;
+	}
 	
+	/**
+	 *  Get the sid.
+	 *  @return The sid.
+	 */
+	public IServiceIdentifier getSid()
+	{
+		return sid;
+	}
+	
+	/**
+	 *  Set a mechanism parameter.
+	 */
+	public IFuture<Void> setAcquisitionMechanismParameterValue(Class<?> type, String name, Object value)
+	{
+		Future<Void> ret = new Future<Void>();
+		try
+		{
+			AAcquisitionMechanism mech = getMechanism(type);
+			mech.setParameterValue(name, value);
+			ret.setResult(null);
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the supported certificate acquire mechanism infos.
+	 */
+	public IFuture<List<MechanismInfo>> getAcquisitionMechanisms()
+	{
+		List<MechanismInfo> ret = new ArrayList<MechanismInfo>();
+		
+		for(AAcquisitionMechanism mech: mechanisms)
+		{
+			ret.add(mech.getMechanismInfo());
+		}
+		
+		return new Future<List<MechanismInfo>>(ret);
+	}
+	
+	/**
+	 *  Set the acquire mechanism.
+	 */
+	public IFuture<Void> setAcquisitionMechanism(Class<?> type)
+	{
+		if(type==null)
+		{
+			selmech = -1;
+		}
+		else
+		{
+			for(int i=0; i<mechanisms.size(); i++)
+			{
+				AAcquisitionMechanism mech = mechanisms.get(i);
+				if(mech.getClass().equals(type))
+				{
+					selmech = i;
+					break;
+				}
+			}
+		}
+		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	protected AAcquisitionMechanism getMechanism(Class<?> type)
+	{
+		AAcquisitionMechanism ret = null;
+		for(AAcquisitionMechanism mech: mechanisms)
+		{
+			if(mech.getClass().equals(type))
+			{
+				ret = mech;
+				break;
+			}
+		}
+		if(ret==null)
+			throw new RuntimeException("Mechanism not found: "+type);
+		return ret;
+	}
+	
+	//-------- static part --------
+
 	/**
 	 *  Build the digest given the timestamp and password.
 	 */

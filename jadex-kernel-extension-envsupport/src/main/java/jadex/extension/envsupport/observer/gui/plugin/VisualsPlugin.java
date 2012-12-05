@@ -289,19 +289,18 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		
 		zoomSpinner = new JSpinner(new SpinnerNumberModel(1.0, 0.1, 20.0, 0.0));
 		zoomSpinner.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
 			{
-				public void stateChanged(ChangeEvent e)
+				IPerspective p = observerCenter_.getSelectedPerspective();
+				if (p instanceof Perspective2D)
 				{
-					
-					IPerspective p = observerCenter_.getSelectedPerspective();
-					if (p instanceof Perspective2D)
-					{
-						Perspective2D pers = (Perspective2D) p;
-						double newVal = ((Double)zoomSpinner.getValue()).doubleValue();
-						pers.setZoom(newVal);
-					}
+					Perspective2D pers = (Perspective2D) p;
+					double newVal = ((Double)zoomSpinner.getValue()).doubleValue();
+					pers.setZoom(newVal);
 				}
-			});
+			}
+		});
 		c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = 0;

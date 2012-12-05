@@ -7,6 +7,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
+import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.commons.ICommand;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -15,6 +16,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.tools.awareness.AwarenessAgentPanel.AddRemoveAction;
@@ -34,6 +36,7 @@ import java.io.File;
 import java.security.cert.Certificate;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -47,10 +50,13 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -301,7 +307,17 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			}
 		});
 		act.run();
-				
+
+		// The acquire certificate settings
+		final AcquireCertificatePanel acp = new AcquireCertificatePanel(secservice, null, 0);
+		secservice.getAcquisitionMechanisms().addResultListener(new SwingDefaultResultListener<List<MechanismInfo>>()
+		{
+			public void customResultAvailable(List<MechanismInfo> result) 
+			{
+				acp.setMechanisms(result);
+			}
+		});
+		
 		// The local password settings.
 		JPanel	plocal	= new JPanel(new GridBagLayout());
 		plocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Password Settings"));
@@ -353,9 +369,8 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
 		slocal.add(new JScrollPane(ktt), new GridBagConstraints(0, y++, 8, 1, 1, 1, 
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
-		slocal.add(bureload, new GridBagConstraints(0, y, 8, 1, 1, 0, 
+		slocal.add(bureload, new GridBagConstraints(0, y++, 8, 1, 1, 0, 
 			GridBagConstraints.EAST, GridBagConstraints.NONE, in, 0, 0));
-
 				
 		ICommand paddrem = new ICommand()
 		{
@@ -403,14 +418,20 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 //		inner.add(no, BorderLayout.NORTH);
 //		inner.add(sp, BorderLayout.CENTER);
 		
-		JSplitPanel sp = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
-		sp.setOneTouchExpandable(true);
-		sp.setDividerLocation(0.5);
-		sp.add(slocal);
-		sp.add(pdetails);
+		JSplitPanel sph = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT);
+		sph.setOneTouchExpandable(true);
+		sph.setDividerLocation(0.5);
+		sph.add(pdetails);
+		sph.add(new JScrollPane(acp));
+		
+		JSplitPanel spv = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+		spv.setOneTouchExpandable(true);
+		spv.setDividerLocation(0.5);
+		spv.add(slocal);
+		spv.add(sph);
 		
 		((JTabbedPane)inner).addTab("Password", plocal);
-		((JTabbedPane)inner).addTab("Keystore", sp);
+		((JTabbedPane)inner).addTab("Keystore", spv);
 		((JTabbedPane)inner).addTab("Remote Passwords", ppp);
 		((JTabbedPane)inner).addTab("Network Names", npp);
 			
