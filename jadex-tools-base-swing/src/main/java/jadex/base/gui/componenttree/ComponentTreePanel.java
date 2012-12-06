@@ -958,9 +958,6 @@ public class ComponentTreePanel extends JSplitPane
 		}
 	}
 	
-	
-
-	
 	//--------------------------------------
 	
 	/**

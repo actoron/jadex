@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.security;
 
-import jadex.bridge.ClassInfo;
 
 /**
  * 
@@ -9,6 +8,9 @@ public class ParameterInfo
 {
 	/** The name. */
 	protected String name;
+	
+	/** The description. */
+	protected String description;
 	
 	/** The type. */
 	protected Class<?> type;
@@ -26,9 +28,10 @@ public class ParameterInfo
 	/**
 	 * 
 	 */
-	public ParameterInfo(String name, Class<?> type, Object value)
+	public ParameterInfo(String name, String description, Class<?> type, Object value)
 	{
 		this.name = name;
+		this.description = description;
 		this.type = type;
 		this.value = value;
 	}
@@ -85,6 +88,24 @@ public class ParameterInfo
 	public void setValue(Object value)
 	{
 		this.value = value;
+	}
+
+	/**
+	 *  Get the description.
+	 *  @return The description.
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 *  Set the description.
+	 *  @param description The description to set.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 
 }

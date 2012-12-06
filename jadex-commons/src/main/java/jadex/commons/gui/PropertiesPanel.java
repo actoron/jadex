@@ -151,6 +151,14 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Create a check box and add it to the panel.
 	 */
+	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled)
+	{
+		return createCheckBox(name, selected, enabled, 0);
+	}
+	
+	/**
+	 *  Create a check box and add it to the panel.
+	 */
 	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled, double weighty)
 	{
 		// Todo: checkbox name vs. checkbox label!?

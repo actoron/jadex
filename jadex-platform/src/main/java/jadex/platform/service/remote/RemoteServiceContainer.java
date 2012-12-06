@@ -12,6 +12,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -63,6 +64,12 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
+//		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("IProxy")!=-1)
+//		{
+//			System.out.println(((TypeResultSelector)selector).getType().getName());
+//			System.out.println("search: "+componentid);
+//		}
+		
 		super.getServices(manager, decider, selector).addResultListener(new IResultListener<Collection<IService>>()
 		{
 			public void resultAvailable(Collection<IService> result)
@@ -72,18 +79,21 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 				// Problem that the container calls itself the decider, could already
 				// be done in search manager when this call is part of a search
 				// But could also be called directly :-(
-				if(!decider.searchNode(RemoteServiceContainer.this, null, RemoteServiceContainer.this, false, result)
+				if(!decider.searchNode(RemoteServiceContainer.this.getId(), RemoteServiceContainer.this.getId(), componentid, false, result)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
 					ret.setResult(result);
 				}
 				else
 				{
-//					if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().equals(IComponentManagementService.class))
-//					{
-//						System.out.println("remote search: "+componentid);
-//						Thread.dumpStack();
-//					}
+					if(result!=null)
+					{
+						for(IService ser: result)
+						{
+							ret.addIntermediateResult(ser);
+						}
+					}
+					
 					// Hack! Use user search manager.
 					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener<Object>()

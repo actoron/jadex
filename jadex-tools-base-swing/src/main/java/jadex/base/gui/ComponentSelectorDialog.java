@@ -28,6 +28,7 @@ import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -91,7 +92,10 @@ public class ComponentSelectorDialog
 	/** Button as field for repaint in addSelectedAgent. */
 	protected JButton	ok;
 	/** Panel as field for repaint in addSelectedAgent. */
-	protected ComponentTreePanel	comptree;
+//	protected ComponentTreePanel	comptree;
+	protected JComponent	comptree;
+	
+	protected JList list;
 	
 	//-------- constructors --------
 
@@ -130,8 +134,9 @@ public class ComponentSelectorDialog
 		dia.setVisible(true);
 		this.singleselection	= false;
 
-		this.comptree.dispose();
-
+//		this.comptree.dispose();
+		disposeTreeView();
+		
 		return !aborted && sels.size()>0 ? (IComponentIdentifier)sels.get(0) : null;
 	}
 
@@ -152,7 +157,8 @@ public class ComponentSelectorDialog
 		aborted	= false;
 		dia.setVisible(true);
 
-		this.comptree.dispose();
+//		this.comptree.dispose();
+		disposeTreeView();
 
 		IComponentIdentifier[]	ret	= null;
 		if(!aborted)
@@ -198,7 +204,6 @@ public class ComponentSelectorDialog
 		ok.setPreferredSize(cancel.getPreferredSize());
 		help.setMinimumSize(cancel.getMinimumSize());
 		help.setPreferredSize(cancel.getPreferredSize());
-
 		
 		select.setEnabled(false);
 		newaid.setEnabled(!singleselection || sels.size()==0);
@@ -206,50 +211,51 @@ public class ComponentSelectorDialog
 		removeall.setEnabled(sels.size()>0);
 		ok.setEnabled(!singleselection || sels.size()>0);
 		
-		final JList	list = new JList(sels);
+		list = new JList(sels);
 		
-		this.comptree = new ComponentTreePanel(access, cmshandler, iconcache);
-		comptree.setPreferredSize(new Dimension(200, 100));
-		comptree.addNodeHandler(new INodeHandler()
-		{
-			public Action[] getPopupActions(ITreeNode[] nodes)
-			{
-				return null;
-			}
-			
-			public Icon getOverlay(ITreeNode node)
-			{
-				Icon	ret	= null;
-				if(node instanceof IActiveComponentTreeNode)
-				{
-					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-					if(sels.contains(id))
-					{
-						ret	= icons.getIcon("edit_overlay");
-					}
-				}
-				return ret;
-			}
-			
-			public Action getDefaultAction(final ITreeNode node)
-			{
-				Action	a	= null;
-				if(node instanceof IActiveComponentTreeNode)
-				{
-					a	= new AbstractAction()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							// Use clone to keep original aid unchanged.
-							IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-							addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
-							comptree.getModel().fireNodeChanged(node);
-						}
-					};
-				}
-				return a;
-			}
-		});
+		this.comptree = createTreeView();
+//		this.comptree = new ComponentTreePanel(access, cmshandler, iconcache);
+//		comptree.setPreferredSize(new Dimension(200, 100));
+//		comptree.addNodeHandler(new INodeHandler()
+//		{
+//			public Action[] getPopupActions(ITreeNode[] nodes)
+//			{
+//				return null;
+//			}
+//			
+//			public Icon getOverlay(ITreeNode node)
+//			{
+//				Icon	ret	= null;
+//				if(node instanceof IActiveComponentTreeNode)
+//				{
+//					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+//					if(sels.contains(id))
+//					{
+//						ret	= icons.getIcon("edit_overlay");
+//					}
+//				}
+//				return ret;
+//			}
+//			
+//			public Action getDefaultAction(final ITreeNode node)
+//			{
+//				Action	a	= null;
+//				if(node instanceof IActiveComponentTreeNode)
+//				{
+//					a	= new AbstractAction()
+//					{
+//						public void actionPerformed(ActionEvent e)
+//						{
+//							// Use clone to keep original aid unchanged.
+//							IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+//							addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
+//							comptree.getModel().fireNodeChanged(node);
+//						}
+//					};
+//				}
+//				return a;
+//			}
+//		});
 		
 		
 		JScrollPane	sp	= new JScrollPane(list);
@@ -311,23 +317,23 @@ public class ComponentSelectorDialog
 		seltreepanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Selected Agents "));
 		// Add border to aidpanel.
 		aidpanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Agent Identifier "));
-		// When user selects an agent in tree, show aid in panel.
-		comptree.getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
-		{
-			public void valueChanged(TreeSelectionEvent e)
-			{
-				boolean	selectenabled	= false;
-				if(comptree.getTree().getLastSelectedPathComponent()!=null)
-				{
-					Object	node	= comptree.getTree().getLastSelectedPathComponent();
-					if(node instanceof IActiveComponentTreeNode)
-					{
-						selectenabled	= !singleselection || sels.size()==0;
-					}
-				}
-				select.setEnabled(selectenabled);
-			}
-		});
+//		// When user selects an agent in tree, show aid in panel.
+//		comptree.getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
+//		{
+//			public void valueChanged(TreeSelectionEvent e)
+//			{
+//				boolean	selectenabled	= false;
+//				if(comptree.getTree().getLastSelectedPathComponent()!=null)
+//				{
+//					Object	node	= comptree.getTree().getLastSelectedPathComponent();
+//					if(node instanceof IActiveComponentTreeNode)
+//					{
+//						selectenabled	= !singleselection || sels.size()==0;
+//					}
+//				}
+//				select.setEnabled(selectenabled);
+//			}
+//		});
 							
 		parent = SGUI.getWindowParent(parent);
 		final JDialog	dia	= parent instanceof Frame
@@ -349,21 +355,12 @@ public class ComponentSelectorDialog
 //		{
 //			help.addActionListener(new CSH.DisplayHelpFromSource(hb));
 //		}
-
 		
 		select.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(!comptree.getTree().getSelectionModel().isSelectionEmpty())
-				{
-					final Object node = comptree.getTree().getLastSelectedPathComponent();
-					if(node instanceof IActiveComponentTreeNode)
-					{
-						IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-						addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
-					}
-				}
+				addSelected();
 			}
 		});
 		newaid.addActionListener(new ActionListener()
@@ -387,7 +384,7 @@ public class ComponentSelectorDialog
 					{
 						newaid.setEnabled(true);
 						ok.setEnabled(false);
-						if(!comptree.getTree().getSelectionModel().isSelectionEmpty())
+						if(!isTreeViewSelectionEmpty())
 						{
 							select.setEnabled(true);
 						}
@@ -406,7 +403,7 @@ public class ComponentSelectorDialog
 				{
 					newaid.setEnabled(true);
 					ok.setEnabled(false);
-					if(!comptree.getTree().getSelectionModel().isSelectionEmpty())
+					if(!isTreeViewSelectionEmpty())
 					{
 						select.setEnabled(true);
 					}
@@ -457,6 +454,119 @@ public class ComponentSelectorDialog
 		return dia;
 	}
 
+	/**
+	 * 
+	 */
+	protected JComponent createTreeView()
+	{
+		final ComponentTreePanel comptree = new ComponentTreePanel(access, cmshandler, iconcache);
+		comptree.setPreferredSize(new Dimension(200, 100));
+		comptree.addNodeHandler(new INodeHandler()
+		{
+			public Action[] getPopupActions(ITreeNode[] nodes)
+			{
+				return null;
+			}
+			
+			public Icon getOverlay(ITreeNode node)
+			{
+				Icon	ret	= null;
+				if(node instanceof IActiveComponentTreeNode)
+				{
+					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+					if(sels.contains(id))
+					{
+						ret	= icons.getIcon("edit_overlay");
+					}
+				}
+				return ret;
+			}
+			
+			public Action getDefaultAction(final ITreeNode node)
+			{
+				Action	a	= null;
+				if(node instanceof IActiveComponentTreeNode)
+				{
+					a	= new AbstractAction()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							// Use clone to keep original aid unchanged.
+							IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+							addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
+							comptree.getModel().fireNodeChanged(node);
+						}
+					};
+				}
+				return a;
+			}
+		});
+		
+		comptree.getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
+		{
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				boolean	selectenabled	= false;
+				if(comptree.getTree().getLastSelectedPathComponent()!=null)
+				{
+					Object	node	= comptree.getTree().getLastSelectedPathComponent();
+					if(node instanceof IActiveComponentTreeNode)
+					{
+						selectenabled	= !singleselection || sels.size()==0;
+					}
+				}
+				select.setEnabled(selectenabled);
+			}
+		});
+		
+		return comptree;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void disposeTreeView()
+	{
+		((ComponentTreePanel)comptree).dispose();
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isTreeViewSelectionEmpty()
+	{
+		return ((ComponentTreePanel)comptree).getTree().getSelectionModel().isSelectionEmpty();
+	}
+	
+	/**
+	 * 
+	 */
+	protected IComponentIdentifier getSelectedObject()
+	{
+		IComponentIdentifier ret = null;
+		Object node = ((ComponentTreePanel)comptree).getTree().getLastSelectedPathComponent();
+		if(node instanceof IActiveComponentTreeNode)
+		{
+			ret	= ((IActiveComponentTreeNode)node).getDescription().getName();
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addSelected()
+	{
+		if(!isTreeViewSelectionEmpty())
+		{
+			IComponentIdentifier cid = getSelectedObject();
+			if(cid!=null)
+			{
+				addSelectedAgent(new ComponentIdentifier(cid.getName(), cid.getAddresses()), list);
+			}
+		}
+	}
+	
 	/**
 	 *  Add an agent to the list of selected agents
 	 *  @param agent	The agent to add.

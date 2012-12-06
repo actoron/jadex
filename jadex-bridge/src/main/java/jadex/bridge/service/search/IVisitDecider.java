@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ public interface IVisitDecider
 	 *  @param target The target data provider.
 	 *  @param results The collection of preliminary results.
 	 */
-	public boolean searchNode(IServiceProvider start, IServiceProvider source, IServiceProvider target, boolean ischild, Collection results);
+	public boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, boolean ischild, Collection results);
 	
 	/**
 	 *  Get the cache key.

@@ -1029,7 +1029,7 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Internal verify method that just checks if f-pubkey(content)=signed.
 	 */
-	protected boolean verifyCall(byte[] content, byte[] signed, Certificate cert)
+	public boolean verifyCall(byte[] content, byte[] signed, Certificate cert)
 	{
 		boolean ret = false;
 		
@@ -1116,7 +1116,7 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
-	 * 
+	 *  Get the alogrithm name of a certificate.
 	 */
 	protected String getAlgorithm(Certificate cert)
 	{
@@ -1136,10 +1136,10 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
-	 *  Get the sid.
-	 *  @return The sid.
+	 *  Get the service identifier.
+	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getSid()
+	public IServiceIdentifier getServiceIdentifier()
 	{
 		return sid;
 	}
@@ -1203,7 +1203,9 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
-	 * 
+	 *  Get the mechanism for a type.
+	 *  @param type The type.
+	 *  @return The mechanism.
 	 */
 	protected AAcquisitionMechanism getMechanism(Class<?> type)
 	{

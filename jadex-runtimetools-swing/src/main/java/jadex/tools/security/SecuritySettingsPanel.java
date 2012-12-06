@@ -228,6 +228,11 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 						CertificatePanel ct = new CertificatePanel((Certificate[])kse.getDetails());
 						pdetails.add(ct, BorderLayout.CENTER);
 					}
+					else if(kse.getDetails() instanceof Certificate)
+					{
+						CertificatePanel ct = new CertificatePanel(new Certificate[]{(Certificate)kse.getDetails()});
+						pdetails.add(ct, BorderLayout.CENTER);
+					}
 //					else
 //					{
 //						System.out.println("o: "+kse.getDetails());
@@ -309,7 +314,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		act.run();
 
 		// The acquire certificate settings
-		final AcquireCertificatePanel acp = new AcquireCertificatePanel(secservice, null, 0);
+		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, null, 0);
 		secservice.getAcquisitionMechanisms().addResultListener(new SwingDefaultResultListener<List<MechanismInfo>>()
 		{
 			public void customResultAvailable(List<MechanismInfo> result) 

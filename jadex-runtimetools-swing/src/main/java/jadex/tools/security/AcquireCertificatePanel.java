@@ -1,16 +1,25 @@
 package jadex.tools.security;
 
+import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.PlatformSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -20,11 +29,14 @@ import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
@@ -32,6 +44,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  */
 public class AcquireCertificatePanel extends JPanel
 {
+	protected IExternalAccess ea;
+	
 	protected ISecurityService secser;
 	
 	protected List<MechanismInfo> mechanisms;
@@ -41,8 +55,9 @@ public class AcquireCertificatePanel extends JPanel
 	/**
 	 * 
 	 */
-	public AcquireCertificatePanel(ISecurityService secser, List<MechanismInfo> mechanisms, int sel)
+	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, List<MechanismInfo> mechanisms, int sel)
 	{
+		this.ea = ea;
 		this.secser = secser;
 		this.mechanisms = mechanisms;
 		
@@ -86,49 +101,19 @@ public class AcquireCertificatePanel extends JPanel
 						List<ParameterInfo> pis = mi.getParameterInfos();
 						for(final ParameterInfo pi: pis)
 						{
-							final JTextField tf = pp.createTextField(pi.getName(), pi.getValue()==null? "": ""+pi.getValue(), true);
-							final Runnable act = new Runnable()
+							Class<?> tcl = pi.getType();
+							if(boolean.class.equals(tcl) || Boolean.class.equals(tcl))
 							{
-								public void run()
-								{
-									Object val = tf.getText();
-									Class<?> cl = pi.getType();
-									if(!String.class.equals(cl))
-									{
-										IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(cl);
-										if(conv==null) // todo:
-											return;
-										
-										try
-										{
-											val = conv.convertString((String)val, null);
-										}
-										catch(Exception ex)
-										{
-											throw new RuntimeException(ex);
-										}
-									}
-									AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), val);
-								}
-							};
-							tf.addActionListener(new ActionListener()
+								createCheckBox(pp, pi, mi);
+							}
+							else if(IComponentIdentifier.class.equals(tcl))
 							{
-								public void actionPerformed(ActionEvent e)
-								{
-									act.run();
-								}
-							});
-							tf.addFocusListener(new FocusListener()
+								createCidChooser(pp, pi, mi);
+							}
+							else
 							{
-								public void focusLost(FocusEvent e)
-								{
-									act.run();
-								}
-	
-								public void focusGained(FocusEvent e)
-								{
-								}
-							});
+								createTextField(pp, pi, mi);
+							}
 						}
 						pdetail.add(pp, cl);
 					}
@@ -156,5 +141,123 @@ public class AcquireCertificatePanel extends JPanel
 			cbmechs.addItem(mi);
 		}
 		cbmechs.addItem("None");
+	}
+	
+	/**
+	 * 
+	 */
+	protected void createTextField(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi)
+	{
+		final JTextField tf = pp.createTextField(pi.getName(), pi.getValue()==null? "": ""+pi.getValue(), true);
+		tf.setToolTipText(pi.getDescription());
+		final Runnable action = new Runnable()
+		{
+			public void run()
+			{
+				Object val = tf.getText();
+				Class<?> cl = pi.getType();
+				if(!String.class.equals(cl))
+				{
+					IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(cl);
+					if(conv==null) // todo:
+						return;
+					
+					try
+					{
+						val = conv.convertString((String)val, null);
+					}
+					catch(Exception ex)
+					{
+						throw new RuntimeException(ex);
+					}
+				}
+				AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), val);
+			}
+		};
+		addTextFieldListener(action, tf);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void createCheckBox(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi)
+	{
+		final JCheckBox cb = pp.createCheckBox(pi.getName(), ((Boolean)pi.getValue()).booleanValue(), true);
+		cb.setToolTipText(pi.getDescription());
+		cb.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), 
+					cb.isSelected()? Boolean.TRUE: Boolean.FALSE);
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void createCidChooser(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi)
+	{
+		final JTextField tf = new JTextField();
+		tf.setToolTipText(pi.getDescription());
+		final JButton bu = new JButton("...");
+		bu.setMargin(new Insets(0,0,0,0));
+		
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(tf, BorderLayout.CENTER);
+		p.add(bu, BorderLayout.EAST);
+		
+		pp.addComponent(pi.getName(), p);
+		
+		final CMSUpdateHandler cmsuh = new CMSUpdateHandler(ea);
+		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(this), ea, cmsuh, new ComponentIconCache(ea));
+		
+		bu.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				IComponentIdentifier cid = csd.selectAgent(null);
+				if(cid!=null)
+				{
+					tf.setText(cid.getName());
+					AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), cid);
+				}
+			}
+		});
+		addTextFieldListener(new Runnable()
+		{
+			public void run()
+			{
+				String name = tf.getText();
+				IComponentIdentifier cid = name.length()>0? new ComponentIdentifier(name): null; 
+				AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), cid);
+			}
+		}, tf);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addTextFieldListener(final Runnable action, JTextField tf)
+	{
+		tf.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				action.run();
+			}
+		});
+		tf.addFocusListener(new FocusListener()
+		{
+			public void focusLost(FocusEvent e)
+			{
+				action.run();
+			}
+
+			public void focusGained(FocusEvent e)
+			{
+			}
+		});
 	}
 }

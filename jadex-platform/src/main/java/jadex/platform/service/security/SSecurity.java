@@ -22,7 +22,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.interfaces.DSAKey;
-import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 import java.util.Date;
 

@@ -30,8 +30,8 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 {
 	//-------- attributes --------
 	
-	/** The aquirecnt (<1=disabled). */
-	protected int aquirecnt;
+	/** The number of responses (<1=disabled). */
+	protected int responses;
 	
 	//-------- constructors --------
 
@@ -48,7 +48,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public DecentralizedAcquisitionMechanism(int aquirecnt)
 	{
-		this.aquirecnt = aquirecnt;
+		this.responses = aquirecnt;
 	}
 	
 	//-------- methods --------
@@ -60,7 +60,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		final Future<Certificate> ret = new Future<Certificate>();
 
-		if(aquirecnt<1)
+		if(responses<1)
 		{
 			ret.setException(new SecurityException("Certificate not available and aquisition disabled: "+name));
 			return ret;
@@ -82,14 +82,14 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 			{
 				ongoing++;
 				
-				if(!((IService)ss).getServiceIdentifier().equals(secser.getSid()))
+				if(!((IService)ss).getServiceIdentifier().equals(secser.getServiceIdentifier()))
 				{
 					ss.getPlatformCertificate(cid).addResultListener(new IResultListener<Certificate>()
 					{
 						public void resultAvailable(Certificate cert)
 						{
 							certs.add(cert);
-							if(certs.size()>=aquirecnt && !ret.isDone())
+							if(certs.size()>=responses && !ret.isDone())
 							{
 								try
 								{
@@ -164,9 +164,9 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public MechanismInfo getMechanismInfo()
 	{
-		ParameterInfo pi = new ParameterInfo("aquirecnt", int.class, new Integer(aquirecnt));
 		List<ParameterInfo> params = new ArrayList<ParameterInfo>();
-		params.add(pi);
+		params.add(new ParameterInfo("responses", "Number of evaluated certificate responses " +
+			"(must all be equal, use 1 for bootstrapping, use <1 to disable)", int.class, new Integer(responses)));
 		MechanismInfo ret = new MechanismInfo("Decentralized", getClass(), params);
 		return ret;
 	}
@@ -178,9 +178,9 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		System.out.println("set param val: "+name+" "+value);
 		
-		if("aquirecnt".equals(name))
+		if("responses".equals(name))
 		{
-			aquirecnt = ((Integer)value).intValue();
+			responses = ((Integer)value).intValue();
 		}
 		else
 		{

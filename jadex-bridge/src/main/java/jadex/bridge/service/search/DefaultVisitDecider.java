@@ -64,7 +64,7 @@ public class DefaultVisitDecider implements IVisitDecider
 	 *  @param target The target data provider.
 	 *  @param results The preliminary results.
 	 */
-	public synchronized boolean searchNode(IServiceProvider start, IServiceProvider source, IServiceProvider target, boolean ischild, Collection results)
+	public synchronized boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, boolean ischild, Collection results)
 	{
 		boolean ret = !(abort && results.size()>0);
 		
@@ -79,17 +79,18 @@ public class DefaultVisitDecider implements IVisitDecider
 			else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 			{
 				// Ok when target is child of source or source itself.
-				ret = source==null || ischild && !isRemoteComponent(target);
+				ret = (source==null || ischild) && isSamePlatform(source, target);
 			}
 			else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 			{
 				// Ok when does not cross application boundary.
-				ret = (!isApplication(source) || ischild) && !isRemoteComponent(target);
+				ret = (!isApplication(source) || ischild) && isSamePlatform(source, target);
 			}
 			else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 			{
 				// Ok when does not cross application boundary.
-				ret = !isRemoteComponent(target);
+				// cannot be used as else the proxy services cannot be found
+				ret = isSamePlatform(source, target);
 			}
 			else if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			{
@@ -186,18 +187,16 @@ public class DefaultVisitDecider implements IVisitDecider
 	/**
 	 *  Test if a target is an application component.
 	 */
-	protected boolean isApplication(IServiceProvider source)
+	protected boolean isApplication(IComponentIdentifier source)
 	{
-		IComponentIdentifier	cid	= source!=null ? (IComponentIdentifier)source.getId() : null;
-		return source!=null && cid.getParent()!=null && cid.getParent().getParent()==null;
-//		return source!=null && source.getType()!=null && source.getType().toLowerCase().indexOf("application")!=-1;
+		return source!=null && source.getParent()!=null && source.getParent().getParent()==null;
 	}
 	
 	/**
 	 *  Test if a target is a remote component.
 	 */
-	protected boolean isRemoteComponent(IServiceProvider target)
+	protected boolean isSamePlatform(IComponentIdentifier source, IComponentIdentifier target)
 	{
-		return target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1;
+		return source==null || (target!=null && source.getPlatformName().equals(target.getPlatformName())); 
 	}
 }
