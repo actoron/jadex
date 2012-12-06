@@ -101,8 +101,7 @@ public class SValidation
 	 *  @param target The proposed target of the edge.
 	 *  @return Error message explaining why the connection is invalid or null if valid.
 	 */
-	public static String getSequenceEdgeValidationError(Object source,
-			Object target)
+	public static String getSequenceEdgeValidationError(Object source, Object target)
 	{
 		String error = null;
 		if (!(source instanceof VActivity) && !(target instanceof VActivity))

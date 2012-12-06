@@ -61,7 +61,7 @@ public class EventHandlerLayout extends mxGraphLayout
 			double pw = vparent.getGeometry().getWidth();
 			Dimension evtsize = new Dimension(BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_BOUNDARY"));
 //			double vpos = graph.getBoundingBox(vparent).getHeight() - 0.5 * evtsize.height;
-			double vpos = vparent.getGeometry().getHeight() - 0.5 * evtsize.height;
+			double vpos = vparent.getGeometry().getHeight() - 0.5 * evtsize.height - 1;
 			double dist = evtsize.width * 1.5;
 //			System.out.println(dist);
 			while (dist * evthandlers.size() > (pw - dist))// * 2.0))

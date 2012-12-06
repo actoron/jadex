@@ -45,6 +45,7 @@ public class EdgeController extends mxConnectionHandler
 	public EdgeController(BpmnGraphComponent graphcomponent)
 	{
 		super(graphcomponent);
+		marker.setHotspot(0.1);
 	}
 	
 	/**
