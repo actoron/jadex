@@ -306,7 +306,7 @@ public class StarterPanel extends JLayeredPane
 			{
 				if(model!=null)
 				{
-					final Map rawargs = new HashMap();
+					final Map<String, String> rawargs = new HashMap();
 					for(int i=0; i<argelems.size(); i++)
 					{
 						String argname = ((JLabel)arguments.getComponent(i*4+1)).getText();
@@ -316,68 +316,14 @@ public class StarterPanel extends JLayeredPane
 					
 					final IResourceIdentifier modelrid = model.getResourceIdentifier();
 //					System.out.println("a: "+modelrid);
-					jcc.getPlatformAccess().scheduleStep(new IComponentStep<Map>()
-					{
-						@Classname("start")
-						public IFuture<Map> execute(IInternalAccess ia)
-						{
-//							System.out.println("b: "+ia.getComponentIdentifier().getName());
-							final Future<Map> ret = new Future<Map>();
-							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, Map>(ret)
-							{
-								public void customResultAvailable(ILibraryService ls)
-								{
-									ls.getClassLoader(modelrid).addResultListener(new SwingDefaultResultListener<ClassLoader>()
-									{
-										public void customResultAvailable(ClassLoader cl)
-										{
-											Map args = SCollection.createHashMap();
-											String errortext = null;
-											for(Iterator it = rawargs.keySet().iterator(); it.hasNext(); )
-											{
-												String argname = (String)it.next();
-												String argval = (String)rawargs.get(argname);
-												if(argval.length()>0)
-												{
-													Object arg = null;
-													try
-													{
-//														arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
-														arg = new JavaCCExpressionParser().parseExpression(argval, null, null, cl).getValue(null);
-													}
-													catch(Exception e)
-													{
-														if(errortext==null)
-															errortext = "Error within argument expressions:\n";
-														errortext += argname+" "+e.getMessage()+"\n";
-													}
-													args.put(argname, arg);
-													
-												}
-											}
-											if(errortext==null)
-											{
-												ret.setResult(args);
-											}
-											else
-											{
-												ret.setException(new RuntimeException(errortext));
-											}
-										}
-									});
-								}
-							}));
-							return ret;
-						}
-					}).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+					SRemoteGui.parseArgs(rawargs, modelrid, jcc.getPlatformAccess())
+						.addResultListener(new SwingDefaultResultListener<Map<String, Object>>(StarterPanel.this)
 					{
 //						JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), errortext, 
 //							"Display Problem", JOptionPane.INFORMATION_MESSAGE);
 						
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Map<String, Object> args)
 						{
-							Map args = (Map)result;
 							final String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
 							final String fullname = model.getFullName();//model.getPackage()+"."+model.getName();
 							final IModelInfo mymodel = model;
@@ -1675,19 +1621,8 @@ public class StarterPanel extends JLayeredPane
 		final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
-		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IComponentManagementService>()
-		{
-			@Classname("create-component")
-			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
-			{
-				Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//				ia.getRequiredService("cms")
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
-				
-				return ret;
-			}
-		}).addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
+		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{

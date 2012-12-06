@@ -3,6 +3,7 @@ package jadex.android.controlcenter.settings;
 import jadex.android.controlcenter.preference.JadexDoublePreference;
 import jadex.android.controlcenter.preference.JadexIntegerPreference;
 import jadex.android.service.JadexPlatformManager;
+import jadex.base.SRemoteClock.ClockState;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -25,7 +26,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.platform.service.simulation.ClockState;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;

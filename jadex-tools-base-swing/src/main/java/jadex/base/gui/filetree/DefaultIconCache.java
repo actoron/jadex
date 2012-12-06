@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.JarAsDirectory;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filechooser.RemoteFile;
 import jadex.bridge.service.types.deployment.FileData;

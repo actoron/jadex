@@ -1,5 +1,6 @@
 package jadex.tools.testcenter;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.IFileNode;
@@ -277,7 +278,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 								{
 									public void customResultAvailable(final IResourceIdentifier rid)
 									{
-										STestCenter.isTestcase(model, getJCC().getPlatformAccess(), rid)
+										SRemoteGui.isTestcase(model, getJCC().getPlatformAccess(), rid)
 											.addResultListener(new SwingDefaultResultListener(mpanel)
 										{
 											public void customResultAvailable(Object result)
@@ -520,7 +521,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					{
 						public void customResultAvailable(final IResourceIdentifier rid)
 						{
-							STestCenter.isTestcase(model, getJCC().getPlatformAccess(), rid)
+							SRemoteGui.isTestcase(model, getJCC().getPlatformAccess(), rid)
 								.addResultListener(new SwingDefaultResultListener(mpanel)
 							{
 								public void customResultAvailable(Object result)

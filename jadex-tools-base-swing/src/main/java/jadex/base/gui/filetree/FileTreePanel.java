@@ -1,13 +1,12 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.IRemoteFilter;
@@ -21,7 +20,8 @@ import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingIntermediateExceptionDelegationResultListener;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -32,6 +32,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -377,25 +378,17 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		final TreeProperties	mep	= new TreeProperties();
 		final RootNode root = (RootNode)getTree().getModel().getRoot();
 		
-		final Future	rootdone	= new Future();
+		final Future<Void>	rootdone	= new Future<Void>();
 		if(!keeproots)
 		{
 			// Convert path to relative must be done on target platform.
 			final String[] paths	= root.getPathEntries();
-			exta.scheduleStep(new IComponentStep<String[]>()
+			SRemoteGui.convertPathsToRelative(paths, exta)
+				.addResultListener(new SwingExceptionDelegationResultListener<Collection<String>, Void>(rootdone)
 			{
-				@Classname("convertPathToRelative")
-				public IFuture<String[]> execute(IInternalAccess ia)
+				public void customResultAvailable(Collection<String> paths)
 				{
-					for(int i=0; i<paths.length; i++)
-						paths[i]	= SUtil.convertPathToRelative(paths[i]);
-					return new Future<String[]>(paths);
-				}
-			}).addResultListener(new SwingDelegationResultListener<String[]>(rootdone)
-			{
-				public void customResultAvailable(String[] paths)
-				{
-					mep.setRootPathEntries(paths);
+					mep.setRootPathEntries(paths.toArray(new String[paths.size()]));
 					rootdone.setResult(null);
 				}
 			});
@@ -476,7 +469,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 				final TreeProperties	mep	= (TreeProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 				final RootNode root = (RootNode)getTree().getModel().getRoot();
 				
-				final Future	rootdone	= new Future();
+				final Future<Void>	rootdone	= new Future<Void>();
 				if(!keeproots)
 				{
 					final String[]	entries	= mep.getRootPathEntries();
@@ -497,31 +490,17 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						}
 						else
 						{
-							exta.scheduleStep(new IComponentStep<FileData[]>()
-							{
-								@Classname("createRootEntries")
-								public IFuture<FileData[]> execute(IInternalAccess ia)
+							SRemoteGui.checkExistence(entries, exta)
+								.addResultListener(new SwingIntermediateExceptionDelegationResultListener<FileData, Void>(rootdone)
+							{								
+								public void customIntermediateResultAvailable(FileData file)
 								{
-									List<FileData>	ret	= new ArrayList<FileData>();
-									for(int i=0; i<entries.length; i++)
-									{
-										File f = new File(entries[i]);
-										if(f.exists())
-										{
-											ret.add(new FileData(new File(entries[i]).getAbsoluteFile()));
-										}
-									}
-									return new Future<FileData[]>((FileData[])ret.toArray(new FileData[ret.size()]));
+									ITreeNode node = factory.createNode(root, model, tree, file, iconcache, exta, factory);
+									addNode(node);
 								}
-							}).addResultListener(new SwingDelegationResultListener<FileData[]>(rootdone)
-							{
-								public void customResultAvailable(FileData[] entries)
+								
+								public void customFinished()
 								{
-									for(int i=0; i<entries.length; i++)
-									{
-										ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, exta, factory);
-										addNode(node);
-									}
 									rootdone.setResult(null);
 								}
 							});

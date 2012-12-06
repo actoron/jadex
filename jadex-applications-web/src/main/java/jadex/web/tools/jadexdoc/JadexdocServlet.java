@@ -1,7 +1,7 @@
 package jadex.web.tools.jadexdoc;
 
+import jadex.base.JarAsDirectory;
 import jadex.base.Starter;
-import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;

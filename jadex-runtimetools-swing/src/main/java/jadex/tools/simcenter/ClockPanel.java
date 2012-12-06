@@ -1,20 +1,10 @@
 package jadex.tools.simcenter;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.RemoteChangeListenerHandler;
+import jadex.base.SRemoteClock;
+import jadex.base.SRemoteClock.ClockState;
 import jadex.bridge.service.types.clock.IClock;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
-import jadex.commons.IRemoteChangeListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.service.simulation.ClockState;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -25,8 +15,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.JCheckBox;
@@ -225,27 +213,10 @@ public class ClockPanel	extends JPanel
 			{
 				if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
 					return;
-		
+				
 				try
 				{
-					final double dil = ((Double)dilation.getValue()).doubleValue();
-					final IClockService	cs	= simp.getSimulationService().getClockService();
-					simp.getComponentForService().addResultListener(new SwingDefaultResultListener(ClockPanel.this)
-					{
-						public void customResultAvailable(Object result)
-						{
-							IExternalAccess	access	= (IExternalAccess)result;
-							access.scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("setDilation")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									cs.setDilation(dil);
-									return IFuture.DONE;
-								}
-							});
-						}
-					});
+					SRemoteClock.setDilation(((Double)dilation.getValue()).doubleValue(), simp.getJCC().getPlatformAccess());
 				}
 				catch(NumberFormatException ex)
 				{
@@ -259,24 +230,7 @@ public class ClockPanel	extends JPanel
 			{
 				try
 				{
-					final long tick = Long.parseLong(ticksize.getText());
-					final IClockService	cs	= simp.getSimulationService().getClockService();
-					simp.getComponentForService().addResultListener(new SwingDefaultResultListener(ClockPanel.this)
-					{
-						public void customResultAvailable(Object result)
-						{
-							IExternalAccess	access	= (IExternalAccess)result;
-							access.scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("setDilation")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									cs.setDelta(tick);
-									return IFuture.DONE;
-								}
-							});
-						}
-					});
+					SRemoteClock.setDelta(Long.parseLong(ticksize.getText()), simp.getJCC().getPlatformAccess());
 				}
 				catch(NumberFormatException ex)
 				{
@@ -384,141 +338,24 @@ public class ClockPanel	extends JPanel
 		// Called from check box -> change state.
 		else
 		{
-			final IRemoteChangeListener	rcl	= new IRemoteChangeListener()
-			{
-				public IFuture changeOccurred(ChangeEvent event)
-				{
-					handleEvent(event);
-					return IFuture.DONE;
-				}
-				
-				public void	handleEvent(ChangeEvent event)
-				{
-					if(RemoteChangeListenerHandler.EVENT_BULK.equals(event.getType()))
-					{
-						Collection	events	= (Collection)event.getValue();
-						for(Iterator it=events.iterator(); it.hasNext(); )
-						{
-							handleEvent((ChangeEvent)it.next());
-						}
-					}
-					else
-					{
-						updateView((ClockState)event.getValue());
-					}
-				}
-			};
+			final String	id	= "ClockPanel"+ClockPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
+			final ISimulationService	simservice	= simp.getSimulationService();
 			
-			simp.getComponentForService().addResultListener(new SwingDefaultResultListener(ClockPanel.this)
+			if(active)
 			{
-				public void customResultAvailable(Object result)
+				SRemoteClock.addClockListener(id, simservice, simp.getJCC().getPlatformAccess())
+					.addResultListener(new SwingIntermediateDefaultResultListener<ClockState>(ClockPanel.this)
 				{
-					IExternalAccess	access	= (IExternalAccess)result;
-					final String	id	= "ClockPanel"+ClockPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
-					final ISimulationService	simservice	= simp.getSimulationService();
-					access.scheduleStep(new IComponentStep<Void>()
+					public void customIntermediateResultAvailable(ClockState result)
 					{
-						@Classname("addListener")
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							RemoteClockChangeListener	rccl	= new RemoteClockChangeListener(id, ia, rcl, simservice);
-							if(active)
-							{
-//								System.out.println("register listener: "+id);
-								simservice.addChangeListener(rccl);
-								simservice.getClockService().addChangeListener(rccl);
-								
-								// Initial event.
-								rccl.changeOccurred(null);
-							}
-							else
-							{
-								simservice.removeChangeListener(rccl);
-								simservice.getClockService().removeChangeListener(rccl);
-//								System.out.println("deregister listener: "+id);
-							}
-							return IFuture.DONE;
-						}
-					});
-				}
-			});
-		}
-	}
-	
-	//--------- helper classes --------
-	
-
-	
-	/**
-	 *  The remote clock change listener.
-	 */
-	public static class RemoteClockChangeListener	extends RemoteChangeListenerHandler	implements IChangeListener
-	{
-		//-------- attributes --------
-		
-		/** The simulation service. */
-		protected ISimulationService	simservice;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a BPMN listener.
-		 */
-		public RemoteClockChangeListener(String id, IInternalAccess instance, IRemoteChangeListener rcl, ISimulationService simservice)
-		{
-			super(id, instance, rcl);
-			this.simservice	= simservice;
-		}
-		
-		//-------- IChangeListener interface --------
-		
-		/**
-		 *  Called when the process executes.
-		 */
-		public void changeOccurred(ChangeEvent event)
-		{
-			// Code in component result listener as clock runs on its own thread. 
-			simservice.isExecuting().addResultListener(instance.createResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					try
-					{
-//						System.out.println("elementChanged");
-						boolean	executing	= ((Boolean)result).booleanValue();
-						IClockService	cs	= simservice.getClockService();
-						elementChanged("clock", new ClockState(cs.getClockType(), cs.getTime(), cs.getTick(), cs.getStarttime(),
-							cs.getDelta(), IClock.TYPE_CONTINUOUS.equals(cs.getClockType()) ? cs.getDilation() : 0, !executing));
+						updateView(result);
 					}
-					catch(Exception e)
-					{
-						exceptionOccurred(e);
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					dispose();
-				}
-			}));
-		}
-
-		/**
-		 *  Remove local listeners.
-		 */
-		protected void dispose()
-		{
-			super.dispose();
-			try
-			{
-				simservice.removeChangeListener(this);
-				simservice.getClockService().removeChangeListener(this);
+				});
 			}
-			catch(Exception e)
+			else
 			{
-				
+				SRemoteClock.removeClockListener(id, simservice, simp.getJCC().getPlatformAccess());
 			}
-//			System.out.println("dispose: "+id);
 		}
 	}
 }

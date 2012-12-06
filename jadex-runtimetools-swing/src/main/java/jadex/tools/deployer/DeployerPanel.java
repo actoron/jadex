@@ -1,9 +1,9 @@
 package jadex.tools.deployer;
 
+import jadex.base.JarAsDirectory;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
-import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;

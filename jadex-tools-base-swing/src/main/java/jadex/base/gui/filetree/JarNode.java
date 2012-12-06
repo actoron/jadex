@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.JarAsDirectory;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 

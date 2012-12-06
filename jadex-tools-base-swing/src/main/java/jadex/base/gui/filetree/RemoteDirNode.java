@@ -1,5 +1,7 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.RemoteJarFile;
+import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentStep;
@@ -12,7 +14,10 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -130,92 +135,20 @@ public class RemoteDirNode extends RemoteFileNode
 	/**
 	 *	Get a file filter according to current file type settings. 
 	 */
-	protected IFuture listFiles()
+	protected IIntermediateFuture<FileData> listFiles()
 	{
-		final Future ret = new Future();
+		final IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
 		
 		if(file instanceof RemoteJarFile)
 		{
 			RemoteJarFile myfile = (RemoteJarFile)file;
-			Collection files = myfile.listFiles();
-			
-			ret.setResult(files);
-			
-//			for(int i=0; i<files.length; i++)
-//			{
-//				final CollectionResultListener lis = new CollectionResultListener(files.length, 
-//					true, new DelegationResultListener(ret));
-//				final RemoteJarFile ff = (RemoteJarFile)files[i];
-//				filter.filter(files[i]).addResultListener(new IResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//						if(((Boolean)result).booleanValue())
-//							lis.resultAvailable(ff);
-//						else
-//							lis.exceptionOccurred(null);
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						lis.exceptionOccurred(null);
-//					}
-//				});
-//			}
+			Collection<FileData> files = myfile.listFiles();
+			ret.setResult(files);			
 		}
 		else
 		{
-			final FileData myfile = file;
-			final IRemoteFilter myfilter = factory.getFileFilter();
-			exta.scheduleStep(new IComponentStep<Collection>()
-			{
-				@Classname("listFiles")
-				public IFuture<Collection> execute(IInternalAccess ia)
-				{
-					Future ret = new Future();
-					
-					File f = new File(myfile.getPath());
-					final File[] files = f.listFiles();
-					if(files!=null)
-					{
-						final CollectionResultListener lis = new CollectionResultListener(files.length, 
-							true, new DelegationResultListener(ret));
-						
-						for(int i=0; i<files.length; i++)
-						{
-							if(myfilter==null)
-							{
-								lis.resultAvailable(files[i]);
-							}
-							else
-							{
-								final File file = files[i];
-								myfilter.filter(files[i]).addResultListener(new IResultListener()
-								{
-									public void resultAvailable(Object result)
-									{
-										if(((Boolean)result).booleanValue())
-											lis.resultAvailable(new FileData(file));
-										else
-											lis.exceptionOccurred(null);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										lis.exceptionOccurred(null);
-									}
-								});
-							}
-						}
-					}
-					else
-					{
-						ret.setResult(Collections.EMPTY_LIST);
-					}
-					
-					return ret;
-				}
-			}).addResultListener(new DelegationResultListener(ret));
+			SRemoteGui.listFiles(file, factory.getFileFilter(), exta)
+				.addResultListener(new IntermediateDelegationResultListener<FileData>(ret));
 		}
 		
 		return ret;

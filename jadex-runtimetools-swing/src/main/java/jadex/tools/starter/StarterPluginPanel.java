@@ -1,5 +1,6 @@
 package jadex.tools.starter;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
@@ -8,8 +9,6 @@ import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -27,7 +26,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -35,8 +33,6 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -115,28 +111,11 @@ public class StarterPluginPanel extends JPanel
 				{
 					final String	path	= ((IFileNode)node).getFilePath();
 					final String	model	= spanel.lastfile;
-					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep<Boolean>()
+					SRemoteGui.matchModel(path, model, jcc.getPlatformAccess()).addResultListener(new SwingDefaultResultListener<Boolean>()
 					{
-						@Classname("matchModel")
-						public IFuture<Boolean> execute(IInternalAccess ia)
+						public void customResultAvailable(Boolean result)
 						{
-							boolean	match	= false;
-							File	pathfile	= SUtil.urlToFile(path);
-							File	modelfile	= SUtil.urlToFile(model);
-							try
-							{
-								match	= pathfile!=null && modelfile!=null && modelfile.getCanonicalPath().startsWith(pathfile.getCanonicalPath());
-							}
-							catch(IOException e)
-							{
-							}
-							return new Future(Boolean.valueOf(match));
-						}
-					}).addResultListener(new SwingDefaultResultListener()
-					{
-						public void customResultAvailable(Object result)
-						{
-							if(((Boolean)result).booleanValue() && model.equals(spanel.lastfile))
+							if(result.booleanValue() && model.equals(spanel.lastfile))
 							{
 								spanel.loadModel(null, null);
 							}

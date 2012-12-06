@@ -139,7 +139,14 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public abstract void customResultAvailable(Collection<E> result);
+	public void customResultAvailable(Collection<E> result)
+	{
+		for(E e: result)
+		{
+			customIntermediateResultAvailable(e);
+		}
+		customFinished();
+	}
 
 	/**
 	 *  Called when the result is available.

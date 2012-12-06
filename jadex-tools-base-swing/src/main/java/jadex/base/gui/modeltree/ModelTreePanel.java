@@ -1,5 +1,6 @@
 package jadex.base.gui.modeltree;
 
+import jadex.base.ModelFileFilter;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
@@ -10,9 +11,7 @@ import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RootNode;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -113,7 +112,7 @@ public class ModelTreePanel extends FileTreePanel
 		{
 			public IRemoteFilter getFileFilter()
 			{
-				return new ModelFileFilter(mic, getRootEntries(), exta);
+				return new ModelFileFilter(mic.isAll(), mic.getSelectedComponentTypes(), getRootEntries(), exta);
 			}
 		});
 		ModelIconCache ic = new ModelIconCache(exta, getTree());
@@ -403,16 +402,9 @@ public class ModelTreePanel extends FileTreePanel
 								}
 							}
 							
-							public void customExceptionOccurred(final Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
-								localexta.scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										ia.getLogger().warning(exception.toString());
-										return IFuture.DONE;
-									}
-								});					
+								SRemoteGui.logWarning(exception.toString(), localexta);
 							}
 						});
 					}
@@ -438,16 +430,9 @@ public class ModelTreePanel extends FileTreePanel
 						ModelTreePanel.super.addNode(node);
 					}
 					
-					public void customExceptionOccurred(final Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
-						localexta.scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								ia.getLogger().warning(exception.toString());
-								return IFuture.DONE;
-							}
-						});					
+						SRemoteGui.logWarning(exception.toString(), localexta);
 					}
 				});
 			}

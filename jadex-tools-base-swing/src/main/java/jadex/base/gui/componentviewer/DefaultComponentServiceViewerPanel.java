@@ -2,20 +2,16 @@ package jadex.base.gui.componentviewer;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -59,29 +55,10 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		component.scheduleStep(new IComponentStep<List>()
+		SServiceProvider.getDeclaredServices(component.getServiceProvider())
+			.addResultListener(new IResultListener<Collection<IService>>()
 		{
-			@Classname("Step")
-//			public static final String XML_CLASSNAME = "Step"; 
-			
-			public IFuture<List> execute(final IInternalAccess ia)
-			{
-				final Future<List> ret = new Future<List>();
-				
-				SServiceProvider.getDeclaredServices(ia.getServiceContainer())
-					.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, List>(ret)
-				{
-					public void customResultAvailable(Collection<IService> result) 
-					{
-						ret.setResult(new ArrayList(result));
-					}
-				});
-				
-				return ret;
-			}
-		}).addResultListener(new IResultListener<List>()
-		{
-			public void resultAvailable(List result)
+			public void resultAvailable(Collection<IService> result)
 			{
 				createPanels(component, result).addResultListener(new DelegationResultListener<Void>(ret));
 			}
@@ -98,7 +75,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	/**
 	 *  Create the panels.
 	 */
-	protected IFuture<Void> createPanels(final IExternalAccess exta, final List services)
+	protected IFuture<Void> createPanels(final IExternalAccess exta, final Collection<IService> services)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -162,9 +139,8 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				// Service panels.
 				if(services!=null)
 				{
-					for(int i=0; i<services.size(); i++)
+					for(IService ser: services)
 					{
-						IService ser = (IService)services.get(i);
 						classes	= getGuiClasses(ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS), cl);
 						found	= false;
 						for(int j=0; !found && j<classes.length; j++)

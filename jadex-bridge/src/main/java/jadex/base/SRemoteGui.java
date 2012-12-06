@@ -9,6 +9,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -23,23 +24,35 @@ import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.MultiCollection;
+import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
 
 /**
  *  Helper class for GUI code to be executed on remote
@@ -413,6 +426,378 @@ public class SRemoteGui
 			}
 		});
 	}
+	
+	/**
+	 *  Check remote files for existence.
+	 *  @param files	The files to check.
+	 *  @return All checked files that exist.
+	 */
+	public static	IIntermediateFuture<FileData>	checkExistence(final String[] files, IExternalAccess exta)
+	{
+		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		{
+			@Classname("checkExistence")
+			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+			{
+				IntermediateFuture<FileData>	ret	= new IntermediateFuture<FileData>();
+				for(int i=0; i<files.length; i++)
+				{
+					File f = new File(files[i]);
+					if(f.exists())
+					{
+						ret.addIntermediateResult(new FileData(new File(files[i]).getAbsoluteFile()));
+					}
+				}
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Convert the given paths to relative paths.
+	 *  @param paths	The paths
+	 * 	@return	The relative paths.
+	 */
+	public static IIntermediateFuture<String>	convertPathsToRelative(final String[] paths, IExternalAccess exta)
+	{
+		return (IIntermediateFuture<String>)exta.scheduleStep(new IComponentStep<Collection<String>>()
+		{
+			@Classname("convertPathToRelative")
+			public IIntermediateFuture<String> execute(IInternalAccess ia)
+			{
+				IntermediateFuture<String>	ret	= new IntermediateFuture<String>();
+				for(String path: paths)
+				{
+					ret.addIntermediateResult(SUtil.convertPathToRelative(path));
+				}
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  List files in a directory matching a filter (if any).
+	 *  @param dir	The directory.
+	 *  @param filter	The filter or null for all files.
+	 */
+	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
+	{
+		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		{
+			@Classname("listFiles")
+			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+			{
+				IntermediateFuture<FileData>	ret	= new IntermediateFuture<FileData>();
+				
+				File f = new File(dir.getPath());
+				final File[] files = f.listFiles();
+				if(files!=null)
+				{
+					final CollectionResultListener<FileData> lis = new CollectionResultListener<FileData>(files.length, true, new IntermediateDelegationResultListener<FileData>(ret));
+					for(final File file: files)
+					{
+						if(filter==null)
+						{
+							lis.resultAvailable(new FileData(file));
+						}
+						else
+						{
+							filter.filter(file).addResultListener(new IResultListener<Boolean>()
+							{
+								public void resultAvailable(Boolean result)
+								{
+									if(result.booleanValue())
+									{
+										lis.resultAvailable(new FileData(file));
+									}
+									else
+									{
+										lis.exceptionOccurred(null);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(null);
+								}
+							});
+						}
+					}
+				}
+				else
+				{
+					ret.setFinished();
+				}
+				
+				return ret;
+			}
+		});
+	}
+
+	/**
+	 *	List files of a remote jar file
+	 */
+	public static IIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IRemoteFilter filter, IExternalAccess exta)
+	{
+		IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
+		exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		{
+			@Classname("listJarFileEntries")
+			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+			{
+				final IntermediateFuture<FileData> ret = new IntermediateFuture<FileData>();
+				
+				final JarAsDirectory jad = new JarAsDirectory(file.getPath());
+				jad.refresh();
+								
+				final Map<String, Collection<FileData>> rjfentries = new LinkedHashMap<String, Collection<FileData>>();
+				MultiCollection zipentries = jad.createEntries();
+				
+				final CollectionResultListener<Tuple2<String, RemoteJarFile>> lis = new CollectionResultListener<Tuple2<String, RemoteJarFile>>(zipentries.size(), 
+					true, new ExceptionDelegationResultListener<Collection<Tuple2<String, RemoteJarFile>>, Collection<FileData>>(ret)
+				{
+					public void customResultAvailable(Collection<Tuple2<String, RemoteJarFile>> result)
+					{
+						for(Tuple2<String, RemoteJarFile> tmp: result)
+						{
+							Collection<FileData>	dir	= rjfentries.get(tmp.getFirstEntity());
+							if(dir==null)
+							{
+								dir	= new ArrayList<FileData>();
+								rjfentries.put(tmp.getFirstEntity(), dir);
+							}
+							dir.add(tmp.getSecondEntity());
+						}
+						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
+							FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, FileData.getPrefixLength(jad), jad.length());
+						Collection<FileData> files = rjf.listFiles();
+						ret.setResult(files);
+					}
+					
+				});
+
+				for(Iterator<?> it=zipentries.keySet().iterator(); it.hasNext(); )
+				{
+					final String name = (String)it.next();
+					Collection<?> childs = (Collection<?>)zipentries.get(name);
+//					System.out.println("childs: "+childs);
+					for(Iterator<?> it2=childs.iterator(); it2.hasNext(); )
+					{
+						ZipEntry entry = (ZipEntry)it2.next();
+						String ename = entry.getName();
+						int	slash = ename.lastIndexOf("/", ename.length()-2);
+						ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
+//						System.out.println("ename: "+ename+" "+entry.getName());
+						final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
+							entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, FileData.getPrefixLength(jad), jad.length());
+						
+						if(filter!=null)
+						{
+							filter.filter(jad.getFile(entry.getName())).addResultListener(new IResultListener<Boolean>()
+							{
+								public void resultAvailable(Boolean result)
+								{
+									if(result.booleanValue())
+									{
+										lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));
+									}
+									else
+									{
+										lis.exceptionOccurred(null);
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									lis.exceptionOccurred(null);
+								}
+							});
+						}
+						else
+						{
+							lis.resultAvailable(new Tuple2<String, RemoteJarFile>(name, tmp));							
+						}
+					}
+				}
+				
+				return ret;
+			}
+		}).addResultListener(new DelegationResultListener<Collection<FileData>>(ret));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check if a component model can be started as test case.
+	 */
+	public static IFuture<Boolean>	isTestcase(final String model, IExternalAccess access, final IResourceIdentifier rid)
+	{
+		return access.scheduleImmediate(new IComponentStep<Boolean>()
+		{
+			@Classname("isTestcase")
+			public IFuture<Boolean> execute(IInternalAccess ia)
+			{
+				final Future<Boolean>	ret	= new Future<Boolean>();
+				final IExternalAccess access	= ia.getExternalAccess();
+				SComponentFactory.isLoadable(access, model, rid)
+					.addResultListener(new DelegationResultListener<Boolean>(ret)
+				{
+					public void customResultAvailable(Boolean result)
+					{
+						if(result.booleanValue())
+						{
+							SComponentFactory.isStartable(access, model, rid)
+								.addResultListener(new DelegationResultListener<Boolean>(ret)
+							{
+								public void customResultAvailable(Boolean result)
+								{
+									if(result.booleanValue())
+									{
+										SComponentFactory.loadModel(access, model, rid)
+											.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
+										{
+											public void customResultAvailable(final IModelInfo model)
+											{
+												if(model!=null && model.getReport()==null)
+												{
+													IArgument[]	results	= model.getResults();
+													boolean	istest	= false;
+													for(int i=0; !istest && i<results.length; i++)
+													{
+														if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
+															&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
+			//												&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
+														{	
+															istest	= true;
+														}
+													}
+													ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+												}
+												else
+												{
+													ret.setResult(Boolean.FALSE);
+												}
+											}
+										});
+									}
+									else
+									{
+										ret.setResult(Boolean.FALSE);
+									}
+								}
+							});
+						}
+						else
+						{
+							ret.setResult(Boolean.FALSE);
+						}
+					}
+				});
+				return ret;
+			}
+		});
+	}
+	
+	public static IFuture<Map<String, Object>>	parseArgs(final Map<String, String> rawargs, final IResourceIdentifier modelrid, IExternalAccess exta)
+	{
+		return exta.scheduleStep(new IComponentStep<Map<String, Object>>()
+		{
+			@Classname("parseArgs")
+			public IFuture<Map<String, Object>> execute(IInternalAccess ia)
+			{
+//				System.out.println("b: "+ia.getComponentIdentifier().getName());
+				final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
+				ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Map<String, Object>>(ret)
+				{
+					public void customResultAvailable(ILibraryService ls)
+					{
+						ls.getClassLoader(modelrid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Map<String, Object>>(ret)
+						{
+							public void customResultAvailable(ClassLoader cl)
+							{
+								Map<String, Object> args = SCollection.createHashMap();
+								String errortext = null;
+								for(String argname: rawargs.keySet())
+								{
+									String argval = rawargs.get(argname);
+									if(argval.length()>0)
+									{
+										Object arg = null;
+										try
+										{
+											arg = new JavaCCExpressionParser().parseExpression(argval, null, null, cl).getValue(null);
+										}
+										catch(Exception e)
+										{
+											if(errortext==null)
+												errortext = "Error within argument expressions:\n";
+											errortext += argname+" "+e.getMessage()+"\n";
+										}
+										args.put(argname, arg);
+										
+									}
+								}
+								if(errortext==null)
+								{
+									ret.setResult(args);
+								}
+								else
+								{
+									ret.setException(new RuntimeException(errortext));
+								}
+							}
+						});
+					}
+				});
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Compare a model to a path.
+	 */
+	public static IFuture<Boolean>	matchModel(final String path, final String model, IExternalAccess exta)
+	{
+		return exta.scheduleImmediate(new IComponentStep<Boolean>()
+		{
+			@Classname("matchModel")
+			public IFuture<Boolean> execute(IInternalAccess ia)
+			{
+				boolean	match	= false;
+				File	pathfile	= SUtil.urlToFile(path);
+				File	modelfile	= SUtil.urlToFile(model);
+				try
+				{
+					match	= pathfile!=null && modelfile!=null && modelfile.getCanonicalPath().startsWith(pathfile.getCanonicalPath());
+				}
+				catch(IOException e)
+				{
+				}
+				return new Future<Boolean>(Boolean.valueOf(match));
+			}
+		});
+	}
+	
+	/**
+	 *  Log a warning on a component.
+	 */
+	public static IFuture<Void>	logWarning(final String msg, IExternalAccess exta)
+	{
+		return exta.scheduleImmediate(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ia.getLogger().warning(msg);
+				return IFuture.DONE;
+			}
+		});
+	}
+
+	/**
+	 *  Redirect some text to the remote input stream.
+	 */
 	public static void redirectInput(IExternalAccess access, final String txt)
 	{
 		access.scheduleImmediate(new IComponentStep<Void>()
