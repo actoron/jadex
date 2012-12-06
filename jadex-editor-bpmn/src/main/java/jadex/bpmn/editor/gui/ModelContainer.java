@@ -34,6 +34,9 @@ public class ModelContainer
 	/** Edit mode for selection. */
 	public static final String EDIT_MODE_SELECTION = "Select";
 	
+	/** Edit mode for adding control points. */
+	public static final String EDIT_MODE_ADD_CONTROL_POINT = "AddControlPoint";
+	
 	/** Edit mode for adding pools. */
 	public static final String EDIT_MODE_POOL = "Pool";
 	

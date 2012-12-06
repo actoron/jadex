@@ -34,4 +34,7 @@ public class GuiConstants
 	// Tool Colors
 	/** Selection Edit Mode Color */
 	public static final String SELECT_COLOR  = "88cfc0";
+	
+	/** Control Point Color */
+	public static final String CONTROL_POINT_COLOR  = "cfc688";
 }
