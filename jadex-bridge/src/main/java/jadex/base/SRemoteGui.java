@@ -39,7 +39,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -569,7 +568,7 @@ public class SRemoteGui
 							dir.add(tmp.getSecondEntity());
 						}
 						RemoteJarFile rjf = new RemoteJarFile(jad.getName(), jad.getAbsolutePath(), true, 
-							FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, FileData.getPrefixLength(jad), jad.length());
+							FileData.getDisplayName(jad), rjfentries, "/", jad.getLastModified(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 						Collection<FileData> files = rjf.listFiles();
 						ret.setResult(files);
 					}
@@ -589,7 +588,7 @@ public class SRemoteGui
 						ename = ename.substring(slash!=-1? slash+1: 0, ename.endsWith("/")? ename.length()-1: ename.length());
 //						System.out.println("ename: "+ename+" "+entry.getName());
 						final RemoteJarFile tmp = new RemoteJarFile(ename, "jar:file:"+jad.getJarPath()+"!/"+entry.getName(), 
-							entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, FileData.getPrefixLength(jad), jad.length());
+							entry.isDirectory(), ename, rjfentries, entry.getName(), entry.getTime(), File.separatorChar, SUtil.getPrefixLength(jad), jad.length());
 						
 						if(filter!=null)
 						{

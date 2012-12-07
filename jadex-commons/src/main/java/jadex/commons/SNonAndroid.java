@@ -3,6 +3,7 @@ package jadex.commons;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -221,5 +222,5 @@ public class SNonAndroid
 	public static File[]	getFiles(File file, boolean hiding)
 	{
 		return FileSystemView.getFileSystemView().getFiles(file, hiding);
-	}
+	}	
 }

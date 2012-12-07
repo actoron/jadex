@@ -2910,6 +2910,35 @@ public class SUtil
 		// Todo: hidden files on android?
 		return SReflect.isAndroid() ? file.listFiles() : SNonAndroid.getFiles(file, hiding);		
 	}
+	
+	/**
+	 *  Get the prefix length of a file.
+	 */
+	public static int getPrefixLength(File file)
+	{
+		int	ret	= 0;
+		try
+		{
+			Method m = File.class.getDeclaredMethod("getPrefixLength", new Class[0]);
+			m.setAccessible(true);
+			ret	= ((Integer)m.invoke(file, new Object[0])).intValue();
+		}
+		catch(Exception e)
+		{
+			// Hack!!! assume unix as default
+			String	path	= file.getPath();
+			if(path.startsWith("~"))	// '~/' or '~user/'
+			{
+				ret	= path.indexOf('/');
+			}
+			else if(path.startsWith("/"))
+			{
+				ret	= 1;
+			}
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Check if a file represents a floppy.

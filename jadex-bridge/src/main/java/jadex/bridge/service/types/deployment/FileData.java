@@ -91,7 +91,7 @@ public class FileData
 		this.lastmodified = floppy ? 0 : file.lastModified();	// Hack to avoid access to floppy disk.
 //		this.root = SUtil.arrayToSet(file.listRoots()).contains(file);
 		this.separator = File.separatorChar;
-		this.prefix = getPrefixLength(file);
+		this.prefix = SUtil.getPrefixLength(file);
 		this.filesize = directory ? 0 : file.length();
 	}
 	
@@ -295,31 +295,5 @@ public class FileData
 	{
 		return "FileData(filename=" + filename + ", path=" + path
 			+ ", directory=" + directory + ", displayname=" + displayname+ ")";
-	}
-	
-	/**
-	 *  Get the prefix length of a file.
-	 */
-	public static int getPrefixLength(File file)
-	{
-		try
-		{
-			Method m = File.class.getDeclaredMethod("getPrefixLength", new Class[0]);
-			m.setAccessible(true);
-			return ((Integer)m.invoke(file, new Object[0])).intValue();
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public static void main(String[] args)
-	{
-		File f = new File("c:\\projects");
-		System.out.println(getPrefixLength(f));
 	}
 }

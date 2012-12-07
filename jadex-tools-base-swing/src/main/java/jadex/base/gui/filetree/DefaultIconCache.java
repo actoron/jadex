@@ -75,7 +75,7 @@ public class DefaultIconCache implements IIconCache
 					if(file instanceof JarAsDirectory && suffix.length()==0)// && !((JarAsDirectory)file).isRoot())
 					{
 						tmp = new RemoteFile(new FileData(file.getName(), "", true, true, FileData.getDisplayName(file), 
-							file.lastModified(), File.separatorChar, FileData.getPrefixLength(file), 0));
+							file.lastModified(), File.separatorChar, SUtil.getPrefixLength(file), 0));
 						ret = FileSystemView.getFileSystemView().getSystemIcon(tmp);  
 					}
 					else
