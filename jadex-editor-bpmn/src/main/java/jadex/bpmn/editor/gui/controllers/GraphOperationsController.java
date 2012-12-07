@@ -3,6 +3,7 @@ package jadex.bpmn.editor.gui.controllers;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VLane;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -33,6 +34,49 @@ public class GraphOperationsController extends mxGraphHandler
 	public GraphOperationsController(mxGraphComponent graphcomponent)
 	{
 		super(graphcomponent);
+	}
+	
+	/**
+	 * 
+	 */
+	public void mousePressed(MouseEvent e)
+	{
+		if (graphComponent.isEnabled() && isEnabled() && !e.isConsumed()
+				&& !graphComponent.isForceMarqueeEvent(e))
+		{
+			cell = graphComponent.getCellAt(e.getX(), e.getY(), false);
+			
+			if (cell == null)
+			{
+				cell = graphComponent.getCellAt(e.getX(), e.getY(), true);
+			}
+			while (cell instanceof VLane)
+			{
+				cell = ((VLane) cell).getParent();
+			}
+			
+			initialCell = cell;
+
+			if (cell != null)
+			{
+				if (isSelectEnabled()
+						&& !graphComponent.getGraph().isCellSelected(cell))
+				{
+					graphComponent.selectCellForEvent(cell, e);
+					cell = null;
+				}
+
+				if (isMoveEnabled() && !e.isPopupTrigger())
+				{
+					start(e);
+					e.consume();
+				}
+			}
+			else if (e.isPopupTrigger())
+			{
+				graphComponent.getGraph().clearSelection();
+			}
+		}
 	}
 	
 	/**

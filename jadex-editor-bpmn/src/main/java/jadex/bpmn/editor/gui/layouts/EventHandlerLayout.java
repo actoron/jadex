@@ -15,9 +15,16 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 
+/**
+ *  Layout for ordering event handlers.
+ *
+ */
 public class EventHandlerLayout extends mxGraphLayout
 {
-
+	/**
+	 * Creates a new event handler layout.
+	 * @param graph The graph.
+	 */
 	public EventHandlerLayout(mxGraph graph)
 	{
 		super(graph);
@@ -32,6 +39,9 @@ public class EventHandlerLayout extends mxGraphLayout
 		execute(cell);
 	}
 	
+	/**
+	 *  Executes the layout.
+	 */
 	public void execute(Object parent)
 	{
 		VElement vparent = (VElement) parent;

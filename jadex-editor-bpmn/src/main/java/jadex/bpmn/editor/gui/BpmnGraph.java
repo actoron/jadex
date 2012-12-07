@@ -29,6 +29,9 @@ public class BpmnGraph extends mxGraph
 	/** The model container. */
 	protected ModelContainer modelcontainer;
 	
+	/** The layout manager. */
+	protected BpmnLayoutManager layoutmanager; 
+	
 	/**
 	 *  Creates the graph.
 	 */
@@ -41,7 +44,7 @@ public class BpmnGraph extends mxGraph
 		setCellsCloneable(false);
 		setAllowNegativeCoordinates(false);
 		setGridEnabled(true);
-		setGridSize(10);
+		setGridSize(20);
 		
 		/*getModel().addListener(mxEvent.EXECUTE, access.getValueChangeController());
 		getSelectionModel().addListener(mxEvent.CHANGE, access.getSelectionController());
@@ -52,8 +55,7 @@ public class BpmnGraph extends mxGraph
 		
 		setStylesheet(sheet);
 		
-//		final BpmnLayoutManager layoutmanager = 
-		new BpmnLayoutManager(this);
+		layoutmanager = new BpmnLayoutManager(this);
 	}
 	
 	/**
@@ -150,6 +152,12 @@ public class BpmnGraph extends mxGraph
 	 */
 	public void refreshCellView(mxICell cell)
 	{
+		mxIGraphLayout layout = layoutmanager.getLayout(cell);
+		if (layout != null)
+		{
+			layout.execute(cell);
+		}
+		
 		getView().clear(cell, true, false);
 		getView().invalidate(cell);
 		Object[] selcells = getSelectionModel().getCells();

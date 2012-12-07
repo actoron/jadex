@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
@@ -8,12 +9,14 @@ import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
 
@@ -23,8 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
 
 /**
  *  Methods for creating model objects.
@@ -42,6 +47,13 @@ public class SCreationController
 	public static final VPool createPool(ModelContainer modelcontainer, Point targetpoint)
 	{
 		VPool vpool = new VPool(modelcontainer.getGraph());
+		
+		if (modelcontainer.getGraph().isGridEnabled())
+		{
+			targetpoint.x -= targetpoint.x % modelcontainer.getGraph().getGridSize();
+			targetpoint.y -= targetpoint.y % modelcontainer.getGraph().getGridSize();
+		}
+		
 		vpool.setGeometry(new mxGeometry(targetpoint.getX(), targetpoint.getY(), BpmnStylesheetColor.DEFAULT_POOL_WIDTH, BpmnStylesheetColor.DEFAULT_POOL_HEIGHT));
 		MPool mpool = new MPool();
 		mpool.setId(modelcontainer.getIdGenerator().generateId());
@@ -197,7 +209,14 @@ public class SCreationController
 		}
 		vactivity.setBpmnElement(mactivity);
 		
-		Point p = adjustPoint(modelcontainer, targetcell, targetpoint);
+		Point p = adjustPoint(modelcontainer.getGraph(), targetcell, new mxPoint(targetpoint)).getPoint();
+		
+		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mactivity.getActivityType()) ?
+				   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mactivity.getActivityType()) :
+				   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
+		
+		p.x -= ds.width * 0.5;
+		p.y -= ds.height * 0.5;
 		
 		if (modelcontainer.getGraph().isGridEnabled())
 		{
@@ -205,11 +224,8 @@ public class SCreationController
 			p.y = p.y - (p.y % modelcontainer.getGraph().getGridSize());
 		}
 		
-		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mactivity.getActivityType()) ?
-					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mactivity.getActivityType()) :
-					   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
-		vactivity.setGeometry(new mxGeometry(p.getX() - ds.width * 0.5,
-											 p.getY() - ds.height * 0.5,
+		vactivity.setGeometry(new mxGeometry(p.getX(),
+											 p.getY(),
 											 ds.width,
 											 ds.height));
 		
@@ -220,8 +236,8 @@ public class SCreationController
 				BpmnStylesheetColor.COLLAPSED_SIZES.get(vactivity.getStyle()) :
 				BpmnStylesheetColor.COLLAPSED_SIZES.get(mactivity.getActivityType()));
 			vactivity.getGeometry().setAlternateBounds(
-				new mxGeometry(p.getX() - ads.width * 0.5,
-					 		   p.getY() - ads.height * 0.5,
+				new mxGeometry(p.getX(),
+					 		   p.getY(),
 					 		   ads.width,
 					 		   ads.height));
 		}
@@ -241,18 +257,6 @@ public class SCreationController
 			mactivity.setEventHandler(true);
 		}
 		
-//		if (cell instanceof VPool)
-//		{
-//			MPool mpool = (MPool) ((VNode) cell).getBpmnElement();
-//			mactivity.setPool(mpool);
-//		}
-//		else
-//		{
-//			//((MLane) ((VNode) cell).getBpmnElement()).addActivity(mactivity);
-//			MPool mpool = (MPool) ((VLane) cell).getPool().getBpmnElement();
-//			mactivity.setPool(mpool);
-//		}
-		
 		modelcontainer.getGraph().getModel().beginUpdate();
 		modelcontainer.getGraph().addCell(vactivity, (VNode) targetcell);
 		modelcontainer.getGraph().getModel().endUpdate();
@@ -266,6 +270,64 @@ public class SCreationController
 	}
 	
 	/**
+	 *  Creates a connection.
+	 *  
+	 *  @param src Source object.
+	 *  @param tgt Target object.
+	 *  @return Created edge.
+	 */
+	public static final mxICell createConnection(BpmnGraph graph, Object src, Object tgt, long timestamp)
+	{
+		ModelContainer modelcontainer = graph.getModelContainer();
+		mxICell ret = null;
+		mxICell source = (mxICell) src;
+		mxICell target = (mxICell) tgt;
+		if (source instanceof VActivity && target instanceof VActivity)
+		{
+			if (src.equals(tgt) &&
+				System.currentTimeMillis() - timestamp < 2000)
+			{
+				graph.refreshCellView((mxICell) src);
+				return null;
+			}
+			MSequenceEdge medge = new MSequenceEdge();
+			medge.setId(modelcontainer.getIdGenerator().generateId());
+			
+			if (((VActivity) source).getParent() instanceof VSubProcess)
+			{
+				((MSubProcess) ((VSubProcess) ((VActivity) source).getParent()).getBpmnElement()).addSequenceEdge(medge);
+			}
+			else
+			{
+				MActivity msrc = (MActivity) ((VActivity) source).getBpmnElement();
+				msrc.getPool().addSequenceEdge(medge);
+			}
+			
+			VSequenceEdge vedge = new VSequenceEdge(modelcontainer.getGraph(), VSequenceEdge.class.getSimpleName());
+			vedge.setBpmnElement(medge);
+			vedge.setSource(source);
+			vedge.setTarget(target);
+			
+//			List<mxPoint> points = new ArrayList<mxPoint>();
+//			double sx = source.getGeometry().getX() + source.getGeometry().getWidth() - 1;
+//			double tx = target.getGeometry().getX();
+//			double dx3 = (target.getGeometry().getX() - sx) / 3.0;
+//			double sy = source.getGeometry().getCenterY();
+//			double ty = target.getGeometry().getCenterY();
+////			points.add(new mxPoint(sx, sy));
+//			points.add(new mxPoint(sx + dx3, sy));
+//			points.add(new mxPoint(sx + dx3 + dx3, ty));
+////			points.add(new mxPoint(tx, ty));
+//			vedge.getGeometry().setPoints(points);
+			
+			modelcontainer.setDirty(true);
+			ret = vedge;
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Adjusts a point for relative positioning.
 	 *  
 	 *  @param modelcontainer The model container.
@@ -273,17 +335,17 @@ public class SCreationController
 	 *  @param point The unadjusted targeted point.
 	 *  @return The adjusted point.
 	 */
-	protected static final Point adjustPoint(ModelContainer modelcontainer, Object parent, Point point)
+	protected static final mxPoint adjustPoint(mxGraph graph, Object parent, mxPoint point)
 	{
-		mxPoint p = new mxPoint(point);
+		mxPoint p = point;
 		
-		mxCellState pstate = modelcontainer.getGraph().getView().getState(parent);
+		mxCellState pstate = graph.getView().getState(parent);
 		if (pstate != null)
 		{
 			p.setX(p.getX() - pstate.getOrigin().getX());
 			p.setY(p.getY() - pstate.getOrigin().getY());
 		}
 		
-		return p.getPoint();
+		return p;
 	}
 }

@@ -4,18 +4,13 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.EdgeDragContextMenu;
-import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VSequenceEdge;
-import jadex.bpmn.editor.model.visual.VSubProcess;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.model.MSubProcess;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +21,7 @@ import com.mxgraph.swing.handler.mxConnectPreview;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
@@ -76,51 +72,6 @@ public class EdgeController extends mxConnectionHandler
 		{
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, ret);
 			ret = "";
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Creates a connection.
-	 *  
-	 *  @param src Source object.
-	 *  @param tgt Target object.
-	 *  @return Created edge.
-	 */
-	public mxICell createConnection(Object src, Object tgt)
-	{
-		ModelContainer modelcontainer = ((BpmnGraph) graphComponent.getGraph()).getModelContainer();
-		mxICell ret = null;
-		mxICell source = (mxICell) src;
-		mxICell target = (mxICell) tgt;
-		if (source instanceof VActivity && target instanceof VActivity)
-		{
-			if (src.equals(tgt) &&
-				System.currentTimeMillis() - ((BpmnConnectPreview) connectPreview).timestamp < 2000)
-			{
-				((BpmnGraph) graphComponent.getGraph()).refreshCellView((mxICell) src);
-				return null;
-			}
-			MSequenceEdge medge = new MSequenceEdge();
-			medge.setId(modelcontainer.getIdGenerator().generateId());
-			
-			if (((VActivity) source).getParent() instanceof VSubProcess)
-			{
-				((MSubProcess) ((VSubProcess) ((VActivity) source).getParent()).getBpmnElement()).addSequenceEdge(medge);
-			}
-			else
-			{
-				MActivity msrc = (MActivity) ((VActivity) source).getBpmnElement();
-				msrc.getPool().addSequenceEdge(medge);
-			}
-			
-			VSequenceEdge vedge = new VSequenceEdge(modelcontainer.getGraph(), VSequenceEdge.class.getSimpleName());
-			vedge.setBpmnElement(medge);
-			vedge.setSource(source);
-			vedge.setTarget(target);
-			modelcontainer.setDirty(true);
-			ret = vedge;
 		}
 		
 		return ret;
@@ -221,13 +172,18 @@ public class EdgeController extends mxConnectionHandler
 						((mxICell) trg).removeEdge(cell, false);
 					}
 					
-					cell = createConnection(src, trg);
+					cell = SCreationController.createConnection((BpmnGraph) graph, src, trg, ((BpmnConnectPreview) connectPreview).timestamp);
+					List<mxPoint> points = null;
+					if (cell.getGeometry() != null)
+					{
+						cell.getGeometry().getPoints();
+					}
 					
 					if (commit || reallycommit)
 					{
 						result = graph.addCell(cell, ((mxICell) src).getParent(), null, src, trg);
 					}
-
+					cell.getGeometry().setPoints(points);
 					fireEvent(new mxEventObject(mxEvent.STOP, "event", e, "commit",
 							commit, "cell", (commit) ? result : null));
 					

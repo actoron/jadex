@@ -28,7 +28,6 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraphView;
 
 /**
@@ -83,7 +82,7 @@ public class MouseController extends MouseAdapter
 					mxGeometry geo = ((VEdge) cell).getGeometry();
 					List<mxPoint> points = (List<mxPoint>) geo.getPoints();
 					
-					int i = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), p.getX(), p.getY());;
+					//int i = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), p.getX(), p.getY());;
 					
 					if (points == null)
 					{
@@ -91,7 +90,14 @@ public class MouseController extends MouseAdapter
 						geo.setPoints(points);
 					}
 					
-					points.add(i, mxp);
+//					if (points.size() == 0)
+					{
+						points.add(mxp);
+					}
+//					else
+//					{
+//						points.add(i, mxp);
+//					}
 					
 					modelcontainer.getGraph().refreshCellView((VEdge) cell);
 					modelcontainer.setDirty(true);

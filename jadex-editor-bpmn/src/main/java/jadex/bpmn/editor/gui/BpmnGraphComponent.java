@@ -156,6 +156,14 @@ public class BpmnGraphComponent extends mxGraphComponent
 	}
 	
 	/**
+	 *  Returns true if the given event is an edit event.
+	 */
+	public boolean isEditEvent(MouseEvent e)
+	{
+		return (e != null) ? e.getClickCount() == 2 && MouseEvent.BUTTON1 == e.getButton() : false;
+	}
+	
+	/**
 	 *  Creates the graph controller.
 	 */
 	protected mxGraphHandler createGraphHandler()

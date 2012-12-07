@@ -295,6 +295,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
 		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
 //		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ORTHOGONAL);
 //		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_SIDETOSIDE);
 		style.put(mxConstants.STYLE_EDGE, new SequenceEdgeStyleFunction());
@@ -305,26 +306,5 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STARTARROW, StrokeMarker.class.getSimpleName());
 		style.put(mxConstants.STYLE_STARTSIZE, 18);
 		putCellStyle(VSequenceEdge.class.getSimpleName() + "_DEFAULT", style);
-	}
-	
-	public Map<String, Object> getCellStyle(String name,
-			Map<String, Object> defaultStyle)
-	{
-		Map<String, Object> ret = super.getCellStyle(name, defaultStyle); 
-		if (VSequenceEdge.class.getSimpleName().equals(name))
-		{
-			ret = new HashMap<String, Object>(ret)
-			{
-				public Object get(Object key)
-				{
-					if (mxConstants.STYLE_EDGE.equals(key))
-					{
-						System.out.println();
-					}
-					return super.get(key);
-				}
-			};
-		}
-		return ret;
 	}
 }

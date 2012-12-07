@@ -37,4 +37,7 @@ public class GuiConstants
 	
 	/** Control Point Color */
 	public static final String CONTROL_POINT_COLOR  = "cfc688";
+	
+	/** Minimum Edge Distance */
+	public static final double MIN_EDGE_DIST = 18.0;
 }
