@@ -8,6 +8,9 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
+import jadex.commons.ChangeEvent;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -31,13 +34,13 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	
 	/** The component id of the trusted third party. (with or without adresses to reach it) */
 	protected IComponentIdentifier ttpcid;
-	
-	/** The security service of the ttp. */
-	protected ISecurityService ttpsecser;
-	
+		
 	/** Must ttp be verified (i.e. must its certificate be known and is checked). */
 	protected boolean verified;
 	
+	/** The security service of the ttp. */
+	protected ISecurityService ttpsecser;
+
 	//-------- constructors --------
 
 	/**
@@ -55,6 +58,8 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		this.ttpcid = new ComponentIdentifier(ttpname);
 		this.verified = true;
+//		setTTPCid(new ComponentIdentifier(ttpname));
+//		setVerified(true);
 	}
 	
 	//-------- methods --------
@@ -243,5 +248,57 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Set the ttpcid.
+	 *  @param ttpcid The ttpcid to set.
+	 */
+	public void setTTPCid(IComponentIdentifier ttpcid)
+	{
+		this.ttpcid = ttpcid;
+		
+		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
+			new Object[]{"ttpcid", ttpcid}));
+	}
+
+	/**
+	 *  Set the verified.
+	 *  @param verified The verified to set.
+	 */
+	public void setVerified(boolean verified)
+	{
+		this.verified = verified;
+		
+		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
+			new Object[]{"verified", verified? Boolean.TRUE: Boolean.FALSE}));
+	}
+
+	/**
+	 *  Get the properties of the mechanism.
+	 */
+	public Properties getProperties()
+	{
+		Properties props = new Properties();
+		props.addProperty(new Property("ttpcid", ttpcid.getName()));
+//		props.addProperty(new Property("ttpcid", JavaWriter.objectToXML(ttpcid, null)));
+		props.addProperty(new Property("verified", ""+verified));
+		return props;
+	}
+
+	/**
+	 *  Set the properties of the mechanism.
+	 */
+	public void setProperties(Properties props)
+	{
+		if(props.getProperty("ttpcid")!=null)
+		{
+			setTTPCid(new ComponentIdentifier(props.getProperty("responses").getValue()));
+//			setTTPCid((IComponentIdentifier)JavaReader.objectFromXML(props.getProperty("responses").getValue(), null);
+		}
+		if(props.getProperty("verified")!=null)
+		{
+			setVerified(props.getBooleanProperty("verified"));
+		}
 	}
 }

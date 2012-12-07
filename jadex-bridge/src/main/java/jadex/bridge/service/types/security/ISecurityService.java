@@ -52,8 +52,11 @@ public interface ISecurityService
 	/** The keystore settings property. */
 	public static final String PROPERTY_KEYSTORESETTINGS = "keystoresettings";
 
-	/** The acquisition_mechanism. */
+	/** The acquisition mechanism. */
 	public static final String PROPERTY_SELECTEDMECHANISM = "selmechanism";
+	
+	/** A mechanism parameter changed. */
+	public static final String PROPERTY_MECHANISMPARAMETER = "mechanismparameter";
 	
 	//-------- password management --------
 	

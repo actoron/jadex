@@ -1,6 +1,5 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;

@@ -8,6 +8,9 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
+import jadex.commons.ChangeEvent;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -46,9 +49,10 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	/**
 	 *  Create a new mechanism.
 	 */
-	public DecentralizedAcquisitionMechanism(int aquirecnt)
+	public DecentralizedAcquisitionMechanism(int responses)
 	{
-		this.responses = aquirecnt;
+		this.responses = responses;
+//		setResponses(responses);
 	}
 	
 	//-------- methods --------
@@ -180,11 +184,44 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 		
 		if("responses".equals(name))
 		{
-			responses = ((Integer)value).intValue();
+			setResponses(((Integer)value).intValue());
 		}
 		else
 		{
 			throw new RuntimeException("Unknown parameter: "+name);
+		}
+	}
+	
+	/**
+	 *  Set the responses.
+	 *  @param responses The responses to set.
+	 */
+	public void setResponses(int responses)
+	{
+		this.responses = responses;
+		
+		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
+			new Object[]{"responses", new Integer(responses)}));
+	}
+
+	/**
+	 *  Get the properties of the mechanism.
+	 */
+	public Properties getProperties()
+	{
+		Properties props = new Properties();
+		props.addProperty(new Property("responses", ""+responses));
+		return props;
+	}
+
+	/**
+	 *  Set the properties of the mechanism.
+	 */
+	public void setProperties(Properties props)
+	{
+		if(props.getProperty("responses")!=null)
+		{
+			setResponses(props.getIntProperty("responses"));
 		}
 	}
 }

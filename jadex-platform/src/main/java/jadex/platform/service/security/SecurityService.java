@@ -311,6 +311,13 @@ public class SecurityService implements ISecurityService
 													
 													selmech = props.getIntProperty("selmech");
 													
+													if(mechanisms!=null)
+													{
+														for(AAcquisitionMechanism mech: mechanisms)
+														{
+															props.addSubproperties(mech.getClass().getName(), mech.getProperties());
+														}
+													}
 													return IFuture.DONE;
 												}
 											});
@@ -347,6 +354,18 @@ public class SecurityService implements ISecurityService
 													ret.addProperty(new Property("keypass", keypass));
 													
 													ret.addProperty(new Property("selmech", ""+selmech));
+													
+													if(mechanisms!=null)
+													{
+														for(AAcquisitionMechanism mech: mechanisms)
+														{
+															Properties mps = props.getSubproperty(mech.getClass().getName());
+															if(mps!=null)
+															{
+																mech.setProperties(mps);
+															}
+														}
+													}
 													
 													return new Future<Properties>(ret);
 												}

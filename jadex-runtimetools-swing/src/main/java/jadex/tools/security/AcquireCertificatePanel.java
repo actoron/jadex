@@ -1,13 +1,11 @@
 package jadex.tools.security;
 
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.PlatformSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
@@ -37,20 +35,21 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
- * 
+ *  Panel that displays the available mechanisms and
+ *  allows for customizing their properties.
  */
 public class AcquireCertificatePanel extends JPanel
 {
+	/** The external access. */
 	protected IExternalAccess ea;
 	
+	/** The security service. */
 	protected ISecurityService secser;
 	
-	protected List<MechanismInfo> mechanisms;
-	
+	/** The combobox with mechanisms. */
 	protected JComboBox cbmechs;
 	
 	/**
@@ -140,7 +139,6 @@ public class AcquireCertificatePanel extends JPanel
 			cbmechs.removeItemListener(lis[i]);
 		}
 		
-		this.mechanisms = mechanisms;
 		cbmechs.removeAllItems();
 		for(MechanismInfo mi: mechanisms)
 		{
@@ -159,16 +157,13 @@ public class AcquireCertificatePanel extends JPanel
 	 */
 	public void setSelectedMechanism(int sel)
 	{
-		if(mechanisms!=null)
+		if(sel==-1)
 		{
-			if(sel==-1)
-			{
-				cbmechs.setSelectedIndex(cbmechs.getItemCount()-1);
-			}
-			else
-			{
-				cbmechs.setSelectedIndex(sel);
-			}
+			cbmechs.setSelectedIndex(cbmechs.getItemCount()-1);
+		}
+		else
+		{
+			cbmechs.setSelectedIndex(sel);
 		}
 	}
 	
