@@ -4,14 +4,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
-
-import javax.swing.filechooser.FileSystemView;
-
 
 /**
  *  Helper methods for remote file system view.
@@ -31,10 +29,9 @@ public class SRemoteFileChooser
 			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
 				Object[]	ret	= new Object[4];
-				FileSystemView view = FileSystemView.getFileSystemView();
 				ret[0]	= FileData.convertToRemoteFiles(File.listRoots());
-				ret[1]	= new FileData(view.getHomeDirectory());
-				ret[2]	= new FileData(view.getDefaultDirectory());
+				ret[1]	= new FileData(SUtil.getHomeDirectory());
+				ret[2]	= new FileData(SUtil.getDefaultDirectory());
 				
 				String	path	= new File(".").getAbsolutePath();
 				if(path.endsWith("."))
@@ -80,8 +77,7 @@ public class SRemoteFileChooser
 			@Classname("getHomeDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				FileSystemView view = FileSystemView.getFileSystemView();
-				File ret = view.getHomeDirectory();
+				File ret = SUtil.getHomeDirectory();
 				return new Future<FileData>(ret!=null? new FileData(ret): null);
 			}
 		});
@@ -121,8 +117,7 @@ public class SRemoteFileChooser
 			@Classname("getDefaultDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				FileSystemView view = FileSystemView.getFileSystemView();
-				File ret = view.getDefaultDirectory();
+				File ret = SUtil.getDefaultDirectory();
 				return new Future<FileData>(ret!=null? new FileData(ret): null);
 			}
 		});
@@ -142,8 +137,7 @@ public class SRemoteFileChooser
 				File[] files;
 				if(dir.exists())
 				{
-					FileSystemView view = FileSystemView.getFileSystemView();
-					files = view.getFiles(dir, useFileHiding);
+					files = SUtil.getFiles(dir, useFileHiding);
 //						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 				}
 				else
@@ -171,8 +165,7 @@ public class SRemoteFileChooser
 			@Classname("getParentDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				FileSystemView view = FileSystemView.getFileSystemView();
-				File parent = view.getParentDirectory(new File(path)); // todo: useFileHandling
+				File parent = SUtil.getParentDirectory(new File(path)); // todo: useFileHandling
 				return new Future<FileData>(parent!=null? new FileData(parent): null);
 			}
 		});

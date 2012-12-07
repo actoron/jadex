@@ -189,4 +189,37 @@ public class SNonAndroid
 	{
 		return SwingUtilities.isEventDispatchThread();
 	}
+	
+	/**
+	 *  Get the home directory.
+	 */
+	public static File	getHomeDirectory()
+	{
+		return FileSystemView.getFileSystemView().getHomeDirectory();
+	}
+	
+	
+	/**
+	 *  Get the default directory.
+	 */
+	public static File	getDefaultDirectory()
+	{
+		return FileSystemView.getFileSystemView().getDefaultDirectory();
+	}
+
+	/**
+	 *  Get the parent directory.
+	 */
+	public static File	getParentDirectory(File file)
+	{
+		return FileSystemView.getFileSystemView().getParentDirectory(file);
+	}
+
+	/**
+	 *  Get the files of a directory.
+	 */
+	public static File[]	getFiles(File file, boolean hiding)
+	{
+		return FileSystemView.getFileSystemView().getFiles(file, hiding);
+	}
 }

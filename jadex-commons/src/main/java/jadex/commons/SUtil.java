@@ -2877,6 +2877,41 @@ public class SUtil
 	//-------- abstractions for Android --------
 	
 	/**
+	 *  Get the home directory.
+	 */
+	public static File	getHomeDirectory()
+	{
+		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getHomeDirectory();		
+	}
+	
+	/**
+	 *  Get the home directory.
+	 */
+	public static File	getDefaultDirectory()
+	{
+		// Todo: default directory on android?
+		return SReflect.isAndroid() ? new File(System.getProperty("user.home")) : SNonAndroid.getDefaultDirectory();		
+	}
+	
+	/**
+	 *  Get the parent directory.
+	 */
+	public static File	getParentDirectory(File file)
+	{
+		// Todo: parent directory on android?
+		return SReflect.isAndroid() ? file.getParentFile() : SNonAndroid.getParentDirectory(file);		
+	}
+
+	/**
+	 *  Get the files of a directory.
+	 */
+	public static File[]	getFiles(File file, boolean hiding)
+	{
+		// Todo: hidden files on android?
+		return SReflect.isAndroid() ? file.listFiles() : SNonAndroid.getFiles(file, hiding);		
+	}
+
+	/**
 	 *  Check if a file represents a floppy.
 	 *  Returns false on android.
 	 */

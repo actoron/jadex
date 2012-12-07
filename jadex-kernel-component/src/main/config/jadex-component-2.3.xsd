@@ -320,20 +320,7 @@ In this section, specifications for extensions as required
 		<xs:complexContent>
 			<xs:extension base="startabletype">
 				<xs:sequence>
-					<xs:element name="arguments" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Argument values to be supplied, when creating the agent.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence minOccurs="0">
-								<xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
+					<xs:element name="arguments" minOccurs="0" type="argumentstype"/>
 					<xs:element name="requiredservices" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
@@ -349,6 +336,19 @@ In this section, specifications for extensions as required
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<xs:complexType name="argumentstype">
+		<xs:annotation>
+			<xs:documentation>Argument values to be supplied, when creating the agent.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:complexType name="argument" mixed="true">
 		<xs:annotation>
 			<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
@@ -502,20 +502,7 @@ In this section, specifications for extensions as required
 		<xs:complexContent>
 			<xs:restriction base="jadex:component">
 				<xs:sequence>
-					<xs:element name="arguments" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Argument values to be supplied, when creating the agent.</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence minOccurs="0">
-								<xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded">
-									<xs:annotation>
-										<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
+					<xs:element name="arguments" minOccurs="0" type="argumentstype"/>
 				</xs:sequence>
 			</xs:restriction>
 		</xs:complexContent>
