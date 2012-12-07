@@ -135,7 +135,6 @@ public class ComponentSelectorDialog
 		dia.setVisible(true);
 		this.singleselection	= false;
 
-//		this.comptree.dispose();
 		disposeTreeView();
 		
 		return !aborted && sels.size()>0 ? (IComponentIdentifier)sels.get(0) : null;
@@ -158,7 +157,6 @@ public class ComponentSelectorDialog
 		aborted	= false;
 		dia.setVisible(true);
 
-//		this.comptree.dispose();
 		disposeTreeView();
 
 		IComponentIdentifier[]	ret	= null;
@@ -215,49 +213,6 @@ public class ComponentSelectorDialog
 		list = new JList(sels);
 		
 		this.comptree = createTreeView();
-//		this.comptree = new ComponentTreePanel(access, cmshandler, iconcache);
-//		comptree.setPreferredSize(new Dimension(200, 100));
-//		comptree.addNodeHandler(new INodeHandler()
-//		{
-//			public Action[] getPopupActions(ITreeNode[] nodes)
-//			{
-//				return null;
-//			}
-//			
-//			public Icon getOverlay(ITreeNode node)
-//			{
-//				Icon	ret	= null;
-//				if(node instanceof IActiveComponentTreeNode)
-//				{
-//					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-//					if(sels.contains(id))
-//					{
-//						ret	= icons.getIcon("edit_overlay");
-//					}
-//				}
-//				return ret;
-//			}
-//			
-//			public Action getDefaultAction(final ITreeNode node)
-//			{
-//				Action	a	= null;
-//				if(node instanceof IActiveComponentTreeNode)
-//				{
-//					a	= new AbstractAction()
-//					{
-//						public void actionPerformed(ActionEvent e)
-//						{
-//							// Use clone to keep original aid unchanged.
-//							IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-//							addSelectedAgent(new ComponentIdentifier(id.getName(), id.getAddresses()), list);
-//							comptree.getModel().fireNodeChanged(node);
-//						}
-//					};
-//				}
-//				return a;
-//			}
-//		});
-		
 		
 		JScrollPane	sp	= new JScrollPane(list);
 		sp.setPreferredSize(new Dimension(200, 100));

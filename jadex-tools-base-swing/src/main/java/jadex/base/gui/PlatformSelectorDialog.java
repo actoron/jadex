@@ -61,14 +61,6 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	protected JComponent createTreeView()
 	{
 		this.pllist = new JList(new DefaultListModel());
-//		list.setCellRenderer(new DefaultListCellRenderer()
-//		{
-//			public Component getListCellRendererComponent(final JList list, Object value,
-//				int index, boolean isSelected, boolean cellHasFocus)
-//			{
-//				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-//			}
-//		});
 		pllist.setSelectionMode(singleselection? ListSelectionModel.SINGLE_SELECTION: ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
 		pllist.getSelectionModel().addListSelectionListener(new ListSelectionListener()
@@ -162,7 +154,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)
 					{
-//						System.out.println("found: "+result);
+//						System.out.println("found: "+ser);
 						addPlatform(ser);
 					}
 					
@@ -193,21 +185,6 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		
 		action.run();
 		
-//		JButton bu = new JButton("Refresh");
-//		bu.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				action.run();
-//			}
-//		});
-		
-//		JPanel p = new JPanel(new GridBagLayout());
-//		p.add(pllist, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, 
-//			GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-//		p.add(bu, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.CENTER, 
-//			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
-//		
 		return new JScrollPane(pllist);
 	}
 	
@@ -255,6 +232,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	protected void disposeTreeView()
 	{
 		cmshandler.removeCMSListener(access.getComponentIdentifier().getRoot(), cmslistener);
+		valmap.clear();
 	}
 	
 	/**

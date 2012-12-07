@@ -15,6 +15,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -22,6 +23,7 @@ import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Base64;
+import jadex.commons.ChangeEvent;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -32,6 +34,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
+import jadex.rules.eca.RuleEvent;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;
@@ -49,6 +55,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +69,7 @@ public class SecurityService implements ISecurityService
 	
 	/** Properties id for the settings service. */
 	public static final String	PROEPRTIES_ID	= "securityservice";
-	
+		
 	//-------- attributes --------
 	
 	/** The component. */
@@ -123,6 +130,9 @@ public class SecurityService implements ISecurityService
 	/** The currently selected mechanism. */
 	protected int selmech;
 	
+	/** The futures of active subscribers. */
+	protected Set<SubscriptionIntermediateFuture<ChangeEvent<Object>>> subscribers;
+	
 	//-------- setup --------
 	
 	/**
@@ -148,6 +158,7 @@ public class SecurityService implements ISecurityService
 	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
 		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms)
 	{
+		this.subscribers = new LinkedHashSet<SubscriptionIntermediateFuture<ChangeEvent<Object>>>();
 		this.platformpasses	= new LinkedHashMap<String, String>();
 		this.networkpasses	= new LinkedHashMap<String, String>();
 		
@@ -232,7 +243,11 @@ public class SecurityService implements ISecurityService
 									}
 
 									if(props!=null)
+									{
 										selmech = props.getIntProperty("selected_mechanism"); 
+//										System.out.println("selm: "+selmech);
+										publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, new Integer(selmech)));
+									}
 									
 									final IExternalAccess	access	= component.getExternalAccess();
 									
@@ -294,6 +309,8 @@ public class SecurityService implements ISecurityService
 														}
 													}
 													
+													selmech = props.getIntProperty("selmech");
+													
 													return IFuture.DONE;
 												}
 											});
@@ -328,6 +345,8 @@ public class SecurityService implements ISecurityService
 													ret.addProperty(new Property("storepath", storepath));
 													ret.addProperty(new Property("storepass", storepass));
 													ret.addProperty(new Property("keypass", keypass));
+													
+													ret.addProperty(new Property("selmech", ""+selmech));
 													
 													return new Future<Properties>(ret);
 												}
@@ -471,7 +490,10 @@ public class SecurityService implements ISecurityService
 			{
 				System.out.println("Using stored platform password: "+password);
 			}
+			
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_USEPASS, enable));
 		}
+		
 		return ret;
 	}
 
@@ -508,6 +530,8 @@ public class SecurityService implements ISecurityService
 			{
 				System.out.println("Using new platform password: "+password);
 			}
+			
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
 		}
 		return ret;
 	}
@@ -553,6 +577,9 @@ public class SecurityService implements ISecurityService
 			// Use remove to avoid keeping old mappings forever (name would still be stored otherwise)
 			platformpasses.remove(target.getPlatformPrefix());
 		}
+		
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
+
 		return IFuture.DONE;		
 	}
 
@@ -581,13 +608,16 @@ public class SecurityService implements ISecurityService
 	{
 		if(password!=null)
 		{
-			networkpasses.put(network, password);
+			networkpasses.put(network, password);			
 		}
 		else
 		{
 			// Use remove to avoid keeping old mappings forever (name would still be stored otherwise)
 			networkpasses.remove(network);
 		}
+		
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
+
 		return IFuture.DONE;	
 	}
 	
@@ -641,6 +671,8 @@ public class SecurityService implements ISecurityService
 		
 		this.trustedlan = allowed;
 		
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, allowed));
+		
 		return IFuture.DONE;
 	}
 	
@@ -679,6 +711,8 @@ public class SecurityService implements ISecurityService
 		
 		// reset keystore
 		this.keystore = null;
+		
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
 		
 		return IFuture.DONE;
 	}
@@ -1150,15 +1184,15 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void> setAcquisitionMechanismParameterValue(Class<?> type, String name, Object value)
 	{
 		Future<Void> ret = new Future<Void>();
-		try
+		AAcquisitionMechanism mech = getMechanism(type);
+		if(mech!=null)
 		{
-			AAcquisitionMechanism mech = getMechanism(type);
 			mech.setParameterValue(name, value);
 			ret.setResult(null);
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			ret.setException(new RuntimeException("Mechanism not found: "+type));
 		}
 		return ret;
 	}
@@ -1179,10 +1213,20 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
+	 *  Get the active acquisition mechanism.
+	 */
+	public IFuture<Integer> getSelectedAcquisitionMechanism()
+	{
+		return new Future<Integer>(selmech);
+	}
+	
+	/**
 	 *  Set the acquire mechanism.
 	 */
 	public IFuture<Void> setAcquisitionMechanism(Class<?> type)
 	{
+		int oldselmech = selmech;
+		
 		if(type==null)
 		{
 			selmech = -1;
@@ -1199,7 +1243,30 @@ public class SecurityService implements ISecurityService
 				}
 			}
 		}
+		
+		if(oldselmech!=selmech)
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, new Integer(selmech)));
+		
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Subscribe to changes.
+	 */
+	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subcribeToEvents()
+	{
+		final SubscriptionIntermediateFuture<ChangeEvent<Object>> ret = new SubscriptionIntermediateFuture<ChangeEvent<Object>>();
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				subscribers.remove(ret);
+			}
+		});
+		subscribers.add(ret);
+		// signal with null subscription done
+		ret.addIntermediateResultIfUndone(null);
+		return ret;
 	}
 	
 	/**
@@ -1221,6 +1288,17 @@ public class SecurityService implements ISecurityService
 		if(ret==null)
 			throw new RuntimeException("Mechanism not found: "+type);
 		return ret;
+	}
+	
+	/**
+	 *  Publish events to all subscribers.
+	 */
+	protected void publishEvent(ChangeEvent<Object> event)
+	{
+		for(SubscriptionIntermediateFuture<ChangeEvent<Object>> sub: subscribers)
+		{
+			sub.addIntermediateResult(event);
+		}
 	}
 	
 	//-------- static part --------

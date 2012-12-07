@@ -46,6 +46,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.rules.eca.RuleEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -439,8 +440,15 @@ public class ChatService implements IChatService, IChatGuiService
 			subscribers	= new LinkedHashSet<SubscriptionIntermediateFuture<ChatEvent>>();
 		}
 		
-		SubscriptionIntermediateFuture<ChatEvent>	ret	= new SubscriptionIntermediateFuture<ChatEvent>();
+		final SubscriptionIntermediateFuture<ChatEvent>	ret	= new SubscriptionIntermediateFuture<ChatEvent>();
 		subscribers.add(ret);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				subscribers.remove(ret);
+			}
+		});
 		
 		return ret;		
 	}

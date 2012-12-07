@@ -56,17 +56,15 @@ public class AcquireCertificatePanel extends JPanel
 	/**
 	 * 
 	 */
-	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, 
-		List<MechanismInfo> mechanisms, int sel, final CMSUpdateHandler cmshandler)
+	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, final CMSUpdateHandler cmshandler)
 	{
 		this.ea = ea;
 		this.secser = secser;
-		this.mechanisms = mechanisms;
 		
 		final ObjectCardLayout ocl = new ObjectCardLayout();
 		final JPanel pdetail = new JPanel(ocl);
 
-		cbmechs = mechanisms==null? new JComboBox(): new JComboBox(mechanisms.toArray());
+		cbmechs = new JComboBox();
 		cbmechs.addItem("None");
 		cbmechs.setRenderer(new BasicComboBoxRenderer()
 		{
@@ -136,6 +134,12 @@ public class AcquireCertificatePanel extends JPanel
 	 */
 	public void setMechanisms(List<MechanismInfo> mechanisms)
 	{
+		ItemListener[] lis = cbmechs.getItemListeners();
+		for(int i=0; i<lis.length; i++)
+		{
+			cbmechs.removeItemListener(lis[i]);
+		}
+		
 		this.mechanisms = mechanisms;
 		cbmechs.removeAllItems();
 		for(MechanismInfo mi: mechanisms)
@@ -143,6 +147,29 @@ public class AcquireCertificatePanel extends JPanel
 			cbmechs.addItem(mi);
 		}
 		cbmechs.addItem("None");
+		
+		for(int i=0; i<lis.length; i++)
+		{
+			cbmechs.addItemListener(lis[i]);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void setSelectedMechanism(int sel)
+	{
+		if(mechanisms!=null)
+		{
+			if(sel==-1)
+			{
+				cbmechs.setSelectedIndex(cbmechs.getItemCount()-1);
+			}
+			else
+			{
+				cbmechs.setSelectedIndex(sel);
+			}
+		}
 	}
 	
 	/**
@@ -199,7 +226,7 @@ public class AcquireCertificatePanel extends JPanel
 	/**
 	 * 
 	 */
-	protected void createCidChooser(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi, CMSUpdateHandler cmshandler)
+	protected void createCidChooser(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi, final CMSUpdateHandler cmshandler)
 	{
 		final JTextField tf = new JTextField();
 		tf.setToolTipText(pi.getDescription());
@@ -211,8 +238,8 @@ public class AcquireCertificatePanel extends JPanel
 		p.add(bu, BorderLayout.EAST);
 		
 		pp.addComponent(pi.getName(), p);
-		
-		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(this), ea, cmshandler, new ComponentIconCache(ea));
+
+		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(AcquireCertificatePanel.this), ea, cmshandler, new ComponentIconCache(ea));
 		
 		bu.addActionListener(new ActionListener()
 		{

@@ -4,7 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.commons.ChangeEvent;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.security.cert.Certificate;
 import java.util.List;
@@ -31,6 +33,27 @@ public interface ISecurityService
 	public static final String CERTIFICATE = "certificate";
 	public static final String TRUSTED_CERTIFICATE = "trusted_certificate";
 	public static final String KEYPAIR = "keypair";
+	
+	/** The event types. */
+	public static final String PROPERTY_USEPASS = "usepass";
+	
+	/** The trusted lan property. */
+	public static final String PROPERTY_TRUSTEDLAN = "trustedlan";
+
+	/** The localpass property. */
+	public static final String PROPERTY_LOCALPASS = "localpass";
+
+	/** The platformpass property. */
+	public static final String PROPERTY_PLATFORMPASS = "platformpass";
+
+	/** The networkpass property. */
+	public static final String PROPERTY_NETWORKPASS = "networkpass";
+
+	/** The keystore settings property. */
+	public static final String PROPERTY_KEYSTORESETTINGS = "keystoresettings";
+
+	/** The acquisition_mechanism. */
+	public static final String PROPERTY_SELECTEDMECHANISM = "selmechanism";
 	
 	//-------- password management --------
 	
@@ -217,4 +240,17 @@ public interface ISecurityService
 	 *  Set the acquisition mechanism.
 	 */
 	public IFuture<Void> setAcquisitionMechanism(Class<?> type);
+
+	/**
+	 *  Get the active acquisition mechanism.
+	 */
+	public IFuture<Integer> getSelectedAcquisitionMechanism();
+	
+	//-------- subscription to changes --------
+	
+	/**
+	 *  Subscribe to changes.
+	 */
+	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subcribeToEvents();
+	
 }

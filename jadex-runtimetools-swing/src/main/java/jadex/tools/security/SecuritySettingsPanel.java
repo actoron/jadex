@@ -14,12 +14,10 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.tools.awareness.AwarenessAgentPanel.AddRemoveAction;
 import jadex.tools.jcc.JCCResultListener;
 
 import java.awt.BorderLayout;
@@ -34,6 +32,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.security.cert.Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -50,13 +49,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -102,6 +98,10 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	/** The key password. */
 	protected JTextField tfkeypass;
 
+	
+	protected JSplitPanel sph;
+	protected JSplitPanel spv;
+	
 	//-------- methods --------
 	
 	/**
@@ -137,7 +137,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				secservice.setTrustedLanMode(cbtrulan.isSelected());
-				doRefresh();
+//				doRefresh();
 			}
 		});
 		
@@ -314,12 +314,19 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		act.run();
 
 		// The acquire certificate settings
-		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, null, 0, jcc.getCMSHandler());
+		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, jcc.getCMSHandler());
 		secservice.getAcquisitionMechanisms().addResultListener(new SwingDefaultResultListener<List<MechanismInfo>>()
 		{
 			public void customResultAvailable(List<MechanismInfo> result) 
 			{
 				acp.setMechanisms(result);
+				secservice.getSelectedAcquisitionMechanism().addResultListener(new SwingDefaultResultListener<Integer>()
+				{
+					public void customResultAvailable(Integer sel) 
+					{
+						acp.setSelectedMechanism(sel);
+					}
+				});
 			}
 		});
 		
@@ -386,7 +393,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				{
 					public void customResultAvailable(Void result)
 					{
-						doRefresh();
+//						doRefresh();
 					}
 				});
 			}
@@ -400,7 +407,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				{
 					public void customResultAvailable(Void result)
 					{
-						doRefresh();
+//						doRefresh();
 					}
 				});
 			}
@@ -423,13 +430,13 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 //		inner.add(no, BorderLayout.NORTH);
 //		inner.add(sp, BorderLayout.CENTER);
 		
-		JSplitPanel sph = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT);
+		sph = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT);
 		sph.setOneTouchExpandable(true);
 		sph.setDividerLocation(0.5);
 		sph.add(pdetails);
 		sph.add(new JScrollPane(acp));
 		
-		JSplitPanel spv = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+		spv = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 		spv.setOneTouchExpandable(true);
 		spv.setDividerLocation(0.5);
 		spv.add(slocal);
@@ -489,7 +496,66 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			}
 		});
 		
-		doRefresh().addResultListener(new SwingDelegationResultListener<Void>(ret));
+//		doRefresh().addResultListener(new SwingDelegationResultListener<Void>(ret));
+		
+		secservice.subcribeToEvents().addResultListener(new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
+		{
+			public void intermediateResultAvailable(jadex.commons.ChangeEvent<Object> event)
+			{
+				// Skip init
+				if(event==null)
+				{
+					ret.setResult(null);
+					return;
+				}
+				
+				System.out.println("event: "+event.getType()+" "+event.getValue());
+				
+				if(ISecurityService.PROPERTY_USEPASS.equals(event.getType()))
+				{
+					cbusepass.setSelected(((Boolean)event.getValue()).booleanValue());
+				}
+				else if(ISecurityService.PROPERTY_TRUSTEDLAN.equals(event.getType()))
+				{
+					cbtrulan.setSelected(((Boolean)event.getValue()).booleanValue());
+				}
+				else if(ISecurityService.PROPERTY_LOCALPASS.equals(event.getType()))
+				{
+					tfpass.setText((String)event.getValue());
+				}
+				else if(ISecurityService.PROPERTY_PLATFORMPASS.equals(event.getType()))
+				{
+					ppp.update((Map<String,String>)event.getValue());
+				}
+				else if(ISecurityService.PROPERTY_NETWORKPASS.equals(event.getType()))
+				{
+					npp.update((Map<String,String>)event.getValue());
+				}
+				else if(ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
+				{
+					String[] info = (String[])event.getValue();
+					tfstorepath.setText(info[0]);
+					tfstorepass.setText(info[1]);
+					tfkeypass.setText(info[2]);
+				}
+				else if(ISecurityService.PROPERTY_SELECTEDMECHANISM.equals(event.getType()))
+				{
+					acp.setSelectedMechanism(((Integer)event.getValue()).intValue());
+				}
+			}
+			
+			public void finished()
+			{
+			}
+			
+			public void resultAvailable(Collection<jadex.commons.ChangeEvent<Object>> result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		
 		return ret;
 	}
@@ -502,72 +568,72 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		return IFuture.DONE;
 	}
 
-	/**
-	 *  Refresh the panel.
-	 */
-	protected IFuture<Void> doRefresh()
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		
-		// Initialize values from security service.
-		secservice.isUsePassword().addResultListener(new SwingExceptionDelegationResultListener<Boolean, Void>(ret)
-		{
-			public void customResultAvailable(Boolean usepass)
-			{
-				cbusepass.setSelected(usepass.booleanValue());
-				
-				secservice.isTrustedLanMode().addResultListener(new SwingExceptionDelegationResultListener<Boolean, Void>(ret)
-				{
-					public void customResultAvailable(Boolean trustedlan)
-					{
-						cbtrulan.setSelected(trustedlan.booleanValue());
-						
-						secservice.getLocalPassword().addResultListener(new SwingExceptionDelegationResultListener<String, Void>(ret)
-						{
-							public void customResultAvailable(String password)
-							{
-								if(password!=null)
-								{
-									tfpass.setText(password);
-								}
-								
-								secservice.getPlatformPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
-								{
-									public void customResultAvailable(Map<String, String> passwords)
-									{
-		//								System.out.println("plat passes: "+passwords);
-										ppp.update(passwords);
-										
-										secservice.getNetworkPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
-										{
-											public void customResultAvailable(Map<String, String> passwords)
-											{
-		//										System.out.println("net passes: "+passwords);
-												npp.update(passwords);
-												
-												secservice.getKeystoreInfo().addResultListener(new SwingExceptionDelegationResultListener<String[], Void>(ret)
-												{
-													public void customResultAvailable(String[] info)
-													{
-														tfstorepath.setText(info[0]);
-														tfstorepass.setText(info[1]);
-														tfkeypass.setText(info[2]);
-														ret.setResult(null);			
-													}
-												});
-											}
-										});
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
+//	/**
+//	 *  Refresh the panel.
+//	 */
+//	protected IFuture<Void> doRefresh()
+//	{
+//		final Future<Void>	ret	= new Future<Void>();
+//		
+//		// Initialize values from security service.
+//		secservice.isUsePassword().addResultListener(new SwingExceptionDelegationResultListener<Boolean, Void>(ret)
+//		{
+//			public void customResultAvailable(Boolean usepass)
+//			{
+//				cbusepass.setSelected(usepass.booleanValue());
+//				
+//				secservice.isTrustedLanMode().addResultListener(new SwingExceptionDelegationResultListener<Boolean, Void>(ret)
+//				{
+//					public void customResultAvailable(Boolean trustedlan)
+//					{
+//						cbtrulan.setSelected(trustedlan.booleanValue());
+//						
+//						secservice.getLocalPassword().addResultListener(new SwingExceptionDelegationResultListener<String, Void>(ret)
+//						{
+//							public void customResultAvailable(String password)
+//							{
+//								if(password!=null)
+//								{
+//									tfpass.setText(password);
+//								}
+//								
+//								secservice.getPlatformPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
+//								{
+//									public void customResultAvailable(Map<String, String> passwords)
+//									{
+//		//								System.out.println("plat passes: "+passwords);
+//										ppp.update(passwords);
+//										
+//										secservice.getNetworkPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
+//										{
+//											public void customResultAvailable(Map<String, String> passwords)
+//											{
+//		//										System.out.println("net passes: "+passwords);
+//												npp.update(passwords);
+//												
+//												secservice.getKeystoreInfo().addResultListener(new SwingExceptionDelegationResultListener<String[], Void>(ret)
+//												{
+//													public void customResultAvailable(String[] info)
+//													{
+//														tfstorepath.setText(info[0]);
+//														tfstorepass.setText(info[1]);
+//														tfkeypass.setText(info[2]);
+//														ret.setResult(null);			
+//													}
+//												});
+//											}
+//										});
+//									}
+//								});
+//							}
+//						});
+//					}
+//				});
+//			}
+//		});
+//		
+//		return ret;
+//	}
 
 	/**
 	 *  Get the component.
@@ -603,6 +669,11 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	public IFuture<Void> setProperties(Properties props)
 	{
 		cbshowchars.setSelected(props.getBooleanProperty("showchars"));
+		((JTabbedPane)inner).setSelectedIndex(props.getIntProperty("selected_tab"));
+		if(props.getProperty("sph")!=null)
+			sph.setDividerLocation(props.getDoubleProperty("sph"));
+		if(props.getProperty("spv")!=null)
+			spv.setDividerLocation(props.getDoubleProperty("spv"));
 		return IFuture.DONE;
 	}
 
@@ -614,6 +685,9 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	{
 		Properties	props	= new Properties();
 		props.addProperty(new Property("showchars", Boolean.toString(cbshowchars.isSelected())));
+		props.addProperty(new Property("selected_tab", ""+((JTabbedPane)inner).getSelectedIndex()));
+		props.addProperty(new Property("sph", ""+sph.getProportionalDividerLocation()));
+		props.addProperty(new Property("spv", ""+spv.getProportionalDividerLocation()));
 		return new Future<Properties>(props);
 	}
 	
