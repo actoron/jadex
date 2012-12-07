@@ -102,7 +102,8 @@ public class ComponentSelectorDialog
 	/**
 	 *  Create a new AgentSelectorDialog.
 	 */
-	public ComponentSelectorDialog(Component parent, IExternalAccess access, CMSUpdateHandler cmshandler, ComponentIconCache iconcache)
+	public ComponentSelectorDialog(Component parent, IExternalAccess access, 
+		CMSUpdateHandler cmshandler, ComponentIconCache iconcache)
 	{
 		this.parent	= parent;
 		this.access	= access;
@@ -185,10 +186,10 @@ public class ComponentSelectorDialog
 		JButton	cancel	= new JButton("Cancel");
 		JButton	help	= new JButton("Help");
 
-		select.setToolTipText("Use selected agent.");
-		newaid.setToolTipText("Add new (empty) agent identifier.");
-		remove.setToolTipText("Remove selected agent.");
-		removeall.setToolTipText("Remove all agents.");
+		select.setToolTipText("Use selected component.");
+		newaid.setToolTipText("Add new (empty) component identifier.");
+		remove.setToolTipText("Remove selected component.");
+		removeall.setToolTipText("Remove all components.");
 		ok.setToolTipText("Close dialog using current selection.");
 		cancel.setToolTipText("Abort dialog.");
 		help.setToolTipText("Show online documentation about this dialog.");
@@ -306,7 +307,7 @@ public class ComponentSelectorDialog
 
 		// Put trees in extra component to add border.
 		JPanel	treepanel	= new JPanel(new GridBagLayout());
-		treepanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Known Agents "));
+		treepanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), getTreeViewName()));
 		treepanel.add(comptree,	new GridBagConstraints(0,0, 1,GridBagConstraints.REMAINDER,	1,1,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0));
 //		treepanel(new JLabel(),	new GridBagConstraints(1,0, GridBagConstraints.REMAINDER,1,	0,1,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));
 		treepanel.add(select,		new GridBagConstraints(1,0, GridBagConstraints.REMAINDER,1,							0,0,GridBagConstraints.CENTER,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
@@ -314,9 +315,9 @@ public class ComponentSelectorDialog
 
 		JPanel	seltreepanel	= new JPanel(new BorderLayout());
 		seltreepanel.add(BorderLayout.CENTER, sp);
-		seltreepanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Selected Agents "));
+		seltreepanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), getSelectedListName()));
 		// Add border to aidpanel.
-		aidpanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Agent Identifier "));
+		aidpanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Component Identifier "));
 //		// When user selects an agent in tree, show aid in panel.
 //		comptree.getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
 //		{
@@ -337,8 +338,8 @@ public class ComponentSelectorDialog
 							
 		parent = SGUI.getWindowParent(parent);
 		final JDialog	dia	= parent instanceof Frame
-			? new JDialog((Frame)parent, "Select/Enter Agent Identifier", true)
-			: new JDialog((Dialog)parent, "Select/Enter Agent Identifier", true);
+			? new JDialog((Frame)parent, getDialogName(), true)
+			: new JDialog((Dialog)parent, getDialogName(), true);
 
 		// Set aborted to [true], when dialog was aborted.
 		dia.addWindowListener(new WindowAdapter()
@@ -589,5 +590,29 @@ public class ComponentSelectorDialog
 			ok.setEnabled(true);
 		}
 		comptree.repaint();
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getDialogName()
+	{
+		return "Select/Enter Component Identifier";
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getTreeViewName()
+	{
+		return " Known Components ";
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getSelectedListName()
+	{
+		return " Selected Components ";
 	}
 }

@@ -7,6 +7,7 @@ import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
@@ -55,7 +56,8 @@ public class AcquireCertificatePanel extends JPanel
 	/**
 	 * 
 	 */
-	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, List<MechanismInfo> mechanisms, int sel)
+	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, 
+		List<MechanismInfo> mechanisms, int sel, final CMSUpdateHandler cmshandler)
 	{
 		this.ea = ea;
 		this.secser = secser;
@@ -108,7 +110,7 @@ public class AcquireCertificatePanel extends JPanel
 							}
 							else if(IComponentIdentifier.class.equals(tcl))
 							{
-								createCidChooser(pp, pi, mi);
+								createCidChooser(pp, pi, mi, cmshandler);
 							}
 							else
 							{
@@ -197,7 +199,7 @@ public class AcquireCertificatePanel extends JPanel
 	/**
 	 * 
 	 */
-	protected void createCidChooser(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi)
+	protected void createCidChooser(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi, CMSUpdateHandler cmshandler)
 	{
 		final JTextField tf = new JTextField();
 		tf.setToolTipText(pi.getDescription());
@@ -210,8 +212,7 @@ public class AcquireCertificatePanel extends JPanel
 		
 		pp.addComponent(pi.getName(), p);
 		
-		final CMSUpdateHandler cmsuh = new CMSUpdateHandler(ea);
-		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(this), ea, cmsuh, new ComponentIconCache(ea));
+		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(this), ea, cmshandler, new ComponentIconCache(ea));
 		
 		bu.addActionListener(new ActionListener()
 		{

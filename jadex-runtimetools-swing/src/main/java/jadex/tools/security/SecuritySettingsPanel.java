@@ -314,7 +314,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		act.run();
 
 		// The acquire certificate settings
-		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, null, 0);
+		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, null, 0, jcc.getCMSHandler());
 		secservice.getAcquisitionMechanisms().addResultListener(new SwingDefaultResultListener<List<MechanismInfo>>()
 		{
 			public void customResultAvailable(List<MechanismInfo> result) 

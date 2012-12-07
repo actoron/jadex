@@ -8,7 +8,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -17,11 +16,6 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
@@ -29,12 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -47,6 +40,9 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	
 	/** The value mappings. (from proxy cid -> remote cid. */
 	protected Map<IComponentIdentifier, IComponentIdentifier> valmap;
+	
+	/** The registered cms listener. */
+	protected ICMSComponentListener cmslistener;
 	
 	//-------- constructors --------
 
@@ -94,16 +90,26 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			}
 		});
 		
-		cmshandler.addCMSListener(access.getComponentIdentifier().getRoot(), new ICMSComponentListener()
+		this.cmslistener = new ICMSComponentListener()
 		{
 			public IFuture<Void> componentRemoved(final IComponentDescription desc, Map<String, Object> results)
 			{
-				System.out.println("removed: "+desc.getName()+" "+desc.getModelName());
-				IComponentIdentifier cid = valmap.remove(desc.getName());
-				if(cid!=null)
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					((DefaultListModel)pllist.getModel()).removeElement(cid);
-				}
+					public void run()
+					{
+//						System.out.println("removed: "+desc.getName()+" "+desc.getModelName());
+						IComponentIdentifier cid = valmap.remove(desc.getName());
+						if(cid!=null)
+						{
+							((DefaultListModel)pllist.getModel()).removeElement(cid);
+						}
+						else
+						{
+							System.out.println("Could not remove: "+desc.getName());
+						}
+					}
+				});
 				return IFuture.DONE;
 			}
 			
@@ -114,26 +120,36 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			
 			public IFuture<Void> componentAdded(final IComponentDescription desc)
 			{
-				System.out.println("added: "+desc);
-				// Hack for speed
-				if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
+//				System.out.println("added: "+desc);
+				
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
-						.addResultListener(new IResultListener<IProxyAgentService>()
+					public void run()
 					{
-						public void resultAvailable(IProxyAgentService ser)
+						// Hack for speed
+						if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
 						{
-							addPlatform(ser);
+							SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
+								.addResultListener(new IResultListener<IProxyAgentService>()
+							{
+								public void resultAvailable(IProxyAgentService ser)
+								{
+									addPlatform(ser);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							});
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-				}
+					}
+				});
+				
 				return IFuture.DONE;
 			}
-		});
+		};
+		
+		cmshandler.addCMSListener(access.getComponentIdentifier().getRoot(), cmslistener);
 		
 		final Runnable action = new Runnable()
 		{
@@ -204,8 +220,27 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		{
 			public void resultAvailable(IComponentIdentifier cid)
 			{
-				valmap.put(((IService)ser).getServiceIdentifier().getProviderId(), cid);
-				((DefaultListModel)pllist.getModel()).add(0, cid);
+				IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
+				if(!valmap.containsKey(key))
+				{
+					valmap.put(key, cid);
+				
+					DefaultListModel lm = (DefaultListModel)pllist.getModel();
+					String name = cid.getName();
+					boolean done = false;
+					for(int i=0; i<lm.getSize() && !done; i++)
+					{
+						if(name.compareTo(((IComponentIdentifier)lm.get(i)).getName())<=0)
+						{
+							lm.add(i, cid);
+							done = true;
+						}
+					}
+					if(!done)
+					{
+						lm.add(lm.getSize(), cid);
+					}
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -219,6 +254,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	 */
 	protected void disposeTreeView()
 	{
+		cmshandler.removeCMSListener(access.getComponentIdentifier().getRoot(), cmslistener);
 	}
 	
 	/**
@@ -235,5 +271,29 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	protected IComponentIdentifier getSelectedObject()
 	{
 		return (IComponentIdentifier)pllist.getSelectedValue();
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getDialogName()
+	{
+		return "Select/Enter Platform Identifier";
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getTreeViewName()
+	{
+		return " Known Platforms ";
+	}
+	
+	/**
+	 * 
+	 */
+	protected String getSelectedListName()
+	{
+		return " Selected Platforms ";
 	}
 }
