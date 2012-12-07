@@ -18,8 +18,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -36,15 +38,19 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -753,6 +759,127 @@ public class SRemoteGui
 			}
 		});
 	}
+	
+	/**
+	 *  Add a remote url via the library service.
+	 *  Needs to schedule on target platform to recreate url.
+	 */
+	public static IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final IResourceIdentifier parid, final String filename, final boolean tl, IExternalAccess exta)
+	{
+		return exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
+		{
+			@Classname("addurl")
+			public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
+			{
+				final URL	url	= SUtil.toURL(filename);
+				final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+				{
+					public void customResultAvailable(final ILibraryService ls)
+					{
+						if(!tl)
+						{
+							// todo: workspace=true?
+							ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+							{
+								public void customResultAvailable(IResourceIdentifier rid)
+								{
+									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+//									exception.printStackTrace();
+									super.exceptionOccurred(exception);
+								}
+							});
+						}
+						else
+						{
+							ls.addTopLevelURL(url).addResultListener(new ExceptionDelegationResultListener<Void, Tuple2<URL, IResourceIdentifier>>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, null));
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+//									exception.printStackTrace();
+									super.exceptionOccurred(exception);
+								}
+							});
+						}
+					}
+				});
+				
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Copy a file between two platforms.
+	 *  Intermediate results represent status messages.
+	 */
+	public static IIntermediateFuture<String> copy(final String source, final IExternalAccess sourceaccess, final String target, final IDeploymentService targetds) 
+	{
+		return (IIntermediateFuture<String>)sourceaccess.scheduleStep(new IComponentStep<Collection<String>>()
+		{
+			@Classname("copyFromSource")
+			public IIntermediateFuture<String> execute(final IInternalAccess ia)
+			{
+				final IntermediateFuture<String> ret = new IntermediateFuture<String>();
+					
+				try
+				{
+					final File	sourcefile	= new File(source);
+					FileInputStream fis = new FileInputStream(sourcefile);
+					ServiceOutputConnection soc = new ServiceOutputConnection();
+					soc.writeFromInputStream(fis, sourceaccess);
+					
+					ITerminableIntermediateFuture<Long> fut = targetds.uploadFile(soc.getInputConnection(), target, sourcefile.getName());
+					fut.addResultListener(new IIntermediateResultListener<Long>()
+					{
+						long	lasttime	= System.currentTimeMillis();
+						public void intermediateResultAvailable(final Long result)
+						{
+							long	curtime	= System.currentTimeMillis();
+							if(curtime-lasttime>1000)
+							{
+								lasttime	= curtime;
+								double done = ((int)((result/(double)sourcefile.length())*10000))/100.0;
+								DecimalFormat fm = new DecimalFormat("#0.00");
+								String txt = "Copy "+fm.format(done)+"% done ("+SUtil.bytesToString(result)+" / "+SUtil.bytesToString(sourcefile.length())+")";
+								ret.addIntermediateResult(txt);
+							}
+						}
+						
+						public void finished()
+						{
+							ret.setFinished();
+						}
+						
+						public void resultAvailable(Collection<Long> result)
+						{
+							finished();
+						}
+						
+						public void exceptionOccurred(final Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				catch(Exception ex)
+				{
+					ret.setException(ex);
+				}
+				
+				return ret;
+			}
+		});
+	}
+
 	
 	/**
 	 *  Compare a model to a path.

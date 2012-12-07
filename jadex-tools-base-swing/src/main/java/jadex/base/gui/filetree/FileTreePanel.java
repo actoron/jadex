@@ -1,5 +1,6 @@
 package jadex.base.gui.filetree;
 
+import jadex.base.DefaultFileFilter;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -610,7 +611,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		{
 			public IRemoteFilter getFileFilter()
 			{
-				return new DefaultFileFilter(mic);
+				return new DefaultFileFilter(mic.isAll(), mic.getSelectedComponentTypes());
 			}
 		});
 		ftp.addNodeHandler(new DefaultNodeHandler(ftp.getTree()));

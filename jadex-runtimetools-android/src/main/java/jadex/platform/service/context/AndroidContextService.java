@@ -233,6 +233,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	{
           Intent intent = new Intent();
           intent.setAction(android.content.Intent.ACTION_VIEW);
+          intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);	// Open as new independent task
           File file = new File(path);
         
           MimeTypeMap mime = MimeTypeMap.getSingleton();

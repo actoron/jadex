@@ -96,7 +96,11 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 
 		setPlatformAutostart(true);
 		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
-		setPlatformOptions("-awareness true -niotcptransport false");
+		setPlatformOptions(
+			"-awareness true " +
+			"-niotcptransport false " +
+			"-networkname jadexnetwork " +
+			"-networkpass laxlax");
 
 		uiHandler = new Handler();
 	}

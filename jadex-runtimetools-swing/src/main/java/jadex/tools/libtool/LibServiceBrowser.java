@@ -1,5 +1,6 @@
 package jadex.tools.libtool;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.AddRIDAction;
@@ -8,16 +9,13 @@ import jadex.base.gui.modeltree.ITreeAbstraction;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IGlobalResourceIdentifier;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -28,8 +26,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -37,7 +33,6 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.platform.service.library.LibraryService;
 
 import java.awt.BorderLayout;
@@ -50,7 +45,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -280,7 +274,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 										else if(obj instanceof FileData)
 										{
 											final String filename = ((FileData)obj).getPath();
-											addRemoteURL(null, filename, true).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+											SRemoteGui.addRemoteURL(null, filename, true, jcc.getPlatformAccess()).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
 											{
 												public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
 												{
@@ -330,7 +324,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											else if(obj instanceof FileData)
 											{
 												final String filename = ((FileData)obj).getPath();
-												addRemoteURL(selrid, filename, false).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
+												SRemoteGui.addRemoteURL(selrid, filename, false, jcc.getPlatformAccess()).addResultListener(new IResultListener<Tuple2<URL,IResourceIdentifier>>()
 												{
 													public void resultAvailable(Tuple2<URL, IResourceIdentifier> result)
 													{
@@ -685,70 +679,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 				});
 			}
 		});
-	}
-	
-	/**
-	 *  Add a remote url via the library service.
-	 *  Needs to schedule on target platform to recreate url.
-	 */
-	protected IFuture<Tuple2<URL, IResourceIdentifier>> addRemoteURL(final IResourceIdentifier parid, 
-		final String filename, final boolean tl)
-	{
-		final Future<Tuple2<URL, IResourceIdentifier>> ret = new Future<Tuple2<URL, IResourceIdentifier>>();
-		
-		jcc.getPlatformAccess().scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
-		{
-			@Classname("addurl")
-			public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
-			{
-				final URL	url	= SUtil.toURL(filename);
-				final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
-				IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
-				{
-					public void customResultAvailable(final ILibraryService ls)
-					{
-						if(!tl)
-						{
-							// todo: workspace=true?
-							ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
-							{
-								public void customResultAvailable(IResourceIdentifier rid)
-								{
-									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									exception.printStackTrace();
-									super.exceptionOccurred(exception);
-								}
-							});
-						}
-						else
-						{
-							ls.addTopLevelURL(url).addResultListener(new ExceptionDelegationResultListener<Void, Tuple2<URL, IResourceIdentifier>>(ret)
-							{
-								public void customResultAvailable(Void result)
-								{
-									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, null));
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									exception.printStackTrace();
-									super.exceptionOccurred(exception);
-								}
-							});
-						}
-					}
-				});
-				
-				return ret;
-			}
-		}).addResultListener(new DelegationResultListener<Tuple2<URL, IResourceIdentifier>>(ret));
-		
-		return ret;
-	}
-	
+	}	
 	
 	/**
 	 *  Informs the plugin that it should stop all its computation

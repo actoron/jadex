@@ -3,6 +3,7 @@ package jadex.tools.deployer;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -28,8 +29,8 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/** The node handler. */
 	protected INodeHandler nodehandler;
 	
-	/** The jcc access (local). */
-	protected IExternalAccess jccaccess;
+	/** The jcc (local). */
+	protected IControlCenter jcc;
 	
 	/** The panel title. */
 	protected String	title;
@@ -39,10 +40,10 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/**
 	 *  Create a new selector panel.
 	 */
-	public DeployerServiceSelectorPanel(IExternalAccess jccaccess, IExternalAccess platformaccess, INodeHandler nodehandler, String title)
+	public DeployerServiceSelectorPanel(IControlCenter jcc, IExternalAccess platformaccess, INodeHandler nodehandler, String title)
 	{
 		super(platformaccess, IDeploymentService.class);
-		this.jccaccess = jccaccess;
+		this.jcc = jcc;
 		this.nodehandler = nodehandler;
 		this.title	= title;
 	}
@@ -56,7 +57,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	{
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
-		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -68,8 +69,8 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 					public void customResultAvailable(Object result) 
 					{
 						IExternalAccess component = (IExternalAccess)result; 
-						boolean remote = !jccaccess.getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
-						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, jccaccess, remote, (IDeploymentService)service, nodehandler, title);
+						boolean remote = !jcc.getJCCAccess().getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
+						DeploymentServiceViewerPanel dp = new DeploymentServiceViewerPanel(component, jcc, remote, (IDeploymentService)service, nodehandler, title);
 						ret.setResult(dp);
 					};
 				});
@@ -138,15 +139,6 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 		}
 	}
 
-	/**
-	 *  Get the jccaccess.
-	 *  @return The jccaccess.
-	 */
-	public IExternalAccess getJCCAccess()
-	{
-		return jccaccess;
-	}
-	
 	/**
 	 *  Get the selected path.
 	 */

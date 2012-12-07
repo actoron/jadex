@@ -157,13 +157,13 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	 *  Get all selected component types.
 	 *  @return The selected component types.
 	 */
-	public List getSelectedComponentTypes()
+	public List<String> getSelectedComponentTypes()
 	{
-		List ret = new ArrayList();
+		List<String> ret = new ArrayList<String>();
 		
-		for(Iterator it=filetypes.keySet().iterator(); it.hasNext(); )
+		for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
 		{
-			String key = (String)it.next();
+			String key = it.next();
 			Object val = filetypes.get(key);
 			if(val instanceof JCheckBoxMenuItem)
 			{

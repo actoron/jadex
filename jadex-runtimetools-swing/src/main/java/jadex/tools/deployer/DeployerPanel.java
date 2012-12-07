@@ -6,46 +6,26 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
-import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SUtil;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
-import jadex.tools.jcc.JCCAgent;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.text.DecimalFormat;
-import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 /**
@@ -84,8 +64,8 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		// Local view on the left
 		DeployerNodeHandler nh1 = new DeployerNodeHandler();
 		DeployerNodeHandler nh2 = new DeployerNodeHandler();
-		p1 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), jcc.getJCCAccess(), nh1, "Local Platform");
-		p2 = new DeployerServiceSelectorPanel(jcc.getJCCAccess(), jcc.getPlatformAccess(), nh2, "Remote Platform");
+		p1 = new DeployerServiceSelectorPanel(jcc, jcc.getJCCAccess(), nh1, "Local Platform");
+		p2 = new DeployerServiceSelectorPanel(jcc, jcc.getPlatformAccess(), nh2, "Remote Platform");
 		nh1.setFirstPanel(p1);
 		nh1.setSecondPanel(p2);
 		nh2.setFirstPanel(p2);
@@ -181,7 +161,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 				if(first!=null && second!=null)
 				{
 					DeploymentServiceViewerPanel.copy((DeploymentServiceViewerPanel)first.getCurrentPanel(), 
-						(DeploymentServiceViewerPanel)second.getCurrentPanel(), second.getSelectedTreePath(), jcc.getJCCAccess());
+						(DeploymentServiceViewerPanel)second.getCurrentPanel(), second.getSelectedTreePath(), jcc);
 				}
 			}
 			
