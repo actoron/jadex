@@ -105,7 +105,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 		
 		if("ttpcid".equals(name))
 		{
-			ttpcid = (IComponentIdentifier)value;
+			setTTPCid(ttpcid);
 		}
 		else
 		{
@@ -293,7 +293,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		if(props.getProperty("ttpcid")!=null)
 		{
-			setTTPCid(new ComponentIdentifier(props.getProperty("responses").getValue()));
+			setTTPCid(new ComponentIdentifier(props.getProperty("ttpcid").getValue()));
 //			setTTPCid((IComponentIdentifier)JavaReader.objectFromXML(props.getProperty("responses").getValue(), null);
 		}
 		if(props.getProperty("verified")!=null)

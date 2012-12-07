@@ -25,12 +25,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -52,6 +54,15 @@ public class AcquireCertificatePanel extends JPanel
 	/** The combobox with mechanisms. */
 	protected JComboBox cbmechs;
 	
+	/** The layout. */
+	protected ObjectCardLayout ocl;
+	
+	/** The mechanism panel. */
+	protected JPanel pdetail;
+	
+	/** The cmshandler. */
+	protected CMSUpdateHandler cmshandler;
+	
 	/**
 	 * 
 	 */
@@ -59,9 +70,10 @@ public class AcquireCertificatePanel extends JPanel
 	{
 		this.ea = ea;
 		this.secser = secser;
+		this.cmshandler = cmshandler;
 		
-		final ObjectCardLayout ocl = new ObjectCardLayout();
-		final JPanel pdetail = new JPanel(ocl);
+		this.ocl = new ObjectCardLayout();
+		this.pdetail = new JPanel(ocl);
 
 		cbmechs = new JComboBox();
 		cbmechs.addItem("None");
@@ -80,6 +92,7 @@ public class AcquireCertificatePanel extends JPanel
 				Object o = cbmechs.getSelectedItem();
 				final MechanismInfo mi = o instanceof MechanismInfo? (MechanismInfo)o: null;
 				AcquireCertificatePanel.this.secser.setAcquisitionMechanism(mi!=null? mi.getClazz(): null);
+				
 				if(mi==null)
 				{
 					if(ocl.getComponent("none")==null)
@@ -92,31 +105,8 @@ public class AcquireCertificatePanel extends JPanel
 				}
 				else
 				{
-					final Class<?> cl = mi.getClazz();
-					if(ocl.getComponent(cl)==null)
-					{
-						PropertiesPanel pp = new PropertiesPanel();
-						pp.addFullLineComponent("Settings", new JLabel("Settings"));
-						List<ParameterInfo> pis = mi.getParameterInfos();
-						for(final ParameterInfo pi: pis)
-						{
-							Class<?> tcl = pi.getType();
-							if(boolean.class.equals(tcl) || Boolean.class.equals(tcl))
-							{
-								createCheckBox(pp, pi, mi);
-							}
-							else if(IComponentIdentifier.class.equals(tcl))
-							{
-								createCidChooser(pp, pi, mi, cmshandler);
-							}
-							else
-							{
-								createTextField(pp, pi, mi);
-							}
-						}
-						pdetail.add(pp, cl);
-					}
-					ocl.show(cl);
+					createMechanismPanel(mi);
+					ocl.show(mi.getClazz());
 				}
 			}
 		});
@@ -126,6 +116,69 @@ public class AcquireCertificatePanel extends JPanel
 		this.setLayout(new BorderLayout(4,4));
 		this.add(cbmechs, BorderLayout.NORTH);
 		this.add(pdetail, BorderLayout.CENTER);
+	}
+	
+	/**
+	 * 
+	 */
+	protected PropertiesPanel createMechanismPanel(MechanismInfo mi)
+	{
+		Class<?> cl = mi.getClazz();
+		if(ocl.getComponent(cl)==null)
+		{
+			PropertiesPanel pp = new PropertiesPanel();
+			pp.addFullLineComponent("Settings", new JLabel("Settings"));
+			List<ParameterInfo> pis = mi.getParameterInfos();
+			for(final ParameterInfo pi: pis)
+			{
+				Class<?> tcl = pi.getType();
+				if(boolean.class.equals(tcl) || Boolean.class.equals(tcl))
+				{
+					createCheckBox(pp, pi, mi);
+				}
+				else if(IComponentIdentifier.class.equals(tcl))
+				{
+					createCidChooser(pp, pi, mi, cmshandler);
+				}
+				else
+				{
+					createTextField(pp, pi, mi);
+				}
+			}
+			pdetail.add(pp, cl);
+		}
+		return (PropertiesPanel)ocl.getComponent(cl);
+	}
+	
+	/**
+	 * 
+	 */
+	public void setParameterValue(String mechname, String name, Object value)
+	{
+		for(int i=0; i<cbmechs.getItemCount(); i++)
+		{
+			if(cbmechs.getItemAt(i) instanceof MechanismInfo)
+			{
+				MechanismInfo mi = (MechanismInfo)cbmechs.getItemAt(i);
+				if(mi.getClazz().getName().endsWith(mechname))
+				{
+					PropertiesPanel pp = createMechanismPanel(mi);
+					JComponent comp = pp.getComponent(name);
+					if(comp instanceof JTextField)
+					{
+						((JTextField)comp).setText(""+value);
+					}
+					else if(comp instanceof JCheckBox)
+					{
+						((JCheckBox)comp).setSelected(((Boolean)value).booleanValue());
+					}
+					else
+					{
+						System.out.println("Cannot set: "+name+" "+value+" "+comp.getClass());
+					}
+				}
+			}
+		}
 	}
 	
 	/**

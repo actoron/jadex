@@ -27,6 +27,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -315,7 +316,11 @@ public class SecurityService implements ISecurityService
 													{
 														for(AAcquisitionMechanism mech: mechanisms)
 														{
-															props.addSubproperties(mech.getClass().getName(), mech.getProperties());
+															Properties mps = props.getSubproperty(SReflect.getInnerClassName(mech.getClass()));
+															if(mps!=null)
+															{
+																mech.setProperties(mps);
+															}
 														}
 													}
 													return IFuture.DONE;
@@ -359,11 +364,7 @@ public class SecurityService implements ISecurityService
 													{
 														for(AAcquisitionMechanism mech: mechanisms)
 														{
-															Properties mps = props.getSubproperty(mech.getClass().getName());
-															if(mps!=null)
-															{
-																mech.setProperties(mps);
-															}
+															ret.addSubproperties(SReflect.getInnerClassName(mech.getClass()), mech.getProperties());
 														}
 													}
 													

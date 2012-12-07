@@ -53,6 +53,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -98,7 +99,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	/** The key password. */
 	protected JTextField tfkeypass;
 
-	
+	/** The split panels. */
 	protected JSplitPanel sph;
 	protected JSplitPanel spv;
 	
@@ -500,7 +501,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		
 		secservice.subcribeToEvents().addResultListener(new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
 		{
-			public void intermediateResultAvailable(jadex.commons.ChangeEvent<Object> event)
+			public void intermediateResultAvailable(final jadex.commons.ChangeEvent<Object> event)
 			{
 				// Skip init
 				if(event==null)
@@ -509,39 +510,51 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 					return;
 				}
 				
-				System.out.println("event: "+event.getType()+" "+event.getValue());
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						System.out.println("event: "+event.getType()+" "+event.getValue());
+						
+						if(ISecurityService.PROPERTY_USEPASS.equals(event.getType()))
+						{
+							cbusepass.setSelected(((Boolean)event.getValue()).booleanValue());
+						}
+						else if(ISecurityService.PROPERTY_TRUSTEDLAN.equals(event.getType()))
+						{
+							cbtrulan.setSelected(((Boolean)event.getValue()).booleanValue());
+						}
+						else if(ISecurityService.PROPERTY_LOCALPASS.equals(event.getType()))
+						{
+							tfpass.setText((String)event.getValue());
+						}
+						else if(ISecurityService.PROPERTY_PLATFORMPASS.equals(event.getType()))
+						{
+							ppp.update((Map<String,String>)event.getValue());
+						}
+						else if(ISecurityService.PROPERTY_NETWORKPASS.equals(event.getType()))
+						{
+							npp.update((Map<String,String>)event.getValue());
+						}
+						else if(ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
+						{
+							String[] info = (String[])event.getValue();
+							tfstorepath.setText(info[0]);
+							tfstorepass.setText(info[1]);
+							tfkeypass.setText(info[2]);
+						}
+						else if(ISecurityService.PROPERTY_SELECTEDMECHANISM.equals(event.getType()))
+						{
+							acp.setSelectedMechanism(((Integer)event.getValue()).intValue());
+						}
+						else if(ISecurityService.PROPERTY_MECHANISMPARAMETER.equals(event.getType()))
+						{
+							Object[] data = (Object[])event.getValue();
+							acp.setParameterValue(((Class<?>)event.getSource()).getName(), (String)data[0], data[1]);
+						}
+					}
+				});
 				
-				if(ISecurityService.PROPERTY_USEPASS.equals(event.getType()))
-				{
-					cbusepass.setSelected(((Boolean)event.getValue()).booleanValue());
-				}
-				else if(ISecurityService.PROPERTY_TRUSTEDLAN.equals(event.getType()))
-				{
-					cbtrulan.setSelected(((Boolean)event.getValue()).booleanValue());
-				}
-				else if(ISecurityService.PROPERTY_LOCALPASS.equals(event.getType()))
-				{
-					tfpass.setText((String)event.getValue());
-				}
-				else if(ISecurityService.PROPERTY_PLATFORMPASS.equals(event.getType()))
-				{
-					ppp.update((Map<String,String>)event.getValue());
-				}
-				else if(ISecurityService.PROPERTY_NETWORKPASS.equals(event.getType()))
-				{
-					npp.update((Map<String,String>)event.getValue());
-				}
-				else if(ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
-				{
-					String[] info = (String[])event.getValue();
-					tfstorepath.setText(info[0]);
-					tfstorepass.setText(info[1]);
-					tfkeypass.setText(info[2]);
-				}
-				else if(ISecurityService.PROPERTY_SELECTEDMECHANISM.equals(event.getType()))
-				{
-					acp.setSelectedMechanism(((Integer)event.getValue()).intValue());
-				}
 			}
 			
 			public void finished()
