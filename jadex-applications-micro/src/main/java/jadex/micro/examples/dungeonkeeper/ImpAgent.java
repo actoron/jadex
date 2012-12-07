@@ -2,6 +2,7 @@ package jadex.micro.examples.dungeonkeeper;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceAction;
@@ -21,7 +22,7 @@ import java.util.Map;
 /**
  *  The imp agent.
  */
-@Properties(@NameValue(name="space", clazz=IFuture.class, value="$component.getParent().getExtension(\"mygc2dspace\")"))
+@Properties(@NameValue(name="space", clazz=IFuture.class, value="$component.getParentAccess().getExtension(\"mygc2dspace\")"))
 public class ImpAgent extends MicroAgent
 {
 	//-------- methods --------
@@ -29,7 +30,7 @@ public class ImpAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		final Grid2D space = (Grid2D)getProperty("space");
 		
@@ -99,5 +100,7 @@ public class ImpAgent extends MicroAgent
 		};
 		
 		waitForTick(com);
+		
+		return new Future<Void>();
 	}
 }

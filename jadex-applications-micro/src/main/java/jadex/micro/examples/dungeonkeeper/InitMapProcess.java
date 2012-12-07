@@ -1,6 +1,6 @@
 package jadex.micro.examples.dungeonkeeper;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -65,7 +65,8 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		try
 		{
 			final Space2D grid = (Space2D)space;
-			ClassLoader cl = space.getExternalAccess().getModel().getClassLoader();
+//			ClassLoader cl = space.getExternalAccess().getModel().getClassLoader();
+			ClassLoader cl = getClass().getClassLoader();
 			String mapfile = (String)getProperty("mapfile");
 			InputStream is = SUtil.getResource(mapfile, cl);
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
