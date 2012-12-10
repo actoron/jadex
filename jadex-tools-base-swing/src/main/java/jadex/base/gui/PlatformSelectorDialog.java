@@ -32,7 +32,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 /**
- * 
+ *  Dialog for selecting among known platforms.
  */
 public class PlatformSelectorDialog extends ComponentSelectorDialog
 {
@@ -56,7 +56,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	}
 	
 	/**
-	 * 
+	 *  Create the tree view.
 	 */
 	protected JComponent createTreeView()
 	{
@@ -148,6 +148,10 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			public void run()
 			{
 				((DefaultListModel)pllist.getModel()).removeAllElements();
+				
+				IComponentIdentifier self = access.getComponentIdentifier().getRoot();
+				valmap.put(null, self);
+				((DefaultListModel)pllist.getModel()).add(0, self);
 				
 				SServiceProvider.getServices(access.getServiceProvider(), IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()

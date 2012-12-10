@@ -488,18 +488,21 @@ public class JavaReader
 			typeinfos.add(ti_enum);
 			
 			// java.security.Certificate
-			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.security", "Certificate")}),
+			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.security.cert", "Certificate")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						// Hack! How to find out certificate type, which others could be used?
-						CertificateFactory cf = CertificateFactory.getInstance("X509");
+						String type = (String)rawattributes.get("type");
+						if(type==null)
+							type = "X.509";
+						CertificateFactory cf = CertificateFactory.getInstance(type);
 						return cf.generateCertificate(new ByteArrayInputStream(Base64.decode(((String)rawattributes.get("data")).getBytes())));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("type", null, AccessInfo.IGNORE_READWRITE)),
 				}
 			));
 			typeinfos.add(ti_cert);

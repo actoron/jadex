@@ -215,10 +215,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 //									System.out.println("Found id value: "+value);
 								}
 								
-								Object defval = getDefaultValue(info);
-								if(!value.equals(defval))
+//								Object defval = getDefaultValue(info);
+//								if(!value.equals(defval))
 								{
-									value = convertValue(info, value, context);
+//									value = convertValue(info, value, context);
 									
 									// Do we want sometimes to write default values?
 									Object xmlattrname = null;

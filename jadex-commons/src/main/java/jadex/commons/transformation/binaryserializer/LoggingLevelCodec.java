@@ -107,8 +107,8 @@ public class LoggingLevelCodec extends AbstractCodec
 			ec.writeBoolean(false);
 			String name = level.getName();
 			int value = level.intValue();
-			ec.writeString(name);
 			ec.writeSignedVarInt(value);
+			ec.writeString(name);
 		}
 		
 		return object;

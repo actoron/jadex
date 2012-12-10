@@ -89,7 +89,8 @@ public class SUtil
 	public static final String		NULL					= "NULL";
 
 	/** Simple date format. */
-    public static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	public static final SimpleDateFormat SDF2 = new SimpleDateFormat("dd.MM.yyyy");
 
 	
 	/**

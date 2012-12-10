@@ -275,10 +275,21 @@ public class JavaWriter
 			));
 			typeinfos.add(ti_inetaddr);
 			
+			// byte/Byte Array
+			IObjectStringConverter bytesconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, Object context)
+				{
+					byte[] bytes = Base64.encode((byte[])val);
+					return new String(bytes);
+				}
+			};
+			
 			// java.security.Certificate
-			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName("typeinfo:java.net", "Certificate")), new ObjectInfo(Certificate.class), 
+			TypeInfo ti_cert = new TypeInfo(new XMLInfo(new QName("typeinfo:java.security.cert", "Certificate")), new ObjectInfo(Certificate.class), 
 				new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("data", null))},
+				new AttributeInfo(new AccessInfo("data", "encoded"), new AttributeConverter(null, bytesconv)),
+				new AttributeInfo(new AccessInfo("type", null))},
 				null
 			));
 			typeinfos.add(ti_cert);
@@ -616,16 +627,7 @@ public class JavaWriter
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bshortconv))));
 			typeinfos.add(ti_bshortarray);
 			
-			// byte/Byte Array
-			IObjectStringConverter bytesconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, Object context)
-				{
-					byte[] bytes = Base64.encode((byte[])val);
-//					byte[] bytes = (byte[])val;
-					return new String(bytes);
-				}
-			};
+			
 			TypeInfo ti_bytearray = new TypeInfo(null, new ObjectInfo(byte[].class),
 				new MappingInfo(null, null,
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bytesconv))));

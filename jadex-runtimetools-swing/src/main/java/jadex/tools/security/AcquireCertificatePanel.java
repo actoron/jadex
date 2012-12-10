@@ -9,30 +9,31 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.security.ParameterInfo;
+import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -45,6 +46,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  */
 public class AcquireCertificatePanel extends JPanel
 {
+	//-------- attributes --------
+	
 	/** The external access. */
 	protected IExternalAccess ea;
 	
@@ -63,14 +66,20 @@ public class AcquireCertificatePanel extends JPanel
 	/** The cmshandler. */
 	protected CMSUpdateHandler cmshandler;
 	
+	/** The update actions. */
+	protected Map<String, ICommand<Object>> updateactions;
+
+	//-------- constructors --------
+
 	/**
-	 * 
+	 *  Create the acquire certificate panel.
 	 */
 	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, final CMSUpdateHandler cmshandler)
 	{
 		this.ea = ea;
 		this.secser = secser;
 		this.cmshandler = cmshandler;
+		this.updateactions = new HashMap<String, ICommand<Object>>();
 		
 		this.ocl = new ObjectCardLayout();
 		this.pdetail = new JPanel(ocl);
@@ -118,8 +127,10 @@ public class AcquireCertificatePanel extends JPanel
 		this.add(pdetail, BorderLayout.CENTER);
 	}
 	
+	//-------- methods --------
+
 	/**
-	 * 
+	 *  Create the mechanism panel.
 	 */
 	protected PropertiesPanel createMechanismPanel(MechanismInfo mi)
 	{
@@ -151,38 +162,18 @@ public class AcquireCertificatePanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Set a parameter value.
+	 *  Uses a previously created update action to actually perform
+	 *  the update.
 	 */
 	public void setParameterValue(String mechname, String name, Object value)
 	{
-		for(int i=0; i<cbmechs.getItemCount(); i++)
-		{
-			if(cbmechs.getItemAt(i) instanceof MechanismInfo)
-			{
-				MechanismInfo mi = (MechanismInfo)cbmechs.getItemAt(i);
-				if(mi.getClazz().getName().endsWith(mechname))
-				{
-					PropertiesPanel pp = createMechanismPanel(mi);
-					JComponent comp = pp.getComponent(name);
-					if(comp instanceof JTextField)
-					{
-						((JTextField)comp).setText(""+value);
-					}
-					else if(comp instanceof JCheckBox)
-					{
-						((JCheckBox)comp).setSelected(((Boolean)value).booleanValue());
-					}
-					else
-					{
-						System.out.println("Cannot set: "+name+" "+value+" "+comp.getClass());
-					}
-				}
-			}
-		}
+		ICommand<Object> update = updateactions.get(mechname+"."+name);
+		update.execute(value);
 	}
 	
 	/**
-	 * 
+	 *  Set the acquisition mechanisms.
 	 */
 	public void setMechanisms(List<MechanismInfo> mechanisms)
 	{
@@ -206,7 +197,7 @@ public class AcquireCertificatePanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Set (select) the acquisition mechanism.
 	 */
 	public void setSelectedMechanism(int sel)
 	{
@@ -221,7 +212,7 @@ public class AcquireCertificatePanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Create input text field.
 	 */
 	protected void createTextField(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi)
 	{
@@ -252,10 +243,34 @@ public class AcquireCertificatePanel extends JPanel
 			}
 		};
 		addTextFieldListener(action, tf);
+		
+		updateactions.put(mi.getClazz().getName()+"."+pi.getName(), new ICommand<Object>()
+		{
+			public void execute(Object val) 
+			{
+				Class<?> cl = pi.getType();
+				if(!String.class.equals(cl))
+				{
+					IObjectStringConverter conv = BasicTypeConverter.getBasicObjectConverter(cl);
+					if(conv!=null)
+					{
+						try
+						{
+							val = conv.convertObject((String)val, null);
+						}
+						catch(Exception ex)
+						{
+							throw new RuntimeException(ex);
+						}
+					}
+				}
+				tf.setText(""+val);
+			}
+		});
 	}
 	
 	/**
-	 * 
+	 *  Create checkbox for boolean choices.
 	 */
 	protected void createCheckBox(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi)
 	{
@@ -269,17 +284,26 @@ public class AcquireCertificatePanel extends JPanel
 					cb.isSelected()? Boolean.TRUE: Boolean.FALSE);
 			}
 		});
+		
+		updateactions.put(mi.getClazz().getName()+"."+pi.getName(), new ICommand<Object>()
+		{
+			public void execute(Object val) 
+			{
+				cb.setSelected(((Boolean)val).booleanValue());
+			}
+		});
 	}
 	
 	/**
-	 * 
+	 *  Create chooser for cid.
 	 */
 	protected void createCidChooser(PropertiesPanel pp, final ParameterInfo pi, final MechanismInfo mi, final CMSUpdateHandler cmshandler)
 	{
 		final JTextField tf = new JTextField();
 		tf.setToolTipText(pi.getDescription());
 		final JButton bu = new JButton("...");
-		bu.setMargin(new Insets(0,0,0,0));
+//		Insets in = bu.getInsets();
+//		bu.setMargin(new Insets(0,in.left,0,in.right));
 		
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(tf, BorderLayout.CENTER);
@@ -310,10 +334,18 @@ public class AcquireCertificatePanel extends JPanel
 				AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), cid);
 			}
 		}, tf);
+		
+		updateactions.put(mi.getClazz().getName()+"."+pi.getName(), new ICommand<Object>()
+		{
+			public void execute(Object val) 
+			{
+				tf.setText(((IComponentIdentifier)val).getName());
+			}
+		});
 	}
 	
 	/**
-	 * 
+	 *  Add listeners on the text field.
 	 */
 	protected void addTextFieldListener(final Runnable action, JTextField tf)
 	{

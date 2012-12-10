@@ -21,7 +21,9 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 /**
- * 
+ *  Interceptor that can be used to realize authenticated end-to-end communication.
+ *  - generates a signed version of the message that is attached to it (in non-functional properties)
+ *  - verifies that a call is authenticated by checking the singed version with public key of the sender
  */
 public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 {

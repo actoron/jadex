@@ -15,7 +15,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -38,7 +37,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.rules.eca.RuleEvent;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;
@@ -52,6 +50,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -977,8 +976,6 @@ public class SecurityService implements ISecurityService
 			{
 				try
 				{
-					if(!getKeyStore().containsAlias(name))
-						getKeyStore().setCertificateEntry(name, cert);
 					if(verifyCall(content, signed, cert))
 					{
 						ret.setResult(null);
@@ -1027,28 +1024,49 @@ public class SecurityService implements ISecurityService
 			
 				KeyStoreEntry kse = new KeyStoreEntry();
 				
+				try
+				{
+					ks.getEntry(alias, null);
+				}
+				catch(Exception e)
+				{
+					kse.setProtected(true);
+				}
+				
 				if(ks.isCertificateEntry(alias))
 				{
 					kse.setType(ISecurityService.CERTIFICATE);
-					kse.setDetails(ks.getCertificateChain(alias));
-//					kse.setDetails(ks.getCertificate(alias));
 				}
 				else if(!ks.isKeyEntry(alias) && ks.getCertificateChain(alias)!=null 
 					&& ks.getCertificateChain(alias).length!=0)
 				{
 					kse.setType(ISecurityService.TRUSTED_CERTIFICATE);
-					kse.setDetails(ks.getCertificateChain(alias));
 				}
 				else 
 				{
 					kse.setType(ISecurityService.KEYPAIR);
-					Certificate[] certs = ks.getCertificateChain(alias);
-					kse.setDetails(certs);
 				}
-
+				
+				Certificate cert = ks.getCertificate(alias);
+				if(cert instanceof X509Certificate)
+				{
+					X509Certificate xcert = (X509Certificate)cert;
+//					kse.setAlgorithm(xcert.getSigAlgName());
+					Date from = xcert.getNotBefore();
+					kse.setFrom(from.getTime());
+					Date to = xcert.getNotAfter();
+					kse.setTo(to.getTime());
+				}
+				
+				if(cert!=null)
+				{
+					kse.setAlgorithm(cert.getPublicKey().getAlgorithm()+" "+SSecurity.getKeyLength(cert.getPublicKey()));
+					Certificate[] chain = ks.getCertificateChain(alias);
+					kse.setCertificates(chain!=null? chain: new Certificate[]{cert});
+				}
+				
 				kse.setAlias(alias);
 				kse.setDate(ks.getCreationDate(alias).getTime());
-				
 				res.put(alias, kse);
 			}
 		}
@@ -1072,6 +1090,8 @@ public class SecurityService implements ISecurityService
 		{
 			KeyStore ks = getKeyStore();
 			ks.deleteEntry(alias);
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+			SSecurity.saveKeystore(keystore, storepath, storepass);
 			return IFuture.DONE;
 		}
 		catch(Exception e)
@@ -1098,6 +1118,28 @@ public class SecurityService implements ISecurityService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a trusted certificate of a platform.
+	 *  @param name The entry name.
+	 *  @param cert The certificate.
+	 */
+	public IFuture<Void> addPlatformCertificate(IComponentIdentifier cid, Certificate cert)
+	{
+		try
+		{
+			KeyStore ks = getKeyStore();
+			ks.setCertificateEntry(cid.getPlatformPrefix(), cert);
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+			SSecurity.saveKeystore(keystore, storepath, storepass);
+//			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, getKeystoreDetails()));
+			return IFuture.DONE;
+		}
+		catch(Exception e)
+		{
+			return new Future<Void>(e);
+		}
 	}
 	
 	/**
@@ -1135,6 +1177,8 @@ public class SecurityService implements ISecurityService
 							{
 								// Store certificate in store
 								getKeyStore().setCertificateEntry(name, cert);
+								publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+								SSecurity.saveKeystore(keystore, storepath, storepass);
 								super.customResultAvailable(cert);
 							}
 							catch(Exception e)

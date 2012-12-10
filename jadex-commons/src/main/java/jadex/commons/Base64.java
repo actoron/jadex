@@ -128,7 +128,6 @@ public final class Base64
     * @param dstart
     * @return index to the buffer byte ofter the text
     */
-
    public final static int encode(final byte[] src, final int sstart, final int len, final byte[] dest, final int dstart)
    {
       int bi = sstart + len;

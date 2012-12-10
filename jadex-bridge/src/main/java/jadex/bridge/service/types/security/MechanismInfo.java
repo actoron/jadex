@@ -11,7 +11,6 @@ public class MechanismInfo
 	protected String name;
 	
 	/** The type. */
-//	protected ClassInfo classinfo;
 	protected Class<?> clazz;
 	
 	/** The parameter infos. */

@@ -51,6 +51,9 @@ public interface ISecurityService
 
 	/** The keystore settings property. */
 	public static final String PROPERTY_KEYSTORESETTINGS = "keystoresettings";
+	
+	/** The keystore entries property. */
+	public static final String PROPERTY_KEYSTOREENTRIES = "keystoreentries";
 
 	/** The acquisition mechanism. */
 	public static final String PROPERTY_SELECTEDMECHANISM = "selmechanism";
@@ -215,6 +218,13 @@ public interface ISecurityService
 	 *  @return The certificate.
 	 */
 	public IFuture<Certificate> getPlatformCertificate(IComponentIdentifier cid);
+	
+	/**
+	 *  Add a trusted certificate of a platform.
+	 *  @param name The entry name.
+	 *  @param cert The certificate.
+	 */
+	public IFuture<Void> addPlatformCertificate(IComponentIdentifier cid, Certificate cert);
 	
 	/**
 	 *  Get info about the current keystore that is used.

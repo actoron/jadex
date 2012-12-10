@@ -40,10 +40,12 @@ public class CertificateCodec extends AbstractCodec
 	{
 		try
 		{
+			String type = context.readString();
+//			String type = "X.509";
 			// This is correct because this byte array is a technical object specific to the image and
 			// is not part of the object graph proper.
 			byte[] data = (byte[])BinarySerializer.decodeObject(context);
-			CertificateFactory cf = CertificateFactory.getInstance("X509");
+			CertificateFactory cf = CertificateFactory.getInstance(type);
 			return cf.generateCertificate(new ByteArrayInputStream(data));
 		}
 		catch(RuntimeException e)
@@ -76,6 +78,7 @@ public class CertificateCodec extends AbstractCodec
 	{
 		try
 		{
+			ec.writeString(((Certificate)object).getType());
 			byte[] encimg = ((Certificate)object).getEncoded();
 			traverser.traverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
 			return object;

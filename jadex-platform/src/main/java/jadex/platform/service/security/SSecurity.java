@@ -1,11 +1,16 @@
 package jadex.platform.service.security;
 
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -21,6 +26,7 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.interfaces.DSAKey;
 import java.security.interfaces.RSAKey;
 import java.util.Date;
@@ -30,6 +36,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
+
+import com.sun.mail.iap.ByteArray;
 
 
 /**
@@ -197,7 +205,8 @@ public class SSecurity
 	 * @param days how many days from now the Certificate is valid for
 	 * @param algorithm the signing algorithm, eg "SHA1withRSA"
 	 */ 
-	public static Certificate generateCertificate(String dn, KeyPair pair, int days, String algorithm) throws GeneralSecurityException, IOException
+	public static Certificate generateCertificate(String dn, KeyPair pair, int days, String algorithm) 
+		throws GeneralSecurityException, IOException
 	{
 		X509V1CertificateGenerator gen = new X509V1CertificateGenerator();
 		X500Principal dnn = new X500Principal(dn); //"CN=Test CA Certificate"
@@ -357,6 +366,77 @@ public class SSecurity
 
 		return ret;
 	}
+	
+	/**
+	 *  Get the textual representation of a certificate.
+	 */
+	public static String getCertificateText(Certificate cert)
+	{
+		String ret = null;
+		
+		try
+		{
+			StringBuffer buf =  new StringBuffer("-----BEGIN CERTIFICATE-----").append(SUtil.LF);
+			buf.append(new String(Base64.toCharArray(cert.getEncoded(), 64)));
+			buf.append(SUtil.LF).append("-----END CERTIFICATE-----");
+			ret = buf.toString();
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the textual representation of a certificate.
+	 */
+	public static Certificate createCertificate(InputStream in)
+	{
+		Certificate ret = null;
+		try 
+		{
+			CertificateFactory fac = CertificateFactory.getInstance("X.509");
+			ret = fac.generateCertificate(in);
+		}
+		catch(Exception ex)
+		{ 
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch(Exception exc)
+			{
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the textual representation of a certificate.
+	 */
+	public static Certificate createCertificate(String text)
+	{
+		Certificate ret = null;
+		
+		try
+		{
+			CertificateFactory fac = CertificateFactory.getInstance("X.509");
+			ByteArrayInputStream bas = new ByteArrayInputStream(text.getBytes());
+			ret = fac.generateCertificate(bas);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
 	
 	/**
 	 *  Main for testing.

@@ -1,9 +1,12 @@
 package jadex.tools.security;
 
+import jadex.base.gui.PlatformSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.idtree.IdTableModel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
@@ -17,7 +20,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.platform.service.security.SSecurity;
 import jadex.tools.jcc.JCCResultListener;
 
 import java.awt.BorderLayout;
@@ -30,7 +36,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.cert.Certificate;
 import java.util.Collection;
 import java.util.Date;
@@ -58,6 +70,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *  The security settings panel.
@@ -102,6 +115,9 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	/** The split panels. */
 	protected JSplitPanel sph;
 	protected JSplitPanel spv;
+	
+	/** The keystore update action. */
+	protected Runnable updateact;
 	
 	//-------- methods --------
 	
@@ -186,8 +202,9 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		final JPanel pdetails = new JPanel(new BorderLayout());
 		
 		final JTable ktt = new JTable();
-		final IdTableModel<String, KeyStoreEntry> kttm = new IdTableModel<String, KeyStoreEntry>(new String[]{"Alias", "Type", "Date"}, 
-			new Class<?>[]{String.class, String.class, String.class}, ktt)
+		final IdTableModel<String, KeyStoreEntry> kttm = new IdTableModel<String, KeyStoreEntry>(new String[]
+			{"Alias", "Type", "Protected", "Expired", "Algorithm", "Validity", "Creation"}, 
+			new Class<?>[]{String.class, String.class, Boolean.class, Boolean.class, String.class, String.class, String.class}, ktt)
 		{
 			public Object getValueAt(KeyStoreEntry obj, int column)
 			{
@@ -202,12 +219,24 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				}
 				else if(column==2)
 				{
+					ret = obj.isProtected();
+				}
+				else if(column==3)
+				{
+					ret = obj.isExpired();
+				}
+				else if(column==4)
+				{
+					ret = obj.getAlgorithm();
+				}
+				else if(column==5)
+				{
+					ret = SUtil.SDF2.format(new Date(obj.getFrom())) +" - "+ SUtil.SDF2.format(new Date(obj.getTo()));
+				}
+				else if(column==6)
+				{
 					ret = SUtil.SDF.format(new Date(obj.getDate()));
 				}
-//				else if(column==3)
-//				{
-//					ret = obj.getDetails();
-//				}
 				return ret;
 			}
 		};
@@ -224,20 +253,8 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				if(idx!=-1)
 				{
 					KeyStoreEntry kse = (KeyStoreEntry)kttm.getValueAt(idx, -1);
-					if(kse.getDetails() instanceof Certificate[])
-					{
-						CertificatePanel ct = new CertificatePanel((Certificate[])kse.getDetails());
-						pdetails.add(ct, BorderLayout.CENTER);
-					}
-					else if(kse.getDetails() instanceof Certificate)
-					{
-						CertificatePanel ct = new CertificatePanel(new Certificate[]{(Certificate)kse.getDetails()});
-						pdetails.add(ct, BorderLayout.CENTER);
-					}
-//					else
-//					{
-//						System.out.println("o: "+kse.getDetails());
-//					}
+					CertificatePanel ct = new CertificatePanel(kse.getCertificates());
+					pdetails.add(ct, BorderLayout.CENTER);
 				}
 				
 				pdetails.invalidate();
@@ -246,7 +263,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			}
 		});
 		
-		final Runnable act = new Runnable()
+		updateact = new Runnable()
 		{
 			public void run()
 			{
@@ -270,7 +287,24 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			}
 		};
 		
-		ktt.addMouseListener(new MouseAdapter()
+		FileFilter ff = new FileFilter()
+		{
+			public String getDescription()
+			{
+				return ".cer";
+			}
+			
+			public boolean accept(File f)
+			{
+				return !f.isDirectory() && f.getName().endsWith(".cer");
+			}
+		};
+		final JFileChooser chls = new JFileChooser(".");
+		chls.setFileFilter(ff);
+		
+		JScrollPane sktt = new JScrollPane(ktt);
+		
+		MouseAdapter ma = new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
 			{
@@ -285,34 +319,223 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				if(e.isPopupTrigger())
 				{
 					int	row	= ktt.rowAtPoint(e.getPoint());
+					
+					JPopupMenu	menu	= new JPopupMenu("Key store menu");
+					
 					if(row!=-1)
 					{
+						ktt.getSelectionModel().setSelectionInterval(row, row);
 						final KeyStoreEntry kse = (KeyStoreEntry)kttm.getValueAt(row, -1);
 						
-						JPopupMenu	menu	= new JPopupMenu("Key store menu");
 						menu.add(new AbstractAction("Delete")
 						{
 							public void actionPerformed(ActionEvent e)
 							{
 								secservice.removeKeyStoreEntry(kse.getAlias());
-								act.run();
+								updateact.run();
 							}
 						});	
-						menu.show(ktt, e.getX(), e.getY());
+						menu.add(new AbstractAction("Export certificate ...")
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								String text = SSecurity.getCertificateText(((Certificate[])kse.getCertificates())[0]);
+								if(JFileChooser.APPROVE_OPTION==chls.showSaveDialog(inner))
+								{
+									BufferedWriter out = null;
+									try 
+									{
+										File f = chls.getSelectedFile();
+										if(f.getName().indexOf(".")==-1)
+											f = new File(f.getParent(), f.getName()+".cer");
+										out = new BufferedWriter(new FileWriter(f));
+										out.write(text);
+									}
+									catch(IOException ex)
+									{ 
+									}
+									finally
+									{
+										try
+										{
+											out.close();
+										}
+										catch(Exception exc)
+										{
+										}
+									}
+								}
+							}
+						});	
 					}
+					
+					menu.add(new AbstractAction("Import certificate ...")
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							PropertiesPanel pp = new PropertiesPanel();
+							
+							JPanel ppl = new JPanel(new BorderLayout());
+							final JTextField tfentry = new JTextField();
+							JButton busep = new JButton("...");
+							ppl.add(tfentry, BorderLayout.CENTER);
+							ppl.add(busep, BorderLayout.EAST);
+							pp.addComponent("Entry name", ppl);
+							
+							busep.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+									IComponentIdentifier cid = psd.selectAgent(null);
+									if(cid!=null)
+										tfentry.setText(cid.getPlatformPrefix());
+								}
+							});
+							
+							JPanel pfi = new JPanel(new BorderLayout());
+							final JTextField tffile = new JTextField();
+							JButton busel = new JButton("...");
+							pfi.add(tffile, BorderLayout.CENTER);
+							pfi.add(busel, BorderLayout.EAST);
+							pp.addComponent("File", pfi);
+							
+							busel.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									if(JFileChooser.APPROVE_OPTION==chls.showOpenDialog(inner))
+									{
+										try
+										{
+											tffile.setText(chls.getSelectedFile().getCanonicalPath());
+										}
+										catch(Exception ex)
+										{
+										}
+									}
+								}
+							});
+							
+							if(SGUI.createDialog("Import Certificate", pp, inner))
+							{
+								String alias = tfentry.getText();
+								String fname = tffile.getText();
+								if(alias.length()>0 && fname.length()>0)
+								{
+									try
+									{
+										final String name = tfentry.getText();
+										FileInputStream fis = new FileInputStream(fname);
+										secservice.addPlatformCertificate(new ComponentIdentifier(name), SSecurity.createCertificate(fis))
+											.addResultListener(new IResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+												jcc.setStatusText("Successfully imported certificate for: "+name);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												jcc.setStatusText("Problem while importing certificate for: "+name+" "+exception.getMessage());
+											}
+										});
+									}
+									catch(Exception ex)
+									{
+										ex.printStackTrace();
+									}
+								}
+							}
+						}
+					});
+					
+					menu.add(new AbstractAction("Generate certificate ...")
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							PropertiesPanel pp = new PropertiesPanel();
+							
+							JPanel ppl = new JPanel(new BorderLayout());
+							final JTextField tfentry = new JTextField();
+							JButton busep = new JButton("...");
+							ppl.add(tfentry, BorderLayout.CENTER);
+							ppl.add(busep, BorderLayout.EAST);
+							pp.addComponent("Entry name", ppl);
+							
+							JTextField tfdn = pp.createTextField("Distinguished name ", "CN=CKS Self Signed Cert", true);
+							JTextField tfdur = pp.createTextField("Validity duration (days)", "365", true);
+							JTextField tfalg = pp.createTextField("Algorithm", "MD5withRSA", true);
+							
+							busep.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+									IComponentIdentifier cid = psd.selectAgent(null);
+									if(cid!=null)
+//										tfentry.setText(cid.getName());
+										tfentry.setText(cid.getPlatformPrefix());
+								}
+							});
+							
+							try
+							{
+								if(SGUI.createDialog("Generate Certificate", pp, inner))
+								{
+									final String name = tfentry.getText();
+									final String dn = tfdn.getText();
+									final int dur = Integer.parseInt(tfdur.getText());
+									final String alg = tfalg.getText();
+									
+									KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");  
+							 	    gen.initialize(1024);  
+							 	    KeyPair keys = gen.generateKeyPair();
+							 	    
+							 	    Certificate cert = SSecurity.generateCertificate(dn, keys, dur, alg);
+
+									secservice.addPlatformCertificate(new ComponentIdentifier(name), cert)
+										.addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+											jcc.setStatusText("Successfully generated certificate for: "+name);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											jcc.setStatusText("Problem while generating certificate for: "+name+" "+exception.getMessage());
+										}
+									});
+								}
+							}
+							catch(Exception ex)
+							{
+								jcc.setStatusText("Error during certificate generation: "+ex.getMessage());
+							}
+						}
+					});	
+					
+					menu.show(ktt, e.getX(), e.getY());
 				}
 			}
-		});
+		};
+		
+		ktt.addMouseListener(ma);
+		ktt.getTableHeader().addMouseListener(ma);
+		sktt.addMouseListener(ma);
 		
 		JButton bureload = new JButton("Reload");
 		bureload.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				act.run();
+				updateact.run();
 			}
 		});
-		act.run();
+		updateact.run();
 
 		// The acquire certificate settings
 		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, jcc.getCMSHandler());
@@ -380,7 +603,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
 		slocal.add(bustoreset, new GridBagConstraints(x++, y++, 1, 1, 0, 0, 
 			GridBagConstraints.WEST, GridBagConstraints.VERTICAL, in, 0, 0));
-		slocal.add(new JScrollPane(ktt), new GridBagConstraints(0, y++, 8, 1, 1, 1, 
+		slocal.add(sktt, new GridBagConstraints(0, y++, 8, 1, 1, 1, 
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, in, 0, 0));
 		slocal.add(bureload, new GridBagConstraints(0, y++, 8, 1, 1, 0, 
 			GridBagConstraints.EAST, GridBagConstraints.NONE, in, 0, 0));
@@ -542,6 +765,18 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 							tfstorepath.setText(info[0]);
 							tfstorepass.setText(info[1]);
 							tfkeypass.setText(info[2]);
+						}
+						else if(ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
+						{
+							String[] info = (String[])event.getValue();
+							tfstorepath.setText(info[0]);
+							tfstorepass.setText(info[1]);
+							tfkeypass.setText(info[2]);
+						}
+						else if(ISecurityService.PROPERTY_KEYSTOREENTRIES.equals(event.getType()))
+						{
+//							Map<String, KeyStoreEntry> entries = (Map<String, KeyStoreEntry>)event.getValue();
+							updateact.run();
 						}
 						else if(ISecurityService.PROPERTY_SELECTEDMECHANISM.equals(event.getType()))
 						{

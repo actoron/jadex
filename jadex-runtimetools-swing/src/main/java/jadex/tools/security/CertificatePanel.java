@@ -1,5 +1,6 @@
 package jadex.tools.security;
 
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -31,8 +32,12 @@ import org.bouncycastle.openssl.PEMWriter;
  */
 public class CertificatePanel extends JPanel
 {
+	//-------- attributes --------
+	
 	/** The certificates. */
 	protected Certificate[] certs;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new panel.
@@ -73,29 +78,29 @@ public class CertificatePanel extends JPanel
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							StringWriter sw = new StringWriter();
-							PEMWriter pw = new PEMWriter(sw);
-							String pem = null;
-							try
-							{
-								pw.writeObject(xcert);
-								pw.flush();
-								pem = sw.toString();
-							}
-							catch(IOException ex)
-							{
-							}
-							try
-							{
-								pw.close();
-							}
-							catch (IOException ex)
-							{
-							}
+//							StringWriter sw = new StringWriter();
+//							PEMWriter pw = new PEMWriter(sw);
+//							String pem = null;
+//							try
+//							{
+//								pw.writeObject(xcert);
+//								pw.flush();
+//								pem = sw.toString();
+//							}
+//							catch(IOException ex)
+//							{
+//							}
+//							try
+//							{
+//								pw.close();
+//							}
+//							catch (IOException ex)
+//							{
+//							}
 							
 							JTextArea ta = new JTextArea();
 							ta.setEditable(false);
-							ta.setText(pem);
+							ta.setText(SSecurity.getCertificateText(xcert));
 							
 							final JDialog dia = new JDialog((JFrame)null, "PEM Encoding", false);
 							

@@ -37,7 +37,7 @@ public class PasswordTablePanel extends JPanel
 	protected DefaultTableModel	tmodel;
 	
 	/**
-	 * 
+	 *  Create a new password panel.
 	 */
 	public PasswordTablePanel(String name, String[] colnames, final ICommand addaction, final ICommand remaction)
 	{

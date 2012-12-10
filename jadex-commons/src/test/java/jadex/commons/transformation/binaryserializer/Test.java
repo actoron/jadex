@@ -53,9 +53,7 @@ public class Test extends jadex.commons.transformation.Test
 		
 		ClassLoader dcl = new ClassLoader()
 		{
-			
-			public Class<?> loadClass(String name)
-					throws ClassNotFoundException
+			public Class<?> loadClass(String name) throws ClassNotFoundException
 			{
 				if (name.endsWith("jadex.commons.transformation.B"))
 				{
