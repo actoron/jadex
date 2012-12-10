@@ -3,7 +3,9 @@
 
   <xs:element name="MASDynamic" type="masDynamics"/>
 
-  <xs:element name="agent" type="agentReference"/>
+  <xs:element name="adaption" type="adaption"/>
+
+  <xs:element name="agent" nillable="true" type="xs:anyType"/>
 
   <xs:element name="agent_data_mapping" type="dataMapping"/>
 
@@ -19,7 +21,11 @@
 
   <xs:element name="configuration" type="directLinkConfiguration"/>
 
+  <xs:element name="constraint" type="constraint"/>
+
   <xs:element name="constraints" type="propertyConstraints"/>
+
+  <xs:element name="convergence" type="convergence"/>
 
   <xs:element name="deco_link" type="decentralMechanismLink"/>
 
@@ -30,6 +36,8 @@
   <xs:element name="direct_link_configuration" type="directCausality"/>
 
   <xs:element name="element" type="elementReference"/>
+
+  <xs:element name="entry" type="entry"/>
 
   <xs:element name="environment_property" type="envrionmentProperty"/>
 
@@ -52,6 +60,7 @@
   <xs:complexType name="masDynamics">
     <xs:sequence>
       <xs:element ref="causalities" minOccurs="0"/>
+      <xs:element ref="convergence" minOccurs="0"/>
       <xs:element name="defines" type="define" minOccurs="0"/>
       <xs:element ref="system_properties" minOccurs="0"/>
     </xs:sequence>
@@ -246,7 +255,7 @@
     <xs:complexContent>
       <xs:extension base="causalityModel">
         <xs:sequence>
-          <xs:element name="active" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="active" type="xs:boolean" default="true" minOccurs="0"/>
           <xs:element name="mechanism_configuration" type="mechanismConfiguration" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
@@ -279,6 +288,85 @@
     </xs:sequence>
     <xs:attribute name="agent_type" type="agentModelType"/>
     <xs:attribute name="mechanism_id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="convergence">
+    <xs:sequence>
+      <xs:element name="adaptions" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="adaption" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="agents" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="agent" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="adaption">
+    <xs:sequence>
+      <xs:element name="constraints" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="constraint" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="realizations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="realization" type="realization" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="answers" type="xs:int"/>
+    <xs:attribute name="delay" type="xs:long"/>
+    <xs:attribute name="id" type="xs:string"/>
+    <xs:attribute name="quorum" type="xs:double"/>
+    <xs:attribute name="reset" type="xs:boolean"/>
+    <xs:attribute name="timeout" type="xs:long"/>
+  </xs:complexType>
+
+  <xs:complexType name="constraint">
+    <xs:sequence/>
+    <xs:attribute name="agent_id" type="xs:string"/>
+    <xs:attribute name="condition" type="xs:int"/>
+    <xs:attribute name="element" type="xs:string"/>
+    <xs:attribute name="threshold" type="xs:int"/>
+    <xs:attribute name="type" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="realization">
+    <xs:sequence>
+      <xs:element name="properties" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="entry" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="activate" type="xs:boolean"/>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="entry">
+    <xs:sequence>
+      <xs:element name="key" type="xs:string" minOccurs="0"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="agent">
+    <xs:sequence/>
+    <xs:attribute name="id" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="define">

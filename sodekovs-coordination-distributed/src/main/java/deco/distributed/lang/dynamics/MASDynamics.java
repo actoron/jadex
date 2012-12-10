@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.distributed.lang.dynamics.causalities.DirectLink;
+import deco.distributed.lang.dynamics.convergence.Convergence;
 import deco.distributed.lang.dynamics.defines.AgentModel;
 import deco.distributed.lang.dynamics.defines.AgentModel.AgentModelType;
 import deco.distributed.lang.dynamics.defines.Define;
@@ -34,8 +35,11 @@ import deco4mas.distributed.annotation.agent.ParameterMapping;
  * The system behavior is described by a set of system variables (Properties) that denote the numbers of agents that exhibit specific behaviors. These variables are linked by direct (i.e. based on
  * "inter-agent communication") and decentralized (i.e. based on "decentralized coordination mechanisms") interdependencies. Both types of interdependencies can be configured to allow their automated
  * enforcement (cf. dec4mas.*).
+ * <br>
+ * The interdependencies can be configured and activated or deactivated autonomously by the participating agents using according to the specified possible adaptions in the convergence part of the
+ * language.
  * 
- * @author Jan Sudeikat
+ * @author Jan Sudeikat & Thomas Preisler
  * 
  */
 @XmlRootElement(name = "MASDynamic")
@@ -54,6 +58,9 @@ public class MASDynamics {
 
 	/** The causal relations between system properties (edges). */
 	private Causalities causalities = new Causalities();
+	
+	/** The convergence properties. */
+	private Convergence convergence = new Convergence();
 
 	// ----------methods-------------
 
@@ -106,6 +113,15 @@ public class MASDynamics {
 
 	public void setProperties(Properties properties) {
 		this.properties = properties;
+	}
+	
+	@XmlElement(name = "convergence")
+	public Convergence getConvergence() {
+		return convergence;
+	}
+	
+	public void setConvergence(Convergence convergence) {
+		this.convergence = convergence;
 	}
 
 	public void setCausalities(Causalities causalities) {

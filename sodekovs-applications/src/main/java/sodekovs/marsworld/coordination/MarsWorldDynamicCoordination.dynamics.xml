@@ -288,7 +288,7 @@
 			<agent id="Carry"/>
 			<agent id="Sentry"/>
 	    </agents>
-	      <adaptions>
+	    <adaptions>
 		    <adaption id="proximity-it-up" answers="3" quorum="0.66" timeout="10000" delay="1000" reset="true">
 		        <realizations>
 			        <realization id="latest_target_seen_proximity" activate="true">
