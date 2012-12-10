@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.IConnection;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -236,12 +237,36 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 		for(int i=0; i<methods.length && !found; i++)
 		{
 			final Method method = methods[i];
-			if(methods[i].isAnnotationPresent(annotation))
+			if(method.isAnnotationPresent(annotation))
 			{
 				found = true;
+				
+				// Try to guess additional parameters as internal or external access.
+				if(args==null || method.getParameterTypes().length>args.length)
+				{
+					Object[]	tmp	= new Object[method.getParameterTypes().length];
+					if(args!=null)
+					{
+						System.arraycopy(args, 0, tmp, 0, args.length);
+					}
+					for(int j=args==null?0:args.length; j<method.getParameterTypes().length; j++)
+					{
+						Class<?>	clazz	= method.getParameterTypes()[j];
+						if(SReflect.isSupertype(clazz, PojoMicroAgent.class))
+						{
+							tmp[j]= PojoMicroAgent.this;
+						}
+						else if(SReflect.isSupertype(clazz, IExternalAccess.class))
+						{
+							tmp[j]= PojoMicroAgent.this.getExternalAccess();
+						}
+					}
+					args	= tmp;
+				}
+				
 				try
 				{
-					Object res = methods[i].invoke(agent, args);
+					Object res = method.invoke(agent, args);
 					if(res instanceof IFuture)
 					{
 						((IFuture)res).addResultListener(createResultListener(

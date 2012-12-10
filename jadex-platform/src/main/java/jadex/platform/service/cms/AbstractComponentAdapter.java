@@ -818,6 +818,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					fatalError(e);
 				}
+				catch(Throwable t)
+				{
+					fatalError(new RuntimeException(t));
+				}
 				if(dostep)
 				{
 					dostep	= false;

@@ -2,6 +2,7 @@ package jadex.platform.service.daemon;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -49,14 +50,27 @@ public class DaemonResponderAgent
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		agent.getLogger().info("Sending message "+content+" to "+cid);
+		agent.getLogger().info("Sending message "+content+" to "+cid+", "+SUtil.arrayToString(cid.getAddresses()));
 		
 		Future<Void>	ret	= new Future<Void>();
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 		msg.put(SFipa.RECEIVERS, cid);
 		msg.put(SFipa.CONTENT, content);
 		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
-			.addResultListener(new DelegationResultListener<Void>(ret));
+			.addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				agent.getLogger().info("Done sending message "+content+" to "+cid);
+				super.customResultAvailable(result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getLogger().info("Error sending message "+content+" to "+cid+", "+exception);
+				super.exceptionOccurred(exception);
+			}
+		});
 		return ret;
 	}
 	
