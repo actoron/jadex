@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -445,6 +446,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 		{
 			public void customResultAvailable(IMessageService ms)
 			{
+				System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
 					interpreter.getModel().getResourceIdentifier(), null, codecids)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
