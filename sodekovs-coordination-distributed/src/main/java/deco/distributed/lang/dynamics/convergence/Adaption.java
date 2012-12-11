@@ -20,19 +20,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Adaption {
 
 	private String id = null;
-	
+
 	private Integer answer = null;
-	
+
 	private Double quorum = null;
-	
+
 	private Long timeout = null;
-	
+
 	private Long delay = null;
-	
+
 	private Boolean reset = null;
-	
+
 	private List<Realization> realizations = new ArrayList<Realization>();
-	
+
 	private List<Constraint> constraints = new ArrayList<Constraint>();
 
 	/**
@@ -44,7 +44,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -59,7 +60,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param answer the answer to set
+	 * @param answer
+	 *            the answer to set
 	 */
 	public void setAnswer(Integer answer) {
 		this.answer = answer;
@@ -74,7 +76,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param quorum the quorum to set
+	 * @param quorum
+	 *            the quorum to set
 	 */
 	public void setQuorum(Double quorum) {
 		this.quorum = quorum;
@@ -89,7 +92,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param timeout the timeout to set
+	 * @param timeout
+	 *            the timeout to set
 	 */
 	public void setTimeout(Long timeout) {
 		this.timeout = timeout;
@@ -104,7 +108,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param delay the delay to set
+	 * @param delay
+	 *            the delay to set
 	 */
 	public void setDelay(Long delay) {
 		this.delay = delay;
@@ -119,7 +124,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param reset the reset to set
+	 * @param reset
+	 *            the reset to set
 	 */
 	public void setReset(Boolean reset) {
 		this.reset = reset;
@@ -135,7 +141,8 @@ public class Adaption {
 	}
 
 	/**
-	 * @param realizations the realizations to set
+	 * @param realizations
+	 *            the realizations to set
 	 */
 	public void setRealizations(List<Realization> realizations) {
 		this.realizations = realizations;
@@ -151,13 +158,16 @@ public class Adaption {
 	}
 
 	/**
-	 * @param constraints the constraints to set
+	 * @param constraints
+	 *            the constraints to set
 	 */
 	public void setConstraints(List<Constraint> constraints) {
 		this.constraints = constraints;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -166,5 +176,24 @@ public class Adaption {
 		return "Adaption [id=" + id + ", answer=" + answer + ", quorum=" + quorum + ", timeout=" + timeout + ", delay=" + delay + ", reset=" + reset + ", realizations="
 				+ (realizations != null ? realizations.subList(0, Math.min(realizations.size(), maxLen)) : null) + ", constraints="
 				+ (constraints != null ? constraints.subList(0, Math.min(constraints.size(), maxLen)) : null) + "]";
+	}
+
+	/**
+	 * Gets all the {@link Constraint}s which reference the given agent id.
+	 * 
+	 * @param agentId
+	 *            the given agent id.
+	 * @return all the {@link Constraint}s which reference the given agent id
+	 */
+	public List<Constraint> getConstraints(String agentId) {
+		List<Constraint> constraints = new ArrayList<Constraint>();
+
+		for (Constraint constraint : this.constraints) {
+			if (constraint.getAgentId().equals(agentId)) {
+				constraints.add(constraint);
+			}
+		}
+
+		return constraints;
 	}
 }

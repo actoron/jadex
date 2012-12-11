@@ -1,12 +1,13 @@
 package deco4mas.distributed.coordinate.environment;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import deco.distributed.lang.dynamics.MASDynamics;
 import deco.distributed.lang.dynamics.mechanism.AgentElement;
 import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
 import deco.distributed.lang.dynamics.mechanism.DirectCausality;
+import deco4mas.distributed.convergence.BDIConvergenceService;
 import deco4mas.distributed.coordinate.DecentralCoordinationInformation;
 import deco4mas.distributed.coordinate.DirectCoordinationInformation;
 import deco4mas.distributed.coordinate.ProcessMASDynamics;
@@ -38,11 +40,11 @@ public class InitBDIAgentForCoordination {
 	private String agentType;
 	private IComponentDescription ai;
 	private deco.distributed.lang.dynamics.MASDynamics masDyn;
-	private AbstractEnvironmentSpace space;
+	private CoordinationSpace space;
 	private int numberOfPublishPercepts = 0;
 	private int numberOfPerceivePercepts = 0;
 
-	public void startInits(IComponentDescription ai, IBDIExternalAccess exta, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	public void startInits(IComponentDescription ai, IBDIExternalAccess exta, CoordinationSpace space, MASDynamics masDyn) {
 		this.ai = ai;
 		this.exta = exta;
 		this.masDyn = masDyn;
@@ -227,6 +229,19 @@ public class InitBDIAgentForCoordination {
 				behObserver = new BDIBehaviorObservationComponent(exta, masDyn);
 				agentType = ai.getLocalType();
 				initPublishAndPercept();
+						
+				// init the convergence service for the agent if the agent type is referenced in convergence part of the masdynamics
+				if (masDyn.getConvergence() != null && masDyn.getConvergence().getAgents().contains(agentType)) {
+					// get the coordination context id
+					StatelessAbstractInterpreter interpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
+					// If it's a distributed application, then it has a contextID.
+					HashMap<String, Object> appArgs = (HashMap<String, Object>) interpreter.getArguments();
+					String coordinationContextID = (String) appArgs.get("CoordinationContextID");
+					
+					BDIConvergenceService service = new BDIConvergenceService((ExternalAccessFlyweight) exta, masDyn.getConvergence(), coordinationContextID);
+					service.start();
+				}
+				
 				return IFuture.DONE;
 			}
 		});

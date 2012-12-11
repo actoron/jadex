@@ -4,9 +4,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.micro.IMicroExternalAccess;
+import jadex.micro.MicroAgent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.distributed.lang.dynamics.mechanism.AgentElement;
 import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
 import deco.distributed.lang.dynamics.mechanism.DirectCausality;
+import deco4mas.distributed.convergence.MicroConvergenceService;
 import deco4mas.distributed.coordinate.DecentralCoordinationInformation;
 import deco4mas.distributed.coordinate.DirectCoordinationInformation;
 import deco4mas.distributed.coordinate.ProcessMASDynamics;
@@ -39,7 +41,7 @@ public class InitMicroAgentForCoordination {
 
 	private IMicroExternalAccess extAccess = null;
 
-	private AbstractEnvironmentSpace space = null;
+	private CoordinationSpace space = null;
 
 	private MASDynamics masDyn = null;
 
@@ -60,7 +62,7 @@ public class InitMicroAgentForCoordination {
 	 * @param space
 	 * @param masDyn
 	 */
-	public void startInits(IComponentDescription ai, IMicroExternalAccess exta, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	public void startInits(IComponentDescription ai, IMicroExternalAccess exta, CoordinationSpace space, MASDynamics masDyn) {
 		this.ai = ai;
 		this.extAccess = exta;
 		this.space = space;
@@ -108,6 +110,19 @@ public class InitMicroAgentForCoordination {
 				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, masDyn, spaces);
 				agentType = ai.getLocalType();
 				initPublishAndPercept();
+				
+				// init the convergence service for the agent if the agent type is referenced in convergence part of the masdynamics
+				if (masDyn.getConvergence() != null && masDyn.getConvergence().getAgents().contains(agentType)) {
+					// get the coordination context id
+					StatelessAbstractInterpreter interpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
+					// If it's a distributed application, then it has a contextID.
+					HashMap<String, Object> appArgs = (HashMap<String, Object>) interpreter.getArguments();
+					String coordinationContextID = (String) appArgs.get("CoordinationContextID");
+					
+					MicroConvergenceService service = new MicroConvergenceService((MicroAgent) ia, masDyn.getConvergence(), coordinationContextID);
+					service.start();
+				}
+				
 				return IFuture.DONE;
 			}
 		});

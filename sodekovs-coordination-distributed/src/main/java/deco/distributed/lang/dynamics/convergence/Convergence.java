@@ -63,4 +63,25 @@ public class Convergence {
 		return "Convergence [agents=" + (agents != null ? agents.subList(0, Math.min(agents.size(), maxLen)) : null) + ", adaptions="
 				+ (adaptions != null ? adaptions.subList(0, Math.min(adaptions.size(), maxLen)) : null) + "]";
 	}
+	
+	/**
+	 * Returns all {@link Adaption}s where the given agentId is referenced in one of the {@link Constraint}s.
+	 * 
+	 * @param agentId the given agent id
+	 * @return the affected {@link Adaption}s
+	 */
+	public List<Adaption> getAffectedAdaptions(String agentId) {
+		List<Adaption> affectedAdaptions = new ArrayList<Adaption>();
+		
+		for (Adaption adaption : this.adaptions) {
+			for (Constraint constraint : adaption.getConstraints()) {
+				if (constraint.getAgentId().equals(agentId)) {
+					affectedAdaptions.add(adaption);
+					break;
+				}
+			}
+		}
+		
+		return affectedAdaptions;
+	}
 }
