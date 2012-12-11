@@ -115,6 +115,8 @@ public class PeerList
 		// Todo: check that specified url is valid and connects to this server.
 		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
 			? RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL)) : "";
+			
+		RelayHandler.getLogger().info("Relay urle: "+url);
 		
 		if(props.containsKey(PROPERTY_PEERS))
 		{
