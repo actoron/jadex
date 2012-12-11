@@ -443,9 +443,11 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						break;
 					case 1: // add to excludes
 						addInOrExclude(info.getComponentIdentifier().getPlatformPrefix(), false);
+						onPreferenceChange(inexcludeCat, null);
 						break;
 					case 2: // add to includes
 						addInOrExclude(info.getComponentIdentifier().getPlatformPrefix(), true);
+						onPreferenceChange(inexcludeCat, null);
 						break;
 					default:
 						break;
