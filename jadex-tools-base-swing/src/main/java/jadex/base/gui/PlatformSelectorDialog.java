@@ -16,6 +16,7 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
@@ -60,7 +61,22 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	 */
 	protected JComponent createTreeView()
 	{
-		this.pllist = new JList(new DefaultListModel());
+		this.pllist = new JList(new DefaultListModel())
+		{
+			public Dimension getMinimumSize() 
+			{
+				Dimension ret = super.getMinimumSize();
+				ret.width = ret.width<50? 150: ret.width;
+				return ret;
+			}
+			
+			public Dimension getPreferredSize() 
+			{
+				Dimension ret = super.getMinimumSize();
+				ret.width = ret.width<50? 150: ret.width;
+				return ret;
+			}
+		};
 		pllist.setSelectionMode(singleselection? ListSelectionModel.SINGLE_SELECTION: ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
 		pllist.getSelectionModel().addListSelectionListener(new ListSelectionListener()

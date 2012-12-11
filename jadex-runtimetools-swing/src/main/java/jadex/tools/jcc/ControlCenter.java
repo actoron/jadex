@@ -227,7 +227,17 @@ public class ControlCenter
 			public void customResultAvailable(Void result)
 			{
 //				System.out.println("Saving platform settings");
-				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener<Void>(ret));
+				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						super.customResultAvailable(result);
+					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						super.customExceptionOccurred(exception);
+					}
+				});
 			}
 		});
 		
@@ -275,13 +285,6 @@ public class ControlCenter
 				windowprops.addProperty(new Property("saveonexit", Boolean.toString(saveonexit)));
 				props.removeSubproperties("window");
 				props.addSubproperties("window", windowprops);
-				
-//				System.out.println("Fetching library service.");
-				// Save properties to file.
-//				SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					.addResultListener(new SwingDelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
 				
 				getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
 				{

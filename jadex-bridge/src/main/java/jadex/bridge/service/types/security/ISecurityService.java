@@ -212,6 +212,8 @@ public interface ISecurityService
 	 */
 	public IFuture<Void> verifyCall(final byte[] content, final byte[] signed, final String name);
 	
+	//-------- keystore handling --------
+	
 	/**
 	 *  Get the certificate of a platform.
 	 *  @param cid The platform component identifier (null for own certificate).
@@ -227,9 +229,13 @@ public interface ISecurityService
 	public IFuture<Void> addPlatformCertificate(IComponentIdentifier cid, Certificate cert);
 	
 	/**
-	 *  Get info about the current keystore that is used.
+	 *  Create a key pair entry.
+	 *  @param cid The entry name.
+	 *  @param algorithm The algorithm.
+	 *  @param keysize The key size (in bits).
 	 */
-	public IFuture<Map<String, KeyStoreEntry>> getKeystoreDetails();
+	@SecureTransmission // Protect password
+	public IFuture<Void> createKeyPair(IComponentIdentifier cid, String algorithm, int keysize, String password, int validity);
 	
 	/**
 	 *  Remove a key store entry.
@@ -237,25 +243,37 @@ public interface ISecurityService
 	 */
 	public IFuture<Void> removeKeyStoreEntry(String alias);
 	
+	/**
+	 *  Get info about the current keystore that is used.
+	 *  @return Info about the keystore content.
+	 */
+	public IFuture<Map<String, KeyStoreEntry>> getKeystoreDetails();
+	
 	//-------- certificate acquisition mechanism methods --------
 	
 	/**
 	 *  Get the supported certificate acquisition mechanism infos.
+	 *  @return The available acquisition mechanisms.
 	 */
 	public IFuture<List<MechanismInfo>> getAcquisitionMechanisms();
 	
 	/**
 	 *  Set a mechanism parameter.
+	 *  @param type The mechanism identifier.
+	 *  @param name The parameter name.
+	 *  @param value The parameter value.
 	 */
 	public IFuture<Void> setAcquisitionMechanismParameterValue(Class<?> type, String name, Object value);
 
 	/**
 	 *  Set the acquisition mechanism.
+	 *  @param type The acquisition mechanism class.
 	 */
 	public IFuture<Void> setAcquisitionMechanism(Class<?> type);
 
 	/**
 	 *  Get the active acquisition mechanism.
+	 *  @return The number of the currently selected mechanism.
 	 */
 	public IFuture<Integer> getSelectedAcquisitionMechanism();
 	

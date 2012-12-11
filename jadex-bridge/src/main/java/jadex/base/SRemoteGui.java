@@ -475,6 +475,7 @@ public class SRemoteGui
 				{
 					ret.addIntermediateResult(SUtil.convertPathToRelative(path));
 				}
+				ret.setFinished();
 				return ret;
 			}
 		});

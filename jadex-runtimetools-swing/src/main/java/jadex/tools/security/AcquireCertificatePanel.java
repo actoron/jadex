@@ -305,6 +305,9 @@ public class AcquireCertificatePanel extends JPanel
 //		Insets in = bu.getInsets();
 //		bu.setMargin(new Insets(0,in.left,0,in.right));
 		
+		if(pi.getValue()!=null)
+			tf.setText(((IComponentIdentifier)pi.getValue()).getPlatformPrefix());
+		
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(tf, BorderLayout.CENTER);
 		p.add(bu, BorderLayout.EAST);
@@ -320,7 +323,7 @@ public class AcquireCertificatePanel extends JPanel
 				IComponentIdentifier cid = csd.selectAgent(null);
 				if(cid!=null)
 				{
-					tf.setText(cid.getName());
+//					tf.setText(cid.getName());
 					AcquireCertificatePanel.this.secser.setAcquisitionMechanismParameterValue(mi.getClazz(), pi.getName(), cid);
 				}
 			}
@@ -339,7 +342,7 @@ public class AcquireCertificatePanel extends JPanel
 		{
 			public void execute(Object val) 
 			{
-				tf.setText(((IComponentIdentifier)val).getName());
+				tf.setText(val==null? "": ((IComponentIdentifier)val).getName());
 			}
 		});
 	}

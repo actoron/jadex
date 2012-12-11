@@ -41,6 +41,7 @@ import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;
 import java.security.Key;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -322,6 +323,7 @@ public class SecurityService implements ISecurityService
 															}
 														}
 													}
+													
 													return IFuture.DONE;
 												}
 											});
@@ -431,8 +433,7 @@ public class SecurityService implements ISecurityService
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Save keystore on disk
-		if(keystore!=null)
-			SSecurity.saveKeystore(keystore, storepath, storepass);
+		saveKeyStore();
 		
 		// Save settings
 		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -1003,7 +1004,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Certificate> getPlatformCertificate(IComponentIdentifier cid)
 	{
-		return getCertificate(cid.getPlatformPrefix());
+		return getCertificate(cid==null? null: cid.getPlatformPrefix());
 	}
 	
 	/**
@@ -1091,7 +1092,7 @@ public class SecurityService implements ISecurityService
 			KeyStore ks = getKeyStore();
 			ks.deleteEntry(alias);
 			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-			SSecurity.saveKeystore(keystore, storepath, storepass);
+			saveKeyStore();
 			return IFuture.DONE;
 		}
 		catch(Exception e)
@@ -1132,7 +1133,7 @@ public class SecurityService implements ISecurityService
 			KeyStore ks = getKeyStore();
 			ks.setCertificateEntry(cid.getPlatformPrefix(), cert);
 			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-			SSecurity.saveKeystore(keystore, storepath, storepass);
+			saveKeyStore();
 //			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, getKeystoreDetails()));
 			return IFuture.DONE;
 		}
@@ -1178,7 +1179,7 @@ public class SecurityService implements ISecurityService
 								// Store certificate in store
 								getKeyStore().setCertificateEntry(name, cert);
 								publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-								SSecurity.saveKeystore(keystore, storepath, storepass);
+								saveKeyStore();
 								super.customResultAvailable(cert);
 							}
 							catch(Exception e)
@@ -1197,6 +1198,30 @@ public class SecurityService implements ISecurityService
 		
 		return ret;
 	}
+	
+	/**
+	 *  Create a key pair entry (with associated certificate).
+	 *  @param cid The entry name.
+	 *  @param algorithm The algorithm.
+	 *  @param keysize The key size (in bits).
+	 */
+	public IFuture<Void> createKeyPair(IComponentIdentifier cid, String algorithm, int keysize, String pass, int validity)
+	{
+		try
+		{
+			KeyPair keys = SSecurity.generateKeyPair(algorithm, keysize);
+			Certificate cert = SSecurity.generateCertificate(keys, validity, "MD5With"+algorithm);
+			getKeyStore().setKeyEntry(cid.getPlatformPrefix(), keys.getPrivate(), pass==null? null: pass.toCharArray(), new Certificate[]{cert});
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+			saveKeyStore();
+			return IFuture.DONE;
+		}
+		catch(Exception e)
+		{
+			return new Future<Void>(e);
+		}
+	}
+
 	
 	/**
 	 * 
@@ -1362,6 +1387,17 @@ public class SecurityService implements ISecurityService
 		for(SubscriptionIntermediateFuture<ChangeEvent<Object>> sub: subscribers)
 		{
 			sub.addIntermediateResult(event);
+		}
+	}
+	
+	/**
+	 *  Save the keystore.
+	 */
+	protected void saveKeyStore()
+	{
+		if(keystore!=null)
+		{
+			SSecurity.saveKeystore(keystore, storepath, storepass);
 		}
 	}
 	

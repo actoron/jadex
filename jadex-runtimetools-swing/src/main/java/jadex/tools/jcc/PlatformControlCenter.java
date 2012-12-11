@@ -433,25 +433,18 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			}
 		});
 		
-		try
+		for(int i=0; i<aplugins.length; i++)
 		{
-			for(int i=0; i<aplugins.length; i++)
+			if(getPluginComponent(aplugins[i])!=null)
 			{
-				if(getPluginComponent(aplugins[i])!=null)
-				{
-//					System.out.println("Pushing platform settings: "+aplugins[i].getName());
-					aplugins[i].pushPlatformSettings().addResultListener(crl);
-				}
-				else
-				{
-//					System.out.println("Not pushing platform settings: "+aplugins[i].getName());
-					crl.resultAvailable(null);
-				}
+//				System.out.println("Pushing platform settings: "+aplugins[i].getName());
+				aplugins[i].pushPlatformSettings().addResultListener(crl);
 			}
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace();
+			else
+			{
+//				System.out.println("Not pushing platform settings: "+aplugins[i].getName());
+				crl.resultAvailable(null);
+			}
 		}
 		
 		return ret;
@@ -838,7 +831,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 							
 							public void customExceptionOccurred(Exception exception)
 							{
-								System.out.println("Plugin propetry saving error: "+plugin.getName());
+//								System.out.println("Plugin propetry saving error: "+plugin.getName());
 								setStatusText("Plugin propetry saving error: "+plugin.getName());
 								crl.resultAvailable(null);
 							}

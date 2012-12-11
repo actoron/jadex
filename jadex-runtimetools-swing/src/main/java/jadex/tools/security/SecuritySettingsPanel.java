@@ -8,6 +8,9 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.security.MechanismInfo;
@@ -327,7 +330,8 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 						ktt.getSelectionModel().setSelectionInterval(row, row);
 						final KeyStoreEntry kse = (KeyStoreEntry)kttm.getValueAt(row, -1);
 						
-						menu.add(new AbstractAction("Delete")
+						
+						menu.add(new AbstractAction("Delete "+kse.getType())
 						{
 							public void actionPerformed(ActionEvent e)
 							{
@@ -335,6 +339,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 								updateact.run();
 							}
 						});	
+					
 						menu.add(new AbstractAction("Export certificate ...")
 						{
 							public void actionPerformed(ActionEvent e)
@@ -369,7 +374,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 						});	
 					}
 					
-					menu.add(new AbstractAction("Import certificate ...")
+					menu.add(new AbstractAction("Import certificate from file ...")
 					{
 						public void actionPerformed(ActionEvent e)
 						{
@@ -451,6 +456,96 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 						}
 					});
 					
+					menu.add(new AbstractAction("Import certificate from platform ...")
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							PropertiesPanel pp = new PropertiesPanel();
+							
+							JPanel ppl = new JPanel(new BorderLayout());
+							final JTextField tfentry = new JTextField();
+							tfentry.setEditable(false);
+							JButton busep = new JButton("...");
+							ppl.add(tfentry, BorderLayout.CENTER);
+							ppl.add(busep, BorderLayout.EAST);
+							pp.addComponent("Entry name", ppl);
+							
+							final IComponentIdentifier[] cid = new IComponentIdentifier[1];
+							busep.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									final PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+									cid[0] = psd.selectAgent(null);
+									if(cid[0]!=null)
+									{
+										tfentry.setText(cid[0].getPlatformPrefix());
+										StringBuffer buf = new StringBuffer();
+										String adrs[] = cid[0].getAddresses();
+										for(int i=0; i<adrs.length; i++)
+										{
+											buf.append(adrs[i]);
+											if(i+1<adrs.length)
+												buf.append(SUtil.LF);
+										}
+										tfentry.setToolTipText(buf.toString());
+									}
+								}
+							});
+							
+							if(SGUI.createDialog("Import Certificate", pp, inner))
+							{
+								if(cid[0]!=null)
+								{
+									try
+									{
+										SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), cid[0].getRoot(), ISecurityService.class)
+											.addResultListener(new IResultListener<ISecurityService>()
+										{
+											public void resultAvailable(ISecurityService ss)
+											{
+												ss.getPlatformCertificate(null).addResultListener(new IResultListener<Certificate>()
+												{
+													public void resultAvailable(Certificate cert)
+													{
+														secservice.addPlatformCertificate(cid[0], cert)
+															.addResultListener(new IResultListener<Void>()
+														{
+															public void resultAvailable(Void result)
+															{
+																jcc.setStatusText("Successfully imported certificate for: "+cid[0].getPlatformPrefix());
+															}
+															
+															public void exceptionOccurred(Exception exception)
+															{
+																jcc.setStatusText("Problem while importing certificate for: "+cid[0].getPlatformPrefix()+" "+exception.getMessage());
+															}
+														});
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														jcc.setStatusText("Problem while importing certificate for: "+cid[0].getPlatformPrefix()+" "+exception.getMessage());
+													}
+												});
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												jcc.setStatusText("Problem while importing certificate for: "+cid[0].getPlatformPrefix()+" "+exception.getMessage());
+											}
+										});
+									}
+									catch(Exception ex)
+									{
+										jcc.setStatusText("Problem while importing certificate for: "+cid[0].getPlatformPrefix()+" "+ex.getMessage());
+									}
+								}
+							}
+						}
+					});
+					
 					menu.add(new AbstractAction("Generate certificate ...")
 					{
 						public void actionPerformed(ActionEvent e)
@@ -507,6 +602,69 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 										public void exceptionOccurred(Exception exception)
 										{
 											jcc.setStatusText("Problem while generating certificate for: "+name+" "+exception.getMessage());
+										}
+									});
+								}
+							}
+							catch(Exception ex)
+							{
+								jcc.setStatusText("Error during certificate generation: "+ex.getMessage());
+							}
+						}
+					});	
+					
+					menu.add(new AbstractAction("Generate key pair ...")
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							PropertiesPanel pp = new PropertiesPanel();
+							
+							JPanel ppl = new JPanel(new BorderLayout());
+							final JTextField tfentry = new JTextField();
+							JButton busep = new JButton("...");
+							ppl.add(tfentry, BorderLayout.CENTER);
+							ppl.add(busep, BorderLayout.EAST);
+							pp.addComponent("Entry name", ppl);
+							
+							busep.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+									IComponentIdentifier cid = psd.selectAgent(null);
+									if(cid!=null)
+//										tfentry.setText(cid.getName());
+										tfentry.setText(cid.getPlatformPrefix());
+								}
+							});
+							
+							JTextField tfalg = pp.createTextField("Algorithm ", "RSA", true);
+							JTextField tfsize = pp.createTextField("Keysize", "2048", true);
+							JTextField tfval = pp.createTextField("Validity (days)", "365", true);
+							JTextField tfpass = pp.createTextField("Password", "", true);
+							
+							try
+							{
+								if(SGUI.createDialog("Generate Key Pair", pp, inner))
+								{
+									final String name = tfentry.getText();
+									final String alg = tfalg.getText();
+									final int size = Integer.parseInt(tfsize.getText());
+									final String pass = tfalg.getText();
+									final int val = Integer.parseInt(tfval.getText());
+									
+									secservice.createKeyPair(new ComponentIdentifier(name), alg, size, pass.length()>0? pass: null, val)
+										.addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+											jcc.setStatusText("Successfully generated key pair for: "+name);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											jcc.setStatusText("Problem while generating key pair for: "+name+" "+exception.getMessage());
 										}
 									});
 								}

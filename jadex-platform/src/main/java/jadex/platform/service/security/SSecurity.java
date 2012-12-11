@@ -3,12 +3,10 @@ package jadex.platform.service.security;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -36,8 +34,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
-
-import com.sun.mail.iap.ByteArray;
 
 
 /**
@@ -133,15 +129,10 @@ public class SSecurity
 //	    	r.init(new KeyGenerationParameters(new SecureRandom(), 1024));
 //	    	AsymmetricCipherKeyPair keys = r.generateKeyPair();
 	    	
-	    	KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");  
-	 	    gen.initialize(1024);  
-	 	    
-//	 	    System.out.println("Generating key pair, this may take a short while.");
-	 	    KeyPair keys = gen.generateKeyPair();
-//	 	    System.out.println("Key generation finished.");
-	 	    
+	    	KeyPair keys = generateKeyPair("RSA", 1024);
 		    Certificate c = generateCertificate("CN=CKS Self Signed Cert", keys, 1000, "MD5WithRSA");
 		    
+		    // Creates key entry (i.e. keypair with certificate)
 		    ks.setKeyEntry(alias, keys.getPrivate(), keypass.toCharArray(),  
 		    	new java.security.cert.Certificate[]{c});  
 		    
@@ -197,6 +188,18 @@ public class SSecurity
 //		return cert;
 //	}   
 	
+	/** 
+	 * Create a self-signed X.509 Certificate
+	 * @param dn the X.509 Distinguished Name, eg "CN=Test, L=London, C=GB"
+	 * @param pair the KeyPair
+	 * @param days how many days from now the Certificate is valid for
+	 * @param algorithm the signing algorithm, eg "SHA1withRSA"
+	 */ 
+	public static Certificate generateCertificate(KeyPair pair, int days, String algorithm) 
+		throws GeneralSecurityException, IOException
+	{
+		return generateCertificate(null, pair, days, algorithm);
+	}
 	
 	/** 
 	 * Create a self-signed X.509 Certificate
@@ -208,6 +211,11 @@ public class SSecurity
 	public static Certificate generateCertificate(String dn, KeyPair pair, int days, String algorithm) 
 		throws GeneralSecurityException, IOException
 	{
+		if(dn==null)
+			dn = "CN=CKS Self Signed Cert";
+		if(days<=0)
+			days = 365;
+		
 		X509V1CertificateGenerator gen = new X509V1CertificateGenerator();
 		X500Principal dnn = new X500Principal(dn); //"CN=Test CA Certificate"
 
@@ -226,81 +234,24 @@ public class SSecurity
 		Certificate cert = gen.generate(pair.getPrivate());
 		
 		return cert;
-	}   
+	}  
 	
-//	/**
-//	 * 
-//	 */
-//	public static void generateKeyPair(String name, KeyStore ks)
-//	{
-//		try
-//		{
-//			java.security.Security.addProvider(new BouncyCastleProvider());
-//		    KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
-//		    generator.initialize(1024, new FixedRand());
-//	 
-//		    KeyPair pair = generator.generateKeyPair();
-//		    Key pubKey = pair.getPublic();
-//		    Key privKey = pair.getPrivate();
-//		    
-//		    if(ks!=null)
-//		    {
-//		    	ks.setEntry(name, new KeyStore.PrivateKeyEntry(pair.getPrivate(), chain),
-//		    			new KeyStore.PasswordProtection(privateKeyEntryPassword.toCharArray())
-//		    			);
-//
-//		    }
-//		}
-//		catch(Exception e)
-//		{
-//			throw new RuntimeException(e);
-//		}
-//	}
+	/** 
+	 * Create a self-signed X.509 Certificate
+	 * @param dn the X.509 Distinguished Name, eg "CN=Test, L=London, C=GB"
+	 * @param pair the KeyPair
+	 * @param days how many days from now the Certificate is valid for
+	 * @param algorithm the signing algorithm, eg "SHA1withRSA"
+	 */ 
+	public static KeyPair generateKeyPair(String algorithm, int keysize) 
+		throws GeneralSecurityException, IOException
+	{
+		KeyPairGenerator gen = KeyPairGenerator.getInstance(algorithm);  
+ 	    gen.initialize(keysize);  
+ 	    KeyPair keys = gen.generateKeyPair();
+		return keys;
+	}
 	
-//	/**
-//	 * 
-//	 */
-//	private static class FixedRand extends SecureRandom 
-//	{
-//        MessageDigest sha;
-//        byte[] state;
-// 
-//        FixedRand() 
-//        {
-//            try
-//            {
-//                this.sha = MessageDigest.getInstance("SHA-1");
-//                this.state = sha.digest();
-//            }
-//            catch(NoSuchAlgorithmException e)
-//            {
-//                throw new RuntimeException("can't find SHA-1!");
-//            }
-//        }
-// 
-//        public void nextBytes(byte[] bytes)
-//        {
-//            int    off = 0;
-//            sha.update(state);
-// 
-//            while (off < bytes.length)
-//            {               
-//                state = sha.digest();
-//                if (bytes.length - off > state.length)
-//                {
-//                    System.arraycopy(state, 0, bytes, off, state.length);
-//                }
-//                else
-//                {
-//                    System.arraycopy(state, 0, bytes, off, bytes.length - off);
-//                }
-// 
-//                off += state.length;
-//                sha.update(state);
-//            }
-//        }
-//    }
-
 	/**
      * 
      */

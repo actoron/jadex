@@ -48,6 +48,9 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier(String name, String[] addresses)
 	{
+		if(name==null)
+			throw new IllegalArgumentException("Name must not null.");
+		
 //		this(name, addresses, null);
 		if(name!=null && (name.indexOf("@")!=name.lastIndexOf("@")))
 		{

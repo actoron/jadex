@@ -1,12 +1,10 @@
 package jadex.platform.service.settings;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -178,7 +176,6 @@ public class SettingsService implements ISettingsService
 		return ret;
 	}
 	
-	
 	/**
 	 *  Set the properties for a given id.
 	 *  Overwrites existing settings (if any).
@@ -290,7 +287,7 @@ public class SettingsService implements ISettingsService
 	 */
 	public IFuture<Void>	saveProperties(boolean shutdown)
 	{
-//		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
+		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
 		final Future<Void>	ret	= new Future<Void>();
 		
 		IResultListener	rl	= new DelegationResultListener(ret)

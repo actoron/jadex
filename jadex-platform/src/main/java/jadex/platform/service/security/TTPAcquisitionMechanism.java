@@ -56,7 +56,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public TTPAcquisitionMechanism(String ttpname)
 	{
-		this.ttpcid = new ComponentIdentifier(ttpname);
+		this.ttpcid = ttpname==null? null: new ComponentIdentifier(ttpname);
 		this.verified = true;
 //		setTTPCid(new ComponentIdentifier(ttpname));
 //		setVerified(true);
@@ -100,12 +100,12 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public void setParameterValue(String name, Object value)
 	{
-		System.out.println("set param val: "+name+" "+value);
+//		System.out.println("set param val: "+name+" "+value);
 		ttpsecser = null;
 		
 		if("ttpcid".equals(name))
 		{
-			setTTPCid(ttpcid);
+			setTTPCid((IComponentIdentifier)value);
 		}
 		else
 		{
@@ -256,6 +256,8 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public void setTTPCid(IComponentIdentifier ttpcid)
 	{
+		if(ttpcid!=null)
+			ttpcid = new ComponentIdentifier(ttpcid.getPlatformPrefix(), ttpcid.getAddresses());
 		this.ttpcid = ttpcid;
 		
 		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
@@ -280,7 +282,8 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	public Properties getProperties()
 	{
 		Properties props = new Properties();
-		props.addProperty(new Property("ttpcid", ttpcid.getName()));
+		if(ttpcid!=null)
+			props.addProperty(new Property("ttpcid", ttpcid.getName()));
 //		props.addProperty(new Property("ttpcid", JavaWriter.objectToXML(ttpcid, null)));
 		props.addProperty(new Property("verified", ""+verified));
 		return props;
@@ -291,9 +294,11 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public void setProperties(Properties props)
 	{
+//		System.out.println("setProps");
 		if(props.getProperty("ttpcid")!=null)
 		{
-			setTTPCid(new ComponentIdentifier(props.getProperty("ttpcid").getValue()));
+			IComponentIdentifier cid = props.getProperty("ttpcid").getValue()!=null? new ComponentIdentifier(props.getProperty("ttpcid").getValue()): null;
+			setTTPCid(cid);
 //			setTTPCid((IComponentIdentifier)JavaReader.objectFromXML(props.getProperty("responses").getValue(), null);
 		}
 		if(props.getProperty("verified")!=null)
