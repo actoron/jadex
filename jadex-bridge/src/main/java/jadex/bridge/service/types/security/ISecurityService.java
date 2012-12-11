@@ -282,6 +282,7 @@ public interface ISecurityService
 	/**
 	 *  Subscribe to changes.
 	 */
+	@SecureTransmission // Sends configuration changes with passwords etc.
 	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subcribeToEvents();
 	
 }

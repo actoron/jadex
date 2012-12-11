@@ -324,13 +324,7 @@ public class SecurityService implements ISecurityService
 														}
 													}
 													
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
-													publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+													publishCurrentState();
 													
 													return IFuture.DONE;
 												}
@@ -376,6 +370,9 @@ public class SecurityService implements ISecurityService
 															ret.addSubproperties(SReflect.getInnerClassName(mech.getClass()), mech.getProperties());
 														}
 													}
+													
+													System.out
+													.println("fini2");
 													
 													return new Future<Properties>(ret);
 												}
@@ -1363,6 +1360,17 @@ public class SecurityService implements ISecurityService
 		subscribers.add(ret);
 		// signal with null subscription done
 		ret.addIntermediateResultIfUndone(null);
+		
+		// Signal current state
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
+		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+		
 		return ret;
 	}
 	
@@ -1407,6 +1415,21 @@ public class SecurityService implements ISecurityService
 		{
 			SSecurity.saveKeystore(keystore, storepath, storepass);
 		}
+	}
+	
+	/**
+	 *  Publish the current state.
+	 */
+	protected void publishCurrentState()
+	{
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
 	}
 	
 	//-------- static part --------

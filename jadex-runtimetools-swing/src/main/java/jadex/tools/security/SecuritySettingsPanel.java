@@ -8,9 +8,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.security.MechanismInfo;
@@ -26,6 +24,7 @@ import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.platform.service.security.SSecurity;
 import jadex.tools.jcc.JCCResultListener;
 
@@ -880,6 +879,22 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		
 //		doRefresh().addResultListener(new SwingDelegationResultListener<Void>(ret));
 		
+//		secservice.getPlatformPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
+//		{
+//			public void customResultAvailable(Map<String, String> passwords)
+//			{
+//				ppp.update(passwords);
+//			}
+//		});
+//		
+//		secservice.getNetworkPasswords().addResultListener(new SwingExceptionDelegationResultListener<Map<String, String>, Void>(ret)
+//		{
+//			public void customResultAvailable(Map<String, String> passwords)
+//			{
+//				npp.update(passwords);
+//			}
+//		});
+		
 		secservice.subcribeToEvents().addResultListener(new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
 		{
 			public void intermediateResultAvailable(final jadex.commons.ChangeEvent<Object> event)
@@ -895,7 +910,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				{
 					public void run()
 					{
-						System.out.println("event: "+event.getType()+" "+event.getValue());
+//						System.out.println("event: "+event.getType()+" "+event.getValue());
 						
 						if(ISecurityService.PROPERTY_USEPASS.equals(event.getType()))
 						{
