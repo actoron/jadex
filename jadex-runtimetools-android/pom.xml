@@ -4,7 +4,7 @@
 	<artifactId>jadex-runtimetools-android</artifactId>
 	<packaging>jar</packaging>
 	<name>jadex-runtimetools-android</name>
-	
+
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
@@ -19,12 +19,18 @@
 	</description>
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>

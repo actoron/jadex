@@ -598,6 +598,7 @@
 			<id>jadex-android</id>
 			<modules>
 				<module>jadex-android-parent</module>
+				<module>jadex-android-commons</module>
 				<module>jadex-android-antlr</module>
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-runtimetools-android</module>

@@ -132,6 +132,7 @@
 			</properties>
 			<modules>
 				<module>jadex-android-parent</module>
+				<module>jadex-android-commons</module>
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-runtimetools-android</module>
@@ -143,7 +144,8 @@
 			<id>dist-minimal</id>
 			<modules>
 				<module>jadex-android-parent</module>
-				<module>jadex-runtimetools-android</module>
+				<module>jadex-android-commons</module>
+<!-- 				<module>jadex-runtimetools-android</module> -->
 		
 				<!-- Additional Jadex modules to include in dist -->
 				<module>jadex-parent</module>
@@ -162,6 +164,7 @@
 			<id>dist</id>
 			<modules>
 				<module>jadex-android-parent</module>
+				<module>jadex-android-commons</module>
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-runtimetools-android</module>

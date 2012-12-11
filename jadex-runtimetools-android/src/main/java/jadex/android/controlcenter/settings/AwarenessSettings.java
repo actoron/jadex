@@ -280,7 +280,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		}
 		for (int i = 0; i < settings.excludes.length; i++)
 		{
-			addInOrExclude(settings.includes[i], false);
+			addInOrExclude(settings.excludes[i], false);
 		}
 	}
 

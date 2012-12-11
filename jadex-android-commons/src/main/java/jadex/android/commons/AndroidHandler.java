@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jadex.commons.android;
+package jadex.android.commons;
 
 import android.util.Log;
 
