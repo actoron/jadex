@@ -117,7 +117,7 @@
 					<artifactId>android-maven-plugin</artifactId>
 					<version>${android-maven-plugin-version}</version>
 					<configuration>
-						<androidManifestFile>${project.build.directory}/AndroidManifest.xml</androidManifestFile>
+						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
 						<mergeManifests>true</mergeManifests>
 						<assetsDirectory>${project.basedir}/assets</assetsDirectory>
 						<resourceDirectory>${project.basedir}/res</resourceDirectory>

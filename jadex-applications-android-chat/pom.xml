@@ -99,34 +99,6 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<version>3.3.0</version>
-				<configuration>
-					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
-					<resourceDirectory>${project.basedir}/res</resourceDirectory>
-					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
-					<sdk>
-						<path>${env.ANDROID_HOME}</path>
-						<platform>2.2</platform>
-					</sdk>
-					<undeployBeforeDeploy>false</undeployBeforeDeploy>
-					<generateApk>true</generateApk>
-					<dex>
-						<jvmArguments>
-							<jvmArgument>-Xms256m</jvmArgument>
-							<jvmArgument>-Xmx1024m</jvmArgument>
-						</jvmArguments>
-						<coreLibrary>false</coreLibrary>
-						<noLocals>false</noLocals>
-						<optimize>true</optimize>
-					</dex>
-
-					<manifest>
-						<versionName>${project.version}</versionName>
-						<debuggable>true</debuggable>
-						<versionCodeAutoIncrement>true</versionCodeAutoIncrement>
-					</manifest>
-				</configuration>
 				<extensions>true</extensions>
 			</plugin>
 
