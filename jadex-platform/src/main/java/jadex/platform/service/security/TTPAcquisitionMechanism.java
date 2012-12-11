@@ -35,8 +35,8 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	/** The component id of the trusted third party. (with or without adresses to reach it) */
 	protected IComponentIdentifier ttpcid;
 		
-	/** Must ttp be verified (i.e. must its certificate be known and is checked). */
-	protected boolean verified;
+	/** Must ttp be verify (i.e. must its certificate be known and is checked). */
+	protected boolean verify;
 	
 	/** The security service of the ttp. */
 	protected ISecurityService ttpsecser;
@@ -57,9 +57,9 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	public TTPAcquisitionMechanism(String ttpname)
 	{
 		this.ttpcid = ttpname==null? null: new ComponentIdentifier(ttpname);
-		this.verified = true;
+		this.verify = true;
 //		setTTPCid(new ComponentIdentifier(ttpname));
-//		setVerified(true);
+//		setverify(true);
 	}
 	
 	//-------- methods --------
@@ -89,7 +89,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	public MechanismInfo getMechanismInfo()
 	{
 		List<ParameterInfo> params = new ArrayList<ParameterInfo>();
-		params.add(new ParameterInfo("verify", "If turned on, the ttp is verified (its certificate must be in local keystore)", boolean.class, verified));
+		params.add(new ParameterInfo("verify", "If turned on, the ttp is verify (its certificate must be in local keystore)", boolean.class, verify));
 		params.add(new ParameterInfo("ttpcid", "The component identifier (or name) of the trusted third party", IComponentIdentifier.class, ttpcid));
 		MechanismInfo ret = new MechanismInfo("Trusted Third Party", getClass(), params);
 		return ret;
@@ -106,6 +106,10 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 		if("ttpcid".equals(name))
 		{
 			setTTPCid((IComponentIdentifier)value);
+		}
+		else if("verify".equals(name))
+		{
+			setverify(((Boolean)value).booleanValue());
 		}
 		else
 		{
@@ -202,7 +206,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(verified)
+		if(verify)
 		{
 			try
 			{
@@ -222,7 +226,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 					{
 						public void customResultAvailable(byte[] signed)
 						{
-							// Check if signed data can be verified with stored certificate
+							// Check if signed data can be verify with stored certificate
 							if(getSecurityService().verifyCall(content, signed, cert))
 							{
 								ret.setResult(null);
@@ -265,15 +269,16 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	}
 
 	/**
-	 *  Set the verified.
-	 *  @param verified The verified to set.
+	 *  Set the verify.
+	 *  @param verify The verify to set.
 	 */
-	public void setVerified(boolean verified)
+	public void setverify(boolean verify)
 	{
-		this.verified = verified;
+		this.verify = verify;
 		
+//		System.out.println("verify: "+verify);
 		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
-			new Object[]{"verified", verified? Boolean.TRUE: Boolean.FALSE}));
+			new Object[]{"verify", verify? Boolean.TRUE: Boolean.FALSE}));
 	}
 
 	/**
@@ -285,7 +290,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 		if(ttpcid!=null)
 			props.addProperty(new Property("ttpcid", ttpcid.getName()));
 //		props.addProperty(new Property("ttpcid", JavaWriter.objectToXML(ttpcid, null)));
-		props.addProperty(new Property("verified", ""+verified));
+		props.addProperty(new Property("verify", ""+verify));
 		return props;
 	}
 
@@ -301,9 +306,9 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 			setTTPCid(cid);
 //			setTTPCid((IComponentIdentifier)JavaReader.objectFromXML(props.getProperty("responses").getValue(), null);
 		}
-		if(props.getProperty("verified")!=null)
+		else if(props.getProperty("verify")!=null)
 		{
-			setVerified(props.getBooleanProperty("verified"));
+			setverify(props.getBooleanProperty("verify"));
 		}
 	}
 }

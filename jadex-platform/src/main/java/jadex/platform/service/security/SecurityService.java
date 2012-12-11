@@ -51,8 +51,10 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1518,4 +1520,25 @@ public class SecurityService implements ISecurityService
 			}
 		}
 	}
+	
+//	public static void main(String[] args)
+//	{
+//		Date d1 = getDate(2012, 1, 14, 2, 24);
+//		Date d2 = getDate(2012, 2, 6, 0, 0);
+//		System.out.println(SUtil.SDF.format(d1)+" - "+SUtil.SDF.format(d2));
+//		long delta = d2.getTime()-d1.getTime();
+//		double days = delta/1000.0/60/60/24;
+//		System.out.println(days);
+//	}
+//	
+//	public static Date getDate(int y, int m, int d, int h, int min)
+//	{
+//		GregorianCalendar gc  = new GregorianCalendar();
+//		gc.set(Calendar.YEAR, y);
+//		gc.set(Calendar.MONTH, m);
+//		gc.set(Calendar.DAY_OF_MONTH, d);
+//		gc.set(Calendar.HOUR, h);
+//		gc.set(Calendar.MINUTE, min);
+//		return gc.getTime();
+//	}
 }

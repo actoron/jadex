@@ -129,7 +129,7 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 				{
 					public void customResultAvailable(byte[] signed)
 					{
-						System.out.println("Signed: "+SUtil.arrayToString(signed));
+//						System.out.println("Signed: "+SUtil.arrayToString(signed));
 						
 						// get service call meta object and set the timeout
 						context.getServiceCall().setProperty(Authenticated.AUTHENTICATED, signed);		
