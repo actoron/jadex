@@ -83,11 +83,10 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
 		Serializable platformId = getIntent().getSerializableExtra(EXTRA_PLATFORMID);
 		this.platformId = platformId != null ? (IComponentIdentifier) platformId : null;
 	}
-
+	
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
@@ -108,6 +107,14 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 	public void onServiceDisconnected(ComponentName name)
 	{
 		super.onServiceDisconnected(name);
+		destroyView();
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		destroyView();
 	}
 
 	@Override
@@ -138,6 +145,14 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 			// main functionality
 			refreshControlCenter();
 			return true;
+		}
+	}
+	
+	private void destroyView()
+	{
+		if (displayedChildSettings != null)
+		{
+			displayedChildSettings.onDestroy();
 		}
 	}
 

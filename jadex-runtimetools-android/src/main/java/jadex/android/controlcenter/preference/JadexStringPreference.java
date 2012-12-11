@@ -5,12 +5,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.EditTextPreference;
-import android.preference.PreferenceManager;
-import android.text.InputType;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 public class JadexStringPreference extends EditTextPreference implements OnClickListener {
 
@@ -68,7 +65,7 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 	@Override
 	public void setText(String text) {
 		super.setText(text);
-		setSummary("Aktueller Wert: "
+		setSummary("Current value: "
 				+ text);
 	}
 	

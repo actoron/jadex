@@ -21,6 +21,11 @@ public interface ISettings {
 	 * @param screen
 	 */
 	void setPreferenceScreen(PreferenceScreen screen);
+	
+	/**
+	 * Called when the PreferenceScreen is switched.
+	 */
+	void onDestroy();
 
 	/**
 	 * Returns the Title of this Settings Implementation. Must be unique.

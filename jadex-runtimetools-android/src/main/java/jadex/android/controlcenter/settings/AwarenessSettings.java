@@ -79,6 +79,10 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		refreshDiscoveryInfos();
 		return true;
 	}
+	
+	public void onDestroy()
+	{
+	}
 
 	@Override
 	protected void createPreferenceHierarchy(final PreferenceScreen screen)

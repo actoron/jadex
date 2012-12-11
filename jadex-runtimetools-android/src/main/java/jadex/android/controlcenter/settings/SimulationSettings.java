@@ -107,7 +107,12 @@ public class SimulationSettings extends AServiceSettings {
 		return true;
 	}
 
-	@Override
+	public void onDestroy()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
 	protected void createPreferenceHierarchy(PreferenceScreen screen) {
 		uiHandler = new Handler();
 
