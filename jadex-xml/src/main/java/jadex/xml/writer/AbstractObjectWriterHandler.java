@@ -127,7 +127,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						Object value = getValue(object, property, context, info);
 						if(value!=null)
 						{
-							value = convertValue(info, value, context);
+//							value = convertValue(info, value, context);
 							wi.setComment(value.toString());
 						}
 					}
@@ -148,7 +148,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						Object value = getValue(object, property, context, info);
 						if(value!=null)
 						{
-							value = convertValue(info, value, context);
+//							value = convertValue(info, value, context);
 							wi.setContent(value.toString());
 						}
 					}
@@ -417,23 +417,23 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		return ret;
 	}
 	
-	/**
-	 *  Convert a value before writing.
-	 */
-	protected Object convertValue(Object info, Object value, IContext context)
-	{
-		Object ret = value;
-		if(info instanceof AttributeInfo)
-		{
-			IObjectStringConverter conv = ((AttributeInfo)info).getConverter();
-			if(conv!=null)
-			{
-				ret = conv.convertObject(value, context);
-			}
-		}
-		return ret;
-	}
-	
+//	/**
+//	 *  Convert a value before writing.
+//	 */
+//	protected Object convertValue(Object info, Object value, IContext context)
+//	{
+//		Object ret = value;
+//		if(info instanceof AttributeInfo)
+//		{
+//			IObjectStringConverter conv = ((AttributeInfo)info).getConverter();
+//			if(conv!=null)
+//			{
+//				ret = conv.convertObject(value, context);
+//			}
+//		}
+//		return ret;
+//	}
+//	
 	/**
 	 *  Get the default value.
 	 */

@@ -46,6 +46,14 @@
      		<scope>test</scope>
 		</dependency>
 		
+		<!-- Hack!!! Requires to restate dependency from commons!? -->
+		<dependency>
+			<groupId>bouncycastle</groupId>
+			<artifactId>bcprov-jdk15</artifactId>
+			<version>140</version>
+			<scope>test</scope>
+		</dependency>  
+				
 		<!-- todo: remove depency before release - ->
 		<dependency>
 		    <groupId>pull-parser</groupId>
