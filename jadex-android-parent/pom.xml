@@ -96,29 +96,11 @@
 				</plugin>
 				
 				<plugin>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.6</version>
-					<executions>
-						<execution>
-							<phase>initialize</phase>
-							<goals>
-								<goal>resources</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>default-resources</id>
-							<phase>DISABLED</phase>
-						</execution>
-					</executions>
-				</plugin>
-				
-				<plugin>
 					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 					<artifactId>android-maven-plugin</artifactId>
 					<version>${android-maven-plugin-version}</version>
 					<configuration>
 						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-						<mergeManifests>true</mergeManifests>
 						<assetsDirectory>${project.basedir}/assets</assetsDirectory>
 						<resourceDirectory>${project.basedir}/res</resourceDirectory>
 						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
