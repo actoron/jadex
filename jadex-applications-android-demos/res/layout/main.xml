@@ -45,6 +45,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_launchRestDemo" />
+        
+        <Button
+            android:id="@+id/main_launchControlCenterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_launchControlCenterDemo" />
     </LinearLayout>
 
 </LinearLayout>

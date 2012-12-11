@@ -87,7 +87,8 @@ public class HelloWorldActivity extends JadexAndroidActivity
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, 0, 0, "Control Center");
+		MenuItem controlCenterMenuItem = menu.add(0, 0, 0, "Control Center");
+		controlCenterMenuItem.setIcon(android.R.drawable.ic_menu_manage);
 		return true;
 	}
 

@@ -23,6 +23,7 @@
 		<activity android:name=".bdi.BDIDemoActivity"></activity>
 		<activity android:name=".rest.RestDemoActivity" android:windowSoftInputMode="adjustPan"></activity>
 		<activity android:name=".rest.view.RestImageActivity"></activity>
+		<activity android:name=".controlcenter.ControlCenterDemoActivity"></activity>
 	</application>
 	
 </manifest>

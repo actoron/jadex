@@ -3,6 +3,7 @@ package jadex.android.applications.demos;
 import jadex.android.applications.demos.bdi.BDIDemoActivity;
 import jadex.android.applications.demos.benchmark.BenchmarkDemoActivity;
 import jadex.android.applications.demos.bpmn.BPMNDemoActivity;
+import jadex.android.applications.demos.controlcenter.ControlCenterDemoActivity;
 import jadex.android.applications.demos.event.EventDemoActivity;
 import jadex.android.applications.demos.rest.RestDemoActivity;
 import jadex.bridge.IComponentIdentifier;
@@ -25,6 +26,7 @@ public class DemoChooserActivity extends Activity
 	private Button launchEventButton;
 	private Button launchBDIButton;
 	private Button launchRestButton;
+	private Button launchControlCenterButton;
 
 	protected IComponentIdentifier lastComponentIdentifier;
 
@@ -49,6 +51,9 @@ public class DemoChooserActivity extends Activity
 		
 		launchRestButton = (Button) findViewById(R.id.main_launchRestDemoButton);
 		launchRestButton.setOnClickListener(buttonListener);
+		
+		launchControlCenterButton = (Button) findViewById(R.id.main_launchControlCenterButton);
+		launchControlCenterButton.setOnClickListener(buttonListener);
 
 	}
 
@@ -71,9 +76,13 @@ public class DemoChooserActivity extends Activity
 			{
 				Intent i = new Intent(DemoChooserActivity.this, RestDemoActivity.class);
 				startActivity(i);
-			} else
+			} else if (view == launchEventButton)
 			{
 				Intent i = new Intent(DemoChooserActivity.this, EventDemoActivity.class);
+				startActivity(i);
+			} else if (view == launchControlCenterButton)
+			{
+				Intent i = new Intent(DemoChooserActivity.this, ControlCenterDemoActivity.class);
 				startActivity(i);
 			}
 		}

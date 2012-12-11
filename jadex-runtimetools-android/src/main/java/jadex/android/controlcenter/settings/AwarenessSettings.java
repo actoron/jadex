@@ -3,6 +3,7 @@ package jadex.android.controlcenter.settings;
 import jadex.android.controlcenter.preference.DiscoveryPreference;
 import jadex.android.controlcenter.preference.JadexBooleanPreference;
 import jadex.android.controlcenter.preference.JadexIntegerPreference;
+import jadex.android.controlcenter.preference.LongClickablePreference;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -17,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -35,7 +39,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 	/** Handler to change UI objects from non-ui threads. */
 	private Handler uiHandler;
-	
+
 	/** Id of the platform to be configured. */
 	private IComponentIdentifier platformId;
 
@@ -50,20 +54,23 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 	private AwarenessManagementAgentHelper helper;
 
-	private String[] excludes;
+	private List<String> excludes;
+	private List<String> includes;
 
-	private String[] includes;
+	private PreferenceCategory inexcludeCat;
 
-	/**Enum for preference keys */
+	/** Enum for preference keys */
 	private enum PREFKEYS
 	{
-		FAST, DELAY, AUTOCREATE, AUTODELETE
+		FAST, DELAY, AUTOCREATE, AUTODELETE, INEXCLUDES
 	}
 
 	public AwarenessSettings(IExternalAccess extAcc)
 	{
 		super(extAcc);
 		helper = new AwarenessManagementAgentHelper(extAcc);
+		includes = new ArrayList<String>();
+		excludes = new ArrayList<String>();
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -79,7 +86,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		refreshDiscoveryInfos();
 		return true;
 	}
-	
+
 	public void onDestroy()
 	{
 	}
@@ -181,8 +188,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 								{
 									disMechanism.setEnabled(true);
 									disMechanism.setChecked(!on);
-									Toast.makeText(screen.getContext(), "Could not start Discovery Mechanism: " + disType,
-											Toast.LENGTH_SHORT).show();
+									Toast.makeText(screen.getContext(), "Could not start Discovery Mechanism: " + disType, Toast.LENGTH_SHORT).show();
 								}
 							});
 						}
@@ -195,8 +201,12 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			mechanismsCat.addPreference(disMechanism);
 		}
 
+		inexcludeCat = new PreferenceCategory(screen.getContext());
+		screen.addPreference(inexcludeCat);
+		inexcludeCat.setTitle("Includes/Excludes");
+		inexcludeCat.setKey(PREFKEYS.INEXCLUDES.toString());
+
 		infoCat = new PreferenceCategory(screen.getContext());
-		// screen.getPreferenceManager().createPreferenceScreen(screen.getContext());
 		screen.addPreference(infoCat);
 		infoCat.setTitle("Discovery Info");
 
@@ -260,9 +270,34 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		cbautoDelete.setEnabled(true);
 		spdelay.setEnabled(true);
 		cbfast.setEnabled(true);
-		
-		this.includes = settings.includes;
-		this.excludes = settings.excludes;
+
+		this.includes.clear();
+		this.excludes.clear();
+
+		for (int i = 0; i < settings.includes.length; i++)
+		{
+			addInOrExclude(settings.includes[i], true);
+		}
+		for (int i = 0; i < settings.excludes.length; i++)
+		{
+			addInOrExclude(settings.includes[i], false);
+		}
+	}
+
+	private void addInOrExclude(String platform, boolean included)
+	{
+		LongClickablePreference includePref = new LongClickablePreference(inexcludeCat.getContext());
+		includePref.setTitle(platform);
+		if (included) {
+			includes.add(platform);
+			includePref.setSummary("included");
+		} else {
+			excludes.add(platform);
+			includePref.setSummary("excluded");
+		}
+		includePref.setOnPreferenceLongClickListener(onInExcludeLongClickListener);
+		includePref.setKey(platform);
+		inexcludeCat.addPreference(includePref);
 	}
 
 	/**
@@ -293,42 +328,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 					{
 						final DiscoveryInfo info = ds[i];
 						DiscoveryPreference disPref = new DiscoveryPreference(infoCat.getContext(), info);
-						disPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
-						{
-							public boolean onPreferenceChange(Preference preference, Object value)
-							{
-								final Boolean create = (Boolean) value;
-								final IComponentIdentifier proxy = info.getProxy() != null && info.getProxy().isDone()
-										&& info.getProxy().getException() == null ? info.getProxy().get(null) : null;
-								if (create && info.getProxy() == null || !create && proxy != null)
-								{
-									// setting changed -> create or
-									// delete proxy
-									helper.createOrDeleteProxy(info.getComponentIdentifier(), create).addResultListener(new DefaultResultListener<Void>()
-									{
-										public void exceptionOccurred(Exception exception)
-										{
-											exception.printStackTrace();
-											uiHandler.post(new Runnable()
-											{
-												public void run()
-												{
-													Toast.makeText(screen.getContext(),
-															"Could not start/stop Proxy for " + info.getComponentIdentifier(),
-															Toast.LENGTH_LONG).show();
-												}
-											});
-										};
-
-										public void resultAvailable(Void result)
-										{
-											refreshDiscoveryInfos();
-										}
-									});
-								}
-								return true;
-							}
-						});
+						disPref.setOnPreferenceLongClickListener(onDiscoveryInfoLongClickListener);
 						newDisPrefs.add(disPref);
 					}
 				}
@@ -349,25 +349,27 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		settings.fast = cbfast.isChecked();
 		settings.autocreate = cbautoCreate.isChecked();
 		settings.autodelete = cbautoDelete.isChecked();
-		settings.includes = this.includes;
-		settings.excludes = this.excludes;
+		settings.includes = this.includes.toArray(new String[this.includes.size()]);
+		settings.excludes = this.excludes.toArray(new String[this.excludes.size()]);
 
 		switch (PREFKEYS.valueOf(preference.getKey()))
 		{
-			case FAST :
-				settings.fast = (Boolean) newValue;
-				break;
-			case AUTOCREATE :
-				settings.autocreate = (Boolean) newValue;
-				break;
-			case AUTODELETE :
-				settings.autodelete = (Boolean) newValue;
-				break;
-			case DELAY :
-				settings.delay = ((Integer) newValue).longValue() * 1000;
-				break;
-			default :
-				break;
+		case FAST:
+			settings.fast = (Boolean) newValue;
+			break;
+		case AUTOCREATE:
+			settings.autocreate = (Boolean) newValue;
+			break;
+		case AUTODELETE:
+			settings.autodelete = (Boolean) newValue;
+			break;
+		case DELAY:
+			settings.delay = ((Integer) newValue).longValue() * 1000;
+			break;
+		case INEXCLUDES:
+			break;
+		default:
+			break;
 		}
 
 		helper.setSettings(settings);
@@ -379,4 +381,115 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		this.platformId = platformId;
 	}
 
+	private OnPreferenceClickListener onDiscoveryInfoLongClickListener = new OnPreferenceClickListener()
+	{
+
+		@Override
+		public boolean onPreferenceClick(Preference preference)
+		{
+			DiscoveryPreference pref = (DiscoveryPreference) preference;
+			final DiscoveryInfo info = pref.getDiscoveryInfo();
+
+			Builder builder = new AlertDialog.Builder(pref.getContext());
+			String addRemoveProxyText;
+			if (info.proxy == null)
+			{
+				addRemoveProxyText = "Add local Proxy";
+			} else
+			{
+				addRemoveProxyText = "Remove local Proxy";
+			}
+			CharSequence[] items = 
+					new CharSequence[] { addRemoveProxyText, "Add to excludes", "Add to includes" };
+			
+			builder.setItems(items, new DialogInterface.OnClickListener()
+			{
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					switch (which)
+					{
+					case 0: // add/remove proxy
+						final Boolean create = (info.proxy == null);
+
+						final IComponentIdentifier proxy = info.getProxy() != null && info.getProxy().isDone() && info.getProxy().getException() == null ? info
+								.getProxy().get(null) : null;
+						if (create && info.getProxy() == null || !create && proxy != null)
+						{
+							// setting changed -> create or
+							// delete proxy
+							helper.createOrDeleteProxy(info.getComponentIdentifier(), create).addResultListener(new DefaultResultListener<Void>()
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									uiHandler.post(new Runnable()
+									{
+										public void run()
+										{
+											Toast.makeText(screen.getContext(), "Could not start/stop Proxy for " + info.getComponentIdentifier(),
+													Toast.LENGTH_LONG).show();
+										}
+									});
+								};
+
+								public void resultAvailable(Void result)
+								{
+									refreshDiscoveryInfos();
+								}
+							});
+						}
+						break;
+					case 1: // add to excludes
+						addInOrExclude(info.getComponentIdentifier().getPlatformPrefix(), false);
+						break;
+					case 2: // add to includes
+						addInOrExclude(info.getComponentIdentifier().getPlatformPrefix(), true);
+						break;
+					default:
+						break;
+					}
+				}
+
+			});
+			AlertDialog dialog = builder.create();
+			dialog.show();
+
+			return true;
+		}
+	};
+
+	private OnPreferenceClickListener onInExcludeLongClickListener = new OnPreferenceClickListener()
+	{
+
+		@Override
+		public boolean onPreferenceClick(Preference p)
+		{
+			Builder builder = new AlertDialog.Builder(p.getContext());
+			final CharSequence platformPrefix = p.getTitle();
+			CharSequence summary = p.getSummary();
+			builder.setMessage("Delete " + summary.subSequence(0, summary.length()-1) + " for " + platformPrefix + "?").setCancelable(false)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+					{
+						public void onClick(DialogInterface dialog, int id)
+						{
+							inexcludeCat.removePreference(inexcludeCat.findPreference(platformPrefix));
+							includes.remove(platformPrefix);
+							excludes.remove(platformPrefix);
+							onPreferenceChange(inexcludeCat, null);
+						}
+					}).setNegativeButton("No", new DialogInterface.OnClickListener()
+					{
+						public void onClick(DialogInterface dialog, int id)
+						{
+							dialog.cancel();
+						}
+					});
+
+			builder.create().show();
+			
+			return true;
+		}
+	};
 }
