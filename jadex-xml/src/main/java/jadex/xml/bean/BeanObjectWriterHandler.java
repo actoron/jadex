@@ -267,95 +267,99 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	protected Object getValue(Object object, Object attr, IContext context, Object info) throws Exception
 	{
-		if(attr==AccessInfo.THIS)
-			return object;
-		
 		Object value = null;
 		
-		Method method = null;
-		Field field = null;
-		Classname xmlc = null;
-		boolean found = false;
-		
-		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
-			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
-		BeanAccessInfo bai = ai!=null && (ai.getExtraInfo() instanceof BeanAccessInfo)? 
-			(BeanAccessInfo)ai.getExtraInfo(): null;
-		
-		if(bai!=null && bai.getFetchHelp()!=null)
+		if(attr==AccessInfo.THIS)
 		{
-			Object tmp = bai.getFetchHelp();
-			if(tmp instanceof Method)
-				method = (Method)tmp;
-			else //if(tmp instanceof Field)
-				field = (Field)tmp;
-		}
-		else if(attr instanceof BeanProperty)
-		{
-			value = ((BeanProperty)attr).getPropertyValue(object);
-			found = true;
-//			method = ((BeanProperty)attr).getGetter();
-//			if(method==null)
-//			{
-//				field = ((BeanProperty)attr).getField();
-//			}
-		}
-		else if(attr instanceof String)
-		{
-			method = findGetMethod(object, (String)attr, new String[]{"get", "is"});
-			if(method==null)
-			{
-				try
-				{
-					field = object.getClass().getField((String)attr);
-				}
-				catch(Exception e)
-				{
-				}
-			}
-		}
-		else if(attr instanceof Classname)
-		{
-			xmlc	= (Classname)attr;
+			value = object;
 		}
 		else
 		{
-			throw new RuntimeException("Unknown attribute type: "+attr);
-		}
-		
-		if(!found)
-		{
-			if(method!=null)
+			Method method = null;
+			Field field = null;
+			Classname xmlc = null;
+			boolean found = false;
+			
+			AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
+				info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
+			BeanAccessInfo bai = ai!=null && (ai.getExtraInfo() instanceof BeanAccessInfo)? 
+				(BeanAccessInfo)ai.getExtraInfo(): null;
+			
+			if(bai!=null && bai.getFetchHelp()!=null)
 			{
-				try
-				{	
-					value = method.invoke(object, new Object[0]);
-				}
-				catch(Exception e)
+				Object tmp = bai.getFetchHelp();
+				if(tmp instanceof Method)
+					method = (Method)tmp;
+				else //if(tmp instanceof Field)
+					field = (Field)tmp;
+			}
+			else if(attr instanceof BeanProperty)
+			{
+				value = ((BeanProperty)attr).getPropertyValue(object);
+				found = true;
+	//			method = ((BeanProperty)attr).getGetter();
+	//			if(method==null)
+	//			{
+	//				field = ((BeanProperty)attr).getField();
+	//			}
+			}
+			else if(attr instanceof String)
+			{
+				method = findGetMethod(object, (String)attr, new String[]{"get", "is"});
+				if(method==null)
 				{
-					e.printStackTrace();
+					try
+					{
+						field = object.getClass().getField((String)attr);
+					}
+					catch(Exception e)
+					{
+					}
 				}
 			}
-			else if(field!=null)
+			else if(attr instanceof Classname)
 			{
-				try
-				{
-					if((field.getModifiers()&Field.PUBLIC)==0)
-						field.setAccessible(true);
-					value = field.get(object);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			else if(xmlc!=null)
-			{
-				value = xmlc.value();
+				xmlc	= (Classname)attr;
 			}
 			else
 			{
-				throw new RuntimeException("Could not fetch value: "+object+" "+attr);
+				throw new RuntimeException("Unknown attribute type: "+attr);
+			}
+			
+			if(!found)
+			{
+				if(method!=null)
+				{
+					try
+					{	
+						value = method.invoke(object, new Object[0]);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else if(field!=null)
+				{
+					try
+					{
+						if((field.getModifiers()&Field.PUBLIC)==0)
+							field.setAccessible(true);
+						value = field.get(object);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else if(xmlc!=null)
+				{
+					value = xmlc.value();
+				}
+				else
+				{
+					throw new RuntimeException("Could not fetch value: "+object+" "+attr);
+				}
 			}
 		}
 		
