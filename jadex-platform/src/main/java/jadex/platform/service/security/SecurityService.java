@@ -324,6 +324,14 @@ public class SecurityService implements ISecurityService
 														}
 													}
 													
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
+													publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+													
 													return IFuture.DONE;
 												}
 											});

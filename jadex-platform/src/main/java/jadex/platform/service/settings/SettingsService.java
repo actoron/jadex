@@ -287,7 +287,7 @@ public class SettingsService implements ISettingsService
 	 */
 	public IFuture<Void>	saveProperties(boolean shutdown)
 	{
-		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
+//		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
 		final Future<Void>	ret	= new Future<Void>();
 		
 		IResultListener	rl	= new DelegationResultListener(ret)
