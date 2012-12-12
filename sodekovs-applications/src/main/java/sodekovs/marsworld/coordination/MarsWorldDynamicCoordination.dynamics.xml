@@ -43,9 +43,8 @@
 	-->
 	<causalities>
 		<deco_links>
-		    <!-- The proximity links -->
 			<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
-			<deco_link realization="latest_target_seen_proximity" type="POSITIVE" name="target_seen_send-receive" spaces="mycoordspace">
+			<deco_link realization="latest_target_seen_proximity" type="POSITIVE" name="target_seen_send-receive-proximity" spaces="mycoordspace">
 				<froms>
 					<from>target_seen_sender</from>
 				</froms>
@@ -54,7 +53,7 @@
 				</tos>
 			</deco_link>			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
-			<deco_link realization="latest_target_analyzed_proximity" type="POSITIVE" name="target_analyzed_send-receive" spaces="mycoordspace">
+			<deco_link realization="latest_target_analyzed_proximity" type="POSITIVE" name="target_analyzed_send-receive-proximity" spaces="mycoordspace">
 				<froms>
 					<from>target_analyzed_sender</from>
 				</froms>
@@ -63,7 +62,7 @@
 				</tos>
 			</deco_link>
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<deco_link realization="latest_target_produced_proximity" type="POSITIVE" name="target_produced_send-receive" spaces="mycoordspace">
+			<deco_link realization="latest_target_produced_proximity" type="POSITIVE" name="target_produced_send-receive-proximity" spaces="mycoordspace">
 				<froms>
 					<from>target_produced_sender</from>
 				</froms>
@@ -71,10 +70,8 @@
 					<to>target_produced_receiver</to>
 				</tos>
 			</deco_link>
-			
-			<!-- The broadcast links -->
 			<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
-			<deco_link realization="latest_target_seen_broadcast" type="POSITIVE" name="target_seen_send-receive" spaces="mycoordspace">
+			<deco_link realization="latest_target_seen_broadcast" type="POSITIVE" name="target_seen_send-receive-broadcast" spaces="mycoordspace">
 				<froms>
 					<from>target_seen_sender</from>
 				</froms>
@@ -83,7 +80,7 @@
 				</tos>
 			</deco_link>			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
-			<deco_link realization="latest_target_analyzed_broadcast" type="POSITIVE" name="target_analyzed_send-receive" spaces="mycoordspace">
+			<deco_link realization="latest_target_analyzed_broadcast" type="POSITIVE" name="target_analyzed_send-receive-broadcast" spaces="mycoordspace">
 				<froms>
 					<from>target_analyzed_sender</from>
 				</froms>
@@ -92,7 +89,7 @@
 				</tos>
 			</deco_link>
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<deco_link realization="latest_target_produced_broadcast" type="POSITIVE" name="target_produced_send-receive" spaces="mycoordspace">
+			<deco_link realization="latest_target_produced_broadcast" type="POSITIVE" name="target_produced_send-receive-broadcast" spaces="mycoordspace">
 				<froms>
 					<from>target_produced_sender</from>
 				</froms>
@@ -104,16 +101,17 @@
 
 		<!-- The detailed configuration of interdependency enactment. -->
 		<deco-link-realizations>
-		    <!-- Proximity links -->
-			<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
+		<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
 			<realization id="latest_target_seen_proximity">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">
+					<!-- <agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">-->
+					<agent_element element="callSentryEvent" agent_id="Producer" type="INTERNAL_EVENT">					
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">
+					<!-- <agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">-->
+					<agent_element element="callSentryEvent" agent_id="Carry" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
@@ -131,7 +129,8 @@
 					</properties>
 				</mechanism_configuration>			
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEFSET">
+					 <!-- <agent_element element="addTargetPlan" agent_id="Sentry" type="BDI_PLAN">-->
+					 <agent_element element="latestTargetEvent" agent_id="Sentry" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
@@ -140,11 +139,11 @@
 				<active>true</active>
 			</realization>
 			
-			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
 			<realization id="latest_target_analyzed_proximity">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_analyzed_target" agent_id="Sentry" type="BDI_BELIEFSET">
+					<agent_element element="callProducerEvent" agent_id="Sentry" type="INTERNAL_EVENT">
+					 <!-- <agent_element element="callProducerAgentPlan" agent_id="Sentry" type="BDI_PLAN">-->
 						<parameter_mappings>
 							<mapping ref="latest_analyzed_target" name="latest_analyzed_target"/>
 						</parameter_mappings>
@@ -162,7 +161,8 @@
 					</properties>
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">
+					 <!-- <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">-->
+					 <agent_element element="latestAnalyzedTargetEvent" agent_id="Producer" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_analyzed_target" name="latest_analyzed_target"/>
 						</parameter_mappings>
@@ -174,7 +174,8 @@
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
 			<realization id="latest_target_produced_proximity">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">
+					<!-- <agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">-->
+					<agent_element element="callCarryEvent" agent_id="Producer" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_produced_target" name="latest_produced_target"/>
 						</parameter_mappings>
@@ -191,8 +192,9 @@
 						</entry>
 					</properties>
 				</mechanism_configuration>	
-				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET">
+				<to>		<!-- Behaviors / events to be triggered upon reception: -->									 
+					 <!-- <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET"> -->
+					 <agent_element element="latestProducedTargetEvent" agent_id="Carry" type="INTERNAL_EVENT">					 
 						<parameter_mappings>
 							<mapping ref="latest_produced_target" name="latest_produced_target"/>
 						</parameter_mappings>
@@ -200,17 +202,18 @@
 				</to>
 				<active>true</active>
 			</realization>
-			
-			<!-- Broadcast links -->
-			<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
+		
+		<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
 			<realization id="latest_target_seen_broadcast">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">
+					<!-- <agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">-->
+					<agent_element element="callSentryEvent" agent_id="Producer" type="INTERNAL_EVENT">					
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">
+					<!-- <agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">-->
+					<agent_element element="callSentryEvent" agent_id="Carry" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
@@ -222,7 +225,8 @@
 					agent_type="JADEX">
 				</mechanism_configuration>			
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_target" agent_id="Sentry" type="BDI_BELIEFSET">
+					 <!-- <agent_element element="addTargetPlan" agent_id="Sentry" type="BDI_PLAN">-->
+					 <agent_element element="latestTargetEvent" agent_id="Sentry" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
@@ -231,11 +235,11 @@
 				<active>false</active>
 			</realization>
 			
-			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
 			<realization id="latest_target_analyzed_broadcast">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_analyzed_target" agent_id="Sentry" type="BDI_BELIEFSET">
+					<agent_element element="callProducerEvent" agent_id="Sentry" type="INTERNAL_EVENT">
+					 <!-- <agent_element element="callProducerAgentPlan" agent_id="Sentry" type="BDI_PLAN">-->
 						<parameter_mappings>
 							<mapping ref="latest_analyzed_target" name="latest_analyzed_target"/>
 						</parameter_mappings>
@@ -247,7 +251,8 @@
 					agent_type="JADEX">
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">
+					 <!-- <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">-->
+					 <agent_element element="latestAnalyzedTargetEvent" agent_id="Producer" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_analyzed_target" name="latest_analyzed_target"/>
 						</parameter_mappings>
@@ -259,7 +264,8 @@
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
 			<realization id="latest_target_produced_broadcast">
 				<from>		<!-- Published behaviors / events: -->					
-					<agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">
+					<!-- <agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">-->
+					<agent_element element="callCarryEvent" agent_id="Producer" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="latest_produced_target" name="latest_produced_target"/>
 						</parameter_mappings>
@@ -269,16 +275,23 @@
 				<mechanism_configuration
 					mechanism_id="sodekovs.marsworld.coordination.BroadcastMechanism"
 					agent_type="JADEX">
+					<properties>
+						<entry>
+							<key>proximity</key>
+							<value>0.25</value>
+						</entry>
+					</properties>
 				</mechanism_configuration>	
-				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
-					 <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET">
+				<to>		<!-- Behaviors / events to be triggered upon reception: -->									 
+					 <!-- <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET"> -->
+					 <agent_element element="latestProducedTargetEvent" agent_id="Carry" type="INTERNAL_EVENT">					 
 						<parameter_mappings>
 							<mapping ref="latest_produced_target" name="latest_produced_target"/>
 						</parameter_mappings>
 					</agent_element>
 				</to>
 				<active>false</active>
-			</realization>
+			</realization>											
 		</deco-link-realizations>
 	</causalities>
 	

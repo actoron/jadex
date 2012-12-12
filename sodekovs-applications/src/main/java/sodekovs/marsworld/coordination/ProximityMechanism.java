@@ -7,6 +7,7 @@ import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector2Double;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.ArrayList;
@@ -57,10 +58,10 @@ public class ProximityMechanism extends CoordinationMechanism {
 	public void perceiveCoordinationEvent(Object obj) {
 		CoordinationInfo ci = (CoordinationInfo) obj;
 		// extract the space object from the coordination info
-		ISpaceObject sp = (ISpaceObject) ci.getValueByName("value");
+		CoordinationSpaceData data = (CoordinationSpaceData) ci.getValueByName("value");
 //		System.out.println("###ProximityMechanism received: " + sp);		
 		// get the position
-		IVector2 pos = (IVector2) sp.getProperty("position");
+		IVector2 pos = new Vector2Double(data.getX(), data.getY());
 		// get the max distance as specified by the mechanism configuration
 		IVector1 distance = new Vector1Double(getMechanismConfiguration().getDoubleProperty("proximity"));
 		// get all agents within the proximity
