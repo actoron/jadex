@@ -26,4 +26,7 @@ ELSE
 	goto delete
 
 :delete
+	echo Deleting JadexPro service...
 	amd64\JadexPro delete
+	echo success
+	pause

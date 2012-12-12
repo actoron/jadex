@@ -29,6 +29,7 @@ ELSE
 FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 
 :install
+	echo Installing JadexPro service...
 	%DIR%\JadexPro install --Install %DIR%\JadexPro.exe ^
 	  --Description "Jadex Production Edition" ^
 	  --Jvm auto --Startup auto ^
@@ -39,7 +40,11 @@ FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 	  --StopMode jvm --StopClass jadex.platform.ServiceStarter --StopMethod stop ^
 	  ++StartParams -platformname;%HOSTNAME%_svc$* ^
 	  ++StartParams -gui;false ^
+	  ++StartParams -ssltransport;true ^
 	  ++StartParams -logging;true
 
 :start
+	echo Starting JadexPro service...
 	%DIR%\JadexPro start
+	echo success
+	Pause
