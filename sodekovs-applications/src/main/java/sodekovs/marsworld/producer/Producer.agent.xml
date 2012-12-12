@@ -51,6 +51,10 @@
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())</fact>
 		</belief>
+		
+		<belief name="no_msg_received" class="Integer">
+		    <fact>new Integer(0)</fact>
+		</belief>
 	</beliefs>
 
   	<goals>
@@ -91,6 +95,11 @@
 				<factadded cref="move.my_targets"/>
 			</trigger>
 		</plan>
+		
+		<!-- Increment the belief no_msg_received by one every second. -->
+		<plan name="count_no_msg_plan">
+		    <body class="CountNoMsgPlan"/>
+		</plan>
 	</plans>
 
 	<events>
@@ -119,6 +128,7 @@
 			</goals>
 			<plans>
 			    <initialplan ref="producer_plan"/>
+			    <initialplan ref="count_no_msg_plan" />
 			</plans>
 		</configuration>
 	</configurations>

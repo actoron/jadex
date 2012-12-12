@@ -60,6 +60,9 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 	
+		<belief name="no_msg_received" class="Integer">
+		    <fact>new Integer(0)</fact>
+		</belief>
 	</beliefs>
 
   	<goals>
@@ -148,6 +151,10 @@
 			<body class="CounterPlan"/>			
 		</plan>
 				
+		<!-- Increment the belief no_msg_received by one every second. -->
+		<plan name="count_no_msg_plan">
+		    <body class="CountNoMsgPlan"/>
+		</plan>
 	</plans> 
 
 	<events>
@@ -173,6 +180,7 @@
 			<plans>
 				<initialplan ref="tmpCounterPlan"/>
 				<initialplan ref="addTargetPlan"/>
+				<initialplan ref="count_no_msg_plan" />
 			</plans>			
 		</configuration>
 	</configurations>

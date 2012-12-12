@@ -71,6 +71,7 @@ public class BDIConvergenceService extends ConvergenceService {
 
 	@Override
 	public IFuture<Boolean> vote(Adaption adaption) {
+		System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " vote is called for " + adaption);
 		Future<Boolean> fut = new Future<Boolean>();
 		boolean result = true;
 
@@ -92,6 +93,7 @@ public class BDIConvergenceService extends ConvergenceService {
 			}
 		}
 
+		System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " voted " + result);
 		fut.setResult(result);
 
 		return fut;
@@ -116,6 +118,8 @@ public class BDIConvergenceService extends ConvergenceService {
 						// initialize listener for adaption and constraint
 						IBelief belief = base.getBelief(constraint.getElement());
 						belief.addBeliefListener(new BDIBeliefListener(adaption, constraint, belief));
+
+						System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " initialized listener for " + constraint);
 					}
 				}
 			}
@@ -126,6 +130,7 @@ public class BDIConvergenceService extends ConvergenceService {
 	protected void startService() {
 		String serviceName = externalAccess.getComponentIdentifier().getLocalName() + SERVICE_POSTFIX;
 		externalAccess.getInterpreter().addService(serviceName, IConvergenceService.class, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, this, null);
+		System.out.println(serviceName + " started");
 	}
 
 	/**
@@ -135,6 +140,7 @@ public class BDIConvergenceService extends ConvergenceService {
 	 *            The given {@link Adaption}
 	 */
 	private void adapt(final Adaption adaption) {
+		System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " starts adaption process for " + adaption);
 		// get all other coordination spaces for the given coordination context
 		SServiceProvider.getServices(externalAccess.getServiceProvider(), ICoordinationSpaceService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<ICoordinationSpaceService>() {
 
@@ -205,6 +211,7 @@ public class BDIConvergenceService extends ConvergenceService {
 
 			// also we assume that the condition is fulfilled if the condition value (integer) equals the current belief value
 			if (constraint.getCondition() >= value) {
+				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " constraint fulfilled " + constraint);
 				// initialize the voting result listener
 				final VoteResultListener voteResultListener = new VoteResultListener(adaption, belief);
 				// start the voting timeout which will notify the voting result listener
@@ -282,19 +289,24 @@ public class BDIConvergenceService extends ConvergenceService {
 		 * This method is called when a voting timeout occurs.
 		 */
 		public void setFinished() {
-			// set it finished
-			finished = true;
-			// and evaluate the results
-			evaluate();
+			if (!finished) {
+				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " voting timeout");
+				// set it finished
+				finished = true;
+				// and evaluate the results
+				evaluate();
+			}
 		}
 
 		@Override
 		public void resultAvailable(Object result) {
 			// only if the vote is not finished yet results are accepted
 			if (!finished) {
+				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " received voting result " + result);
 				results.add((Boolean) result);
 				// if all required results are received
 				if (results.size() == adaption.getAnswer()) {
+					System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " received required number of answers " + adaption.getAnswer());
 					finished = true;
 					// evaluate
 					evaluate();
@@ -320,12 +332,16 @@ public class BDIConvergenceService extends ConvergenceService {
 
 			// if the quorum is reached
 			if (voteResult >= adaption.getQuorum()) {
+				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " quorom is reached " + voteResult);
 				// adapt!
 				adapt(adaption);
 				// if not check for reset
-			} else if (adaption.getReset()) {
-				// for now reseting just means to set the integer value back to 0
-				belief.setFact(new Integer(0));
+			} else {
+				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " quorom is was not reached " + voteResult);
+				if (adaption.getReset()) {
+					// for now reseting just means to set the integer value back to 0
+					belief.setFact(new Integer(0));
+				}
 			}
 		}
 	}

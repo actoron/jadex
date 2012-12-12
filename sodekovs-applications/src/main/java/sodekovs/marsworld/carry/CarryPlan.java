@@ -31,6 +31,8 @@ public class CarryPlan extends Plan {
 	public void body() {
 		while (true) {
 			IInternalEvent event = waitForInternalEvent("latestProducedTargetEvent");
+			// reset the no_msg_received counter for the convergence
+			getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
 			
 			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_produced_target").getValue();
 			System.out.println("#CarryPlan# Received latest produced target:  " + data);

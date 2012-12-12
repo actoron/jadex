@@ -291,7 +291,7 @@
 	    <adaptions>
 		    <adaption id="proximity-it-up" answers="3" quorum="0.66" timeout="10000" delay="1000" reset="true">
 		        <realizations>
-			        <realization id="latest_target_seen_proximity" activate="true">
+			        <realization id="latest_target_seen_proximity">
 			            <properties>
 			                <entry>
 			                    <key>proximity</key>
@@ -299,7 +299,7 @@
 			                </entry>
 			            </properties>
 			        </realization>
-			        <realization id="latest_target_analyzed_proximity" activate="true">
+			        <realization id="latest_target_analyzed_proximity">
 			            <properties>
 			                <entry>
 			                    <key>proximity</key>
@@ -307,7 +307,7 @@
 			                </entry>
 			            </properties>
 			        </realization>
-			        <realization id="latest_target_produced_proximity" activate="true">
+			        <realization id="latest_target_produced_proximity">
 			            <properties>
 			                <entry>
 			                    <key>proximity</key>

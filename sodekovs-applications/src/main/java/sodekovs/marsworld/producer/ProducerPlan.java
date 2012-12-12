@@ -32,7 +32,9 @@ public class ProducerPlan extends Plan {
 	public void body() {
 		while (true) {
 			IInternalEvent event = waitForInternalEvent("latestAnalyzedTargetEvent");
-			
+			// reset the no_msg_received counter for the convergence
+			getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
+
 			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_analyzed_target").getValue();
 			System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
 
