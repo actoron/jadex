@@ -5,6 +5,7 @@ import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.gui.stylesheets.SequenceEdgeStyleFunction;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
@@ -28,6 +29,7 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraphView;
 
 /**
@@ -79,10 +81,16 @@ public class MouseController extends MouseAdapter
 					modelcontainer.getGraph().getSelectionCount() == 1 &&
 					modelcontainer.getGraph().getSelectionCell() instanceof VEdge)
 				{
-					mxGeometry geo = ((VEdge) cell).getGeometry();
+					VEdge vedge = (VEdge) cell;
+					mxGeometry geo = vedge.getGeometry();
 					List<mxPoint> points = (List<mxPoint>) geo.getPoints();
 					
-					//int i = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), p.getX(), p.getY());;
+					
+					if (vedge.getSource().getParent() != null)
+					{
+//						mxp = SequenceEdgeStyleFunction.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
+						mxp = SCreationController.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
+					}
 					
 					if (points == null)
 					{
@@ -90,14 +98,15 @@ public class MouseController extends MouseAdapter
 						geo.setPoints(points);
 					}
 					
-//					if (points.size() == 0)
+					if (points.size() == 0)
 					{
 						points.add(mxp);
 					}
-//					else
-//					{
-//						points.add(i, mxp);
-//					}
+					else
+					{
+						int i = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), p.getX(), p.getY());;
+						points.add(i, mxp);
+					}
 					
 					modelcontainer.getGraph().refreshCellView((VEdge) cell);
 					modelcontainer.setDirty(true);

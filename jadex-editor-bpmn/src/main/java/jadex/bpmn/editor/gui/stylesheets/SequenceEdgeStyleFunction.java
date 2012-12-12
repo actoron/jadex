@@ -30,6 +30,7 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		}
 		
 		double scale = state.getView().getScale();
+		double adjedgedist = GuiConstants.MIN_EDGE_DIST * scale;
 		mxGeometry sgeo = ((mxICell) source.getCell()).getGeometry();
 		mxPoint spos = new mxPoint(sgeo.getX() * scale, sgeo.getY() * scale);
 		if (((mxICell) source.getCell()).getParent() != null)
@@ -38,13 +39,13 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		}
 		sgeo = new mxGeometry(spos.getX(), spos.getY(), sgeo.getWidth() * scale, sgeo.getHeight() * scale);
 		mxGeometry tgeo = ((mxICell) target.getCell()).getGeometry();
-		mxPoint tpos = new mxPoint(tgeo.getX(), tgeo.getY());
+		mxPoint tpos = new mxPoint(tgeo.getX() * scale, tgeo.getY() * scale);
 		if (((mxICell) target.getCell()).getParent() != null)
 		{
 			tpos = adjustPoint(state.getView().getGraph(), ((mxICell) target.getCell()).getParent(), tpos);
 		}
-		tpos.setX(tpos.getX() * scale);
-		tpos.setY(tpos.getY() * scale);
+//		tpos.setX(tpos.getX() * scale);
+//		tpos.setY(tpos.getY() * scale);
 		tgeo = new mxGeometry(tpos.getX(), tpos.getY(), tgeo.getWidth() * scale, tgeo.getHeight() * scale);
 		
 		if (points == null || points.size() == 0)
@@ -74,22 +75,22 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 				else
 				{
 					double ydist = tgeo.getY() - (sgeo.getY() + sgeo.getHeight());
-					if (ydist > GuiConstants.MIN_EDGE_DIST)
+					if (ydist > adjedgedist)
 					{
 						double cy = sgeo.getY() + sgeo.getHeight() + ydist * 0.5;
 						result.add(new mxPoint(sgeo.getCenterX(), cy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, cy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, cy));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 					}
 					else
 					{
 						ydist = sgeo.getY() - (tgeo.getY() + tgeo.getHeight());
-						if (ydist > GuiConstants.MIN_EDGE_DIST)
+						if (ydist > adjedgedist)
 						{
 							double cy = sgeo.getY() - ydist * 0.5;
 							result.add(new mxPoint(sgeo.getCenterX(), cy));
-							result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, cy));
-							result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+							result.add(new mxPoint(tgeo.getX() - adjedgedist, cy));
+							result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 						}
 						else
 						{
@@ -119,28 +120,28 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 					}
 					else
 					{
-						if (tgeo.getY() - GuiConstants.MIN_EDGE_DIST > sgeo.getY() + sgeo.getHeight())
+						if (tgeo.getY() - adjedgedist > sgeo.getY() + sgeo.getHeight())
 						{
 							double ydist = tgeo.getY() - (sgeo.getY() + sgeo.getHeight());
 							double cy = sgeo.getY() + sgeo.getHeight() + ydist * 0.5;
 							result.add(new mxPoint(sgeo.getCenterX(), cy));
-							result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, cy));
-							result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+							result.add(new mxPoint(tgeo.getX() - adjedgedist, cy));
+							result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 						}
 						else
 						{
-							double maxy = tgeo.getY() + tgeo.getHeight() + GuiConstants.MIN_EDGE_DIST;
+							double maxy = tgeo.getY() + tgeo.getHeight() + adjedgedist;
 							result.add(new mxPoint(sgeo.getCenterX(), maxy));
-							result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, maxy));
-							result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+							result.add(new mxPoint(tgeo.getX() - adjedgedist, maxy));
+							result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 						}
 					}
 				}
 				else
 				{
-					if (tgeo.getX() - GuiConstants.MIN_EDGE_DIST > pgeo.getX() + pgeo.getWidth())
+					if (tgeo.getX() - adjedgedist > pgeo.getX() + pgeo.getWidth())
 					{
-						double maxy = sgeo.getY() + sgeo.getHeight() + GuiConstants.MIN_EDGE_DIST;
+						double maxy = sgeo.getY() + sgeo.getHeight() + adjedgedist;
 						double cx = tgeo.getX() - (tgeo.getX() - pgeo.getX() - pgeo.getWidth()) * 0.5;
 						result.add(new mxPoint(sgeo.getCenterX(), maxy));
 						result.add(new mxPoint(cx, maxy));
@@ -148,9 +149,9 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 					}
 					else
 					{
-						double maxy = sgeo.getY() + sgeo.getHeight() + GuiConstants.MIN_EDGE_DIST;
-						double minx = Math.min(pgeo.getX() - GuiConstants.MIN_EDGE_DIST,
-											   tgeo.getX() - GuiConstants.MIN_EDGE_DIST);
+						double maxy = sgeo.getY() + sgeo.getHeight() + adjedgedist;
+						double minx = Math.min(pgeo.getX() - adjedgedist,
+											   tgeo.getX() - adjedgedist);
 						result.add(new mxPoint(sgeo.getCenterX(), maxy));
 						result.add(new mxPoint(minx, maxy));
 						result.add(new mxPoint(minx, tgeo.getCenterY()));
@@ -169,55 +170,64 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 				if (sgeo.getY() > tgeo.getY())
 				{
 					double ydist = sgeo.getY() - (tgeo.getY() + tgeo.getHeight());
-					if (ydist > GuiConstants.MIN_EDGE_DIST)
+					if (ydist > adjedgedist)
 					{
 						double cy = sgeo.getY() - ydist * 0.5;
-						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + GuiConstants.MIN_EDGE_DIST, sgeo.getCenterY()));
-						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + GuiConstants.MIN_EDGE_DIST, cy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, cy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + adjedgedist, sgeo.getCenterY()));
+						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + adjedgedist, cy));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, cy));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 					}
 					else
 					{
-						double maxx = Math.max(sgeo.getX() + sgeo.getWidth() + GuiConstants.MIN_EDGE_DIST,
-								   			   tgeo.getX() + tgeo.getWidth() + GuiConstants.MIN_EDGE_DIST);
-						double miny = Math.min(sgeo.getY() - GuiConstants.MIN_EDGE_DIST,
-								   			   tgeo.getY() - GuiConstants.MIN_EDGE_DIST);
+						double maxx = Math.max(sgeo.getX() + sgeo.getWidth() + adjedgedist,
+								   			   tgeo.getX() + tgeo.getWidth() + adjedgedist);
+						double miny = Math.min(sgeo.getY() - adjedgedist,
+								   			   tgeo.getY() - adjedgedist);
 						result.add(new mxPoint(maxx, sgeo.getCenterY()));
 						result.add(new mxPoint(maxx, miny));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, miny));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, miny));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 					}
 				}
 				else
 				{
 					double ydist = tgeo.getY() - (sgeo.getY() + sgeo.getHeight());
-					if (ydist > GuiConstants.MIN_EDGE_DIST)
+					if (ydist > adjedgedist)
 					{
 						double cy = tgeo.getY() - ydist * 0.5;
-						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + GuiConstants.MIN_EDGE_DIST, sgeo.getCenterY()));
-						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + GuiConstants.MIN_EDGE_DIST, cy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, cy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + adjedgedist, sgeo.getCenterY()));
+						result.add(new mxPoint(sgeo.getX() + sgeo.getWidth() + adjedgedist, cy));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, cy));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 					}
 					else
 					{
-						double maxx = Math.max(sgeo.getX() + sgeo.getWidth() + GuiConstants.MIN_EDGE_DIST,
-											   tgeo.getX() + tgeo.getWidth() + GuiConstants.MIN_EDGE_DIST);
-						double maxy = Math.max(sgeo.getY() + sgeo.getHeight() + GuiConstants.MIN_EDGE_DIST,
-											   tgeo.getY() + tgeo.getHeight() + GuiConstants.MIN_EDGE_DIST);
+						double maxx = Math.max(sgeo.getX() + sgeo.getWidth() + adjedgedist,
+											   tgeo.getX() + tgeo.getWidth() + adjedgedist);
+						double maxy = Math.max(sgeo.getY() + sgeo.getHeight() + adjedgedist,
+											   tgeo.getY() + tgeo.getHeight() + adjedgedist);
 						result.add(new mxPoint(maxx, sgeo.getCenterY()));
 						result.add(new mxPoint(maxx, maxy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, maxy));
-						result.add(new mxPoint(tgeo.getX() - GuiConstants.MIN_EDGE_DIST, tgeo.getCenterY()));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, maxy));
+						result.add(new mxPoint(tgeo.getX() - adjedgedist, tgeo.getCenterY()));
 					}
 				}
 			}
 		}
 		else
 		{
-			result.add(new mxPoint(sgeo.getX() + sgeo.getWidth(), sgeo.getCenterY()));
-			result.add(new mxPoint(tgeo.getX() - 1, tgeo.getCenterY()));
+			for (mxPoint point : points)
+			{
+				mxPoint res = new mxPoint(point);
+				res.setX(res.getX() * scale);
+				res.setY(res.getY() * scale);
+				if (((mxICell) source.getCell()).getParent() != null)
+				{
+					res = adjustPoint(state.getView().getGraph(), ((mxICell) source.getCell()), res);
+				}
+				result.add(res);
+			}
 		}
 	}
 	
@@ -229,15 +239,16 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 	 *  @param point The unadjusted targeted point.
 	 *  @return The adjusted point.
 	 */
-	protected static final mxPoint adjustPoint(mxGraph graph, Object parent, mxPoint point)
+	public static final mxPoint adjustPoint(mxGraph graph, Object parent, mxPoint point)
 	{
 		mxPoint p = point;
+		double scale = graph.getView().getScale();
 		
 		mxCellState pstate = graph.getView().getState(parent);
 		if (pstate != null)
 		{
-			p.setX(p.getX() + pstate.getOrigin().getX());
-			p.setY(p.getY() + pstate.getOrigin().getY());
+			p.setX(p.getX() + pstate.getOrigin().getX() * scale);
+			p.setY(p.getY() + pstate.getOrigin().getY() * scale);
 		}
 		
 		return p;
