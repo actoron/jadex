@@ -86,4 +86,12 @@ public interface ICoordinationSpaceService extends CoordinationEventListener {
 	 * @return
 	 */
 	public IFuture<Void> changeCoordinationMechanismConfiguration(String realization, String key, String value);
+	
+	/**
+	 * Used for distributed case: denotes the context of a distributed application. In order to recognize, all instances of a distributed application have to use the same CoordinationCotextID, which
+	 * is defined in the *.application.xml.
+	 * 
+	 * @return
+	 */
+	public String getCoordinationContextID();
 }

@@ -58,6 +58,9 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 
 	/** List of EventListener that should be informed when something on coordination mechanisms changes */
 	private EventListenerList coordinationEventListener = new EventListenerList();
+	
+	/** The coordination context id */
+	private String coordinationContextId = null;
 
 	// -------- constructors --------
 
@@ -86,8 +89,14 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	public IFuture<Void> initSpace() {
 		super.initSpace();
 
-		startService();
+		StatelessAbstractInterpreter applicationInterpreter = (StatelessAbstractInterpreter) this.getApplicationInternalAccess();
 
+		// If it's a distributed application, then it has a contextID.
+		HashMap<String, Object> appArgs = (HashMap<String, Object>) applicationInterpreter.getArguments();
+		this.coordinationContextId = (String) appArgs.get("CoordinationContextID");
+		
+		startService();
+		
 		initSpaces();
 		initDeco4mas();
 		for (CoordinationMechanism icord : activeCoordinationMechanisms.values()) {
@@ -101,7 +110,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 * Starts the {@link ICoordinationSpaceService} the space offers.
 	 */
 	private void startService() {
-		ICoordinationSpaceService css = new CoordinationSpaceService(this);
+		ICoordinationSpaceService css = new CoordinationSpaceService(this, coordinationContextId);
 		this.addCoordinationEventListener(css);
 
 		((StatelessAbstractInterpreter) getApplicationInternalAccess())

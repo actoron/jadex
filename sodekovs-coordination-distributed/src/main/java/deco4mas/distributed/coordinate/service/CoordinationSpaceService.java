@@ -26,6 +26,11 @@ import deco4mas.distributed.mechanism.CoordinationMechanism;
 public class CoordinationSpaceService implements ICoordinationSpaceService {
 
 	/**
+	 * The coordination context id
+	 */
+	private String coordinationContextId = null;
+
+	/**
 	 * The Coordination Space
 	 */
 	private CoordinationSpace space = null;
@@ -40,9 +45,12 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 	 * 
 	 * @param space
 	 *            the given {@link CoordinationSpace}
+	 * @param coordinationContextId
+	 *            the given coordination context id
 	 */
-	public CoordinationSpaceService(CoordinationSpace space) {
+	public CoordinationSpaceService(CoordinationSpace space, String coordinationContextId) {
 		this.space = space;
+		this.coordinationContextId = coordinationContextId;
 		this.subscribers = new ArrayList<SubscriptionIntermediateFuture<CoordinationChangeEvent>>();
 	}
 
@@ -222,5 +230,10 @@ public class CoordinationSpaceService implements ICoordinationSpaceService {
 		event.setKey(key);
 		event.setValue(value);
 		publish(event);
+	}
+
+	@Override
+	public String getCoordinationContextID() {
+		return this.coordinationContextId;
 	}
 }
