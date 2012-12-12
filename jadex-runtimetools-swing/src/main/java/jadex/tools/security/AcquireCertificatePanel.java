@@ -256,7 +256,7 @@ public class AcquireCertificatePanel extends JPanel
 					{
 						try
 						{
-							val = conv.convertObject((String)val, null);
+							val = conv.convertObject(val, null);
 						}
 						catch(Exception ex)
 						{
