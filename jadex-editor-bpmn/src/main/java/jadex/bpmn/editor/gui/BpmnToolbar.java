@@ -148,9 +148,9 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_SELECTION, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.SELECT_COLOR),
 				"Select", iconsize));
 		
-//		sym = "cpsym";
-//		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_ADD_CONTROL_POINT, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.CONTROL_POINT_COLOR),
-//				"Add Control Point", iconsize));
+		sym = "cpsym";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_ADD_CONTROL_POINT, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.CONTROL_POINT_COLOR),
+				"Add Control Point", iconsize));
 		
 		sym = "Pool";
 		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_POOL, ImageProvider.SHAPE_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.POOL_COLOR),

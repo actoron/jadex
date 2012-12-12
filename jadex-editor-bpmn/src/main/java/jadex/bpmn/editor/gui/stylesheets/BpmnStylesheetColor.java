@@ -65,10 +65,10 @@ public class BpmnStylesheetColor extends mxStylesheet
 	public static final String BOUNDARY_EVENT_COLOR = "#eaef53";
 	
 	/** Default Pool Width */
-	public static final int DEFAULT_POOL_WIDTH = 1000;
+	public static final int DEFAULT_POOL_WIDTH = 3000;
 	
 	/** Default Pool Height */
-	public static final int DEFAULT_POOL_HEIGHT = 300;
+	public static final int DEFAULT_POOL_HEIGHT = 600;
 	
 	/** Default Activity Sizes */
 	public static final Map<String, Dimension> DEFAULT_ACTIVITY_SIZES = new HashMap<String, Dimension>();

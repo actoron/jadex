@@ -85,11 +85,13 @@ public class MouseController extends MouseAdapter
 					mxGeometry geo = vedge.getGeometry();
 					List<mxPoint> points = (List<mxPoint>) geo.getPoints();
 					
-					
-					if (vedge.getSource().getParent() != null)
+//					double scale = modelcontainer.getGraph().getView().getScale();
+//					mxp.setX(mxp.getX() * scale);
+//					mxp.setY(mxp.getY() * scale);
+					if (vedge.getSource() != null && vedge.getSource().getParent() != null)
 					{
-//						mxp = SequenceEdgeStyleFunction.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
-						mxp = SCreationController.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
+						mxp = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
+//						mxp = SCreationController.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
 					}
 					
 					if (points == null)
@@ -191,7 +193,7 @@ public class MouseController extends MouseAdapter
 	 */
 	public void mousePressed(MouseEvent e)
 	{
-		if (MouseEvent.BUTTON3 == e.getButton())
+		if (MouseEvent.BUTTON1 != e.getButton())
 		{
 			modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
 		}

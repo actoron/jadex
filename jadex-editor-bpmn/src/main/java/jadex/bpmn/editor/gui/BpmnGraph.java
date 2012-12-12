@@ -44,7 +44,7 @@ public class BpmnGraph extends mxGraph
 		setCellsCloneable(false);
 		setAllowNegativeCoordinates(false);
 		setGridEnabled(true);
-		setGridSize(20);
+		setGridSize(10);
 		
 		/*getModel().addListener(mxEvent.EXECUTE, access.getValueChangeController());
 		getSelectionModel().addListener(mxEvent.CHANGE, access.getSelectionController());

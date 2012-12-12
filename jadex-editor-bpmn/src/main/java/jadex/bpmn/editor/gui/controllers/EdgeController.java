@@ -105,10 +105,12 @@ public class EdgeController extends mxConnectionHandler
 			};
 			EdgeDragContextMenu edcm = new EdgeDragContextMenu(((BpmnGraph) graphComponent.getGraph()).getModelContainer(),
 					((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true),
-					e.getPoint(),
+					graphComponent.getPointForEvent(e).getPoint(),
 					actionlistener);
 			edcmc[0] = edcm;
-			edcm.show(graphComponent, (int) e.getX(), (int) e.getY());			
+			int x = e.getX() - graphComponent.getHorizontalScrollBar().getModel().getValue();
+			int y = e.getY() - graphComponent.getVerticalScrollBar().getModel().getValue();
+			edcm.show(graphComponent, x, y);			
 		}
 		else
 		{
@@ -174,16 +176,20 @@ public class EdgeController extends mxConnectionHandler
 					
 					cell = SCreationController.createConnection((BpmnGraph) graph, src, trg, ((BpmnConnectPreview) connectPreview).timestamp);
 					List<mxPoint> points = null;
-					if (cell.getGeometry() != null)
+					if (cell != null && cell.getGeometry() != null)
 					{
-						cell.getGeometry().getPoints();
+						points = cell.getGeometry().getPoints();
 					}
 					
 					if (commit || reallycommit)
 					{
 						result = graph.addCell(cell, ((mxICell) src).getParent(), null, src, trg);
 					}
-					cell.getGeometry().setPoints(points);
+					
+					if (points != null)
+					{
+						cell.getGeometry().setPoints(points);
+					}
 					fireEvent(new mxEventObject(mxEvent.STOP, "event", e, "commit",
 							commit, "cell", (commit) ? result : null));
 					

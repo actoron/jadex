@@ -13,6 +13,7 @@ import jadex.bpmn.model.io.SBpmnModelWriter;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
@@ -27,7 +28,12 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.xmlgraphics.java2d.GraphicContext;
+import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+
+import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxStylesheet;
 
 public class BpmnMenuBar extends JMenuBar
@@ -46,6 +52,7 @@ public class BpmnMenuBar extends JMenuBar
 		filemenu.addSeparator();
 		filemenu.add(createSaveMenuItem());
 		filemenu.add(createSaveAsMenuItem());
+		filemenu.add(createExportMenuItem());
 		filemenu.addSeparator();
 		filemenu.add(createExitMenuItem());
 		add(filemenu);
@@ -241,6 +248,98 @@ public class BpmnMenuBar extends JMenuBar
 		});
 		
 		return saveasitem;
+	}
+	
+	/**
+	 *  Creates the "Export" menu item.
+	 *  
+	 *  @return The menu item.
+	 */
+	protected JMenuItem createExportMenuItem()
+	{
+		JMenuItem exportitem = new JMenuItem(new AbstractAction("Export...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				BetterFileChooser fc = new BetterFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("EPS file", "eps");
+				fc.addChoosableFileFilter(filter);
+				fc.setFileFilter(filter);
+				int result = fc.showSaveDialog(modelcontainer.getGraphComponent());
+				if (JFileChooser.APPROVE_OPTION == result)
+				{
+					try
+					{
+						EPSDocumentGraphics2D g2d = new EPSDocumentGraphics2D(false);
+						g2d.setGraphicContext(new GraphicContext());
+						
+						BpmnGraph graph = modelcontainer.getGraph();
+						
+						int x = Integer.MAX_VALUE;
+						int y = Integer.MAX_VALUE;
+						int w = 0;
+						int h = 0;
+						
+						for (int i = 0; i < graph.getModel().getChildCount(graph.getDefaultParent()); ++i)
+						{
+							mxICell cell = (mxICell) graph.getModel().getChildAt(graph.getDefaultParent(), i);
+							mxRectangle geo = graph.getCellBounds(cell);
+							//mxGeometry geo = cell.getGeometry();
+							if (geo.getX() < x)
+							{
+								x = (int) geo.getX();
+							}
+							if (geo.getY() < y)
+							{
+								y = (int) geo.getY();
+							}
+							if (geo.getX() + geo.getWidth() - x > w)
+							{
+								w = (int) Math.ceil(geo.getX() + geo.getWidth() - x);
+							}
+							if (geo.getY() + geo.getHeight() - y > h)
+							{
+								h = (int) Math.ceil(geo.getY() + geo.getHeight() - y);
+							}
+						}
+						
+						// Avoid cutting off shadows.
+						w += 4;
+						h += 4;
+						
+						File tmpfile = File.createTempFile("export", ".eps");
+						//modelcontainer.getGraphComponent().paint(g)
+						FileOutputStream fos = new FileOutputStream(tmpfile);
+						g2d.setupDocument(fos, w, h);
+						g2d.setClip(0, 0, w, h);
+						g2d.translate(-x, -y);
+						Object[] selcells = modelcontainer.getGraph().getSelectionModel().getCells();
+						modelcontainer.getGraph().getSelectionModel().removeCells(selcells);
+			        	//modelcontainer.getGraphComponent().paint(g2d);
+			        	//modelcontainer.getGraphComponent().setSize(w, h);
+			        	//modelcontainer.getGraphComponent().paintComponents(g2d);
+						modelcontainer.getGraphComponent().getGraphControl().paint(g2d);
+			        	modelcontainer.getGraph().setSelectionCells(selcells);
+			        	g2d.finish();
+			        	fos.close();
+			        	
+			        	File file = fc.getSelectedFile();
+			        	String ext = "." + filter.getExtensions()[0];
+			        	if (!file.getName().endsWith(ext))
+						{
+							file = new File(file.getAbsolutePath() + ext);
+						}
+			        	tmpfile.renameTo(file);
+					}
+					catch (IOException e1)
+					{
+						displayIOError(e1);
+					}
+				}
+			}
+		});
+		
+		return exportitem;
 	}
 	
 	/**

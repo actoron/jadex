@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.stylesheets;
 
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.model.MActivity;
 
 import java.util.List;
@@ -222,9 +223,10 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 				mxPoint res = new mxPoint(point);
 				res.setX(res.getX() * scale);
 				res.setY(res.getY() * scale);
-				if (((mxICell) source.getCell()).getParent() != null)
+				VEdge vedge = (VEdge) state.getCell();
+				if (vedge.getSource() != null && vedge.getSource().getParent() != null)
 				{
-					res = adjustPoint(state.getView().getGraph(), ((mxICell) source.getCell()), res);
+					res = adjustPoint(state.getView().getGraph(), vedge.getSource().getParent(), res);
 				}
 				result.add(res);
 			}
@@ -249,6 +251,29 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		{
 			p.setX(p.getX() + pstate.getOrigin().getX() * scale);
 			p.setY(p.getY() + pstate.getOrigin().getY() * scale);
+		}
+		
+		return p;
+	}
+	
+	/**
+	 *  Adjusts a point for absolute positioning.
+	 *  
+	 *  @param modelcontainer The model container.
+	 *  @param parent The parent cell.
+	 *  @param point The unadjusted targeted point.
+	 *  @return The adjusted point.
+	 */
+	public static final mxPoint unAdjustPoint(mxGraph graph, Object parent, mxPoint point)
+	{
+		mxPoint p = point;
+		double scale = graph.getView().getScale();
+		
+		mxCellState pstate = graph.getView().getState(parent);
+		if (pstate != null)
+		{
+			p.setX(p.getX() - pstate.getOrigin().getX() * scale);
+			p.setY(p.getY() - pstate.getOrigin().getY() * scale);
 		}
 		
 		return p;
