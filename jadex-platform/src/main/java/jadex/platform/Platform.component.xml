@@ -109,6 +109,8 @@
 		<argument name="cliconsole" class="boolean">true</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>
+		<!-- Open JCC for specific remote platforms. -->
+		<argument name="jccplatforms" class="String">null</argument>
 		<!-- Enable verbose logging (shortcut for setting logging_level to info). -->
 		<argument name="logging" class="boolean">false</argument>
 		<!-- Logging level for platform. -->
@@ -388,6 +390,7 @@
 				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="saveonexit">$args.saveonexit</argument>
+						<argument name="platforms">$args.jccplatforms</argument>
 					</arguments>
 				</component>
 				<component name="rspub" type="rspublish" daemon="true" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
@@ -428,6 +431,7 @@
 				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="saveonexit">$args.saveonexit</argument>
+						<argument name="platforms">$args.jccplatforms</argument>
 					</arguments>
 				</component>
 				<component name="rspub" type="rspublish" daemon="true" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>

@@ -86,7 +86,14 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public abstract void customResultAvailable(Collection<E> result);
+	public void customResultAvailable(Collection<E> result)
+	{
+		for(E e: result)
+		{
+			intermediateResultAvailable(e);
+		}
+		finished();
+	}
 
 	/**
 	 *  Called when an exception occurred.

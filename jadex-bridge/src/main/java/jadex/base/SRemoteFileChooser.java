@@ -28,19 +28,29 @@ public class SRemoteFileChooser
 			@Classname("init")
 			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
-				Object[]	ret	= new Object[4];
-				ret[0]	= FileData.convertToRemoteFiles(File.listRoots());
-				ret[1]	= new FileData(SUtil.getHomeDirectory());
-				ret[2]	= new FileData(SUtil.getDefaultDirectory());
-				
-				String	path	= new File(".").getAbsolutePath();
-				if(path.endsWith("."))
+				try
 				{
-					path	= path.substring(0, path.length()-1);
+					Object[]	ret	= new Object[4];
+					ret[0]	= FileData.convertToRemoteFiles(File.listRoots());
+					ret[1]	= new FileData(SUtil.getHomeDirectory());
+					ret[2]	= new FileData(SUtil.getDefaultDirectory());
+					
+					String	path	= new File(".").getAbsolutePath();
+					if(path.endsWith("."))
+					{
+						path	= path.substring(0, path.length()-1);
+					}
+					ret[3]	= new FileData(new File(path));					
+					
+					return new Future<Object[]>(ret);
 				}
-				ret[3]	= new FileData(new File(path));					
-				
-				return new Future<Object[]>(ret);
+				catch(Exception e)
+				{
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<Object[]>(e);
+				}
 			}
 		});
 	}
@@ -57,10 +67,18 @@ public class SRemoteFileChooser
 			@Classname("getRoots")
 			public IFuture<FileData[]> execute(IInternalAccess ia)
 			{
-//				FileSystemView view = FileSystemView.getFileSystemView();
-//				File[] roots = view.getRoots();
-				File[] roots = File.listRoots();
-				return new Future<FileData[]>(FileData.convertToRemoteFiles(roots));
+				try
+				{
+					File[] roots = File.listRoots();
+					return new Future<FileData[]>(FileData.convertToRemoteFiles(roots));
+				}
+				catch(Exception e)
+				{
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<FileData[]>(e);
+				}					
 			}
 		});
 	}
@@ -77,8 +95,18 @@ public class SRemoteFileChooser
 			@Classname("getHomeDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				File ret = SUtil.getHomeDirectory();
-				return new Future<FileData>(ret!=null? new FileData(ret): null);
+				try
+				{
+					File ret = SUtil.getHomeDirectory();
+					return new Future<FileData>(ret!=null? new FileData(ret): null);
+				}
+				catch(Exception e)
+				{
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<FileData>(e);
+				}
 			}
 		});
 	}
@@ -93,12 +121,22 @@ public class SRemoteFileChooser
 			@Classname("getCurrentDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				String	path	= new File(".").getAbsolutePath();
-				if(path.endsWith("."))
+				try
 				{
-					path	= path.substring(0, path.length()-1);
+					String	path	= new File(".").getAbsolutePath();
+					if(path.endsWith("."))
+					{
+						path	= path.substring(0, path.length()-1);
+					}
+					return new Future<FileData>(new FileData(new File(path)));
 				}
-				return new Future<FileData>(new FileData(new File(path)));					
+				catch(Exception e)
+				{
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<FileData>(e);
+				}				
 			}
 		});
 	}
@@ -117,8 +155,18 @@ public class SRemoteFileChooser
 			@Classname("getDefaultDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				File ret = SUtil.getDefaultDirectory();
-				return new Future<FileData>(ret!=null? new FileData(ret): null);
+				try
+				{
+					File ret = SUtil.getDefaultDirectory();
+					return new Future<FileData>(ret!=null? new FileData(ret): null);
+				}
+				catch(Exception e)
+				{
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<FileData>(e);
+				}					
 			}
 		});
 	}
@@ -133,19 +181,29 @@ public class SRemoteFileChooser
 			@Classname("getFiles")
 			public IFuture<FileData[]> execute(IInternalAccess ia)
 			{
-				File dir = new File(mydir.getPath());
-				File[] files;
-				if(dir.exists())
+				try
 				{
-					files = SUtil.getFiles(dir, useFileHiding);
-//						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
+					File dir = new File(mydir.getPath());
+					File[] files;
+					if(dir.exists())
+					{
+						files = SUtil.getFiles(dir, useFileHiding);
+	//						System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
+					}
+					else
+					{
+	//						System.out.println("file does not exist: "+dir);
+						files = new File[0];
+					}
+					return new Future<FileData[]>(FileData.convertToRemoteFiles(files));
 				}
-				else
+				catch(Exception e)
 				{
-//						System.out.println("file does not exist: "+dir);
-					files = new File[0];
-				}
-				return new Future<FileData[]>(FileData.convertToRemoteFiles(files));
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<FileData[]>(e);
+				}					
 			}
 		});
 	}
@@ -165,8 +223,18 @@ public class SRemoteFileChooser
 			@Classname("getParentDirectory")
 			public IFuture<FileData> execute(IInternalAccess ia)
 			{
-				File parent = SUtil.getParentDirectory(new File(path)); // todo: useFileHandling
-				return new Future<FileData>(parent!=null? new FileData(parent): null);
+				try
+				{
+					File parent = SUtil.getParentDirectory(new File(path)); // todo: useFileHandling
+					return new Future<FileData>(parent!=null? new FileData(parent): null);
+				}
+				catch(Exception e)
+				{
+					// Protect remote platform from execution errors.
+					Thread.dumpStack();
+					e.printStackTrace();
+					return new Future<FileData>(e);
+				}
 			}
 		});
 	}

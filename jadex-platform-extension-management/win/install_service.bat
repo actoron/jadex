@@ -15,26 +15,31 @@ ELSE
 
 :amd64
 	set DIR=%CD%\amd64
-	goto start
+	goto hostname
 	
 :ia64
 	set DIR=%CD%\ia64
-	goto start
+	goto hostname
 	
 :x86
 	set DIR=%CD%\x86
-	goto start
+	goto hostname
 
-:start
+:hostname
+FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
+
+:install
 	%DIR%\JadexPro install --Install %DIR%\JadexPro.exe ^
 	  --Description "Jadex Production Edition" ^
 	  --Jvm auto --Startup auto ^
-	  --LogPath %CD% --StdOutput %CD%\out.txt --StdError %CD%\err.txt ^
+	  --LogPath %CD%\logs --StdOutput %CD%\logs\svc$out.txt --StdError %CD%\logs\svc$err.txt ^
 	  --Classpath %CD%\..\lib\jadex-platform-standalone-launch-2.3-SNAPSHOT.jar ^
 	  --StartPath %CD%\..\ ^
 	  --StartMode jvm --StartClass jadex.platform.ServiceStarter --StartMethod start ^
 	  --StopMode jvm --StopClass jadex.platform.ServiceStarter --StopMethod stop ^
+	  ++StartParams -platformname;%HOSTNAME%_svc$* ^
 	  ++StartParams -gui;false ^
 	  ++StartParams -logging;true
 
+:start
 	%DIR%\JadexPro start

@@ -4,17 +4,19 @@ import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.xml.PropertiesXMLHelper;
 
 import java.awt.Dimension;
@@ -58,7 +60,7 @@ public class ControlCenter
 	protected String[]	plugin_classes;
 	
 	/** The platform control centers (cid -> pcc). */
-	protected Map	pccs;
+	protected Map<IComponentIdentifier, PlatformControlCenter>	pccs;
 
 	/** The currently displayed platform control center. */
 	protected PlatformControlCenter	pcc;
@@ -86,39 +88,27 @@ public class ControlCenter
 	/**
 	 *  Create a control center.
 	 */
-	public IFuture<Void>	init(IExternalAccess jccaccess, final String[] plugin_classes, boolean saveonexit)
+	public IFuture<Void>	init(IExternalAccess jccaccess, IExternalAccess platformaccess, final String[] plugin_classes, boolean saveonexit)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
 		this.jccaccess = jccaccess;
 		this.plugin_classes	= plugin_classes;
-		this.pccs	= new HashMap();
+		this.pccs	= new HashMap<IComponentIdentifier, PlatformControlCenter>();
 		this.saveonexit	= saveonexit;
 		this.window = new ControlCenterWindow(this);
 		
-		// Default platform control center for local platform.
-		final Future<Void>	inited	= new Future<Void>();
 		this.pcc	= new PlatformControlCenter();
-		
-		SJCC.getRootAccess(jccaccess).addResultListener(new SwingDelegationResultListener(inited)
+		pccs.put(platformaccess.getComponentIdentifier(), pcc);
+		pcc.init(platformaccess, ControlCenter.this, plugin_classes)
+			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
-			{
-				IExternalAccess	platformaccess	= (IExternalAccess)result;
-				pccs.put(platformaccess.getComponentIdentifier(), pcc);
-				pcc.init(platformaccess, ControlCenter.this, plugin_classes)
-					.addResultListener(new SwingDelegationResultListener(inited));
-			}
-		});
-		
-		inited.addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				// Load settings and open window.
-				loadSettings().addResultListener(new SwingDelegationResultListener(ret)
+				loadSettings().addResultListener(new SwingDelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 						// Add PCC to window.
 						window.showPlatformPanel(pcc);
@@ -137,7 +127,7 @@ public class ControlCenter
 	/**
 	 *  Load the settings.
 	 */
-	public IFuture	loadSettings()
+	public IFuture<Void>	loadSettings()
 	{
 		// Only load GUI settings as platform settings are loaded on platform startup and every tool init as required.
 		return loadSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION));
@@ -146,9 +136,9 @@ public class ControlCenter
 	/**
 	 *  Load the settings.
 	 */
-	public IFuture	loadSettings(final File file)
+	public IFuture<Void>	loadSettings(final File file)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		// Read project properties
 //		SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -156,12 +146,10 @@ public class ControlCenter
 //		{
 //			public void customResultAvailable(Object result)
 			{
-				getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
+				getPCC().getClassLoader(null).addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(ClassLoader cl)
 					{
-						ClassLoader cl = (ClassLoader)result;
-						
 						Properties	props;
 						try
 						{
@@ -204,7 +192,7 @@ public class ControlCenter
 							window.setLocation(SGUI.calculateMiddlePosition(window));
 						}
 						
-						pcc.setProperties(props).addResultListener(new SwingDelegationResultListener(ret));
+						pcc.setProperties(props).addResultListener(new SwingDelegationResultListener<Void>(ret));
 					}
 				});
 			}

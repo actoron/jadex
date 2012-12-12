@@ -14,6 +14,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.micro.IPojoMicroAgent;
 import jadex.tools.jcc.ControlCenter;
 import jadex.tools.jcc.JCCAgent;
 import jadex.tools.jcc.PlatformControlCenter;
@@ -44,9 +45,9 @@ public class JCCTest extends TestCase
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final JCCAgent	jcca	= (JCCAgent)ia;
+				final JCCAgent	jcca	= (JCCAgent)((IPojoMicroAgent)ia).getPojoAgent();
 				final ControlCenter	cc	= jcca.getControlCenter();
 				
 				final Future<Void>	ret	= new Future<Void>();
@@ -56,7 +57,7 @@ public class JCCTest extends TestCase
 					{
 						PlatformControlCenter	pcc	= cc.getPCC();
 						IControlCenterPlugin[]	plugins	= pcc.getPlugins();
-						activatePlugins(jcca, pcc, plugins, 0).addResultListener(new DelegationResultListener<Void>(ret));
+						activatePlugins(ia, pcc, plugins, 0).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 				return ret;
@@ -69,7 +70,7 @@ public class JCCTest extends TestCase
 	/**
 	 *  Activate all plugins recursively.
 	 */
-	protected IFuture<Void>	activatePlugins(final JCCAgent jcca, final PlatformControlCenter pcc, final IControlCenterPlugin[] plugins, final int i)
+	protected IFuture<Void>	activatePlugins(final IInternalAccess jcca, final PlatformControlCenter pcc, final IControlCenterPlugin[] plugins, final int i)
 	{
 		IFuture<Void>	ret;
 		if(i<plugins.length)
@@ -80,7 +81,7 @@ public class JCCTest extends TestCase
 			{
 				public void customResultAvailable(Void result)
 				{
-					jcca.waitFor(500, new IComponentStep<Void>()
+					jcca.waitForDelay(500, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
