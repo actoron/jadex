@@ -12,7 +12,7 @@ import jadex.gpmn.editor.gui.GpmnEditorWindow;
 public class GpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 3;
+	public static final int BUILD = 4;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex GPMN Editor";

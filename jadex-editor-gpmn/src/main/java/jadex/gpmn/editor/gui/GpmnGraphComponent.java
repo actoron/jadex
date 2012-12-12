@@ -2,11 +2,8 @@ package jadex.gpmn.editor.gui;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.JScrollBar;
 import javax.swing.Timer;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -121,53 +118,53 @@ public class GpmnGraphComponent extends mxGraphComponent
 					e.consume();
 				}
 				
-				if (Math.max(Math.abs(velocity.getX()), Math.abs(velocity.getY())) > GuiConstants.THROW_ANIMATION_VELOCITY_CUTOFF)
-				{
-					throwtimer = new Timer(GuiConstants.ANIMATION_FRAME_TIME, new AbstractAction()
-					{
-						protected mxPoint vispos;
-						
-						protected int unslowedframes = UNSLOWED_FRAMES;
-						
-						public void actionPerformed(ActionEvent e)
-						{
-							double dx = velocity.getX() * GuiConstants.THROW_ANIMATION_VELOCITY_SPEEDUP;
-							double dy = velocity.getY() * GuiConstants.THROW_ANIMATION_VELOCITY_SPEEDUP;
-							
-							JScrollBar hbar = graphComponent.getHorizontalScrollBar();
-							JScrollBar vbar = graphComponent.getVerticalScrollBar();
-							
-							if (vispos == null)
-							{
-								vispos = new mxPoint(hbar.getModel().getValue(), vbar.getModel().getValue());
-							}
-							
-							vispos.setX(vispos.getX() - dx);
-							vispos.setY(vispos.getY() - dy);
-							
-							hbar.getModel().setValue((int) Math.round(vispos.getX()));
-							vbar.getModel().setValue((int) Math.round(vispos.getY()));
-							
-							if (unslowedframes == 0)
-							{
-								velocity.setX(velocity.getX() * THROW_SLOWDOWN);
-								velocity.setY(velocity.getY() * THROW_SLOWDOWN);
-							}
-							else
-							{
-								--unslowedframes;
-							}
-							
-							if (Math.abs(velocity.getX()) < GuiConstants.THROW_ANIMATION_VELOCITY_CUTOFF &&
-								Math.abs(velocity.getY()) < GuiConstants.THROW_ANIMATION_VELOCITY_CUTOFF)
-							{
-								throwtimer.stop();
-								throwtimer = null;
-							}
-						}
-					});
-					throwtimer.start();
-				}
+//				if (Math.max(Math.abs(velocity.getX()), Math.abs(velocity.getY())) > GuiConstants.THROW_ANIMATION_VELOCITY_CUTOFF)
+//				{
+//					throwtimer = new Timer(GuiConstants.ANIMATION_FRAME_TIME, new AbstractAction()
+//					{
+//						protected mxPoint vispos;
+//						
+//						protected int unslowedframes = UNSLOWED_FRAMES;
+//						
+//						public void actionPerformed(ActionEvent e)
+//						{
+//							double dx = velocity.getX() * GuiConstants.THROW_ANIMATION_VELOCITY_SPEEDUP;
+//							double dy = velocity.getY() * GuiConstants.THROW_ANIMATION_VELOCITY_SPEEDUP;
+//							
+//							JScrollBar hbar = graphComponent.getHorizontalScrollBar();
+//							JScrollBar vbar = graphComponent.getVerticalScrollBar();
+//							
+//							if (vispos == null)
+//							{
+//								vispos = new mxPoint(hbar.getModel().getValue(), vbar.getModel().getValue());
+//							}
+//							
+//							vispos.setX(vispos.getX() - dx);
+//							vispos.setY(vispos.getY() - dy);
+//							
+//							hbar.getModel().setValue((int) Math.round(vispos.getX()));
+//							vbar.getModel().setValue((int) Math.round(vispos.getY()));
+//							
+//							if (unslowedframes == 0)
+//							{
+//								velocity.setX(velocity.getX() * THROW_SLOWDOWN);
+//								velocity.setY(velocity.getY() * THROW_SLOWDOWN);
+//							}
+//							else
+//							{
+//								--unslowedframes;
+//							}
+//							
+//							if (Math.abs(velocity.getX()) < GuiConstants.THROW_ANIMATION_VELOCITY_CUTOFF &&
+//								Math.abs(velocity.getY()) < GuiConstants.THROW_ANIMATION_VELOCITY_CUTOFF)
+//							{
+//								throwtimer.stop();
+//								throwtimer = null;
+//							}
+//						}
+//					});
+//					throwtimer.start();
+//				}
 			}
 
 			start = null;

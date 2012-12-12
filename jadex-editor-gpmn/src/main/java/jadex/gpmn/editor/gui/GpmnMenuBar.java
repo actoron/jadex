@@ -330,7 +330,7 @@ public class GpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				BetterFileChooser fc = new BetterFileChooser();
-				FileFilter filter = new FileNameExtensionFilter("EPS file", "eps");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("EPS file", "eps");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
 				int result = fc.showSaveDialog(modelcontainer.getGraphComponent());
@@ -381,10 +381,17 @@ public class GpmnMenuBar extends JMenuBar
 						g2d.setupDocument(fos, w, h);
 						g2d.setClip(0, 0, w, h);
 						g2d.translate(-x, -y);
-			        	modelcontainer.getGraphComponent().paint(g2d);
+			        	modelcontainer.getGraphComponent().getGraphControl().paint(g2d);
 			        	g2d.finish();
 			        	fos.close();
-			        	tmpfile.renameTo(fc.getSelectedFile());
+			        	
+			        	File file = fc.getSelectedFile();
+			        	String ext = "." + filter.getExtensions()[0];
+			        	if (!file.getName().endsWith(ext))
+						{
+							file = new File(file.getAbsolutePath() + ext);
+						}
+			        	tmpfile.renameTo(file);
 					}
 					catch (IOException e1)
 					{
