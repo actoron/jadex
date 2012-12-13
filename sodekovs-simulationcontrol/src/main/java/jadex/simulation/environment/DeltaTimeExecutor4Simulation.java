@@ -156,9 +156,10 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 							// consumer.consumeData(currenttime, clockservice.getTick());
 							// }
 
+							System.out.println("#DeltaTimeExecutor# Tick Size: " + clockservice.getTick());
 							dilationCounter += progress;
 
-							if (dilationCounter >= 1000) {
+//							if (dilationCounter >= 100) {
 
 								// consumer.consumeData(currenttime, clockservice.getTick());
 								// Hack: "tick" can not be used since the tick is not reseted when a new simulation is started. Instead, it continues to run once the platform and the ClockService have
@@ -182,7 +183,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 								}
 								// reset dilationCounter
 								dilationCounter = 0;
-							}
+//							}
 
 							// Send the percepts to the components.
 							space.getPerceptList().processPercepts(null);

@@ -115,7 +115,8 @@ public class RuntimeManagerPlan extends Plan {
 				while (time.getValue() > (clockservice.getTick()-startTick)) {
 					waitForTick();
 //				System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
-				}
+				}				
+//				System.out.println("StartTick: " + startTick + " vs. endTick" + (clockservice.getTick()-startTick));
 			} else {
 
 				Long terminationTime = new Long(-1);

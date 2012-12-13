@@ -32,6 +32,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 	public void body() {
 		// TODO Auto-generated method stub
+		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 		System.out.println("#ComputeExperimentRowResultsPlan# Compute Row Results");
 		HashMap simulationFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		int rowCounter = ((Integer) simulationFacts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
@@ -49,11 +50,9 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		// 3. Store results
 		storeResults(rowResults, simulationFacts, rowCounter, rowsDoTo, resultsAsString);
 
+		// Do application specific evaluation, if required
+		// compareSimulationWithRealData(rowResults);
 
-		//Do application specific evaluation, if required
-//		compareSimulationWithRealData(rowResults);
-		
-		
 		// if (rowCounter == rowsDoTo) {
 		//
 		// // store result as XML-File
@@ -100,9 +99,12 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			IGoal goal = createGoal("StartSimulationExperiments");
 			System.out.println("#InitSim# Starting " + rowCounter + ". round of Simulation Experiments.");
 			dispatchTopLevelGoal(goal);
-		}else{			
-			//Do application specific evaluation
-			compareSimulationWithRealData(rowResults);
+		} else {
+			// Do application specific evaluation
+			if (simConf.getApplicationReference().indexOf("BikesharingSimulation") != -1) {
+				//Do specific evaluation for Bikesharing
+				compareSimulationWithRealData(rowResults);
+			}
 		}
 
 	}
@@ -263,17 +265,27 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		}
 		return buffer.toString();
 	}
-	
-	//Application specific evaluation --> compare simulations results with real data
-	private void compareSimulationWithRealData(HashMap rowResults){
-		
+
+	// Application specific evaluation --> compare simulations results with real data
+	private void compareSimulationWithRealData(HashMap rowResults) {
+
 		for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
-		
+
 			BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
 			bikeSharEval.compare();
-			
+
 			System.out.println("\n\n\n Results of comparison between simulation data and real data");
 			System.out.println(bikeSharEval.resultsToString());
+			
+			
+		//Persists result in file on disk
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + String.valueOf(getClock().getTime()) + ".txt"));
+				out.write(bikeSharEval.resultsToString());
+				out.close();
+			} catch (IOException e) {
+			}
+			
 		}
 	}
 }

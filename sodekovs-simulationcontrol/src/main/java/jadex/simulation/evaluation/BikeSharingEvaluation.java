@@ -2,9 +2,13 @@ package jadex.simulation.evaluation;
 
 import jadex.simulation.helper.Constants;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import sodekovs.bikesharing.model.SimulationDescription;
 import sodekovs.bikesharing.model.Station;
@@ -19,7 +23,9 @@ import sodekovs.util.misc.XMLHandler;
  */
 public class BikeSharingEvaluation {
 
-	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing\\MyProject\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
+	// private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing\\MyProject\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
+	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Jadex mit altem Maven 2\\Jadex\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
+	private SimulationDescription realData;
 	// conf. following method for understanding the data structure:
 	// EvaluateRow.evaluateRowData(preparedRowData)
 	private HashMap<String, HashMap<String, HashMap<String, ArrayList<String>>>> simulationData;
@@ -34,12 +40,17 @@ public class BikeSharingEvaluation {
 
 	public void compare() {
 
+		realData = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
+
 		// 1.Compute tick size, e.g. the "length" of the observed simulation
 		int tickSize = computeTickSize();
 
 		// 2.Transform simData into new data structure --> contains the values
 		// of each object instances sorted by tick
 		HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> transformedSimDataMap = transformSimData(tickSize);
+
+		//put the single ticks into buckets according to the time slices
+		transformToTimeSlices(transformedSimDataMap);
 
 		// 3.Compare Simulation Results with real data
 		compareResults(transformedSimDataMap);
@@ -132,9 +143,7 @@ public class BikeSharingEvaluation {
 	 */
 	private HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> compareResults(HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> transformedSimDataMap) {
 
-		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
-
-		for (TimeSlice tSlice : scenario.getTimeSlices().getTimeSlice()) {
+		for (TimeSlice tSlice : realData.getTimeSlices().getTimeSlice()) {
 			long startTime = tSlice.getStartTime();
 
 			for (Station station : tSlice.getStations().getStation()) {
@@ -142,10 +151,10 @@ public class BikeSharingEvaluation {
 				// String observedVal =
 				// transformedSimDataMap.get((int)startTime).get(station.getStationID()).get("stock").get(Constants.MEAN_VALUE);
 
-				// check, whether there are suimulation results for this station
+				// check, whether there are simulation results for this station
 				// HashMap<String, HashMap<String, String>> stationInstancesMap = transformedSimDataMap.get((int) startTime).get(station.getStationID());
 
-				// check , whether there are results for this tick
+				// check, whether there are results for this tick
 				// check also, whether there are simulation results for this station
 				if (transformedSimDataMap.get((int) startTime) != null && transformedSimDataMap.get((int) startTime).get(station.getStationID()) != null) {
 					// HashMap<String, String> prop = statID.get("stock");
@@ -190,14 +199,101 @@ public class BikeSharingEvaluation {
 		return compareSimAndRealWorldResultsMap;
 	}
 
+	/**
+	 * Since now, the results are sorted by each tick. Now, the ticks are put into buckets according to the time slices: Tick 1-60 into TimeSlice60, Tick 61-120 into Tick 120 and so on. Therefore,
+	 * each bucket value represents the average value of the single observed values
+	 * 
+	 * @param transformedSimDataMap
+	 * @return
+	 */
+	private void transformToTimeSlices(HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> transformedSimDataMap) {
+
+		HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> resultMap = new HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>>();
+
+		// 1)Transform data. From single values for each tick to buckets containing the values for a timeSlice
+		for (int i = 0; realData.getTimeSlices().getTimeSlice().size() > i; i++) {
+			TimeSlice tSlice = realData.getTimeSlices().getTimeSlice().get(i);
+
+			int currentTickBucket = 0;
+
+			for (Iterator<Integer> tickIt = transformedSimDataMap.keySet().iterator(); tickIt.hasNext();) {
+				currentTickBucket = tickIt.next();
+
+				// check, if it belongs still to this bucket
+				if ((i + 1 < realData.getTimeSlices().getTimeSlice().size() && ((tSlice.getStartTime() <= currentTickBucket) && realData.getTimeSlices().getTimeSlice().get(i + 1).getStartTime() > Long
+						.valueOf(currentTickBucket))) || (i + 1 == realData.getTimeSlices().getTimeSlice().size() && tSlice.getStartTime() <= currentTickBucket)) {
+
+					HashMap<String, HashMap<String, HashMap<String, String>>> stationsMap = transformedSimDataMap.get(currentTickBucket);
+
+					// station instance iterator
+					for (Iterator<String> stationInstanceIt = stationsMap.keySet().iterator(); stationInstanceIt.hasNext();) {
+						String currentStation = stationInstanceIt.next();
+						HashMap<String, HashMap<String, String>> stationInstancePropertiesMap = stationsMap.get(currentStation);
+
+						String stockLevel = stationInstancePropertiesMap.get("stock").get(Constants.MEAN_VALUE);
+
+						// check, if hashMaps have been already initialized
+						if (resultMap.get((int) tSlice.getStartTime()) == null) {
+							resultMap.put((int) tSlice.getStartTime(), new HashMap<String, HashMap<String, HashMap<String, String>>>());
+						}
+
+						if (resultMap.get((int) tSlice.getStartTime()).get(currentStation) == null) {
+							resultMap.get((int) tSlice.getStartTime()).put(currentStation, new HashMap<String, HashMap<String, String>>());
+						}
+
+						if (resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock") == null) {
+							resultMap.get((int) tSlice.getStartTime()).get(currentStation).put("stock", new HashMap<String, String>());
+							// init value
+							resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.MEAN_VALUE, "0.0");
+						}
+
+						double cumulatedStockValue = Double.valueOf(resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.MEAN_VALUE));
+						cumulatedStockValue += Double.valueOf(stockLevel);
+
+						resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.MEAN_VALUE, String.valueOf(cumulatedStockValue));
+					}
+
+				}
+			}
+		}
+		
+		
+		System.out.println("#BikeSharingEval# Nr. of Eval Time Slices: " + resultMap.size());
+		// 2)Compute average for each bucket
+
+		for (Iterator<Integer> timeSliceIt = resultMap.keySet().iterator(); timeSliceIt.hasNext();) {
+			int currentTickBucket = timeSliceIt.next();
+
+			HashMap<String, HashMap<String, HashMap<String, String>>> stationsMap = resultMap.get(currentTickBucket);
+
+			// station instance iterator
+			for (Iterator<String> stationInstanceIt = stationsMap.keySet().iterator(); stationInstanceIt.hasNext();) {
+				String currentStation = stationInstanceIt.next();
+				HashMap<String, HashMap<String, String>> stationInstancePropertiesMap = stationsMap.get(currentStation);
+
+				Double stockLevel = Double.valueOf(stationInstancePropertiesMap.get("stock").get(Constants.MEAN_VALUE));
+				double averageStockLevel = stockLevel / 60;
+				stationInstancePropertiesMap.get("stock").put(Constants.MEAN_VALUE, String.valueOf(averageStockLevel));
+			}
+		}
+	}
+
 	public String resultsToString() {
 		StringBuffer result = new StringBuffer();
 
 		// ew HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>>();
 
+		
+		
+//		for (Integer key : timeSliceKey) { 
+//			HashMap<String, HashMap<String, HashMap<String, String>>> timeSlicesMap = compareSimAndRealWorldResultsMap.get(key);
+//		   // do something
+//		}
 		// get object instances
-		for (Iterator<Integer> it1 = compareSimAndRealWorldResultsMap.keySet().iterator(); it1.hasNext();) {
-			int timeSliceKey = it1.next();
+		SortedSet<Integer> timeSliceKeys = new TreeSet<Integer>(compareSimAndRealWorldResultsMap.keySet());
+//		for (Iterator<Integer> it1 = compareSimAndRealWorldResultsMap.keySet().iterator(); it1.hasNext();) {
+		for (Integer timeSliceKey : timeSliceKeys) {
+//			int timeSliceKey = it1.next();
 			HashMap<String, HashMap<String, HashMap<String, String>>> timeSlicesMap = compareSimAndRealWorldResultsMap.get(timeSliceKey);
 
 			// How many of the results differ between 0-10, 11-20, 21-30 etc.
@@ -206,62 +302,62 @@ public class BikeSharingEvaluation {
 				diffStats.add(0);
 			}
 
+			result.append("\n");
 			result.append("TIME SLICE: ");
 			result.append("\t");
 			result.append(timeSliceKey);
 			result.append("\n");
 
+			int totalValues = 0;
+
 			for (Iterator<String> it2 = timeSlicesMap.keySet().iterator(); it2.hasNext();) {
 				String objectInstancesKey = it2.next();
 				HashMap<String, HashMap<String, String>> objectInstancesMap = timeSlicesMap.get(objectInstancesKey);
 
-				// for (Iterator<String> it3 = propertiesMap.keySet().iterator(); it3.hasNext();) {
-				// String observedPropertyValuesKey = it3.next();
 				HashMap<String, String> observedPropertyValues = objectInstancesMap.get("stock");
 
-				// result.append("Station ");
-				result.append(objectInstancesKey);
-				result.append("\t: ");
-				result.append(observedPropertyValues.get(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA));
-				result.append("\n");
-				computeDiff(diffStats, observedPropertyValues.get(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA));
-				// }
+//				 result.append(objectInstancesKey);
+//				 result.append("\t: ");
+//				 result.append(observedPropertyValues.get(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA));
+//				 result.append("\n");
+				 computeDiff(diffStats, observedPropertyValues.get(Constants.MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA));
 
+				totalValues++;
 			}
+
 			// Eval similarities between the stock of the bikestations in the real data and the simulation. Compute only the relative comparison, separated into buckets.
-			result.append("\n******** Similarities between real and sim data ********************");
-			result.append("\nDifference between 0%-10% " + diffStats.get(0));
-			result.append("\nDifference between 11%-20% " + diffStats.get(1));
-			result.append("\nDifference between 21%-30% " + diffStats.get(2));
-			result.append("\nDifference between 31%-40% " + diffStats.get(3));
-			result.append("\nDifference between 41%-50% " + diffStats.get(4));
-			result.append("\nDifference between 51%-60% " + diffStats.get(5));
-			result.append("\nDifference between 61%-70% " + diffStats.get(6));
-			result.append("\nDifference between 71%-80% " + diffStats.get(7));
-			result.append("\nDifference between 81%-90% " + diffStats.get(8));
-			result.append("\nDifference between 91%-100% " + diffStats.get(9));
+			NumberFormat numberFormat = new DecimalFormat("0.00");
+
+			result.append("\nDifference between 0%-10% " + diffStats.get(0) + " (" + numberFormat.format(((double) diffStats.get(0) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 11%-20% " + diffStats.get(1) + " (" + numberFormat.format(((double) diffStats.get(1) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 21%-30% " + diffStats.get(2) + " (" + numberFormat.format(((double) diffStats.get(2) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 31%-40% " + diffStats.get(3) + " (" + numberFormat.format(((double) diffStats.get(3) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 41%-50% " + diffStats.get(4) + " (" + numberFormat.format(((double) diffStats.get(4) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 51%-60% " + diffStats.get(5) + " (" + numberFormat.format(((double) diffStats.get(5) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 61%-70% " + diffStats.get(6) + " (" + numberFormat.format(((double) diffStats.get(6) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 71%-80% " + diffStats.get(7) + " (" + numberFormat.format(((double) diffStats.get(7) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 81%-90% " + diffStats.get(8) + " (" + numberFormat.format(((double) diffStats.get(8) / (double) totalValues) * 100) + "%)");
+			result.append("\nDifference between 91%-100% " + diffStats.get(9) + " (" + numberFormat.format(((double) diffStats.get(9) / (double) totalValues) * 100) + "%)");
 			result.append("\n*********************************************************************");
 			result.append("\n*********************************************************************");
 
-			
-			
 			// Print the evaluation of the stock levels of the bikestations using following three buckets:
 			// 1.) stock < 1 --> "red"
-			// 2.) stock > 0 && stock < capacity  --> "green"
+			// 2.) stock > 0 && stock < capacity --> "green"
 			// 3.) stock >= capacity --> "blue"
 			HashMap<String, Integer> tmp = stockLevelResultsMap.get(timeSliceKey);
 			int red = tmp.get(Constants.STOCK_LEVEL_RED);
 			int green = tmp.get(Constants.STOCK_LEVEL_GREEN);
 			int blue = tmp.get(Constants.STOCK_LEVEL_BLUE);
-			int total = red+blue+green;			
+			int total = red + blue + green;
 			result.append("\n******** Print the evaluation of the stock levels of the bikestations using following three buckets:");
 			result.append("\n stock < 1 --> \"red\"");
 			result.append("\n stock > 0 && stock < capacity  --> \"green\"");
 			result.append("\n stock >= capacity --> \"blue\"");
 			result.append("\n");
-			result.append("\n RED: " + red + "(" + (red/total)*100 + "%)");
-			result.append("\n GREEN: " + green + "(" + (green/total)*100 + "%)");
-			result.append("\n BLUE: " + blue + "(" + (blue/total)*100 + "%)");
+			result.append("\n RED: " + red + "(" + numberFormat.format(((double) red / (double) total) * 100) + "%)");
+			result.append("\n GREEN: " + green + "(" + numberFormat.format(((double) green / (double) total) * 100) + "%)");
+			result.append("\n BLUE: " + blue + "(" + numberFormat.format(((double) blue / (double) total) * 100) + "%)");
 			result.append("\n*********************************************************************");
 			result.append("\n*********************************************************************");
 		}
@@ -269,14 +365,14 @@ public class BikeSharingEvaluation {
 		return result.toString();
 	}
 
-	// Compute the stock level of the bikestations uisng three buckets:
+	// Compute the stock level (of the simulated scenario) of the bike stations using three buckets:
 	// 1.) stock < 1
 	// 2.) stock > 0 && stock < capacity
 	// 3.) stock >= capacity
 	private void evalStockLevel(HashMap<Integer, HashMap<String, HashMap<String, HashMap<String, String>>>> transformedSimDataMap) {
-		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
+		SimulationDescription realData = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
 
-		for (TimeSlice tSlice : scenario.getTimeSlices().getTimeSlice()) {
+		for (TimeSlice tSlice : realData.getTimeSlices().getTimeSlice()) {
 			long startTime = tSlice.getStartTime();
 
 			for (Station station : tSlice.getStations().getStation()) {

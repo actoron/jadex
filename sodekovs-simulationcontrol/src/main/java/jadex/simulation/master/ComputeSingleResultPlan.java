@@ -1,14 +1,12 @@
 package jadex.simulation.master;
 
 import jadex.bdi.runtime.Plan;
-import jadex.simulation.evaluation.IntermediateEvaluation;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Property;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
-import jadex.simulation.model.result.IntermediateResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +74,8 @@ public class ComputeSingleResultPlan extends Plan {
 
 		String res = "ID: " + experimentRow + "." + expInRow + " - Total #" + totalRuns + " (Size of ObservedEvents: " + sortedResultList.size() + ") ***********************************";
 		System.out.println(res);
+
+		
 		// for (Iterator it = content.keySet().iterator(); it.hasNext();) {
 		// Object key = it.next();
 		// Object value = content.get(key);
