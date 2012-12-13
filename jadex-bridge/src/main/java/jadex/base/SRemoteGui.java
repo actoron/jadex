@@ -143,9 +143,9 @@ public class SRemoteGui
 							@Classname("installListener")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
+								final Future<Void>	ret	= new Future<Void>();
 								try
 								{
-									final Future<Void>	ret	= new Future<Void>();
 									SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 									{

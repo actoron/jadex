@@ -116,7 +116,7 @@ public class PeerList
 		this.url	= props.containsKey(PROPERTY_URL) && !"".equals(props.getProperty(PROPERTY_URL))
 			? RelayConnectionManager.relayAddress(props.getProperty(PROPERTY_URL)) : "";
 			
-		RelayHandler.getLogger().info("Relay urle: "+url);
+		RelayHandler.getLogger().info("Relay url: "+url);
 		
 		if(props.containsKey(PROPERTY_PEERS))
 		{
