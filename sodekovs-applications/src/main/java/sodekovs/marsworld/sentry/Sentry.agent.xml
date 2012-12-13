@@ -19,6 +19,7 @@
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>sodekovs.marsworld.movement.*</import>
+		<import>sodekovs.marsworld.convergence.*</import>
 		<import>sodekovs.marsworld.coordination.*</import>
 		<import>deco4mas.distributed.coordinate.environment.*</import>
 		<import>jadex.commons.future.*</import>	
@@ -27,6 +28,8 @@
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="Movement" />
+		<!-- Include the convergence capability. -->
+		<capability name="convergence" file="Convergence" />
 	</capabilities>
 
 	<beliefs>
@@ -60,9 +63,9 @@
 			<concrete ref="move.missionend"/>
 		</beliefref>
 	
-		<belief name="no_msg_received" class="Integer">
-		    <fact>new Integer(0)</fact>
-		</belief>
+		<beliefref name="no_msg_received">
+		    <concrete ref="convergence.no_msg_received"/>
+		</beliefref>
 	</beliefs>
 
   	<goals>
@@ -150,11 +153,6 @@
 		<plan name="tmpCounterPlan">
 			<body class="CounterPlan"/>			
 		</plan>
-				
-		<!-- Increment the belief no_msg_received by one every second. -->
-		<plan name="count_no_msg_plan">
-		    <body class="CountNoMsgPlan"/>
-		</plan>
 	</plans> 
 
 	<events>
@@ -180,7 +178,6 @@
 			<plans>
 				<initialplan ref="tmpCounterPlan"/>
 				<initialplan ref="addTargetPlan"/>
-				<initialplan ref="count_no_msg_plan" />
 			</plans>			
 		</configuration>
 	</configurations>

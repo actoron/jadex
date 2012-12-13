@@ -1,0 +1,39 @@
+<!--
+	The convergence capability supplies the agents with basic
+	plans and beliefs for using the DeCoMAS convergence layer.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Convergence"
+	package="sodekovs.marsworld.convergence">
+
+	<imports>
+	    <import>java.lang.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="no_msg_received" class="Integer">
+		    <fact>new Integer(0)</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+	</goals>
+
+	<plans>
+		<!-- Increment the belief no_msg_received by one every second. -->
+		<plan name="count_no_msg_plan">
+		    <body class="CountNoMsgPlan"/>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+			    <initialplan ref="count_no_msg_plan" />
+			</plans>
+		</configuration>
+	</configurations>
+</capability>

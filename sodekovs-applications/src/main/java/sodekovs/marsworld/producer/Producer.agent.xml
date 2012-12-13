@@ -18,6 +18,7 @@
 		<import>jadex.extension.envsupport.math.*</import>		
 		<import>sodekovs.marsworld.*</import>
 		<import>sodekovs.marsworld.movement.*</import>
+		<import>sodekovs.marsworld.convergence.*</import>
 		<import>sodekovs.marsworld.coordination.*</import>
 		<import>deco4mas.distributed.coordinate.environment.*</import>		
 		<import>jadex.bridge.service.*</import>
@@ -27,6 +28,8 @@
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="Movement" />
+		<!-- Include the convergence capability. -->
+		<capability name="convergence" file="Convergence"/>
 	</capabilities>
 
 	<beliefs>
@@ -52,9 +55,9 @@
 			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())</fact>
 		</belief>
 		
-		<belief name="no_msg_received" class="Integer">
-		    <fact>new Integer(0)</fact>
-		</belief>
+		<beliefref name="no_msg_received">
+		    <concrete ref="convergence.no_msg_received"/>
+		</beliefref>
 	</beliefs>
 
   	<goals>
@@ -95,11 +98,6 @@
 				<factadded cref="move.my_targets"/>
 			</trigger>
 		</plan>
-		
-		<!-- Increment the belief no_msg_received by one every second. -->
-		<plan name="count_no_msg_plan">
-		    <body class="CountNoMsgPlan"/>
-		</plan>
 	</plans>
 
 	<events>
@@ -128,7 +126,6 @@
 			</goals>
 			<plans>
 			    <initialplan ref="producer_plan"/>
-			    <initialplan ref="count_no_msg_plan" />
 			</plans>
 		</configuration>
 	</configurations>
