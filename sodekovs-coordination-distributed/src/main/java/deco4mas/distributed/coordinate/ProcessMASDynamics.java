@@ -146,29 +146,15 @@ public class ProcessMASDynamics {
 			if (sp instanceof RoleOccupation) {
 				RoleOccupation ro = (RoleOccupation) sp;
 				for (AgentReference ar : ro.getAgentReferences()) {
-					if (ar.getAgent_id().equals(agent_model_id)) {// filter for
-																	// elements
-																	// of the
-																	// surrounding
-																	// agent
-																	// store
-																	// perception:
+					if (ar.getAgent_id().equals(agent_model_id)) { // filter for elements of the surrounding agent; store perception
 						co_inf_list.add(new DecentralCoordinationInformation(direction, ar, dml));
 					}
 				}
 			}
-			if (sp instanceof GroupMembership) { // "Group" are GroupMembership
-													// as well
+			if (sp instanceof GroupMembership) { // "Group" are GroupMembership as well
 				GroupMembership gm = (GroupMembership) sp;
 				for (AgentReference ar : gm.getAgent_elements()) {
-					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id)) { // filter
-																				// for
-																				// elements
-																				// of
-																				// this
-																				// agent
-																				// store
-																				// perception:
+					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id)) { // filter for elements of this agent; store perception
 						co_inf_list.add(new DecentralCoordinationInformation(direction, ar, dml));
 					}
 				}
@@ -192,37 +178,21 @@ public class ProcessMASDynamics {
 
 				RoleOccupation ro = (RoleOccupation) sp;
 				for (AgentReference ar : ro.getAgentReferences()) {
-					if (ar.getAgent_id().equals(agent_model_id)) { // filter for
-																	// elements
-																	// of the
-																	// surrounding
-																	// agent
-																	// store
-																	// perception:
+					if (ar.getAgent_id().equals(agent_model_id)) {// filter for elements of the surrounding agent; store perception
 						direct_coord_informations.add(new DirectCoordinationInformation(direction, ar, dl));
 					}
 				}
 
 			}
-			if (sp instanceof GroupMembership) { // "Group" are
-													// GroupMembership as
-													// well
+			if (sp instanceof GroupMembership) { // "Group" are GroupMembership as well
 				GroupMembership gm = (GroupMembership) sp;
 				for (AgentReference ar : gm.getAgent_elements()) {
-					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id)) { // filter
-																				// for
-																				// elements
-																				// of
-																				// this
-																				// agent
-																				// store
-																				// perception:
+					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id)) { // filter for elements of this agent; store perception
 						direct_coord_informations.add(new DirectCoordinationInformation(direction, ar, dl));
 					}
 				}
 			}
 		}
-
 	}
 
 	/**

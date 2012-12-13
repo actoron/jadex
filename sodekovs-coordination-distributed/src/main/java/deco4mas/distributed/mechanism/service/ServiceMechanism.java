@@ -61,8 +61,8 @@ public class ServiceMechanism extends CoordinationMechanism {
 
 					@Override
 					public void resultAvailable(Collection<ICoordinationService> result) {
+						System.out.println("#ServiceMedium# Size : " + result.size());
 						for (ICoordinationService service : result) {
-
 							if (service.getCoordinationContextID().equalsIgnoreCase(coordinationContextID)) {
 								System.out.println("#ServiceMechanism# Publishing CoordinationInformation " + ci.toString() + " using following mechanism:  " + service.toString());
 								service.publish(ci);
