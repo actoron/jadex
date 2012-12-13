@@ -17,6 +17,14 @@ public class MechanismInfo
 	protected List<ParameterInfo> parameterinfos;
 	
 	/**
+	 *  
+	 */
+	public MechanismInfo()
+	{
+		// Bean constructor.
+	}
+	
+	/**
 	 * 
 	 */
 	public MechanismInfo(String name, Class<?> clazz, List<ParameterInfo> parameterinfos)
