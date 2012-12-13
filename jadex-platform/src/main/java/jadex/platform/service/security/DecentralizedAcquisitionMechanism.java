@@ -180,7 +180,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	 */
 	public void setParameterValue(String name, Object value)
 	{
-		System.out.println("set param val: "+name+" "+value);
+//		System.out.println("set param val: "+name+" "+value);
 		
 		if("responses".equals(name))
 		{

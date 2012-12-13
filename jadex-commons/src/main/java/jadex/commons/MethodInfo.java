@@ -82,11 +82,6 @@ public class MethodInfo
 	}
 	
 	/**
-	 *  Add a parameter type.
-	 * /
-	public void ad*/
-
-	/**
 	 *  Get the hashcode.
 	 */
 	public int hashCode()

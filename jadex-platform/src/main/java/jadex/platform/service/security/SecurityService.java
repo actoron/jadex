@@ -134,6 +134,10 @@ public class SecurityService implements ISecurityService
 	/** The futures of active subscribers. */
 	protected Set<SubscriptionIntermediateFuture<ChangeEvent<Object>>> subscribers;
 	
+	
+	/** The mappings of virtual names to platform names. */
+	protected Map<String, Set<String>> virtualsmap;
+	
 	//-------- setup --------
 	
 	/**
@@ -141,7 +145,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(Boolean.TRUE, true, Boolean.FALSE, null, null, null);
+		this(Boolean.TRUE, true, Boolean.FALSE, null, null, null, null);
 	}
 
 	/**
@@ -150,15 +154,16 @@ public class SecurityService implements ISecurityService
 	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
 		String[] networknames, String[] networkpasses)
 	{
-		this(usepass, printpass, trustedlan, networknames, networkpasses, null);
+		this(usepass, printpass, trustedlan, networknames, networkpasses, null, null);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
 	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
-		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms)
+		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms, Map<String, Set<String>> namemap)
 	{
+		this.virtualsmap = namemap==null? new HashMap<String, Set<String>>(): namemap;
 		this.subscribers = new LinkedHashSet<SubscriptionIntermediateFuture<ChangeEvent<Object>>>();
 		this.platformpasses	= new LinkedHashMap<String, String>();
 		this.networkpasses	= new LinkedHashMap<String, String>();
@@ -953,7 +958,7 @@ public class SecurityService implements ISecurityService
 			String name = component.getComponentIdentifier().getPlatformPrefix();
 			Key key = getKeyStore().getKey(name, keypass.toCharArray());
 			Certificate cert = getKeyStore().getCertificate(name);
-			Signature eng = Signature.getInstance(getAlgorithm(cert));
+			Signature eng = Signature.getInstance(SSecurity.getAlgorithm(cert));
 			byte[] signed = SSecurity.signContent((PrivateKey)key, eng, content);
 		    ret.setResult(signed);
 		}
@@ -963,6 +968,32 @@ public class SecurityService implements ISecurityService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Check if the name belongs to the mappings of one
+	 *  of the virtual names.
+	 *  @param virtuals The virtual names.
+	 *  @param name The name to check.
+	 *  @return True, if name is ok.
+	 */
+	public IFuture<Void> checkVirtual(String[] virtuals, String name)
+	{
+		boolean ret = false;
+		
+		if(virtuals!=null)
+		{
+			for(int i=0; i<virtuals.length && !ret; i++)
+			{
+				Set<String> names = virtualsmap.get(virtuals[i]);
+				if(names!=null)
+				{
+					ret = names.contains(name);
+				}
+			}
+		}
+		
+		return ret? new Future<Void>((Void)null): new Future<Void>(new SecurityException("Name not mapped by virtual names: "+name));
 	}
 	
 	/**
@@ -1073,6 +1104,7 @@ public class SecurityService implements ISecurityService
 				kse.setAlias(alias);
 				kse.setDate(ks.getCreationDate(alias).getTime());
 				res.put(alias, kse);
+				
 			}
 		}
 		catch(Exception e)
@@ -1114,7 +1146,7 @@ public class SecurityService implements ISecurityService
 		
 		try
 		{
-			Signature eng = Signature.getInstance(getAlgorithm(cert));
+			Signature eng = Signature.getInstance(SSecurity.getAlgorithm(cert));
 			ret = SSecurity.verifyContent(cert.getPublicKey(), eng, content, signed);
 		}
 		catch(Exception e)
@@ -1137,8 +1169,8 @@ public class SecurityService implements ISecurityService
 			KeyStore ks = getKeyStore();
 			ks.setCertificateEntry(cid.getPlatformPrefix(), cert);
 			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-			saveKeyStore();
 //			publishEvent(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, getKeystoreDetails()));
+			saveKeyStore();
 			return IFuture.DONE;
 		}
 		catch(Exception e)
@@ -1148,7 +1180,10 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
-	 * 
+	 *  Get a certificate with an alias name.
+	 *  Uses a mechanism to acquire a certificate.
+	 *  @param name The alias name.
+	 *  @return The certificate.
 	 */
 	protected IFuture<Certificate> getCertificate(final String name)
 	{
@@ -1174,7 +1209,7 @@ public class SecurityService implements ISecurityService
 				}
 				else
 				{
-					aquireCertificate(name).addResultListener(new DelegationResultListener<Certificate>(ret)
+					acquireCertificate(name).addResultListener(new DelegationResultListener<Certificate>(ret)
 					{
 						public void customResultAvailable(Certificate cert)
 						{
@@ -1226,11 +1261,11 @@ public class SecurityService implements ISecurityService
 		}
 	}
 
-	
 	/**
-	 * 
+	 *  Delegates an acquire certificate call to the selected
+	 *  (or no) mechanism.
 	 */
-	protected IFuture<Certificate> aquireCertificate(final String name)
+	protected IFuture<Certificate> acquireCertificate(final String name)
 	{
 		if(selmech>-1)
 		{
@@ -1242,16 +1277,7 @@ public class SecurityService implements ISecurityService
 		}
 	}
 	
-	/**
-	 *  Get the alogrithm name of a certificate.
-	 */
-	protected String getAlgorithm(Certificate cert)
-	{
-		String ret = "MD5WithRSA"; // todo: how to find out if not X509
-		if(cert instanceof X509Certificate)
-			ret = ((X509Certificate)cert).getSigAlgName();
-		return ret;
-	}
+	
 	
 	/**
 	 *  Get the component.

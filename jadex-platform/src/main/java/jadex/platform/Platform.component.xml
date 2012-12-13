@@ -159,6 +159,8 @@
 		<argument name="networkname" class="String"/>
 		<!-- Network pass. -->
 		<argument name="networkpass" class="String"/>
+		<!-- Virtual names that are used for authentication -->
+		<argument name="virtualnames" class="Map"/>
 		
 		<!-- Flag if local transport is enabled. -->
 		<argument name="localtransport" class="boolean">true</argument>
@@ -287,7 +289,7 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
 			<implementation>
-				new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass})
+				new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.message.IMessageService">

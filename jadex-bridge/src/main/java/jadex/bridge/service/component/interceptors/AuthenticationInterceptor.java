@@ -5,7 +5,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Authenticated;
-import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -25,13 +24,17 @@ import java.util.Set;
  *  - generates a signed version of the message that is attached to it (in non-functional properties)
  *  - verifies that a call is authenticated by checking the singed version with public key of the sender
  */
-public class AuthenticationInterceptor implements IServiceInvocationInterceptor
+public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 {
+	//-------- attributes --------
+	
 	/** The external access. */
 	protected IExternalAccess ea;
 	
 	/** The mode (send or receive). */
 	protected boolean send;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new AuthenticationInterceptor.
@@ -41,12 +44,14 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 		this.ea = ea;
 		this.send = send;
 	}
+
+	//-------- constructors --------
 	
 	/**
 	 *  Test if the interceptor is applicable.
 	 *  @return True, if applicable.
 	 */
-	public boolean isApplicable(ServiceInvocationContext context)
+	public boolean customIsApplicable(ServiceInvocationContext context)
 	{
 		boolean ret = false;
 		Annotation[] anns = context.getMethod().getDeclaringClass().getAnnotations();
@@ -145,7 +150,7 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 	/**
 	 *  Check the authentication.
 	 */
-	protected IFuture<Void> checkAuthentication(ServiceInvocationContext context)
+	protected IFuture<Void> checkAuthentication(final ServiceInvocationContext context)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -169,29 +174,33 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 				Authenticated au = targetm.getAnnotation(Authenticated.class);
 				if(au==null)
 					au = targetcl.getAnnotation(Authenticated.class);
-				Set<String> allowed = SUtil.arrayToSet(au.value());
+				Set<String> allowed = SUtil.arrayToSet(au.names());
 				if(!allowed.contains(callername))
 				{
-					ret.setException(new SecurityException("Authentication failed: "+allowed+" "+callername));
-				}
-				else
-				{
-					// In principle allowed caller, now has to be authenticated
-					// todo: timepoint
-					String classname = context.getMethod().getDeclaringClass().getName();
-					String methodname = context.getMethod().getName();
-					Object[] args = context.getArgumentArray();
-					Object[] t = new Object[]{callername, classname, methodname, args};
-					final byte[] content = BinarySerializer.objectToByteArray(t, null);
-					
+					// if not contained in direct names check virtual name mappings
+					final String[] virtuals = au.virtuals();
 					SServiceProvider.getService(ea.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 					{
 						public void customResultAvailable(ISecurityService sser)
 						{
-							sser.verifyCall(content, signed, callername).addResultListener(new DelegationResultListener<Void>(ret));
+							sser.checkVirtual(virtuals, callername).addResultListener(new DelegationResultListener<Void>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									// In principle allowed caller, now has to be authenticated
+									// todo: timepoint
+									internalCheck(context, callername, signed).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
 						}
 					});
+				}
+				else
+				{
+					// In principle allowed caller, now has to be authenticated
+					// todo: timepoint
+					internalCheck(context, callername, signed).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			}
 			catch(Exception e)
@@ -199,6 +208,31 @@ public class AuthenticationInterceptor implements IServiceInvocationInterceptor
 				ret.setException(new SecurityException(e));
 			}
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Internal check method that calls verify on 
+	 */
+	protected IFuture<Void> internalCheck(ServiceInvocationContext context, final String callername, final byte[] signed)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		String classname = context.getMethod().getDeclaringClass().getName();
+		String methodname = context.getMethod().getName();
+		Object[] args = context.getArgumentArray();
+		Object[] t = new Object[]{callername, classname, methodname, args};
+		final byte[] content = BinarySerializer.objectToByteArray(t, null);
+		
+		SServiceProvider.getService(ea.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
+		{
+			public void customResultAvailable(ISecurityService sser)
+			{
+				sser.verifyCall(content, signed, callername).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
 		
 		return ret;
 	}

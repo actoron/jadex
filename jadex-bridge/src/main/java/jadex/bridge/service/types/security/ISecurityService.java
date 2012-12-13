@@ -12,8 +12,6 @@ import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.KeyStroke;
-
 /**
  *  The security service is responsible for
  *  validating (remote) requests.
@@ -211,6 +209,14 @@ public interface ISecurityService
 	 *  @param name The callers name (used to find the certificate and public key). 
 	 */
 	public IFuture<Void> verifyCall(final byte[] content, final byte[] signed, final String name);
+	
+	/**
+	 *  Check if the name belongs to the mappings of one
+	 *  of the virtual names.
+	 *  @param virtuals The virtual names.
+	 *  @param name The name to check.
+	 */
+	public IFuture<Void> checkVirtual(String[] virtuals, String name);
 	
 	//-------- keystore handling --------
 	

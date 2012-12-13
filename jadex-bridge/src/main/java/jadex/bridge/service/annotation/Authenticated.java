@@ -14,5 +14,14 @@ public @interface Authenticated
 {
 	public static String AUTHENTICATED = "authenticated";
 
-	public String[] value() default {};
+	/**
+	 *  The platform (prefix) names that are allowed.
+	 */
+	public String[] names() default {};
+	
+	/**
+	 *  The virtual names. Are mapped to real platform names
+	 *  via the security service.
+	 */
+	public String[] virtuals() default {};
 }

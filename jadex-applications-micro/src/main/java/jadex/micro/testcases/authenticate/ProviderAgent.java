@@ -22,7 +22,8 @@ public class ProviderAgent implements ITestService
 	 *  Call a method that must use a secure
 	 *  transport under the hood.
 	 */
-	@Authenticated({"VSISSTAFF17", "Alex-PC-neu", "Lars-PC", "willi", "hans"})
+//	@Authenticated(names={"VSISSTAFF17", "Alex-PC-neu", "Lars-PC", "willi", "hans"})
+	@Authenticated(virtuals="testuser")
 	public IFuture<Void> method(String msg)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();

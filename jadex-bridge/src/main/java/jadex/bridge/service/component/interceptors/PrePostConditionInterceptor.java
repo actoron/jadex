@@ -3,7 +3,6 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
-import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
@@ -23,13 +22,13 @@ import java.util.Map;
 /**
  *  Interceptor that checks annotated pre- and postconditions.
  */
-public class PrePostConditionInterceptor implements IServiceInvocationInterceptor
+public class PrePostConditionInterceptor extends AbstractLRUApplicableInterceptor
 {
 	/**
 	 *  Test if the interceptor is applicable.
 	 *  @return True, if applicable.
 	 */
-	public boolean isApplicable(ServiceInvocationContext context)
+	public boolean customIsApplicable(ServiceInvocationContext context)
 	{
 		boolean ret = false;
 		Annotation[] methodannos = context.getMethod().getAnnotations();

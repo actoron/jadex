@@ -25,6 +25,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAKey;
 import java.security.interfaces.RSAKey;
 import java.util.Date;
@@ -388,6 +389,16 @@ public class SSecurity
 		return ret;
 	}
 	
+	/**
+	 *  Get the alogrithm name of a certificate.
+	 */
+	public static String getAlgorithm(Certificate cert)
+	{
+		String ret = "MD5WithRSA"; // todo: how to find out if not X509
+		if(cert instanceof X509Certificate)
+			ret = ((X509Certificate)cert).getSigAlgName();
+		return ret;
+	}
 	
 	/**
 	 *  Main for testing.
