@@ -10,7 +10,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceProcess;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -32,7 +31,6 @@ import sodekovs.bikesharing.model.ProbabilitiesForStation;
 import sodekovs.bikesharing.model.SimulationDescription;
 import sodekovs.bikesharing.model.Station;
 import sodekovs.bikesharing.model.TimeSlice;
-import sodekovs.bikesharing.model.TimeSlice.ProbabilitiesForStations;
 import sodekovs.util.math.GetRandom;
 
 /**
@@ -122,20 +120,20 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			if (i + 1 < timeSlicesList.size()) {
 				if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
 					executeTimeSlice(i, space);
-					// System.out.println("Time Slice exetuced:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+//					 System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 					// counterTmp++;
 					break;
 				}
 			} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
 				executeTimeSlice(i, space);
-				// System.out.println("Time Slice exetuced:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+//				 System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 			}
 		}
 
 		// printClockAndSimSettings();
 	}
 
-	// }
+	// } 
 
 	/**
 	 * Parse the xml setup file.
