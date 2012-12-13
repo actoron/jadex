@@ -3,14 +3,11 @@ package jadex.platform.service.daemon;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
@@ -45,40 +42,16 @@ public class DaemonResponderAgent
 	//-------- methods --------
 	
 	/**
-	 *  Agent init.
+	 *  Agent behavior.
 	 */
-	@AgentCreated
+	@AgentBody
 	public IFuture<Void> start()
 	{
 		agent.getLogger().info("Sending message "+content+" to "+cid+", "+SUtil.arrayToString(cid.getAddresses()));
 		
-		Future<Void>	ret	= new Future<Void>();
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 		msg.put(SFipa.RECEIVERS, cid);
 		msg.put(SFipa.CONTENT, content);
-		agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
-			.addResultListener(new DelegationResultListener<Void>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				agent.getLogger().info("Done sending message "+content+" to "+cid);
-				super.customResultAvailable(result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				agent.getLogger().info("Error sending message "+content+" to "+cid+", "+exception);
-				super.exceptionOccurred(exception);
-			}
-		});
-		return ret;
-	}
-	
-	/**
-	 *  Agent body just ends the agent.
-	 */
-	@AgentBody(keepalive=false)
-	public void	body()
-	{
+		return agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 	}
 }

@@ -40,7 +40,7 @@ FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 	  --StopMode jvm --StopClass jadex.platform.ServiceStarter --StopMethod stop ^
 	  ++StartParams -platformname;%HOSTNAME%_svc$* ^
 	  ++StartParams -gui;false ^
-	  ++StartParams -ssltransport;true ^
+	  ++StartParams -ssltcptransport;true ^
 	  ++StartParams -logging;true
 
 :start

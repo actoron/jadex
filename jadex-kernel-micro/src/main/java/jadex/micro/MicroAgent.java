@@ -446,7 +446,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 		{
 			public void customResultAvailable(IMessageService ms)
 			{
-				System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
+//				System.err.println("send msg1: "+getComponentIdentifier()+" "+me.get(SFipa.CONTENT));
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
 					interpreter.getModel().getResourceIdentifier(), null, codecids)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));

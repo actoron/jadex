@@ -46,12 +46,12 @@
      		<scope>test</scope>
 		</dependency>
 		
-		<!-- Hack!!! Requires to restate dependency from commons!? -->
+		<!-- Hack!!! Required to restate dependency from commons!? -->
 		<dependency>
 			<groupId>bouncycastle</groupId>
 			<artifactId>bcprov-jdk15</artifactId>
 			<version>140</version>
-			<scope>test</scope>
+			<!-- <scope>test</scope>  --> <!-- Hack!!! cannot change scope in platform module. -->
 		</dependency>  
 				
 		<!-- todo: remove depency before release - ->

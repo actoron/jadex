@@ -321,7 +321,7 @@ public class MessageService extends BasicService implements IMessageService
 		IComponentIdentifier osender, final IResourceIdentifier rid, 
 		final IComponentIdentifier realrec, final byte[] codecids)//, final Map<String, Object> nonfunc)
 	{
-		System.err.println("send msg2: "+osender+" "+origmsg.get(SFipa.CONTENT));
+//		System.err.println("send msg2: "+osender+" "+origmsg.get(SFipa.CONTENT));
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
 		final Future<Void> ret = new Future<Void>();
@@ -335,7 +335,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			public void customResultAvailable(final ClassLoader cl)
 			{
-				System.err.println("send msg3: "+sender+" "+msg.get(SFipa.CONTENT));
+//				System.err.println("send msg3: "+sender+" "+msg.get(SFipa.CONTENT));
 //				System.out.println("on1: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 				
 				if(loc!=null && IComponentIdentifier.LOCAL.get()!=null && !loc.equals(IComponentIdentifier.LOCAL.get()))
@@ -457,7 +457,7 @@ public class MessageService extends BasicService implements IMessageService
 //								System.out.println("msgservice calling doSendMessage()");
 //								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 								
-								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
+//								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
 								doSendMessage(msg, type, exta, cl, ret, codecids);
 							}
 							public void exceptionOccurred(Exception exception)
