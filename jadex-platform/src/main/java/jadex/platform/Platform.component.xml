@@ -160,7 +160,7 @@
 		<!-- Network pass. -->
 		<argument name="networkpass" class="String"/>
 		<!-- Virtual names that are used for authentication -->
-		<argument name="virtualnames" class="Map"/>
+		<argument name="virtualnames" class="java.util.Map"/>
 		
 		<!-- Flag if local transport is enabled. -->
 		<argument name="localtransport" class="boolean">true</argument>
