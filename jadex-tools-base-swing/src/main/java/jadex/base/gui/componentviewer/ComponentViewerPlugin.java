@@ -17,6 +17,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -390,7 +391,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 													catch(Exception e)
 													{
 														e.printStackTrace();
-														getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
+														getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+SUtil.arrayToString(clid), e);
 													}
 												}
 												

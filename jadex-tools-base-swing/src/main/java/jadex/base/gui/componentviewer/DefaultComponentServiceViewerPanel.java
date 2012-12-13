@@ -7,11 +7,11 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -80,9 +80,9 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		final Future<Void> ret = new Future<Void>();
 		
 		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
-			.addResultListener(new DefaultResultListener<ClassLoader>()
+			.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 		{
-			public void resultAvailable(final ClassLoader cl)
+			public void customResultAvailable(final ClassLoader cl)
 			{
 				final List<Object[]> panels = new ArrayList<Object[]>();
 				
