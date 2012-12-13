@@ -59,6 +59,7 @@
 		<module>../jadex-kernel-extension-envsupport-opengl</module>
 		<module>../jadex-kernel-extension-agr</module>
 		<module>../jadex-kernel-extension-relay</module>
+		<module>../jadex-platform-extension-webservice</module>
 		<module>../jadex-platform-extension-webservice-desktop</module>
 
 		<module>../jadex-applib-bdi</module>
@@ -474,7 +475,7 @@
 				<module>jadex-platform-standalone-maven-launch</module>				
 				<module>jadex-platform-extension-webservice</module>
 				<module>jadex-platform-extension-maven</module>
-				<module>jadex-platform-extension-natmtp</module>
+				<module>jadex-platform-extension-natmtp</module>				
 				<module>jadex-platform-extension-webservice-desktop</module>
 								
 				<module>jadex-rules-eca</module>
