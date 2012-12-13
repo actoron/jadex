@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,6 +29,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -3340,6 +3342,91 @@ public class SUtil
 	    return ret;
 	}
 
+	/**
+	 *  Compute a file hash.
+	 *  @param filename The filename.
+	 *  @return The hash.
+	 */
+	public static byte[] computeFileHash(String filename)
+	{
+		return computeFileHash(filename, null);
+	}
+	
+	/**
+	 *  Compute a file hash.
+	 *  @param filename The filename.
+	 *  @param algorithm The hash algorithm.
+	 *  @return The hash.
+	 */
+	public static byte[] computeFileHash(String filename, String algorithm)
+	{
+		byte[] ret = null;
+		
+		FileInputStream fis = null;
+		try
+		{
+			MessageDigest md = MessageDigest.getInstance(algorithm==null? "SHA-1": algorithm);
+			File file = new File(filename);
+			
+			if(file.exists() && !file.isDirectory())
+			{
+				fis = new FileInputStream(file);
+				int bufsize = 8192;
+				byte[] data = new byte[bufsize];
+				int read = 0;
+				long len = file.length();
+				while(read!=-1 && len>0)
+				{
+					int toread = (int)Math.min(len, bufsize);
+					read = fis.read(data, 0, toread);
+				    len -= read;
+					md.update(data, 0, read);
+				}
+				ret = md.digest();
+ 			}
+			else
+			{
+				String[] files = file.list(new FilenameFilter()
+				{
+					public boolean accept(File dir, String name)
+					{
+						return !".jadexbackup".equals(name);
+					}
+				});
+				for(String name: files)
+				{
+					md.update((byte)0);	// marker between directory names to avoid {a, bc} being the same as {ab, c}. 
+					md.update(name.getBytes("UTF-8"));
+				}
+				
+				ret = md.digest();
+			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			try
+			{
+				if(fis!=null)
+				{
+					fis.close();
+				}
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 * Main method for testing.
 	 */

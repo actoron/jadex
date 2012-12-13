@@ -21,6 +21,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bouncycastle.util.encoders.Base64;
+
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.session.WebAuthSession;
 
@@ -323,13 +325,16 @@ public class DropboxBackupResource implements IBackupResource
 				
 				// upload file to dropbox
 				FileInputStream fis = new FileInputStream(tmp);
+				String hash = new String(Base64.encode(SUtil.computeFileHash(tmp.getAbsolutePath())));
 				DropboxTest.overwriteFileData(api, localfi.getPath(), fis, tmp.length());
+				// Ask again for file to save server update time
+				FileData newf = DropboxTest.getFileData(api, remotefi.getPath());
 				
 				FileMetaInfo ofi = getFileInfo(remotefi.getPath());
 	
 				// Update meta information to reflect new current state.
 				// todo: file hash code.
-				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : System.currentTimeMillis(), null, orig.isExisting());
+				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : newf.getLastModified(), hash, orig.isExisting());
 				ofi.updateVTimes(remotefi, true);
 				props.setProperty(ofi.getPath(), ofi.getVTime());
 				save();

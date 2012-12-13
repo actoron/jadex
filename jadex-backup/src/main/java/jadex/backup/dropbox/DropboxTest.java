@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,15 +42,19 @@ public class DropboxTest
 			
 			DropboxAPI<WebAuthSession> api = createSession(akey, asecret, skey, ssecret);
 			
-			Map<String, Tuple2<FileData, List<String>>> fis = new HashMap<String, Tuple2<FileData,List<String>>>();
-			getFileDatas(api, "/", fis);
-			System.out.println(fis);
+//			Map<String, Tuple2<FileData, List<String>>> fis = new HashMap<String, Tuple2<FileData,List<String>>>();
+//			getFileDatas(api, "/", fis);
+//			System.out.println(fis);
+			
+			Entry e = api.metadata("/testing.txt", 0, null, false, null);
+//			DropboxFileInfo fi = api.getFile("/testing.txt", null, new ByteArrayOutputStream(), null);
+			System.out.println("hash: "+e.hash);
 			
 //			System.out.print("Uploading file...");
-//			String str = "Hello World 2!";
+//			String str = "Hello World 22!";
 //			ByteArrayInputStream is = new ByteArrayInputStream(str.getBytes());
 //			Entry entry = api.putFileOverwrite("/testing.txt", is, str.length(), null);
-//			Entry entry = api.putFile("/testing.txt", is, str.length(), null, null);
+////			Entry entry = api.putFile("/testing.txt", is, str.length(), null, null);
 //			System.out.println("Done. \nRevision of file: " + entry.rev);
 //			is.close();
 		}

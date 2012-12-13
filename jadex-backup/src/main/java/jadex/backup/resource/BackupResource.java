@@ -184,7 +184,7 @@ public class BackupResource implements IBackupResource
 	{
 		try
 		{
-			File	file	= getFile(location);
+			File file = getFile(location);
 			FileMetaInfo ret = new FileMetaInfo(new FileData(location, file.isDirectory(), file.exists(), file.isDirectory() ? 0 : file.length(), file.lastModified()),
 				props.containsKey(location) ? props.getProperty(location) : null);
 			
@@ -192,28 +192,7 @@ public class BackupResource implements IBackupResource
 			// ...change in file existence? -> store at current time
 			if(file.lastModified()>ret.getVTime(getLocalId()) || ret.isExisting()!=file.exists())
 			{
-				
-				String	hash	= null;
-				
-				// Build hash for contents of directory (Todo: hash for files)
-				if(file.isDirectory())
-				{
-					final MessageDigest	md	= MessageDigest.getInstance("SHA-1");
-					String[]	files	= file.list(new FilenameFilter()
-					{
-						public boolean accept(File dir, String name)
-						{
-							return !".jadexbackup".equals(name);
-						}
-					});
-					for(String name: files)
-					{
-						md.update((byte)0);	// marker between directory names to avoid {a, bc} being the same as {ab, c}. 
-						md.update(name.getBytes("UTF-8"));
-					}
-					
-					hash	= new String(Base64.encode(md.digest()));
-				}
+				String	hash = new String(Base64.encode(SUtil.computeFileHash(file.getCanonicalPath())));
 				
 				ret.bumpVTime(getLocalId(), file.exists() ? file.lastModified() : System.currentTimeMillis(), hash, file.exists());
 				props.setProperty(location, ret.getVTime());
@@ -256,9 +235,6 @@ public class BackupResource implements IBackupResource
 			props.setProperty(local.getPath(), local.getVTime());
 			save();
 		}
-		
-		if(ret==null)
-			System.out.println("guuuuuuuuuuuuuuuuuuurke");
 		
 		System.out.println("state: "+ret+", "+fi.getPath());
 		
