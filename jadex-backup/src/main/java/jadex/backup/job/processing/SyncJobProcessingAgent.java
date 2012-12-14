@@ -1,6 +1,5 @@
 package jadex.backup.job.processing;
 
-import jadex.backup.dropbox.DropboxSyncJob;
 import jadex.backup.job.AbstractSyncJob;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.SyncProfile;

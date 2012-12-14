@@ -4,7 +4,7 @@ package jadex.backup.resource;
 /**
  *  Generic file data replacement
  */
-public class FileData //implements IFile
+public class FileData
 {
 	//-------- attributes --------
 	
@@ -23,15 +23,17 @@ public class FileData //implements IFile
 	/** The last modified date from underlying file. */
 	protected long lastmodified;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new file data.
 	 */
 	public FileData()
 	{
 	}
 	
 	/**
-	 * 
+	 *  Create a new file data.
 	 */
 	public FileData(String path)
 	{
@@ -39,7 +41,7 @@ public class FileData //implements IFile
 	}
 	
 	/**
-	 * 
+	 *  Create a new file data.
 	 */
 	public FileData(String path, boolean directory, boolean exists, long size, long lastmodified)
 	{
@@ -49,6 +51,8 @@ public class FileData //implements IFile
 		this.size = size;
 		this.lastmodified = lastmodified;
 	}
+
+	//-------- methods --------
 
 	/**
 	 *  Get the path.

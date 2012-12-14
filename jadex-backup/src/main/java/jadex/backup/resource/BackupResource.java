@@ -190,11 +190,14 @@ public class BackupResource implements IBackupResource
 			
 			// Known file? -> check if update needed based on last modified or...
 			// ...change in file existence? -> store at current time
+//			if((file.lastModified()>ret.getVTime(getLocalId()) && ret.getSize()!=ret.getData().getSize()) 
+//				|| ret.isExisting()!=file.exists())
 			if(file.lastModified()>ret.getVTime(getLocalId()) || ret.isExisting()!=file.exists())
 			{
-				String	hash = new String(Base64.encode(SUtil.computeFileHash(file.getCanonicalPath())));
-				
-				ret.bumpVTime(getLocalId(), file.exists() ? file.lastModified() : System.currentTimeMillis(), hash, file.exists());
+				// file.lastModified()>ret.getVTime(getLocalId()) is true because ret.getVTime(getLocalId()) is 0 at beginning
+				// update meta info
+				String	hash = file.exists()? new String(Base64.encode(SUtil.computeFileHash(file.getCanonicalPath()))): null;
+				ret.bumpVTime(getLocalId(), file.exists()? file.lastModified() : System.currentTimeMillis(), hash, file.exists(), file.length());
 				props.setProperty(location, ret.getVTime());
 				save();				
 			}
@@ -336,7 +339,7 @@ public class BackupResource implements IBackupResource
 
 			// Update meta information to reflect new current state.
 			// todo: file hash code.
-			ofi.bumpVTime(getLocalId(), orig.exists() ? orig.lastModified() : System.currentTimeMillis(), null, orig.exists());
+			ofi.bumpVTime(getLocalId(), orig.exists() ? orig.lastModified() : System.currentTimeMillis(), null, orig.exists(), orig.length());
 			ofi.updateVTimes(remotefi, true);
 			props.setProperty(ofi.getPath(), ofi.getVTime());
 			save();
@@ -376,7 +379,7 @@ public class BackupResource implements IBackupResource
 
 			// Update meta information to reflect new current state.
 			// todo: file hash code.
-			ofi.bumpVTime(getLocalId(), orig.exists() ? orig.lastModified() : System.currentTimeMillis(), null, orig.exists());
+			ofi.bumpVTime(getLocalId(), orig.exists() ? orig.lastModified() : System.currentTimeMillis(), null, orig.exists(), orig.length());
 			ofi.updateVTimes(remotefi, true);
 			props.setProperty(ofi.getPath(), ofi.getVTime());
 			save();

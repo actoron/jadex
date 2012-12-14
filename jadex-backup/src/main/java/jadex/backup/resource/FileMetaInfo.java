@@ -1,5 +1,7 @@
 package jadex.backup.resource;
 
+import jadex.bridge.IComponentIdentifier;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -8,10 +10,15 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * 
+ *  Meta information about a file. This meta information is not
+ *  physically backed by a file but is written to the metadata repo.
+ *  
+ *  Using a filedata the meta info is linked to a physical file. 
  */
 public class FileMetaInfo
 {
+	//-------- attributes --------
+	
 	/** The file location relative to the resource root (using '/' as separator char). */
 	protected FileData	data;
 	
@@ -23,6 +30,9 @@ public class FileMetaInfo
 	
 	/** The cached hash code if any (transferred in base 64 at start of vtime string "hash.platform1@time1..."). */
 	protected String hash;
+	
+	/** The file size. */
+	protected long size;
 	
 	//-------- constructors --------
 	
@@ -41,6 +51,8 @@ public class FileMetaInfo
 	{
 		this.data	= data;
 		this.exists	= parseExists(vtime);
+		this.size	= parseSize(vtime);
+		this.hash	= parseHash(vtime);
 		this.vtimes	= parseVTime(vtime);
 	}
 	
@@ -62,7 +74,8 @@ public class FileMetaInfo
 	}
 	
 	/**
-	 * 
+	 *  Get the file path.
+	 *  @return The file path.
 	 */
 	public String getPath()
 	{
@@ -122,7 +135,7 @@ public class FileMetaInfo
 	 */
 	public String	getVTime()
 	{
-		return vtimesToString(vtimes, hash, exists);
+		return vtimesToString(vtimes, hash, exists, size);
 	}
 	
 	/**
@@ -168,6 +181,24 @@ public class FileMetaInfo
 	{
 		this.hash = hash;
 	}
+	
+	/**
+	 *  Get the size.
+	 *  @return The size.
+	 */
+	public long getSize()
+	{
+		return size;
+	}
+
+	/**
+	 *  Set the size.
+	 *  @param size The size to set.
+	 */
+	public void setSize(long size)
+	{
+		this.size = size;
+	}
 
 	/**
 	 *  Update a part of the vector time and 
@@ -176,7 +207,7 @@ public class FileMetaInfo
 	 *  @param time	The time.
 	 *  @param hash	The new hash.
 	 */
-	public void	bumpVTime(String node, long time, String hash, boolean exists)
+	public void	bumpVTime(String node, long time, String hash, boolean exists, long size)
 	{
 		// Do not save unknown time as vector time.
 		if(time==0)
@@ -198,6 +229,7 @@ public class FileMetaInfo
 			
 			this.hash	= hash;
 			this.exists	= exists;
+			this.size = size;
 		}
 		
 		setVTime(node, time);
@@ -283,6 +315,27 @@ public class FileMetaInfo
 		}		
 	}
 	
+//	/**
+//	 * 
+//	 */
+//	protected boolean hasChanged(String localid)
+//	{
+//		// changed when deleted (or recreated)
+//		boolean ret = data.exists!=exists;
+//		
+//		if(!ret)
+//		{
+//			boolean mod = data.getLastModified()==getVTime(localid);
+//			boolean sz = data.getSize()==getSize();
+//			if(mod && sz && deep)
+//			{
+//				// how to check hash?!
+//			}
+//		}
+//		
+//		return ret;
+//	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -290,7 +343,43 @@ public class FileMetaInfo
 	 */
 	protected static boolean	parseExists(String vtime)
 	{
-		return vtime!=null && !vtime.startsWith("D.");
+		boolean ret = false;
+		if(vtime!=null)
+		{
+			StringTokenizer	stok = new StringTokenizer(vtime, ".");
+			while(stok.hasMoreTokens())
+			{
+				String tok = stok.nextToken();
+				if(tok.startsWith("D"))
+				{
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the size.
+	 */
+	protected static long parseSize(String vtime)
+	{
+		long ret = 0;
+		if(vtime!=null)
+		{
+			StringTokenizer	stok = new StringTokenizer(vtime, ".");
+			while(stok.hasMoreTokens())
+			{
+				String tok = stok.nextToken();
+				if(tok.startsWith("S"))
+				{
+					ret = Long.parseLong(tok.substring(1));
+					break;
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -299,9 +388,18 @@ public class FileMetaInfo
 	protected static String	parseHash(String vtime)
 	{
 		String	ret	= null;
-		if(vtime.indexOf('.')<vtime.indexOf('@'))
+		if(vtime!=null)
 		{
-			ret	= vtime.substring(vtime.startsWith("D.") ? 2 : 0, vtime.indexOf('.'));
+			StringTokenizer	stok = new StringTokenizer(vtime, ".");
+			while(stok.hasMoreTokens())
+			{
+				String tok = stok.nextToken();
+				if(tok.startsWith("H"))
+				{
+					ret = tok.substring(1);
+					break;
+				}
+			}
 		}
 		return ret;
 	}
@@ -315,16 +413,17 @@ public class FileMetaInfo
 
 		if(vtime!=null)
 		{
-			StringTokenizer	stok	= new StringTokenizer(vtime, "@.", true);
-			String	last	= null;
+			StringTokenizer	stok	= new StringTokenizer(vtime, ".");
 			while(stok.hasMoreTokens())
 			{
-				String	next	= stok.nextToken();
-				if("@".equals(next) && stok.hasMoreTokens())
+				String tok	= stok.nextToken();
+				if(tok.startsWith("T"))
 				{
-					vtimes.put(last, new Long(Long.parseLong(stok.nextToken())));
+					int idx = tok.indexOf("@");
+					String name = tok.substring(1, idx);
+					String time = tok.substring(idx+1, tok.length());
+					vtimes.put(name, new Long(time));
 				}
-				last	= next;
 			}
 		}
 		return vtimes;
@@ -333,7 +432,7 @@ public class FileMetaInfo
 	/**
 	 *  Get the vector time as string.
 	 */
-	protected static String	vtimesToString(Map<String, Long> vtimes, String hash, boolean exists)
+	protected static String	vtimesToString(Map<String, Long> vtimes, String hash, boolean exists, long size)
 	{
 		StringBuffer	buf	= new StringBuffer();
 		
@@ -342,26 +441,35 @@ public class FileMetaInfo
 			buf.append("D.");
 		}
 		
-		for(String key: vtimes.keySet())
+		if(buf.length()>0)
 		{
-			if(buf.length()>0)
-			{
-				buf.append('.');
-			}
-			buf.append(key);
-			buf.append("@");
-			buf.append(vtimes.get(key));
+			buf.insert(0, '.');
 		}
+		buf.append("S").append(size);
 		
 		if(hash!=null)
 		{
 			if(buf.length()>0)
 			{
-				buf.insert(0, '.');
+				buf.append('.');
 			}
-			buf.insert(0, hash);
+			buf.append("H").append(hash);
+		}
+		
+		for(String key: vtimes.keySet())
+		{
+			if(buf.length()>0)
+			{
+				buf.append(".");
+			}
+			buf.append("T");
+			buf.append(key);
+			buf.append("@");
+			buf.append(vtimes.get(key));
 		}
 
+//		System.out.println(buf.toString());
+		
 		return buf.toString();
 	}
 }

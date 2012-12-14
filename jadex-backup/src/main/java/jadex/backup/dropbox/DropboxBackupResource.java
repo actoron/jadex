@@ -202,6 +202,8 @@ public class DropboxBackupResource implements IBackupResource
 			
 			// Known file? -> check if update needed based on last modified or...
 			// ...change in file existence? -> store at current time
+//			if((file.getLastModified()>ret.getVTime(getLocalId()) && ret.getSize()!=ret.getData().getSize())
+//				|| ret.isExisting()!=file.isExisting())
 			if(file.getLastModified()>ret.getVTime(getLocalId()) || ret.isExisting()!=file.isExisting())
 			{
 				String	hash	= null;
@@ -209,7 +211,7 @@ public class DropboxBackupResource implements IBackupResource
 				// cannot get updated information about the file without downloading it
 				// -> save info when file is uploaded
 				
-				ret.bumpVTime(getLocalId(), file.isExisting() ? file.getLastModified() : System.currentTimeMillis(), hash, file.isExisting());
+				ret.bumpVTime(getLocalId(), file.isExisting() ? file.getLastModified() : System.currentTimeMillis(), hash, file.isExisting(), file.getSize());
 				props.setProperty(path, ret.getVTime());
 				save();				
 			}
@@ -249,7 +251,8 @@ public class DropboxBackupResource implements IBackupResource
 			save();
 		}
 		
-//			System.out.println("state: "+ret+", "+fi.getPath());
+		if(FILE_CONFLICT.equals(ret))
+			System.out.println("state: "+ret+", "+fi.getPath());
 		
 		return new Tuple2<FileMetaInfo, String>(local, ret);
 	}
@@ -339,7 +342,7 @@ public class DropboxBackupResource implements IBackupResource
 	
 				// Update meta information to reflect new current state.
 				// todo: file hash code.
-				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : newf.getLastModified(), hash, orig.isExisting());
+				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : newf.getLastModified(), hash, orig.isExisting(), orig.getSize());
 				ofi.updateVTimes(remotefi, true);
 				props.setProperty(ofi.getPath(), ofi.getVTime());
 				save();
@@ -383,7 +386,7 @@ public class DropboxBackupResource implements IBackupResource
 				
 				// Update meta information to reflect new current state.
 				// todo: file hash code.
-				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : System.currentTimeMillis(), null, orig.isExisting());
+				ofi.bumpVTime(getLocalId(), orig.isExisting() ? orig.getLastModified() : System.currentTimeMillis(), null, orig.isExisting(), orig.getSize());
 				ofi.updateVTimes(remotefi, true);
 				props.setProperty(ofi.getPath(), ofi.getVTime());
 				save();

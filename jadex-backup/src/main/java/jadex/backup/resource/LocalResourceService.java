@@ -261,7 +261,7 @@ public class LocalResourceService	implements ILocalResourceService
 	 */
 	protected void	doScan(final IResourceService remote, final TerminableIntermediateFuture<BackupEvent> ret, final List<StackElement> stack)
 	{
-		System.out.println("+++do update: "+getResource().getResourceId()+", "+getResource().getLocalId()+", "+remote.getLocalId()+", "+stack);
+//		System.out.println("+++do update: "+getResource().getResourceId()+", "+getResource().getLocalId()+", "+remote.getLocalId()+", "+stack);
 		
 		// All done.
 		if(stack.isEmpty() || ret.isDone())
