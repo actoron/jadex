@@ -379,7 +379,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 				_geometryNode.attachChild(objectNode);
 
 			}
-			else
+			/** Only make updates if the Drawable3d is dynamic */
+			else if(combiner3d.isDynamic())
 			{
 				Spatial node = _geometryNode.getChild(identifier.toString());
 				_tmpNode = (Node)node;
@@ -618,7 +619,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 			public Void call() throws Exception
 			{	
 				_app.stop(false);
-				System.out.println("ViewportJmonkey: STOP!");
+//				System.out.println("ViewportJmonkey: STOP!");
 				return null;
 			}
 		});
@@ -685,7 +686,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 			if(_firstrun)
 			{
 				_capabilities = _app.getCaps();
-				System.out.println("capabilities: \n" + _capabilities);
+//				System.out.println("capabilities: \n" + _capabilities);
 				_staticNode = createStatics(staticvisuals);
 				_app.setStaticGeometry(_staticNode);
 				_app.setChannels(_animChannels);

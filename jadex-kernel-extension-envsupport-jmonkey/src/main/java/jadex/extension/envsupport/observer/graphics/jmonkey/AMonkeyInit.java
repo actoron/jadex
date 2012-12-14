@@ -94,10 +94,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	protected void simpleInit() {
 		// Base Setup
-		Logger.getLogger("").setLevel(Level.SEVERE);
+		Logger.getLogger("").setLevel(Level.OFF);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
-		viewPort.setBackgroundColor(ColorRGBA.LightGray);
+		viewPort.setBackgroundColor(ColorRGBA.Black);
 		stateManager.getState(StatsAppState.class).toggleStats();
 		
 		initRoot();

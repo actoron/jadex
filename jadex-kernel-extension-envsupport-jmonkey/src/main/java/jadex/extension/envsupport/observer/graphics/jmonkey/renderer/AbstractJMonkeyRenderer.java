@@ -303,7 +303,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 								}
 								catch(Exception e)
 								{
-									System.out.println("Animation Existiert nicht");
+//									System.out.println("Animation Existiert nicht");
 								}
 								
 //								System.out.println("animation! " + a.getName());
