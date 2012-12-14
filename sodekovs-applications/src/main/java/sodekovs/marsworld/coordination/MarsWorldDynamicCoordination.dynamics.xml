@@ -335,21 +335,21 @@
 	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
 	    		</constraints>
 		    </adaption>
-		    <adaption id="change-to-broadcast" answers="3" quorum="0.66" timeout="10000" delay="1000" reset="true">
-		        <realiazions>
-			        <realization id="latest_target_seen_proximity" activate="false"/>
-			        <realization id="latest_target_analyzed_proximity" activate="false"/>
-			        <realization id="latest_target_produced_proximity" activate="false"/>
-			        <realization id="latest_target_seen_broadcast" activate="true"/>
-			        <realization id="latest_target_analyzed_broadcast" activate="true"/>
-			        <realization id="latest_target_produced_broadcast" activate="true"/>
-		        </realiazions>
-		        <constraints>
-	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/>
-	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/>
-	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/>
-	    		</constraints>
-		    </adaption>
+<!-- 		    <adaption id="change-to-broadcast" answers="3" quorum="0.66" timeout="10000" delay="1000" reset="true"> -->
+<!-- 		        <realiazions> -->
+<!-- 			        <realization id="latest_target_seen_proximity" activate="false"/> -->
+<!-- 			        <realization id="latest_target_analyzed_proximity" activate="false"/> -->
+<!-- 			        <realization id="latest_target_produced_proximity" activate="false"/> -->
+<!-- 			        <realization id="latest_target_seen_broadcast" activate="true"/> -->
+<!-- 			        <realization id="latest_target_analyzed_broadcast" activate="true"/> -->
+<!-- 			        <realization id="latest_target_produced_broadcast" activate="true"/> -->
+<!-- 		        </realiazions> -->
+<!-- 		        <constraints> -->
+<!-- 	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
+<!-- 	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
+<!-- 	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
+<!-- 	    		</constraints> -->
+<!-- 		    </adaption> -->
 	    </adaptions>
 	</convergence>
 </MASDynamic>

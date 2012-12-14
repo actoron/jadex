@@ -21,7 +21,8 @@ public class CountNoMsgPlan extends Plan {
 			waitFor(1000);
 			
 			Integer oldValue = (Integer) getBeliefbase().getBelief("no_msg_received").getFact();
-			getBeliefbase().getBelief("no_msg_received").setFact(oldValue++);
+			Integer newValue = oldValue + 1;
+			getBeliefbase().getBelief("no_msg_received").setFact(newValue);
 		}
 	}
 }
