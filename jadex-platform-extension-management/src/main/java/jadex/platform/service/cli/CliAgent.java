@@ -206,6 +206,7 @@ public class CliAgent implements ICliService, IInternalCliService
 					{
 						ThreadSuspendable sus = new ThreadSuspendable();
 						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), new Integer(0));
+						System.out.println("Jadex shell (type 'h' for help)");
 						System.out.println(getShell(consess).getShellPrompt().get(sus));
 						// redirect System.in
 						try{SUtil.getOutForSystemIn(tp);}catch(Exception e){}

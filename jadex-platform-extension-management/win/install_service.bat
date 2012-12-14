@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 
 :pathname
 FOR %%F IN ("%CD%") DO SET PATHNAME=%%~sF

@@ -72,16 +72,16 @@
 			</plans>
 		</configuration>
 		<configuration name="def2"/>
-		<!--  <configuration name="capability">
+		<configuration name="max=10000">
 			<beliefs>
-				<initialbelief ref="service">
-					<fact>false</fact>
+				<initialbelief ref="max">
+					<fact>10000</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>
 				<initialplan ref="start_peer"/>
 			</plans>
-		</configuration>-->
+		</configuration>
 	</configurations>
 </agent>
 
