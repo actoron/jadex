@@ -16,6 +16,11 @@ import deco.distributed.lang.dynamics.convergence.Convergence;
  */
 public abstract class ConvergenceService implements IConvergenceService {
 	
+	/** BDI Belief Constant */
+	public static final String BDI_BELIEF = "BDI_BELIEF";
+	
+	public static final String MICRO_PARAMETER = "MICRO_PARAMETER";
+	
 	/** Postfix of the service name */
 	protected static final String SERVICE_POSTFIX = "ConvergenceService";
 	

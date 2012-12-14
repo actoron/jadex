@@ -49,9 +49,6 @@ import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 @Service
 public class BDIConvergenceService extends ConvergenceService {
 
-	/** BDI Belief Constant */
-	public static final String BDI_BELIEF = "BDI_BELIEF";
-
 	/** External access for the agent */
 	private ExternalAccessFlyweight externalAccess = null;
 

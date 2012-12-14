@@ -14,7 +14,7 @@
 		<!-- The roles required for the coordination of new detected targets. -->
 			<role_occupation name="target_seen_sender" multiple="false">
 				<agent id="Producer" />
-				<agent id="Carry" />								
+				<agent id="MicroCarry" />								
 			</role_occupation>
 			<role_occupation name="target_seen_receiver" multiple="false">
 				<agent id="Sentry" />										
@@ -31,7 +31,7 @@
 				<agent id="Producer" />												
 			</role_occupation>
 			<role_occupation name="target_produced_receiver" multiple="false">
-				<agent id="Carry" />										
+				<agent id="MicroCarry" />										
 			</role_occupation>
 		</role_occupations>
 	</system_properties>
@@ -111,7 +111,7 @@
 						</parameter_mappings>
 					</agent_element>
 					<!-- <agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">-->
-					<agent_element element="callSentryEvent" agent_id="Carry" type="INTERNAL_EVENT">
+					<agent_element element="CallSentryStep" agent_id="MicroCarry" type="MICRO_STEP">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
@@ -194,7 +194,7 @@
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->									 
 					 <!-- <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET"> -->
-					 <agent_element element="latestProducedTargetEvent" agent_id="Carry" type="INTERNAL_EVENT">					 
+					 <agent_element element="LatestProducedTargetStep" agent_id="MicroCarry" type="MICRO_STEP">					 
 						<parameter_mappings>
 							<mapping ref="latest_produced_target" name="latest_produced_target"/>
 						</parameter_mappings>
@@ -213,7 +213,7 @@
 						</parameter_mappings>
 					</agent_element>
 					<!-- <agent_element element="latest_target" agent_id="Carry" type="BDI_BELIEFSET">-->
-					<agent_element element="callSentryEvent" agent_id="Carry" type="INTERNAL_EVENT">
+					<agent_element element="CallSentryStep" agent_id="MicroCarry" type="MICRO_STEP">
 						<parameter_mappings>
 							<mapping ref="latest_target" name="latest_target"/>
 						</parameter_mappings>
@@ -277,8 +277,8 @@
 					agent_type="JADEX">
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->									 
-					 <!-- <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET"> -->
-					 <agent_element element="latestProducedTargetEvent" agent_id="Carry" type="INTERNAL_EVENT">					 
+					<!-- <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET"> -->
+					 <agent_element element="LatestProducedTargetStep" agent_id="MicroCarry" type="MICRO_STEP">					 
 						<parameter_mappings>
 							<mapping ref="latest_produced_target" name="latest_produced_target"/>
 						</parameter_mappings>
@@ -292,7 +292,7 @@
 	<convergence>
 	    <agents>
 	        <agent id="Producer"/>
-			<agent id="Carry"/>
+			<agent id="MicroCarry"/>
 			<agent id="Sentry"/>
 	    </agents>
 	    <adaptions>
@@ -325,7 +325,7 @@
 		        </realizations>
 		        <constraints>
 	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
-	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
+	        		<constraint agent_id="MicroCarry" element="no_msg_received" type="MICRO_PARAMETER" condition="10" threshold="7"/>
 	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
 	    		</constraints>
 		    </adaption>

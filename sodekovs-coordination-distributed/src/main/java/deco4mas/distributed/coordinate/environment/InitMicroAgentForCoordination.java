@@ -20,6 +20,7 @@ import deco.distributed.lang.dynamics.AgentElementType;
 import deco.distributed.lang.dynamics.Causalities;
 import deco.distributed.lang.dynamics.MASDynamics;
 import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.convergence.Agent;
 import deco.distributed.lang.dynamics.mechanism.AgentElement;
 import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
 import deco.distributed.lang.dynamics.mechanism.DirectCausality;
@@ -112,7 +113,9 @@ public class InitMicroAgentForCoordination {
 				initPublishAndPercept();
 				
 				// init the convergence service for the agent if the agent type is referenced in convergence part of the masdynamics
-				if (masDyn.getConvergence() != null && masDyn.getConvergence().getAgents().contains(agentType)) {
+				Agent agent = new Agent();
+				agent.setId(agentType);
+				if (masDyn.getConvergence() != null && masDyn.getConvergence().getAgents().contains(agent)) {
 					// get the coordination context id
 					StatelessAbstractInterpreter interpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
 					// If it's a distributed application, then it has a contextID.
