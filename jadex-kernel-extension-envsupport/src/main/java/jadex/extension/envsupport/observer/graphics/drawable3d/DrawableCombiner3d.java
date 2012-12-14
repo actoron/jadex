@@ -31,8 +31,10 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/** The properties */
 	public Map<String, Object> properties;
 	
+	/** does the Drawable3d have dynamic subelements? */
+	public boolean dynamic;
+	
 	/** Has a SpaceObject?*/
-
 	//TODO : better Name
 	public boolean _hasSpaceobject;
 	
@@ -71,7 +73,7 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	 */
 	public DrawableCombiner3d()
 	{
-		this(null, null, null, true, false, true);
+		this(null, null, null, true, true, false, true);
 	}
 
 	//-------- methods --------
@@ -79,12 +81,13 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/**
 	 * Creates a new DrawableCombiner3d
 	 */
-	public DrawableCombiner3d(Object position, Object rotation, Object size, boolean hasSpaceobject, boolean rotation3d, boolean autoRotation)
+	public DrawableCombiner3d(Object position, Object rotation, Object size, boolean dynamic, boolean hasSpaceobject, boolean rotation3d, boolean autoRotation)
 	{
 		super(position==null? "position": position, rotation, size);
 		_hasSpaceobject = hasSpaceobject;
 		_rotation3d = rotation3d;
 		_autoRotation = autoRotation;
+		this.dynamic = dynamic;
 		primitives3d = new ArrayList<Primitive3d>();
 		
 		setProperty("$deg45x", DEG45X);
@@ -272,6 +275,14 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	public void setAutoRotation(boolean _autoRotation)
 	{
 		this._autoRotation = _autoRotation;
+	}
+
+	public boolean isDynamic() {
+		return dynamic;
+	}
+
+	public void setDynamic(boolean dynamic) {
+		this.dynamic = dynamic;
 	}
 
 }

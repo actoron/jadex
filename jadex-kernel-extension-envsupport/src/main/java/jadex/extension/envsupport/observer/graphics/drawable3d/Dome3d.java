@@ -45,11 +45,11 @@ public class Dome3d extends Primitive3d
 	 * @param drawcondition
 	 */
 	public Dome3d(Object position, Object rotation, Object size, int absFlags,
-			Object c, String texturePath, double radius, int samples,
+			Object c, String materialpath, String texturePath, double radius, int samples,
 			int planes, IParsedExpression drawcondition, String shadowtype)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_DOME, position, rotation, size,
-				absFlags, c, texturePath, drawcondition, shadowtype);
+				absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
 		_radius = radius;
 		_samples = samples;
 		_planes = planes;

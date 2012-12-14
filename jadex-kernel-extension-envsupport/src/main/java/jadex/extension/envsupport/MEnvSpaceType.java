@@ -563,6 +563,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
 				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
 				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("isDynamic", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("hasSpaceobject", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("rotation3d", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("autoRotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
@@ -594,6 +595,11 @@ public class MEnvSpaceType
 								(Double)getProperty(args, "height"),
 								(Double)getProperty(args, "depth"));
 						}
+						Boolean isDynamic = (Boolean)getProperty(args, "isDynamic");
+						if(isDynamic==null)
+						{
+							isDynamic = true;
+						}
 						Boolean hasSpaceobject = (Boolean)getProperty(args, "hasSpaceobject");
 						if(hasSpaceobject==null)
 						{
@@ -610,7 +616,7 @@ public class MEnvSpaceType
 						{
 							autoRotation = true;
 						}
-						DrawableCombiner3d ret = new DrawableCombiner3d(position, rotation, size, (boolean)hasSpaceobject, rotation3d, autoRotation);
+						DrawableCombiner3d ret = new DrawableCombiner3d(position, rotation, size, (boolean)isDynamic, (boolean)hasSpaceobject, rotation3d, autoRotation);
 						
 						List parts = (List)args.get("parts");
 						if(parts!=null)
@@ -664,6 +670,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
@@ -699,13 +706,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp, shadowtype);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -732,6 +744,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
@@ -766,13 +779,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp, shadowtype);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
 						//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
@@ -801,6 +819,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
@@ -841,13 +860,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, height, exp, shadowtype);
+						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, radius, height, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -874,6 +898,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("planes", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
@@ -937,13 +962,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, (int)samples, (int)planes, exp, shadowtype);
+						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, radius, (int)samples, (int)planes, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -970,6 +1000,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("innerRadius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("outerRadius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
@@ -1033,13 +1064,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp, shadowtype);
+						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1067,6 +1103,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("modelpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("hasLightMaterials", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
@@ -1105,6 +1142,11 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						
 						Boolean hasLightMaterials = (Boolean)getProperty(args, "hasLightMaterials");
 						if(hasLightMaterials==null)
@@ -1135,7 +1177,7 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims);
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), materialpath, texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1236,6 +1278,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
@@ -1274,13 +1317,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp, shadowtype);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1342,13 +1390,18 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, (String)getProperty(args, "text"), exp, shadowtype);
+						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, (String)getProperty(args, "text"), exp, shadowtype);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},

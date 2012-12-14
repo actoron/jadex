@@ -53,7 +53,7 @@ public class Sky3d extends Primitive3d
 	 */
 	public Sky3d(String skyFile, Boolean isSphere, String skyPath, String west, String east, String north, String south, String up, String down, IParsedExpression drawcondition)
 	{
-		super(Primitive3d.PRIMITIVE_TYPE_SKY, null, null, null, 0, null, skyFile,  drawcondition, "Off");
+		super(Primitive3d.PRIMITIVE_TYPE_SKY, null, null, null, 0, null, null, skyFile,  drawcondition, "Off");
 		this._skyFile = skyFile!=null? skyFile: "";
 		this._isSphere = isSphere!=null? isSphere: false;
 		this._skyPath = skyPath!=null? skyPath: "";

@@ -4,6 +4,10 @@ import java.awt.Color;
 
 import jadex.javaparser.IParsedExpression;
 
+/**
+ * @author 7willuwe
+ *
+ */
 public class Primitive3d extends AbstractVisual3d
 {
 	public static final int ABSOLUTE_POSITION = 1;
@@ -39,6 +43,9 @@ public class Primitive3d extends AbstractVisual3d
 	
 	/** Path to the Texture */
 	protected String	texturePath_;
+	
+	/** Path to the Material */
+	protected String	materialPath_;
 	
 	/** The condition deciding if the drawable should be drawn. */
 	protected IParsedExpression drawcondition;
@@ -142,7 +149,7 @@ public class Primitive3d extends AbstractVisual3d
 	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param c the drawable's color or color binding
 	 */
-	public Primitive3d(int type, Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, IParsedExpression drawcondition, String shadowtype)
+	public Primitive3d(int type, Object position, Object rotation, Object size, int absFlags, Object c,  String materialPath, String texturePath, IParsedExpression drawcondition, String shadowtype)
 	{
 		super(position, rotation, size);
 		this.type = type;
@@ -154,6 +161,7 @@ public class Primitive3d extends AbstractVisual3d
 		if (c == null)
 			c = Color.DARK_GRAY;
 		setColor(c);
+		setMaterialPath(materialPath);
 		setTexturePath(texturePath);
 		if(shadowtype.equals(SHADOW_CAST)||shadowtype.equals(SHADOW_RECEIVE)||shadowtype.equals(SHADOW_OFF))
 		{
@@ -318,5 +326,13 @@ public class Primitive3d extends AbstractVisual3d
 	public void setShadowtype(String shadowtype)
 	{
 		this.shadowtype = shadowtype;
+	}
+
+	public String getMaterialPath() {
+		return materialPath_;
+	}
+
+	public void setMaterialPath(String materialPath_) {
+		this.materialPath_ = materialPath_;
 	}
 }

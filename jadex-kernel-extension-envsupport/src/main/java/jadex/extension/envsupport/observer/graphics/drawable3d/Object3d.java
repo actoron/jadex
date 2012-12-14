@@ -48,9 +48,9 @@ public class Object3d extends Primitive3d
 	 * @param texturePath
 	 * @param drawcondition
 	 */
-	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String texturePath, boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, String shadowtype, List<Animation> animations)
+	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String materialpath, String texturePath, boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, String shadowtype, List<Animation> animations)
 	{
-		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, texturePath, drawcondition, shadowtype);
+		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
 		_modelPath = modelPath;
 		_hasLightMaterials = hasLightMaterials;
 		_rigDebug = rigDebug;

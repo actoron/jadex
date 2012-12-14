@@ -43,11 +43,11 @@ public class Cylinder3d extends Primitive3d
 	 * @param drawcondition
 	 */
 	public Cylinder3d(Object position, Object rotation, Object size, int absFlags,
-			Object c, String texturePath, double radius,
+			Object c, String texturePath, String materialPath, double radius,
 			double height, IParsedExpression drawcondition, String shadowtype)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_CYLINDER, position, rotation, size,
-				absFlags, c, texturePath, drawcondition, shadowtype);
+				absFlags, c, materialPath, texturePath, drawcondition, shadowtype);
 		_radius = radius;
 		_height = height;
 	}
