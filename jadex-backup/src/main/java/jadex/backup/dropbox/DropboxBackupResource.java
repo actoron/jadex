@@ -13,6 +13,7 @@ import jadex.commons.Tuple2;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -48,28 +49,32 @@ public class DropboxBackupResource implements IBackupResource
 	/** The dropbox api. */
 	protected DropboxAPI<WebAuthSession> api;
 	
+	/** The cid. */
+	protected IComponentIdentifier cid;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Open a resource.
+	 *  @param id The global id.
 	 *  @param root	The resource root directory.
 	 *  @throws Exception, if the resource is already opened by another component or process.
 	 */
 	public DropboxBackupResource(String id, IComponentIdentifier cid, 
 		String akey, String asecret, String skey, String ssecret) throws Exception
 	{
+		this.cid = cid;
 		this.api = DropboxTest.createSession(akey, asecret, skey, ssecret);
 		
 		this.props	= new Properties();
 		
 		// Try to find the ".jadexbackup" folder 
-		FileData fd = DropboxTest.getFileData(api, "/.jadexbackup/resource.properties");
-		if(fd!=null && fd.isExisting())
+		File f = new File("./.jadexbackup/resource.properties");
+		if(f.exists())
 		{
-			byte[] data = DropboxTest.getFileContent(api, fd.getPath());
-			ByteArrayInputStream is = new ByteArrayInputStream(data);
-			this.props	= new Properties();
-			props.load(is);
+			FileInputStream	fips = new FileInputStream(f);
+			props.load(fips);
+			fips.close();
 		}
 		else
 		{
@@ -81,6 +86,26 @@ public class DropboxBackupResource implements IBackupResource
 			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3));
 			save();
 		}
+		
+//		// Try to find the ".jadexbackup" folder 
+//		FileData fd = DropboxTest.getFileData(api, "./"+cid.getPlatformPrefix()+"/.jadexbackup/resource.properties");
+//		if(fd!=null && fd.isExisting())
+//		{
+//			byte[] data = DropboxTest.getFileContent(api, fd.getPath());
+//			ByteArrayInputStream is = new ByteArrayInputStream(data);
+//			this.props	= new Properties();
+//			props.load(is);
+//		}
+//		else
+//		{
+//			if(id==null)
+//			{
+//				id	= "dropbox_"+UUID.randomUUID().toString(); // todo?
+//			}
+//			props.setProperty("id", id);
+//			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3));
+//			save();
+//		}
 	}
 	
 	/** 
@@ -181,28 +206,8 @@ public class DropboxBackupResource implements IBackupResource
 			{
 				String	hash	= null;
 				
-				// Build hash for contents of directory (Todo: hash for files)
-				
-				// todo:
-				
-//				if(file.isDirectory())
-//				{
-//					final MessageDigest	md	= MessageDigest.getInstance("SHA-1");
-//					String[]	files	= file.list(new FilenameFilter()
-//					{
-//						public boolean accept(File dir, String name)
-//						{
-//							return !".jadexbackup".equals(name);
-//						}
-//					});
-//					for(String name: files)
-//					{
-//						md.update((byte)0);	// marker between directory names to avoid {a, bc} being the same as {ab, c}. 
-//						md.update(name.getBytes("UTF-8"));
-//					}
-//					
-//					hash	= new String(Base64.encode(md.digest()));
-//				}
+				// cannot get updated information about the file without downloading it
+				// -> save info when file is uploaded
 				
 				ret.bumpVTime(getLocalId(), file.isExisting() ? file.getLastModified() : System.currentTimeMillis(), hash, file.isExisting());
 				props.setProperty(path, ret.getVTime());
@@ -431,11 +436,11 @@ public class DropboxBackupResource implements IBackupResource
 	
 	//-------- helper methods --------
 
-	/**
-	 *  Save the meta information.
-	 */
-	protected void	save()
-	{
+//	/**
+//	 *  Save the meta information.
+//	 */
+//	protected void	save()
+//	{
 //		try
 //		{
 //			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -452,6 +457,27 @@ public class DropboxBackupResource implements IBackupResource
 //		{
 //			throw new RuntimeException(e);
 //		}
+//	}
+	
+	/**
+	 *  Save the meta information.
+	 */
+	protected void	save()
+	{
+		try
+		{
+			File meta = new File("./.jadexbackup");
+			meta.mkdirs();
+			File fprops	= new File(meta, "resource.properties");
+			FileOutputStream	fops	= new FileOutputStream(fprops);
+			props.store(fops, "Jadex Backup meta information.");
+			fops.close();
+		}
+		catch(Exception e)
+		{
+			// todo: deal with errors.
+			e.printStackTrace();
+		}
 	}
 	
 //	/**
