@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
@@ -34,7 +35,24 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		if(file==null)
 		{
 			 file = (String)((Object3d) primitive).getModelPath();
+			 if(file.contains("?"))
+			 {
+				 SpaceObject sobj = (SpaceObject) obj;
+				 String neighborhood = Integer.toBinaryString(((Integer) sobj.getProperty("neighborhood")));
+				 
+				 // Parse to correct Length according to the files
+				 while(neighborhood.length()<8)
+				 {
+					 neighborhood = "0".concat(neighborhood);
+				 }
+				 
+				 file = file.replace("?.j3o", "");
+				 file = file.concat(neighborhood);
+				 file = file.concat(".j3o");
+				 System.out.println("file: " + file);
+			 }
 		}
+	
 		
 		Boolean hasLight = (Boolean)((Object3d) primitive).isHasLightMaterials();
 
