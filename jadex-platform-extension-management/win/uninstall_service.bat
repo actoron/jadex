@@ -1,31 +1,35 @@
 @echo off
 
-IF "%PROCESSOR_ARCHITECTURE%" == amd64 (
+:pathname
+FOR %%F IN ("%CD%") DO SET PATHNAME=%%~sF
+
+
+IF "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
 	goto amd64
-) ELSE IF "%PROCESSOR_ARCHITEW6432%" == amd64 (
+) ELSE IF "%PROCESSOR_ARCHITEW6432%" == "AMD64" (
 	goto amd64
-) ELSE IF "%PROCESSOR_ARCHITECTURE%" == ia64 (
+) ELSE IF "%PROCESSOR_ARCHITECTURE%" == "IA64" (
 	goto ia64
-) ELSE IF "%PROCESSOR_ARCHITEW6432%" == ia64 (
+) ELSE IF "%PROCESSOR_ARCHITEW6432%" == "IA64" (
 	goto ia64
 ) ELSE (
     goto x86
 )
 
 :amd64
-	set DIR=%CD%\amd64
-	goto delete
+	set DIR=%PATHNAME%\amd64
+	goto uninstall
 	
 :ia64
-	set DIR=%CD%\ia64
-	goto delete
+	set DIR=%PATHNAME%\ia64
+	goto uninstall
 	
 :x86
-	set DIR=%CD%\x86
-	goto delete
+	set DIR=%PATHNAME%\x86
+	goto uninstall
 
-:delete
-	echo Deleting JadexPro service...
-	amd64\JadexPro delete
+:uninstall
+	echo Uninstalling JadexPro service...
+	%DIR%\JadexPro delete
 	echo success
 	pause
