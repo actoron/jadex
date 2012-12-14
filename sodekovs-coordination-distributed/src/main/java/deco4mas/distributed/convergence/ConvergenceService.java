@@ -1,6 +1,11 @@
 package deco4mas.distributed.convergence;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import deco.distributed.lang.dynamics.convergence.Adaption;
 import deco.distributed.lang.dynamics.convergence.Convergence;
 
@@ -19,9 +24,12 @@ public abstract class ConvergenceService implements IConvergenceService {
 	
 	/** The coordination context */
 	protected String coordinationContextId = null;
+	
+	/** Used to block voting attempts until a previous voting process was finished */
+	protected Map<Adaption, Boolean> locks = new HashMap<Adaption, Boolean>();
 
 	@Override
-	public abstract IFuture<Boolean> vote(Adaption adaption);
+	public abstract IFuture<Boolean> vote(Adaption adaption, IComponentIdentifier initiator);
 	
 	@Override
 	public String getCoordinationContextID() {

@@ -3,6 +3,7 @@
  */
 package deco4mas.distributed.convergence;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco.distributed.lang.dynamics.convergence.Adaption;
@@ -22,15 +23,6 @@ public class MicroConvergenceService extends ConvergenceService {
 		this.coordinationContextId = coordinationContextId;
 	}
 
-	/* (non-Javadoc)
-	 * @see deco4mas.distributed.convergence.IConvergenceService#vote(deco.distributed.lang.dynamics.convergence.Adaption)
-	 */
-	@Override
-	public IFuture<Boolean> vote(Adaption adaption) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	protected void initListener() {
 			
@@ -40,5 +32,17 @@ public class MicroConvergenceService extends ConvergenceService {
 	protected void startService() {
 		String serviceName = agent.getComponentIdentifier().getLocalName() + SERVICE_POSTFIX;
 		agent.addService(serviceName, IConvergenceService.class, this);
+	}
+
+	@Override
+	public void resetConstraint(Adaption adaption) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IFuture<Boolean> vote(Adaption adaption, IComponentIdentifier initiator) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

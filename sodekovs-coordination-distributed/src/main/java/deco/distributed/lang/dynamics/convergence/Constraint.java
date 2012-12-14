@@ -106,4 +106,59 @@ public class Constraint {
 	public String toString() {
 		return "Constraint [agentId=" + agentId + ", element=" + element + ", type=" + type + ", condition=" + condition + ", threshold=" + threshold + "]";
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((agentId == null) ? 0 : agentId.hashCode());
+		result = prime * result + ((condition == null) ? 0 : condition.hashCode());
+		result = prime * result + ((element == null) ? 0 : element.hashCode());
+		result = prime * result + ((threshold == null) ? 0 : threshold.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Constraint other = (Constraint) obj;
+		if (agentId == null) {
+			if (other.agentId != null)
+				return false;
+		} else if (!agentId.equals(other.agentId))
+			return false;
+		if (condition == null) {
+			if (other.condition != null)
+				return false;
+		} else if (!condition.equals(other.condition))
+			return false;
+		if (element == null) {
+			if (other.element != null)
+				return false;
+		} else if (!element.equals(other.element))
+			return false;
+		if (threshold == null) {
+			if (other.threshold != null)
+				return false;
+		} else if (!threshold.equals(other.threshold))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
+	}
 }

@@ -12,6 +12,7 @@ import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -28,6 +29,7 @@ import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import deco.distributed.lang.dynamics.MASDynamics;
 import deco.distributed.lang.dynamics.convergence.Adaption;
@@ -70,26 +72,31 @@ public class BDIConvergenceService extends ConvergenceService {
 	}
 
 	@Override
-	public IFuture<Boolean> vote(Adaption adaption) {
-		System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " vote is called for " + adaption);
+	public IFuture<Boolean> vote(Adaption adaption, IComponentIdentifier initiator) {
+		System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " vote is called for " + adaption + " by " + initiator);
 		Future<Boolean> fut = new Future<Boolean>();
-		boolean result = true;
+		boolean result = false;
 
-		// get all constraints which reference the agent type
-		List<Constraint> constraints = adaption.getConstraints(externalAccess.getLocalType());
-		for (Constraint constraint : constraints) {
-			// get the belief value
-			IOAVState state = externalAccess.getState();
-			Object[] scope = AgentRules.resolveCapability(constraint.getElement(), OAVBDIMetaModel.belief_type, externalAccess.getScope(), state);
-			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+		if (!locks.get(adaption) || initiator.equals(externalAccess.getComponentIdentifier())) {
+			locks.put(adaption, true);
+			result = true;
 
-			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0])) {
-				IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
-				// for now we just assume it is an integer value
-				Integer value = (Integer) base.getBelief(constraint.getElement()).getFact();
+			// get all constraints which reference the agent type
+			List<Constraint> constraints = adaption.getConstraints(externalAccess.getLocalType());
+			for (Constraint constraint : constraints) {
+				// get the belief value
+				IOAVState state = externalAccess.getState();
+				Object[] scope = AgentRules.resolveCapability(constraint.getElement(), OAVBDIMetaModel.belief_type, externalAccess.getScope(), state);
+				Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 
-				// result should only be true if all referenced constraints are fulfilled
-				result = result && value >= constraint.getThreshold();
+				if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0])) {
+					IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
+					// for now we just assume it is an integer value
+					Integer value = (Integer) base.getBelief(constraint.getElement()).getFact();
+
+					// result should only be true if all referenced constraints are fulfilled
+					result = result && value >= constraint.getThreshold();
+				}
 			}
 		}
 
@@ -118,6 +125,7 @@ public class BDIConvergenceService extends ConvergenceService {
 						// initialize listener for adaption and constraint
 						IBelief belief = base.getBelief(constraint.getElement());
 						belief.addBeliefListener(new BDIBeliefListener(adaption, constraint, belief));
+						locks.put(adaption, false);
 
 						System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " initialized listener for " + constraint);
 					}
@@ -177,6 +185,34 @@ public class BDIConvergenceService extends ConvergenceService {
 	}
 
 	/**
+	 * Calls all remote convergence services and ask them to reset their convergence constraints if a previous voting attempt (Adaption) was successfull.
+	 * 
+	 * @param adaption
+	 *            the given {@link Adaption}
+	 */
+	private void resetConstraints(final Adaption adaption) {
+		System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " resets all constraints for " + adaption);
+		// get remote convergence services
+		SServiceProvider.getServices(externalAccess.getServiceProvider(), IConvergenceService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<IConvergenceService>() {
+
+			@Override
+			public boolean filter(IConvergenceService obj) {
+				if (coordinationContextId.equals(obj.getCoordinationContextID())) {
+					return true;
+				}
+				return false;
+			}
+		}).addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
+
+			@Override
+			public void intermediateResultAvailable(IConvergenceService result) {
+				// and reset them
+				result.resetConstraint(adaption);
+			}
+		});
+	}
+
+	/**
 	 * Private {@link IBeliefListener} class. Observes the agent for an given {@link Adaption}, {@link Constraint} and {@link IBelief}.
 	 */
 	private class BDIBeliefListener implements IBeliefListener {
@@ -207,53 +243,71 @@ public class BDIConvergenceService extends ConvergenceService {
 		@Override
 		public void beliefChanged(AgentEvent ae) {
 			// for now we just assume it is an integer value
-			Integer value = (Integer) ae.getValue();
+			final Integer value = (Integer) ae.getValue();
 
-			// also we assume that the condition is fulfilled if the condition value (integer) equals the current belief value
-			if (constraint.getCondition() >= value) {
-				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " constraint fulfilled " + constraint);
-				// initialize the voting result listener
-				final VoteResultListener voteResultListener = new VoteResultListener(adaption, belief);
-				// start the voting timeout which will notify the voting result listener
-				externalAccess.scheduleStep(new IComponentStep<Void>() {
+			Random rnd = new Random();
+			final int delay = rnd.nextInt(adaption.getDelay().intValue());
+			externalAccess.scheduleStep(new IComponentStep<Void>() {
 
-					@Override
-					public IFuture<Void> execute(IInternalAccess ia) {
-						ia.waitForDelay(adaption.getTimeout(), new IComponentStep<Void>() {
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia) {
+					return ia.waitForDelay(delay, new IComponentStep<Void>() {
 
-							@Override
-							public IFuture<Void> execute(IInternalAccess ia) {
-								voteResultListener.setFinished();
-								return IFuture.DONE;
+						@Override
+						public IFuture<Void> execute(IInternalAccess ia) {
+							// also we assume that the condition is fulfilled if the condition value (integer) equals the current belief value
+							if (value >= constraint.getCondition() && !locks.get(adaption)) {
+								System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " constraint fulfilled " + constraint);
+								locks.put(adaption, true);
+								// initialize the voting result listener
+								final VoteResultListener voteResultListener = new VoteResultListener(adaption, belief);
+								// start the voting timeout which will notify the voting result listener
+								externalAccess.scheduleStep(new IComponentStep<Void>() {
+
+									@Override
+									public IFuture<Void> execute(IInternalAccess ia) {
+										ia.waitForDelay(adaption.getTimeout(), new IComponentStep<Void>() {
+
+											@Override
+											public IFuture<Void> execute(IInternalAccess ia) {
+												voteResultListener.setFinished();
+												return IFuture.DONE;
+											}
+										});
+										return IFuture.DONE;
+									}
+								});
+								// get all other IConvergence services for the same coordination context
+								IIntermediateFuture<IConvergenceService> result = SServiceProvider.getServices(externalAccess.getServiceProvider(), IConvergenceService.class,
+										RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<IConvergenceService>() {
+
+											@Override
+											public boolean filter(IConvergenceService obj) {
+												if (obj.getCoordinationContextID().equals(coordinationContextId)) {
+													return true;
+												}
+												return false;
+											}
+										});
+								result.addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
+
+									@SuppressWarnings("unchecked")
+									@Override
+									public void intermediateResultAvailable(IConvergenceService service) {
+										// let them vote
+										IFuture<Boolean> res = service.vote(adaption, externalAccess.getComponentIdentifier());
+										// and given the result a reference to the vote result listener
+										res.addResultListener(voteResultListener);
+									}
+								});
 							}
-						});
-						return IFuture.DONE;
-					}
-				});
-				// get all other IConvergence services for the same coordination context
-				IIntermediateFuture<IConvergenceService> result = SServiceProvider.getServices(externalAccess.getServiceProvider(), IConvergenceService.class, RequiredServiceInfo.SCOPE_GLOBAL,
-						new IFilter<IConvergenceService>() {
 
-							@Override
-							public boolean filter(IConvergenceService obj) {
-								if (obj.getCoordinationContextID().equals(coordinationContextId)) {
-									return true;
-								}
-								return false;
-							}
-						});
-				result.addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
+							return IFuture.DONE;
+						}
+					});
+				}
+			});
 
-					@SuppressWarnings("unchecked")
-					@Override
-					public void intermediateResultAvailable(IConvergenceService service) {
-						// let them vote
-						IFuture<Boolean> res = service.vote(adaption);
-						// and given the result a reference to the vote result listener
-						res.addResultListener(voteResultListener);
-					}
-				});
-			}
 		}
 	}
 
@@ -335,6 +389,8 @@ public class BDIConvergenceService extends ConvergenceService {
 				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " quorom is reached " + voteResult);
 				// adapt!
 				adapt(adaption);
+				// reset
+				resetConstraints(adaption);
 				// if not check for reset
 			} else {
 				System.out.println(externalAccess.getComponentIdentifier().getLocalName() + " quorom is was not reached " + voteResult);
@@ -343,6 +399,27 @@ public class BDIConvergenceService extends ConvergenceService {
 					belief.setFact(new Integer(0));
 				}
 			}
+
+			locks.put(adaption, false);
 		}
+	}
+
+	@Override
+	public void resetConstraint(Adaption adaption) {
+		List<Constraint> constraints = adaption.getConstraints(externalAccess.getLocalType());
+		for (Constraint constraint : constraints) {
+			// get the belief value
+			IOAVState state = externalAccess.getState();
+			Object[] scope = AgentRules.resolveCapability(constraint.getElement(), OAVBDIMetaModel.belief_type, externalAccess.getScope(), state);
+			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+
+			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0])) {
+				IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
+				// reset the contraint by setting the value back to 0
+				base.getBelief(constraint.getElement()).setFact(new Integer(0));
+			}
+		}
+
+		locks.put(adaption, false);
 	}
 }

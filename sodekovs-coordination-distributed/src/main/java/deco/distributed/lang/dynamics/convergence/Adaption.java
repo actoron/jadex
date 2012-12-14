@@ -172,10 +172,11 @@ public class Adaption {
 	 */
 	@Override
 	public String toString() {
-		final int maxLen = 10;
-		return "Adaption [id=" + id + ", answer=" + answer + ", quorum=" + quorum + ", timeout=" + timeout + ", delay=" + delay + ", reset=" + reset + ", realizations="
-				+ (realizations != null ? realizations.subList(0, Math.min(realizations.size(), maxLen)) : null) + ", constraints="
-				+ (constraints != null ? constraints.subList(0, Math.min(constraints.size(), maxLen)) : null) + "]";
+//		final int maxLen = 10;
+//		return "Adaption [id=" + id + ", answer=" + answer + ", quorum=" + quorum + ", timeout=" + timeout + ", delay=" + delay + ", reset=" + reset + ", realizations="
+//				+ (realizations != null ? realizations.subList(0, Math.min(realizations.size(), maxLen)) : null) + ", constraints="
+//				+ (constraints != null ? constraints.subList(0, Math.min(constraints.size(), maxLen)) : null) + "]";
+		return "Adaption " + id;
 	}
 
 	/**
@@ -195,5 +196,78 @@ public class Adaption {
 		}
 
 		return constraints;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((answer == null) ? 0 : answer.hashCode());
+		result = prime * result + ((constraints == null) ? 0 : constraints.hashCode());
+		result = prime * result + ((delay == null) ? 0 : delay.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((quorum == null) ? 0 : quorum.hashCode());
+		result = prime * result + ((realizations == null) ? 0 : realizations.hashCode());
+		result = prime * result + ((reset == null) ? 0 : reset.hashCode());
+		result = prime * result + ((timeout == null) ? 0 : timeout.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Adaption other = (Adaption) obj;
+		if (answer == null) {
+			if (other.answer != null)
+				return false;
+		} else if (!answer.equals(other.answer))
+			return false;
+		if (constraints == null) {
+			if (other.constraints != null)
+				return false;
+		} else if (!constraints.equals(other.constraints))
+			return false;
+		if (delay == null) {
+			if (other.delay != null)
+				return false;
+		} else if (!delay.equals(other.delay))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (quorum == null) {
+			if (other.quorum != null)
+				return false;
+		} else if (!quorum.equals(other.quorum))
+			return false;
+		if (realizations == null) {
+			if (other.realizations != null)
+				return false;
+		} else if (!realizations.equals(other.realizations))
+			return false;
+		if (reset == null) {
+			if (other.reset != null)
+				return false;
+		} else if (!reset.equals(other.reset))
+			return false;
+		if (timeout == null) {
+			if (other.timeout != null)
+				return false;
+		} else if (!timeout.equals(other.timeout))
+			return false;
+		return true;
 	}
 }
