@@ -6,9 +6,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -17,6 +19,7 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
@@ -42,6 +45,14 @@ import jadex.tools.testcenter.TestCenterPlugin;
 @Agent
 public class JCCAgent	implements IComponentStep<Void>
 {
+	//-------- constants --------
+	
+	/** Number of tries, when connecting initially to remote platforms. */
+	public static final int	MAX_TRIES	= 10;	
+	
+	/** Delay in milliseconds between two subsequent tries. */
+	public static final int	RETRY_DELAY	= 1000;
+	
 	//-------- attributes --------
 	
 	/** The saveonexit argument. */
@@ -55,12 +66,18 @@ public class JCCAgent	implements IComponentStep<Void>
 	/** The control center. */
 	protected ControlCenter	cc;
 	
+	/** Number of tries, when connecting initially to remote platforms. */
+	protected int	tries;
+	
+	/** True when initially connected to a remote platform.. */
+	protected boolean	connected;
+	
 	//-------- micro agent methods --------
 	
 	/**
 	 *  Open the gui on agent startup.
 	 */
-	@AgentCreated
+	@AgentBody
 	public IFuture<Void>	execute(final IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -80,58 +97,80 @@ public class JCCAgent	implements IComponentStep<Void>
 		}
 		else
 		{
-			// Find matching platforms.
-			agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
-			
-			agent.getServiceContainer().searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-				.addResultListener(new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			tries++;
+
+			// No connection -> shutdown platform
+			if(tries>MAX_TRIES)
 			{
-				boolean	found	= false;
-				public void intermediateResultAvailable(IComponentManagementService cms)
-				{
-					IComponentIdentifier	cid	= ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
-					if(cid.getName().startsWith(platforms))
-					{
-						found	= true;
-						cms.getExternalAccess(cid)
-							.addResultListener(new IResultListener<IExternalAccess>()
-						{
-							public void resultAvailable(IExternalAccess platform)
-							{
-								initControlCenter(agent, platform)
-									.addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										ret.setResultIfUndone(null);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										ret.setExceptionIfUndone(exception);
-									}
-								});
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setExceptionIfUndone(exception);
-							}
-						});
-					}
-				}
+				agent.getLogger().info("No platforms found matching '"+platforms+"'.");
+				agent.killComponent();
+			}
+			
+			// Try to find matching platforms.
+			else
+			{
+				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				public void finished()
+				agent.getServiceContainer().searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+					.addResultListener(new TimeoutIntermediateResultListener<IComponentManagementService>(RETRY_DELAY, agent.getExternalAccess(),
+						new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
-					// If no platform found, search again after 1 second.
-					if(!found)
+					boolean	found	= false;
+					public void intermediateResultAvailable(IComponentManagementService cms)
 					{
-						// Todo: fail after x seconds?
-						agent.waitForDelay(1000, JCCAgent.this)
-							.addResultListener(new DelegationResultListener<Void>(ret));
+						IComponentIdentifier	cid	= ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+						if(cid.getName().startsWith(platforms))
+						{
+							found	= true;
+							cms.getExternalAccess(cid)
+								.addResultListener(new IResultListener<IExternalAccess>()
+							{
+								public void resultAvailable(IExternalAccess platform)
+								{
+									initControlCenter(agent, platform)
+										.addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+											ret.setResultIfUndone(null);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											ret.setExceptionIfUndone(exception);
+										}
+									});
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setExceptionIfUndone(exception);
+								}
+							});
+						}
 					}
-				}
-			});
+					
+					public void finished()
+					{
+						// If no platform found, search again after 1 second.
+						if(!found)
+						{
+							agent.waitForDelay(RETRY_DELAY, JCCAgent.this)
+								.addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// If no platform found, search again after 1 second.
+						if(!found)
+						{
+							agent.waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this)
+								.addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					}
+				}));
+			}
 		}
 
 		return ret;
