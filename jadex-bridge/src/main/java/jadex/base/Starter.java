@@ -1,7 +1,6 @@
 package jadex.base;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -29,7 +28,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;

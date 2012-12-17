@@ -19,7 +19,6 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
@@ -77,7 +76,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	/**
 	 *  Open the gui on agent startup.
 	 */
-	@AgentBody
+	@AgentCreated
 	public IFuture<Void>	execute(final IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -103,7 +102,20 @@ public class JCCAgent	implements IComponentStep<Void>
 			if(tries>MAX_TRIES)
 			{
 				agent.getLogger().info("No platforms found matching '"+platforms+"'.");
+				
+				// Gracefully terminate the agent:
 				agent.killComponent();
+				ret.setResultIfUndone(null);
+				
+				// This would let the whole platform init fail:
+//				ret.setExceptionIfUndone(new RuntimeException("No platforms found matching '"+platforms+"'."));
+//				{
+//					public void printStackTrace()
+//					{
+//						Thread.dumpStack();
+//						super.printStackTrace();
+//					}
+//				});
 			}
 			
 			// Try to find matching platforms.
@@ -115,13 +127,12 @@ public class JCCAgent	implements IComponentStep<Void>
 					.addResultListener(new TimeoutIntermediateResultListener<IComponentManagementService>(RETRY_DELAY, agent.getExternalAccess(),
 						new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
-					boolean	found	= false;
 					public void intermediateResultAvailable(IComponentManagementService cms)
 					{
 						IComponentIdentifier	cid	= ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
 						if(cid.getName().startsWith(platforms))
 						{
-							found	= true;
+							connected	= true;
 							cms.getExternalAccess(cid)
 								.addResultListener(new IResultListener<IExternalAccess>()
 							{
@@ -153,7 +164,7 @@ public class JCCAgent	implements IComponentStep<Void>
 					public void finished()
 					{
 						// If no platform found, search again after 1 second.
-						if(!found)
+						if(!connected)
 						{
 							agent.waitForDelay(RETRY_DELAY, JCCAgent.this)
 								.addResultListener(new DelegationResultListener<Void>(ret));
@@ -163,7 +174,7 @@ public class JCCAgent	implements IComponentStep<Void>
 					public void exceptionOccurred(Exception exception)
 					{
 						// If no platform found, search again after 1 second.
-						if(!found)
+						if(!connected)
 						{
 							agent.waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this)
 								.addResultListener(new DelegationResultListener<Void>(ret));
@@ -184,18 +195,16 @@ public class JCCAgent	implements IComponentStep<Void>
 	{
 //		System.out.println("JCC agent killed");
 		Future<Void>	ret	= new Future<Void>();
-		cc.shutdown().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)));
-//		ret.addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				System.out.println("r1");
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("r2");
-//			}
-//		});
+		if(cc!=null)
+		{
+			cc.shutdown()
+				.addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+
 		return ret;
 	}
 	
