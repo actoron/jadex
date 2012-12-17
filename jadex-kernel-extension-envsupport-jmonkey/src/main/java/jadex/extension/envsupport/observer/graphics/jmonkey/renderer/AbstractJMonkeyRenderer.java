@@ -4,6 +4,7 @@ import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
@@ -22,6 +23,7 @@ import com.jme3.animation.LoopMode;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.font.BitmapText;
+import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.material.RenderState.FaceCullMode;
@@ -33,6 +35,7 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.LightControl;
 import com.jme3.texture.Texture;
 
 
@@ -82,104 +85,143 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			draw = ((Boolean)drawcondition.getValue(_fetcher)).booleanValue();
 		}
 		
+
+		
 		if(draw)
 		{	
-			// first create the Spatial
-			spatial = draw(dc, primitive, obj, vp);
 
-			Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj,
-					primitive.getRotation(), vp));
-			rotation = new Vector3f(rotationD.getXAsFloat(),
-					rotationD.getYAsFloat(), rotationD.getZAsFloat());
+				spatial = draw(dc, primitive, obj, vp);
 
-			Vector3Double sizelocalD = ((Vector3Double)dc.getBoundValue(obj,
-					primitive.getSize(), vp));
-			sizelocal = new Vector3f(sizelocalD.getXAsFloat(),
-					sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());
+				Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj,
+						primitive.getRotation(), vp));
+				rotation = new Vector3f(rotationD.getXAsFloat(),
+						rotationD.getYAsFloat(), rotationD.getZAsFloat());
 
-			Vector3Double positionlocalD = ((Vector3Double)dc.getBoundValue(
-					obj, primitive.getPosition(), vp));
-			positionlocal = new Vector3f(positionlocalD.getXAsFloat(),
-					positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());
+				Vector3Double sizelocalD = ((Vector3Double)dc.getBoundValue(obj,
+						primitive.getSize(), vp));
+				sizelocal = new Vector3f(sizelocalD.getXAsFloat(),
+						sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());
 
-			// Shadow, by default off
-			spatial.setShadowMode(ShadowMode.Off);
+				Vector3Double positionlocalD = ((Vector3Double)dc.getBoundValue(
+						obj, primitive.getPosition(), vp));
+				positionlocal = new Vector3f(positionlocalD.getXAsFloat(),
+						positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());
 
-			String shadow = primitive.getShadowtype();
+				// Shadow, by default off
+				spatial.setShadowMode(ShadowMode.Off);
 
-			if(shadow.equals(Primitive3d.SHADOW_CAST))
-			{
-				spatial.setShadowMode(ShadowMode.Cast);
-			}
-			else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
-			{
-				spatial.setShadowMode(ShadowMode.Receive);
-			}
+				String shadow = primitive.getShadowtype();
 
-
-			float[] angles = {rotation.x, rotation.y, rotation.z};
-			quatation = spatial.getLocalRotation().fromAngles(angles);
-
-			// Set the local size
-			spatial.setLocalScale(sizelocal);
-
-			// Set the local Translation
-			spatial.setLocalTranslation(positionlocal);
-
-			// Set the local Rotation
-			spatial.setLocalRotation(quatation);
-
-
-			// Set the Material
-			if((spatial instanceof Geometry) && primitive.getType() != 6
-					&& primitive.getType() != 8 && primitive.getType() != 9) // And
-																				// not
-																				// a
-																				// Node
-																				// ->
-																				// Object3D
-			{
-
-				Material mat_tt = new Material(assetManager,
-						"Common/MatDefs/Light/Lighting.j3md");
-				Color c = (Color)dc
-						.getBoundValue(obj, primitive.getColor(), vp);
-				float alpha = ((float)c.getAlpha()) / 255;
-				ColorRGBA color = new ColorRGBA(((float)c.getRed()) / 255,
-						((float)c.getGreen()) / 255,
-						((float)c.getBlue()) / 255, alpha);
-
-				if(alpha < 1)
+				if(shadow.equals(Primitive3d.SHADOW_CAST))
 				{
-					mat_tt.getAdditionalRenderState().setBlendMode(
-							BlendMode.Alpha); // activate transparency
-					spatial.setQueueBucket(Bucket.Translucent);
-					spatial.setQueueBucket(Bucket.Transparent);
+					spatial.setShadowMode(ShadowMode.Cast);
 				}
-				String texturepath = primitive.getTexturePath();
-
-				if(!texturepath.equals(""))
+				else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
 				{
-					mat_tt = new Material(assetManager,
-							"Common/MatDefs/Misc/Unshaded.j3md");
-
-					Texture tex_ml = assetManager.loadTexture(texturepath);
-					mat_tt.setColor("Color", color);
-					mat_tt.setTexture("ColorMap", tex_ml);
-
-
-				}
-				else
-				{
-					mat_tt.setColor("Diffuse", color);
-					mat_tt.setColor("Ambient", color);
-					mat_tt.setBoolean("UseMaterialColors", true);
+					spatial.setShadowMode(ShadowMode.Receive);
 				}
 
-				spatial.setMaterial(mat_tt);
+
+				float[] angles = {rotation.x, rotation.y, rotation.z};
+				quatation = spatial.getLocalRotation().fromAngles(angles);
+
+				// Set the local size
+				spatial.setLocalScale(sizelocal);
+
+				// Set the local Translation
+				spatial.setLocalTranslation(positionlocal);
+
+				// Set the local Rotation
+				spatial.setLocalRotation(quatation);
+
+
+				// Set the Material
+				if((spatial instanceof Geometry) && primitive.getType() != 6
+						&& primitive.getType() != 8 && primitive.getType() != 9) // And
+																					// not
+																					// a
+																					// Node
+																					// ->
+																					// Object3D
+				{
+
+					Material mat_tt = new Material(assetManager,
+							"Common/MatDefs/Light/Lighting.j3md");
+					Color c = (Color)dc
+							.getBoundValue(obj, primitive.getColor(), vp);
+					float alpha = ((float)c.getAlpha()) / 255;
+					ColorRGBA color = new ColorRGBA(((float)c.getRed()) / 255,
+							((float)c.getGreen()) / 255,
+							((float)c.getBlue()) / 255, alpha);
+
+					if(alpha < 1)
+					{
+						mat_tt.getAdditionalRenderState().setBlendMode(
+								BlendMode.Alpha); // activate transparency
+						spatial.setQueueBucket(Bucket.Translucent);
+						spatial.setQueueBucket(Bucket.Transparent);
+					}
+					String texturepath = primitive.getTexturePath();
+
+					if(!texturepath.equals(""))
+					{
+						mat_tt = new Material(assetManager,
+								"Common/MatDefs/Misc/Unshaded.j3md");
+
+						Texture tex_ml = assetManager.loadTexture(texturepath);
+						mat_tt.setColor("Color", color);
+						mat_tt.setTexture("ColorMap", tex_ml);
+
+
+					}
+					else
+					{
+						mat_tt.setColor("Diffuse", color);
+						mat_tt.setColor("Ambient", color);
+						mat_tt.setBoolean("UseMaterialColors", true);
+					}
+
+					spatial.setMaterial(mat_tt);
+				}
+				
+				if(primitive.getType()== Primitive3d.PRIMITIVE_TYPE_POINTLIGHT)
+				{
+					
+					System.out.println("create PointLight AbstractJMonkeyRenderer");
+					PointLight  light;
+					Color color; 
+						float radius = (float)((PointLight3d) primitive).getRadius();
+						
+						color = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
+						
+						light = new PointLight();
+						ColorRGBA rgbacolor = new ColorRGBA(((float)color.getRed()) / 255,
+								((float)color.getGreen()) / 255,
+								((float)color.getBlue()) / 255, ((float)color.getAlpha() /255));
+						
+						light.setColor(rgbacolor);
+						light.setRadius(radius*20);
+						
+						light.setPosition(new Vector3f(spatial.getLocalTranslation().clone().add(0f,1f,0f)));
+	
+//						light.setRadius(100);
+						
+//						light.setPosition(new Vector3f(250, 10, 250));
+						
+						
+						
+						LightControl lightControl = new LightControl(light);
+						spatial.addControl(lightControl); // this spatial controls the position of this light.
+						
+						
+						
+						vp.addLight(light);
+						
+				}
+			
+				
 			}
-		}
-		
+
 		return spatial;
 	}
 
@@ -271,7 +313,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			}
 			
 			// Special Case 02: Animation Updates
-			if(primitive.getType()==6)
+			else if(primitive.getType()==6)
 			{
 				Object animation = sp.getUserData("Animation");
 				if(animation instanceof Boolean && ((Boolean)animation).booleanValue())
@@ -312,6 +354,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					}
 				}
 			}
+
 		}
 		else
 		{

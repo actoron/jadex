@@ -28,6 +28,13 @@ public class MonkeyApp extends AMonkeyFunctions {
 
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdateAbstract(tpf);
+//		System.out.println("dim");
+		if(cleanupPostFilter)
+		{
+			fpp.cleanup();
+			cleanupPostFilter = false;
+		}
+
 
 	}
 

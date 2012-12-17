@@ -15,6 +15,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.CylinderJMo
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.DomeJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Object3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.PointLightRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SoundJMonkeyPlayer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SphereJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Text3dJMonkeyRenderer;
@@ -25,7 +26,7 @@ import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.extension.envsupport.observer.perspective.Perspective3D;
 
-import java.awt.EventQueue;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,13 +37,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.naming.Context;
-
 import com.jme3.animation.AnimChannel;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.input.InputManager;
+import com.jme3.light.Light;
+import com.jme3.light.PointLight;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -114,15 +115,19 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 	/** The overal scale for the Application */
 	private final static int				_scaleApp		= 500;
+	
+	private Dimension canvasSize;
 
 
 	/**
 	 * Animation Stuff
 	 */
 	private HashMap<String, AnimChannel>	_animChannels;
+	
+	private ArrayList<Light> lights = new ArrayList<Light>();
 
 	/** The 3d renderers. */
-	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[11];
+	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[12];
 	static
 	{
 		RENDERERS[0] = new SphereJMonkeyRenderer();
@@ -136,6 +141,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		RENDERERS[8] = new SkyJMonkeyRenderer();
 		RENDERERS[9] = new TerrainJMonkeyRenderer();
 		RENDERERS[10] = new SoundJMonkeyPlayer();
+		RENDERERS[11] = new PointLightRenderer();
 	}
 
 	/**
@@ -154,6 +160,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		// Animation Channels
 		_animChannels = new HashMap<String, AnimChannel>();
+		
+		
+		
+		
 
 		// TODO: scaling komplett
 		_scale = _scaleApp / areaSize_.getXAsFloat();
@@ -168,6 +178,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_context = (JmeCanvasContext)_app.getContext();
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
+		canvasSize = canvas_.getSize();
+		
+		
+//		canvas_.setSize(1024, 768);
 
 		// Drawstuff
 		_drawObjects = Collections.synchronizedSet(new HashSet<Object>());
@@ -667,6 +681,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 		this._animChannels = _animChannels;
 	}
+	private int i = 0;
+	private boolean light = false;
 
 	public class MyCallAction implements Callable<Void>
 	{
@@ -679,21 +695,45 @@ public class ViewportJMonkey extends AbstractViewport3d
 			this.staticvisuals = staticvisuals;
 		}
 		
+		
+		
 		public Void call()
 		{
+
+			
 			_geometryNode = updateMonkey(objectList);
 
 			if(_firstrun)
 			{
-				_capabilities = _app.getCaps();
+//				_capabilities = _app.getCaps();
 //				System.out.println("capabilities: \n" + _capabilities);
 				_staticNode = createStatics(staticvisuals);
 				_app.setStaticGeometry(_staticNode);
 				_app.setChannels(_animChannels);
+
 				_staticNode.setLocalScale(_scale);
 				_geometryNode.setLocalScale(_scale);
 				_firstrun = false;
+				
+//				for(Light l : getLights())
+//				{
+////					remveLight(l);
+////					rootNode.removeLight(light)
+//					System.out.println("add light! \n");
+//					System.out.println("light: " + l.getColor() + l.getType() + " pos: " + ((PointLight)l).getPosition() + "radius " + ((PointLight)l).getRadius());
+//					_geometryNode.addLight(l);
+//				}
 			}
+				
+			if(!canvas_.getSize().equals(canvasSize))
+			{
+//				System.out.println("old dim " + canvasSize + " canvas dim: " + canvas_.getSize());
+				_app.setCleanupPostFilter(true);
+				canvasSize = canvas_.getSize();
+			}
+			
+//			asd
+//			_app.setLights(lights);
 			_app.setGeometry(_geometryNode);
 
 			rendering = false;
@@ -704,5 +744,30 @@ public class ViewportJMonkey extends AbstractViewport3d
 			return null;
 		}
 	}
+
+	/**
+	 * @return the lights
+	 */
+	public ArrayList<Light> getLights() {
+		return lights;
+	}
+
+	/**
+	 * @param lights the lights to set
+	 */
+	public void setLights(ArrayList<Light> lights) {
+		this.lights = lights;
+	}
+	
+	public void addLight(Light light)
+	{
+		lights.add(light);
+	}
+	
+	public void remveLight(Light light)
+	{
+		lights.remove(light);
+	}
+	
 
 }

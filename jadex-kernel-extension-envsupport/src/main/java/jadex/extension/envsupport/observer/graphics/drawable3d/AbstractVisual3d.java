@@ -20,7 +20,7 @@ public class AbstractVisual3d
 	private Object	position;
 	
 	/** save if its already created in the scene or not */
-	private boolean created;
+//	private boolean created;
 	
 	//-------- constructors --------
 	
@@ -40,7 +40,7 @@ public class AbstractVisual3d
 		this.size = size!=null? size: new Vector3Double(1.0);
 		this.rotation = rotation!=null? rotation: Vector3Double.ZERO;
 		this.position = position!=null? position: Vector3Double.ZERO;
-		this.created = null != null;
+//		this.created = null != null;
 	}
 	
 	//-------- methods --------
@@ -127,20 +127,20 @@ public class AbstractVisual3d
 		return this.position;
 	}
 	
-	/**
-	 *  Mark as created
-	 */
-	public void setCreated(boolean value)
-	{
-		this.created = value;
-	}
-
-	/**
-	 *  Is created?
-	 *  @return the boolean
-	 */
-	public boolean isCreated()
-	{
-		return this.created;
-	}
+//	/**
+//	 *  Mark as created
+//	 */
+//	public void setCreated(boolean value)
+//	{
+//		this.created = value;
+//	}
+//
+//	/**
+//	 *  Is created?
+//	 *  @return the boolean
+//	 */
+//	public boolean isCreated()
+//	{
+//		return this.created;
+//	}
 }

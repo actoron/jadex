@@ -31,13 +31,13 @@ public class CustomChaseCamera implements ActionListener, AnalogListener, Contro
     protected float distance = 200;
     protected float zoomSpeed = 20f;
     protected float rotationSpeed = 1.0f;
-    protected float rotation = 0;
+    protected float rotation = FastMath.PI/4;
     protected float trailingRotationInertia = 0.05f;
     protected float zoomSensitivity = 5f;
     protected float rotationSensitivity = 5f;
     protected float chasingSensitivity = 5f;
     protected float trailingSensitivity = 0.5f;
-    protected float vRotation = FastMath.PI / 6;
+    protected float vRotation = FastMath.PI / 3;
     protected boolean smoothMotion = false;
     protected boolean trailingEnabled = true;
     protected float rotationLerpFactor = 0;

@@ -24,6 +24,8 @@ public class Primitive3d extends AbstractVisual3d
 	public static final int PRIMITIVE_TYPE_SKY	 			= 8;
 	public static final int PRIMITIVE_TYPE_TERRAIN	 		= 9;
 	public static final int PRIMITIVE_TYPE_SOUND	 		= 10;
+	public static final int PRIMITIVE_TYPE_POINTLIGHT	 		= 11;
+	public static final int PRIMITIVE_TYPE_DIRECTIONALLIGHT	 		= 12;
 	
 	public static final String SHADOW_OFF = "Off";
 	public static final String SHADOW_CAST = "Cast";
@@ -69,6 +71,7 @@ public class Primitive3d extends AbstractVisual3d
 		enableDCRot = false;
 		setColor(Color.MAGENTA);
 		texturePath_ = "";
+		materialPath_ = "";
 	}
 	
 	public Primitive3d(int type)
@@ -81,8 +84,22 @@ public class Primitive3d extends AbstractVisual3d
 		enableDCRot = false;
 		setColor(Color.MAGENTA);
 		texturePath_ = "";
+		materialPath_ ="";
 	}
 	
+	public Primitive3d(int type, Object position, Object c, IParsedExpression drawcondition)
+	{
+		super(position, null, null);
+		this.type = type;
+		shadowtype = "Off";
+		enableDCPos = false;
+		enableDCSize = false;
+		enableDCRot = false;
+		setColor(c);
+		texturePath_ = "";
+		materialPath_ ="";
+		this.drawcondition = drawcondition;
+	}
 	
 	/**
 	 * Initializes the drawable.
@@ -161,6 +178,7 @@ public class Primitive3d extends AbstractVisual3d
 		if (c == null)
 			c = Color.DARK_GRAY;
 		setColor(c);
+		
 		setMaterialPath(materialPath);
 		setTexturePath(texturePath);
 		if(shadowtype.equals(SHADOW_CAST)||shadowtype.equals(SHADOW_RECEIVE)||shadowtype.equals(SHADOW_OFF))

@@ -32,6 +32,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
@@ -648,6 +649,7 @@ public class MEnvSpaceType
 				new SubobjectInfo(new AccessInfo(new QName(uri, "terrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "rndterrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),	
 				new SubobjectInfo(new AccessInfo(new QName(uri, "sound3d"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "pointlight"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -878,6 +880,46 @@ public class MEnvSpaceType
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
+		
+		
+		
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "pointlight")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}
+						
+						Double radius = (Double)getProperty(args, "radius");
+						if(radius==null)
+						{
+							radius = 1.0;
+						}
+						
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new PointLight3d(position,  getProperty(args, "color"), radius, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		
+		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dome")}), new ObjectInfo(MultiCollection.class),
 				new MappingInfo(null, new AttributeInfo[]{

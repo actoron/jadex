@@ -5,6 +5,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -19,15 +20,24 @@ import com.jme3.app.StatsAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
+import com.jme3.light.Light;
+import com.jme3.light.PointLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.SceneProcessor;
+import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Box;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+//import com.jme3.post.*;
+//import com.jme3.post.ssao.SSAOFilter;
 
 import de.lessvoid.nifty.Nifty;
 
@@ -38,10 +48,17 @@ import de.lessvoid.nifty.Nifty;
  * 
  * @author 7willuwe
  */
+
+
+
 public abstract class AMonkeyInit extends SimpleApplication implements AnimEventListener 
 {
 	// The Animation Channels for Animations
 	protected HashMap<String, AnimChannel> animChannels;
+	
+	protected ArrayList<Light> lights = new ArrayList<Light>();
+	
+	protected FilterPostProcessor fpp;
 	
 	//The Terrain
 	protected TerrainQuad terrain;
@@ -76,6 +93,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected boolean hudactive = false;
 	protected boolean focusCamActive = false;
 	protected boolean complexShadows = true;
+	protected boolean cleanupPostFilter = false;
 
 	public AMonkeyInit(float dim, float spaceSize, boolean isGrid)
 	{
@@ -89,6 +107,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.walkCam = false;
 		this.selectedTarget = -1;
 		this.selectedSpatial = null;
+		
 
 	}
 	
@@ -109,13 +128,30 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	private void initRoot() {
 		this.rootNode.attachChild(this.staticNode);
+		
 		DirectionalLight sun = new DirectionalLight();
-		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
-		rootNode.addLight(sun);
+		sun.setColor(ColorRGBA.White.mult(0.2f));
+		sun.setDirection(new Vector3f(0, -1f, 0).normalizeLocal());
+		
+		
+		DirectionalLight sun1 = new DirectionalLight();
+		sun1.setColor(ColorRGBA.White.mult(0.7f));
+		sun1.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
+		
+		DirectionalLight sun2 = new DirectionalLight();
+		sun2.setColor(ColorRGBA.White.mult(0.7f));
+		sun2.setDirection(new Vector3f(.5f, .5f, .5f).normalizeLocal());
+		
+		
+//		rootNode.addLight(sun);
+		rootNode.addLight(sun1);
+		rootNode.addLight(sun2);
+//		rootNode.addLight(sun3);
+//		rootNode.addLight(sun4);
+//		rootNode.addLight(sun5);
 
 		AmbientLight al = new AmbientLight();
-		al.setColor(ColorRGBA.White.mult(0.5f));
+		al.setColor(ColorRGBA.White.mult(1f));
 		rootNode.addLight(al);
 		
 		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appDimension, spaceSize, assetManager, isGrid);
@@ -145,17 +181,29 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		 flyCamera.setDragToRotate(true);
 		 flyCamera.setEnabled(true);
 		 
-//		 flyCamera.setEnabled(false);
 		 
-//		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, staticNode, rootNode);
-//		 dungeonCam.setEnabled(true);
-
+		 flyCamera.setEnabled(false);
 		 
 			/** Configure cam to look at scene */
-			cam.setLocation(new Vector3f(appDimension * 1.2f, appDimension / 2, appDimension / 2));
+			cam.setLocation(new Vector3f(appDimension / 2 , 0, appDimension / 2));
 			cam.lookAt(new Vector3f(appDimension / 2, 0, appDimension / 2), Vector3f.UNIT_Y);
 			cam.setFrustumNear(1f);
 			cam.setFrustumFar(appDimension * 5);
+			cam.resize(1024, 1024, true);
+			Box b = new Box(1f,1f,1f);
+			Node boxnode = new Node("boxnode");
+			Geometry geo = new Geometry("box", b);
+			boxnode.attachChild(geo);
+			boxnode.setLocalTranslation(appDimension / 2, 0, appDimension / 2);
+//			Geometry g = b;
+		
+//		 ((Spatial) b).setLocalTranslation(appDimension / 2 , 0, appDimension / 2);
+		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, boxnode, rootNode);
+		 dungeonCam.setEnabled(true);
+
+		 
+
+//			cam.
 
 		// Change the mappings we don't want
 
@@ -186,6 +234,13 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	
 	private void initRenderer(boolean complexShadows) {
+		
+		this.fpp = new FilterPostProcessor(assetManager);
+		SSAOFilter ssaoFilter = new SSAOFilter(12.94f, 43.92f, 0.5f, 0.61f);
+		fpp.addFilter(ssaoFilter);
+		viewPort.addProcessor(fpp);
+		
+		
 		if(complexShadows)
 		{		
 			pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
@@ -199,6 +254,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); //light direction
 			viewPort.addProcessor(bsr);
 		 }
+//		
+
 		
 		// BLOOOM FILTER
 		//		 FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
@@ -530,6 +587,41 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;
+	}
+
+	/**
+	 * @return the lights
+	 */
+	public ArrayList<Light> getLights() {
+		return lights;
+	}
+
+	/**
+	 * @param lights the lights to set
+	 */
+	public void setLights(ArrayList<Light> lights) {
+		this.lights = lights;
+		for(Light l : this.lights)
+		{
+//			rootNode.removeLight(light)
+			System.out.println("add light! \n");
+			System.out.println("light: " + l.getColor() + l.getType() + " pos: " + ((PointLight)l).getPosition() + "radius " + ((PointLight)l).getRadius());
+			rootNode.addLight(l);
+		}
+	}
+
+	/**
+	 * @return the cleanupPostFilter
+	 */
+	public boolean isCleanupPostFilter() {
+		return cleanupPostFilter;
+	}
+
+	/**
+	 * @param cleanupPostFilter the cleanupPostFilter to set
+	 */
+	public void setCleanupPostFilter(boolean cleanupPostFilter) {
+		this.cleanupPostFilter = cleanupPostFilter;
 	}
 
 
