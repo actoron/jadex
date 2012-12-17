@@ -36,7 +36,7 @@ FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 	%DIR%\JadexPro install --Install %DIR%\JadexPro.exe ^
 	  --Description "Jadex Production Edition" ^
 	  --Jvm auto --Startup auto ^
-	  --LogPath %PATHNAME%\logs --StdOutput %PATHNAME%\logs\svc$out.txt --StdError %PATHNAME%\logs\svc$err.txt ^
+	  --LogPath %PATHNAME%\logs --StdOutput %PATHNAME%\logs\svc$out.txt --StdError %PATHNAME%\logs\svc$log.txt ^
 	  --Classpath %PATHNAME%\..\lib\jadex-platform-standalone-launch-2.3-SNAPSHOT.jar ^
 	  --StartPath %PATHNAME%\..\ ^
 	  --StartMode jvm --StartClass jadex.platform.ServiceStarter --StartMethod start ^

@@ -11,4 +11,6 @@ FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 		-printpass false ^
 		-welcome false ^
 		-cli false ^
-		-jccplatforms "\"%HOSTNAME%_svc$\""
+		-logging true ^
+		-jccplatforms "\"%HOSTNAME%_svc$\"" ^
+		>win\logs\mgr$out.txt 2>win\logs\mgr$log.txt
