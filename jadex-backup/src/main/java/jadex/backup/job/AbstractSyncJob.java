@@ -1,12 +1,5 @@
 package jadex.backup.job;
 
-import jadex.backup.resource.BackupResource;
-import jadex.backup.resource.IBackupResource;
-import jadex.backup.swing.SyncJobPanel;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-
-import java.io.File;
 
 /**
  * 

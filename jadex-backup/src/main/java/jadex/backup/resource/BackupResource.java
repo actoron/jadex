@@ -81,7 +81,7 @@ public class BackupResource implements IBackupResource
 				id	= root.getName()+"_"+UUID.randomUUID().toString();
 			}
 			props.setProperty("id", id);
-			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3));
+			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3)+"_"+root.getCanonicalPath());
 			save();
 		}
 	}
@@ -228,7 +228,7 @@ public class BackupResource implements IBackupResource
 		// (hack? only for files)
 		FileMetaInfo	local	= getFileInfo(fi.getPath());
 		Tuple tup = new Tuple(new Object[]{fi.isNewerThan(local), local.isNewerThan(fi), fi.isExisting(), local.isExisting()});
-		System.out.println("getState: "+fi.getPath());
+//		System.out.println("getState: "+fi.getPath());
 		String ret	= STATE_CHANGES.get(tup);
 		
 		if(FILE_UNCHANGED.equals(ret))

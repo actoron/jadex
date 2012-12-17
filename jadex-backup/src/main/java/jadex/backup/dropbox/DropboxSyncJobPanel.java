@@ -126,7 +126,7 @@ public class DropboxSyncJobPanel extends JPanel
 			bp.add(rcb, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(0,2,0,2),0,0));
 			bp.add(viewb, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
 			bp.add(ackb, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(0,2,0,2),0,0));
-			pp.addComponent("Sync Tasks: ",bp);
+			pp.addComponent("Sync Tasks: ", bp);
 			
 			ackb.addActionListener(new ActionListener()
 			{

@@ -83,7 +83,7 @@ public class DropboxBackupResource implements IBackupResource
 				id	= "dropbox_"+UUID.randomUUID().toString(); // todo?
 			}
 			props.setProperty("id", id);
-			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3));
+			props.setProperty("localid", SUtil.createUniqueId(cid.getPlatformPrefix(), 3)+"_dropbox");
 			save();
 		}
 		
@@ -251,8 +251,8 @@ public class DropboxBackupResource implements IBackupResource
 			save();
 		}
 		
-		if(FILE_CONFLICT.equals(ret))
-			System.out.println("state: "+ret+", "+fi.getPath());
+//		if(FILE_CONFLICT.equals(ret))
+//			System.out.println("state: "+ret+", "+fi.getPath());
 		
 		return new Tuple2<FileMetaInfo, String>(local, ret);
 	}

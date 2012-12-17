@@ -273,7 +273,7 @@ public class SyncJobProcessingAgent
 		{
 			public void intermediateResultAvailable(BackupEvent result)
 			{
-				System.out.println("backupevent: "+result);
+//				System.out.println("backupevent: "+result);
 				
 				SyncTaskEntry entry = null;
 				
