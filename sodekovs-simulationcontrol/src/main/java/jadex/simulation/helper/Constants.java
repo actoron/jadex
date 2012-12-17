@@ -102,6 +102,9 @@ public class Constants {
 
 	// Mean values
 	public static final String MEAN_VALUE = "meanValue";
+	
+	//How often this value has been accumulated? required for computing the correct quotient for the mean_value 
+	public static final String VALUE_COUNTER = "valueCounter";
 
 	// Mean difference between real and sim data
 	public static final String MEAN_VALUE_DIFF_BETWEEN_SIM_AND_REAL_DATA = "meanValueDiffBetweenSimAndRealData";

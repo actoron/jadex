@@ -24,7 +24,7 @@ import sodekovs.util.misc.XMLHandler;
 public class BikeSharingEvaluation {
 
 	// private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing\\MyProject\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
-	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Jadex mit altem Maven 2\\Jadex\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
+	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Test\\21\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
 	private SimulationDescription realData;
 	// conf. following method for understanding the data structure:
 	// EvaluateRow.evaluateRowData(preparedRowData)
@@ -245,12 +245,16 @@ public class BikeSharingEvaluation {
 							resultMap.get((int) tSlice.getStartTime()).get(currentStation).put("stock", new HashMap<String, String>());
 							// init value
 							resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.MEAN_VALUE, "0.0");
+							resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.VALUE_COUNTER, "0");							
 						}
 
 						double cumulatedStockValue = Double.valueOf(resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.MEAN_VALUE));
 						cumulatedStockValue += Double.valueOf(stockLevel);
-
-						resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.MEAN_VALUE, String.valueOf(cumulatedStockValue));
+						
+						//variable how often this value has been accumulated. required for computing the correct quotient for the mean_value 
+						int valueCounter = Integer.valueOf(resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.VALUE_COUNTER));
+						valueCounter++;
+						resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.VALUE_COUNTER, String.valueOf( valueCounter));						
 					}
 
 				}
@@ -272,7 +276,8 @@ public class BikeSharingEvaluation {
 				HashMap<String, HashMap<String, String>> stationInstancePropertiesMap = stationsMap.get(currentStation);
 
 				Double stockLevel = Double.valueOf(stationInstancePropertiesMap.get("stock").get(Constants.MEAN_VALUE));
-				double averageStockLevel = stockLevel / 60;
+				int valueCounter = Integer.valueOf(stationInstancePropertiesMap.get("stock").get(Constants.VALUE_COUNTER));
+				double averageStockLevel = stockLevel / valueCounter;
 				stationInstancePropertiesMap.get("stock").put(Constants.MEAN_VALUE, String.valueOf(averageStockLevel));
 			}
 		}
