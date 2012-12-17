@@ -453,7 +453,7 @@ public class RuntimeManagerPlan extends Plan {
 		// 1: delete the ".." at the beginning
 		String oldDirpath = simConf.getApplicationReference().substring(2);
 		// 2.delete the *.application.xml at the end of the path
-		directoryPath += oldDirpath.substring(0, oldDirpath.lastIndexOf("\\\\") + 2);
+		directoryPath += oldDirpath.substring(0, oldDirpath.lastIndexOf("/")+1);
 
 		// ***********************************************************
 		// Purpose: Replace 'name' of application in the *.application.xml with the new name

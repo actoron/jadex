@@ -7,7 +7,7 @@
 	-->
 
 <SimulationConfiguration name="BikeSharingWashington"
-	applicationReference="..\\sodekovs-applications\\target\\classes\\sodekovs\\bikesharing\\examples\\BikesharingSimulation.application.xml"
+	applicationReference="../sodekovs-applications/target/classes/sodekovs/bikesharing/examples/BikesharingSimulation.application.xml"
 	applicationConfiguration="Washington"
 	nameOfSpace="my2dspace">
 
