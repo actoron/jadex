@@ -78,7 +78,7 @@ public class FileHandler {
 		try {
 
 			// Construct the BufferedOutputStream object
-			bufferedOutput = new BufferedOutputStream(new FileOutputStream(directory  + "\\" + filename));
+			bufferedOutput = new BufferedOutputStream(new FileOutputStream(directory  + "/" + filename));
 
 			// Start writing to the output stream
 			bufferedOutput.write(input.getBytes());
