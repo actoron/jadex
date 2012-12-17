@@ -477,7 +477,7 @@ public class RuntimeManagerPlan extends Plan {
 		// ***********************************************************
 
 		// change reference to current path
-		simConf.setApplicationReference(directoryPath + "\\" + simConf.getName() + ".application.xml");
+		simConf.setApplicationReference(directoryPath +  simConf.getName() + ".application.xml");
 
 		return simConf;
 	}
