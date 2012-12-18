@@ -1122,7 +1122,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-							System.out.println("state change: "+ce.getComponentIdentifier()+", "+ce.getNick()+", "+ce.getImage()+", "+ce.getValue());
+//							System.out.println("state change: "+ce.getComponentIdentifier()+", "+ce.getNick()+", "+ce.getImage()+", "+ce.getValue());
 							setUserState(ce.getComponentIdentifier(),
 								!IChatService.STATE_DEAD.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
 								IChatService.STATE_TYPING.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
@@ -1211,7 +1211,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					if(autorefresh)
 					{
-						System.out.println("refresh: start");
+//						System.out.println("refresh: start");
 						final Set<IComponentIdentifier>	known	= new HashSet<IComponentIdentifier>(usermodel.getUserIDs());
 						
 						getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
@@ -1221,12 +1221,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
 								known.remove(cid);
 								updateChatUser(cid, chat);
-								System.out.println("refresh: "+known);
+//								System.out.println("refresh: "+known);
 							}
 							
 							public void customFinished()
 							{
-								System.out.println("refresh: finished");
+//								System.out.println("refresh: finished");
 								updateOfflineUsers();
 							}
 							
@@ -1239,7 +1239,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							{
 								for(IComponentIdentifier cu: known)
 								{
-									System.out.println("Offline: "+cu);
+//									System.out.println("Offline: "+cu);
 									setUserState(cu, Boolean.FALSE, null, null, null, null);
 								}
 							}
