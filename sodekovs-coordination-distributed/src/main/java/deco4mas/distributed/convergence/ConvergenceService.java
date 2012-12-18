@@ -30,9 +30,12 @@ public abstract class ConvergenceService implements IConvergenceService {
 	/** The coordination context */
 	protected String coordinationContextId = null;
 	
-	/** Used to block voting attempts until a previous voting process was finished */
-	protected Map<Adaption, Boolean> locks = new HashMap<Adaption, Boolean>();
-
+	protected Map<Adaption, Boolean> runningAdaptions = null;
+	
+	public ConvergenceService() {
+		this.runningAdaptions = new HashMap<Adaption, Boolean>();
+	}
+	
 	@Override
 	public abstract IFuture<Boolean> vote(Adaption adaption, IComponentIdentifier initiator);
 	
