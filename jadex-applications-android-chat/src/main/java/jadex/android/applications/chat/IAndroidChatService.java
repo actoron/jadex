@@ -1,6 +1,8 @@
 package jadex.android.applications.chat;
 
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -33,5 +35,7 @@ public interface IAndroidChatService
 	IFuture<Void> cancelFileTransfer(TransferInfo ti);
 
 	void shutdown();
+
+	IIntermediateFuture<IChatService> setStatus(String status, byte[] image, IComponentIdentifier[] receivers);
 	
 }

@@ -44,17 +44,10 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-component</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-bpmn</artifactId>
+			<artifactId>jadex-android-commons</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>

@@ -64,9 +64,18 @@
 			<version>3.12.1.GA</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>bouncycastle</groupId>
+			<artifactId>bcprov-jdk15</artifactId>
+			<version>140</version>
+			<scope>provided</scope>
+		</dependency>	
 	</dependencies>
 
 	<build>
+	    <outputDirectory>bin/classes</outputDirectory>
+    	<testOutputDirectory>bin/test-classes</testOutputDirectory>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>

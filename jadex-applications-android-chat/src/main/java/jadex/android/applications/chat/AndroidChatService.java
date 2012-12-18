@@ -24,6 +24,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Binding;
+import jadex.platform.service.chat.ChatService;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -195,6 +196,11 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 			}
 			
 			@Override
+			public IIntermediateFuture<IChatService> setStatus(String status, byte[] image, IComponentIdentifier[] receivers) {
+				return chatgui.status(status, image, receivers);
+			}
+			
+			@Override
 			public void shutdown() {
 				AndroidChatService.this.stopPlatforms();
 				stopSelf();
@@ -202,6 +208,12 @@ public class AndroidChatService extends jadex.android.service.JadexPlatformServi
 		};
 	}
 
+	@Override
+	public boolean onUnbind(Intent intent)
+	{
+		return super.onUnbind(intent);
+	}
+	
 	@Override
 	public void onDestroy()
 	{

@@ -10,6 +10,7 @@ import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.platform.service.chat.ChatService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -86,6 +87,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 		if (service != null) {
 			service.removeMessageListener(this);
 		}
+		this.service.setStatus(ChatService.STATE_AWAY, null, null);
 		unbindService(this);
 	}
 	
@@ -212,6 +214,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	public void chatConnected()
 	{
 		setConnected(true);
+		this.service.setStatus(ChatService.STATE_IDLE, null, null);
 	}
 
 	// -------- helper methods --------
