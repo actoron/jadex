@@ -298,6 +298,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				else
 				{
 					Thread t = new Thread(reader);
+					t.setDaemon(true);
 					t.start();
 				}
 			}
