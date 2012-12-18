@@ -75,7 +75,7 @@ public class BDIConvergenceService extends ConvergenceService {
 	public IFuture<Boolean> vote(Adaption adaption, IComponentIdentifier initiator) {
 		System.out.println(externalAccess.getComponentIdentifier() + " vote is called for " + adaption + " by " + initiator);
 		boolean result = true;
-		
+
 		// if the service himself already started the same adaption
 		if (runningAdaptions.containsKey(adaption)) {
 			int ownHashCode = externalAccess.getComponentIdentifier().hashCode();
@@ -232,6 +232,8 @@ public class BDIConvergenceService extends ConvergenceService {
 		private Constraint constraint = null;
 		/** The Belief under observation */
 		private IBelief belief = null;
+		private boolean previous = false;
+		private long lastCall = 0;
 
 		/**
 		 * Constructor.
@@ -250,12 +252,34 @@ public class BDIConvergenceService extends ConvergenceService {
 		}
 
 		@Override
-		public void beliefChanged(AgentEvent ae) {
+		public void beliefChanged(final AgentEvent ae) {
+			//if there was a previous voting attempt wait for the specified delay before checking the constraint again
+			if (previous) {
+				// calculate delay
+				long currentCall = System.currentTimeMillis();
+				long delay = adaption.getDelay() - (currentCall - lastCall);
+				delay = delay >= 0 ? delay : 0;
+				// and wait
+				externalAccess.scheduleStep(new IComponentStep<Void>() {
+
+					@Override
+					public IFuture<Void> execute(IInternalAccess ia) {
+						checkConstraint(ae);
+						return null;
+					}
+				}, delay);
+			} else {
+				checkConstraint(ae);
+			}
+		}
+
+		private void checkConstraint(AgentEvent ae) {
+			previous = false;
 			// for now we just assume it is an integer value
 			final Integer value = (Integer) ae.getValue();
-
 			// also we assume that the condition is fulfilled if the condition value (integer) equals the current belief value
 			if (value >= constraint.getCondition()) {
+				previous = true;
 				System.out.println(externalAccess.getComponentIdentifier() + " constraint fulfilled " + constraint);
 				// initialize the voting result listener
 				final VoteResultListener voteResultListener = new VoteResultListener(adaption, belief);
