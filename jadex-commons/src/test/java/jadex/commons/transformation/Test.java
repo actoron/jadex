@@ -84,71 +84,73 @@ public abstract class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				testCertificate(); 
+				testException();
 
-				testTimestamp();
-
-				testEnum();
-
-				testByte();
-				testDouble();
-//				testBigData();
-				testSpecialCharacter();
-					
-				testByteArray();
-				testBByteArray();
-				testIntArray();
-				testIntegerArray();
-				testDoubleArray();
-				testBDoubleArray();
-				testFloatArray();
-				testBFloatArray();
-				testLongArray();
-				testBLongArray();
-				testCharArray();
-				testCharacterArray();
-				testShortArray();
-				testBShortArray();
-				testBooleanArray();
-				testBBooleanArray();
-				testVectorModel();
-				testMultiCollection();
-				testEmptySet();
-				testEmptyList();
-				testEmptyMap();
-				testArray();
-				testList();
-				testSet();
-				testMap();
-				testEmptyArray();
-				testArrayOrder();
-				testMultiArray();
-				testMultiArray2();
-				testMultiArrayAttribute();
-				testByteArrayAttribute();
-				
-				testClass();
-				testDate();
-				testUUID();
-				testInnerClass();
-				testURL();
-				testLoggingLevel();
-				testLogRecord();
-				testInetAddress();
-				testTuple();
-				testTuple2();
-				testTimestamp();
-			
-				testBean();
-				testBeanWithPublicFields();
-				testBeanWithIncludedFields();
-				testAnonymousInnerClass();
-				testAnonymousInnerClassWithSimpleTypes();
-				testSelfReferenceBean();
-			
-				testColor();
-				testImage();
-				testRectangle();
+//				testCertificate(); 
+//
+//				testTimestamp();
+//
+//				testEnum();
+//
+//				testByte();
+//				testDouble();
+////				testBigData();
+//				testSpecialCharacter();
+//					
+//				testByteArray();
+//				testBByteArray();
+//				testIntArray();
+//				testIntegerArray();
+//				testDoubleArray();
+//				testBDoubleArray();
+//				testFloatArray();
+//				testBFloatArray();
+//				testLongArray();
+//				testBLongArray();
+//				testCharArray();
+//				testCharacterArray();
+//				testShortArray();
+//				testBShortArray();
+//				testBooleanArray();
+//				testBBooleanArray();
+//				testVectorModel();
+//				testMultiCollection();
+//				testEmptySet();
+//				testEmptyList();
+//				testEmptyMap();
+//				testArray();
+//				testList();
+//				testSet();
+//				testMap();
+//				testEmptyArray();
+//				testArrayOrder();
+//				testMultiArray();
+//				testMultiArray2();
+//				testMultiArrayAttribute();
+//				testByteArrayAttribute();
+//				
+//				testClass();
+//				testDate();
+//				testUUID();
+//				testInnerClass();
+//				testURL();
+//				testLoggingLevel();
+//				testLogRecord();
+//				testInetAddress();
+//				testTuple();
+//				testTuple2();
+//				testTimestamp();
+//			
+//				testBean();
+//				testBeanWithPublicFields();
+//				testBeanWithIncludedFields();
+//				testAnonymousInnerClass();
+//				testAnonymousInnerClassWithSimpleTypes();
+//				testSelfReferenceBean();
+//			
+//				testColor();
+//				testImage();
+//				testRectangle();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -178,7 +180,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-//		System.out.println("written is:"+new String((byte[])written));
+		System.out.println("written is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
@@ -997,6 +999,27 @@ public abstract class Test extends TestCase
 	{
 		Timestamp ts = new Timestamp(System.currentTimeMillis());
 		doWriteAndRead(ts);
+	}
+	
+	/**
+	 *  Test reading / writing exception.
+	 */
+	public void	testException() throws Exception
+	{
+		RuntimeException e = new RuntimeException("Some runtime reason.");
+		SecurityException ex = new SecurityException("Some security concern.", e);
+		doWriteAndRead(ex, new Comparator<Exception>()
+		{
+			public int compare(Exception e1, Exception e2)
+			{
+				int ret = -1;
+				if(e1.getClass().equals(e2.getClass()))
+				{
+					ret = Arrays.equals(e1.getStackTrace(), e2.getStackTrace())? 0: -1;
+				}
+				return ret;
+			}
+		});
 	}
 	
 	/**

@@ -1,6 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.service.remote.ExceptionInfo;
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
@@ -23,7 +22,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 	protected String terminatecallid;
 	
 	/** The exception. */
-	protected ExceptionInfo exceptioninfo;
+	protected Exception exception;
 		
 	//-------- constructors --------
 	
@@ -41,7 +40,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 	{
 		this.callid = callid;
 		this.terminatecallid = terminatecallid;
-		this.exceptioninfo	= new ExceptionInfo(reason);
+		this.exception	= reason;
 //		System.out.println("rmi on client: "+callid+" "+methodname);
 	}
 	
@@ -73,7 +72,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 		if(tfut!=null)
 		{
 //			System.out.println("terminating remote future: "+tfut.hashCode());
-			((ITerminableFuture<?>)tfut).terminate(exceptioninfo.recreateException());
+			((ITerminableFuture<?>)tfut).terminate(exception);
 		}
 		else
 		{
@@ -86,7 +85,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 					if(tfut!=null)
 					{
 //						System.out.println("terminated future afterwards");
-						((ITerminableFuture<?>)tfut).terminate(exceptioninfo.recreateException());
+						((ITerminableFuture<?>)tfut).terminate(exception);
 					}
 				}
 			});
@@ -119,24 +118,42 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 		this.callid = callid;
 	}
 
+//	/**
+//	 *  Get the exception.
+//	 *  @return the exception.
+//	 */
+//	public ExceptionInfo getExceptionInfo()
+//	{
+//		return exception;
+//	}
+//
+//	/**
+//	 *  Set the exception.
+//	 *  @param exception The exception to set.
+//	 */
+//	public void setExceptionInfo(ExceptionInfo exception)
+//	{
+//		this.exception = exception;
+//	}
+
 	/**
 	 *  Get the exception.
-	 *  @return the exception.
+	 *  @return The exception.
 	 */
-	public ExceptionInfo getExceptionInfo()
+	public Exception getException()
 	{
-		return exceptioninfo;
+		return exception;
 	}
 
 	/**
 	 *  Set the exception.
 	 *  @param exception The exception to set.
 	 */
-	public void setExceptionInfo(ExceptionInfo exception)
+	public void setException(Exception exception)
 	{
-		this.exceptioninfo = exception;
+		this.exception = exception;
 	}
-
+	
 	/**
 	 *  Get the terminate call id.
 	 *  @return the terminate call id.

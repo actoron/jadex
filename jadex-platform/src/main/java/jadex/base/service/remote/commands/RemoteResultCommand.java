@@ -1,6 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.service.remote.ExceptionInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Security;
@@ -31,7 +30,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	protected Object result;
 
 	/** The exception. */
-	protected ExceptionInfo exceptioninfo;
+	protected Exception exception;
 	
 	/** The callid. */
 	protected String callid;
@@ -71,7 +70,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		
 		this.result = result;
 		this.sender = sender;
-		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
+		this.exception = exception;
 		this.callid = callid;
 		this.isref = isref;
 		this.methodname = methodname;
@@ -137,9 +136,9 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		if(wci!=null)
 		{
 			Future future = wci.getFuture();
-			if(exceptioninfo!=null)
+			if(exception!=null)
 			{
-				future.setExceptionIfUndone(exceptioninfo.recreateException());
+				future.setExceptionIfUndone(exception);
 			}
 			else
 			{
@@ -180,22 +179,40 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		this.result = result;
 	}
 	
+//	/**
+//	 *  Get the exception.
+//	 *  @return the exception.
+//	 */
+//	public ExceptionInfo getExceptionInfo()
+//	{
+//		return exceptioninfo;
+//	}
+//
+//	/**
+//	 *  Set the exception.
+//	 *  @param exception The exception to set.
+//	 */
+//	public void setExceptionInfo(ExceptionInfo exception)
+//	{
+//		this.exceptioninfo = exception;
+//	}
+	
 	/**
 	 *  Get the exception.
-	 *  @return the exception.
+	 *  @return The exception.
 	 */
-	public ExceptionInfo getExceptionInfo()
+	public Exception getException()
 	{
-		return exceptioninfo;
+		return exception;
 	}
 
 	/**
 	 *  Set the exception.
 	 *  @param exception The exception to set.
 	 */
-	public void setExceptionInfo(ExceptionInfo exception)
+	public void setException(Exception exception)
 	{
-		this.exceptioninfo = exception;
+		this.exception = exception;
 	}
 	
 	/**
@@ -206,7 +223,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	{
 		return callid;
 	}
-
+	
 	/**
 	 *  Set the callid.
 	 *  @param callid The callid to set.
@@ -257,6 +274,6 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public String toString()
 	{
-		return SReflect.getInnerClassName(getClass())+"(result="+result+", exception="+exceptioninfo+", callid="+callid+")";
+		return SReflect.getInnerClassName(getClass())+"(result="+result+", exception="+exception+", callid="+callid+")";
 	}
 }

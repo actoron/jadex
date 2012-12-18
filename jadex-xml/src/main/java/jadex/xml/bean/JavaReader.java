@@ -29,6 +29,7 @@ import jadex.xml.stax.XMLReporter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.URL;
 import java.security.cert.CertificateFactory;
@@ -119,6 +120,7 @@ public class JavaReader
 	 *	- jadex.commons.Tuple3
 	 *  - java.util.UUID
 	 *  - java.security.Certifcate
+	 *  - java.lang.Throwable
 	 */
 	public static Set<TypeInfo> getTypeInfos()
 	{
@@ -842,6 +844,60 @@ public class JavaReader
 					new AttributeInfo(new AccessInfo("leastSignificantBits", null, AccessInfo.IGNORE_READWRITE))
 			}));
 			typeinfos.add(ti_uuid);
+			
+			// java.lang.Throwable
+			TypeInfo ti_th = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Throwable")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						Object ret = null;
+						String clname = (String)rawattributes.get("class");
+						String msg = (String)rawattributes.get("message");
+						Class<?> cl = SReflect.findClass(clname, null, context.getClassLoader());
+						try
+						{
+							Constructor<?> con = cl.getConstructor(new Class<?>[]{String.class});
+							ret = con.newInstance(new Object[]{msg});
+						}
+						catch(Exception e)
+						{
+							// Try find empty constructor
+							Constructor<?> con = cl.getConstructor(new Class<?>[0]);
+							ret = con.newInstance(new Object[0]);
+						}
+						return ret;
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("class", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("message", null, AccessInfo.IGNORE_READWRITE))},
+				new SubobjectInfo[]{
+					new SubobjectInfo(new AccessInfo("cause", null, null, null, 
+						new BeanAccessInfo(Exception.class.getMethod("initCause", new Class[]{Throwable.class}), null)))	
+				}
+			));
+			typeinfos.add(ti_th);
+			TypeInfo ti_ste = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "StackTraceElement")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						String decl = (String)rawattributes.get("className");
+						String mname = (String)rawattributes.get("methodName");
+						String fname = (String)rawattributes.get("fileName");
+						String num = (String)rawattributes.get("lineNumber");
+						return new StackTraceElement(decl, mname, fname, Integer.parseInt(num));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("className", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("methodName", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("fileName", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("lineNumber", null, AccessInfo.IGNORE_READWRITE))
+				})
+			);
+			typeinfos.add(ti_ste);
 			
 			if(!SReflect.isAndroid()) 
 			{

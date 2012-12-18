@@ -49,7 +49,7 @@ public class BeanCodec extends AbstractCodec
 	{
 		Object bean = null;
 		boolean isanonclass = context.readBoolean();
-		if (isanonclass)
+		if(isanonclass)
 		{
 			String correctcl = context.readString();
 			
@@ -125,27 +125,28 @@ public class BeanCodec extends AbstractCodec
 	 */
 	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
 	{
-		if (object != null)
+		if(object != null)
 		{
-			Map props = intro.getBeanProperties(clazz, true, false);
-			int size = (int) context.readVarInt();
-			for (int i = 0; i < size; ++i)
-			{
-				String name = context.readString();
-				Object val = null;
-				val = BinarySerializer.decodeObject(context);
-				if (object != null)
-				{
-					try
-					{
-						((BeanProperty) props.get(name)).setPropertyValue(object, val);
-					}
-					catch (Exception e)
-					{
-						context.getErrorReporter().exceptionOccurred(e);
-					}
-				}
-			}
+			readBeanProperties(object, clazz, context, intro);
+//			Map props = intro.getBeanProperties(clazz, true, false);
+//			int size = (int) context.readVarInt();
+//			for (int i = 0; i < size; ++i)
+//			{
+//				String name = context.readString();
+//				Object val = null;
+//				val = BinarySerializer.decodeObject(context);
+//				if (object != null)
+//				{
+//					try
+//					{
+//						((BeanProperty) props.get(name)).setPropertyValue(object, val);
+//					}
+//					catch (Exception e)
+//					{
+//						context.getErrorReporter().exceptionOccurred(e);
+//					}
+//				}
+//			}
 		}
 		else
 		{
@@ -179,7 +180,7 @@ public class BeanCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		if (!nonanonclasscache.contains(clazz))
 		{
@@ -208,30 +209,32 @@ public class BeanCodec extends AbstractCodec
 			ec.writeBoolean(false);
 		}
 		
-		Map props = intro.getBeanProperties(clazz, true, false);
+		writeBeanProperties(object, clazz, processors, traverser, traversed, clone, ec, intro);
 		
-		List<String> names = new ArrayList<String>();
-		List<Object> values = new ArrayList<Object>();
-		List<Class> clazzes = new ArrayList<Class>();
-		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
-		{
-			BeanProperty prop = (BeanProperty)props.get(it.next());
-			Object val = prop.getPropertyValue(object);
-			if (val != null)
-			{
-				names.add(prop.getName());
-				clazzes.add(prop.getType());
-				values.add(val);
-			}
-		}
-		ec.writeVarInt(names.size());
-		
-		for (int i = 0; i < names.size(); ++i)
-		{
-			ec.writeString(names.get(i));
-			Object val = values.get(i);
-			traverser.traverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
-		}
+//		Map props = intro.getBeanProperties(clazz, true, false);
+//		
+//		List<String> names = new ArrayList<String>();
+//		List<Object> values = new ArrayList<Object>();
+//		List<Class> clazzes = new ArrayList<Class>();
+//		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
+//		{
+//			BeanProperty prop = (BeanProperty)props.get(it.next());
+//			Object val = prop.getPropertyValue(object);
+//			if (val != null)
+//			{
+//				names.add(prop.getName());
+//				clazzes.add(prop.getType());
+//				values.add(val);
+//			}
+//		}
+//		ec.writeVarInt(names.size());
+//		
+//		for (int i = 0; i < names.size(); ++i)
+//		{
+//			ec.writeString(names.get(i));
+//			Object val = values.get(i);
+//			traverser.traverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
+//		}
 		
 		/*for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 		{
@@ -262,6 +265,64 @@ public class BeanCodec extends AbstractCodec
 		}*/
 		
 		return object;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec, IBeanIntrospector intro)
+	{
+		Map props = intro.getBeanProperties(clazz, true, false);
+		
+		List<String> names = new ArrayList<String>();
+		List<Object> values = new ArrayList<Object>();
+		List<Class> clazzes = new ArrayList<Class>();
+		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
+		{
+			BeanProperty prop = (BeanProperty)props.get(it.next());
+			Object val = prop.getPropertyValue(object);
+			if(val != null)
+			{
+				names.add(prop.getName());
+				clazzes.add(prop.getType());
+				values.add(val);
+			}
+		}
+		ec.writeVarInt(names.size());
+		
+		for(int i = 0; i < names.size(); ++i)
+		{
+			ec.writeString(names.get(i));
+			Object val = values.get(i);
+			traverser.traverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static void readBeanProperties(Object object, Class clazz, DecodingContext context, IBeanIntrospector intro)
+	{
+		Map props = intro.getBeanProperties(clazz, true, false);
+		int size = (int) context.readVarInt();
+		for (int i = 0; i < size; ++i)
+		{
+			String name = context.readString();
+			Object val = null;
+			val = BinarySerializer.decodeObject(context);
+			if(object != null)
+			{
+				try
+				{
+					((BeanProperty) props.get(name)).setPropertyValue(object, val);
+				}
+				catch (Exception e)
+				{
+					context.getErrorReporter().exceptionOccurred(e);
+				}
+			}
+		}
 	}
 	
 	/**

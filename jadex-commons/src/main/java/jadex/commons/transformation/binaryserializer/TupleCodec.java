@@ -13,7 +13,6 @@ import java.util.Map;
 
 /**
  *  Codec for encoding and decoding URL objects.
- *
  */
 public class TupleCodec extends AbstractCodec
 {
@@ -62,7 +61,7 @@ public class TupleCodec extends AbstractCodec
 	 */
 	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
 	{
-		Object[] entities = (Object[]) BinarySerializer.decodeObject(context);
+		Object[] entities = (Object[])BinarySerializer.decodeObject(context);
 		try
 		{
 			Field fentities = SReflect.getField(object.getClass(), "entities");
@@ -92,11 +91,10 @@ public class TupleCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		Object[] entities = ((Tuple) object).getEntities();
+		Object[] entities = ((Tuple)object).getEntities();
 		traverser.traverse(entities, entities.getClass(), traversed, processors, clone, null, ec);
-		
 		return object;
 	}
 }

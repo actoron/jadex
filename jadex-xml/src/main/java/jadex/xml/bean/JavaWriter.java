@@ -114,6 +114,7 @@ public class JavaWriter
 	 *	- jadex.commons.Tuple2
 	 *  - jadex.commons.Tuple3
 	 *  - java.util.UUID
+	 *  - java.lang.Throwable
 	 */
 	public static Set<TypeInfo> getTypeInfos()
 	{
@@ -710,7 +711,33 @@ public class JavaWriter
 			));
 			typeinfos.add(ti_uuid);
 			
-			if (!SReflect.isAndroid()) {
+			// java.lang.Throwable
+			TypeInfo ti_th = new TypeInfo(new XMLInfo(new QName("typeinfo:java.lang", "Throwable")), 
+				new ObjectInfo(Throwable.class),
+				new MappingInfo(null, new AttributeInfo[]
+				{
+					new AttributeInfo(new AccessInfo("message", null)),
+					new AttributeInfo(new AccessInfo("class", null), new AttributeConverter(null, clconv)),
+				}, new SubobjectInfo[]
+				{
+					new SubobjectInfo(new AccessInfo("stackTrace"), null),
+					new SubobjectInfo(new AccessInfo("cause"), null),
+				}
+			));
+			typeinfos.add(ti_th);
+			TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
+				new MappingInfo(null, new AttributeInfo[]
+				{
+					new AttributeInfo(new AccessInfo("className", null)),
+					new AttributeInfo(new AccessInfo("methodName", null)),
+					new AttributeInfo(new AccessInfo("fileName", null)),
+					new AttributeInfo(new AccessInfo("lineNumber", null)),
+				}, null
+			));
+			typeinfos.add(ti_ste);
+			
+			if(!SReflect.isAndroid()) 
+			{
 				typeinfos.addAll(STypeInfosAWT.getWriterTypeInfos());
 			}
 		}

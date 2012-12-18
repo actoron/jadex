@@ -58,7 +58,7 @@ public class StringCodec extends AbstractCodec
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		ec.writeString((String)object);
 		

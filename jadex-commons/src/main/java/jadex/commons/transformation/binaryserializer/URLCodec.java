@@ -64,7 +64,7 @@ public class URLCodec extends AbstractCodec
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		ec.writeString(((URL) object).toString());
+		ec.writeString(((URL)object).toString());
 		
 		return object;
 	}
