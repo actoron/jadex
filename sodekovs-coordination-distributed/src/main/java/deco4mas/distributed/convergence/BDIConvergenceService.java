@@ -74,7 +74,8 @@ public class BDIConvergenceService extends ConvergenceService {
 	@Override
 	public IFuture<Boolean> vote(Adaption adaption, IComponentIdentifier initiator) {
 		System.out.println(externalAccess.getComponentIdentifier() + " vote is called for " + adaption + " by " + initiator);
-
+		boolean result = true;
+		
 		// if the service himself already started the same adaption
 		if (runningAdaptions.containsKey(adaption)) {
 			int ownHashCode = externalAccess.getComponentIdentifier().hashCode();
@@ -83,11 +84,13 @@ public class BDIConvergenceService extends ConvergenceService {
 			// abort the adaption if he remote initiators component identifier has a higher hash value
 			if (remoteHashCode > ownHashCode) {
 				runningAdaptions.put(adaption, false);
+				// else if your hash code is higher vote false
+			} else if (ownHashCode > remoteHashCode) {
+				result = false;
 			}
 		}
 
 		Future<Boolean> fut = new Future<Boolean>();
-		boolean result = true;
 
 		// get all constraints which reference the agent type
 		List<Constraint> constraints = adaption.getConstraints(externalAccess.getLocalType());
