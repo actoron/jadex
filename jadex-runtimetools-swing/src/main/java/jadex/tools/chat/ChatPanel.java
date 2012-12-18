@@ -1211,37 +1211,21 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					if(autorefresh)
 					{
-//						System.out.println("refresh: start");
-						final Set<IComponentIdentifier>	known	= new HashSet<IComponentIdentifier>(usermodel.getUserIDs());
+						for(IComponentIdentifier cu: usermodel.getUserIDs())
+						{
+							// Reset user -> will be removed if not updated within some time.
+							setUserState(cu, null, null, null, null, null);
+						}
 						
 						getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
 						{
 							public void customIntermediateResultAvailable(final IChatService chat)
 							{
-								IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
-								known.remove(cid);
+								final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
 								updateChatUser(cid, chat);
-//								System.out.println("refresh: "+known);
 							}
-							
-							public void customFinished()
-							{
-//								System.out.println("refresh: finished");
-								updateOfflineUsers();
-							}
-							
 							public void customExceptionOccurred(Exception exception)
 							{
-								updateOfflineUsers();
-							}
-							
-							protected void	updateOfflineUsers()
-							{
-								for(IComponentIdentifier cu: known)
-								{
-//									System.out.println("Offline: "+cu);
-									setUserState(cu, Boolean.FALSE, null, null, null, null);
-								}
 							}
 						});
 					}
@@ -1544,7 +1528,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				boolean	isnew	= false;
 				boolean	isdead	= false;
 				ChatUser	cu	= usermodel.getUser(cid);
-				if(cu==null && (online==null || online.booleanValue()))
+				if(cu==null && online!=null && online.booleanValue())
 				{
 //					System.out.println("create User "+cid+", "+online);
 					cu	= new ChatUser(cid);
@@ -1554,10 +1538,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				
 				if(cu!=null)
 				{
-					if(online!=null)
-					{
-						isdead	= cu.setOffline(!online.booleanValue());
-					}
+					isdead	= cu.setOnline(online);
 					
 					if(isdead)
 					{

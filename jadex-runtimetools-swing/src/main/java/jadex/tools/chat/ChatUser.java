@@ -55,8 +55,8 @@ public class ChatUser
 	/** The avatar image. */
 	protected Icon	avatar;
 	
-	/** The offline detection counter. */
-	protected int	offline;
+	/** The time of the last update for checking when user becomes offline. */
+	protected long	lastupdate;
 	
 	//-------- constructors --------
 	
@@ -68,6 +68,7 @@ public class ChatUser
 		this.cid	= cid;
 		this.nick = "unknown";
 		this.messages	= new HashSet<Integer>();
+		this.lastupdate	= System.currentTimeMillis();
 	}
 
 	//-------- methods --------
@@ -79,7 +80,7 @@ public class ChatUser
 	{
 		Icon	ret	= avatar!=null ? avatar : icons.getIcon("default_avatar");
 		
-		if(offline>0)
+		if(System.currentTimeMillis()-lastupdate>15000)	// offline after 15 seconds.
 		{
 			BufferedImage image = new BufferedImage(ret.getIconWidth(), ret.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 	        ret.paintIcon(null, image.getGraphics(), 0, 0);
@@ -115,6 +116,7 @@ public class ChatUser
 	public void	setTyping(boolean typing)
 	{
 		this.typing	= typing;
+		this.lastupdate	= System.currentTimeMillis();
 	}
 	
 	/**
@@ -131,6 +133,7 @@ public class ChatUser
 	public void	setAway(boolean away)
 	{
 		this.away	= away;
+		this.lastupdate	= System.currentTimeMillis();
 	}
 	
 	/**
@@ -157,6 +160,7 @@ public class ChatUser
 	public void setNick(String nick)
 	{
 		this.nick = nick;
+		this.lastupdate	= System.currentTimeMillis();
 	}
 	
 	/**
@@ -167,25 +171,6 @@ public class ChatUser
 		return "unknown".equals(nick);
 	}
 	
-//	/**
-//	 *  Get the chat.
-//	 *  @return the chat.
-//	 */
-//	public IChatService getChatService()
-//	{
-//		return chat;
-//	}
-//
-//	/**
-//	 *  renamed to not be bean conform
-//	 *  Set the chat.
-//	 *  @param chat The chat to set.
-//	 */
-//	public void setChatService(IChatService chat)
-//	{
-//		this.chat = chat;
-//	}
-
 	/**
 	 *  Test if image is unknown.
 	 */
@@ -201,6 +186,7 @@ public class ChatUser
 	public void setAvatar(Icon avatar)
 	{
 		this.avatar = avatar;
+		this.lastupdate	= System.currentTimeMillis();
 	}
 
 	/**
@@ -218,6 +204,7 @@ public class ChatUser
 	public void	addMessage(int id)
 	{
 		this.messages.add(new Integer(id));
+		this.lastupdate	= System.currentTimeMillis();
 	}
 	
 	/**
@@ -226,22 +213,24 @@ public class ChatUser
 	public void	removeMessage(int id)
 	{
 		this.messages.remove(new Integer(id));
+		this.lastupdate	= System.currentTimeMillis();
 	}
 	
 	/**
 	 *  Called when the user has been detected offline or online
 	 *  @return True, when to much offline detections appeared and the user should be removed.
 	 */
-	public boolean	setOffline(boolean offline)
+	public boolean	setOnline(Boolean online)
 	{
-		if(!offline)
+		if(online!=null && online.booleanValue())
 		{
-			this.offline	= 0;
+			lastupdate	= System.currentTimeMillis();	// User is known to be online.
 		}
-		else
+		else if(online!=null)
 		{
-			this.offline++;
+			lastupdate	= 0;	// User is known to be offline.			
 		}
-		return this.offline>=3;
+		
+		return System.currentTimeMillis()-lastupdate > 45000;	// Offline when no update for 45 seconds.
 	}
 }
