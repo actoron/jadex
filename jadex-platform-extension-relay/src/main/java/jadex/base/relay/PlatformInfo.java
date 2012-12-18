@@ -111,7 +111,7 @@ public class PlatformInfo
 		this.id	= id!=null ? SUtil.makeConform(id) : null;
 		this.hostip	= hostip!=null ? SUtil.makeConform(hostip) : null;
 		this.hostname	= hostname!=null ? SUtil.makeConform(hostname) : null;
-		this.scheme	= scheme!=null ? SUtil.makeConform(protocol) : null;
+		this.scheme	= protocol!=null ? SUtil.makeConform(protocol) : null;
 		
 		this.connect_time	= connect_time;
 		this.disconnect_time	= disconnect_time;
