@@ -7,7 +7,6 @@ import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.micro.IMicroExternalAccess;
-import jadex.micro.MicroAgent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ import deco.distributed.lang.dynamics.convergence.Agent;
 import deco.distributed.lang.dynamics.mechanism.AgentElement;
 import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
 import deco.distributed.lang.dynamics.mechanism.DirectCausality;
+import deco4mas.distributed.convergence.ConvergenceMicroAgent;
 import deco4mas.distributed.convergence.MicroConvergenceService;
 import deco4mas.distributed.coordinate.DecentralCoordinationInformation;
 import deco4mas.distributed.coordinate.DirectCoordinationInformation;
@@ -122,7 +122,7 @@ public class InitMicroAgentForCoordination {
 					HashMap<String, Object> appArgs = (HashMap<String, Object>) interpreter.getArguments();
 					String coordinationContextID = (String) appArgs.get("CoordinationContextID");
 					
-					MicroConvergenceService service = new MicroConvergenceService((MicroAgent) ia, masDyn.getConvergence(), coordinationContextID);
+					MicroConvergenceService service = new MicroConvergenceService((ConvergenceMicroAgent) ia, masDyn.getConvergence(), coordinationContextID);
 					service.start();
 				}
 				

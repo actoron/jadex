@@ -44,7 +44,6 @@ import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
  * 
  * @author Thomas Preisler
  */
-// TODO Handle delay
 @Service
 public class BDIConvergenceService extends ConvergenceService {
 
@@ -232,7 +231,9 @@ public class BDIConvergenceService extends ConvergenceService {
 		private Constraint constraint = null;
 		/** The Belief under observation */
 		private IBelief belief = null;
+		/** Was there a previous voting attempt */
 		private boolean previous = false;
+		/** Timestamp of the last voting attempt*/ 
 		private long lastCall = 0;
 
 		/**
