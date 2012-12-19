@@ -37,7 +37,8 @@
 		<import>deco4mas.distributed.coordinate.environment.*</import>
 		<import>deco4mas.distributed.coordinate.interpreter.coordination_information.*</import>
 		<import>deco4mas.distributed.annotation.agent.*</import>
-		<import>deco4mas.distributed.coordinate.*</import>						
+		<import>deco4mas.distributed.coordinate.*</import>	
+		<import>deco4mas.distributed.convergence.*</import>						
 	</imports>
 
 	<arguments>
@@ -277,9 +278,6 @@
 	<configurations>
 		<configuration name="StandardConfiguation">
 			<extensions>
-			<!-- The CoordinationSpace -->
-			<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
-			
 				<!-- <env:envspace name="my2dspace" type="2dspace"> -->
 				<env:envspace name="my2dspace" type="2dspace" width="1"
 					height="1">
@@ -330,6 +328,9 @@
 						</env:observer>
 					</env:observers>
 				</env:envspace>
+				
+				<!-- The CoordinationSpace -->
+				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
 			</extensions>
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />

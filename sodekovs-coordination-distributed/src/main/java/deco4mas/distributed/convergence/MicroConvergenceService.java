@@ -42,15 +42,17 @@ public class MicroConvergenceService extends ConvergenceService {
 		this.agent = agent;
 		this.convergence = convergence;
 		this.coordinationContextId = coordinationContextId;
+		
+		System.out.println("ComponentIdentifier: " + agent.getComponentIdentifier() + "  HashCode: " + agent.getComponentIdentifier().hashCode());
 	}
 
 	@Override
 	protected void initListener() {
 		// get all affected adaptions
-		List<Adaption> adaptions = convergence.getAffectedAdaptions(agent.getAgentName());
+		List<Adaption> adaptions = convergence.getAffectedAdaptions(agent.getExternalAccess().getLocalType());
 		for (Adaption adaption : adaptions) {
 			// get all matching constraints
-			List<Constraint> constraints = adaption.getConstraints(agent.getAgentName());
+			List<Constraint> constraints = adaption.getConstraints(agent.getExternalAccess().getLocalType());
 			for (Constraint constraint : constraints) {
 				if (constraint.getType().equals(MICRO_CONSTRAINT)) {
 					agent.addEventListener(constraint.getElement(), new MicroAgentConvergenceListener(adaption, constraint));
@@ -62,14 +64,15 @@ public class MicroConvergenceService extends ConvergenceService {
 
 	@Override
 	protected void startService() {
-		String serviceName = agent.getComponentIdentifier().getLocalName() + SERVICE_POSTFIX;
+		String serviceName = agent.getComponentIdentifier() + SERVICE_POSTFIX;
 		agent.addService(serviceName, IConvergenceService.class, this);
+		System.out.println(serviceName + " started");
 	}
 
 	@Override
 	public void resetConstraint(Adaption adaption) {
 		// / get all matching constraints
-		List<Constraint> constraints = adaption.getConstraints(agent.getAgentName());
+		List<Constraint> constraints = adaption.getConstraints(agent.getExternalAccess().getLocalType());
 		for (Constraint constraint : constraints) {
 			if (constraint.getType().equals(MICRO_CONSTRAINT)) {
 				agent.setConstraintValue(constraint.getElement(), new Integer(0));
@@ -99,7 +102,7 @@ public class MicroConvergenceService extends ConvergenceService {
 		Future<Boolean> fut = new Future<Boolean>();
 
 		// get all constraints which reference the agent type
-		List<Constraint> constraints = adaption.getConstraints(agent.getAgentName());
+		List<Constraint> constraints = adaption.getConstraints(agent.getExternalAccess().getLocalType());
 		for (Constraint constraint : constraints) {
 			Integer value = (Integer) agent.getConstraintValue(constraint.getElement());
 			

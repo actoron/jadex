@@ -325,7 +325,7 @@
 		        </realizations>
 		        <constraints>
 	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
-	        		<constraint agent_id="MicroCarry" element="no_msg_received" type="MICRO_PARAMETER" condition="10" threshold="7"/>
+	        		<constraint agent_id="MicroCarry" element="no_msg_received" type="MICRO_CONSTRAINT" condition="10" threshold="7"/>
 	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
 	    		</constraints>
 		    </adaption>
@@ -340,7 +340,7 @@
 <!-- 		        </realiazions> -->
 <!-- 		        <constraints> -->
 <!-- 	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
-<!-- 	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
+<!-- 	        		<constraint agent_id="MicroCarry" element="no_msg_received" type="MICRO_CONSTRAINT" condition="15" threshold="12"/> -->
 <!-- 	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
 <!-- 	    		</constraints> -->
 <!-- 		    </adaption> -->

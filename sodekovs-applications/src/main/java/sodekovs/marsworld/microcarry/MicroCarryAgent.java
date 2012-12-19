@@ -13,7 +13,6 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
-import jadex.micro.MicroAgent;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,10 +26,11 @@ import sodekovs.marsworld.movement.MicroMoveTask;
 import sodekovs.marsworld.movement.MoveTask;
 import sodekovs.marsworld.producer.ProduceOreTask;
 import sodekovs.marsworld.sentry.AnalyzeTargetTask;
+import deco4mas.distributed.convergence.ConvergenceMicroAgent;
 import deco4mas.distributed.coordinate.annotation.CoordinationParameter;
 import deco4mas.distributed.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
-public class MicroCarryAgent extends MicroAgent{
+public class MicroCarryAgent extends ConvergenceMicroAgent {
 
 	Space2D environment;
 	ISpaceObject myself;
@@ -60,6 +60,7 @@ public class MicroCarryAgent extends MicroAgent{
 	// Handling of an incoming Message-Event
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
+		
 		ISpaceObject ot = ((RequestCarry)msg.get(SFipa.CONTENT)).getTarget();
 		if (!targets.contains(ot))
 			targets.add(ot);		
@@ -68,7 +69,23 @@ public class MicroCarryAgent extends MicroAgent{
 	public IFuture<Void> agentCreated()
 	{
 		scheduleStep(new PerformStep());
+		scheduleStep(new CountNoMsgStep());
 		return IFuture.DONE;
+	}
+	
+	public class CountNoMsgStep implements IComponentStep<Void> {
+
+		@Override
+		public IFuture<Void> execute(IInternalAccess ia) {
+			ia.waitForDelay(1000, CountNoMsgStep.this);
+			Integer oldValue = (Integer) getConstraintValue("no_msg_received");
+			if (oldValue == null)
+				oldValue = 0;
+			setConstraintValue("no_msg_received", oldValue++);
+			
+			return IFuture.DONE;
+		}
+		
 	}
 	
 	public class PerformStep implements IComponentStep<Void>
@@ -269,6 +286,9 @@ public class MicroCarryAgent extends MicroAgent{
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
 			System.out.println("#LatestProducedTargetStep# Received latest produced target: " + latest_produced_target);
+			
+			setConstraintValue("no_msg_received", new Integer(0));
+			
 			IVector2 position = new Vector2Double(latest_produced_target.getX(), latest_produced_target.getY());
 			ISpaceObject latestTarget = environment.getNearestObject(position, null, "target");
 						
