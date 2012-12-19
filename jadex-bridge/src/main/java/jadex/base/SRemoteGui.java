@@ -109,8 +109,8 @@ public class SRemoteGui
 				catch(Exception e)
 				{
 					// Protect remote platform from execution errors.
-					Thread.dumpStack();
-					e.printStackTrace();
+//					Thread.dumpStack();
+//					e.printStackTrace();
 					ret.setException(e);
 				}
 				return ret;

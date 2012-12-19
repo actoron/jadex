@@ -13,6 +13,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -32,7 +33,6 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
-import jadex.micro.annotation.Agent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -300,8 +300,19 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				final FieldInfo[] fields = model.getServiceInjections(sernames[i]);
 				final Future<Void> fut = new Future<Void>();
 				fut.addResultListener(lis);
-				getServiceContainer().getRequiredService(sernames[i])
-					.addResultListener(new DelegationResultListener(fut)
+				
+				RequiredServiceInfo	info	= model.getModelInfo().getRequiredService(sernames[i]);				
+				IFuture<?>	sfut;
+				if(info!=null && info.isMultiple())
+				{
+					sfut	= getServiceContainer().getRequiredServices(sernames[i]);
+				}
+				else
+				{
+					sfut	= getServiceContainer().getRequiredService(sernames[i]);					
+				}
+				
+				sfut.addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
