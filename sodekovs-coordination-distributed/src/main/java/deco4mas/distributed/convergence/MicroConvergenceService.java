@@ -27,22 +27,23 @@ import deco.distributed.lang.dynamics.convergence.Realization;
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
 
 /**
- * This class implements the {@link IConvergenceService} for {@link ConvergenceMicroAgent}s by implementing the interface methods and adding listeners to the agent to monitor if a distributed voting process should be
- * started.
+ * This class implements the {@link IConvergenceService} for {@link ConvergenceMicroAgent}s by implementing the interface methods and adding listeners to the agent to monitor if a distributed voting
+ * process should be started.
  * 
  * @author Thomas Preisler
  */
 @Service
 public class MicroConvergenceService extends ConvergenceService {
 
-	/** Reference to the mirco agent */ 
+	/** Reference to the mirco agent */
 	private ConvergenceMicroAgent agent = null;
 
 	public MicroConvergenceService(ConvergenceMicroAgent agent, Convergence convergence, String coordinationContextId) {
 		this.agent = agent;
 		this.convergence = convergence;
 		this.coordinationContextId = coordinationContextId;
-		
+		this.externalAccess = this.agent.getExternalAccess();
+
 		System.out.println("ComponentIdentifier: " + agent.getComponentIdentifier() + "  HashCode: " + agent.getComponentIdentifier().hashCode());
 	}
 
@@ -73,7 +74,7 @@ public class MicroConvergenceService extends ConvergenceService {
 	public void resetConstraint(Adaption adaption) {
 		// / get all matching constraints
 		List<Constraint> constraints = adaption.getConstraints(agent.getExternalAccess().getLocalType());
-		for (Constraint constraint : constraints) {
+		for (final Constraint constraint : constraints) {
 			if (constraint.getType().equals(MICRO_CONSTRAINT)) {
 				agent.setConstraintValue(constraint.getElement(), new Integer(0));
 			}
@@ -105,7 +106,7 @@ public class MicroConvergenceService extends ConvergenceService {
 		List<Constraint> constraints = adaption.getConstraints(agent.getExternalAccess().getLocalType());
 		for (Constraint constraint : constraints) {
 			Integer value = (Integer) agent.getConstraintValue(constraint.getElement());
-			
+
 			result = result && value != null && value >= constraint.getThreshold();
 		}
 
@@ -147,7 +148,7 @@ public class MicroConvergenceService extends ConvergenceService {
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia) {
 								checkConstraint(event);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 					}
@@ -307,34 +308,6 @@ public class MicroConvergenceService extends ConvergenceService {
 				System.out.println(agent.getComponentIdentifier() + " adaption was aborted due to remote one with higher priority");
 			}
 		}
-	}
-
-	/**
-	 * Calls all remote convergence services and ask them to reset their convergence constraints if a previous voting attempt (Adaption) was successfull.
-	 * 
-	 * @param adaption
-	 *            the given {@link Adaption}
-	 */
-	private void resetConstraints(final Adaption adaption) {
-		System.out.println(agent.getComponentIdentifier() + " resets all constraints for " + adaption);
-		// get remote convergence services
-		SServiceProvider.getServices(agent.getServiceProvider(), IConvergenceService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<IConvergenceService>() {
-
-			@Override
-			public boolean filter(IConvergenceService obj) {
-				if (coordinationContextId.equals(obj.getCoordinationContextID())) {
-					return true;
-				}
-				return false;
-			}
-		}).addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
-
-			@Override
-			public void intermediateResultAvailable(IConvergenceService result) {
-				// and reset them
-				result.resetConstraint(adaption);
-			}
-		});
 	}
 
 	/**
