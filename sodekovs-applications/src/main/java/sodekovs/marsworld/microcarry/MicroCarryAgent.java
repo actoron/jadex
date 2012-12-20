@@ -81,7 +81,8 @@ public class MicroCarryAgent extends ConvergenceMicroAgent {
 			Integer oldValue = (Integer) getConstraintValue("no_msg_received");
 			if (oldValue == null)
 				oldValue = 0;
-			setConstraintValue("no_msg_received", oldValue++);
+			oldValue = oldValue + 1;
+			setConstraintValue("no_msg_received", oldValue);
 			
 			return IFuture.DONE;
 		}
