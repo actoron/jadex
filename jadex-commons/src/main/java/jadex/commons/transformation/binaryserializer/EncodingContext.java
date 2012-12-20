@@ -270,7 +270,7 @@ public class EncodingContext
 	public void writeString(String string)
 	{
 		Integer sid = stringpool.get(string);
-		if (sid == null)
+		if(sid == null)
 		{
 			sid = stringpool.size();
 			stringpool.put(string, sid);
@@ -288,7 +288,9 @@ public class EncodingContext
 			}
 		}
 		else
+		{
 			writeVarInt(sid);
+		}
 	}
 	
 	/**

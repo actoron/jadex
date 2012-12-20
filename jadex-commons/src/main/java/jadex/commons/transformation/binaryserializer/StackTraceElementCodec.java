@@ -31,8 +31,8 @@ public class StackTraceElementCodec extends AbstractCodec
 	 */
 	public Object createObject(Class clazz, DecodingContext context)
 	{
-		return new StackTraceElement(context.readString(), context.readString(), 
-			context.readString(), (int)context.readSignedVarInt());
+		return new StackTraceElement((String)BinarySerializer.decodeObject(context), (String)BinarySerializer.decodeObject(context), 
+				(String)BinarySerializer.decodeObject(context), (int)context.readSignedVarInt());
 	}
 	
 	
@@ -51,14 +51,13 @@ public class StackTraceElementCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		StackTraceElement ste = (StackTraceElement)object;
-
-		ec.writeString(ste.getClassName());
-		ec.writeString(ste.getMethodName());
-		ec.writeString(ste.getFileName());
+		traverser.traverse(ste.getClassName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.traverse(ste.getMethodName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.traverse(ste.getFileName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
 		ec.writeSignedVarInt(ste.getLineNumber());
 		
 		return object;

@@ -180,6 +180,10 @@ public class Traverser
 				}
 			}
 		}
+		else
+		{
+			ret = handleNull(object, clazz, processors, clone, context);
+		}
 			
 		return ret;
 	}
@@ -190,6 +194,15 @@ public class Traverser
 	public void handleDuplicate(Object object, Class<?> clazz, Object match, 
 		List<ITraverseProcessor> processors, boolean clone, Object context)
 	{
+	}
+	
+	/**
+	 *  Special handling for null objects.
+	 */
+	public Object handleNull(Object object, Class<?> clazz,
+		List<ITraverseProcessor> processors, boolean clone, Object context)
+	{
+		return object;
 	}
 }
 

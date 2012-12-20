@@ -130,10 +130,21 @@ public class BinarySerializer
 			public void handleDuplicate(Object object, Class<?> clazz, Object match,
 				List<ITraverseProcessor> processors, boolean clone, Object context)
 			{
-				EncodingContext ec = (EncodingContext) context;
+				EncodingContext ec = (EncodingContext)context;
 				int ref = ((Integer)match).intValue();
 				ec.writeClassname(REFERENCE_MARKER);
 				ec.writeVarInt(ref);
+			}
+			
+			/**
+			 *  Special handling for null objects.
+			 */
+			public Object handleNull(Object object, Class<?> clazz,
+				List<ITraverseProcessor> processors, boolean clone, Object context)
+			{
+				EncodingContext ec = (EncodingContext)context;
+				ec.writeClassname(NULL_MARKER);
+				return object;
 			}
 		};
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
