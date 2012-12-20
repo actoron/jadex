@@ -31,6 +31,7 @@ public class MonkeyApp extends AMonkeyFunctions {
 //		System.out.println("dim");
 		if(cleanupPostFilter)
 		{
+			System.out.println("cleanup!");
 			fpp.cleanup();
 			cleanupPostFilter = false;
 		}

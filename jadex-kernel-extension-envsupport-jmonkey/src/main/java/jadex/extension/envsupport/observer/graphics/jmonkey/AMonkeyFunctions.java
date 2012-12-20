@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
+import org.lwjgl.Sys;
+
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -104,6 +106,9 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 			// action:
 			Spatial selectedsp = target;
 
+			try {
+				
+			
 			// we look for the SpaceObject-Parent
 			if (selectedsp != null) {
 				while (!Character.isDigit(selectedsp.getName().charAt(0))) {
@@ -112,6 +117,10 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 
 				selection = Integer.parseInt(selectedsp.getName());
 				selectedspatial = selectedsp;
+			}
+			}
+			catch (NullPointerException e) {
+				System.out.println("AMonkeyFunctions: Selection NULL");
 			}
 		}
 		setSelectedTarget(selection);
