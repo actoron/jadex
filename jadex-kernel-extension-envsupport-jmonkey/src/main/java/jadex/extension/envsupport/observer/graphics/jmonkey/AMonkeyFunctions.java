@@ -94,7 +94,33 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 		cam.setLocation(pos);
 	}
 	
-	
+	public void getSpacePosition()
+	{
+		CollisionResults results = fireRaytrace();
+		if (results.size() > 0) {
+			Geometry target = results.getClosestCollision().getGeometry();
+			// Here comes the
+			// action:
+			Spatial selectedsp = target;
+
+			try {
+				
+			
+			// we look for the SpaceObject-Parent
+			if (selectedsp != null) {
+				while (!Character.isDigit(selectedsp.getName().charAt(0))) {
+					selectedsp = selectedsp.getParent();
+				}
+
+				System.out.println("name: " + selectedsp.getName());
+			}
+			}
+			catch (NullPointerException e) {
+				System.out.println("AMonkeyFunctions: Selection NULL");
+			}
+		}
+		
+	}
 	public void fireSelection() {
 		CollisionResults results = fireRaytrace();
 
@@ -117,6 +143,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 
 				selection = Integer.parseInt(selectedsp.getName());
 				selectedspatial = selectedsp;
+				System.out.println("selected!");
 			}
 			}
 			catch (NullPointerException e) {
@@ -203,6 +230,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 	private void initKeys() {
 
 		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+		inputManager.addMapping("Leftclick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 		inputManager.addMapping("Hud", new KeyTrigger(KeyInput.KEY_F1));
 		inputManager.addMapping("ChaseCam", new KeyTrigger(KeyInput.KEY_F3));
@@ -226,16 +254,16 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 					hudactive = !hudactive;
 				}
 
-				if (keyPressed && name.equals("Fullscreen")) {
+				else if (keyPressed && name.equals("Fullscreen")) {
 					fireFullscreen();
 
 				}
 
-				if (keyPressed && name.equals("Random")) {
+				else if (keyPressed && name.equals("Random")) {
 					setHeight();
 
 				}
-				if (keyPressed && name.equals("Grid")) {
+				else if (keyPressed && name.equals("Grid")) {
 
 					if (rootNode.getChild("gridNode") != null) {
 						rootNode.detachChild(gridNode);
@@ -249,21 +277,25 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 				if (name.equals("Select") && keyPressed) {
 					fireSelection();
 				}
+				
+				if (name.equals("Leftclick") && keyPressed) {
+					getSpacePosition();
+				}
 
-				if (!focusCamActive&&name.equals("ZoomIn")) {
+				else if (!focusCamActive&&name.equals("ZoomIn")) {
 					moveCamera(6, false);
 				} 
 				
-				if (!focusCamActive &&name.equals("ZoomOut")) {
+				else if (!focusCamActive &&name.equals("ZoomOut")) {
 					moveCamera(-6, false);
 				}
 				
-				if (!focusCamActive && keyPressed && name.equals("WalkCam")) {
+				else if (!focusCamActive && keyPressed && name.equals("WalkCam")) {
 					walkCam = !walkCam;
 					System.out.println("walkcam!");
 				}
 
-				if (keyPressed && name.equals("ChaseCam")) {
+				else if (keyPressed && name.equals("ChaseCam")) {
 
 					focusCamActive = !focusCamActive;
 					
@@ -301,7 +333,9 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 		inputManager.addListener(actionListener, new String[] { "WalkCam" });
 		inputManager.addListener(actionListener, new String[] { "ZoomIn" });
 		inputManager.addListener(actionListener, new String[] { "ZoomOut" });
+		inputManager.addListener(actionListener, new String[] { "Leftclick" });
 		inputManager.addListener(actionListener, new String[] { "Select" });
+		inputManager.addListener(actionListener, new String[] { "Fullscreen" });
 		inputManager.addListener(actionListener, new String[] { "FollowCam" });
 		inputManager.addListener(actionListener, new String[] { "Fullscreen" });
 

@@ -49,9 +49,15 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 		 if(file.contains("?"))
 		 {
 			 SpaceObject sobj = (SpaceObject) obj;
-			 String neighborhood = Integer.toBinaryString(((Integer) sobj.getProperty("neighborhood")));
-			 file = parseTilesets(file, neighborhood);
+			 String neighborhood =  (String) sobj.getProperty("neighborhood");
+			 
+			 System.out.println("neighborhood: " + neighborhood);
+			 
+			 file = file.replace("?.j3o", "");
+			 file = file.concat(neighborhood);
+			 file = file.concat(".j3o");
 //			 System.out.println("file: " + file);
+
 
 		 }
 		 
@@ -124,44 +130,7 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 
 	}
 
-	private String parseTilesets(String file, String neighborhood) {
-		
-		
-		 String ret = file;
-		 // Parse to correct Length according to the files
-		 while(neighborhood.length()<8)
-		 {
-			 neighborhood = "0".concat(neighborhood);
-		 }
-		 // Special Random Cases
-		 if(neighborhood.equals("00111110")||neighborhood.equals("10001111")||neighborhood.equals("11100011")||neighborhood.equals("11111000"))
-		 {
-			 int rnd = (int) (4*Math.random());
-			 switch (rnd) {
-			case 0:
-				neighborhood = neighborhood.concat("a");
-				break;
-			case 1:
-				neighborhood = neighborhood.concat("b");
-				break;
-			case 2:
-				neighborhood = neighborhood.concat("c");
-				break;
-			case 3:
-				neighborhood = neighborhood.concat("d");
-				break;
 
-			default:
-				break;
-			}
-		 }
-		 
-		 ret = file.replace("?.j3o", "");
-		 ret = ret.concat(neighborhood);
-		 ret = ret.concat(".j3o");
-//		 System.out.println("file: " + ret);
-		return ret;
-	}
 
 
 }

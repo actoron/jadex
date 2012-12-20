@@ -151,7 +151,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 //		rootNode.addLight(sun5);
 
 		AmbientLight al = new AmbientLight();
-		al.setColor(ColorRGBA.White.mult(1f));
+		al.setColor(ColorRGBA.White.mult(2f));
 		rootNode.addLight(al);
 		
 		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appDimension, spaceSize, assetManager, isGrid);
@@ -235,11 +235,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	private void initRenderer(boolean complexShadows) {
 		
+
 		this.fpp = new FilterPostProcessor(assetManager);
-		SSAOFilter ssaoFilter = new SSAOFilter(12.94f, 43.92f, 0.5f, 0.61f);
-		fpp.addFilter(ssaoFilter);
-		viewPort.addProcessor(fpp);
-		
 		
 		if(complexShadows)
 		{		
@@ -247,6 +244,11 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light direction
 			pssmRenderer.setShadowIntensity(0.6f);
 			viewPort.addProcessor(pssmRenderer);
+			
+			
+			SSAOFilter ssaoFilter = new SSAOFilter(10.94f, 30.92f, 0.3f, 0.61f);
+			fpp.addFilter(ssaoFilter);
+			viewPort.addProcessor(fpp);
 		}
 		else
 		{ 

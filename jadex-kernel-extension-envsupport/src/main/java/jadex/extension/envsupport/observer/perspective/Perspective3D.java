@@ -522,5 +522,14 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		this.wireframe = wireframe;
 	}
 
+	public DrawableCombiner3d getMarkerDrawCombiner() {
+		return marker;
+	}
+	
+	public void setMarkerDrawCombiner(DrawableCombiner3d marker) {
+		this.marker = marker;
+	}
+
+
 
 }

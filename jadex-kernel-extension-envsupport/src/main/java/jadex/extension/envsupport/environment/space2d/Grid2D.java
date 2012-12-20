@@ -261,6 +261,60 @@ public class Grid2D extends Space2D
 		}		
 	}
 	
+	public Set getNearGridObjects(IVector2 position, int range, String types[])
+	{
+		synchronized(monitor)
+		{
+			Set ret = new HashSet();
+			
+			int sizex = areasize.getXAsInteger();
+			int sizey = areasize.getYAsInteger();
+	
+			int x = position.getXAsInteger();
+			int y = position.getYAsInteger();
+			IVector2 pos = new Vector2Int(x, y);
+			
+			
+			int minx = x - range >= 0 || getBorderMode().equals(BORDER_TORUS) ? x - range : 0;
+			int maxx = x + range <= sizex || getBorderMode().equals(BORDER_TORUS) ? x + range : sizex;
+
+			int miny = y - range >= 0 || getBorderMode().equals(BORDER_TORUS) ? y - range : 0;
+			int maxy = y + range <= sizey || getBorderMode().equals(BORDER_TORUS) ? y + range : sizey;
+
+			for(int i = minx; i <= maxx; i++)
+			{
+				for(int j = miny; j <= maxy; j++)
+				{
+					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
+						Collection tmp = objectsygridpos.getCollection(testpos);
+						if(tmp != null)
+						{
+							if(types==null)
+							{
+								ret.addAll(tmp);
+							}
+							else
+							{
+								for(Iterator it=tmp.iterator(); it.hasNext(); )
+								{
+									ISpaceObject obj = (ISpaceObject)it.next();
+									for(int z = 0; z<types.length; z++ )
+									{
+										if(obj.getType().equals(types[z]))
+											ret.add(obj);
+									}
+
+								}
+							}
+						}
+					
+				}
+			}
+			
+			return ret;
+		}
+	}
+	
 	/**
 	 *  Retrieve all objects in the distance for a position.
 	 *  Uses position->object mapping, for fast operation.

@@ -4,8 +4,10 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.IViewport;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.extension.envsupport.observer.perspective.Perspective2D;
+import jadex.extension.envsupport.observer.perspective.Perspective3D;
 import jadex.commons.SimplePropertyObject;
 
 import java.awt.Canvas;
@@ -22,6 +24,7 @@ import javax.swing.event.ChangeListener;
 public abstract class AbstractInteractionPlugin extends SimplePropertyObject implements IObserverCenterPlugin
 {
 	private DrawableCombiner marker;
+	private DrawableCombiner3d marker3d;
 	
 	private ObserverCenter obsCenter;
 	
@@ -163,13 +166,24 @@ public abstract class AbstractInteractionPlugin extends SimplePropertyObject imp
 			initialized = true;
 		}
 		
+		//TODO: 3d Support for 2d Applications?
+		
 		main.getSelectedPerspective().setSelectedObject(null);
-		
-		marker = ((Perspective2D) main.getSelectedPerspective()).getMarkerDrawCombiner();
-		((Perspective2D) main.getSelectedPerspective()).setMarkerDrawCombiner(new DrawableCombiner());
-		
-		((Canvas) ((Perspective2D) main.getSelectedPerspective()).getView()).addMouseListener(clickListener);
-		main.addSelectedObjectListener(objectListener);
+		if(main.getSelectedPerspective() instanceof Perspective2D)
+		{
+			
+			marker = ((Perspective2D) main.getSelectedPerspective()).getMarkerDrawCombiner();
+			((Perspective2D) main.getSelectedPerspective()).setMarkerDrawCombiner(new DrawableCombiner());
+			
+			((Canvas) ((Perspective2D) main.getSelectedPerspective()).getView()).addMouseListener(clickListener);
+			main.addSelectedObjectListener(objectListener);
+		}
+		else if (main.getSelectedPerspective() instanceof Perspective3D)
+		{
+			marker3d = ((Perspective3D) main.getSelectedPerspective()).getMarkerDrawCombiner();
+			System.out.println("3d PLUGIN? " + this.getClass().getName());
+		}
+
 		
 		startUp(main);
 	}
