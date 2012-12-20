@@ -473,7 +473,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 			{
 				perp.leftClicked("" + selected);
 				Node node = (Node)_geometryNode.getChild("" + _lastselect);
-				if(node.getChild("Marker") != null)
+				if(node != null && node.getChild("Marker") != null)
 				{
 					node.getChild("Marker").removeFromParent();
 				}

@@ -1,13 +1,13 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
 import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;

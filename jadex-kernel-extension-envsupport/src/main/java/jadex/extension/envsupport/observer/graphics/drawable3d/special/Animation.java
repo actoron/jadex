@@ -1,9 +1,9 @@
-package jadex.extension.envsupport.observer.graphics.drawable3d;
+package jadex.extension.envsupport.observer.graphics.drawable3d.special;
 
 import jadex.javaparser.IParsedExpression;
 
 /**
- * 
+ * Dataholder for Animations
  */
 public class Animation
 {

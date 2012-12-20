@@ -4,131 +4,80 @@ import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.SkeletonDebugger;
 
 
-public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
+public class Object3dJMonkeyRenderer extends AObject3dRenderer
 {
-	/** Object for jMonkey. */
-	private Spatial object;
-	
-	private AnimControl control;
-	
-	private String matpath;
-	
-	private Material mat;
+	/** 3d Object for jMonkey. */
 
-	private HashMap<String, AnimChannel> animChannels; 
 	
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			Object obj, ViewportJMonkey vp)
 	{	
 
-		matpath = ((String)dc.getBoundValue(obj, ((Object3d)primitive).getMaterialPath(), vp));
-		if(matpath==null || matpath.equals(""))
-		{
-			matpath = (String)((Object3d) primitive).getMaterialPath();
-//			System.out.println("material: " + matpath);
-		}
-		String file = ((String)dc.getBoundValue(obj, ((Object3d)primitive).getModelPath(), vp));
-		if(file==null)
-		{
-			 file = (String)((Object3d) primitive).getModelPath();
-		}
-		 if(file.contains("?"))
-		 {
-			 SpaceObject sobj = (SpaceObject) obj;
-			 String neighborhood =  (String) sobj.getProperty("neighborhood");
-			 
-			 System.out.println("neighborhood: " + neighborhood);
-			 
-			 file = file.replace("?.j3o", "");
-			 file = file.concat(neighborhood);
-			 file = file.concat(".j3o");
-//			 System.out.println("file: " + file);
-
-
-		 }
-		 
-
-	
+		loadAndSetMesh(dc, primitive, obj, vp);
 		
-		Boolean hasLight = (Boolean)((Object3d) primitive).isHasLightMaterials();
-
-        object = assetManager.loadModel(file);
-        
-        object.setName(identifier);
-        
-        if(!matpath.equals(""))
-        {
-        	mat = assetManager.loadMaterial(matpath);
-
-        	object.setMaterial(mat);
-//        	System.out.println("gesetztes material: " + matpath);
-        }
-		 
-        
-        
-        
-        
-		TreeSet<String> channels = 		((TreeSet<String>)dc.getBoundValue(obj, ((Object3d)primitive).getChannels(), vp));
-//		List<Animation> animations = 	((List<Animation>)dc.getBoundValue(obj, ((Object3d)primitive).getAnimations(), vp));
+		loadAndSetMaterial(dc, primitive, obj, vp);
 		
+		loadAndSetAnimation(dc, primitive, obj, vp);
 		
-		object.setUserData("Animation", false);
-		
+		loadAndSetComplexMaterial(dc, primitive, obj, vp);
 
-		
-		control = object.getControl(AnimControl.class);
-		if(control != null)
-		{
-			control = object.getControl(AnimControl.class);
-			
-			
-			if((Boolean)((Object3d) primitive).isRigDebug())
-			{
-				// Show for Debugging
-//			    for (String anim : control.getAnimationNames()) { System.out.println(anim); }
-			    SkeletonDebugger skeletonDebug = 
-			            new SkeletonDebugger("skeleton", control.getSkeleton());
-			    Material mat2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			    mat2.setColor("Color", ColorRGBA.Green);
-			    mat2.getAdditionalRenderState().setDepthTest(false);
-			    skeletonDebug.setMaterial(mat2);
-			    ((Node)object).attachChild(skeletonDebug);
-			}
-
-		    
-		    if(channels.size()>0)
-		    {
-		    	((Node)object).setUserData("Animation", true);
-		    	animChannels = new HashMap<String, AnimChannel>();
-		    	for(String c : channels)
-		    	{
-		    		AnimChannel tmp = control.createChannel();
-		    		vp.getAnimChannels().put(c+" "+ obj.hashCode(), tmp);
-		    		
-		    	}
-		    	
-		    }
-		    
-		    
-		}
 		return object;
 
 
 	}
+	
+	protected void loadAndSetComplexMaterial(DrawableCombiner3d dc, Primitive3d primitive, Object obj, ViewportJMonkey vp) {
+		ArrayList<Materialfile> materials = ((Object3d)primitive).getMaterials();
+		if(materials!=null)
+		{
+		if(object instanceof Node)
+		{
+			Node objectnode = (Node)object; 
+			
+			for(Spatial s : objectnode.getChildren())
+			{
+				for(Materialfile mat : materials)
+				{
+					if(mat.getName().equals(s.getName()))
+					{
+						s.setMaterial(assetManager.loadMaterial(mat.getPath()));
+					}
+				}
+				
+				}
+				
+				
+			}
+		}
+		}
+
+
+		
+		    
+		
+	
+	
+	
+
+
+
+
 
 
 

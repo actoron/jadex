@@ -22,7 +22,6 @@ import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Cylinder3d;
@@ -33,6 +32,8 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
@@ -1214,17 +1215,31 @@ public class MEnvSpaceType
 								fanims.add(anim);
 							}
 						}
+						
+						List materials = (List)args.get("materialfile");
+						List fmaterials = null;
+						if(materials!=null)
+						{
+							fmaterials = new ArrayList();
+							for(int i=0; i<materials.size(); i++)
+							{
+								Map srcmat = (Map)materials.get(i);
+								Materialfile mat = (Materialfile)((IObjectCreator)getProperty(srcmat, "creator")).createObject(srcmat);
+								fmaterials.add(mat);
+							}
+						}
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), materialpath, texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims);
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), materialpath, texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims, fmaterials);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "animation"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "materialfile"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1254,6 +1269,7 @@ public class MEnvSpaceType
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "animationcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
+
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "sound3d")}), new ObjectInfo(MultiCollection.class),
 				new MappingInfo(null, new AttributeInfo[]{
@@ -1299,6 +1315,31 @@ public class MEnvSpaceType
 				},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "soundcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "materialfile")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null,
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("part", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("path", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						String part = (String)getProperty(args, "part");
+						String path = (String)getProperty(args, "path");
+						if(part==null)
+						{
+							part = "defaultpart";
+						}				
+
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "materialcondition");
+						return new Materialfile(part, path, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				}, 
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "materialcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "arrow")}), new ObjectInfo(MultiCollection.class),
