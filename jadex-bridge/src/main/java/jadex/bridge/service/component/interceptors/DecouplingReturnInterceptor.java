@@ -105,6 +105,29 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 										}
 									});
 								}
+//								catch(ComponentTerminatedException e)
+//								{
+//									
+////									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+////									if(sic.getMethod().getName().equals("destroyComponent")
+////										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
+////									{
+//										Runnable run = new Runnable()
+//										{
+//											public void run() 
+//											{
+//												listener.resultAvailable(null);
+//											}
+//										};
+//										Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+////									}
+////									else
+////									{
+////										// pass exception back to result provider as receiver is already dead.
+////										throw e;
+//////										listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+////									}
+//								}
 								catch(final Exception e)
 								{
 									Runnable run = new Runnable()
