@@ -42,7 +42,6 @@ public class MicroConvergenceService extends ConvergenceService {
 		this.agent = agent;
 		this.convergence = convergence;
 		this.coordinationContextId = coordinationContextId;
-		this.externalAccess = this.agent.getExternalAccess();
 
 		System.out.println("ComponentIdentifier: " + agent.getComponentIdentifier() + "  HashCode: " + agent.getComponentIdentifier().hashCode());
 	}
@@ -349,6 +348,34 @@ public class MicroConvergenceService extends ConvergenceService {
 						}
 					}
 				}
+			}
+		});
+	}
+	
+	/**
+	 * Calls all remote convergence services and ask them to reset their convergence constraints if a previous voting attempt (Adaption) was successfull.
+	 * 
+	 * @param adaption
+	 *            the given {@link Adaption}
+	 */
+	protected void resetConstraints(final Adaption adaption) {
+		System.out.println(agent.getComponentIdentifier() + " resets all constraints for " + adaption);
+		// get remote convergence services
+		SServiceProvider.getServices(agent.getServiceProvider(), IConvergenceService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<IConvergenceService>() {
+
+			@Override
+			public boolean filter(IConvergenceService obj) {
+				if (coordinationContextId.equals(obj.getCoordinationContextID())) {
+					return true;
+				}
+				return false;
+			}
+		}).addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
+
+			@Override
+			public void intermediateResultAvailable(IConvergenceService result) {
+				// and reset them
+				result.resetConstraint(adaption);
 			}
 		});
 	}

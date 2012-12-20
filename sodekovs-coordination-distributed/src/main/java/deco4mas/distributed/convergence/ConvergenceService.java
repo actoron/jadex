@@ -1,12 +1,7 @@
 package deco4mas.distributed.convergence;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +32,6 @@ public abstract class ConvergenceService implements IConvergenceService {
 	
 	/** Map of currently runnig {@link Adaption}s*/
 	protected Map<Adaption, Boolean> runningAdaptions = null;
-	
-	protected IExternalAccess externalAccess = null;
 	
 	/**
 	 * Default constructor.
@@ -73,31 +66,5 @@ public abstract class ConvergenceService implements IConvergenceService {
 	 */
 	protected abstract void startService();
 	
-	/**
-	 * Calls all remote convergence services and ask them to reset their convergence constraints if a previous voting attempt (Adaption) was successfull.
-	 * 
-	 * @param adaption
-	 *            the given {@link Adaption}
-	 */
-	protected void resetConstraints(final Adaption adaption) {
-		System.out.println(externalAccess.getComponentIdentifier() + " resets all constraints for " + adaption);
-		// get remote convergence services
-		SServiceProvider.getServices(externalAccess.getServiceProvider(), IConvergenceService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<IConvergenceService>() {
-
-			@Override
-			public boolean filter(IConvergenceService obj) {
-				if (coordinationContextId.equals(obj.getCoordinationContextID())) {
-					return true;
-				}
-				return false;
-			}
-		}).addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
-
-			@Override
-			public void intermediateResultAvailable(IConvergenceService result) {
-				// and reset them
-				result.resetConstraint(adaption);
-			}
-		});
-	}
+	
 }

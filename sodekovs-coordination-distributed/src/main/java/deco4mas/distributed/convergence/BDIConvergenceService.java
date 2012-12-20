@@ -413,4 +413,32 @@ public class BDIConvergenceService extends ConvergenceService {
 			}
 		}
 	}
+	
+	/**
+	 * Calls all remote convergence services and ask them to reset their convergence constraints if a previous voting attempt (Adaption) was successfull.
+	 * 
+	 * @param adaption
+	 *            the given {@link Adaption}
+	 */
+	private void resetConstraints(final Adaption adaption) {
+		System.out.println(externalAccess.getComponentIdentifier() + " resets all constraints for " + adaption);
+		// get remote convergence services
+		SServiceProvider.getServices(externalAccess.getServiceProvider(), IConvergenceService.class, RequiredServiceInfo.SCOPE_GLOBAL, new IFilter<IConvergenceService>() {
+
+			@Override
+			public boolean filter(IConvergenceService obj) {
+				if (coordinationContextId.equals(obj.getCoordinationContextID())) {
+					return true;
+				}
+				return false;
+			}
+		}).addResultListener(new IntermediateDefaultResultListener<IConvergenceService>() {
+
+			@Override
+			public void intermediateResultAvailable(IConvergenceService result) {
+				// and reset them
+				result.resetConstraint(adaption);
+			}
+		});
+	}
 }
