@@ -817,6 +817,26 @@ public class ImageProvider
 			g.setColor(Color.BLACK);
 			g.fill(shape);
 		}
+		else if ("EVT_X".equals(name))
+		{
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setColor(Color.BLACK);
+			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.draw(EventShape.getXCrossShape(0, 0, size.width, size.height));
+		}
+		else if ("invEVT_X".equals(name))
+		{
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			Shape shape = EventShape.getXCrossShape(0, 0, size.width, size.height);
+			g.setColor(Color.BLACK);
+			g.fill(shape);
+		}
 		
 		return ret;
 	}

@@ -209,22 +209,27 @@ public class SCreationController
 		}
 		vactivity.setBpmnElement(mactivity);
 		
-		Point p = adjustPoint(modelcontainer.getGraph(), targetcell, new mxPoint(targetpoint)).getPoint();
-		
 		Dimension ds = BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.containsKey(mactivity.getActivityType()) ?
 				   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mactivity.getActivityType()) :
 				   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
 		
-		if (xcenter)
-		{
-			p.x -= ds.width * 0.5;
-		}
-		p.y -= ds.height * 0.5;
+		Point p = new Point();
 		
-		if (modelcontainer.getGraph().isGridEnabled())
+		if (!mode.endsWith(ModelContainer.BOUNDARY_EVENT))
 		{
-			p.x = p.x - (p.x % modelcontainer.getGraph().getGridSize());
-			p.y = p.y - (p.y % modelcontainer.getGraph().getGridSize());
+			p = adjustPoint(modelcontainer.getGraph(), targetcell, new mxPoint(targetpoint)).getPoint();
+			
+			if (xcenter)
+			{
+				p.x -= ds.width * 0.5;
+			}
+			p.y -= ds.height * 0.5;
+			
+			if (modelcontainer.getGraph().isGridEnabled())
+			{
+				p.x = p.x - (p.x % modelcontainer.getGraph().getGridSize());
+				p.y = p.y - (p.y % modelcontainer.getGraph().getGridSize());
+			}
 		}
 		
 		vactivity.setGeometry(new mxGeometry(p.getX(),

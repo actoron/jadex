@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
+import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 
@@ -120,7 +121,10 @@ public class EventShape extends mxEllipseShape
 		else if (eventtype.endsWith("Compensation"))
 		{
 			symbol = getBackArrowsShape(x, y, w, h);
-			simple = true;
+		}
+		else if (eventtype.endsWith("Cancel"))
+		{
+			symbol = getXCrossShape(x, y, w, h);
 		}
 		else if (eventtype.endsWith("Rule"))
 		{
@@ -399,7 +403,7 @@ public class EventShape extends mxEllipseShape
 	}
 	
 	/**
-	 *  Creates a lightning bolt shape.
+	 *  Creates a back arrows shape.
 	 *  
 	 *  @param x X-position.
 	 *  @param y Y-position.
@@ -437,5 +441,46 @@ public class EventShape extends mxEllipseShape
 //		gp.closePath();
 		
 		return gp;
+	}
+	
+	/**
+	 *  Creates an x-cross shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
+	public static final Shape getXCrossShape(double x, double y, double w, double h)
+	{
+		double barwidthratio = 0.2;
+		double barlengthratio = 0.45;
+		double barwidthratio2 = barwidthratio * 0.5;
+		double posbaseshift = 0.5 - barlengthratio * 0.5;
+		double w2 = w * 0.5;
+		double h2 = h * 0.5;
+		double shift = Math.sqrt(w2 * w2 + h2 * h2) * barwidthratio2 * GuiConstants.SINE_45;
+		double blx = barlengthratio * w;
+		double bly = barlengthratio * h;
+		double basex = x + posbaseshift * w;
+		double basey = y + posbaseshift * h;
+		GeneralPath bar = new GeneralPath();
+		bar.moveTo(basex - shift, basey + shift);
+		bar.lineTo(basex + shift, basey - shift);
+		bar.lineTo(basex + blx + shift, basey + bly - shift);
+		bar.lineTo(basex + blx - shift, basey + bly + shift);
+		bar.closePath();
+		Area ret = new Area(bar);
+		basex += blx;
+		bar = new GeneralPath();
+		bar.moveTo(basex - shift, basey - shift);
+		bar.lineTo(basex + shift, basey + shift);
+		bar.lineTo(basex - blx + shift, basey + bly + shift);
+		bar.lineTo(basex - blx - shift, basey + bly - shift);
+		bar.closePath();
+		ret.add(new Area(bar));
+		
+		return ret;
 	}
 }

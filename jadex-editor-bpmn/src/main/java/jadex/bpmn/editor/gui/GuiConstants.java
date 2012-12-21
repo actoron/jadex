@@ -7,6 +7,9 @@ package jadex.bpmn.editor.gui;
  */
 public class GuiConstants
 {
+	/** Constant 45 degree sine value. */
+	public static final double SINE_45 = Math.sin(0.25 * Math.PI);
+	
 	/** Ratio between graph and property view. */
 	public static final double GRAPH_PROPERTY_RATIO = 0.7;
 	

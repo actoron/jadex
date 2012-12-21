@@ -278,6 +278,10 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_COMPENSATION_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
 				"Throwing Compensation End Event", iconsize));
 		
+		sym = "invEVT_X";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_CANCEL_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+				"Throwing Cancel End Event", iconsize));
+		
 		++row;
 		
 		sym = "bolt";
@@ -295,6 +299,10 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		sym = "backarrows";
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_COMPENSATION, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
 				"Compensation Boundary Event", iconsize));
+		
+		sym = "EVT_X";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_CANCEL, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),
+				"Cancel Boundary Event", iconsize));
 		
 		sym = "page";
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_BOUNDARY_RULE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.BOUNDARY_EVENT_COLOR),

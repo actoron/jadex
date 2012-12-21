@@ -1,5 +1,7 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
+import jadex.bpmn.editor.gui.GuiConstants;
+
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -38,9 +40,6 @@ public class GatewayShape extends mxRhombusShape
 	// Helper Constants to speed calculation
 	/** Half of PI */
 	protected static final double PI2 = Math.PI * 0.5;
-	
-	/** Constant 45 degree sine value. */
-	protected static final double SINE_45 = Math.sin(0.25 * Math.PI);
 	
 	/** Half of bar thickness as ratio of rhombus side length. */
 	protected static final double BAR_WIDTH_RATIO2 = BAR_WIDTH_RATIO * 0.5;
@@ -111,7 +110,7 @@ public class GatewayShape extends mxRhombusShape
 	{
 		double w2 = w * 0.5;
 		double h2 = h * 0.5;
-		double shift = Math.sqrt(w2 * w2 + h2 * h2) * BAR_WIDTH_RATIO2 * SINE_45;
+		double shift = Math.sqrt(w2 * w2 + h2 * h2) * BAR_WIDTH_RATIO2 * GuiConstants.SINE_45;
 		double blx = XOR_BAR_LENGTH_RATIO * w;
 		double bly = XOR_BAR_LENGTH_RATIO * h;
 		double basex = x + XOR_POS_BASE_SHIFT * w;
@@ -141,7 +140,7 @@ public class GatewayShape extends mxRhombusShape
 		double h2 = h * 0.5;
 		double basex = x + POS_BASE_SHIFT * w;
 		double basey = y + h2;
-		double shift = h * SINE_45 * BAR_WIDTH_RATIO2;
+		double shift = h * GuiConstants.SINE_45 * BAR_WIDTH_RATIO2;
 		double bl = w * BAR_LENGTH_RATIO;
 		GeneralPath bar = new GeneralPath();
 		bar.moveTo(basex, basey - shift);
@@ -152,7 +151,7 @@ public class GatewayShape extends mxRhombusShape
 		Area ret = new Area(bar);
 		basex = x + w2;
 		basey = y + POS_BASE_SHIFT * h;
-		shift = w * SINE_45 * BAR_WIDTH_RATIO2;
+		shift = w * GuiConstants.SINE_45 * BAR_WIDTH_RATIO2;
 		bl = h * BAR_LENGTH_RATIO;
 		bar = new GeneralPath();
 		bar.moveTo(basex + shift, basey);
