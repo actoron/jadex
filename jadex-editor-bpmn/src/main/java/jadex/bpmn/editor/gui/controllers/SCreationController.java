@@ -151,7 +151,7 @@ public class SCreationController
 	 *  @param targetpoint The targeted point for the activity.
 	 *  @return The created activity.
 	 */
-	public static VActivity createActivity(ModelContainer modelcontainer, String mode, Object targetcell, Point targetpoint)
+	public static VActivity createActivity(ModelContainer modelcontainer, String mode, Object targetcell, Point targetpoint, boolean xcenter)
 	{
 		if (mode.endsWith(ModelContainer.BOUNDARY_EVENT))
 		{
@@ -215,7 +215,10 @@ public class SCreationController
 				   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(mactivity.getActivityType()) :
 				   BpmnStylesheetColor.DEFAULT_ACTIVITY_SIZES.get(vactivity.getStyle());
 		
-		p.x -= ds.width * 0.5;
+		if (xcenter)
+		{
+			p.x -= ds.width * 0.5;
+		}
 		p.y -= ds.height * 0.5;
 		
 		if (modelcontainer.getGraph().isGridEnabled())

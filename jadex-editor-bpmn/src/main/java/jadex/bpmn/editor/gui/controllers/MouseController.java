@@ -127,7 +127,7 @@ public class MouseController extends MouseAdapter
 			}
 			else if (ModelContainer.ACTIVITY_MODES.contains(mode) || mode.contains("Event"))
 			{
-				SCreationController.createActivity(modelcontainer, mode, cell, p);
+				SCreationController.createActivity(modelcontainer, mode, cell, p, true);
 				modelcontainer.getGraphComponent().doLayout();
 			}
 			else if (cell == null)

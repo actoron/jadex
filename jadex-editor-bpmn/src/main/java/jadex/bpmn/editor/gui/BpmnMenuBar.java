@@ -5,14 +5,19 @@ import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
+import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
+import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.model.io.SBpmnModelWriter;
+import jadex.bridge.ResourceIdentifier;
+import jadex.commons.ResourceInfo;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -170,20 +175,42 @@ public class BpmnMenuBar extends JMenuBar
 				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
+				filter = new FileNameExtensionFilter("Legacy BPMN model file", "bpmn");
+				//fc.addChoosableFileFilter(filter);
 				int result = fc.showOpenDialog(getParent());
 				if (JFileChooser.APPROVE_OPTION == result)
 				{
 					try
 					{
-						BpmnGraph graph = new BpmnGraph(modelcontainer, modelcontainer.getGraph().getStylesheet());
-						BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
-						
 						File file = fc.getSelectedFile();
-						if (!file.getName().endsWith(".bpmn2"))
+						if (!file.getName().endsWith(".bpmn2") &&
+							!file.getName().endsWith(".bpmn"))
 						{
-							file = new File(file.getAbsolutePath() + ".bpmn2");
+							File tmpfile = new File(file.getAbsolutePath() + ".bpmn2");
+							if (tmpfile.exists())
+							{
+								file = tmpfile;
+							}
+							else
+							{
+								file = new File(file.getAbsolutePath() + ".bpmn");
+							}
 						}
-						MBpmnModel mmodel = SBpmnModelReader.readModel(file, vreader);
+						
+						BpmnGraph graph = new BpmnGraph(modelcontainer, modelcontainer.getGraph().getStylesheet());
+						
+						MBpmnModel mmodel = null;
+						if (file.getName().endsWith("bpmn2"))
+						{
+							BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
+							mmodel = SBpmnModelReader.readModel(file, vreader);
+						}
+						else
+						{
+							ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified());
+							mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
+							(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
+						}
 						
 						initializeNewModel(modelcontainer, graph, mmodel);
 						modelcontainer.setFile(file);

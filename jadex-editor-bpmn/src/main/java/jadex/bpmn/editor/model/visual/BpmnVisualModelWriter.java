@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.io.IBpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 
@@ -60,31 +61,35 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			}
 			out.println("\">");
 			
-			mxGeometry geo = node.getGeometry();
-			out.print(SBpmnModelWriter.getIndent(4));
-			out.print("<dc:Bounds height=\"");
-			out.print(geo.getHeight());
-			out.print("\" width=\"");
-			out.print(geo.getWidth());
-			out.print("\" x=\"");
-			out.print(geo.getX());
-			out.print("\" y=\"");
-			out.print(geo.getY());
-			out.println("\"/>");
-			
-			mxRectangle alt = geo.getAlternateBounds();
-			if (alt != null)
+			if (!(node instanceof VActivity && ((MActivity) ((VActivity) node).getBpmnElement()).isEventHandler()))
 			{
+				mxGeometry geo = node.getGeometry();
 				out.print(SBpmnModelWriter.getIndent(4));
 				out.print("<dc:Bounds height=\"");
-				out.print(alt.getHeight());
+				out.print(geo.getHeight());
 				out.print("\" width=\"");
-				out.print(alt.getWidth());
+				out.print(geo.getWidth());
 				out.print("\" x=\"");
-				out.print(alt.getX());
+				out.print(geo.getX());
 				out.print("\" y=\"");
-				out.print(alt.getY());
+				out.print(geo.getY());
 				out.println("\"/>");
+			
+			
+				mxRectangle alt = geo.getAlternateBounds();
+				if (alt != null)
+				{
+					out.print(SBpmnModelWriter.getIndent(4));
+					out.print("<dc:Bounds height=\"");
+					out.print(alt.getHeight());
+					out.print("\" width=\"");
+					out.print(alt.getWidth());
+					out.print("\" x=\"");
+					out.print(alt.getX());
+					out.print("\" y=\"");
+					out.print(alt.getY());
+					out.println("\"/>");
+				}
 			}
 			
 			//FIXME: Necessary?

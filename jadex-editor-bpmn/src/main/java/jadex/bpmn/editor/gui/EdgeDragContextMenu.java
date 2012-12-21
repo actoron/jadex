@@ -104,7 +104,8 @@ public class EdgeDragContextMenu extends JPopupMenu
 				target = SCreationController.createActivity(modelcontainer,
 												   ((JMenuItem) e.getSource()).getName(),
 												   parent,
-												   loc);
+												   loc,
+												   false);
 				actionlistener.actionPerformed(e);
 			}
 		};

@@ -123,6 +123,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			}
 			
 			mxGeometry geo = (mxGeometry) buffer.remove("bounds");
+			mxGeometry oldgeo = vnode.getGeometry();
 			if (geo != null)
 			{
 				vnode.setGeometry(geo);
@@ -135,6 +136,8 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				
 				if (act.isEventHandler())
 				{
+					// Geometry is handled by layout manager.
+					vnode.setGeometry(oldgeo);
 					Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
 					parent = (VNode) vmap.get(ehpm.get(act.getId()));
 				}

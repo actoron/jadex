@@ -109,12 +109,18 @@ public class EventShape extends mxEllipseShape
 		if (eventtype.endsWith("Message"))
 		{
 			symbol = getLetterShape(x, y, w, h);
+//			symbol = getBackArrowsShape(x, y, w, h);
 			simple = false;
 		}
 		else if (eventtype.endsWith("Timer"))
 		{
 			symbol = getClockShape(x, y, w, h);
 			simple = false;
+		}
+		else if (eventtype.endsWith("Compensation"))
+		{
+			symbol = getBackArrowsShape(x, y, w, h);
+			simple = true;
 		}
 		else if (eventtype.endsWith("Rule"))
 		{
@@ -388,6 +394,47 @@ public class EventShape extends mxEllipseShape
 		gp.lineTo(x + w23, ybottom);
 		gp.lineTo(x + w3, y + maxthick);
 		gp.closePath();
+		
+		return gp;
+	}
+	
+	/**
+	 *  Creates a lightning bolt shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
+	public static final Shape getBackArrowsShape(double x, double y, double w, double h)
+	{
+		GeneralPath gp = new GeneralPath();
+		
+		double sf = 0.50;
+		double w2 = w;
+		double h2 = h;
+		w *= sf;
+		h *= sf;
+		x += (w2 - w) * 0.415;
+		y += (h2 - h) * 0.5;
+		double ybottom = y + h;
+		double yhalf = y + h * 0.5;
+		double xhalf = x + w * 0.5;
+		
+		gp.moveTo(x, yhalf);
+		gp.lineTo(xhalf, ybottom);
+		gp.lineTo(xhalf, yhalf);
+		gp.lineTo(x + w, ybottom);
+		gp.lineTo(x + w, y);
+		gp.lineTo(xhalf, yhalf);
+		gp.lineTo(xhalf, y);
+		gp.closePath();
+//		gp.moveTo(x, y);
+//		gp.lineTo(x, ybottom);
+//		gp.lineTo(x + w, ybottom);
+//		gp.lineTo(x + w, y);
+//		gp.closePath();
 		
 		return gp;
 	}

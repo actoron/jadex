@@ -46,10 +46,11 @@ public class GraphOperationsController extends mxGraphHandler
 		{
 			cell = graphComponent.getCellAt(e.getX(), e.getY(), false);
 			
-			if (cell == null)
-			{
-				cell = graphComponent.getCellAt(e.getX(), e.getY(), true);
-			}
+			// Enable to make the whole pool draggable.
+//			if (cell == null)
+//			{
+//				cell = graphComponent.getCellAt(e.getX(), e.getY(), true);
+//			}
 			while (cell instanceof VLane)
 			{
 				cell = ((VLane) cell).getParent();
