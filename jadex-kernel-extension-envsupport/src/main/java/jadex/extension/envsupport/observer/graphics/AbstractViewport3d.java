@@ -66,8 +66,14 @@ public abstract class AbstractViewport3d implements IViewport3d
 	
 	private boolean							isGrid_			= false;
 	
+	private boolean shader = true;
 	
-	public AbstractViewport3d(IPerspective perspective, IVector3 areasize, boolean isGrid)
+	private String camera = "Default";
+	
+	
+	
+	
+	public AbstractViewport3d(IPerspective perspective, IVector3 areasize, boolean isGrid, boolean shader, String camera)
 	{
 		rendering = false;
 		this.perspective = perspective;
@@ -81,6 +87,8 @@ public abstract class AbstractViewport3d implements IViewport3d
 //		objectList_ = new ArrayList<Object>();
 		listeners_ = new HashSet<Object>();
 		zoomLimit_ = 20.0;
+		this.shader = shader;
+		this.camera = camera;
 	}
 	
 //	/**
@@ -236,6 +244,22 @@ public abstract class AbstractViewport3d implements IViewport3d
 	{
 		isGrid_ = isGrid;
 
+	}
+
+	public boolean isShader() {
+		return shader;
+	}
+
+	public void setShader(boolean shader) {
+		this.shader = shader;
+	}
+
+	public String getCamera() {
+		return camera;
+	}
+
+	public void setCamera(String camera) {
+		this.camera = camera;
 	}
 	
 	

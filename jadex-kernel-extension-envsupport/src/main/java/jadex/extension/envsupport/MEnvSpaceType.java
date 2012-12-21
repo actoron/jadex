@@ -504,6 +504,8 @@ public class MEnvSpaceType
 				new MappingInfo(ti_po, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),		
 				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shader", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("camera", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 				{
 					public Object createObject(Map args) throws Exception
@@ -511,7 +513,19 @@ public class MEnvSpaceType
 						IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
 						args = (Map)args.get("object");
 						
-						IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
+						Boolean shader = (Boolean) getProperty(args, "shader");
+						if(shader==null)
+						{
+							shader = true;
+						}
+						
+						String camera = (String) getProperty(args, "camera");
+						if(camera==null)
+						{
+							camera = "Default";
+						}
+//						IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
+						Perspective3D ret = new Perspective3D(shader, camera);
 
 											
 						if(ret instanceof Perspective3D)

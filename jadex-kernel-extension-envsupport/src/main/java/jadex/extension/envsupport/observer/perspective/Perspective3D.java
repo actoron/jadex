@@ -94,14 +94,22 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	private Primitive3d							_markerPrimitive;
 
 	boolean										wireframe;
+	
+	private boolean shader = true;
+	
+	private String camera = "Default";
 
 	/**
 	 * Creates a 3D-Perspective.
 	 */
-	public Perspective3D()
+	public Perspective3D(boolean shader, String camera)
 	{
 
 		super(null);
+		
+		this.shader = shader;
+		
+		this.camera = camera;
 
 		System.out.println("Perspective3D --->>> new Perspective3D");
 		this.visuals = Collections.synchronizedMap(new HashMap());
@@ -263,12 +271,12 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 				
 				IVector3 tmp3dsize = new Vector3Double(tmpsize.getXAsDouble(),(tmpsize.getXAsDouble()+tmpsize.getYAsDouble())/2,tmpsize.getYAsDouble());
 				
-				viewport3d = createViewport(this, cl, tmp3dsize, isGrid);
+				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera);
 			}
 			else if(space instanceof Space3D)
 			{
 				IVector3 tmp3dsize = ((Space3D)space).getAreaSize();
-				viewport3d = createViewport(this, cl, tmp3dsize, isGrid);
+				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera);
 			}
 
 		}
@@ -419,15 +427,15 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		}
 	}
 
-	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize, boolean isGrid)
+	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize, boolean isGrid, boolean shader, String camera)
 	{
 		System.out.println("Perspective3D - > Create new Viewport!");
 		try
 		{
 			Constructor con = Class.forName("jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey", true,
-					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class, boolean.class});
+					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class, boolean.class, boolean.class, String.class});
 
-			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize, isGrid});
+			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize, isGrid, shader, camera});
 
 			viewport3d = vp;
 			vp.startApp();
