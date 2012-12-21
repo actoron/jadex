@@ -188,7 +188,7 @@ public class CliShell extends ACliShell
 			{
 				public void exceptionOccurred(final Exception exception)
 				{
-					if(exception instanceof RemoteException && ((RemoteException)exception).getType().equals(CloseShellException.class))
+					if(exception instanceof CloseShellException)
 					{
 						removeSubshell().addResultListener(new ExceptionDelegationResultListener<Boolean, String>(ret)
 						{

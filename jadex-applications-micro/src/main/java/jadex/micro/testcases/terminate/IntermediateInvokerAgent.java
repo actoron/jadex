@@ -51,8 +51,7 @@ public class IntermediateInvokerAgent	extends InvokerAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				if(exception instanceof FutureTerminatedException || 
-					(exception instanceof RemoteException && ((RemoteException)exception).getType().equals(FutureTerminatedException.class)))
+				if(exception instanceof FutureTerminatedException)
 				{
 					tmp.setResult(null);
 				}

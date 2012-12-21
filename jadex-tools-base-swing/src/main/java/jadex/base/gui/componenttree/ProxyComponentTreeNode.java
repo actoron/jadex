@@ -91,8 +91,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("ex: "+exception);
-				state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
-					? STATE_LOCKED : STATE_UNCONNECTED;
+				state	= exception instanceof SecurityException? STATE_LOCKED : STATE_UNCONNECTED;
 				getModel().fireNodeChanged(ProxyComponentTreeNode.this);
 			}
 		}));
@@ -158,8 +157,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 						{
 //							System.out.println("ex: "+exception);
 							busy	= false;
-							state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
-								? STATE_LOCKED : STATE_UNCONNECTED;
+							state	= exception instanceof SecurityException? STATE_LOCKED : STATE_UNCONNECTED;
 							List<ITreeNode> list	= Collections.emptyList();
 							setChildren(list);
 							getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
@@ -178,8 +176,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("ex: "+exception);
-				state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
-					? STATE_LOCKED : STATE_UNCONNECTED;
+				state	= exception instanceof SecurityException? STATE_LOCKED : STATE_UNCONNECTED;
 				List<ITreeNode> list	= Collections.emptyList();
 				setChildren(list);
 				getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
