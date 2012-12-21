@@ -60,6 +60,7 @@ public class Object3d extends Primitive3d
 		_rigDebug = rigDebug;
 		_animations = (ArrayList<Animation>)animations;
 		_channels = new TreeSet<String>();
+		this.materials = (ArrayList<Materialfile>) materials;
 		if(_animations != null)
 		{
 			for(Animation a : _animations)
