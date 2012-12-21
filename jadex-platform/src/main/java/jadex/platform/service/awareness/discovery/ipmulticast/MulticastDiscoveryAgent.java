@@ -18,7 +18,7 @@ import java.net.MulticastSocket;
  *  Agent that sends multicasts to locate other Jadex awareness agents.
  */
 @Description("This agent looks for other awareness agents in the local net.")
-@Arguments(
+@Arguments(replace=false, value=
 {
 	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents.")

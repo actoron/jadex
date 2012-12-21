@@ -26,10 +26,13 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
@@ -298,46 +301,64 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			for(int i=0; i<sernames.length; i++)
 			{
 				final FieldInfo[] fields = model.getServiceInjections(sernames[i]);
-				final Future<Void> fut = new Future<Void>();
-				fut.addResultListener(lis);
-				
+				final CounterResultListener<Void> lis2 = new CounterResultListener<Void>(fields.length, lis);
+
 				RequiredServiceInfo	info	= model.getModelInfo().getRequiredService(sernames[i]);				
-				IFuture<?>	sfut;
+				IFuture<Object>	sfut;
 				if(info!=null && info.isMultiple())
 				{
-					sfut	= getServiceContainer().getRequiredServices(sernames[i]);
+					IFuture	ifut	= getServiceContainer().getRequiredServices(sernames[i]);
+					sfut	= ifut;
 				}
 				else
 				{
 					sfut	= getServiceContainer().getRequiredService(sernames[i]);					
 				}
 				
-				sfut.addResultListener(new DelegationResultListener(fut)
+				for(int j=0; j<fields.length; j++)
 				{
-					public void customResultAvailable(Object result)
+					final Field	f	= fields[j].getField(getClassLoader());
+					if(SReflect.isSupertype(IFuture.class, f.getType()))
 					{
 						try
 						{
-							for(int j=0; j<fields.length; j++)
-							{
-								fields[j].getField(getClassLoader()).setAccessible(true);
-								fields[j].getField(getClassLoader()).set(agent, result);
-							}
-							fut.setResult(null);
+							f.setAccessible(true);
+							f.set(agent, sfut);
+							lis2.resultAvailable(null);
 						}
 						catch(Exception e)
 						{
 							getLogger().warning("Field injection failed: "+e);
-							fut.setException(e);
+							lis2.exceptionOccurred(e);
 						}	
 					}
-					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						exception.printStackTrace();
-//						fut.setException(exception);
-//					}
-				});
+					else
+					{
+						sfut.addResultListener(new IResultListener<Object>()
+						{
+							public void resultAvailable(Object result)
+							{
+								try
+								{
+									f.setAccessible(true);
+									f.set(agent, result);
+									lis2.resultAvailable(null);
+								}
+								catch(Exception e)
+								{
+									getLogger().warning("Field injection failed: "+e);
+									lis2.exceptionOccurred(e);
+								}	
+							}
+							
+							public void exceptionOccurred(Exception e)
+							{
+								getLogger().warning("Field injection failed: "+e);
+								lis2.exceptionOccurred(e);
+							}
+						});
+					}
+				}
 			}
 		}
 		else

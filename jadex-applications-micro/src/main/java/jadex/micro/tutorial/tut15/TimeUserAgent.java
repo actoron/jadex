@@ -1,5 +1,6 @@
 package jadex.micro.tutorial.tut15;
 
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
@@ -9,7 +10,6 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -24,7 +24,7 @@ public class TimeUserAgent
 	
 	/** The time services are searched and set at agent startup. */
 	@AgentService
-	Collection<ITimeService>	timeservices;
+	IIntermediateFuture<ITimeService>	timeservices;
 	
 	//-------- methods --------
 	
@@ -35,19 +35,22 @@ public class TimeUserAgent
 	public void	start()
 	{
 		// Subscribe to all found time services.
-		for(final ITimeService timeservice: timeservices)
+		timeservices.addResultListener(new IntermediateDefaultResultListener<ITimeService>()
 		{
-			ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
-			subscription.addResultListener(new IntermediateDefaultResultListener<Date>()
+			public void intermediateResultAvailable(final ITimeService timeservice)
 			{
-				/**
-				 *  This method gets called for each received time submission.
-				 */
-				public void intermediateResultAvailable(Date time)
+				ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
+				subscription.addResultListener(new IntermediateDefaultResultListener<Date>()
 				{
-					System.out.println("New time received from "+timeservice.getName()+": "+time);
-				}
-			});
-		}
+					/**
+					 *  This method gets called for each received time submission.
+					 */
+					public void intermediateResultAvailable(Date time)
+					{
+						System.out.println("New time received from "+timeservice.getName()+": "+time);
+					}
+				});
+			}
+		});
 	}	
 }

@@ -1,7 +1,11 @@
 package jadex.micro.benchmarks.servicecall;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -11,27 +15,29 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.micro.testcases.TestAgent;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  *  Agent providing a direct service.
  */
 @RequiredServices({
-	@RequiredService(name="raw", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_RAW, dynamic=true)),
-	@RequiredService(name="direct", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DIRECT, dynamic=true)),
-	@RequiredService(name="decoupled", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DECOUPLED, dynamic=true)),
+	@RequiredService(name="raw", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_RAW, dynamic=true, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="direct", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DIRECT, dynamic=true, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="decoupled", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DECOUPLED, dynamic=true, scope=Binding.SCOPE_GLOBAL)),
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 @Agent
-@Arguments(@Argument(name="max", clazz=int.class, defaultvalue="10000"))
-public class ServiceCallAgent
+@Arguments(replace=false,
+	value=@Argument(name="max", clazz=int.class, defaultvalue="100"))
+public class ServiceCallAgent	extends TestAgent
 {
 	//-------- attributes --------
 	
@@ -48,85 +54,139 @@ public class ServiceCallAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
-	public IFuture<Void>	body()
+	protected IFuture<Void> performTests(final Testcase tc)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		performTests(RawServiceAgent.class.getName()+".class", 20).addResultListener(new DelegationResultListener<Void>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				performTests(DirectServiceAgent.class.getName()+".class", 2).addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						performTests(DecoupledServiceAgent.class.getName()+".class", 1).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-		});
-		
-		Future<Void> del = new Future<Void>();
-		ret.addResultListener(new DelegationResultListener<Void>(del)
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				agent.getLogger().warning("Exception during run: "+exception);
-				customResultAvailable(null);
-			}
-		});
-		
-		return del;
-	}
-
-	/**
-	 *  Perform all tests with the given agent.
-	 */
-	protected IFuture<Void>	performTests(final String agentname, final int factor)
-	{
-		final Future<Void> ret	= new Future<Void>();
 		IFuture<IComponentManagementService>	fut	= agent.getServiceContainer().getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.createComponent(null, agentname, new CreationInfo(agent.getComponentIdentifier()), null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				test(cms, true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
-					public void customResultAvailable(final IComponentIdentifier cid)
+					public void customResultAvailable(TestReport result)
 					{
-						final Future<Void>	ret2	= new Future<Void>();
-						performSingleTest("raw", 5*factor).addResultListener(new DelegationResultListener<Void>(ret2)
+						tc.addReport(result);
+						createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 						{
-							public void customResultAvailable(Void result)
+							public void customResultAvailable(final IExternalAccess exta)
 							{
-								performSingleTest("direct", 2*factor).addResultListener(new DelegationResultListener<Void>(ret2)
+								createProxy(cms, exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 								{
-									public void customResultAvailable(Void result)
+									public void customResultAvailable(IComponentIdentifier result)
 									{
-										performSingleTest("decoupled", 1*factor).addResultListener(new DelegationResultListener<Void>(ret2));
+										SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+											.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+										{
+											public void customResultAvailable(IComponentManagementService cms2)
+											{
+												test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+												{
+													public void customResultAvailable(TestReport result)
+													{
+														tc.addReport(result);
+														exta.killComponent();
+														ret.setResult(null);
+													}
+												});
+											}
+										}));
 									}
 								});
 							}
 						});
-						
-						ret2.addResultListener(new IResultListener<Void>()
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a proxy for the remote platform.
+	 */
+	protected IFuture<IComponentIdentifier>	createProxy(IComponentManagementService local, IExternalAccess remote)
+	{
+		Map<String, Object>	args = new HashMap<String, Object>();
+		args.put("component", remote.getComponentIdentifier());
+		CreationInfo ci = new CreationInfo(args);
+		return local.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null);
+
+	}
+	
+	/**
+	 *  Perform tests.
+	 */
+	protected IFuture<TestReport>	test(final IComponentManagementService cms, final boolean local)
+	{
+		final Future<TestReport>	ret	= new Future<TestReport>();
+		
+		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 2000 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				performTests(cms, DirectServiceAgent.class.getName()+".class", local ? 200 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						performTests(cms, DecoupledServiceAgent.class.getName()+".class", local ? 100 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 						{
-							public void exceptionOccurred(Exception exception)
+							public void customResultAvailable(Void result)
 							{
-								cms.destroyComponent(cid);
-								ret.setException(exception);
+								ret.setResult(new TestReport("#1", "test", true, null));
 							}
-							public void resultAvailable(Void result)
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Perform all tests with the given agent.
+	 */
+	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int factor)
+	{
+		final Future<Void> ret	= new Future<Void>();
+		cms.createComponent(null, agentname, null /*new CreationInfo(agent.getComponentIdentifier())*/, null)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+		{
+			public void customResultAvailable(final IComponentIdentifier cid)
+			{
+				final Future<Void>	ret2	= new Future<Void>();
+				performSingleTest("raw", 5*factor).addResultListener(new DelegationResultListener<Void>(ret2)
+				{
+					public void customResultAvailable(Void result)
+					{
+						performSingleTest("direct", 2*factor).addResultListener(new DelegationResultListener<Void>(ret2)
+						{
+							public void customResultAvailable(Void result)
 							{
-								cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
-								{
-									public void customResultAvailable(Map<String, Object> result)
-									{
-										ret.setResult(null);
-									}
-								});
+								performSingleTest("decoupled", 1*factor).addResultListener(new DelegationResultListener<Void>(ret2));
+							}
+						});
+					}
+				});
+				
+				ret2.addResultListener(new IResultListener<Void>()
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						cms.destroyComponent(cid);
+						ret.setException(exception);
+					}
+					
+					public void resultAvailable(Void result)
+					{
+						cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> result)
+							{
+								ret.setResult(null);
 							}
 						});
 					}

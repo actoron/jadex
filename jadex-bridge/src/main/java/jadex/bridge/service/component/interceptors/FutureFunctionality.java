@@ -451,42 +451,6 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		return ret;
 	}
 	
-//	/**
-//	 *  Notify the listener.
-//	 */
-//	protected void notifyListener(final IResultListener<Collection<Object>> listener)
-//	{
-//		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyListener(listener);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
-//	}
-//	
-//	/**
-//	 *  Schedule listener notification on component thread. 
-//	 */
-//	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-//	{
-//		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void v)
-//			{
-//				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyIntermediateResult(listener, result);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
-//	}
-	
 	/**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.

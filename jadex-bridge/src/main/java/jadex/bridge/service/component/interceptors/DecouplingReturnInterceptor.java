@@ -105,73 +105,73 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 										}
 									});
 								}
-//								catch(ComponentTerminatedException e)
+								catch(ComponentTerminatedException e)
+								{
+									
+									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+									if(sic.getMethod().getName().equals("destroyComponent")
+										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
+									{
+										Runnable run = new Runnable()
+										{
+											public void run() 
+											{
+												listener.resultAvailable(null);
+											}
+										};
+										Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+									}
+									else
+									{
+										// pass exception back to result provider as receiver is already dead.
+										throw e;
+//										listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+									}
+								}
+//								catch(final Exception e)
 //								{
-//									
-////									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
-////									if(sic.getMethod().getName().equals("destroyComponent")
-////										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
-////									{
-//										Runnable run = new Runnable()
+//									Runnable run = new Runnable()
+//									{
+//										public void run() 
 //										{
-//											public void run() 
+////											System.out.println("out ex2: "+mycnt);
+//											
+//											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
+//											if(sic.getMethod().getName().equals("destroyComponent")
+//												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
 //											{
+////												System.out.println("Rescheduled to rescue thread1: "+e+", "+sic);
 //												listener.resultAvailable(null);
 //											}
-//										};
-//										Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+//											else
+//											{
+////												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic+", "+this);
+////												Thread.dumpStack();
+//												listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+//											}
+//										}
+//									};
+//									Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+////									if(tp!=null)
+////									{
+////										// Hack!!! Thread pool service should be asynchronous.
+////										try
+////										{
+////											tp.execute(run);
+////										}
+////										catch(RuntimeException re)
+////										{
+////											// Happens when thread pool already terminated.
+////											Thread t = new Thread(run);
+////											t.start();																
+////										}
 ////									}
 ////									else
 ////									{
-////										// pass exception back to result provider as receiver is already dead.
-////										throw e;
-//////										listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
+////										Thread t = new Thread(run);
+////										t.start();
 ////									}
 //								}
-								catch(final Exception e)
-								{
-									Runnable run = new Runnable()
-									{
-										public void run() 
-										{
-//											System.out.println("out ex2: "+mycnt);
-											
-											// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
-											if(sic.getMethod().getName().equals("destroyComponent")
-												&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))
-											{
-//												System.out.println("Rescheduled to rescue thread1: "+e+", "+sic);
-												listener.resultAvailable(null);
-											}
-											else
-											{
-//												System.out.println("Rescheduled to rescue thread2: "+e+", "+sic+", "+this);
-//												Thread.dumpStack();
-												listener.exceptionOccurred(new ComponentTerminatedException(ada.getComponentIdentifier(), "Cannot reschedule "+sic+": "+e));
-											}
-										}
-									};
-									Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
-//									if(tp!=null)
-//									{
-//										// Hack!!! Thread pool service should be asynchronous.
-//										try
-//										{
-//											tp.execute(run);
-//										}
-//										catch(RuntimeException re)
-//										{
-//											// Happens when thread pool already terminated.
-//											Thread t = new Thread(run);
-//											t.start();																
-//										}
-//									}
-//									else
-//									{
-//										Thread t = new Thread(run);
-//										t.start();
-//									}
-								}
 							}
 						}
 						
