@@ -25,7 +25,7 @@ public class ImmutableProcessor implements ITraverseProcessor
 	{
 		return object instanceof Enum || object instanceof URL || object instanceof URI 
 			|| object instanceof Level || object instanceof InetAddress || object instanceof Exception
-			|| object instanceof Certificate;
+			|| object instanceof Certificate || object instanceof String;
 	}
 //	SReflect.isSupertype(Enum.class, object.getClass())
 	

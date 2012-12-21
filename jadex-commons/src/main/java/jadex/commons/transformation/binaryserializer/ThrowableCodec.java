@@ -101,7 +101,7 @@ public class ThrowableCodec extends AbstractCodec
 	{
 		Throwable t = (Throwable)object;
 		
-		traverser.traverse(t.getMessage(), clazz, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.traverse(t.getMessage(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
 	
 		Object val = t.getCause();
 		traverser.traverse(val, val!=null? val.getClass(): Throwable.class, 
