@@ -1,5 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.javaparser.IParsedExpression;
 
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ public class Object3d extends Primitive3d
 	protected boolean _hasLightMaterials;
 	
 	protected ArrayList<Animation> _animations;
+	
+	protected ArrayList<Materialfile> materials;
 	
 	protected TreeSet<String> _channels;
 	
@@ -48,7 +52,7 @@ public class Object3d extends Primitive3d
 	 * @param texturePath
 	 * @param drawcondition
 	 */
-	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String materialpath, String texturePath, boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, String shadowtype, List<Animation> animations)
+	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String materialpath, String texturePath, boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, String shadowtype, List<Animation> animations, List<Materialfile> materials)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
 		_modelPath = modelPath;
@@ -145,6 +149,12 @@ public class Object3d extends Primitive3d
 	public void setRigDebug(boolean rigDebug)
 	{
 		this._rigDebug = rigDebug;
+	}
+	public ArrayList<Materialfile> getMaterials() {
+		return materials;
+	}
+	public void setMaterials(ArrayList<Materialfile> materials) {
+		this.materials = materials;
 	}
 	
 
