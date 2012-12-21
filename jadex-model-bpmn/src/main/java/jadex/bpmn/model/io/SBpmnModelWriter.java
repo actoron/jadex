@@ -73,6 +73,7 @@ public class SBpmnModelWriter
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_MESSAGE, END_EVENT_TAG);
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_SIGNAL, END_EVENT_TAG);
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_COMPENSATION, END_EVENT_TAG);
+		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_CANCEL, END_EVENT_TAG);
 	}
 	
 	/**
@@ -782,6 +783,11 @@ public class SBpmnModelWriter
 				{
 					out.print(getIndent(baseind + 1));
 					out.println("<semantic:compensateEventDefinition/>");
+				}
+				else if (activity.getActivityType().contains("Cancel"))
+				{
+					out.print(getIndent(baseind + 1));
+					out.println("<semantic:cancelEventDefinition/>");
 				}
 			}
 			
