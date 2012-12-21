@@ -33,8 +33,8 @@ import com.jme3.terrain.heightmap.HillHeightMap;
  */
 public abstract class AMonkeyFunctions extends AMonkeyInit{
 
-	public AMonkeyFunctions(float dim, float spaceSize, boolean isGrid) {
-		super(dim, spaceSize, isGrid);
+	public AMonkeyFunctions(float dim, float spaceSize, boolean isGrid, boolean shader, String camera) {
+		super(dim, spaceSize, isGrid, shader, camera);
 		
 	}
 

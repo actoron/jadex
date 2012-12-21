@@ -28,7 +28,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
     private CustomChaseCamera chaseCam;
     private InputManager inputManager;
     private int moveSpeed = 100, zoomSpeed = 5, rotationSpeed = 15; //max speeds
-    private int minDist = 50, maxDist = 300;
+    private int minDist = 50, maxDist = 600;
     private float acceleration = 20;
 
     public DungeonMasterCamera(Camera cam, InputManager inputManager, Spatial target, Node rootNode)

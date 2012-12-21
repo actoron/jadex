@@ -125,6 +125,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 	private HashMap<String, AnimChannel>	_animChannels;
 	
 	private ArrayList<Light> lights = new ArrayList<Light>();
+	
+	private boolean shader;
+	
+	private String camera;
 
 	/** The 3d renderers. */
 	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[12];
@@ -150,9 +154,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 	 * @param perspective the selected Perspective
 	 * @param ClassLoader the Classloader
 	 */
-	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid)
+	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid, boolean shader, String camera)
 	{
-		super(perspective, spacesize, isGrid);
+		super(perspective, spacesize, isGrid, shader, camera);
 
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
@@ -163,12 +167,13 @@ public class ViewportJMonkey extends AbstractViewport3d
 		
 		
 		
-		
+		this.shader = shader;
+		this.camera = camera;
 
 		// TODO: scaling komplett
 		_scale = _scaleApp / areaSize_.getXAsFloat();
 
-		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid);
+		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid, shader, camera);
 		AppSettings settings = new AppSettings(true);
 		_app.setPauseOnLostFocus(false);
 		_app.setSettings(settings);

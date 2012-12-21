@@ -94,8 +94,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected boolean focusCamActive = false;
 	protected boolean complexShadows = true;
 	protected boolean cleanupPostFilter = false;
+	protected boolean shader = true;
+	protected String camera = "Default";
 
-	public AMonkeyInit(float dim, float spaceSize, boolean isGrid)
+	public AMonkeyInit(float dim, float spaceSize, boolean isGrid, boolean shader, String camera)
 	{
 		//Set the Variables
 		this.appDimension = dim;
@@ -107,6 +109,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.walkCam = false;
 		this.selectedTarget = -1;
 		this.selectedSpatial = null;
+		this.shader = shader;
+		this.camera = camera;
 		
 
 	}
@@ -161,35 +165,29 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	}
 	
 	public void initCam() {
-
-		// The Focus Camera
-		focusCam = new FocusCamera(cam, staticNode, inputManager);
-		focusCam.setUpVector(Vector3f.UNIT_Y);
-		focusCam.setSmoothMotion(true);
-		focusCam.setDragToRotate(true);
-		focusCam.setDefaultDistance(1000f);
-		focusCam.setMaxDistance(2000f);
-		focusCam.setMinDistance(50f);
-		focusCam.setZoomSpeed(20f);
-		focusCam.setEnabled(false);
-
-		// The Fly Camera
-		 flyCamera = new FlyCamera(cam);
-		 flyCamera.setUpVector(Vector3f.UNIT_Y);
-		 flyCamera.registerWithInput(inputManager);
-		 flyCamera.setMoveSpeed(appDimension);
-		 flyCamera.setDragToRotate(true);
-		 flyCamera.setEnabled(true);
-		 
-		 
-		 flyCamera.setEnabled(false);
-		 
-			/** Configure cam to look at scene */
-			cam.setLocation(new Vector3f(appDimension / 2 , 0, appDimension / 2));
-			cam.lookAt(new Vector3f(appDimension / 2, 0, appDimension / 2), Vector3f.UNIT_Y);
-			cam.setFrustumNear(1f);
-			cam.setFrustumFar(appDimension * 5);
-			cam.resize(1024, 1024, true);
+		/** Configure cam to look at scene */
+		cam.setLocation(new Vector3f(appDimension / 2 , 0, appDimension / 2));
+		cam.lookAt(new Vector3f(appDimension / 2, 0, appDimension / 2), Vector3f.UNIT_Y);
+		cam.setFrustumNear(1f);
+		cam.setFrustumFar(appDimension * 5);
+		cam.resize(1024, 1024, true);
+		
+		if(camera.equals("Default"))
+		{
+			// The Fly Camera
+			 flyCamera = new FlyCamera(cam);
+			 flyCamera.setUpVector(Vector3f.UNIT_Y);
+			 flyCamera.registerWithInput(inputManager);
+			 flyCamera.setMoveSpeed(appDimension);
+			 flyCamera.setDragToRotate(true);
+			 flyCamera.setEnabled(true);
+			 
+			 
+			 flyCamera.setEnabled(true);
+		}
+		else if(camera.equals("Iso"))
+		{
+//			 flyCamera.setEnabled(false);
 			Box b = new Box(1f,1f,1f);
 			Node boxnode = new Node("boxnode");
 			Geometry geo = new Geometry("box", b);
@@ -200,6 +198,24 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 //		 ((Spatial) b).setLocalTranslation(appDimension / 2 , 0, appDimension / 2);
 		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, boxnode, rootNode);
 		 dungeonCam.setEnabled(true);
+		}
+		else if(camera.equals("Focus"))
+		{
+
+			// The Focus Camera
+			focusCam = new FocusCamera(cam, staticNode, inputManager);
+			focusCam.setUpVector(Vector3f.UNIT_Y);
+			focusCam.setSmoothMotion(true);
+			focusCam.setDragToRotate(true);
+			focusCam.setDefaultDistance(1000f);
+			focusCam.setMaxDistance(2000f);
+			focusCam.setMinDistance(50f);
+			focusCam.setZoomSpeed(20f);
+			focusCam.setEnabled(true);
+		}
+
+
+
 
 		 
 
@@ -238,24 +254,26 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 		this.fpp = new FilterPostProcessor(assetManager);
 		
-		if(complexShadows)
+		if(shader)
 		{		
-			pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-			pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light direction
-			pssmRenderer.setShadowIntensity(0.6f);
-			viewPort.addProcessor(pssmRenderer);
+			
 			
 			
 			SSAOFilter ssaoFilter = new SSAOFilter(10.94f, 30.92f, 0.3f, 0.61f);
 			fpp.addFilter(ssaoFilter);
 			viewPort.addProcessor(fpp);
 		}
-		else
-		{ 
-			bsr = new BasicShadowRenderer(assetManager, 256);
-			bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); //light direction
-			viewPort.addProcessor(bsr);
-		 }
+//		else
+//		{ 
+//			bsr = new BasicShadowRenderer(assetManager, 256);
+//			bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); //light direction
+//			viewPort.addProcessor(bsr);
+//		 }
+		
+		pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
+		pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light direction
+		pssmRenderer.setShadowIntensity(0.6f);
+		viewPort.addProcessor(pssmRenderer);
 //		
 
 		

@@ -16,8 +16,8 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
  */
 public class MonkeyApp extends AMonkeyFunctions {
 
-	public MonkeyApp(float dim, float spaceSize, boolean isGrid) {
-		super(dim, spaceSize, isGrid);
+	public MonkeyApp(float dim, float spaceSize, boolean isGrid, boolean shader, String camera) {
+		super(dim, spaceSize, isGrid, shader, camera);
 	}
 
 	public void simpleInitApp() {
