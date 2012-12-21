@@ -72,6 +72,7 @@ public class SBpmnModelWriter
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_ERROR, END_EVENT_TAG);
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_MESSAGE, END_EVENT_TAG);
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_SIGNAL, END_EVENT_TAG);
+		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_COMPENSATION, END_EVENT_TAG);
 	}
 	
 	/**
@@ -777,6 +778,11 @@ public class SBpmnModelWriter
 					out.print(getIndent(baseind + 1));
 					out.println("<semantic:errorEventDefinition/>");
 				}
+				else if (activity.getActivityType().contains("Compensation"))
+				{
+					out.print(getIndent(baseind + 1));
+					out.println("<semantic:compensateEventDefinition/>");
+				}
 			}
 			
 			boolean issubproc = MBpmnModel.SUBPROCESS.equals(activity.getActivityType());
@@ -925,7 +931,7 @@ public class SBpmnModelWriter
 	 *  @param pool The pool.
 	 *  @return The contained activities.
 	 */
-	protected static final List<MActivity> getPoolActivities(MPool pool)
+	public static final List<MActivity> getPoolActivities(MPool pool)
 	{
 		List<MActivity> ret = new ArrayList<MActivity>();
 		if (pool.getActivities() != null && pool.getActivities().size() > 0)

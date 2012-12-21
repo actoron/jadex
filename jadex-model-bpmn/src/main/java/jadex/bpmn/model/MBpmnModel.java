@@ -74,6 +74,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		
 	/** Constant for event end signal. */
 	public static final String EVENT_END_SIGNAL = "EventEndSignal";
+	
+	/** Constant for event end compensation. */
+	public static final String EVENT_END_COMPENSATION = "EventEndCompensation";
 		
 	
 	/** Constant for event start empty. */
@@ -93,6 +96,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/** Constant for event intermediate timer. */
 	public static final String EVENT_INTERMEDIATE_TIMER = "EventIntermediateTimer";
+	
+	/** Constant for event intermediate compensation. */
+	public static final String EVENT_INTERMEDIATE_COMPENSATION = "EventIntermediateCompensation";
 
 	/** Constant for event intermediate multiple. */
 	public static final String EVENT_INTERMEDIATE_MULTIPLE = "EventIntermediateMultiple";
