@@ -14,6 +14,14 @@ public class ComponentTerminatedException	extends RuntimeException
 	//-------- constructors --------
 	
 	/**
+	 *  Simple constructor for deserialization.
+	 */
+	public ComponentTerminatedException(String message)
+	{
+		super(message);
+	}
+	
+	/**
 	 *	Create an component termination exception.  
 	 */
 	public ComponentTerminatedException(IComponentIdentifier cid)
@@ -40,5 +48,14 @@ public class ComponentTerminatedException	extends RuntimeException
 	public IComponentIdentifier getComponentIdentifier()
 	{
 		return cid;
+	}
+	
+	/**
+	 *  Get the component identifier.
+	 *  @return The component identifier.
+	 */
+	public void setComponentIdentifier(IComponentIdentifier cid)
+	{
+		this.cid	= cid;
 	}
 }

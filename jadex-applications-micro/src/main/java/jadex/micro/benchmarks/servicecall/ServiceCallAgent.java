@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -152,7 +153,9 @@ public class ServiceCallAgent	extends TestAgent
 	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		cms.createComponent(null, agentname, null /*new CreationInfo(agent.getComponentIdentifier())*/, null)
+		CreationInfo	ci	= ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
+			? new CreationInfo(agent.getComponentIdentifier()) : null;
+		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)

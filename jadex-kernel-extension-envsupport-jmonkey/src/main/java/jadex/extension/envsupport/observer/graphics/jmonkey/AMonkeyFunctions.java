@@ -4,8 +4,6 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
-import org.lwjgl.Sys;
-
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;

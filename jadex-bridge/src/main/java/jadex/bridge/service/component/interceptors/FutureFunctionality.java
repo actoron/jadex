@@ -318,7 +318,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -336,7 +336,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -352,9 +352,9 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			Object res = func.addIntermediateResult(result);
 			DelegatingSubscriptionIntermediateDelegationFuture.super.addIntermediateResult(res);
 		}
-		catch(Exception e)
+		catch(RuntimeException e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -372,7 +372,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -391,7 +391,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -409,7 +409,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -427,7 +427,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -445,7 +445,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -466,9 +466,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! notification in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
-				DelegatingSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(exception);
 			}
 		});
     }
@@ -538,7 +536,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -556,7 +554,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -574,7 +572,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -592,7 +590,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -610,7 +608,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -628,7 +626,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -646,7 +644,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -664,47 +662,11 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
 	}
-	
-//	/**
-//	 *  Notify the listener.
-//	 */
-//	protected void notifyListener(final IResultListener<Collection<Object>> listener)
-//	{
-//		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				DelegatingTerminableIntermediateDelegationFuture.super.notifyListener(listener);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
-//	}
-//	
-//	/**
-//	 *  Schedule listener notification on component thread. 
-//	 */
-//	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-//	{
-//		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void v)
-//			{
-//				DelegatingTerminableIntermediateDelegationFuture.super.notifyIntermediateResult(listener, result);
-//			}	
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
-//			}
-//		});
-//	}
 	
 	/**
      *  Start scheduled listener notifications if not already running.
@@ -721,9 +683,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! notification in functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when starting scheduled notifications: "+exception);
-				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(exception);
 			}
 		});
     }
@@ -787,7 +747,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -805,7 +765,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -823,7 +783,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableDelegationFuture.super.terminate(e);
 		}
 	}
 	
@@ -841,7 +801,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
+			DelegatingTerminableDelegationFuture.super.terminate(e);
 		}
 		
 		return ret;
@@ -861,9 +821,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 
 			public void exceptionOccurred(Exception exception)
 			{
-				// Hack!!! functionality failed -> should change result of future to failure?
-				func.getLogger().warning("Exception when notifying: "+exception);
-				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
+				DelegatingTerminableDelegationFuture.super.terminate(exception);
 			}
 		});
 	}

@@ -7,8 +7,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
