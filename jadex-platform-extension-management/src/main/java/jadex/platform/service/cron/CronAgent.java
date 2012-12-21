@@ -1,15 +1,20 @@
 package jadex.platform.service.cron;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
-import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -60,7 +65,8 @@ import java.util.Map;
 @Arguments(
 {
 	@Argument(name="realtime", clazz=boolean.class, defaultvalue="true", description="Realtime means using system clock, otherwise Jadex clock is used (allows for simulation)"),
-	@Argument(name="lookahead", clazz=long.class, defaultvalue="1000L*60*60*24*365*2", description="Maximum lookahead for the next timepoint in time patterns (default=2 years)")
+	@Argument(name="lookahead", clazz=long.class, defaultvalue="1000L*60*60*24*365*2", description="Maximum lookahead for the next timepoint in time patterns (default=2 years)"),
+	@Argument(name="useworkeragent", clazz=boolean.class, defaultvalue="true", description="Flag if a worker agent should be used to execute a cron job.")
 })
 @Service
 @ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
@@ -78,11 +84,16 @@ public class CronAgent implements ICronService
 	@AgentArgument
 	protected boolean realtime;
 	
+	/** The agent lookahead. */
 	@AgentArgument
 	protected long lookahead;
 	
+	/** The agent lookahead. */
+	@AgentArgument
+	protected boolean useworkeragent;
+	
 	/** The cron jobs (id -> job). */
-	protected Map<String, Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>> jobs;
+	protected Map<String, Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>> jobs;
 	
 	/** The agent. */
 	@Agent
@@ -109,23 +120,15 @@ public class CronAgent implements ICronService
 					{
 						Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>[] cjs = (Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>[])jobs.values()
 							.toArray(new Tuple2[jobs.size()]);
+						
 						for(final Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> tup: cjs)
 						{
 							if(tup.getFirstEntity().getFilter().filter(time))
 							{
-								// schedule job on subagent?!
-								IFuture<Object> res = (IFuture<Object>)tup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)));
-								res.addResultListener(new IResultListener<Object>()
+								executeJob(tup, time).addResultListener(new DefaultResultListener<Void>()
 								{
-									public void resultAvailable(Object result)
+									public void resultAvailable(Void result)
 									{
-										((IntermediateFuture<Object>)tup.getSecondEntity()).addIntermediateResultIfUndone(result);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										// or ignore?
-										tup.getSecondEntity().setExceptionIfUndone(exception);
 									}
 								});
 							}
@@ -169,10 +172,10 @@ public class CronAgent implements ICronService
 		{
 			if(jobs==null)
 			{
-				jobs = new LinkedHashMap<String, Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>>();
+				jobs = new LinkedHashMap<String, Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>>();
 			}
-			final Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>> jobtup = new Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>>
-				((CronJob<Object>)job, (SubscriptionIntermediateFuture<Object>)ret);
+			final Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> jobtup = new Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>>
+				((CronJob<?>)job, (SubscriptionIntermediateFuture<?>)ret);
 			jobs.put(job.getId(), jobtup);
 		
 			ret.setTerminationCommand(new TerminationCommand()
@@ -278,7 +281,7 @@ public class CronAgent implements ICronService
 	{
 		if(jobs!=null)
 		{
-			Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>> tup = jobs.remove(jobid);
+			Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> tup = jobs.remove(jobid);
 			tup.getSecondEntity().setFinishedIfUndone();
 		}
 		
@@ -286,13 +289,75 @@ public class CronAgent implements ICronService
 	}
 	
 	/**
-	 * 
+	 *  Execute a job on worker agent or directly.
 	 */
-	protected IFuture<Void> executeJob(final Tuple2<CronJob<Object>, SubscriptionIntermediateFuture<Object>> jobtup, long time)
+	protected IFuture<Void> executeJob(final Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> jobtup, final long time)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		// schedule job on subagent?!
+		if(useworkeragent)
+		{
+			IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			{
+				public void customResultAvailable(final IComponentManagementService cms)
+				{
+					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
+//					cms.createComponent(null, "invocation", ci, null)
+					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
+						.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier cid) 
+						{
+							cms.getExternalAccess(cid).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+							{
+								public void customResultAvailable(IExternalAccess exta) 
+								{
+									// Set to finished before executing command to decouple from cron main task
+									ret.setResult(null);
+									
+									exta.scheduleStep(new IComponentStep<Object>()
+									{
+										public IFuture<Object> execute(final IInternalAccess ia)
+										{
+											doExecuteCommand(jobtup, time).addResultListener(ia.createResultListener(new IResultListener<Void>()
+											{
+												public void resultAvailable(Void result)
+												{
+													ia.killComponent();
+												}
+												public void exceptionOccurred(Exception exception)
+												{
+													exception.printStackTrace();
+												}
+											}));
+											
+											return new Future<Object>(null);
+										}
+									});
+								}
+							}));
+						}
+					}));
+				}
+			}));
+		}
+		else
+		{
+			return doExecuteCommand(jobtup, time);
+		}
+		
+		
+		return ret;
+	}
+	
+	/**
+	 *  Execute the command of a job.
+	 */
+	protected IFuture<Void> doExecuteCommand(final Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> jobtup, final long time)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
 		IFuture<Object> res = (IFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)));
 		res.addResultListener(new IResultListener<Object>()
 		{

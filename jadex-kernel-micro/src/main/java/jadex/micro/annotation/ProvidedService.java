@@ -22,7 +22,7 @@ public @interface ProvidedService
 	/** 
 	 *  The service interface type. 
 	 */
-	public Class type();
+	public Class<?> type();
 	
 	/**
 	 *  The service implementation.

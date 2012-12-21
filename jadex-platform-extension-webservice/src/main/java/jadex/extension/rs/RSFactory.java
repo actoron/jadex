@@ -12,14 +12,18 @@ public abstract class RSFactory
 {
 	private static RSFactory INSTANCE = null;
 	
-	public static RSFactory getInstance() {
-		if (INSTANCE == null) {
+	public static RSFactory getInstance() 
+	{
+		if(INSTANCE == null) 
+		{
 			Class<?> clazz = null;
 			clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryAndroid", null);
-			if (clazz == null) {
+			if(clazz == null) 
+			{
 				clazz = SReflect.classForName0("jadex.extension.rs.RSFactoryDesktop", null);
 			}
-			if (clazz != null) {
+			if(clazz != null) 
+			{
 				try
 				{
 					INSTANCE = (RSFactory) clazz.newInstance();
