@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
@@ -92,6 +93,12 @@ public class BpmnMenuBar extends JMenuBar
 		JRadioButtonMenuItem sgrayview = new JRadioButtonMenuItem(styleaction);
 		sgrayview.putClientProperty("sheet", new BpmnStylesheetSimpleGrayscale());
 		sgrayview.setText("Simple Grayscale");
+		stylegroup.add(sgrayview);
+		stylemenu.add(sgrayview);
+		
+		sgrayview = new JRadioButtonMenuItem(styleaction);
+		sgrayview.putClientProperty("sheet", new BpmnStylesheetComplexGrayscale());
+		sgrayview.setText("Complex Grayscale");
 		stylegroup.add(sgrayview);
 		stylemenu.add(sgrayview);
 		

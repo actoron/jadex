@@ -16,8 +16,6 @@ public class BpmnStylesheetSimpleGrayscale extends BpmnStylesheetColor
 {
 	public BpmnStylesheetSimpleGrayscale()
 	{
-		super();
-		
 		String white = "#ffffff";
 		
 		styles.get(VPool.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, white);
