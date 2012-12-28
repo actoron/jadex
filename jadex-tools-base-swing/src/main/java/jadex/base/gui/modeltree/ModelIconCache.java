@@ -133,10 +133,13 @@ public class ModelIconCache implements IIconCache
 										{
 											public void resultAvailable(byte[] result)
 											{
-												Icon	icon	= new ImageIcon(result); 
-												myicons.put(node, icon);
-												myicons.put(type, icon);
-												refresh(node);
+												if(result!=null)	// Corner case on platform shutdown!?
+												{
+													Icon	icon	= new ImageIcon(result); 
+													myicons.put(node, icon);
+													myicons.put(type, icon);
+													refresh(node);
+												}
 											}
 											
 											public void exceptionOccurred(Exception exception)

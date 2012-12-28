@@ -256,7 +256,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			if(target.getClass().isAnonymousClass())
 				method.setAccessible(true);
 			
-			Object res = method.invoke(target, parametervalues);
+			final Object res = method.invoke(target, parametervalues);
 			
 			// Remember invocation for termination invocation
 			if(terminable)
@@ -275,14 +275,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					{
 //						System.out.println("inter: "+result);
 						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, result, callid, 
-							returnisref, methodname, false, getNonFunctionalProperties()));
+							returnisref, methodname, false, getNonFunctionalProperties(), (IFuture<?>)res));
 					}
 					
 					public void finished()
 					{
 //						System.out.println("fin");
 						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, null, callid, 
-							returnisref, methodname, true, getNonFunctionalProperties()));
+							returnisref, methodname, true, getNonFunctionalProperties(), (IFuture<?>)res));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}

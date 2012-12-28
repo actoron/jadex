@@ -262,6 +262,7 @@ public class TCPTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
+//		System.out.println("shutdown: "+this);
 		try{this.serversocket.close();}catch(Exception e){}
 		connections = null; // Help gc
 		return IFuture.DONE;
@@ -285,6 +286,7 @@ public class TCPTransport implements ITransport
 	public Socket createClientSocket(String host, int port) throws Exception
 	{
 		Socket ret = new Socket(host, port);
+		ret.setSoTimeout(10000);
 //		ret.setTcpNoDelay(true);
 //		System.out.println("buffer size: "+ret.getSendBufferSize());
 		// Bug: http://archives.postgresql.org/pgsql-hackers/2006-06/msg01458.php
@@ -599,7 +601,7 @@ public class TCPTransport implements ITransport
 //					{
 //						connections.put(address, new TCPDeadConnection());
 //					}
-					ret.setResult(null);
+					ret.setException(e);
 					break;
 	//				logger.warning("Could not create connection: "+e.getMessage());
 					//e.printStackTrace();

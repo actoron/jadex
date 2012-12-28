@@ -3,6 +3,7 @@ package jadex.platform.service.message.transport.niotcpmtp;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -11,7 +12,7 @@ import java.nio.channels.SocketChannel;
 /**
  * The input connection (channel) for incoming requests.
  */
-public class NIOTCPInputConnection
+public class NIOTCPInputConnection	implements Closeable
 {
 	// -------- constants ---------
 
@@ -145,6 +146,7 @@ public class NIOTCPInputConnection
 	{
 		try
 		{
+//			System.out.println("closed: "+this);
 			sc.close();
 		}
 		catch(IOException e)

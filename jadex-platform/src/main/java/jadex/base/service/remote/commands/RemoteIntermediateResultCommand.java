@@ -2,6 +2,7 @@ package jadex.base.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -17,6 +18,9 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 {
 	/** The flag if is finished. */
 	protected boolean finished;
+	
+	/** The original future (not transmitted). */
+	protected IFuture<?>	orig;
 	
 	/**
 	 *  Create a new remote intermediate result command.
@@ -37,10 +41,19 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	 *  Create a new remote intermediate result command.
 	 */
 	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, 
-		String methodname, boolean finished, Map<String, Object> nonfunc)
+		String methodname, boolean finished, Map<String, Object> nonfunc, IFuture<?> orig)
 	{
 		super(realreceiver, result, null, callid, isref, methodname, nonfunc);
 		this.finished = finished;
+		this.orig	= orig;
+	}
+	
+	/**
+	 *  Get the original future.
+	 */
+	public IFuture<?>	getOriginalFuture()
+	{
+		return orig;
 	}
 	
 	/**

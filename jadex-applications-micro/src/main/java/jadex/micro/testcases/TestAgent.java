@@ -3,11 +3,15 @@ package jadex.micro.testcases;
 import jadex.base.Starter;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -20,6 +24,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -30,7 +35,9 @@ import jadex.micro.annotation.Results;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Agent
 @RequiredServices(
@@ -38,6 +45,8 @@ import java.util.Map;
 	@RequiredService(name="msgservice", type=IMessageService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="cms", type=IComponentManagementService.class, 
+		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="clock", type=IClockService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 //@ComponentTypes(
@@ -52,6 +61,35 @@ public abstract class TestAgent
 {
 	@Agent
 	protected MicroAgent agent;
+	
+	protected Set<IExternalAccess>	platforms	= new LinkedHashSet<IExternalAccess>();
+	
+	
+	/**
+	 *  Cleanup created platforms.
+	 */
+	@AgentKilled
+	public IFuture<Void>	cleanup()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		for(IExternalAccess platform: platforms)
+		{
+			platform.killComponent();
+		}
+		
+		// Give platforms time to terminate.
+		agent.waitForDelay(100, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ret.setResult(null);
+				return IFuture.DONE;
+			}
+		});
+		
+		return ret;
+	}
 	
 	/**
 	 *  The agent body.
@@ -106,7 +144,10 @@ public abstract class TestAgent
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//				"-logging", "true",
+//			"-logging", "true",
+//			"-relaytransport", "false",
+//			"-niotcptransport", "false",
+//			"-tcptransport", "true",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
 			"-binarymessages", "false",
 			"-gui", "true", "-simulation", "false", "-printpass", "false"};
@@ -135,7 +176,14 @@ public abstract class TestAgent
 //		System.out.println("platform args: "+SUtil.arrayToString(defargs));
 		
 		Starter.createPlatform(defargs).addResultListener(agent.createResultListener(
-			new DelegationResultListener<IExternalAccess>(ret)));
+			new DelegationResultListener<IExternalAccess>(ret)
+		{
+			public void customResultAvailable(IExternalAccess result)
+			{
+				platforms.add(result);
+				super.customResultAvailable(result);
+			}
+		}));
 		
 		return ret;
 	}
@@ -143,8 +191,17 @@ public abstract class TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<IComponentIdentifier> createComponent(final String filename, 
+	protected IFuture<IComponentIdentifier> createComponent(final String filename,
 		final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	{
+		return createComponent(filename, null, null, root, reslis);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IComponentIdentifier> createComponent(final String filename, final Map<String, Object> args, 
+		final String config, final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
@@ -157,6 +214,8 @@ public abstract class TestAgent
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
 				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
+				ci.setArguments(args);
+				ci.setConfiguration(config);
 				cms.createComponent(null, filename, ci, reslis)
 					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
@@ -197,4 +256,76 @@ public abstract class TestAgent
 		return ret;
 	}
 	
+	/**
+	 *  Setup a local test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	{
+		return createComponent(filename, agent.getComponentIdentifier().getRoot(), reslis);
+	}
+	
+	/**
+	 *  Setup a remote test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
+		final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	{
+		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
+		
+		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						// inverse proxy from remote to local.
+						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
+							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a proxy for the remote platform.
+	 */
+	protected IFuture<IComponentIdentifier>	createProxy(IComponentIdentifier root, IComponentIdentifier remote)
+	{
+		Map<String, Object>	args = new HashMap<String, Object>();
+		args.put("component", remote);
+		return createComponent("jadex/platform/service/remote/ProxyAgent.class", args, null, root, null);
+	}
+
+	
+	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
+	{
+		final Future<T>	ret	= new Future<T>();
+		IFuture<IClockService>	clockfut	= agent.getServiceContainer().getRequiredService("clock");
+		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+		{
+			public void customResultAvailable(IClockService clock)
+			{
+				clock.createRealtimeTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						agent.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+					}
+				});
+			}
+		});
+		return ret;
+	}
 }

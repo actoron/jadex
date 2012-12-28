@@ -1,7 +1,6 @@
 package jadex.bridge.service;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;

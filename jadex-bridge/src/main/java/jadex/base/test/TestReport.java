@@ -96,6 +96,14 @@ public class TestReport
 	}
 
 	/**
+	 *  Is the test finished, i.e. failed or succeeded?
+	 */
+	public boolean isFinished()
+	{
+		return succeeded || reason!=null;
+	}
+
+	/**
 	 *  Set the test success.
 	 *  @param succeded True on success.
 	 */

@@ -2,13 +2,15 @@ package jadex.platform.service.message.transport.niotcpmtp;
 
 import jadex.platform.service.message.transport.niotcpmtp.SelectorThread.Cleaner;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
 /**
  *  Struct for holding information about an output connection.
  */
-public class NIOTCPOutputConnection
+public class NIOTCPOutputConnection	implements Closeable
 {
 	//-------- attributes --------
 	
@@ -57,5 +59,17 @@ public class NIOTCPOutputConnection
 	public Cleaner getCleaner()
 	{
 		return cleaner;
+	}
+
+	
+	/**
+	 *  Close the connection.
+	 */
+	public void close() throws IOException
+	{
+//		System.out.println("Shutdown: "+sc.socket());
+		sc.close();
+		sc.socket().shutdownOutput();
+		cleaner.remove();
 	}
 }

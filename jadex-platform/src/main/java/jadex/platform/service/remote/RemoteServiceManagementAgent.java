@@ -2,8 +2,8 @@ package jadex.platform.service.remote;
 
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
+import jadex.base.service.remote.commands.RemoteIntermediateResultCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
-import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
@@ -25,6 +25,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
@@ -278,9 +279,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						
 						public void sendCommand(final IRemoteCommand result)
 						{
-//							if(((String)orig).indexOf("store")!=-1)
-//								System.out.println("result of command: "+com+" "+result);
-//							System.out.println("send command: "+result);
+//							if(result instanceof RemoteResultCommand && "ping".equals(((RemoteResultCommand)result).getResult()))
+//								System.out.println("result command: "+result);
 							
 							if(result!=null)
 							{
@@ -313,7 +313,25 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										reply.put(SFipa.CONTENT, result);
 //										System.out.println("content: "+result);
 //										System.out.println("reply: "+callid);
-										sendMessage(reply, mt, null);
+										sendMessage(reply, mt, null).addResultListener(new IResultListener<Void>()
+										{
+											public void resultAvailable(Void res)
+											{
+//												System.out.println("result: "+result);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+//												System.out.println("exception: "+result+", "+exception);
+//												exception.printStackTrace();
+												// Could not send message -> terminate future, if terminable.
+												if(result instanceof RemoteIntermediateResultCommand
+													&& ((RemoteIntermediateResultCommand)result).getOriginalFuture() instanceof ITerminableFuture)
+												{
+													((ITerminableFuture<?>)((RemoteIntermediateResultCommand)result).getOriginalFuture()).terminate();
+												}
+											}
+										});
 									}
 									
 									public void exceptionOccurred(Exception exception)

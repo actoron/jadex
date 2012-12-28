@@ -161,6 +161,7 @@ public class NIOTCPTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
+//		System.out.println("shutdown: "+this);
 		try{this.ssc.close();}catch(Exception e){}
 		selectorthread.setRunning(false);
 		this.shutdown	= true;

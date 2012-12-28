@@ -1,9 +1,12 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  *  Dead connection identifier.
  */
-public class NIOTCPDeadConnection
+public class NIOTCPDeadConnection	implements Closeable
 {
 	//-------- constants --------
 	
@@ -34,5 +37,12 @@ public class NIOTCPDeadConnection
 	public boolean shouldRetry()
 	{
 		return System.currentTimeMillis()>deadtime+DEADSPAN;
+	}
+	
+	/**
+	 *  Close the connection.
+	 */
+	public void close() throws IOException
+	{
 	}
 }

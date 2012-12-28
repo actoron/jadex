@@ -7,6 +7,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -53,7 +54,7 @@ public class SelectorThread implements Runnable
 
 	/** The pool of output connections (address -> Future|NIOTCPOutputConnection|DeadConnection). */
 	protected Map<InetSocketAddress, Object>	connections;
-
+	
 	/** The write tasks of data waiting to be written to a connection. */
 	protected Map<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>	writetasks;
 	
@@ -143,12 +144,18 @@ public class SelectorThread implements Runnable
 			}
 		}
 		
-		for(Iterator<Object> it=connections.values().iterator(); it.hasNext(); )
+		for(SelectionKey key: selector.keys())
 		{
-			Object	con	= it.next();
-			if(con instanceof NIOTCPOutputConnection)
+			Object	con	= key.attachment();
+			if(con instanceof Closeable)
 			{
-				((NIOTCPOutputConnection)con).getCleaner().remove();
+				try
+				{
+					((Closeable)con).close();
+				}
+				catch(IOException e)
+				{
+				}
 			}
 		}
 		
@@ -208,6 +215,7 @@ public class SelectorThread implements Runnable
 							try
 							{
 								SocketChannel	sc	= SocketChannel.open();
+//								sc.socket().setSoTimeout(10);
 								sc.configureBlocking(false);
 								sc.connect(address);
 								sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
@@ -433,6 +441,9 @@ public class SelectorThread implements Runnable
 	protected void handleWrite(SelectionKey key)
 	{
 		SocketChannel	sc	= (SocketChannel)key.channel();
+		
+//		System.out.println("write: "+sc.socket().isInputShutdown()+", "+sc.socket().isOutputShutdown());
+		
 		NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)key.attachment();
 		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
 
