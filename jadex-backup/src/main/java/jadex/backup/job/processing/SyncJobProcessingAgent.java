@@ -270,7 +270,8 @@ public class SyncJobProcessingAgent
 		
 		((IService)resser).getServiceIdentifier().getProviderId();
 		SyncLocation loc = new SyncLocation();
-		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
+		final SyncTask task = new SyncTask(job.getId(), loc, loc, System.currentTimeMillis());
+//		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
 		
 		// Scan for changes wrt a specific remote resource
 		resser.scanForChanges(remresser).addResultListener(new IIntermediateResultListener<BackupEvent>()
@@ -413,7 +414,7 @@ public class SyncJobProcessingAgent
 				List<SyncTaskEntry> ses = task.getEntries();
 				if(ses!=null)
 				{
-					IResourceService remresser = findRessourceService(task.getSource());
+					IResourceService remresser = findRessourceService(task.getSource().getPath());
 					if(remresser!=null)
 					{
 						performActions(resser, remresser, ses.iterator())

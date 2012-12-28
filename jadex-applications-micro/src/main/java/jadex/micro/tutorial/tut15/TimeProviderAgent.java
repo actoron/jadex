@@ -100,6 +100,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 			 */
 			public void terminated(Exception reason)
 			{
+				System.out.println("removed subscriber due to: "+reason);
 				subscriptions.remove(ret);
 			}
 		});
