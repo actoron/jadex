@@ -10,7 +10,6 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.runtime.APL;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
@@ -92,8 +91,6 @@ public class GoalBDI
 //		protected void planFinished(RPlan plan)
 //		{
 //		}
-//	
-//
 //		
 //		@MRStarted
 //		protected void mrStarted()

@@ -48,8 +48,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
 		}
 			
-		if(!ret)
-			System.out.println("not valid: "+this+" "+element);
+//		if(!ret)
+//			System.out.println("not valid: "+this+" "+element);
 		
 		return ret;
 	}

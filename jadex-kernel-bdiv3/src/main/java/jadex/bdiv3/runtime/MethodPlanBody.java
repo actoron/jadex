@@ -88,6 +88,11 @@ public class MethodPlanBody implements IPlanBody
 					}
 				});
 			}
+			else
+			{
+				if(reason instanceof RProcessableElement)
+					((RProcessableElement)reason).planFinished(ia, rplan);
+			}
 		}
 		catch(Exception e)
 		{

@@ -373,7 +373,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rulesystem.getRulebase().addRule(rule);
 			}
 		}
-		
 	}
 	
 	/**
@@ -392,15 +391,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		// Evaluate condition before executing step.
 		if(rulesystem!=null)
-		{
 			rulesystem.processAllEvents();
-		}
 		
 //		if(steps!=null && steps.size()>0)
 //		{
 //			System.out.println("steps: "+steps.size()+" "+((Object[])steps.get(0))[0]);
 //		}
-		return super.executeStep();
+		boolean ret = super.executeStep();
+
+		return ret || (rulesystem!=null && rulesystem.isEventAvailable());
 	}
 	
 	/**

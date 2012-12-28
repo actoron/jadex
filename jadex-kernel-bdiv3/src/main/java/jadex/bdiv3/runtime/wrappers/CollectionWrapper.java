@@ -5,6 +5,7 @@ import jadex.rules.eca.RuleSystem;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  Wrapper for collections. Creates rule events on add/remove/change operation calls.
@@ -168,5 +169,42 @@ public class CollectionWrapper <T> implements Collection<T>
 		{
 			rulesystem.addEvent(new Event(addevent, t));
 		}
+	}
+	
+	/** 
+	 *  Get the hashcode of the object.
+	 *  @return The hashcode.
+	 */
+	public int hashCode()
+	{
+		return delegate.hashCode();
+	}
+
+	/** 
+	 *  Test if this object equals another.
+	 *  @param obj The other object.
+	 *  @return True, if equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof CollectionWrapper)
+		{
+			ret = delegate.equals(((CollectionWrapper)obj).delegate);
+		}
+		else if(obj instanceof Map)
+		{
+			ret = delegate.equals(obj);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return delegate.toString();
 	}
 }

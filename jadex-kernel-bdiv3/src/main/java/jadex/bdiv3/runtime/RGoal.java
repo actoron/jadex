@@ -5,9 +5,13 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.annotation.GoalDropCondition;
+import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -105,6 +109,7 @@ public class RGoal extends RProcessableElement
 	
 	/** Flag if goal is declarative. */
 	protected boolean declarative;
+	protected boolean maintain; // hack remove me
 
 	/**
 	 *  Create a new rgoal. 
@@ -373,33 +378,22 @@ public class RGoal extends RProcessableElement
 		ip.getRuleSystem().observeObject(getPojoElement());
 		
 		Method[] ms = getPojoElement().getClass().getDeclaredMethods();
+		Method mcond = null;
 		for(final Method m: ms)
 		{
+			if(m.isAnnotationPresent(GoalMaintainCondition.class))
+				mcond = m; // do later
+			
 			if(m.isAnnotationPresent(GoalTargetCondition.class))
 			{			
-				Annotation[][] annos = m.getParameterAnnotations();
-				List<String> events = new ArrayList<String>();
-				for(Annotation[] ana: annos)
-				{
-					for(Annotation an: ana)
-					{
-						if(an instanceof jadex.rules.eca.annotations.Event)
-						{
-							events.add(((jadex.rules.eca.annotations.Event)an).value());
-						}
-					}
-				}
+				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_target", 
 					new MethodCondition(getPojoElement(), m), new IAction<Void>()
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
-						System.out.println("Goal target triggered: "+RGoal.this);
-//						rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-						setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
-						
-						// todo: call rgoal.finished()? succeeded or set lifecycle state directly?
-						//rgoal.
+						targetConditionTriggered(ia, event, rule, context);
 						return IFuture.DONE;
 					}
 				});
@@ -412,18 +406,8 @@ public class RGoal extends RProcessableElement
 			
 			if(m.isAnnotationPresent(GoalDropCondition.class))
 			{			
-				Annotation[][] annos = m.getParameterAnnotations();
-				List<String> events = new ArrayList<String>();
-				for(Annotation[] ana: annos)
-				{
-					for(Annotation an: ana)
-					{
-						if(an instanceof jadex.rules.eca.annotations.Event)
-						{
-							events.add(((jadex.rules.eca.annotations.Event)an).value());
-						}
-					}
-				}
+				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_drop", 
 					new MethodCondition(getPojoElement(), m), new IAction<Void>()
 				{
@@ -442,7 +426,84 @@ public class RGoal extends RProcessableElement
 				addRule(rule);
 			}
 		}
+		
+		if(mcond!=null)
+		{			
+			List<String> events = readAnnotationEvents(ia, mcond.getParameterAnnotations());
+			
+			Rule<Void> rule = new Rule<Void>(getId()+"_goal_maintain", 
+				new MethodCondition(getPojoElement(), mcond, true), new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					System.out.println("Goal maintain triggered: "+RGoal.this);
+					if(GOALPROCESSINGSTATE_IDLE.equals(getProcessingState()))
+					{
+//						System.out.println("state was: "+getProcessingState());
+						setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
+					}
+//					else
+//					{
+//						System.out.println("state is: "+getProcessingState());
+//					}
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(events);
+			ip.getRuleSystem().getRulebase().addRule(rule);
+			addRule(rule);
+			
+			// if has no own target condition
+			if(!declarative)
+			{
+				// if not has own target condition use the maintain cond
+				rule = new Rule<Void>(getId()+"_goal_target", 
+					new MethodCondition(getPojoElement(), mcond), new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						targetConditionTriggered(ia, event, rule, context);
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				ip.getRuleSystem().getRulebase().addRule(rule);
+				addRule(rule);
+			}
+
+			declarative = true;
+			maintain = true;
+		}
 	}
+	
+	/**
+	 * 
+	 */
+	protected List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
+	{
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		List<String> events = new ArrayList<String>();
+		for(Annotation[] ana: annos)
+		{
+			for(Annotation an: ana)
+			{
+				if(an instanceof jadex.rules.eca.annotations.Event)
+				{
+					String belname = ((jadex.rules.eca.annotations.Event)an).value();
+					events.add(belname);
+					MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+					if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
+					{
+						events.add(ChangeEvent.FACTADDED+"."+belname);
+						events.add(ChangeEvent.FACTREMOVED+"."+belname);
+						events.add(ChangeEvent.FACTCHANGED+"."+belname);
+					}
+				}
+			}
+		}
+		return events;
+	}
+
 	
 	/**
 	 * 
@@ -511,7 +572,6 @@ public class RGoal extends RProcessableElement
 		return "RGoal(lifecyclestate=" + lifecyclestate + ", processingstate="
 			+ processingstate + ", state=" + state + ", id=" + id + ")";
 	}
-
 	
 	/**
 	 * 
@@ -559,12 +619,16 @@ public class RGoal extends RProcessableElement
 		}
 	}
 	
+	//-------- methods that are goal specific --------
+
+	// todo: implement those methods in goal types
+	
 	/**
 	 * 
 	 */
 	public boolean onActivate()
 	{
-		return true; // for perform, achieve, query
+		return !maintain; // for perform, achieve, query
 	}
 	
 	/**
@@ -588,6 +652,7 @@ public class RGoal extends RProcessableElement
 	 */
 	public boolean isProceduralSucceeded(RPlan plan)
 	{
+		// wrong for perform goals
 		return isProceduralGoal() && plan.isPassed();
 	}
 	
@@ -597,5 +662,21 @@ public class RGoal extends RProcessableElement
 	public boolean isProceduralGoal()
 	{
 		return !declarative;
+	}
+	
+	/**
+	 * 
+	 */
+	public void targetConditionTriggered(IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
+	{
+		System.out.println("Goal target triggered: "+RGoal.this);
+		if(maintain)
+		{
+			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_IDLE);
+		}
+		else
+		{
+			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
+		}
 	}
 }

@@ -149,4 +149,41 @@ public class MapWrapper<T, E> implements Map<T, E>
 	{
 		return delegate.entrySet();
 	}
+
+	/** 
+	 *  Get the hashcode of the object.
+	 *  @return The hashcode.
+	 */
+	public int hashCode()
+	{
+		return delegate.hashCode();
+	}
+
+	/** 
+	 *  Test if this object equals another.
+	 *  @param obj The other object.
+	 *  @return True, if equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof MapWrapper)
+		{
+			ret = delegate.equals(((MapWrapper)obj).delegate);
+		}
+		else if(obj instanceof Map)
+		{
+			ret = delegate.equals(obj);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return delegate.toString();
+	}
 }

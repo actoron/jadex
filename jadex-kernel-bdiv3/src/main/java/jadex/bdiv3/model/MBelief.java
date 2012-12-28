@@ -1,6 +1,12 @@
 package jadex.bdiv3.model;
 
 import jadex.commons.FieldInfo;
+import jadex.commons.SReflect;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -13,6 +19,9 @@ public class MBelief extends MElement
 
 	/** The collection implementation class. */
 	protected String impl;
+	
+	/** Flag if is multi. */
+	protected Boolean multi;
 	
 	/**
 	 *  Create a new belief.
@@ -58,5 +67,29 @@ public class MBelief extends MElement
 	public void setImplClassName(String impl)
 	{
 		this.impl = impl;
+	}
+
+	/**
+	 *  Get the multi.
+	 *  @return The multi.
+	 */
+	public boolean isMulti(ClassLoader cl)
+	{
+		if(multi==null)
+		{
+			Field f = target.getField(cl);
+			Class<?> ftype = f.getType();
+			if(SReflect.isSupertype(List.class, ftype) 
+				|| SReflect.isSupertype(Set.class, ftype)
+				|| SReflect.isSupertype(Map.class, ftype))
+			{
+				multi = Boolean.TRUE;
+			}
+			else
+			{
+				multi = Boolean.FALSE;
+			}
+		}
+		return multi;
 	}
 }

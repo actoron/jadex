@@ -23,6 +23,7 @@ public class FieldInfo
 	public FieldInfo()
 	{
 	}
+	
 	/**
 	 *  Create a new FieldInfo. 
 	 */

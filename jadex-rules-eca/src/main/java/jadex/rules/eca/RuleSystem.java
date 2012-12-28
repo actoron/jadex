@@ -470,6 +470,14 @@ public class RuleSystem
 	{
 		events.add(event);
 	}
+	
+	/**
+	 *  Test if at least one event is available.
+	 */
+	public boolean isEventAvailable()
+	{
+		return !events.isEmpty();
+	}
 }
 
 /**
