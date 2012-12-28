@@ -96,9 +96,9 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
 							// if is a putfield and is belief and not is in init (__agent field is not available)
-							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) && "<init>".equals(name))
+							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) && !"<init>".equals(methodname))
 							{
-//								System.out.println("method: "+methodname+" "+name);
+								System.out.println("method: "+methodname+" "+name);
 								
 								// is already on stack (object + value)
 	//							mv.visitVarInsn(ALOAD, 0);

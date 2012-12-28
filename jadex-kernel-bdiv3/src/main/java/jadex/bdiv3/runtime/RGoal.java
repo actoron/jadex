@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
+import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
@@ -11,15 +12,16 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.rules.eca.IAction;
+import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
+import jadex.rules.eca.annotations.CombinedCondition;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -368,7 +370,7 @@ public class RGoal extends RProcessableElement
 	}
 
 	/**
-	 * 
+	 *  Observe a goal by creating rules for the goal conditions.
 	 */
 	public void observeGoal(final IInternalAccess ia)
 	{
@@ -387,7 +389,6 @@ public class RGoal extends RProcessableElement
 			if(m.isAnnotationPresent(GoalTargetCondition.class))
 			{			
 				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
-
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_target", 
 					new MethodCondition(getPojoElement(), m), new IAction<Void>()
 				{
@@ -398,7 +399,6 @@ public class RGoal extends RProcessableElement
 					}
 				});
 				rule.setEvents(events);
-				
 				ip.getRuleSystem().getRulebase().addRule(rule);
 				addRule(rule);
 				declarative = true;
@@ -407,7 +407,6 @@ public class RGoal extends RProcessableElement
 			if(m.isAnnotationPresent(GoalDropCondition.class))
 			{			
 				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
-
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_drop", 
 					new MethodCondition(getPojoElement(), m), new IAction<Void>()
 				{
@@ -421,7 +420,47 @@ public class RGoal extends RProcessableElement
 					}
 				});
 				rule.setEvents(events);
+				ip.getRuleSystem().getRulebase().addRule(rule);
+				addRule(rule);
+			}
+			
+			if(m.isAnnotationPresent(GoalContextCondition.class))
+			{			
+				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+				Rule<Void> rule = new Rule<Void>(getId()+"_goal_suspend", 
+					new CombinedCondition(new ICondition[]{
+						new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED, false),
+						new MethodCondition(getPojoElement(), m, true),
+					}), new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						System.out.println("Goal suspended: "+RGoal.this);
+						setLifecycleState(GOALLIFECYCLESTATE_SUSPENDED);
+						setState(null);
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				ip.getRuleSystem().getRulebase().addRule(rule);
+				addRule(rule);
 				
+				rule = new Rule<Void>(getId()+"_goal_option", 
+					new CombinedCondition(new ICondition[]{
+						new LifecycleStateCondition(GOALLIFECYCLESTATE_OPTION, false),
+						new MethodCondition(getPojoElement(), m),
+					}), new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						System.out.println("Goal made option: "+RGoal.this);
+//						setLifecycleState(GOALLIFECYCLESTATE_OPTION);
+						setLifecycleState(GOALLIFECYCLESTATE_ACTIVE); // todo: make option and use deliberation
+						setState(null);
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
 				ip.getRuleSystem().getRulebase().addRule(rule);
 				addRule(rule);
 			}
@@ -432,20 +471,17 @@ public class RGoal extends RProcessableElement
 			List<String> events = readAnnotationEvents(ia, mcond.getParameterAnnotations());
 			
 			Rule<Void> rule = new Rule<Void>(getId()+"_goal_maintain", 
-				new MethodCondition(getPojoElement(), mcond, true), new IAction<Void>()
+				new CombinedCondition(new ICondition[]{
+					new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
+					new ProcessingStateCondition(GOALPROCESSINGSTATE_IDLE),
+					new MethodCondition(getPojoElement(), mcond, true),
+				}), new IAction<Void>()
 			{
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					System.out.println("Goal maintain triggered: "+RGoal.this);
-					if(GOALPROCESSINGSTATE_IDLE.equals(getProcessingState()))
-					{
-//						System.out.println("state was: "+getProcessingState());
-						setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
-					}
-//					else
-//					{
-//						System.out.println("state is: "+getProcessingState());
-//					}
+//					System.out.println("state was: "+getProcessingState());
+					setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
 					return IFuture.DONE;
 				}
 			});
@@ -477,7 +513,7 @@ public class RGoal extends RProcessableElement
 	}
 	
 	/**
-	 * 
+	 *  Read the annotation events from method annotations.
 	 */
 	protected List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
 	{
@@ -503,10 +539,9 @@ public class RGoal extends RProcessableElement
 		}
 		return events;
 	}
-
 	
 	/**
-	 * 
+	 *  Add a rule.
 	 */
 	protected void addRule(IRule<?> rule)
 	{
@@ -516,7 +551,7 @@ public class RGoal extends RProcessableElement
 	}
 	
 	/**
-	 * 
+	 *  Unobserve a runtime goal.
 	 */
 	public void unobserveGoal(final IInternalAccess ia)
 	{
@@ -677,6 +712,118 @@ public class RGoal extends RProcessableElement
 		else
 		{
 			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	class LifecycleStateCondition implements ICondition
+	{
+		/** The allowed states. */
+		protected Set<String> states;
+		
+		/** The flag if state is allowed or disallowed. */
+		protected boolean allowed;
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(String state)
+		{
+			this(SUtil.createHashSet(new String[]{state}));
+		}
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(Set<String> states)
+		{
+			this(states, true);
+		}
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(String state, boolean allowed)
+		{
+			this(SUtil.createHashSet(new String[]{state}), allowed);
+		}
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(Set<String> states, boolean allowed)
+		{
+			this.states = states;
+			this.allowed = allowed;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean evaluate(IEvent event)
+		{
+			boolean ret = states.contains(getLifecycleState());
+			if(!allowed)
+				ret = !ret;
+			return ret;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	class ProcessingStateCondition implements ICondition
+	{
+		/** The allowed states. */
+		protected Set<String> states;
+		
+		/** The flag if state is allowed or disallowed. */
+		protected boolean allowed;
+		
+		/**
+		 * 
+		 */
+		public ProcessingStateCondition(String state)
+		{
+			this(SUtil.createHashSet(new String[]{state}));
+		}
+		
+		/**
+		 * 
+		 */
+		public ProcessingStateCondition(Set<String> states)
+		{
+			this(states, true);
+		}
+		
+		/**
+		 * 
+		 */
+		public ProcessingStateCondition(String state, boolean allowed)
+		{
+			this(SUtil.createHashSet(new String[]{state}), allowed);
+		}
+		
+		/**
+		 * 
+		 */
+		public ProcessingStateCondition(Set<String> states, boolean allowed)
+		{
+			this.states = states;
+			this.allowed = allowed;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean evaluate(IEvent event)
+		{
+			boolean ret = states.contains(getProcessingState());
+			if(!allowed)
+				ret = !ret;
+			return ret;
 		}
 	}
 }
