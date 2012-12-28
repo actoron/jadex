@@ -327,7 +327,7 @@ public class DropboxSyncJobPanel extends JPanel
 						{
 							rcb.addItem(ev.getTask());
 						}
-						else if(JobProcessingEvent.TASK_ADDED.equals(ev.getType()))
+						else if(JobProcessingEvent.TASK_REMOVED.equals(ev.getType()))
 						{
 							rcb.removeItem(ev.getTask());
 						}

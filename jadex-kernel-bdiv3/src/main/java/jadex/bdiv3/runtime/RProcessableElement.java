@@ -157,6 +157,7 @@ public abstract class RProcessableElement extends RElement
 			
 		setState(state);
 		
+		// start MR when state gets to unprocessed
 		if(PROCESSABLEELEMENT_UNPROCESSED.equals(state))
 		{
 			ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this));

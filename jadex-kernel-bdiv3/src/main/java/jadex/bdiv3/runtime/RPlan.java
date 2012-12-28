@@ -254,4 +254,28 @@ public class RPlan extends RElement
 			&& waitabstraction!=null && waitabstraction.isWaitingFor(procelem);
 	}
 	
+	/**
+	 * 
+	 */
+	public boolean isPassed()
+	{
+		return RPlan.PLANLIFECYCLESTATE_PASSED.equals(lifecyclestate);
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isFailed()
+	{
+		return RPlan.PLANLIFECYCLESTATE_FAILED.equals(lifecyclestate);
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isAborted()
+	{
+		return RPlan.PLANLIFECYCLESTATE_ABORTED.equals(lifecyclestate);
+	}
+
 }

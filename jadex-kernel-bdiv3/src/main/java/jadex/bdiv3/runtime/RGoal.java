@@ -102,6 +102,9 @@ public class RGoal extends RProcessableElement
 	
 	/** The goal listeners. */
 	protected List<IResultListener<Void>> listeners;
+	
+	/** Flag if goal is declarative. */
+	protected boolean declarative;
 
 	/**
 	 *  Create a new rgoal. 
@@ -265,7 +268,14 @@ public class RGoal extends RProcessableElement
 		if(GOALLIFECYCLESTATE_ACTIVE.equals(lifecyclestate))
 		{
 			// start means-end reasoning
-			setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
+			if(onActivate())
+			{
+				setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
+			}
+			else
+			{
+				setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			}
 		}
 		else if(GOALLIFECYCLESTATE_OPTION.equals(lifecyclestate))
 		{
@@ -298,39 +308,6 @@ public class RGoal extends RProcessableElement
 						lis.exceptionOccurred(exception);
 					}
 				}
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public void planFinished(IInternalAccess ia, RPlan rplan)
-	{
-		super.planFinished(ia, rplan);
-		// create reasoning step depending on the processable element type
-		
-		if(!isSucceeded() && !isFailed())
-		{
-			// Test if is retry
-			if(getMGoal().isRetry())
-			{
-				if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
-				{
-					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
-				}
-				else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
-				{
-					setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
-				}
-				else
-				{
-					System.out.println("??? "+getState());
-				}
-			}
-			else
-			{
-				setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
 			}
 		}
 	}
@@ -430,6 +407,7 @@ public class RGoal extends RProcessableElement
 				
 				ip.getRuleSystem().getRulebase().addRule(rule);
 				addRule(rule);
+				declarative = true;
 			}
 			
 			if(m.isAnnotationPresent(GoalDropCondition.class))
@@ -533,5 +511,91 @@ public class RGoal extends RProcessableElement
 		return "RGoal(lifecyclestate=" + lifecyclestate + ", processingstate="
 			+ processingstate + ", state=" + state + ", id=" + id + ")";
 	}
+
 	
+	/**
+	 * 
+	 */
+	public void planFinished(IInternalAccess ia, RPlan rplan)
+	{
+		super.planFinished(ia, rplan);
+		// create reasoning step depending on the processable element type
+
+		// Check procedural success semantics
+		if(isProceduralSucceeded(rplan))
+		{
+			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
+		}
+		
+		if(!isSucceeded() && !isFailed())
+		{
+			// Test if is retry
+			if(isRetry())
+			{
+				if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
+				{
+					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+				}
+				else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
+				{
+					setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+				}
+				else
+				{
+					System.out.println("??? "+getState());
+				}
+			}
+			else
+			{
+				if(isRecur())
+				{
+					setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+				}
+				else
+				{
+					setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean onActivate()
+	{
+		return true; // for perform, achieve, query
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isRetry()
+	{
+		return getMGoal().isRetry();
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isRecur()
+	{
+		return getMGoal().isRecur();
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isProceduralSucceeded(RPlan plan)
+	{
+		return isProceduralGoal() && plan.isPassed();
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isProceduralGoal()
+	{
+		return !declarative;
+	}
 }

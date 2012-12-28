@@ -169,11 +169,32 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 			{
 				// Find allowed caller names by inspecting the implementation annotation
 				// todo: make this more configurable somehow
+
+				// try to find implementation method annotation
 				Class<?> targetcl = context.getTargetObject().getClass();
 				Method targetm = targetcl.getDeclaredMethod(context.getMethod().getName(), context.getMethod().getParameterTypes());
 				Authenticated au = targetm.getAnnotation(Authenticated.class);
+				
+				// if not available use interface method anno
 				if(au==null)
+				{
+					au = context.getMethod().getAnnotation(Authenticated.class);
+					if(au.names().length==0 && au.virtuals().length==0)
+						au = null;
+				}
+				
+				// if not available use implementation service anno
+				if(au==null)
+				{
 					au = targetcl.getAnnotation(Authenticated.class);
+				}
+				
+				// if not available use interface service anno
+				if(au==null)
+				{
+					au = context.getMethod().getClass().getAnnotation(Authenticated.class);
+				}
+				
 				Set<String> allowed = SUtil.arrayToSet(au.names());
 				if(!allowed.contains(callername))
 				{

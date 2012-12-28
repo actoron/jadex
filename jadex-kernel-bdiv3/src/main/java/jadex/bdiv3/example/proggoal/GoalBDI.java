@@ -73,6 +73,10 @@ public class GoalBDI
 			return cnt==drop;
 		}
 
+//		@MRActivated
+//		protected boolean activate()
+//		{			
+//		}
 		
 //		@MRCreateAPL
 //		protected APL createAPL(APL apl)
@@ -88,10 +92,20 @@ public class GoalBDI
 //		protected void planFinished(RPlan plan)
 //		{
 //		}
+//	
+//
+//		
+//		@MRStarted
+//		protected void mrStarted()
+//		{
+//			// default: create apl, select plans, execute
+////			APL apl = createAPL();
+//		}
 //		
 //		@MRFinished
 //		protected void mrFinished()
 //		{
+//			// default: -> paused or mrStart
 //		}
 		
 	}

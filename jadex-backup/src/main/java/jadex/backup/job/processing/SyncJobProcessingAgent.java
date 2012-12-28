@@ -4,6 +4,7 @@ import jadex.backup.job.AbstractSyncJob;
 import jadex.backup.job.SyncJob;
 import jadex.backup.job.SyncProfile;
 import jadex.backup.job.SyncTask;
+import jadex.backup.job.SyncTask.SyncLocation;
 import jadex.backup.job.SyncTaskEntry;
 import jadex.backup.job.Task;
 import jadex.backup.job.management.IJobManagementService;
@@ -13,6 +14,7 @@ import jadex.backup.resource.IResourceService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -266,6 +268,8 @@ public class SyncJobProcessingAgent
 
 		final IResourceService remresser = resservices.get(0);
 		
+		((IService)resser).getServiceIdentifier().getProviderId();
+		SyncLocation loc = new SyncLocation();
 		final SyncTask task = new SyncTask(job.getId(), remresser.getLocalId(), System.currentTimeMillis());
 		
 		// Scan for changes wrt a specific remote resource

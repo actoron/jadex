@@ -3,6 +3,7 @@ package jadex.micro.testcases.authenticate;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Authenticated;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
