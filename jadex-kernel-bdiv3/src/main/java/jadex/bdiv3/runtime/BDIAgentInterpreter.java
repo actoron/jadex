@@ -139,7 +139,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		super.startBehavior();
 		
-		Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
+		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
 		
 		// Init bdi configuration
 		String confname = getConfiguration();
@@ -333,8 +333,59 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //			 todo: explicit bdi creation rule
 //			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
 		
+			boolean fin = false;
+			
 			MGoal mgoal = goals.get(i);
 			final Class<?> gcl = mgoal.getTargetClass(getClassLoader());
+			
+			Constructor<?>[] cons = gcl.getConstructors();
+			for(final Constructor<?> c: cons)
+			{
+				if(c.isAnnotationPresent(GoalCreationCondition.class))
+				{
+					List<String> events = RGoal.readAnnotationEvents(getInternalAccess(), c.getParameterAnnotations());
+					Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
+						ICondition.TRUE_CONDITION, new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							System.out.println("create: "+context);
+							
+							Object pojogoal = null;
+							try
+							{
+								Class<?>[] ptypes = c.getParameterTypes();
+								Object[] pvals = new Object[ptypes.length];
+								
+								for(int i=0; i<ptypes.length; i++)
+								{
+									if(event.getContent()!=null && SReflect.isSupertype(event.getContent().getClass(), ptypes[i]))
+									{
+										pvals[i] = event.getContent();
+									}
+									else if(SReflect.isSupertype(agent.getClass(), ptypes[i]))
+									{
+										pvals[i] = agent;
+									}
+								}
+								
+								pojogoal = c.newInstance(pvals);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
+							
+							((BDIAgent)microagent).dispatchGoalAndWait(pojogoal);
+							
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+				}
+			}	
+			
 			Method[] ms = gcl.getDeclaredMethods();
 			for(Method m: ms)
 			{

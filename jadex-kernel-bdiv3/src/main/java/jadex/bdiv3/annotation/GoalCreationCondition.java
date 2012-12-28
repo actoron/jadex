@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  *
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GoalCreationCondition
 {

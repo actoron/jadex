@@ -2,6 +2,8 @@ package jadex.bdiv3.example.helloworld;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.PlanFailureException;
@@ -9,9 +11,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.rules.eca.annotations.Event;
 
 @Agent
-//@Goals(HelloGoal.class) // todo: type declarations for non-inline goals and plans to be able to setup conditions
+//@Goals(HelloGoal.class) 
 
 // class is checked for annotations
 // goal, plan type declarations from annotations or inline plans 
@@ -26,18 +29,40 @@ import jadex.micro.annotation.AgentBody;
 // Plan is selected and executed (hello is printed out)
 public class HelloWorldBDI
 {
+	/** The bdi agent. */
 	@Agent
 	protected BDIAgent agent;
 	
+	/** The text that is printed. */
 	@Belief
 	private String sayhello;
 	
 	/**
-	 *  Get the agent.
+	 *  Simple hello world goal.
 	 */
-	public BDIAgent getAgent()
+	@Goal
+	public class HelloGoal
 	{
-		return agent;
+		/** The text. */
+		protected String text;
+		
+		/**
+		 *  Create a new goal whenever sayhello belief is changed.
+		 */
+		@GoalCreationCondition
+		public HelloGoal(@Event("sayhello") String text)
+		{
+			this.text = text;
+		}
+		
+		/**
+		 *  Get the text.
+		 *  @return the text.
+		 */
+		public String getText()
+		{
+			return text;
+		}
 	}
 	
 	@AgentBody
