@@ -14,6 +14,9 @@ import java.util.Set;
  */
 public abstract class RProcessableElement extends RElement
 {
+	/** The processable element state initial. */
+	public static final String	PROCESSABLEELEMENT_INITIAL	= "initial";
+	
 	/** The processable element state unprocessed. */
 	public static final String	PROCESSABLEELEMENT_UNPROCESSED	= "unprocessed";
 
@@ -31,12 +34,12 @@ public abstract class RProcessableElement extends RElement
 
 	public static Set<String> PROCESSABLEELEMENT_STATES = SUtil.createHashSet(new String[]
 	{
+		PROCESSABLEELEMENT_INITIAL,
 		PROCESSABLEELEMENT_UNPROCESSED,
 		PROCESSABLEELEMENT_APLAVAILABLE,
 		PROCESSABLEELEMENT_METALEVELREASONING,
 		PROCESSABLEELEMENT_NOCANDIDATES,
 		PROCESSABLEELEMENT_CANDIDATESSELECTED,
-		null
 	});
 	
 	/** The pojo element. */
@@ -190,9 +193,4 @@ public abstract class RProcessableElement extends RElement
 			apl.planFinished(rplan);
 		}
 	}
-	
-//	/**
-//	 * 
-//	 */
-//	public abstract void reason(IInternalAccess ia);
 }

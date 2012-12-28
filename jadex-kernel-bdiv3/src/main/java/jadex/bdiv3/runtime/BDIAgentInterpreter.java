@@ -1,6 +1,8 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.PojoBDIAgent;
+import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfiguration;
@@ -29,11 +31,13 @@ import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
+import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -326,8 +330,57 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		List<MGoal> goals = bdimodel.getCapability().getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
-			// todo: explicit bdi creation rule
-			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
+//			 todo: explicit bdi creation rule
+//			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
+		
+			MGoal mgoal = goals.get(i);
+			final Class<?> gcl = mgoal.getTargetClass(getClassLoader());
+			Method[] ms = gcl.getDeclaredMethods();
+			for(Method m: ms)
+			{
+				if(m.isAnnotationPresent(GoalCreationCondition.class))
+				{
+					List<String> events = RGoal.readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
+						new MethodCondition(null, m), new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							System.out.println("create: "+context);
+							
+							Object pojogoal = null;
+							if(event.getContent()!=null)
+							{
+								try
+								{
+									Class<?> evcl = event.getContent().getClass();
+									Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
+									pojogoal = c.newInstance(new Object[]{event.getContent()});
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
+							}
+							else
+							{
+								// todo:
+//								Constructor<?>[] cons = gcl.getConstructors();
+//								for(Constructor c: cons)
+//								{
+//								}
+								throw new RuntimeException("Unknown how to create goal: "+gcl);
+							}
+							
+							((BDIAgent)microagent).dispatchGoalAndWait(pojogoal);
+							
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+				}
+			}
 		}
 		
 		// Observe plan types

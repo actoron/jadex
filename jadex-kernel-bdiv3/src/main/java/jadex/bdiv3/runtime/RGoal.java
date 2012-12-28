@@ -190,7 +190,7 @@ public class RGoal extends RProcessableElement
 		{
 			// todo: introduce some state for finished?!
 //			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_state, null);
-			setState(null);
+			setState(PROCESSABLEELEMENT_INITIAL);
 			
 			// Remove finished plans that would otherwise interfere with next goal processing (if any).
 //			Collection	fplans	= state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans);
@@ -291,13 +291,13 @@ public class RGoal extends RProcessableElement
 		else if(GOALLIFECYCLESTATE_SUSPENDED.equals(lifecyclestate))
 		{
 			// goal is suspended (no more plan executions)
-			setState(null);
+			setState(PROCESSABLEELEMENT_INITIAL);
 		}
 		
 		if(GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
 		{
 			// goal is dropping (no more plan executions)
-			setState(null);
+			setState(PROCESSABLEELEMENT_INITIAL);
 			ia.getExternalAccess().scheduleStep(new DropGoalAction(this));
 		}
 		else if(GOALLIFECYCLESTATE_DROPPED.equals(lifecyclestate))
@@ -437,7 +437,7 @@ public class RGoal extends RProcessableElement
 					{
 						System.out.println("Goal suspended: "+RGoal.this);
 						setLifecycleState(GOALLIFECYCLESTATE_SUSPENDED);
-						setState(null);
+						setState(PROCESSABLEELEMENT_INITIAL);
 						return IFuture.DONE;
 					}
 				});
@@ -456,7 +456,7 @@ public class RGoal extends RProcessableElement
 						System.out.println("Goal made option: "+RGoal.this);
 //						setLifecycleState(GOALLIFECYCLESTATE_OPTION);
 						setLifecycleState(GOALLIFECYCLESTATE_ACTIVE); // todo: make option and use deliberation
-						setState(null);
+						setState(PROCESSABLEELEMENT_INITIAL);
 						return IFuture.DONE;
 					}
 				});
@@ -515,7 +515,7 @@ public class RGoal extends RProcessableElement
 	/**
 	 *  Read the annotation events from method annotations.
 	 */
-	protected List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
+	public static List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		List<String> events = new ArrayList<String>();

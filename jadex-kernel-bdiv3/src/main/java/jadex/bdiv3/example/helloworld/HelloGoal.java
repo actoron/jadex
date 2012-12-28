@@ -1,6 +1,7 @@
 package jadex.bdiv3.example.helloworld;
 
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.annotations.Action;
@@ -24,6 +25,12 @@ public class HelloGoal
 		this.text = text;
 	}
 	
+//	@GoalCreationCondition
+//	public HelloGoal(@Event("sayhello") String text)
+//	{
+//		this.text = text;
+//	}
+	
 	/**
 	 *  Get the text.
 	 *  @return the text.
@@ -33,32 +40,25 @@ public class HelloGoal
 		return text;
 	}
 
-	//	@GoalCreation()
-	@Condition("creation")
+	@GoalCreationCondition
 	protected static boolean create(@Event("sayhello") String sayhello)
 	{
 		return true;
+//		return new HelloGoal(sayhello);
 	}
 	
-	@Action("creation")
-	protected static void action(IEvent event, IRule rule, Object context)
-	{
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)context;
-		HelloWorldBDI agent = (HelloWorldBDI)context;
-		agent.getAgent().dispatchGoalAndWait(new HelloGoal((String)event.getContent()));
-	}
-	
-//	@GoalContext / @GoalDrop / @GoalRecur
-//	event???
-//	public boolean	isValid()
-//	{
-//		return text!=null;
-//	}
-	
-//	@TargetCondition()
-//	@Condition("target")
-//	protected boolean target(@Event("sayhello") String sayhello)
+//	//	@GoalCreation()
+//	@Condition("creation")
+//	protected static boolean create(@Event("sayhello") String sayhello)
 //	{
 //		return true;
+//	}
+	
+//	@Action("creation")
+//	protected static void action(IEvent event, IRule rule, Object context)
+//	{
+////		BDIAgentInterpreter ip = (BDIAgentInterpreter)context;
+//		HelloWorldBDI agent = (HelloWorldBDI)context;
+//		agent.getAgent().dispatchGoalAndWait(new HelloGoal((String)event.getContent()));
 //	}
 }
