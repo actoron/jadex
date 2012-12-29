@@ -1,4 +1,4 @@
-package jadex.micro.tutorial.tut15;
+package jadex.micro.quickstart;
 
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;

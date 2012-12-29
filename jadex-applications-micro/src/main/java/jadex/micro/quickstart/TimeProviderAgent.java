@@ -1,4 +1,4 @@
-package jadex.micro.tutorial.tut15;
+package jadex.micro.quickstart;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
