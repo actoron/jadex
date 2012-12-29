@@ -76,12 +76,14 @@ public class MethodPlanBody implements IPlanBody
 				{
 					public void resultAvailable(Object result)
 					{
+						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 						rplan.setException(exception);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
@@ -90,6 +92,7 @@ public class MethodPlanBody implements IPlanBody
 			}
 			else
 			{
+				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
 				if(reason instanceof RProcessableElement)
 					((RProcessableElement)reason).planFinished(ia, rplan);
 			}
@@ -97,6 +100,7 @@ public class MethodPlanBody implements IPlanBody
 		catch(Exception e)
 		{
 			rplan.setException(e);
+			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 			if(rplan.getReason() instanceof RProcessableElement)
 				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
 		}

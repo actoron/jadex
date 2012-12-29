@@ -113,6 +113,7 @@ public class RPlan extends RElement
 	{
 		super(mplan);
 		this.candidate = candidate;
+		setLifecycleState(PLANLIFECYCLESTATE_NEW);
 	}
 
 	/**
@@ -211,10 +212,6 @@ public class RPlan extends RElement
 	 */
 	public IPlanBody getBody()
 	{
-		if(body==null)
-		{
-			
-		}
 		return body;
 	}
 

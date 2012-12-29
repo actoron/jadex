@@ -49,7 +49,7 @@ public abstract class RProcessableElement extends RElement
 	protected APL apl;
 	
 	/** The tried plans. */
-	protected List<Object> triedplans;
+	protected List<RPlan> triedplans;
 	
 	/** The state. */
 	protected String state;
@@ -105,11 +105,11 @@ public abstract class RProcessableElement extends RElement
 	/**
 	 *  Add a tried plan.
 	 */
-	public void addTriedPlan(Object plan)
+	public void addTriedPlan(RPlan plan)
 	{
 		if(triedplans==null)
 		{
-			triedplans = new ArrayList<Object>();
+			triedplans = new ArrayList<RPlan>();
 		}
 		triedplans.add(plan);
 	}
@@ -118,7 +118,7 @@ public abstract class RProcessableElement extends RElement
 	 *  Get the triedplans.
 	 *  @return The triedplans.
 	 */
-	public List<Object> getTriedPlans()
+	public List<RPlan> getTriedPlans()
 	{
 		return triedplans;
 	}
@@ -127,7 +127,7 @@ public abstract class RProcessableElement extends RElement
 	 *  Set the triedplans.
 	 *  @param triedplans The triedplans to set.
 	 */
-	public void setTriedPlans(List<Object> triedplans)
+	public void setTriedPlans(List<RPlan> triedplans)
 	{
 		this.triedplans = triedplans;
 	}
@@ -188,8 +188,7 @@ public abstract class RProcessableElement extends RElement
 	{
 		if(rplan!=null)
 		{
-			// potentially remove candidate
-			addTriedPlan(rplan.getCandidate());
+			addTriedPlan(rplan);
 			apl.planFinished(rplan);
 		}
 	}

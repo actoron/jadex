@@ -617,7 +617,7 @@ public class RGoal extends RProcessableElement
 		// create reasoning step depending on the processable element type
 
 		// Check procedural success semantics
-		if(isProceduralSucceeded(rplan))
+		if(isProceduralSucceeded())
 		{
 			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
 		}
@@ -685,10 +685,18 @@ public class RGoal extends RProcessableElement
 	/**
 	 * 
 	 */
-	public boolean isProceduralSucceeded(RPlan plan)
+	public boolean isProceduralSucceeded()
 	{
-		// wrong for perform goals
-		return isProceduralGoal() && plan.isPassed();
+		boolean ret = false;
+		
+		// todo: perform goals
+		if(isProceduralGoal() && !getTriedPlans().isEmpty())
+		{
+			RPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
+			ret = rplan.isPassed();
+		}
+		
+		return ret;
 	}
 	
 	/**

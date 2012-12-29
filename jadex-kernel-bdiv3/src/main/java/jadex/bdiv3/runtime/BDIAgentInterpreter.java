@@ -23,6 +23,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
@@ -376,7 +377,20 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								e.printStackTrace();
 							}
 							
-							((BDIAgent)microagent).dispatchGoalAndWait(pojogoal);
+							final Object fpojogoal = pojogoal;
+							((BDIAgent)microagent).dispatchGoalAndWait(pojogoal)
+								.addResultListener(new IResultListener<Object>()
+							{
+								public void resultAvailable(Object result)
+								{
+									getLogger().info("Goal succeeded: "+result);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									getLogger().info("Goal failed: "+fpojogoal+" "+exception);
+								}
+							});
 							
 							return IFuture.DONE;
 						}

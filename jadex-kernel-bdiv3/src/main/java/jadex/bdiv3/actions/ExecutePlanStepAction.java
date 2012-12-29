@@ -64,6 +64,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 
 		
+		rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_BODY);
 		IPlanBody body = rplan.getBody();
 		return body.executePlanStep();
 	}
