@@ -1,7 +1,6 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.model.BDIModel;
-import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -23,6 +22,7 @@ import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
 import org.kohsuke.asm4.util.ASMifier;
+import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -72,7 +72,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
-	//		CheckClassAdapter cc = new CheckClassAdapter(tcv);
+//			CheckClassAdapter cc = new CheckClassAdapter(tcv);
 			
 	//		final String classname = "lars/Lars";
 	//		final String supername = "jadex/bdiv3/MyTestClass";
@@ -98,6 +98,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							// if is a putfield and is belief and not is in init (__agent field is not available)
 							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) && !"<init>".equals(methodname))
 							{
+								// stack before putfield is object,value ()
 								System.out.println("method: "+methodname+" "+name);
 								
 								// is already on stack (object + value)
@@ -106,13 +107,16 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								
 //								System.out.println("vis: "+opcode+" "+owner+" "+name+" "+desc);
 //								System.out.println(Type.getType(desc).getClassName());
-								
+																
 								// possibly transform basic value
 								if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
 									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
 								
+								visitInsn(Opcodes.SWAP);
+//								visitInsn(Opcodes.POP);
+								
 								// fetch bdi agent value from field
-								visitVarInsn(Opcodes.ALOAD, 0);
+//								visitVarInsn(Opcodes.ALOAD, 0);
 								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
 								visitInsn(Opcodes.SWAP);
 								
