@@ -122,7 +122,6 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								
 								// add field name	
 								visitLdcInsn(name);
-								
 								// add this
 								visitVarInsn(Opcodes.ALOAD, 0);
 								

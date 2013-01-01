@@ -216,6 +216,11 @@ public class SReflect
 		return new Float(val);
 	}
 	
+	public static Object wrapValue(double val)
+	{
+		return new Double(val);
+	}
+	
 	public static Object wrapValue(short val)
 	{
 		return new Short(val);
