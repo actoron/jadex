@@ -52,7 +52,8 @@ public class RecurBDI
 	protected List<Item> store;
 	
 	/**
-	 * 
+	 *  A buy items goal that is responsible for buying
+	 *  a number of items.
 	 */
 	@Goal(excludemode=MGoal.EXCLUDE_WHEN_FAILED)
 	public class BuyItemsGoal
@@ -70,7 +71,7 @@ public class RecurBDI
 		@GoalTargetCondition
 		protected boolean checkTarget(@Event("money") double mon)
 		{
-			return items.size()>num;
+			return items.size()>=num;
 		}
 		
 		@GoalRecurCondition

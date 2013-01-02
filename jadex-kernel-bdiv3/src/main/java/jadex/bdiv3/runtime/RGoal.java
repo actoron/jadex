@@ -457,7 +457,7 @@ public class RGoal extends RProcessableElement
 						System.out.println("Goal made option: "+RGoal.this);
 //						setLifecycleState(GOALLIFECYCLESTATE_OPTION);
 						setLifecycleState(GOALLIFECYCLESTATE_ACTIVE); // todo: make option and use deliberation
-						setState(PROCESSABLEELEMENT_INITIAL);
+						setState(ia, PROCESSABLEELEMENT_INITIAL);
 						return IFuture.DONE;
 					}
 				});
@@ -480,7 +480,7 @@ public class RGoal extends RProcessableElement
 					{
 						setTriedPlans(null);
 						setApplicablePlanList(null);
-						setState(PROCESSABLEELEMENT_INITIAL);
+						setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
 						return IFuture.DONE;
 					}
 				});
