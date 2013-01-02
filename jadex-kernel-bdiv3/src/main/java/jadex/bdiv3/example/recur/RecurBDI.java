@@ -1,12 +1,8 @@
 package jadex.bdiv3.example.recur;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
@@ -16,12 +12,26 @@ import jadex.bdiv3.runtime.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.rules.eca.annotations.Event;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 /**
- *
+ *  Agent that has a goal for buying an amount of items.
+ *  
  */
 @Agent
 public class RecurBDI
@@ -44,7 +54,7 @@ public class RecurBDI
 	/**
 	 * 
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=MGoal.EXCLUDE_WHEN_FAILED)
 	public class BuyItemsGoal
 	{
 		protected int num;
@@ -109,6 +119,29 @@ public class RecurBDI
 				exception.printStackTrace();
 			}
 		});
+		
+
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				JFrame f = new JFrame();
+				PropertiesPanel pp = new PropertiesPanel();
+				final JTextField tfm = pp.createTextField("money", ""+money);
+				final JButton bu = pp.createButton("add", "Add money");
+				bu.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						setMoney(getMoney()+5);
+					}
+				});
+				f.add(pp, BorderLayout.CENTER);
+				f.pack();
+				f.setLocation(SGUI.calculateMiddlePosition(f));
+				f.setVisible(true);
+			}
+		});
 	}
 	
 	/**
@@ -143,6 +176,24 @@ public class RecurBDI
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Get the money.
+	 *  @return The money.
+	 */
+	public double getMoney()
+	{
+		return money;
+	}
+
+	/**
+	 *  Set the money.
+	 *  @param money The money to set.
+	 */
+	public void setMoney(double money)
+	{
+		this.money = money;
 	}
 }
 

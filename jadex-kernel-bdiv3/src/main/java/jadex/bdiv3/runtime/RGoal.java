@@ -7,6 +7,7 @@ import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
+import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
@@ -464,6 +465,30 @@ public class RGoal extends RProcessableElement
 				ip.getRuleSystem().getRulebase().addRule(rule);
 				addRule(rule);
 			}
+			
+			if(m.isAnnotationPresent(GoalRecurCondition.class))
+			{			
+				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+				Rule<Void> rule = new Rule<Void>(getId()+"_goal_recur", 
+					new CombinedCondition(new ICondition[]{
+						new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
+						new ProcessingStateCondition(GOALPROCESSINGSTATE_PAUSED),
+						new MethodCondition(getPojoElement(), m),
+					}), new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						setTriedPlans(null);
+						setApplicablePlanList(null);
+						setState(PROCESSABLEELEMENT_INITIAL);
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				ip.getRuleSystem().getRulebase().addRule(rule);
+				addRule(rule);
+				declarative = true;
+			}
 		}
 		
 		if(mcond!=null)
@@ -625,7 +650,7 @@ public class RGoal extends RProcessableElement
 		if(!isSucceeded() && !isFailed())
 		{
 			// Test if is retry
-			if(isRetry())
+			if(isRetry() && rplan!=null)
 			{
 				if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
 				{
@@ -644,7 +669,7 @@ public class RGoal extends RProcessableElement
 			{
 				if(isRecur())
 				{
-					setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+					setProcessingState(ia, GOALPROCESSINGSTATE_PAUSED);
 				}
 				else
 				{
