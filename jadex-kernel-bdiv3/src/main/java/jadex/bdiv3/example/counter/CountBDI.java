@@ -35,7 +35,7 @@ public class CountBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchGoalAndWait(new CountGoal(10, 5))
+		agent.dispatchTopLevelGoalAndWait(new CountGoal(10, 5))
 			.addResultListener(new A());
 		
 //		agent.dispatchGoalAndWait(new CountGoal(10, 5))

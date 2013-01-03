@@ -389,7 +389,12 @@ public class RGoal extends RProcessableElement
 			
 			if(m.isAnnotationPresent(GoalTargetCondition.class))
 			{			
+				String[] evs = m.getAnnotation(GoalTargetCondition.class).events();
 				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+				for(String ev: evs)
+				{
+					addBeliefEvents(ia, events, ev);
+				}
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_target", 
 					new MethodCondition(getPojoElement(), m), new IAction<Void>()
 				{
@@ -407,7 +412,12 @@ public class RGoal extends RProcessableElement
 			
 			if(m.isAnnotationPresent(GoalDropCondition.class))
 			{			
+				String[] evs = m.getAnnotation(GoalDropCondition.class).events();
 				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+				for(String ev: evs)
+				{
+					addBeliefEvents(ia, events, ev);
+				}
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_drop", 
 					new MethodCondition(getPojoElement(), m), new IAction<Void>()
 				{
@@ -427,7 +437,13 @@ public class RGoal extends RProcessableElement
 			
 			if(m.isAnnotationPresent(GoalContextCondition.class))
 			{			
+				String[] evs = m.getAnnotation(GoalContextCondition.class).events();
 				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+				for(String ev: evs)
+				{
+					addBeliefEvents(ia, events, ev);
+				}
+				
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_suspend", 
 					new CombinedCondition(new ICondition[]{
 						new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED, false),
@@ -468,7 +484,12 @@ public class RGoal extends RProcessableElement
 			
 			if(m.isAnnotationPresent(GoalRecurCondition.class))
 			{			
+				String[] evs = m.getAnnotation(GoalRecurCondition.class).events();
 				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
+				for(String ev: evs)
+				{
+					addBeliefEvents(ia, events, ev);
+				}
 				Rule<Void> rule = new Rule<Void>(getId()+"_goal_recur", 
 					new CombinedCondition(new ICondition[]{
 						new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
@@ -492,8 +513,13 @@ public class RGoal extends RProcessableElement
 		}
 		
 		if(mcond!=null)
-		{			
+		{		
+			String[] evs = mcond.getAnnotation(GoalMaintainCondition.class).events();
 			List<String> events = readAnnotationEvents(ia, mcond.getParameterAnnotations());
+			for(String ev: evs)
+			{
+				addBeliefEvents(ia, events, ev);
+			}
 			
 			Rule<Void> rule = new Rule<Void>(getId()+"_goal_maintain", 
 				new CombinedCondition(new ICondition[]{
@@ -542,7 +568,6 @@ public class RGoal extends RProcessableElement
 	 */
 	public static List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
 	{
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		List<String> events = new ArrayList<String>();
 		for(Annotation[] ana: annos)
 		{
@@ -551,18 +576,27 @@ public class RGoal extends RProcessableElement
 				if(an instanceof jadex.rules.eca.annotations.Event)
 				{
 					String belname = ((jadex.rules.eca.annotations.Event)an).value();
-					events.add(belname);
-					MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
-					if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
-					{
-						events.add(ChangeEvent.FACTADDED+"."+belname);
-						events.add(ChangeEvent.FACTREMOVED+"."+belname);
-						events.add(ChangeEvent.FACTCHANGED+"."+belname);
-					}
+					addBeliefEvents(ia, events, belname);
 				}
 			}
 		}
 		return events;
+	}
+	
+	/**
+	 * 
+	 */
+	public static void addBeliefEvents(IInternalAccess ia, List<String> events, String belname)
+	{
+		events.add(belname);
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
+		{
+			events.add(ChangeEvent.FACTADDED+"."+belname);
+			events.add(ChangeEvent.FACTREMOVED+"."+belname);
+			events.add(ChangeEvent.FACTCHANGED+"."+belname);
+		}
 	}
 	
 	/**

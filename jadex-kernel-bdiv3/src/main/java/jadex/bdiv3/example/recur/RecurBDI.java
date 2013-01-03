@@ -8,6 +8,8 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.runtime.BeliefAdapter;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -21,6 +23,7 @@ import jadex.rules.eca.annotations.Event;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +71,8 @@ public class RecurBDI
 			this.num = num;
 		}
 		
-		@GoalTargetCondition
-		protected boolean checkTarget(@Event("money") double mon)
+		@GoalTargetCondition(events="items")
+		protected boolean checkTarget()//@Event("items") Object ev)
 		{
 			return items.size()>=num;
 		}
@@ -108,7 +111,7 @@ public class RecurBDI
 	
 		BuyItemsGoal goal = new BuyItemsGoal(5);
 		
-		agent.dispatchGoalAndWait(goal).addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
+		agent.dispatchTopLevelGoalAndWait(goal).addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
 		{
 			public void resultAvailable(BuyItemsGoal result)
 			{
@@ -121,14 +124,31 @@ public class RecurBDI
 			}
 		});
 		
-
+//		agent.addBeliefListener("items", new BeliefAdapter()
+//		{
+//			public void factAdded(Object value)
+//			{
+//				System.out.println("added: "+value);
+//			}
+//		});
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				JFrame f = new JFrame();
 				PropertiesPanel pp = new PropertiesPanel();
+				
 				final JTextField tfm = pp.createTextField("money", ""+money);
+				final NumberFormat formatter = NumberFormat.getCurrencyInstance();
+				agent.addBeliefListener("money", new BeliefAdapter()
+				{
+					public void beliefChanged(Object val)
+					{
+						tfm.setText(formatter.format(((Double)val).doubleValue()));
+					}
+				});
+				
 				final JButton bu = pp.createButton("add", "Add money");
 				bu.addActionListener(new ActionListener()
 				{
@@ -137,6 +157,7 @@ public class RecurBDI
 						setMoney(getMoney()+5);
 					}
 				});
+				
 				f.add(pp, BorderLayout.CENTER);
 				f.pack();
 				f.setLocation(SGUI.calculateMiddlePosition(f));

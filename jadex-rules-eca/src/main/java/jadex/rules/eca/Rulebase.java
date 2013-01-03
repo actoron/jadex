@@ -54,14 +54,14 @@ public class Rulebase implements IRulebase
 	 *  Remove a rule.
 	 *  @param rule The rule.
 	 */
-	public void removeRule(String ruleid)
+	public void removeRule(String rulename)
 	{
 		IRule<?> rule = null;
 		if(rules!=null)
 		{
-			rule = rules.remove(ruleid);
+			rule = rules.remove(rulename);
 			if(rule==null)
-				throw new RuntimeException("Rule not contained: "+ruleid);
+				throw new RuntimeException("Rule not contained: "+rulename);
 		}
 		
 		if(evrules!=null)

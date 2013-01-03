@@ -10,8 +10,11 @@ import java.util.List;
  */
 public class RCapability extends RElement
 {
-	/** The beliefs. */
+//	/** The beliefs. */
 //	protected List<RBelief> beliefs;
+	
+//	/** The belief listeners. */
+//	protected Map<String, List<IBeliefListener>> belieflisteners;
 	
 	/** The goals. */
 	protected List<RGoal> goals;
@@ -113,4 +116,37 @@ public class RCapability extends RElement
 			plans.remove(plan);
 		}
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public void addBeliefListener(String name, IBeliefListener listener)
+//	{
+//		if(belieflisteners==null)
+//			belieflisteners = new HashMap<String, List<IBeliefListener>>();
+//		List<IBeliefListener> lis = belieflisteners.get(name);
+//		if(lis==null)
+//		{
+//			lis = new ArrayList<IBeliefListener>();
+//			belieflisteners.put(name, lis);
+//		}
+//		lis.add(listener);
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	public void removeBeliefListener(String name, IBeliefListener listener)
+//	{
+//		if(belieflisteners!=null)
+//		{
+//			List<IBeliefListener> lis = belieflisteners.get(name);
+//			if(lis!=null)
+//			{
+//				lis.remove(lis);
+//				if(lis.size()==0)
+//				belieflisteners.remove(name);
+//			}
+//		}
+//	}
 }

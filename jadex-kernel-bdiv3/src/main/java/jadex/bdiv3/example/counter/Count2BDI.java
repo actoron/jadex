@@ -89,7 +89,7 @@ public class Count2BDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchGoalAndWait(new CountGoal(10, 5))
+		agent.dispatchTopLevelGoalAndWait(new CountGoal(10, 5))
 			.addResultListener(new IResultListener<CountGoal>()
 		{
 			public void resultAvailable(CountGoal goal)

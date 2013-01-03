@@ -1,21 +1,34 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.actions.AdoptGoalAction;
+import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.RCapability;
 import jadex.bdiv3.runtime.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
+import jadex.rules.eca.IAction;
+import jadex.rules.eca.ICondition;
+import jadex.rules.eca.IEvent;
+import jadex.rules.eca.IRule;
+import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Base class for application agents.
@@ -51,9 +64,9 @@ public class BDIAgent extends MicroAgent
 //	}
 	
 	/**
-	 * 
+	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchGoalAndWait(final T goal)
+	public <T> IFuture<T> dispatchTopLevelGoalAndWait(final T goal)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -78,6 +91,61 @@ public class BDIAgent extends MicroAgent
 	
 		return ret;
 	}
+	
+	/**
+	 *  Add a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
+	 */
+	public void addBeliefListener(final String name, final IBeliefListener listener)
+	{
+		List<String> events = new ArrayList<String>();
+		RGoal.addBeliefEvents(this, events, name);
+
+		final boolean multi = ((MCapability)getCapability().getModelElement()).getBelief(name).isMulti(getClassLoader());
+		
+		String rulename = name+"_belief_listener_"+listener.hashCode();
+		Rule<Void> rule = new Rule<Void>(rulename, 
+			ICondition.TRUE_CONDITION, new IAction<Void>()
+		{
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+			{
+				if(!multi)
+				{
+					listener.beliefChanged(event.getContent());
+				}
+				else
+				{
+					if(event.getType().startsWith(ChangeEvent.FACTADDED))
+					{
+						listener.factAdded(event.getContent());
+					}
+					else if(event.getType().startsWith(ChangeEvent.FACTREMOVED))
+					{
+						listener.factAdded(event.getContent());
+					}
+				}
+				return IFuture.DONE;
+			}
+		});
+		rule.setEvents(events);
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+		ip.getRuleSystem().getRulebase().addRule(rule);
+	}
+	
+	/**
+	 *  Remove a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
+	 */
+	public void removeBeliefListener(String name, IBeliefListener listener)
+	{
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+		String rulename = name+"_belief_listener_"+listener.hashCode();
+		ip.getRuleSystem().getRulebase().removeRule(rulename);
+	}
+	
+	//-------- internal method used for rewriting field access -------- 
 	
 	/**
 	 *  Method that is called automatically when a belief 

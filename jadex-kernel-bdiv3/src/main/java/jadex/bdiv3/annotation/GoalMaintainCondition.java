@@ -12,5 +12,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GoalMaintainCondition
 {
+	/**
+	 *  The events this condition should react to.
+	 */
+	public String[] events() default {};
 }
 

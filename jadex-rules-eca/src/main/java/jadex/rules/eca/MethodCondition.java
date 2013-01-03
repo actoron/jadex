@@ -3,10 +3,12 @@ package jadex.rules.eca;
 import java.lang.reflect.Method;
 
 /**
- * 
+ *  Condition implementation that invokes a predefined method.
  */
 public class MethodCondition implements ICondition
 {
+	//-------- attributes --------
+	
 	/** The object. */
 	protected Object object;
 	
@@ -16,8 +18,10 @@ public class MethodCondition implements ICondition
 	/** The invert flag. Inverts method result. */
 	protected boolean invert;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new method condition.
 	 */
 	public MethodCondition(Object object, Method method)
 	{
@@ -25,7 +29,7 @@ public class MethodCondition implements ICondition
 	}
 	
 	/**
-	 * 
+	 *  Create a new method condition.
 	 */
 	public MethodCondition(Object object, Method method, boolean invert)
 	{
@@ -34,8 +38,10 @@ public class MethodCondition implements ICondition
 		this.invert = invert;
 	}
 
+	//-------- methods --------
+
 	/**
-	 * 
+	 *  Evaluate the condition.
 	 */
 	public boolean evaluate(IEvent event)
 	{
@@ -43,7 +49,16 @@ public class MethodCondition implements ICondition
 		try
 		{
 			method.setAccessible(true);
-			Object result = method.invoke(object, ((Event)event).getContent());
+			Object result = null;
+			if(method.getParameterTypes().length==0)
+			{
+				result = method.invoke(object, new Object[0]);
+			}
+			else
+			{
+				result = method.invoke(object, new Object[]{((Event)event).getContent()});
+			}
+			
 			ret = ((Boolean)result).booleanValue();
 			if(invert)
 			{

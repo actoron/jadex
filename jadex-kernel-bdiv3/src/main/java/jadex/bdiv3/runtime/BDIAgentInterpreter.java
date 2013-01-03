@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MConfiguration;
@@ -344,7 +345,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				if(c.isAnnotationPresent(GoalCreationCondition.class))
 				{
+					String[] evs = c.getAnnotation(GoalCreationCondition.class).events();
 					List<String> events = RGoal.readAnnotationEvents(getInternalAccess(), c.getParameterAnnotations());
+					for(String ev: evs)
+					{
+						RGoal.addBeliefEvents(getInternalAccess(), events, ev);
+					}
+				
 					Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 						ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
@@ -378,7 +385,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 							
 							final Object fpojogoal = pojogoal;
-							((BDIAgent)microagent).dispatchGoalAndWait(pojogoal)
+							((BDIAgent)microagent).dispatchTopLevelGoalAndWait(pojogoal)
 								.addResultListener(new IResultListener<Object>()
 							{
 								public void resultAvailable(Object result)
@@ -437,7 +444,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								throw new RuntimeException("Unknown how to create goal: "+gcl);
 							}
 							
-							((BDIAgent)microagent).dispatchGoalAndWait(pojogoal);
+							((BDIAgent)microagent).dispatchTopLevelGoalAndWait(pojogoal);
 							
 							return IFuture.DONE;
 						}
