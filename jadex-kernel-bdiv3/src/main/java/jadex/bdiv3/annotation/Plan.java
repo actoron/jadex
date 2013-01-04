@@ -21,4 +21,9 @@ public @interface Plan
 	 *  The plan priority. 
 	 */
 	public int priority() default 0;
+	
+	/**
+	 *  The body (if external plan class).
+	 */
+	public Class<?> body() default Object.class;
 }

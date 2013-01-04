@@ -110,6 +110,9 @@ public class RGoal extends RProcessableElement
 	/** The goal listeners. */
 	protected List<IResultListener<Void>> listeners;
 	
+	/** The parent plan. */
+	protected RPlan parentplan;
+	
 	/** Flag if goal is declarative. */
 	protected boolean declarative;
 	protected boolean maintain; // hack remove me
@@ -117,9 +120,10 @@ public class RGoal extends RProcessableElement
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(MGoal mgoal, Object goal)
+	public RGoal(MGoal mgoal, Object goal, RPlan parentplan)
 	{
 		super(mgoal, goal);
+		this.parentplan = parentplan;
 		this.lifecyclestate = GOALLIFECYCLESTATE_NEW;
 		this.processingstate = GOALPROCESSINGSTATE_IDLE;
 	}
@@ -133,6 +137,15 @@ public class RGoal extends RProcessableElement
 		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	}
 	
+	/**
+	 *  Get the parentplan.
+	 *  @return The parentplan.
+	 */
+	public RPlan getParentPlan()
+	{
+		return parentplan;
+	}
+
 	/**
 	 *  Get the lifecycleState.
 	 *  @return The lifecycleState.

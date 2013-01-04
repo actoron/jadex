@@ -86,7 +86,7 @@ public class TranslationE3BDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoalAndWait(new MaintainStorageGoal());
+		agent.dispatchTopLevelGoal(new MaintainStorageGoal());
 
 		egwords.put("milk", "Milch");
 		egwords.put("cow", "Kuh");

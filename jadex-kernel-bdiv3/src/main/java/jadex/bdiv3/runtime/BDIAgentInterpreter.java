@@ -247,7 +247,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					if(mgoal==null || goal==null)
 						throw new RuntimeException("Could not create initial goal: ");
 					
-					RGoal rgoal = new RGoal(mgoal, goal);
+					RGoal rgoal = new RGoal(mgoal, goal, null);
 					RGoal.adoptGoal(rgoal, getInternalAccess());
 				}
 			}
@@ -385,7 +385,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 							
 							final Object fpojogoal = pojogoal;
-							((BDIAgent)microagent).dispatchTopLevelGoalAndWait(pojogoal)
+							((BDIAgent)microagent).dispatchTopLevelGoal(pojogoal)
 								.addResultListener(new IResultListener<Object>()
 							{
 								public void resultAvailable(Object result)
@@ -444,7 +444,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								throw new RuntimeException("Unknown how to create goal: "+gcl);
 							}
 							
-							((BDIAgent)microagent).dispatchTopLevelGoalAndWait(pojogoal);
+							((BDIAgent)microagent).dispatchTopLevelGoal(pojogoal);
 							
 							return IFuture.DONE;
 						}

@@ -9,7 +9,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.BeliefAdapter;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -91,7 +90,20 @@ public class RecurBDI
 			}
 			return ret;
 		}
+		
+//		@GoalResult
+//		protected String getResult()
+//		{
+//			return "hello";
+//		}
 	}
+	
+//	@GoalMethod(BuyItemsGoal.class, kind=subgoal)
+//	protected native IFuture<String> buyItems(int num);
+	
+//  lamdba goal
+//	@GoalMethod(kind=subgoal)
+//	protected native IFuture<LamdbaGoal> buyItems(int num);
 	
 	/**
 	 *  The agent body.
@@ -111,7 +123,7 @@ public class RecurBDI
 	
 		BuyItemsGoal goal = new BuyItemsGoal(5);
 		
-		agent.dispatchTopLevelGoalAndWait(goal).addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
+		agent.dispatchTopLevelGoal(goal).addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
 		{
 			public void resultAvailable(BuyItemsGoal result)
 			{
@@ -124,13 +136,13 @@ public class RecurBDI
 			}
 		});
 		
-//		agent.addBeliefListener("items", new BeliefAdapter()
-//		{
-//			public void factAdded(Object value)
-//			{
-//				System.out.println("added: "+value);
-//			}
-//		});
+		agent.addBeliefListener("items", new BeliefAdapter()
+		{
+			public void factAdded(Object value)
+			{
+				System.out.println("added: "+value);
+			}
+		});
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{

@@ -1,12 +1,21 @@
 package jadex.bdiv3.runtime;
 
-import java.lang.reflect.Method;
-
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -53,8 +62,8 @@ public class RPlan extends RElement
 	/** The plan has a dispatched element (current goal/event). */
 	public Object dispatchedelement;
 	
-//	/** The plan has subgoals attribute (hack!!! redundancy to goal_has_parentplan). */
-//	public static OAVAttributeType plan_has_subgoals;
+	/** The plan has subgoals attribute (hack!!! redundancy to goal_has_parentplan). */
+	public List<RGoal> subgoals;
 		
 	/** The plan has a wait abstraction attribute. */
 	public WaitAbstraction waitabstraction;
@@ -83,6 +92,10 @@ public class RPlan extends RElement
 	/** The candidate from which this plan was created. Used for tried plans in proc elem. */
 	protected Object candidate;
 	
+	// hack?
+	/** The internal access. */
+	protected IInternalAccess ia;
+	
 	/**
 	 * 
 	 */
@@ -94,6 +107,7 @@ public class RPlan extends RElement
 		rplan.setBody(body);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
+		rplan.setInternalAccess(ia);
 		return rplan;
 	}
 	
@@ -241,6 +255,24 @@ public class RPlan extends RElement
 	{
 		this.candidate = candidate;
 	}
+	
+	/**
+	 *  Get the ia.
+	 *  @return The ia.
+	 */
+	public IInternalAccess getInternalAccess()
+	{
+		return ia;
+	}
+
+	/**
+	 *  Set the ia.
+	 *  @param ia The ia to set.
+	 */
+	public void setInternalAccess(IInternalAccess ia)
+	{
+		this.ia = ia;
+	}
 
 	/**
 	 * 
@@ -274,5 +306,59 @@ public class RPlan extends RElement
 	{
 		return RPlan.PLANLIFECYCLESTATE_ABORTED.equals(lifecyclestate);
 	}
+	
+	/**
+	 * 
+	 */
+	public void addSubgoal(RGoal subgoal)
+	{
+		if(subgoals==null)
+		{
+			subgoals = new ArrayList<RGoal>();
+		}
+		subgoals.add(subgoal);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeSubgoal(RGoal subgoal)
+	{
+		if(subgoals!=null)
+		{
+			subgoals.remove(subgoal);
+		}
+	}
 
+	// methods that can be called from pojo plan
+	
+	/**
+	 *  Dispatch a goal wait for its result.
+	 */
+	public <T> IFuture<T> dispatchSubgoal(final T goal)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+
+		BDIModel bdim = ip.getBDIModel();
+		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
+		if(mgoal==null)
+			throw new RuntimeException("Unknown goal type: "+goal);
+		final RGoal rgoal = new RGoal(mgoal, goal, this);
+		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ret.setResult(goal);
+			}
+		});
+
+		addSubgoal(rgoal);
+		
+//		System.out.println("adopt goal");
+		ip.scheduleStep(new AdoptGoalAction(rgoal));
+	
+		return ret;
+	}
 }

@@ -66,7 +66,7 @@ public class BDIAgent extends MicroAgent
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchTopLevelGoalAndWait(final T goal)
+	public <T> IFuture<T> dispatchTopLevelGoal(final T goal)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -77,7 +77,7 @@ public class BDIAgent extends MicroAgent
 		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(mgoal, goal);
+		final RGoal rgoal = new RGoal(mgoal, goal, null);
 		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -104,7 +104,7 @@ public class BDIAgent extends MicroAgent
 
 		final boolean multi = ((MCapability)getCapability().getModelElement()).getBelief(name).isMulti(getClassLoader());
 		
-		String rulename = name+"_belief_listener_"+listener.hashCode();
+		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		Rule<Void> rule = new Rule<Void>(rulename, 
 			ICondition.TRUE_CONDITION, new IAction<Void>()
 		{
@@ -141,7 +141,7 @@ public class BDIAgent extends MicroAgent
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-		String rulename = name+"_belief_listener_"+listener.hashCode();
+		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		ip.getRuleSystem().getRulebase().removeRule(rulename);
 	}
 	
