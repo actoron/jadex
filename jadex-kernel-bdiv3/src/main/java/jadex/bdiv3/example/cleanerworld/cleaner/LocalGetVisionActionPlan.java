@@ -1,9 +1,8 @@
-package jadex.bdiv3.example.cleanerworld.plans;
+package jadex.bdiv3.example.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
-import jadex.bdiv3.example.cleanerworld.CleanerBDI;
 import jadex.bdiv3.example.cleanerworld.world.Cleaner;
 import jadex.bdiv3.example.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.example.cleanerworld.world.Vision;

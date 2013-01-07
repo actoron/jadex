@@ -1,7 +1,6 @@
-package jadex.bdiv3.example.cleanerworld;
+package jadex.bdiv3.example.cleanerworld.environment;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.example.cleanerworld.environment.EnvironmentGui;
 import jadex.bdiv3.example.cleanerworld.world.Environment;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -12,15 +11,15 @@ import jadex.micro.annotation.AgentBody;
 @Agent
 public class EnvironmentLocalBDI
 {
-	static
-	{
-		System.out.println("loading EnvironmentLocalBDI: "+EnvironmentLocalBDI.class.getClassLoader());
-	}
+//	static
+//	{
+//		System.out.println("loading EnvironmentLocalBDI: "+EnvironmentLocalBDI.class.getClassLoader());
+//	}
 	
 	@Agent
 	protected BDIAgent agent;
 	
-	protected Environment environment;
+	protected Environment environment = Environment.getInstance();
 	
 	/**
 	 *  The agent body.
@@ -29,7 +28,7 @@ public class EnvironmentLocalBDI
 	public void body()
 	{
 //		System.out.println(EnvironmentLocalBDI.class.getClassLoader());
-		System.out.println("body: "+getClass().getClassLoader());
+		System.out.println("body: "+getClass().getClassLoader()+" "+agent.getClassLoader());
 		EnvironmentGui envgui = new EnvironmentGui(agent.getExternalAccess());
 	}
 	

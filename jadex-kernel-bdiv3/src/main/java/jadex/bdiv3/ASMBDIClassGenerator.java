@@ -5,7 +5,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -13,6 +12,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.kohsuke.asm4.ClassReader;
@@ -21,9 +21,6 @@ import org.kohsuke.asm4.ClassWriter;
 import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.util.ASMifier;
-import org.kohsuke.asm4.util.CheckClassAdapter;
-import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
  * 
@@ -153,26 +150,34 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			InputStream is = null;
 			try
 			{
-				is = SUtil.getResource(clname.replace('.', '/') + ".class", cl);
+				String fname = clname.replace('.', '/') + ".class";
+				is = SUtil.getResource(fname, cl);
 				ClassReader cr = new ClassReader(is);
 				cr.accept(cv, 0);
 				byte[] data = cw.toByteArray();
 				
-				// Need to load all inner classes as well because otherwise
-				// they could be loaded by a parent class loader 
-				// -> class cannot access inner class as they are 
-				// then considered belonging to other packages
-			
-				Class<?> icl = null;
-				for(String name: iclasses)
+				// Find correct cloader for injecting the class.
+				// Probes to load class without loading class.
+				
+				List<ClassLoader> pas = new LinkedList<ClassLoader>();
+				ClassLoader tmp = cl;
+				while(tmp!=null)
 				{
-//					System.out.println("loading: "+cl+" "+name);
-					icl = cl.loadClass(name.replace("/", "."));
+					pas.add(0, tmp);
+					tmp = tmp.getParent();
 				}
 				
-				ClassLoader ncl = icl==null? cl: icl.getClassLoader();
+				ClassLoader found = null;
+				for(ClassLoader tmpcl: pas)
+				{
+					if(tmpcl.getResource(fname)!=null)
+					{
+						found = tmpcl;
+						break;
+					}
+				}
 				
-				ret = toClass(clname, data, ncl, null);
+				ret = toClass(clname, data, found, null);
 			}
 			catch(Exception e)
 			{

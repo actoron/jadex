@@ -1567,6 +1567,21 @@ public class MicroClassReader
 		{
 			this.orig = orig;
 		}
+		
+		/**
+		 * 
+		 */
+		public String toString()
+		{
+			String ret = super.toString();
+			ClassLoader pa = getParent();
+			while(pa!=null)
+			{
+				ret += " "+pa.toString();
+				pa = pa.getParent();
+			}
+			return ret;
+		}
 	}
 	
 	/**

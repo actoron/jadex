@@ -1,13 +1,12 @@
-package jadex.bdiv3.example.cleanerworld.plans;
+package jadex.bdiv3.example.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
-import jadex.bdiv3.example.cleanerworld.CleanerBDI;
-import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchieveCleanup;
-import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchieveDropWaste;
-import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchievePickupWaste;
-import jadex.bdiv3.example.cleanerworld.CleanerBDI.QueryWastebin;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchieveCleanup;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchieveDropWaste;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchievePickupWaste;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.QueryWastebin;
 import jadex.bdiv3.example.cleanerworld.world.Waste;
 import jadex.bdiv3.example.cleanerworld.world.Wastebin;
 import jadex.bdiv3.runtime.RGoal;

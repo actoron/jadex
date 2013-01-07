@@ -1,4 +1,4 @@
-package jadex.bdiv3.example.cleanerworld.plans;
+package jadex.bdiv3.example.cleanerworld.cleaner;
 
 import jadex.bdiv3.example.cleanerworld.world.Location;
 import jadex.bdiv3.example.cleanerworld.world.Waste;

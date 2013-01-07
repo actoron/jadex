@@ -1,4 +1,4 @@
-package jadex.bdiv3.example.cleanerworld;
+package jadex.bdiv3.example.cleanerworld.cleaner;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
@@ -10,18 +10,6 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.example.cleanerworld.plans.CleanUpWastePlan;
-import jadex.bdiv3.example.cleanerworld.plans.DropWastePlan;
-import jadex.bdiv3.example.cleanerworld.plans.ExploreMapPlan;
-import jadex.bdiv3.example.cleanerworld.plans.LeastSeenWalkPlan;
-import jadex.bdiv3.example.cleanerworld.plans.LoadBatteryPlan;
-import jadex.bdiv3.example.cleanerworld.plans.LocalDropWasteActionPlan;
-import jadex.bdiv3.example.cleanerworld.plans.LocalGetVisionActionPlan;
-import jadex.bdiv3.example.cleanerworld.plans.LocalPickUpWasteActionPlan;
-import jadex.bdiv3.example.cleanerworld.plans.MemorizePositionsPlan;
-import jadex.bdiv3.example.cleanerworld.plans.MoveToLocationPlan;
-import jadex.bdiv3.example.cleanerworld.plans.PatrolPlan;
-import jadex.bdiv3.example.cleanerworld.plans.PickUpWastePlan;
 import jadex.bdiv3.example.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.example.cleanerworld.world.Cleaner;
 import jadex.bdiv3.example.cleanerworld.world.Environment;
