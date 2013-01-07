@@ -27,6 +27,8 @@ import jadex.micro.annotation.AgentBody;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 @Agent
 @Plans(
 {
@@ -66,7 +68,7 @@ public class CleanerBDI
 	protected Set<Cleaner> cleaners;
 	
 	@Belief
-	protected Tuple2<Integer, Integer> raster;
+	protected Tuple2<Integer, Integer> raster = new Tuple2<Integer, Integer>(new Integer(10), new Integer(10));
 
 	@Belief
 	protected Set<MapPoint> visited_positions;
@@ -92,8 +94,8 @@ public class CleanerBDI
 	@Belief
 	protected List<Location> patrolpoints;
 	
-//	@Belief
-//	protected CleanerGui gui;
+	@Belief
+	protected CleanerGui gui;
 	
 	@Goal
 	public class MaintainBatteryLoaded
@@ -404,6 +406,14 @@ public class CleanerBDI
 	@AgentBody
 	public void body()
 	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				gui = new CleanerGui(agent.getExternalAccess());
+			}
+		});
+		
 		patrolpoints.add(new Location(0.1, 0.1));
 		patrolpoints.add(new Location(0.1, 0.9));
 		patrolpoints.add(new Location(0.3, 0.9));
@@ -517,7 +527,7 @@ public class CleanerBDI
 	 */
 	public void setMyLocation(Location mylocation)
 	{
-		System.out.println("mypos: "+mylocation);
+//		System.out.println("mypos: "+mylocation);
 		this.my_location = mylocation;
 	}
 

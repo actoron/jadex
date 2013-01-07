@@ -113,6 +113,9 @@ public class RGoal extends RProcessableElement
 	/** The parent plan. */
 	protected RPlan parentplan;
 	
+	/** The child plan. */
+	protected RPlan childplan;
+	
 	/** Flag if goal is declarative. */
 	protected boolean declarative;
 	protected boolean maintain; // hack remove me
@@ -282,7 +285,7 @@ public class RGoal extends RProcessableElement
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-		System.out.println("goal state change: "+this.getId()+" "+lifecyclestate);
+//		System.out.println("goal state change: "+this.getId()+" "+lifecyclestate);
 		
 		setLifecycleState(lifecyclestate);
 		
@@ -671,6 +674,24 @@ public class RGoal extends RProcessableElement
 			listeners.remove(listener);
 	}
 	
+	/**
+	 *  Get the childplan.
+	 *  @return The childplan.
+	 */
+	public RPlan getChildPlan()
+	{
+		return childplan;
+	}
+
+	/**
+	 *  Set the childplan.
+	 *  @param childplan The childplan to set.
+	 */
+	public void setChildPlan(RPlan childplan)
+	{
+		this.childplan = childplan;
+	}
+
 	/** 
 	 * 
 	 */
@@ -686,6 +707,8 @@ public class RGoal extends RProcessableElement
 	public void planFinished(IInternalAccess ia, RPlan rplan)
 	{
 		super.planFinished(ia, rplan);
+		childplan = null;
+		
 		// create reasoning step depending on the processable element type
 
 		// Check procedural success semantics

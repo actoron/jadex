@@ -189,7 +189,8 @@ public abstract class RProcessableElement extends RElement
 		if(rplan!=null)
 		{
 			addTriedPlan(rplan);
-			apl.planFinished(rplan);
+			if(apl!=null)
+				apl.planFinished(rplan);
 		}
 	}
 }

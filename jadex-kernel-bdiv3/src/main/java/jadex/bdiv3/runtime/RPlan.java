@@ -341,6 +341,28 @@ public class RPlan extends RElement
 			subgoals.remove(subgoal);
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public void abortPlan()
+	{
+		setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
+		
+		if(subgoals!=null)
+		{
+			for(RGoal subgoal: subgoals)
+			{
+				String gs = subgoal.getLifecycleState();
+				
+				if(!RGoal.GOALLIFECYCLESTATE_DROPPING.equals(gs) 
+					&& !RGoal.GOALLIFECYCLESTATE_DROPPED.equals(gs))
+				{
+					subgoal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPING);
+				}
+			}
+		}
+	}
 
 	// methods that can be called from pojo plan
 	
@@ -384,7 +406,14 @@ public class RPlan extends RElement
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				return IFuture.DONE;
+				if(isAborted() || isFailed())
+				{
+					return new Future<Void>(new PlanFailureException());
+				}
+				else
+				{
+					return IFuture.DONE;
+				}
 			}
 		}).addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;

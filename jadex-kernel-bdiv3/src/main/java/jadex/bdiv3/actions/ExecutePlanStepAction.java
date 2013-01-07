@@ -46,6 +46,9 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			RGoal rgoal = (RGoal)element;
 			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
 				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+			// todo: hack, how to avoid side effect
+			if(!ret)
+				rplan.abortPlan();
 		}
 			
 //		if(!ret)
@@ -64,6 +67,12 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 
 		
+		Object element = rplan.getReason();
+		if(element instanceof RGoal)
+		{
+			RGoal rgoal = (RGoal)element;
+			rgoal.setChildPlan(rplan);
+		}
 		rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_BODY);
 		IPlanBody body = rplan.getBody();
 		return body.executePlanStep();
