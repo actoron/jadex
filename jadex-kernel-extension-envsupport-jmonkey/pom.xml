@@ -182,9 +182,7 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 	</dependencies>
-
 
 	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
 	<profiles>
