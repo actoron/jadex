@@ -356,12 +356,12 @@ public class SUtil
 	 * @param as The array of arrays to join..
 	 * @return The joined array.
 	 */
-	public static Object[] joinArbitraryArrays(Object[] as)
+	public static <T> T[] joinArbitraryArrays(Object[] as)
 	{
 		int lsum = 0;
 		for(int i = 0; i < as.length; i++)
 			lsum += Array.getLength(as[i]);
-		Object[] ret = new Object[lsum];
+		T[] ret = (T[])new Object[lsum];
 		// Object ret = Array.newInstance(Object.class, lsum);
 
 		int start = 0;

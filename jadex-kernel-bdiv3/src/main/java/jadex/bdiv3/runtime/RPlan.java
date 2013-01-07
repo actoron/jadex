@@ -7,8 +7,11 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -102,8 +105,17 @@ public class RPlan extends RElement
 	public static RPlan createRPlan(MPlan mplan, Object reason, IInternalAccess ia)
 	{
 		RPlan rplan = new RPlan((MPlan)mplan, mplan);
-		Method mbody = ((MethodInfo)mplan.getBody()).getMethod(ia.getClassLoader());
-		IPlanBody body = new MethodPlanBody(ia, rplan, mbody);
+		Object bd = mplan.getBody();
+		IPlanBody body = null;
+		if(bd instanceof MethodInfo)
+		{
+			Method mbody = ((MethodInfo)bd).getMethod(ia.getClassLoader());
+			body = new MethodPlanBody(ia, rplan, mbody);
+		}
+		else if(bd instanceof ClassInfo)
+		{
+			body = new ClassPlanBody(ia, rplan, (Class<?>)((ClassInfo)bd).getType(ia.getClassLoader()));
+		}
 		rplan.setBody(body);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
@@ -359,6 +371,22 @@ public class RPlan extends RElement
 //		System.out.println("adopt goal");
 		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Void> waitFor(long delay)
+	{
+		final Future<Void> ret = new Future<Void>();
+		ia.waitForDelay(delay, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return IFuture.DONE;
+			}
+		}).addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;
 	}
 }

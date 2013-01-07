@@ -59,4 +59,18 @@ public class ChangeableURLClassLoader extends URLClassLoader
 		return (URL[])urls.toArray(new URL[urls.size()]);
 	}
 	
+	/**
+	 * 
+	 */
+	public String toString()
+	{
+		String ret = super.toString();
+		ClassLoader pa = getParent();
+		while(pa!=null)
+		{
+			ret += " "+pa.toString();
+			pa = pa.getParent();
+		}
+		return ret;
+	}
 }

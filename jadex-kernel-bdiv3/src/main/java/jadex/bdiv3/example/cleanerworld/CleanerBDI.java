@@ -24,6 +24,7 @@ import jadex.bdiv3.example.cleanerworld.plans.PatrolPlan;
 import jadex.bdiv3.example.cleanerworld.plans.PickUpWastePlan;
 import jadex.bdiv3.example.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.example.cleanerworld.world.Cleaner;
+import jadex.bdiv3.example.cleanerworld.world.Environment;
 import jadex.bdiv3.example.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.example.cleanerworld.world.Location;
 import jadex.bdiv3.example.cleanerworld.world.MapPoint;
@@ -62,7 +63,7 @@ public class CleanerBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected IEnvironment environment;
+	protected IEnvironment environment = Environment.getInstance();
 	
 	@Belief
 	protected Set<Waste> wastes;
@@ -86,16 +87,16 @@ public class CleanerBDI
 	protected boolean daytime;
 
 	@Belief
-	protected Location my_location;
+	protected Location my_location = new Location(0.2, 0.2);
 	
 	@Belief 
-	protected double my_speed;
+	protected double my_speed = 3;
 	
 	@Belief
-	protected double my_vision;
+	protected double my_vision = 0.1;
 	
 	@Belief
-	protected double my_chargestate;
+	protected double my_chargestate = 1.0;
 	
 	@Belief
 	protected Waste carriedwaste;
@@ -181,6 +182,15 @@ public class CleanerBDI
 			}
 			return ret;
 		}
+
+		/**
+		 *  Get the waste.
+		 *  @return The waste.
+		 */
+		public Waste getWaste()
+		{
+			return waste;
+		}
 	}
 	
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
@@ -237,10 +247,24 @@ public class CleanerBDI
 	{
 		protected Location location;
 		
+		public AchieveMoveTo(Location location)
+		{
+			this.location = location;
+		}
+		
 		@GoalTargetCondition(events="my_location")
 		public boolean checkContext()
 		{
 			return my_location.isNear(location);
+		}
+
+		/**
+		 *  Get the location.
+		 *  @return The location.
+		 */
+		public Location getLocation()
+		{
+			return location;
 		}
 	}
 	
@@ -283,6 +307,16 @@ public class CleanerBDI
 	public class GetVisionAction
 	{
 		protected Vision vision;
+		
+		public Vision getVision()
+		{
+			return vision;
+		}
+
+		public void setVision(Vision vision)
+		{
+			this.vision = vision;
+		}
 	}
 	
 	@Goal
@@ -382,10 +416,21 @@ public class CleanerBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new PerformLookForWaste());
+		patrolpoints.add(new Location(0.1, 0.1));
+		patrolpoints.add(new Location(0.1, 0.9));
+		patrolpoints.add(new Location(0.3, 0.9));
+		patrolpoints.add(new Location(0.3, 0.1));
+		patrolpoints.add(new Location(0.5, 0.1));
+		patrolpoints.add(new Location(0.5, 0.9));
+		patrolpoints.add(new Location(0.7, 0.9));
+		patrolpoints.add(new Location(0.7, 0.1));
+		patrolpoints.add(new Location(0.9, 0.1));
+		patrolpoints.add(new Location(0.9, 0.9));
+		
+//		agent.dispatchTopLevelGoal(new PerformLookForWaste());
 		agent.dispatchTopLevelGoal(new PerformPatrol());
-		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
-		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
+//		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
+//		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
 	}
 
 	/**
@@ -459,6 +504,15 @@ public class CleanerBDI
 	{
 		return daytime;
 	}
+	
+	/**
+	 *  Set the daytime.
+	 *  @param daytime The daytime to set.
+	 */
+	public void setDaytime(boolean daytime)
+	{
+		this.daytime = daytime;
+	}
 
 	/**
 	 *  Get the my_location.
@@ -467,6 +521,16 @@ public class CleanerBDI
 	public Location getMyLocation()
 	{
 		return my_location;
+	}
+	
+	/**
+	 *  Set the my_location.
+	 *  @param my_location The my_location to set.
+	 */
+	public void setMyLocation(Location mylocation)
+	{
+		System.out.println("mypos: "+mylocation);
+		this.my_location = mylocation;
 	}
 
 	/**
@@ -494,6 +558,15 @@ public class CleanerBDI
 	public double getMyChargestate()
 	{
 		return my_chargestate;
+	}
+	
+	/**
+	 *  Set the my_chargestate.
+	 *  @param my_chargestate The my_chargestate to set.
+	 */
+	public void setMyChargestate(double mychargestate)
+	{
+		this.my_chargestate = mychargestate;
 	}
 
 	/**

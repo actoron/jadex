@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -13,6 +14,7 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -163,33 +165,22 @@ public class BDIClassReader extends MicroClassReader
 				if(isAnnotationPresent(methods[i], Plan.class, cl))
 				{
 //					System.out.println("found plan: "+methods[i].getName());
-					MTrigger tr = new MTrigger();
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
-					Trigger trigger = p.trigger();
-					Class<?>[] gs = trigger.goals();
-					for(int j=0; j<gs.length; j++)
-					{
-						Goal ga = getAnnotation(gs[j], Goal.class, cl);
-						MGoal mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
-							ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay());
-						tr.addGoal(mgoal);
-						
-						if(!bdimodel.getCapability().getGoals().contains(mgoal))
-						{	
-							bdimodel.getCapability().addGoal(mgoal);
-						}
-					}
-					String[] fas = trigger.factaddeds();
-					for(int j=0; j<fas.length; j++)
-					{
-						tr.addFactAdded(fas[j]);
-					}
-					String[] frs = trigger.factremoveds();
-					for(int j=0; j<frs.length; j++)
-					{
-						tr.addFactRemoved(frs[j]);
-					}
-					MPlan mplan = new MPlan(methods[i].getName(), new jadex.bdiv3.model.MethodInfo(methods[i]),  tr, p.priority());
+					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl);
+					MPlan mplan = new MPlan(methods[i].getName(), new jadex.bdiv3.model.MethodInfo(methods[i]), mtr, p.priority());
+					bdimodel.getCapability().addPlan(mplan);
+				}
+			}
+			
+			// Find external plans
+			if(isAnnotationPresent(clazz, Plans.class, cl))
+			{
+				Plan[] plans = getAnnotation(clazz, Plans.class, cl).value();
+				for(Plan p: plans)
+				{
+					Class<?> bodycl = p.body();
+					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl);
+					MPlan mplan = new MPlan(SReflect.getInnerClassName(bodycl), new ClassInfo(bodycl.getName()), mtr, p.priority());
 					bdimodel.getCapability().addPlan(mplan);
 				}
 			}
@@ -307,5 +298,39 @@ public class BDIClassReader extends MicroClassReader
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		Class<?> genclazz = gen.generateBDIClass(cma.getName(), bdimodel, classloader);
 //		System.out.println("genclazz: "+genclazz);
+	}
+	
+	/**
+	 * 
+	 */
+	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Plan p, ClassLoader cl)
+	{
+		MTrigger tr = new MTrigger();
+		Trigger trigger = p.trigger();
+		Class<?>[] gs = trigger.goals();
+		for(int j=0; j<gs.length; j++)
+		{
+			Goal ga = getAnnotation(gs[j], Goal.class, cl);
+			MGoal mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
+				ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay());
+			tr.addGoal(mgoal);
+			
+			if(!bdimodel.getCapability().getGoals().contains(mgoal))
+			{	
+				bdimodel.getCapability().addGoal(mgoal);
+			}
+		}
+		String[] fas = trigger.factaddeds();
+		for(int j=0; j<fas.length; j++)
+		{
+			tr.addFactAdded(fas[j]);
+		}
+		String[] frs = trigger.factremoveds();
+		for(int j=0; j<frs.length; j++)
+		{
+			tr.addFactRemoved(frs[j]);
+		}
+		
+		return tr;
 	}
 }

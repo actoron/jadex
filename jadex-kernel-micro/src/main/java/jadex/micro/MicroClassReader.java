@@ -1376,7 +1376,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected boolean isAnnotationPresent(Class<?> clazz, Class<? extends Annotation> anclazz, ClassLoader cl)
+	public static boolean isAnnotationPresent(Class<?> clazz, Class<? extends Annotation> anclazz, ClassLoader cl)
 	{
 		return clazz.isAnnotationPresent((Class<? extends Annotation>)getClass(anclazz, cl));
 	}
@@ -1384,7 +1384,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected boolean isAnnotationPresent(Field f, Class<? extends Annotation> anclazz, ClassLoader cl)
+	public static boolean isAnnotationPresent(Field f, Class<? extends Annotation> anclazz, ClassLoader cl)
 	{
 		return f.isAnnotationPresent((Class<? extends Annotation>)getClass(anclazz, cl));
 	}
@@ -1392,7 +1392,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected boolean isAnnotationPresent(Method m, Class<? extends Annotation> anclazz, ClassLoader cl)
+	public static boolean isAnnotationPresent(Method m, Class<? extends Annotation> anclazz, ClassLoader cl)
 	{
 		return m.isAnnotationPresent((Class<? extends Annotation>)getClass(anclazz, cl));
 	}
@@ -1400,7 +1400,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1409,7 +1409,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(f.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1418,7 +1418,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
+	public static <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(m.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1427,7 +1427,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
+	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
 	{
 		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl1)), cl2);
 	}
@@ -1435,7 +1435,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected Class<?> getClass(Class<?> clazz, ClassLoader cl)
+	public static Class<?> getClass(Class<?> clazz, ClassLoader cl)
 	{
 		Class<?> ret = clazz;
 		
@@ -1458,7 +1458,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected Class<?>[] getClassArray(Class<?>[] clazzes, ClassLoader cl)
+	public static Class<?>[] getClassArray(Class<?>[] clazzes, ClassLoader cl)
 	{
 		Class<?>[] ret = new Class[clazzes.length];
 		for(int i=0; i<clazzes.length; i++)
@@ -1472,7 +1472,7 @@ public class MicroClassReader
 	 *  Gets proxy annotation that can be invoked by corresponding classloader.
 	 * @return 
 	 */
-	protected <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
+	public static <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
 	{
 		T ret = null;
 		
@@ -1572,7 +1572,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	protected boolean isClassLoaderCompatible(Class<?> clazz, ClassLoader cl)
+	protected static boolean isClassLoaderCompatible(Class<?> clazz, ClassLoader cl)
 	{
 		ClassLoader clcl = clazz.getClassLoader();
 		boolean ret = clcl==null || clcl.equals(cl);

@@ -1,11 +1,41 @@
 package jadex.bdiv3.example.cleanerworld.plans;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.example.cleanerworld.CleanerBDI;
+import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchieveMoveTo;
+import jadex.bdiv3.example.cleanerworld.CleanerBDI.GetVisionAction;
+import jadex.bdiv3.example.cleanerworld.world.Chargingstation;
+import jadex.bdiv3.example.cleanerworld.world.Cleaner;
+import jadex.bdiv3.example.cleanerworld.world.Location;
+import jadex.bdiv3.example.cleanerworld.world.LocationObject;
+import jadex.bdiv3.example.cleanerworld.world.Vision;
+import jadex.bdiv3.example.cleanerworld.world.Waste;
+import jadex.bdiv3.example.cleanerworld.world.Wastebin;
+import jadex.bdiv3.runtime.RGoal;
+import jadex.bdiv3.runtime.RPlan;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
 
 /**
  *  Move to a point.
  */
 public class MoveToLocationPlan
 {
+	@PlanCapability
+	protected CleanerBDI capa;
+	
+	@PlanPlan
+	protected RPlan rplan;
+
 	//-------- constructors --------
 
 	/**
@@ -21,183 +51,262 @@ public class MoveToLocationPlan
 	/**
 	 *  The plan body.
 	 */
-	public void body()
+	public IFuture<Void> body()
 	{
-//		//long	time	= getRootGoal().getExecutionTime();
-//		Location target = (Location)getParameter("location").getValue();
-//		Location myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
-//		while(!myloc.isNear(target))
-//		{
-//			//pause(atm);
-//			// calculate the new position offset.
-//			//long	newtime	= getTime();
-//			double speed = ((Double)getBeliefbase().getBelief("my_speed").getFact()).doubleValue();
-//			double d = myloc.getDistance(target);
-//			double r = speed*0.00004*100;//(newtime-time);
-//			double dx = target.getX()-myloc.getX();
-//			double dy = target.getY()-myloc.getY();
-//			//time	= newtime;
-//
-//			// When radius greater than distance, just move a step.
-//			double rx = r<d? r*dx/d: dx;
-//			double ry = r<d? r*dy/d: dy;
-//			getBeliefbase().getBelief("my_location").setFact(new Location(myloc.getX()+rx, myloc.getY()+ry));
-//
-//			// Alter the charge state
-//			double	charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-//			charge	-= r*0.075;
-//			getBeliefbase().getBelief("my_chargestate").setFact(new Double(charge));
-//
-//			waitFor(100); // wait for 0.01 seconds
-//
-//			// Ceck if location has changed in mean time.
-//			myloc = (Location)getBeliefbase().getBelief("my_location").getFact();
-//
-//			updateVision();
-//		}
+		return moveToTarget();
 	}
 
+	/**
+	 * 
+	 */
+	@PlanBody
+	protected IFuture<Void> moveToTarget()
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		Location target = ((AchieveMoveTo)((RGoal)rplan.getReason()).getPojoElement()).getLocation();
+		Location myloc = capa.getMyLocation();
+		
+		if(!myloc.isNear(target))
+		{
+			oneStepToTarget().addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					moveToTarget().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> oneStepToTarget()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		Location target = ((AchieveMoveTo)((RGoal)rplan.getReason()).getPojoElement()).getLocation();
+		Location myloc = capa.getMyLocation();
+
+		double speed = capa.getMySpeed();
+		double d = myloc.getDistance(target);
+		double r = speed*0.00004*100;//(newtime-time);
+		double dx = target.getX()-myloc.getX();
+		double dy = target.getY()-myloc.getY();
+
+		double rx = r<d? r*dx/d: dx;
+		double ry = r<d? r*dy/d: dy;
+		capa.setMyLocation(new Location(myloc.getX()+rx, myloc.getY()+ry));
+
+		// Alter the charge state
+		double	charge	= capa.getMyChargestate();
+		charge	-= r*0.075;
+		capa.setMyChargestate(new Double(charge));
+		
+		// wait for 0.01 seconds
+		rplan.waitFor(100).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				updateVision().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
 	//-------- helper methods --------
 
 	/**
 	 *  Update the vision, when having moved.
 	 */
-	protected void	updateVision()
+	protected IFuture<Void>	updateVision()
 	{		
+		final Future<Void> ret = new Future<Void>();
 ////		long start = System.currentTimeMillis();
 //		
-//		// Create a representation of myself.
-//		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(),
-//			getComponentName(),
-//			(Waste)getBeliefbase().getBelief("carriedwaste").getFact(),
-//			((Number)getBeliefbase().getBelief("my_vision").getFact()).doubleValue(),
-//			((Number)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue());
-//
-//		//IEnvironment env = (IEnvironment)getBeliefbase().getBelief("environment").getFact();
+		// Create a representation of myself.
+		final Cleaner cl = new Cleaner(capa.getMyLocation(),
+			capa.getAgent().getComponentIdentifier().getName(),
+			capa.getCarriedWaste(), capa.getMyVision(),
+			capa.getMyChargestate());
+
+		//IEnvironment env = (IEnvironment)getBeliefbase().getBelief("environment").getFact();
 //		//Vision vi = env.getVision(cl);
 //		IGoal dg = createGoal("get_vision_action");
 //		dispatchSubgoalAndWait(dg);
-//
-//		//Vision vi = (Vision)dg.getResult();
-//		Vision vi = (Vision)dg.getParameter("vision").getValue();
-//
-//		if(vi!=null)
-//		{
-//			getBeliefbase().getBelief("daytime").setFact(new Boolean(vi.isDaytime()));
-//			
-//			Waste[] ws = vi.getWastes();
-//			Wastebin[] wbs = vi.getWastebins();
-//			Chargingstation[] cs = vi.getStations();
-//			Cleaner[] cls = vi.getCleaners();
-//
-//			// When an object is not seen any longer (not
-//			// in actualvision, but in (near) beliefs), remove it.
-//			List known = (List)getExpression("query_in_vision_objects").execute();
-//			for(int i=0; i<known.size(); i++)
-//			{
-//				Object object = known.get(i);
-//				if(object instanceof Waste)
-//				{
-//					List tmp = SUtil.arrayToList(ws);
-//					if(!tmp.contains(object))
-//						getBeliefbase().getBeliefSet("wastes").removeFact(object);
-//				}
-//				else if(object instanceof Wastebin)
-//				{
-//					List tmp = SUtil.arrayToList(wbs);
-//					if(!tmp.contains(object))
-//						getBeliefbase().getBeliefSet("wastebins").removeFact(object);
-//				}
-//				else if(object instanceof Chargingstation)
-//				{
-//					List tmp = SUtil.arrayToList(cs);
-//					if(!tmp.contains(object))
-//						getBeliefbase().getBeliefSet("chargingstations").removeFact(object);
-//				}
-//				else if(object instanceof Cleaner)
-//				{
-//					List tmp = SUtil.arrayToList(cls);
-//					if(!tmp.contains(object))
-//						getBeliefbase().getBeliefSet("cleaners").removeFact(object);
-//				}
-//			}
-//
-//			// Add new or changed objects to beliefs.
-//			for(int i=0; i<ws.length; i++)
-//			{
-//				if(!getBeliefbase().getBeliefSet("wastes").containsFact(ws[i]))
-//					getBeliefbase().getBeliefSet("wastes").addFact(ws[i]);
-//			}
-//			for(int i=0; i<wbs.length; i++)
-//			{
-//				// Remove contained wastes from knowledge.
-//				// Otherwise the agent might think that the waste is still
-//				// somewhere (outside its vision) and then it creates lots of
-//				// cleanup goals, that are instantly achieved because the
-//				// target condition (waste in wastebin) holds.
-//				Waste[]	wastes	= wbs[i].getWastes();
-//				for(int j=0; j<wastes.length; j++)
-//				{
-//					if(getBeliefbase().getBeliefSet("wastes").containsFact(wastes[j]))
-//						getBeliefbase().getBeliefSet("wastes").removeFact(wastes[j]);
-//				}
-//
-//				// Now its safe to add wastebin to beliefs.
-//				IBeliefSet bs = getBeliefbase().getBeliefSet("wastebins");
-//				if(bs.containsFact(wbs[i]))
-//				{
-////					bs.updateFact(wbs[i]);
-//					Wastebin wb = (Wastebin)bs.getFact(wbs[i]);
-//					wb.update(wbs[i]);
-//				}
-//				else
-//				{
-//					bs.addFact(wbs[i]);
-//				}
-//				//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wbs[i]);
-//			}
-//			for(int i=0; i<cs.length; i++)
-//			{
-//				IBeliefSet bs = getBeliefbase().getBeliefSet("chargingstations");
-//				if(bs.containsFact(cs[i]))
-//				{
-////					bs.updateFact(cs[i]);
-//					Chargingstation stat = (Chargingstation)bs.getFact(cs[i]);
-//					stat.update(cs[i]);
-//				}
-//				else
-//				{
-//					bs.addFact(cs[i]);
-//				}
-//				//getBeliefbase().getBeliefSet("chargingstations").updateOrAddFact(cs[i]);
-//			}
-//			for(int i=0; i<cls.length; i++)
-//			{
-//				if(!cls[i].equals(cl))
-//				{
-//					IBeliefSet bs = getBeliefbase().getBeliefSet("cleaners");
-//					if(bs.containsFact(cls[i]))
-//					{
-////						bs.updateFact(cls[i]);
-//						Cleaner clea = (Cleaner)bs.getFact(cls[i]);
-//						clea.update(cls[i]);
-//					}
-//					else
-//					{
-//						bs.addFact(cls[i]);
-//					}
-//					//getBeliefbase().getBeliefSet("cleaners").updateOrAddFact(cls[i]);
-//				}
-//			}
-//
-//			//getBeliefbase().getBelief("???").setFact("allowed_to_move", new Boolean(true));
-//		}
-//		else
-//		{
-//			//System.out.println("Error when updating vision! "+event.getGoal());
-//			System.out.println(getComponentName()+" Error when updating vision! ");
-//		}
-//		
-////		System.out.println("update vision: "+(System.currentTimeMillis()-start));
+
+		rplan.dispatchSubgoal(capa.new GetVisionAction())
+			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.GetVisionAction, Void>(ret)
+		{
+			public void customResultAvailable(GetVisionAction gva)
+			{
+				Vision vi = gva.getVision();
+			
+				if(vi!=null)
+				{
+					capa.setDaytime(vi.isDaytime());
+					
+					Waste[] ws = vi.getWastes();
+					Wastebin[] wbs = vi.getWastebins();
+					Chargingstation[] cs = vi.getStations();
+					Cleaner[] cls = vi.getCleaners();
+		
+					// When an object is not seen any longer (not
+					// in actualvision, but in (near) beliefs), remove it.
+//					List known = (List)getExpression("query_in_vision_objects").execute();
+					List<LocationObject> known = getInVisionObjects();
+					
+					for(int i=0; i<known.size(); i++)
+					{
+						Object object = known.get(i);
+						if(object instanceof Waste)
+						{
+							List tmp = SUtil.arrayToList(ws);
+							if(!tmp.contains(object))
+								capa.getWastes().remove(object);
+						}
+						else if(object instanceof Wastebin)
+						{
+							List tmp = SUtil.arrayToList(wbs);
+							if(!tmp.contains(object))
+								capa.getWastebins().remove(object);
+						}
+						else if(object instanceof Chargingstation)
+						{
+							List tmp = SUtil.arrayToList(cs);
+							if(!tmp.contains(object))
+								capa.getChargingStations().remove(object);
+						}
+						else if(object instanceof Cleaner)
+						{
+							List tmp = SUtil.arrayToList(cls);
+							if(!tmp.contains(object))
+								capa.getCleaners().remove(object);
+						}
+					}
+		
+					// Add new or changed objects to beliefs.
+					for(int i=0; i<ws.length; i++)
+					{
+						if(!capa.getWastes().contains(ws[i]))
+							capa.getWastes().add(ws[i]);
+					}
+					for(int i=0; i<wbs.length; i++)
+					{
+						// Remove contained wastes from knowledge.
+						// Otherwise the agent might think that the waste is still
+						// somewhere (outside its vision) and then it creates lots of
+						// cleanup goals, that are instantly achieved because the
+						// target condition (waste in wastebin) holds.
+						Waste[]	wastes	= wbs[i].getWastes();
+						for(int j=0; j<wastes.length; j++)
+						{
+							if(capa.getWastes().contains(wastes[j]))
+								capa.getWastes().remove(wastes[j]);
+						}
+		
+						// Now its safe to add wastebin to beliefs.
+						if(capa.getWastebins().contains(wbs[i]))
+						{
+							capa.getWastebins().remove(wbs[i]);
+							capa.getWastebins().add(wbs[i]);
+//							bs.updateFact(wbs[i]);
+//							Wastebin wb = (Wastebin)bs.getFact(wbs[i]);
+//							wb.update(wbs[i]);
+						}
+						else
+						{
+							capa.getWastebins().add(wbs[i]);
+						}
+						//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wbs[i]);
+					}
+					for(int i=0; i<cs.length; i++)
+					{
+						if(capa.getChargingStations().contains(cs[i]))
+						{
+//								bs.updateFact(cs[i]);
+//							Chargingstation stat = (Chargingstation)bs.getFact(cs[i]);
+//							stat.update(cs[i]);
+							capa.getChargingStations().remove(cs[i]);
+							capa.getChargingStations().add(cs[i]);
+						}
+						else
+						{
+							capa.getChargingStations().add(cs[i]);
+						}
+						//getBeliefbase().getBeliefSet("chargingstations").updateOrAddFact(cs[i]);
+					}
+					for(int i=0; i<cls.length; i++)
+					{
+						if(!cls[i].equals(cl))
+						{
+							if(capa.getCleaners().contains(cls[i]))
+							{
+//									bs.updateFact(cls[i]);
+//								Cleaner clea = (Cleaner)bs.getFact(cls[i]);
+//								clea.update(cls[i]);
+								capa.getCleaners().remove(cls[i]);
+								capa.getCleaners().add(cls[i]);
+							}
+							else
+							{
+								capa.getCleaners().add(cls[i]);
+							}
+							//getBeliefbase().getBeliefSet("cleaners").updateOrAddFact(cls[i]);
+						}
+					}
+		
+					//getBeliefbase().getBelief("???").setFact("allowed_to_move", new Boolean(true));
+				}
+				else
+				{
+//					System.out.println("Error when updating vision! "+event.getGoal());
+				}
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+	protected List<LocationObject> getInVisionObjects()
+	{
+		List<LocationObject> ret = new ArrayList<LocationObject>();
+		List<LocationObject> from = new ArrayList<LocationObject>();
+		from.addAll(capa.getWastes());
+		from.addAll(capa.getWastebins());
+		from.addAll(capa.getChargingStations());
+		from.addAll(capa.getCleaners());
+		for(LocationObject o: from)
+		{
+			if(capa.getMyLocation().isNear(o.getLocation(), capa.getMyVision()))
+			{
+				ret.add(o);
+			}
+		}
+		return ret;
+	}
+	
+//	<expression name="query_in_vision_objects">
+//	select LocationObject $object
+//	from SUtil.joinArbitraryArrays(new Object[]
+//			{
+//				$beliefbase.getBeliefSet("wastes").getFacts(),
+//				$beliefbase.getBeliefSet("wastebins").getFacts(),
+//				$beliefbase.getBeliefSet("chargingstations").getFacts(),
+//				$beliefbase.getBeliefSet("cleaners").getFacts()
+//		})
+//	where $beliefbase.getBelief("my_location").getFact().isNear($object.getLocation(), $beliefbase.getBelief("my_vision").getFact())
+//</expression>
 }

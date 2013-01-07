@@ -4,11 +4,13 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.example.cleanerworld.CleanerBDI;
+import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchieveCleanup;
 import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchieveDropWaste;
 import jadex.bdiv3.example.cleanerworld.CleanerBDI.AchievePickupWaste;
 import jadex.bdiv3.example.cleanerworld.CleanerBDI.QueryWastebin;
 import jadex.bdiv3.example.cleanerworld.world.Waste;
 import jadex.bdiv3.example.cleanerworld.world.Wastebin;
+import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -52,8 +54,8 @@ public class CleanUpWastePlan
 		if(capa.getCarriedWaste()==null)
 		{
 //			Waste waste = (Waste)getParameter("waste").getValue();
-			Waste waste = null;//(()rplan.getReason()
-			
+			// todo: hack, depends on goal type
+			Waste waste = ((AchieveCleanup)((RGoal)rplan.getReason()).getPojoElement()).getWaste();
 			
 			rplan.dispatchSubgoal(capa.new AchievePickupWaste(waste)).addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchievePickupWaste, Void>(ret)
 			{

@@ -11,14 +11,8 @@ import java.lang.reflect.Method;
 /**
  * 
  */
-public class MethodPlanBody implements IPlanBody
+public class MethodPlanBody extends AbstractPlanBody
 {
-	/** The bdi interpreter. */
-	protected IInternalAccess ia;
-	
-	/** The rplan. */
-	protected RPlan rplan;
-	
 	/** The method. */
 	protected Method body;
 	
@@ -28,83 +22,84 @@ public class MethodPlanBody implements IPlanBody
 	 */
 	public MethodPlanBody(IInternalAccess ia, RPlan rplan, Method body)
 	{
-		this.ia = ia;
-		this.rplan = rplan;
+		super(ia, rplan);
 		this.body = body;
 	}
-
+	
 	/**
 	 * 
 	 */
-	public IFuture<Void> executePlanStep()
+	public Object executeBody(Object agent, Object[] params)
 	{
 		try
 		{
-//			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
-//				new Object[]{rplan.getReason().getPojoElement()});
-			
-			final Object reason = rplan.getReason();
-			Object pojope = null;
-			if(reason instanceof RProcessableElement)
-				pojope = ((RProcessableElement)reason).getPojoElement();
-			
-			// Guess parameters
-			Class<?>[] ptypes = body.getParameterTypes();
-			Object[] params = new Object[ptypes.length];
-			
-			for(int i=0; i<ptypes.length; i++)
-			{
-				if(reason!=null && SReflect.isSupertype(reason.getClass(), ptypes[i]))
-				{
-					params[i] = reason;
-				}
-				else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))
-				{
-					params[i] = pojope;
-				}
-				else if(SReflect.isSupertype(RPlan.class, ptypes[i]))
-				{
-					params[i] = rplan;
-				}
-			}
-			
-			body.setAccessible(true);
-			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, params);
-			if(res instanceof IFuture)
-			{
-				((IFuture)res).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
-						if(reason instanceof RProcessableElement)
-							((RProcessableElement)reason).planFinished(ia, rplan);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
-						rplan.setException(exception);
-						if(reason instanceof RProcessableElement)
-							((RProcessableElement)reason).planFinished(ia, rplan);
-					}
-				});
-			}
-			else
-			{
-				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
-				if(reason instanceof RProcessableElement)
-					((RProcessableElement)reason).planFinished(ia, rplan);
-			}
+			return body.invoke(agent, params);
 		}
 		catch(Exception e)
 		{
-			rplan.setException(e);
-			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
-			if(rplan.getReason() instanceof RProcessableElement)
-				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
+			throw new RuntimeException(e);
 		}
-		
-		return IFuture.DONE;
 	}
+	
+	/**
+	 * 
+	 */
+	public Class<?>[] getBodyParameterTypes()
+	{
+		return body.getParameterTypes();
+	}
+
+//	/**
+//	 * 
+//	 */
+//	public IFuture<Void> executePlanStep()
+//	{
+//		try
+//		{
+////			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
+////				new Object[]{rplan.getReason().getPojoElement()});
+//
+//			// Guess parameters
+//			Class<?>[] ptypes = body.getParameterTypes();
+//			Object[] params = guessParameters(ptypes);
+//			
+//			body.setAccessible(true);
+//			Object res = body.invoke(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, params);
+//			if(res instanceof IFuture)
+//			{
+//				((IFuture)res).addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
+//						if(reason instanceof RProcessableElement)
+//							((RProcessableElement)reason).planFinished(ia, rplan);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+//						rplan.setException(exception);
+//						if(reason instanceof RProcessableElement)
+//							((RProcessableElement)reason).planFinished(ia, rplan);
+//					}
+//				});
+//			}
+//			else
+//			{
+//				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
+//				if(reason instanceof RProcessableElement)
+//					((RProcessableElement)reason).planFinished(ia, rplan);
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//			rplan.setException(e);
+//			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+//			if(rplan.getReason() instanceof RProcessableElement)
+//				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
+//		}
+//		
+//		return IFuture.DONE;
+//	}
 }
