@@ -167,7 +167,6 @@ public class APL
 	
 	/**
 	 * 
-	 * @return
 	 */
 	public List<Object> selectCandidates()
 	{
