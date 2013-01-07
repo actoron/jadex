@@ -9,18 +9,20 @@ import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.AbstractViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.ArrowJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.BoxJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.CylinderJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.DomeJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Object3dJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.PointLightRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SoundJMonkeyPlayer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SphereJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Text3dJMonkeyRenderer;
-import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.TorusJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.ArrowJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.BoxJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.CylinderJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.DomeJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Object3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.SphereJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Text3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.TorusJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.PointLightRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SkyJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SoundJMonkeyPlayer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectSaver;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.TerrainJMonkeyRenderer;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
@@ -40,18 +42,23 @@ import java.util.concurrent.Callable;
 import com.jme3.animation.AnimChannel;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
-import com.jme3.audio.AudioNode;
-import com.jme3.input.InputManager;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.light.AmbientLight;
 import com.jme3.light.Light;
-import com.jme3.light.PointLight;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Caps;
+import com.jme3.scene.BatchNode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
+import com.jme3.water.SimpleWaterProcessor;
+
+import de.lessvoid.nifty.effects.Effect;
 
 
 /**
@@ -94,6 +101,12 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 	private Node							_geometryNode	= new Node("Geometry");
 
+	private BatchNode						tmpVisualsBatch	= new BatchNode("StaticVisuals");
+	
+	private Node							dVisuals	= new Node("DynamicVisuals");
+	
+//	private BatchNode						sVisualsBatch	= new BatchNode("StaticVisuals");
+
 	private Node							_staticNode		= new Node("Static Geometry");
 
 	private boolean							_firstrun		= true;
@@ -105,9 +118,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 	private int								_lastselect		= -1;
 
-	/** Action that renders the frame. */
-	private Runnable						renderFrame;
-
 //	private Callable<Object>				renderFrameAction_;
 
 	private float							_scale			= 1;
@@ -118,20 +128,42 @@ public class ViewportJMonkey extends AbstractViewport3d
 	
 	private Dimension canvasSize;
 
+	private boolean batchchanges = false;
+	private boolean deletechanges = false;
+	
+	/**
+	 * BatchLists
+	 */
+	ArrayList<String> toRemoveList = new ArrayList<String>();
+	ArrayList<Spatial> toAddList = new ArrayList<Spatial>();
 
 	/**
 	 * Animation Stuff
 	 */
 	private HashMap<String, AnimChannel>	_animChannels;
 	
+	/**
+	 * Effect Stuff
+	 */
+	private HashMap<String, ParticleEmitter> _particleEmiters;
+	
 	private ArrayList<Light> lights = new ArrayList<Light>();
 	
 	private boolean shader;
 	
 	private String camera;
+	
+	private SimpleWaterProcessor waterProcessor;
+	
+	private AmbientLight lightmarker = new AmbientLight();
+	
+	public HashMap<String, Material> materials = new HashMap<String, Material>();
+	public HashMap<String, Spatial> complexobjects = new HashMap<String, Spatial>();
+
+
 
 	/** The 3d renderers. */
-	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[12];
+	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[14];
 	static
 	{
 		RENDERERS[0] = new SphereJMonkeyRenderer();
@@ -146,6 +178,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 		RENDERERS[9] = new TerrainJMonkeyRenderer();
 		RENDERERS[10] = new SoundJMonkeyPlayer();
 		RENDERERS[11] = new PointLightRenderer();
+		RENDERERS[12] = new PointLightRenderer();
+		RENDERERS[13] = new EffectRenderer();
 	}
 
 	/**
@@ -158,66 +192,45 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 		super(perspective, spacesize, isGrid, shader, camera);
 
+		
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
 		_classloader = classloader;
 
 		// Animation Channels
 		_animChannels = new HashMap<String, AnimChannel>();
-		
-		
-		
 		this.shader = shader;
 		this.camera = camera;
 
 		// TODO: scaling komplett
 		_scale = _scaleApp / areaSize_.getXAsFloat();
-
-		_app = new MonkeyApp(_scaleApp, areaSize_.getXAsFloat(), isGrid, shader, camera);
+		
+		_geometryNode.attachChild(dVisuals);
+//		_geometryNode.attachChild(sVisualsBatch);
+		_staticNode.setLocalScale(_scale);
+		_geometryNode.setLocalScale(_scale);
+		
+		_app = new MonkeyApp(_scaleApp, _scale, areaSize_.getXAsFloat(), isGrid, this.shader, this.camera);
 		AppSettings settings = new AppSettings(true);
 		_app.setPauseOnLostFocus(false);
 		_app.setSettings(settings);
 		_app.createCanvas();
 		_app.startCanvas();
+		
+		_app.getRootNode().attachChild(_geometryNode);
 
 		_context = (JmeCanvasContext)_app.getContext();
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
 		canvasSize = canvas_.getSize();
-		
-		
-//		canvas_.setSize(1024, 768);
 
 		// Drawstuff
 		_drawObjects = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsRefresh = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsLast = Collections.synchronizedSet(new HashSet<Object>());
-
-
-	}
-
-	/**
-	 * set the Selected Visual by intId
-	 */
-	public void setSelected(int selected, DrawableCombiner3d marker)
-	{
-		_selectedId = selected;
-		_marker = marker;
-	}
-
-	/**
-	 * get the Selected Visual
-	 */
-	public int getSelected()
-	{
-		_selectedId = _app.getSelectedTarget();
-		return _selectedId;
-	}
-
-
-	public DrawableCombiner3d getMarker()
-	{
-		return _marker;
+		
+//		lightmarker.setPosition(new Vector3f(0,_scaleApp,0));
+		lightmarker.setColor(ColorRGBA.Red.mult(2f));
 	}
 
 	public void refresh(List<Object[]>  objectList, Collection<DrawableCombiner3d> staticvisuals)
@@ -230,36 +243,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 		}
 	}
 
-	public AssetManager getAssetManager()
-	{
-		return _app.getAssetManager();
-	}
-
-	/**
-	 * Create a 3d Object
-	 * 
-	 * @param drawableCombiner3d The 3d combiner.
-	 * @param p The primitive3d.
-	 * @param obj The object being drawn.
-	 */
-	public Spatial createPrimitive3d(DrawableCombiner3d drawableCombiner3d, Primitive3d p, Object obj)
-	{
-		return RENDERERS[p.getType()].prepareAndExecuteDraw(drawableCombiner3d, p, obj, this);
-	}
-
-	/**
-	 * Update a 3d Object
-	 * 
-	 * @param drawableCombiner3d The 3d combiner.
-	 * @param p The primitive3d.
-	 * @param obj The object being drawn.
-	 * @param sp The spatial where the object is saved.
-	 */
-	public void updatePrimitive3d(DrawableCombiner3d drawableCombiner3d, Primitive3d p, Object obj, Spatial sp)
-	{
-		RENDERERS[p.getType()].prepareAndExecuteUpdate(drawableCombiner3d, p, obj, this, sp);
-
-	}
 
 	/**
 	 * This starts the jMonkey Application
@@ -307,8 +290,13 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * the Dynamic Visuals are created and updated here
 	 */
-	private Node updateMonkey(List<Object[]> objectList)
+	private void updateMonkey(List<Object[]> objectList)
 	{
+		toRemoveList.clear();
+		toAddList.clear();
+		this.batchchanges = false;
+		this.deletechanges = false;
+		
 		// Clear the Refresh "listener"
 		// This list holds every object that has been drawn in the last
 		// Draw-"round". The list is necessary to make it possible to check
@@ -317,10 +305,13 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 		// Step 2 : Create and/or update all visible Visuals
 		createAndUpdateVisuals(objectList);
+		
+		
 
 		// Step 3 : Set and Create the Visualiszation of the Selected Object
 		int selected = getSelected();
 		createAndUpdateVisualSelection(selected);
+
 
 		// Step 4 : Update deleted Objects (Remove them from gemetryNode)
 		for(Iterator<Object> itr = _drawObjectsLast.iterator(); itr.hasNext();)
@@ -328,14 +319,30 @@ public class ViewportJMonkey extends AbstractViewport3d
 			Object id = itr.next();
 			if(!_drawObjectsRefresh.contains(id))
 			{
-				_geometryNode.getChild(id.toString()).removeFromParent();
+				Spatial delspatial = dVisuals.getChild(id.toString());
+				if(delspatial !=null)
+				{
+					delspatial.removeFromParent();
+				}
+				else
+				{
+					toRemoveList.add(id.toString());
+				}
+				
 			}
 
 		}
+
+
 		_drawObjectsLast = new HashSet<Object>(_drawObjectsRefresh);
-		
+
 		// Step 5 Return the freshest Version of the geometryNode
-		return _geometryNode;
+		if(batchchanges)
+		{
+
+			_app.setToDelete(toRemoveList);
+			_app.setToAdd(toAddList);
+		}
 
 	}
 
@@ -347,6 +354,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 		for(Iterator<Object[]> it = objectList.iterator(); it.hasNext();)
 		{
+			
 			Object[] o = it.next();
 			DrawableCombiner3d combiner3d = (DrawableCombiner3d)o[1];
 			SpaceObject sobj = (SpaceObject)o[0];
@@ -375,35 +383,44 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 			if(!_drawObjects.contains(identifier))
 			{
+
+				
 				_drawObjects.add(identifier);
 				Node objectNode = new Node(identifier.toString());
 
-				// Use this distance Vector to calculate the Rotation of the
-				// Object
-				// Quaternion quat = calculateRotation(position,
-				// objectNode.getLocalTranslation(), rotation3d);
-				//
-				// if(quat != null)
-				// objectNode.setLocalRotation(quat);
 				objectNode.setLocalScale(sizeDrawable);
 				objectNode.setLocalTranslation(position);
-
-				// The visuals for each DrawableCombiner3d (stored in a the
-				// objectNode, influenced by its holder the SpaceObject
-				// (sobj)...
+				
+				
+				
 				createObjects(objectNode, combiner3d, sobj);
+				if(combiner3d.isDynamic())
+				{
+					dVisuals.attachChild(objectNode);
+				}
+				else
+				{
+					
+//					sVisualsBatch.attachChild(objectNode);
+					toAddList.add(objectNode);
+//					sVisualsBatch.batch();
+					batchchanges = true;
+				}
+				
+				
+				
 
-				// ...and attached to the gemetryNode, holder of all dyn.
-				// visuals in the Scene
-				_geometryNode.attachChild(objectNode);
-
+				
 			}
+			
+
 			/** Only make updates if the Drawable3d is dynamic */
 			else if(combiner3d.isDynamic())
 			{
-				Spatial node = _geometryNode.getChild(identifier.toString());
-				_tmpNode = (Node)node;
 
+				Node dynamicnode = (Node)_geometryNode.getChild("DynamicVisuals");
+				Spatial node = dynamicnode.getChild(identifier.toString());
+				_tmpNode = (Node)node;
 
 				// Calculate the Direction
 				Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d, sobj, combiner3d.isAutoRotation());
@@ -425,25 +442,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 					{
 						Primitive3d p = (Primitive3d)itx.next();
 
-						identifier = "Type: " + p.getType() + " HCode " + p.hashCode();
+						//TODO: waaaaaaaa? identifier
+						identifier = "Type: "+ p.getType()+ " HCode " +p.hashCode() + " sobjid " + sobj.hashCode();
 
 						Spatial sp = _tmpNode.getChild((String)identifier);
-
-
-						// TODO HACK for Soundfile
-						if(p.getType() == 10)
-						{
-							if(sp instanceof Node)
-							{
-								Node n = (Node)sp;
-								Spatial x = n.getChild(0);
-								if(x instanceof AudioNode)
-								{
-									sp = x;
-								}
-							}
-						}
-
 
 						if(!(sp == null))
 						{
@@ -462,7 +464,11 @@ public class ViewportJMonkey extends AbstractViewport3d
 				}
 			}
 		}
+
+
 	}
+	
+
 
 	/**
 	 * the Dynamic Visuals for the Visualization of the Selection are created
@@ -477,11 +483,26 @@ public class ViewportJMonkey extends AbstractViewport3d
 			if(_lastselect != -1 && _lastselect != selected)
 			{
 				perp.leftClicked("" + selected);
-				Node node = (Node)_geometryNode.getChild("" + _lastselect);
-				if(node != null && node.getChild("Marker") != null)
-				{
-					node.getChild("Marker").removeFromParent();
-				}
+				
+				
+				
+				_geometryNode.getChild("Marker").removeFromParent();
+				
+				
+//				Node node = (Node)_geometryNode.getChild("" + _lastselect);
+//				if(node != null && node.getChild("Marker") != null)
+//				{
+//					_geometryNode.getChild("Marker").removeFromParent();
+////					if(node.getParent() instanceof BatchNode)
+////					{
+////					}
+////					else
+////					{
+////						node.getChild("Marker").removeFromParent();
+////						node.removeLight(lightmarker);
+////					}
+//					
+//				}
 			}
 
 			if(_lastselect != selected)
@@ -491,9 +512,22 @@ public class ViewportJMonkey extends AbstractViewport3d
 				marker = new Node("Marker");
 				createObjects(marker, getMarker(), _selectedObj);
 
-				if(node.getChild("Marker") == null)
+				if(_geometryNode.getChild("Marker") == null)
 				{
-					node.attachChild(marker);
+					
+					_geometryNode.attachChild(marker);		
+					marker.setLocalTranslation(node.getLocalTranslation());
+					
+					
+//					if(node.getParent() instanceof BatchNode)
+//					{
+////						BatchNode staticnode = (BatchNode)node.getParent();
+////						staticnode.batch();
+//					}
+//					else
+//					{
+//		
+//					}
 				}
 			}
 		}
@@ -501,9 +535,17 @@ public class ViewportJMonkey extends AbstractViewport3d
 		{
 			perp.leftClicked("" + selected);
 			Node node = (Node)_geometryNode.getChild("" + _lastselect);
-			if(node.getChild("Marker") != null)
+			if(_geometryNode.getChild("Marker") != null)
 			{
-				node.getChild("Marker").removeFromParent();
+				_geometryNode.getChild("Marker").removeFromParent();
+//				if(node.getParent() instanceof BatchNode)
+//				{
+//				}
+//				else
+//				{
+//					node.getChild("Marker").removeFromParent();
+//					node.removeLight(lightmarker);
+//				}
 			}
 		}
 
@@ -514,7 +556,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/**
 	 * Handle the Height Value. Check if its set or not
 	 */
-	private Vector3f handleHeightValue(Object posObj)
+	public Vector3f handleHeightValue(Object posObj)
 	{
 		Vector3f position = Vector3f.ZERO;
 		if(posObj instanceof Vector2Double)
@@ -609,13 +651,56 @@ public class ViewportJMonkey extends AbstractViewport3d
 		if(drawList == null)
 			return;
 
+		objectNode.setUserData("hasEffect", false);
+		
 		for(Iterator<Primitive3d> itp = drawList.iterator(); itp.hasNext();)
 		{
+			List <Spatial> spatials =null;
+			
 			Primitive3d p = (Primitive3d)itp.next();
 			Spatial spatial = createPrimitive3d(combiner3d, p, sobj);
 			if(spatial != null)
 			{
+				
+				
+				
+				if((p.getType()==Primitive3d.PRIMITIVE_TYPE_EFFECT))
+				{
+					objectNode.setUserData("hasEffect", true);
+					//now the Effects are in the correct Size, we emit the Particles if there is an effect
+					if(spatial instanceof Node)
+					{
+						Node effectNode = ((Node) spatial);
+						
+						if(effectNode!=null && effectNode.getName().equals("effectNode for : "+"Type: "+ p.getType()+ " HCode " +p.hashCode() + " sobjid " + sobj.hashCode()))
+						{
+							spatials = effectNode.getChildren();
+							
+							if(!spatials.isEmpty())
+							{
+								
+								for(Spatial effect : spatials)
+								{
+									
+									if(effect != null && effect instanceof ParticleEmitter)
+									{
+										
+//										ParticleEmitter tmpeffect = ((ParticleEmitter)effect);
+//										tmpeffect.emitAllParticles();
+									}
+								}
+								
+
+							}
+						}
+					}
+
+				}
+				
+				
 				objectNode.attachChild(spatial);
+
+
 			}
 		}
 	}
@@ -638,7 +723,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 			public Void call() throws Exception
 			{	
 				_app.stop(false);
-//				System.out.println("ViewportJmonkey: STOP!");
 				return null;
 			}
 		});
@@ -686,8 +770,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 	{
 		this._animChannels = _animChannels;
 	}
-	private int i = 0;
-	private boolean light = false;
 
 	public class MyCallAction implements Callable<Void>
 	{
@@ -704,48 +786,32 @@ public class ViewportJMonkey extends AbstractViewport3d
 		
 		public Void call()
 		{
-
-			
-			_geometryNode = updateMonkey(objectList);
-
 			if(_firstrun)
 			{
-//				_capabilities = _app.getCaps();
-//				System.out.println("capabilities: \n" + _capabilities);
 				_staticNode = createStatics(staticvisuals);
 				_app.setStaticGeometry(_staticNode);
 				_app.setChannels(_animChannels);
-
-				_staticNode.setLocalScale(_scale);
-				_geometryNode.setLocalScale(_scale);
+				_app.setParticleEmiters(_particleEmiters);
 				_firstrun = false;
-				
-//				for(Light l : getLights())
-//				{
-////					remveLight(l);
-////					rootNode.removeLight(light)
-//					System.out.println("add light! \n");
-//					System.out.println("light: " + l.getColor() + l.getType() + " pos: " + ((PointLight)l).getPosition() + "radius " + ((PointLight)l).getRadius());
-//					_geometryNode.addLight(l);
-//				}
 			}
+			else
+			{
+				updateMonkey(objectList);
+			}
+
 				
 			if(!canvas_.getSize().equals(canvasSize))
 			{
-//				System.out.println("old dim " + canvasSize + " canvas dim: " + canvas_.getSize());
 				_app.setCleanupPostFilter(true);
 				canvasSize = canvas_.getSize();
 			}
+
 			
-//			asd
-//			_app.setLights(lights);
-			_app.setGeometry(_geometryNode);
 
 			rendering = false;
+
 			
-			InputManager test = _app.getInputManager();
-			test.toString();
-			
+
 			return null;
 		}
 	}
@@ -772,6 +838,74 @@ public class ViewportJMonkey extends AbstractViewport3d
 	public void remveLight(Light light)
 	{
 		lights.remove(light);
+	}
+
+	/**
+	 * @return the waterProcessor
+	 */
+	public SimpleWaterProcessor getWaterProcessor() {
+		return waterProcessor;
+	}
+
+	/**
+	 * @param waterProcessor the waterProcessor to set
+	 */
+	public void setWaterProcessor(SimpleWaterProcessor waterProcessor) {
+		this.waterProcessor = waterProcessor;
+	}
+	
+	/**
+	 * set the Selected Visual by intId
+	 */
+	public void setSelected(int selected, DrawableCombiner3d marker)
+	{
+		_selectedId = selected;
+		_marker = marker;
+	}
+
+	/**
+	 * get the Selected Visual
+	 */
+	public int getSelected()
+	{
+		_selectedId = _app.getSelectedTarget();
+		return _selectedId;
+	}
+
+
+	public DrawableCombiner3d getMarker()
+	{
+		return _marker;
+	}
+	
+	public AssetManager getAssetManager()
+	{
+		return _app.getAssetManager();
+	}
+
+	/**
+	 * Create a 3d Object
+	 * 
+	 * @param drawableCombiner3d The 3d combiner.
+	 * @param p The primitive3d.
+	 * @param obj The object being drawn.
+	 */
+	public Spatial createPrimitive3d(DrawableCombiner3d drawableCombiner3d, Primitive3d p, SpaceObject sobj)
+	{
+		return RENDERERS[p.getType()].prepareAndExecuteDraw(drawableCombiner3d, p, sobj, this);
+	}
+
+	/**
+	 * Update a 3d Object
+	 * 
+	 * @param drawableCombiner3d The 3d combiner.
+	 * @param p The primitive3d.
+	 * @param obj The object being drawn.
+	 * @param sp The spatial where the object is saved.
+	 */
+	public void updatePrimitive3d(DrawableCombiner3d drawableCombiner3d, Primitive3d p, SpaceObject sobj, Spatial sp)
+	{
+		RENDERERS[p.getType()].prepareAndExecuteUpdate(drawableCombiner3d, p, sobj, this, sp);
 	}
 	
 

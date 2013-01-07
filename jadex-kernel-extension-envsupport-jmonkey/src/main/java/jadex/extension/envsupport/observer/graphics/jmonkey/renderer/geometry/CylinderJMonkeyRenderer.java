@@ -1,9 +1,11 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
+package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Cylinder3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 import com.jme3.bounding.BoundingBox;
 import com.jme3.scene.Geometry;
@@ -17,7 +19,7 @@ public class CylinderJMonkeyRenderer extends AbstractJMonkeyRenderer
 	private Cylinder	cylinder;
 
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
-			Object obj, ViewportJMonkey vp)
+			SpaceObject sobj, ViewportJMonkey vp)
 	{
 
 		float radius = (float)((Cylinder3d)primitive).getRadius();

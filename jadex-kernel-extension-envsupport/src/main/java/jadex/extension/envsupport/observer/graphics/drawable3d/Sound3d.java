@@ -14,10 +14,12 @@ public class Sound3d extends Primitive3d
 	protected boolean continuosly;
 	
 	protected boolean positional;
+	
+	protected int numRndFiles;
 
 	protected IParsedExpression cond;
 
-	public Sound3d(String soundfile, boolean loop, double volume, boolean continuosly, boolean positional, IParsedExpression cond)
+	public Sound3d(String soundfile, boolean loop, double volume, boolean continuosly, boolean positional, int numRndFiles, IParsedExpression cond)
 	{
 		super();
 		type = Primitive3d.PRIMITIVE_TYPE_SOUND;
@@ -26,6 +28,7 @@ public class Sound3d extends Primitive3d
 		this.volume = volume;
 		this.continuosly = continuosly;
 		this.positional = positional;
+		this.numRndFiles = numRndFiles;
 		this.cond = cond;
 	}
 
@@ -123,6 +126,20 @@ public class Sound3d extends Primitive3d
 	public void setCond(IParsedExpression cond)
 	{
 		this.cond = cond;
+	}
+
+	/**
+	 * @return the numRndFiles
+	 */
+	public int getNumRndFiles() {
+		return numRndFiles;
+	}
+
+	/**
+	 * @param numRndFiles the numRndFiles to set
+	 */
+	public void setNumRndFiles(int numRndFiles) {
+		this.numRndFiles = numRndFiles;
 	}
 	
 	

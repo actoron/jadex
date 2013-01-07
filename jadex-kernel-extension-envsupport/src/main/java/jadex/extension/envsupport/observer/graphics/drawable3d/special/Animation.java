@@ -13,14 +13,18 @@ public class Animation
 	
 	protected boolean loop;
 
+	protected float speed;
+	
 	protected IParsedExpression cond;
 	
-	public Animation(String name, String channel, boolean loop, IParsedExpression cond)
+	
+	public Animation(String name, String channel, boolean loop, double speed, IParsedExpression cond)
 	{
 		this.name = name;
 		this.channel = channel;
 		this.loop = loop;
 		this.cond = cond;
+		this.speed = (float) speed;
 	}
 
 	/**
@@ -85,6 +89,20 @@ public class Animation
 	public void setAnimationCondition(IParsedExpression animationCondition)
 	{
 		this.cond = animationCondition;
+	}
+
+	/**
+	 * @return the speed
+	 */
+	public float getSpeed() {
+		return speed;
+	}
+
+	/**
+	 * @param speed the speed to set
+	 */
+	public void setSpeed(float speed) {
+		this.speed = speed;
 	}
 
 }

@@ -24,8 +24,9 @@ public class Primitive3d extends AbstractVisual3d
 	public static final int PRIMITIVE_TYPE_SKY	 			= 8;
 	public static final int PRIMITIVE_TYPE_TERRAIN	 		= 9;
 	public static final int PRIMITIVE_TYPE_SOUND	 		= 10;
-	public static final int PRIMITIVE_TYPE_POINTLIGHT	 		= 11;
-	public static final int PRIMITIVE_TYPE_DIRECTIONALLIGHT	 		= 12;
+	public static final int PRIMITIVE_TYPE_POINTLIGHT	 	= 11;
+	public static final int PRIMITIVE_TYPE_DIRECTIONALLIGHT	= 12;
+	public static final int PRIMITIVE_TYPE_EFFECT 	= 13;
 	
 	public static final String SHADOW_OFF = "Off";
 	public static final String SHADOW_CAST = "Cast";
@@ -87,6 +88,19 @@ public class Primitive3d extends AbstractVisual3d
 		materialPath_ ="";
 	}
 	
+	public Primitive3d(int type, Object position, IParsedExpression drawcondition)
+	{
+		super(position, null, null);
+		this.type = type;
+		shadowtype = "Off";
+		enableDCPos = false;
+		enableDCSize = false;
+		enableDCRot = false;
+		texturePath_ = "";
+		materialPath_ ="";
+		this.drawcondition = drawcondition;
+	}
+	
 	public Primitive3d(int type, Object position, Object c, IParsedExpression drawcondition)
 	{
 		super(position, null, null);
@@ -98,6 +112,27 @@ public class Primitive3d extends AbstractVisual3d
 		setColor(c);
 		texturePath_ = "";
 		materialPath_ ="";
+		this.drawcondition = drawcondition;
+	}
+	
+	/**
+	 * Initializes the drawable.
+	 * 
+	 * @param position position or position-binding
+	 * @param xrotation xrotation or rotation-binding
+	 * @param yrotation yrotation or rotation-binding
+	 * @param zrotation zrotation or rotation-binding
+	 * @param size size or size-binding
+	 * @param c the drawable's color or color binding
+	 */
+	public Primitive3d(int type, Object position, Object rotation, Object size, IParsedExpression drawcondition)
+	{
+		super(position, rotation, size);
+		this.type = type;
+		
+
+		setTexturePath("");
+		setShadowtype(SHADOW_OFF);
 		this.drawcondition = drawcondition;
 	}
 	

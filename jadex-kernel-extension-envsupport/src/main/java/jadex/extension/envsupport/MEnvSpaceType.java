@@ -34,6 +34,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
@@ -504,7 +505,7 @@ public class MEnvSpaceType
 				new MappingInfo(ti_po, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),		
 				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
-				new AttributeInfo(new AccessInfo("shader", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("ambientOcclusion", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("camera", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 				{
@@ -513,10 +514,10 @@ public class MEnvSpaceType
 						IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
 						args = (Map)args.get("object");
 						
-						Boolean shader = (Boolean) getProperty(args, "shader");
-						if(shader==null)
+						Boolean ambientOcclusion = (Boolean) getProperty(args, "ambientOcclusion");
+						if(ambientOcclusion==null)
 						{
-							shader = true;
+							ambientOcclusion = false;
 						}
 						
 						String camera = (String) getProperty(args, "camera");
@@ -525,7 +526,7 @@ public class MEnvSpaceType
 							camera = "Default";
 						}
 //						IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
-						Perspective3D ret = new Perspective3D(shader, camera);
+						Perspective3D ret = new Perspective3D(ambientOcclusion, camera);
 
 											
 						if(ret instanceof Perspective3D)
@@ -654,6 +655,7 @@ public class MEnvSpaceType
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "sphere"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "box"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "effect"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "cylinder"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "dome"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "torus"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
@@ -735,6 +737,75 @@ public class MEnvSpaceType
 						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
 						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "effect")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				
+				new AttributeInfo(new AccessInfo("numParticles", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("particlesPerSec", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				
+				new AttributeInfo(new AccessInfo("startsize", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("endsize", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				
+				new AttributeInfo(new AccessInfo("mintime", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("maxtime", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("startcolor", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("endcolor", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				
+				new AttributeInfo(new AccessInfo("initialVelocity", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("velocityVariation", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("facingVelocity", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("facingUp", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				
+				new AttributeInfo(new AccessInfo("rotateSpeed", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("isRandomAngleRotation", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("gravityVector", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("sphereEmitterRadius", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("predefinedid", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				
+
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}		
+						
+						IParsedExpression exp;
+						
+						
+						String predefinedId = (String)getProperty(args, "predefinedid");
+						if(predefinedId!=null)
+						{
+
+						}
+						else
+						{
+//							return null;
+						}
+						
+						exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Effect(position, predefinedId, (Double)getProperty(args, "startsize"), (Double)getProperty(args, "endsize"), exp);
+						
+				
+						
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1263,6 +1334,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("channel", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("loop", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("speed", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1273,10 +1345,15 @@ public class MEnvSpaceType
 						if(channel==null)
 						{
 							channel = "default";
-						}				
+						}
+						Double speed = (Double)getProperty(args, "speed");
+						if(speed==null)
+						{
+							speed = 1.0;
+						}
 
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "animationcondition");
-						return new Animation(name, channel, loop, exp);
+						return new Animation(name, channel, loop, speed, exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				}, 
@@ -1292,6 +1369,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("continuosly", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("positional", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("volume", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("numRndFiles", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1321,9 +1399,14 @@ public class MEnvSpaceType
 						{
 							volume = 1.0;
 						}	
+						Integer numRndFiles = (Integer)getProperty(args, "numRndFiles");
+						if(numRndFiles==null)
+						{
+							numRndFiles = 1;
+						}
 
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "soundcondition");
-						return new Sound3d(soundfile, loop, volume, continuosly, positional, exp);
+						return new Sound3d(soundfile, loop, volume, continuosly, positional, numRndFiles,  exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
@@ -1336,6 +1419,7 @@ public class MEnvSpaceType
 				new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("part", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("path", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("useAlpha", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1345,10 +1429,15 @@ public class MEnvSpaceType
 						if(part==null)
 						{
 							part = "defaultpart";
-						}				
+						}
+						Boolean useAlpha = (Boolean)getProperty(args, "useAlpha");
+						if(useAlpha==null)
+						{
+							useAlpha = false;
+						}
 
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "materialcondition");
-						return new Materialfile(part, path, exp);
+						return new Materialfile(part, path, useAlpha, exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				}, 

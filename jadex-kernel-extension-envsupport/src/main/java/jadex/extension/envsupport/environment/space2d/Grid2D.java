@@ -286,6 +286,7 @@ public class Grid2D extends Space2D
 				for(int j = miny; j <= maxy; j++)
 				{
 					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
+
 						Collection tmp = objectsygridpos.getCollection(testpos);
 						if(tmp != null)
 						{
@@ -306,7 +307,8 @@ public class Grid2D extends Space2D
 
 								}
 							}
-						}
+						
+					}
 					
 				}
 			}

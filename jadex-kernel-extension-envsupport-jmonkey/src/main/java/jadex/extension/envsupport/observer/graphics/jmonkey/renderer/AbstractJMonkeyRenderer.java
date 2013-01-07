@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
@@ -22,6 +23,8 @@ import com.jme3.animation.AnimChannel;
 import com.jme3.animation.LoopMode;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
+import com.jme3.audio.AudioNode.Status;
+import com.jme3.effect.ParticleEmitter;
 import com.jme3.font.BitmapText;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
@@ -36,6 +39,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.LightControl;
+import com.jme3.scene.control.LodControl;
 import com.jme3.texture.Texture;
 
 
@@ -49,12 +53,13 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 	
 	protected AssetManager assetManager;
 	protected Geometry geo;
-	protected String identifier;
+	public String identifier;
 	protected Vector3f rotation;
 	protected Quaternion quatation;
 	protected Vector3f positionlocal;
 	protected Vector3f sizelocal;
 	protected SimpleValueFetcher _fetcher;
+
 	
 	/**
 	 *  Create a new AbstractJMonkeyRenderer.
@@ -67,46 +72,68 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 	/**
 	 * Returns null if Drawcondition == null
 	 */
-	public Spatial prepareAndExecuteDraw(DrawableCombiner3d dc, Primitive3d primitive, Object obj, ViewportJMonkey vp)
+	public Spatial prepareAndExecuteDraw(DrawableCombiner3d dc, Primitive3d primitive, SpaceObject sobj, ViewportJMonkey vp)
 	{
 		if(_fetcher==null)
 		{
 			_fetcher = new SimpleValueFetcher(vp.getPerspective().getObserverCenter().getSpace().getFetcher());		
 		}
 		Spatial spatial = null;
-		identifier = "Type: "+ primitive.getType()+ " HCode " +primitive.hashCode();
+		
+		if(sobj!=null)
+		{
+			identifier = "Type: "+ primitive.getType()+ " HCode " +primitive.hashCode() + " sobjid " + sobj.hashCode();
+		}
+		else
+		{
+			identifier = "Type: "+ primitive.getType() + " HCode " +primitive.hashCode() + " sobjid " + "null hashcode";
+		}
+
 		assetManager = vp.getAssetManager();
 		IParsedExpression drawcondition = primitive.getDrawCondition();
 		boolean draw = drawcondition==null;
 		if(!draw)
 		{
-			_fetcher.setValue("$object", obj);
+			_fetcher.setValue("$object", sobj);
 			_fetcher.setValue("$perspective", vp.getPerspective());
 			draw = ((Boolean)drawcondition.getValue(_fetcher)).booleanValue();
 		}
-		
 
-		
 		if(draw)
 		{	
-
-				spatial = draw(dc, primitive, obj, vp);
-
-				Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj,
+				Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(sobj,
 						primitive.getRotation(), vp));
 				rotation = new Vector3f(rotationD.getXAsFloat(),
 						rotationD.getYAsFloat(), rotationD.getZAsFloat());
 
-				Vector3Double sizelocalD = ((Vector3Double)dc.getBoundValue(obj,
+				Vector3Double sizelocalD = ((Vector3Double)dc.getBoundValue(sobj,
 						primitive.getSize(), vp));
 				sizelocal = new Vector3f(sizelocalD.getXAsFloat(),
 						sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());
 
 				Vector3Double positionlocalD = ((Vector3Double)dc.getBoundValue(
-						obj, primitive.getPosition(), vp));
+						sobj, primitive.getPosition(), vp));
 				positionlocal = new Vector3f(positionlocalD.getXAsFloat(),
 						positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());
+				
+				
+				/*
+				 * Here we create the CONCRETE Spatial
+				 */
+				spatial = draw(dc, primitive, sobj, vp);
 
+				float[] angles = {rotation.x, rotation.y, rotation.z};
+				quatation = spatial.getLocalRotation().fromAngles(angles);
+
+				// Set the local size
+				spatial.setLocalScale(sizelocal);
+
+				// Set the local Translation
+				spatial.setLocalTranslation(positionlocal);
+
+				// Set the local Rotation
+				spatial.setLocalRotation(quatation);
+				
 				// Shadow, by default off
 				spatial.setShadowMode(ShadowMode.Off);
 
@@ -122,33 +149,17 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				}
 
 
-				float[] angles = {rotation.x, rotation.y, rotation.z};
-				quatation = spatial.getLocalRotation().fromAngles(angles);
-
-				// Set the local size
-				spatial.setLocalScale(sizelocal);
-
-				// Set the local Translation
-				spatial.setLocalTranslation(positionlocal);
-
-				// Set the local Rotation
-				spatial.setLocalRotation(quatation);
-
-
 				// Set the Material
 				if((spatial instanceof Geometry) && primitive.getType() != 6
-						&& primitive.getType() != 8 && primitive.getType() != 9) // And
-																					// not
-																					// a
-																					// Node
-																					// ->
-																					// Object3D
+						&& primitive.getType() != 8 && primitive.getType() != 9 && primitive.getType() != Primitive3d.PRIMITIVE_TYPE_EFFECT) 
+					
+					
 				{
 
 					Material mat_tt = new Material(assetManager,
 							"Common/MatDefs/Light/Lighting.j3md");
 					Color c = (Color)dc
-							.getBoundValue(obj, primitive.getColor(), vp);
+							.getBoundValue(sobj, primitive.getColor(), vp);
 					float alpha = ((float)c.getAlpha()) / 255;
 					ColorRGBA color = new ColorRGBA(((float)c.getRed()) / 255,
 							((float)c.getGreen()) / 255,
@@ -179,20 +190,23 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						mat_tt.setColor("Diffuse", color);
 						mat_tt.setColor("Ambient", color);
 						mat_tt.setBoolean("UseMaterialColors", true);
+						
+						
 					}
-
+//					Material mat2 = mat_tt.clone();
 					spatial.setMaterial(mat_tt);
 				}
+				
+				
 				
 				if(primitive.getType()== Primitive3d.PRIMITIVE_TYPE_POINTLIGHT)
 				{
 					
-					System.out.println("create PointLight AbstractJMonkeyRenderer");
 					PointLight  light;
 					Color color; 
 						float radius = (float)((PointLight3d) primitive).getRadius();
 						
-						color = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
+						color = (Color)dc.getBoundValue(sobj, primitive.getColor(), vp);
 						
 						light = new PointLight();
 						ColorRGBA rgbacolor = new ColorRGBA(((float)color.getRed()) / 255,
@@ -218,6 +232,35 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						vp.addLight(light);
 						
 				}
+				
+//				 Special Case 03: Sound
+				else if(primitive.getType() == Primitive3d.PRIMITIVE_TYPE_SOUND)
+				{
+					if(spatial instanceof AudioNode)
+					{
+						AudioNode audionode = (AudioNode)spatial;
+
+						Sound3d sound = (Sound3d)primitive;
+						
+						IParsedExpression soundcondition = sound.getCond();
+						boolean soundActive = soundcondition==null;
+						if(!soundActive)
+						{
+							_fetcher.setValue("$object", sobj);
+							_fetcher.setValue("$perspective", vp.getPerspective());
+							soundActive = ((Boolean)soundcondition.getValue(_fetcher)).booleanValue();
+						}
+						
+						if(soundActive)
+						{
+								audionode.play();
+
+						}
+						
+						
+
+					}
+				}
 			
 				
 			}
@@ -225,26 +268,26 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 		return spatial;
 	}
 
-	public Spatial prepareAndExecuteUpdate(DrawableCombiner3d dc, Primitive3d primitive, Object obj, ViewportJMonkey vp, Spatial sp)
+	public Spatial prepareAndExecuteUpdate(DrawableCombiner3d dc, Primitive3d primitive, SpaceObject sobj, ViewportJMonkey vp, Spatial sp)
 	{	
 		IParsedExpression drawcondition = primitive.getDrawCondition();
 		boolean draw = drawcondition==null;
 		if(!draw)
 		{
-			_fetcher.setValue("$object", obj);
+			_fetcher.setValue("$object", sobj);
 			_fetcher.setValue("$perspective", vp.getPerspective());
 			draw = ((Boolean)drawcondition.getValue(_fetcher)).booleanValue();
 		}
 		
 		if(draw)
 		{
-			Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(obj, primitive.getRotation(), vp));
+			Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getRotation(), vp));
 			rotation = new Vector3f(rotationD.getXAsFloat(), rotationD.getYAsFloat(), rotationD.getZAsFloat());	
 			
-			Vector3Double  sizelocalD = ((Vector3Double)dc.getBoundValue(obj, primitive.getSize(), vp));	
+			Vector3Double  sizelocalD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getSize(), vp));	
 			sizelocal =   new Vector3f(sizelocalD.getXAsFloat(), sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());	
 			
-			Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(obj, primitive.getPosition(), vp));	
+			Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getPosition(), vp));	
 			positionlocal =   new Vector3f(positionlocalD.getXAsFloat(), positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());	
 
 			float[] angles = {rotation.x, rotation.y, rotation.z};
@@ -254,8 +297,9 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			sp.setLocalTranslation(positionlocal);
 			sp.setLocalRotation(quatation);
 			
+			
 //			 Special Case 01: 3d-Text
-			if(primitive.getType() == 7)
+			if(primitive.getType() == Primitive3d.PRIMITIVE_TYPE_TEXT3D)
 			{
 				if(sp instanceof Node)
 				{
@@ -267,7 +311,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						
 						Text3d textP = (Text3d)primitive;
 						// text = (String)((Text3d)primitive).getText();
-						String text = Text3d.getReplacedText(dc, obj, textP.getText(), vp);
+						String text = Text3d.getReplacedText(dc, sobj, textP.getText(), vp);
 						
 //						String text = ((String)dc.getBoundValue(obj, ((Text3d)primitive).getText(), vp));
 //						 if (text==null)
@@ -279,41 +323,56 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					}
 				}
 			}
-			
 //			 Special Case 03: Sound
-			if(primitive.getType() == 10)
+			if(primitive.getType() == Primitive3d.PRIMITIVE_TYPE_SOUND)
 			{
-//				System.out.println("spatial" + sp.toString());
 				if(sp instanceof AudioNode)
 				{
-//					System.out.println("AUDIONODE!");
 					AudioNode audionode = (AudioNode)sp;
-					
+
 					Sound3d sound = (Sound3d)primitive;
 					
 					IParsedExpression soundcondition = sound.getCond();
 					boolean soundActive = soundcondition==null;
 					if(!soundActive)
 					{
-						_fetcher.setValue("$object", obj);
+						_fetcher.setValue("$object", sobj);
 						_fetcher.setValue("$perspective", vp.getPerspective());
 						soundActive = ((Boolean)soundcondition.getValue(_fetcher)).booleanValue();
 					}
 					
 					if(soundActive)
 					{
-						audionode.play();
-//						System.out.println("PLAY!");
+						Status audiostatus = audionode.getStatus();
+						if(audiostatus==Status.Playing)
+						{
+							
+
+						}
+						else
+						{
+							Node parent = sp.getParent();
+							sp.removeFromParent();
+							sp = draw(dc, primitive, sobj, vp);
+							parent.attachChild(sp);
+							audionode = (AudioNode) sp;
+							
+							audionode.play();
+						}
 					}
 					else
 					{
-						audionode.stop();
+						if(!(boolean)((Sound3d) primitive).isContinuosly())
+						{
+							audionode.stop();
+						}
+
 					}
 				}
 			}
 			
 			// Special Case 02: Animation Updates
-			else if(primitive.getType()==6)
+			else if(primitive.getType()==Primitive3d.PRIMITIVE_TYPE_OBJECT3D)
 			{
 				Object animation = sp.getUserData("Animation");
 				if(animation instanceof Boolean && ((Boolean)animation).booleanValue())
@@ -328,14 +387,16 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						boolean animActive = animationcondition==null;
 						if(!animActive)
 						{
-							_fetcher.setValue("$object", obj);
+							_fetcher.setValue("$object", sobj);
 							_fetcher.setValue("$perspective", vp.getPerspective());
 							animActive = ((Boolean)animationcondition.getValue(_fetcher)).booleanValue();
 						}
 						
 						if(animActive)
 						{
-							AnimChannel chan = anichannels.get(a.getChannel()+" "+ obj.hashCode());
+							AnimChannel chan = anichannels.get(a.getChannel()+" "+ sobj.hashCode());
+
+							chan.setSpeed(a.getSpeed());
 							if(!a.getName().equals(chan.getAnimationName()))
 							{
 								
@@ -345,10 +406,9 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 								}
 								catch(Exception e)
 								{
-//									System.out.println("Animation Existiert nicht");
 								}
 								
-//								System.out.println("animation! " + a.getName());
+
 							}
 						}
 					}
@@ -363,5 +423,4 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 
 		return sp;
 	}
-	
 }

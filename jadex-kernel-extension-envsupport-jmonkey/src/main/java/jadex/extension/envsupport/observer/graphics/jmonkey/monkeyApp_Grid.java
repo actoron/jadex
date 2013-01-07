@@ -1,6 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
 
+import jme3tools.optimize.GeometryBatchFactory;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -41,6 +43,8 @@ public class monkeyApp_Grid
 
 		if(_isGrid)
 			shiftGrid();
+		
+		GeometryBatchFactory.optimize(_gridNode);
 	}
 
 

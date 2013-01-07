@@ -31,13 +31,14 @@ import com.jme3.terrain.heightmap.HillHeightMap;
  */
 public abstract class AMonkeyFunctions extends AMonkeyInit{
 
-	public AMonkeyFunctions(float dim, float spaceSize, boolean isGrid, boolean shader, String camera) {
-		super(dim, spaceSize, isGrid, shader, camera);
+	public AMonkeyFunctions(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera) {
+		super(dim, appScaled, spaceSize, isGrid, shader, camera);
 		
 	}
 
 	protected void simpleInit() {
 		super.simpleInit();
+		
 		
 		// Init Methods
 		initKeys();
@@ -205,7 +206,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 		// nodes in results
 		// list.
 		// rootNode.collideWith(ray, results);
-		this.geometryNode.collideWith(ray, results);
+		this.getRootNode().getChild("Geometry").collideWith(ray, results);
 
 		return results;
 	}

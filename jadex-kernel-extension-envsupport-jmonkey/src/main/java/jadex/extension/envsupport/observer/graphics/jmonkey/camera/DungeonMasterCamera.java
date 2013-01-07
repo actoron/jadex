@@ -27,8 +27,8 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
     private boolean rotating;
     private CustomChaseCamera chaseCam;
     private InputManager inputManager;
-    private int moveSpeed = 100, zoomSpeed = 5, rotationSpeed = 15; //max speeds
-    private int minDist = 50, maxDist = 600;
+    private int moveSpeed = 100, zoomSpeed = 1, rotationSpeed = 5; //max speeds
+    private int minDist = 50, maxDist = 300;
     private float acceleration = 20;
 
     public DungeonMasterCamera(Camera cam, InputManager inputManager, Spatial target, Node rootNode)
@@ -44,8 +44,8 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         chaseCam.setToggleRotationTrigger(Triggers.toggleRotate);
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setInvertHorizontalAxis(false);
-        chaseCam.setMinVerticalRotation(0.25f);
-        chaseCam.setMaxVerticalRotation(FastMath.HALF_PI - 0.1f);
+        chaseCam.setMinVerticalRotation(0.50f);
+        chaseCam.setMaxVerticalRotation(FastMath.HALF_PI - 0.05f);
         chaseCam.setSmoothMotion(false);
         chaseCam.setChasingSensitivity(acceleration);
         chaseCam.setZoomInTrigger(Triggers.zoomInTrigger);
@@ -55,6 +55,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         chaseCam.setTrailingEnabled(false);
         chaseCam.setRotationSensitivity(rotationSpeed);
         chaseCam.setZoomSensitivity(zoomSpeed);
+        
    
         target.addControl(this);
         registerInput(inputManager);

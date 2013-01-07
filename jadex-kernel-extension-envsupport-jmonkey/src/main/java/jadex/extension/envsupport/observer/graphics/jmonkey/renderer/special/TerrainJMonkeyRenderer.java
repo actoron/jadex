@@ -3,6 +3,7 @@ package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
@@ -29,7 +30,7 @@ public class TerrainJMonkeyRenderer extends AbstractJMonkeyRenderer
 	Material mat_terrain;
 	TerrainQuad terrain;
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
-			Object obj, ViewportJMonkey vp)
+			SpaceObject sobj, ViewportJMonkey vp)
 	{
 		
 		boolean isRnd = (Boolean)((Terrain3d)primitive).isRnd();
@@ -52,7 +53,6 @@ public class TerrainJMonkeyRenderer extends AbstractJMonkeyRenderer
 	    {
 	    	if(!tex.getTexture().equals(""))
 	    	{
-//	    		System.out.println("tex " + terrapath.concat(tex.getTexture()) + "name " + tex.getName());
 	    		Texture text = assetManager.loadTexture(terrapath.concat(tex.getTexture()));
 	    		text.setWrap(WrapMode.Repeat);
 	    	    mat_terrain.setTexture(tex.getName(), text);
@@ -126,6 +126,8 @@ public class TerrainJMonkeyRenderer extends AbstractJMonkeyRenderer
 		{
 			terrain.setShadowMode(ShadowMode.Receive);
 		}
+		
+
 
 	    terrain.setMaterial(mat_terrain);
 	    

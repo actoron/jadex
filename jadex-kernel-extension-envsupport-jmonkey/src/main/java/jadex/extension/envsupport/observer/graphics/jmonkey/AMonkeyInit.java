@@ -18,17 +18,23 @@ import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.Environment;
+import com.jme3.effect.ParticleEmitter;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Plane;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.SceneProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+import com.jme3.scene.BatchNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -36,168 +42,216 @@ import com.jme3.scene.shape.Box;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-//import com.jme3.post.*;
-//import com.jme3.post.ssao.SSAOFilter;
+import com.jme3.texture.Texture;
+import com.jme3.water.SimpleWaterProcessor;
+import com.jme3.water.WaterFilter;
+// import com.jme3.post.*;
+// import com.jme3.post.ssao.SSAOFilter;
 
 import de.lessvoid.nifty.Nifty;
 
+
 /**
- * The Second Abstract Application for the renders the 3d output for Jadex in the Jmonkey Engine
- * 
- * This Class has most of the Getter and Setter and init Methods from the MonkeyApp for better structure
+ * The Second Abstract Application for the renders the 3d output for Jadex in
+ * the Jmonkey Engine This Class has most of the Getter and Setter and init
+ * Methods from the MonkeyApp for better structure
  * 
  * @author 7willuwe
  */
 
 
-
-public abstract class AMonkeyInit extends SimpleApplication implements AnimEventListener 
+public abstract class AMonkeyInit extends SimpleApplication implements AnimEventListener
 {
 	// The Animation Channels for Animations
-	protected HashMap<String, AnimChannel> animChannels;
-	
-	protected ArrayList<Light> lights = new ArrayList<Light>();
-	
-	protected FilterPostProcessor fpp;
-	
-	//The Terrain
-	protected TerrainQuad terrain;
-	
-	//The Cameras
-	protected FocusCamera focusCam;
-	protected FlyCamera flyCamera;
-	
-	// The NiftyGUIDisplay 
-	protected NiftyJmeDisplay niftyDisplay;
-	
-	// Helper Classes jop
-	protected Node geometryNode;
-	protected Node gridNode;
-	protected Node staticNode;
-	
-	// Dimensions
-	protected float appDimension;
-	protected float spaceSize;
-	
-	// The Selected Object by the User as Spatial and ID
-	protected Spatial selectedSpatial;
-	protected int selectedTarget;
-	
-	// Shadow Renderer
-	protected PssmShadowRenderer pssmRenderer;
-	protected BasicShadowRenderer bsr;
-	
-	//Booleans
-	protected boolean isGrid;
-	protected boolean walkCam;
-	protected boolean hudactive = false;
-	protected boolean focusCamActive = false;
-	protected boolean complexShadows = true;
-	protected boolean cleanupPostFilter = false;
-	protected boolean shader = true;
-	protected String camera = "Default";
+	protected HashMap<String, AnimChannel>		animChannels;
 
-	public AMonkeyInit(float dim, float spaceSize, boolean isGrid, boolean shader, String camera)
+	protected HashMap<String, ParticleEmitter>	particleEmitters;
+
+	protected ArrayList<Light>					lights				= new ArrayList<Light>();
+
+	protected FilterPostProcessor				fpp;
+
+	// The Terrain
+	protected TerrainQuad						terrain;
+
+	// The Cameras
+	protected FocusCamera						focusCam;
+
+	protected FlyCamera							flyCamera;
+
+	// The NiftyGUIDisplay
+	protected NiftyJmeDisplay					niftyDisplay;
+
+	// Helper Classes jop
+	protected Node								gridNode;
+
+	protected Node								staticNode;
+
+	// Dimensions
+	protected float								appSize;
+
+	protected float								appScaled;
+
+	protected float								spaceSize;
+
+	// The Selected Object by the User as Spatial and ID
+	protected Spatial							selectedSpatial;
+
+	protected int								selectedTarget;
+
+	// Shadow Renderer
+	protected PssmShadowRenderer				pssmRenderer;
+
+	protected BasicShadowRenderer				bsr;
+
+	// Booleans
+	protected boolean							isGrid;
+
+	protected boolean							walkCam;
+
+	protected boolean							hudactive			= false;
+
+	protected boolean							focusCamActive		= false;
+
+	protected boolean							complexShadows		= true;
+
+	protected boolean							cleanupPostFilter	= false;
+
+	protected boolean							ambientOcclusion	= true;
+
+	protected String							camera				= "Default";
+
+	protected ArrayList<String>				toDelete			= new ArrayList<String>();
+
+	protected ArrayList<Spatial>				toAdd				= new ArrayList<Spatial>();
+	
+	BatchNode staticbatchgeo = new BatchNode("StaticBatchVisuals");
+	Node staticgeo = new Node("StaticVisuals");
+
+
+	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera)
 	{
-		//Set the Variables
-		this.appDimension = dim;
+		// Set the Variables
+		this.appSize = dim;
+		this.appScaled = appScaled;
 		this.isGrid = isGrid;
 		this.spaceSize = spaceSize;
-		this.geometryNode = new Node("geometryNode");
 		this.staticNode = new Node("staticNode");
 		this.gridNode = new Node("gridNode");
 		this.walkCam = false;
 		this.selectedTarget = -1;
 		this.selectedSpatial = null;
-		this.shader = shader;
+		this.ambientOcclusion = shader;
 		this.camera = camera;
-		
+
 
 	}
-	
-	protected void simpleInit() {
+
+	protected void simpleInit()
+	{
 		// Base Setup
 		Logger.getLogger("").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
 		viewPort.setBackgroundColor(ColorRGBA.Black);
 		stateManager.getState(StatsAppState.class).toggleStats();
-		
+
 		initRoot();
-		initCam();
+
 		initRenderer(complexShadows);
 		initAudio();
 		initNifty();
+		initCam();
+
+
 	}
-	
-	private void initRoot() {
+
+	private void initRoot()
+	{
 		this.rootNode.attachChild(this.staticNode);
-		
+
 		DirectionalLight sun = new DirectionalLight();
 		sun.setColor(ColorRGBA.White.mult(0.2f));
 		sun.setDirection(new Vector3f(0, -1f, 0).normalizeLocal());
-		
-		
+
+
 		DirectionalLight sun1 = new DirectionalLight();
-		sun1.setColor(ColorRGBA.White.mult(0.7f));
+		sun1.setColor(ColorRGBA.White.mult(0.2f));
 		sun1.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
-		
+
 		DirectionalLight sun2 = new DirectionalLight();
-		sun2.setColor(ColorRGBA.White.mult(0.7f));
-		sun2.setDirection(new Vector3f(.5f, .5f, .5f).normalizeLocal());
-		
-		
-//		rootNode.addLight(sun);
+		sun2.setColor(ColorRGBA.White.mult(0.2f));
+		sun2.setDirection(new Vector3f(.5f, -.5f, .5f).normalizeLocal());
+
+		DirectionalLight sun3 = new DirectionalLight();
+		sun3.setColor(ColorRGBA.White.mult(0.2f));
+		sun3.setDirection(new Vector3f(-.1f, -.5f, -.5f).normalizeLocal());
+
+		DirectionalLight sun4 = new DirectionalLight();
+		sun4.setColor(ColorRGBA.White.mult(0.2f));
+		sun4.setDirection(new Vector3f(.5f, -.5f, .1f).normalizeLocal());
+
+
+		// rootNode.addLight(sun);
 		rootNode.addLight(sun1);
 		rootNode.addLight(sun2);
-//		rootNode.addLight(sun3);
-//		rootNode.addLight(sun4);
-//		rootNode.addLight(sun5);
+		rootNode.addLight(sun3);
+		rootNode.addLight(sun4);
+		// rootNode.addLight(sun5);
 
 		AmbientLight al = new AmbientLight();
-		al.setColor(ColorRGBA.White.mult(2f));
+		al.setColor(ColorRGBA.White.mult(2.5f));
 		rootNode.addLight(al);
-		
-		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appDimension, spaceSize, assetManager, isGrid);
+
+		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appSize, spaceSize, assetManager, isGrid);
 		this.gridNode = gridHandler.getGrid();
-		this.rootNode.attachChild(this.geometryNode);
+		staticgeo.setLocalScale(appScaled);
+		staticbatchgeo.setLocalScale(appScaled);
+		this.rootNode.attachChild(staticgeo);
+		this.rootNode.attachChild(staticbatchgeo);
 
 	}
-	
-	public void initCam() {
+
+	public void initCam()
+	{
 		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(appDimension / 2 , 0, appDimension / 2));
-		cam.lookAt(new Vector3f(appDimension / 2, 0, appDimension / 2), Vector3f.UNIT_Y);
+		cam.setLocation(new Vector3f(appSize / 2, 0, appSize / 2));
+		cam.lookAt(new Vector3f(appSize / 2, 0, appSize / 2), Vector3f.UNIT_Y);
 		cam.setFrustumNear(1f);
-		cam.setFrustumFar(appDimension * 5);
+		cam.setFrustumFar(appSize * 200);
 		cam.resize(1024, 1024, true);
-		
+
 		if(camera.equals("Default"))
 		{
+			cam.setLocation(new Vector3f(appSize / 2, appSize / 4, appSize / 2));
 			// The Fly Camera
-			 flyCamera = new FlyCamera(cam);
-			 flyCamera.setUpVector(Vector3f.UNIT_Y);
-			 flyCamera.registerWithInput(inputManager);
-			 flyCamera.setMoveSpeed(appDimension);
-			 flyCamera.setDragToRotate(true);
-			 flyCamera.setEnabled(true);
-			 
-			 
-			 flyCamera.setEnabled(true);
+			flyCamera = new FlyCamera(cam);
+			flyCamera.setUpVector(Vector3f.UNIT_Y);
+			flyCamera.registerWithInput(inputManager);
+			flyCamera.setMoveSpeed(appScaled);
+			flyCamera.setDragToRotate(true);
+			flyCamera.setEnabled(true);
+
+
+			flyCamera.setEnabled(true);
 		}
 		else if(camera.equals("Iso"))
 		{
-//			 flyCamera.setEnabled(false);
-			Box b = new Box(1f,1f,1f);
-			Node boxnode = new Node("boxnode");
-			Geometry geo = new Geometry("box", b);
-			boxnode.attachChild(geo);
-			boxnode.setLocalTranslation(appDimension / 2, 0, appDimension / 2);
-//			Geometry g = b;
-		
-//		 ((Spatial) b).setLocalTranslation(appDimension / 2 , 0, appDimension / 2);
-		 DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, boxnode, rootNode);
-		 dungeonCam.setEnabled(true);
+
+			// Box box = new Box(Vector3f.ZERO, 1, 1, 1);
+			//
+			// Geometry geo = new Geometry("j", box);
+			// Material mat_tt = new Material(assetManager,
+			// "Common/MatDefs/Misc/Unshaded.j3md");
+			// mat_tt.setColor("Color", ColorRGBA.Cyan);
+			//
+			// geo.setMaterial(mat_tt);
+			//
+			// geo.setLocalTranslation(new Vector3f(appSize*2 , appSize*2,
+			// appSize*2 ));
+			// rootNode.attachChild(geo);
+			DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, rootNode, rootNode);
+			dungeonCam.setEnabled(true);
 		}
 		else if(camera.equals("Focus"))
 		{
@@ -215,11 +269,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		}
 
 
-
-
-		 
-
-//			cam.
+		// cam.
 
 		// Change the mappings we don't want
 
@@ -247,385 +297,460 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		// view_n.setBackgroundColor(ColorRGBA.Black);
 
 	}
-	
-	
-	private void initRenderer(boolean complexShadows) {
-		
+
+
+	private void initRenderer(boolean complexShadows)
+	{
+
 
 		this.fpp = new FilterPostProcessor(assetManager);
-		
-		if(shader)
-		{		
-			
-			
-			
-			SSAOFilter ssaoFilter = new SSAOFilter(10.94f, 30.92f, 0.3f, 0.61f);
+		viewPort.addProcessor(fpp);
+
+
+		// waterProcessor = new SimpleWaterProcessor(assetManager);
+		// waterProcessor.setReflectionScene(geometryNode);
+		//
+		// Vector3f waterLocation=new Vector3f(0,-4,0);
+		// waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y,
+		// waterLocation.dot(Vector3f.UNIT_Y)));
+		//
+		// waterProcessor.setDebug(false);
+		// waterProcessor.setWaveSpeed(0.02f);
+		// // waterProcessor.setRefractionClippingOffset(10.1f);
+		// waterProcessor.setWaterColor(ColorRGBA.Cyan.mult(10.5f));
+		// // waterProcessor.setLightPosition(new Vector3f(-100,20,-100));
+		// waterProcessor.setWaterDepth(40);
+		// waterProcessor.setWaterTransparency(0.1f);
+		// viewPort.addProcessor(waterProcessor);
+
+
+		// BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
+		// fpp.addFilter(bf);
+
+
+		Vector3f lightDir = new Vector3f(1f, -2f, 1f);
+		WaterFilter water = new WaterFilter(rootNode, lightDir);
+		water.setWaterHeight(-0.2f * appScaled);
+		water.setUseFoam(false);
+		water.setUseRipples(true);
+		water.setDeepWaterColor(ColorRGBA.Black.mult(0.1f));
+		water.setWaterColor(ColorRGBA.Black.mult(0.15f));
+		water.setWaterTransparency(0.001f);
+		water.setMaxAmplitude(0.3f);
+		water.setReflectionDisplace(0.2f);
+		water.setWaveScale(0.008f);
+		water.setSpeed(0.1f);
+		water.setShoreHardness(1.0f);
+		water.setRefractionConstant(0.2f);
+		water.setShininess(0.3f);
+		water.setSunScale(0.001f);
+		water.setLightColor(ColorRGBA.Red.mult(0.1f).set(ColorRGBA.Orange.mult(0.1f).r, ColorRGBA.Orange.mult(0.1f).g, ColorRGBA.Orange.mult(0.1f).b, 0.01f));
+		water.setColorExtinction(new Vector3f(10.0f, 20.0f, 30.0f));
+		fpp.addFilter(water);
+
+
+		if(ambientOcclusion)
+		{
+			SSAOFilter ssaoFilter = new SSAOFilter(20.00f, 20.92f, 0.3f, 0.61f);
+
+			// ssaoFilter.setUseAo(false);
+			// ssaoFilter.setUseOnlyAo(true);
 			fpp.addFilter(ssaoFilter);
-			viewPort.addProcessor(fpp);
+
 		}
-//		else
-//		{ 
-//			bsr = new BasicShadowRenderer(assetManager, 256);
-//			bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal()); //light direction
-//			viewPort.addProcessor(bsr);
-//		 }
-		
+		// else
+		// {
+		// bsr = new BasicShadowRenderer(assetManager, 256);
+		// bsr.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal());
+		// //light direction
+		// viewPort.addProcessor(bsr);
+		// }
+
 		pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-		pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light direction
+		pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light
+																					// direction
 		pssmRenderer.setShadowIntensity(0.6f);
 		viewPort.addProcessor(pssmRenderer);
-//		
+		//
 
-		
+
 		// BLOOOM FILTER
-		//		 FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
-		//		 BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
-		//		 fpp.addFilter(bf);
-		//		 viewPort.addProcessor(fpp);
+		// FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
+		// BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
+		// fpp.addFilter(bf);
+		// viewPort.addProcessor(fpp);
 
 		rootNode.setShadowMode(ShadowMode.Off);
 
 	}
-	private void initNifty() {
-		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager,
-				audioRenderer, guiViewPort);
+
+	private void initNifty()
+	{
+		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 		/** Create a new NiftyGUI object */
 		Nifty nifty = niftyDisplay.getNifty();
 		/** Read your XML and initialize your custom ScreenController */
-		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud",
-				new GuiController(this));
-		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default",
-				new GuiController(this));
+		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new GuiController(this));
+		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new GuiController(this));
 		nifty.gotoScreen("default");
 
 		guiViewPort.addProcessor(niftyDisplay);
 	}
-	
-	private void initAudio() {
-		// unused
-	}
-	public void onAnimChange(AnimControl control, AnimChannel channel,
-			String animName) {
+
+	private void initAudio()
+	{
+		audioRenderer.setEnvironment(new Environment(Environment.Dungeon));
 	}
 
-	public void onAnimCycleDone(AnimControl control, AnimChannel channel,
-			String animName) {
-		if (channel.getLoopMode() == LoopMode.DontLoop) {
+	public void onAnimChange(AnimControl control, AnimChannel channel, String animName)
+	{
+	}
+
+	public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName)
+	{
+		if(channel.getLoopMode() == LoopMode.DontLoop)
+		{
 			channel.reset(true);
 		}
 	}
-	
-	public void simpleUpdateAbstract(float tpf) {
-		//Update the SoundListener to the CamLocation and Rotation
+
+	public void simpleUpdateAbstract(float tpf)
+	{
+		// Update the SoundListener to the CamLocation and Rotation
 		listener.setLocation(cam.getLocation());
 		listener.setRotation(cam.getRotation());
-		
+
 	}
-	
-	//Getter and Setter
-	
-	public void setChannels(HashMap<String, AnimChannel> animChannels) {
+
+	// Getter and Setter
+
+	public void setChannels(HashMap<String, AnimChannel> animChannels)
+	{
 		this.animChannels = animChannels;
 	}
 
-	public HashMap<String, AnimChannel> getChannels() {
+	public HashMap<String, AnimChannel> getChannels()
+	{
 		return this.animChannels;
 	}
-	
-	public Collection<com.jme3.renderer.Caps> getCaps() {
+
+	public Collection<com.jme3.renderer.Caps> getCaps()
+	{
 		return renderer.getCaps();
 	}
 
 	/**
 	 * @return the animChannels
 	 */
-	public HashMap<String, AnimChannel> getAnimChannels() {
+	public HashMap<String, AnimChannel> getAnimChannels()
+	{
 		return animChannels;
 	}
 
 	/**
 	 * @param animChannels the animChannels to set
 	 */
-	public void setAnimChannels(HashMap<String, AnimChannel> animChannels) {
+	public void setAnimChannels(HashMap<String, AnimChannel> animChannels)
+	{
 		this.animChannels = animChannels;
 	}
 
 	/**
 	 * @return the terrain
 	 */
-	public TerrainQuad getTerrain() {
+	public TerrainQuad getTerrain()
+	{
 		return terrain;
 	}
 
 	/**
 	 * @param terrain the terrain to set
 	 */
-	public void setTerrain(TerrainQuad terrain) {
+	public void setTerrain(TerrainQuad terrain)
+	{
 		this.terrain = terrain;
 	}
 
 	/**
 	 * @return the focusCam
 	 */
-	public FocusCamera getFocusCam() {
+	public FocusCamera getFocusCam()
+	{
 		return focusCam;
 	}
 
 	/**
 	 * @param focusCam the focusCam to set
 	 */
-	public void setFocusCam(FocusCamera focusCam) {
+	public void setFocusCam(FocusCamera focusCam)
+	{
 		this.focusCam = focusCam;
 	}
 
 	/**
 	 * @return the flyCamera
 	 */
-	public FlyCamera getFlyCamera() {
+	public FlyCamera getFlyCamera()
+	{
 		return flyCamera;
 	}
 
 	/**
 	 * @param flyCamera the flyCamera to set
 	 */
-	public void setFlyCamera(FlyCamera flyCamera) {
+	public void setFlyCamera(FlyCamera flyCamera)
+	{
 		this.flyCamera = flyCamera;
 	}
 
 	/**
 	 * @return the niftyDisplay
 	 */
-	public NiftyJmeDisplay getNiftyDisplay() {
+	public NiftyJmeDisplay getNiftyDisplay()
+	{
 		return niftyDisplay;
 	}
 
 	/**
 	 * @param niftyDisplay the niftyDisplay to set
 	 */
-	public void setNiftyDisplay(NiftyJmeDisplay niftyDisplay) {
+	public void setNiftyDisplay(NiftyJmeDisplay niftyDisplay)
+	{
 		this.niftyDisplay = niftyDisplay;
-	}
-
-	/**
-	 * @return the geometryNode
-	 */
-	public Node getGeometryNode() {
-		return geometryNode;
-	}
-
-	/**
-	 * @param geometryNode the geometryNode to set
-	 */
-	public void setGeometryNode(Node geometryNode) {
-		this.geometryNode = geometryNode;
 	}
 
 	/**
 	 * @return the gridNode
 	 */
-	public Node getGridNode() {
+	public Node getGridNode()
+	{
 		return gridNode;
 	}
 
 	/**
 	 * @param gridNode the gridNode to set
 	 */
-	public void setGridNode(Node gridNode) {
+	public void setGridNode(Node gridNode)
+	{
 		this.gridNode = gridNode;
 	}
 
 	/**
 	 * @return the staticNode
 	 */
-	public Node getStaticNode() {
+	public Node getStaticNode()
+	{
 		return staticNode;
 	}
 
 	/**
 	 * @param staticNode the staticNode to set
 	 */
-	public void setStaticNode(Node staticNode) {
+	public void setStaticNode(Node staticNode)
+	{
 		this.staticNode = staticNode;
 	}
 
 	/**
 	 * @return the appDimension
 	 */
-	public float getAppDimension() {
-		return appDimension;
+	public float getAppDimension()
+	{
+		return appScaled;
 	}
 
 	/**
 	 * @param appDimension the appDimension to set
 	 */
-	public void setAppDimension(float appDimension) {
-		this.appDimension = appDimension;
+	public void setAppDimension(float appDimension)
+	{
+		this.appScaled = appDimension;
 	}
 
 	/**
 	 * @return the spaceSize
 	 */
-	public float getSpaceSize() {
+	public float getSpaceSize()
+	{
 		return spaceSize;
 	}
 
 	/**
 	 * @param spaceSize the spaceSize to set
 	 */
-	public void setSpaceSize(float spaceSize) {
+	public void setSpaceSize(float spaceSize)
+	{
 		this.spaceSize = spaceSize;
 	}
 
 	/**
 	 * @return the selectedSpatial
 	 */
-	public Spatial getSelectedSpatial() {
+	public Spatial getSelectedSpatial()
+	{
 		return selectedSpatial;
 	}
 
 	/**
 	 * @param selectedSpatial the selectedSpatial to set
 	 */
-	public void setSelectedSpatial(Spatial selectedSpatial) {
+	public void setSelectedSpatial(Spatial selectedSpatial)
+	{
 		this.selectedSpatial = selectedSpatial;
 	}
 
 	/**
 	 * @return the selectedTarget
 	 */
-	public int getSelectedTarget() {
+	public int getSelectedTarget()
+	{
 		return selectedTarget;
 	}
 
 	/**
 	 * @param selectedTarget the selectedTarget to set
 	 */
-	public void setSelectedTarget(int selectedTarget) {
+	public void setSelectedTarget(int selectedTarget)
+	{
 		this.selectedTarget = selectedTarget;
 	}
 
 	/**
 	 * @return the pssmRenderer
 	 */
-	public PssmShadowRenderer getPssmRenderer() {
+	public PssmShadowRenderer getPssmRenderer()
+	{
 		return pssmRenderer;
 	}
 
 	/**
 	 * @param pssmRenderer the pssmRenderer to set
 	 */
-	public void setPssmRenderer(PssmShadowRenderer pssmRenderer) {
+	public void setPssmRenderer(PssmShadowRenderer pssmRenderer)
+	{
 		this.pssmRenderer = pssmRenderer;
 	}
 
 	/**
 	 * @return the bsr
 	 */
-	public BasicShadowRenderer getBsr() {
+	public BasicShadowRenderer getBsr()
+	{
 		return bsr;
 	}
 
 	/**
 	 * @param bsr the bsr to set
 	 */
-	public void setBsr(BasicShadowRenderer bsr) {
+	public void setBsr(BasicShadowRenderer bsr)
+	{
 		this.bsr = bsr;
 	}
 
 	/**
 	 * @return the isGrid
 	 */
-	public boolean isGrid() {
+	public boolean isGrid()
+	{
 		return isGrid;
 	}
 
 	/**
 	 * @param isGrid the isGrid to set
 	 */
-	public void setGrid(boolean isGrid) {
+	public void setGrid(boolean isGrid)
+	{
 		this.isGrid = isGrid;
 	}
 
 	/**
 	 * @return the walkCam
 	 */
-	public boolean isWalkCam() {
+	public boolean isWalkCam()
+	{
 		return walkCam;
 	}
 
 	/**
 	 * @param walkCam the walkCam to set
 	 */
-	public void setWalkCam(boolean walkCam) {
+	public void setWalkCam(boolean walkCam)
+	{
 		this.walkCam = walkCam;
 	}
 
 	/**
 	 * @return the hudactive
 	 */
-	public boolean isHudactive() {
+	public boolean isHudactive()
+	{
 		return hudactive;
 	}
 
 	/**
 	 * @param hudactive the hudactive to set
 	 */
-	public void setHudactive(boolean hudactive) {
+	public void setHudactive(boolean hudactive)
+	{
 		this.hudactive = hudactive;
 	}
 
 	/**
 	 * @return the focusCamActive
 	 */
-	public boolean isFocusCamActive() {
+	public boolean isFocusCamActive()
+	{
 		return focusCamActive;
 	}
 
 	/**
 	 * @param focusCamActive the focusCamActive to set
 	 */
-	public void setFocusCamActive(boolean focusCamActive) {
+	public void setFocusCamActive(boolean focusCamActive)
+	{
 		this.focusCamActive = focusCamActive;
 	}
 
 	/**
 	 * @return the complexShadows
 	 */
-	public boolean isComplexShadows() {
+	public boolean isComplexShadows()
+	{
 		return complexShadows;
 	}
 
 	/**
 	 * @param complexShadows the complexShadows to set
 	 */
-	public void setComplexShadows(boolean complexShadows) {
+	public void setComplexShadows(boolean complexShadows)
+	{
 		this.complexShadows = complexShadows;
 	}
-	
+
 	/**
 	 * @return the assetManager
 	 */
-	public AssetManager getAssetManager() {
+	public AssetManager getAssetManager()
+	{
 		return assetManager;
 	}
 
 	/**
 	 * @return the lights
 	 */
-	public ArrayList<Light> getLights() {
+	public ArrayList<Light> getLights()
+	{
 		return lights;
 	}
 
 	/**
 	 * @param lights the lights to set
 	 */
-	public void setLights(ArrayList<Light> lights) {
+	public void setLights(ArrayList<Light> lights)
+	{
 		this.lights = lights;
 		for(Light l : this.lights)
 		{
-//			rootNode.removeLight(light)
-			System.out.println("add light! \n");
-			System.out.println("light: " + l.getColor() + l.getType() + " pos: " + ((PointLight)l).getPosition() + "radius " + ((PointLight)l).getRadius());
 			rootNode.addLight(l);
 		}
 	}
@@ -633,18 +758,105 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	/**
 	 * @return the cleanupPostFilter
 	 */
-	public boolean isCleanupPostFilter() {
+	public boolean isCleanupPostFilter()
+	{
 		return cleanupPostFilter;
 	}
 
 	/**
 	 * @param cleanupPostFilter the cleanupPostFilter to set
 	 */
-	public void setCleanupPostFilter(boolean cleanupPostFilter) {
+	public void setCleanupPostFilter(boolean cleanupPostFilter)
+	{
 		this.cleanupPostFilter = cleanupPostFilter;
 	}
 
 
+	/**
+	 * @return the particleEmiters
+	 */
+	public HashMap<String, ParticleEmitter> getParticleEmiters()
+	{
+		return particleEmitters;
+	}
+
+	/**
+	 * @param particleEmiters the particleEmiters to set
+	 */
+	public void setParticleEmiters(HashMap<String, ParticleEmitter> particleEmiters)
+	{
+		this.particleEmitters = particleEmiters;
+	}
+
+	/**
+	 * @return the toDelete
+	 */
+	public ArrayList<String> getToDelete()
+	{
+		return toDelete;
+	}
+
+	/**
+	 * @param toDelete the toDelete to set
+	 */
+	public void setToDelete(ArrayList<String> toDelete)
+	{
+		if(this.toDelete.isEmpty())
+		{
+			this.toDelete = toDelete;
+		}
+		else
+		{
+			for(String newSp : toDelete)
+			{
+				if(this.toDelete.contains(newSp))
+				{
+
+				}
+				else
+				{
+					this.toDelete.add(newSp);
+				}
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * @return the toAdd
+	 */
+	public ArrayList<Spatial> getToAdd()
+	{
+		return toAdd;
+	}
+
+	/**
+	 * @param toAdd the toAdd to set
+	 */
+	public void setToAdd(ArrayList<Spatial> toAdd)
+	{
+		if(this.toAdd.isEmpty())
+		{
+			this.toAdd = toAdd;
+		}
+		else
+		{
+			for(Spatial newSp : toAdd)
+			{
+				if(this.toAdd.contains(newSp))
+				{
+
+				}
+				else
+				{
+					this.toAdd.add(newSp);
+				}
+
+			}
+		}
+	}
 
 
 }

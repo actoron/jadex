@@ -71,7 +71,7 @@
 					<env:property name="state" class="String">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
-					<env:property name="rotation" class="IVector2">new Vector2Double(-1.111, Math.PI*Math.random(), -1.111)</env:property>
+					<env:property name="rotation" class="IVector2"></env:property>
 					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>

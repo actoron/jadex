@@ -1,12 +1,14 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
+package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
 import java.awt.Color;
 
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 import com.jme3.bounding.BoundingBox;
 import com.jme3.font.BitmapFont;
@@ -28,15 +30,12 @@ public class Text3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 	private String	text;
 
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
-			Object obj, ViewportJMonkey vp)
+			SpaceObject sobj, ViewportJMonkey vp)
 	{
 		Node textnode = new Node(identifier);
 		
 		Text3d textP = (Text3d)primitive;
-		// text = (String)((Text3d)primitive).getText();
-		String text = Text3d.getReplacedText(dc, obj, textP.getText(), vp);
-//		 text = ((String)dc.getBoundValue(obj, ((Text3d)primitive).getText(), vp));
-		 System.out.println("text: " + text);
+		String text = Text3d.getReplacedText(dc, sobj, textP.getText(), vp);
 		 if (text==null)
 		 {
 			text= ((Text3d)primitive).getText();

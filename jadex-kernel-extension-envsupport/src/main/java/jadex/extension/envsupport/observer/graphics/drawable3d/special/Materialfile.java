@@ -12,10 +12,13 @@ public class Materialfile {
 	protected String path;
 	
 	protected IParsedExpression cond;
+	
+	protected boolean useAlpha;
 
-	public Materialfile(String part, String path, IParsedExpression cond) {
+	public Materialfile(String part, String path, boolean useAlpha, IParsedExpression cond) {
 		super();
 		this.part = part;
+		this.useAlpha = useAlpha;
 		this.path = path;
 		this.cond = cond;
 	}
@@ -46,6 +49,20 @@ public class Materialfile {
 	 */
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	/**
+	 * @return the useAlpha
+	 */
+	public boolean isUseAlpha() {
+		return useAlpha;
+	}
+
+	/**
+	 * @param useAlpha the useAlpha to set
+	 */
+	public void setUseAlpha(boolean useAlpha) {
+		this.useAlpha = useAlpha;
 	}
 
 }

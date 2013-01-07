@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special;
 
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
@@ -19,7 +20,7 @@ public class SkyJMonkeyRenderer extends AbstractJMonkeyRenderer
 	Spatial	sky;
 
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
-			Object obj, ViewportJMonkey vp)
+			SpaceObject sobj, ViewportJMonkey vp)
 	{
 
 		String skyfile = (String)((Sky3d)primitive).getSkyFile();
