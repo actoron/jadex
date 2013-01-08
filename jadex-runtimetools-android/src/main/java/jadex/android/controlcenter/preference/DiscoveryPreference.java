@@ -5,10 +5,6 @@ import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import java.text.SimpleDateFormat;
 
 import android.content.Context;
-import android.preference.DialogPreference;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
 
 public class DiscoveryPreference extends LongClickablePreference {
 

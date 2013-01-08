@@ -1,7 +1,6 @@
 package jadex.android.controlcenter.preference;
 
 import android.content.Context;
-import android.preference.EditTextPreference;
 import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
@@ -22,7 +21,7 @@ public class JadexDoublePreference extends JadexStringPreference {
 	
 	@Override
 	public void setValue(Object value) {
-		Double doubleValue = (Double) value;
+//		Double doubleValue = (Double) value;
 		super.setValue("" + value);
 	}
 	

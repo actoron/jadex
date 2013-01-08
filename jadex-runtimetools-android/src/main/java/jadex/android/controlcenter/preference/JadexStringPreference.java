@@ -13,7 +13,6 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 
 	private int mWhichButtonClicked;
 	private AlertDialog.Builder mBuilder;
-	private AlertDialog mDialog;
 	private View view;
 	private ViewGroup parent;
 
@@ -46,7 +45,7 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 		onPrepareDialogBuilder(mBuilder);
 
 		// Create the dialog
-		final Dialog dialog = mDialog = mBuilder.create();
+		final Dialog dialog = mBuilder.create();
 		// if (needInputMethod()) {
 		// requestInputMethod(dialog);
 		// }
@@ -80,7 +79,6 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 
 	@Override
 	public void onDismiss(DialogInterface dialog) {
-		mDialog = null;
 		boolean result = mWhichButtonClicked == DialogInterface.BUTTON_POSITIVE;
 		if (result) {
 		}

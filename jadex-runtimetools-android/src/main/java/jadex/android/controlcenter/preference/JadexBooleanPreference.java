@@ -2,7 +2,6 @@ package jadex.android.controlcenter.preference;
 
 import android.content.Context;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
