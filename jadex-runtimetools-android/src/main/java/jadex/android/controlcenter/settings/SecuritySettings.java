@@ -189,7 +189,6 @@ public class SecuritySettings extends AServiceSettings
 			netNameDialog.setOnApplyListener(new OnClickListener()
 			{
 
-				@Override
 				public void onClick(View v)
 				{
 					String netName = netNameDialog.getText();
@@ -203,6 +202,10 @@ public class SecuritySettings extends AServiceSettings
 		}
 
 		return result;
+	}
+	
+	public void onOptionsMenuClosed(Menu menu)
+	{
 	}
 
 	public void setPlatformId(IComponentIdentifier platformId)
@@ -314,17 +317,14 @@ public class SecuritySettings extends AServiceSettings
 	private IIntermediateResultListener<ChangeEvent<Object>> refreshListener = new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
 	{
 
-		@Override
 		public void exceptionOccurred(Exception exception)
 		{
 		}
 
-		@Override
 		public void resultAvailable(Collection<ChangeEvent<Object>> result)
 		{
 		}
 
-		@Override
 		public void intermediateResultAvailable(final ChangeEvent<Object> event)
 		{
 			if (event == null) {
@@ -381,7 +381,6 @@ public class SecuritySettings extends AServiceSettings
 			});
 		}
 
-		@Override
 		public void finished()
 		{
 		}

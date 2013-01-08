@@ -109,8 +109,10 @@ public class SimulationSettings extends AServiceSettings {
 
 	public void onDestroy()
 	{
-		// TODO Auto-generated method stub
-		
+	}
+	
+	public void onOptionsMenuClosed(Menu menu)
+	{
 	}
 	
 	protected void createPreferenceHierarchy(PreferenceScreen screen) {

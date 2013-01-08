@@ -3,7 +3,8 @@ package jadex.android.controlcenter;
 import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
 import jadex.android.controlcenter.settings.ISettings;
-import jadex.android.controlcenter.settings.ServiceConnectingPreferenceActivity;
+import jadex.android.service.IJadexPlatformBinder;
+import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -22,11 +23,10 @@ import jadex.micro.annotation.Binding;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.Preference;
@@ -46,137 +46,110 @@ import android.widget.ListView;
  * A Simple Control Center for Jadex-Android. Provides Access to configurable
  * Components and Services.
  * 
- * Can be instanciated by creating an Intent an passing the ComponentIdentifier
+ * Can be instantiated by creating an Intent an passing the ComponentIdentifier
  * of the Platform to be configured as Extra with the Key:
  * JadexAndroidControlCenter.EXTRA_PLATFORMID
  */
-// Because Android doesn't provide a way to set Option
-// Menus for Child PreferenceScreens, this Activity is instantiated once for
-// every child PreferenceScreen that is displayed. It then displays the child
-// PreferenceScreen and delegates calls to the child Settings Implementation.
-// 
-//(See
-// http://stackoverflow.com/questions/5032141/adding-menus-to-child-preference-screens)
-public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivity
+
+public class JadexAndroidControlCenter extends OptionsMenuDelegatingActivity implements ServiceConnection
 {
-	
+
+	protected IJadexPlatformBinder platformService;
 
 	private static final String EXTRA_PLATFORMID = "platformId";
-	private static final String EXTRA_SHOWCHILDPREFSCREEN = "showChildPrefScreen";
-	private static final String EXTRA_SETTINGSKEY = "settingsKey";
-	// private SharedPreferences sharedPreferences;
+
 	private PreferenceCategory servicesCat;
 	private PreferenceCategory componentsCat;
-	private ISettings displayedChildSettings;
 
 	/** The platformID to display preferences for */
 	private IComponentIdentifier platformId;
 
-	static private Map<String, ISettings> childSettings;
-
-	static
-	{
-		childSettings = new HashMap<String, ISettings>();
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		Serializable platformId = getIntent().getSerializableExtra(EXTRA_PLATFORMID);
-		this.platformId = platformId != null ? (IComponentIdentifier) platformId : null;
-	}
-	
-	@Override
-	public void onServiceConnected(ComponentName name, IBinder service)
-	{
-		super.onServiceConnected(name, service);
-		if (platformId == null)
-		{
-			Log.d("jadex-android", "ControlCenter: No platformId passed, using a random started platform...");
-			// TODO remove
-			this.platformId = null;
-		} else
+		if (platformId != null)
 		{
 			this.platformId = (IComponentIdentifier) platformId;
 		}
-		createView();
+	}
+
+	public void onServiceConnected(ComponentName name, IBinder service)
+	{
+		this.platformService = (IJadexPlatformBinder) service;
+
+		if (platformId == null)
+		{
+			Log.d("jadex-android", "ControlCenter: No platformId passed, using a random started platform...");
+			this.platformId = null;
+		}
+		else
+		{
+			this.platformId = (IComponentIdentifier) platformId;
+		}
+		if (!isDisplayingChildScreen())
+		{
+			refreshControlCenter();
+		}
+	}
+
+	public void onServiceDisconnected(ComponentName name)
+	{
+		this.platformService = null;
+		onDestroy(); // ?
 	}
 
 	@Override
-	public void onServiceDisconnected(ComponentName name)
+	protected void onResume()
 	{
-		super.onServiceDisconnected(name);
-		destroyView();
+		super.onResume();
+		Intent intent = new Intent(this, JadexPlatformService.class);
+		bindService(intent, this, BIND_AUTO_CREATE);
 	}
-	
+
 	@Override
-	protected void onDestroy()
+	protected void onPause()
 	{
-		super.onDestroy();
-		destroyView();
+		super.onPause();
+		unbindService(this);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		super.onCreateOptionsMenu(menu);
-		if (displayedChildSettings != null)
-		{
-			// child functionality
-			return displayedChildSettings.onCreateOptionsMenu(menu);
-		} else
+		boolean result = super.onCreateOptionsMenu(menu);
+		if (!result)
 		{
 			// main functionality
 			menu.add("Refresh");
-			return true;
+			result = true;
 		}
+		else
+		{
+		}
+		return result;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if (displayedChildSettings != null)
-		{
-			// child functionality
-			return displayedChildSettings.onOptionsItemSelected(item);
-		} else
+		boolean result = super.onOptionsItemSelected(item);
+		if (!result)
 		{
 			// main functionality
 			refreshControlCenter();
-			return true;
+			result = true;
 		}
-	}
-	
-	private void destroyView()
-	{
-		if (displayedChildSettings != null)
-		{
-			displayedChildSettings.onDestroy();
-		}
+		return result;
 	}
 
-	private void createView()
+	@Override
+	protected boolean updateView()
 	{
 		// Are we displaying Preferences for a child Prefscreen?
-		if (getIntent().getBooleanExtra(EXTRA_SHOWCHILDPREFSCREEN, false))
+		if (!super.updateView())
 		{
-			String settingsKey = getIntent().getStringExtra(EXTRA_SETTINGSKEY);
-			displayedChildSettings = childSettings.get(settingsKey);
-			if (displayedChildSettings != null)
-			{
-				// display child preferences, enables us to control the options
-				// menu
-				PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
-				setPreferenceScreen(root);
-				displayedChildSettings.setPreferenceScreen(root);
-				this.setTitle(settingsKey);
-			} else
-			{
-				// display error
-			}
-		} else
-		{
+			// no, so set up main screen
 			setPreferenceScreen(createPreferenceHierarchy());
 			this.setTitle("Control Center");
 		}
@@ -197,6 +170,7 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 				return false;
 			}
 		});
+		return true;
 	}
 
 	/**
@@ -216,7 +190,7 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 		componentsCat.setTitle("Components");
 		root.addPreference(componentsCat);
 
-		refreshControlCenter();
+		// refreshControlCenter();
 		return root;
 	}
 
@@ -228,89 +202,99 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 	{
 		servicesCat.removeAll();
 		componentsCat.removeAll();
-		childSettings.clear();
+		resetChildScreens();
 		addDummyPrefs();
 
 		if (platformService.isPlatformRunning(platformId))
 		{
-			// get all viewable services
 			IExternalAccess extAcc = platformService.getExternalPlatformAccess(platformId);
+			// add all viewable services
+			addViewableServices(extAcc);
 
-			IServiceProvider sp = extAcc.getServiceProvider();
-			ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
-			IVisitDecider decider = SServiceProvider.getVisitDecider(false, Binding.SCOPE_PLATFORM);
-
-			BasicResultSelector selector = new BasicResultSelector(ViewableFilter.VIEWABLE_FILTER, false);
-			IIntermediateFuture<IService> services = sp.getServices(manager, decider, selector);
-
-			services.addResultListener(new IntermediateDefaultResultListener<IService>()
-			{
-
-				@Override
-				public void resultAvailable(Collection<IService> result)
-				{
-					for (IService service : result)
-					{
-						intermediateResultAvailable(service);
-					}
-				}
-
-				@Override
-				public void intermediateResultAvailable(IService service)
-				{
-					if (addServiceSettings(servicesCat, service))
-					{
-						Preference dummyPref = servicesCat.findPreference("dummy");
-						if (dummyPref != null)
-							servicesCat.removePreference(dummyPref);
-					}
-				}
-
-			});
-
-			// get all viewable components
-			SServiceProvider.getServiceUpwards(extAcc.getServiceProvider(), IComponentManagementService.class).addResultListener(
-					new DefaultResultListener<IComponentManagementService>()
-					{
-						public void resultAvailable(final IComponentManagementService cms)
-						{
-							cms.getComponentIdentifiers().addResultListener(new DefaultResultListener<IComponentIdentifier[]>()
-							{
-								public void resultAvailable(IComponentIdentifier[] result)
-								{
-									for (IComponentIdentifier cid : result)
-									{
-										cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
-										{
-											public void resultAvailable(final IExternalAccess acc)
-											{
-												Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS, getClassLoader());
-
-												final Class<?> clazz = getGuiClass(clid);
-
-												if (clazz != null)
-												{
-													runOnUiThread(new Runnable()
-													{
-														public void run()
-														{
-															if (addComponentSettings(componentsCat, acc, clazz))
-															{
-																Preference dummyPref = componentsCat.findPreference("dummy");
-																if (dummyPref != null)
-																	componentsCat.removePreference(dummyPref);
-															}
-														}
-													});
-												}
-											}
-										});
-									}
-								}
-							});
-						}
-					});
+			// add all viewable components
+			addViewableComponents(extAcc);
 		}
+	}
+
+	private void addViewableServices(IExternalAccess extAcc)
+	{
+		IServiceProvider sp = extAcc.getServiceProvider();
+		ISearchManager manager = SServiceProvider.getSearchManager(true, Binding.SCOPE_PLATFORM);
+		IVisitDecider decider = SServiceProvider.getVisitDecider(false, Binding.SCOPE_PLATFORM);
+
+		BasicResultSelector<IService> selector = new BasicResultSelector<IService>(ViewableFilter.VIEWABLE_FILTER, false);
+		IIntermediateFuture<IService> services = sp.getServices(manager, decider, selector);
+
+		services.addResultListener(new IntermediateDefaultResultListener<IService>()
+		{
+
+			@Override
+			public void resultAvailable(Collection<IService> result)
+			{
+				for (IService service : result)
+				{
+					intermediateResultAvailable(service);
+				}
+			}
+
+			@Override
+			public void intermediateResultAvailable(IService service)
+			{
+				if (addServiceSettings(servicesCat, service))
+				{
+					Preference dummyPref = servicesCat.findPreference("dummy");
+					if (dummyPref != null)
+						servicesCat.removePreference(dummyPref);
+				}
+			}
+
+		});
+	}
+
+	private void addViewableComponents(IExternalAccess extAcc)
+	{
+		SServiceProvider.getServiceUpwards(extAcc.getServiceProvider(), IComponentManagementService.class).addResultListener(
+				new DefaultResultListener<IComponentManagementService>()
+				{
+					public void resultAvailable(final IComponentManagementService cms)
+					{
+						cms.getComponentIdentifiers().addResultListener(new DefaultResultListener<IComponentIdentifier[]>()
+						{
+							public void resultAvailable(IComponentIdentifier[] result)
+							{
+								for (IComponentIdentifier cid : result)
+								{
+									cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+									{
+										public void resultAvailable(final IExternalAccess acc)
+										{
+											Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
+													getClassLoader());
+
+											final Class<?> clazz = getGuiClass(clid);
+
+											if (clazz != null)
+											{
+												runOnUiThread(new Runnable()
+												{
+													public void run()
+													{
+														if (addComponentSettings(componentsCat, acc, clazz))
+														{
+															Preference dummyPref = componentsCat.findPreference("dummy");
+															if (dummyPref != null)
+																componentsCat.removePreference(dummyPref);
+														}
+													}
+												});
+											}
+										}
+									});
+								}
+							}
+						});
+					}
+				});
 	}
 
 	/**
@@ -334,7 +318,9 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 
 	protected boolean addServiceSettings(PreferenceGroup root, IService service)
 	{
-		final Object clid = service.getPropertyMap() != null ? service.getPropertyMap().get(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS) : null;
+		final Object clid = service.getPropertyMap() != null
+				? service.getPropertyMap().get(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS)
+				: null;
 		Class<?> guiClass = getGuiClass(clid);
 		if (guiClass != null)
 		{
@@ -343,22 +329,28 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 				AServiceSettings settings = (AServiceSettings) guiClass.getConstructor(IService.class).newInstance(service);
 				addSettings(root, settings);
 				return true;
-			} catch (InstantiationException e)
+			}
+			catch (InstantiationException e)
 			{
 				e.printStackTrace();
-			} catch (IllegalAccessException e)
+			}
+			catch (IllegalAccessException e)
 			{
 				e.printStackTrace();
-			} catch (IllegalArgumentException e)
+			}
+			catch (IllegalArgumentException e)
 			{
 				e.printStackTrace();
-			} catch (SecurityException e)
+			}
+			catch (SecurityException e)
 			{
 				e.printStackTrace();
-			} catch (InvocationTargetException e)
+			}
+			catch (InvocationTargetException e)
 			{
 				e.printStackTrace();
-			} catch (NoSuchMethodException e)
+			}
+			catch (NoSuchMethodException e)
 			{
 				e.printStackTrace();
 			}
@@ -373,22 +365,28 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 			AComponentSettings settings = (AComponentSettings) guiClass.getConstructor(IExternalAccess.class).newInstance(component);
 			addSettings(root, settings);
 			return true;
-		} catch (IllegalArgumentException e)
+		}
+		catch (IllegalArgumentException e)
 		{
 			e.printStackTrace();
-		} catch (SecurityException e)
+		}
+		catch (SecurityException e)
 		{
 			e.printStackTrace();
-		} catch (InstantiationException e)
+		}
+		catch (InstantiationException e)
 		{
 			e.printStackTrace();
-		} catch (IllegalAccessException e)
+		}
+		catch (IllegalAccessException e)
 		{
 			e.printStackTrace();
-		} catch (InvocationTargetException e)
+		}
+		catch (InvocationTargetException e)
 		{
 			e.printStackTrace();
-		} catch (NoSuchMethodException e)
+		}
+		catch (NoSuchMethodException e)
 		{
 			e.printStackTrace();
 		}
@@ -398,17 +396,8 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 	protected void addSettings(PreferenceGroup root, ISettings settings)
 	{
 		settings.setPlatformId(this.platformId);
-		PreferenceScreen screen = this.getPreferenceManager().createPreferenceScreen(this);
+		PreferenceScreen screen = createSubPreferenceScreen(settings);
 		root.addPreference(screen);
-		Intent i = new Intent(this, JadexAndroidControlCenter.class);
-		i.putExtra(EXTRA_PLATFORMID, (Serializable) platformId);
-		i.putExtra(EXTRA_SHOWCHILDPREFSCREEN, true);
-		i.putExtra(EXTRA_SETTINGSKEY, settings.getTitle());
-		childSettings.put(settings.getTitle(), settings);
-		screen.setIntent(i);
-		screen.setKey(settings.getTitle());
-		screen.setTitle(settings.getTitle());
-		// settings.setPreferenceScreen(screen);
 	}
 
 	/**
@@ -429,7 +418,8 @@ public class JadexAndroidControlCenter extends ServiceConnectingPreferenceActivi
 			{
 				guiClass = clazz;
 			}
-		} else if (clid instanceof String[])
+		}
+		else if (clid instanceof String[])
 		{
 			for (String className : (String[]) clid)
 			{

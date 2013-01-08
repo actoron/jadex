@@ -86,12 +86,15 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 		refreshDiscoveryInfos();
 		return true;
 	}
+	
+	public void onOptionsMenuClosed(Menu menu)
+	{
+	}
 
 	public void onDestroy()
 	{
 	}
 
-	@Override
 	protected void createPreferenceHierarchy(final PreferenceScreen screen)
 	{
 		this.screen = screen;
@@ -384,7 +387,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	private OnPreferenceClickListener onDiscoveryInfoLongClickListener = new OnPreferenceClickListener()
 	{
 
-		@Override
 		public boolean onPreferenceClick(Preference preference)
 		{
 			DiscoveryPreference pref = (DiscoveryPreference) preference;
@@ -405,7 +407,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			builder.setItems(items, new DialogInterface.OnClickListener()
 			{
 
-				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
 					switch (which)
@@ -465,7 +466,6 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 	private OnPreferenceClickListener onInExcludeLongClickListener = new OnPreferenceClickListener()
 	{
 
-		@Override
 		public boolean onPreferenceClick(Preference p)
 		{
 			Builder builder = new AlertDialog.Builder(p.getContext());
