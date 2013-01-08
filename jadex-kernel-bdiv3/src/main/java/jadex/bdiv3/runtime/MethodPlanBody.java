@@ -33,6 +33,7 @@ public class MethodPlanBody extends AbstractPlanBody
 	{
 		try
 		{
+			body.setAccessible(true);
 			return body.invoke(agent, params);
 		}
 		catch(Exception e)

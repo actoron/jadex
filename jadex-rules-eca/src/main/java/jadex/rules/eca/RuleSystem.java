@@ -76,109 +76,157 @@ public class RuleSystem
 	 *      and adds them to the rulebase.
 	 *  - Subscribes for events
 	 */
-	public Object observeObject(final Object object)
+	public Object observeObject(final Object object, boolean bean, boolean hasrules, 
+		IResultCommand<IFuture<IEvent>, PropertyChangeEvent> eventcreator)
 	{
+		// Create proxy object if eventcreators are present
+		Object proxy = object;
+					
 		Class<?> clazz = object.getClass();
-		
-//		addPropertyChangeListener(object);
-		
-		final Map<Method, IResultCommand<?,?>> eventcreators = new HashMap<Method, IResultCommand<?,?>>();
-		final Map<String, Rule<?>> rules = new HashMap<String, Rule<?>>();
-		
-		// Analyze the dynamic or static methods of the object (static if object is a class)
-		// todo: what about using constructors of classes
-		if(!(object instanceof Class))
+
+		if(bean && !(object instanceof Class))
 		{
-			while(!clazz.equals(Object.class))
+			addPropertyChangeListener(object, eventcreator);
+		}
+		
+		if(hasrules)
+		{
+			final Map<Method, IResultCommand<?,?>> eventcreators = new HashMap<Method, IResultCommand<?,?>>();
+			final Map<String, Rule<?>> rules = new HashMap<String, Rule<?>>();
+			
+			// Analyze the dynamic or static methods of the object (static if object is a class)
+			// todo: what about using constructors of classes
+			if(!(object instanceof Class))
 			{
-				Method[] methods = clazz.getDeclaredMethods();
+				while(!clazz.equals(Object.class))
+				{
+					Method[] methods = clazz.getDeclaredMethods();
+					for(int i=0; i<methods.length; i++)
+					{
+						if(!Modifier.isStatic(methods[i].getModifiers()))
+						{
+							analyzeMethod(methods[i], object, eventcreators, rules);
+						}
+					}
+					clazz = clazz.getSuperclass();
+				}
+			}
+			else
+			{
+				Method[] methods = ((Class<?>)object).getDeclaredMethods();
 				for(int i=0; i<methods.length; i++)
 				{
-					if(!Modifier.isStatic(methods[i].getModifiers()))
+					if(Modifier.isStatic(methods[i].getModifiers()))
 					{
 						analyzeMethod(methods[i], object, eventcreators, rules);
 					}
 				}
-				clazz = clazz.getSuperclass();
 			}
-		}
-		else
-		{
-			Method[] methods = ((Class<?>)object).getDeclaredMethods();
-			for(int i=0; i<methods.length; i++)
+			
+			// Add rules to rulebase
+			for(Iterator<Rule<?>> it=rules.values().iterator(); it.hasNext(); )
 			{
-				if(Modifier.isStatic(methods[i].getModifiers()))
+				Rule<?> rule = it.next();
+				if(rule.getAction()==null || rule.getCondition()==null 
+					|| rule.getEvents()==null || rule.getEvents().size()==0)
 				{
-					analyzeMethod(methods[i], object, eventcreators, rules);
+					throw new RuntimeException("Rule is incomplete: "+rule.getName());
 				}
+				rulebase.addRule(rule);
 			}
+			
+			//todo: fixme
+			
+	//		if(eventcreators.size()>0)
+	//		{
+	//			ProxyFactory pf = new ProxyFactory(object);
+	//			pf.addAdvice(new MethodInterceptor()
+	//			{
+	//				public Object invoke(MethodInvocation mi) throws Throwable
+	//				{
+	//					Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
+	//					IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
+	//					if(creator!=null)
+	//					{
+	//						Event event = (Event)creator.execute(null);
+	//						addEvent(event);
+	//	//					System.out.println("created event: "+event);
+	//					}
+	//					return ret;
+	//			    }
+	//			});
+	//			proxy = pf.getProxy();
+	//		}
+	
+			this.rules.put(object, new Tuple2(proxy, rules.values().toArray(new IRule[rules.size()])));
+	
+			// Recusrively call observe object on all direct monitored fields.
+			// todo: do we want this?
+	//		if(!(object instanceof Class))
+	//		{
+	//			clazz = object.getClass();
+	//			Field[] fields = clazz.getDeclaredFields();
+	//			for(int i=0; i<fields.length; i++)
+	//			{
+	//				if(fields[i].isAnnotationPresent(RuleObject.class))
+	//				{
+	//					fields[i].setAccessible(true);
+	//					try
+	//					{
+	//						Object subobject = fields[i].get(object);
+	//						observeObject(subobject);
+	//					}
+	//					catch(Exception e)
+	//					{
+	//						e.printStackTrace();
+	//					}
+	//				}
+	//			}
+	//		}
 		}
 		
-		// Add rules to rulebase
-		for(Iterator<Rule<?>> it=rules.values().iterator(); it.hasNext(); )
+		return proxy;
+	}
+	
+	/**
+	 *  Unobserve an object.
+	 */
+	public void unobserveObject(final Object object)
+	{
+		if(object==null)
+			return;
+		
+		removePropertyChangeListener(object);
+
+		Tuple2<Object, IRule<?>[]> tup = rules.remove(object);
+		if(tup!=null)
 		{
-			Rule<?> rule = it.next();
-			if(rule.getAction()==null || rule.getCondition()==null 
-				|| rule.getEvents()==null || rule.getEvents().size()==0)
+			IRule<?>[] rls = tup.getSecondEntity();
+			for(int i=0; i<rls.length; i++)
 			{
-				throw new RuntimeException("Rule is incomplete: "+rule.getName());
+				rulebase.removeRule(rls[i].getName());
 			}
-			rulebase.addRule(rule);
 		}
 		
-		// Create proxy object if eventcreators are present
-		Object proxy = object;
-		
-		//todo: fixme
-		
-//		if(eventcreators.size()>0)
+//		// Recusrively call unobserve object on all direct monitored fields.
+//		Class<?> clazz = object.getClass();
+//		Field[] fields = clazz.getDeclaredFields();
+//		for(int i=0; i<fields.length; i++)
 //		{
-//			ProxyFactory pf = new ProxyFactory(object);
-//			pf.addAdvice(new MethodInterceptor()
+//			if(fields[i].isAnnotationPresent(RuleObject.class))
 //			{
-//				public Object invoke(MethodInvocation mi) throws Throwable
+//				fields[i].setAccessible(true);
+//				try
 //				{
-//					Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
-//					IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
-//					if(creator!=null)
-//					{
-//						Event event = (Event)creator.execute(null);
-//						addEvent(event);
-//	//					System.out.println("created event: "+event);
-//					}
-//					return ret;
-//			    }
-//			});
-//			proxy = pf.getProxy();
-//		}
-
-		this.rules.put(object, new Tuple2(proxy, rules.values().toArray(new IRule[rules.size()])));
-
-		// Recusrively call observe object on all direct monitored fields.
-		// todo: do we want this?
-//		if(!(object instanceof Class))
-//		{
-//			clazz = object.getClass();
-//			Field[] fields = clazz.getDeclaredFields();
-//			for(int i=0; i<fields.length; i++)
-//			{
-//				if(fields[i].isAnnotationPresent(RuleObject.class))
+//					Object subobject = fields[i].get(object);
+//					unobserveObject(subobject);
+//				}
+//				catch(Exception e)
 //				{
-//					fields[i].setAccessible(true);
-//					try
-//					{
-//						Object subobject = fields[i].get(object);
-//						observeObject(subobject);
-//					}
-//					catch(Exception e)
-//					{
-//						e.printStackTrace();
-//					}
+//					e.printStackTrace();
 //				}
 //			}
 //		}
-		
-		return proxy;
 	}
 
 	/**
@@ -249,43 +297,6 @@ public class RuleSystem
 	}
 		
 	/**
-	 *  Unobserve an object.
-	 */
-	public void unobserveObject(final Object object)
-	{
-//		removePropertyChangeListener(object);
-		Tuple2<Object, IRule<?>[]> tup = rules.remove(object);
-		if(tup!=null)
-		{
-			IRule<?>[] rls = tup.getSecondEntity();
-			for(int i=0; i<rls.length; i++)
-			{
-				rulebase.removeRule(rls[i].getName());
-			}
-		}
-		
-		// Recusrively call unobserve object on all direct monitored fields.
-		Class<?> clazz = object.getClass();
-		Field[] fields = clazz.getDeclaredFields();
-		for(int i=0; i<fields.length; i++)
-		{
-			if(fields[i].isAnnotationPresent(RuleObject.class))
-			{
-				fields[i].setAccessible(true);
-				try
-				{
-					Object subobject = fields[i].get(object);
-					unobserveObject(subobject);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	
-	/**
 	 *  Get the rulebase.
 	 *  @return The rule base.
 	 */
@@ -297,7 +308,7 @@ public class RuleSystem
 	/**  
 	 *  Add a property change listener.
 	 */
-	protected void	addPropertyChangeListener(Object object)
+	protected void	addPropertyChangeListener(Object object, final IResultCommand<IFuture<IEvent>, PropertyChangeEvent> eventcreator)
 	{
 		if(object!=null)
 		{
@@ -317,9 +328,27 @@ public class RuleSystem
 							// todo: problems:
 							// - may be called on wrong thread (-> synchronizator)
 							// - how to create correct event with type and value
-							
-							Event event = new Event(evt.getPropertyName(), evt.getNewValue());
-							addEvent(event);
+
+							if(eventcreator!=null)
+							{
+								eventcreator.execute(evt).addResultListener(new IResultListener<IEvent>()
+								{
+									public void resultAvailable(IEvent event)
+									{
+										addEvent(event);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										System.out.println("Event creator had exception: "+exception);
+									}
+								});
+							}
+							else
+							{
+								Event event = new Event(evt.getPropertyName(), evt.getNewValue());
+								addEvent(event);
+							}
 						}
 					};
 				}

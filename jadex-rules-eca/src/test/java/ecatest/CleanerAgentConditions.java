@@ -44,7 +44,7 @@ public class CleanerAgentConditions
 	{
 		RuleSystem rs = new RuleSystem(null);
 		CleanerAgentConditions cac = new CleanerAgentConditions();
-		cac = (CleanerAgentConditions)rs.observeObject(cac);
+		cac = (CleanerAgentConditions)rs.observeObject(cac, true, true, null);
 				
 		for(int i=0; i<100; i++)
 		{

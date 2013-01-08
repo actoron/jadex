@@ -15,15 +15,22 @@ import jadex.bdiv3.example.cleanerworld.world.Cleaner;
 import jadex.bdiv3.example.cleanerworld.world.Environment;
 import jadex.bdiv3.example.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.example.cleanerworld.world.Location;
+import jadex.bdiv3.example.cleanerworld.world.LocationObject;
 import jadex.bdiv3.example.cleanerworld.world.MapPoint;
 import jadex.bdiv3.example.cleanerworld.world.Vision;
 import jadex.bdiv3.example.cleanerworld.world.Waste;
 import jadex.bdiv3.example.cleanerworld.world.Wastebin;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.runtime.RPlan;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +60,7 @@ public class CleanerBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected IEnvironment environment = Environment.getInstance();
+	protected IEnvironment environment;// = Environment.getInstance(); // problem: how to observe initial values, bdiagent is not available
 	
 	@Belief
 	protected Set<Waste> wastes;
@@ -400,12 +407,180 @@ public class CleanerBDI
 //		return IFuture.DONE;
 //	}
 	
+	@Plan(trigger=@Trigger(factchangeds={"environment", "my_location"}))
+	protected IFuture<Void> updateVision(RPlan rplan)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		// Create a representation of myself.
+		final Cleaner cl = new Cleaner(getMyLocation(),
+			getAgent().getComponentIdentifier().getName(),
+			getCarriedWaste(), getMyVision(),
+			getMyChargestate());
+
+		rplan.dispatchSubgoal(new GetVisionAction())
+			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.GetVisionAction, Void>(ret)
+		{
+			public void customResultAvailable(GetVisionAction gva)
+			{
+				Vision vi = gva.getVision();
+			
+				if(vi!=null)
+				{
+					setDaytime(vi.isDaytime());
+					
+					Waste[] ws = vi.getWastes();
+					Wastebin[] wbs = vi.getWastebins();
+					Chargingstation[] cs = vi.getStations();
+					Cleaner[] cls = vi.getCleaners();
+		
+					// When an object is not seen any longer (not
+					// in actualvision, but in (near) beliefs), remove it.
+	//				List known = (List)getExpression("query_in_vision_objects").execute();
+					List<LocationObject> known = getInVisionObjects();
+					
+					for(int i=0; i<known.size(); i++)
+					{
+						Object object = known.get(i);
+						if(object instanceof Waste)
+						{
+							List tmp = SUtil.arrayToList(ws);
+							if(!tmp.contains(object))
+								getWastes().remove(object);
+						}
+						else if(object instanceof Wastebin)
+						{
+							List tmp = SUtil.arrayToList(wbs);
+							if(!tmp.contains(object))
+								getWastebins().remove(object);
+						}
+						else if(object instanceof Chargingstation)
+						{
+							List tmp = SUtil.arrayToList(cs);
+							if(!tmp.contains(object))
+								getChargingStations().remove(object);
+						}
+						else if(object instanceof Cleaner)
+						{
+							List tmp = SUtil.arrayToList(cls);
+							if(!tmp.contains(object))
+								getCleaners().remove(object);
+						}
+					}
+		
+					// Add new or changed objects to beliefs.
+					for(int i=0; i<ws.length; i++)
+					{
+						if(!getWastes().contains(ws[i]))
+							getWastes().add(ws[i]);
+					}
+					for(int i=0; i<wbs.length; i++)
+					{
+						// Remove contained wastes from knowledge.
+						// Otherwise the agent might think that the waste is still
+						// somewhere (outside its vision) and then it creates lots of
+						// cleanup goals, that are instantly achieved because the
+						// target condition (waste in wastebin) holds.
+						Waste[]	wastes	= wbs[i].getWastes();
+						for(int j=0; j<wastes.length; j++)
+						{
+							if(getWastes().contains(wastes[j]))
+								getWastes().remove(wastes[j]);
+						}
+		
+						// Now its safe to add wastebin to beliefs.
+						if(getWastebins().contains(wbs[i]))
+						{
+							getWastebins().remove(wbs[i]);
+							getWastebins().add(wbs[i]);
+	//						bs.updateFact(wbs[i]);
+	//						Wastebin wb = (Wastebin)bs.getFact(wbs[i]);
+	//						wb.update(wbs[i]);
+						}
+						else
+						{
+							getWastebins().add(wbs[i]);
+						}
+						//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wbs[i]);
+					}
+					for(int i=0; i<cs.length; i++)
+					{
+						if(getChargingStations().contains(cs[i]))
+						{
+	//							bs.updateFact(cs[i]);
+	//						Chargingstation stat = (Chargingstation)bs.getFact(cs[i]);
+	//						stat.update(cs[i]);
+							getChargingStations().remove(cs[i]);
+							getChargingStations().add(cs[i]);
+						}
+						else
+						{
+							getChargingStations().add(cs[i]);
+						}
+						//getBeliefbase().getBeliefSet("chargingstations").updateOrAddFact(cs[i]);
+					}
+					for(int i=0; i<cls.length; i++)
+					{
+						if(!cls[i].equals(cl))
+						{
+							if(getCleaners().contains(cls[i]))
+							{
+	//								bs.updateFact(cls[i]);
+	//							Cleaner clea = (Cleaner)bs.getFact(cls[i]);
+	//							clea.update(cls[i]);
+								getCleaners().remove(cls[i]);
+								getCleaners().add(cls[i]);
+							}
+							else
+							{
+								getCleaners().add(cls[i]);
+							}
+							//getBeliefbase().getBeliefSet("cleaners").updateOrAddFact(cls[i]);
+						}
+					}
+		
+					//getBeliefbase().getBelief("???").setFact("allowed_to_move", new Boolean(true));
+				}
+				else
+				{
+	//				System.out.println("Error when updating vision! "+event.getGoal());
+				}
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<LocationObject> getInVisionObjects()
+	{
+		List<LocationObject> ret = new ArrayList<LocationObject>();
+		List<LocationObject> from = new ArrayList<LocationObject>();
+		from.addAll(getWastes());
+		from.addAll(getWastebins());
+		from.addAll(getChargingStations());
+		from.addAll(getCleaners());
+		for(LocationObject o: from)
+		{
+			if(getMyLocation().isNear(o.getLocation(), getMyVision()))
+			{
+				ret.add(o);
+			}
+		}
+		return ret;
+	}
+	
 	/**
 	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
 	{
+		environment = Environment.getInstance();
+		 
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

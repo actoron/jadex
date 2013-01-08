@@ -405,8 +405,9 @@ public class RGoal extends RProcessableElement
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		
-		// do we still need to observe directly?!
-		ip.getRuleSystem().observeObject(getPojoElement());
+		// do we still need to observe directly?! -> yes bean property changes?!
+		// todo: support goal change event?!
+//		ip.getRuleSystem().observeObject(getPojoElement(), true, false);
 		
 		Method[] ms = getPojoElement().getClass().getDeclaredMethods();
 		Method mcond = null;
@@ -492,7 +493,7 @@ public class RGoal extends RProcessableElement
 				
 				rule = new Rule<Void>(getId()+"_goal_option", 
 					new CombinedCondition(new ICondition[]{
-						new LifecycleStateCondition(GOALLIFECYCLESTATE_OPTION, false),
+						new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED),
 						new MethodCondition(getPojoElement(), m),
 					}), new IAction<Void>()
 				{
@@ -500,8 +501,8 @@ public class RGoal extends RProcessableElement
 					{
 						System.out.println("Goal made option: "+RGoal.this);
 //						setLifecycleState(GOALLIFECYCLESTATE_OPTION);
-						setLifecycleState(GOALLIFECYCLESTATE_ACTIVE); // todo: make option and use deliberation
-						setState(ia, PROCESSABLEELEMENT_INITIAL);
+						setLifecycleState(ia, GOALLIFECYCLESTATE_ACTIVE); // todo: make option and use deliberation
+//						setState(ia, PROCESSABLEELEMENT_INITIAL);
 						return IFuture.DONE;
 					}
 				});
@@ -616,14 +617,15 @@ public class RGoal extends RProcessableElement
 	 */
 	public static void addBeliefEvents(IInternalAccess ia, List<String> events, String belname)
 	{
-		events.add(belname);
+		events.add(ChangeEvent.BELIEFCHANGED+"."+belname); // the whole value was changed
+		events.add(ChangeEvent.FACTCHANGED+"."+belname); // property change of a value
+		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
 		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
 		{
 			events.add(ChangeEvent.FACTADDED+"."+belname);
 			events.add(ChangeEvent.FACTREMOVED+"."+belname);
-			events.add(ChangeEvent.FACTCHANGED+"."+belname);
 		}
 	}
 	

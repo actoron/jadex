@@ -497,6 +497,18 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				}
 				rulesystem.getRulebase().addRule(rule);
 			}
+			
+			List<String> fcs = trigger.getFactChangeds();
+			if(fcs!=null && fcs.size()>0)
+			{
+				Rule<Void> rule = new Rule<Void>("create_plan_factchanged_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
+				for(String fc: fcs)
+				{
+					rule.addEvent(ChangeEvent.FACTCHANGED+"."+fc);
+					rule.addEvent(ChangeEvent.BELIEFCHANGED+"."+fc);
+				}
+				rulesystem.getRulebase().addRule(rule);
+			}
 		}
 	}
 	

@@ -330,6 +330,11 @@ public class BDIClassReader extends MicroClassReader
 		{
 			tr.addFactRemoved(frs[j]);
 		}
+		String[] fcs = trigger.factchangeds();
+		for(int j=0; j<fcs.length; j++)
+		{
+			tr.addFactChangeds(fcs[j]);
+		}
 		
 		return tr;
 	}

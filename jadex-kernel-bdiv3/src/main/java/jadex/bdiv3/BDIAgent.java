@@ -12,7 +12,9 @@ import jadex.bdiv3.runtime.RCapability;
 import jadex.bdiv3.runtime.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
+import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -151,17 +153,42 @@ public class BDIAgent extends MicroAgent
 	 *  Method that is called automatically when a belief 
 	 *  is written as field access.
 	 */
-	public void writeField(Object val, String fieldname, Object obj)
+	public void writeField(Object val, final String fieldname, Object obj)
 	{
+		// todo: support for belief sets (un/observe values? insert mappers when setting value etc.
+		
 		try
 		{
 //			System.out.println("write: "+val+" "+fieldname+" "+obj);
-			Field f = obj.getClass().getDeclaredField(fieldname);
-			f.setAccessible(true);
-			f.set(obj, val);
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
-			rs.addEvent(new Event(fieldname, val));
+
+			Field f = obj.getClass().getDeclaredField(fieldname);
+			f.setAccessible(true);
+			
+			// unobserve old value for property changes
+			Object oldval = f.get(obj);
+			rs.unobserveObject(oldval);
+			
+			f.set(obj, val);
+			rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
+			
+			// observe new value for property changes
+			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+			{
+				public IFuture<IEvent> execute(final PropertyChangeEvent event)
+				{
+					return scheduleStep(new IComponentStep<IEvent>()
+					{
+						public IFuture<IEvent> execute(IInternalAccess ia)
+						{
+//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+							return new Future<IEvent>(ev);
+						}
+					});
+				}
+			});
 			
 			// initiate a step to reevaluate the conditions
 			scheduleStep(new IComponentStep()

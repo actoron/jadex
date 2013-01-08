@@ -48,6 +48,8 @@ public class Rulebase implements IRulebase
 			}
 			rs.add(rule);
 		}
+		
+//		System.out.println("evrules: "+evrules);
 	}
 	
 	/**
@@ -87,6 +89,9 @@ public class Rulebase implements IRulebase
 	 */
 	public List<IRule<?>> getRules(String event)
 	{
+//		if(event.equals("factchanged.environment"))
+//			System.out.println("ff");
+		
 		return evrules!=null? evrules.get(event): null;
 	}
 	

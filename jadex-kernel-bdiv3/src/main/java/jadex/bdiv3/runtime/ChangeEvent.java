@@ -11,9 +11,12 @@ public class ChangeEvent
 	/** Event type that a fact has been removed. */
 	public static final String FACTREMOVED = "factremoved";
 
-	/** Event type that a fact has been added. */
+	/** Event type that a fact has changed (property change in case of bean). */
 	public static final String FACTCHANGED = "factchanged";
 
+	/** Event type that a belief value has changed. */
+	public static final String BELIEFCHANGED = "beliefchanged";
+	
 	
 	/** The event type. */
 	protected String type;

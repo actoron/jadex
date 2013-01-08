@@ -18,13 +18,17 @@ public @interface Trigger
 	public Class<?>[] goals() default {};
 	
 	/**
-	 *  The fact added belief name.
+	 *  The fact added belief names.
 	 */
 	public String[] factaddeds() default {};
 	
 	/**
-	 *  The fact removed belief name.
+	 *  The fact removed belief names.
 	 */
 	public String[] factremoveds() default {};
-
+	
+	/**
+	 *  The fact changed belief names.
+	 */
+	public String[] factchangeds() default {};
 }

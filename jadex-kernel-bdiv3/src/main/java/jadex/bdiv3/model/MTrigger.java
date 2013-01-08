@@ -21,6 +21,8 @@ public class MTrigger
 	
 	protected List<String> factremoveds;
 	
+	protected List<String> factchangeds;
+	
 	/**
 	 * 
 	 */
@@ -109,6 +111,16 @@ public class MTrigger
 	}
 	
 	/**
+	 * 
+	 */
+	public void addFactChangeds(String fact)
+	{
+		if(factchangeds==null)
+			this.factchangeds = new ArrayList<String>();
+		factchangeds.add(fact);
+	}
+	
+	/**
 	 *  Get the fact added triggers (belief set names).
 	 */
 	public List<String>	getFactAddeds()
@@ -123,10 +135,13 @@ public class MTrigger
 	{
 		return factremoveds==null? Collections.EMPTY_LIST: factremoveds;
 	}
-//	
-//	/**
-//	 *  Get the fact added triggers (belief set names).
-//	 */
-//	public String[]	getFactChangeds();
+	
+	/**
+	 *  Get the fact changeds triggers (belief set names).
+	 */
+	public List<String>	getFactChangeds()
+	{
+		return factchangeds==null? Collections.EMPTY_LIST: factchangeds;
+	}
 
 }

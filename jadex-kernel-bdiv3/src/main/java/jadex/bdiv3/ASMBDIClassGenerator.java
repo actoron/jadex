@@ -96,7 +96,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) && !"<init>".equals(methodname))
 							{
 								// stack before putfield is object,value ()
-								System.out.println("method: "+methodname+" "+name);
+//								System.out.println("method: "+methodname+" "+name);
 								
 								// is already on stack (object + value)
 	//							mv.visitVarInsn(ALOAD, 0);
