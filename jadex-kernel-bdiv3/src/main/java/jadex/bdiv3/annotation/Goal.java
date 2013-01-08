@@ -53,4 +53,10 @@ public @interface Goal
 	 * The recur delay. 
 	 */
 	public long recurdelay() default -1;
+
+	/**
+	 *  Should the goal procedural succeed when first plan executed successfully. 
+	 */
+	public boolean succeedonpassed() default true;
+
 }

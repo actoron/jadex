@@ -183,7 +183,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
 	public class PerformLookForWaste
 	{
 		@GoalContextCondition(events="daytime")
@@ -193,7 +193,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
 	public class PerformPatrol
 	{
 		@GoalContextCondition(events="daytime")
@@ -322,7 +322,7 @@ public class CleanerBDI
 		protected Wastebin wastebin;
 	}
 	
-	@Goal
+	@Goal(succeedonpassed=false)
 	public class PerformMemorizePositions
 	{
 	}

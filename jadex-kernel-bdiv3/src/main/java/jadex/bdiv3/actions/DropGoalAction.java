@@ -45,9 +45,6 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 		try
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			RPlan plan = goal.getChildPlan();
-			if(plan!=null)
-				plan.abortPlan();
 			goal.unobserveGoal(ia);
 			ip.getCapability().removeGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPED);

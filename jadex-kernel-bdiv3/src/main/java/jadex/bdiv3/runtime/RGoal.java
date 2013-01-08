@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
+import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
@@ -308,12 +309,14 @@ public class RGoal extends RProcessableElement
 		else if(GOALLIFECYCLESTATE_SUSPENDED.equals(lifecyclestate))
 		{
 			// goal is suspended (no more plan executions)
+			abortPlans();
 			setState(PROCESSABLEELEMENT_INITIAL);
 		}
 		
 		if(GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
 		{
 			// goal is dropping (no more plan executions)
+			abortPlans();
 			setState(PROCESSABLEELEMENT_INITIAL);
 			ia.getExternalAccess().scheduleStep(new DropGoalAction(this));
 		}
@@ -334,6 +337,15 @@ public class RGoal extends RProcessableElement
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void abortPlans()
+	{
+		if(childplan!=null)
+			childplan.abortPlan();
 	}
 	
 	/**
@@ -469,7 +481,7 @@ public class RGoal extends RProcessableElement
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
 						System.out.println("Goal suspended: "+RGoal.this);
-						setLifecycleState(GOALLIFECYCLESTATE_SUSPENDED);
+						setLifecycleState(ia, GOALLIFECYCLESTATE_SUSPENDED);
 						setState(PROCESSABLEELEMENT_INITIAL);
 						return IFuture.DONE;
 					}
@@ -709,6 +721,9 @@ public class RGoal extends RProcessableElement
 		super.planFinished(ia, rplan);
 		childplan = null;
 		
+//		if(getPojoElement().getClass().getName().indexOf("PatrolPlan")!=-1)
+//			System.out.println("pips");
+		
 		// create reasoning step depending on the processable element type
 
 		// Check procedural success semantics
@@ -717,33 +732,36 @@ public class RGoal extends RProcessableElement
 			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
 		}
 		
-		if(!isSucceeded() && !isFailed())
+		if(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(getLifecycleState()))
 		{
-			// Test if is retry
-			if(isRetry() && rplan!=null)
+			if(!isSucceeded() && !isFailed())
 			{
-				if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
+				// Test if is retry
+				if(isRetry() && rplan!=null)
 				{
-					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
-				}
-				else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
-				{
-					setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+					if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
+					{
+						ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+					}
+					else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
+					{
+						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+					}
+					else
+					{
+						System.out.println("??? "+getState());
+					}
 				}
 				else
 				{
-					System.out.println("??? "+getState());
-				}
-			}
-			else
-			{
-				if(isRecur())
-				{
-					setProcessingState(ia, GOALPROCESSINGSTATE_PAUSED);
-				}
-				else
-				{
-					setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+					if(isRecur())
+					{
+						setProcessingState(ia, GOALPROCESSINGSTATE_PAUSED);
+					}
+					else
+					{
+						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+					}
 				}
 			}
 		}
@@ -785,7 +803,8 @@ public class RGoal extends RProcessableElement
 		boolean ret = false;
 		
 		// todo: perform goals
-		if(isProceduralGoal() && !getTriedPlans().isEmpty())
+		if(isProceduralGoal() && getMGoal().isSucceedOnPassed() 
+			&& !getTriedPlans().isEmpty())
 		{
 			RPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
 			ret = rplan.isPassed();

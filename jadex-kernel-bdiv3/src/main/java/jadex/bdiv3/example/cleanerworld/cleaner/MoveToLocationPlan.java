@@ -102,7 +102,7 @@ public class MoveToLocationPlan
 
 		double rx = r<d? r*dx/d: dx;
 		double ry = r<d? r*dy/d: dy;
-		System.out.println("mypos: "+(myloc.getX()+rx)+" "+(myloc.getY()+ry)+" "+target);
+//		System.out.println("mypos: "+(myloc.getX()+rx)+" "+(myloc.getY()+ry)+" "+target);
 		capa.setMyLocation(new Location(myloc.getX()+rx, myloc.getY()+ry));
 
 		// Alter the charge state
