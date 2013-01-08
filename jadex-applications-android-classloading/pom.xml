@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jadex-applications-android-classloading</artifactId>
+	<packaging>apk</packaging>
+	<name>jadex-applications-android-classloading</name>
+
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-android-parent</artifactId>
+		<version>2.3-SNAPSHOT</version>
+		<relativePath>../jadex-android-parent/pom.xml</relativePath>
+	</parent>
+	
+	<description>
+	This project contains an android application to demonstrate some jadex features.
+	</description>
+
+	<dependencies>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-platform</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 			<scope>provided</scope> -->
+<!-- 		</dependency> -->
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-commons</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-kernel-component</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-kernel-bpmn</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-kernel-bdi</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency>		 -->
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-runtimetools-android</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-platform-extension-webservice-android</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<version>2.2.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/.svn/*</exclude>
+				</excludes>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.bpmn</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
