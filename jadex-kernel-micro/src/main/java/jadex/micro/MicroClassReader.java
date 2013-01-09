@@ -1400,7 +1400,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
+	public <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1409,7 +1409,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public static <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
+	public <T extends Annotation> T getAnnotation(Field f, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(f.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1418,7 +1418,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public static <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
+	public <T extends Annotation> T getAnnotation(Method m, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(m.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
@@ -1427,7 +1427,7 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
-	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
+	public <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl1, ClassLoader cl2)
 	{
 		return getProxyAnnotation(clazz.getAnnotation((Class<T>)getClass(anclazz, cl1)), cl2);
 	}
@@ -1472,7 +1472,7 @@ public class MicroClassReader
 	 *  Gets proxy annotation that can be invoked by corresponding classloader.
 	 * @return 
 	 */
-	public static <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
+	public <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
 	{
 		T ret = null;
 		
