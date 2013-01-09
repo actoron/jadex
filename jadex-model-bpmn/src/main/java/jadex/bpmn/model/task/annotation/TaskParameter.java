@@ -1,4 +1,4 @@
-package jadex.bpmn.annotation;
+package jadex.bpmn.model.task.annotation;
 
 /**
  *  A declared parameter of a task.

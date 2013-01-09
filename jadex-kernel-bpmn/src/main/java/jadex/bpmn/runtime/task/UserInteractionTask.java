@@ -2,9 +2,8 @@ package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -57,7 +56,7 @@ public class UserInteractionTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
+	public IFuture execute(final ITaskContext context, final IInternalAccess instance)
 	{
 		final Future ret = new Future();
 		
@@ -190,7 +189,7 @@ public class UserInteractionTask implements ITask
 		            {
 		                pane.setValue(null);
 		                
-		                instance.scheduleStep(new IComponentStep<Void>()
+		                instance.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 						{
 		                	@Classname("rem")
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -243,7 +242,7 @@ public class UserInteractionTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final BpmnInterpreter instance)
+	public IFuture cancel(final IInternalAccess instance)
 	{
 		final Future ret = new Future();
 		SwingUtilities.invokeLater(new Runnable()

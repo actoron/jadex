@@ -60,7 +60,6 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.AReadContext;
-import jadex.xml.reader.Reader;
 import jadex.xml.reader.XMLReaderFactory;
 
 import java.io.File;
@@ -1062,7 +1061,7 @@ public class BpmnXMLReader
 		{
 			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MSequenceEdge edge = (MSequenceEdge)object;
-			JavaCCExpressionParser parser = new JavaCCExpressionParser();
+			//JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
 			// Read annotations from Jadex bpmn tool.
 			

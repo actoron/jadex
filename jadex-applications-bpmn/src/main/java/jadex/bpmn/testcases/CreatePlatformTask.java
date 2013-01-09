@@ -1,13 +1,13 @@
 package jadex.bpmn.testcases;
 
 import jadex.base.Starter;
-import jadex.bpmn.annotation.Task;
-import jadex.bpmn.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,7 +26,7 @@ public class CreatePlatformTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @return	To be notified, when the task has completed.
 	 */
-	public IFuture<Void> execute(final ITaskContext context, BpmnInterpreter process)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess process)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
@@ -55,7 +55,7 @@ public class CreatePlatformTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture<Void> cancel(BpmnInterpreter instance)
+	public IFuture<Void> cancel(IInternalAccess instance)
 	{
 		return IFuture.DONE;
 	}

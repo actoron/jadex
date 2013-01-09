@@ -39,7 +39,7 @@ public abstract class DocumentAdapter implements DocumentListener
 	 *  @param doc The document.
 	 *  @return The extracted String.
 	 */
-	protected final String getText(Document doc)
+	public static final String getText(Document doc)
 	{
 		String ret = null;
         

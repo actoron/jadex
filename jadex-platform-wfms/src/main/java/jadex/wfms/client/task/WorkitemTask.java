@@ -2,12 +2,13 @@ package jadex.wfms.client.task;
 
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -36,7 +37,7 @@ public class WorkitemTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public IFuture execute(final ITaskContext context, final BpmnInterpreter process)
+	public IFuture execute(final ITaskContext context, final IInternalAccess process)
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = process.getServiceContainer();
@@ -57,7 +58,7 @@ public class WorkitemTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final BpmnInterpreter instance)
+	public IFuture cancel(final IInternalAccess instance)
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = instance.getServiceContainer();
@@ -79,13 +80,13 @@ public class WorkitemTask implements ITask
 	 * @param listener The result listener
 	 * @return a new workitem
 	 */
-	private static IWorkitem createWorkitem(BpmnInterpreter process, ITaskContext context)
+	private static IWorkitem createWorkitem(IInternalAccess process, ITaskContext context)
 	{
 		Map parameterTypes = new LinkedHashMap();
 		Map parameterValues = new HashMap();
 		Map metaProperties = new HashMap();
 		Set readOnlyParameters = new HashSet();
-		Map parameters = context.getModelElement().getParameters();
+		IndexMap parameters = context.getModelElement().getParameters();
 		if (parameters != null)
 		{
 			for (Iterator it = parameters.keySet().iterator(); it.hasNext(); )

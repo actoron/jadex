@@ -1,10 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-platform-wfms</artifactId>
-	<version>2.3</version>
-	<url>http://jadex.sourceforge.net</url>
+	<packaging>jar</packaging>
+	<name>jadex-platform-wfms</name>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-parent</artifactId>
+		<version> 2.3-SNAPSHOT </version>
+		<relativePath>../jadex-parent/pom.xml</relativePath>
+	</parent>
 
 	<description>
 		The Jadex WfMS platform adds functionalities
@@ -157,49 +162,49 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-javaparser</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -209,7 +214,7 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applib-bdi</artifactId>
-			<version>2.2</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jfree</groupId>

@@ -1,15 +1,15 @@
 package jadex.bdibpmn.examples.helloworld;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Print hello on the console and increment parameter 'x'.
  */
 public class SayHelloTask	extends AbstractTask
 {
-	public void doExecute(ITaskContext context, BpmnInterpreter instance)
+	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		System.out.println("Hello BPMN world!");
 		int	x	= ((Number)context.getParameterValue("x")).intValue();

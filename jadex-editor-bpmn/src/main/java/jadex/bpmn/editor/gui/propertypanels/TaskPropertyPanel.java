@@ -14,6 +14,7 @@ import jadex.commons.SUtil;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -24,12 +25,15 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.border.EmptyBorder;
 
 /**
  *  Property panel for task activities.
@@ -58,9 +62,16 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		tabpane.addTab("Task", column);
 		
 		JLabel label = new JLabel("Class");
-		String[] tasknames = BpmnEditor.TASK_INFOS.keySet().toArray(new String[BpmnEditor.TASK_INFOS.size()]);
+		Set<String> tasknameset = new HashSet<String>(BpmnEditor.TASK_INFOS.keySet());
+		
+		if (modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+		{
+			tasknameset.addAll(modelcontainer.getProjectTaskMetaInfos().keySet());
+		}
+		
+		String[] tasknames = tasknameset.toArray(new String[BpmnEditor.TASK_INFOS.size()]);
 		Arrays.sort(tasknames);
-		JComboBox cbox = new JComboBox(tasknames);
+		final JComboBox cbox = new JComboBox(tasknames);
 		
 		cbox.setEditable(true);
 		if (getBpmnTask().getClazz() != null)
@@ -87,6 +98,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		processTaskInfos((String) cbox.getSelectedItem(), descarea);
 		
+		final JButton defaultParameterButton = new JButton();
+		defaultParameterButton.setEnabled(getTaskMetaInfo((String) cbox.getSelectedItem()) != null);
+		
 		cbox.addActionListener(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -95,7 +109,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				getBpmnTask().setClazz(new ClassInfo(taskname));
 				
 				processTaskInfos(taskname, descarea);
-				processTaskParameters(taskname, atable);
+				
+				defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
 			}
 		});
 		
@@ -130,6 +145,26 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		};
 		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
 		
+		Action setDefaultParametersAction = new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				processTaskParameters((String) cbox.getSelectedItem(), atable);
+			}
+		};
+		
+		Icon[] icons = modelcontainer.getImageProvider().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), "page", buttonpanel.getIconColor());
+		defaultParameterButton.setAction(setDefaultParametersAction);
+		defaultParameterButton.setIcon(icons[0]);
+		defaultParameterButton.setPressedIcon(icons[1]);
+		defaultParameterButton.setRolloverIcon(icons[2]);
+		defaultParameterButton.setContentAreaFilled(false);
+		defaultParameterButton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		defaultParameterButton.setMargin(new Insets(0, 0, 0, 0));
+		defaultParameterButton.setToolTipText("Enter default parameters appropriate for the selected task.");
+		((GridLayout) buttonpanel.getLayout()).setRows(3);
+		buttonpanel.add(defaultParameterButton);
+		
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -161,7 +196,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 */
 	protected void processTaskInfos(String taskname, JEditorPane descarea)
 	{
-		TaskMetaInfo info = BpmnEditor.TASK_INFOS.get(taskname);
+		TaskMetaInfo info = getTaskMetaInfo(taskname);
+		
 		descarea.setEditable(true);
 		if (info != null)
 		{
@@ -218,7 +254,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 */
 	protected void processTaskParameters(String taskname, ActivityParameterTable atable)
 	{
-		TaskMetaInfo info = BpmnEditor.TASK_INFOS.get(taskname);
+		TaskMetaInfo info = getTaskMetaInfo(taskname);
 		
 		if (info != null)
 		{
@@ -279,5 +315,25 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				atable.removeParameters(ind);
 			}
 		}
+	}
+	
+	/**
+	 *  Gets the task meta information.
+	 *  
+	 *  @param taskname Name of the task.
+	 *  @return The info, null if not found.
+	 */
+	protected TaskMetaInfo getTaskMetaInfo(String taskname)
+	{
+		TaskMetaInfo ret = null;
+		if (modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+		{
+			ret = modelcontainer.getProjectTaskMetaInfos().get(taskname);
+		}
+		if (ret == null)
+		{
+			ret = BpmnEditor.TASK_INFOS.get(taskname);
+		}
+		return ret;
 	}
 }

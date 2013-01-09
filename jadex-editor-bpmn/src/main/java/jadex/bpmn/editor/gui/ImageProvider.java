@@ -184,17 +184,17 @@ public class ImageProvider
 	 *  
 	 *  @param iconsize The icon size.
 	 * 	@param symbol Symbol name or text.
-	 *  @param bgcolor Color of the icon
+	 *  @param symbolcolor Color of the symbol.
 	 *  @return The generated icons.
 	 */
-	public Icon[] generateGenericFlatImageIconSet(int iconsize, String symbol)
+	public Icon[] generateGenericFlatImageIconSet(int iconsize, String symbol, Color symbolcolor)
 	{
 		Image offimage = imagecache.get(new Tuple3<String, Integer, String>("flat_off", iconsize, symbol));
 		Image onimage = imagecache.get(new Tuple3<String, Integer, String>("flat_on", iconsize, symbol));
 		Image highimage = imagecache.get(new Tuple3<String, Integer, String>("flat_high", iconsize, symbol));
 		if (offimage == null || onimage == null || highimage == null)
 		{
-			Image symimg = getSymbol(symbol, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE));
+			Image symimg = getSymbol(symbol, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE), symbolcolor);
 			BufferedImage darksymimg = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = darksymimg.createGraphics();
 			g.setComposite(new ModulateComposite(new Color(0.8f, 0.8f, 0.8f, 1.0f), true));
@@ -250,12 +250,12 @@ public class ImageProvider
 	 *  @param bgcolor Color of the icon.
 	 *  @return The generated icons.
 	 */
-	public Icon[] generateGenericButtonIconSet(int iconsize, Shape baseshape, String symbol, Color bgcolor)
+	public Icon[] generateGenericButtonIconSet(int iconsize, Shape baseshape, String symbol, Color symbolcolor, Color bgcolor)
 	{
 		Icon[] ret = new Icon[3];
-		ret[0] = generateGenericButtonIcon(iconsize, baseshape, symbol, bgcolor, false, false);
-		ret[1] = generateGenericButtonIcon(iconsize, baseshape, symbol, bgcolor, true, true);
-		ret[2] = generateGenericButtonIcon(iconsize, baseshape, symbol, bgcolor, true, false);
+		ret[0] = generateGenericButtonIcon(iconsize, baseshape, symbol, symbolcolor, bgcolor, false, false);
+		ret[1] = generateGenericButtonIcon(iconsize, baseshape, symbol, symbolcolor, bgcolor, true, true);
+		ret[2] = generateGenericButtonIcon(iconsize, baseshape, symbol, symbolcolor, bgcolor, true, false);
 		return ret;
 	}
 	
@@ -269,12 +269,12 @@ public class ImageProvider
 	 *  @param bgcolor Color of the icon.
 	 *  @return The generated icons.
 	 */
-	public Icon[] generateGenericButtonIconSet(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor)
+	public Icon[] generateGenericButtonIconSet(int iconsize, Shape baseshape, int frametype, String symbol, Color symbolcolor, Color bgcolor)
 	{
 		Icon[] ret = new Icon[3];
-		ret[0] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, bgcolor, false, false);
-		ret[1] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, true);
-		ret[2] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, bgcolor, true, false);
+		ret[0] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, symbolcolor, bgcolor, false, false);
+		ret[1] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, symbolcolor, bgcolor, true, true);
+		ret[2] = generateGenericButtonIcon(iconsize, baseshape, frametype, symbol, symbolcolor, bgcolor, true, false);
 		return ret;
 	}
 	
@@ -289,9 +289,9 @@ public class ImageProvider
 	 *  @param shift Shift (for pressed status) if true.
 	 *  @return The generated image icon.
 	 */
-	public ImageIcon generateGenericButtonIcon(int iconsize, Shape baseshape, String symbol, Color bgcolor, boolean high, boolean shift)
+	public ImageIcon generateGenericButtonIcon(int iconsize, Shape baseshape, String symbol, Color symbolcolor, Color bgcolor, boolean high, boolean shift)
 	{
-		return generateGenericButtonIcon(iconsize, baseshape, THICK_FRAME_TYPE, symbol, bgcolor, high, shift);
+		return generateGenericButtonIcon(iconsize, baseshape, THICK_FRAME_TYPE, symbol, symbolcolor, bgcolor, high, shift);
 	}
 	
 	/**
@@ -306,10 +306,10 @@ public class ImageProvider
 	 *  @param shift Shift (for pressed status) if true.
 	 *  @return The generated image icon.
 	 */
-	public ImageIcon generateGenericButtonIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor, boolean high, boolean shift)
+	public ImageIcon generateGenericButtonIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color symbolcolor, Color bgcolor, boolean high, boolean shift)
 	{
 		Dimension size = new Dimension(BUTTON_SIZE, BUTTON_SIZE);
-		Image symimg = getSymbol(symbol, size);
+		Image symimg = getSymbol(symbol, size, symbolcolor);
 		Image frame = generateGenericFrame(frametype, baseshape, size);
 		Image glass = generateGenericGlass(baseshape, size);
 		Image bgshape = generateGenericBackground(baseshape, size);
@@ -334,11 +334,11 @@ public class ImageProvider
 	 *  @param shift Shift (for pressed status) if true.
 	 *  @return The generated image icon.
 	 */
-	public ImageIcon generateFlatButtonIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color bgcolor)
+	public ImageIcon generateFlatButtonIcon(int iconsize, Shape baseshape, int frametype, String symbol, Color symbolcolor, Color bgcolor)
 	{
 		Dimension basesize = new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE);
 		Dimension size = new Dimension(iconsize, iconsize);
-		Image symimg = getSymbol(symbol, basesize);
+		Image symimg = getSymbol(symbol, basesize, symbolcolor);
 		Image frame = generateGenericFrame(frametype, baseshape, basesize);
 		Image glass = generateGenericGlass(baseshape, basesize);
 		Image bgshape = generateGenericBackground(baseshape, basesize);
@@ -597,7 +597,7 @@ public class ImageProvider
 	 *  @param name Name of the symbol.
 	 *  @return The symbol.
 	 */
-	private Image generateSymbol(String name, Dimension size)
+	private Image generateSymbol(String name, Dimension size, Color color)
 	{
 		BufferedImage ret = null;
 		
@@ -673,7 +673,7 @@ public class ImageProvider
 			int basex = (int) Math.round(size.width * 0.25);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
 			g.drawLine(basex, 0, basex, size.height);
-			Image txt = generateTextImage("P", 1.0f, size);
+			Image txt = generateTextImage("P", 1.0f, size, Color.BLACK);
 			basex >>>= 1;
 			g.drawImage(txt, basex, 0, size.width, size.height, 0, 0, size.width - basex, size.height, null);
 			g.dispose();
@@ -688,7 +688,7 @@ public class ImageProvider
 			int basex = (int) Math.round(size.width * 0.25);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS));
 			g.drawLine(basex, 0, basex, size.height);
-			Image txt = generateTextImage("L", 1.0f, size);
+			Image txt = generateTextImage("L", 1.0f, size, Color.BLACK);
 			basex >>>= 1;
 			g.drawImage(txt, basex, 0, size.width, size.height, 0, 0, size.width - basex, size.height, null);
 			g.dispose();
@@ -699,7 +699,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getLetterShape(0, 0, size.width, size.height));
 		}
@@ -710,7 +710,7 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			Shape letter = EventShape.getLetterShape(0, 0, size.width, size.height);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(letter);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.setComposite(AlphaComposite.Src);
@@ -723,7 +723,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getClockShape(0, 0, size.width, size.height));
 		}
@@ -733,7 +733,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getPageShape(0, 0, size.width, size.height));
 		}
@@ -743,7 +743,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getTriangleShape(0, 0, size.width, size.height));
 		}
@@ -754,7 +754,7 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			Shape triangle = EventShape.getTriangleShape(0, 0, size.width, size.height);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(triangle);
 		}
 		else if ("pentagon".equals(name))
@@ -763,7 +763,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getPentagonShape(0, 0, size.width, size.height));
 		}
@@ -774,7 +774,7 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			Shape pentagon = EventShape.getPentagonShape(0, 0, size.width, size.height);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(pentagon);
 		}
 		else if ("bolt".equals(name))
@@ -783,7 +783,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getBoltShape(0, 0, size.width, size.height));
 		}
@@ -794,7 +794,7 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			Shape bolt = EventShape.getBoltShape(0, 0, size.width, size.height);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(bolt);
 		}
 		else if ("backarrows".equals(name))
@@ -803,7 +803,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getBackArrowsShape(0, 0, size.width, size.height));
 		}
@@ -814,7 +814,7 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			Shape shape = EventShape.getBackArrowsShape(0, 0, size.width, size.height);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(shape);
 		}
 		else if ("EVT_X".equals(name))
@@ -823,7 +823,7 @@ public class ImageProvider
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.setStroke(new BasicStroke(THIN_FRAME_THICKNESS, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			g.draw(EventShape.getXCrossShape(0, 0, size.width, size.height));
 		}
@@ -834,7 +834,7 @@ public class ImageProvider
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			Shape shape = EventShape.getXCrossShape(0, 0, size.width, size.height);
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(shape);
 		}
 		
@@ -1034,9 +1034,11 @@ public class ImageProvider
 	 *  Renders text as image.
 	 *  
 	 *  @param text The text.
+	 *  @param size Size of the image.
+	 *  @param color Color of the text.
 	 *  @return The image.
 	 */
-	private Image generateTextImage(String text, float scaling, Dimension size)
+	private Image generateTextImage(String text, float scaling, Dimension size, Color color)
 	{
 		Image ret = textimagecache.get(text);
 		
@@ -1119,15 +1121,18 @@ public class ImageProvider
 	 *  Loads or generates a symbol.
 	 *  
 	 *  @param name Name of the symbol.
+	 *  @param size Size of the symbol.
+	 *  @param color Color of the symbol, only works with some symbols.
 	 *  @return The symbol.
 	 */
-	private Image getSymbol(String name, Dimension size)
+	private Image getSymbol(String name, Dimension size, Color color)
 	{
-		Image ret = imagecache.get(name);
+		Tuple3<String, Dimension, Color> key = new Tuple3<String, Dimension, Color>("symbol_" + name, size, color);
+		Image ret = imagecache.get(key);
 		
 		if (ret == null)
 		{
-			ret = generateSymbol(name, size);
+			ret = generateSymbol(name, size, color);
 		
 			if (ret == null)
 			{
@@ -1144,7 +1149,7 @@ public class ImageProvider
 			
 			if (ret == null)
 			{
-				ret = generateTextImage(name, 1.0f / (float) Math.sqrt(name.length()), size);
+				ret = generateTextImage(name, 1.0f / (float) Math.sqrt(name.length()), size, color);
 			}
 			
 			imagecache.put(name, ret);

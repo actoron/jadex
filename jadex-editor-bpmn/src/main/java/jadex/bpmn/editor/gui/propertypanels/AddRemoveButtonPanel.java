@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.gui.ImageProvider;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
@@ -17,6 +18,12 @@ import javax.swing.border.EmptyBorder;
  */
 public class AddRemoveButtonPanel extends JPanel
 {
+	/** Icon size for this panel's buttons. */
+	protected static final int ICON_SIZE = 32;
+	
+	/** Icon color for this panel's buttons. */
+	protected static final Color ICON_COLOR = new Color(126, 229, 80);
+	
 	/**
 	 *  Creates a panel.
 	 *  
@@ -29,8 +36,8 @@ public class AddRemoveButtonPanel extends JPanel
 		setLayout(new GridLayout(2, 1));
 		
 		JButton addbutton = new JButton();
-		int iconsize = 32;
-		Icon[] icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "add_+");
+		int iconsize = getIconSize();
+		Icon[] icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "add_+", getIconColor());
 		addbutton.setAction(addaction);
 		addbutton.setText(null);
 		addbutton.setIcon(icons[0]);
@@ -42,7 +49,7 @@ public class AddRemoveButtonPanel extends JPanel
 		addbutton.setToolTipText((String) addaction.getValue(Action.NAME));
 		
 		JButton removebutton = new JButton();
-		icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "remove_-");
+		icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "remove_-", getIconColor());
 		removebutton.setAction(removeaction);
 		removebutton.setText(null);
 		removebutton.setIcon(icons[0]);
@@ -55,5 +62,25 @@ public class AddRemoveButtonPanel extends JPanel
 		
 		add(addbutton);
 		add(removebutton);
+	}
+	
+	/**
+	 *  Returns the icon size used in this panel.
+	 *  
+	 *  @return The icon size.
+	 */
+	public int getIconSize()
+	{
+		return ICON_SIZE;
+	}
+	
+	/**
+	 *  Returns the icon color used in this panel.
+	 *  
+	 *  @return The icon color.
+	 */
+	public Color getIconColor()
+	{
+		return ICON_COLOR;
 	}
 }

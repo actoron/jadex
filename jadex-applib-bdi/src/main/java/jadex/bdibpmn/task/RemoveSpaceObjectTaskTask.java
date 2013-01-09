@@ -1,10 +1,10 @@
 package jadex.bdibpmn.task;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 
@@ -19,7 +19,7 @@ public class RemoveSpaceObjectTaskTask	implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public IFuture execute(ITaskContext context, BpmnInterpreter process)
+	public IFuture execute(ITaskContext context, IInternalAccess process)
 	{
 		IEnvironmentSpace	space	= (IEnvironmentSpace)context.getParameterValue("space");
 		Object	objectid	= context.getParameterValue("objectid");
@@ -33,7 +33,7 @@ public class RemoveSpaceObjectTaskTask	implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final BpmnInterpreter instance)
+	public IFuture cancel(final IInternalAccess instance)
 	{
 		return IFuture.DONE;
 	}

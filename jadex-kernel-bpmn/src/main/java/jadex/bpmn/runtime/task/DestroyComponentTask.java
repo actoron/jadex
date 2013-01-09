@@ -1,12 +1,12 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -23,7 +23,7 @@ public class DestroyComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
+	public IFuture execute(final ITaskContext context, final IInternalAccess instance)
 	{
 		final Future ret = new Future();
 		
@@ -91,7 +91,7 @@ public class DestroyComponentTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final BpmnInterpreter instance)
+	public IFuture cancel(final IInternalAccess instance)
 	{
 		return IFuture.DONE;
 	}

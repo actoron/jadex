@@ -3,6 +3,11 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.task.info.STaskMetaInfoExtractor;
+import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -18,6 +23,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -212,6 +218,9 @@ public class ModelContainer
 	/** The project classloader. */
 	protected ClassLoader projectclassloader;
 	
+	/** The infos of tasks in the project. */
+	protected Map<String, TaskMetaInfo> projecttaskmetainfos;
+	
 	/** The edit mode tool bar. */
 	protected AbstractEditingToolbar editingtoolbar;
 	
@@ -231,6 +240,7 @@ public class ModelContainer
 	{
 		this.idgen = new IdGenerator();
 		this.imageprovider = new ImageProvider();
+		this.projecttaskmetainfos = new HashMap<String, TaskMetaInfo>();
 	}
 	
 	/**
@@ -338,12 +348,74 @@ public class ModelContainer
 		projectroot = root;
 		try
 		{
-			projectclassloader = new URLClassLoader(new URL[] { root.toURI().toURL() });
+			String rootpath = root.getAbsolutePath();
+			File clroot = null;
+			if (rootpath.contains("src" + File.separator + "main" + File.separator + "java"))
+			{
+				String clpath = rootpath.replace("src" + File.separator + "main" + File.separator + "java",
+												 "target" + File.separator + "classes");
+				clroot = new File(clpath);
+				if (!clroot.exists())
+				{
+					clroot = null;
+				}
+			}
+			if (clroot == null && (rootpath.endsWith("src") || rootpath.endsWith("src" + File.separator)))
+			{
+				String clpath = rootpath.replace("src", "bin");
+				clroot = new File(clpath);
+				if (!clroot.exists())
+				{
+					clroot = null;
+				}
+			}
+			
+			if (clroot != null)
+			{
+				URL[] urls = new URL[] { clroot.toURI().toURL() };
+				projectclassloader = new URLClassLoader(urls, ModelContainer.class.getClassLoader());
+				Class<?>[] classes = SReflect.scanForClasses(urls, projectclassloader,
+				new IFilter<Object>()
+				{
+					public boolean filter(Object obj)
+					{
+						String name = null;
+						if (obj instanceof ZipEntry)
+						{
+							name = ((ZipEntry) obj).getName();
+						}
+						else if (obj instanceof File)
+						{
+							name = ((File) obj).getName();
+						}
+						if (name != null)
+						{
+							return name.endsWith(".class") && !(name.contains("$"));
+						}
+						return false;
+					}
+				},
+				new IFilter<Class<?>>()
+				{
+					public boolean filter(Class<?> clazz)
+					{
+						System.out.print(clazz.getCanonicalName());
+						System.out.print(": ");
+						System.out.println(SReflect.isSupertype(ITask.class, clazz));
+						return SReflect.isSupertype(ITask.class, clazz);
+					}
+				});
+				
+				for (Class<?> clazz : classes)
+				{
+					projecttaskmetainfos.put(clazz.getCanonicalName(), STaskMetaInfoExtractor.getMetaInfo(clazz));
+				}
+			}
 		}
 		catch (MalformedURLException e)
 		{
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING,
-				"Indentified project root, unable to generate classloader: " + e.getMessage());
+				"Identified project root, unable to generate classloader: " + e.getMessage());
 		}
 	}
 	
@@ -365,16 +437,15 @@ public class ModelContainer
 	public void setFile(File file)
 	{
 		this.file = file;
-		
-		if (projectroot == null)
+		try
 		{
-			try
-			{
-				findProjectRoot();
-			}
-			catch (Exception e)
-			{
-			}
+			projecttaskmetainfos.clear();
+			projectclassloader = null;
+			projectroot = null;
+			findProjectRoot();
+		}
+		catch (Exception e)
+		{
 		}
 	}
 	
@@ -386,6 +457,11 @@ public class ModelContainer
 	public ClassLoader getProjectClassLoader()
 	{
 		return projectclassloader;
+	}
+	
+	public Map<String, TaskMetaInfo> getProjectTaskMetaInfos()
+	{
+		return projecttaskmetainfos;
 	}
 	
 //	/**

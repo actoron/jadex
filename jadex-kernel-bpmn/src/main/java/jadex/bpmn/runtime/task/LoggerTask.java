@@ -1,9 +1,9 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.IInternalAccess;
 
 import java.util.logging.Level;
 
@@ -15,7 +15,7 @@ public class LoggerTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public void doExecute(ITaskContext context, BpmnInterpreter instance)
+	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		String	text	= (String)context.getParameterValue("text");
 		Level	level	= (Level)context.getParameterValue("level");

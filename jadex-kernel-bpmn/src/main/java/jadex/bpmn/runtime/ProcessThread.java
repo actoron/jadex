@@ -7,6 +7,8 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IFilter;

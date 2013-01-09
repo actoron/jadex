@@ -1,4 +1,4 @@
-package jadex.bpmn.annotation;
+package jadex.bpmn.model.task.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

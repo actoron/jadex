@@ -1,12 +1,13 @@
 package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -56,7 +57,7 @@ public class CreateComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture<Void> execute(final ITaskContext context, final BpmnInterpreter instance)
+	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess instance)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -190,8 +191,8 @@ public class CreateComponentTask implements ITask
 				
 				// todo: rid
 				cms.createComponent(name, model,
-					new CreationInfo(config, args, sub? instance.getComponentAdapter().getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings,
+					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
+						suspend, master, daemon, autoshutdown, ((BpmnInterpreter) instance).getModelElement().getModelInfo().getAllImports(), bindings,
 						instance.getModel().getResourceIdentifier()), lis)
 					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));
 				
@@ -220,7 +221,7 @@ public class CreateComponentTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture<Void> cancel(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
 		final Future<Void> ret = new Future<Void>();
 		creationfuture.addResultListener(instance.createResultListener(new IResultListener<IComponentIdentifier>()

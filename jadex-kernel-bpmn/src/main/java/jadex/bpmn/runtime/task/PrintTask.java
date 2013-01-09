@@ -1,11 +1,11 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.annotation.Task;
-import jadex.bpmn.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Print out some text stored in variable text.
@@ -18,7 +18,7 @@ public class PrintTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public void doExecute(ITaskContext context, BpmnInterpreter instance)
+	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		String text = (String)context.getParameterValue("text");
 		System.out.println(text);

@@ -1,9 +1,9 @@
 package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
@@ -46,7 +46,7 @@ public class ServiceCallTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @return	To be notified, when the task has completed.
 	 */
-	public IFuture execute(final ITaskContext context, final BpmnInterpreter process)
+	public IFuture execute(final ITaskContext context, final IInternalAccess process)
 	{
 		final Future	ret	= new Future();
 		String	service	= null;
@@ -170,7 +170,7 @@ public class ServiceCallTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(BpmnInterpreter instance)
+	public IFuture cancel(IInternalAccess instance)
 	{
 		// Todo: how to compensate service call!?
 		return IFuture.DONE;

@@ -1,11 +1,11 @@
 package jadex.bpmn.examples.remoteprocess;
 
-import jadex.bpmn.annotation.Task;
-import jadex.bpmn.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -42,7 +42,7 @@ public class ChoosePlatformTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @return	To be notified, when the task has completed.
 	 */
-	public IFuture<Void> execute(final ITaskContext context, BpmnInterpreter process)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess process)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
@@ -110,7 +110,7 @@ public class ChoosePlatformTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture<Void> cancel(BpmnInterpreter instance)
+	public IFuture<Void> cancel(IInternalAccess instance)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		SwingUtilities.invokeLater(new Runnable()

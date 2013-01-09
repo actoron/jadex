@@ -48,7 +48,12 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 		MSubProcess	proc	= (MSubProcess) activity;
 		List<MActivity> start = proc.getStartActivities();
-		final String	file	= (String)thread.getPropertyValue("file");
+		String tmpfile = (String)thread.getPropertyValue("file");
+		if (tmpfile == null)
+		{
+			tmpfile = (String)thread.getPropertyValue("filename");
+		}
+		final String	file	= tmpfile;
 	
 		// Internal subprocess (when no file is given and has start activities).
 		// Todo: cancel timer on normal/exception exit

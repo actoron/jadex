@@ -567,7 +567,12 @@ public class SBpmnModelReader
 		}
 		else if ("subprocessref".equals(tag.getLocalPart()))
 		{
-			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("file", content.trim());
+			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("filename", content.trim());
+		}
+		else if ("subprocessexpressionref".equals(tag.getLocalPart()))
+		{
+			UnparsedExpression fileexp = new UnparsedExpression("file", String.class, content.trim(), null);
+			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("file", fileexp);
 		}
 		else if ("parameter".equals(tag.getLocalPart()))
 		{

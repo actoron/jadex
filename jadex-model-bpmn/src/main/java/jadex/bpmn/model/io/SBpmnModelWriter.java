@@ -793,12 +793,19 @@ public class SBpmnModelWriter
 			
 			boolean issubproc = MBpmnModel.SUBPROCESS.equals(activity.getActivityType());
 			String procref = null;
+			boolean isprocrefexp = false;
 			if (issubproc)
 			{
 				MSubProcess subproc = (MSubProcess) activity;
 				if (subproc.hasPropertyValue("file"))
 				{
-					procref = (String) subproc.getPropertyValue("file");
+					UnparsedExpression fileexp = (UnparsedExpression) subproc.getPropertyValue("file"); 
+					procref = fileexp.getValue();
+					isprocrefexp = true;
+				}
+				else if (subproc.hasPropertyValue("filename"))
+				{
+					procref = (String) subproc.getPropertyValue("filename");
 				}
 				else
 				{
@@ -861,9 +868,14 @@ public class SBpmnModelWriter
 				
 				if (procref != null)
 				{
-					out.print(getIndent(baseind + 2) + "<jadex:subprocessref>");
+					String tagpart = "jadex:subprocessref>";
+					if (isprocrefexp)
+					{
+						tagpart = "jadex:subprocessexpressionref>";
+					}
+					out.print(getIndent(baseind + 2) + "<" + tagpart);
 					out.print(procref);
-					out.println("</jadex:subprocessref>");
+					out.println("</" + tagpart);
 				}
 				
 				out.println(getIndent(baseind + 1) + "</semantic:extensionElements>");

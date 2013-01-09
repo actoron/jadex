@@ -1,8 +1,8 @@
 package jadex.bpmn.tutorial;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -26,7 +26,7 @@ public class AsynchronousOKTask	 implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture<Void> execute(final ITaskContext context, BpmnInterpreter process)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess process)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -75,7 +75,7 @@ public class AsynchronousOKTask	 implements ITask
 	 *  Cleanup in case the task is cancelled.
 	 *  @return	A future to indicate when cancellation has completed.
 	 */
-	public IFuture<Void> cancel(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
 		cancelled	= true;
 		final Future<Void> ret = new Future<Void>();

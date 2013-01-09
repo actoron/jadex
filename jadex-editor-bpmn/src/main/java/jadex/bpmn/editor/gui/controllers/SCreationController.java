@@ -199,7 +199,7 @@ public class SCreationController
 		else if (ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS.equals(mode))
 		{
 			mactivity.setName("External Sub-Process");
-			mactivity.setPropertyValue("file", "");
+			mactivity.setPropertyValue("filename", "");
 			vactivity = new VExternalSubProcess(modelcontainer.getGraph());
 			vactivity.setCollapsed(true);
 		}

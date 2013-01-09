@@ -2,9 +2,10 @@ package jadex.bpmn.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -22,9 +23,9 @@ public class CompensationTestTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @return	To be notified, when the task has completed.
 	 */
-	public IFuture execute(ITaskContext context, BpmnInterpreter process)
+	public IFuture execute(ITaskContext context, IInternalAccess process)
 	{
-		process.setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
+		((BpmnInterpreter) process).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
 		executionFuture = new Future();
 		process.killComponent();
 		return executionFuture;
@@ -37,9 +38,9 @@ public class CompensationTestTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(BpmnInterpreter instance)
+	public IFuture cancel(IInternalAccess instance)
 	{
-		instance.setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
+		((BpmnInterpreter) instance).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
 		executionFuture.setResult(null);
 		return IFuture.DONE;
 	}

@@ -1,8 +1,9 @@
 package jadex.bpmn.tutorial;
 
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
@@ -17,7 +18,7 @@ public class GetTimeTask	 implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture<Void> execute(final ITaskContext context, final BpmnInterpreter process)
+	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess process)
 	{
 		final Future<Void> ret = new Future<Void>();
 		IFuture<IClockService> clockfut	= SServiceProvider.getServiceUpwards(process.getServiceContainer(), IClockService.class);
@@ -25,7 +26,7 @@ public class GetTimeTask	 implements ITask
 		{
 			public void resultAvailable(final IClockService	clock)
 			{
-				process.getComponentAdapter().invokeLater(new Runnable()
+				((BpmnInterpreter) process).getComponentAdapter().invokeLater(new Runnable()
 				{
 					public void run()
 					{
@@ -47,7 +48,7 @@ public class GetTimeTask	 implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture<Void> cancel(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
 		return IFuture.DONE;
 	}

@@ -74,10 +74,19 @@ public class EventHandlerLayout extends mxGraphLayout
 			double vpos = vparent.getGeometry().getHeight() - 0.5 * evtsize.height - 1;
 			double dist = evtsize.width * 1.5;
 //			System.out.println(dist);
-			while (dist * evthandlers.size() > (pw - dist))// * 2.0))
+			if (pw > 0.0)
 			{
-				dist *= 0.9;
+				double fulldist = dist * evthandlers.size() + dist;
+				if (fulldist > pw)
+				{
+					dist = dist * (pw / fulldist);
+				}
 			}
+			else
+			{
+				dist = 0.0;
+			}
+			
 //			System.out.println(dist);
 			int count = 0;
 			for (VActivity vactivity : evthandlers)

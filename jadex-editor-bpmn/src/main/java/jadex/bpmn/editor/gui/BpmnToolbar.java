@@ -352,7 +352,7 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		
 		public void run()
 		{
-			iconset = imgprovider.generateGenericButtonIconSet(iconsize, baseshape, frametype, sym, color);
+			iconset = imgprovider.generateGenericButtonIconSet(iconsize, baseshape, frametype, sym, Color.BLACK, color);
 		}
 		
 		public Icon[] getIconSet()

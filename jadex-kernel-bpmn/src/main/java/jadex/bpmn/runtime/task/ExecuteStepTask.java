@@ -1,10 +1,10 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -17,7 +17,7 @@ public class ExecuteStepTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public void doExecute(ITaskContext context, BpmnInterpreter instance)
+	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		Object[] step = (Object[])context.getParameterValue("step");
 		Future ret = (Future)step[1];

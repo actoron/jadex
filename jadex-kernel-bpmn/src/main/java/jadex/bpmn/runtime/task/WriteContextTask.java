@@ -1,9 +1,10 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Writes values to context variables.
@@ -13,14 +14,14 @@ public class WriteContextTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public void doExecute(ITaskContext context, BpmnInterpreter instance) throws Exception
+	public void doExecute(ITaskContext context, IInternalAccess instance) throws Exception
 	{
 		if(context.hasParameterValue("name"))
 		{
 			String name = (String)context.getParameterValue("name");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
-			instance.setContextVariable(name, key, val);
+			((BpmnInterpreter) instance).setContextVariable(name, key, val);
 		}
 		
 		for(int i=0; ; i++)
@@ -30,7 +31,7 @@ public class WriteContextTask extends AbstractTask
 				String name = (String)context.getParameterValue("name"+i);
 				Object val = context.getParameterValue("value"+i);
 				Object key = context.getParameterValue("key"+i);
-				instance.setContextVariable(name, key, val);
+				((BpmnInterpreter) instance).setContextVariable(name, key, val);
 			}
 			else
 			{

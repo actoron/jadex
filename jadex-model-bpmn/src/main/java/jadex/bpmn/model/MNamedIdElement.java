@@ -121,4 +121,14 @@ public class MNamedIdElement extends MAnnotationElement
 	{
 		return properties!=null? (String[])properties.keySet().toArray(new String[properties.size()]): SUtil.EMPTY_STRING_ARRAY;
 	}
+	
+	/**
+	 *  Removes a property.
+	 *  
+	 *  @param name Name of the property.
+	 */
+	public void removeProperty(String name)
+	{
+		properties.remove(name);
+	}
 }

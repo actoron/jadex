@@ -1,4 +1,4 @@
-package jadex.bpmn.runtime;
+package jadex.bpmn.model.task;
 
 import jadex.bpmn.model.MActivity;
 

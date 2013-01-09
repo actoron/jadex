@@ -1,10 +1,10 @@
 package jadex.bpmn.tutorial;
 
-import jadex.bpmn.annotation.Task;
-import jadex.bpmn.annotation.TaskParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bridge.IInternalAccess;
 
 import javax.swing.JOptionPane;
 
@@ -21,7 +21,7 @@ public class OKTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public void doExecute(ITaskContext context, BpmnInterpreter instance)
+	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		String	message	= (String)context.getParameterValue("message");
 		String	title	= (String)context.getParameterValue("title");

@@ -1,11 +1,11 @@
 package jadex.bdibpmn.examples.puzzle;
 
 import jadex.bdibpmn.BpmnPlanBodyInstance;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.IInternalAccess;
 
 /**
  *  Write our print used memory for benchmark agent.
@@ -16,7 +16,7 @@ public class BenchmarkMemoryTask extends AbstractTask
 	/**
 	 * 	Execute the task.
 	 */
-	public void doExecute(ITaskContext context, BpmnInterpreter instance)
+	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		BpmnPlanBodyInstance	inst	= (BpmnPlanBodyInstance)instance;
 		if(inst.getBeliefbase().containsBelief("endmem"))

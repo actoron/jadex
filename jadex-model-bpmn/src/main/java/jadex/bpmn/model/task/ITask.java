@@ -1,5 +1,6 @@
-package jadex.bpmn.runtime;
+package jadex.bpmn.model.task;
 
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 
 /**
@@ -14,11 +15,11 @@ public interface ITask
 	 *  @param process	The process instance executing the task.
 	 *  @return	To be notified, when the task has completed.
 	 */
-	public IFuture<Void> execute(ITaskContext context, BpmnInterpreter process);
+	public IFuture<Void> execute(ITaskContext context, IInternalAccess process);
 	
 	/**
 	 *  Cleanup in case the task is cancelled.
 	 *  @return	A future to indicate when cancellation has completed.
 	 */
-	public IFuture<Void> cancel(BpmnInterpreter instance);
+	public IFuture<Void> cancel(IInternalAccess instance);
 }

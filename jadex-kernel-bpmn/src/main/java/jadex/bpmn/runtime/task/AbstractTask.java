@@ -1,8 +1,8 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -17,7 +17,7 @@ public abstract class AbstractTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public IFuture<Void> execute(ITaskContext context, BpmnInterpreter instance)
+	public IFuture<Void> execute(ITaskContext context, IInternalAccess instance)
 	{
 		Future<Void> ret = new Future<Void>();
 		
@@ -38,7 +38,7 @@ public abstract class AbstractTask implements ITask
 	 *  Cleanup in case the task is cancelled.
 	 *  @return	A future to indicate when cancellation has completed.
 	 */
-	public IFuture<Void> cancel(final BpmnInterpreter instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
 		return IFuture.DONE;
 	}
@@ -51,5 +51,5 @@ public abstract class AbstractTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @throws	Exception When task execution fails.
 	 */
-	public abstract void doExecute(ITaskContext context, BpmnInterpreter instance)	throws Exception;
+	public abstract void doExecute(ITaskContext context, IInternalAccess instance)	throws Exception;
 }
