@@ -7,14 +7,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
 
 import java.net.InetSocketAddress;
@@ -46,6 +44,9 @@ public class NIOTCPTransport implements ITransport
 	/** How long to keep connections alive (5 min). */
 	protected static final int	MAX_KEEPALIVE	= 300000;
 
+	/** The time span for which a failed connection is not retried. */
+	public static long DEADSPAN = 60000;
+	
 	/** Default port. */
 	protected static final int DEFAULT_PORT	= 8765;
 	

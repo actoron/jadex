@@ -30,9 +30,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -133,7 +133,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	protected Map<IComponentIdentifier, DiscoveryInfo> discovered;
 	
 	/** The discovery listeners. */
-	protected Set<TerminableIntermediateFuture<DiscoveryInfo>>	listeners;
+	protected Set<SubscriptionIntermediateDelegationFuture<DiscoveryInfo>>	listeners;
 	
 	/** The timer. */
 	protected Timer	timer;
@@ -449,13 +449,13 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 *  	Otherwise only changes that happen after the subscription will be posted. 
 	 *  @return An intermediate future that is notified about any changes.
 	 */
-	public ITerminableIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial)
+	public ISubscriptionIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial)
 	{
 		if(listeners==null)
 		{
-			listeners	= new LinkedHashSet<TerminableIntermediateFuture<DiscoveryInfo>>();
+			listeners	= new LinkedHashSet<SubscriptionIntermediateDelegationFuture<DiscoveryInfo>>();
 		}
-		TerminableIntermediateFuture<DiscoveryInfo>	ret	= new TerminableIntermediateFuture<DiscoveryInfo>();
+		SubscriptionIntermediateDelegationFuture<DiscoveryInfo>	ret	= new SubscriptionIntermediateDelegationFuture<DiscoveryInfo>();
 		listeners.add(ret);
 		
 		if(include_initial)
@@ -476,17 +476,21 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	{
 		if(listeners!=null)
 		{
-			for(Iterator<TerminableIntermediateFuture<DiscoveryInfo>> it=listeners.iterator(); it.hasNext() ; )
+			for(Iterator<SubscriptionIntermediateDelegationFuture<DiscoveryInfo>> it=listeners.iterator(); it.hasNext() ; )
 			{
-				TerminableIntermediateFuture<DiscoveryInfo>	fut	= it.next();
+				SubscriptionIntermediateDelegationFuture<DiscoveryInfo>	fut	= it.next();
+				
 				try
 				{
-					fut.addIntermediateResult(dif);
+					if(!fut.addIntermediateResultIfUndone(dif))
+					{
+						// Future terminated, i.e., subscription cancelled.
+						it.remove();
+					}
 				}
 				catch(Exception e)
 				{
-					// Future terminated, i.e., subscription cancelled.
-					it.remove();
+					e.printStackTrace();
 				}
 			}
 		}
@@ -693,7 +697,6 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				List<DiscoveryInfo> todel = autodelete? new ArrayList<DiscoveryInfo>(): null;
 				synchronized(AwarenessManagementAgent.this)
 				{
-					long time = getClockTime();
 					for(Iterator<DiscoveryInfo> it=discovered.values().iterator(); it.hasNext(); )
 					{
 						DiscoveryInfo dif = it.next();

@@ -226,6 +226,13 @@ public class SelectorThread implements Runnable
 							{
 //									System.out.println(new Date()+": Failed connection to: "+address+", "+ret.hashCode());
 								fut.setException(e);
+								synchronized(connections)
+								{
+									if(connections.get(address)==fut)
+									{
+										connections.remove(address);
+									}
+								}
 							}
 						}			
 					};
@@ -377,26 +384,28 @@ public class SelectorThread implements Runnable
 				if(sc.read(ByteBuffer.wrap(new byte[1]))!=1)
 					throw new IOException("Error receiving handshake byte.");
 				
-				Cleaner	cleaner	= new Cleaner(address);
+				Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.MAX_KEEPALIVE);
 				NIOTCPOutputConnection	con	= new NIOTCPOutputConnection(sc, address, cleaner);
-				cleaner.refresh();
 				synchronized(connections)
 				{
 					connections.put(address, con);
 				}
+				cleaner.refresh();
 				// Keep channel on hold until we are ready to write.
 			    key.interestOps(0);
 				logger.info("NIOTCP connected to: "+address);
 				ret.setResult(con);
 			}
 			catch(Exception e)
-			{ 
+			{
+				Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
 				synchronized(connections)
 				{
-					connections.put(address, new NIOTCPDeadConnection());
+					connections.put(address, new NIOTCPDeadConnection(cleaner));
 				}
+				cleaner.refresh();
 				ret.setException(e);
-				logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
+				logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
 //				e.printStackTrace();
 				key.cancel();
 			}
@@ -422,14 +431,16 @@ public class SelectorThread implements Runnable
 			logger.info("NIOTCP connected to: "+address+", waiting for handshake");
 		}
 		catch(Exception e)
-		{ 
+		{
+			Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
 			synchronized(connections)
 			{
-				connections.put(address, new NIOTCPDeadConnection());
+				connections.put(address, new NIOTCPDeadConnection(cleaner));
 			}
+			cleaner.refresh();
 			ret.setException(e);
 //			System.out.println("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
-			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
+			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -618,13 +629,19 @@ public class SelectorThread implements Runnable
 		/** The timer task. */
 		protected TimerTask timertask;
 		
+		/** The delay time before the cleaner gets active. */
+		protected long	delay;
+		
+		/** The connection associated to the address. */
+		protected Object	con;
+		
 		//-------- constructors --------
 		
 		/**
 		 *  Cleaner for a specified output connection.
 		 *  @param address The address.
 		 */
-		public Cleaner(InetSocketAddress address)
+		public Cleaner(InetSocketAddress address, long delay)
 		{
 			this.address = address;
 		}
@@ -636,6 +653,14 @@ public class SelectorThread implements Runnable
 		 */
 		public void refresh()
 		{
+			if(con==null)
+			{
+				synchronized(connections)
+				{
+					con	= connections.get(address);
+				}
+			}
+			
 			if(timer==null)
 			{
 				timer	= new Timer(true);
@@ -650,10 +675,17 @@ public class SelectorThread implements Runnable
 				public void run()
 				{
 					logger.info("Timeout reached for: "+address);
-					Object	con;
 					synchronized(connections)
 					{
-						con	= connections.remove(address);
+						if(con.equals(connections.get(address)))
+						{
+							connections.remove(address);
+						}
+						else
+						{
+							// Connection of cleaner is obsolete.
+							con	= null;
+						}
 					}
 					if(con instanceof NIOTCPOutputConnection)
 					{
@@ -668,7 +700,7 @@ public class SelectorThread implements Runnable
 					}
 				}
 			};
-			timer.schedule(timertask, NIOTCPTransport.MAX_KEEPALIVE);
+			timer.schedule(timertask, delay);
 		}
 		
 		/**

@@ -1,5 +1,7 @@
 package jadex.platform.service.message.transport.niotcpmtp;
 
+import jadex.platform.service.message.transport.niotcpmtp.SelectorThread.Cleaner;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -8,24 +10,23 @@ import java.io.IOException;
  */
 public class NIOTCPDeadConnection	implements Closeable
 {
-	//-------- constants --------
-	
-	/** The time span for which this connection is dead. */
-	public static long DEADSPAN = 60000;
-	
 	//-------- attributes --------
 	
 	/** The dead connection start time. */
 	protected long deadtime;
 	
+	/** The cleaner. */
+	protected Cleaner	cleaner;
+
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new dead connection.
 	 */
-	public NIOTCPDeadConnection()
+	public NIOTCPDeadConnection(Cleaner cleaner)
 	{
 		this.deadtime = System.currentTimeMillis();
+		this.cleaner	= cleaner;
 	}
 	
 	//-------- methods --------
@@ -36,7 +37,7 @@ public class NIOTCPDeadConnection	implements Closeable
 	 */
 	public boolean shouldRetry()
 	{
-		return System.currentTimeMillis()>deadtime+DEADSPAN;
+		return System.currentTimeMillis()>deadtime+NIOTCPTransport.DEADSPAN;
 	}
 	
 	/**
@@ -44,5 +45,6 @@ public class NIOTCPDeadConnection	implements Closeable
 	 */
 	public void close() throws IOException
 	{
+		cleaner.remove();
 	}
 }

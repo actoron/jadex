@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ public interface IAwarenessManagementService
 	 *  @return An intermediate future that is notified about any changes.
 	 */
 	@Timeout(Timeout.NONE)
-	public ITerminableIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial);
+	public ISubscriptionIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial);
 	
 	// Todo: create / remove proxies?
 	
