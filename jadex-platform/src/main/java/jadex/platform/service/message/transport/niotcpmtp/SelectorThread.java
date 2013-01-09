@@ -173,6 +173,8 @@ public class SelectorThread implements Runnable
 		selector.wakeup();
 	}
 	
+	public static int cnt	= 0;
+	
 	/**
 	 *  Get a connection to one of the given addresses.
 	 *  Tries all addresses in parallel and returns the first
@@ -214,6 +216,11 @@ public class SelectorThread implements Runnable
 						{
 							try
 							{
+								synchronized(connections)
+								{
+									cnt++;
+								}
+								
 								SocketChannel	sc	= SocketChannel.open();
 //								sc.socket().setSoTimeout(10);
 								sc.configureBlocking(false);
@@ -224,7 +231,12 @@ public class SelectorThread implements Runnable
 							}
 							catch(Exception e)
 							{
-//									System.out.println(new Date()+": Failed connection to: "+address+", "+ret.hashCode());
+								synchronized(connections)
+								{
+									cnt--;
+								}
+								
+//								logger.severe("Failed connection to: "+address+": "+cnt);
 								fut.setException(e);
 								synchronized(connections)
 								{
@@ -436,11 +448,12 @@ public class SelectorThread implements Runnable
 			synchronized(connections)
 			{
 				connections.put(address, new NIOTCPDeadConnection(cleaner));
+				cnt--;
 			}
 			cleaner.refresh();
 			ret.setException(e);
 //			System.out.println("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
-			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
+//			logger.severe("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -506,6 +519,7 @@ public class SelectorThread implements Runnable
 			{
 				// Connection lost, try to reconnect before marking as dead connection.
 				connections.remove(con.getAddress());
+				cnt--;
 			}
 			
 			// Connection failure: notify all open tasks.
@@ -518,7 +532,7 @@ public class SelectorThread implements Runnable
 			}
 			writetasks.remove(sc);
 			
-//			logger.info("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
+//			logger.severe("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -689,6 +703,11 @@ public class SelectorThread implements Runnable
 					}
 					if(con instanceof NIOTCPOutputConnection)
 					{
+						synchronized(connections)
+						{
+							cnt--;
+						}
+						
 						try
 						{
 							((NIOTCPOutputConnection)con).getSocketChannel().close();
@@ -696,7 +715,7 @@ public class SelectorThread implements Runnable
 						catch(Exception e)
 						{
 						}
-						logger.info("Removed connection to : "+address);
+//						logger.severe("Removed connection to : "+address+", "+cnt);
 					}
 				}
 			};

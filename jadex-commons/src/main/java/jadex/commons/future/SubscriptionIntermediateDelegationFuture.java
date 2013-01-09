@@ -22,4 +22,13 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	{
 		super(src);
 	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Don't store results.
+	 */
+	protected void addResult(E result)
+	{
+	}
 }

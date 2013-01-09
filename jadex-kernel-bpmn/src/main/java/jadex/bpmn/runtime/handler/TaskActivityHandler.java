@@ -42,7 +42,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+//						exception.printStackTrace();
 						if(!thread.isCanceled())
 						{
 							thread.setException(exception);
