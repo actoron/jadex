@@ -4,6 +4,12 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
+
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -15,6 +21,7 @@ public class GuiController extends AbstractAppState implements ScreenController 
     public Nifty nifty;
     public Screen screen;
     public SimpleApplication app;
+    public Node rootNode;
 
     /** custom methods */
     public GuiController() {
@@ -65,11 +72,16 @@ public class GuiController extends AbstractAppState implements ScreenController 
     }
 
     /** jME3 AppState methods */
-    @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         this.app = (SimpleApplication) app;
+        rootNode = this.app.getRootNode();
+        
+
+
     }
+    
+    
 
     @Override
     public void update(float tpf) {

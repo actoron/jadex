@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
@@ -20,6 +21,10 @@ import java.util.Set;
 
 public abstract class AbstractViewport3d implements IViewport3d
 {
+	
+	/** The Space Controller */
+	protected ISpaceController spacecontroller;
+	
 	/** Canvas for graphical output. */
 	protected Canvas			canvas_;
 
@@ -260,6 +265,14 @@ public abstract class AbstractViewport3d implements IViewport3d
 
 	public void setCamera(String camera) {
 		this.camera = camera;
+	}
+
+	public ISpaceController getSpaceController() {
+		return spacecontroller;
+	}
+
+	public void getSpaceController(ISpaceController spacecontroller) {
+		this.spacecontroller = spacecontroller;
 	}
 	
 	

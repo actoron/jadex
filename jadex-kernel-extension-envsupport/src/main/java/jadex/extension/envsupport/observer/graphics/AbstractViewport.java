@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
@@ -27,6 +28,9 @@ import javax.swing.event.MouseInputAdapter;
 
 public abstract class AbstractViewport implements IViewport
 {
+	/** The Space Controller */
+	protected ISpaceController spacecontroller;
+	
 	/** Axis inversion flag */
 	protected IVector2			inversionFlag_;
 
@@ -574,4 +578,13 @@ public abstract class AbstractViewport implements IViewport
 				lastDragPos = null;
 		}
 	}
+
+	public ISpaceController getSpaceController() {
+		return spacecontroller;
+	}
+
+	public void getSpaceController(ISpaceController spacecontroller) {
+		this.spacecontroller = spacecontroller;
+	}
+
 }

@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.observer.graphics;
 
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
@@ -17,6 +18,13 @@ import java.util.List;
  */
 public interface IViewport
 {
+	
+	/**
+	 * 
+	 * @return the spacecontroller
+	 */
+	public ISpaceController getSpaceController();
+	
 	/**
 	 * Gets the position of the viewport.
 	 */

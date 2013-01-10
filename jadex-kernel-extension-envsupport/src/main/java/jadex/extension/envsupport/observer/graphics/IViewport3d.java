@@ -5,12 +5,21 @@ import java.util.Collection;
 import java.util.List;
 
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 public interface IViewport3d
 {
+	
+	/**
+	 * 
+	 * @return the spacecontroller
+	 */
+	public ISpaceController getSpaceController();
+	
+	
 	/**
 	 * Set the Selected Objects in the Viewport by the User
 	 */

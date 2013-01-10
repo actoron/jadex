@@ -36,6 +36,8 @@ import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.ssao.SSAOFilter;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.BatchNode;
 import com.jme3.scene.Node;
@@ -43,6 +45,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+import com.jme3.water.SimpleWaterProcessor;
 import com.jme3.water.WaterFilter;
 
 import de.lessvoid.nifty.Nifty;
@@ -149,6 +152,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.camera = camera;
 		this.guiCreatorPath = guiCreatorPath;
 		this.niftyScreens = (ArrayList<NiftyScreen>)niftyScreens;
+		 
+		 
 		
 		if(niftyScreens!=null)
 		{
@@ -165,6 +170,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected void simpleInit()
 	{
+		this.fpp = new FilterPostProcessor(assetManager);
+		
 		// Base Setup
 		Logger.getLogger("").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
@@ -188,38 +195,19 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	{
 		this.rootNode.attachChild(this.staticNode);
 
-		DirectionalLight sun = new DirectionalLight();
-		sun.setColor(ColorRGBA.White.mult(0.2f));
-		sun.setDirection(new Vector3f(0, -1f, 0).normalizeLocal());
+		if(defaultGui)
+		{
+			
+			DirectionalLight dl = new DirectionalLight();
+	        dl.setDirection(new Vector3f(-0.8f, -1.0f, -0.08f).normalizeLocal());
+	        dl.setColor(new ColorRGBA(ColorRGBA.White));
+	        getRootNode().addLight(dl);    
 
-
-		DirectionalLight sun1 = new DirectionalLight();
-		sun1.setColor(ColorRGBA.White.mult(0.2f));
-		sun1.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
-
-		DirectionalLight sun2 = new DirectionalLight();
-		sun2.setColor(ColorRGBA.White.mult(0.2f));
-		sun2.setDirection(new Vector3f(.5f, -.5f, .5f).normalizeLocal());
-
-		DirectionalLight sun3 = new DirectionalLight();
-		sun3.setColor(ColorRGBA.White.mult(0.2f));
-		sun3.setDirection(new Vector3f(-.1f, -.5f, -.5f).normalizeLocal());
-
-		DirectionalLight sun4 = new DirectionalLight();
-		sun4.setColor(ColorRGBA.White.mult(0.2f));
-		sun4.setDirection(new Vector3f(.5f, -.5f, .1f).normalizeLocal());
-
-
-		// rootNode.addLight(sun);
-		rootNode.addLight(sun1);
-		rootNode.addLight(sun2);
-		rootNode.addLight(sun3);
-		rootNode.addLight(sun4);
-		// rootNode.addLight(sun5);
-
-		AmbientLight al = new AmbientLight();
-		al.setColor(ColorRGBA.White.mult(2.5f));
-		rootNode.addLight(al);
+	        AmbientLight al = new AmbientLight();
+//	        al.setColor(new ColorRGBA(1.7f,2.2f,3.2f,1f));
+	        al.setColor(ColorRGBA.White.mult(2.0f));
+	        getRootNode().addLight(al);
+		}
 
 		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appSize, spaceSize, assetManager, isGrid);
 		this.gridNode = gridHandler.getGrid();
@@ -257,19 +245,6 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		}
 		else if(camera.equals("Iso"))
 		{
-//			inputManager.clearMappings();
-			// Box box = new Box(Vector3f.ZERO, 1, 1, 1);
-			//
-			// Geometry geo = new Geometry("j", box);
-			// Material mat_tt = new Material(assetManager,
-			// "Common/MatDefs/Misc/Unshaded.j3md");
-			// mat_tt.setColor("Color", ColorRGBA.Cyan);
-			//
-			// geo.setMaterial(mat_tt);
-			//
-			// geo.setLocalTranslation(new Vector3f(appSize*2 , appSize*2,
-			// appSize*2 ));
-			// rootNode.attachChild(geo);
 			DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, rootNode, rootNode);
 			dungeonCam.setEnabled(true);
 		}
@@ -294,27 +269,31 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		// Change the mappings we don't want
 
 		//
-		// Camera cam_n = cam.clone();
-		// cam.setViewPort( 0.0f , 1.0f , 0.0f , 1.0f );
-		// cam_n.setViewPort( 0.8f , 1.0f , 0.8f , 1.0f );
-		// cam_n.setLocation(new Vector3f(_appDimension/2, _appDimension*1.5f,
-		// _appDimension/2));
-		// cam_n.lookAt(new Vector3f(_appDimension/2, 0, _appDimension/2),
-		// Vector3f.UNIT_Y);
-
-		// ViewPort view = renderManager.createMainView("View of camera #1",
-		// cam);
-		// view.setEnabled(true);
-		// view.setClearFlags(true, true, true);
-		// view.attachScene(rootNode);
-		// view.setBackgroundColor(ColorRGBA.Black);
-		//
-		// ViewPort view_n = renderManager.createMainView("View of camera #2",
-		// cam_n);
-		// view_n.setEnabled(true);
-		// view_n.setClearFlags(true, true, true);
-		// view_n.attachScene(rootNode);
-		// view_n.setBackgroundColor(ColorRGBA.Black);
+//		 Camera cam_n = cam.clone();
+//		 cam.setViewPort( 0.0f , 1.0f , 0.0f , 1.0f );
+//		 cam_n.setViewPort( 0.0f , 0.1f , 0.85f , 1.0f );
+//		 cam_n.setLocation(new Vector3f(appSize/2, appSize/2,
+//				 appSize/2));
+//		 cam_n.lookAt(new Vector3f(appSize/2, 0.001f, appSize/2),
+//		 Vector3f.UNIT_Y);
+//
+//
+//		 
+//		 
+//		 ViewPort view = renderManager.createMainView("View of camera #1",
+//		 cam);
+//		 view.setEnabled(true);
+//		 view.setClearFlags(true, true, true);
+//		 view.attachScene(rootNode);
+//		 view.setBackgroundColor(ColorRGBA.Black);
+//		 view.addProcessor(fpp);
+//		//
+//		 ViewPort view_n = renderManager.createMainView("View of camera #2",
+//		 cam_n);
+//		 view_n.setEnabled(true);
+//		 view_n.setClearFlags(true, true, true);
+//		 view_n.attachScene(rootNode);
+//		 view_n.setBackgroundColor(ColorRGBA.Black);
 
 	}
 
@@ -323,34 +302,36 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	{
 
 
-		this.fpp = new FilterPostProcessor(assetManager);
+
 		viewPort.addProcessor(fpp);
+		
 
 
-		// waterProcessor = new SimpleWaterProcessor(assetManager);
-		// waterProcessor.setReflectionScene(geometryNode);
-		//
-		// Vector3f waterLocation=new Vector3f(0,-4,0);
-		// waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y,
-		// waterLocation.dot(Vector3f.UNIT_Y)));
-		//
-		// waterProcessor.setDebug(false);
-		// waterProcessor.setWaveSpeed(0.02f);
-		// // waterProcessor.setRefractionClippingOffset(10.1f);
-		// waterProcessor.setWaterColor(ColorRGBA.Cyan.mult(10.5f));
-		// // waterProcessor.setLightPosition(new Vector3f(-100,20,-100));
-		// waterProcessor.setWaterDepth(40);
-		// waterProcessor.setWaterTransparency(0.1f);
-		// viewPort.addProcessor(waterProcessor);
+
+//		SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
+//		 waterProcessor.setReflectionScene(geometryNode);
+//		
+//		 Vector3f waterLocation=new Vector3f(0,-4,0);
+//		 waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y,
+//		 waterLocation.dot(Vector3f.UNIT_Y)));
+//		
+//		 waterProcessor.setDebug(false);
+//		 waterProcessor.setWaveSpeed(0.02f);
+//		 // waterProcessor.setRefractionClippingOffset(10.1f);
+//		 waterProcessor.setWaterColor(ColorRGBA.Cyan.mult(10.5f));
+//		 // waterProcessor.setLightPosition(new Vector3f(-100,20,-100));
+//		 waterProcessor.setWaterDepth(40);
+//		 waterProcessor.setWaterTransparency(0.1f);
+//		 viewPort.addProcessor(waterProcessor);
 
 
 		 BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
 		 fpp.addFilter(bf);
 
-
+//
 		Vector3f lightDir = new Vector3f(1f, -2f, 1f);
 		WaterFilter water = new WaterFilter(rootNode, lightDir);
-		water.setWaterHeight(-0.2f * appScaled);
+		water.setWaterHeight(-2.5f);
 		water.setUseFoam(false);
 		water.setUseRipples(true);
 		water.setDeepWaterColor(ColorRGBA.Black.mult(0.1f));
@@ -363,7 +344,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		water.setShoreHardness(1.0f);
 		water.setRefractionConstant(0.2f);
 		water.setShininess(0.3f);
-		water.setSunScale(0.001f);
+		water.setSunScale(0.1f);
 		water.setLightColor(ColorRGBA.Red.mult(0.1f).set(ColorRGBA.Orange.mult(0.1f).r, ColorRGBA.Orange.mult(0.1f).g, ColorRGBA.Orange.mult(0.1f).b, 0.01f));
 		water.setColorExtinction(new Vector3f(10.0f, 20.0f, 30.0f));
 		fpp.addFilter(water);
