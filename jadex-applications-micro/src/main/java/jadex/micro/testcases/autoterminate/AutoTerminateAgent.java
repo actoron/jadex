@@ -78,6 +78,8 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			: "Test remote offline automatic subscription termination.");
 		reports.add(report);
 		
+		System.out.println("test: "+report.getDescription());
+		
 		waitForRealtimeDelay(10000,
 			new IComponentStep<Void>()
 		{
