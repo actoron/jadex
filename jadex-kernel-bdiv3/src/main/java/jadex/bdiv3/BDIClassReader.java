@@ -312,7 +312,7 @@ public class BDIClassReader extends MicroClassReader
 		{
 			Goal ga = getAnnotation(gs[j], Goal.class, cl);
 			MGoal mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
-				ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed());
+				ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed(), ga.unique());
 			tr.addGoal(mgoal);
 			
 			if(!bdimodel.getCapability().getGoals().contains(mgoal))

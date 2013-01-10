@@ -53,7 +53,7 @@
 		
 		<beliefset name="negotiation_reports" class="NegotiationReport"/>
 		
-		<belief name="gui" class="jadex.bdi.planlib.GuiCreator"/>
+		<belief name="gui" class="jadex.commons.gui.GuiCreator"/>
 		
 		<beliefref name="cnp_filter">
 			<concrete ref="procap.cnp_filter"/>
@@ -167,7 +167,7 @@
 					<fact>jadex.commons.IFilter.ALWAYS</fact>
 				</initialbelief>
 				<initialbelief ref="gui">
-					<fact>new jadex.bdi.planlib.GuiCreator(Gui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+					<fact>new jadex.commons.gui.GuiCreator(Gui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 						new Object[]{$scope.getExternalAccess()})</fact>
 				</initialbelief>
 			</beliefs>

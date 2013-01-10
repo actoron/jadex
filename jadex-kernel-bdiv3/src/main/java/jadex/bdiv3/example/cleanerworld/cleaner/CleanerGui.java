@@ -53,8 +53,7 @@ public class CleanerGui	extends JFrame
 			@Classname("disp")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IInternalAccess bia = (IInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+				ia.addComponentListener(new TerminationAdapter()
 				{
 					public void componentTerminated()
 					{

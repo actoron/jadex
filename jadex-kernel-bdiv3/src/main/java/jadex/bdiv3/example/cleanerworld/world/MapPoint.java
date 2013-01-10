@@ -1,5 +1,7 @@
 package jadex.bdiv3.example.cleanerworld.world;
 
+import java.util.Set;
+
 import jadex.commons.SReflect;
 
 /**

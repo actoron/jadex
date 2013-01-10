@@ -9,12 +9,12 @@ import jadex.bdi.examples.blackjack.RequestBet;
 import jadex.bdi.examples.blackjack.RequestDraw;
 import jadex.bdi.examples.blackjack.RequestFinished;
 import jadex.bdi.examples.blackjack.player.HumanPlayerInterface.HumanPlayerControlPanel;
-import jadex.bdi.planlib.GuiCreator;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.gui.GuiCreator;
 
 /**
  *  This plan is executed for every game round.
@@ -39,7 +39,7 @@ public class PlayerPlayGameRoundPlan extends Plan
 			Object	gui	= getBeliefbase().getBelief("gui").getFact();
 			if(gui instanceof GuiCreator)
 			{
-				gui	= ((GuiCreator)gui).getFrame();
+				gui	= ((GuiCreator)gui).getGui();
 				getBeliefbase().getBelief("gui").setFact(gui);	// Hack!!!
 			}
 			hpi = (HumanPlayerInterface)gui;

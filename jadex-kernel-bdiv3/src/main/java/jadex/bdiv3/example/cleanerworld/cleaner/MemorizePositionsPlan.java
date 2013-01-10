@@ -1,5 +1,14 @@
 package jadex.bdiv3.example.cleanerworld.cleaner;
 
+import java.util.Set;
+
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.example.cleanerworld.world.Location;
+import jadex.bdiv3.example.cleanerworld.world.MapPoint;
+import jadex.bdiv3.runtime.RPlan;
+
 
 
 /**
@@ -9,6 +18,12 @@ public class MemorizePositionsPlan
 {
 	//-------- attributes --------
 
+	@PlanCapability
+	protected CleanerBDI capa;
+	
+	@PlanPlan
+	protected RPlan rplan;
+	
 	/** The forget factor. */
 	protected double forget;
 
@@ -29,30 +44,25 @@ public class MemorizePositionsPlan
 	/**
 	 *  The plan body.
 	 */
+	@PlanBody
 	public void body()
 	{
-//		while(true)
-//		{
-//			Location	my_location	= (Location)getBeliefbase().getBelief("my_location").getFact();
-//			double	my_vision	= ((Double)getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
-//			MapPoint[] mps = (MapPoint[])getBeliefbase().getBeliefSet("visited_positions").getFacts();
-//			for(int i=0; i<mps.length; i++)
-//			{
-//				if(my_location.isNear(mps[i].getLocation(), my_vision))
-//				{
-//					mps[i].setQuantity(mps[i].getQuantity()+1);
-//					mps[i].setSeen(1);
-//				}
-//				else
-//				{
-//					double oldseen = mps[i].getSeen();
-//					double newseen = oldseen - oldseen*forget;
-//					mps[i].setSeen(newseen);
-//				}
-//			}
-//
-//			//System.out.println("inc: "+SUtil.arrayToString(mps));
-//			waitFor(300);
-//		}
+		Location my_location = capa.getMyLocation();
+		double	my_vision	= capa.getMyVision();
+		Set<MapPoint> mps = capa.getVisitedPositions();
+		for(MapPoint mp: mps)
+		{
+			if(my_location.isNear(mp.getLocation(), my_vision))
+			{
+				mp.setQuantity(mp.getQuantity()+1);
+				mp.setSeen(1);
+			}
+			else
+			{
+				double oldseen = mp.getSeen();
+				double newseen = oldseen - oldseen*forget;
+				mp.setSeen(newseen);
+			}
+		}
 	}
 }

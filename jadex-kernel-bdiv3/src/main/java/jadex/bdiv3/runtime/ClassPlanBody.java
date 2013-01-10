@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIClassReader;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanReason;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroClassReader;
 
@@ -71,6 +72,19 @@ public class ClassPlanBody extends AbstractPlanBody
 					f.setAccessible(true);
 					f.set(plan, agent);
 				}
+				else if(f.isAnnotationPresent(PlanReason.class))
+				{
+					Object r = getRPlan().getReason();
+					if(r instanceof RProcessableElement)
+					{
+						Object reason = ((RProcessableElement)r).getPojoElement();
+						if(reason!=null)
+						{
+							f.setAccessible(true);
+							f.set(plan, reason);
+						}
+					}
+				}
 			}
 			
 			bodymethod.setAccessible(true);
@@ -78,6 +92,7 @@ public class ClassPlanBody extends AbstractPlanBody
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}

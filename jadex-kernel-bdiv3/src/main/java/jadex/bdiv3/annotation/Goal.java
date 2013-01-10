@@ -58,5 +58,10 @@ public @interface Goal
 	 *  Should the goal procedural succeed when first plan executed successfully. 
 	 */
 	public boolean succeedonpassed() default true;
+	
+	/**
+	 *  Should the goal be unique (no other goal is allowed that is the same).
+	 */
+	public boolean unique() default false;
 
 }

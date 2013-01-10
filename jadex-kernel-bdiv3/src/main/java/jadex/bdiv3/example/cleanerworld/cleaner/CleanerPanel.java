@@ -102,6 +102,7 @@ class CleanerPanel extends JPanel
 					h	= (int)(((double)drawdata.visited_positions[i].getQuantity())*cellh/drawdata.max_quantity*bounds.height);
 				int y = (int)(p.y+cellh/2*bounds.height-h);
 				g.setColor(new Color(54, 10, 114));
+				g.setColor(Color.GREEN);
 				//System.out.println("h: "+h);
 				g.fillRect(p.x+(int)(cellw*0.3*bounds.width), y,
 					Math.max(1, (int)(cellw/10*bounds.width)), h);
@@ -217,10 +218,8 @@ class CleanerPanel extends JPanel
 			CleanerBDI cleaner = (CleanerBDI)((IPojoMicroAgent)ia).getPojoAgent();
 			DrawData	drawdata	= new DrawData();
 			drawdata.daytime = cleaner.isDaytime();
-			
-//			drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
-//			drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
-			
+			drawdata.visited_positions = cleaner.getVisitedPositions().toArray(new MapPoint[0]);
+			drawdata.max_quantity = cleaner.getMaxQuantity().get(0).getQuantity();
 			drawdata.xcnt = cleaner.getRaster().getFirstEntity();
 			drawdata.ycnt = cleaner.getRaster().getSecondEntity();
 			drawdata.cleaners = cleaner.getCleaners().toArray(new Cleaner[0]);

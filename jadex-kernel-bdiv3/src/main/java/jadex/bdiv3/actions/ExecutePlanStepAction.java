@@ -17,9 +17,6 @@ import jadex.commons.future.IFuture;
  */
 public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 {
-//	/** The element. */
-//	protected RProcessableElement element;
-	
 	/** The plan. */
 	protected RPlan rplan;
 	
@@ -64,6 +61,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
+//		System.out.println("execute candidate: "+rplan);
+		
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 
 		

@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -21,6 +22,9 @@ import org.kohsuke.asm4.ClassWriter;
 import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
+import org.kohsuke.asm4.util.ASMifier;
+import org.kohsuke.asm4.util.CheckClassAdapter;
+import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
  * 
@@ -69,7 +73,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
-//			CheckClassAdapter cc = new CheckClassAdapter(tcv);
+//			CheckClassAdapter cc = new CheckClassAdapter(cw);
 			
 	//		final String classname = "lars/Lars";
 	//		final String supername = "jadex/bdiv3/MyTestClass";
@@ -93,10 +97,22 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
 							// if is a putfield and is belief and not is in init (__agent field is not available)
-							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) && !"<init>".equals(methodname))
+							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name))// && !"<init>".equals(methodname))
 							{
+//								visitInsn(Opcodes.POP);
+//								visitInsn(Opcodes.POP);
+								
 								// stack before putfield is object,value ()
-//								System.out.println("method: "+methodname+" "+name);
+								System.out.println("method: "+methodname+" "+name);
+
+								// write init values also immediately to allow dependencies
+								if("<init>".equals(methodname))
+								{
+									super.visitFieldInsn(opcode, owner, name, desc);
+									visitVarInsn(Opcodes.ALOAD, 0);
+									visitInsn(Opcodes.DUP);
+									super.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
+								}
 								
 								// is already on stack (object + value)
 	//							mv.visitVarInsn(ALOAD, 0);
@@ -115,15 +131,22 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								// fetch bdi agent value from field
 //								visitVarInsn(Opcodes.ALOAD, 0);
 								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
-								visitInsn(Opcodes.SWAP);
+//								visitInsn(Opcodes.SWAP);
 								
 								// add field name	
 								visitLdcInsn(name);
+								visitInsn(Opcodes.SWAP);
 								// add this
 								visitVarInsn(Opcodes.ALOAD, 0);
+								visitInsn(Opcodes.SWAP);
 								
 								// invoke method
-								visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(BDIAgent.class), "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V");
+//								String bdin = Type.getDescriptor(BDIAgent.class);
+//								System.out.println("bdin: "+bdin);
+//								visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(BDIAgent.class), "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V");
+//								visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(BDIAgent.class), "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;"+bdin+")V");
+								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+//								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeField", "()V");
 							}
 							else
 							{

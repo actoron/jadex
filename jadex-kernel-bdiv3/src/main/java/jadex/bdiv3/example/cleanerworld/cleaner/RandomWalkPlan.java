@@ -1,5 +1,15 @@
 package jadex.bdiv3.example.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
+import jadex.bdiv3.example.cleanerworld.world.Location;
+import jadex.bdiv3.runtime.RPlan;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
 
 
 /**
@@ -7,6 +17,11 @@ package jadex.bdiv3.example.cleanerworld.cleaner;
  */
 public class RandomWalkPlan
 {
+	@PlanCapability
+	protected CleanerBDI capa;
+	
+	@PlanPlan
+	protected RPlan rplan;
 
 	//-------- constructors --------
 
@@ -23,16 +38,24 @@ public class RandomWalkPlan
 	/**
 	 *  The plan body.
 	 */
-	public void body()
+	@PlanBody
+	public IFuture<Void> body()
 	{
-//		double x_dest = Math.random();
-//		double y_dest = Math.random();
-//		Location dest = new Location(x_dest, y_dest);
-//		IGoal moveto = createGoal("achievemoveto");
-//		moveto.getParameter("location").setValue(dest);
-////		System.out.println("Created: "+dest+" "+this);
-//		dispatchSubgoalAndWait(moveto);
-////		System.out.println("Reached: "+dest+" "+this);
-////		getLogger().info("Reached point: "+dest);
+		final Future<Void> ret = new Future<Void>();
+		
+		double x_dest = Math.random();
+		double y_dest = Math.random();
+		Location dest = new Location(x_dest, y_dest);
+		
+		rplan.dispatchSubgoal(capa.new AchieveMoveTo(dest))
+			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		{
+			public void customResultAvailable(AchieveMoveTo amt)
+			{
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 }

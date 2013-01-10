@@ -108,8 +108,8 @@
 			<fact>new Location(0.9, 0.9)</fact>
 		</beliefset>
 		
-		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
-			<fact>new jadex.bdi.planlib.GuiCreator(CleanerGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(CleanerGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>

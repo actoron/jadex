@@ -59,6 +59,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
+//		System.out.println("select candidates: "+element);
+		
 		Future<Void> ret = new Future<Void>();
 
 		List<Object> cands = element.getApplicablePlanList().selectCandidates();

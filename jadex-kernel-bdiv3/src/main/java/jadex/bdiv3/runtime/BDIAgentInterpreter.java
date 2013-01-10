@@ -96,19 +96,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			FieldInfo[] fields = model.getAgentInjections();
 			for(int i=0; i<fields.length; i++)
 			{
-//				if(fields[i].isAnnotationPresent(Agent.class))
-//				{
-					try
-					{
-						Field f = fields[i].getField(getClassLoader());
-						f.setAccessible(true);
-						f.set(agent, ret);
-					}
-					catch(Exception e)
-					{
-						getLogger().warning("Agent injection failed: "+e);
-					}
-//				}
+				try
+				{
+					Field f = fields[i].getField(getClassLoader());
+					f.setAccessible(true);
+					f.set(agent, ret);
+				}
+				catch(Exception e)
+				{
+					getLogger().warning("Agent injection failed: "+e);
+				}
 			}
 		}
 		
@@ -130,7 +127,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
-
+		
 		return ret;
 	}
 	
@@ -142,7 +139,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		super.startBehavior();
 		
 		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
-		
+				
 		// Init bdi configuration
 		String confname = getConfiguration();
 		if(confname!=null)
@@ -260,7 +257,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				{
 					MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
 					// todo: allow Java plan constructor calls
-//							Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
+//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 				
 					RPlan rplan = RPlan.createRPlan(mplan, null, getInternalAccess());
 					RPlan.adoptPlan(rplan, getInternalAccess());
@@ -384,20 +381,27 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								e.printStackTrace();
 							}
 							
-							final Object fpojogoal = pojogoal;
-							((BDIAgent)microagent).dispatchTopLevelGoal(pojogoal)
-								.addResultListener(new IResultListener<Object>()
+							if(!getCapability().containsGoal(pojogoal))
 							{
-								public void resultAvailable(Object result)
+								final Object fpojogoal = pojogoal;
+								((BDIAgent)microagent).dispatchTopLevelGoal(pojogoal)
+									.addResultListener(new IResultListener<Object>()
 								{
-									getLogger().info("Goal succeeded: "+result);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									getLogger().info("Goal failed: "+fpojogoal+" "+exception);
-								}
-							});
+									public void resultAvailable(Object result)
+									{
+										getLogger().info("Goal succeeded: "+result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										getLogger().info("Goal failed: "+fpojogoal+" "+exception);
+									}
+								});
+							}
+							else
+							{
+								System.out.println("new goal not adopted, already contained: "+pojogoal);
+							}
 							
 							return IFuture.DONE;
 						}
@@ -510,6 +514,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rulesystem.getRulebase().addRule(rule);
 			}
 		}
+		
+		// perform init write fields (after injection of bdiagent)
+		BDIAgent.performInitWrites((BDIAgent)microagent);
 	}
 	
 	/**

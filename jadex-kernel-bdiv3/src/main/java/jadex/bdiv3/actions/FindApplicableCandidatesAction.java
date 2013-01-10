@@ -55,6 +55,8 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
+//		System.out.println("find applicable candidates: "+element);
+		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		RCapability rcapa = ip.getCapability();
 		

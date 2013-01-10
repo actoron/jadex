@@ -19,6 +19,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.IAction;
@@ -30,7 +31,9 @@ import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Base class for application agents.
@@ -205,5 +208,55 @@ public class BDIAgent extends MicroAgent
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 *  Method that is called automatically when a belief 
+	 *  is written as field access.
+	 */
+	public static void writeField(Object val, final String fieldname, Object obj, BDIAgent agent)
+	{
+//		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 
+		if(agent!=null)
+		{
+			agent.writeField(val, fieldname, obj);
+		}
+		else
+		{
+			synchronized(initwrites)
+			{
+				List<Object[]> inits = initwrites.get(obj);
+				if(inits==null)
+				{
+					inits = new ArrayList<Object[]>();
+					initwrites.put(obj, inits);
+				}
+				inits.add(new Object[]{val, fieldname, obj});	
+			}
+		}
+	}
+	
+	/** Saved init writes. */
+	protected static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
+	
+	/**
+	 * 
+	 */
+	public static void performInitWrites(BDIAgent agent)
+	{
+		Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
+
+		synchronized(initwrites)
+		{
+			List<Object[]> writes = initwrites.remove(pojo);
+			if(writes!=null)
+			{
+				for(Object[] write: writes)
+				{
+					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
+					agent.writeField(write[0], (String)write[1], write[2]);
+				}
+			}
+		}
+	}
 }

@@ -34,11 +34,15 @@ public class MGoal extends MClassBasedElement
 	/** The procedual success flag. */
 	protected boolean succeedonpassed;
 	
+	/** The unique. */
+	protected boolean unique;
+	
 	/**
 	 *  Create a new belief.
 	 */
 	public MGoal(String target, boolean posttoall, boolean randomselection, String excludemode,
-		boolean retry, boolean recur, long retrydelay, long recurdelay, boolean succeedonpassed)
+		boolean retry, boolean recur, long retrydelay, long recurdelay, 
+		boolean succeedonpassed, boolean unique)
 	{
 		super(target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -46,6 +50,7 @@ public class MGoal extends MClassBasedElement
 		this.retrydelay = retrydelay;
 		this.recurdelay = recurdelay;
 		this.succeedonpassed = succeedonpassed;
+		this.unique = unique;
 	}
 	
 	/**
@@ -110,12 +115,22 @@ public class MGoal extends MClassBasedElement
 	{
 		this.succeedonpassed = succeedonpassed;
 	}
-	
-	
-//	/**
-//	 *  Test if goal should be unique.
-//	 *  @return True, if unique.
-//	 */
-//	public boolean isUnique();
-	
+
+	/**
+	 *  Get the unique.
+	 *  @return The unique.
+	 */
+	public boolean isUnique()
+	{
+		return unique;
+	}
+
+	/**
+	 *  Set the unique.
+	 *  @param unique The unique to set.
+	 */
+	public void setUnique(boolean unique)
+	{
+		this.unique = unique;
+	}
 }

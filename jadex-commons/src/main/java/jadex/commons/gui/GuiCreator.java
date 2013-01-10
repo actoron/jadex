@@ -1,12 +1,10 @@
-package jadex.bdi.planlib;
+package jadex.commons.gui;
 
-import jadex.commons.SUtil;
-
+import java.awt.Component;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
@@ -21,14 +19,14 @@ public class GuiCreator
 	//-------- attributes --------
 
 	/** The gui. */
-	protected JFrame frame;
+	protected Component gui;
 
 	//-------- constructors --------
 
 	/**
 	 *  Create a new clock.
 	 */
-	public GuiCreator(final Class frameclass, final Class[] argclasses, final Object[] args)
+	public GuiCreator(final Class<? extends Component> clazz, final Class<?>[] argclasses, final Object[] args)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -36,8 +34,8 @@ public class GuiCreator
 			{
 				try
 				{
-					Constructor con = frameclass.getConstructor(argclasses);
-					frame = (JFrame)con.newInstance(args);
+					Constructor<?> con = clazz.getConstructor(argclasses);
+					gui = (Component)con.newInstance(args);
 				}
 				catch(InvocationTargetException e)
 				{
@@ -59,7 +57,7 @@ public class GuiCreator
 	/**
 	 *  Create a new clock.
 	 */
-	public GuiCreator(final Method createmethod, final Class[] argclasses, final Object[] args)
+	public GuiCreator(final Method createmethod, final Class<?>[] argclasses, final Object[] args)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -67,7 +65,7 @@ public class GuiCreator
 			{
 				try
 				{
-					frame = (JFrame)createmethod.invoke(null, args);
+					gui = (Component)createmethod.invoke(null, args);
 				}
 				catch(Exception e)
 				{
@@ -83,8 +81,8 @@ public class GuiCreator
 	 *  Get the frame.
 	 *  @return The frame. 
 	 */
-	public JFrame getFrame()
+	public Component getGui()
 	{
-		return frame;
+		return gui;
 	}
 }

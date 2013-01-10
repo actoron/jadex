@@ -37,8 +37,8 @@
 			<concrete ref="procap.rp_filter"/>
 		</beliefref>
 		
-		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
-			<fact>new jadex.bdi.planlib.GuiCreator(EnvironmentGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(EnvironmentGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>

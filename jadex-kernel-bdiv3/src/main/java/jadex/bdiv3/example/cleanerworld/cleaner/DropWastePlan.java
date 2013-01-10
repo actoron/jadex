@@ -1,5 +1,6 @@
 package jadex.bdiv3.example.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.example.cleanerworld.world.Location;
 import jadex.bdiv3.example.cleanerworld.world.Waste;
 import jadex.bdiv3.example.cleanerworld.world.Wastebin;
@@ -27,6 +28,7 @@ public class DropWastePlan
 	/**
 	 *  The plan body.
 	 */
+	@PlanBody
 	public void body()
 	{
 //		Waste waste = (Waste)getBeliefbase().getBelief("carriedwaste").getFact();

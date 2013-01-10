@@ -286,7 +286,7 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 					<fact>false</fact>
 				</initialbelief>
 				<initialbelief ref="gui">
-					<fact>new jadex.bdi.planlib.GuiCreator(BlocksworldGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+					<fact>new jadex.commons.gui.GuiCreator(BlocksworldGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 						new Object[]{$scope.getExternalAccess()})</fact>
 				</initialbelief>
 			</beliefs>

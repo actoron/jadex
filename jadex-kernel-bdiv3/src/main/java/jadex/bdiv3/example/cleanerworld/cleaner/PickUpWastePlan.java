@@ -1,5 +1,6 @@
 package jadex.bdiv3.example.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.example.cleanerworld.world.Location;
 import jadex.bdiv3.example.cleanerworld.world.Waste;
 
@@ -25,6 +26,7 @@ public class PickUpWastePlan
 	/**
 	 *  The plan body.
 	 */
+	@PlanBody
 	public void body()
 	{
 //		Waste waste = (Waste)getParameter("waste").getValue();

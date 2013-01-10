@@ -21,6 +21,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -394,7 +395,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class ret = SReflect.findClass0(clname, imports, classloader);
-//		System.out.println(clname+" "+cma+" "+ret);
+		System.out.println(clname+" "+SUtil.arrayToString(imports)+" "+ret);
 		int idx;
 		while(ret==null && (idx=clname.indexOf('.'))!=-1)
 		{
@@ -403,7 +404,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 //			System.out.println(clname+" "+cma+" "+ret);
 		}
 		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-			throw new RuntimeException("No micro agent file: "+clname+" "+classloader);
+			throw new RuntimeException("No bdi agent file: "+clname+" "+classloader);
 		return ret;
 	}
 	

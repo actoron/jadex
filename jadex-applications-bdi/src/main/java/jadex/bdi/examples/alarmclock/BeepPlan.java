@@ -1,9 +1,10 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.planlib.GuiCreator;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
+import jadex.commons.gui.GuiCreator;
 
+import java.awt.Component;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -24,7 +25,7 @@ public class BeepPlan extends Plan
 	public void body()
 	{
 		Alarm	alarm	= (Alarm)getParameter("alarm").getValue();
-		final JFrame	parent	= ((GuiCreator)getBeliefbase().getBelief("gui").getFact()).getFrame(); // Hack!
+		final Component	parent	= ((GuiCreator)getBeliefbase().getBelief("gui").getFact()).getGui(); // Hack!
 		final String	message	= alarm.getMessage()!=null ? SUtil.wrapText(alarm.getMessage()) : null;
 		SwingUtilities.invokeLater(new Runnable()
 		{

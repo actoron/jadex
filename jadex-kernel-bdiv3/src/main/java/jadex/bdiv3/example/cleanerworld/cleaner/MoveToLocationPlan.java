@@ -1,25 +1,14 @@
 package jadex.bdiv3.example.cleanerworld.cleaner;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
-import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.GetVisionAction;
-import jadex.bdiv3.example.cleanerworld.world.Chargingstation;
-import jadex.bdiv3.example.cleanerworld.world.Cleaner;
 import jadex.bdiv3.example.cleanerworld.world.Location;
-import jadex.bdiv3.example.cleanerworld.world.LocationObject;
-import jadex.bdiv3.example.cleanerworld.world.Vision;
-import jadex.bdiv3.example.cleanerworld.world.Waste;
-import jadex.bdiv3.example.cleanerworld.world.Wastebin;
 import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RPlan;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -34,6 +23,9 @@ public class MoveToLocationPlan
 	
 	@PlanPlan
 	protected RPlan rplan;
+	
+	@PlanReason
+	protected AchieveMoveTo goal;
 
 	//-------- constructors --------
 
@@ -50,6 +42,7 @@ public class MoveToLocationPlan
 	/**
 	 *  The plan body.
 	 */
+	@PlanBody
 	public IFuture<Void> body()
 	{
 		return moveToTarget();
@@ -63,7 +56,7 @@ public class MoveToLocationPlan
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		Location target = ((AchieveMoveTo)((RGoal)rplan.getReason()).getPojoElement()).getLocation();
+		Location target = goal.getLocation();
 		Location myloc = capa.getMyLocation();
 		
 		if(!myloc.isNear(target))
@@ -91,7 +84,7 @@ public class MoveToLocationPlan
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Location target = ((AchieveMoveTo)((RGoal)rplan.getReason()).getPojoElement()).getLocation();
+		Location target = goal.getLocation();
 		Location myloc = capa.getMyLocation();
 
 		double speed = capa.getMySpeed();

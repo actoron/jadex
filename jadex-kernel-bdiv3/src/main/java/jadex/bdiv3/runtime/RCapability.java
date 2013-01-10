@@ -4,7 +4,10 @@ import jadex.bdiv3.model.MCapability;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -15,7 +18,8 @@ public class RCapability extends RElement
 //	protected List<RBelief> beliefs;
 	
 	/** The goals. */
-	protected List<RGoal> goals;
+//	protected List<RGoal> goals;
+	protected Set<RGoal> goals;
 	
 	/** The plans. */
 	protected List<RPlan> plans;
@@ -32,7 +36,7 @@ public class RCapability extends RElement
 	 *  Get the goals.
 	 *  @return The goals.
 	 */
-	public List<RGoal> getGoals()
+	public Collection<RGoal> getGoals()
 	{
 		return goals;
 	}
@@ -56,12 +60,22 @@ public class RCapability extends RElement
 		
 		return ret;
 	}
+	
+	/**
+	 *  Test if a goal is contained.
+	 *  @param type The type.
+	 *  @return The goals.
+	 */
+	public boolean containsGoal(Object pojogoal)
+	{
+		return goals.contains(pojogoal);
+	}
 
 	/**
 	 *  Set the goals.
 	 *  @param goals The goals to set.
 	 */
-	public void setGoals(List<RGoal> goals)
+	public void setGoals(Set<RGoal> goals)
 	{
 		this.goals = goals;
 	}
@@ -92,8 +106,12 @@ public class RCapability extends RElement
 	{
 		if(goals==null)
 		{
-			goals = new ArrayList<RGoal>();
+			goals = new LinkedHashSet<RGoal>();
 		}
+		
+		if(goals.contains(goal))
+			throw new RuntimeException("Goal already contained: "+goal);
+		
 		goal.setLifecycleState(RGoal.GOALLIFECYCLESTATE_ADOPTED);
 		goals.add(goal);
 	}

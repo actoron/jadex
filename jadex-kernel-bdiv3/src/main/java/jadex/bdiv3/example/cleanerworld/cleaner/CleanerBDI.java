@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalContextCondition;
+import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
@@ -31,6 +32,10 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +65,7 @@ public class CleanerBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected IEnvironment environment;// = Environment.getInstance(); // problem: how to observe initial values, bdiagent is not available
+	protected IEnvironment environment = Environment.getInstance();
 	
 	@Belief
 	protected Set<Waste> wastes;
@@ -78,7 +83,9 @@ public class CleanerBDI
 	protected Tuple2<Integer, Integer> raster = new Tuple2<Integer, Integer>(new Integer(10), new Integer(10));
 
 	@Belief
-	protected Set<MapPoint> visited_positions;
+	protected Set<MapPoint> visited_positions =	new HashSet<MapPoint>(Arrays.asList(
+		MapPoint.getMapPointRaster(raster.getFirstEntity().intValue(), 
+		raster.getSecondEntity().intValue(), 1, 1)));
 
 	@Belief
 	protected boolean daytime;
@@ -101,8 +108,9 @@ public class CleanerBDI
 	@Belief
 	protected List<Location> patrolpoints;
 	
-	@Belief
-	protected CleanerGui gui;
+//	@Belief
+//	protected CleanerGui gui = new CleanerGui(agent.getExternalAccess());
+//	protected GuiCreator gc = new GuiCreator(CleanerGui.class, new Class[]{IExternalAccess.class}, new Object[]{agent.getExternalAccess()});
 	
 	@Goal
 	public class MaintainBatteryLoaded
@@ -126,7 +134,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal
+	@Goal(unique=true)
 	public class AchieveCleanup
 	{
 		// <unique/>
@@ -138,13 +146,14 @@ public class CleanerBDI
 		
 		protected Waste waste;
 		
-		// todo: creation
+		@GoalCreationCondition(events="wastes")
+		public AchieveCleanup(Waste waste)
+		{
+			System.out.println("new achieve cleanup: "+waste);
+			this.waste = waste;
+		}
 		
-//		@GoalCreationCondition(events="wastes")
-//		public AchieveCleanup(Waste waste)
-//		{
-//			this.waste = waste;
-//		}
+		// todo: creation
 		
 //		@GoalCreationCondition
 //		public static boolean checkCreate(@Event("wastes") Waste waste)
@@ -155,21 +164,21 @@ public class CleanerBDI
 		@GoalContextCondition(events="daytime")
 		public boolean checkContext()
 		{
-			return daytime;
+			return isDaytime();
 		}
 		
 		@GoalDropCondition(events={"carriedwaste", "wastes"})
 		public boolean checkDrop()
 		{
-			return carriedwaste==null && wastes.contains(waste);
+			return getCarriedWaste()==null && !getWastes().contains(waste);
 		}
 		
-		@GoalDropCondition
+		@GoalTargetCondition
 		public boolean checkTarget()
 		{
 			boolean ret = false;
 			
-			for(Wastebin wb: wastebins)
+			for(Wastebin wb: getWastebins())
 			{
 				if(wb.contains(waste))
 				{
@@ -188,6 +197,31 @@ public class CleanerBDI
 		{
 			return waste;
 		}
+
+		public int hashCode()
+		{
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((waste == null) ? 0 : waste.hashCode());
+			return result;
+		}
+
+		public boolean equals(Object obj)
+		{
+			boolean ret = false;
+			if(obj instanceof AchieveCleanup)
+			{
+				AchieveCleanup other = (AchieveCleanup)obj;
+				ret = getOuterType().equals(other.getOuterType()) && SUtil.equals(waste, other.getWaste());
+			}
+			return ret;
+		}
+
+		private CleanerBDI getOuterType()
+		{
+			return CleanerBDI.this;
+		}
 	}
 	
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
@@ -196,7 +230,8 @@ public class CleanerBDI
 		@GoalContextCondition(events="daytime")
 		public boolean checkContext()
 		{
-			return daytime;
+			return daytime 
+				&& agent.getCapability().getGoals(AchieveCleanup.class).size()==0; // hack!
 		}
 	}
 	
@@ -320,16 +355,40 @@ public class CleanerBDI
 	public class PickupWasteAction
 	{
 		protected Waste waste;
+
+		public Waste getWaste()
+		{
+			return waste;
+		}
 	}
 	
 	@Goal
 	public class DropWasteAction
 	{
 		protected Waste waste;
+		
 		protected Wastebin wastebin;
+		
+		/**
+		 *  Get the waste.
+		 *  @return The waste.
+		 */
+		public Waste getWaste()
+		{
+			return waste;
+		}
+
+		/**
+		 *  Get the wastebin.
+		 *  @return The wastebin.
+		 */
+		public Wastebin getWastebin()
+		{
+			return wastebin;
+		}
 	}
 	
-	@Goal(succeedonpassed=false)
+	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false, retrydelay=300)
 	public class PerformMemorizePositions
 	{
 	}
@@ -579,13 +638,11 @@ public class CleanerBDI
 	@AgentBody
 	public void body()
 	{
-		environment = Environment.getInstance();
-		 
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				gui = new CleanerGui(agent.getExternalAccess());
+				new CleanerGui(agent.getExternalAccess());
 			}
 		});
 		
@@ -600,8 +657,8 @@ public class CleanerBDI
 		patrolpoints.add(new Location(0.9, 0.1));
 		patrolpoints.add(new Location(0.9, 0.9));
 		
-//		agent.dispatchTopLevelGoal(new PerformLookForWaste());
-		agent.dispatchTopLevelGoal(new PerformPatrol());
+		agent.dispatchTopLevelGoal(new PerformLookForWaste());
+//		agent.dispatchTopLevelGoal(new PerformPatrol());
 //		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 //		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
 	}
@@ -767,6 +824,23 @@ public class CleanerBDI
 	public BDIAgent getAgent()
 	{
 		return agent;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<MapPoint> getMaxQuantity()
+	{
+		Set<MapPoint> locs = getVisitedPositions();
+		List<MapPoint> ret = new ArrayList<MapPoint>(locs);
+		Collections.sort(ret, new Comparator<MapPoint>()
+		{
+			public int compare(MapPoint o1, MapPoint o2)
+			{
+				return o2.getQuantity()-o1.getQuantity();
+			}
+		});
+		return ret;
 	}
 }
 

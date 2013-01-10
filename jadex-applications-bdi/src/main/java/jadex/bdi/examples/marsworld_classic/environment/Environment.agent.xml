@@ -24,8 +24,8 @@
 			<fact>Environment.createInstance($properties.clock)</fact>
 	  	</belief>
 
-		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
-			<fact>new jadex.bdi.planlib.GuiCreator(MarsworldGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(MarsworldGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>

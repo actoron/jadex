@@ -706,6 +706,22 @@ public class RGoal extends RProcessableElement
 		this.childplan = childplan;
 	}
 
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return getMGoal().isUnique()? getPojoElement().hashCode(): super.hashCode();
+	}
+
+	/**
+	 *  Test if equal to other object.
+	 */
+	public boolean equals(Object obj)
+	{
+		return getMGoal().isUnique()? getPojoElement().equals(obj): super.equals(obj);
+	}
+
 	/** 
 	 * 
 	 */
@@ -743,7 +759,14 @@ public class RGoal extends RProcessableElement
 				{
 					if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
 					{
-						ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+						if(getMGoal().getRetryDelay()>-1)
+						{
+							ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this), getMGoal().getRetryDelay());
+						}
+						else
+						{
+							ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
+						}
 					}
 					else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
 					{
