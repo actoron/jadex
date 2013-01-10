@@ -236,7 +236,7 @@ public class SelectorThread implements Runnable
 									cnt--;
 								}
 								
-//								logger.severe("Failed connection to: "+address+": "+cnt);
+								logger.info("Failed connection to: "+address+": "+cnt);
 								fut.setException(e);
 								synchronized(connections)
 								{
@@ -453,7 +453,7 @@ public class SelectorThread implements Runnable
 			cleaner.refresh();
 			ret.setException(e);
 //			System.out.println("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
-//			logger.severe("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
+			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -532,7 +532,7 @@ public class SelectorThread implements Runnable
 			}
 			writetasks.remove(sc);
 			
-//			logger.severe("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
+			logger.info("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -658,6 +658,7 @@ public class SelectorThread implements Runnable
 		public Cleaner(InetSocketAddress address, long delay)
 		{
 			this.address = address;
+			this.delay	= delay;
 		}
 		
 		//-------- methods --------
@@ -688,7 +689,7 @@ public class SelectorThread implements Runnable
 			{
 				public void run()
 				{
-					logger.info("Timeout reached for: "+address);
+					logger.info("Timeout reached for: "+address+", "+delay);
 					synchronized(connections)
 					{
 						if(con.equals(connections.get(address)))
@@ -715,7 +716,7 @@ public class SelectorThread implements Runnable
 						catch(Exception e)
 						{
 						}
-//						logger.severe("Removed connection to : "+address+", "+cnt);
+						logger.info("Removed connection to : "+address+", "+cnt);
 					}
 				}
 			};
