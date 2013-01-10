@@ -298,6 +298,7 @@ public class SelectorThread implements Runnable
 					{
 						queue	= new LinkedList<Tuple2<List<ByteBuffer>, Future<Void>>>();
 						writetasks.put(con.getSocketChannel(), queue);
+						System.out.println("writetasks0: "+writetasks.size());
 					}
 					queue.add(task);
 					
@@ -531,6 +532,7 @@ public class SelectorThread implements Runnable
 				it.remove();
 			}
 			writetasks.remove(sc);
+			System.out.println("writetasks1: "+writetasks.size());
 			
 			logger.info("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
 //			e.printStackTrace();
