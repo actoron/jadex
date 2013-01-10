@@ -34,6 +34,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
@@ -507,6 +508,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("ambientOcclusion", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("camera", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("guiCreatorPath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 				{
 					public Object createObject(Map args) throws Exception
@@ -525,8 +527,27 @@ public class MEnvSpaceType
 						{
 							camera = "Default";
 						}
+						
+						String guiCreatorPath = (String) getProperty(args, "guiCreatorPath");
+						if(guiCreatorPath==null)
+						{
+							guiCreatorPath = "None";
+						}
+						
+						List screens = (List)args.get("niftyScreen");
+						List fscreens = null;
+						if(screens!=null)
+						{
+							fscreens = new ArrayList();
+							for(int i=0; i<screens.size(); i++)
+							{
+								Map srcscreen = (Map)screens.get(i);
+								NiftyScreen nscr = (NiftyScreen)((IObjectCreator)getProperty(srcscreen, "creator")).createObject(srcscreen);
+								fscreens.add(nscr);
+							}
+						}
 //						IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
-						Perspective3D ret = new Perspective3D(ambientOcclusion, camera);
+						Perspective3D ret = new Perspective3D(ambientOcclusion, camera, guiCreatorPath, fscreens);
 
 											
 						if(ret instanceof Perspective3D)
@@ -555,7 +576,35 @@ public class MEnvSpaceType
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "niftyScreen"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawable3d"), "drawables3d", null, null, new BeanAccessInfo(AccessInfo.THIS)))
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "niftyScreen")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null,
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("path", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("isStartScreen", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						String name = (String)getProperty(args, "name");
+						String path = (String)getProperty(args, "path");
+						
+						Boolean isStartScreen = (Boolean)getProperty(args, "isStartScreen");
+						if(isStartScreen==null)
+						{
+							isStartScreen = false;
+						}
+
+						return new NiftyScreen(name, path, isStartScreen);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				}, 
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "materialcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
 		

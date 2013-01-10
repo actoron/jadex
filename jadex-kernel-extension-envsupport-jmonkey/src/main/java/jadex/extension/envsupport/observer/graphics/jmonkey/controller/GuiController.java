@@ -12,9 +12,9 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.*;
 
 public class GuiController extends AbstractAppState implements ScreenController {
 
-    private Nifty nifty;
-    private Screen screen;
-    private SimpleApplication app;
+    public Nifty nifty;
+    public Screen screen;
+    public SimpleApplication app;
 
     /** custom methods */
     public GuiController() {
@@ -31,13 +31,23 @@ public class GuiController extends AbstractAppState implements ScreenController 
     }
 
     
-    public void fireFullscreen() {
-    	System.out.println("firefullscreen");
-    	 ((MonkeyApp)app).fireFullscreen();
-    }
+//    public void fireFullscreen() {
+//    	System.out.println("firefullscreen aus nifty");
+//    	 ((MonkeyApp)app).fireFullscreen();
+//    }
     
     public void options() {
-        System.out.println("options");
+        
+        
+    }
+    
+    public void setBindZero() {
+    	System.out.println("set bind zero");
+    	
+    	app.getInputManager().deleteMapping("Leftclick");
+//    	app.getInputManager().clearMappings();
+//    	inputManager.addListener(actionListener, new String[] { "Leftclick" });
+        
     }
     
     

@@ -1,5 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import java.util.List;
+
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectSaver;
 import jme3tools.optimize.GeometryBatchFactory;
 
@@ -24,38 +27,18 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 public class MonkeyApp extends AMonkeyFunctions
 {
 
-
-	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera)
+	
+	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
 	{
-		super(dim, appScaled, spaceSize, isGrid, shader, camera);
+		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
 	}
 
 	public void simpleInitApp()
 	{
 		super.simpleInit();
 
-		mat01 = assetManager.loadMaterial("models/tilesets/dirt/Dirt.j3m");
-		mat02 = assetManager.loadMaterial("models/tilesets/claimed/Claimedwall.j3m");
-		mat03 = assetManager.loadMaterial("models/tilesets/Gold.j3m");
-		mat04 = assetManager.loadMaterial("models/tilesets/Rock.j3m");
-		mat05 = assetManager.loadMaterial("models/tilesets/Lava.j3m");
-		Material mat2[] = {mat01, mat02, mat03, mat04, mat05};
-		material = mat2;
-
-
 	}
 
-	Material	mat01;
-
-	Material	mat02;
-
-	Material	mat03;
-
-	Material	mat04;
-
-	Material	mat05;
-
-	Material	material[];
 
 
 	public void simpleUpdate(float tpf)

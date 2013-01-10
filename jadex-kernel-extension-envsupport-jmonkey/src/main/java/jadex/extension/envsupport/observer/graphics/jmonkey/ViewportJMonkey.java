@@ -9,6 +9,7 @@ import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.AbstractViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.ArrowJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.BoxJMonkeyRenderer;
@@ -28,6 +29,7 @@ import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.extension.envsupport.observer.perspective.Perspective3D;
 
+import java.awt.Canvas;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -188,7 +190,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 	 * @param perspective the selected Perspective
 	 * @param ClassLoader the Classloader
 	 */
-	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid, boolean shader, String camera)
+	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
 	{
 		super(perspective, spacesize, isGrid, shader, camera);
 
@@ -210,9 +212,11 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_staticNode.setLocalScale(_scale);
 		_geometryNode.setLocalScale(_scale);
 		
-		_app = new MonkeyApp(_scaleApp, _scale, areaSize_.getXAsFloat(), isGrid, this.shader, this.camera);
+		_app = new MonkeyApp(_scaleApp, _scale, areaSize_.getXAsFloat(), isGrid, this.shader, this.camera, guiCreatorPath,  niftyScreens);
 		AppSettings settings = new AppSettings(true);
+		settings.setResolution(1024, 786);
 		_app.setPauseOnLostFocus(false);
+
 		_app.setSettings(settings);
 		_app.createCanvas();
 		_app.startCanvas();

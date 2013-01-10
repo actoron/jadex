@@ -2,6 +2,7 @@ package jadex.extension.envsupport.environment.space2d;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
@@ -261,7 +262,7 @@ public class Grid2D extends Space2D
 		}		
 	}
 	
-	public Set getNearGridObjects(IVector2 position, int range, String types[])
+	public Set<SpaceObject> getNearGridObjects(IVector2 position, int range, String types[])
 	{
 		synchronized(monitor)
 		{

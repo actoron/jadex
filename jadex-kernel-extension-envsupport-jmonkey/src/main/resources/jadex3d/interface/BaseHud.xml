@@ -1,5 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+     <!-- Your IDE now tells you that one <screen></screen> element is expected here, etc. -->
 
-<nifty>
 	<useControls filename="nifty-default-controls.xml" />
 	<useStyles filename="nifty-default-styles.xml" />
 
@@ -9,31 +12,24 @@
 		<layer id="background" childLayout="center">
 
 		</layer>
-		<layer id="foreground" childLayout="horizontal">
+		<layer childLayout="vertical" >
 
 
-			<panel id="panel_left" width="5%" height="100%" childLayout="vertical">
 
+				<panel id="panel_top" width="100%" height="70%" valign="top" align="left" />
 
-				<panel id="panel_top_left" width="100%" height="99%" valign="top" />
-
-				<panel id="panel_bottom_left" width="100%" height="1%"
-					valign="bottom" childLayout="horizontal">
-					<control name="button" label="Fullscreen" id="FireButton"
-						align="center" valign="bottom" visibleToMouse="true">
+				<panel id="panel_bottom" width="100%" height="30%"  
+					align="left" valign="bottom" childLayout="horizontal" >
+					<control name="button" label="Fullscreen" id="FireButton" 
+						align="center" valign="bottom" visibleToMouse="true" >
 						<interact onClick="fireFullscreen()" />
 					</control>
 					<control name="button" label="Options" id="OptionsButton"
 						align="center" valign="bottom" visibleToMouse="true">
 						<interact onClick="options()" />
 					</control>
+
 				</panel>
-
-			</panel>
-
-
-
-			<panel id="panel_right" width="95%" height="100%" />
 
 		</layer>
 	</screen>

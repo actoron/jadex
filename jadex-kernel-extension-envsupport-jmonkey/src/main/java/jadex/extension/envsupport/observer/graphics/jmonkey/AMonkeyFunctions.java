@@ -1,8 +1,11 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
+
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
@@ -31,10 +34,13 @@ import com.jme3.terrain.heightmap.HillHeightMap;
  */
 public abstract class AMonkeyFunctions extends AMonkeyInit{
 
-	public AMonkeyFunctions(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera) {
-		super(dim, appScaled, spaceSize, isGrid, shader, camera);
+	public AMonkeyFunctions(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens) 
+	{
+		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
 		
 	}
+
+
 
 	protected void simpleInit() {
 		super.simpleInit();
@@ -59,6 +65,8 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 	 */
 	public void fireFullscreen() {
 		System.out.println("fullscreen command aus JMonkey");
+		
+		
 
 		JmeCanvasContext context = (JmeCanvasContext) getContext();
 
@@ -67,6 +75,8 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 				KeyEvent.VK_F11, KeyEvent.CHAR_UNDEFINED);
 
 		Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(event);
+		
+		cleanupPostFilter = true;
 
 	}
 	
@@ -227,14 +237,16 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 	
 	/** Custom Keybinding: Map named actions to inputs. */
 	private void initKeys() {
+		
 
 		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 		inputManager.addMapping("Leftclick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 		inputManager.addMapping("Hud", new KeyTrigger(KeyInput.KEY_F1));
-		inputManager.addMapping("ChaseCam", new KeyTrigger(KeyInput.KEY_F3));
-		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
-		inputManager.addMapping("WalkCam", new KeyTrigger(KeyInput.KEY_F6));
+//		inputManager.addMapping("Wireframe", new KeyTrigger(KeyInput.KEY_F2));
+//		inputManager.addMapping("ChaseCam", new KeyTrigger(KeyInput.KEY_F3));
+//		inputManager.addMapping("FollowCam", new KeyTrigger(KeyInput.KEY_F4));
+//		inputManager.addMapping("WalkCam", new KeyTrigger(KeyInput.KEY_F6));
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
 		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11),new KeyTrigger(KeyInput.KEY_F));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
@@ -244,17 +256,25 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 			public void onAction(String name, boolean keyPressed, float tpf) {
 
 				if (keyPressed && name.equals("Hud")) {
-					if (hudactive) {
-						niftyDisplay.getNifty().gotoScreen("hud");
-					} else {
-						niftyDisplay.getNifty().gotoScreen("default");
-					}
+					if(defaultGui)
+					{
+						if (hudactive) {
+							niftyDisplay.getNifty().gotoScreen("hud");
+						} else {
+							niftyDisplay.getNifty().gotoScreen("default");
+						}
 
-					hudactive = !hudactive;
+						hudactive = !hudactive;
+					}
+					
 				}
 
 				else if (keyPressed && name.equals("Fullscreen")) {
 					fireFullscreen();
+
+				}
+				else if (keyPressed && name.equals("Wireframe")) {
+					makeWireframe();
 
 				}
 
@@ -277,9 +297,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 					fireSelection();
 				}
 				
-				if (name.equals("Leftclick") && keyPressed) {
-					getSpacePosition();
-				}
+
 
 				else if (!focusCamActive&&name.equals("ZoomIn")) {
 					moveCamera(6, false);
@@ -323,6 +341,26 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 				}
 			}
 
+			private void makeWireframe()
+			{
+				
+
+				
+			}
+
+		};
+		
+		ActionListener leftClickListener = new ActionListener() {
+			
+			public void onAction(String name, boolean keyPressed, float tpf) {
+				
+				if (name.equals("Leftclick") && keyPressed) {
+					System.out.println("leftclick jmonkey!");
+					getSpacePosition();
+				}
+				
+			}
+				
 		};
 
 		inputManager.addListener(actionListener, new String[] { "Hud" });
@@ -332,7 +370,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit{
 		inputManager.addListener(actionListener, new String[] { "WalkCam" });
 		inputManager.addListener(actionListener, new String[] { "ZoomIn" });
 		inputManager.addListener(actionListener, new String[] { "ZoomOut" });
-		inputManager.addListener(actionListener, new String[] { "Leftclick" });
+		inputManager.addListener(leftClickListener, new String[] { "Leftclick" });
 		inputManager.addListener(actionListener, new String[] { "Select" });
 		inputManager.addListener(actionListener, new String[] { "Fullscreen" });
 		inputManager.addListener(actionListener, new String[] { "FollowCam" });

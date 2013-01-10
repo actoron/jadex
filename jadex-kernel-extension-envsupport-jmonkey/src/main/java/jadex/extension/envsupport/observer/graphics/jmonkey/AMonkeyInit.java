@@ -1,13 +1,20 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.observer.graphics.IViewport3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.DungeonMasterCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
+import jadex.extension.envsupport.observer.graphics.jmonkey.controller.IGuiControllerCreator;
+import jadex.extension.envsupport.observer.perspective.IPerspective;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,32 +30,25 @@ import com.jme3.effect.ParticleEmitter;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
-import com.jme3.light.PointLight;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Plane;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.post.SceneProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.BatchNode;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import com.jme3.texture.Texture;
-import com.jme3.water.SimpleWaterProcessor;
 import com.jme3.water.WaterFilter;
-// import com.jme3.post.*;
-// import com.jme3.post.ssao.SSAOFilter;
 
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.screen.ScreenController;
+// import com.jme3.post.*;
+// import com.jme3.post.ssao.SSAOFilter;
 
 
 /**
@@ -115,7 +115,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected boolean							complexShadows		= true;
 
-	protected boolean							cleanupPostFilter	= false;
+	protected boolean							cleanupPostFilter	= true;
 
 	protected boolean							ambientOcclusion	= true;
 
@@ -127,9 +127,13 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	BatchNode staticbatchgeo = new BatchNode("StaticBatchVisuals");
 	Node staticgeo = new Node("StaticVisuals");
+	
+	protected boolean defaultGui = true;
+	
+	protected String guiCreatorPath;
+	protected ArrayList<NiftyScreen> niftyScreens;
 
-
-	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera)
+	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
 	{
 		// Set the Variables
 		this.appSize = dim;
@@ -143,6 +147,18 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.selectedSpatial = null;
 		this.ambientOcclusion = shader;
 		this.camera = camera;
+		this.guiCreatorPath = guiCreatorPath;
+		this.niftyScreens = (ArrayList<NiftyScreen>)niftyScreens;
+		
+		if(niftyScreens!=null)
+		{
+			this.defaultGui = false;
+		}
+		
+		System.out.println("guicreatorpath: " + guiCreatorPath);
+		System.out.println("niftyScreens: " + niftyScreens);
+		
+		
 
 
 	}
@@ -155,6 +171,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
 		viewPort.setBackgroundColor(ColorRGBA.Black);
 		stateManager.getState(StatsAppState.class).toggleStats();
+		
+		
 
 		initRoot();
 
@@ -220,6 +238,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		cam.setFrustumNear(1f);
 		cam.setFrustumFar(appSize * 200);
 		cam.resize(1024, 1024, true);
+		
+		flyCam.setEnabled(false);
 
 		if(camera.equals("Default"))
 		{
@@ -237,7 +257,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		}
 		else if(camera.equals("Iso"))
 		{
-
+//			inputManager.clearMappings();
 			// Box box = new Box(Vector3f.ZERO, 1, 1, 1);
 			//
 			// Geometry geo = new Geometry("j", box);
@@ -260,7 +280,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			focusCam = new FocusCamera(cam, staticNode, inputManager);
 			focusCam.setUpVector(Vector3f.UNIT_Y);
 			focusCam.setSmoothMotion(true);
-			focusCam.setDragToRotate(true);
+			focusCam.setDragToRotate(false);
 			focusCam.setDefaultDistance(1000f);
 			focusCam.setMaxDistance(2000f);
 			focusCam.setMinDistance(50f);
@@ -324,8 +344,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		// viewPort.addProcessor(waterProcessor);
 
 
-		// BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
-		// fpp.addFilter(bf);
+		 BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
+		 fpp.addFilter(bf);
 
 
 		Vector3f lightDir = new Vector3f(1f, -2f, 1f);
@@ -383,16 +403,56 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		rootNode.setShadowMode(ShadowMode.Off);
 
 	}
+	
+	
 
 	private void initNifty()
 	{
-		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
+		
 		/** Create a new NiftyGUI object */
+		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 		Nifty nifty = niftyDisplay.getNifty();
+		
+		if(defaultGui)
+		{
+
 		/** Read your XML and initialize your custom ScreenController */
 		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new GuiController(this));
 		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new GuiController(this));
-		nifty.gotoScreen("default");
+		}
+		else
+		{
+			
+			IGuiControllerCreator guiCreator;
+			try
+			{
+				Constructor con = Class.forName(this.guiCreatorPath, true,
+						Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{SimpleApplication.class});
+
+				guiCreator = (IGuiControllerCreator)con.newInstance(new Object[]{this});
+
+			}
+			catch(ClassNotFoundException cnfe)
+			{
+				throw new RuntimeException("Cannot find this GUI-Creator", cnfe);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+			
+			NiftyScreen startScreen = null;
+			for(NiftyScreen nscreen : niftyScreens)
+			{
+				nifty.fromXml(nscreen.getPath(), nscreen.getName(), guiCreator.getScreenController());
+				if(nscreen.isStartScreen()||startScreen==null)
+				{
+					startScreen = nscreen;
+				}
+			}
+			System.out.println("startscreen: " + startScreen.getName());
+			nifty.gotoScreen(startScreen.getName());
+		}
 
 		guiViewPort.addProcessor(niftyDisplay);
 	}

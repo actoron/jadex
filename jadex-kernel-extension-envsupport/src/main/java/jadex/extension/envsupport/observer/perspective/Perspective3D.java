@@ -15,6 +15,7 @@ import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
@@ -98,11 +99,16 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	private boolean shader = true;
 	
 	private String camera = "Default";
+	
+	private String guiCreatorPath = "None";
+	
+	private List<NiftyScreen> niftyScreens;
 
 	/**
 	 * Creates a 3D-Perspective.
+	 * @param ncreens 
 	 */
-	public Perspective3D(boolean shader, String camera)
+	public Perspective3D(boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> ncreens)
 	{
 
 		super(null);
@@ -110,6 +116,10 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		this.shader = shader;
 		
 		this.camera = camera;
+		
+		this.guiCreatorPath = guiCreatorPath;
+		
+		this.niftyScreens = ncreens;
 
 		System.out.println("Perspective3D --->>> new Perspective3D");
 		this.visuals = Collections.synchronizedMap(new HashMap());
@@ -271,12 +281,12 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 				
 				IVector3 tmp3dsize = new Vector3Double(tmpsize.getXAsDouble(),(tmpsize.getXAsDouble()+tmpsize.getYAsDouble())/2,tmpsize.getYAsDouble());
 				
-				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera);
+				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
 			}
 			else if(space instanceof Space3D)
 			{
 				IVector3 tmp3dsize = ((Space3D)space).getAreaSize();
-				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera);
+				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
 			}
 
 		}
@@ -427,15 +437,15 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		}
 	}
 
-	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize, boolean isGrid, boolean shader, String camera)
+	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
 	{
 		System.out.println("Perspective3D - > Create new Viewport!");
 		try
 		{
 			Constructor con = Class.forName("jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey", true,
-					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class, boolean.class, boolean.class, String.class});
+					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class, boolean.class, boolean.class, String.class, String.class, (Class<List<NiftyScreen>>)(Class<?>)List.class});
 
-			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize, isGrid, shader, camera});
+			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize, isGrid, shader, camera, guiCreatorPath, niftyScreens});
 
 			viewport3d = vp;
 			vp.startApp();
@@ -536,6 +546,22 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	
 	public void setMarkerDrawCombiner(DrawableCombiner3d marker) {
 		this.marker = marker;
+	}
+
+	/**
+	 * @return the niftyScreens
+	 */
+	public List<NiftyScreen> getNiftyScreens()
+	{
+		return niftyScreens;
+	}
+
+	/**
+	 * @param niftyScreens the niftyScreens to set
+	 */
+	public void setNiftyScreens(List<NiftyScreen> niftyScreens)
+	{
+		this.niftyScreens = niftyScreens;
 	}
 
 
