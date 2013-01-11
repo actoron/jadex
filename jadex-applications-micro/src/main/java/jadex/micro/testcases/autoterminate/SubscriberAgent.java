@@ -43,6 +43,8 @@ public class SubscriberAgent
 	@AgentBody
 	public void	body(IInternalAccess agent)
 	{
+		System.out.println("subscribe "+agent.getComponentIdentifier());
+		
 		sub.subscribe();
 		
 		if("platform".equals(agent.getConfiguration()))
