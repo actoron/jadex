@@ -18,9 +18,13 @@ public class MultiPlatformsTest extends TestCase
 {
 	/**
 	 *  Perform the test.
+	 * @throws Exception 
 	 */
-	public void	testMultiplePlatforms()
+	public void	testMultiplePlatforms() throws Exception
 	{
+//		while(true)
+		{
+		
 		int number	= 25; // larger numbers cause timeout on toaster.
 		long timeout	= 120000;	// time required by toaster.
 		
@@ -78,5 +82,9 @@ public class MultiPlatformsTest extends TestCase
 			}
 			platforms[i].killComponent().get(sus, timeout);
 		}
+		
+		}
+		
+//		Thread.sleep(300000);
 	}
 }

@@ -85,6 +85,8 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("test1: "+report.getDescription());
+				
 				if(!report.isSucceeded())
 				{
 					report.setFailed("Termination did not happen.");
@@ -98,6 +100,8 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public void terminated(Exception reason)
 			{
+				System.out.println("test2: "+report.getDescription());
+				
 				if(report.getReason()==null)
 				{
 					report.setSucceeded(true);
@@ -110,6 +114,8 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("test3: "+report.getDescription());
+				
 				ret.addIntermediateResultIfUndone("ping");
 				agent.waitForDelay(1000, this);
 				
@@ -126,7 +132,9 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			&& reports.get(0).isFinished()
 			&& reports.get(1).isFinished()
 			&& reports.get(2).isFinished();
-		
+
+		System.out.println("test4: "+reports.size()+", "+finished);
+
 		if(finished)
 		{
 			agent.setResultValue("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
