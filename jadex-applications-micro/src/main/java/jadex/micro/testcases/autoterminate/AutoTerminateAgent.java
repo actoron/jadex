@@ -110,14 +110,14 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			}
 		});
 		
-		agent.waitForDelay(1000, new IComponentStep<Void>()
+		waitForRealtimeDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("test3: "+report.getDescription());
 				
 				ret.addIntermediateResultIfUndone("ping");
-				agent.waitForDelay(1000, this);
+				waitForRealtimeDelay(1000, this);
 				
 				return IFuture.DONE;
 			}
