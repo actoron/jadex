@@ -116,8 +116,10 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			{
 				System.out.println("test3: "+report.getDescription());
 				
-				ret.addIntermediateResultIfUndone("ping");
-				waitForRealtimeDelay(1000, this);
+				if(ret.addIntermediateResultIfUndone("ping"))
+				{
+					waitForRealtimeDelay(1000, this);
+				}
 				
 				return IFuture.DONE;
 			}
