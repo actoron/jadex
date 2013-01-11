@@ -133,6 +133,9 @@ public class SelectorThread implements Runnable
 					}
 					else
 					{
+						
+//						System.out.println("writetasks3: "+writetasks.get(key.channel()));
+
 						key.cancel();
 					}
 				}
@@ -214,6 +217,7 @@ public class SelectorThread implements Runnable
 					{
 						public void run()
 						{
+							boolean	connected	= false;
 							try
 							{
 								synchronized(connections)
@@ -225,12 +229,20 @@ public class SelectorThread implements Runnable
 //								sc.socket().setSoTimeout(10);
 								sc.configureBlocking(false);
 								sc.connect(address);
+								connected	= true;
 								sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
+//								Thread.sleep(1000);
+//								sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
 								logger.info("Attempting connection to: "+address);
 //									System.out.println(new Date()+": Attempting connection to: "+address+", "+ret.hashCode());
 							}
 							catch(Exception e)
 							{
+								if(connected)
+								{
+									e.printStackTrace();
+								}
+								
 								synchronized(connections)
 								{
 									cnt--;
@@ -284,31 +296,42 @@ public class SelectorThread implements Runnable
 			{
 				try
 				{
-					// Convert message into buffers.
-					List<ByteBuffer>	buffers	= new ArrayList<ByteBuffer>();
-					
-					buffers.add(ByteBuffer.wrap(SUtil.intToBytes(prolog.length+data.length)));
-					buffers.add(ByteBuffer.wrap(prolog));
-					buffers.add(ByteBuffer.wrap(data));
-					
-					// Add buffers as new write task.
-					Tuple2<List<ByteBuffer>, Future<Void>>	task	= new Tuple2<List<ByteBuffer>, Future<Void>>(buffers, ret);
-					List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)writetasks.get(con.getSocketChannel());
-					if(queue==null)
-					{
-						queue	= new LinkedList<Tuple2<List<ByteBuffer>, Future<Void>>>();
-						writetasks.put(con.getSocketChannel(), queue);
-						System.out.println("writetasks0: "+writetasks.size());
-					}
-					queue.add(task);
-					
-					// Inform NIO that we want to write data.
 					SelectionKey	key	= con.getSocketChannel().keyFor(selector);
-					key.interestOps(SelectionKey.OP_WRITE);
-					key.attach(con);
+					if(key!=null && key.isValid())
+					{
+						// Convert message into buffers.
+						List<ByteBuffer>	buffers	= new ArrayList<ByteBuffer>();
+						
+						buffers.add(ByteBuffer.wrap(SUtil.intToBytes(prolog.length+data.length)));
+						buffers.add(ByteBuffer.wrap(prolog));
+						buffers.add(ByteBuffer.wrap(data));
+						
+						// Add buffers as new write task.
+						Tuple2<List<ByteBuffer>, Future<Void>>	task	= new Tuple2<List<ByteBuffer>, Future<Void>>(buffers, ret);
+						List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)writetasks.get(con.getSocketChannel());
+						if(queue==null)
+						{
+							queue	= new LinkedList<Tuple2<List<ByteBuffer>, Future<Void>>>();
+							writetasks.put(con.getSocketChannel(), queue);
+	//						System.out.println("writetasks0: "+writetasks.size());
+						}
+						queue.add(task);
+						
+						// Inform NIO that we want to write data.
+						key.interestOps(SelectionKey.OP_WRITE);
+						key.attach(con);
+					}
+					else
+					{						
+//						System.err.println("writetasks6: "+writetasks.get(con.getSocketChannel()));
+						ret.setException(new RuntimeException("key is nullor invalid!? "+key));
+					}
 				}
 				catch(RuntimeException e)
 				{
+//					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
+//					e.printStackTrace();
+					
 					// Message encoding failed.
 					ret.setException(e);
 				}
@@ -457,6 +480,8 @@ public class SelectorThread implements Runnable
 			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPTransport.DEADSPAN/1000+" seconds): "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();
+						
+//			System.out.println("writetasks2: "+writetasks.get(sc));
 		}
 	}
 	
@@ -483,6 +508,9 @@ public class SelectorThread implements Runnable
 					// We wrote away all data, so we're no longer interested in
 					// writing on this socket.
 					key.interestOps(0);
+
+					writetasks.remove(sc);
+//					System.out.println("writetasks5: "+writetasks.size());
 				}
 				else
 				{
@@ -532,7 +560,7 @@ public class SelectorThread implements Runnable
 				it.remove();
 			}
 			writetasks.remove(sc);
-			System.out.println("writetasks1: "+writetasks.size());
+//			System.out.println("writetasks1: "+writetasks.size());
 			
 			logger.info("NIOTCP sending error while writing to connection: "+sc.socket().getRemoteSocketAddress()+", "+e);
 //			e.printStackTrace();
