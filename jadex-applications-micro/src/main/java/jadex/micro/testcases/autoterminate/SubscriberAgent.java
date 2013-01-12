@@ -2,6 +2,7 @@ package jadex.micro.testcases.autoterminate;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentService;
@@ -41,19 +42,23 @@ public class SubscriberAgent
 	 *  The agent body.
 	 */
 	@AgentBody
-	public void	body(IInternalAccess agent)
+	public void	body(final IInternalAccess agent)
 	{
 		System.out.println("subscribe "+agent.getComponentIdentifier());
 		
-		sub.subscribe();
-		
-		if("platform".equals(agent.getConfiguration()))
+		sub.subscribe().addResultListener(new IntermediateDefaultResultListener<String>()
 		{
-			cms.destroyComponent(agent.getComponentIdentifier().getRoot());
-		}
-		else
-		{
-			agent.killComponent();
-		}
+			public void intermediateResultAvailable(String result)
+			{
+				if("platform".equals(agent.getConfiguration()))
+				{
+					cms.destroyComponent(agent.getComponentIdentifier().getRoot());
+				}
+				else
+				{
+					agent.killComponent();
+				}
+			}
+		});
 	}
 }
