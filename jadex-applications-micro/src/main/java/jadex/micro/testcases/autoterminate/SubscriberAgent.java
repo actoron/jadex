@@ -44,7 +44,7 @@ public class SubscriberAgent
 	@AgentBody
 	public void	body(final IInternalAccess agent)
 	{
-		System.out.println("subscribe "+agent.getComponentIdentifier());
+//		System.out.println("subscribe "+agent.getComponentIdentifier());
 		
 		sub.subscribe().addResultListener(new IntermediateDefaultResultListener<String>()
 		{
