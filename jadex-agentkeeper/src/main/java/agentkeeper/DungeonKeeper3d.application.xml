@@ -1,0 +1,681 @@
+<!-- <H3>The dungeon keeper scenario</H3> -->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-application-2.3.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.3.xsd"
+	name="DungeonKeeper3d" package="agentkeeper">
+
+	<imports>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>agentkeeper.imps.*</import>
+		<import>agentkeeper.auftragsverwaltung.*</import>
+		<import>agentkeeper.gui.*</import>
+		<import>agentkeeper.map.*</import>
+	</imports>
+
+	<extensiontypes>
+		<env:envspacetype name="gc2dspace" width="1" height="1"
+			class="Grid2D">
+
+			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
+			<env:property name="tile" class="Double">0.795</env:property>
+			<env:property name="auftraege" />
+			<env:property name="gold" />
+			<env:property name="schatztruhen" />
+
+			<env:objecttypes>
+				<env:objecttype name="rock">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+					<env:property name="active" class="boolean">false</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="tilefit" class="Double">$space.getProperty("tile")</env:property>
+				</env:objecttype>
+				<env:objecttype name="dirt_path">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="active" class="boolean">false</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="impenetrable_rock">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="reinforced_wall">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="gold">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="gold2">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="gems">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="claimed_path">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="locked" class="boolean">false</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="water">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="lava">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="hero">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="dungeonheart">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="dungeonheartcenter">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="treasury">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="hatchery">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+					<env:property dynamic="false" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
+				</env:objecttype>
+				<env:objecttype name="hatcherycenter">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+					
+				</env:objecttype>
+				<env:objecttype name="lair">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+					<env:property dynamic="false" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
+				</env:objecttype>
+				<env:objecttype name="portal">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="trainingroom">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="trainingroomcenter">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="library">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				<env:objecttype name="torture">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="amount" class="int">25</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
+				
+				
+				<env:objecttype name="imp">
+					<env:property name="position" />
+					<env:property name="geschlagen">false</env:property>
+					<env:property name="direction">0.0</env:property>
+					<env:property name="level" class="int">1</env:property>
+					<env:property name="maxleben" class="int">25</env:property>
+					<env:property name="leben" class="int">25</env:property>
+					<env:property name="loyalitaet" class="double">5.0
+					</env:property>
+					<env:property name="status" class="String">"Idle"</env:property>
+				</env:objecttype>
+				<env:objecttype name="goblin">
+					<env:property name="position" />
+					<env:property name="geschlagen">false</env:property>
+					<env:property name="direction">0.0</env:property>
+					<env:property name="level" class="int">1</env:property>
+					<env:property name="maxleben" class="int">50</env:property>
+					<env:property name="leben" class="int">50</env:property>
+					<env:property name="loyalitaet" class="double">5.0
+					</env:property>
+					<env:property name="abklingzeit" class="int">2
+					</env:property>
+					<env:property name="status" class="String">"Walk"
+					</env:property>
+				</env:objecttype>
+				<env:objecttype name="warlock">
+					<env:property name="position" />
+					<env:property name="geschlagen">false</env:property>
+					<env:property name="direction">0.0</env:property>
+					<env:property name="level" class="int">1
+					</env:property>
+					<env:property name="maxleben" class="int">30</env:property>
+					<env:property name="leben" class="int">30</env:property>
+					<env:property name="loyalitaet" class="double">5.0
+					</env:property>
+					<env:property name="abklingzeit" class="int">2
+					</env:property>
+					<env:property name="status" class="String">"Walk"
+					</env:property>
+				</env:objecttype>
+				<env:objecttype name="paladin">
+					<env:property name="geschlagen">false</env:property>
+					<env:property name="position" />
+					<env:property name="direction">0.0</env:property>
+					<env:property name="maxleben" class="int">40</env:property>
+					<env:property name="leben" class="int">40</env:property>
+					<env:property name="abklingzeit" class="int">2
+					</env:property>
+					<env:property name="status" class="String">"Walk"
+					</env:property>
+				</env:objecttype>
+
+				<env:objecttype name="spielprozesse">
+					<env:property name="position" />
+					<env:property name="direction">0.0</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+
+			<env:processtypes>
+				<env:processtype name="init" class="InitMapProcess" />
+			</env:processtypes>
+
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D3D" />
+			</env:dataviews>
+
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Imp" objecttype="imp" createcomponent="true"/> 
+				<env:avatarmapping componenttype="Goblin" objecttype="goblin" createcomponent="true"/> 
+				<env:avatarmapping componenttype="Warlock" objecttype="warlock" createcomponent="true"/>
+				<env:avatarmapping componenttype="Paladin" objecttype="paladin" createcomponent="true"/> 
+<!-- 				<env:avatarmapping componenttype="SpielProzesse" objecttype="spielprozesse" createcomponent="true"/>  -->
+			</env:avatarmappings>
+
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction">
+					<env:property name="object_id" class="Object" />
+					<env:property name="direction" class="double" />
+				</env:actiontype>
+			</env:actiontypes>
+
+			<env:perspectives>
+				<env:perspective3d name="Complex3D" class="Perspective3D" camera="Iso" ambientOcclusion="false" guiCreatorPath="controller.CustomControllerCreator">
+					<env:niftyScreen name="hud" path="gui/DungeonHud.xml" isStartScreen="true"/>
+					<env:niftyScreen name="default" path="gui/DungeonHud.xml" isStartScreen="false"/>
+				
+					<env:drawable3d objecttype="static" hasSpaceobject="false"
+						width="1" height="1" depth="1">	
+						<env:sky skypath="skybox/cave/" west="caveright.jpg" east="caveleft2.jpg" north="caveback.jpg" south="cavefront.jpg" up="caveup2.jpg" down="cavedown.jpg" isSphere="false" />  
+						<env:sound3d soundfile="sounds/music/TheSnowQueen.ogg" loop="true" volume="0.1" continuosly="true" positional="false" />
+					</env:drawable3d>
+					
+					
+					
+					<env:drawable3d objecttype="rock" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+							modelpath="models/tilesets/dirt/Dirt_?.j3o"
+							materialpath="models/tilesets/dirt/DirtClicked.j3m">
+							<env:drawcondition>$object.getProperty("clicked")</env:drawcondition>
+						</env:object3d>
+						
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+							modelpath="models/tilesets/dirt/Dirt_?.j3o"
+							materialpath="models/tilesets/dirt/Dirt.j3m">
+							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
+						</env:object3d>
+
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="reinforced_wall" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+							materialpath="models/tilesets/RockTestClicked.j3m"
+							modelpath="models/tilesets/dirt/Dirt_?.j3o">
+							<env:drawcondition>$object.getProperty("clicked")</env:drawcondition>
+						</env:object3d>
+						
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+							materialpath="models/tilesets/RockTest.j3m"
+							modelpath="models/tilesets/dirt/Dirt_?.j3o">
+							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
+						</env:object3d>
+						
+					</env:drawable3d>
+					
+					
+					<env:drawable3d objecttype="gold" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d 
+							width="0.79998" height="1" depth="0.79998" 
+							x="0" y="0" z="0" 
+							materialpath="models/tilesets/Gold.j3m"
+							modelpath="models/tilesets/dirt/Dirt_?.j3o" />
+					</env:drawable3d>
+					
+					
+					<env:drawable3d objecttype="impenetrable_rock" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+							<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+							materialpath="models/tilesets/dirt/Dirt.j3m"
+							modelpath="models/tilesets/dirt/Dirt_?.j3o" />
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="water" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/water/Water_?.j3o" hasLightMaterials="true">
+						<env:materialfile part="Water" path="models/tilesets/water/Water-Water.j3m" useAlpha="true"/>
+						<env:materialfile part="Dirt" path="models/tilesets/water/Water-Dirt.j3m"/>
+						</env:object3d>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="claimed_path" width="1.0" height="1.0" depth="1.0" isDynamic="false" >
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/tilesets/claimed/Claimedpath.j3m" 
+						 >
+						<env:materialfile part="Dirt" path="models/tilesets/claimed/Claimedpath.j3m"/>
+						</env:object3d>
+						
+						<env:effect x="0" y="0.001" z="0" predefinedid="shockwave01" startsize="0" endsize="10">
+							<env:drawcondition>$object.getProperty("status").equals("byImpCreated")</env:drawcondition>
+						</env:effect>
+						
+						<env:sound3d soundfile="sounds/claim/claimed.ogg" loop="false" volume="0.1" continuosly="false" positional="true"  >
+						<env:soundcondition>
+							$object.getProperty("status").equals("byImpCreated")
+						</env:soundcondition>
+						</env:sound3d>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="lava" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/water/Water_?.j3o" hasLightMaterials="true">
+						<env:materialfile part="Water" path="models/tilesets/water/Water-Lava.j3m"/>
+						<env:materialfile part="Dirt" path="models/tilesets/water/Water-Dirt.j3m"/>
+						</env:object3d>
+					</env:drawable3d>
+
+
+					<env:drawable3d objecttype="dirt_path" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/dirt/Dirt.j3o" 
+						materialpath="models/tilesets/dirt/Dirt.j3m"
+						hasLightMaterials="true">
+						</env:object3d>
+						<env:effect x="0" y="1" z="0" predefinedid="debris01" startsize="2.5" endsize="2.5">
+							<env:drawcondition>
+								$object.getProperty("status").equals("byImpCreated")
+							</env:drawcondition>
+						</env:effect>
+						<env:effect x="0" y="2" z="0" predefinedid="smoke01" startsize="20" endsize="30">
+							<env:drawcondition>
+								$object.getProperty("status").equals("byImpCreated")
+							</env:drawcondition>
+						</env:effect>
+						<env:sound3d soundfile="sounds/rockfalling/RocksFalling?.ogg" numRndFiles="6" loop="false" volume="2.0" continuosly="true" positional="true"  >
+						<env:soundcondition>
+							$object.getProperty("status").equals("byImpCreated")
+						</env:soundcondition>
+						</env:sound3d>
+					</env:drawable3d>
+					
+					<!--  
+					
+					BUILDINGS 
+					
+					-->
+					
+					<env:drawable3d objecttype="treasury" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+					<env:property dynamic="true" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
+					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/treasury/TreasuryPlank.j3m"
+						hasLightMaterials="true" />
+					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/hatchery/HatcheryGround.j3m"
+						hasLightMaterials="true" />	
+										
+						<env:object3d width="1.65" height="1.65" depth="1.65" x="0" y="0" z="0" 
+						modelpath="models/buildings/treasury/GoldBag.j3o" 
+						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m"
+						rotation="rota" />
+					</env:drawable3d>
+
+					
+					<env:drawable3d objecttype="lair" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/lair/LairGround.j3m"/>
+						<env:object3d width="0.75" height="0.75" depth="0.75" x="0" y="0" z="0" 
+						modelpath="models/buildings/lair/Bed.j3o" 
+						rotation="rota">
+						<env:materialfile part="Blanket" path="models/buildings/lair/BedBlanket.j3m" />
+						<env:materialfile part="WhiteCloth" path="models/buildings/lair/BedBlanket.j3m" />
+						<env:materialfile part="Wood" path="models/buildings/lair/BedWood.j3m" />
+						</env:object3d>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="dungeonheartcenter" width="2.0" height="2.0" depth="2.0" isDynamic="true">
+						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
+						modelpath="models/buildings/dungeonheart/DungeonTemple.j3o" hasLightMaterials="true" />
+						<env:object3d width="1" height="1" depth="1" x="0" y="1.25" z="0" 
+						modelpath="models/buildings/dungeonheart/Sphere.j3o" hasLightMaterials="true" >
+							<env:animation name="my_animation" channel="chanA" loop="true"/>
+						</env:object3d>
+
+					</env:drawable3d>
+
+					<env:drawable3d objecttype="dungeonheart" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" modelpath="models/tilesets/claimed/Claimedpath.j3o"/>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="hatchery" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+					<env:property dynamic="true" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>	
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/hatchery/HatcheryGround.j3m"/>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="hatcherycenter" width="1.0" height="1.0" depth="1.0" isDynamic="false">			
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/hatchery/HatcheryGround.j3m" />
+						<env:object3d width="0.65" height="0.65" depth="0.65" x="0" y="0" z="0" 
+						modelpath="models/buildings/hatchery/farm.j3o" 
+						materialpath="models/buildings/hatchery/farm.j3m"
+						rotation="rota" />
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="trainingroom" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/lair/LairGround.j3m"
+						 />				
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="trainingroomcenter" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+					<env:property dynamic="true" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
+					
+					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
+						materialpath="models/buildings/lair/LairGround.j3m"/>
+									
+						<env:object3d width="0.3" height="0.3" depth="0.3" x="0" y="0" z="0" 
+						modelpath="models/buildings/training/trainingpole.j3o" 
+						materialpath="models/buildings/training/trainingpole.j3m" 
+						rotation="rota" />			
+					</env:drawable3d>
+
+
+					<env:drawable3d objecttype="imp" width="1" height="1"
+						depth="1" isDynamic="true">
+						<env:property name="level" dynamic="true">$object.getProperty("level").toString()
+						</env:property>
+						<env:property name="lifesize" dynamic="true">new
+							Vector2Double(((((((Number)$object.getProperty("leben"))).doubleValue()/(((Number)$object.getProperty("maxleben"))).doubleValue()))*0.7),0.05)
+						</env:property>
+						<env:property name="lifeposition" dynamic="true">new
+							Vector2Double((((($object.getProperty("leben")).doubleValue()/($object.getProperty("maxleben")).doubleValue())*0.70)/2)-0.9,-1)
+						</env:property>
+						<env:object3d width="0.15" height="0.15" depth="0.15"
+							x="0" y="0" z="0" modelpath="models/kobold/kobold.j3o"
+							hasLightMaterials="true">
+							<env:animation name="Walk" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
+							</env:animation>
+							<env:animation name="Idle" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
+							</env:animation>
+							<env:animation name="Dig" channel="chanA" loop="true" speed="3">
+								<env:animationcondition>$object.getProperty("status").equals("Dig")</env:animationcondition>
+							</env:animation>
+						</env:object3d>
+						
+						<env:sound3d soundfile="sounds/digslow/Digging?.ogg" numRndFiles="17" loop="false" volume="2.0" continuosly="true" positional="true"  >
+						<env:soundcondition>
+							$object.getProperty("status").equals("Dig")
+						</env:soundcondition>
+					</env:sound3d>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="warlock" width="1"
+						height="1" depth="1" isDynamic="true">
+						<env:object3d width="0.08" height="0.08" depth="0.08"
+							x="0" y="1.5" z="0"
+							modelpath="jadex3d/models/characters/medieval/mage/mage.j3o"
+							hasLightMaterials="true">
+							<env:animation name="Walk" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
+							</env:animation>
+							<env:animation name="Idle" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
+							</env:animation>
+						</env:object3d>
+					</env:drawable3d>
+
+<!-- 					<env:drawable3d objecttype="goblin" width="1" -->
+<!-- 						height="1" depth="1"> -->
+<!-- 						<env:object3d width="0.15" height="0.15" depth="0.15" -->
+<!-- 							x="0" y="1.5" z="0" -->
+<!-- 							modelpath="jadex3d/models/characters/medieval/knight/knight.j3o" -->
+<!-- 							hasLightMaterials="true"> -->
+<!-- 							<env:animation name="Walk" channel="chanA" loop="true"> -->
+<!-- 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition> -->
+<!-- 							</env:animation> -->
+<!-- 							<env:animation name="Idle" channel="chanA" loop="true"> -->
+<!-- 								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition> -->
+<!-- 							</env:animation> -->
+<!-- 						</env:object3d> -->
+<!-- 					</env:drawable3d> -->
+				</env:perspective3d>
+			</env:perspectives>
+
+			<!-- executor -->
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+
+		<componenttype name="Imp" filename="agentkeeper/imps/imp.agent.xml" />
+		<componenttype name="Goblin"
+			filename="agentkeeper/monster/goblin.agent.xml" />
+		<componenttype name="Warlock"
+			filename="agentkeeper/monster/warlock.agent.xml" />
+		<componenttype name="Paladin"
+			filename="agentkeeper/gegner/gegner.agent.xml" />
+
+<!-- 		<componenttype name="SpielProzesse" -->
+<!-- 			filename="agentkeeper/SpielProzesseAgent.class" /> -->
+	</componenttypes>
+
+	<configurations>
+		<configuration name="Test map">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="37" height="37">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/test.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main">
+							<env:plugin name="SpielGUI" class="SpielGui" />
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+
+		<configuration name="Level 1">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="27" height="27">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/level1.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="main">
+							<env:plugin name="SpielGUI" class="SpielGui" />
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+
+
+		<configuration name="Level 2">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="34" height="34">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/level2.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="main">
+							<env:plugin name="SpielGUI" class="SpielGui" />
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+		
+				<configuration name="Level 3">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="50" height="50">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/level3.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="main">
+							<env:plugin name="SpielGUI" class="SpielGui" />
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+		
+		<configuration name="Level 4">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="25" height="100">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/level4.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main">
+							<env:plugin name="SpielGUI" class="SpielGui" />
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+			<configuration name="Megamap">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="100" height="100">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/megamap.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main">
+							<env:plugin name="SpielGUI" class="SpielGui" />
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+
+	</configurations>
+
+</applicationtype>

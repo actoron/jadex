@@ -1,0 +1,7 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : models/kobold/kobold_skin6.png
+    }
+    AdditionalRenderState {
+    }
+}

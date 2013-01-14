@@ -1,0 +1,12 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : textures/gold/Gold.png
+        NormalMap : textures/gold/Gold_nor6.png
+        SpecularMap : textures/gold/Gold_spec2.png
+        GlowMap : textures/gold/Gold_glow.png
+        
+     }
+     AdditionalRenderState {
+      FaceCull Back
+    }
+}

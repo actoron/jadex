@@ -1,0 +1,17 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        GlowColor : 0.0 0.0 0.0 0.0
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 0.2 0.0 0.0 1.0
+        Ambient : 0.4 0.4 0.4 0.0
+        UseMaterialColors : true
+        Shininess : 0.1
+        
+        DiffuseMap : Repeat textures/dirt/Dirt_darkE.png
+        NormalMap : Repeat textures/dirt/Dirt_dark_nor3.png
+        SpecularMap : Repeat textures/dirt/Dirt_spec4.png
+
+    }
+    AdditionalRenderState {
+
+}

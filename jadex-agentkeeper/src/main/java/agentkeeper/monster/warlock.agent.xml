@@ -1,0 +1,120 @@
+<agent xmlns="http://jadex.sourceforge.net/jadex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.3.xsd"
+	name="warlock" package="agentkeeper.monster">
+
+	<imports>
+		<import>jadex.planlib.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>agentkeeper.auftragsverwaltung.*</import>
+		<import>agentkeeper.basisplaene.*</import>
+		<import>agentkeeper.gegner.*</import>
+	</imports>
+	<capabilities>
+		<capability name="basis" file="agentkeeper/basisplaene/basis.capability.xml" />
+	</capabilities>
+	
+	<beliefs>
+		<belief name="hunger" class="Double">
+			<fact>4.0</fact>
+		</belief>
+		<belief name="schlaf" class="Double">
+			<fact>10.0</fact>
+		</belief>
+		<belief name="stimmung" class="Double">
+			<fact>10.0</fact>
+		</belief>
+		<belief name="loyalitaet" class="Double">
+			<fact>5.0</fact>
+		</belief>
+		<belief name="zufrieden" class="boolean">
+			<fact>true</fact>
+		</belief>
+		<belief name="staerke" class="int">
+			<fact>5</fact>
+		</belief>
+		<belief name="zauberkraft" class="int">
+			<fact>1</fact>
+		</belief>
+		<beliefref name="environment">
+			<concrete ref="basis.environment" />
+		</beliefref>
+
+	</beliefs>
+
+	<goals>
+		<achievegoal name="issWas"></achievegoal>
+
+		<achievegoal name="schlafen"></achievegoal>
+
+		<achievegoal name="trainieren"></achievegoal>
+
+		<achievegoal name="lernen"></achievegoal>
+
+		<achievegoal name="angreifen">
+			<parameter name="auftrag" class="Auftrag" />
+		</achievegoal>
+
+
+	</goals>
+
+	<plans>
+		<plan name="rumbewegen">
+			<body class="RumbewegplanWarlock" />
+		</plan>
+
+		<plan name="issWas">
+			<body class="IssWasPlan" />
+			<trigger>
+				<goal ref="issWas" />
+			</trigger>
+		</plan>
+
+		<plan name="schlafen">
+			<body class="SchlafenPlan" />
+			<trigger>
+				<goal ref="schlafen" />
+			</trigger>
+		</plan>
+
+		<plan name="trainieren">
+			<body class="TrainierenPlan" />
+			<trigger>
+				<goal ref="trainieren" />
+			</trigger>
+		</plan>
+
+		<plan name="lernen">
+			<body class="LernPlan" />
+			<trigger>
+				<goal ref="lernen" />
+			</trigger>
+		</plan>
+
+		<plan name="angreifplan">
+			<parameter name="auftrag" class="Auftrag">
+				<goalmapping ref="angreifen.auftrag" />
+			</parameter>
+			<body class="AngreifPlan" />
+			<trigger>
+				<goal ref="angreifen" />
+			</trigger>
+		</plan>
+	</plans>
+
+
+
+
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="rumbewegen" />
+			</plans>
+		</configuration>
+	</configurations>
+
+
+</agent>

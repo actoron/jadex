@@ -1,0 +1,17 @@
+Material Water : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : textures/buildings/secret_floor.jpg
+        UseMaterialColors : false
+     }
+     AdditionalRenderState {
+      FaceCull Back
+      Wireframe On
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
+    }
+}

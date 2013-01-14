@@ -1,0 +1,8 @@
+Material Water : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : textures/buildings/trak_bricks2_g.jpg
+        UseMaterialColors : false
+     }
+    AdditionalRenderState {
+    }
+}

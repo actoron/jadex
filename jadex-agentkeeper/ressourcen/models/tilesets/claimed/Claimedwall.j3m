@@ -1,0 +1,10 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Repeat textures/claimed/Claimedwall2B.png
+        SpecularMap : Repeat textures/claimed/Claimedwall2_spec3.png
+
+    }
+     AdditionalRenderState {
+
+    }
+}

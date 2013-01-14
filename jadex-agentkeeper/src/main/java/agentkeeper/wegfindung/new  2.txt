@@ -1,0 +1,55 @@
+JADE-Werkzeuge
+• Wichtigste Standardwerkzeuge:
+ RMA (Remote Monitoring Agent) zur
+Plattformadministration
+?? DFGUI für die Inspektion der registrierten Agenten und
+Dienste
+Sniffer zur Visualisierung von Kommunikation
+Introspector zum Debuggen von Agenten
+Dummy Agent zur direkten Mensch-Agent Interaktion
+Logmanager Agent zur Einstellung von Logging
+Eigenschaften
+
+
+Jadex V2 Architektur
+Design-Ziele:
+?? Agentenplattform sollte verschiedene Arten von Agenten
+ausführen können (auch gleichzeitig)
+?? Ein Agentenkernel sollte auf unterschiedlichen Arten von
+Plattformen ausführbar sein
+?? Agentenanwendungen sollten möglichst
+plattformunabhängig sein
+?? Agentenanwendungen sollten aus unterschiedlichen
+Agententypen bestehen können (hybride Anwendungen)
+
+
+
+Die “EasyDeliberation” Strategie
+Basiert auf praktischen Anforderungen und Goal-Beziehungen aus
+Modellierungstechniken (z.B. TROPOS, KAOS)
+1. Einflussfaktoren des Entscheidungsprozesses
+?? Nur Ziele, Pläne werden nicht berücksichtigt
+?? Meta-Information: Goal-Cardinality, Inhibition-Arcs
+2. Wann und wie oft soll ein Agent deliberieren?
+Inhibition-Arcs und Cardinalities werden überprüft:
+???? Vor Aktivierung von Zielen
+?? Nach Beenden / Unterbrechen aktiver Ziele
+3. Über welche Menge an Zielen soll der Agent deliberieren?
+?? Das Ziel das aktiviert/unterbrochen/beendet wurde
+?? Ziele gleichen Typs (für Cardinality-Checks)
+
+BDI Kernel Rules
+• Realisieren die volle BDI-Funktionalität einschließlich
+„Goal deliberation“ und „Means-end reasoning“
+• Die Regeln wurden in unterschiedliche Gruppen
+eingeordnet: belief, goal, plan, event processing,
+message matching, …
+• Einige Regeln sind anwendungsspezifisch und werden
+nur bei Bedarf eingebunden (z.B. eine „Target Condition“
+eines Ziels)
+• Einfaches Beispiel (in CLIPS):
+?plan <- (plan (processingstate „ready“) (lifecyclestate „body“))
+?agent <- (agent (plans contains ?plan))
+=> // Java code for plan execution
+
+

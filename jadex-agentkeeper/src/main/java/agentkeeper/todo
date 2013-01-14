@@ -1,0 +1,47 @@
+WICHTIG
+ - Nachbarberechnung verallgemeinern
+ - Tileset Algorithmus verallgemeinern und Varianten anbieten (Complex & Simple)
+ 
+INTERATKION
+ - Selektion
+ - Neuer Selektor
+ - Boxselektion
+ - Spielerinteraktion
+ 
+GRAFIK
+ - Claimed Wall bauen (Blender)
+ - Wasserelemente (check)
+ - Effekte (check)
+ 
+ INIT MAP PROZESS
+ - Mittelpunkte von Gebäuden automatisch setzen (halb)
+ 
+ ALLGEMEINE VERBESSERUNGEN
+ - Erreichbarkeit im Field Speichern pro Player
+ 	- Abbau für IMPS verbessern
+ - Type Property aus den Fields rausnehmen
+ - A* Verbessern
+ - Gebäudeerreichbarkeit im Gebäude speichern
+ 
+ SPIELPROZESSE
+ - Überarbeiten
+ 
+ BDI
+ - Alle Pläne überarbeiten / neu machen
+ - Execution Task statt SpaceAction
+ 
+ IMPS
+ - Sounds einbauen (check)
+ - Effekte einbauen (check)
+ 
+ SPIELLOGIK
+ - Eventuell Aufteilung pro Gridsektor in 2x2
+ 	- Dynamischere Fortbewegung
+ 	- Eventuell einfachere Tilesets
+ 	- Dynamischere Kämpfe
+ 	
+ PERFORMANCE
+  - Batch Node (check)
+  - Lichtquellen reduzieren (check)
+ 
+ 

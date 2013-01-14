@@ -1,0 +1,10 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : textures/rock/Rock_col.png
+        NormalMap : textures/rock/Rock_nor.png
+        SpecularMap : textures/rock/Rock_spec.png
+     }
+     AdditionalRenderState {
+      FaceCull Back
+    }
+}

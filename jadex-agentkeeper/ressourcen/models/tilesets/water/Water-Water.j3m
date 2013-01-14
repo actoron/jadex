@@ -1,0 +1,10 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : textures/water/Water.png
+        NormalMap : textures/water/Water_nor.png
+        SpecularMap : textures/water/Water_spec.png
+        UseMaterialColors : true
+        Diffuse : 1.0 1.0 1.0 0.5
+    }
+    AdditionalRenderState {
+}
