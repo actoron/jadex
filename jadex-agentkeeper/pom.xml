@@ -39,6 +39,12 @@
 					<exclude>**/.svn/*</exclude>
 				</excludes>
 			</resource>
+			<resource>
+				<directory>ressourcen</directory>
+				<excludes>
+					<exclude>**/.svn/*</exclude>
+				</excludes>
+			</resource>
 		</resources>
 	</build>
 
