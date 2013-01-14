@@ -78,7 +78,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 	
 	
 	
-	public AbstractViewport3d(IPerspective perspective, IVector3 areasize, boolean isGrid, boolean shader, String camera)
+	public AbstractViewport3d(IPerspective perspective, IVector3 areasize, boolean isGrid, boolean shader, String camera, ISpaceController spaceController)
 	{
 		rendering = false;
 		this.perspective = perspective;
@@ -94,6 +94,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 		zoomLimit_ = 20.0;
 		this.shader = shader;
 		this.camera = camera;
+		this.spacecontroller = spaceController;
 	}
 	
 //	/**

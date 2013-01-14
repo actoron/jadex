@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.java2d;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.observer.graphics.AbstractViewport;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
@@ -368,4 +369,5 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 			g.translate(-pixPosition_.getXAsDouble(), -pixPosition_.getYAsDouble());
 		}
 	}
+
 }

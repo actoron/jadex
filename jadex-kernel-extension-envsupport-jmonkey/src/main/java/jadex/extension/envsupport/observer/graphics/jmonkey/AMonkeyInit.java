@@ -1,6 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.DungeonMasterCamera;
@@ -128,6 +130,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected ArrayList<Spatial>				toAdd				= new ArrayList<Spatial>();
 	
+	Vector3Int selectedworldcoord;
+	
 	BatchNode staticbatchgeo = new BatchNode("StaticBatchVisuals");
 	Node staticgeo = new Node("StaticVisuals");
 	
@@ -135,8 +139,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	protected String guiCreatorPath;
 	protected ArrayList<NiftyScreen> niftyScreens;
+	
+	protected ISpaceController spaceController;
 
-	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
+	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
 		// Set the Variables
 		this.appSize = dim;
@@ -152,6 +158,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.camera = camera;
 		this.guiCreatorPath = guiCreatorPath;
 		this.niftyScreens = (ArrayList<NiftyScreen>)niftyScreens;
+		this.spaceController = spaceController;
 		 
 		 
 		
@@ -408,9 +415,9 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			try
 			{
 				Constructor con = Class.forName(this.guiCreatorPath, true,
-						Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{SimpleApplication.class});
+						Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{SimpleApplication.class, ISpaceController.class});
 
-				guiCreator = (IGuiControllerCreator)con.newInstance(new Object[]{this});
+				guiCreator = (IGuiControllerCreator)con.newInstance(new Object[]{this, spaceController});
 
 			}
 			catch(ClassNotFoundException cnfe)
@@ -897,6 +904,14 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 			}
 		}
+	}
+
+	public Vector3Int getSelectedworldcoord() {
+		return selectedworldcoord;
+	}
+
+	public void setSelectedworldcoord(Vector3Int selectedworldcoord) {
+		this.selectedworldcoord = selectedworldcoord;
 	}
 
 

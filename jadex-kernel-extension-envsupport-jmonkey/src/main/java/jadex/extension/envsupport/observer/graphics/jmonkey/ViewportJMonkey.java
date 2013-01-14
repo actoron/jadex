@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector2;
@@ -163,7 +164,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 	public HashMap<String, Spatial> complexobjects = new HashMap<String, Spatial>();
 
 
-
 	/** The 3d renderers. */
 	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[14];
 	static
@@ -190,11 +190,10 @@ public class ViewportJMonkey extends AbstractViewport3d
 	 * @param perspective the selected Perspective
 	 * @param ClassLoader the Classloader
 	 */
-	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
+	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader, IVector3 spacesize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
-		super(perspective, spacesize, isGrid, shader, camera);
+		super(perspective, spacesize, isGrid, shader, camera, spaceController);
 
-		
 		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
 		_classloader = classloader;
@@ -203,6 +202,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_animChannels = new HashMap<String, AnimChannel>();
 		this.shader = shader;
 		this.camera = camera;
+		
 
 		// TODO: scaling komplett
 		_scale = _scaleApp / areaSize_.getXAsFloat();
@@ -212,7 +212,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_staticNode.setLocalScale(_scale);
 		_geometryNode.setLocalScale(_scale);
 		
-		_app = new MonkeyApp(_scaleApp, _scale, areaSize_.getXAsFloat(), isGrid, this.shader, this.camera, guiCreatorPath,  niftyScreens);
+		_app = new MonkeyApp(_scaleApp, _scale, areaSize_.getXAsFloat(), isGrid, this.shader, this.camera, guiCreatorPath,  niftyScreens, spaceController);
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(1024, 786);
 		_app.setPauseOnLostFocus(false);
@@ -313,8 +313,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 		
 
 		// Step 3 : Set and Create the Visualiszation of the Selected Object
-		int selected = getSelected();
-		createAndUpdateVisualSelection(selected);
+//		int selected = getSelected();
+//		createAndUpdateVisualSelection(selected);
 
 
 		// Step 4 : Update deleted Objects (Remove them from gemetryNode)

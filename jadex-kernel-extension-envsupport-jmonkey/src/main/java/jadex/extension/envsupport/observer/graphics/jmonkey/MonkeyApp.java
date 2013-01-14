@@ -2,6 +2,7 @@ package jadex.extension.envsupport.observer.graphics.jmonkey;
 
 import java.util.List;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectSaver;
 import jme3tools.optimize.GeometryBatchFactory;
@@ -28,9 +29,9 @@ public class MonkeyApp extends AMonkeyFunctions
 {
 
 	
-	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
+	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
-		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
+		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, niftyScreens, spaceController);
 	}
 
 	public void simpleInitApp()
@@ -79,30 +80,9 @@ public class MonkeyApp extends AMonkeyFunctions
 							}
 						}
 						staticgeo.attachChild(add);
-
 						if((Boolean)addnode.getUserData("hasEffect") == true)
 						{
-							for(Spatial effectspatial : addnode.getChildren())
-							{
-								if(effectspatial instanceof Node)
-								{
-									Node effectnode = (Node)effectspatial;
-									if(effectnode.getName().startsWith("effectNode"))
-									{
-
-										for(Spatial effect : effectnode.getChildren())
-
-											if(effect != null && effect instanceof ParticleEmitter)
-											{
-
-												ParticleEmitter tmpeffect = ((ParticleEmitter)effect);
-												tmpeffect.emitAllParticles();
-											}
-									}
-
-
-								}
-							}
+							startEffect(addnode);
 
 						}
 
@@ -150,6 +130,31 @@ public class MonkeyApp extends AMonkeyFunctions
 
 	}
 
+
+	private void startEffect(Node addnode) {
+		for(Spatial effectspatial : addnode.getChildren())
+		{
+			if(effectspatial instanceof Node)
+			{
+				Node effectnode = (Node)effectspatial;
+				if(effectnode.getName().startsWith("effectNode"))
+				{
+
+					for(Spatial effect : effectnode.getChildren())
+
+						if(effect != null && effect instanceof ParticleEmitter)
+						{
+
+							ParticleEmitter tmpeffect = ((ParticleEmitter)effect);
+							tmpeffect.emitAllParticles();
+						}
+				}
+
+
+			}
+		}
+		
+	}
 
 	public void setStaticGeometry(Node staticNode)
 	{

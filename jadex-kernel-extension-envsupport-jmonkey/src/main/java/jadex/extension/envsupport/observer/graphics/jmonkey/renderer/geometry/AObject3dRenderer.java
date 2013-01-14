@@ -91,6 +91,7 @@ public abstract class AObject3dRenderer extends AbstractJMonkeyRenderer
 				mat = tmp;
 			}
 
+
 			object.setMaterial(mat);
 		}
 

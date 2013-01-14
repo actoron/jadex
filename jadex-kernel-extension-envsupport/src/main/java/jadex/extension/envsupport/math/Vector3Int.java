@@ -552,6 +552,13 @@ public class Vector3Int implements IVector3
 	{
 		return copy();
 	}
+	
+	public String toString()
+	{
+		String ret =  "Vector3Int(" + x_+ ", "+ y_ +", " + z_ + ")";
+		return ret;
+		
+	}
 
 
 }

@@ -4,6 +4,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.space2d.*;
 import jadex.extension.envsupport.environment.space3d.*;
 import jadex.extension.envsupport.environment.SpaceObject;
@@ -275,18 +276,19 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 
 			// TODO alles ok hier?
 			AbstractEnvironmentSpace space = obscenter.getSpace();
+			GridController gridcontrol = new GridController(space);
 			if(space instanceof Space2D)
 			{
 				IVector2 tmpsize = ((Space2D)space).getAreaSize();
 				
 				IVector3 tmp3dsize = new Vector3Double(tmpsize.getXAsDouble(),(tmpsize.getXAsDouble()+tmpsize.getYAsDouble())/2,tmpsize.getYAsDouble());
 				
-				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
+				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, niftyScreens, gridcontrol);
 			}
 			else if(space instanceof Space3D)
 			{
 				IVector3 tmp3dsize = ((Space3D)space).getAreaSize();
-				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, niftyScreens);
+				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, niftyScreens, gridcontrol);
 			}
 
 		}
@@ -437,15 +439,15 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		}
 	}
 
-	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens)
+	private IViewport3d createViewport(IPerspective persp, ClassLoader cl, IVector3 spacesize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
 		System.out.println("Perspective3D - > Create new Viewport!");
 		try
 		{
 			Constructor con = Class.forName("jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey", true,
-					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class, boolean.class, boolean.class, String.class, String.class, (Class<List<NiftyScreen>>)(Class<?>)List.class});
+					Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{IPerspective.class, ClassLoader.class, IVector3.class, boolean.class, boolean.class, String.class, String.class, (Class<List<NiftyScreen>>)(Class<?>)List.class, ISpaceController.class});
 
-			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize, isGrid, shader, camera, guiCreatorPath, niftyScreens});
+			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl, spacesize, isGrid, shader, camera, guiCreatorPath, niftyScreens, spaceController});
 
 			viewport3d = vp;
 			vp.startApp();
