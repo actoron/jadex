@@ -45,7 +45,7 @@ return intromsg;
 /**
 Vector holding strings that have been added using PRINT.
 */
-public Vector msg=new Vector();
+public Vector<String> msg=new Vector<String>();
 
 /**
 Cute hack to make it look like BASIC.
