@@ -5,7 +5,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 /**
- * Interface used for Child Preference Screens that are shown in {@link OptionsMenuDelegatingActivity}.
+ * Interface used for Child Preference Screens that are shown in {@link OptionsMenuDelegatingPreferenceActivity}.
  */
 public interface IChildPreferenceScreen
 {

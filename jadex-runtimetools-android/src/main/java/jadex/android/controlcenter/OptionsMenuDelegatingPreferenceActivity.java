@@ -21,7 +21,7 @@ import android.view.MenuItem;
  * createSubPreferenceScreen.
  * 
  */
-public class OptionsMenuDelegatingActivity extends PreferenceActivity
+public class OptionsMenuDelegatingPreferenceActivity extends PreferenceActivity
 {
 	public static final String EXTRA_SHOWCHILDPREFSCREEN = "showChildPrefScreen";
 	public static final String EXTRA_SETTINGSKEY = "settingsKey";
@@ -39,6 +39,12 @@ public class OptionsMenuDelegatingActivity extends PreferenceActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
 		updateView();
 	}
 

@@ -1,10 +1,12 @@
 package jadex.android.controlcenter;
 
+import jadex.android.controlcenter.componentViewer.ComponentViewer;
 import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
 import jadex.android.controlcenter.settings.ISettings;
 import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformService;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -51,12 +53,12 @@ import android.widget.ListView;
  * JadexAndroidControlCenter.EXTRA_PLATFORMID
  */
 
-public class JadexAndroidControlCenter extends OptionsMenuDelegatingActivity implements ServiceConnection
+public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceActivity implements ServiceConnection
 {
 
 	protected IJadexPlatformBinder platformService;
 
-	private static final String EXTRA_PLATFORMID = "platformId";
+	public static final String EXTRA_PLATFORMID = "platformId";
 
 	private PreferenceCategory servicesCat;
 	private PreferenceCategory componentsCat;
@@ -189,6 +191,13 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingActivity imp
 		componentsCat = new PreferenceCategory(this);
 		componentsCat.setTitle("Components");
 		root.addPreference(componentsCat);
+		
+		Preference componentViewer = new Preference(this);
+		componentViewer.setTitle("Component Viewer");
+		Intent intent = new Intent(this, ComponentViewer.class);
+		intent.putExtra(EXTRA_PLATFORMID, (ComponentIdentifier) platformId);
+		componentViewer.setIntent(intent);
+		root.addPreference(componentViewer);
 
 		// refreshControlCenter();
 		return root;

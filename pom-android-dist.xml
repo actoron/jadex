@@ -172,6 +172,7 @@
 				<!-- Additional Jadex modules to include in dist -->
 				<module>jadex-parent</module>
 				<module>jadex-commons</module>
+				<module>jadex-tools-base</module>
 				<module>jadex-bridge</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-xml</module>
