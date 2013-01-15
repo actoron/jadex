@@ -4,6 +4,7 @@ import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
+import jadex.extension.envsupport.observer.graphics.jmonkey.camera.Triggers;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -16,6 +17,7 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -320,6 +322,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 		inputManager.addMapping("Hud", new KeyTrigger(KeyInput.KEY_F1));
+		
 
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
 		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11), new KeyTrigger(KeyInput.KEY_F));
@@ -328,6 +331,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 
 		ActionListener actionListener = new ActionListener()
 		{
+		    
 			public void onAction(String name, boolean keyPressed, float tpf)
 			{
 
@@ -348,6 +352,9 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 					}
 
 				}
+				
+
+					
 
 				else if(keyPressed && name.equals("Fullscreen"))
 				{

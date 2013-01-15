@@ -24,11 +24,20 @@ public class Triggers
             zoomOutTrigger = new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true),
             zoomInTrigger = new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false),
             toggleRotate = new MouseButtonTrigger(MouseInput.BUTTON_MIDDLE),
-            //            lefts = new KeyTrigger(KeyInput.KEY_LEFT),
-            //            rights = new KeyTrigger(KeyInput.KEY_RIGHT),
-            //            ups = new KeyTrigger(KeyInput.KEY_UP),
-            //            downs = new KeyTrigger(KeyInput.KEY_DOWN),
+                        lefts = new KeyTrigger(KeyInput.KEY_LEFT),
+                        rights = new KeyTrigger(KeyInput.KEY_RIGHT),
+                        ups = new KeyTrigger(KeyInput.KEY_UP),
+                        downs = new KeyTrigger(KeyInput.KEY_DOWN),
+                        
+                        
+            rightsmouse = new MouseAxisTrigger(MouseInput.AXIS_X, true),
+         	leftsmouse = new MouseAxisTrigger(MouseInput.AXIS_X, false),
+            upsmouse = new	 MouseAxisTrigger(MouseInput.AXIS_Y, true),
+            downsmouse = new 	 MouseAxisTrigger(MouseInput.AXIS_Y, false),
             queueButton = new KeyTrigger(KeyInput.KEY_LSHIFT),
             secondButton = new MouseButtonTrigger(MouseInput.BUTTON_RIGHT),
             actionButton = new MouseButtonTrigger(MouseInput.BUTTON_LEFT);;
+            
+            
+
 }

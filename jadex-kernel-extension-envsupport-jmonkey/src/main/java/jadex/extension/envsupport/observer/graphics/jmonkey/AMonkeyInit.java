@@ -12,6 +12,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiContro
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.IGuiControllerCreator;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
+import java.awt.Dimension;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,6 +142,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected ArrayList<NiftyScreen> niftyScreens;
 	
 	protected ISpaceController spaceController;
+	
+	protected Dimension	canvassize;
 
 	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
@@ -252,7 +255,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		}
 		else if(camera.equals("Iso"))
 		{
-			DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, rootNode, rootNode);
+			DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, rootNode, rootNode, (MonkeyApp)this);
 			dungeonCam.setEnabled(true);
 		}
 		else if(camera.equals("Focus"))
@@ -912,6 +915,18 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	public void setSelectedworldcoord(Vector3Int selectedworldcoord) {
 		this.selectedworldcoord = selectedworldcoord;
+	}
+	
+	public void setCanvassize(Dimension canvasSize)
+	{
+		this.canvassize = canvasSize;
+
+		
+	}
+
+	public Dimension getCanvassize()
+	{
+		return canvassize;
 	}
 
 

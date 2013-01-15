@@ -7,6 +7,7 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
@@ -14,6 +15,10 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.Control;
+
+import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
+
+import java.awt.Dimension;
 import java.io.IOException;
 
 /**
@@ -30,8 +35,16 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
     private int moveSpeed = 100, zoomSpeed = 1, rotationSpeed = 5; //max speeds
     private int minDist = 50, maxDist = 300;
     private float acceleration = 20;
+    private MonkeyApp app;
 
-    public DungeonMasterCamera(Camera cam, InputManager inputManager, Spatial target, Node rootNode)
+    private float borderMovement = 30;
+    
+    private boolean MOUSE_LEFT = false;
+    private boolean MOUSE_RIGHT = false;
+    private boolean MOUSE_UP = false;
+    private boolean MOUSE_DOWN = false;
+    
+    public DungeonMasterCamera(Camera cam, InputManager inputManager, Spatial target, Node rootNode, MonkeyApp app)
     {
         this.cam = cam;
         camNode = new Node();
@@ -55,6 +68,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         chaseCam.setTrailingEnabled(false);
         chaseCam.setRotationSensitivity(rotationSpeed);
         chaseCam.setZoomSensitivity(zoomSpeed);
+        this.app = app;
         
    
         target.addControl(this);
@@ -71,12 +85,29 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         inputManager.addMapping(mappings[1], Triggers.leftTrigger);
         inputManager.addMapping(mappings[2], Triggers.upTrigger);
         inputManager.addMapping(mappings[3], Triggers.downTrigger);
+        inputManager.addMapping(mappings[0], Triggers.rights);
+        inputManager.addMapping(mappings[1], Triggers.lefts);
+        inputManager.addMapping(mappings[2], Triggers.ups);
+        inputManager.addMapping(mappings[3], Triggers.downs);
+        
+		String mouseMovement = "mousemovement";
+		inputManager.addMapping(mouseMovement, Triggers.downsmouse);
+		inputManager.addMapping(mouseMovement, Triggers.upsmouse);
+		inputManager.addMapping(mouseMovement, Triggers.leftsmouse);
+		inputManager.addMapping(mouseMovement, Triggers.rightsmouse);
+        
+//        inputManager.addMapping(mappings[0], Triggers.rightsmouse);
+//        inputManager.addMapping(mappings[1], Triggers.leftsmouse);
+//        inputManager.addMapping(mappings[2], Triggers.upsmouse);
+//        inputManager.addMapping(mappings[3], Triggers.downsmouse);
+        
         inputManager.addMapping("rotate", Triggers.toggleRotate);
         inputManager.addListener(this, "rotate");
         inputManager.addMapping("Get angle", new com.jme3.input.controls.KeyTrigger(KeyInput.KEY_T));
         inputManager.addListener(this, "Get angle");
 
         inputManager.addListener(this, mappings);
+        inputManager.addListener(this, mouseMovement);
     }
 
     public void onAction(String name, boolean isPressed, float tpf)
@@ -100,9 +131,32 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         camDir = camDir.normalizeLocal();
         Vector3f camLeft = cam.getLeft().clone().multLocal(0.5f);
         camLeft.setY(0.0f);
+        
+        Vector3f direction = new Vector3f(0, 0, 0);
+        
+        if(name.equals("mousemovement"))
+        {
+
+        	Vector2f click2d = inputManager.getCursorPosition();
+        	
+        	Dimension candim = app.getCanvassize();
+        	if(candim!=null)
+        	{
+            	double height = candim.getHeight();
+            	double width = candim.getWidth();
+
+            	MOUSE_LEFT = click2d.getX()<borderMovement ?  true :  false;
+            	MOUSE_RIGHT = click2d.getX()>width-borderMovement ?  true :  false;
+            	MOUSE_UP = click2d.getY()>height-borderMovement ?  true :  false;
+            	MOUSE_DOWN = click2d.getY()<borderMovement ?  true :  false;
+
+        	}
+        	
+//        	System.out.println("click2d" + click2d);
+        }
 
         //If camera is moving
-        Vector3f direction = new Vector3f(0, 0, 0);
+
         if(name.equals("-X")) // || inputManager.getCursorPosition().x < 5
         {
             direction.addLocal(camLeft).normalizeLocal();
@@ -124,6 +178,47 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
 
     public void update(float tpf)
     {
+    	if(MOUSE_LEFT || MOUSE_RIGHT || MOUSE_DOWN || MOUSE_UP)
+    	{
+            Vector3f camDir = cam.getDirection().clone().multLocal(0.8f);
+            camDir = camDir.setY(0.0f); //Ignore up and down when moving forward
+            camDir = camDir.normalizeLocal();
+            Vector3f camLeft = cam.getLeft().clone().multLocal(0.5f);
+            camLeft.setY(0.0f);
+            
+            Vector3f direction = Vector3f.ZERO;
+            
+            
+        	if(MOUSE_LEFT)
+        	{
+        		direction.addLocal(camLeft).normalizeLocal();
+
+        	}
+        	
+        	if(MOUSE_RIGHT)
+        	{
+        		direction.addLocal(camLeft.negate()).normalizeLocal();
+        	}
+        	
+        	if(MOUSE_DOWN)
+        	{
+        		direction.addLocal(camDir.negate()).normalizeLocal();
+
+        	}
+        	
+        	if(MOUSE_UP)
+        	{
+        		direction.addLocal(camDir).normalizeLocal();
+        	}
+
+            	setLocation(camNode.getLocalTranslation().addLocal(direction.multLocal(moveSpeed/2 * tpf)));
+
+    	}
+    	
+
+    	
+
+    	
     }
 
     public void setLocation(Vector3f pos)
@@ -133,7 +228,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
 
     public Control cloneForSpatial(Spatial spatial)
     {
-        DungeonMasterCamera other = new DungeonMasterCamera(cam, inputManager, spatial, rootNode);
+        DungeonMasterCamera other = new DungeonMasterCamera(cam, inputManager, spatial, rootNode, app);
         return other;
     }
 

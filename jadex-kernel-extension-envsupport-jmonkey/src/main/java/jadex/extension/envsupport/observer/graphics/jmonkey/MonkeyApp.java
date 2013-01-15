@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import java.awt.Dimension;
 import java.util.List;
 
 import jadex.extension.envsupport.environment.ISpaceController;
@@ -29,6 +30,8 @@ public class MonkeyApp extends AMonkeyFunctions
 {
 
 	
+
+
 	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
 		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, niftyScreens, spaceController);
@@ -201,5 +204,7 @@ public class MonkeyApp extends AMonkeyFunctions
 
 		return height;
 	}
+
+
 
 }

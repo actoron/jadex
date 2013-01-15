@@ -796,6 +796,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 				_app.setStaticGeometry(_staticNode);
 				_app.setChannels(_animChannels);
 				_app.setParticleEmiters(_particleEmiters);
+				_app.setCanvassize(canvas_.getSize());
 				_firstrun = false;
 			}
 			else
@@ -808,6 +809,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 			{
 				_app.setCleanupPostFilter(true);
 				canvasSize = canvas_.getSize();
+				_app.setCanvassize(canvas_.getSize());
 			}
 
 			
