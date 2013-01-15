@@ -48,6 +48,10 @@ public class MonkeyApp extends AMonkeyFunctions
 	public void simpleUpdate(float tpf)
 	{
 		super.simpleUpdateAbstract(tpf);
+		
+		/**
+		 * Update the Filter if necessary
+		 */
 		if(cleanupPostFilter)
 		{
 			blockCamMoving = true;
@@ -56,84 +60,94 @@ public class MonkeyApp extends AMonkeyFunctions
 		}
 
 
+		/**
+		 * Update the Batchnode 
+		 */
 		if(!toDelete.isEmpty() || !toAdd.isEmpty())
 		{
+			
+			handleBatchNode();
 
-			if(!toAdd.isEmpty())
-			{
-				for(Spatial add : toAdd)
-				{
-					if(add instanceof Node)
-					{
-						Node addnode = (Node)add;
-						for(Spatial addchild : addnode.getChildren())
-						{
-							if(addchild instanceof Node)
-							{
-								if(addchild.getName().startsWith("Type: 6"))
-								{
-									addchild.removeFromParent();
-									addchild.setLocalTranslation(addnode.getLocalTranslation());
-									addchild.setLocalScale(addchild.getLocalScale().multLocal(add.getLocalScale()));
-									addchild.setName(add.getName());
-									staticbatchgeo.attachChild(addchild);
-
-
-								}
-
-							}
-						}
-						staticgeo.attachChild(add);
-						if((Boolean)addnode.getUserData("hasEffect") == true)
-						{
-							startEffect(addnode);
-
-						}
-
-
-					}
-
-
-				}
-
-			}
-
-
-			if(!toDelete.isEmpty())
-			{
-				for(String id : toDelete)
-				{
-					Spatial delete = staticbatchgeo.getChild(id);
-					staticgeo.detachChildNamed(id);
-
-					if(delete != null)
-					{
-						if(delete instanceof Node)
-						{
-							Node delnode = (Node)delete;
-							delnode.detachAllChildren();
-						}
-						staticbatchgeo.detachChild(delete);
-						delete.removeFromParent();
-
-					}
-					else
-					{
-						
-					}
-
-				}
-			}
-
-
-			staticbatchgeo.batch();
-
-			toDelete.clear();
-			toAdd.clear();
 		}
 
 	}
 
+
+	private void handleBatchNode()
+	{
+		if(!toAdd.isEmpty())
+		{
+			for(Spatial add : toAdd)
+			{
+				if(add instanceof Node)
+				{
+					Node addnode = (Node)add;
+					for(Spatial addchild : addnode.getChildren())
+					{
+						if(addchild instanceof Node)
+						{
+							if(addchild.getName().startsWith("Type: 6"))
+							{
+								addchild.removeFromParent();
+								addchild.setLocalTranslation(addnode.getLocalTranslation());
+								addchild.setLocalScale(addchild.getLocalScale().multLocal(add.getLocalScale()));
+								addchild.setName(add.getName());
+								staticbatchgeo.attachChild(addchild);
+
+
+							}
+
+						}
+					}
+					staticgeo.attachChild(add);
+					if((Boolean)addnode.getUserData("hasEffect") == true)
+					{
+						startEffect(addnode);
+
+					}
+
+
+				}
+
+
+			}
+
+		}
+
+
+		if(!toDelete.isEmpty())
+		{
+			for(String id : toDelete)
+			{
+				Spatial delete = staticbatchgeo.getChild(id);
+				staticgeo.detachChildNamed(id);
+
+				if(delete != null)
+				{
+					if(delete instanceof Node)
+					{
+						Node delnode = (Node)delete;
+						delnode.detachAllChildren();
+					}
+					staticbatchgeo.detachChild(delete);
+					delete.removeFromParent();
+
+				}
+				else
+				{
+					
+				}
+
+			}
+		}
+
+
+		staticbatchgeo.batch();
+
+		toDelete.clear();
+		toAdd.clear();
+		
+	}
 
 	private void startEffect(Node addnode) {
 		for(Spatial effectspatial : addnode.getChildren())

@@ -5,7 +5,9 @@ import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.DungeonMasterCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.CameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.IsoCameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.camera.IsoCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
@@ -125,7 +127,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected boolean							ambientOcclusion	= true;
 
-	protected String							camera				= "Default";
+	protected String							cameraSelection				= "Default";
 
 	protected ArrayList<String>				toDelete			= new ArrayList<String>();
 
@@ -146,6 +148,9 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected Dimension	canvassize;
 	
 	protected boolean blockCamMoving;
+	
+	protected CameraState cameraState;
+	
 
 	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
@@ -160,7 +165,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.selectedTarget = -1;
 		this.selectedSpatial = null;
 		this.ambientOcclusion = shader;
-		this.camera = camera;
+		this.cameraSelection = camera;
 		this.guiCreatorPath = guiCreatorPath;
 		this.niftyScreens = (ArrayList<NiftyScreen>)niftyScreens;
 		this.spaceController = spaceController;
@@ -232,80 +237,17 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	public void initCam()
 	{
-		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(appSize / 2, 0, appSize / 2));
-		cam.lookAt(new Vector3f(appSize / 2, 0, appSize / 2), Vector3f.UNIT_Y);
-		cam.setFrustumNear(1f);
-		cam.setFrustumFar(appSize * 200);
-		cam.resize(1024, 1024, true);
-		
-		flyCam.setEnabled(false);
-
-		if(camera.equals("Default"))
+		if(cameraSelection.equals("Default"))
 		{
-			cam.setLocation(new Vector3f(appSize / 2, appSize / 4, appSize / 2));
-			// The Fly Camera
-			flyCamera = new FlyCamera(cam);
-			flyCamera.setUpVector(Vector3f.UNIT_Y);
-			flyCamera.registerWithInput(inputManager);
-			flyCamera.setMoveSpeed(appScaled);
-			flyCamera.setDragToRotate(true);
-			flyCamera.setEnabled(true);
-
-
-			flyCamera.setEnabled(true);
+			cameraState =  new CameraState();
+			stateManager.attach(cameraState);
 		}
-		else if(camera.equals("Iso"))
+		else if(cameraSelection.equals("Iso"))
 		{
-			DungeonMasterCamera dungeonCam = new DungeonMasterCamera(cam, inputManager, rootNode, rootNode, (MonkeyApp)this);
-			dungeonCam.setEnabled(true);
-		}
-		else if(camera.equals("Focus"))
-		{
-
-			// The Focus Camera
-			focusCam = new FocusCamera(cam, staticNode, inputManager);
-			focusCam.setUpVector(Vector3f.UNIT_Y);
-			focusCam.setSmoothMotion(true);
-			focusCam.setDragToRotate(false);
-			focusCam.setDefaultDistance(1000f);
-			focusCam.setMaxDistance(2000f);
-			focusCam.setMinDistance(50f);
-			focusCam.setZoomSpeed(20f);
-			focusCam.setEnabled(true);
+			IsoCameraState isoState = new IsoCameraState();
+			stateManager.attach(isoState);
 		}
 
-
-		// cam.
-
-		// Change the mappings we don't want
-
-		//
-//		 Camera cam_n = cam.clone();
-//		 cam.setViewPort( 0.0f , 1.0f , 0.0f , 1.0f );
-//		 cam_n.setViewPort( 0.0f , 0.1f , 0.85f , 1.0f );
-//		 cam_n.setLocation(new Vector3f(appSize/2, appSize/2,
-//				 appSize/2));
-//		 cam_n.lookAt(new Vector3f(appSize/2, 0.001f, appSize/2),
-//		 Vector3f.UNIT_Y);
-//
-//
-//		 
-//		 
-//		 ViewPort view = renderManager.createMainView("View of camera #1",
-//		 cam);
-//		 view.setEnabled(true);
-//		 view.setClearFlags(true, true, true);
-//		 view.attachScene(rootNode);
-//		 view.setBackgroundColor(ColorRGBA.Black);
-//		 view.addProcessor(fpp);
-//		//
-//		 ViewPort view_n = renderManager.createMainView("View of camera #2",
-//		 cam_n);
-//		 view_n.setEnabled(true);
-//		 view_n.setClearFlags(true, true, true);
-//		 view_n.attachScene(rootNode);
-//		 view_n.setBackgroundColor(ColorRGBA.Black);
 
 	}
 
@@ -939,6 +881,36 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	public void setBlockCamMoving(boolean blockCamMoving)
 	{
 		this.blockCamMoving = blockCamMoving;
+	}
+
+	public float getAppSize()
+	{
+		return appSize;
+	}
+
+	public void setAppSize(float appSize)
+	{
+		this.appSize = appSize;
+	}
+
+	public String getCameraSelection()
+	{
+		return cameraSelection;
+	}
+
+	public void setCameraSelection(String cameraSelection)
+	{
+		this.cameraSelection = cameraSelection;
+	}
+
+	public float getAppScaled()
+	{
+		return appScaled;
+	}
+
+	public void setAppScaled(float appScaled)
+	{
+		this.appScaled = appScaled;
 	}
 
 
