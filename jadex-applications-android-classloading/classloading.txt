@@ -8,7 +8,7 @@
 Ansatz:
 - Jadex dexen und aufs android filesystem legen
 - DexClassLoader lädt dex und speichert optimierte klassen in app-privatem Verzeichnis
-- LoaderActivity lädt mit eigenem diesem ClassLoader die eigentliche (User-)Activity. Die wird dann natürlich vom parent loader geladen.
+- LoaderActivity lädt mit diesem ClassLoader die eigentliche (User-)Activity. Die wird dann natürlich vom parent loader geladen.
 - UserActivity erbt aber von JadexAndroidActivity, die der parent loader nicht kennt
 -> parent
    |
@@ -27,6 +27,9 @@ Probleme:
 - Lösung: Anwendung besteht nur aus einer Activity, der Content wird dynamisch ersetzt.
   D.h. User erweitert nichtmehr Activity, sondern eigene Basisklasse. Aufwändig!
   Außerdem keine Intents mehr verwendbar.
+  
+- Lösung Service: MetaService, Schnittstelle zur activity generisch, Aufrufe werden zu userService weitergeleitet -> dynamicProxy
+  userService wird von eigenem Classloader geladen. 
 
 http://stackoverflow.com/questions/10832029/custom-class-loader-for-android
 http://lsd.luminis.nl/osgi-on-google-android-using-apache-felix/
