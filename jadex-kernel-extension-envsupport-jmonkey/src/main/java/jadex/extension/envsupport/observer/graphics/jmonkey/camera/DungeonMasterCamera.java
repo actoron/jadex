@@ -186,7 +186,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         setLocation(camNode.getLocalTranslation().addLocal(direction.multLocal(moveSpeed * tpf)));
     }
     
-    public int count = 20;
+    public int count = 50;
 
     public void update(float tpf)
     {
@@ -200,7 +200,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
     		if(!app.isBlockCamMoving())
     		{
     			
-        	count = 20;
+        	count = 50;
 
             Vector3f camDir = cam.getDirection().clone().multLocal(0.8f);
             camDir = camDir.setY(0.0f); //Ignore up and down when moving forward
@@ -239,7 +239,10 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
     		}
     		else
     		{
-
+            	MOUSE_LEFT =  false;
+            	MOUSE_RIGHT =   false;
+            	MOUSE_UP =   false;
+            	MOUSE_DOWN =  false;
 				count--;
 				System.out.println("count: " + count);
     			if(count < 0)

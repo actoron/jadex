@@ -227,6 +227,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
 		canvasSize = canvas_.getSize();
+		
+		
 
 		// Drawstuff
 		_drawObjects = Collections.synchronizedSet(new HashSet<Object>());
