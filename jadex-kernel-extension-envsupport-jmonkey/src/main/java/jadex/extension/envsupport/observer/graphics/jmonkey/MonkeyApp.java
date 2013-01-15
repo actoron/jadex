@@ -44,12 +44,13 @@ public class MonkeyApp extends AMonkeyFunctions
 	}
 
 
-
+	
 	public void simpleUpdate(float tpf)
 	{
 		super.simpleUpdateAbstract(tpf);
 		if(cleanupPostFilter)
 		{
+			blockCamMoving = true;
 			fpp.cleanup();
 			cleanupPostFilter = false;
 		}

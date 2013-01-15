@@ -144,6 +144,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected ISpaceController spaceController;
 	
 	protected Dimension	canvassize;
+	
+	protected boolean blockCamMoving;
 
 	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
 	{
@@ -927,6 +929,16 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	public Dimension getCanvassize()
 	{
 		return canvassize;
+	}
+
+	public boolean isBlockCamMoving()
+	{
+		return blockCamMoving;
+	}
+
+	public void setBlockCamMoving(boolean blockCamMoving)
+	{
+		this.blockCamMoving = blockCamMoving;
 	}
 
 

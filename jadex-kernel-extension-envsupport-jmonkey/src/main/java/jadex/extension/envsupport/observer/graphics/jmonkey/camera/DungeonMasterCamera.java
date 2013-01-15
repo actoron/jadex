@@ -124,6 +124,7 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         }
     }
 
+
     public void onAnalog(String name, float value, float tpf)
     {
         Vector3f camDir = cam.getDirection().clone().multLocal(0.8f);
@@ -138,8 +139,14 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         {
 
         	Vector2f click2d = inputManager.getCursorPosition();
+        	System.out.println("click2d " + click2d);
+        	
+
+
         	
         	Dimension candim = app.getCanvassize();
+        	
+        	System.out.println("click2d" + click2d);
         	if(candim!=null)
         	{
             	double height = candim.getHeight();
@@ -152,7 +159,10 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
 
         	}
         	
-//        	System.out.println("click2d" + click2d);
+        	
+
+        	
+        	
         }
 
         //If camera is moving
@@ -175,11 +185,23 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         }
         setLocation(camNode.getLocalTranslation().addLocal(direction.multLocal(moveSpeed * tpf)));
     }
+    
+    public int count = 20;
 
     public void update(float tpf)
     {
+    	Vector2f click2d = inputManager.getCursorPosition();
+    	System.out.println("click2d " + click2d);
+    	
     	if(MOUSE_LEFT || MOUSE_RIGHT || MOUSE_DOWN || MOUSE_UP)
     	{
+
+    		
+    		if(!app.isBlockCamMoving())
+    		{
+    			
+        	count = 20;
+
             Vector3f camDir = cam.getDirection().clone().multLocal(0.8f);
             camDir = camDir.setY(0.0f); //Ignore up and down when moving forward
             camDir = camDir.normalizeLocal();
@@ -210,8 +232,21 @@ public class DungeonMasterCamera implements Control, AnalogListener, ActionListe
         	{
         		direction.addLocal(camDir).normalizeLocal();
         	}
+        	
 
             	setLocation(camNode.getLocalTranslation().addLocal(direction.multLocal(moveSpeed/2 * tpf)));
+            	
+    		}
+    		else
+    		{
+
+				count--;
+				System.out.println("count: " + count);
+    			if(count < 0)
+    			{
+    				app.setBlockCamMoving(false);
+    			}
+    		}
 
     	}
     	
