@@ -1,8 +1,9 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.implementation;
 
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -65,7 +66,13 @@ public class ExecuteServiceByAgentTask implements ITask {
 	}
 
 	@Override
-	public IFuture<Void> cancel(BpmnInterpreter instance) {
+	public IFuture<Void> execute(ITaskContext context, IInternalAccess process) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IFuture<Void> cancel(IInternalAccess instance) {
 		// TODO Auto-generated method stub
 		return null;
 	}

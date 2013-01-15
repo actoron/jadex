@@ -1,4 +1,4 @@
-package deco4mas.distributed.jcc.viewer;
+package sodekovs.swing.jcc.plugins.coordination;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;

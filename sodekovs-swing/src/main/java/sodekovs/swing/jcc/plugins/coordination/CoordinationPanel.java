@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.distributed.jcc.viewer;
+package sodekovs.swing.jcc.plugins.coordination;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -33,6 +33,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import sodekovs.swing.jcc.plugins.coordination.CoordinationPlugin;
 
 import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
 import deco4mas.distributed.coordinate.service.CoordinationChangeEvent;

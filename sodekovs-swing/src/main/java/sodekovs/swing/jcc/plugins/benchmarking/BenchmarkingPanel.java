@@ -1,4 +1,4 @@
-package sodekovs.benchmarking.viewer;
+package sodekovs.swing.jcc.plugins.benchmarking;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -39,9 +39,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import sodekovs.benchmarking.helper.CheckFileThread;
 import sodekovs.benchmarking.helper.Constants;
 import sodekovs.benchmarking.services.IBenchmarkingManagementService;
+import sodekovs.swing.jcc.plugins.benchmarking.helper.CheckFileThread;
 import sodekovs.util.gnuplot.CreateImage;
 import sodekovs.util.misc.FileHandler;
 import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
@@ -55,8 +55,8 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[] { "refresh", SGUI.makeIcon(BenchmarkingPanel.class, "/jadex/tools/common/images/new_refresh_anim00.png"), "png_not_found",
-			SGUI.makeIcon(BenchmarkingPanel.class, "/sodekovs/benchmarking/viewer/images/PNGFileNotFound.png"), "manual_injection",
-			SGUI.makeIcon(BenchmarkingPanel.class, "/sodekovs/benchmarking/viewer/images/injection.png") });
+			SGUI.makeIcon(BenchmarkingPanel.class, "/sodekovs/swing/jcc/plugins/benchmarking/images/PNGFileNotFound.png"), "manual_injection",
+			SGUI.makeIcon(BenchmarkingPanel.class, "/sodekovs/swing/jcc/plugins/benchmarking/images/injection.png") });
 
 	// -------- attributes --------
 

@@ -1,9 +1,9 @@
-package sodekovs.benchmarking.helper;
+package sodekovs.swing.jcc.plugins.benchmarking.helper;
 
 
 import java.util.TimerTask;
 
-import sodekovs.benchmarking.viewer.BenchmarkingPanel;
+import sodekovs.swing.jcc.plugins.benchmarking.BenchmarkingPanel;
 import sodekovs.util.misc.FileHandler;
 import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.distributed.jcc.viewer;
+package sodekovs.swing.jcc.plugins.coordination;
 
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 

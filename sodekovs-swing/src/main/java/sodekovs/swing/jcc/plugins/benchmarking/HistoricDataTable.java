@@ -1,4 +1,4 @@
-package sodekovs.benchmarking.viewer;
+package sodekovs.swing.jcc.plugins.benchmarking;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.df.IProperty;
@@ -11,18 +11,18 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 /**
- * Table showing the df component services.
+ * Table showing historic data found in a db.
  */
-public class BenchmarkingServiceTable extends JTable// JScrollPane
+public class HistoricDataTable extends JTable// JScrollPane
 {
 	/**
 	 * Constructor.
 	 */
-	public BenchmarkingServiceTable() {
-		super(new TableSorter(new BenchmarkingTableModel()));
+	public HistoricDataTable() {
+		super(new TableSorter(new HistoricDataTableModel()));
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		TableSorter sorter = (TableSorter) getModel();
 		sorter.setTableHeader(getTableHeader());
@@ -31,31 +31,14 @@ public class BenchmarkingServiceTable extends JTable// JScrollPane
 		setDefaultRenderer(IProperty[].class, new PropertyArrayRenderer());
 	}
 
-	// /**
-	// * Get the selected component/service description.
-	// * @return The currently selected service/component description.
-	// */
-	// public Object[] getSelectedServices()
-	// {
-	// Object[] ret = new Object[]{null, null};
-	// int sel = getSelectedRow();
-	// if(sel>=0)
-	// {
-	// TableSorter sorter = (TableSorter)getModel();
-	// BenchmarkingTableModel model = (BenchmarkingTableModel)sorter.getTableModel();
-	// sel = sorter.modelIndex(sel);
-	// ret = new Object[]{model.getServiceDescription(sel)};
-	// }
-	// return ret;
-	// }
-
 	/**
-	 * Get the selected service description.
+	 * Get the selected history description.
 	 * 
 	 * @return The currently selected history description.
 	 */
-	public IBenchmarkingDescription getSelectedService() {
-		IBenchmarkingDescription ret = null;
+	public IHistoricDataDescription getSelectedHistoricDataDescription() {
+		// Object[] ret = new Object[]{null, null};
+		IHistoricDataDescription ret = null;
 		int sel = getSelectedRow();
 
 		// Hack: somehow sel is sometimes -1 : avoid nullpointer-exception with this hack.
@@ -66,9 +49,9 @@ public class BenchmarkingServiceTable extends JTable// JScrollPane
 		// if(sel>=0)
 		// {
 		TableSorter sorter = (TableSorter) getModel();
-		BenchmarkingTableModel model = (BenchmarkingTableModel) sorter.getTableModel();
+		HistoricDataTableModel model = (HistoricDataTableModel) sorter.getTableModel();
 		sel = sorter.modelIndex(sel);
-		ret = model.getServiceDescription(sel);
+		ret = model.getHistoricDataDescription(sel);
 		// }else if(sel == -1){
 		// sel=0;
 		// System.out.println("YYYYYYYYYYYYYYES");
@@ -85,11 +68,11 @@ public class BenchmarkingServiceTable extends JTable// JScrollPane
 	 * 
 	 * @param ad
 	 */
-	public void setComponentDescriptions(IBenchmarkingDescription[] benchDesc) {
+	public void setComponentDescriptions(IHistoricDataDescription[] histDataDesc) {
 		TableSorter sorter = (TableSorter) getModel();
-		BenchmarkingTableModel model = (BenchmarkingTableModel) sorter.getTableModel();
+		HistoricDataTableModel model = (HistoricDataTableModel) sorter.getTableModel();
 		// model.setComponentDescriptions(ad);
-		model.setBenchmarkingDescriptions(benchDesc);
+		model.setHistoricDataDescriptions(histDataDesc);
 	}
 
 	// /**

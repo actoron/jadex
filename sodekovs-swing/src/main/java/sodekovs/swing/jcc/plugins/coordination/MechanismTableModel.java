@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.distributed.jcc.viewer;
+package sodekovs.swing.jcc.plugins.coordination;
 
 import java.util.ArrayList;
 import java.util.List;

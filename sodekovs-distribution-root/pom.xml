@@ -93,6 +93,7 @@
 		<module>../sodekovs-productionline</module>
 		<module>../sodekovs-simulationcontrol</module>
 		<module>../sodekovs-util</module>
+		<module>../sodekovs-swing</module>
 		<module>../sodekovs-investigation-framework</module>
 		
 	</modules>
@@ -494,6 +495,7 @@
 				<module>../sodekovs-productionline</module>
 				<module>../sodekovs-simulationcontrol</module>
 				<module>../sodekovs-util</module>
+				<module>../sodekovs-swing</module>
 				<module>../sodekovs-distribution-root</module>
 				<module>../sodekovs-investigation-framework</module>
 				

@@ -2,22 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>sodekovs-util</artifactId>
+	<artifactId>sodekovs-swing</artifactId>
 	<packaging>jar</packaging>
 	<version>2.1</version>
-	<name>sodekovs-util</name>
+	<name>sodekovs-swing</name>
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 
-	<!--
-		<parent> <groupId>jadex</groupId>
-		<artifactId>jadex-settings</artifactId> <version>2.1</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
+	<!-- <parent> <groupId>jadex</groupId> <artifactId>jadex-settings</artifactId> 
+		<version>2.1</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
+		</parent> -->
 
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
+	</properties>
 
 	<build>
 		<resources>
@@ -27,14 +24,8 @@
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource><!-- 
-			<resource>
-				<directory>src/test/java</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-			</resource> -->
+			</resource><!-- <resource> <directory>src/test/java</directory> <excludes> 
+				<exclude>**/*.java</exclude> <exclude>**/.svn/*</exclude> </excludes> </resource> -->
 		</resources>
 
 		<plugins>
@@ -76,10 +67,10 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-javadoc-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -88,55 +79,72 @@
 						</goals>
 					</execution>
 				</executions>
-        	</plugin>
+			</plugin>
 		</plugins>
 	</build>
 
 
-	<dependencies>	
-	<dependency>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applib-bdi</artifactId>
 			<version>2.3-SNAPSHOT</version>
 		</dependency>
+		<!-- <dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdi</artifactId>
+			<version>2.3-SNAPSHOT</version>
+		</dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>2.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.7.1.1</version>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdibpmn</artifactId>
+			<version>2.3-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+		<!-- <dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools-swing</artifactId>
+			<version>2.3-SNAPSHOT</version>
+		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>sodekovs-util</artifactId>
+			<version>2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-extension-agr</artifactId>
-			<version>2.3-SNAPSHOT</version>
+			<artifactId>sodekovs-coordination-distributed</artifactId>
+			<version>2.1</version>
 		</dependency>
-		
 		<dependency>
-			<groupId>com.derby</groupId>
-			<artifactId>client</artifactId>
-			<version>10.8.1.2</version>
-			<scope>compile</scope>
-			</dependency>
-			<dependency>
-			<groupId>com.derby</groupId>
-			<artifactId>core</artifactId>
-			<version>10.8.1.2</version>
-			<scope>compile</scope>
-			</dependency>
-			<dependency>
-			<groupId>com.derby</groupId>
-			<artifactId>net</artifactId>
-			<version>10.8.1.2</version>
-			<scope>compile</scope>
-			</dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>sodekovs-benchmarking</artifactId>
+			<version>2.1</version>
+		</dependency>
 		<dependency>
-  			<groupId>colt</groupId>
-  			<artifactId>colt</artifactId>
-  			<version>1.2.0</version>
-		</dependency> 
-	</dependencies>	
+ 			<groupId>net.sourceforge.jadex</groupId>
+ 			<artifactId>jadex-runtimetools-swing</artifactId> 
+ 			<version>2.3-SNAPSHOT</version>
+ 		</dependency>		
+	</dependencies>
 </project>

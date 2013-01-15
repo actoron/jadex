@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.distributed.jcc.viewer;
+package sodekovs.swing.jcc.plugins.coordination;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
@@ -23,8 +23,8 @@ import deco4mas.distributed.jcc.service.ICoordinationManagementService;
 public class CoordinationPlugin extends AbstractServicePlugin {
 
 	static {
-		icons.put("coordination", SGUI.makeIcon(CoordinationPlugin.class, "/deco4mas/distributed/jcc/viewer/images/coordination.png"));
-		icons.put("coordination_sel", SGUI.makeIcon(CoordinationPlugin.class, "/deco4mas/distributed/jcc/viewer/images/coordination-invert.png"));
+		icons.put("coordination", SGUI.makeIcon(CoordinationPlugin.class, "/sodekovs/swing/jcc/plugins/coordination/images/coordination.png"));
+		icons.put("coordination_sel", SGUI.makeIcon(CoordinationPlugin.class, "/sodekovs/swing/jcc/plugins/coordination/images/coordination-invert.png"));
 	}
 
 	@Override

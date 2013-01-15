@@ -1,4 +1,4 @@
-package sodekovs.benchmarking.viewer;
+package sodekovs.swing.jcc.plugins.benchmarking;
 
 
 import javax.swing.table.AbstractTableModel;

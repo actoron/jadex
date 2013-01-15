@@ -9,7 +9,6 @@ import jadex.commons.future.Future;
 import java.util.Collection;
 
 import deco4mas.distributed.coordinate.service.ICoordinationSpaceService;
-import deco4mas.distributed.jcc.viewer.CoordinationPanel;
 
 /**
  * The coordination management service manages the handling of all found {@link ICoordinationSpaceService} for the {@link CoordinationPanel}.

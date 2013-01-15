@@ -1,4 +1,4 @@
-package sodekovs.benchmarking.viewer;
+package sodekovs.swing.jcc.plugins.benchmarking;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
@@ -22,8 +22,8 @@ public class BenchmarkingPlugin extends AbstractServicePlugin
 
 	static
 	{
-		icons.put("benchmark", SGUI.makeIcon(BenchmarkingPlugin.class, "/sodekovs/benchmarking/viewer/images/benchmark2.png"));
-		icons.put("benchmark_sel", SGUI.makeIcon(BenchmarkingPlugin.class, "/sodekovs/benchmarking/viewer/images/benchmark_sel.png"));
+		icons.put("benchmark", SGUI.makeIcon(BenchmarkingPlugin.class, "/sodekovs/swing/jcc/plugins/benchmarking/images/benchmark2.png"));
+		icons.put("benchmark_sel", SGUI.makeIcon(BenchmarkingPlugin.class, "/sodekovs/swing/jcc/plugins/benchmarking/images/benchmark_sel.png"));
 	}
 
 	//-------- methods --------
