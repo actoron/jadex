@@ -6,6 +6,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -30,12 +31,15 @@ public class JCCTest extends TestCase
 {
 	public void	testJCC()
 	{
-		long timeout	= 30000;
-		ISuspendable	sus	= 	new ThreadSuspendable();
 		System.err.println("starting platform");
-		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases_*",
+		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 //			"-logging", "true",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"}).get(sus, timeout);
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"});
+		
+		long timeout	= BasicService.DEFAULT_LOCAL;
+		ISuspendable	sus	= 	new ThreadSuspendable();
+		
+		final IExternalAccess	platform	= fut.get(sus, timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
