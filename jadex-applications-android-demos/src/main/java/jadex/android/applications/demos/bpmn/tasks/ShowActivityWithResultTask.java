@@ -1,10 +1,11 @@
 package jadex.android.applications.demos.bpmn.tasks;
 
-import jadex.bpmn.annotation.Task;
-import jadex.bpmn.annotation.TaskParameter;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskContext;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -28,7 +29,7 @@ public class ShowActivityWithResultTask implements ITask, Serializable
 	/** This map is used to retrieve attributes for the current Activity and to store its results for the next task */
 	private static HashMap<String, Serializable> attributes;
 	
-	public IFuture<Void> execute(ITaskContext taskContext, BpmnInterpreter process)
+	public IFuture<Void> execute(ITaskContext taskContext, IInternalAccess process)
 	{
 		// get task attributes
 		android.content.Context androidContext = (android.content.Context)taskContext.getParameterValue("androidContext");
@@ -80,7 +81,7 @@ public class ShowActivityWithResultTask implements ITask, Serializable
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final BpmnInterpreter instance)
+	public IFuture cancel(final IInternalAccess instance)
 	{
 		final Future ret = new Future();
 		ret.setResult(null);

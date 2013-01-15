@@ -1,10 +1,11 @@
 package jadex.android.applications.demos.bpmn.tasks;
 
-import jadex.bpmn.annotation.Task;
-import jadex.bpmn.annotation.TaskParameter;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bridge.IInternalAccess;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import android.content.Intent;
 public class ShowActivityTask extends AbstractTask
 {
 
-	public void doExecute(ITaskContext taskContext, BpmnInterpreter instance) throws Exception
+	public void doExecute(ITaskContext taskContext, IInternalAccess instance) throws Exception
 	{
 		System.out.println("ShowActivityTask: activityClass=" + ((Class)taskContext.getParameterValue("activityClass")).getName());
 		
