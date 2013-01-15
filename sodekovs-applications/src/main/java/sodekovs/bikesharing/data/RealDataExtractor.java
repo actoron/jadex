@@ -140,6 +140,12 @@ public class RealDataExtractor {
 					String xmlFile = "WashingtonSimulation_Monday.xml";
 					XmlUtil.saveAsXML(sd, xmlFile);
 					System.out.println(xmlFile + " written.");
+					
+					int runTotal = 0;
+					for (TimeSlice ts : sd.getTimeSlices().getTimeSlice()) {
+						runTotal += ts.getRunTotal();
+					}
+					System.out.println("RunTotal: " + runTotal);
 
 					System.out.println("Writing XML File for Evaluation");
 					String xmlEvalFile = "WashingtonEvaluation_Monday.xml";
