@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -80,7 +81,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		
 //		System.out.println("test: "+report.getDescription());
 		
-		waitForRealtimeDelay(10000,
+		waitForRealtimeDelay(BasicService.DEFAULT_LOCAL,
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
