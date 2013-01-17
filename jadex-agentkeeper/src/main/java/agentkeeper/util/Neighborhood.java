@@ -60,13 +60,40 @@ public class Neighborhood {
 		bigcase4, bigcase5, bigcase6, bigcase7, bigcase8, bigcase9, bigcase10, bigcase11, bigcase12, bigcase13, bigcase14, bigcase15, bigcase16};
 
 	
+	
+//	/**
+//	 * Simple= Only 4 Neighbors
+//	 * @param zielpos
+//	 * @param grid
+//	 */
+//	public static void updateMyNeighborsSimple(IVector2 zielpos, Grid2D grid) {
+//		for(int i = 0; i<simpleDirections.length; i++ )
+//		{
+//			
+//			IVector2 ziel = zielpos.copy().add(simpleDirections[i]);
+//			SpaceObject thatsme = InitMapProcess.getFieldTypeAtPos(ziel, grid);
+//			updateMyNeighborvalueBasedOnMyNeighborhood(ziel, thatsme, grid);
+//		}
+//		
+//	}
+//
+//	/**
+//	 * Complex= All 8 Neighbors
+//	 * @param zielpos
+//	 * @param grid
+//	 */
+//	public static void updateMyNeighborsComplex(IVector2 zielpos, Grid2D grid) {
+//		for(int i = 0; i<cases.length; i++ )
+//		{
+//			IVector2 ziel = zielpos.copy().add(cases[i]);
+//			SpaceObject thatsme = InitMapProcess.getFieldTypeAtPos(ziel, grid);
+//			updateMyNeighborvalueBasedOnMyNeighborhood(ziel, thatsme, grid);
+//			
+//		}
+//	}
 
-	/**
-	 * Simple= Only 4 Neighbors
-	 * @param zielpos
-	 * @param grid
-	 */
-	public static void updateMyNeighborsSimple(IVector2 zielpos, Grid2D grid) {
+
+	public static void updateMyNeighborsSimpleField(IVector2 zielpos, Grid2D grid) {
 		for(int i = 0; i<simpleDirections.length; i++ )
 		{
 			
@@ -76,15 +103,8 @@ public class Neighborhood {
 		}
 		
 	}
-	
 
-
-	/**
-	 * Complex= All 8 Neighbors
-	 * @param zielpos
-	 * @param grid
-	 */
-	public static void updateMyNeighborsComplex(IVector2 zielpos, Grid2D grid) {
+	public static void updateMyNeighborsComplexField(IVector2 zielpos, Grid2D grid) {
 		for(int i = 0; i<cases.length; i++ )
 		{
 			IVector2 ziel = zielpos.copy().add(cases[i]);
@@ -92,7 +112,29 @@ public class Neighborhood {
 			updateMyNeighborvalueBasedOnMyNeighborhood(ziel, thatsme, grid);
 			
 		}
+	}
+	
+
+	public static void updateMyNeighborsSimpleBuilding(IVector2 zielpos, Grid2D grid) {
+		for(int i = 0; i<simpleDirections.length; i++ )
+		{
+			
+			IVector2 ziel = zielpos.copy().add(simpleDirections[i]);
+			SpaceObject thatsme = InitMapProcess.getBuildingTypeAtPos(ziel, grid);
+			updateMyNeighborvalueBasedOnMyNeighborhood(ziel, thatsme, grid);
+		}
 		
+	}
+
+
+	public static void updateMyNeighborsComplexBuilding(IVector2 zielpos, Grid2D grid) {
+		for(int i = 0; i<cases.length; i++ )
+		{
+			IVector2 ziel = zielpos.copy().add(cases[i]);
+			SpaceObject thatsme = InitMapProcess.getBuildingTypeAtPos(ziel, grid);
+			updateMyNeighborvalueBasedOnMyNeighborhood(ziel, thatsme, grid);
+			
+		}
 	}
 	
 	private static void updateMyNeighborvalueBasedOnMyNeighborhood(IVector2 ziel, SpaceObject thatsme, Grid2D grid) {
@@ -144,7 +186,7 @@ public class Neighborhood {
 			Vector2Double sobjpos = (Vector2Double) sobj.getProperty(Space2D.PROPERTY_POSITION);
 			if (sobjpos.equals(myPos)) {
 				thatsme = sobj;
-				if(sobj.getType().equals(InitMapProcess.WATER)||sobj.getType().equals(InitMapProcess.LAVA)){
+				if(sobj.getType().equals(InitMapProcess.WATER)||sobj.getType().equals(InitMapProcess.LAVA)||InitMapProcess.BUILDING_SET.contains(sobj.getType())){
 					alternatives = false;
 				}
 			} else  

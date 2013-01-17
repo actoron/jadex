@@ -124,7 +124,7 @@ public class CustomGuiController extends GuiController {
     public void setup()
     {
      	dl = new DirectionalLight();
-        dl.setDirection(new Vector3f(-0.0f, -1.0f, -0.00f).normalizeLocal());
+        dl.setDirection(new Vector3f(-0.001f, -1.0f, -0.01f).normalizeLocal());
         dl.setColor(new ColorRGBA(0.5f,0.4f,0.4f,1f).multLocal(0.7f));
         this.app.getRootNode().addLight(dl);    
 

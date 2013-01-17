@@ -38,11 +38,13 @@ import agentkeeper.gui.UserEingabenManager;
 import agentkeeper.util.Neighborhood;
 import agentkeeper.wegfindung.ASternSuche;
 
+
 /**
  * Environment process for creating wastes.
  */
-public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IMap, ISpaceObjects {
-	
+public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IMap, ISpaceObjects
+{
+
 
 	// -------- ISpaceProcess interface --------
 
@@ -50,33 +52,34 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 	 * This method will be executed by the object before the process gets added
 	 * to the execution queue.
 	 * 
-	 * @param clock
-	 *            The clock.
-	 * @param space
-	 *            The space this process is running in.
+	 * @param clock The clock.
+	 * @param space The space this process is running in.
 	 */
-	public void start(IClockService clock, IEnvironmentSpace space) {
-		final Grid2D grid = (Grid2D) space;
+	public void start(IClockService clock, IEnvironmentSpace space)
+	{
+		final Grid2D grid = (Grid2D)space;
 
-			loadAndSetupMissions(grid);
-			
-			try
-			{
+		loadAndSetupMissions(grid);
+
+		try
+		{
 			// ClassLoader cl =
 			// space.getExternalAccess().getModel().getClassLoader();
 			ClassLoader cl = getClass().getClassLoader();
-			
-			
+
+
 			/** Mapkrams */
-			String mapfile = (String) getProperty("mapfile");
+			String mapfile = (String)getProperty("mapfile");
 			InputStream is = SUtil.getResource(mapfile, cl);
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 			// dis.available() returns 0 if the file does not have more lines.
-			while (br.ready()) {
+			while(br.ready())
+			{
 				String data = br.readLine();
 
-				if ("MAP".equals(data)) {
+				if("MAP".equals(data))
+				{
 					String size = br.readLine();
 					int del = size.indexOf("X");
 					String xstr = size.substring(0, del - 1);
@@ -86,93 +89,104 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 
 					grid.setAreaSize(new Vector2Int(sizex, sizey));
 
-					ArrayList<Vector2Int> complexNPos = new ArrayList<Vector2Int>();
-					
-					//Building Positions for setting the Centers
+					ArrayList<SimpleMapType> complexNPos = new ArrayList<SimpleMapType>();
+
+					// Building Positions for setting the Centers
 					ArrayList<Vector2Int> center_building_pos = new ArrayList<Vector2Int>();
-					
+
 					int dungeon_heart_counter = 0;
 
 					// Now init the field
 					String line = br.readLine();
-					for (int y = 0; y < sizey; y++) {
+					for(int y = 0; y < sizey; y++)
+					{
 						line = br.readLine();
-						for (int x = 0; x < sizex; x++) {
+						for(int x = 0; x < sizex; x++)
+						{
 							Vector2Int aktPos = new Vector2Int(x, y);
 
 							String key = line.substring(x * 2 + 2, x * 2 + 4);
-							String type = (String) imagenames.get(key);
+							String type = (String)imagenames.get(key);
 							Map<String, Object> props = new HashMap<String, Object>();
 							props.put("bearbeitung", new Integer(0));
 							props.put("clicked", false);
-							if (type == GOLD) {
+							if(type == GOLD)
+							{
 								props.put("amount", 30);
-								complexNPos.add(aktPos);
+								complexNPos.add(new SimpleMapType(aktPos, type));
 							}
-							 if (type.equals(TREASURY)
-									|| type.equals(HATCHERY)
-									|| type.equals(LAIR)
-									|| type.equals(TRAININGROOM)
-									|| type.equals(LIBRARY)
-									|| type.equals(TORTURE)
-									||type.equals(DUNGEONHEART)) {
+							if(type.equals(TREASURY) || type.equals(HATCHERY) || type.equals(LAIR) || type.equals(TRAININGROOM) || type.equals(LIBRARY)
+									|| type.equals(TORTURE) || type.equals(DUNGEONHEART))
+							{
 								gebaeuedeverwalter.machGebaeude(new Vector2Int(x, y), type);
-								if (type == TREASURY) 
+								if(type == TREASURY)
 								{
 									props.put("amount", 150);
+									complexNPos.add(new SimpleMapType(aktPos, type));
 								}
-								else if (type == HATCHERY) {
+								else if(type == HATCHERY)
+								{
 									center_building_pos.add(aktPos);
 									props.put("huehner", 5.0);
 									props.put("besetzt", "0");
+									complexNPos.add(new SimpleMapType(aktPos, type));
 								}
 								else if(type.equals(DUNGEONHEART))
 								{
 									dungeon_heart_counter++;
-									if(dungeon_heart_counter==13)
+									if(dungeon_heart_counter == 13)
 									{
 										type = DUNGEONHEARTCENTER;
 									}
 								}
-								else if (type == LAIR) {
+								else if(type == LAIR)
+								{
 									props.put("besetzt", "0");
+									complexNPos.add(new SimpleMapType(aktPos, type));
 								}
 
-								else if (type == TRAININGROOM) {
+								else if(type == TRAININGROOM)
+								{
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
+									complexNPos.add(new SimpleMapType(aktPos, type));
 								}
 
-								else if (type == LIBRARY) {
+								else if(type == LIBRARY)
+								{
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
+									complexNPos.add(new SimpleMapType(aktPos, type));
 								}
 
-								else if (type == TORTURE) {
+								else if(type == TORTURE)
+								{
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
+									complexNPos.add(new SimpleMapType(aktPos, type));
 								}
-							}  
-							 
-							 
-							 else if (type == ROCK) {
-								complexNPos.add(aktPos);
 							}
-							 else if (type == REINFORCED_WALL)
+
+
+							else if(type == ROCK)
 							{
-								complexNPos.add(aktPos);
+								complexNPos.add(new SimpleMapType(aktPos, type));
 							}
-							 else if (type == IMPENETRABLE_ROCK)
+							else if(type == REINFORCED_WALL)
 							{
-								complexNPos.add(aktPos);
+								complexNPos.add(new SimpleMapType(aktPos, type));
 							}
-							 else if(type == WATER||type == LAVA)
+							else if(type == IMPENETRABLE_ROCK)
 							{
-								complexNPos.add(aktPos);
+								complexNPos.add(new SimpleMapType(aktPos, type));
 							}
-							 else if(type == CLAIMED_PATH || type == DIRT_PATH)
+							else if(type == WATER || type == LAVA)
 							{
-//								pathpos.add(aktPos);
+								complexNPos.add(new SimpleMapType(aktPos, type));
+							}
+							else if(type == CLAIMED_PATH || type == DIRT_PATH)
+							{
+								// pathpos.add(aktPos);
 							}
 
 							props.put("neighborhood", "00000000");
@@ -182,68 +196,91 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 						}
 					}
 
-					// The map is full, so now we generate Neighbor dependend Stuff
-					
-					for (Vector2Int pos : complexNPos) {
+					// The map is full, so now we generate Neighbor dependend
+					// Stuff
 
-						SpaceObject thatsme = getFieldTypeAtPos(pos, grid);
+					for(SimpleMapType postype : complexNPos)
+					{
+						SpaceObject thatsme = null;
+
+						if(InitMapProcess.FIELD_SET.contains(postype.getType()))
+						{
+							thatsme = getFieldTypeAtPos(postype.getPosition(), grid);
+						}
+						else if(InitMapProcess.BUILDING_SET.contains(postype.getType()))
+						{
+							thatsme = getBuildingTypeAtPos(postype.getPosition(), grid);
+						}
+
 						if(thatsme != null)
 						{
-								Set<SpaceObject> nearRocks = InitMapProcess.getNeighborBlocksInRange(pos, 1, grid, InitMapProcess.NEIGHBOR_RELATIONS.get(thatsme.getType()));
-								thatsme.setProperty("neighborhood", Neighborhood.reCalculateNeighborhood(pos, nearRocks));
+							Set<SpaceObject> nearRocks = InitMapProcess.getNeighborBlocksInRange(postype.getPosition(), 1, grid,
+									InitMapProcess.NEIGHBOR_RELATIONS.get(thatsme.getType()));
+							
+							String newNeighborhood = Neighborhood.reCalculateNeighborhood(postype.getPosition(), nearRocks);
+							
+							if(postype.getType().equals("lair"))
+							{
+								System.out.println("lairneighborhoood: " + newNeighborhood);
+							}
+							thatsme.setProperty("neighborhood", newNeighborhood);
 						}
 						else
 						{
 
 						}
 					}
-					
+
+
+					/*
+					 * Calculate Buildings
+					 */
 					ArrayList<Vector2Int> center_closed_pos = new ArrayList<Vector2Int>();
 					int yline = -1;
 					int xcount = 1;
-					for (Vector2Int pos : center_building_pos) 
+					for(Vector2Int pos : center_building_pos)
 					{
-						if(yline==-1||pos.getYAsInteger()!=yline)
+						if(yline == -1 || pos.getYAsInteger() != yline)
 						{
 							yline = pos.getYAsInteger();
 
 						}
-						
-						if(xcount==1)
+
+						if(xcount == 1)
 						{
 							if(!center_closed_pos.contains(pos))
 							{
-								for(int xv = 0; xv<=2; xv++)
+								for(int xv = 0; xv <= 2; xv++)
 								{
-									for(int yv = 0; yv<=2; yv++)
+									for(int yv = 0; yv <= 2; yv++)
 									{
 										Vector2Int delta = new Vector2Int(xv, yv);
-												
-										center_closed_pos.add((Vector2Int) pos.copy().add(delta));
+
+										center_closed_pos.add((Vector2Int)pos.copy().add(delta));
 									}
 								}
-								
-								Vector2Int centerpos = (Vector2Int) pos.copy().add(new Vector2Int(1,1));
-								
+
+								Vector2Int centerpos = (Vector2Int)pos.copy().add(new Vector2Int(1, 1));
+
 								SpaceObject thatsme = getBuildingTypeAtPos(centerpos, grid);
-								
-								if(thatsme!=null)
+
+								if(thatsme != null)
 								{
 									Map properties = thatsme.getProperties();
 
 									grid.createSpaceObject(CENTER_TYPES.get(thatsme.getType()), properties, null);
 									grid.destroySpaceObject(thatsme.getId());
 								}
-								
+
 
 							}
-							
+
 						}
-						
-						
+
+
 						xcount++;
-						
-						if(xcount>3)
+
+						if(xcount > 3)
 						{
 							xcount = 1;
 						}
@@ -252,13 +289,15 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 
 				}
 
-				if ("CREATURES".equals(data)) {
+				if("CREATURES".equals(data))
+				{
 					int cnt = Integer.parseInt(br.readLine().trim());
 					// cnt = 1;
-					for (int i = 0; i < cnt; i++) {
-						StringTokenizer stok = new StringTokenizer(
-								br.readLine());
-						while (stok.hasMoreTokens()) {
+					for(int i = 0; i < cnt; i++)
+					{
+						StringTokenizer stok = new StringTokenizer(br.readLine());
+						while(stok.hasMoreTokens())
+						{
 							String type = stok.nextToken().toLowerCase();
 							int x = Integer.parseInt(stok.nextToken());
 							int y = Integer.parseInt(stok.nextToken());
@@ -271,19 +310,23 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 							props.put("type", type);
 							// props.put(AngreifPlan.ABKLINGZEIT, new
 							// Integer(0));
-							props.put(Space2D.PROPERTY_POSITION,
-									new Vector2Double(x, y));
-							
-							props.put("intPos",
-									new Vector2Int(x, y));
-//							props.put("auftragsverwalter", gegnerauftraege);
+							props.put(Space2D.PROPERTY_POSITION, new Vector2Double(x, y));
 
-							if (gegnertypen.contains(type)) {
+							props.put("intPos", new Vector2Int(x, y));
+							// props.put("auftragsverwalter", gegnerauftraege);
+
+							if(gegnertypen.contains(type))
+							{
 								props.put("spieler", new Integer(2));
-							} else {
-								if (type.equals("spielprozesse")) {
+							}
+							else
+							{
+								if(type.equals("spielprozesse"))
+								{
 									props.put("spieler", 0);
-								} else {
+								}
+								else
+								{
 									props.put("spieler", new Integer(1));
 								}
 
@@ -295,12 +338,14 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 					}
 				}
 
-				if ("MISSIONEN".equals(data)) {
+				if("MISSIONEN".equals(data))
+				{
 					int cnt = Integer.parseInt(br.readLine().trim());
-					for (int i = 0; i < cnt; i++) {
-						StringTokenizer stok = new StringTokenizer(
-								br.readLine());
-						while (stok.hasMoreTokens()) {
+					for(int i = 0; i < cnt; i++)
+					{
+						StringTokenizer stok = new StringTokenizer(br.readLine());
+						while(stok.hasMoreTokens())
+						{
 							String typ = stok.nextToken();
 							int menge = Integer.parseInt(stok.nextToken());
 							mv.neueMission(new Mission(typ, menge, uem));
@@ -310,11 +355,11 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 			}
 			br.close();
 		}
-	 catch (Exception e) {
+		catch(Exception e)
+		{
 			e.printStackTrace();
 		}
-		int gold = gebaeuedeverwalter.gibGebaeude(InitMapProcess.TREASURY)
-				.size() * 150;
+		int gold = gebaeuedeverwalter.gibGebaeude(InitMapProcess.TREASURY).size() * 150;
 		// int gold = schatztruhenliste.size() * 150;
 
 		int mana = 450;
@@ -339,5 +384,4 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 	}
 
 
-	
 }

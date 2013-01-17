@@ -1,0 +1,9 @@
+Material Water : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : textures/buildings/hatchery/planks_diffuse.png
+        NormalMap: textures/buildings/hatchery/planks_normal.png
+     }
+     AdditionalRenderState {
+      FaceCull Back
+    }
+}

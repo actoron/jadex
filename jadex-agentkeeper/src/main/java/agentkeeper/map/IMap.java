@@ -1,6 +1,7 @@
 package agentkeeper.map;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import jadex.extension.envsupport.math.Vector2Int;
@@ -72,7 +73,18 @@ public interface IMap {
 	
 	public static final String[] LAVA_NEIGHBORS = {LAVA};
 	
+	public static final String[] LAIR_NEIGHBORS = BUILDING_TYPES;
+	public static final String[] HATCHERY_NEIGHBORS = BUILDING_TYPES;
+	public static final String[] TRAINNGROOM_NEIGHBORS = BUILDING_TYPES;
+	public static final String[] LIBRARY_NEIGHBORS = BUILDING_TYPES;
+	public static final String[] TORTURE_NEIGHBORS = BUILDING_TYPES;
+	
+	
 	public static final HashMap<String,String[]> NEIGHBOR_RELATIONS = new HashMap<String,String[]>(); 
+	
+	public static final HashSet<String> FIELD_SET = new HashSet<String>(); 
+	
+	public static final HashSet<String> BUILDING_SET = new HashSet<String>(); 
 	
 	public static final HashMap<String,String> CENTER_TYPES = new HashMap<String,String>(); 
 

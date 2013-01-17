@@ -143,7 +143,8 @@ public abstract class GehHinUndArbeit extends KreaturenPlan {
 				
 				if(updateNeighbors)
 				{
-					Neighborhood.updateMyNeighborsComplex(zielpos, grid);
+					//TODO: detect Field/Building automatic
+					Neighborhood.updateMyNeighborsComplexField(zielpos, grid);
 				}
 				
 				testUmgebungComplex(grid, _myIntPos);

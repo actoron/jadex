@@ -399,6 +399,12 @@
 						modelpath="models/buildings/treasury/GoldBag.j3o" 
 						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m"
 						rotation="rota" />
+						
+						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
+							modelpath="models/tilesets/buildings/border/Default_?.j3o"
+							materialpath="models/tilesets/buildings/border/default.j3m">
+						</env:object3d>
+						
 					</env:drawable3d>
 
 					
@@ -413,6 +419,13 @@
 						<env:materialfile part="WhiteCloth" path="models/buildings/lair/BedBlanket.j3m" />
 						<env:materialfile part="Wood" path="models/buildings/lair/BedWood.j3m" />
 						</env:object3d>
+						
+						
+						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
+							modelpath="models/tilesets/buildings/border/Default_?.j3o"
+							materialpath="models/tilesets/buildings/border/default.j3m">
+						</env:object3d>
+						
 					</env:drawable3d>
 					
 					<env:drawable3d objecttype="dungeonheartcenter" width="2.0" height="2.0" depth="2.0" isDynamic="true">
@@ -433,13 +446,20 @@
 					<env:property dynamic="true" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>	
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
-						materialpath="models/buildings/hatchery/HatcheryGround.j3m"/>
+						materialpath="models/buildings/hatchery/HatcheryPlanks.j3m"/>
+						
+						
+						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
+							modelpath="models/tilesets/buildings/border/Default_?.j3o"
+							materialpath="models/tilesets/buildings/border/default.j3m">
+						</env:object3d>
+						
 					</env:drawable3d>
 					
 					<env:drawable3d objecttype="hatcherycenter" width="1.0" height="1.0" depth="1.0" isDynamic="false">			
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
-						materialpath="models/buildings/hatchery/HatcheryGround.j3m" />
+						materialpath="models/buildings/hatchery/HatcheryPlanks.j3m" />
 						<env:object3d width="0.65" height="0.65" depth="0.65" x="0" y="0" z="0" 
 						modelpath="models/buildings/hatchery/farm.j3o" 
 						materialpath="models/buildings/hatchery/farm.j3m"
@@ -451,6 +471,13 @@
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
 						materialpath="models/buildings/lair/LairGround.j3m"
 						 />				
+						 
+						 
+						 <env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
+							modelpath="models/tilesets/buildings/border/Default_?.j3o"
+							materialpath="models/tilesets/buildings/border/default.j3m">
+						</env:object3d>
+						
 					</env:drawable3d>
 					
 					<env:drawable3d objecttype="trainingroomcenter" width="1.0" height="1.0" depth="1.0" isDynamic="false">
@@ -465,6 +492,14 @@
 						materialpath="models/buildings/training/trainingpole.j3m" 
 						rotation="rota" />			
 					</env:drawable3d>
+					
+					
+					<!-- 
+					
+						CREATURES
+						
+						
+					 -->
 
 
 					<env:drawable3d objecttype="imp" width="1" height="1"

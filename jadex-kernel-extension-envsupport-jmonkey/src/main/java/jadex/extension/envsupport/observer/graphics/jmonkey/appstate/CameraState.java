@@ -67,7 +67,7 @@ public class CameraState extends AbstractAppState
 
 
 		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(appSize / 2, 0, appSize / 2));
+		cam.setLocation(new Vector3f(appSize / 2, appSize / 2, appSize / 2));
 		cam.lookAt(new Vector3f(appSize / 2, 0, appSize / 2), Vector3f.UNIT_Y);
 		cam.setFrustumNear(1f);
 		cam.setFrustumFar(appSize * 5);

@@ -1,0 +1,12 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : textures/buildings/border/default/diffus.png
+        SpecularMap : textures/buildings/border/default/specular.png
+        NormalMap : textures/buildings/border/default/normal.png
+        EnvMapAsSphereMap : false
+        EnvMap : textures/buildings/border/default/height.png
+    }
+    AdditionalRenderState {
+      FaceCull Back
+    }
+}

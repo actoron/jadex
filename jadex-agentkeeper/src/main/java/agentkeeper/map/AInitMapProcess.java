@@ -84,6 +84,24 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 		NEIGHBOR_RELATIONS.put(IMPENETRABLE_ROCK, IMPENETRABLE_ROCK_NEIGHBORS);
 		NEIGHBOR_RELATIONS.put(WATER, WATER_NEIGHBORS);
 		NEIGHBOR_RELATIONS.put(LAVA, LAVA_NEIGHBORS);
+		NEIGHBOR_RELATIONS.put(LAIR, BUILDING_TYPES);
+		NEIGHBOR_RELATIONS.put(TRAININGROOM, BUILDING_TYPES);
+		NEIGHBOR_RELATIONS.put(LIBRARY, BUILDING_TYPES);
+		NEIGHBOR_RELATIONS.put(TORTURE, BUILDING_TYPES);
+		NEIGHBOR_RELATIONS.put(HATCHERY, BUILDING_TYPES);
+		NEIGHBOR_RELATIONS.put(TREASURY, BUILDING_TYPES);
+		
+		
+		
+		for(int i = 0; i<FIELD_TYPES.length; i++ )
+		{
+			FIELD_SET.add(FIELD_TYPES[i]);
+		}
+		
+		for(int i = 0; i<BUILDING_TYPES.length; i++ )
+		{
+			BUILDING_SET.add(BUILDING_TYPES[i]);
+		}
 		
 		CENTER_TYPES.put(HATCHERY, HATCHERYCENTER);
 		CENTER_TYPES.put(PORTAL, PORTALCENTER);
@@ -221,9 +239,10 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 		return null;
 	}
 	
+	
 	public static SpaceObject getBuildingTypeAtPos(IVector2 pos, Grid2D gridext)
 	{
-		for(int i = 0; i<FIELD_TYPES.length; i++ )
+		for(int i = 0; i<BUILDING_TYPES.length; i++ )
 		{
 			Collection sobjs = gridext.getSpaceObjectsByGridPosition(pos, BUILDING_TYPES[i]);
 			if(sobjs!=null)

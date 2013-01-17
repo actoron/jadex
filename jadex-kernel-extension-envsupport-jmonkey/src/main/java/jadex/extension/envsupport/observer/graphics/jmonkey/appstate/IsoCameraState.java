@@ -84,65 +84,65 @@ public class IsoCameraState extends AbstractAppState
 
 	}
 	
-	 public void update(float tpf)
-	    {
-	    	Vector2f click2d = inputManager.getCursorPosition();
-//	    	System.out.println("click2d " + click2d);
-	    	
-	    	if(MOUSE_LEFT || MOUSE_RIGHT || MOUSE_DOWN || MOUSE_UP)
-	    	{
-
-	    		
-	    		if(!app.isCleanupPostFilter())
-	    		{
-	    			
-
-	            Vector3f camDir = cam.getDirection().clone().multLocal(0.8f);
-	            camDir = camDir.setY(0.0f); //Ignore up and down when moving forward
-	            camDir = camDir.normalizeLocal();
-	            Vector3f camLeft = cam.getLeft().clone().multLocal(0.5f);
-	            camLeft.setY(0.0f);
-	            
-	            Vector3f direction = Vector3f.ZERO;
-	            
-	            
-	        	if(MOUSE_LEFT)
-	        	{
-	        		direction.addLocal(camLeft).normalizeLocal();
-
-	        	}
-	        	
-	        	if(MOUSE_RIGHT)
-	        	{
-	        		direction.addLocal(camLeft.negate()).normalizeLocal();
-	        	}
-	        	
-	        	if(MOUSE_DOWN)
-	        	{
-	        		direction.addLocal(camDir.negate()).normalizeLocal();
-
-	        	}
-	        	
-	        	if(MOUSE_UP)
-	        	{
-	        		direction.addLocal(camDir).normalizeLocal();
-	        	}
-	        	
-
-	            	camNode.setLocalTranslation(camNode.getLocalTranslation().addLocal(direction.multLocal(isoCam.getMoveSpeed()/2 * tpf)));
-	            	
-	    		}
-	    		else
-	    		{
-	            	MOUSE_LEFT =  false;
-	            	MOUSE_RIGHT =   false;
-	            	MOUSE_UP =   false;
-	            	MOUSE_DOWN =  false;
-
-	    		}
-
-	    	}
-	    }
+//	 public void update(float tpf)
+//	    {
+//	    	Vector2f click2d = inputManager.getCursorPosition();
+////	    	System.out.println("click2d " + click2d);
+//	    	
+//	    	if(MOUSE_LEFT || MOUSE_RIGHT || MOUSE_DOWN || MOUSE_UP)
+//	    	{
+//
+//	    		
+//	    		if(!app.isCleanupPostFilter())
+//	    		{
+//	    			
+//
+//	            Vector3f camDir = cam.getDirection().clone().multLocal(0.8f);
+//	            camDir = camDir.setY(0.0f); //Ignore up and down when moving forward
+//	            camDir = camDir.normalizeLocal();
+//	            Vector3f camLeft = cam.getLeft().clone().multLocal(0.5f);
+//	            camLeft.setY(0.0f);
+//	            
+//	            Vector3f direction = Vector3f.ZERO;
+//	            
+//	            
+//	        	if(MOUSE_LEFT)
+//	        	{
+//	        		direction.addLocal(camLeft).normalizeLocal();
+//
+//	        	}
+//	        	
+//	        	if(MOUSE_RIGHT)
+//	        	{
+//	        		direction.addLocal(camLeft.negate()).normalizeLocal();
+//	        	}
+//	        	
+//	        	if(MOUSE_DOWN)
+//	        	{
+//	        		direction.addLocal(camDir.negate()).normalizeLocal();
+//
+//	        	}
+//	        	
+//	        	if(MOUSE_UP)
+//	        	{
+//	        		direction.addLocal(camDir).normalizeLocal();
+//	        	}
+//	        	
+//
+//	            	camNode.setLocalTranslation(camNode.getLocalTranslation().addLocal(direction.multLocal(isoCam.getMoveSpeed()/2 * tpf)));
+//	            	
+//	    		}
+//	    		else
+//	    		{
+//	            	MOUSE_LEFT =  false;
+//	            	MOUSE_RIGHT =   false;
+//	            	MOUSE_UP =   false;
+//	            	MOUSE_DOWN =  false;
+//
+//	    		}
+//
+//	    	}
+//	    }
 	    	
 
 	    	
@@ -157,6 +157,8 @@ public class IsoCameraState extends AbstractAppState
 		cam.lookAt(new Vector3f(appSize / 2, 0, appSize / 2), Vector3f.UNIT_Y);
 		cam.setFrustumNear(1f);
 		cam.setFrustumFar(appSize * 5);
+		
+		app.getFlyByCamera().setEnabled(false);
 
 		this.isoCam = new IsoCamera(cam, inputManager, app);
 		camNode = isoCam.getCamNode();
@@ -253,7 +255,7 @@ public class IsoCameraState extends AbstractAppState
 		};
 		
         inputManager.addListener(analogListener, mappings);
-        inputManager.addListener(analogListener, mouseMovement);
+//        inputManager.addListener(analogListener, mouseMovement);
 		
 		inputManager.addListener(actionListener, "rotate");
 		
