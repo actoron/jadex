@@ -14,6 +14,7 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -163,6 +164,26 @@ public class IsoCameraState extends AbstractAppState
 		this.isoCam = new IsoCamera(cam, inputManager, app);
 		camNode = isoCam.getCamNode();
 		rootNode.attachChild(camNode);
+		
+		
+		
+		 Camera cam_n = cam.clone();
+		 cam.setViewPort( 0.0f , 1.0f , 0.0f , 1.0f );
+		 cam_n.setViewPort( 0.9f , 1.0f , 0.85f , 1.0f );
+		
+		 cam_n.setLocation(new Vector3f(appSize/2f, appSize/1.5f,
+		 appSize/1.9f));
+		 cam_n.lookAt(new Vector3f(appSize/2, 0, appSize/2),
+		 Vector3f.UNIT_Y);
+
+		 ViewPort view_n = this.app.getRenderManager().createMainView("View of camera #2",
+		 cam_n);
+		 view_n.setEnabled(true);
+		 view_n.setClearFlags(true, true, true);
+		 view_n.attachScene(rootNode);
+		 view_n.setBackgroundColor(ColorRGBA.Black);
+		
+		
 
 	}
 	

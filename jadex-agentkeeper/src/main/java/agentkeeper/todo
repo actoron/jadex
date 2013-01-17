@@ -3,7 +3,8 @@ WICHTIG
  - Tileset Algorithmus verallgemeinern und Varianten anbieten (Complex & Simple)
  
 INTERATKION
- - Selektion
+ - Selektion (check)
+ - Raytrace Verbessern
  - Neuer Selektor
  - Boxselektion
  - Spielerinteraktion
@@ -11,7 +12,8 @@ INTERATKION
 GRAFIK
  - Claimed Wall bauen (Blender)
  - Wasserelemente (check)
- - Effekte (check)
+ - Effekte (halb)
+ - Effekte genau einstellbar machen
  
  INIT MAP PROZESS
  - Mittelpunkte von Gebäuden automatisch setzen (halb)
@@ -19,7 +21,7 @@ GRAFIK
  ALLGEMEINE VERBESSERUNGEN
  - Erreichbarkeit im Field Speichern pro Player
  	- Abbau für IMPS verbessern
- - Type Property aus den Fields rausnehmen
+ - Type Property aus den Fields rausnehmen (check)
  - A* Verbessern
  - Gebäudeerreichbarkeit im Gebäude speichern
  
@@ -35,7 +37,7 @@ GRAFIK
  - Effekte einbauen (check)
  
  SPIELLOGIK
- - Eventuell Aufteilung pro Gridsektor in 2x2
+ - Eventuell unterteilung pro Gridsektor in 2x2 oder 3x3
  	- Dynamischere Fortbewegung
  	- Eventuell einfachere Tilesets
  	- Dynamischere Kämpfe
