@@ -300,8 +300,11 @@ public class RGoal extends RProcessableElement
 	{
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
-		
-//		System.out.println("goal state change: "+this.getId()+" "+lifecyclestate);
+
+		if(getId().indexOf("Battery")!=-1 && GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
+			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+		if(getId().indexOf("Patrol")!=-1)
+			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		setLifecycleState(lifecyclestate);
@@ -888,6 +891,14 @@ public class RGoal extends RProcessableElement
 				ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINHIBITED, this));
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isInhibited()
+	{
+		return inhibitors!=null && !inhibitors.isEmpty();
 	}
 
 	/**

@@ -381,24 +381,17 @@ public class RPlan extends RElement
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(mgoal, goal, this);
-//		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				ret.setResult(goal);
-//			}
-//		});
 		rgoal.addGoalListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				if(PLANLIFECYCLESTATE_BODY.equals(getLifecycleState()))
+				if(isAborted() || isFailed())
 				{
-					ret.setResult(null);
+					ret.setException(new PlanFailureException());
 				}
 				else
 				{
-					ret.setException(new PlanFailureException());
+					ret.setResult(goal);
 				}
 			}
 			

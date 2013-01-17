@@ -627,6 +627,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			rule = new Rule<Void>("goal_activate", 
 				new CombinedCondition(new ICondition[]{
 					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_OPTION),
+					new ICondition()
+					{
+						public boolean evaluate(IEvent event)
+						{
+							RGoal goal = (RGoal)event.getContent();
+							return !goal.isInhibited();
+						}
+					}
 				}), new IAction<Void>()
 			{
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)

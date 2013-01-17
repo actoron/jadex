@@ -20,12 +20,10 @@ public class GameLogic extends AbstractInteractionPlugin implements Listener, IP
 	private IEnvironmentSpace _space;
 
 	public String getName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Component getView() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

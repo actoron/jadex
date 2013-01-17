@@ -102,7 +102,7 @@ public class CleanerBDI
 	protected double my_vision = 0.1;
 	
 	@Belief
-	protected double my_chargestate = 0.3;
+	protected double my_chargestate = 0.1;
 	
 	@Belief
 	protected Waste carriedwaste;
@@ -716,7 +716,7 @@ public class CleanerBDI
 		patrolpoints.add(new Location(0.9, 0.9));
 		
 //		agent.dispatchTopLevelGoal(new PerformLookForWaste());
-		agent.dispatchTopLevelGoal(new PerformPatrol());
+//		agent.dispatchTopLevelGoal(new PerformPatrol());
 		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 //		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
 	}
