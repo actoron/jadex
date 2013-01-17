@@ -61,6 +61,7 @@ public class PatrolPlan
 		if(it.hasNext())
 		{
 			Location loc = it.next();
+			System.out.println("patrol to: "+loc);
 			rplan.dispatchSubgoal(capa.new AchieveMoveTo(loc))
 				.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 			{

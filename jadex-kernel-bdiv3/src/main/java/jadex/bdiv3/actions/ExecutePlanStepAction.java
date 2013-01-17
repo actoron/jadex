@@ -35,17 +35,22 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		boolean ret = true;
+		// todo: abort execution
+		boolean ret = RPlan.PLANLIFECYCLESTATE_NEW.equals(rplan.getLifecycleState())
+			|| RPlan.PLANLIFECYCLESTATE_BODY.equals(rplan.getLifecycleState());
 		
-		Object element = rplan.getReason();
-		if(element instanceof RGoal)
+		if(ret)
 		{
-			RGoal rgoal = (RGoal)element;
-			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
-				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
-			// todo: hack, how to avoid side effect
-			if(!ret)
-				rplan.abortPlan();
+			Object element = rplan.getReason();
+			if(element instanceof RGoal)
+			{
+				RGoal rgoal = (RGoal)element;
+				ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
+					&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+				// todo: hack, how to avoid side effect
+				if(!ret)
+					rplan.abortPlan();
+			}
 		}
 			
 //		if(!ret)

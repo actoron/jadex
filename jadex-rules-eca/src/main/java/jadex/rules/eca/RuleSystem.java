@@ -408,6 +408,10 @@ public class RuleSystem
 		if(events.size()>0)
 		{
 			IEvent event = events.remove(0);
+			
+//			if(event.getType().startsWith("goalopt"))
+//				System.out.println("here");
+			
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
 			
 			if(rules!=null)

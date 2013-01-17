@@ -2,10 +2,12 @@ package jadex.bdiv3.example.cleanerworld.cleaner;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
+import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
@@ -100,7 +102,7 @@ public class CleanerBDI
 	protected double my_vision = 0.1;
 	
 	@Belief
-	protected double my_chargestate = 1.0;
+	protected double my_chargestate = 0.3;
 	
 	@Belief
 	protected Waste carriedwaste;
@@ -112,49 +114,42 @@ public class CleanerBDI
 //	protected CleanerGui gui = new CleanerGui(agent.getExternalAccess());
 //	protected GuiCreator gc = new GuiCreator(CleanerGui.class, new Class[]{IExternalAccess.class}, new Object[]{agent.getExternalAccess()});
 	
-	@Goal
+	@Goal(deliberation=@Deliberation(inhibits={PerformLookForWaste.class, AchieveCleanup.class, PerformPatrol.class}))
 	public class MaintainBatteryLoaded
 	{
-//		<deliberation>
-//			<inhibits ref="performlookforwaste" inhibit="when_in_process"/>
-//			<inhibits ref="achievecleanup" inhibit="when_in_process"/>
-//			<inhibits ref="performpatrol" inhibit="when_in_process"/>
-//		</deliberation>
-		
-		@GoalMaintainCondition
+		@GoalMaintainCondition(events="my_chargestate")
 		public boolean checkMaintain()
 		{
 			return my_chargestate>0.2;
 		}
 		
-		@GoalTargetCondition
+		@GoalTargetCondition(events="my_chargestate")
 		public boolean checkTarget()
 		{
 			return my_chargestate>=1.0;
 		}
 	}
 	
-	@Goal(unique=true)
+	@Goal(unique=true, deliberation=@Deliberation(cardinality=1, inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
 	public class AchieveCleanup
 	{
-		// <unique/>
-		// <deliberation cardinality="1">
-		// <inhibits ref="performlookforwaste"/>
-		// <inhibits ref="achievecleanup" language="jcl">
-		// $beliefbase.my_location.getDistance($goal.waste.getLocation())
-		// &lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
+		@GoalInhibit(AchieveCleanup.class)
+		protected boolean inhibitAchieveCleanUp(AchieveCleanup other)
+		{
+			return getMyLocation().getDistance(waste.getLocation())
+				< getMyLocation().getDistance(other.getWaste().getLocation());
+		}
 		
 		protected Waste waste;
 		
-		@GoalCreationCondition(events="wastes")
-		public AchieveCleanup(Waste waste)
-		{
-			System.out.println("new achieve cleanup: "+waste);
-			this.waste = waste;
-		}
+//		@GoalCreationCondition(events="wastes")
+//		public AchieveCleanup(Waste waste)
+//		{
+//			System.out.println("new achieve cleanup: "+waste);
+//			this.waste = waste;
+//		}
 		
-		// todo: creation
-		
+		// todo: conditional creation?
 //		@GoalCreationCondition
 //		public static boolean checkCreate(@Event("wastes") Waste waste)
 //		{
@@ -245,8 +240,7 @@ public class CleanerBDI
 		}
 	}
 	
-//	@Goal(retry=MPro)
-	@Goal
+	@Goal(retry=false)
 	public class AchievePickupWaste
 	{
 		protected Waste waste;
@@ -254,6 +248,11 @@ public class CleanerBDI
 		public AchievePickupWaste(Waste waste)
 		{
 			this.waste = waste;
+		}
+		
+		public Waste getWaste()
+		{
+			return waste;
 		}
 	}
 	
@@ -272,6 +271,11 @@ public class CleanerBDI
 		{
 			return wastebin.isFull();
 		}
+
+		public Wastebin getWastebin()
+		{
+			return wastebin;
+		}
 	}
 	
 	@Goal
@@ -281,6 +285,7 @@ public class CleanerBDI
 		
 		public AchieveMoveTo(Location location)
 		{
+			System.out.println("created: "+location);
 			this.location = location;
 		}
 		
@@ -305,19 +310,44 @@ public class CleanerBDI
 	{
 		protected Wastebin wastebin;
 		
-		@GoalTargetCondition(events="my_location")
+		@GoalTargetCondition(events="wastebins")
 		public boolean checkTarget()
 		{
-			// todo: assign wastin to neareast nonfull wastebin and if not null return true??
-			return getResult()!=null;
+			wastebin = getNearestNonFullWastebin();
+			return wastebin!=null;
 		}
 		
-//		@GoalResult
-		public Wastebin getResult()
+		/**
+		 * 
+		 */
+		protected Wastebin getNearestNonFullWastebin()
 		{
-			if(wastebin==null)
+			Wastebin ret = null;
+			for(Wastebin wb: wastebins)
 			{
+				if(!wb.isFull())
+				{
+					if(ret==null)
+					{
+						ret = wb;
+					}
+					else if(getMyLocation().getDistance(wb.getLocation())
+						<getMyLocation().getDistance(ret.getLocation()))
+					{
+						ret = wb;
+					}
+				}
 			}
+			return ret;
+		}
+
+		/**
+		 *  Get the wastebin.
+		 *  @return The wastebin.
+		 */
+//		@GoalResult
+		public Wastebin getWastebin()
+		{
 			return wastebin;
 		}
 	}
@@ -327,11 +357,28 @@ public class CleanerBDI
 	{
 		protected Chargingstation station;
 		
-		@GoalTargetCondition(events="my_location")
+		@GoalTargetCondition(events="my_location") // should react on parameter
 		public boolean checkTarget()
 		{
-			// todo: assign nearest charging station to station
-			return false;
+			return station!=null;
+		}
+
+		/**
+		 *  Get the station.
+		 *  @return The station.
+		 */
+		public Chargingstation getStation()
+		{
+			return station;
+		}
+
+		/**
+		 *  Set the station.
+		 *  @param station The station to set.
+		 */
+		public void setStation(Chargingstation station)
+		{
+			this.station = station;
 		}
 	}
 
@@ -356,6 +403,11 @@ public class CleanerBDI
 	{
 		protected Waste waste;
 
+		public PickupWasteAction(Waste waste)
+		{
+			this.waste = waste;
+		}
+
 		public Waste getWaste()
 		{
 			return waste;
@@ -369,6 +421,12 @@ public class CleanerBDI
 		
 		protected Wastebin wastebin;
 		
+		public DropWasteAction(Waste waste, Wastebin wastebin)
+		{
+			this.waste = waste;
+			this.wastebin = wastebin;
+		}
+
 		/**
 		 *  Get the waste.
 		 *  @return The waste.
@@ -657,9 +715,9 @@ public class CleanerBDI
 		patrolpoints.add(new Location(0.9, 0.1));
 		patrolpoints.add(new Location(0.9, 0.9));
 		
-		agent.dispatchTopLevelGoal(new PerformLookForWaste());
-//		agent.dispatchTopLevelGoal(new PerformPatrol());
-//		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
+//		agent.dispatchTopLevelGoal(new PerformLookForWaste());
+		agent.dispatchTopLevelGoal(new PerformPatrol());
+		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 //		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
 	}
 
@@ -806,6 +864,15 @@ public class CleanerBDI
 	public Waste getCarriedWaste()
 	{
 		return carriedwaste;
+	}
+	
+	/**
+	 *  Set the carriedwaste.
+	 *  @param carriedwaste The carriedwaste to set.
+	 */
+	public void setCarriedwaste(Waste carriedwaste)
+	{
+		this.carriedwaste = carriedwaste;
 	}
 
 	/**

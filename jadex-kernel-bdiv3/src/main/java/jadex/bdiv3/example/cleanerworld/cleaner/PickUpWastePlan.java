@@ -1,8 +1,18 @@
 package jadex.bdiv3.example.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.AchievePickupWaste;
+import jadex.bdiv3.example.cleanerworld.cleaner.CleanerBDI.PickupWasteAction;
 import jadex.bdiv3.example.cleanerworld.world.Location;
 import jadex.bdiv3.example.cleanerworld.world.Waste;
+import jadex.bdiv3.runtime.RPlan;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 
 /**
@@ -10,6 +20,14 @@ import jadex.bdiv3.example.cleanerworld.world.Waste;
  */
 public class PickUpWastePlan
 {
+	@PlanCapability
+	protected CleanerBDI capa;
+	
+	@PlanPlan
+	protected RPlan rplan;
+	
+	@PlanReason
+	protected AchievePickupWaste goal;
 
 	//-------- constructors --------
 
@@ -27,58 +45,33 @@ public class PickUpWastePlan
 	 *  The plan body.
 	 */
 	@PlanBody
-	public void body()
+	public IFuture<Void> body()
 	{
-//		Waste waste = (Waste)getParameter("waste").getValue();
-//
-//		// Move to the waste position when necessary
-////		getLogger().info("Moving to waste!");
-//		IGoal moveto = createGoal("achievemoveto");
-//		Location location = waste.getLocation();
-//		moveto.getParameter("location").setValue(location);
-////		System.out.println("Created: "+location+" "+this);
-//		dispatchSubgoalAndWait(moveto);
-////		System.out.println("Reached: "+location+" "+this);
-//
-//		//----- new -----
-//		IGoal dg = createGoal("pickup_waste_action");
-//		dg.getParameter("waste").setValue(waste);
-//		dispatchSubgoalAndWait(dg);
-//		getBeliefbase().getBelief("carriedwaste").setFact(waste);
-//		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
-////		getLogger().info("Picked up-waste!");
-//
-//		//----- old -----
-////		// Needed???
-////		if(!getBeliefbase().getBeliefSet("wastes").containsFact(waste))
-////			throw new PlanFailureException();
-////
-////		// Hack to block that other achieve goals can't be created
-////		// while requesting to pick up.
-////		getBeliefbase().getBelief("carriedwaste").setFact(waste);
-////
-////		//IEnvironment env = (IEnvironment)getBeliefbase().getBelief("environment").getFact();
-////		//boolean success = env.pickUpWaste(waste);
-////
-////		IGoal dg = createGoal("pickup_waste_action");
-////		dg.getParameter("waste").setValue(waste);
-////		dispatchSubgoalAndWait(dg);
-////
-////		if(dg.isSucceeded())
-////		{
-////			getLogger().info("Picking up-waste!");
-////			getBeliefbase().getBeliefSet("wastes").removeFact(waste);
-////		}
-////		else
-////		{
-////			// Remove the waste from my beliefs to avoid
-////			// creating a new clean up goal for it.
-////			getBeliefbase().getBeliefSet("wastes").removeFact(waste);
-////			getBeliefbase().getBelief("carriedwaste").setFact(null);
-////			getLogger().warning("Failed to pick up waste: "+waste);
-////			getLogger().warning("wastes: "+jadex.commons.SUtil.arrayToString(getBeliefbase()
-////				.getBeliefSet("wastes").getFacts()));
-////			throw new PlanFailureException();
-////		}
-	}
+		final Future<Void> ret = new Future<Void>();
+		
+		final Waste waste = goal.getWaste();
+
+		// Move to the waste position when necessary
+//		getLogger().info("Moving to waste!");
+		
+		rplan.dispatchSubgoal(capa.new AchieveMoveTo(waste.getLocation()))
+			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		{
+			public void customResultAvailable(AchieveMoveTo amt)
+			{
+				rplan.dispatchSubgoal(capa.new PickupWasteAction(waste))
+					.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.PickupWasteAction, Void>(ret)
+				{
+					public void customResultAvailable(PickupWasteAction pwa)
+					{
+						capa.setCarriedwaste(waste);
+						capa.getWastes().remove(waste);
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}	
 }

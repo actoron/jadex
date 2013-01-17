@@ -15,6 +15,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -380,11 +381,30 @@ public class RPlan extends RElement
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(mgoal, goal, this);
-		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
+//		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
+//		{
+//			public void customResultAvailable(Void result)
+//			{
+//				ret.setResult(goal);
+//			}
+//		});
+		rgoal.addGoalListener(new IResultListener<Void>()
 		{
-			public void customResultAvailable(Void result)
+			public void resultAvailable(Void result)
 			{
-				ret.setResult(goal);
+				if(PLANLIFECYCLESTATE_BODY.equals(getLifecycleState()))
+				{
+					ret.setResult(null);
+				}
+				else
+				{
+					ret.setException(new PlanFailureException());
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
 

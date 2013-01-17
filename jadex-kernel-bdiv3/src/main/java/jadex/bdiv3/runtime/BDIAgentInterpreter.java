@@ -6,10 +6,13 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.runtime.RGoal.LifecycleStateCondition;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -20,6 +23,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -36,6 +40,7 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
+import jadex.rules.eca.annotations.CombinedCondition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -515,6 +520,126 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 		}
 		
+		// add/rem goal inhibitor rule
+		if(!goals.isEmpty())
+		{
+			List<String> events = RGoal.getGoalEvents();
+			
+			Rule<Void> rule = new Rule<Void>("goal_addinhibitor", 
+				new ICondition()
+				{
+					public boolean evaluate(IEvent event)
+					{
+						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
+							System.out.println("maintain");
+						
+						// return true when other goal is active and inprocess
+						boolean ret = false;
+						String type = event.getType();
+						RGoal goal = (RGoal)event.getContent();
+						ret = type.startsWith(ChangeEvent.GOALADOPTED) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
+							|| (type.startsWith(ChangeEvent.GOALINPROCESS) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
+						return ret;
+					}
+				}, new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					RGoal goal = (RGoal)event.getContent();
+					MDeliberation delib = goal.getMGoal().getDeliberation();
+					if(delib!=null)
+					{
+						Set<MGoal> inhs = delib.getInhibitions();
+						for(MGoal inh: inhs)
+						{
+							List<RGoal> goals = getCapability().getGoals(inh);
+							for(RGoal other: goals)
+							{
+								if(goal.inhibits(other, getInternalAccess()))
+								{
+									other.addInhibitor(goal, getInternalAccess());
+								}
+							}
+						}
+					}
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(events);
+			getRuleSystem().getRulebase().addRule(rule);
+			
+			rule = new Rule<Void>("goal_removeinhibitor", 
+				new ICondition()
+				{
+					public boolean evaluate(IEvent event)
+					{
+						// return true when other goal is active and inprocess
+						boolean ret = false;
+						String type = event.getType();
+						if(type.startsWith("goal"))
+						{
+							RGoal other = (RGoal)event.getContent();
+							ret = type.startsWith(ChangeEvent.GOALSUSPENDED) || type.startsWith(ChangeEvent.GOALOPTION) 
+								|| !RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(other.getProcessingState());
+						}
+						return ret;
+					}
+				}, new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					RGoal goal = (RGoal)event.getContent();
+					MDeliberation delib = goal.getMGoal().getDeliberation();
+					if(delib!=null)
+					{
+						Set<MGoal> inhs = delib.getInhibitions();
+						for(MGoal inh: inhs)
+						{
+							List<RGoal> goals = getCapability().getGoals(inh);
+							for(RGoal other: goals)
+							{
+								other.removeInhibitor(goal, getInternalAccess());
+							}
+						}
+					}
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(events);
+			getRuleSystem().getRulebase().addRule(rule);
+			
+			
+			rule = new Rule<Void>("goal_inhibit", 
+				new CombinedCondition(new ICondition[]{
+					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_ACTIVE),
+				}), new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					RGoal goal = (RGoal)event.getContent();
+					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALINHIBITED}));
+			getRuleSystem().getRulebase().addRule(rule);
+			
+			rule = new Rule<Void>("goal_activate", 
+				new CombinedCondition(new ICondition[]{
+					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_OPTION),
+				}), new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					RGoal goal = (RGoal)event.getContent();
+					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_ACTIVE);
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
+			getRuleSystem().getRulebase().addRule(rule);
+		}
+		
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	}
@@ -571,5 +696,62 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public RCapability getCapability()
 	{
 		return capa;
+	}
+	
+	/**
+	 * 
+	 */
+	public static class LifecycleStateCondition implements ICondition
+	{
+		/** The allowed states. */
+		protected Set<String> states;
+		
+		/** The flag if state is allowed or disallowed. */
+		protected boolean allowed;
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(String state)
+		{
+			this(SUtil.createHashSet(new String[]{state}));
+		}
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(Set<String> states)
+		{
+			this(states, true);
+		}
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(String state, boolean allowed)
+		{
+			this(SUtil.createHashSet(new String[]{state}), allowed);
+		}
+		
+		/**
+		 * 
+		 */
+		public LifecycleStateCondition(Set<String> states, boolean allowed)
+		{
+			this.states = states;
+			this.allowed = allowed;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean evaluate(IEvent event)
+		{
+			RGoal goal = (RGoal)event.getContent();
+			boolean ret = states.contains(goal.getLifecycleState());
+			if(!allowed)
+				ret = !ret;
+			return ret;
+		}
 	}
 }

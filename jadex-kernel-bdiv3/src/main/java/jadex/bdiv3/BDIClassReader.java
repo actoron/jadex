@@ -3,7 +3,9 @@ package jadex.bdiv3;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
@@ -11,9 +13,11 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfiguration;
+import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.model.MethodInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -45,9 +49,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Reads micro agent classes and generates a model from metainfo and annotations.
@@ -285,7 +292,18 @@ public class BDIClassReader extends MicroClassReader
 			
 			clazz = clazz.getSuperclass();
 		}
-
+		
+		// init deliberation of goals
+		List<MGoal> mgoals = bdimodel.getCapability().getGoals();
+		for(MGoal mgoal: mgoals)
+		{
+			MDeliberation delib = mgoal.getDeliberation();
+			if(delib!=null)
+			{
+				delib.init(bdimodel.getCapability());
+			}
+		}
+		
 		ModelInfo modelinfo = (ModelInfo)bdimodel.getModelInfo();
 		if(confs.size()>0)
 		{
@@ -311,14 +329,47 @@ public class BDIClassReader extends MicroClassReader
 		for(int j=0; j<gs.length; j++)
 		{
 			Goal ga = getAnnotation(gs[j], Goal.class, cl);
-			MGoal mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
-				ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed(), ga.unique());
-			tr.addGoal(mgoal);
 			
-			if(!bdimodel.getCapability().getGoals().contains(mgoal))
+			MGoal mgoal = bdimodel.getCapability().getGoal(gs[j].getName());
+			
+			if(mgoal==null)
 			{	
+				Deliberation del = ga.deliberation();
+				Class<?>[] inh = del.inhibits();
+				Set<String> inhnames = null;
+				if(inh.length>0)
+				{
+					inhnames = new HashSet<String>();
+					for(Class<?> gcl: inh)
+					{
+						inhnames.add(gcl.getName());
+					}
+				}
+				MDeliberation mdel = null;
+				if(del.cardinality()>0 || inhnames!=null)
+				{
+					// scan for instance delib methods
+					Map<String, MethodInfo> inhms = new HashMap<String, MethodInfo>();
+					Method[] ms = gs[j].getDeclaredMethods();
+					for(Method m: ms)
+					{
+						GoalInhibit ginh = m.getAnnotation(GoalInhibit.class);
+						if(ginh!=null)
+						{
+							Class<?> gcl = ginh.value();
+							inhms.put(gcl.getName(), new MethodInfo(m));
+						}
+					}
+					mdel = new MDeliberation(del.cardinality(), inhnames, inhms.isEmpty()? null: inhms);
+				}
+				
+				mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
+					ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed(), ga.unique(), mdel);
+
 				bdimodel.getCapability().addGoal(mgoal);
 			}
+
+			tr.addGoal(mgoal);
 		}
 		String[] fas = trigger.factaddeds();
 		for(int j=0; j<fas.length; j++)

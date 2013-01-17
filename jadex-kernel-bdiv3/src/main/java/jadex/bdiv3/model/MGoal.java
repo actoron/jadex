@@ -37,12 +37,15 @@ public class MGoal extends MClassBasedElement
 	/** The unique. */
 	protected boolean unique;
 	
+	/** The deliberation. */
+	protected MDeliberation deliberation;
+	
 	/**
 	 *  Create a new belief.
 	 */
 	public MGoal(String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
-		boolean succeedonpassed, boolean unique)
+		boolean succeedonpassed, boolean unique, MDeliberation deliberation)
 	{
 		super(target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -51,6 +54,7 @@ public class MGoal extends MClassBasedElement
 		this.recurdelay = recurdelay;
 		this.succeedonpassed = succeedonpassed;
 		this.unique = unique;
+		this.deliberation = deliberation;
 	}
 	
 	/**
@@ -132,5 +136,14 @@ public class MGoal extends MClassBasedElement
 	public void setUnique(boolean unique)
 	{
 		this.unique = unique;
+	}
+
+	/**
+	 *  Get the deliberation.
+	 *  @return The deliberation.
+	 */
+	public MDeliberation getDeliberation()
+	{
+		return deliberation;
 	}
 }

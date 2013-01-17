@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MGoal;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
@@ -39,6 +40,26 @@ public class RCapability extends RElement
 	public Collection<RGoal> getGoals()
 	{
 		return goals;
+	}
+	
+	/**
+	 *  Get goals of a specific pojo type.
+	 *  @param type The type.
+	 *  @return The goals.
+	 */
+	public List<RGoal> getGoals(MGoal mgoal)
+	{
+		List<RGoal> ret = new ArrayList<RGoal>();
+		
+		for(RGoal goal: goals)
+		{
+			if(mgoal.equals(goal.getMGoal()))
+			{
+				ret.add(goal);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**

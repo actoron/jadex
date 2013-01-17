@@ -103,7 +103,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 //								visitInsn(Opcodes.POP);
 								
 								// stack before putfield is object,value ()
-								System.out.println("method: "+methodname+" "+name);
+//								System.out.println("method: "+methodname+" "+name);
 
 								// write init values also immediately to allow dependencies
 								if("<init>".equals(methodname))

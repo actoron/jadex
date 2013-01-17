@@ -63,5 +63,9 @@ public @interface Goal
 	 *  Should the goal be unique (no other goal is allowed that is the same).
 	 */
 	public boolean unique() default false;
-
+	
+	/**
+	 * 
+	 */
+	public Deliberation deliberation() default @Deliberation();
 }

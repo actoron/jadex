@@ -67,7 +67,7 @@ public class CleanUpWastePlan
 					{
 						public void customResultAvailable(QueryWastebin qw)
 						{
-							rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getResult())).addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
+							rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getWastebin())).addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
 							{
 								public void resultAvailable(AchieveDropWaste result)
 								{

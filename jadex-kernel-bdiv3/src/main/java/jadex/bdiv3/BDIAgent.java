@@ -253,7 +253,7 @@ public class BDIAgent extends MicroAgent
 			{
 				for(Object[] write: writes)
 				{
-					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
+//					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
 					agent.writeField(write[0], (String)write[1], write[2]);
 				}
 			}
