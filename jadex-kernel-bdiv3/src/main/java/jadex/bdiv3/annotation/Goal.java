@@ -42,7 +42,7 @@ public @interface Goal
 	/** 
 	 * The recur flag. 
 	 */
-	public boolean recur() default true;
+	public boolean recur() default false;
 	
 	/** 
 	 * The retry delay. 

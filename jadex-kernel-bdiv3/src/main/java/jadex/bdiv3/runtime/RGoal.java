@@ -395,6 +395,7 @@ public class RGoal extends RProcessableElement
 	 */
 	public void setException(Exception exception)
 	{
+		assert this.exception==null;
 		this.exception = exception;
 	}
 
@@ -770,6 +771,7 @@ public class RGoal extends RProcessableElement
 					}
 					else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
 					{
+						setException(new GoalFailureException("No canditates."));
 						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
 					}
 					else
@@ -785,6 +787,7 @@ public class RGoal extends RProcessableElement
 					}
 					else
 					{
+						setException(new GoalFailureException("No canditates 2."));
 						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
 					}
 				}

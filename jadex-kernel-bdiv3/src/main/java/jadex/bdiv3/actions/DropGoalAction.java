@@ -42,18 +42,11 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		Future<Void> ret = new Future<Void>();
-		try
-		{
-			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			goal.unobserveGoal(ia);
-			ip.getCapability().removeGoal(goal);
-			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPED);
-			ret.setResult(null);
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		goal.unobserveGoal(ia);
+		ip.getCapability().removeGoal(goal);
+		goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPED);
+		ret.setResult(null);
 		return ret;
 	}
 }

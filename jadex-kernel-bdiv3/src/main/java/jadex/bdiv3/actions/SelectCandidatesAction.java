@@ -1,9 +1,7 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MethodInfo;
-import jadex.bdiv3.runtime.IPlanBody;
-import jadex.bdiv3.runtime.MethodPlanBody;
+import jadex.bdiv3.runtime.PlanCandidate;
 import jadex.bdiv3.runtime.RGoal;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.bdiv3.runtime.RProcessableElement;
@@ -12,7 +10,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -72,7 +69,14 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				if(cand instanceof MPlan)
 				{
 					MPlan mplan = (MPlan)cand;
-					RPlan rplan = RPlan.createRPlan(mplan, element, ia);
+					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
+					RPlan.adoptPlan(rplan, ia);
+					ret.setResult(null);
+				}
+				if(cand instanceof PlanCandidate)
+				{
+					MPlan mplan = ((PlanCandidate)cand).getMPlan();
+					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
 					RPlan.adoptPlan(rplan, ia);
 					ret.setResult(null);
 				}

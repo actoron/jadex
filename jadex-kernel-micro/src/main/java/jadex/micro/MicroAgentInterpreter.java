@@ -393,9 +393,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						// result?!
 //						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
 						if(exception instanceof RuntimeException)
+						{
 							throw (RuntimeException)exception;
+						}
 						else
+						{
 							throw new RuntimeException(exception);
+						}
 //						microagent.killComponent();
 					}
 				}));

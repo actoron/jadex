@@ -102,9 +102,9 @@ public class RPlan extends RElement
 	/**
 	 * 
 	 */
-	public static RPlan createRPlan(MPlan mplan, Object reason, IInternalAccess ia)
+	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
 	{
-		RPlan rplan = new RPlan((MPlan)mplan, mplan);
+		RPlan rplan = new RPlan(mplan, candidate);
 		Object bd = mplan.getBody();
 		IPlanBody body = null;
 		if(bd instanceof MethodInfo)

@@ -259,7 +259,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					// todo: allow Java plan constructor calls
 //						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 				
-					RPlan rplan = RPlan.createRPlan(mplan, null, getInternalAccess());
+					RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getInternalAccess());
 					RPlan.adoptPlan(rplan, getInternalAccess());
 				}
 			}
@@ -472,7 +472,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					int idx = event.getType().indexOf(".");
 					String evtype = event.getType().substring(0, idx);
 					String belname = event.getType().substring(idx+1);
-					RPlan rplan = RPlan.createRPlan(mplan, new ChangeEvent(evtype, belname, event.getContent()), getInternalAccess());
+					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(evtype, belname, event.getContent()), getInternalAccess());
 					RPlan.adoptPlan(rplan, getInternalAccess());
 					return IFuture.DONE;
 				}

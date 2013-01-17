@@ -1,11 +1,16 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MTrigger;
+import jadex.commons.SReflect;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,40 +85,54 @@ public class APL
 		if(candidates==null || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
 			if(candidates==null)
-				candidates = new ArrayList<Object>();
-			
-			// Use the plan priorities to sort the candidates.
-			// If the priority is the same use the following order:
-			// running plan - waitque of running plan - passive plan
-
-//			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
-			
-			// todo: generate binding candidates
-			if(precandidates==null)
 			{
-				precandidates = new ArrayList<MPlan>();
-				List<MPlan> mplans = ((MCapability)capa.getModelElement()).getPlans();
-				if(mplans!=null)
+				boolean	done	= false;
+				Object	pojo	= element.getPojoElement();
+				if(pojo!=null)
 				{
-					for(int i=0; i<mplans.size(); i++)
+					Class<?>	clazz	= pojo.getClass();
+					Method[]	ms	= SReflect.getAllMethods(clazz);
+					for(int i=0; !done && i<ms.length; i++)
 					{
-						MPlan mplan = mplans.get(i);
-						MTrigger mtrigger = mplan.getTrigger();
-						if(element instanceof RGoal)
+						if(ms[i].isAnnotationPresent(GoalAPLBuild.class))
 						{
-							List<MGoal> mgoals = mtrigger.getGoals();
-							if(mgoals!=null && mgoals.contains(element.getModelElement()))
+							if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
 							{
-								precandidates.add(mplan);
-								candidates.add(mplan);
+								done	= true;
+								try
+								{
+									candidates	= (List<Object>)ms[i].invoke(pojo, null);
+									for(Object cand: candidates)
+									{
+										((PlanCandidate)cand).init(element, capa);
+									}
+								}
+								catch(InvocationTargetException e)
+								{
+									throw e.getTargetException() instanceof RuntimeException
+										? (RuntimeException)e.getTargetException()
+										: new RuntimeException(e.getTargetException());
+								}
+								catch(Exception e)
+								{
+									throw e instanceof RuntimeException
+										? (RuntimeException)e
+										: new RuntimeException(e);
+								}
+								
+							}
+							else
+							{
+								throw new RuntimeException("Method not public: "+ms[i]);
 							}
 						}
 					}
 				}
-			}
-			else
-			{
-				candidates.addAll(precandidates);
+				
+				if(!done)
+				{
+					candidates	= doBuild(capa);
+				}
 			}
 			
 			List<RPlan> rplans = capa.getPlans();
@@ -188,6 +207,43 @@ public class APL
 		return ret;
 	}
 	
+	protected List<Object>	doBuild(RCapability capa)
+	{
+		List<Object>	ret = new ArrayList<Object>();
+		
+//		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+		
+		// todo: generate binding candidates
+		if(precandidates==null)
+		{
+			precandidates = new ArrayList<MPlan>();
+			List<MPlan> mplans = ((MCapability)capa.getModelElement()).getPlans();
+			if(mplans!=null)
+			{
+				for(int i=0; i<mplans.size(); i++)
+				{
+					MPlan mplan = mplans.get(i);
+					MTrigger mtrigger = mplan.getTrigger();
+					if(element instanceof RGoal)
+					{
+						List<MGoal> mgoals = mtrigger.getGoals();
+						if(mgoals!=null && mgoals.contains(element.getModelElement()))
+						{
+							precandidates.add(mplan);
+							ret.add(mplan);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			ret.addAll(precandidates);
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Get the next candidate with respect to the plan
 	 *  priority and the rank of the candidate.
@@ -195,8 +251,12 @@ public class APL
 	 *  @param random The random selection flag.
 	 *  @return The next candidate.
 	 */
-	public Object getNextCandidate()
+	protected Object getNextCandidate()
 	{
+		// Use the plan priorities to sort the candidates.
+		// If the priority is the same use the following rank order:
+		// running plan - waitque of running plan - passive plan
+
 		// first find the list of highest ranked candidates
 		// then choose one or more of them
 		
@@ -252,6 +312,10 @@ public class APL
 		{
 			mplan = (MPlan)((RPlan)cand).getModelElement();
 		}
+		else if(cand instanceof PlanCandidate)
+		{
+			mplan = ((PlanCandidate)cand).getMPlan();
+		}
 		else 
 		{
 			mplan = (MPlan)cand;
@@ -263,7 +327,7 @@ public class APL
 	/**
 	 *  Get the rank of a candidate.
 	 *  The order is as follows:
-	 *  running plan (0) -> waitqueue (1) -> plan instance (2).
+	 *  new plan from model/candidate (0) -> waitqueue (1) -> running plan instance (2).
 	 *  @return The rank of a candidate.
 	 */
 	protected static int getRank(Object cand)
@@ -288,7 +352,7 @@ public class APL
 	/**
 	 * 
 	 */
-	protected void planFinished(RPlan rplan)
+	public void planFinished(RPlan rplan)
 	{
 		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		String exclude = mpe.getExcludeMode();
