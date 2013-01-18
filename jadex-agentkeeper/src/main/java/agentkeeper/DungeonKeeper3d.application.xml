@@ -263,8 +263,7 @@
 
 			<env:perspectives>
 				<env:perspective3d name="Complex3D" class="Perspective3D" camera="Iso" ambientOcclusion="false" guiCreatorPath="controller.CustomControllerCreator">
-					<env:niftyScreen name="hud" path="gui/DungeonHud.xml" isStartScreen="true"/>
-					<env:niftyScreen name="default" path="gui/DungeonHud.xml" isStartScreen="false"/>
+
 				
 					<env:drawable3d objecttype="static" hasSpaceobject="false"
 						width="1" height="1" depth="1">	

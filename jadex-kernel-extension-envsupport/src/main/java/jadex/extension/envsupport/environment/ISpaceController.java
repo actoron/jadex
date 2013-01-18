@@ -11,5 +11,7 @@ public interface ISpaceController
 	public Object getProperty(String name);
 	
 	public void setProperty(String name, Object value);
+	
+	public ISpaceObject getSpaceObject(Object id);
 
 }

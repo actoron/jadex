@@ -7,11 +7,13 @@ import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.CameraState;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.IsoCameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection.SelectionControl;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.IsoCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.IGuiControllerCreator;
+import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 import java.awt.Dimension;
@@ -127,6 +129,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected boolean							ambientOcclusion	= true;
 
+	//TODO: thats crap
 	protected String							cameraSelection				= "Default";
 
 	protected ArrayList<String>				toDelete			= new ArrayList<String>();
@@ -135,7 +138,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	Vector3Int selectedworldcoord;
 	
-	BatchNode staticbatchgeo = new BatchNode("StaticBatchVisuals");
+	BatchNode staticbatchgeo = new BatchNode(StringNames.BATCH_NODE);
 	Node staticgeo = new Node("StaticVisuals");
 	
 	protected boolean defaultGui = true;
@@ -151,8 +154,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	protected CameraState cameraState;
 	
+	protected SelectionControl selectionControl;
+	
 
-	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, List<NiftyScreen> niftyScreens, ISpaceController spaceController)
+	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, ISpaceController spaceController)
 	{
 		// Set the Variables
 		this.appSize = dim;
@@ -167,19 +172,17 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.ambientOcclusion = shader;
 		this.cameraSelection = camera;
 		this.guiCreatorPath = guiCreatorPath;
-		this.niftyScreens = (ArrayList<NiftyScreen>)niftyScreens;
 		this.spaceController = spaceController;
 		 
-		 
+
 		
-		if(niftyScreens!=null)
+		//TODO: thats crap
+		if(guiCreatorPath!=null)
 		{
 			this.defaultGui = false;
 		}
 		
-		System.out.println("guicreatorpath: " + guiCreatorPath);
-		System.out.println("niftyScreens: " + niftyScreens);
-		
+
 		
 
 
@@ -193,6 +196,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		Logger.getLogger("").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+		
 		viewPort.setBackgroundColor(ColorRGBA.Black);
 		stateManager.getState(StatsAppState.class).toggleStats();
 		
@@ -204,8 +208,15 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		initAudio();
 		initNifty();
 		initCam();
+		initSelection();
 
 
+	}
+
+	private void initSelection()
+	{
+		this.selectionControl = new SelectionControl();
+		stateManager.attach(this.selectionControl);
 	}
 
 	private void initRoot()
@@ -377,16 +388,24 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			}
 			
 			NiftyScreen startScreen = null;
-			for(NiftyScreen nscreen : niftyScreens)
+			for(NiftyScreen nscreen : guiCreator.getNiftyScreens())
 			{
+				System.out.println("nscreen " + nscreen.getName() );
 				nifty.fromXml(nscreen.getPath(), nscreen.getName(), guiCreator.getScreenController());
 				if(nscreen.isStartScreen()||startScreen==null)
 				{
 					startScreen = nscreen;
 				}
 			}
-			System.out.println("startscreen: " + startScreen.getName());
+
 			nifty.gotoScreen(startScreen.getName());
+			
+			//TODO: extra class
+			if(guiCreator.getCustomAppState()!=null)
+			{
+				stateManager.attach(guiCreator.getCustomAppState());
+			}
+
 		}
 
 		guiViewPort.addProcessor(niftyDisplay);
@@ -911,6 +930,16 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	public void setAppScaled(float appScaled)
 	{
 		this.appScaled = appScaled;
+	}
+
+	public ISpaceController getSpaceController()
+	{
+		return spaceController;
+	}
+
+	public void setSpaceController(ISpaceController spaceController)
+	{
+		this.spaceController = spaceController;
 	}
 
 

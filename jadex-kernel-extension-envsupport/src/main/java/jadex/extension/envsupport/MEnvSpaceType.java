@@ -534,20 +534,9 @@ public class MEnvSpaceType
 							guiCreatorPath = "None";
 						}
 						
-						List screens = (List)args.get("niftyScreen");
-						List fscreens = null;
-						if(screens!=null)
-						{
-							fscreens = new ArrayList();
-							for(int i=0; i<screens.size(); i++)
-							{
-								Map srcscreen = (Map)screens.get(i);
-								NiftyScreen nscr = (NiftyScreen)((IObjectCreator)getProperty(srcscreen, "creator")).createObject(srcscreen);
-								fscreens.add(nscr);
-							}
-						}
+
 //						IPerspective ret = (IPerspective)((Class)getProperty(args, "clazz")).newInstance();
-						Perspective3D ret = new Perspective3D(ambientOcclusion, camera, guiCreatorPath, fscreens);
+						Perspective3D ret = new Perspective3D(ambientOcclusion, camera, guiCreatorPath);
 
 											
 						if(ret instanceof Perspective3D)
@@ -576,7 +565,6 @@ public class MEnvSpaceType
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo(new QName(uri, "niftyScreen"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawable3d"), "drawables3d", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 				})));
 		

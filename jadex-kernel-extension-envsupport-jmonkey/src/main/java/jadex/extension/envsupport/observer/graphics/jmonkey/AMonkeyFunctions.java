@@ -44,9 +44,9 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 {
 
 	public AMonkeyFunctions(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath,
-			List<NiftyScreen> niftyScreens, ISpaceController spaceController)
+			ISpaceController spaceController)
 	{
-		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, niftyScreens, spaceController);
+		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, spaceController);
 
 	}
 
@@ -117,138 +117,16 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 		cam.setLocation(pos);
 	}
 
-	public void getSpacePosition()
-	{
-		CollisionResults results = fireRaytrace();
-		if(results.size() > 0)
-		{
-			Geometry target = results.getClosestCollision().getGeometry();
-			// Here comes the
-			// action:
-			Spatial selectedsp = target;
-
-			try
-			{
-
-
-				// we look for the SpaceObject-Parent
-				if(selectedsp != null)
-				{
-					while(!Character.isDigit(selectedsp.getName().charAt(0)))
-					{
-						selectedsp = selectedsp.getParent();
-					}
-
-					System.out.println("name: " + selectedsp.getName());
-				}
-			}
-			catch(NullPointerException e)
-			{
-				System.out.println("AMonkeyFunctions: Selection NULL");
-			}
-		}
-
-	}
-
 	public Vector3Int getSelectedWorldCoord()
 	{
-		Vector3Int ret = null;
-		CollisionResults results = fireRaytrace();
-
-		if (results.size() > 0) {
-			
-
-			System.out.println(appScaled + " contact point " + results.getClosestCollision().getContactPoint());
-			
-			Vector3f contact = results.getClosestCollision().getContactPoint();
-			
-			Vector3f worldcontact = contact.divideLocal(appScaled);
-			
-			System.out.println("worldcontact before casting " + worldcontact);
-			
-			
-
-			Vector3Int intworld = new Vector3Int(Math.round(worldcontact.getX()), Math.round(worldcontact.getY()), Math.round(worldcontact.getZ()));
-			
-			System.out.println("worldcontact after casting " + intworld);
-			
-			ret = intworld;
-			
-		}
-		return ret;
+		return selectionControl.getSelectedWorldCoord();
 	}
-
-	public void fireSelection()
+	
+	public Object getSelectedSpaceObjectId()
 	{
-		CollisionResults results = fireRaytrace();
-
-		int selection = -1;
-		Spatial selectedspatial = null;
-		if(results.size() > 0)
-		{
-
-
-			System.out.println("app scaled " + appScaled + " contact point " + results.getClosestCollision().getContactPoint());
-
-			Vector3f contact = results.getClosestCollision().getContactPoint();
-			
-			Geometry target = results.getClosestCollision().getGeometry();
-			
-			System.out.println("target parent " + target.getParent().getName());
-			
-			System.out.println("target parent parent  " + target.getParent().getParent().getName());
-
-			Vector3f worldcontact = contact.divideLocal(appScaled);
-
-			selectedworldcoord = new Vector3Int((int)worldcontact.getX(), (int)worldcontact.getY(), (int)worldcontact.getZ());
-
-			// for(Iterator<CollisionResult> itp = results.iterator();
-			// itp.hasNext();)
-			// {
-			// CollisionResult result = itp.next();
-			//
-			// Geometry geo = result.getGeometry();
-			// System.out.println("geo: " + geo.getName());
-			// }
-
-		}
-
-		// Geometry target = results.getClosestCollision().getGeometry();
-		//
-		// System.out.println("target: " + target.getName());
-		// // Here comes the
-		// // action:
-		// Spatial selectedsp = target;
-		//
-		// try {
-		//
-		//
-		// // we look for the SpaceObject-Parent
-		// if (selectedsp != null) {
-		// while (!Character.isDigit(selectedsp.getName().charAt(0))) {
-		// selectedsp = selectedsp.getParent();
-		// }
-		//
-		// selection = Integer.parseInt(selectedsp.getName());
-		// selectedspatial = selectedsp;
-		// System.out.println("selected!");
-		// }
-		// }
-		// catch (NullPointerException e) {
-		// System.out.println("AMonkeyFunctions: Selection NULL");
-		// }
-		// }
-		// setSelectedTarget(selection);
-		// setSelectedSpatial(selectedspatial);
-		// if(focusCamActive)
-		// {
-		// if(selectedspatial!=null)
-		// focusCam.setSpatial(selectedspatial);
-		// else
-		// focusCam.setSpatial(staticNode);
-		// }
-
+		return selectionControl.computeSelectedId();
 	}
+	
 
 	public void setHeight()
 	{
@@ -277,25 +155,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 		}
 	}
 
-	private CollisionResults fireRaytrace()
-	{
-		this.selectedSpatial = null;
-		// Reset results list.
-		CollisionResults results = new CollisionResults();
-		// Convert screen click
-		// to 3d position
-		Vector2f click2d = inputManager.getCursorPosition();
-		Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-		Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalize();
-
-		// Aim the ray from the clicked spot forwards.
-		Ray ray = new Ray(click3d, dir);
-
-		// rootNode.collideWith(ray, results);
-		staticbatchgeo.collideWith(ray, results);
-
-		return results;
-	}
+	
 
 	/*
 	 * Use only for Camera
@@ -389,7 +249,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 
 				if(name.equals("Select") && keyPressed)
 				{
-					fireSelection();
+//					fireSelection();
 				}
 
 

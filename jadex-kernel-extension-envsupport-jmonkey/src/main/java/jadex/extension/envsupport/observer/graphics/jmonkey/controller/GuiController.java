@@ -70,15 +70,15 @@ public class GuiController extends AbstractAppState implements ScreenController 
         super.initialize(stateManager, app);
         this.app = (SimpleApplication) app;
         rootNode = this.app.getRootNode();
+
         
 
 
     }
     
+    public void update(float tpf) {
+
+    }
     
 
-    @Override
-    public void update(float tpf) {
-        /** jME update loop! */
-    }
 }
