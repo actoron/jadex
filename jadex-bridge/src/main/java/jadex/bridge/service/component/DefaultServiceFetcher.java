@@ -436,14 +436,22 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				// No component found with cid -> create.
 //				System.out.println("creating: "+binding.getComponentName());
-				createComponent(provider, info, binding).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-//				{
-//					public void exceptionOccurred(Exception exception)
+				if(binding.isCreate() && binding.getCreationInfo()!=null)
+				{
+					createComponent(provider, info, binding).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 //					{
-//						System.out.println("kuku");
-//						super.exceptionOccurred(exception);
-//					}
-//				});
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							System.out.println("kuku");
+//							super.exceptionOccurred(exception);
+//						}
+//					});				
+				}
+				else
+				{
+					ret.setException(exception);
+				}
+				
 			}
 		});
 		return ret;
@@ -525,7 +533,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										cms.getExternalAccess(result[i]).addResultListener(lis);
 									}
 								}
-								else
+								else if(binding.isCreate() && binding.getCreationInfo()!=null)
 								{
 									createComponent(provider, info, binding)
 										.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<IExternalAccess>>(ret)
@@ -539,20 +547,31 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										}
 									});
 								}
+								else
+								{
+									ret.setException(new ServiceNotFoundException(binding.getName()));
+								}
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								createComponent(provider, info, binding).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<IExternalAccess>>(ret)
+								if(binding.isCreate() && binding.getCreationInfo()!=null)
 								{
-									public void customResultAvailable(IExternalAccess result)
+									createComponent(provider, info, binding).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<IExternalAccess>>(ret)
 									{
-										List<IExternalAccess> res = new ArrayList<IExternalAccess>();
-										res.add(result);
-										ret.setResult(res);
-//										super.customResultAvailable(ret);
-									}
-								});
+										public void customResultAvailable(IExternalAccess result)
+										{
+											List<IExternalAccess> res = new ArrayList<IExternalAccess>();
+											res.add(result);
+											ret.setResult(res);
+	//										super.customResultAvailable(ret);
+										}
+									});
+								}
+								else
+								{
+									ret.setException(exception);
+								}
 							}
 						});
 					}

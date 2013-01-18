@@ -2,8 +2,12 @@ package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.PojoBDIAgent;
+import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
+import jadex.bdiv3.annotation.GoalRecurCondition;
+import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
@@ -13,10 +17,12 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.RGoal.LifecycleStateCondition;
+import jadex.bdiv3.runtime.RGoal.ProcessingStateCondition;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -33,6 +39,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
+import jadex.rules.eca.Event;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -42,6 +49,7 @@ import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -332,15 +340,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 
 		// Observe goal types
 		List<MGoal> goals = bdimodel.getCapability().getGoals();
-		for(int i=0; i<goals.size(); i++)
+		for(final MGoal mgoal: goals)
 		{
 //			 todo: explicit bdi creation rule
 //			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
 		
 			boolean fin = false;
 			
-			MGoal mgoal = goals.get(i);
 			final Class<?> gcl = mgoal.getTargetClass(getClassLoader());
+			boolean declarative = false;
+			boolean maintain = false;
 			
 			Constructor<?>[] cons = gcl.getConstructors();
 			for(final Constructor<?> c: cons)
@@ -348,10 +357,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(c.isAnnotationPresent(GoalCreationCondition.class))
 				{
 					String[] evs = c.getAnnotation(GoalCreationCondition.class).events();
-					List<String> events = RGoal.readAnnotationEvents(getInternalAccess(), c.getParameterAnnotations());
+					List<String> events = readAnnotationEvents(getInternalAccess(), c.getParameterAnnotations());
 					for(String ev: evs)
 					{
-						RGoal.addBeliefEvents(getInternalAccess(), events, ev);
+						addBeliefEvents(getInternalAccess(), events, ev);
 					}
 				
 					Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
@@ -416,12 +425,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				}
 			}	
 			
+			Method mcond = null;
 			Method[] ms = gcl.getDeclaredMethods();
-			for(Method m: ms)
+			for(final Method m: ms)
 			{
 				if(m.isAnnotationPresent(GoalCreationCondition.class))
 				{
-					List<String> events = RGoal.readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
 					Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 						new MethodCondition(null, m), new IAction<Void>()
 					{
@@ -461,7 +471,246 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 				}
+				
+				if(m.isAnnotationPresent(GoalMaintainCondition.class))
+					mcond = m; // do later
+				
+				if(m.isAnnotationPresent(GoalTargetCondition.class))
+				{			
+					String[] evs = m.getAnnotation(GoalTargetCondition.class).events();
+					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					for(String ev: evs)
+					{
+						addBeliefEvents(getInternalAccess(), events, ev);
+					}
+					events.add(ChangeEvent.GOALADOPTED); // check also initially 
+					
+					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
+						new GoalsExistCondition(mgoal, capa), 
+						new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							for(RGoal goal: getCapability().getGoals(mgoal))
+							{
+								if(executeGoalMethod(m, goal, event))
+									goal.targetConditionTriggered(getInternalAccess(), event, rule, context);
+							}
+						
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+					declarative = true;
+				}
+				
+				if(m.isAnnotationPresent(GoalDropCondition.class))
+				{			
+					String[] evs = m.getAnnotation(GoalDropCondition.class).events();
+					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					for(String ev: evs)
+					{
+						addBeliefEvents(getInternalAccess(), events, ev);
+					}
+					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_drop", 
+						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							for(RGoal goal: getCapability().getGoals(mgoal))
+							{
+								if(executeGoalMethod(m, goal, event))
+								{
+									System.out.println("Goal dropping triggered: "+goal);
+//									rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
+									goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+									goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_FAILED);
+								}
+							}
+							
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+				}
+				
+				if(m.isAnnotationPresent(GoalContextCondition.class))
+				{			
+					String[] evs = m.getAnnotation(GoalContextCondition.class).events();
+					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					for(String ev: evs)
+					{
+						addBeliefEvents(getInternalAccess(), events, ev);
+					}
+					
+					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_suspend", 
+						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
+//						new CombinedCondition(new ICondition[]{
+//							new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED, false),
+//							new MethodCondition(getPojoElement(), m, true),
+//						}), new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							for(RGoal goal: getCapability().getGoals(mgoal))
+							{
+								if(!RGoal.GOALLIFECYCLESTATE_SUSPENDED.equals(goal.getLifecycleState()))
+								{	
+									if(!executeGoalMethod(m, goal, event))
+									{
+										System.out.println("Goal suspended: "+goal);
+										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_SUSPENDED);
+										goal.setState(RGoal.PROCESSABLEELEMENT_INITIAL);
+									}
+								}
+							}
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+					
+					rule = new Rule<Void>(mgoal.getName()+"_goal_option", 
+						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
+//						new CombinedCondition(new ICondition[]{
+//							new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED),
+//							new MethodCondition(getPojoElement(), m),
+//						}), new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							for(RGoal goal: getCapability().getGoals(mgoal))
+							{
+								if(RGoal.GOALLIFECYCLESTATE_SUSPENDED.equals(goal.getLifecycleState()))
+								{	
+									if(executeGoalMethod(m, goal, event))
+									{
+										System.out.println("Goal made option: "+goal);
+										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
+//										setState(ia, PROCESSABLEELEMENT_INITIAL);
+									}
+								}
+							}
+							
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+				}
+				
+				if(m.isAnnotationPresent(GoalRecurCondition.class))
+				{			
+					String[] evs = m.getAnnotation(GoalRecurCondition.class).events();
+					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					for(String ev: evs)
+					{
+						addBeliefEvents(getInternalAccess(), events, ev);
+					}
+					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_recur",
+						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
+//						new CombinedCondition(new ICondition[]{
+//							new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
+//							new ProcessingStateCondition(GOALPROCESSINGSTATE_PAUSED),
+//							new MethodCondition(getPojoElement(), m),
+//						}), new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							for(RGoal goal: getCapability().getGoals(mgoal))
+							{
+								if(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState())
+									&& RGoal.GOALPROCESSINGSTATE_PAUSED.equals(goal.getProcessingState()))
+								{	
+									if(executeGoalMethod(m, goal, event))
+									{
+										goal.setTriedPlans(null);
+										goal.setApplicablePlanList(null);
+										goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_INPROCESS);
+									}
+								}
+							}
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+					declarative = true;
+				}
 			}
+			
+			if(mcond!=null)
+			{		
+				final Method m = mcond;
+				
+				String[] evs = mcond.getAnnotation(GoalMaintainCondition.class).events();
+				List<String> events = readAnnotationEvents(getInternalAccess(), mcond.getParameterAnnotations());
+				for(String ev: evs)
+				{
+					addBeliefEvents(getInternalAccess(), events, ev);
+				}
+				
+				Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_maintain", 
+					new GoalsExistCondition(mgoal, capa), new IAction<Void>()
+//					new CombinedCondition(new ICondition[]{
+//						new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
+//						new ProcessingStateCondition(GOALPROCESSINGSTATE_IDLE),
+//						new MethodCondition(getPojoElement(), mcond, true),
+//					}), new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						for(RGoal goal: getCapability().getGoals(mgoal))
+						{
+							if(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState())
+								&& RGoal.GOALPROCESSINGSTATE_IDLE.equals(goal.getProcessingState()))
+							{	
+								if(!executeGoalMethod(m, goal, event))
+								{
+									System.out.println("Goal maintain triggered: "+goal);
+//									System.out.println("state was: "+getProcessingState());
+									goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_INPROCESS);
+								}
+							}
+						}
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				getRuleSystem().getRulebase().addRule(rule);
+				
+				// if has no own target condition
+				if(!declarative)
+				{
+					// if not has own target condition use the maintain cond
+					rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
+						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
+//						new MethodCondition(getPojoElement(), mcond), new IAction<Void>()
+					{
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						{
+							for(RGoal goal: getCapability().getGoals(mgoal))
+							{
+								if(executeGoalMethod(m, goal, event))
+									goal.targetConditionTriggered(getInternalAccess(), event, rule, context);
+							}
+							
+							return IFuture.DONE;
+						}
+					});
+					rule.setEvents(events);
+					getRuleSystem().getRulebase().addRule(rule);
+				}
+
+				declarative = true;
+				maintain = true;
+			}
+			
+			// todo: do not write from instance level!
+			mgoal.setDeclarative(declarative);
+			mgoal.setMaintain(maintain);
 		}
 		
 		// Observe plan types
@@ -523,7 +772,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// add/rem goal inhibitor rule
 		if(!goals.isEmpty())
 		{
-			List<String> events = RGoal.getGoalEvents();
+			List<String> events = getGoalEvents();
 			
 			Rule<Void> rule = new Rule<Void>("goal_addinhibitor", 
 				new ICondition()
@@ -648,8 +897,33 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			getRuleSystem().getRulebase().addRule(rule);
 		}
 		
+		// add goal type specific rules
+		
+		
+		
+		
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean executeGoalMethod(Method m, RGoal goal, IEvent event)
+	{
+		try
+		{
+			m.setAccessible(true);
+			Object result = null;
+			if(m.getParameterTypes().length==0)
+				result = m.invoke(goal.getPojoElement(), m.getParameterTypes().length==0? new Object[0]: new Object[]{event.getContent()});
+			return ((Boolean)result).booleanValue();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	/**
@@ -709,6 +983,71 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 * 
 	 */
+	public static void addBeliefEvents(IInternalAccess ia, List<String> events, String belname)
+	{
+		events.add(ChangeEvent.BELIEFCHANGED+"."+belname); // the whole value was changed
+		events.add(ChangeEvent.FACTCHANGED+"."+belname); // property change of a value
+		
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
+		{
+			events.add(ChangeEvent.FACTADDED+"."+belname);
+			events.add(ChangeEvent.FACTREMOVED+"."+belname);
+		}
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	public static void addGoalEvents(IInternalAccess ia, List<String> events, String goalname)
+//	{
+//		events.add(ChangeEvent.GOALADOPTED+"."+goalname);
+//		events.add(ChangeEvent.GOALDROPPED+"."+goalname);
+//		events.add(ChangeEvent.GOALOPTION+"."+goalname);
+//		events.add(ChangeEvent.GOALSUSPENDED+"."+goalname);
+//		events.add(ChangeEvent.GOALINPROCESS+"."+goalname);
+//		events.add(ChangeEvent.GOALNOTINPROCESS+"."+goalname);
+//	}
+	
+	/**
+	 * 
+	 */
+	public static List<String> getGoalEvents()
+	{
+		List<String> events = new ArrayList<String>();
+		events.add(ChangeEvent.GOALADOPTED);
+		events.add(ChangeEvent.GOALDROPPED);
+		events.add(ChangeEvent.GOALOPTION);
+		events.add(ChangeEvent.GOALSUSPENDED);
+		events.add(ChangeEvent.GOALINPROCESS);
+		events.add(ChangeEvent.GOALNOTINPROCESS);
+		return events;
+	}
+	
+	/**
+	 *  Read the annotation events from method annotations.
+	 */
+	public static List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
+	{
+		List<String> events = new ArrayList<String>();
+		for(Annotation[] ana: annos)
+		{
+			for(Annotation an: ana)
+			{
+				if(an instanceof jadex.rules.eca.annotations.Event)
+				{
+					String belname = ((jadex.rules.eca.annotations.Event)an).value();
+					addBeliefEvents(ia, events, belname);
+				}
+			}
+		}
+		return events;
+	}
+	
+	/**
+	 * 
+	 */
 	public static class LifecycleStateCondition implements ICondition
 	{
 		/** The allowed states. */
@@ -760,6 +1099,30 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			if(!allowed)
 				ret = !ret;
 			return ret;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class GoalsExistCondition implements ICondition
+	{
+		protected MGoal mgoal;
+		
+		protected RCapability capa;
+		
+		public GoalsExistCondition(MGoal mgoal, RCapability capa)
+		{
+			this.mgoal = mgoal;
+			this.capa = capa;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean evaluate(IEvent event)
+		{
+			return !capa.getGoals(mgoal).isEmpty();
 		}
 	}
 }

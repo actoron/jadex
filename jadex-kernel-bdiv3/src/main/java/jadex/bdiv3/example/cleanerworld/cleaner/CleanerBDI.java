@@ -25,6 +25,8 @@ import jadex.bdiv3.example.cleanerworld.world.Waste;
 import jadex.bdiv3.example.cleanerworld.world.Wastebin;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.RPlan;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -102,7 +104,7 @@ public class CleanerBDI
 	protected double my_vision = 0.1;
 	
 	@Belief
-	protected double my_chargestate = 0.1;
+	protected double my_chargestate = 0.21;
 	
 	@Belief
 	protected Waste carriedwaste;
@@ -305,7 +307,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal
+	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
 	public class QueryWastebin
 	{
 		protected Wastebin wastebin;
@@ -352,17 +354,40 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal
+	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
 	public class QueryChargingStation
 	{
 		protected Chargingstation station;
 		
-		@GoalTargetCondition(events="my_location") // should react on parameter
+		@GoalTargetCondition(events="chargingstations")
 		public boolean checkTarget()
 		{
+			station = getNearestChargingStation();
 			return station!=null;
 		}
-
+		
+		/**
+		 * 
+		 */
+		protected Chargingstation getNearestChargingStation()
+		{
+			Chargingstation ret = null;
+			for(Chargingstation cg: chargingstations)
+			{
+				if(ret==null)
+				{
+					ret = cg;
+				}
+				else if(getMyLocation().getDistance(cg.getLocation())
+					<getMyLocation().getDistance(ret.getLocation()))
+				{
+					ret = cg;
+				}
+			}
+			return ret;
+		}
+		
+		
 		/**
 		 *  Get the station.
 		 *  @return The station.
@@ -716,9 +741,18 @@ public class CleanerBDI
 		patrolpoints.add(new Location(0.9, 0.9));
 		
 //		agent.dispatchTopLevelGoal(new PerformLookForWaste());
-//		agent.dispatchTopLevelGoal(new PerformPatrol());
+		agent.dispatchTopLevelGoal(new PerformPatrol());
 		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 //		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
+		
+		agent.waitFor(100, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				setMyChargestate(0.1);
+				return IFuture.DONE;
+			}
+		});
 	}
 
 	/**

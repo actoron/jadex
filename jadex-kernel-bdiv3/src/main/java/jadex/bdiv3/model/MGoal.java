@@ -40,6 +40,13 @@ public class MGoal extends MClassBasedElement
 	/** The deliberation. */
 	protected MDeliberation deliberation;
 	
+	
+	// hack?!
+	protected boolean declarative;
+	
+	// hack?!
+	protected boolean maintain;
+	
 	/**
 	 *  Create a new belief.
 	 */
@@ -146,4 +153,44 @@ public class MGoal extends MClassBasedElement
 	{
 		return deliberation;
 	}
+
+	
+	// todo: do not write from instance level!
+	
+	/**
+	 *  Get the declarative.
+	 *  @return The declarative.
+	 */
+	public boolean isDeclarative()
+	{
+		return declarative;
+	}
+
+	/**
+	 *  Set the declarative.
+	 *  @param declarative The declarative to set.
+	 */
+	public void setDeclarative(boolean declarative)
+	{
+		this.declarative = declarative;
+	}
+
+	/**
+	 *  Get the maintain.
+	 *  @return The maintain.
+	 */
+	public boolean isMaintain()
+	{
+		return maintain;
+	}
+
+	/**
+	 *  Set the maintain.
+	 *  @param maintain The maintain to set.
+	 */
+	public void setMaintain(boolean maintain)
+	{
+		this.maintain = maintain;
+	}
+	
 }

@@ -105,7 +105,7 @@ public class BDIAgent extends MicroAgent
 	public void addBeliefListener(final String name, final IBeliefListener listener)
 	{
 		List<String> events = new ArrayList<String>();
-		RGoal.addBeliefEvents(this, events, name);
+		BDIAgentInterpreter.addBeliefEvents(this, events, name);
 
 		final boolean multi = ((MCapability)getCapability().getModelElement()).getBelief(name).isMulti(getClassLoader());
 		

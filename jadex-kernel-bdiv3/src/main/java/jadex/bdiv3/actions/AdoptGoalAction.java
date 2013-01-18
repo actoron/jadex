@@ -45,7 +45,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
-			goal.observeGoal(ia);
+//			goal.observeGoal(ia);
 			ip.getCapability().addGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_OPTION);
 //			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_ACTIVE);

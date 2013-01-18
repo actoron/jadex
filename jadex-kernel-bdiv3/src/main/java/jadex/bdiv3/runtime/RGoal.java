@@ -109,8 +109,8 @@ public class RGoal extends RProcessableElement
 	/** The exception. */
 	protected Exception exception;
 	
-	/** The observing rules. */
-	protected List<String> rulenames;
+//	/** The observing rules. */
+//	protected List<String> rulenames;
 	
 	/** The goal listeners. */
 	protected List<IResultListener<Void>> listeners;
@@ -122,8 +122,8 @@ public class RGoal extends RProcessableElement
 	protected RPlan childplan;
 	
 	/** Flag if goal is declarative. */
-	protected boolean declarative;
-	protected boolean maintain; // hack remove me
+//	protected boolean declarative;
+//	protected boolean maintain; // hack remove me
 	
 	/** The set of inhibitors. */
 	protected Set<RGoal> inhibitors;
@@ -301,6 +301,8 @@ public class RGoal extends RProcessableElement
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 
+		if(getId().indexOf("QueryCharging")!=-1 && GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
+			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 		if(getId().indexOf("Battery")!=-1 && GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
 			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 		if(getId().indexOf("Patrol")!=-1)
@@ -425,392 +427,33 @@ public class RGoal extends RProcessableElement
 		this.exception = exception;
 	}
 
-	/**
-	 *  Observe a goal by creating rules for the goal conditions.
-	 */
-	public void observeGoal(final IInternalAccess ia)
-	{
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		
-		// do we still need to observe directly?! -> yes bean property changes?!
-		// todo: support goal change event?!
-//		ip.getRuleSystem().observeObject(getPojoElement(), true, false);
-
-//		InstanceCondition ic = new InstanceCondition();
-		
-		// add rules that add and remove inhibitors to this goal when any
-		// other goal becomes active or inactive
-		
-//		List<String> events = new ArrayList<String>();
-//		List<MGoal> allgoals = ((MCapability)ip.getCapability().getModelElement()).getGoals();
-//		for(MGoal mgoal: allgoals)
-//		{
-//			addGoalEvents(ia, events, null);
-//		}
-//		
-//		Rule<Void> rule = new Rule<Void>(getId()+"_goal_addinhibitor", 
-//			new ICondition()
-//			{
-//				public boolean evaluate(IEvent event)
-//				{
-//					// return true when other goal is active and inprocess
-//					boolean ret = false;
-//					String type = event.getType();
-//					RGoal other = (RGoal)event.getContent();
-//					ret = type.startsWith(ChangeEvent.GOALADOPTED) && GOALPROCESSINGSTATE_INPROCESS.equals(other.getProcessingState())
-//						|| (type.startsWith(ChangeEvent.GOALINPROCESS) && GOALLIFECYCLESTATE_ACTIVE.equals(other.getLifecycleState()));
-//					return ret;
-//				}
-//			}, new IAction<Void>()
-//		{
-//			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-//			{
-//				RGoal other = (RGoal)event.getContent();
-//				if(other.inhibits(RGoal.this, ia))
-//					addInhibitor(other, ia);
-//				return IFuture.DONE;
-//			}
-//		});
-//		rule.setEvents(events);
-//		ip.getRuleSystem().getRulebase().addRule(rule);
-//		addRule(rule);
-//		
-//		rule = new Rule<Void>(getId()+"_goal_reminhibitor", 
-//			new ICondition()
-//			{
-//				public boolean evaluate(IEvent event)
-//				{
-//					// return true when other goal is active and inprocess
-//					boolean ret = false;
-//					String type = event.getType();
-//					if(type.startsWith("goal"))
-//					{
-//						RGoal other = (RGoal)event.getContent();
-//						ret = type.startsWith(ChangeEvent.GOALSUSPENDED) || type.startsWith(ChangeEvent.GOALOPTION) 
-//							|| !GOALPROCESSINGSTATE_INPROCESS.equals(other.getProcessingState());
-//					}
-//					return ret;
-//				}
-//			}, new IAction<Void>()
-//		{
-//			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-//			{
-//				RGoal other = (RGoal)event.getContent();
-//				removeInhibitor(other, ia);
-//				return IFuture.DONE;
-//			}
-//		});
-//		rule.setEvents(events);
-//		ip.getRuleSystem().getRulebase().addRule(rule);
-//		addRule(rule);
-//		
-//		// Add rules for activating and deactivating this goal
-//		
-//		Rule<Void> rule = new Rule<Void>(getId()+"_goal_inhibit", 
-//			new CombinedCondition(new ICondition[]{
-//				new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
-//			}), new IAction<Void>()
-//		{
-//			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-//			{
-//				setLifecycleState(ia, GOALLIFECYCLESTATE_SUSPENDED);
-//				return IFuture.DONE;
-//			}
-//		});
-//		rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALINHIBITED+"."+getId()}));
-//		ip.getRuleSystem().getRulebase().addRule(rule);
-//		addRule(rule);
-//		
-//		rule = new Rule<Void>(getId()+"_goal_activate", 
-//			new CombinedCondition(new ICondition[]{
-//				new LifecycleStateCondition(GOALLIFECYCLESTATE_OPTION),
-//			}), new IAction<Void>()
-//		{
-//			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-//			{
-//				setLifecycleState(ia, GOALLIFECYCLESTATE_ACTIVE);
-//				return IFuture.DONE;
-//			}
-//		});
-//		rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED+"."+getId(), 
-//			ChangeEvent.GOALOPTION+"."+getId()}));
-//		ip.getRuleSystem().getRulebase().addRule(rule);
-//		addRule(rule);
-		
-		Method[] ms = getPojoElement().getClass().getDeclaredMethods();
-		Method mcond = null;
-		for(final Method m: ms)
-		{
-			if(m.isAnnotationPresent(GoalMaintainCondition.class))
-				mcond = m; // do later
-			
-			if(m.isAnnotationPresent(GoalTargetCondition.class))
-			{			
-				String[] evs = m.getAnnotation(GoalTargetCondition.class).events();
-				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
-				for(String ev: evs)
-				{
-					addBeliefEvents(ia, events, ev);
-				}
-				Rule<?> rule = new Rule<Void>(getId()+"_goal_target", 
-					new CombinedCondition(new ICondition[]{new MethodCondition(getPojoElement(), m)}), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-					{
-						targetConditionTriggered(ia, event, rule, context);
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
-				addRule(rule);
-				declarative = true;
-			}
-			
-			if(m.isAnnotationPresent(GoalDropCondition.class))
-			{			
-				String[] evs = m.getAnnotation(GoalDropCondition.class).events();
-				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
-				for(String ev: evs)
-				{
-					addBeliefEvents(ia, events, ev);
-				}
-				Rule<?> rule = new Rule<Void>(getId()+"_goal_drop", 
-					new CombinedCondition(new ICondition[]{new MethodCondition(getPojoElement(), m)}), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-					{
-						System.out.println("Goal dropping triggered: "+RGoal.this);
-//						rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-						setException(new GoalFailureException("drop condition: "+m.getName()));
-						setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_FAILED);
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
-				addRule(rule);
-			}
-			
-			if(m.isAnnotationPresent(GoalContextCondition.class))
-			{			
-				String[] evs = m.getAnnotation(GoalContextCondition.class).events();
-				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
-				for(String ev: evs)
-				{
-					addBeliefEvents(ia, events, ev);
-				}
-				
-				Rule<?> rule = new Rule<Void>(getId()+"_goal_suspend", 
-					new CombinedCondition(new ICondition[]{
-						new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED, false),
-						new MethodCondition(getPojoElement(), m, true),
-					}), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-					{
-						System.out.println("Goal suspended: "+RGoal.this);
-						setLifecycleState(ia, GOALLIFECYCLESTATE_SUSPENDED);
-						setState(PROCESSABLEELEMENT_INITIAL);
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
-				addRule(rule);
-				
-				rule = new Rule<Void>(getId()+"_goal_option", 
-					new CombinedCondition(new ICondition[]{
-						new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED),
-						new MethodCondition(getPojoElement(), m),
-					}), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-					{
-						System.out.println("Goal made option: "+RGoal.this);
-						setLifecycleState(ia, GOALLIFECYCLESTATE_OPTION);
-//						setState(ia, PROCESSABLEELEMENT_INITIAL);
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
-				addRule(rule);
-			}
-			
-			if(m.isAnnotationPresent(GoalRecurCondition.class))
-			{			
-				String[] evs = m.getAnnotation(GoalRecurCondition.class).events();
-				List<String> events = readAnnotationEvents(ia, m.getParameterAnnotations());
-				for(String ev: evs)
-				{
-					addBeliefEvents(ia, events, ev);
-				}
-				Rule<?> rule = new Rule<Void>(getId()+"_goal_recur", 
-					new CombinedCondition(new ICondition[]{
-						new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
-						new ProcessingStateCondition(GOALPROCESSINGSTATE_PAUSED),
-						new MethodCondition(getPojoElement(), m),
-					}), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-					{
-						setTriedPlans(null);
-						setApplicablePlanList(null);
-						setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
-				addRule(rule);
-				declarative = true;
-			}
-		}
-		
-		if(mcond!=null)
-		{		
-			String[] evs = mcond.getAnnotation(GoalMaintainCondition.class).events();
-			List<String> events = readAnnotationEvents(ia, mcond.getParameterAnnotations());
-			for(String ev: evs)
-			{
-				addBeliefEvents(ia, events, ev);
-			}
-			
-			Rule<?> rule = new Rule<Void>(getId()+"_goal_maintain", 
-				new CombinedCondition(new ICondition[]{
-					new LifecycleStateCondition(GOALLIFECYCLESTATE_ACTIVE),
-					new ProcessingStateCondition(GOALPROCESSINGSTATE_IDLE),
-					new MethodCondition(getPojoElement(), mcond, true),
-				}), new IAction<Void>()
-			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-				{
-					System.out.println("Goal maintain triggered: "+RGoal.this);
-//					System.out.println("state was: "+getProcessingState());
-					setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
-					return IFuture.DONE;
-				}
-			});
-			rule.setEvents(events);
-			ip.getRuleSystem().getRulebase().addRule(rule);
-			addRule(rule);
-			
-			// if has no own target condition
-			if(!declarative)
-			{
-				// if not has own target condition use the maintain cond
-				rule = new Rule<Void>(getId()+"_goal_target", 
-					new MethodCondition(getPojoElement(), mcond), new IAction<Void>()
-				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-					{
-						targetConditionTriggered(ia, event, rule, context);
-						return IFuture.DONE;
-					}
-				});
-				rule.setEvents(events);
-				ip.getRuleSystem().getRulebase().addRule(rule);
-				addRule(rule);
-			}
-
-			declarative = true;
-			maintain = true;
-		}
-	}
-	
-	/**
-	 *  Read the annotation events from method annotations.
-	 */
-	public static List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
-	{
-		List<String> events = new ArrayList<String>();
-		for(Annotation[] ana: annos)
-		{
-			for(Annotation an: ana)
-			{
-				if(an instanceof jadex.rules.eca.annotations.Event)
-				{
-					String belname = ((jadex.rules.eca.annotations.Event)an).value();
-					addBeliefEvents(ia, events, belname);
-				}
-			}
-		}
-		return events;
-	}
-	
-	/**
-	 * 
-	 */
-	public static void addBeliefEvents(IInternalAccess ia, List<String> events, String belname)
-	{
-		events.add(ChangeEvent.BELIEFCHANGED+"."+belname); // the whole value was changed
-		events.add(ChangeEvent.FACTCHANGED+"."+belname); // property change of a value
-		
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
-		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
-		{
-			events.add(ChangeEvent.FACTADDED+"."+belname);
-			events.add(ChangeEvent.FACTREMOVED+"."+belname);
-		}
-	}
-	
 //	/**
-//	 * 
+//	 *  Add a rule.
 //	 */
-//	public static void addGoalEvents(IInternalAccess ia, List<String> events, String goalname)
+//	protected void addRule(IRule<?> rule)
 //	{
-//		events.add(ChangeEvent.GOALADOPTED+"."+goalname);
-//		events.add(ChangeEvent.GOALDROPPED+"."+goalname);
-//		events.add(ChangeEvent.GOALOPTION+"."+goalname);
-//		events.add(ChangeEvent.GOALSUSPENDED+"."+goalname);
-//		events.add(ChangeEvent.GOALINPROCESS+"."+goalname);
-//		events.add(ChangeEvent.GOALNOTINPROCESS+"."+goalname);
+//		if(rulenames==null)
+//			rulenames = new ArrayList<String>();
+//		rulenames.add(rule.getName());
 //	}
 	
-	/**
-	 * 
-	 */
-	public static List<String> getGoalEvents()
-	{
-		List<String> events = new ArrayList<String>();
-		events.add(ChangeEvent.GOALADOPTED);
-		events.add(ChangeEvent.GOALDROPPED);
-		events.add(ChangeEvent.GOALOPTION);
-		events.add(ChangeEvent.GOALSUSPENDED);
-		events.add(ChangeEvent.GOALINPROCESS);
-		events.add(ChangeEvent.GOALNOTINPROCESS);
-		return events;
-	}
-	
-	/**
-	 *  Add a rule.
-	 */
-	protected void addRule(IRule<?> rule)
-	{
-		if(rulenames==null)
-			rulenames = new ArrayList<String>();
-		rulenames.add(rule.getName());
-	}
-	
-	/**
-	 *  Unobserve a runtime goal.
-	 */
-	public void unobserveGoal(final IInternalAccess ia)
-	{
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			
-		ip.getRuleSystem().unobserveObject(getPojoElement());
-		
-		if(rulenames!=null)
-		{
-			for(String rulename: rulenames)
-			{
-				ip.getRuleSystem().getRulebase().removeRule(rulename);
-			}
-		}
-	}
+//	/**
+//	 *  Unobserve a runtime goal.
+//	 */
+//	public void unobserveGoal(final IInternalAccess ia)
+//	{
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//			
+//		ip.getRuleSystem().unobserveObject(getPojoElement());
+//		
+//		if(rulenames!=null)
+//		{
+//			for(String rulename: rulenames)
+//			{
+//				ip.getRuleSystem().getRulebase().removeRule(rulename);
+//			}
+//		}
+//	}
 
 	/**
 	 * 
@@ -883,6 +526,8 @@ public class RGoal extends RProcessableElement
 	 */
 	protected void removeInhibitor(RGoal inhibitor, IInternalAccess ia)
 	{
+		System.out.println("rem inhibit: "+getId()+" "+inhibitor.getId());
+		
 		if(inhibitors!=null)
 		{
 			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
@@ -998,7 +643,7 @@ public class RGoal extends RProcessableElement
 	 */
 	public boolean onActivate()
 	{
-		return !maintain; // for perform, achieve, query
+		return !getMGoal().isMaintain(); // for perform, achieve, query
 	}
 	
 	/**
@@ -1040,7 +685,7 @@ public class RGoal extends RProcessableElement
 	 */
 	public boolean isProceduralGoal()
 	{
-		return !declarative;
+		return !getMGoal().isDeclarative();
 	}
 	
 	/**
@@ -1049,7 +694,7 @@ public class RGoal extends RProcessableElement
 	public void targetConditionTriggered(IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
 	{
 		System.out.println("Goal target triggered: "+RGoal.this);
-		if(maintain)
+		if(getMGoal().isMaintain())
 		{
 			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_IDLE);
 		}

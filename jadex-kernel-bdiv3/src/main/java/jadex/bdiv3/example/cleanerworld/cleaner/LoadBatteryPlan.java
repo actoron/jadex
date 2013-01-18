@@ -77,6 +77,7 @@ public class LoadBatteryPlan
 								}
 								if(charge>=1.0)
 								{
+									System.out.println("finished loading");
 									ret.setResult(null);
 								}
 								else
