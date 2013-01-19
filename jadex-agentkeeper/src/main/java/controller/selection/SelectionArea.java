@@ -10,6 +10,9 @@ public class SelectionArea
 {
     public Vector2f start = new Vector2f();
     public Vector2f end = new Vector2f();
+    public float delta_xaxis;
+    public float delta_yaxis;
+    public float scale = 1;
 
     public SelectionArea(Vector2f start, Vector2f end)
     {
@@ -18,11 +21,14 @@ public class SelectionArea
     }
     /**
      * For single square use only
+     * @param vector2f 
+     * @param appScaled 
      */
-    public SelectionArea(Vector2f pos)
+    public SelectionArea(float appScaled, Vector2f start, Vector2f end)
     {
-        this.start = pos;
-        this.end = pos;
+        this.start = start;
+        this.end = end;
+        this.scale = appScaled;
     }
 
     /**
@@ -56,4 +62,33 @@ public class SelectionArea
     {
         this.end = end;
     }
+	/**
+	 * @return the scale
+	 */
+	public float getScale()
+	{
+		return scale;
+	}
+	/**
+	 * @param scale the scale to set
+	 */
+	public void setScale(float scale)
+	{
+		this.scale = scale;
+	}
+	/**
+	 * @return the delta_xaxis
+	 */
+	public float getDeltaXaxis()
+	{
+		return end.x-start.x;
+	}
+	/**
+	 * @return the delta_yaxis
+	 */
+	public float getDeltaYaxis()
+	{
+		return end.y-start.y;
+	}
+
 }

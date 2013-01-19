@@ -1,5 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection;
 
+import jadex.extension.envsupport.math.IVector3;
+import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 
@@ -70,11 +72,11 @@ public class SelectionLogic
 		return ret;
 	}
 
-	public Object computeSelectedId(Node node)
+	public Object computeSelectedId(Node collidenode)
 	{
 		Object ret = -1;
 		
-		CollisionResults results = fireRaytrace(node);
+		CollisionResults results = fireRaytrace(collidenode);
 		if (results.size() > 0) {
 			
 			Geometry contact = results.getClosestCollision().getGeometry();
@@ -86,6 +88,22 @@ public class SelectionLogic
 			}
 			
 			ret = parent.getName();
+			
+		}
+		return ret;
+	}
+
+	public IVector3 getMouseContactPoint(Node collidenode)
+	{
+		IVector3 ret = null;
+		CollisionResults results = fireRaytrace(collidenode);
+
+		if (results.size() > 0) {
+			
+			Vector3f contact = results.getClosestCollision().getContactPoint().divideLocal(this.app.getAppScaled());
+			
+			ret = new Vector3Double(contact.getX(), contact.getY(), contact.getZ());
+		
 			
 		}
 		return ret;

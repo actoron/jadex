@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection;
 
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
@@ -32,7 +33,6 @@ public class SelectionControl extends AbstractAppState
 
 	public void initialize(AppStateManager stateManager, Application app)
 	{
-		System.out.println("inizialize new Selection Control");
 		super.initialize(stateManager, app);
 		this.app = (MonkeyApp)app;
 		this.rootNode = this.app.getRootNode();
@@ -43,6 +43,14 @@ public class SelectionControl extends AbstractAppState
 		this.selectionLogic = new SelectionLogic(stateManager, app);
 	}
 
+	
+	
+	public IVector3 getMouseContactPoint()
+	{
+		return selectionLogic.getMouseContactPoint(rootNode);
+	}
+	
+	//TODO: still big hack, todo: make it more general
 	public Vector3Int getSelectedWorldCoord()
 	{
 		return selectionLogic.getSelectedVector3Int((Node)this.rootNode.getChild(StringNames.BATCH_NODE));

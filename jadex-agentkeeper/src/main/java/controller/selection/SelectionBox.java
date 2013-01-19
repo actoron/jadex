@@ -56,7 +56,7 @@ public class SelectionBox extends AbstractBox
     public SelectionBox(float x, float y, float z)
     {
         super();
-        updateGeometry(Vector3f.ZERO, x, y, z);
+        updateGeometry(Vector3f.ZERO, x, y*1.5f, z);
         geo = new Geometry("SelectionBox", this);
     }
 
@@ -76,7 +76,7 @@ public class SelectionBox extends AbstractBox
     public SelectionBox(Vector3f center, float x, float y, float z)
     {
         super();
-        updateGeometry(center, x, y, z);
+        updateGeometry(center, x, y*1.5f, z);
         geo = new Geometry("SelectionBox", this);
     }
 
@@ -178,10 +178,10 @@ public class SelectionBox extends AbstractBox
     public void updateSelectionBoxVertices(SelectionArea selectionArea)
     {
         if(selectionArea != null) {
-            selectionArea.start.x = selectionArea.start.x - 0.5f;
-            selectionArea.start.y = selectionArea.start.y - 0.5f;
-            selectionArea.end.x = selectionArea.end.x + 0.5f;
-            selectionArea.end.y = selectionArea.end.y + 0.5f;
+            selectionArea.start.x = selectionArea.start.x - selectionArea.getScale()/2;
+            selectionArea.start.y = selectionArea.start.y - selectionArea.getScale()/2;
+            selectionArea.end.x = selectionArea.end.x + selectionArea.getScale()/2;
+            selectionArea.end.y = selectionArea.end.y + selectionArea.getScale()/2;
         }else {
             selectionArea = new SelectionArea(new Vector2f(0, 0), new Vector2f(0, 0));
         }

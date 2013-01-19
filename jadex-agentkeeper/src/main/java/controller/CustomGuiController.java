@@ -29,7 +29,7 @@ public class CustomGuiController extends GuiController
 
 	private SpaceObject			selected;
 
-	private ISpaceController			spaceController;
+	private ISpaceController	spaceController;
 
 	private UserEingabenManager	usermanager;
 
@@ -44,9 +44,8 @@ public class CustomGuiController extends GuiController
 		this.usermanager = (UserEingabenManager)spacecontroller.getProperty("uem");
 
 
-
 	}
-	
+
 
 	private void setupListener()
 	{
@@ -60,11 +59,15 @@ public class CustomGuiController extends GuiController
 				if(name.equals("Leftclick") && keyPressed)
 				{
 
-					Vector3Int selectedworldcoord = ((MonkeyApp)app).getSelectedWorldCoord();
-					if(selectedworldcoord != null)
-					{
-						usermanager.userAktion(selectedworldcoord.getXAsInteger(), selectedworldcoord.getZAsInteger(), UserEingabenManager.ABREISSEN);
-					}
+				}
+				else if(name.equals("Leftclick") && !keyPressed)
+				{
+//					Vector3Int selectedworldcoord = ((MonkeyApp)app).getSelectedWorldCoord();
+//					if(selectedworldcoord != null)
+//					{
+//						usermanager.userAktion(selectedworldcoord.getXAsInteger(), selectedworldcoord.getZAsInteger(), UserEingabenManager.ABREISSEN);
+//					}
+					
 
 				}
 
@@ -95,7 +98,8 @@ public class CustomGuiController extends GuiController
 
 	public void options()
 	{
-		spaceController.getSpaceObjectsByGridPosition(new Vector2Int(10, 10), null);
+		// spaceController.getSpaceObjectsByGridPosition(new Vector2Int(10, 10),
+		// null);
 
 
 	}

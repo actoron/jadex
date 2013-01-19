@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
 import jadex.extension.envsupport.environment.ISpaceController;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
@@ -125,6 +126,11 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	public Object getSelectedSpaceObjectId()
 	{
 		return selectionControl.computeSelectedId();
+	}
+	
+	public IVector3 getWorldContactPoint()
+	{
+		return selectionControl.getMouseContactPoint();
 	}
 	
 
