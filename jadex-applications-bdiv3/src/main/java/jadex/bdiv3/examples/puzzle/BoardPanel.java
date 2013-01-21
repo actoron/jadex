@@ -192,7 +192,7 @@ public class BoardPanel extends JPanel
 		if(board.getLastMove()!=null)
 		{
 			// Display new move.
-			if(movecnt<board.getMoves().size())
+			if(movecnt<=board.getMoves().size())
 			{
 				last	= board.getLastMove();
 				g.setColor(Color.green);
