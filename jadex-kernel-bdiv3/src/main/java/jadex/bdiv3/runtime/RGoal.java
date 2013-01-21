@@ -341,7 +341,7 @@ public class RGoal extends RProcessableElement
 		
 		if(GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
 		{
-			System.out.println("dropping: "+getId());
+//			System.out.println("dropping: "+getId());
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 			abortPlans();

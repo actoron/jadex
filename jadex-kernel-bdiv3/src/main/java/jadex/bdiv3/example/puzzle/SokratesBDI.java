@@ -52,17 +52,11 @@ public class SokratesBDI
 	 *  Setup the gui and start playing.
 	 */
 	@AgentBody
-	public IFuture<Void>	body(final BDIAgent agent)
+	public IFuture<Void>	body(BDIAgent agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				new BoardGui(agent.getExternalAccess(), board);
-			}
-		});
+
+		createGui(agent);
 		
 		System.out.println("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
@@ -95,6 +89,20 @@ public class SokratesBDI
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Create the GUI (if any).
+	 */
+	protected void	createGui(final BDIAgent agent)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				new BoardGui(agent.getExternalAccess(), board);
+			}
+		});
 	}
 	
 	//-------- goals --------
@@ -145,12 +153,12 @@ public class SokratesBDI
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		Move	move	= (Move)((PlanCandidate)rplan.getCandidate()).getParameters().get("move");
+		final Move	move	= (Move)((PlanCandidate)rplan.getCandidate()).getParameters().get("move");
 		triescnt++;
 		print("Trying "+move+" ("+triescnt+") ", depth);
 		depth++;
 		board.move(move);
-		
+				
 		rplan.waitFor(delay)
 			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -162,6 +170,14 @@ public class SokratesBDI
 					public void customResultAvailable(MoveGoal result)
 					{
 						ret.setResult(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						print("Failed "+move, depth);
+						board.takeback();
+						depth--;
+						rplan.waitFor(delay).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}

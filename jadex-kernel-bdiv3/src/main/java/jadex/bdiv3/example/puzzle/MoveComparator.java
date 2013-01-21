@@ -51,13 +51,14 @@ public class MoveComparator implements Comparator<Move>
 		boolean same1 = board.wasLastMoveWhite()==board.getPiece(move1.getStart()).isWhite();
 		boolean same2 = board.wasLastMoveWhite()==board.getPiece(move2.getStart()).isWhite();
 		
+		int compare_same	= same1 && !same2 ? -1
+				: same2 && !same1 ? 1
+				: 0;
+		
 		int	compare_long	= move1.isJumpMove() && !move2.isJumpMove() ? -1
 							: move2.isJumpMove() && !move1.isJumpMove() ? 1
 							: 0;
 		
-		int compare_same	= same1 && !same2 ? -1
-							: same2 && !same1 ? 1
-							: 0;
 		int	ret	= 0;
 		
 		if(STRATEGY_LONG.equals(strategy))
@@ -66,11 +67,13 @@ public class MoveComparator implements Comparator<Move>
 		}
 		else if(STRATEGY_SAME_LONG.equals(strategy))
 		{
-			ret	= compare_long!=0 ? compare_long : compare_same;
+			ret	= compare_same!=0 ? compare_same : compare_long;
+//			ret	= compare_long!=0 ? compare_long : compare_same;
 		}
 		else if(STRATEGY_ALTER_LONG.equals(strategy))
 		{
-			ret	= compare_long!=0 ? compare_long : -compare_same;
+			ret	= compare_same!=0 ? -compare_same : compare_long;
+//			ret	= compare_long!=0 ? compare_long : -compare_same;
 		}
 		
 		return ret;
