@@ -1,4 +1,4 @@
-package jadex.bdiv3.example.puzzle;
+package jadex.bdiv3.examples.puzzle;
 
 import jadex.commons.beans.PropertyChangeListener;
 import java.util.List;

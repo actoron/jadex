@@ -1,4 +1,4 @@
-package jadex.bdiv3.example.puzzle;
+package jadex.bdiv3.examples.puzzle;
 
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.gui.SGUI;
@@ -32,9 +32,9 @@ public class BoardPanel extends JPanel
 	/** The image icons. */
 	public static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"white_piece",	SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/example/puzzle/images/white_piece.png"),
-		"red_piece",	SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/example/puzzle/images/red_piece.png"),
-		"empty_field", SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/example/puzzle/images/empty_field.png")
+		"white_piece",	SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/examples/puzzle/images/white_piece.png"),
+		"red_piece",	SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/examples/puzzle/images/red_piece.png"),
+		"empty_field", SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/examples/puzzle/images/empty_field.png")
 	});
 
 	//-------- attributes --------

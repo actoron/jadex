@@ -63,6 +63,7 @@
 
 		<module>jadex-applib-bdi</module>
 		<module>jadex-applications-bdi</module>
+		<module>jadex-applications-bdiv3</module>
 		<module>jadex-applications-micro</module>
 		<module>jadex-applications-bpmn</module>
 		<module>jadex-applications-bdibpmn</module>
