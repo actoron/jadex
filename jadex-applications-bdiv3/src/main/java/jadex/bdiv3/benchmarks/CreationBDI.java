@@ -1,16 +1,24 @@
 package jadex.bdiv3.benchmarks;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.RPlan;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -73,7 +81,7 @@ public class CreationBDI
 		{
 			name	= name.substring(0, index);
 		}
-		if(num!=1)
+		if(num>0)
 		{
 			name	+= "Peer_#"+num;
 		}
@@ -137,7 +145,7 @@ public class CreationBDI
 		{
 			getClock().addResultListener(new DefaultResultListener<IClockService>()
 			{
-				public void resultAvailable(IClockService clock)
+				public void resultAvailable(final IClockService clock)
 				{
 					final long end = clock.getTime();
 					
@@ -158,42 +166,120 @@ public class CreationBDI
 					final double pera = dur/max;
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
-//					// Use initial component to kill others
-//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-//					{
-//						public void resultAvailable(IComponentManagementService cms)
-//						{
-//							String	initial	= createPeerName(1, agent.getComponentIdentifier());
-//							IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
-//							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
-//							{
-//								public void resultAvailable(IExternalAccess exta)
-//								{
-//									exta.scheduleStep(new IComponentStep<Void>()
-//									{
-//										@Classname("deletePeers")
-//										public IFuture<Void> execute(IInternalAccess ia)
-//										{
-//											((PojoAgentCreationAgent)((PojoMicroAgent)ia).getPojoAgent())
-//												.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
-//											return IFuture.DONE;
-//										}
-//									});
-//								}
-//							});
-//						}
-//					});
+					// Use initial component to kill others
+					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+					{
+						public void resultAvailable(IComponentManagementService cms)
+						{
+							String	initial	= createPeerName(0, agent.getComponentIdentifier());
+							IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							{
+								public void resultAvailable(IExternalAccess exta)
+								{
+									exta.scheduleStep(new IComponentStep<Void>()
+									{
+										@Classname("deletePeers")
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											((CreationBDI)((PojoBDIAgent)ia).getPojoAgent())
+												.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
+											return IFuture.DONE;
+										}
+									});
+								}
+							});
+						}
+					});
 				}
 			});
 		}
 	}
+	
+	/**
+	 *  Delete all peers from last-1 to first.
+	 *  @param cnt The highest number of the agent to kill.
+	 */
+	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
+		final long omem, final double upera)
+	{
+		final String name = createPeerName(cnt, agent.getComponentIdentifier());
+		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+		{
+			public void resultAvailable(IComponentManagementService cms)
+			{
+				IComponentIdentifier aid = new ComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+				{
+					public void resultAvailable(Map<String, Object> result)
+					{
+						System.out.println("Successfully destroyed peer: "+name);
+						
+						if(cnt>1)
+						{
+							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
+						}
+						else
+						{
+							killLastPeer(killstarttime, dur, pera, omem, upera);
+						}
+					}
+				});
+			}
+		});
+	}
 
+	/**
+	 *  Kill the last peer and print out the results.
+	 */
+	protected void killLastPeer(final long killstarttime, final double dur, final double pera, 
+		final long omem, final double upera)
+	{
+		getClock().addResultListener(new DefaultResultListener<IClockService>()
+		{
+			public void resultAvailable(IClockService cs)
+			{
+				long killend = cs.getTime();
+				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+				double killdur = ((double)killend-killstarttime)/1000.0;
+				final double killpera = killdur/(max-1);
+				
+				Runtime.getRuntime().gc();
+				try
+				{
+					Thread.sleep(500);
+				}
+				catch(InterruptedException e){}
+				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+				
+				System.out.println("\nCumulated results:");
+				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+				System.out.println("Still used memory: "+stillused+"kB.");
+				
+				agent.setResultValue("microcreationtime", new Tuple(""+pera, "s"));
+				agent.setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.setResultValue("micromem", new Tuple(""+upera, "kb"));
+				agent.killComponent();
+			}
+		});
+	}
+	
 	/**
 	 *  Get the clock service.
 	 */
 	protected IFuture<IClockService> getClock()
 	{
 		return agent.getServiceContainer().searchServiceUpwards(IClockService.class);
+	}
+
+	/**
+	 *  Get the cms.
+	 */
+	protected IFuture<IComponentManagementService>	getCMS()
+	{
+		return agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class);
 	}
 
 	
