@@ -385,7 +385,7 @@ public class RPlan extends RElement
 		{
 			public void resultAvailable(Void result)
 			{
-				if(isAborted() || isFailed())
+				if(!rgoal.isFinished() && isAborted() || isFailed())
 				{
 					ret.setException(new PlanFailureException());
 				}

@@ -9,10 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Deliberation
 {
-	/**
-	 *  The cardinality.
-	 */
-	public int cardinality() default -1;
+//	/**
+//	 *  The cardinality.
+//	 */
+//	public int cardinality() default -1;
 	
 	/**
 	 *  The inhibited goal.

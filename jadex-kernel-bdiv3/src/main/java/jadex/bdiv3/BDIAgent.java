@@ -177,21 +177,24 @@ public class BDIAgent extends MicroAgent
 			rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
 			
 			// observe new value for property changes
-			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+			if(val!=null)
 			{
-				public IFuture<IEvent> execute(final PropertyChangeEvent event)
+				rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
 				{
-					return scheduleStep(new IComponentStep<IEvent>()
+					public IFuture<IEvent> execute(final PropertyChangeEvent event)
 					{
-						public IFuture<IEvent> execute(IInternalAccess ia)
+						return scheduleStep(new IComponentStep<IEvent>()
 						{
-//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
-							return new Future<IEvent>(ev);
-						}
-					});
-				}
-			});
+							public IFuture<IEvent> execute(IInternalAccess ia)
+							{
+	//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+								Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+								return new Future<IEvent>(ev);
+							}
+						});
+					}
+				});
+			}
 			
 			// initiate a step to reevaluate the conditions
 			scheduleStep(new IComponentStep()

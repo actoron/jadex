@@ -2,7 +2,10 @@ package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -140,8 +143,10 @@ public class RCapability extends RElement
 		if(goals.contains(goal))
 			throw new RuntimeException("Goal already contained: "+goal);
 		
-		goal.setLifecycleState(RGoal.GOALLIFECYCLESTATE_ADOPTED);
 		goals.add(goal);
+		
+//		if(goal.getPojoElement().getClass().getName().indexOf("AchieveCleanup")!=-1)
+//			System.out.println("adopted new goal: "+goal);
 	}
 	
 	/**
@@ -179,5 +184,31 @@ public class RCapability extends RElement
 		{
 			plans.remove(plan);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void dumpGoals(IInternalAccess ia)
+	{
+		IComponentStep<Void> step = new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if(goals!=null)
+				{
+					System.out.println("--------");
+					for(RGoal goal: goals)
+					{
+						System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState());
+						System.out.println(goal.inhibitors);
+						System.out.println("--------");
+					}
+				}
+				ia.waitForDelay(500, this);
+				return IFuture.DONE;
+			}
+		};
+		ia.getExternalAccess().scheduleStep(step);
 	}
 }

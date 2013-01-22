@@ -9,8 +9,8 @@ import java.util.Set;
  */
 public class MDeliberation
 {
-	/** The cardinality. */
-	protected int cardinality;
+//	/** The cardinality. */
+//	protected int cardinality;
 	
 	/** The inhibited goal types. */
 	protected Set<MGoal> inhibitions;
@@ -25,9 +25,10 @@ public class MDeliberation
 	/**
 	 *  Create a new deliberation.
 	 */
-	public MDeliberation(int cardinality, Set<String> inhnames, Map<String, MethodInfo> inhmethods)
+//	public MDeliberation(int cardinality, Set<String> inhnames, Map<String, MethodInfo> inhmethods)
+	public MDeliberation(Set<String> inhnames, Map<String, MethodInfo> inhmethods)
 	{
-		this.cardinality = cardinality;
+//		this.cardinality = cardinality;
 		this.inhnames = inhnames;
 		this.inhmethods = inhmethods;
 	}
@@ -47,23 +48,23 @@ public class MDeliberation
 		}
 	}
 
-	/**
-	 *  Get the cardinality.
-	 *  @return The cardinality.
-	 */
-	public int getCardinality()
-	{
-		return cardinality;
-	}
-
-	/**
-	 *  Set the cardinality.
-	 *  @param cardinality The cardinality to set.
-	 */
-	public void setCardinality(int cardinality)
-	{
-		this.cardinality = cardinality;
-	}
+//	/**
+//	 *  Get the cardinality.
+//	 *  @return The cardinality.
+//	 */
+//	public int getCardinality()
+//	{
+//		return cardinality;
+//	}
+//
+//	/**
+//	 *  Set the cardinality.
+//	 *  @param cardinality The cardinality to set.
+//	 */
+//	public void setCardinality(int cardinality)
+//	{
+//		this.cardinality = cardinality;
+//	}
 
 	/**
 	 *  Get the inhibited.

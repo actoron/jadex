@@ -346,21 +346,23 @@ public class BDIClassReader extends MicroClassReader
 					}
 				}
 				MDeliberation mdel = null;
-				if(del.cardinality()>0 || inhnames!=null)
+//				if(del.cardinality()>0 || inhnames!=null)
+				if(inhnames!=null)
 				{
 					// scan for instance delib methods
 					Map<String, MethodInfo> inhms = new HashMap<String, MethodInfo>();
 					Method[] ms = gs[j].getDeclaredMethods();
 					for(Method m: ms)
 					{
-						GoalInhibit ginh = m.getAnnotation(GoalInhibit.class);
-						if(ginh!=null)
+						if(isAnnotationPresent(m, GoalInhibit.class, cl))
 						{
+							GoalInhibit ginh = getAnnotation(m, GoalInhibit.class, cl);
 							Class<?> gcl = ginh.value();
 							inhms.put(gcl.getName(), new MethodInfo(m));
 						}
 					}
-					mdel = new MDeliberation(del.cardinality(), inhnames, inhms.isEmpty()? null: inhms);
+//					mdel = new MDeliberation(del.cardinality(), inhnames, inhms.isEmpty()? null: inhms);
+					mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms);
 				}
 				
 				mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 

@@ -24,6 +24,10 @@ public class ChangeEvent
 	/** Event type that a goal has been removed. */
 	public static final String GOALDROPPED = "goaldropped";
 
+	
+	/** Event type that a goal has been added. */
+	public static final String GOALACTIVE = "goaladopted";
+	
 	/** Event type that a goal has been optionized. */
 	public static final String GOALOPTION = "goaloption";
 	

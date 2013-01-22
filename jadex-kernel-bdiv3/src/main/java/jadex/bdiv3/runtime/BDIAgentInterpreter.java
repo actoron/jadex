@@ -16,8 +16,6 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
-import jadex.bdiv3.runtime.RGoal.LifecycleStateCondition;
-import jadex.bdiv3.runtime.RGoal.ProcessingStateCondition;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -39,7 +37,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
-import jadex.rules.eca.Event;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -587,7 +584,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{	
 									if(executeGoalMethod(m, goal, event))
 									{
-										System.out.println("Goal made option: "+goal);
+//										System.out.println("Goal made option: "+goal);
 										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
 //										setState(ia, PROCESSABLEELEMENT_INITIAL);
 									}
@@ -772,21 +769,49 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// add/rem goal inhibitor rule
 		if(!goals.isEmpty())
 		{
-			List<String> events = getGoalEvents();
+			List<String> events = new ArrayList<String>();
+			events.add(ChangeEvent.GOALADOPTED);
 			
-			Rule<Void> rule = new Rule<Void>("goal_addinhibitor", 
+			Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
+				ICondition.TRUE_CONDITION, new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					// create the complete inhibitorset for a newly adopted goal
+					
+					RGoal goal = (RGoal)event.getContent();
+					for(RGoal other: getCapability().getGoals())
+					{
+//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
+//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
+						if(other.inhibits(goal, getInternalAccess()))
+						{
+							goal.addInhibitor(other, getInternalAccess());
+						}
+					}
+					
+//					if(goal.inhibitors!=null && goal.inhibitors.size()>0)
+//						System.out.println("initial inhibitors of: "+goal+" "+goal.inhibitors);
+					return IFuture.DONE;
+				}
+			});
+			rule.setEvents(events);
+			getRuleSystem().getRulebase().addRule(rule);
+			
+			events = getGoalEvents();
+			rule = new Rule<Void>("goal_addinhibitor", 
 				new ICondition()
 				{
 					public boolean evaluate(IEvent event)
 					{
-						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
-							System.out.println("maintain");
+//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
+//							System.out.println("maintain");
 						
 						// return true when other goal is active and inprocess
 						boolean ret = false;
 						String type = event.getType();
 						RGoal goal = (RGoal)event.getContent();
-						ret = type.startsWith(ChangeEvent.GOALADOPTED) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
+						ret = type.startsWith(ChangeEvent.GOALACTIVE) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
 							|| (type.startsWith(ChangeEvent.GOALINPROCESS) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
 						return ret;
 					}
@@ -804,7 +829,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							List<RGoal> goals = getCapability().getGoals(inh);
 							for(RGoal other: goals)
 							{
-								if(goal.inhibits(other, getInternalAccess()))
+								if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
 								{
 									other.addInhibitor(goal, getInternalAccess());
 								}
@@ -844,10 +869,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						Set<MGoal> inhs = delib.getInhibitions();
 						for(MGoal inh: inhs)
 						{
+//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
+//								System.out.println("reminh: "+goal);
+							
 							List<RGoal> goals = getCapability().getGoals(inh);
 							for(RGoal other: goals)
 							{
-								other.removeInhibitor(goal, getInternalAccess());
+								if(goal.equals(other))
+									continue;
+								
+								if(other.isInhibitedBy(goal))
+									other.removeInhibitor(goal, getInternalAccess());
 							}
 						}
 					}
@@ -889,6 +921,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
+//					System.out.println("reactivating: "+goal);
 					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_ACTIVE);
 					return IFuture.DONE;
 				}
@@ -897,13 +930,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			getRuleSystem().getRulebase().addRule(rule);
 		}
 		
-		// add goal type specific rules
-		
-		
-		
-		
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
+	
+//		getCapability().dumpGoals(getInternalAccess());
 	}
 	
 	/**
@@ -997,19 +1027,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public static void addGoalEvents(IInternalAccess ia, List<String> events, String goalname)
-//	{
-//		events.add(ChangeEvent.GOALADOPTED+"."+goalname);
-//		events.add(ChangeEvent.GOALDROPPED+"."+goalname);
-//		events.add(ChangeEvent.GOALOPTION+"."+goalname);
-//		events.add(ChangeEvent.GOALSUSPENDED+"."+goalname);
-//		events.add(ChangeEvent.GOALINPROCESS+"."+goalname);
-//		events.add(ChangeEvent.GOALNOTINPROCESS+"."+goalname);
-//	}
-	
 	/**
 	 * 
 	 */
@@ -1018,8 +1035,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		List<String> events = new ArrayList<String>();
 		events.add(ChangeEvent.GOALADOPTED);
 		events.add(ChangeEvent.GOALDROPPED);
+		
 		events.add(ChangeEvent.GOALOPTION);
+		events.add(ChangeEvent.GOALACTIVE);
 		events.add(ChangeEvent.GOALSUSPENDED);
+		
 		events.add(ChangeEvent.GOALINPROCESS);
 		events.add(ChangeEvent.GOALNOTINPROCESS);
 		return events;
