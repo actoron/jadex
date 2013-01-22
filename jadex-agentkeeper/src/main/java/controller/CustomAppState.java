@@ -183,7 +183,7 @@ public class CustomAppState extends AbstractAppState
 				}
 				catch(NumberFormatException e)
 				{
-					System.out.println("cant parse: " + id);
+//					System.out.println("cant parse: " + id);
 					idlong = -1;
 				}
 
@@ -239,7 +239,7 @@ public class CustomAppState extends AbstractAppState
 		
 		
 		Vector2f click2d = inputManager.getCursorPosition().clone();
-		System.out.println("click2d " + click2d);
+//		System.out.println("click2d " + click2d);
 //		 float border = this.app.getViewPort().getCamera().getHeight()*0.15f;
 		 
 		
