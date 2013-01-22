@@ -132,30 +132,11 @@ public class CleanerBDI
 		}
 	}
 	
+	// currently creates too many goals and abandons them with during adopt with unique
 //	@Goal(unique=true, deliberation=@Deliberation(cardinality=1, inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
 	@Goal(unique=true, deliberation=@Deliberation(inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
 	public class AchieveCleanup
 	{
-		@GoalInhibit(AchieveCleanup.class)
-		protected boolean inhibitAchieveCleanUp(AchieveCleanup other)
-		{
-			boolean ret = getWaste().equals(getCarriedWaste());
-			
-			if(!ret)
-			{
-				double d1 = getMyLocation().getDistance(waste.getLocation());
-				double d2 = getMyLocation().getDistance(other.getWaste().getLocation());
-				ret = d1<d2;
-				if(!ret && d1==d2)
-				{
-					ret = hashCode()<other.hashCode();
-				}
-			}
-				
-//			System.out.println("inh methodb: "+this+" "+other+" "+ret);
-			return ret;
-		}
-		
 		protected Waste waste;
 		
 		@GoalCreationCondition(events="wastes")
@@ -198,6 +179,26 @@ public class CleanerBDI
 				}
 			}
 			
+			return ret;
+		}
+		
+		@GoalInhibit(AchieveCleanup.class)
+		protected boolean inhibitAchieveCleanUp(AchieveCleanup other)
+		{
+			boolean ret = getWaste().equals(getCarriedWaste());
+			
+			if(!ret)
+			{
+				double d1 = getMyLocation().getDistance(waste.getLocation());
+				double d2 = getMyLocation().getDistance(other.getWaste().getLocation());
+				ret = d1<d2;
+				if(!ret && d1==d2)
+				{
+					ret = hashCode()<other.hashCode();
+				}
+			}
+				
+//			System.out.println("inh methodb: "+this+" "+other+" "+ret);
 			return ret;
 		}
 
@@ -314,7 +315,7 @@ public class CleanerBDI
 		
 		public AchieveMoveTo(Location location)
 		{
-			System.out.println("created: "+location);
+//			System.out.println("created: "+location);
 			this.location = location;
 		}
 		
