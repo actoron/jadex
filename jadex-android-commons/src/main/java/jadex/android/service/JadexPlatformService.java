@@ -4,12 +4,8 @@ import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -18,7 +14,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +41,7 @@ public class JadexPlatformService extends Service
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
+		platformKernels = JadexPlatformManager.DEFAULT_KERNELS;
 	}
 
 	@Override

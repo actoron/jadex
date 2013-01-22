@@ -47,6 +47,24 @@ public class JadexPlatformManager
 	
 	public static final String[] DEFAULT_KERNELS = new String[]
 	{ KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN };
+	
+	public static final String DEFAULT_OPTIONS = 
+			"-logging_level java.util.logging.Level.INFO" + 
+			" -extensions null" + 
+			" -awareness false" + 
+			" -wspublish false" + 
+			" -rspublish false" + 
+			" -android true" +  
+			" -binarymessages true" +
+			" -conf jadex.platform.PlatformAgent" +
+			// " -tcptransport false" +
+			// " -niotcptransport false" +
+			// " -relaytransport true" +
+			// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
+			// +
+			" -autoshutdown false" + 
+			" -saveonexit true" +
+			" -gui false";
 
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
@@ -159,18 +177,12 @@ public class JadexPlatformManager
 				}
 				kernelString.append("\"");
 				
-				final String defOptions = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -awareness false" + " -wspublish false" + " -rspublish false" + " -android true" + " -kernels "
-						+ kernelString.toString() + " -binarymessages true" +
-						" -conf jadex.platform.PlatformAgent" +
-						// " -tcptransport false" +
-						// " -niotcptransport false" +
-						// " -relaytransport true" +
-						// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
-						// +
-						// " -saveonexit false -gui false" +
-						" -autoshutdown false" + " -platformname " + (platformId != null ? platformId : getRandomPlatformID()) + " -saveonexit true -gui false" + " ";
+				final String usedOptions = DEFAULT_OPTIONS 
+						+ " -kernels " + kernelString.toString() 
+						+ " -platformname " + (platformId != null ? platformId : getRandomPlatformID()) 
+						+ (options == null ? "" : " " + options); 
 				
-				IFuture<IExternalAccess> future = Starter.createPlatform((defOptions + options).split("\\s+"));
+				IFuture<IExternalAccess> future = Starter.createPlatform((usedOptions).split("\\s+"));
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result)
