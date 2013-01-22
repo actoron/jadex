@@ -34,43 +34,43 @@ import controller.selection.SelectionBox;
 public class CustomAppState extends AbstractAppState
 {
 
-	private MonkeyApp		app;
-	
-	private MonkeyApp		monkeyapp;
+	private MonkeyApp			app;
 
-	private Node			rootNode;
+	private MonkeyApp			monkeyapp;
 
-	private AssetManager	assetManager;
+	private Node				rootNode;
 
-	private AppStateManager	stateManager;
+	private AssetManager		assetManager;
 
-	private InputManager	inputManager;
+	private AppStateManager		stateManager;
 
-	private ViewPort		viewPort;
-	
-	private DirectionalLight			dl;
-	
-	private ISpaceController			spaceController;
-	
+	private InputManager		inputManager;
+
+	private ViewPort			viewPort;
+
+	private DirectionalLight	dl;
+
+	private ISpaceController	spaceController;
+
 	private SpaceObject			selected;
 
 	protected SelectionBox		selectionBox;
-	
-	private Geometry				wireBoxGeo;
-	private WireBox wireBox;
-	
-	private float appScaled;
-	
-	protected Vector2f selectionStart = new Vector2f(Vector2f.ZERO);
-	
-	protected SelectionArea selectionArea;
-	
-	CustomAppStateKeyListener listener;
-	
-	Line line1;
-	
-	Geometry geoline1;
-	
+
+	private Geometry			wireBoxGeo;
+
+	private WireBox				wireBox;
+
+	private float				appScaled;
+
+	protected Vector2f			selectionStart	= new Vector2f(Vector2f.ZERO);
+
+	protected SelectionArea		selectionArea;
+
+	CustomAppStateKeyListener	listener;
+
+	Line						line1;
+
+	Geometry					geoline1;
 
 
 	public void initialize(AppStateManager stateManager, Application app)
@@ -85,88 +85,102 @@ public class CustomAppState extends AbstractAppState
 		this.monkeyapp = (MonkeyApp)app;
 		this.spaceController = monkeyapp.getSpaceController();
 		this.appScaled = monkeyapp.getAppScaled();
-		this.selectionArea  = new SelectionArea(appScaled, new Vector2f(0, 0), new Vector2f(0, 0));
+		this.selectionArea = new SelectionArea(appScaled, new Vector2f(0, 0), new Vector2f(0, 0));
 
 		setup();
 		createSelectionBox();
 		setupListener();
 	}
-	
-	
-    protected SelectionArea getSelectionArea()
-    {
-        
-        if(getRounded2dMousePos() != null) {
-            if(getRounded2dMousePos().x < selectionStart.x) {
-                selectionArea.start.x = getRounded2dMousePos().x;
-                selectionArea.end.x = selectionStart.x;
-            }else {
-                selectionArea.start.x = selectionStart.x;
-                selectionArea.end.x = getRounded2dMousePos().x;
-            }
-            if(getRounded2dMousePos().y < selectionStart.y) {
-                selectionArea.start.y = getRounded2dMousePos().y;
-                selectionArea.end.y = selectionStart.y;
-            }else {
-                selectionArea.start.y = selectionStart.y;
-                selectionArea.end.y = getRounded2dMousePos().y;
-            }
-            return selectionArea;
-        }
-        return null;
-    }
-
-    protected void updateSelectionBox()
-    {
-        selectionBox.updateSelectionBoxVertices(getSelectionArea());
-       
-
-        int minusx = Math.round(selectionArea.getDeltaXaxis()/appScaled);
-        int minusy = Math.round(selectionArea.getDeltaYaxis()/appScaled);
-        
-        wireBoxGeo.setLocalTranslation(selectionArea.start.x+appScaled/2*(minusx), appScaled/2, selectionArea.start.y+appScaled/2*(minusy));
-        wireBox.updatePositions(appScaled/2*minusx,appScaled,appScaled/2*minusy);
-        	
-        
 
 
-    }
-    
-    /**
-     * Returns the mouse position as a Vector2f with rounded values (int)
-     * @return The position of the mouse
-     */
-    protected Vector2f getRounded2dMousePos()
-    {
-    	Vector2f ret = new Vector2f(0,0);
-    	IVector3 tmp = ((MonkeyApp)app).getWorldContactPoint();
-    	if(tmp!=null)
-    	{
-    		
-    		ret = new Vector2f(Math.round(tmp.getXAsFloat()),Math.round(tmp.getZAsFloat()));
-    		ret.multLocal(appScaled);
-    	}
-    	return ret;
-    }
-    
-    
-    protected void placeSelectionBox(float x, float z)
-    {
-        selectionStart.set(x, z);
-    }
-    
-	
+	protected SelectionArea getSelectionArea()
+	{
+
+		if(getRounded2dMousePos() != null)
+		{
+			if(getRounded2dMousePos().x < selectionStart.x)
+			{
+				selectionArea.start.x = getRounded2dMousePos().x;
+				selectionArea.end.x = selectionStart.x;
+			}
+			else
+			{
+				selectionArea.start.x = selectionStart.x;
+				selectionArea.end.x = getRounded2dMousePos().x;
+			}
+			if(getRounded2dMousePos().y < selectionStart.y)
+			{
+				selectionArea.start.y = getRounded2dMousePos().y;
+				selectionArea.end.y = selectionStart.y;
+			}
+			else
+			{
+				selectionArea.start.y = selectionStart.y;
+				selectionArea.end.y = getRounded2dMousePos().y;
+			}
+			return selectionArea;
+		}
+		return null;
+	}
+
+	protected void updateSelectionBox()
+	{
+		if(isOnView())
+		{
+			selectionBox.updateSelectionBoxVertices(getSelectionArea());
+
+			int minusx = Math.round(selectionArea.getDeltaXaxis() / appScaled);
+			int minusy = Math.round(selectionArea.getDeltaYaxis() / appScaled);
+
+			wireBoxGeo.setLocalTranslation(selectionArea.start.x + appScaled / 2 * (minusx), appScaled / 2, selectionArea.start.y + appScaled / 2 * (minusy));
+			wireBox.updatePositions(appScaled / 2 * minusx, appScaled, appScaled / 2 * minusy);
+
+		}
+
+
+	}
+
+	/**
+	 * Returns the mouse position as a Vector2f with rounded values (int)
+	 * 
+	 * @return The position of the mouse
+	 */
+	protected Vector2f getRounded2dMousePos()
+	{
+		Vector2f ret = new Vector2f(0, 0);
+		IVector3 tmp = ((MonkeyApp)app).getWorldContactPoint();
+		if(tmp != null)
+		{
+
+			ret = new Vector2f(Math.round(tmp.getXAsFloat()), Math.round(tmp.getZAsFloat()));
+			ret.multLocal(appScaled);
+		}
+		return ret;
+	}
+
+
+	protected void placeSelectionBox(float x, float z)
+	{
+		selectionStart.set(x, z);
+	}
+
+	protected boolean isOnView()
+	{
+		System.out.println("getRounded2dMousePos().y " + getRounded2dMousePos().y );
+		System.out.println("this.app.getViewPort().getCamera().getHeight() * 0.15f " + this.app.getViewPort().getCamera().getHeight() * 0.15f );
+		return (getRounded2dMousePos().y > this.app.getViewPort().getCamera().getHeight() * 0.15f);
+	}
+
 	public void update(float tpf)
 	{
-		updateSelection();
+		if(isOnView())
+		{
+			updateSelection();
+		}
 	}
-	
+
 	private void updateSelection()
 	{
-		if(mouseOnView())
-		{
-			
-
 		Object id = ((MonkeyApp)app).getSelectedSpaceObjectId();
 
 		long idlong = -1;
@@ -183,7 +197,7 @@ public class CustomAppState extends AbstractAppState
 				}
 				catch(NumberFormatException e)
 				{
-//					System.out.println("cant parse: " + id);
+					// System.out.println("cant parse: " + id);
 					idlong = -1;
 				}
 
@@ -201,52 +215,40 @@ public class CustomAppState extends AbstractAppState
 			try
 			{
 				selected = (SpaceObject)spaceController.getSpaceObject(idlong);
-				if(selected.getType().equals(InitMapProcess.ROCK)||selected.getType().equals(InitMapProcess.REINFORCED_WALL))
+				if(selected.getType().equals(InitMapProcess.ROCK) || selected.getType().equals(InitMapProcess.REINFORCED_WALL))
 				{
-				
-			        if(getSelectionArea() != null) {
-			            if(!listener.actionIsPressed && !listener.cancelIsPressed) {
-			                placeSelectionBox(getRounded2dMousePos().x, getRounded2dMousePos().y);
-			            }
-			            updateSelectionBox();
-			        }else {
-			        	listener.actionIsPressed = false;
-			        	listener.cancelIsPressed = false;
-			        }
-			        
+
+					if(getSelectionArea() != null)
+					{
+						if(!listener.actionIsPressed && !listener.cancelIsPressed)
+						{
+							placeSelectionBox(getRounded2dMousePos().x, getRounded2dMousePos().y);
+						}
+						updateSelectionBox();
+					}
+					else
+					{
+						listener.actionIsPressed = false;
+						listener.cancelIsPressed = false;
+					}
+
 				}
 
 				else
 				{
-					selectionBox.updateGeometry(new Vector3f(0, 0, 0), appScaled/2, appScaled*1.5f, appScaled/2);
-					wireBoxGeo.setLocalTranslation(appScaled/2, -100f, appScaled/2);
+					selectionBox.updateGeometry(new Vector3f(0, 0, 0), appScaled / 2, appScaled * 1.5f, appScaled / 2);
+					wireBoxGeo.setLocalTranslation(appScaled / 2, -100f, appScaled / 2);
 				}
 			}
 			catch(Exception e)
 			{
-				
+
 			}
 
 		}
-		}
 
 	}
-	
-	private boolean mouseOnView()
-	{
-		
-//		this.app.getViewPort().getCamera().setViewPort( 0.0f , 1.0f , 0.15f , 0.9f );
-		
-		
-		Vector2f click2d = inputManager.getCursorPosition().clone();
-//		System.out.println("click2d " + click2d);
-//		 float border = this.app.getViewPort().getCamera().getHeight()*0.15f;
-		 
-		
-//		return (click2d.getY()>border);
-		
-		return true;
-	}
+
 
 
 	private void setupListener()
@@ -254,21 +256,21 @@ public class CustomAppState extends AbstractAppState
 		listener = new CustomAppStateKeyListener(this);
 
 		this.app.getInputManager().addListener(listener, new String[]{"Leftclick"});
-//		this.app.getInputManager().addListener(myclickListener, new String[]{"Leftclick"});
+		// this.app.getInputManager().addListener(myclickListener, new
+		// String[]{"Leftclick"});
 
 	}
-	
-    
-	
+
+
 	private void createSelectionBox()
 	{
-		
-		selectionBox = new SelectionBox(new Vector3f(0, 0.5f, 0), appScaled/2, appScaled, appScaled/2);
+
+		selectionBox = new SelectionBox(new Vector3f(0, 0.5f, 0), appScaled / 2, appScaled, appScaled / 2);
 		selectionBox.setDynamic();
-		
-		
+
+
 		Material mat = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-//		mat.getAdditionalRenderState().setWireframe(true);
+		// mat.getAdditionalRenderState().setWireframe(true);
 		mat.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off);
 		Material mat2 = mat.clone();
 		mat2.setColor("Color", ColorRGBA.Black);
@@ -278,36 +280,35 @@ public class CustomAppState extends AbstractAppState
 		selectionBox.getGeo().setMaterial(mat);
 		selectionBox.getGeo().setCullHint(CullHint.Never);
 		selectionBox.getGeo().setQueueBucket(Bucket.Transparent);
-//		selectionBox.getGeo().setQueueBucket(Bucket.Translucent);
+		// selectionBox.getGeo().setQueueBucket(Bucket.Translucent);
 
 		this.app.getRootNode().attachChild(selectionBox.getGeo());
-		
-		
-		wireBox = new WireBox(appScaled/2,appScaled,appScaled/2);
+
+
+		wireBox = new WireBox(appScaled / 2, appScaled, appScaled / 2);
 		wireBox.setDynamic();
-		
+
 		this.wireBoxGeo = new Geometry("wireBox", wireBox);
-		
+
 		this.wireBoxGeo.setMaterial(mat2);
 		this.wireBoxGeo.setCullHint(CullHint.Never);
-		
+
 		this.app.getRootNode().attachChild(this.wireBoxGeo);
-		
-		
-        line1 = new Line(Vector3f.ZERO,Vector3f.UNIT_XYZ);
-        line1.setDynamic();
-        geoline1 = new Geometry("line1", line1);
-        
-        geoline1.setMaterial(mat2);
 
-        
 
-        this.app.getRootNode().attachChild(geoline1);
-		
+		line1 = new Line(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+		line1.setDynamic();
+		geoline1 = new Geometry("line1", line1);
+
+		geoline1.setMaterial(mat2);
+
+
+		this.app.getRootNode().attachChild(geoline1);
+
 
 	}
-	
-	
+
+
 	public void setup()
 	{
 		dl = new DirectionalLight();

@@ -179,13 +179,12 @@ public class IsoCameraState extends AbstractAppState
 //		 view_n2.setBackgroundColor(ColorRGBA.Black);
 		 
 		 
-		 float height = cam.getHeight()*0.15f;
-		 float width = (cam.getWidth()-height)/cam.getWidth();
+		 float height = (cam.getWidth()*0.15f)/cam.getHeight();
 		
 		 
 		 
 		 
-		 cam_map.setViewPort( width , 1.0f , 0.85f , 1.0f );
+		 cam_map.setViewPort( 0 , 0.1f , 0.0f , height );
 		
 		 cam_map.setLocation(new Vector3f(appSize/2f, appSize/1.5f,
 		 appSize/1.9f));

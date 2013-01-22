@@ -32,10 +32,12 @@ public class CustomGuiController extends GuiController
 	private ISpaceController	spaceController;
 
 	private UserEingabenManager	usermanager;
+	
+	private MonkeyApp app;
 
 	public CustomGuiController(SimpleApplication app, ISpaceController spacecontroller)
 	{
-		this.app = app;
+		this.app = (MonkeyApp)app;
 		rootNode = this.app.getRootNode();
 
 		setupListener();
@@ -77,7 +79,7 @@ public class CustomGuiController extends GuiController
 
 		};
 
-		this.app.getInputManager().addListener(myclickListener, new String[]{"Leftclick"});
+//		this.app.getInputManager().addListener(myclickListener, new String[]{"Leftclick"});
 
 	}
 
@@ -91,10 +93,14 @@ public class CustomGuiController extends GuiController
 
 	public void fireFullscreen()
 	{
-		((MonkeyApp)app).fireFullscreen();
+		app.fireFullscreen();
 
 	}
 
+	public void guiActive()
+	{
+		app.setGuiActive(true);
+	}
 
 	public void options()
 	{

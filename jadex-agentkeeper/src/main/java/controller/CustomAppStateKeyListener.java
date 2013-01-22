@@ -18,7 +18,7 @@ public class CustomAppStateKeyListener implements ActionListener
 	public void onAction(String name, boolean keyPressed, float tpf)
 	{
 
-		if(name.equals("Leftclick")) { //Pressed
+		if(name.equals("Leftclick")&&state.isOnView()) { //Pressed
             if(keyPressed && !cancelIsPressed) {
                 actionIsPressed = true;
                 if(state.getSelectionArea() != null) {

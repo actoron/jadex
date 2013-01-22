@@ -20,6 +20,7 @@ import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 
 
+
 /**
  * The Application that renders the 3d output for Jadex in the Jmonkey Engine it
  * get the refreshed Geometry and Static Objects from the Viewport
@@ -29,7 +30,7 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 public class MonkeyApp extends AMonkeyFunctions
 {
 
-	
+	private boolean guiActive = false;
 
 
 	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, ISpaceController spaceController)
@@ -59,12 +60,13 @@ public class MonkeyApp extends AMonkeyFunctions
 			cleanupPostFilter = false;
 //			cam.setViewPort( 0.0f , 1.0f , 0.15f , 1.0f );
 			
-			 float height = cam.getHeight()*0.15f;
-			 float width = (cam.getWidth()-height)/cam.getWidth();
+//			 float height = (cam.getWidth()*0.1f)/cam.getHeight();
 
 			try
 			{
-				 this.getRenderManager().getMainView("MapView").getCamera().setViewPort( width , 1.0f , 0.85f , 1.0f );
+//				cam_map.setViewPort( 0 , width , 0.0f , 0.15f );
+//				this.getRenderManager().getMainView("MapView").getCamera().setViewPort( width , 1.0f , 0.85f , 1.0f );
+//				 this.getRenderManager().getMainView("MapView").getCamera().setViewPort( 0 , 0.10f , 0.0f , height );
 			}
 			catch(NullPointerException e)
 			{
@@ -233,6 +235,22 @@ public class MonkeyApp extends AMonkeyFunctions
 		}
 
 		return height;
+	}
+
+	/**
+	 * @return the guiActive
+	 */
+	public boolean isGuiActive()
+	{
+		return guiActive;
+	}
+
+	/**
+	 * @param guiActive the guiActive to set
+	 */
+	public void setGuiActive(boolean guiActive)
+	{
+		this.guiActive = guiActive;
 	}
 
 
