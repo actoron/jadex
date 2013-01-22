@@ -18,25 +18,19 @@
 	</description>
 
 	<dependencies>
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-platform</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-classloading</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-commons</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-component</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
 
 <!-- 		<dependency> -->
 <!-- 			<groupId>net.sourceforge.jadex</groupId> -->

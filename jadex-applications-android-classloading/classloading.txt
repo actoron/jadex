@@ -30,6 +30,17 @@ Probleme:
   
 - Lösung Service: MetaService, Schnittstelle zur activity generisch, Aufrufe werden zu userService weitergeleitet -> dynamicProxy
   userService wird von eigenem Classloader geladen. 
+  Einschränkungen: Jede UserActivity kann nur einen Service nutzen!!
+
+Problem:
+Nutzerservice "TimeService"
+1. Wird geladen von apk-loader, weil superklasse nicht im default CL ist.
+2. Inner Class TimeService$MyBinder wird geladen von default CL -> TimeService kann nicht auf TimeService$MyBinder zugreifen!
+
+
 
 http://stackoverflow.com/questions/10832029/custom-class-loader-for-android
 http://lsd.luminis.nl/osgi-on-google-android-using-apache-felix/
+
+
+

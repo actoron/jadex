@@ -14,7 +14,7 @@
         android:icon="@drawable/icon"
         android:label="classloading"
         android:screenOrientation="portrait" >
-        <activity android:name="jadex.android.classloading.SystemActivity" >
+        <activity android:name="jadex.android.classloading.UserActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,11 +23,10 @@
         <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" />
 
         <service
-            android:name="jadex.android.service.JadexPlatformService"
-            android:label="JadexPlatformService" >
+            android:name="jadex.android.classloading.metaservice.JadexMetaService"
+            android:label="JadexMetaService" >
         </service>
-
-        <activity android:name="jadex.android.classloading.UserActivity" />
+        
     </application>
 
 </manifest>
