@@ -57,6 +57,21 @@ public class MonkeyApp extends AMonkeyFunctions
 			blockCamMoving = true;
 			fpp.cleanup();
 			cleanupPostFilter = false;
+//			cam.setViewPort( 0.0f , 1.0f , 0.15f , 1.0f );
+			
+			 float height = cam.getHeight()*0.15f;
+			 float width = (cam.getWidth()-height)/cam.getWidth();
+
+			try
+			{
+				 this.getRenderManager().getMainView("MapView").getCamera().setViewPort( width , 1.0f , 0.85f , 1.0f );
+			}
+			catch(NullPointerException e)
+			{
+				System.out.println("camera MapView not there");
+			}
+			
+
 		}
 
 

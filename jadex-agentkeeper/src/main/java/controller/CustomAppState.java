@@ -163,6 +163,10 @@ public class CustomAppState extends AbstractAppState
 	
 	private void updateSelection()
 	{
+		if(mouseOnView())
+		{
+			
+
 		Object id = ((MonkeyApp)app).getSelectedSpaceObjectId();
 
 		long idlong = -1;
@@ -224,9 +228,27 @@ public class CustomAppState extends AbstractAppState
 			}
 
 		}
+		}
 
 	}
 	
+	private boolean mouseOnView()
+	{
+		
+//		this.app.getViewPort().getCamera().setViewPort( 0.0f , 1.0f , 0.15f , 0.9f );
+		
+		
+		Vector2f click2d = inputManager.getCursorPosition().clone();
+		System.out.println("click2d " + click2d);
+//		 float border = this.app.getViewPort().getCamera().getHeight()*0.15f;
+		 
+		
+//		return (click2d.getY()>border);
+		
+		return true;
+	}
+
+
 	private void setupListener()
 	{
 		listener = new CustomAppStateKeyListener(this);

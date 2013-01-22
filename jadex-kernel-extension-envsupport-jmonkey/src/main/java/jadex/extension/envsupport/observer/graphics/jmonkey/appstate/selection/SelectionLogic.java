@@ -41,6 +41,7 @@ public class SelectionLogic
 		// Convert screen click
 		// to 3d position
 		Vector2f click2d = inputManager.getCursorPosition();
+		
 		Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
 		Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalize();
 
@@ -102,7 +103,11 @@ public class SelectionLogic
 			
 			Vector3f contact = results.getClosestCollision().getContactPoint().divideLocal(this.app.getAppScaled());
 			
+			
+			
 			ret = new Vector3Double(contact.getX(), contact.getY(), contact.getZ());
+			
+			System.out.println("world contact point " + ret);
 		
 			
 		}

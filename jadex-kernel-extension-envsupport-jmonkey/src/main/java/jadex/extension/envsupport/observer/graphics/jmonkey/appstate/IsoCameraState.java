@@ -167,21 +167,38 @@ public class IsoCameraState extends AbstractAppState
 		
 		
 		
-		 Camera cam_n = cam.clone();
-		 cam.setViewPort( 0.0f , 1.0f , 0.0f , 1.0f );
-		 cam_n.setViewPort( 0.9f , 1.0f , 0.85f , 1.0f );
+		 Camera cam_map = cam.clone();
+		 cam.setViewPort( 0.0f , 1.0f , 0.15f , 1.0f );
+//		 Camera cam_n2 = cam.clone();
+//		 cam_n2.setViewPort( 0.0f , 1.0f , 0.0f , 0.15f );
+//		 ViewPort view_n2 = this.app.getRenderManager().createMainView("View of camera #3",
+//		 cam_n2);
+//		 view_n2.setEnabled(true);
+//		 view_n2.setClearFlags(true, true, true);
+//		 view_n2.attachScene(rootNode);
+//		 view_n2.setBackgroundColor(ColorRGBA.Black);
+		 
+		 
+		 float height = cam.getHeight()*0.15f;
+		 float width = (cam.getWidth()-height)/cam.getWidth();
 		
-		 cam_n.setLocation(new Vector3f(appSize/2f, appSize/1.5f,
+		 
+		 
+		 
+		 cam_map.setViewPort( width , 1.0f , 0.85f , 1.0f );
+		
+		 cam_map.setLocation(new Vector3f(appSize/2f, appSize/1.5f,
 		 appSize/1.9f));
-		 cam_n.lookAt(new Vector3f(appSize/2, 0, appSize/2),
+		 cam_map.lookAt(new Vector3f(appSize/2, 0, appSize/2),
 		 Vector3f.UNIT_Y);
+		 
 
-		 ViewPort view_n = this.app.getRenderManager().createMainView("View of camera #2",
-		 cam_n);
-		 view_n.setEnabled(true);
-		 view_n.setClearFlags(true, true, true);
-		 view_n.attachScene(rootNode);
-		 view_n.setBackgroundColor(ColorRGBA.Black);
+		 
+		 ViewPort view_map = this.app.getRenderManager().createMainView("MapView", cam_map);
+		 view_map.setEnabled(true);
+		 view_map.setClearFlags(true, true, true);
+		 view_map.attachScene(rootNode);
+		 view_map.setBackgroundColor(ColorRGBA.Black);
 		
 		
 

@@ -17,7 +17,9 @@
 					
 					
 					<panel id="panel_bottom_l"  width="100%" x="0"  y="85%" height="15%"
-					 valign="bottom" childLayout="horizontal" backgroundColor="#3338">
+					 valign="bottom" childLayout="horizontal" backgroundColor="#3330">
+<!-- 					 <interact onMouseOver="niftyActive" /> -->
+					 
 					
 					<control name="button" label="Fullscreen" id="FireButton" 
 						align="right" valign="bottom" visibleToMouse="true" >
