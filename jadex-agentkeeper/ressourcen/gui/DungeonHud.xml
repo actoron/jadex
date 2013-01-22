@@ -28,7 +28,7 @@
 					
 					<control name="button" label="Select" id="Select" 
 						align="right" valign="bottom" visibleToMouse="true" >
-						<interact onClick="options()" />
+						<interact onClick="options()"  />
 					</control>
 
 					

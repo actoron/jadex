@@ -107,7 +107,7 @@ public class SelectionLogic
 			
 			ret = new Vector3Double(contact.getX(), contact.getY(), contact.getZ());
 			
-//			System.out.println("world contact point " + ret);
+//			System.out.println("world contact point " +  ret);
 		
 			
 		}
