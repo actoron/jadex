@@ -14,13 +14,10 @@
 		</layer>
 		<layer childLayout="center">
 
-
-				<panel id="panel_bottom"  height="25px"   
-					align="right" valign="bottom" childLayout="center" backgroundColor="#3338">
 					
 					
-					<panel id="panel_bottom_l"  width="500px" height="25px"   
-					align="right" valign="bottom" childLayout="horizontal" backgroundColor="#3338">
+					<panel id="panel_bottom_l"  width="100%" x="0"  y="85%" height="15%"
+					 valign="bottom" childLayout="horizontal" backgroundColor="#3338">
 					
 					<control name="button" label="Fullscreen" id="FireButton" 
 						align="right" valign="bottom" visibleToMouse="true" >
@@ -49,7 +46,7 @@
 					</control>
 					</panel>
 
-				</panel>
+
 
 		</layer>
 	</screen>
