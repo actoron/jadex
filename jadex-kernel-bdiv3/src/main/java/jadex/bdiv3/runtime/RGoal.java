@@ -713,7 +713,7 @@ public class RGoal extends RProcessableElement
 	 */
 	public void targetConditionTriggered(IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
 	{
-		System.out.println("Goal target triggered: "+RGoal.this);
+//		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().isMaintain())
 		{
 			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_IDLE);

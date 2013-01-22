@@ -898,6 +898,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
+					System.out.println("optionizing: "+goal);
 					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
 					return IFuture.DONE;
 				}
@@ -921,7 +922,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
-//					System.out.println("reactivating: "+goal);
+					System.out.println("reactivating: "+goal);
 					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_ACTIVE);
 					return IFuture.DONE;
 				}
@@ -933,7 +934,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	
-//		getCapability().dumpGoals(getInternalAccess());
+		getCapability().dumpGoals(getInternalAccess());
 	}
 	
 	/**
