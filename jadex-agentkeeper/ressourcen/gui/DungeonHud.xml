@@ -15,6 +15,12 @@
 
 		</layer>
 		<layer childLayout="center">
+					<panel id="infopanel" x="50%" width="50%" height="5%"
+				valign="top" align="right" childLayout="overlay"
+				backgroundColor="#0002">
+				<text id="infotext" style="nifty-label" color="#f00f" text="Hello World!"
+				textHAlign="center" textVAlign="center" align="center" valign="center"/>
+				</panel>
 
 
 			<panel id="panel" x="10%" width="90%" y="85%" height="15%"

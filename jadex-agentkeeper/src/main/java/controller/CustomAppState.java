@@ -29,6 +29,8 @@ import com.jme3.scene.shape.Line;
 
 import controller.selection.SelectionArea;
 import controller.selection.SelectionBox;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 
 
 public class CustomAppState extends AbstractAppState
@@ -71,6 +73,8 @@ public class CustomAppState extends AbstractAppState
 	Line						line1;
 
 	Geometry					geoline1;
+	
+	protected String 	selectedObject;
 
 
 	public void initialize(AppStateManager stateManager, Application app)
@@ -216,7 +220,12 @@ public class CustomAppState extends AbstractAppState
 			try
 			{
 				selected = (SpaceObject)spaceController.getSpaceObject(idlong);
-				if(selected.getType().equals(InitMapProcess.ROCK) || selected.getType().equals(InitMapProcess.REINFORCED_WALL))
+				
+				selectedObject = selected.getType();
+				
+				updateInfoText(selectedObject);
+				
+				if(selectedObject.equals(InitMapProcess.ROCK) || selectedObject.equals(InitMapProcess.REINFORCED_WALL))
 				{
 
 					if(getSelectionArea() != null)
@@ -250,6 +259,15 @@ public class CustomAppState extends AbstractAppState
 
 	}
 
+
+
+	private void updateInfoText(String selectedObject)
+	{
+		Element infotext = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("infotext");
+		TextRenderer textRender = infotext.getRenderer(TextRenderer.class);
+		textRender.setText(selectedObject);
+		
+	}
 
 
 	private void setupListener()
