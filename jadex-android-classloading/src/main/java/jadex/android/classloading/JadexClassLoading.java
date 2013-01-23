@@ -22,22 +22,20 @@ public class JadexClassLoading
 		this.context = ctx;
 	}
 
-	public ClassLoader createJadexClassLoaderHierarchy() {
+	public ClassLoader getClassLoaderWithoutParent() {
 		copyDex();
 		defLoader = this.getClass().getClassLoader();
 		ClassLoader jarCl = getClassLoaderForExternalDex(ClassLoader.getSystemClassLoader());
 		ClassLoader apkCl = getClassLoaderForApk(jarCl);
 		
-		try
-		{
-			Class<?> loadClass2 = apkCl.loadClass("jadex.micro.MicroAgentFactory");
-//			Class<?> loadClass = internalCl.loadClass("jadex.android.classloading.TimeService");
-			System.out.println("loaded");
-		}
-		catch (ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
+		return apkCl;
+	}
+	
+	public ClassLoader getClassLoaderWithDefaultParent() {
+		copyDex();
+		defLoader = this.getClass().getClassLoader();
+		ClassLoader jarCl = getClassLoaderForExternalDex(this.getClass().getClassLoader());
+		ClassLoader apkCl = getClassLoaderForApk(jarCl);
 		
 		return apkCl;
 	}

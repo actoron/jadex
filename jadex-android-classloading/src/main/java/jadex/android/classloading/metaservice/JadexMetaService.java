@@ -1,6 +1,5 @@
 package jadex.android.classloading.metaservice;
 
-import jadex.android.AndroidContextManager;
 import jadex.android.classloading.JadexClassLoading;
 
 import java.lang.reflect.InvocationHandler;
@@ -32,7 +31,7 @@ public class JadexMetaService extends Service
 	{
 		super.onCreate();
 		classLoading = new JadexClassLoading(this);
-		cl = classLoading.createJadexClassLoaderHierarchy();
+		cl = classLoading.getClassLoaderWithoutParent();
 //		AndroidContextManager.getInstance().setAndroidContext(this);
 	}
 	
@@ -58,6 +57,7 @@ public class JadexMetaService extends Service
 		}
 
 		Thread.currentThread().setContextClassLoader(cl);
+		uService.onCreate();
 		uServiceBinder = uService.onBind(null);
 		
 		final ComponentName componentName = new ComponentName(this, uService.getClass());
@@ -134,7 +134,6 @@ public class JadexMetaService extends Service
 			if (newInstance instanceof Service)
 			{
 				userService = (Service) newInstance;
-				userService.onCreate();
 			}
 
 		}
@@ -167,6 +166,7 @@ public class JadexMetaService extends Service
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
+			Method[] methods = uServiceBinder.getClass().getMethods();
 			Method method2 = uServiceBinder.getClass().getMethod(method.getName(), method.getParameterTypes());
 			return method2.invoke(uServiceBinder, args);
 		}

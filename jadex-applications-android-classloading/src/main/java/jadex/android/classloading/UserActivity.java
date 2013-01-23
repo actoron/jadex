@@ -1,9 +1,11 @@
 package jadex.android.classloading;
 
-import java.util.Calendar;
-
+import jadex.android.classloading.ITimeService.Listener;
 import jadex.android.classloading.metaservice.ActivityUsingMetaService;
 import jadex.android.classloading.metaservice.IUserService;
+
+import java.util.Calendar;
+
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
@@ -49,6 +51,16 @@ public class UserActivity extends ActivityUsingMetaService
 		ITimeService ts = (ITimeService) service;
 		label.setText("service connected");
 		label.setText(ts.getTime(Calendar.getInstance().getTimeInMillis()));
+		
+		ts.setListener(new Listener()
+		{
+			
+			@Override
+			public void platformStarted()
+			{
+				label.setText("done");
+			}
+		});
 		ts.startJadexPlatform();
 	}
 

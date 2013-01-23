@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
@@ -92,7 +93,11 @@ public class JadexPlatformService extends Service
 	public void onCreate()
 	{
 		super.onCreate();
-		AndroidContextManager.getInstance().setAndroidContext(this);
+		Context base = this.getBaseContext();
+		if (base != null) {
+			// if base is null, this service was not started through android
+			AndroidContextManager.getInstance().setAndroidContext(this);
+		}
 		if (platformAutostart) {
 			startPlatform();
 		}
@@ -104,7 +109,11 @@ public class JadexPlatformService extends Service
 	{
 		super.onDestroy();
 		jadexPlatformManager.shutdownJadexPlatforms();
-		AndroidContextManager.getInstance().setAndroidContext(null);
+		Context base = this.getBaseContext();
+		if (base != null) {
+			// if base is null, this service was not started through android
+			AndroidContextManager.getInstance().setAndroidContext(null);
+		}
 		// jadexAndroidContext.removeContextChangeListener(this);
 	}
 	
