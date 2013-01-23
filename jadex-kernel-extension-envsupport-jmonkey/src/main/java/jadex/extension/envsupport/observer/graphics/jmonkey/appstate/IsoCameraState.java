@@ -169,21 +169,9 @@ public class IsoCameraState extends AbstractAppState
 		
 		 Camera cam_map = cam.clone();
 		 cam.setViewPort( 0.0f , 1.0f , 0.15f , 1.0f );
-//		 Camera cam_n2 = cam.clone();
-//		 cam_n2.setViewPort( 0.0f , 1.0f , 0.0f , 0.15f );
-//		 ViewPort view_n2 = this.app.getRenderManager().createMainView("View of camera #3",
-//		 cam_n2);
-//		 view_n2.setEnabled(true);
-//		 view_n2.setClearFlags(true, true, true);
-//		 view_n2.attachScene(rootNode);
-//		 view_n2.setBackgroundColor(ColorRGBA.Black);
 		 
 		 
 		 float height = (cam.getWidth()*0.15f)/cam.getHeight();
-		
-		 
-		 
-		 
 		 cam_map.setViewPort( 0 , 0.1f , 0.0f , height );
 		
 		 cam_map.setLocation(new Vector3f(appSize/2f, appSize/1.5f,

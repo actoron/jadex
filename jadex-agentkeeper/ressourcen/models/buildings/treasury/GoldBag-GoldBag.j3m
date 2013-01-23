@@ -1,23 +1,15 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         DiffuseMap : Repeat textures/buildings/GoldBag.png
-        GlowColor : 0.0 0.0 0.0 1.0
-        Specular : 0.06693843 0.06693843 0.06693843 1.0
-        Diffuse : 0.64000005 0.64000005 0.64000005 1.0
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 1.0 1.0
+        GlowColor : 1.0 1.0 1.0 1.0
+        VertexLighting : true
         UseMaterialColors : true
-        ParallaxHeight : 0.05
-        Ambient : 0.0 0.0 0.0 1.0
         Shininess : 12.5
     }
     AdditionalRenderState {
       FaceCull Back
-      Wireframe Off
-      DepthWrite On
-      PolyOffset 0.0 0.0
-      AlphaTestFalloff 0.0
-      Blend Off
-      PointSprite Off
-      ColorWrite On
-      DepthTest On
     }
 }

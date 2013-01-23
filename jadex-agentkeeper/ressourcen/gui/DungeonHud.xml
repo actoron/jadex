@@ -15,15 +15,16 @@
 
 		</layer>
 		<layer childLayout="center">
-		
 
-			<panel id="panel" x="10%" width="90%"  y="85%" height="15%"
-				valign="bottom" align="right" childLayout="vertical" backgroundColor="#0335">
-				
+
+			<panel id="panel" x="10%" width="90%" y="85%" height="15%"
+				valign="bottom" align="right" childLayout="vertical"
+				backgroundColor="#0335">
+
 
 				<panel id="panel_buttons" width="100%" valign="bottom"
 					childLayout="horizontal" backgroundColor="#3035">
-					
+
 					<control name="button" label="Default Menu" id="DefaultSelector"
 						align="right" valign="bottom" visibleToMouse="true">
 						<effect>
@@ -57,22 +58,22 @@
 					<panel id="panel_default" width="100%" valign="bottom"
 						childLayout="horizontal" backgroundColor="#3035">
 						<control name="button" label="Fullscreen" id="FireButton"
-							 visibleToMouse="true">
+							visibleToMouse="true">
 							<interact onClick="fireFullscreen()" />
 						</control>
 
 						<control name="button" label="Grid" id="OptionsButton2"
-							 visibleToMouse="true">
+							visibleToMouse="true">
 							<interact onClick="setGrid()" />
 						</control>
 
 						<control name="button" label="Stats" id="OptionsButton3"
-							 visibleToMouse="true">
+							visibleToMouse="true">
 							<interact onClick="setPerform()" />
 						</control>
 
-						<control name="button" label="Exit" id="ExitButton" 
-							 visibleToMouse="true">
+						<control name="button" label="Exit" id="ExitButton"
+							visibleToMouse="true">
 							<interact onClick="quitGame()" />
 						</control>
 
@@ -84,17 +85,28 @@
 						<effect>
 							<onStartScreen name="hide" targetElement="panel_units"></onStartScreen>
 						</effect>
-						<image filename="/gui/images/monster/kobold_item.png" height="95%"/>
-						<image filename="/gui/images/monster/goblin_item.png" height="95%"/>
-						<image filename="/gui/images/monster/warlock_item.png" height="95%"/>
-						<image filename="/gui/images/monster/orc_item.png" height="95%"/>
+						<image filename="/gui/images/monster/kobold_item.png"
+							height="95%">
+							<interact onClick="setGrid()" />
+						</image>
+						<image filename="/gui/images/monster/goblin_item.png"
+							height="95%">
+							<interact onClick="setGrid()" />
+						</image>
+						<image filename="/gui/images/monster/warlock_item.png"
+							height="95%">
+							<interact onClick="setGrid()" />
+						</image>
+						<image filename="/gui/images/monster/orc_item.png" height="95%">
+							<interact onClick="setGrid()" />
+						</image>
 
 					</panel>
 
 					<panel id="panel_buildings" width="100%" valign="bottom"
 						childLayout="horizontal" backgroundColor="#2005" visible="false">
 						<control name="button" label="TestBuildings" id="TestBuildings"
-							  visibleToMouse="true">
+							visibleToMouse="true">
 						</control>
 					</panel>
 				</panel>

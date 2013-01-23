@@ -1,8 +1,13 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         UseMaterialColors : true
-        Diffuse : 0.2 0.6 0.0 1.0
         NormalMap : textures/buildings/lair/bed_n.png
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 0.0 0.0 1.0
+        Ambient : 1.0 0.5 0.5 1.0
+        GlowColor : 1.0 1.0 1.0 1.0
+        VertexLighting : true
+        UseMaterialColors : false
     }
     AdditionalRenderState {
       FaceCull Back

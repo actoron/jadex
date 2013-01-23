@@ -102,7 +102,7 @@ public class Object3dJMonkeyRenderer extends AObject3dRenderer
 							if(mat.isUseAlpha())
 							{
 								mati.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-								s.setQueueBucket(Bucket.Translucent);
+//								s.setQueueBucket(Bucket.Translucent);
 								s.setQueueBucket(Bucket.Transparent);
 
 								// IF WATER FILTER!

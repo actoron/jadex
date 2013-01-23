@@ -290,8 +290,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 //		 viewPort.addProcessor(waterProcessor);
 
 
-		 BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
-		 fpp.addFilter(bf);
+//		 BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
+//		 fpp.addFilter(bf);
 
 //
 		Vector3f lightDir = new Vector3f(1f, -2f, 1f);
@@ -359,6 +359,9 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 		Nifty nifty = niftyDisplay.getNifty();
 		
+		
+		nifty.setIgnoreKeyboardEvents(true);
+		
 		if(defaultGui)
 		{
 
@@ -407,6 +410,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			}
 
 		}
+
 
 		guiViewPort.addProcessor(niftyDisplay);
 	}

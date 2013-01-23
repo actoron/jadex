@@ -2,6 +2,12 @@ Material FarmMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         DiffuseMap : textures/buildings/farm_barn_D.png
         UseMaterialColors : false
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 1.0 1.0
+        GlowColor : 1.0 1.0 1.0 1.0
+        VertexLighting : true
+        UseMaterialColors : true
     }
     AdditionalRenderState {
       FaceCull Back

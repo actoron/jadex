@@ -166,9 +166,10 @@ public class CustomAppState extends AbstractAppState
 
 	protected boolean isOnView()
 	{
-		System.out.println("getRounded2dMousePos().y " + getRounded2dMousePos().y );
-		System.out.println("this.app.getViewPort().getCamera().getHeight() * 0.15f " + this.app.getViewPort().getCamera().getHeight() * 0.15f );
-		return (getRounded2dMousePos().y > this.app.getViewPort().getCamera().getHeight() * 0.15f);
+//		System.out.println("getRounded2dMousePos().y " + getRounded2dMousePos().y );
+//		System.out.println("this.app.getViewPort().getCamera().getHeight() * 0.15f " + this.app.getViewPort().getCamera().getHeight() * 0.15f );
+		return (getRounded2dMousePos().y < this.app.getViewPort().getCamera().getHeight() * 0.85f);
+
 	}
 
 	public void update(float tpf)
@@ -312,13 +313,13 @@ public class CustomAppState extends AbstractAppState
 	public void setup()
 	{
 		dl = new DirectionalLight();
-		dl.setDirection(new Vector3f(-0.001f, -1.0f, -0.01f).normalizeLocal());
-		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.7f));
+		dl.setDirection(new Vector3f(-0.01f, -1.0f, -0.01f).normalizeLocal());
+		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.3f));
 		this.app.getRootNode().addLight(dl);
 
 		AmbientLight al = new AmbientLight();
 		// al.setColor(new ColorRGBA(1.7f,2.2f,3.2f,1f));
-		al.setColor(ColorRGBA.White.mult(3.0f));
+		al.setColor(ColorRGBA.White.mult(0.5f));
 		this.app.getRootNode().addLight(al);
 	}
 

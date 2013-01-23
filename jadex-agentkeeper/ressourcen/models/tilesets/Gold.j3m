@@ -3,10 +3,16 @@ Material My Material : Common/MatDefs/Light/Lighting.j3md {
         DiffuseMap : textures/gold/Gold.png
         NormalMap : textures/gold/Gold_nor6.png
         SpecularMap : textures/gold/Gold_spec2.png
-        GlowMap : textures/gold/Gold_glow.png
-        
+        Shininess : 2.0
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 1.0 1.0
+        GlowColor : 1.0 1.0 1.0 1.0
+        VertexLighting : true
+        UseMaterialColors : true
+
      }
-     AdditionalRenderState {
+    AdditionalRenderState {
       FaceCull Back
     }
 }

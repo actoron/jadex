@@ -75,6 +75,10 @@ public class SoundJMonkeyPlayer extends AbstractJMonkeyRenderer
 			soundnode.setReverbEnabled(true);
 			soundnode.setRefDistance(50f);
 		}
+		else
+		{
+			soundnode.setPositional(false);
+		}
 
 	    
 		return soundnode;

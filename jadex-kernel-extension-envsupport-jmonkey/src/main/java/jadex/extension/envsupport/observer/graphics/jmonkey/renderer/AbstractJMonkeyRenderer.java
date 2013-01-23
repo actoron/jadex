@@ -169,7 +169,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					{
 						mat_tt.getAdditionalRenderState().setBlendMode(
 								BlendMode.Alpha); // activate transparency
-						spatial.setQueueBucket(Bucket.Translucent);
+//						spatial.setQueueBucket(Bucket.Translucent);
 						spatial.setQueueBucket(Bucket.Transparent);
 					}
 					String texturepath = primitive.getTexturePath();
@@ -253,6 +253,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						
 						if(soundActive)
 						{
+//							System.out.println("audionode: " + audionode.getName() );
 								audionode.play();
 
 						}
