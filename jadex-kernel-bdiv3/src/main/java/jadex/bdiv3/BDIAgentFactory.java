@@ -395,7 +395,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class ret = SReflect.findClass0(clname, imports, classloader);
-		System.out.println(clname+" "+SUtil.arrayToString(imports)+" "+ret);
+//		System.out.println("getMAC:"+clname+" "+SUtil.arrayToString(imports)+" "+ret);
 		int idx;
 		while(ret==null && (idx=clname.indexOf('.'))!=-1)
 		{

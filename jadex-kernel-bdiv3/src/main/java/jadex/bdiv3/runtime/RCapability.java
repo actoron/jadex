@@ -189,26 +189,34 @@ public class RCapability extends RElement
 	/**
 	 * 
 	 */
-	public void dumpGoals(IInternalAccess ia)
+	protected void dumpGoalsPeriodically(IInternalAccess ia)
 	{
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if(goals!=null)
-				{
-					System.out.println("--------");
-					for(RGoal goal: goals)
-					{
-						System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState());
-						System.out.println(goal.inhibitors);
-						System.out.println("--------");
-					}
-				}
+				dumpGoals();
 				ia.waitForDelay(500, this);
 				return IFuture.DONE;
 			}
 		};
 		ia.getExternalAccess().scheduleStep(step);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void dumpGoals()
+	{
+		if(goals!=null)
+		{
+			System.out.println("--------");
+			for(RGoal goal: goals)
+			{
+				System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState());
+				System.out.println(goal.inhibitors);
+				System.out.println("--------");
+			}
+		}
 	}
 }

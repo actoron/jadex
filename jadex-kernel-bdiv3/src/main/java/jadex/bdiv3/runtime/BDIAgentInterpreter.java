@@ -365,7 +365,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
-							System.out.println("create: "+context);
+//							System.out.println("create: "+context);
 							
 							Object pojogoal = null;
 							try
@@ -434,7 +434,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
-							System.out.println("create: "+context);
+//							System.out.println("create: "+context);
 							
 							Object pojogoal = null;
 							if(event.getContent()!=null)
@@ -519,7 +519,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							{
 								if(executeGoalMethod(m, goal, event))
 								{
-									System.out.println("Goal dropping triggered: "+goal);
+//									System.out.println("Goal dropping triggered: "+goal);
 //									rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
 									goal.setException(new GoalFailureException("drop condition: "+m.getName()));
 									goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_FAILED);
@@ -557,7 +557,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{	
 									if(!executeGoalMethod(m, goal, event))
 									{
-										System.out.println("Goal suspended: "+goal);
+//										System.out.println("Goal suspended: "+goal);
 										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_SUSPENDED);
 										goal.setState(RGoal.PROCESSABLEELEMENT_INITIAL);
 									}
@@ -666,7 +666,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							{	
 								if(!executeGoalMethod(m, goal, event))
 								{
-									System.out.println("Goal maintain triggered: "+goal);
+//									System.out.println("Goal maintain triggered: "+goal);
 //									System.out.println("state was: "+getProcessingState());
 									goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_INPROCESS);
 								}
@@ -820,6 +820,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
+//					if(goal.getId().indexOf("AchieveCleanup")!=-1)
+//						System.out.println("addinh: "+goal);
 					MDeliberation delib = goal.getMGoal().getDeliberation();
 					if(delib!=null)
 					{
@@ -871,7 +873,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 //							if(goal.getId().indexOf("AchieveCleanup")!=-1)
 //								System.out.println("reminh: "+goal);
-							
 							List<RGoal> goals = getCapability().getGoals(inh);
 							for(RGoal other: goals)
 							{
@@ -898,7 +899,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
-					System.out.println("optionizing: "+goal);
+//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
 					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
 					return IFuture.DONE;
 				}
@@ -922,7 +923,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
-					System.out.println("reactivating: "+goal);
+//					System.out.println("reactivating: "+goal);
 					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_ACTIVE);
 					return IFuture.DONE;
 				}
@@ -934,7 +935,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	
-		getCapability().dumpGoals(getInternalAccess());
+//		getCapability().dumpGoalsPeriodically(getInternalAccess());
 	}
 	
 	/**
@@ -972,6 +973,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public boolean executeStep()
 	{
 		// Evaluate condition before executing step.
+		boolean aborted = false;
+//		if(rulesystem!=null)
+//			aborted = rulesystem.processAllEvents(15);
+//		if(aborted)
+//			getCapability().dumpGoals();
+		
 		if(rulesystem!=null)
 			rulesystem.processAllEvents();
 		

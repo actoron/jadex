@@ -344,6 +344,7 @@ public class RGoal extends RProcessableElement
 //				System.out.println("dropping: "+getId());
 			
 //			System.out.println("dropping: "+getId());
+
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 			abortPlans();
@@ -510,9 +511,7 @@ public class RGoal extends RProcessableElement
 	 * 
 	 */
 	protected void addInhibitor(RGoal inhibitor, IInternalAccess ia)
-	{
-//		System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
-		
+	{		
 		if(inhibitors==null)
 			inhibitors = new HashSet<RGoal>();
 		
@@ -521,6 +520,8 @@ public class RGoal extends RProcessableElement
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALINHIBITED, this));
 		}
+		
+//		System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 	}
 	
 	/**
@@ -528,7 +529,7 @@ public class RGoal extends RProcessableElement
 	 */
 	protected void removeInhibitor(RGoal inhibitor, IInternalAccess ia)
 	{
-		System.out.println("rem inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
+//		System.out.println("rem inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 		
 //		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
 //			System.out.println("kokoko");
@@ -537,7 +538,7 @@ public class RGoal extends RProcessableElement
 		{
 			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
 			{
-				System.out.println("goal not inhibited: "+this);
+//				System.out.println("goal not inhibited: "+this);
 				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINHIBITED, this));
 			}
