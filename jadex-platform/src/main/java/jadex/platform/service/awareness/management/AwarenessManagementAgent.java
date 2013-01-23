@@ -816,6 +816,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		return pcreatefut;
 	}
 	
+//	int	cnt;
+	
 	/**
 	 *  Create a proxy using given settings.
 	 *  @param dif	The discovery info
@@ -854,6 +856,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					CreationInfo ci = new CreationInfo(args);
 					ci.setDaemon(true);
 					ci.setParent(parent);
+					
+//					System.out.println("create proxy: "+(++cnt));
+					
 					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", ci, 
 						createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
 					{

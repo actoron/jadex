@@ -22,9 +22,9 @@ public class MultiPlatformsTest extends TestCase
 	 */
 	public void	testMultiplePlatforms() throws Exception
 	{
-//		while(true)
+//		for(int p=0; p<100; p++)
 		{
-		
+//			long	time	= System.currentTimeMillis();
 		int number	= 25; // larger numbers cause timeout on toaster.
 		long timeout	= 120000;	// time required by toaster.
 		
@@ -42,8 +42,10 @@ public class MultiPlatformsTest extends TestCase
 //				"-awareness", "false",
 //				"-componentfactory", "jadex.micro.MicroAgentFactory",
 //				"-conf", "jadex.standalone.PlatformAgent",
-//				"-awamechanisms", "new String[]{\"Multicast\"}", 
-//				"-awamechanisms", "new String[]{\"Broadcast\", \"Multicast\", \"Message\"}", 
+//				"-awamechanisms", "\"Relay\"", 
+//				"-awamechanisms", "\"Broadcast\"", // broadcast 3 times as slow!?
+//				"-awamechanisms", "\"Multicast\"", 
+//				"-awamechanisms", "\"Relay, Multicast, Message\"", 
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
@@ -55,15 +57,15 @@ public class MultiPlatformsTest extends TestCase
 			{
 				System.out.println("Waiting for platform "+i);
 			}
-//			try
-//			{
+			try
+			{
 				platforms[i]	= futures.get(i).get(sus, timeout);
-//			}
-//			catch(RuntimeException e)
-//			{
-//				System.out.println("failed: "+i);
-//				throw e;
-//			}
+			}
+			catch(RuntimeException e)
+			{
+				System.out.println("failed: "+i+e);
+				throw e;
+			}
 		}
 		
 //		try
@@ -83,6 +85,9 @@ public class MultiPlatformsTest extends TestCase
 			platforms[i].killComponent().get(sus, timeout);
 		}
 		
+		
+//			time	= System.currentTimeMillis() - time;
+//			System.out.println("run "+p+" took "+time+" milliseconds.");
 		}
 		
 //		Thread.sleep(300000);
