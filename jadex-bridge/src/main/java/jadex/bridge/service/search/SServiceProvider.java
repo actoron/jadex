@@ -206,6 +206,9 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
+		if(type==null)
+			System.out.println("ttt: "+type);
+		
 //		if(type.toString().indexOf("IComponentM")!=-1 && scope.equals("upwards"))
 //			System.out.println("here22");
 		

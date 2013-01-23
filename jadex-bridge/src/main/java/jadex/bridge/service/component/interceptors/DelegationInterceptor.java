@@ -64,13 +64,13 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DelegationInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
+	public DelegationInterceptor(IInternalAccess ia, RequiredServiceInfo info, 
 		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher, IServiceIdentifier sid, boolean realtime)
 	{
-		this.ea = ea;
+		this.ea = ia.getExternalAccess();
 		this.info = info;
 		this.binding = binding;
-		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider(), ea, realtime);
+		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider(), ia, realtime);
 		this.sid = sid;
 	}
 	

@@ -64,51 +64,65 @@ import javax.swing.SwingUtilities;
 })
 public class CleanerBDI
 {
-	/** The bdi agent. */
+	/** The bdi agent. Automatically injected */
 	@Agent
 	protected BDIAgent agent;
 	
+	/** The virtual environment of the cleaner. */
 	@Belief
 	protected IEnvironment environment = Environment.getInstance();
 	
+	/** The set of wastes. */
 	@Belief
 	protected Set<Waste> wastes;
 	
+	/** The known set of wastebins. */
 	@Belief
 	protected Set<Wastebin> wastebins;
 	
+	/** The known set of chargingstation. */
 	@Belief
 	protected Set<Chargingstation> chargingstations;
 	
+	/** The known set of other cleaners. */
 	@Belief
 	protected Set<Cleaner> cleaners;
 	
+	/** The raster for memorizing positions. */
 	@Belief
 	protected Tuple2<Integer, Integer> raster = new Tuple2<Integer, Integer>(new Integer(10), new Integer(10));
 
+	/** The visited positions. */
 	@Belief
 	protected Set<MapPoint> visited_positions =	new HashSet<MapPoint>(Arrays.asList(
 		MapPoint.getMapPointRaster(raster.getFirstEntity().intValue(), 
 		raster.getSecondEntity().intValue(), 1, 1)));
 
+	/** The flag if it is daytime or night. */
 	@Belief
 	protected boolean daytime;
 
+	/** The location of the cleaner. */
 	@Belief
 	protected Location my_location = new Location(0.2, 0.2);
 	
+	/** The speed of the cleaner. */
 	@Belief 
 	protected double my_speed = 3;
 	
+	/** The vision. */
 	@Belief
 	protected double my_vision = 0.1;
 	
+	/** The chargestate. */
 	@Belief
 	protected double my_chargestate = 0.21;
 	
+	/** The carried waste (or null). */
 	@Belief
 	protected Waste carriedwaste;
 	
+	/** The patrol points. */
 	@Belief
 	protected List<Location> patrolpoints;
 	
@@ -116,15 +130,26 @@ public class CleanerBDI
 //	protected CleanerGui gui = new CleanerGui(agent.getExternalAccess());
 //	protected GuiCreator gc = new GuiCreator(CleanerGui.class, new Class[]{IExternalAccess.class}, new Object[]{agent.getExternalAccess()});
 	
+	/**
+	 *  Goal for keeping the battery loaded.
+	 */
 	@Goal(deliberation=@Deliberation(inhibits={PerformLookForWaste.class, AchieveCleanup.class, PerformPatrol.class}))
 	public class MaintainBatteryLoaded
 	{
+		/**
+		 *  When the chargestate is below 0.2
+		 *  the cleaner will activate this goal.
+		 */
 		@GoalMaintainCondition(events="my_chargestate")
 		public boolean checkMaintain()
 		{
 			return my_chargestate>0.2;
 		}
 		
+		/**
+		 *  The target condition determines when
+		 *  the goal goes back to idle. 
+		 */
 		@GoalTargetCondition(events="my_chargestate")
 		public boolean checkTarget()
 		{
@@ -132,17 +157,29 @@ public class CleanerBDI
 		}
 	}
 	
+	/**
+	 *  Achieve cleanup goals are created for every piece
+	 *  of waste the agent notices.
+	 *  
+	 *  Avoids having multiple goals for the same piece of
+	 *  waste by setting goal to unique. For this purpose
+	 *  the hashcode and equals method need to be implemented. 
+	 */
 	// currently creates too many goals and abandons them with during adopt with unique
 //	@Goal(unique=true, deliberation=@Deliberation(cardinality=1, inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
 	@Goal(unique=true, deliberation=@Deliberation(inhibits={PerformLookForWaste.class, AchieveCleanup.class}))
 	public class AchieveCleanup
 	{
+		/** The waste. */
 		protected Waste waste;
 		
+		/**
+		 *  Create a new goal.
+		 */
 		@GoalCreationCondition(events="wastes")
 		public AchieveCleanup(Waste waste)
 		{
-			System.out.println("new achieve cleanup: "+waste);
+//			System.out.println("new achieve cleanup: "+waste);
 			this.waste = waste;
 		}
 		
@@ -152,20 +189,31 @@ public class CleanerBDI
 //		{
 //			return true; // ??
 //		}
-		
+
+		/**
+		 *  Suspend the goal when night.
+		 */
 		@GoalContextCondition(events="daytime")
 		public boolean checkContext()
 		{
 			return isDaytime();
 		}
 		
+		/**
+		 *  Drop the goal when waste is not seen
+		 *  anymore and the agent agent does not carry it.
+		 */
 		@GoalDropCondition(events={"carriedwaste", "wastes"})
 		public boolean checkDrop()
 		{
-			System.out.println("drop triggerd: "+getWaste());
+//			System.out.println("drop triggerd: "+getWaste());
 			return getCarriedWaste()==null && !getWastes().contains(waste);
 		}
 		
+		/**
+		 *  Check if the waste is contained
+		 *  in a wastebin.
+		 */
 		public boolean checkTarget()
 		{
 			boolean ret = false;
@@ -182,19 +230,33 @@ public class CleanerBDI
 			return ret;
 		}
 		
+		/**
+		 *  Inhibit other achieve cleanup goals that 
+		 *  are farer away from the cleaner.
+		 */
 		@GoalInhibit(AchieveCleanup.class)
 		protected boolean inhibitAchieveCleanUp(AchieveCleanup other)
 		{
+			// this goal inhibits other if its waste is currently transported
 			boolean ret = getWaste().equals(getCarriedWaste());
-			
+
 			if(!ret)
 			{
-				double d1 = getMyLocation().getDistance(waste.getLocation());
-				double d2 = getMyLocation().getDistance(other.getWaste().getLocation());
-				ret = d1<d2;
-				if(!ret && d1==d2)
+				// if other goal is cur active
+				if(other.getWaste().equals(getCarriedWaste()))
 				{
-					ret = hashCode()<other.hashCode();
+					// must not interfere with that
+					ret = false;
+				}
+				else
+				{
+					double d1 = getMyLocation().getDistance(waste.getLocation());
+					double d2 = getMyLocation().getDistance(other.getWaste().getLocation());
+					ret = d1<d2;
+					if(!ret && d1==d2)
+					{
+						ret = hashCode()<other.hashCode();
+					}
 				}
 			}
 				
@@ -214,7 +276,7 @@ public class CleanerBDI
 		// hashcode and equals implementation for unique flag
 		
 		/**
-		 * 
+		 *  Get the hashcode.
 		 */
 		public int hashCode()
 		{
@@ -226,7 +288,9 @@ public class CleanerBDI
 		}
 
 		/**
-		 * 
+		 *  Test if equal to other goal.
+		 *  @param obj The other object.
+		 *  @return True, if equal.
 		 */
 		public boolean equals(Object obj)
 		{
@@ -239,20 +303,34 @@ public class CleanerBDI
 			return ret;
 		}
 
+		/**
+		 *  Get the outer type.
+		 *  @return The outer type.
+		 */
 		private CleanerBDI getOuterType()
 		{
 			return CleanerBDI.this;
 		}
 		
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
 		public String toString()
 		{
 			return "AchieveCleanup: "+getWaste();
 		}
 	}
 	
+	/**
+	 *  Goal that lets the cleaner look for waste.
+	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
 	public class PerformLookForWaste
 	{
+		/**
+		 *  Suspend the goal at night.
+		 */
 		@GoalContextCondition(events="daytime")
 		public boolean checkContext()
 		{
@@ -260,9 +338,15 @@ public class CleanerBDI
 		}
 	}
 	
+	/**
+	 *  Goal that lets the agent perform patrol rounds.
+	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
 	public class PerformPatrol
 	{
+		/**
+		 *  Suspend the goal when daytime.
+		 */
 		@GoalContextCondition(events="daytime")
 		public boolean checkContext()
 		{
@@ -270,57 +354,95 @@ public class CleanerBDI
 		}
 	}
 	
+	/**
+	 *  Goal for picking up a piece of waste.
+	 */
 	@Goal(retry=false)
 	public class AchievePickupWaste
 	{
+		/** The waste. */
 		protected Waste waste;
 		
+		/**
+		 *  Create a new goal.
+		 */
 		public AchievePickupWaste(Waste waste)
 		{
 			this.waste = waste;
 		}
 		
+		/**
+		 *  Get the piece of waste.
+		 *  @return The piece of waste.
+		 */
 		public Waste getWaste()
 		{
 			return waste;
 		}
 	}
 	
+	/**
+	 *  
+	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
 	public class AchieveDropWaste
 	{
+		/** The wastebin. */
 		protected Wastebin wastebin;
 		
+		/**
+		 *  Create a new goal.
+		 *  @param wastebin The wastebin.
+		 */
 		public AchieveDropWaste(Wastebin wastebin)
 		{
 			this.wastebin = wastebin;
 		}
 		
+		/**
+		 *  Drop the goal when the wastebin is full.
+		 */
 		@GoalDropCondition(events="wastebin") // todo: check when parameter value changes
 		public boolean checkContext()
 		{
 			return wastebin.isFull();
 		}
 
+		/**
+		 *  Get the wastebin.
+		 *  @return The wastebin.
+		 */
 		public Wastebin getWastebin()
 		{
 			return wastebin;
 		}
 	}
 	
+	/**
+	 *  The goal is used to move to a specific location.
+	 */
 	@Goal
 	public class AchieveMoveTo
 	{
+		/** The location. */
 		protected Location location;
 		
+		/**
+		 *  Create a new goal.
+		 *  @param location The location.
+		 */
 		public AchieveMoveTo(Location location)
 		{
 //			System.out.println("created: "+location);
 			this.location = location;
 		}
 		
+		/**
+		 *  The goal is achieved when the position
+		 *  of the cleaner is near to the target position.
+		 */
 		@GoalTargetCondition(events="my_location")
-		public boolean checkContext()
+		public boolean checkTarget()
 		{
 			return my_location.isNear(location);
 		}
@@ -334,10 +456,14 @@ public class CleanerBDI
 			return location;
 		}
 	}
-	
+
+	/**
+	 *  
+	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
 	public class QueryWastebin
 	{
+		/** The wastebin. */
 		protected Wastebin wastebin;
 		
 		@GoalTargetCondition(events="wastebins")

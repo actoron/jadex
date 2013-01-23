@@ -44,7 +44,8 @@ public class ClassInfo
 	{
 		if(type==null)
 			throw new IllegalArgumentException("Must not null.");
-		this.type = type;
+		this.type = type; // remember only classname to avoid classloader dependencies
+//		this.typename = SReflect.getClassName(type);
 	}
 	
 	/**
@@ -82,7 +83,7 @@ public class ClassInfo
 	 */
 	public Class<?> getType(ClassLoader cl)
 	{
-		if(type==null && typename!=null)
+		if(type==null && typename!=null && cl!=null)
 		{
 			type = SReflect.classForName0(typename, cl);
 		}
@@ -102,14 +103,14 @@ public class ClassInfo
 		return type;
 	}
 	
-	/**
-	 *  Get the type.
-	 *  @return The type.
-	 */
-	public Class<?> getType()
-	{
-		return type;
-	}
+//	/**
+//	 *  Get the type.
+//	 *  @return The type.
+//	 */
+//	public Class<?> getType()
+//	{
+//		return type;
+//	}
 
 	/**
 	 *  Set the type.

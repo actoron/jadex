@@ -61,7 +61,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 		getTextField("Type").setText(service.getType().getTypeName());
 //		getTextField("Implementation").setText();
 
-		if(service.getType().getType()==null)
+		if(service.getType().getType(null)==null)
 		{
 			SServiceProvider.getService(ea.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
@@ -83,7 +83,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 		}
 		else
 		{
-			internalSetService(service.getType().getType());
+			internalSetService(service.getType().getType(null));
 		}
 	}
 	

@@ -62,7 +62,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	protected IServiceProvider provider;
 	
 	/** The external access. */
-	protected IExternalAccess	access;
+//	protected IExternalAccess	access;
+	protected IInternalAccess	ia;
 	
 	/** The result. */
 	protected Object result;
@@ -75,9 +76,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Create a new required service fetcher.
 	 */
-	public DefaultServiceFetcher(IServiceProvider provider, IExternalAccess access, boolean realtime)
+	public DefaultServiceFetcher(IServiceProvider provider, IInternalAccess access, boolean realtime)
 	{
-		this.access	= access;
+		this.ia	= access;
 		this.provider = provider;
 		this.realtime	= realtime;
 	}
@@ -90,7 +91,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, final IFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
-		final Class<T> type = (Class<T>)info.getType().getType();
+		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
 		
 //		System.out.println(info.getType().getTypeName().toString());
 //		if(info.getType().getTypeName().indexOf("IDis")!=-1)
@@ -198,7 +199,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final RequiredServiceBinding bd, boolean rebind, final IFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
-		final Class<T> type = (Class<T>)info.getType().getType();
+		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
 		
 		final IntermediateFuture<T> ret = new IntermediateFuture<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
@@ -830,12 +831,12 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 					public void customResultAvailable(final IComponentAdapter adapter)
 					{
-						IFuture<T>	fut	= access.scheduleStep(new IComponentStep<T>()
+						IFuture<T>	fut	= ia.getExternalAccess().scheduleStep(new IComponentStep<T>()
 						{
 							public IFuture<T> execute(IInternalAccess ia)
 							{
 //								System.out.println("createProxy 2:"+service);
-								return new Future<T>((T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, 
+								return new Future<T>((T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ia.getExternalAccess(), 
 									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime));
 							}
 						});

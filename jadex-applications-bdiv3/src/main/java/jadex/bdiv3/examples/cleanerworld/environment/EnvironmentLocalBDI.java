@@ -28,7 +28,7 @@ public class EnvironmentLocalBDI
 	public void body()
 	{
 //		System.out.println(EnvironmentLocalBDI.class.getClassLoader());
-		System.out.println("body: "+getClass().getClassLoader()+" "+agent.getClassLoader());
+//		System.out.println("body: "+getClass().getClassLoader()+" "+agent.getClassLoader());
 		EnvironmentGui envgui = new EnvironmentGui(agent.getExternalAccess());
 	}
 	

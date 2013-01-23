@@ -545,12 +545,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a delegation service proxy for 
 	 *  provided service that is not offered by the component itself.
 	 */
-	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
+	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid, adapter.getLogger(), realtime);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null, sid, realtime));
+		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader)}, handler); //sid.getServiceType()

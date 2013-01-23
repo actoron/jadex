@@ -6,7 +6,6 @@ import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.MaintainBatteryLoaded;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.QueryChargingStation;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.bridge.IComponentStep;
@@ -15,7 +14,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 
 /**
@@ -77,7 +75,7 @@ public class LoadBatteryPlan
 								}
 								if(charge>=1.0)
 								{
-									System.out.println("finished loading");
+//									System.out.println("finished loading");
 									ret.setResult(null);
 								}
 								else

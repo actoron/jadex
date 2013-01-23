@@ -486,14 +486,30 @@ public class RuleSystem
 	}
 	
 	/**
-	 *  Process events until the event queue is empty.
+	 *  Process events until the event queue is empty or max
+	 *  events have been processed.
+	 *  @return True if was aborted due to reaching max events.
 	 */
 	public void processAllEvents()
 	{
-		while(events.size()>0)
+		processAllEvents(-1);
+	}
+	
+	/**
+	 *  Process events until the event queue is empty or max
+	 *  events have been processed.
+	 *  @return True if was aborted due to reaching max events.
+	 */
+	public boolean processAllEvents(int max)
+	{
+		int i=0;
+		
+		for(i=0; events.size()>0 && (max==-1 || i<max); i++)
 		{
 			processEvent();
 		}
+		
+		return i==max;
 	}
 	
 	/**

@@ -371,8 +371,6 @@ public class MicroClassReader
 				
 				for(int i=0; i<vals.length; i++)
 				{
-					try
-					{
 					RequiredServiceBinding binding = createBinding(vals[i].binding());
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
 						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding);
@@ -385,11 +383,6 @@ public class MicroClassReader
 					else
 					{
 						rsers.put(vals[i].name(), rsis);
-					}
-					}
-					catch(ClassCastException e)
-					{
-						e.printStackTrace();
 					}
 				}
 			}

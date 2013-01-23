@@ -77,7 +77,7 @@ public class SRemoteGui
 		return ea.scheduleImmediate(new IComponentStep<Object[]>()
 		{
 			@Classname("getServiceInfos")
-			public IFuture<Object[]> execute(IInternalAccess ia)
+			public IFuture<Object[]> execute(final IInternalAccess ia)
 			{
 				final Future<Object[]>	ret	= new Future<Object[]>();
 				try
@@ -99,7 +99,7 @@ public class SRemoteGui
 								sis[i] = service.getServiceIdentifier();
 								pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), 
 	//								service.getServiceIdentifier().getServiceType(), null, null);
-									sis[i].getServiceType().getType(), null, null);
+									sis[i].getServiceType().getType(ia.getClassLoader()), null, null);
 							}
 							
 							ret.setResult(new Object[]{pis, ris, sis});

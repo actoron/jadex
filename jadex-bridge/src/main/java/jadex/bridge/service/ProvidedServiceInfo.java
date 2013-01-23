@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
 
 
 /**
@@ -38,12 +39,12 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class type, ProvidedServiceImplementation implementation, PublishInfo publish)
+	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, PublishInfo publish)
 	{
 		this.name = name;
 		this.implementation = implementation;
 		this.publish = publish;
-		setType(new ClassInfo(type));
+		setType(new ClassInfo(SReflect.getClassName(type)));
 	}
 	
 //	/**

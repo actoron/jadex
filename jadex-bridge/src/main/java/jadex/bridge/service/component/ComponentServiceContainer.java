@@ -500,7 +500,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			throw new ComponentTerminatedException(id);
 		}
 			
-		return new DefaultServiceFetcher(this, instance.getExternalAccess(), realtime);
+		return new DefaultServiceFetcher(this, instance, realtime);
 	}
 	
 	/**
@@ -695,9 +695,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final Future<Class<?>> ret = new Future<Class<?>>();
-		if(sid.getServiceType().getType()!=null)
+		if(sid.getServiceType().getType(instance.getClassLoader())!=null)
 		{
-			ret.setResult(sid.getServiceType().getType()); // todo: only local? remote would cause nullpointer
+			ret.setResult(sid.getServiceType().getType(instance.getClassLoader())); // todo: only local? remote would cause nullpointer
 		}
 		else
 		{

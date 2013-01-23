@@ -65,7 +65,7 @@ public class CleanUpWastePlan
 			}
 		});
 		
-		System.out.println("Clean-up waste plan started: "+goal.getWaste());
+//		System.out.println("Clean-up waste plan started: "+goal.getWaste());
 
 		if(capa.getCarriedWaste()==null)
 		{
@@ -76,7 +76,7 @@ public class CleanUpWastePlan
 			{
 				public void customResultAvailable(AchievePickupWaste apw)
 				{
-					System.out.println("picked up waste: "+goal.getWaste());
+//					System.out.println("picked up waste: "+goal.getWaste());
 					
 					dropWaste().addResultListener(new DelegationResultListener<Void>(ret));
 				}
@@ -101,12 +101,12 @@ public class CleanUpWastePlan
 		{
 			public void customResultAvailable(QueryWastebin qw)
 			{
-				System.out.println("found wastebin: "+goal.getWaste());
+//				System.out.println("found wastebin: "+goal.getWaste());
 				rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getWastebin())).addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
 				{
 					public void resultAvailable(AchieveDropWaste result)
 					{
-						System.out.println("clean-up waste plan succ: "+goal.getWaste());
+//						System.out.println("clean-up waste plan succ: "+goal.getWaste());
 						ret.setResult(null);
 					}
 					

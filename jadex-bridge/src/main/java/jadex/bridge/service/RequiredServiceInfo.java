@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,9 +104,9 @@ public class RequiredServiceInfo
 	{
 		this.name = name;
 		if(type!=null)
-			setType(new ClassInfo(type));
+			setType(new ClassInfo(SReflect.getClassName(type)));
 		if(multiplextype!=null)
-			setMultiplexType(new ClassInfo(multiplextype));
+			setMultiplexType(new ClassInfo(SReflect.getClassName(multiplextype)));
 		this.multiple = multiple;
 		this.binding = binding;
 	}
