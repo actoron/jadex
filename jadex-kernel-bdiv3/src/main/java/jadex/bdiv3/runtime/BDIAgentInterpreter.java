@@ -521,8 +521,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{
 //									System.out.println("Goal dropping triggered: "+goal);
 //									rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-									goal.setException(new GoalFailureException("drop condition: "+m.getName()));
-									goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_FAILED);
+									if(!goal.isFinished())
+									{
+										goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+										goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_FAILED);
+									}
 								}
 							}
 							

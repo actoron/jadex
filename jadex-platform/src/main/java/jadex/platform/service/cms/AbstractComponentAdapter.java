@@ -530,6 +530,20 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(cms==null || cms.getException()!=null)
 		{
 			cms	= SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
+			cms.addResultListener(new IResultListener<IComponentManagementService>()
+			{
+				public void resultAvailable(IComponentManagementService result)
+				{
+					// Replace future to save memory (all listeners and searchmanagers can be garbage collected)
+					cms	= new Future<IComponentManagementService>(result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// Replace future to save memory (all listeners and searchmanagers can be garbage collected)
+					cms	= new Future<IComponentManagementService>(exception);
+				}
+			});
 		}
 		return cms;
 	}
