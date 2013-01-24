@@ -7,6 +7,8 @@ import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
 import agentkeeper.gui.UserEingabenManager;
+import agentkeeper.state.CreatureState;
+import agentkeeper.util.Property;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
@@ -16,6 +18,8 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.scene.Node;
 
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
 
 
@@ -34,6 +38,8 @@ public class CustomGuiController extends GuiController
 	private UserEingabenManager	usermanager;
 	
 	private MonkeyApp app;
+	
+	private CreatureState creatureState;
 
 	public CustomGuiController(SimpleApplication app, ISpaceController spacecontroller)
 	{
@@ -44,6 +50,7 @@ public class CustomGuiController extends GuiController
 
 		this.spaceController = spacecontroller;
 		this.usermanager = (UserEingabenManager)spacecontroller.getProperty("uem");
+		this.creatureState = (CreatureState)spaceController.getProperty(Property.CREATURE_STATE);
 
 
 	}
@@ -141,6 +148,10 @@ public class CustomGuiController extends GuiController
 
 	public void onStartScreen()
 	{
+		Element creatureText = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("imp_total");
+		TextRenderer textRender = creatureText.getRenderer(TextRenderer.class);
+		
+		textRender.setText(""+creatureState.getCountImp());
 
 	}
 

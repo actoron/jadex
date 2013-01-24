@@ -15,104 +15,136 @@
 
 		</layer>
 		<layer childLayout="center">
-					<panel id="infopanel" x="50%" width="50%" height="5%"
-				valign="top" align="right" childLayout="overlay"
-				backgroundColor="#0002">
+			<panel id="infopanel" x="50%" width="50%" height="5%" valign="top"
+				align="right" childLayout="overlay" backgroundColor="#0002">
 				<text id="infotext" style="nifty-label" color="#f00f" text="Hello World!"
-				textHAlign="center" textVAlign="center" align="center" valign="center"/>
-				</panel>
+					textHAlign="center" textVAlign="center" align="center" valign="center" />
+			</panel>
+			
+			<panel id="panel_map" width="10%" height="16%" valign="bottom" align="left"
+					childLayout="overlay" backgroundImage="/gui/images/map_icon_32.png"
+					imageMode="resize:15,2,15,15,15,2,15,2,15,2,15,15" backgroundColor="#0005">
+			</panel>
 
 
-			<panel id="panel" x="10%" width="90%" y="85%" height="15%"
-				valign="bottom" align="right" childLayout="vertical"
-				backgroundColor="#0335">
+			<panel id="panel" x="10%" width="90%"  height="133px"
+				backgroundColor="#fff0" valign="bottom" align="right" childLayout="center">
 
 
-				<panel id="panel_buttons" width="100%" valign="bottom"
-					childLayout="horizontal" backgroundColor="#3035">
+				<panel id="panel_buttons" width="100%" valign="top"
+					childLayout="horizontal" backgroundColor="#3030">
 
-					<control name="button" label="Default Menu" id="DefaultSelector"
-						align="right" valign="bottom" visibleToMouse="true">
+
+					<image id="DefaultS" filename="/gui/images/main/options.png"
+						height="32px" width="32px" hint="options">
 						<effect>
+							<onHover name="hint" hintText="Options" hintDelay="1000" />
+							<onHover name="imageOverlay" filename="/gui/images/main/options_clicked.png"
+								post="true" imageMode="normal" height="32px" width="32px" neverStopRendering="true" />
 							<onClick name="show" targetElement="panel_default"></onClick>
 							<onClick name="hide" targetElement="panel_units"></onClick>
 							<onClick name="hide" targetElement="panel_buildings"></onClick>
 						</effect>
-					</control>
-
-					<control name="button" label="Units" id="UnitsSelector"
-						align="right" valign="bottom" visibleToMouse="true">
+					</image>
+					
+					<image id="UnitsS" filename="/gui/images/main/monster.png"
+						height="32px" width="32px" hint="options">
 						<effect>
+							<onHover name="hint" hintText="Creatures" hintDelay="1000" />
+							<onHover name="imageOverlay" filename="/gui/images/main/monster_clicked.png"
+								post="true" imageMode="normal" height="32px" width="32px" neverStopRendering="true" />
 							<onClick name="show" targetElement="panel_units"></onClick>
 							<onClick name="hide" targetElement="panel_default"></onClick>
 							<onClick name="hide" targetElement="panel_buildings"></onClick>
 						</effect>
-					</control>
-					<control name="button" label="Buildings" id="BuildingsSelector"
-						align="right" valign="bottom" visibleToMouse="true">
+					</image>
+					
+					<image id="BuildingsS" filename="/gui/images/main/home.png"
+						height="32px" width="32px" hint="options">
 						<effect>
+							<onHover name="hint" hintText="Buildings" hintDelay="1000" />
+							<onHover name="imageOverlay" filename="/gui/images/main/home_clicked.png"
+								post="true" imageMode="normal" height="32px" width="32px" neverStopRendering="true" />
 							<onClick name="show" targetElement="panel_buildings"></onClick>
 							<onClick name="hide" targetElement="panel_units"></onClick>
 							<onClick name="hide" targetElement="panel_default"></onClick>
 						</effect>
-					</control>
+					</image>
 				</panel>
 
 				<panel id="panel_content" width="100%" valign="bottom"
-					childLayout="overlay" backgroundColor="#1230">
+					childLayout="overlay" backgroundImage="/gui/images/icon_32.png"
+					imageMode="resize:15,2,15,15,15,2,15,2,15,2,15,15" backgroundColor="#0005"  height="100px">
+					<panel id="panel_units" width="100%" valign="bottom" childLayout="horizontal" backgroundColor="#0030" padding="15px">
+					
+						<panel id="imp_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/kobold_item.png" >
+							<effect>
+								<onHover name="hint" hintText="Imp" hintDelay="1000" />
+							</effect>
+							<text id="imp_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="imp_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="imp_total" style="nifty-label" align="right" color="#777f" text="6" />
+						</panel>
+						
+					<panel id="goblin_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/goblin_item.png">
+						<effect>
+							<onHover name="hint" hintText="Goblin" hintDelay="1000" />
+						</effect>
+							<text id="goblin_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="goblin_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="goblin_total" style="nifty-label" align="right" color="#333f" text="0" />
+					</panel>
+					<panel id="warlock_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/warlock_item.png">
+						<effect>
+							<onHover name="hint" hintText="Warlock" hintDelay="1000" />
+						</effect>
+							<text id="warlock_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="warlock_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="warlock_total" style="nifty-label" align="right" color="#333f" text="0" />
+					</panel>
+					<panel id="orc_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/orc_item.png">
+						<effect>
+							<onHover name="hint" hintText="Orc" hintDelay="1000" />
+						</effect>
+							<text id="orc_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="orc_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
+							<text id="orc_total" style="nifty-label" align="right" color="#333f" text="0" />
+					</panel>
 
-					<panel id="panel_default" width="100%" valign="bottom"
-						childLayout="horizontal" backgroundColor="#3035">
+					</panel>
+
+					<panel id="panel_default" width="100%" valign="bottom" visible="false"
+						childLayout="horizontal" backgroundColor="#3030" padding="15px">
+
 						<control name="button" label="Fullscreen" id="FireButton"
-							visibleToMouse="true">
+							visibleToMouse="true" height="50%" valign="center" align="left" >
 							<interact onClick="fireFullscreen()" />
 						</control>
 
+
 						<control name="button" label="Grid" id="OptionsButton2"
-							visibleToMouse="true">
+							visibleToMouse="true" height="50%" valign="center" align="left" >
 							<interact onClick="setGrid()" />
 						</control>
 
 						<control name="button" label="Stats" id="OptionsButton3"
-							visibleToMouse="true">
+							visibleToMouse="true" height="50%" valign="center" align="left">
 							<interact onClick="setPerform()" />
 						</control>
 
 						<control name="button" label="Exit" id="ExitButton"
-							visibleToMouse="true">
-							<interact onClick="quitGame()" />
+							visibleToMouse="true" height="50%" valign="center" align="left">
+<!-- 							<interact onClick="quitGame()" /> -->
 						</control>
 
 					</panel>
 
 
-					<panel id="panel_units" width="100%" valign="bottom"
-						childLayout="horizontal" backgroundColor="#0035" visible="false">
-						<effect>
-							<onStartScreen name="hide" targetElement="panel_units"></onStartScreen>
-						</effect>
-						<image filename="/gui/images/monster/kobold_item.png"
-							height="95%">
-							<interact onClick="setGrid()" />
-						</image>
-						<image filename="/gui/images/monster/goblin_item.png"
-							height="95%">
-							<interact onClick="setGrid()" />
-						</image>
-						<image filename="/gui/images/monster/warlock_item.png"
-							height="95%">
-							<interact onClick="setGrid()" />
-						</image>
-						<image filename="/gui/images/monster/orc_item.png" height="95%">
-							<interact onClick="setGrid()" />
-						</image>
-
-					</panel>
 
 					<panel id="panel_buildings" width="100%" valign="bottom"
-						childLayout="horizontal" backgroundColor="#2005" visible="false">
+						childLayout="horizontal" backgroundColor="#2000" visible="false" padding="15px">
 						<control name="button" label="TestBuildings" id="TestBuildings"
-							visibleToMouse="true">
+							visibleToMouse="true" height="50%" valign="center">
 						</control>
 					</panel>
 				</panel>

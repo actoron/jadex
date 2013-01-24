@@ -45,7 +45,6 @@ public class MonkeyApp extends AMonkeyFunctions
 	}
 
 
-	
 	public void simpleUpdate(float tpf)
 	{
 		super.simpleUpdateAbstract(tpf);

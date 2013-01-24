@@ -328,6 +328,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 								else
 								{
 									props.put("spieler", new Integer(1));
+									creatureState.addCreature(type);
 								}
 
 							}
