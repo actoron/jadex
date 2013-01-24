@@ -360,7 +360,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		Nifty nifty = niftyDisplay.getNifty();
 		
 		
-		nifty.setIgnoreKeyboardEvents(true);
+//		nifty.setIgnoreKeyboardEvents(true);
 		
 		if(defaultGui)
 		{
