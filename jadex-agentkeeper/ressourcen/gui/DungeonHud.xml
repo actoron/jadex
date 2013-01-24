@@ -6,7 +6,7 @@
 		here, etc. -->
 
 	<useControls filename="nifty-default-controls.xml" />
-	<useStyles filename="nifty-default-styles.xml" />
+	<useStyles filename="/gui/nifty-style/nifty-default-styles.xml" />
 
 
 	<screen id="hud" controller="controller.CustomGuiController">
@@ -17,8 +17,9 @@
 		<layer childLayout="center">
 			<panel id="infopanel" x="50%" width="50%" height="5%" valign="top"
 				align="right" childLayout="overlay" backgroundColor="#0002">
-				<text id="infotext" style="nifty-label" color="#f00f" text="Hello World!"
-					textHAlign="center" textVAlign="center" align="center" valign="center" />
+				
+				<text id="infotext" style="nifty-arial-label"  text="Hello World!"
+					textHAlign="center" textVAlign="center" height="100%" align="left" valign="center" />
 			</panel>
 			
 			<panel id="panel_map" width="10%" height="16%" valign="bottom" align="left"
