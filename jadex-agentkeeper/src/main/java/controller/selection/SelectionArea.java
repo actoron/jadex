@@ -1,5 +1,7 @@
 package controller.selection;
 
+import jadex.extension.envsupport.math.Vector2Int;
+
 import com.jme3.math.Vector2f;
 
 /**
@@ -10,6 +12,9 @@ public class SelectionArea
 {
     public Vector2f start = new Vector2f();
     public Vector2f end = new Vector2f();
+    
+    private Vector2Int worldstart;
+    private Vector2Int worldend;
     public float delta_xaxis;
     public float delta_yaxis;
     public float scale = 1;
@@ -29,6 +34,8 @@ public class SelectionArea
         this.start = start;
         this.end = end;
         this.scale = appScaled;
+        this.worldend = new Vector2Int(Math.round(end.divide(scale).x), Math.round(end.divide(scale).y));
+        this.worldstart = new Vector2Int(Math.round(start.divide(scale).x), Math.round(start.divide(scale).y));
     }
 
     /**
@@ -45,6 +52,7 @@ public class SelectionArea
     public void setStart(Vector2f start)
     {
         this.start = start;
+        this.worldstart = new Vector2Int(Math.round(start.divide(scale).x), Math.round(start.divide(scale).y));
     }
 
     /**
@@ -61,6 +69,8 @@ public class SelectionArea
     public void setEnd(Vector2f end)
     {
         this.end = end;
+        this.worldend = new Vector2Int(Math.round(end.divide(scale).x), Math.round(end.divide(scale).y));
+        System.out.println("worldend " + worldend + " end " + end);
     }
 	/**
 	 * @return the scale
@@ -89,6 +99,20 @@ public class SelectionArea
 	public float getDeltaYaxis()
 	{
 		return end.y-start.y;
+	}
+	/**
+	 * @return the worldstart
+	 */
+	public Vector2Int getWorldstart()
+	{
+		return new Vector2Int(Math.round(start.divide(scale).x), Math.round(start.divide(scale).y));
+	}
+	/**
+	 * @return the worldend
+	 */
+	public Vector2Int getWorldend()
+	{
+		return new Vector2Int(Math.round(end.divide(scale).x), Math.round(end.divide(scale).y));
 	}
 
 }

@@ -107,6 +107,16 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 			BUILDING_SET.add(BUILDING_TYPES[i]);
 		}
 		
+		for(int i = 0; i<BREAKABLE_FIELD.length; i++ )
+		{
+			BREAKABLE_FIELD_TYPES.add(BREAKABLE_FIELD[i]);
+		}
+		
+		for(int i = 0; i<MOVE_TYPES.length; i++ )
+		{
+			MOVEABLES.add(MOVE_TYPES[i]);
+		}
+		
 		CENTER_TYPES.put(HATCHERY, HATCHERYCENTER);
 		CENTER_TYPES.put(PORTAL, PORTALCENTER);
 		CENTER_TYPES.put(TRAININGROOM, TRAININGROOMCENTER);
@@ -124,45 +134,8 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 		// grid.getBorderMode();
 		// Initialize the field.
 		try {
-			Auftragsverwalter auftragsverwalter = new Auftragsverwalter();
-			
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 17));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 16));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 15));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 14));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 13));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 12));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(16, 13));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(16, 14));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(16, 15));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(18, 13));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(18, 14));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(18, 15));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(19, 14));
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(15, 14));
-			
-			auftragsverwalter.neuerAuftrag(Auftragsverwalter.BESETZEN, new Vector2Int(20, 30));
-//			
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.BESETZEN, new Vector2Int(24, 19));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.BESETZEN, new Vector2Int(18, 22));
-//			
-//			
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(13, 27));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(23, 20));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(21, 22));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(14, 21));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(15, 21));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(16, 21));
-//			
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(30, 17));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(29, 16));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(28, 16));
-//			
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(18, 24));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(17, 24));
-//			
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(16, 25));
-//			auftragsverwalter.neuerAuftrag(Auftragsverwalter.WANDABBAU, new Vector2Int(15, 25));
+			Auftragsverwalter auftragsverwalter = new Auftragsverwalter(grid);
+
 
 
 			grid.setProperty("auftraege", auftragsverwalter);
@@ -229,6 +202,17 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 			return null;
 				
 
+	}
+	
+	public static SpaceObject getSolidTypeAtPos(IVector2 pos, Grid2D gridext)
+	{
+		SpaceObject ret = null;
+		ret = getFieldTypeAtPos(pos, gridext);
+		if(ret == null)
+		{
+			ret = getBuildingTypeAtPos(pos, gridext);
+		}
+		return ret;
 	}
 	
 	public static SpaceObject getFieldTypeAtPos(IVector2 pos, Grid2D gridext)

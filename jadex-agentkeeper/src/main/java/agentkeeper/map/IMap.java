@@ -51,6 +51,9 @@ public interface IMap {
 	
 	public static final String[] MOVE_TYPES = {DIRT_PATH, CLAIMED_PATH, GOLD2, LAVA, HERO, TREASURY, HATCHERY, LAIR, PORTAL, TRAININGROOM, LIBRARY, TORTURE, DUNGEONHEART};
 	
+	static final String[] BREAKABLE_FIELD = {ROCK, REINFORCED_WALL};
+	
+	
 	public static final boolean ROCK_COMPLEX_NEIHBORHOOD = true;
 	public static final boolean GOLD_COMPLEX_NEIHBORHOOD = true;
 	public static final boolean REINFORCED_COMPLEX_NEIHBORHOOD = true;
@@ -85,6 +88,10 @@ public interface IMap {
 	public static final HashSet<String> FIELD_SET = new HashSet<String>(); 
 	
 	public static final HashSet<String> BUILDING_SET = new HashSet<String>(); 
+	
+	public static final HashSet<String> BREAKABLE_FIELD_TYPES = new HashSet<String>(); 
+	
+	public static final HashSet<String> MOVEABLES = new HashSet<String>(); 
 	
 	public static final HashMap<String,String> CENTER_TYPES = new HashMap<String,String>(); 
 

@@ -77,6 +77,7 @@ public class CustomAppState extends AbstractAppState
 	protected String 	selectedObject;
 
 
+
 	public void initialize(AppStateManager stateManager, Application app)
 	{
 		super.initialize(stateManager, app);
@@ -171,7 +172,7 @@ public class CustomAppState extends AbstractAppState
 	protected boolean isOnView()
 	{
 //		System.out.println("getRounded2dMousePos().y " + getRounded2dMousePos().y );
-//		System.out.println("this.app.getViewPort().getCamera().getHeight() * 0.15f " + this.app.getViewPort().getCamera().getHeight() * 0.15f );
+//		System.out.println("this.app.getViewPort().getCamera().getHeight() * 0.58f " + this.app.getViewPort().getCamera().getHeight() * 0.85f );
 		return (getRounded2dMousePos().y < this.app.getViewPort().getCamera().getHeight() * 0.85f);
 
 	}
@@ -339,6 +340,24 @@ public class CustomAppState extends AbstractAppState
 		// al.setColor(new ColorRGBA(1.7f,2.2f,3.2f,1f));
 		al.setColor(ColorRGBA.White.mult(0.5f));
 		this.app.getRootNode().addLight(al);
+	}
+
+
+	/**
+	 * @return the spaceController
+	 */
+	public ISpaceController getSpaceController()
+	{
+		return spaceController;
+	}
+
+
+	/**
+	 * @param spaceController the spaceController to set
+	 */
+	public void setSpaceController(ISpaceController spaceController)
+	{
+		this.spaceController = spaceController;
 	}
 
 }

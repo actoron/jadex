@@ -1,5 +1,7 @@
 package agentkeeper.auftragsverwaltung;
 
+import controller.selection.SelectionArea;
+import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Int;
 
@@ -18,6 +20,8 @@ public class Auftragsverwalter implements IAuftragsverwalter {
 	public static final String ERREICHEEINHEIT = "basis.erreicheeinheit";
 	public static final String KAPUTTMACHEN = "kaputtmachen";
 	public static final String ANGREIFEN = "angreifen";
+	
+	private BreakWallList breakWallList;
 
 	// 1. Prio Auftr�ge
 	Auftragsliste _auftraege[];
@@ -25,7 +29,9 @@ public class Auftragsverwalter implements IAuftragsverwalter {
 	/**
 	 * Initialisiert die Auftragsliste
 	 */
-	public Auftragsverwalter() {
+	public Auftragsverwalter(Grid2D grid) {
+		
+		breakWallList = new BreakWallList(grid);
 
 		_auftraege = new Auftragsliste[3];
 		//Prio 1
@@ -47,6 +53,12 @@ public class Auftragsverwalter implements IAuftragsverwalter {
 			if(!loading)
 			{
 				loading = true;
+				Auftrag auf = breakWallList.getClosest(position);
+				if(auf!=null)
+				{
+					loading = false;
+					return auf;
+				}
 				for(int i = 0; i<_auftraege.length; i++ )
 				{
 					if (!_auftraege[i].isEmpty()) {
@@ -63,6 +75,8 @@ public class Auftragsverwalter implements IAuftragsverwalter {
 						}
 					}
 				}
+				
+				
 				loading = false;
 				
 
@@ -71,7 +85,7 @@ public class Auftragsverwalter implements IAuftragsverwalter {
 			}
 			else
 			{
-				
+				return null;
 			}
 
 
@@ -150,6 +164,16 @@ public class Auftragsverwalter implements IAuftragsverwalter {
 				_auftraege[2].add(a);
 			}
 		}
+	}
+	
+	public synchronized void newBreakWalls(SelectionArea area)
+	{
+		breakWallList.newBreakWalls(area);
+	}
+	
+	public synchronized void updatePosition(IVector2 position)
+	{
+		breakWallList.updatePosition(position);
 	}
 	
 

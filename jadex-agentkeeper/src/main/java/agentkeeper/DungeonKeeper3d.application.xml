@@ -290,15 +290,15 @@
 					
 					<env:drawable3d objecttype="reinforced_wall" width="1.0" height="1.0" depth="1.0" isDynamic="false">
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
-							materialpath="models/tilesets/RockTestClicked.j3m"
+							materialpath="models/tilesets/claimed/Claimedwall.j3m"
 							modelpath="models/tilesets/dirt/Dirt_?.j3o">
-							<env:drawcondition>$object.getProperty("clicked")</env:drawcondition>
+							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
 						</env:object3d>
 						
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
-							materialpath="models/tilesets/RockTest.j3m"
+							materialpath="models/tilesets/claimed/ClaimedwallClicked.j3m"
 							modelpath="models/tilesets/dirt/Dirt_?.j3o">
-							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
+							<env:drawcondition>$object.getProperty("clicked")</env:drawcondition>
 						</env:object3d>
 						
 					</env:drawable3d>

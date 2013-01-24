@@ -6,7 +6,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         
         Specular : 1.0 1.0 1.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0
-        Ambient : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 2.0 1.0
         GlowColor : 1.0 1.0 1.0 1.0
         VertexLighting : true
         UseMaterialColors : true

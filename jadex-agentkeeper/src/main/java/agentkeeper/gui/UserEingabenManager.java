@@ -2,6 +2,8 @@ package agentkeeper.gui;
 
 import java.util.Map;
 
+import controller.selection.SelectionArea;
+
 import agentkeeper.SpielerAktionen;
 import agentkeeper.auftragsverwaltung.Auftragsverwalter;
 import agentkeeper.map.InitMapProcess;
@@ -81,6 +83,11 @@ public class UserEingabenManager {
 			return zauberImp(x, y);
 		}
 		return "";
+	}
+	
+	public void destoryWalls(SelectionArea area)
+	{
+		_auftraege.newBreakWalls(area);
 	}
 
 	private String bauAktion(int x, int y, int aktion) {

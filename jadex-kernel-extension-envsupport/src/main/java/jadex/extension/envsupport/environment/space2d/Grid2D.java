@@ -240,6 +240,35 @@ public class Grid2D extends Space2D
 	 * Destroys an object in this space.
 	 * @param objectId the object's ID
 	 */
+	public boolean destroyAndVerifySpaceObject(Object id)
+	{
+		boolean ret = false;
+		try
+		{
+			synchronized(monitor)
+			{
+				// remove the object from grid
+				IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.PROPERTY_POSITION);
+				if(pos!=null)
+				{
+					IVector2 fieldpos = new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger());
+					objectsygridpos.remove(fieldpos, spaceobjects.get(id));
+				}
+				super.destroySpaceObject(id);
+				ret = true;
+			}
+		}
+		catch(Exception e)
+		{
+			ret = false;
+		}		
+		return ret;
+	}
+	
+	/** 
+	 * Destroys an object in this space.
+	 * @param objectId the object's ID
+	 */
 	public void destroySpaceObject(Object id)
 	{
 		try

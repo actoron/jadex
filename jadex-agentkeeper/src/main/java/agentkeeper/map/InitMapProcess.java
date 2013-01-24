@@ -219,10 +219,6 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 							
 							String newNeighborhood = Neighborhood.reCalculateNeighborhood(postype.getPosition(), nearRocks);
 							
-							if(postype.getType().equals("lair"))
-							{
-								System.out.println("lairneighborhoood: " + newNeighborhood);
-							}
 							thatsme.setProperty("neighborhood", newNeighborhood);
 						}
 						else
