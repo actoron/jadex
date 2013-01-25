@@ -1998,7 +1998,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void addProperty(String name, Object val)
 	{
-		System.out.println("addprop: "+name+" "+val);
 		if(properties==null)
 			properties = new HashMap();
 		properties.put(name, val);
