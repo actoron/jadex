@@ -1,5 +1,10 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.annotation.GoalResult;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 
 /**
  *  Goal model.
@@ -40,12 +45,17 @@ public class MGoal extends MClassBasedElement
 	/** The deliberation. */
 	protected MDeliberation deliberation;
 	
+	/** The pojo result access (field or method). */
+	protected Object pojoresultaccess;
+	
 	
 	// hack?!
 	protected boolean declarative;
 	
 	// hack?!
 	protected boolean maintain;
+	
+	
 	
 	/**
 	 *  Create a new belief.
@@ -153,7 +163,6 @@ public class MGoal extends MClassBasedElement
 	{
 		return deliberation;
 	}
-
 	
 	// todo: do not write from instance level!
 	
@@ -193,4 +202,45 @@ public class MGoal extends MClassBasedElement
 		this.maintain = maintain;
 	}
 	
+	/**
+	 *  Get the pojo result access, i.e. the method or field
+	 *  annotated with @GoalResult.
+	 */
+	public Object getPojoResultAccess(ClassLoader cl)
+	{
+		if(pojoresultaccess==null)
+		{
+			Class<?> pojocl = getTargetClass(cl);
+			for(Method m: pojocl.getDeclaredMethods())
+			{
+				if(m.isAnnotationPresent(GoalResult.class))
+				{
+					pojoresultaccess = m;
+					break;
+				}
+			}
+			if(pojoresultaccess==null)
+			{
+				for(Field f: pojocl.getDeclaredFields())
+				{
+					if(f.isAnnotationPresent(GoalResult.class))
+					{
+						pojoresultaccess = f;
+						break;
+					}
+				}
+				if(pojoresultaccess==null)
+					pojoresultaccess = Boolean.FALSE;
+			}
+		}
+		
+		if(!Boolean.FALSE.equals(pojoresultaccess))
+		{
+			return pojoresultaccess;
+		}
+		else
+		{
+			return null;
+		}
+	}
 }

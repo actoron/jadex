@@ -79,7 +79,7 @@ public class GoalDelegationHandler  //implements InvocationHandler
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
 		MCapability mcapa = (MCapability)agent.getCapability().getModelElement();
-		MGoal mgoal = mcapa.getGoal(goalname);
+		final MGoal mgoal = mcapa.getGoal(goalname);
 		
 		Class<?> goalcl = mgoal.getTargetClass(agent.getClassLoader());
 		
@@ -89,13 +89,13 @@ public class GoalDelegationHandler  //implements InvocationHandler
 		if(c==null)
 			throw new RuntimeException("Goal must have constructor with same signature as method: "+method);
 
-		Object goal = c.newInstance(args);
+		final Object goal = c.newInstance(args);
 		
 		agent.dispatchTopLevelGoal(goal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-//				ret.setResult(RGoal.getGoalResult(goal));
+				ret.setResult(RGoal.getGoalResult(goal, mgoal, agent.getClassLoader()));
 			}
 		});
 	

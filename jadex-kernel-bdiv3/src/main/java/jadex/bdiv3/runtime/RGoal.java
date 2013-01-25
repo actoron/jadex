@@ -15,6 +15,7 @@ import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -707,6 +708,43 @@ public class RGoal extends RProcessableElement
 	public boolean isProceduralGoal()
 	{
 		return !getMGoal().isDeclarative();
+	}
+	
+	/**
+	 *  Get the goal result of the pojo element.
+	 *  Searches @GoalResult and delivers value.
+	 */
+	public static Object getGoalResult(Object pojo, MGoal mgoal, ClassLoader cl)
+	{
+		Object ret = null;
+		Object pac = mgoal.getPojoResultAccess(cl);
+		if(pac instanceof Field)
+		{
+			try
+			{
+				Field f = (Field)pac;
+				f.setAccessible(true);
+				ret = f.get(pojo);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else if(pac instanceof Method)
+		{
+			try
+			{
+				Method m = (Method)pac;
+				m.setAccessible(true);
+				ret = m.invoke(pojo, new Object[0]);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return ret;
 	}
 	
 	/**

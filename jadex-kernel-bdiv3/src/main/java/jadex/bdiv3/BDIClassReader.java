@@ -147,6 +147,8 @@ public class BDIClassReader extends MicroClassReader
 		List<MConfiguration> bdiconfs = new ArrayList<MConfiguration>();
 		boolean confdone = false;
 		
+		Map<ClassInfo, List<Object[]>> pubs = new HashMap<ClassInfo, List<Object[]>>();
+		
 		Class<?> clazz = cma;
 		while(clazz!=null && !clazz.equals(Object.class) && !clazz.equals(getClass(BDIAgent.class, cl)))
 		{
@@ -173,7 +175,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found plan: "+methods[i].getName());
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
-					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl);
+					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
 					MPlan mplan = new MPlan(methods[i].getName(), new jadex.bdiv3.model.MethodInfo(methods[i]), mtr, p.priority());
 					bdimodel.getCapability().addPlan(mplan);
 				}
@@ -186,7 +188,7 @@ public class BDIClassReader extends MicroClassReader
 				for(Plan p: plans)
 				{
 					Class<?> bodycl = p.body();
-					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl);
+					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
 					MPlan mplan = new MPlan(SReflect.getInnerClassName(bodycl), new ClassInfo(bodycl.getName()), mtr, p.priority());
 					bdimodel.getCapability().addPlan(mplan);
 				}
@@ -321,7 +323,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Plan p, ClassLoader cl)
+	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Plan p, ClassLoader cl, Map<ClassInfo, List<Object[]>> pubs)
 	{
 		MTrigger tr = new MTrigger();
 		Trigger trigger = p.trigger();
@@ -370,6 +372,14 @@ public class BDIClassReader extends MicroClassReader
 				{
 					ClassInfo ci = new ClassInfo(pub.type().getName());
 					String method = pub.method().length()>0? pub.method(): null;
+					
+					List<Object[]> tmp = pubs.get(ci);
+					if(tmp==null)
+					{
+						tmp = new ArrayList<Object[]>();
+						pubs.put(ci, tmp);
+					}
+					tmp.add(new Object[]{mgoal, method});
 				}
 				
 				mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
