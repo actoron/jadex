@@ -79,6 +79,13 @@
 		</dependency>
 		-->
 		
+		
+<!-- 		<dependency> -->
+<!--   			<groupId>net.sourceforge.jadex.jme3ext</groupId> -->
+<!--   			<artifactId>jmonkeyengine3</artifactId> -->
+<!--   			<version>${jmonkey.version}</version> -->
+<!-- 		</dependency> -->
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-extension-envsupport-jmonkey</artifactId>

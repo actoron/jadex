@@ -31,15 +31,19 @@ public class MonkeyApp extends AMonkeyFunctions
 {
 
 	private boolean guiActive = false;
+	
+	private NodeQueue effectStack;
 
 
 	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, ISpaceController spaceController)
 	{
 		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, spaceController);
+		this.effectStack = new NodeQueue(10);
 	}
 
 	public void simpleInitApp()
 	{
+		
 		super.simpleInit();
 
 	}
@@ -54,25 +58,10 @@ public class MonkeyApp extends AMonkeyFunctions
 		 */
 		if(cleanupPostFilter)
 		{
+			System.out.println("cleanup!");
 			blockCamMoving = true;
 			fpp.cleanup();
 			cleanupPostFilter = false;
-//			cam.setViewPort( 0.0f , 1.0f , 0.15f , 1.0f );
-			
-//			 float height = (cam.getWidth()*0.1f)/cam.getHeight();
-
-			try
-			{
-//				cam_map.setViewPort( 0 , width , 0.0f , 0.15f );
-//				this.getRenderManager().getMainView("MapView").getCamera().setViewPort( width , 1.0f , 0.85f , 1.0f );
-//				 this.getRenderManager().getMainView("MapView").getCamera().setViewPort( 0 , 0.10f , 0.0f , height );
-			}
-			catch(NullPointerException e)
-			{
-				System.out.println("camera MapView not there");
-			}
-			
-
 		}
 
 
@@ -182,6 +171,14 @@ public class MonkeyApp extends AMonkeyFunctions
 							ParticleEmitter tmpeffect = ((ParticleEmitter)effect);
 							tmpeffect.emitAllParticles();
 						}
+					
+					Node oldnode = effectStack.push(effectnode);
+					
+					if(oldnode!=null)
+					{
+						oldnode.removeFromParent();
+					}
+					
 				}
 
 

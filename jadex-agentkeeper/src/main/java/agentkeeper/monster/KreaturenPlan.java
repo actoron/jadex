@@ -176,7 +176,7 @@ public abstract class KreaturenPlan extends Plan {
 
 		}
 		else {
-			System.out.println("Schon da!Schon da!");
+//			System.out.println("Schon da!Schon da!");
 		}
 	}
 	

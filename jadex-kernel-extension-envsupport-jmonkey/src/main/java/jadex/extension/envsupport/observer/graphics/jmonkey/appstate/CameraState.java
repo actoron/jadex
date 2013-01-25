@@ -8,6 +8,9 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
@@ -19,43 +22,19 @@ public class CameraState extends AbstractAppState
 
 	private MonkeyApp		app;
 
-	private Node			rootNode;
-
-	private AssetManager	assetManager;
-
-	private AppStateManager	stateManager;
-
-	private InputManager	inputManager;
-
-	private ViewPort		viewPort;
-
 	private Camera			cam;
 
 	private float			appSize;
 
-	private float			appScaled;
 
-	private String			cameraSelection;
-
-	private Node			camNode;
 
 
 	public void initialize(AppStateManager stateManager, Application app)
 	{
 		super.initialize(stateManager, app);
 		this.app = (MonkeyApp)app;
-		this.rootNode = this.app.getRootNode();
-		this.assetManager = this.app.getAssetManager();
-		this.stateManager = this.app.getStateManager();
-		this.inputManager = this.app.getInputManager();
-		this.viewPort = this.app.getViewPort();
 		this.cam = this.app.getCamera();
 		this.appSize = this.app.getAppSize();
-		this.appScaled = this.app.getAppScaled();
-		this.cameraSelection = this.app.getCameraSelection();
-
-		camNode = new Node("camNode");
-
 
 		initCam();
 
@@ -68,82 +47,21 @@ public class CameraState extends AbstractAppState
 
 		/** Configure cam to look at scene */
 		cam.setLocation(new Vector3f(appSize / 2, appSize / 2, appSize / 2));
-		cam.lookAt(new Vector3f(appSize / 2, 0, appSize / 2), Vector3f.UNIT_Y);
+		cam.lookAt(new Vector3f(0, 0, 0), Vector3f.UNIT_Y);
 		cam.setFrustumNear(1f);
 		cam.setFrustumFar(appSize * 5);
 
+		this.app.getFlyByCamera().setEnabled(true);
+		
+		DirectionalLight dl = new DirectionalLight();
+        dl.setDirection(new Vector3f(-0.8f, -1.0f, -0.08f).normalizeLocal());
+        dl.setColor(new ColorRGBA(ColorRGBA.White));
+        this.app.getRootNode().addLight(dl);    
 
-		app.getFlyByCamera().setEnabled(false);
+        AmbientLight al = new AmbientLight();
+        al.setColor(ColorRGBA.White.mult(0.2f));
+        this.app.getRootNode().addLight(al);
 
-
-		if(cameraSelection.equals("Default"))
-		{
-			cam.setLocation(new Vector3f(appSize / 2, appSize / 4, appSize / 2));
-			// The Fly Camera
-
-			app.getFlyByCamera().setUpVector(Vector3f.UNIT_Y);
-			app.getFlyByCamera().registerWithInput(inputManager);
-			app.getFlyByCamera().setMoveSpeed(appScaled);
-			app.getFlyByCamera().setDragToRotate(true);
-			app.getFlyByCamera().setEnabled(true);
-
-
-			app.getFlyByCamera().setEnabled(true);
-		}
-		else if(cameraSelection.equals("Iso"))
-		{
-
-			IsoCamera dungeonCam = new IsoCamera(cam, inputManager, app);
-
-			camNode = dungeonCam.getCamNode();
-			rootNode.attachChild(camNode);
-		}
-		else if(cameraSelection.equals("Focus"))
-		{
-
-			// // The Focus Camera
-			// focusCam = new FocusCamera(cam, staticNode, inputManager);
-			// focusCam.setUpVector(Vector3f.UNIT_Y);
-			// focusCam.setSmoothMotion(true);
-			// focusCam.setDragToRotate(false);
-			// focusCam.setDefaultDistance(1000f);
-			// focusCam.setMaxDistance(2000f);
-			// focusCam.setMinDistance(50f);
-			// focusCam.setZoomSpeed(20f);
-			// focusCam.setEnabled(true);
-		}
-
-
-		// cam.
-
-		// Change the mappings we don't want
-
-		//
-		// Camera cam_n = cam.clone();
-		// cam.setViewPort( 0.0f , 1.0f , 0.0f , 1.0f );
-		// cam_n.setViewPort( 0.0f , 0.1f , 0.85f , 1.0f );
-		// cam_n.setLocation(new Vector3f(appSize/2, appSize/2,
-		// appSize/2));
-		// cam_n.lookAt(new Vector3f(appSize/2, 0.001f, appSize/2),
-		// Vector3f.UNIT_Y);
-		//
-		//
-		//
-		//
-		// ViewPort view = renderManager.createMainView("View of camera #1",
-		// cam);
-		// view.setEnabled(true);
-		// view.setClearFlags(true, true, true);
-		// view.attachScene(rootNode);
-		// view.setBackgroundColor(ColorRGBA.Black);
-		// view.addProcessor(fpp);
-		// //
-		// ViewPort view_n = renderManager.createMainView("View of camera #2",
-		// cam_n);
-		// view_n.setEnabled(true);
-		// view_n.setClearFlags(true, true, true);
-		// view_n.attachScene(rootNode);
-		// view_n.setBackgroundColor(ColorRGBA.Black);
 
 	}
 }

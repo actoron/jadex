@@ -17,7 +17,7 @@
 	</description>
 
 	<properties>
-		<jmonkey.version>3.0.0.20120512-SNAPSHOT</jmonkey.version>
+		<jmonkey.version>3.0.0.20130125-SNAPSHOT</jmonkey.version>
 		<!-- <jmonkey.version>[3.0.0-SNAPSHOT,)</jmonkey.version> -->
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 	</properties>
@@ -48,113 +48,112 @@
 	<dependencies>
 	
 	<!-- JMonkey Spezific -->
- 		<dependency>
-			<groupId>com.jme3</groupId>
-			<artifactId>jmonkeyengine3</artifactId>
-			<version>${jmonkey.version}</version>
-			<scope>runtime</scope>
+		<dependency>
+  			<groupId>net.sourceforge.jadex.jme3ext</groupId>
+  			<artifactId>jmonkeyengine3</artifactId>
+  			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-core</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-terrain</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-lwjgl</artifactId>
 			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-lwjgl-natives</artifactId>
 			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-effects</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>	
 		
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>lwjgl</artifactId>
 			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-blender</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-desktop</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-plugins</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-testdata</artifactId>
 			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-jogg</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>j-ogg-oggd</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>j-ogg-vorbisd</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-niftygui</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>nifty</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>nifty-default-controls</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.jme3</groupId>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>nifty-style-black</artifactId>
 			<version>${jmonkey.version}</version>
 		</dependency>

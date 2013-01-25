@@ -1,27 +1,22 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
 import jadex.extension.envsupport.environment.ISpaceController;
-import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector3Int;
-import jadex.extension.envsupport.observer.graphics.IViewport3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.CameraState;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.IsoCameraState;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection.SelectionControl;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.IsoCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
 import jadex.extension.envsupport.observer.graphics.jmonkey.controller.IGuiControllerCreator;
 import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
-import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 import java.awt.Dimension;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,17 +29,12 @@ import com.jme3.app.StatsAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.Environment;
 import com.jme3.effect.ParticleEmitter;
-import com.jme3.light.AmbientLight;
-import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.ssao.SSAOFilter;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.BatchNode;
 import com.jme3.scene.Node;
@@ -52,11 +42,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.BasicShadowRenderer;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import com.jme3.water.SimpleWaterProcessor;
 import com.jme3.water.WaterFilter;
 
 import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.screen.ScreenController;
 // import com.jme3.post.*;
 // import com.jme3.post.ssao.SSAOFilter;
 
@@ -173,18 +161,6 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.cameraSelection = camera;
 		this.guiCreatorPath = guiCreatorPath;
 		this.spaceController = spaceController;
-		 
-
-		
-		//TODO: thats crap
-		if(guiCreatorPath!=null)
-		{
-			this.defaultGui = false;
-		}
-		
-
-		
-
 
 	}
 
@@ -223,19 +199,6 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	{
 		this.rootNode.attachChild(this.staticNode);
 
-		if(defaultGui)
-		{
-			
-			DirectionalLight dl = new DirectionalLight();
-	        dl.setDirection(new Vector3f(-0.8f, -1.0f, -0.08f).normalizeLocal());
-	        dl.setColor(new ColorRGBA(ColorRGBA.White));
-	        getRootNode().addLight(dl);    
-
-	        AmbientLight al = new AmbientLight();
-//	        al.setColor(new ColorRGBA(1.7f,2.2f,3.2f,1f));
-	        al.setColor(ColorRGBA.White.mult(2.0f));
-	        getRootNode().addLight(al);
-		}
 
 		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appSize, spaceSize, assetManager, isGrid);
 		this.gridNode = gridHandler.getGrid();
@@ -332,11 +295,11 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		// viewPort.addProcessor(bsr);
 		// }
 
-		pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-		pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light
-																					// direction
-		pssmRenderer.setShadowIntensity(0.6f);
-		viewPort.addProcessor(pssmRenderer);
+//		pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
+//		pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light
+//																					// direction
+//		pssmRenderer.setShadowIntensity(0.6f);
+//		viewPort.addProcessor(pssmRenderer);
 		//
 
 
@@ -360,18 +323,20 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		Nifty nifty = niftyDisplay.getNifty();
 		
 		
-//		nifty.setIgnoreKeyboardEvents(true);
-		
-		if(defaultGui)
-		{
+		nifty.setIgnoreKeyboardEvents(true);
+
 
 		/** Read your XML and initialize your custom ScreenController */
 		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new GuiController(this));
 		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new GuiController(this));
-		}
-		else
+		nifty.gotoScreen("hud");
+		
+		System.out.println("guiCreatorPath " + guiCreatorPath);
+		
+		if(!guiCreatorPath.equals("None"))
 		{
 			
+			System.out.println("guiCreatorPath " + guiCreatorPath);
 			IGuiControllerCreator guiCreator;
 			try
 			{
@@ -379,35 +344,39 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 						Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{SimpleApplication.class, ISpaceController.class});
 
 				guiCreator = (IGuiControllerCreator)con.newInstance(new Object[]{this, spaceController});
+				
+				NiftyScreen startScreen = null;
+				for(NiftyScreen nscreen : guiCreator.getNiftyScreens())
+				{
+					System.out.println("nscreen " + nscreen.getName() );
+					nifty.fromXml(nscreen.getPath(), nscreen.getName(), guiCreator.getScreenController());
+					if(nscreen.isStartScreen()||startScreen==null)
+					{
+						startScreen = nscreen;
+					}
+				}
+
+				nifty.gotoScreen(startScreen.getName());
+				
+				//TODO: extra class
+				if(guiCreator.getCustomAppState()!=null)
+				{
+					stateManager.attach(guiCreator.getCustomAppState());
+				}
 
 			}
 			catch(ClassNotFoundException cnfe)
 			{
+
 				throw new RuntimeException("Cannot find this GUI-Creator", cnfe);
+
 			}
 			catch(Exception e)
 			{
 				throw new RuntimeException(e);
 			}
 			
-			NiftyScreen startScreen = null;
-			for(NiftyScreen nscreen : guiCreator.getNiftyScreens())
-			{
-				System.out.println("nscreen " + nscreen.getName() );
-				nifty.fromXml(nscreen.getPath(), nscreen.getName(), guiCreator.getScreenController());
-				if(nscreen.isStartScreen()||startScreen==null)
-				{
-					startScreen = nscreen;
-				}
-			}
 
-			nifty.gotoScreen(startScreen.getName());
-			
-			//TODO: extra class
-			if(guiCreator.getCustomAppState()!=null)
-			{
-				stateManager.attach(guiCreator.getCustomAppState());
-			}
 
 		}
 

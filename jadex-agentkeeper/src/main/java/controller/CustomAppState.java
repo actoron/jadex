@@ -166,14 +166,21 @@ public class CustomAppState extends AbstractAppState
 
 	protected void placeSelectionBox(float x, float z)
 	{
-		selectionStart.set(x, z);
+		if(isOnView())
+		{
+			selectionStart.set(x, z);
+		}
+		
 	}
 
 	protected boolean isOnView()
 	{
+//		System.out.println("getRounded2dMousePos().x " + getRounded2dMousePos().x );
 //		System.out.println("getRounded2dMousePos().y " + getRounded2dMousePos().y );
+//		System.out.println("cursor " + this.app.getInputManager().getCursorPosition() );
+		
 //		System.out.println("this.app.getViewPort().getCamera().getHeight() * 0.58f " + this.app.getViewPort().getCamera().getHeight() * 0.85f );
-		return (getRounded2dMousePos().y < this.app.getViewPort().getCamera().getHeight() * 0.85f);
+		return this.app.getInputManager().getCursorPosition().y>100;
 
 	}
 

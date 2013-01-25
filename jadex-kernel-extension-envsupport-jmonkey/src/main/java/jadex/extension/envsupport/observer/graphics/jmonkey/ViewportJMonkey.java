@@ -669,32 +669,32 @@ public class ViewportJMonkey extends AbstractViewport3d
 				{
 					objectNode.setUserData("hasEffect", true);
 					//now the Effects are in the correct Size, we emit the Particles if there is an effect
-					if(spatial instanceof Node)
-					{
-						Node effectNode = ((Node) spatial);
-						
-						if(effectNode!=null && effectNode.getName().equals("effectNode for : "+"Type: "+ p.getType()+ " HCode " +p.hashCode() + " sobjid " + sobj.hashCode()))
-						{
-							spatials = effectNode.getChildren();
-							
-							if(!spatials.isEmpty())
-							{
-								
-								for(Spatial effect : spatials)
-								{
-									
-									if(effect != null && effect instanceof ParticleEmitter)
-									{
-										
+//					if(spatial instanceof Node)
+//					{
+//						Node effectNode = ((Node) spatial);
+//						
+//						if(effectNode!=null && effectNode.getName().equals("effectNode for : "+"Type: "+ p.getType()+ " HCode " +p.hashCode() + " sobjid " + sobj.hashCode()))
+//						{
+//							spatials = effectNode.getChildren();
+//							
+//							if(!spatials.isEmpty())
+//							{
+//								
+//								for(Spatial effect : spatials)
+//								{
+//									
+//									if(effect != null && effect instanceof ParticleEmitter)
+//									{
+//										
 //										ParticleEmitter tmpeffect = ((ParticleEmitter)effect);
 //										tmpeffect.emitAllParticles();
-									}
-								}
-								
-
-							}
-						}
-					}
+//									}
+//								}
+//								
+//
+//							}
+//						}
+//					}
 
 				}
 				

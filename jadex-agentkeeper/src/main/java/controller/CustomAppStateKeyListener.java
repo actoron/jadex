@@ -27,7 +27,6 @@ public class CustomAppStateKeyListener implements ActionListener
 
 		if(name.equals("Leftclick")&&state.isOnView()) { //Pressed
             if(keyPressed && !cancelIsPressed) {
-            	System.out.println("leftklick!");
                 actionIsPressed = true;
                 if(state.getSelectionArea() != null) {
                 	state.placeSelectionBox(state.getRounded2dMousePos().x, state.getRounded2dMousePos().y);
