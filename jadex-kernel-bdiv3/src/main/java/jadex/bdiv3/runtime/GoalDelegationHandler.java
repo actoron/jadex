@@ -95,7 +95,7 @@ public class GoalDelegationHandler  //implements InvocationHandler
 		{
 			public void customResultAvailable(Object result)
 			{
-				ret.setResult(RGoal.getGoalResult(goal));
+//				ret.setResult(RGoal.getGoalResult(goal));
 			}
 		});
 	
