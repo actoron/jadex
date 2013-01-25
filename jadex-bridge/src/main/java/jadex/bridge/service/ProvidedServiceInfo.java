@@ -47,6 +47,17 @@ public class ProvidedServiceInfo
 		setType(new ClassInfo(SReflect.getClassName(type)));
 	}
 	
+	/**
+	 *  Create a new service info.
+	 */
+	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, PublishInfo publish)
+	{
+		this.name = name;
+		this.implementation = implementation;
+		this.publish = publish;
+		setType(type);
+	}
+	
 //	/**
 //	 *  Create a new service info.
 //	 */

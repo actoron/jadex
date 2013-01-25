@@ -1,40 +1,23 @@
 package jadex.bdiv3.runtime;
 
-//package jadex.bdi.runtime.impl;
-//
-//
-//import jadex.bdi.model.IMParameter;
-//import jadex.bdi.model.IMParameterSet;
-//import jadex.bdi.model.OAVBDIMetaModel;
-//import jadex.bdi.runtime.AgentEvent;
-//import jadex.bdi.runtime.IBDIInternalAccess;
-//import jadex.bdi.runtime.IGoal;
-//import jadex.bdi.runtime.IGoalListener;
-//import jadex.bdi.runtime.IParameter;
-//import jadex.bdi.runtime.IParameterSet;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IResultListener;
+import jadex.micro.IPojoMicroAgent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
  *  
  */
 @Service
-public class GoalDelegationHandler  //implements InvocationHandler
+public class GoalDelegationHandler  implements InvocationHandler
 {
 	//-------- attributes --------
 	
@@ -85,17 +68,32 @@ public class GoalDelegationHandler  //implements InvocationHandler
 		
 		Class<?>[] mptypes = method.getParameterTypes();
 		
-		Constructor<?> c = goalcl.getConstructor(mptypes);
-		if(c==null)
-			throw new RuntimeException("Goal must have constructor with same signature as method: "+method);
-
-		final Object goal = c.newInstance(args);
+		Object goal;
 		
-		agent.dispatchTopLevelGoal(goal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
+		try
+		{
+			Constructor<?> c = goalcl.getConstructor(mptypes);
+			goal = c.newInstance(args);
+		}
+		catch(Exception e)
+		{
+			Class<?>[] mptypes2 = new Class<?>[mptypes.length+1];
+			System.arraycopy(mptypes, 0, mptypes2, 1, mptypes.length);
+			Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
+			mptypes2[0] = pojo.getClass();
+			Constructor<?> c = goalcl.getConstructor(mptypes2);
+			Object[] args2 = new Object[args.length+1];
+			System.arraycopy(args, 0, args2, 1, args.length);
+			args2[0] = pojo;
+			goal = c.newInstance(args2);
+		}
+		
+		final Object fgoal = goal;
+		agent.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				ret.setResult(RGoal.getGoalResult(goal, mgoal, agent.getClassLoader()));
+				ret.setResult(RGoal.getGoalResult(fgoal, mgoal, agent.getClassLoader()));
 			}
 		});
 	

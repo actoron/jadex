@@ -2,16 +2,15 @@ package jadex.bdiv3.tutorial;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
+import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +22,6 @@ import java.util.Map;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITranslationService.class, 
-	implementation=@Implementation(expression="$pojoagent")))
 public class TranslationB2BDI 
 {
 	//-------- attributes --------
@@ -43,7 +40,7 @@ public class TranslationB2BDI
 	@AgentBody
 	public void body()
 	{
-		System.out.println("Created: "+this);
+//		System.out.println("Created: "+this);
 
 		this.wordtable = new HashMap<String, String>();
 		this.wordtable.put("coffee", "Kaffee");
@@ -57,54 +54,44 @@ public class TranslationB2BDI
 	public class TranslateGoal
 	{
 		protected String gword;
+		protected String eword;
 
 		/**
 		 *  Create a new TranslateGoal. 
 		 */
-		public TranslateGoal(String gword)
+		public TranslateGoal(String eword)
 		{
-			this.gword = gword;
+			this.eword = eword;
 		}
 
-		/**
-		 *  Get the gword.
-		 *  @return The gword.
-		 */
+		@GoalResult
 		public String getGWord()
 		{
 			return gword;
 		}
+		
+		public void setGWord(String gword)
+		{
+			this.gword = gword;
+		}
+		
+		public String getEWord()
+		{
+			return eword;
+		}
+		
+		public String getEword()
+		{
+			return eword;
+		}
 	}
 	
-	@Plan
-	public String translatePlan(TranslateGoal tg)
+	@Plan(trigger=@Trigger(goals=TranslateGoal.class))
+	public void translatePlan(TranslateGoal tg)
 	{
-		return wordtable.get(tg.getGWord());
+		String eword = wordtable.get(tg.getEWord());
+		tg.setGWord(eword);
 	}
-	
-//	<achievegoal name="getoneeuro">
-//	<parameter name="name" class="String">
-//		<!-- todo: support also expressions such as $arg0+$arg1 -->
-//		<!-- <servicemapping ref="paintservice.arg0"/>  -->
-//	</parameter>
-//	<parameter name="result" class="String" direction="out">
-//		<!-- <servicemapping ref="paintservice.result"/> -->
-//	</parameter>
-//	<publish class="IPaintMoneyService" method="paintOneEuro"/>
-//		<!-- <termination>$beliefbase.painter==null</termination>
-//	</publish> -->
-//  </achievegoal>
-	
-//	<plan name="letotherpaintone">
-//	<parameter name="name" class="String">
-//		<value>$scope.getComponentIdentifier().getName()</value>
-//	</parameter>
-//	<parameter name="result" class="String" direction="out"/>
-//	<body service="paintservices" method="paintOneEuro"/>
-//	<trigger>
-//		<goal ref="getoneeuro"/>
-//	</trigger>
-//  </plan>
 	
 	/**
 	 *  Translate an English word to German.
