@@ -232,6 +232,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
 			
 			String name = getLoggerName(getComponentIdentifier());
+
+//			System.out.println("getLogger: "+name);
+			
 			logger = LogManager.getLogManager().getLogger(name);
 			
 			// if logger does not already exists, create it

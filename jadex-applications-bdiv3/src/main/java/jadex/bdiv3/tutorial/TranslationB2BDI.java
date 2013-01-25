@@ -2,6 +2,8 @@ package jadex.bdiv3.tutorial;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Publish;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,13 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent A1.
+ *  The translation agent B2.
+ *  
+ *  BDI goal that is automatically published as service.
  */
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=ITranslationService.class, 
 	implementation=@Implementation(expression="$pojoagent")))
-public class TranslationB2BDI implements ITranslationService
+public class TranslationB2BDI 
 {
 	//-------- attributes --------
 
@@ -49,9 +53,33 @@ public class TranslationB2BDI implements ITranslationService
 		this.wordtable.put("dog", "Hund");
 	}
 	
-	@Goal()
-	public class PaintMoneyGoal
+	@Goal(publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman"))
+	public class TranslateGoal
 	{
+		protected String gword;
+
+		/**
+		 *  Create a new TranslateGoal. 
+		 */
+		public TranslateGoal(String gword)
+		{
+			this.gword = gword;
+		}
+
+		/**
+		 *  Get the gword.
+		 *  @return The gword.
+		 */
+		public String getGWord()
+		{
+			return gword;
+		}
+	}
+	
+	@Plan
+	public String translatePlan(TranslateGoal tg)
+	{
+		return wordtable.get(tg.getGWord());
 	}
 	
 //	<achievegoal name="getoneeuro">

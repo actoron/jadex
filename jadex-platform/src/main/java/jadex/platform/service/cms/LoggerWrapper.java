@@ -1126,4 +1126,132 @@ public class LoggerWrapper extends Logger
 			return System.currentTimeMillis();
 		}
 	}
+	
+	
+	   /**
+     * Log a SEVERE message.
+     * <p>
+     * If the logger is currently enabled for the SEVERE message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void severe(String msg) 
+    {
+        if (Level.SEVERE.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.SEVERE, msg);
+    }
+
+    /**
+     * Log a WARNING message.
+     * <p>
+     * If the logger is currently enabled for the WARNING message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void warning(String msg) 
+    {
+        if (Level.WARNING.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.WARNING, msg);
+    }
+
+    /**
+     * Log an INFO message.
+     * <p>
+     * If the logger is currently enabled for the INFO message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void info(String msg) 
+    {
+        if (Level.INFO.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.INFO, msg);
+    }
+
+    /**
+     * Log a CONFIG message.
+     * <p>
+     * If the logger is currently enabled for the CONFIG message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void config(String msg) 
+    {
+        if (Level.CONFIG.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.CONFIG, msg);
+    }
+
+    /**
+     * Log a FINE message.
+     * <p>
+     * If the logger is currently enabled for the FINE message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void fine(String msg) 
+    {
+        if (Level.FINE.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.FINE, msg);
+    }
+
+    /**
+     * Log a FINER message.
+     * <p>
+     * If the logger is currently enabled for the FINER message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void finer(String msg) 
+    {
+        if (Level.FINER.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.FINER, msg);
+    }
+
+    /**
+     * Log a FINEST message.
+     * <p>
+     * If the logger is currently enabled for the FINEST message
+     * level then the given message is forwarded to all the
+     * registered output Handler objects.
+     * <p>
+     * @param   msg     The string message (or a key in the message catalog)
+     */
+    public void finest(String msg) 
+    {
+        if (Level.FINEST.intValue() < logger.getLevel().intValue()) 
+        {
+            return;
+        }
+        log(Level.FINEST, msg);
+    }
+
 }

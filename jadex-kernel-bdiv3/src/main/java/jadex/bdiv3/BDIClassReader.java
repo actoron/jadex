@@ -365,6 +365,13 @@ public class BDIClassReader extends MicroClassReader
 					mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms);
 				}
 				
+				jadex.bdiv3.annotation.Publish pub = ga.publish();
+				if(pub!=null)
+				{
+					ClassInfo ci = new ClassInfo(pub.type().getName());
+					String method = pub.method().length()>0? pub.method(): null;
+				}
+				
 				mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
 					ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed(), ga.unique(), mdel);
 
@@ -391,4 +398,75 @@ public class BDIClassReader extends MicroClassReader
 		
 		return tr;
 	}
+	
+//	public void a()
+//	{
+//		Map<Class<?>, List<Object[]>> pubs = new HashMap<Class<?>, List<Object[]>>();
+//
+//		// Evaluate the published goals and create provided services for them
+//		for(Iterator<Class<?>> it = pubs.keySet().iterator(); it.hasNext(); )
+//		{
+//			Class<?> key = it.next();
+//			List<Object[]> vals = pubs.get(key);
+//			Map<String, String> goalnames = new LinkedHashMap<String, String>();
+//			for(Object[] val: vals)
+//			{
+//				if(goalnames.containsKey(val[1]))
+//				{
+//					Tuple se	= new Tuple(new Object[]{
+//						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+//						new StackElement(new QName("goals"), null),
+//						new StackElement(new QName("goal"), val[0])});	// Todo: mcaparef no longer in state!=
+//					model.addEntry(se, "Goal publish has error.");
+//				}
+//				String goalname = (String)state.getAttributeValue(val[0], OAVBDIMetaModel.modelelement_has_name);
+//				goalnames.put((String)val[1], goalname);
+//			}
+//	//				System.out.println("found goal publish: "+key);
+//			
+//			StringBuffer buf = new StringBuffer();
+//			buf.append("jadex.bdi.runtime.interpreter.BDIInterpreter.createServiceImplementation($scope, ");
+//			buf.append(SReflect.getClassName(key)+".class, ");
+//			buf.append("new String[]{");
+//			for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
+//			{
+//				buf.append("\"").append(it2.next()).append("\"");
+//				if(it2.hasNext())
+//					buf.append(", ");
+//			}
+//			buf.append("}, ");
+//			buf.append("new String[]{");
+//			for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
+//			{
+//				buf.append("\"").append(goalnames.get(it2.next())).append("\"");
+//				if(it2.hasNext())
+//					buf.append(", ");
+//			}
+//			buf.append("}");
+//			buf.append(")");
+//			
+//	//				System.out.println("service creation expression: "+buf.toString());
+//			
+//			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
+//				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
+//			info.addProvidedService(new ProvidedServiceInfo(null, key, psi, null));
+//		}
+//	}
+	
+//	/**
+//	 *  Create a wrapper service implementation based on 
+//	 */
+//	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, String[] methodnames, String[] goalnames)
+//	{
+////		if(methodnames==null || methodnames.length==0)
+////			throw new IllegalArgumentException("At least one method-goal mapping must be given.");
+//		Map<String, String> gn = new HashMap<String, String>();
+//		for(int i=0; i<methodnames.length; i++)
+//		{
+//			gn.put(methodnames[i], goalnames[i]);
+//		}
+//		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+//			new GoalDelegationHandler(agent, gn));
+//	}
+	
 }

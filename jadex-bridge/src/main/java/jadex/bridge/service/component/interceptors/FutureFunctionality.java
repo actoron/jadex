@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -27,6 +28,7 @@ public class FutureFunctionality
 {
 	/** The logger used for notification failure warnings (if any). */
 	protected Logger	logger;
+	protected IResultCommand<Logger, Void> loggerfetcher;
 	
 	/**
 	 * 
@@ -37,11 +39,31 @@ public class FutureFunctionality
 	}
 	
 	/**
+	 * 
+	 */
+	public FutureFunctionality(IResultCommand<Logger, Void> loggerfetcher)
+	{
+		this.loggerfetcher = loggerfetcher;
+	}
+	
+	/**
 	 *  Get the logger.
 	 */
 	protected Logger	getLogger()
 	{
-		return logger!=null ? logger : Logger.getAnonymousLogger();
+		if(logger==null)
+		{
+			if(loggerfetcher!=null)
+			{
+				logger = loggerfetcher.execute(null);
+			}
+			else
+			{
+				Logger.getAnonymousLogger();
+			}
+		}
+		return logger;
+//		return logger!=null ? logger : Logger.getAnonymousLogger();
 	}
 	
 	/**

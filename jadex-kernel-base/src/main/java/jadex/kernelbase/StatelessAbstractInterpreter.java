@@ -41,6 +41,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -1897,7 +1898,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			Method method = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
 			Class clazz = method.getReturnType();
-			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getLogger()));
+//			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getLogger()));
+			// Must not be fetched before properties are available!
+			ret = FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(new IResultCommand<Logger, Void>()
+			{
+				public Logger execute(Void args)
+				{
+					return getLogger();
+				}
+			}));
 		}
 		catch(Exception e)
 		{

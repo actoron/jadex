@@ -99,7 +99,7 @@ public class RCapability extends RElement
 	 */
 	public boolean containsGoal(Object pojogoal)
 	{
-		return goals.contains(pojogoal);
+		return goals!=null? goals.contains(pojogoal): false;
 	}
 
 	/**

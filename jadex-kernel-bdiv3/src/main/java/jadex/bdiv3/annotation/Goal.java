@@ -68,4 +68,9 @@ public @interface Goal
 	 * 
 	 */
 	public Deliberation deliberation() default @Deliberation();
+	
+	/**
+	 * 
+	 */
+	public Publish publish() default @Publish(type=Object.class);
 }
