@@ -61,9 +61,12 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The provider. */
 	protected IServiceProvider provider;
 	
-	/** The external access. */
-//	protected IExternalAccess	access;
+	/** The internal access. */
 	protected IInternalAccess	ia;
+	
+	/** The external access. */
+	protected IExternalAccess	access;
+
 	
 	/** The result. */
 	protected Object result;
@@ -76,9 +79,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Create a new required service fetcher.
 	 */
-	public DefaultServiceFetcher(IServiceProvider provider, IInternalAccess access, boolean realtime)
+	public DefaultServiceFetcher(IServiceProvider provider, IInternalAccess ia, boolean realtime)
 	{
-		this.ia	= access;
+		this.ia	= ia;
+		this.access	= ia.getExternalAccess();
 		this.provider = provider;
 		this.realtime	= realtime;
 	}
@@ -831,7 +835,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				{
 					public void customResultAvailable(final IComponentAdapter adapter)
 					{
-						IFuture<T>	fut	= ia.getExternalAccess().scheduleStep(new IComponentStep<T>()
+						IFuture<T>	fut	= access.scheduleStep(new IComponentStep<T>()
 						{
 							public IFuture<T> execute(IInternalAccess ia)
 							{
