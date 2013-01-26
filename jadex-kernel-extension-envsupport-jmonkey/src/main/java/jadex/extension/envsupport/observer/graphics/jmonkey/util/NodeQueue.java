@@ -1,4 +1,4 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey;
+package jadex.extension.envsupport.observer.graphics.jmonkey.util;
 
 import java.util.LinkedList;
 import java.util.Queue;

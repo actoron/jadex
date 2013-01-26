@@ -1,4 +1,4 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey;
+package jadex.extension.envsupport.observer.graphics.jmonkey.util;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
@@ -20,7 +20,7 @@ import de.lessvoid.nifty.Nifty;
  * test
  * @author normenhansen
  */
-public class Main extends SimpleApplication {
+public class TestMain extends SimpleApplication {
     
     BatchNode batch = new BatchNode("Batch");
     
@@ -34,7 +34,7 @@ public class Main extends SimpleApplication {
         
 
     public static void main(String[] args) {
-        Main app = new Main();
+        TestMain app = new TestMain();
         app.start();
     }
 

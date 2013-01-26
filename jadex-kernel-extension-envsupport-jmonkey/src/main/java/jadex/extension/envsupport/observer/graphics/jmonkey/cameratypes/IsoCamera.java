@@ -1,4 +1,4 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.camera;
+package jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes;
 
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;

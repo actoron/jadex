@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.EffectSaver;
+import jadex.extension.envsupport.observer.graphics.jmonkey.util.NodeQueue;
 import jme3tools.optimize.GeometryBatchFactory;
 
 import com.jme3.effect.ParticleEmitter;
@@ -188,7 +189,7 @@ public class MonkeyApp extends AMonkeyFunctions
 
 	public void setStaticGeometry(Node staticNode)
 	{
-		this.staticNode = staticNode;
+		this.staticgeo = staticNode;
 		// Add SKY direct to Root
 		Spatial sky = staticNode.getChild("Skymap");
 		if(sky != null)
@@ -214,8 +215,8 @@ public class MonkeyApp extends AMonkeyFunctions
 
 
 		}
-		GeometryBatchFactory.optimize(staticNode, true);
-		this.rootNode.attachChild(staticNode);
+		GeometryBatchFactory.optimize(this.staticgeo, true);
+		this.rootNode.attachChild(this.staticgeo);
 
 	}
 

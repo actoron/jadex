@@ -5,7 +5,7 @@ import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.Triggers;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.Triggers;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -271,35 +271,6 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 					System.out.println("walkcam!");
 				}
 
-				else if(keyPressed && name.equals("ChaseCam"))
-				{
-
-					focusCamActive = !focusCamActive;
-
-					if(focusCamActive)
-					{
-						if(selectedSpatial != null)
-						{
-							focusCam.setSpatial(selectedSpatial);
-						}
-						else
-						{
-							focusCam.setSpatial(staticNode);
-						}
-						focusCam.setEnabled(true);
-						flyCamera.setEnabled(false);
-						walkCam = false;
-
-
-					}
-					else
-					{
-						focusCam.setEnabled(false);
-						flyCamera.setEnabled(true);
-					}
-
-
-				}
 			}
 
 			private void makeWireframe()
@@ -314,7 +285,6 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 		inputManager.addListener(actionListener, new String[]{"Hud"});
 		inputManager.addListener(actionListener, new String[]{"Random"});
 		inputManager.addListener(actionListener, new String[]{"Grid"});
-		inputManager.addListener(actionListener, new String[]{"ChaseCam"});
 		inputManager.addListener(actionListener, new String[]{"WalkCam"});
 		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});

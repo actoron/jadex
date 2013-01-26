@@ -7,13 +7,13 @@ import com.jme3.app.SimpleApplication;
 import de.lessvoid.nifty.screen.ScreenController;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.jmonkey.controller.IGuiControllerCreator;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
 
 
 /**
  * Necessary Class to Create the custom Nifty-Gui for the Application
  */
-public class CustomControllerCreator implements IGuiControllerCreator
+public class CustomControllerCreator implements ICustomStateCreator
 {
 	CustomGuiController		controller;
 	

@@ -1,4 +1,5 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.controller;
+
+package jadex.extension.envsupport.observer.graphics.jmonkey.appstate;
 
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 
@@ -8,7 +9,7 @@ import com.jme3.app.state.AppState;
 
 import de.lessvoid.nifty.screen.ScreenController;
 
-public interface IGuiControllerCreator
+public interface ICustomStateCreator
 {
 
 	ScreenController getScreenController();

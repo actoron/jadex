@@ -5,7 +5,7 @@ import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.Vector2Int;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController;
 import agentkeeper.gui.UserEingabenManager;
 import agentkeeper.state.CreatureState;
 import agentkeeper.util.Property;
@@ -23,7 +23,7 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
 
 
-public class CustomGuiController extends GuiController
+public class CustomGuiController extends DefaultGuiController
 {
 
 

@@ -1,7 +1,7 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.appstate;
+package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera;
 
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.IsoCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.IsoCamera;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
@@ -17,7 +17,7 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 
 
-public class CameraState extends AbstractAppState
+public class DefaultCameraState extends AbstractAppState
 {
 
 	private MonkeyApp		app;
@@ -25,9 +25,6 @@ public class CameraState extends AbstractAppState
 	private Camera			cam;
 
 	private float			appSize;
-
-
-
 
 	public void initialize(AppStateManager stateManager, Application app)
 	{

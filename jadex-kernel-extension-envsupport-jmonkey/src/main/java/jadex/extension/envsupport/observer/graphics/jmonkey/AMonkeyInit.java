@@ -3,13 +3,13 @@ package jadex.extension.envsupport.observer.graphics.jmonkey;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.CameraState;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.IsoCameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.DefaultCameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.IsoCameraState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection.SelectionControl;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FlyCamera;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.FocusCamera;
-import jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController;
-import jadex.extension.envsupport.observer.graphics.jmonkey.controller.IGuiControllerCreator;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FlyCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
 
 import java.awt.Dimension;
@@ -83,7 +83,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	// Helper Classes jop
 	protected Node								gridNode;
 
-	protected Node								staticNode;
+//	protected Node								staticNode;
 
 	// Dimensions
 	protected float								appSize;
@@ -127,7 +127,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	Vector3Int selectedworldcoord;
 	
 	BatchNode staticbatchgeo = new BatchNode(StringNames.BATCH_NODE);
-	Node staticgeo = new Node("StaticVisuals");
+	Node staticgeo = new Node(StringNames.STATIC_NODE);
 	
 	protected boolean defaultGui = true;
 	
@@ -138,7 +138,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	
 	protected Dimension	canvassize;
 		
-	protected CameraState cameraState;
+	protected DefaultCameraState cameraState;
 	
 	protected SelectionControl selectionControl;
 	
@@ -150,7 +150,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.appScaled = appScaled;
 		this.isGrid = isGrid;
 		this.spaceSize = spaceSize;
-		this.staticNode = new Node("staticNode");
+//		this.staticNode = new Node("staticNode");
 		this.gridNode = new Node("gridNode");
 		this.walkCam = false;
 		this.selectedTarget = -1;
@@ -167,7 +167,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.fpp = new FilterPostProcessor(assetManager);
 		
 		// Base Setup
-//		Logger.getLogger("").setLevel(Level.SEVERE);
+		Logger.getLogger("").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
 		
@@ -195,7 +195,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	private void initRoot()
 	{
-		this.rootNode.attachChild(this.staticNode);
+//		this.rootNode.attachChild(this.staticNode);
 
 
 		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appSize, spaceSize, assetManager, isGrid);
@@ -211,7 +211,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	{
 		if(cameraSelection.equals("Default"))
 		{
-			cameraState =  new CameraState();
+			cameraState =  new DefaultCameraState();
 			stateManager.attach(cameraState);
 		}
 		else if(cameraSelection.equals("Iso"))
@@ -325,8 +325,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 
 		/** Read your XML and initialize your custom ScreenController */
-		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new GuiController(this));
-		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new GuiController(this));
+		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new DefaultGuiController(this));
+		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new DefaultGuiController(this));
 		nifty.gotoScreen("hud");
 		
 		System.out.println("guiCreatorPath " + guiCreatorPath);
@@ -335,19 +335,19 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		{
 			
 			System.out.println("guiCreatorPath " + guiCreatorPath);
-			IGuiControllerCreator guiCreator;
+			ICustomStateCreator customCreator;
 			try
 			{
 				Constructor con = Class.forName(this.guiCreatorPath, true,
 						Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{SimpleApplication.class, ISpaceController.class});
 
-				guiCreator = (IGuiControllerCreator)con.newInstance(new Object[]{this, spaceController});
+				customCreator = (ICustomStateCreator)con.newInstance(new Object[]{this, spaceController});
 				
 				NiftyScreen startScreen = null;
-				for(NiftyScreen nscreen : guiCreator.getNiftyScreens())
+				for(NiftyScreen nscreen : customCreator.getNiftyScreens())
 				{
 					System.out.println("nscreen " + nscreen.getName() );
-					nifty.fromXml(nscreen.getPath(), nscreen.getName(), guiCreator.getScreenController());
+					nifty.fromXml(nscreen.getPath(), nscreen.getName(), customCreator.getScreenController());
 					if(nscreen.isStartScreen()||startScreen==null)
 					{
 						startScreen = nscreen;
@@ -357,9 +357,9 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 				nifty.gotoScreen(startScreen.getName());
 				
 				//TODO: extra class
-				if(guiCreator.getCustomAppState()!=null)
+				if(customCreator.getCustomAppState()!=null)
 				{
-					stateManager.attach(guiCreator.getCustomAppState());
+					stateManager.attach(customCreator.getCustomAppState());
 				}
 
 			}
@@ -520,21 +520,6 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.gridNode = gridNode;
 	}
 
-	/**
-	 * @return the staticNode
-	 */
-	public Node getStaticNode()
-	{
-		return staticNode;
-	}
-
-	/**
-	 * @param staticNode the staticNode to set
-	 */
-	public void setStaticNode(Node staticNode)
-	{
-		this.staticNode = staticNode;
-	}
 
 	/**
 	 * @return the appDimension

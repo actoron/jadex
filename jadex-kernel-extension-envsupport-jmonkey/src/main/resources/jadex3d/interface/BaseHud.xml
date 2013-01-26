@@ -8,7 +8,7 @@
 
 
 	<screen id="hud"
-		controller="jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController">
+		controller="jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController">
 		<layer id="background" childLayout="center">
 
 		</layer>
@@ -35,7 +35,7 @@
 	</screen>
 	
 		<screen id="default"
-		controller="jadex.extension.envsupport.observer.graphics.jmonkey.controller.GuiController">
+		ccontroller="jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController">
 		<layer id="background" childLayout="center">
 
 		</layer>

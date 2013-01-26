@@ -1,10 +1,10 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.appstate;
+package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera;
 
 import java.awt.Dimension;
 
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.IsoCamera;
-import jadex.extension.envsupport.observer.graphics.jmonkey.camera.Triggers;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.IsoCamera;
+import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.Triggers;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
