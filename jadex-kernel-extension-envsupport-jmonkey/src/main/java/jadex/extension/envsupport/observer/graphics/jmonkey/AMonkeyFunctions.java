@@ -36,7 +36,7 @@ import com.jme3.terrain.heightmap.HillHeightMap;
 
 /**
  * The Abstract Application for the renders the 3d output for Jadex in the
- * Jmonkey Engine This Class holds most of the Functions and KeyCommands for
+ * Jmonkey Engine This Class holds most of the Functions  for
  * better structure
  * 
  * @author 7willuwe
@@ -56,10 +56,6 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	{
 		super.simpleInit();
 
-
-		// Init Methods
-		initKeys();
-
 	}
 
 	public void simpleUpdateAbstract(float tpf)
@@ -74,8 +70,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	 */
 	public void fireFullscreen()
 	{
-		System.out.println("fullscreen command aus JMonkey");
-
+	
 		JmeCanvasContext context = (JmeCanvasContext)getContext();
 
 		KeyEvent event = new KeyEvent(context.getCanvas(), KeyEvent.KEY_PRESSED, EventQueue.getMostRecentEventTime(), 0, KeyEvent.VK_F11,
@@ -91,7 +86,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	/**
 	 * This Functions moves the Camera for the WalkCamera
 	 */
-	private void moveCamera(float value, boolean sideways)
+	public void moveCamera(float value, boolean sideways)
 	{
 		Vector3f vel = new Vector3f();
 		Vector3f pos = cam.getLocation().clone();
@@ -130,7 +125,7 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	}
 	
 
-	public void setHeight()
+	public void randomizeHeightMap()
 	{
 		if(terrain != null)
 		{
@@ -175,124 +170,5 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 		return (height.isNaN() ? 3 : height);
 	}
 
-	/** Custom Keybinding: Map named actions to inputs. */
-	private void initKeys()
-	{
-
-
-		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-
-		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
-		inputManager.addMapping("Hud", new KeyTrigger(KeyInput.KEY_F1));
-		
-
-		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
-		inputManager.addMapping("Fullscreen", new KeyTrigger(KeyInput.KEY_F11), new KeyTrigger(KeyInput.KEY_F));
-		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-
-		ActionListener actionListener = new ActionListener()
-		{
-		    
-			public void onAction(String name, boolean keyPressed, float tpf)
-			{
-
-				if(keyPressed && name.equals("Hud"))
-				{
-					if(defaultGui)
-					{
-						if(hudactive)
-						{
-							niftyDisplay.getNifty().gotoScreen("hud");
-						}
-						else
-						{
-							niftyDisplay.getNifty().gotoScreen("default");
-						}
-
-						hudactive = !hudactive;
-					}
-
-				}
-				
-
-					
-
-				else if(keyPressed && name.equals("Fullscreen"))
-				{
-					fireFullscreen();
-
-				}
-				else if(keyPressed && name.equals("Wireframe"))
-				{
-					makeWireframe();
-
-				}
-
-				else if(keyPressed && name.equals("Random"))
-				{
-					setHeight();
-
-				}
-				else if(keyPressed && name.equals("Grid"))
-				{
-
-					if(rootNode.getChild("gridNode") != null)
-					{
-						rootNode.detachChild(gridNode);
-
-					}
-					else
-					{
-						rootNode.attachChild(gridNode);
-					}
-
-				}
-
-				if(name.equals("Select") && keyPressed)
-				{
-//					fireSelection();
-				}
-
-
-				else if(!focusCamActive && name.equals("ZoomIn"))
-				{
-					moveCamera(6, false);
-				}
-
-				else if(!focusCamActive && name.equals("ZoomOut"))
-				{
-					moveCamera(-6, false);
-				}
-
-				else if(!focusCamActive && keyPressed && name.equals("WalkCam"))
-				{
-					walkCam = !walkCam;
-					System.out.println("walkcam!");
-				}
-
-			}
-
-			private void makeWireframe()
-			{
-
-
-			}
-
-		};
-
-
-		inputManager.addListener(actionListener, new String[]{"Hud"});
-		inputManager.addListener(actionListener, new String[]{"Random"});
-		inputManager.addListener(actionListener, new String[]{"Grid"});
-		inputManager.addListener(actionListener, new String[]{"WalkCam"});
-		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
-		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
-
-		inputManager.addListener(actionListener, new String[]{"Select"});
-		inputManager.addListener(actionListener, new String[]{"Fullscreen"});
-		inputManager.addListener(actionListener, new String[]{"FollowCam"});
-		inputManager.addListener(actionListener, new String[]{"Fullscreen"});
-
-	}
+	
 }

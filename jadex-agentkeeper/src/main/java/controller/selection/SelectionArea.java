@@ -6,7 +6,7 @@ import com.jme3.math.Vector2f;
 
 /**
  *
- * @author lohnn
+ * @author 7willuwe : Philip Willuweit
  */
 public class SelectionArea
 {

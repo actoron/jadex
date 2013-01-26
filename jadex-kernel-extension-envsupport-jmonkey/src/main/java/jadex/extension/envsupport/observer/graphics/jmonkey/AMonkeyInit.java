@@ -7,7 +7,8 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStat
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.DefaultCameraState;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.IsoCameraState;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.selection.SelectionControl;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction.InteractionState;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.userinteraction.SelectionControl;
 import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FlyCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.FocusCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.util.StringNames;
@@ -81,9 +82,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected NiftyJmeDisplay					niftyDisplay;
 
 	// Helper Classes jop
-	protected Node								gridNode;
-
-//	protected Node								staticNode;
+	public Node								gridNode;
 
 	// Dimensions
 	protected float								appSize;
@@ -141,6 +140,8 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected DefaultCameraState cameraState;
 	
 	protected SelectionControl selectionControl;
+
+	protected Node	staticNode;
 	
 
 	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, ISpaceController spaceController)
@@ -150,7 +151,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.appScaled = appScaled;
 		this.isGrid = isGrid;
 		this.spaceSize = spaceSize;
-//		this.staticNode = new Node("staticNode");
+		this.staticNode = new Node("staticNode");
 		this.gridNode = new Node("gridNode");
 		this.walkCam = false;
 		this.selectedTarget = -1;
@@ -172,7 +173,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
 		
 		viewPort.setBackgroundColor(ColorRGBA.Black);
-//		stateManager.getState(StatsAppState.class).toggleStats();
+		stateManager.getState(StatsAppState.class).toggleStats();
 		
 		
 
@@ -189,21 +190,29 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	private void initSelection()
 	{
+		if(guiCreatorPath.equals("None"))
+		{
+			InteractionState interactionState = new InteractionState();
+			stateManager.attach(interactionState);
+		}
 		this.selectionControl = new SelectionControl();
 		stateManager.attach(this.selectionControl);
 	}
 
 	private void initRoot()
 	{
-//		this.rootNode.attachChild(this.staticNode);
+		this.rootNode.attachChild(this.staticNode);
 
 
 		monkeyApp_Grid gridHandler = new monkeyApp_Grid(appSize, spaceSize, assetManager, isGrid);
 		this.gridNode = gridHandler.getGrid();
-		staticgeo.setLocalScale(appScaled);
-		staticbatchgeo.setLocalScale(appScaled);
+		this.staticgeo.setLocalScale(appScaled);
+		this.staticbatchgeo.setLocalScale(appScaled);
+		
+		this.staticNode.setLocalScale(appScaled);
 		this.rootNode.attachChild(staticgeo);
 		this.rootNode.attachChild(staticbatchgeo);
+
 
 	}
 

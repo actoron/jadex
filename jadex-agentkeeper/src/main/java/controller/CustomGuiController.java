@@ -46,8 +46,6 @@ public class CustomGuiController extends DefaultGuiController
 		this.app = (MonkeyApp)app;
 		rootNode = this.app.getRootNode();
 
-		setupListener();
-
 		this.spaceController = spacecontroller;
 		this.usermanager = (UserEingabenManager)spacecontroller.getProperty("uem");
 		this.creatureState = (CreatureState)spaceController.getProperty(Property.CREATURE_STATE);
@@ -55,40 +53,6 @@ public class CustomGuiController extends DefaultGuiController
 
 	}
 
-
-	private void setupListener()
-	{
-		this.app.getInputManager().addMapping("Leftclick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		ActionListener myclickListener = new ActionListener()
-		{
-
-			public void onAction(String name, boolean keyPressed, float tpf)
-			{
-
-				if(name.equals("Leftclick") && keyPressed)
-				{
-
-				}
-				else if(name.equals("Leftclick") && !keyPressed)
-				{
-//					Vector3Int selectedworldcoord = ((MonkeyApp)app).getSelectedWorldCoord();
-//					if(selectedworldcoord != null)
-//					{
-//						usermanager.userAktion(selectedworldcoord.getXAsInteger(), selectedworldcoord.getZAsInteger(), UserEingabenManager.ABREISSEN);
-//					}
-					
-
-				}
-
-
-			}
-
-
-		};
-
-//		this.app.getInputManager().addListener(myclickListener, new String[]{"Leftclick"});
-
-	}
 
 	/** Nifty GUI ScreenControl methods */
 	public void bind(Nifty nifty, Screen screen)

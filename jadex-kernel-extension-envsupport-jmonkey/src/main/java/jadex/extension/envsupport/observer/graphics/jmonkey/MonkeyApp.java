@@ -87,6 +87,7 @@ public class MonkeyApp extends AMonkeyFunctions
 				if(add instanceof Node)
 				{
 					Node addnode = (Node)add;
+					
 					for(Spatial addchild : addnode.getChildren())
 					{
 						if(addchild instanceof Node)
@@ -104,7 +105,9 @@ public class MonkeyApp extends AMonkeyFunctions
 
 						}
 					}
-					staticgeo.attachChild(add);
+					staticgeo.attachChild(addnode);
+					
+					
 					if((Boolean)addnode.getUserData("hasEffect") == true)
 					{
 						startEffect(addnode);
@@ -155,6 +158,7 @@ public class MonkeyApp extends AMonkeyFunctions
 	}
 
 	private void startEffect(Node addnode) {
+		
 		for(Spatial effectspatial : addnode.getChildren())
 		{
 			if(effectspatial instanceof Node)
@@ -162,6 +166,8 @@ public class MonkeyApp extends AMonkeyFunctions
 				Node effectnode = (Node)effectspatial;
 				if(effectnode.getName().startsWith("effectNode"))
 				{
+					
+					
 
 					for(Spatial effect : effectnode.getChildren())
 
@@ -189,7 +195,7 @@ public class MonkeyApp extends AMonkeyFunctions
 
 	public void setStaticGeometry(Node staticNode)
 	{
-		this.staticgeo = staticNode;
+		this.staticNode = staticNode;
 		// Add SKY direct to Root
 		Spatial sky = staticNode.getChild("Skymap");
 		if(sky != null)
@@ -215,8 +221,8 @@ public class MonkeyApp extends AMonkeyFunctions
 
 
 		}
-		GeometryBatchFactory.optimize(this.staticgeo, true);
-		this.rootNode.attachChild(this.staticgeo);
+		GeometryBatchFactory.optimize(this.staticNode, true);
+		this.rootNode.attachChild(this.staticNode);
 
 	}
 
