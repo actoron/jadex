@@ -971,7 +971,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/**
 	 *  Set the initialization expression of a declared context variable.
 	 *  @param name	The variable name.
-	 *  @return The initialization expression (if any).
 	 */
 	public void setContextVariableExpression(String name, String config, UnparsedExpression exp)
 	{

@@ -52,7 +52,6 @@ public class ComponentTerminatedException	extends RuntimeException
 	
 	/**
 	 *  Get the component identifier.
-	 *  @return The component identifier.
 	 */
 	public void setComponentIdentifier(IComponentIdentifier cid)
 	{

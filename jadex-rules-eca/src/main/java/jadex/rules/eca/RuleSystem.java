@@ -488,7 +488,6 @@ public class RuleSystem
 	/**
 	 *  Process events until the event queue is empty or max
 	 *  events have been processed.
-	 *  @return True if was aborted due to reaching max events.
 	 */
 	public void processAllEvents()
 	{

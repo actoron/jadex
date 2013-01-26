@@ -1463,7 +1463,7 @@ public class MicroClassReader
 	
 	/**
 	 *  Gets proxy annotation that can be invoked by corresponding classloader.
-	 * @return 
+	 * @return ret
 	 */
 	public <T extends Annotation> T getProxyAnnotation(final T an, final ClassLoader cl)
 	{
