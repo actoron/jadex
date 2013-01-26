@@ -137,9 +137,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected ISpaceController spaceController;
 	
 	protected Dimension	canvassize;
-	
-	protected boolean blockCamMoving;
-	
+		
 	protected CameraState cameraState;
 	
 	protected SelectionControl selectionControl;
@@ -169,12 +167,12 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.fpp = new FilterPostProcessor(assetManager);
 		
 		// Base Setup
-		Logger.getLogger("").setLevel(Level.SEVERE);
+//		Logger.getLogger("").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
 		
 		viewPort.setBackgroundColor(ColorRGBA.Black);
-		stateManager.getState(StatsAppState.class).toggleStats();
+//		stateManager.getState(StatsAppState.class).toggleStats();
 		
 		
 
@@ -865,15 +863,6 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		return canvassize;
 	}
 
-	public boolean isBlockCamMoving()
-	{
-		return blockCamMoving;
-	}
-
-	public void setBlockCamMoving(boolean blockCamMoving)
-	{
-		this.blockCamMoving = blockCamMoving;
-	}
 
 	public float getAppSize()
 	{

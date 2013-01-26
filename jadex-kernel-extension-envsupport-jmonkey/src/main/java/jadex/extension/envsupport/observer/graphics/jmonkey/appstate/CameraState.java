@@ -44,7 +44,6 @@ public class CameraState extends AbstractAppState
 	public void initCam()
 	{
 
-
 		/** Configure cam to look at scene */
 		cam.setLocation(new Vector3f(appSize / 2, appSize / 2, appSize / 2));
 		cam.lookAt(new Vector3f(0, 0, 0), Vector3f.UNIT_Y);
@@ -59,7 +58,7 @@ public class CameraState extends AbstractAppState
         this.app.getRootNode().addLight(dl);    
 
         AmbientLight al = new AmbientLight();
-        al.setColor(ColorRGBA.White.mult(0.2f));
+        al.setColor(ColorRGBA.White.mult(0.3f));
         this.app.getRootNode().addLight(al);
 
 

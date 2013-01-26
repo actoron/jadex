@@ -65,10 +65,6 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	public void simpleUpdateAbstract(float tpf)
 	{
 		super.simpleUpdateAbstract(tpf);
-		if(walkCam)
-		{
-
-		}
 
 	}
 

@@ -59,7 +59,6 @@ public class MonkeyApp extends AMonkeyFunctions
 		if(cleanupPostFilter)
 		{
 			System.out.println("cleanup!");
-			blockCamMoving = true;
 			fpp.cleanup();
 			cleanupPostFilter = false;
 		}
