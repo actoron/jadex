@@ -17,6 +17,11 @@ public @interface Goal
 	/**
 	 * 
 	 */
+	public Class<?> clazz() default Object.class;
+	
+	/**
+	 * 
+	 */
 	public boolean posttoall() default false;
 	
 	/**

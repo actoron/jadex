@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalInhibit;
@@ -192,9 +193,10 @@ public class BDIClassReader extends MicroClassReader
 				Plan[] plans = getAnnotation(clazz, Plans.class, cl).value();
 				for(Plan p: plans)
 				{
-					Class<?> bodycl = p.body();
+					Body body = p.body();
 					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
-					MPlan mplan = new MPlan(SReflect.getInnerClassName(bodycl), new ClassInfo(bodycl.getName()), mtr, p.priority());
+					MPlan mplan = new MPlan(SReflect.getInnerClassName(body.value()), new ClassInfo(body.value().getName()), mtr, p.priority());
+//					MPlan mplan = new MPlan(SReflect.getInnerClassName(bodycl), new ClassInfo(bodycl.getName()), mtr, p.priority());
 					bdimodel.getCapability().addPlan(mplan);
 				}
 			}
@@ -415,7 +417,7 @@ public class BDIClassReader extends MicroClassReader
 					ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed(), ga.unique(), mdel);
 				
 				jadex.bdiv3.annotation.Publish pub = ga.publish();
-				if(pub!=null)
+				if(!Object.class.equals(pub.type()))
 				{
 					ClassInfo ci = new ClassInfo(pub.type().getName());
 					String method = pub.method().length()>0? pub.method(): null;

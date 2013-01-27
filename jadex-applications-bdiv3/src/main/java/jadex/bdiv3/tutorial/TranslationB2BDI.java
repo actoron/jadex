@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 @Agent
 @Service
+@Goals(@Goal(clazz=TranslationGoalB2.class, 
+	publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman")))
 public class TranslationB2BDI 
 {
 	//-------- attributes --------
@@ -50,44 +53,44 @@ public class TranslationB2BDI
 		this.wordtable.put("dog", "Hund");
 	}
 	
-	@Goal(publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman"))
-	public class TranslateGoal
-	{
-		protected String gword;
-		protected String eword;
-
-		/**
-		 *  Create a new TranslateGoal. 
-		 */
-		public TranslateGoal(String eword)
-		{
-			this.eword = eword;
-		}
-
-		@GoalResult
-		public String getGWord()
-		{
-			return gword;
-		}
-		
-		public void setGWord(String gword)
-		{
-			this.gword = gword;
-		}
-		
-		public String getEWord()
-		{
-			return eword;
-		}
-		
-		public String getEword()
-		{
-			return eword;
-		}
-	}
+//	@Goal(publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman"))
+//	public class TranslateGoal
+//	{
+//		protected String gword;
+//		protected String eword;
+//
+//		/**
+//		 *  Create a new TranslateGoal. 
+//		 */
+//		public TranslateGoal(String eword)
+//		{
+//			this.eword = eword;
+//		}
+//
+//		@GoalResult
+//		public String getGWord()
+//		{
+//			return gword;
+//		}
+//		
+//		public void setGWord(String gword)
+//		{
+//			this.gword = gword;
+//		}
+//		
+//		public String getEWord()
+//		{
+//			return eword;
+//		}
+//		
+//		public String getEword()
+//		{
+//			return eword;
+//		}
+//	}
 	
-	@Plan(trigger=@Trigger(goals=TranslateGoal.class))
-	public void translatePlan(TranslateGoal tg)
+	@Plan(trigger=@Trigger(goals=TranslationGoalB2.class))
+	public void translatePlan(TranslationGoalB2 tg)
 	{
 		String eword = wordtable.get(tg.getEWord());
 		tg.setGWord(eword);

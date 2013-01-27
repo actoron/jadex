@@ -2,6 +2,7 @@ package jadex.bdiv3.examples.cleanerworld.cleaner;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalContextCondition;
@@ -48,19 +49,19 @@ import javax.swing.SwingUtilities;
 @Agent
 @Plans(
 {
-	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformLookForWaste.class), body=LeastSeenWalkPlan.class),
-	@Plan(trigger=@Trigger(goals={CleanerBDI.QueryWastebin.class, CleanerBDI.QueryChargingStation.class}), body=ExploreMapPlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformPatrol.class), body=PatrolPlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveCleanup.class), body=CleanUpWastePlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.AchievePickupWaste.class), body=PickUpWastePlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveDropWaste.class), body=DropWastePlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.MaintainBatteryLoaded.class), body=LoadBatteryPlan.class),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformLookForWaste.class), body=@Body(LeastSeenWalkPlan.class)),
+	@Plan(trigger=@Trigger(goals={CleanerBDI.QueryWastebin.class, CleanerBDI.QueryChargingStation.class}), body=@Body(ExploreMapPlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformPatrol.class), body=@Body(PatrolPlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveCleanup.class), body=@Body(CleanUpWastePlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.AchievePickupWaste.class), body=@Body(PickUpWastePlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveDropWaste.class), body=@Body(DropWastePlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.MaintainBatteryLoaded.class), body=@Body(LoadBatteryPlan.class)),
 	// <CONTEXTCONDITION>$BELIEFBASE.MY_CHARGESTATE &GT; 0</CONTEXTCONDITION>
-	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveMoveTo.class), body=MoveToLocationPlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformMemorizePositions.class), body=MemorizePositionsPlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.PickupWasteAction.class), priority=1, body=LocalPickUpWasteActionPlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.DropWasteAction.class), priority=1, body=LocalDropWasteActionPlan.class),
-	@Plan(trigger=@Trigger(goals=CleanerBDI.GetVisionAction.class), priority=1, body=LocalGetVisionActionPlan.class)
+	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveMoveTo.class), body=@Body(MoveToLocationPlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformMemorizePositions.class), body=@Body(MemorizePositionsPlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.PickupWasteAction.class), priority=1, body=@Body(LocalPickUpWasteActionPlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.DropWasteAction.class), priority=1, body=@Body(LocalDropWasteActionPlan.class)),
+	@Plan(trigger=@Trigger(goals=CleanerBDI.GetVisionAction.class), priority=1, body=@Body(LocalGetVisionActionPlan.class))
 })
 public class CleanerBDI
 {
