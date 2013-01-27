@@ -1,13 +1,16 @@
 package jadex.bdiv3.tutorial;
 
+import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 
 /**
  * 
  */
+@Goal
 public class TranslationGoalB2
 {
 	protected String gword;
+	
 	protected String eword;
 
 	/**

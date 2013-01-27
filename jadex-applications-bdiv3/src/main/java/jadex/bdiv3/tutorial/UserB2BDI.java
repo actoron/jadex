@@ -30,6 +30,7 @@ import javax.swing.SwingUtilities;
 /**
  * 
  */
+@Agent
 @RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Plans(@Plan(trigger=@Trigger(goals=TranslateGoal.class), 
