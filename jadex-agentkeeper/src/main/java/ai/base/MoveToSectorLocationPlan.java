@@ -17,12 +17,13 @@ import java.util.Stack;
 
 import agentkeeper.wegfindung.ASternSuche;
 import ai.AbstractBeingBDI;
-import ai.AbstractBeingBDI.AchieveMoveToNextSector;
+import ai.AbstractBeingBDI.PerformMoveToNextSector;
 import ai.AbstractBeingBDI.AchieveMoveToSector;
 
-
 /**
- * Move to a point.
+ * Move to a Location on the Grid
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  */
 public class MoveToSectorLocationPlan
 {
@@ -83,10 +84,10 @@ public class MoveToSectorLocationPlan
 			
 			System.out.println("nextTarget " + nextTarget);
 
-			rplan.dispatchSubgoal(capa.new AchieveMoveToNextSector(nextTarget))
-				.addResultListener(new ExceptionDelegationResultListener<AbstractBeingBDI.AchieveMoveToNextSector, Void>(ret)
+			rplan.dispatchSubgoal(capa.new PerformMoveToNextSector(nextTarget))
+				.addResultListener(new ExceptionDelegationResultListener<AbstractBeingBDI.PerformMoveToNextSector, Void>(ret)
 			{
-				public void customResultAvailable(AchieveMoveToNextSector mtg)
+				public void customResultAvailable(PerformMoveToNextSector mtg)
 				{
 					moveToNextSector(it).addResultListener(new DelegationResultListener<Void>(ret));
 				}
