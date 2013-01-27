@@ -11,10 +11,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import view.selection.SelectionArea;
+
+
 import agentkeeper.map.InitMapProcess;
 import agentkeeper.util.Neighborhood;
 
-import controller.selection.SelectionArea;
 
 public class BreakWallList
 {

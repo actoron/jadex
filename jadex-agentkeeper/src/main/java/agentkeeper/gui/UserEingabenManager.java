@@ -2,7 +2,8 @@ package agentkeeper.gui;
 
 import java.util.Map;
 
-import controller.selection.SelectionArea;
+import view.selection.SelectionArea;
+
 
 import agentkeeper.SpielerAktionen;
 import agentkeeper.auftragsverwaltung.Auftragsverwalter;

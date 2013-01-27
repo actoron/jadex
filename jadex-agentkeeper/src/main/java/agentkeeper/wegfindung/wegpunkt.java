@@ -3,7 +3,7 @@ package agentkeeper.wegfindung;
 import jadex.extension.envsupport.math.IVector2;
 
 /**
- * Eine Klasse fuer die Datenhaltung der Wegpunkte (nur relevant für die
+ * Eine Klasse fuer die Datenhaltung der Wegpunkte (nur relevant fï¿½r die
  * Pfadsuche) und dadurch auch die Wegkostenverarbeitung
  * 
  * @author 7willuwe

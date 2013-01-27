@@ -1,5 +1,6 @@
-package controller.selection;
+package view.selection;
 
+import view.AppState;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
@@ -19,14 +20,13 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.debug.WireBox;
 
-import controller.CustomAppState;
 
 
 public class SelectionHandler
 {
 	private MonkeyApp						app;
 
-	private CustomAppState					mystate;
+	private AppState					mystate;
 
 	private float							appScaled;
 
@@ -52,7 +52,7 @@ public class SelectionHandler
 	private SelectionHandlingKeyListener	selectionListener;
 
 
-	public SelectionHandler(MonkeyApp app, CustomAppState mystate)
+	public SelectionHandler(MonkeyApp app, AppState mystate)
 	{
 		this.app = app;
 		this.mystate = mystate;

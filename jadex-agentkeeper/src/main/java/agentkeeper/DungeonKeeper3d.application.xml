@@ -262,7 +262,7 @@
 			</env:actiontypes>
 
 			<env:perspectives>
-				<env:perspective3d name="Complex3D" class="Perspective3D" camera="Iso" ambientOcclusion="false" guiCreatorPath="controller.CustomControllerCreator">
+				<env:perspective3d name="Complex3D" class="Perspective3D" camera="Iso" ambientOcclusion="false" guiCreatorPath="view.CustomControllerCreator">
 
 				
 					<env:drawable3d objecttype="static" hasSpaceobject="false"

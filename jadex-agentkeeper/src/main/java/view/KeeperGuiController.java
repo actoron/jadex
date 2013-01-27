@@ -1,4 +1,4 @@
-package controller;
+package view;
 
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.SpaceObject;
@@ -7,7 +7,8 @@ import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.gui.DefaultGuiController;
 import agentkeeper.gui.UserEingabenManager;
-import agentkeeper.state.CreatureState;
+import agentkeeper.map.InitMapProcess;
+import agentkeeper.state.SimpleCreatureState;
 import agentkeeper.util.Property;
 
 import com.jme3.app.SimpleApplication;
@@ -22,8 +23,13 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
 
-
-public class CustomGuiController extends DefaultGuiController
+/**
+ * The Methods from all GUI Input are implemented here
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
+public class KeeperGuiController extends DefaultGuiController
 {
 
 
@@ -39,16 +45,16 @@ public class CustomGuiController extends DefaultGuiController
 	
 	private MonkeyApp app;
 	
-	private CreatureState creatureState;
+	private SimpleCreatureState creatureState;
 
-	public CustomGuiController(SimpleApplication app, ISpaceController spacecontroller)
+	public KeeperGuiController(SimpleApplication app, ISpaceController spacecontroller)
 	{
 		this.app = (MonkeyApp)app;
 		rootNode = this.app.getRootNode();
 
 		this.spaceController = spacecontroller;
 		this.usermanager = (UserEingabenManager)spacecontroller.getProperty("uem");
-		this.creatureState = (CreatureState)spaceController.getProperty(Property.CREATURE_STATE);
+		this.creatureState = (SimpleCreatureState)spaceController.getProperty(Property.CREATURE_STATE);
 
 
 	}
@@ -112,10 +118,10 @@ public class CustomGuiController extends DefaultGuiController
 
 	public void onStartScreen()
 	{
-		Element creatureText = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("imp_total");
-		TextRenderer textRender = creatureText.getRenderer(TextRenderer.class);
+		Element impText = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("imp_total");
+		TextRenderer impRender = impText.getRenderer(TextRenderer.class);
 		
-		textRender.setText(""+creatureState.getCountImp());
+		impRender.setText(""+creatureState.getCreatureCount(InitMapProcess.IMP));
 
 	}
 

@@ -1,12 +1,12 @@
-package controller.selection;
+package view.selection;
 
+import view.AppState;
 import agentkeeper.gui.UserEingabenManager;
 
 import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 
-import controller.CustomAppState;
 
 
 public class SelectionHandlingKeyListener implements ActionListener

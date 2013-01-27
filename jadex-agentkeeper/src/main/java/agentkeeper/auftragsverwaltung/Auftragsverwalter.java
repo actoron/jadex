@@ -1,6 +1,6 @@
 package agentkeeper.auftragsverwaltung;
 
-import controller.selection.SelectionArea;
+import view.selection.SelectionArea;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Int;

@@ -1,4 +1,4 @@
-package controller.selection;
+package view.selection;
 
 import jadex.extension.envsupport.math.Vector2Int;
 

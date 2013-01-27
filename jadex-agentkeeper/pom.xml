@@ -8,24 +8,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	
 	<properties>
-		<!-- Specify desired Jadex version here. -->
 		<jadex.version> 2.3-SNAPSHOT </jadex.version>
 	</properties>
-	
-	<!-- Additional repositories (only required when using snapshot and/or pro version of Jadex).
-	     You may use www0.activecomponents.org/..., www1.activecomponents.org/... to address mirrors directly. -->
+
 	<repositories>
 		<repository>
 			<id>jadex-snapshots</id>
 			<url>http://www.activecomponents.org/nexus/content/repositories/snapshots</url>
-		</repository>
-		<repository>
-			<id>jadex-pro-snapshots</id>
-			<url>http://www.activecomponents.org/nexus/content/repositories/pro-snapshots</url>
-		</repository>
-		<repository>
-			<id>jadex-pro-releases</id>
-			<url>http://www.activecomponents.org/nexus/content/repositories/pro-releases</url>
 		</repository>
 	</repositories>
 	
@@ -49,24 +38,10 @@
 	</build>
 
 	<dependencies>
-	    
-	    <!-- For simplicity, several default Jadex distributions
-	         are provided as Maven artifacts as shown below.
-	         
-	         Advanced developers might prefer, to include direct dependencies
-	         to single Jadex artifacts instead (e.g. jadex-kernel-bdi),
-	         for more fine-grained control over the dependencies. -->
-	    
-		<!-- Platform for execution
-			 Minimal: only component and micro kernel, no gui
-			 Standard: Minimal + all kernels and gui tools, envsupport and AGR extension
-			 Pro: Standard + all commercial add-ons (requires access to pro-repository)
-		 -->
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-distribution-standard</artifactId>
-			<!-- <artifactId>jadex-distribution-minimal</artifactId> -->
-			<!-- <artifactId>jadex-distribution-pro</artifactId> -->
 			<version>${jadex.version}</version>
 		</dependency>
 		
@@ -78,13 +53,7 @@
 			<version>${jadex.version}</version>
 		</dependency>
 		-->
-		
-		
-<!-- 		<dependency> -->
-<!--   			<groupId>net.sourceforge.jadex.jme3ext</groupId> -->
-<!--   			<artifactId>jmonkeyengine3</artifactId> -->
-<!--   			<version>${jmonkey.version}</version> -->
-<!-- 		</dependency> -->
+
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

@@ -9,7 +9,7 @@
 	<useStyles filename="/gui/nifty-style/nifty-default-styles.xml" />
 
 
-	<screen id="hud" controller="controller.CustomGuiController">
+	<screen id="hud" controller="view.KeeperGuiController">
 		<layer id="background" childLayout="center">
 
 

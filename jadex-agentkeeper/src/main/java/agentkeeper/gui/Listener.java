@@ -1,7 +1,7 @@
 package agentkeeper.gui;
 
 /**
- * Das ist das Interface Listener für die GUI
+ * Das ist das Interface Listener fï¿½r die GUI
  * 
  * @author 7willuwe
  * 

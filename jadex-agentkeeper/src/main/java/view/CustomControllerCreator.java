@@ -1,4 +1,4 @@
-package controller;
+package view;
 
 import java.util.ArrayList;
 
@@ -11,13 +11,15 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStat
 
 
 /**
- * Necessary Class to Create the custom Nifty-Gui for the Application
+ * Necessary Class to Create the custom Nifty-Gui for the Application over CLASS-Loading
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  */
 public class CustomControllerCreator implements ICustomStateCreator
 {
-	CustomGuiController		controller;
+	KeeperGuiController		controller;
 	
-	CustomAppState customAppState;
+	AppState customAppState;
 
 	SimpleApplication		app;
 
@@ -30,8 +32,8 @@ public class CustomControllerCreator implements ICustomStateCreator
 	public CustomControllerCreator(SimpleApplication app, ISpaceController spaceController)
 	{
 		this.app = app;
-		this.controller = new CustomGuiController(app, spaceController);
-		this.customAppState = new CustomAppState();
+		this.controller = new KeeperGuiController(app, spaceController);
+		this.customAppState = new AppState();
 		this.niftyScreens.add(screen1);
 		this.niftyScreens.add(screen2);
 	}
@@ -51,12 +53,12 @@ public class CustomControllerCreator implements ICustomStateCreator
 		this.niftyScreens = niftyScreens;
 	}
 
-	public CustomAppState getCustomAppState()
+	public AppState getCustomAppState()
 	{
 		return customAppState;
 	}
 
-	public void setCustomAppState(CustomAppState customAppState)
+	public void setCustomAppState(AppState customAppState)
 	{
 		this.customAppState = customAppState;
 	}

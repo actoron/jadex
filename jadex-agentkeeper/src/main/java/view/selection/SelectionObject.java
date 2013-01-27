@@ -1,4 +1,4 @@
-package controller.selection;
+package view.selection;
 
 import java.nio.FloatBuffer;
 

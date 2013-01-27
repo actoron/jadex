@@ -13,7 +13,7 @@ import agentkeeper.auftragsverwaltung.Gebaudeverwalter;
 import agentkeeper.auftragsverwaltung.MissionsVerwalter;
 import agentkeeper.gui.GUIInformierer;
 import agentkeeper.gui.UserEingabenManager;
-import agentkeeper.state.CreatureState;
+import agentkeeper.state.SimpleCreatureState;
 import agentkeeper.util.Property;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
@@ -41,7 +41,7 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 
 	public static Vector2Double portalort;
 	
-	public CreatureState creatureState;
+	public SimpleCreatureState creatureState;
 	
 	public UserEingabenManager uem;
 	public MissionsVerwalter mv;
@@ -141,7 +141,7 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 			grid.setProperty("auftraege", auftragsverwalter);
 			
 
-			this.creatureState = new CreatureState();
+			this.creatureState = new SimpleCreatureState();
 			uem = new UserEingabenManager(grid);
 			mv = new MissionsVerwalter();
 

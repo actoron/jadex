@@ -1,5 +1,9 @@
-package controller;
+package view;
 
+import view.selection.SelectionArea;
+import view.selection.SelectionBox;
+import view.selection.SelectionHandler;
+import view.selection.SelectionHandlingKeyListener;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector3;
@@ -31,15 +35,16 @@ import com.jme3.scene.control.UpdateControl;
 import com.jme3.scene.debug.WireBox;
 import com.jme3.scene.shape.Line;
 
-import controller.selection.SelectionHandlingKeyListener;
-import controller.selection.SelectionArea;
-import controller.selection.SelectionBox;
-import controller.selection.SelectionHandler;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
-
-public class CustomAppState extends AbstractAppState
+/**
+ * The customized-szene Setup spezific for AgentKeeper, using the JMonkey AppState-Concept
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
+public class AppState extends AbstractAppState
 {
 
 	private MonkeyApp			app;
@@ -81,10 +86,6 @@ public class CustomAppState extends AbstractAppState
 		this.spaceController = monkeyapp.getSpaceController();
 		this.usermanager = (UserEingabenManager) spaceController.getProperty("uem");
 		this.handler = new SelectionHandler((MonkeyApp)app, this);
-		
-		
-
-		
 
 		setup();
 
