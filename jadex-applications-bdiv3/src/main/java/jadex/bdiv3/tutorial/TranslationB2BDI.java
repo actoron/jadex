@@ -2,7 +2,6 @@ package jadex.bdiv3.tutorial;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;

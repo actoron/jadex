@@ -3,11 +3,11 @@ package jadex.bdiv3.tutorial;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.tutorial.UserB2BDI.TranslateGoal;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -33,7 +33,8 @@ import javax.swing.SwingUtilities;
 @Agent
 @RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-@Plans(@Plan(trigger=@Trigger(goals=TranslateGoal.class), 
+@Goals(@Goal(clazz=TranslationGoalB2.class))
+@Plans(@Plan(trigger=@Trigger(goals=TranslationGoalB2.class), 
 	body=@Body(service=@ServicePlan(name="transser"))))
 public class UserB2BDI
 {
@@ -45,11 +46,6 @@ public class UserB2BDI
 	
 	//-------- methods ---------
 
-	@Goal
-	public class TranslateGoal
-	{
-	}
-	
 	/**
 	 * 
 	 */
@@ -71,10 +67,10 @@ public class UserB2BDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.dispatchTopLevelGoal(new TranslateGoal())
-							.addResultListener(new IResultListener<TranslateGoal>()
+						agent.dispatchTopLevelGoal(new TranslationGoalB2(tfe.getText()))
+							.addResultListener(new IResultListener<TranslationGoalB2>()
 						{
-							public void resultAvailable(TranslateGoal tg) 
+							public void resultAvailable(TranslationGoalB2 tg) 
 							{
 								tfg.setText(tg.toString());
 							}

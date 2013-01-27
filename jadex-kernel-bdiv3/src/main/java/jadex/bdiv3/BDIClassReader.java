@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalInhibit;
+import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
@@ -158,6 +159,17 @@ public class BDIClassReader extends MicroClassReader
 		Class<?> clazz = cma;
 		while(clazz!=null && !clazz.equals(Object.class) && !clazz.equals(getClass(BDIAgent.class, cl)))
 		{
+			// Find external goals
+			if(isAnnotationPresent(clazz, Goals.class, cl))
+			{
+				Goal[] goals = getAnnotation(clazz, Goals.class, cl).value();
+				for(Goal goal: goals)
+				{
+					MGoal mgoal = createMGoal(goal, goal.clazz(), cl, pubs);
+					bdimodel.getCapability().addGoal(mgoal);
+				}
+			}
+			
 			// Find beliefs
 			Field[] fields = clazz.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
@@ -382,55 +394,7 @@ public class BDIClassReader extends MicroClassReader
 			
 			if(mgoal==null)
 			{	
-				Deliberation del = ga.deliberation();
-				Class<?>[] inh = del.inhibits();
-				Set<String> inhnames = null;
-				if(inh.length>0)
-				{
-					inhnames = new HashSet<String>();
-					for(Class<?> gcl: inh)
-					{
-						inhnames.add(gcl.getName());
-					}
-				}
-				MDeliberation mdel = null;
-//				if(del.cardinality()>0 || inhnames!=null)
-				if(inhnames!=null)
-				{
-					// scan for instance delib methods
-					Map<String, MethodInfo> inhms = new HashMap<String, MethodInfo>();
-					Method[] ms = gs[j].getDeclaredMethods();
-					for(Method m: ms)
-					{
-						if(isAnnotationPresent(m, GoalInhibit.class, cl))
-						{
-							GoalInhibit ginh = getAnnotation(m, GoalInhibit.class, cl);
-							Class<?> gcl = ginh.value();
-							inhms.put(gcl.getName(), new MethodInfo(m));
-						}
-					}
-//					mdel = new MDeliberation(del.cardinality(), inhnames, inhms.isEmpty()? null: inhms);
-					mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms);
-				}
-
-				mgoal = new MGoal(gs[j].getName(), ga.posttoall(), ga.randomselection(), ga.excludemode(), 
-					ga.retry(), ga.recur(), ga.retrydelay(), ga.recurdelay(), ga.succeedonpassed(), ga.unique(), mdel);
-				
-				jadex.bdiv3.annotation.Publish pub = ga.publish();
-				if(!Object.class.equals(pub.type()))
-				{
-					ClassInfo ci = new ClassInfo(pub.type().getName());
-					String method = pub.method().length()>0? pub.method(): null;
-					
-					List<Tuple2<MGoal, String>> tmp = pubs.get(ci);
-					if(tmp==null)
-					{
-						tmp = new ArrayList<Tuple2<MGoal, String>>();
-						pubs.put(ci, tmp);
-					}
-					tmp.add(new Tuple2<MGoal, String>(mgoal, method));
-				}
-
+				mgoal = createMGoal(ga, gs[j], cl, pubs);
 				bdimodel.getCapability().addGoal(mgoal);
 			}
 
@@ -471,4 +435,60 @@ public class BDIClassReader extends MicroClassReader
 			new GoalDelegationHandler(agent, gn));
 	}
 	
+	/**
+	 * 
+	 */
+	protected MGoal createMGoal(Goal goal, Class<?> gcl, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	{
+		Deliberation del = goal.deliberation();
+		Class<?>[] inh = del.inhibits();
+		Set<String> inhnames = null;
+		if(inh.length>0)
+		{
+			inhnames = new HashSet<String>();
+			for(Class<?> icl: inh)
+			{
+				inhnames.add(icl.getName());
+			}
+		}
+		MDeliberation mdel = null;
+//		if(del.cardinality()>0 || inhnames!=null)
+		if(inhnames!=null)
+		{
+			// scan for instance delib methods
+			Map<String, MethodInfo> inhms = new HashMap<String, MethodInfo>();
+			Method[] ms = gcl.getDeclaredMethods();
+			for(Method m: ms)
+			{
+				if(isAnnotationPresent(m, GoalInhibit.class, cl))
+				{
+					GoalInhibit ginh = getAnnotation(m, GoalInhibit.class, cl);
+					Class<?> icl = ginh.value();
+					inhms.put(icl.getName(), new MethodInfo(m));
+				}
+			}
+//			mdel = new MDeliberation(del.cardinality(), inhnames, inhms.isEmpty()? null: inhms);
+			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms);
+		}
+
+		MGoal mgoal = new MGoal(gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
+			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel);
+		
+		jadex.bdiv3.annotation.Publish pub = goal.publish();
+		if(!Object.class.equals(pub.type()))
+		{
+			ClassInfo ci = new ClassInfo(pub.type().getName());
+			String method = pub.method().length()>0? pub.method(): null;
+			
+			List<Tuple2<MGoal, String>> tmp = pubs.get(ci);
+			if(tmp==null)
+			{
+				tmp = new ArrayList<Tuple2<MGoal, String>>();
+				pubs.put(ci, tmp);
+			}
+			tmp.add(new Tuple2<MGoal, String>(mgoal, method));
+		}
+
+		return mgoal;
+	}
 }
