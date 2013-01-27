@@ -67,6 +67,12 @@
 			<version>${jadex.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3</artifactId>
+			<version>${jadex.version}</version>
+		</dependency>
+		
 	</dependencies>
 
 </project>

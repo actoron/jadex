@@ -19,6 +19,7 @@
 		<import>agentkeeper.auftragsverwaltung.*</import>
 		<import>agentkeeper.gui.*</import>
 		<import>agentkeeper.map.*</import>
+		<import>agentkeeper.ai.*</import>
 	</imports>
 
 	<extensiontypes>
@@ -34,8 +35,6 @@
 			<env:objecttypes>
 				<env:objecttype name="rock">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 					<env:property name="active" class="boolean">false</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
@@ -43,139 +42,96 @@
 				</env:objecttype>
 				<env:objecttype name="dirt_path">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="active" class="boolean">false</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="impenetrable_rock">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="reinforced_wall">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="gold">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="gold2">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="gems">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="claimed_path">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="water">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="lava">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="hero">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="dungeonheart">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="dungeonheartcenter">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="treasury">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="hatchery">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 					<env:property dynamic="false" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
 				</env:objecttype>
 				<env:objecttype name="hatcherycenter">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="neighborhood" class="String"></env:property>
-					
+					<env:property name="neighborhood" class="String"></env:property>	
 				</env:objecttype>
 				<env:objecttype name="lair">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 					<env:property dynamic="false" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
 				</env:objecttype>
 				<env:objecttype name="portal">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="trainingroom">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="trainingroomcenter">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="library">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				<env:objecttype name="torture">
 					<env:property name="status" class="String">"Nothing"</env:property>
-					<env:property name="amount" class="int">25</env:property>
-					<env:property name="amount" class="int">25</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
 				
@@ -215,17 +171,6 @@
 					<env:property name="leben" class="int">30</env:property>
 					<env:property name="loyalitaet" class="double">5.0
 					</env:property>
-					<env:property name="abklingzeit" class="int">2
-					</env:property>
-					<env:property name="status" class="String">"Walk"
-					</env:property>
-				</env:objecttype>
-				<env:objecttype name="paladin">
-					<env:property name="geschlagen">false</env:property>
-					<env:property name="position" />
-					<env:property name="direction">0.0</env:property>
-					<env:property name="maxleben" class="int">40</env:property>
-					<env:property name="leben" class="int">40</env:property>
 					<env:property name="abklingzeit" class="int">2
 					</env:property>
 					<env:property name="status" class="String">"Walk"
@@ -547,20 +492,20 @@
 						</env:object3d>
 					</env:drawable3d>
 
-<!-- 					<env:drawable3d objecttype="goblin" width="1" -->
-<!-- 						height="1" depth="1"> -->
-<!-- 						<env:object3d width="0.15" height="0.15" depth="0.15" -->
-<!-- 							x="0" y="1.5" z="0" -->
-<!-- 							modelpath="jadex3d/models/characters/medieval/knight/knight.j3o" -->
-<!-- 							hasLightMaterials="true"> -->
-<!-- 							<env:animation name="Walk" channel="chanA" loop="true"> -->
-<!-- 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition> -->
-<!-- 							</env:animation> -->
-<!-- 							<env:animation name="Idle" channel="chanA" loop="true"> -->
-<!-- 								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition> -->
-<!-- 							</env:animation> -->
-<!-- 						</env:object3d> -->
-<!-- 					</env:drawable3d> -->
+					<env:drawable3d objecttype="goblin" width="1"
+						height="1" depth="1">
+						<env:object3d width="0.15" height="0.15" depth="0.15"
+							x="0" y="1.5" z="0"
+							modelpath="jadex3d/models/characters/medieval/knight/knight.j3o"
+							hasLightMaterials="true">
+							<env:animation name="Walk" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
+							</env:animation>
+							<env:animation name="Idle" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
+							</env:animation>
+						</env:object3d>
+					</env:drawable3d>
 				</env:perspective3d>
 			</env:perspectives>
 
@@ -576,7 +521,7 @@
 
 		<componenttype name="Imp" filename="agentkeeper/imps/imp.agent.xml" />
 		<componenttype name="Goblin"
-			filename="agentkeeper/monster/goblin.agent.xml" />
+			filename="ai/AbstractBeingBDI.class" />
 		<componenttype name="Warlock"
 			filename="agentkeeper/monster/warlock.agent.xml" />
 		<componenttype name="Paladin"

@@ -35,8 +35,6 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 
 	public static Gebaudeverwalter gebaeuedeverwalter;
 
-	static List<String> gegnertypen;
-
 	public static int monsteressverbrauch;
 
 	public static Vector2Double portalort;
@@ -45,16 +43,11 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 	
 	public UserEingabenManager uem;
 	public MissionsVerwalter mv;
-	public GegnerVerwalter gegnerauftraege;
 
 	static {
 		gebaeuedeverwalter = new Gebaudeverwalter();
-		gegnertypen = new LinkedList<String>();
 		portalort = new Vector2Double(12, 19);
 		monsteressverbrauch = 4;
-
-		gegnertypen.add(FRAU);
-		gegnertypen.add(PALADIN);
 
 		imagenames = new HashMap<String, String>();
 
@@ -149,9 +142,6 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 			grid.setProperty("uem", uem);
 			grid.setProperty(Property.CREATURE_STATE, this.creatureState);
 
-			gegnerauftraege = new GegnerVerwalter();
-
-			grid.setProperty("gegnerverwalter", gegnerauftraege);
 		}
 		 catch (Exception e) {
 				e.printStackTrace();

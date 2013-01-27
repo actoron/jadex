@@ -2,12 +2,9 @@ package agentkeeper.map;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-
-import jadex.extension.envsupport.math.Vector2Int;
 
 /**
- * Constants for field types.
+ * Constants for field and creature types.
  */
 public interface IMap {
 	public static final String IMPENETRABLE_ROCK = "impenetrable_rock";
@@ -86,7 +83,9 @@ public interface IMap {
 	public static final String[] LIBRARY_NEIGHBORS = BUILDING_TYPES;
 	public static final String[] TORTURE_NEIGHBORS = BUILDING_TYPES;
 	
-	
+	/**
+	 * Hash Maps for easier contains-using inside the Code
+	 */
 	public static final HashMap<String,String[]> NEIGHBOR_RELATIONS = new HashMap<String,String[]>(); 
 	
 	public static final HashSet<String> FIELD_SET = new HashSet<String>(); 
@@ -98,15 +97,5 @@ public interface IMap {
 	public static final HashSet<String> MOVEABLES = new HashSet<String>(); 
 	
 	public static final HashMap<String,String> CENTER_TYPES = new HashMap<String,String>(); 
-
-	public static final String FRAU = "frau";
-	public static final String PALADIN = "paladin";
-	
-
-
-
-
-	
-	
 
 }

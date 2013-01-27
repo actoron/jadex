@@ -196,7 +196,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 						}
 					}
 
-					// The map is full, so now we generate Neighbor dependend
+					// The map is complete loaded, so now we generate Neighbor dependencies
 					// Stuff
 
 					for(SimpleMapType postype : complexNPos)
@@ -216,15 +216,12 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 						{
 							Set<SpaceObject> nearRocks = InitMapProcess.getNeighborBlocksInRange(postype.getPosition(), 1, grid,
 									InitMapProcess.NEIGHBOR_RELATIONS.get(thatsme.getType()));
-							
+
 							String newNeighborhood = Neighborhood.reCalculateNeighborhood(postype.getPosition(), nearRocks);
-							
+
 							thatsme.setProperty("neighborhood", newNeighborhood);
 						}
-						else
-						{
 
-						}
 					}
 
 
@@ -297,9 +294,9 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 							String type = stok.nextToken().toLowerCase();
 							int x = Integer.parseInt(stok.nextToken());
 							int y = Integer.parseInt(stok.nextToken());
-							@SuppressWarnings("unused")
+
 							String level = stok.nextToken();
-							@SuppressWarnings("unused")
+
 							String owner = stok.nextToken();
 
 							HashMap<String, Object> props = new HashMap<String, Object>();
@@ -311,23 +308,16 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 							props.put("intPos", new Vector2Int(x, y));
 							// props.put("auftragsverwalter", gegnerauftraege);
 
-							if(gegnertypen.contains(type))
+							if(type.equals("spielprozesse"))
 							{
-								props.put("spieler", new Integer(2));
+								props.put("spieler", 0);
 							}
 							else
 							{
-								if(type.equals("spielprozesse"))
-								{
-									props.put("spieler", 0);
-								}
-								else
-								{
-									props.put("spieler", new Integer(1));
-									creatureState.addCreature(type);
-								}
-
+								props.put("spieler", new Integer(1));
+								creatureState.addCreature(type);
 							}
+
 
 							// todo: level, owner
 							grid.createSpaceObject(type, props, null);

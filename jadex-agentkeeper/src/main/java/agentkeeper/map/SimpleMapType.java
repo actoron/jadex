@@ -6,6 +6,8 @@ public class SimpleMapType
 {
 	/**
 	 * Simple Helper Class for Map generation
+	 * 
+	 * @author Philip Willuweit p.willuweit@gmx.de
 	 */
 
 	private Vector2Int position;

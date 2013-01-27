@@ -50,38 +50,7 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction {
 		
 		grid.setPosition(id, pos);
 
-//		if(begehbar(pos, space))
-//		{
-//			
-//			grid.setPosition(id, pos);
-//		}
-//		else
-//		{
-//			
-//			System.out.println("Not allowed to go to: " + pos);
-//			throw new RuntimeException();
-//		}
-
 		return null;
 	}
-	
-	private boolean begehbar(IVector2 punkt, IEnvironmentSpace space) {
 
-		//TODO:: umschreiben
-		for (Object o : ((Grid2D) space).getSpaceObjectsByGridPosition(punkt, null)) {
-			if (o instanceof ISpaceObject) {
-				ISpaceObject blub = (ISpaceObject) o;
-				if (MoveAction.ALLOWFIELDS.contains(blub.getType())) {
-					return true;
-				}
-				else
-				{
-					System.out.println("Position von nicht begehbar: " + blub.getProperty(Space2D.PROPERTY_POSITION));
-					System.out.println("Type von nicht begehbar: " + blub.getType());
-					
-				}
-			}
-		}
-		return false;
-	}
 }

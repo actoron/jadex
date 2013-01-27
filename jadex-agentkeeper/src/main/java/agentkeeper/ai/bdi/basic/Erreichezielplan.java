@@ -59,12 +59,11 @@ public class Erreichezielplan extends KreaturenPlan {
 	public void aktion() {
 
 		if (_suche.istErreichbar()) {
+			
 			//TODO: was soll schritt?
 			if (_schritt == 0) {
 				
 				//TODO: hier gut?
-				
-				
 				Stack<Vector2Int> pfad = _suche.gibPfad();
 
 
