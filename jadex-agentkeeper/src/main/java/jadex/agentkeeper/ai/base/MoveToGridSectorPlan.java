@@ -95,7 +95,8 @@ public class MoveToGridSectorPlan
 			
 			System.out.println("nextTarget " + nextTarget);
 			
-			oneStepToTarget(nextTarget);
+			oneStepToTarget(nextTarget)
+				.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -105,8 +106,9 @@ public class MoveToGridSectorPlan
 		return ret;
 	}
 	
-	private void oneStepToTarget(Vector2Int nextTarget)
+	private IFuture<Void> oneStepToTarget(Vector2Int nextTarget)
 	{
+		Future<Void>	ret = new Future<Void>();
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, nextTarget);
 
@@ -116,13 +118,12 @@ public class MoveToGridSectorPlan
 		
 //		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 //		myself.getId();
-		SyncResultListener	res	= new SyncResultListener();
 		
 		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, rplan.getId());
-		res	= new SyncResultListener();
-		capa.getEnvironment().addTaskListener(mtaskid, rplan.getId(), res);
-		res.waitForResult();
+		capa.getEnvironment().addTaskListener(mtaskid, rplan.getId(),
+			new DelegationResultListener<Void>(ret));
+		
+		return ret;
 	}
-
-
 }
+

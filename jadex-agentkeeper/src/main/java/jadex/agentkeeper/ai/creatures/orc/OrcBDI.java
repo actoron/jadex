@@ -74,6 +74,7 @@ public class OrcBDI
 			public void customResultAvailable(IExtensionInstance ext)
 			{
 				environment	= (Grid2D)ext;
+				environment.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
 				ret.setResult(null);
 			}
 		});
