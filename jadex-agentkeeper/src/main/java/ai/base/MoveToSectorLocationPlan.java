@@ -70,6 +70,10 @@ public class MoveToSectorLocationPlan
 			Stack<Vector2Int> path = astar.gibPfad();
 			moveToNextSector(path.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
+		else
+		{
+			ret.setException(new RuntimeException("Not reachable: "+target));
+		}
 
 		return ret;
 	}

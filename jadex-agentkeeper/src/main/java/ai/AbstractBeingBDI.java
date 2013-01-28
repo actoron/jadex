@@ -17,6 +17,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -25,6 +26,7 @@ import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
@@ -51,7 +53,6 @@ public class AbstractBeingBDI
 	protected BDIAgent		agent;
 
 	/** The virtual environment of the Dungeon. */
-	@Belief
 	protected Grid2D		environment;
 
 	/** The position of the "Being". */
@@ -62,6 +63,25 @@ public class AbstractBeingBDI
 	@Belief
 	protected float			my_speed	= 1;
 
+	/**
+	 *  Initialize the agent.
+	 *  Called at startup.
+	 */
+	@AgentCreated
+	public IFuture<Void>	init()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		agent.getParentAccess().getExtension("mygc2dspace")
+			.addResultListener(new ExceptionDelegationResultListener<IExtensionInstance, Void>(ret)
+		{
+			public void customResultAvailable(IExtensionInstance ext)
+			{
+				environment	= (Grid2D)ext;
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
 
 	/**
 	 * The agent body.
@@ -69,15 +89,6 @@ public class AbstractBeingBDI
 	@AgentBody
 	public void body()
 	{
-
-		environment = null;
-		final Future<IExtensionInstance> ret = new Future<IExtensionInstance>();
-
-		IFuture<IExtensionInstance> test = agent.getParentAccess().getExtension("mygc2dspace");
-		test.addResultListener(new DelegationResultListener<IExtensionInstance>(ret));
-
-		// AbstractEnvironmentSpace space = test.;
-
 	}
 
 	/**
