@@ -1,4 +1,4 @@
-package jadex.agentkeeper.init.map;
+package jadex.agentkeeper.ai.oldai.basic;
 
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;

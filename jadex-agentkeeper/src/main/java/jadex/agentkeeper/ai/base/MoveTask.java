@@ -1,5 +1,6 @@
 package jadex.agentkeeper.ai.base;
 
+import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
@@ -13,6 +14,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector2Double;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -32,17 +34,14 @@ public class MoveTask extends AbstractTask
 
 	/** The scope property. */
 	public static final String	PROPERTY_SCOPE = "scope";
+	
+	/** The scope property. */
+	public static final String	PROPERTY_AGENT = "agent";
 
 	/** The speed property of the moving object (units per second). */
 	public static final String	PROPERTY_SPEED	= "speed";
 	
-	/** The vision property of the moving object (radius in units). */
-	public static final String	PROPERTY_VISION	= "vision";
 	
-	/** The target radius. */
-	public static final String	PROPERTY_TARGETRADIUS	= "targetradius";
-
-		
 	//-------- IObjectTask methods --------
 	
 	/**
@@ -54,63 +53,49 @@ public class MoveTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
-		final IBDIExternalAccess agent = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
+		IVector2 idis = (IVector2)getProperty(PROPERTY_DESTINATION);
 
-		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
+		double	speed	= ((Number)getProperty(PROPERTY_SPEED)).doubleValue();
 		
-		double	maxdist	= progress*speed*0.001;
+		double	maxdist	= progress*speed*0.0005;
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		
-		double r = (Double)space.getProperty(PROPERTY_TARGETRADIUS);
-		double dist = ((Space2D)space).getDistance(loc, destination).getAsDouble();
+		OrcBDI		capa = (OrcBDI)getProperty(PROPERTY_AGENT);
+		
+		double r = 0;
+		double dist = ((Space2D)space).getDistance(loc, idis).getAsDouble();
 		IVector2	newloc;
 		boolean fin = false;
+		
+		Vector2Double destination = new Vector2Double(idis.getXAsDouble(), idis.getYAsDouble());
+		
 		if(dist>r)
 		{
+			
 			// Todo: how to handle border conditions!?
-			newloc	= dist<=maxdist? destination 
-				: destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
-	
+			newloc	= (Vector2Double)(dist<=maxdist? destination 
+				: destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc));
+			
+
+			System.out.println("newloc: " + newloc);
+
 			((Space2D)space).setPosition(obj.getId(), newloc);
+			capa.setMyPosition(new Vector2Double(newloc.getXAsDouble(), newloc.getYAsDouble()));
+
 		}
 		else
 		{
+			
 			fin = true;
 			newloc = loc; 
 		}
 		
-		// Process vision at new location.
-		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
-		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
-		if(objects!=null)
-		{
-			agent.scheduleStep(new IComponentStep<Void>()
-			{
-				@Classname("add")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					for(Iterator it=objects.iterator(); it.hasNext(); )
-					{
-						final ISpaceObject so = (ISpaceObject)it.next();
-						if(so.getType().equals("target"))
-						{
-							if(!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
-							{
-								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
-							}
-//							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-							
-						}
-					}
-					return IFuture.DONE;
-				}
-			});
-			
-		}
 		
 		if(newloc==destination || fin)
+		{
+			System.out.println("newloc == destination or fin!");
 			setFinished(space, obj, true);
+		}
+			
 	}
 }

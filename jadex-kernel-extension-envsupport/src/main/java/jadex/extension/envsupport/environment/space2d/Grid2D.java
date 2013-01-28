@@ -7,6 +7,7 @@ import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector1Int;
+import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
 import java.util.ArrayList;
@@ -178,6 +179,23 @@ public class Grid2D extends Space2D
 				}
 			}
 			
+			return ret;
+		}
+	}
+	
+	/**
+	 * Retrieves a random position within the simulation area with a minimum
+	 * distance from the edge.
+	 * @param distance minimum distance from the edge, null or zero for no distance
+	 */
+	public IVector2 getRandomGridPosition(IVector2 distance)
+	{
+		synchronized(monitor)
+		{
+			IVector2 ret = null;
+			
+			ret = new Vector2Int(getRandomPosition(distance));
+
 			return ret;
 		}
 	}

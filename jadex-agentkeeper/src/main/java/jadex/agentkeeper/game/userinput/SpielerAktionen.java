@@ -9,7 +9,7 @@ package jadex.agentkeeper.game.userinput;
 import java.util.HashMap;
 
 
-import jadex.agentkeeper.init.map.MoveAction;
+import jadex.agentkeeper.ai.oldai.basic.MoveAction;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;

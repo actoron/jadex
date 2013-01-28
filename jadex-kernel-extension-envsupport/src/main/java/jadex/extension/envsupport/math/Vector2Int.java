@@ -8,6 +8,7 @@ public class Vector2Int implements IVector2
 {
 	/** Zero vector. */
 	public static final IVector2 ZERO = new Vector2Int(0);
+	public static final IVector2 UNIT = new Vector2Int(1);
 	
 	private int x_;
 	private int y_;

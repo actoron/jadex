@@ -1,31 +1,25 @@
 package jadex.agentkeeper.ai.base;
 
-import jadex.agentkeeper.ai.AbstractBeingBDI;
-import jadex.agentkeeper.ai.AbstractBeingBDI.AchieveMoveToSector;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
-import jadex.bdi.runtime.Plan.SyncResultListener;
+import jadex.agentkeeper.ai.creatures.orc.OrcBDI.AchieveMoveToSector;
+import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
+import jadex.agentkeeper.ai.pathfinding.AStarSearch;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.environment.AbstractTask;
-import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
-import com.jme3.audio.Environment;
-
-import jadex.agentkeeper.ai.pathfinding.*;
 
 /**
  * Move to a Location on the Grid
@@ -35,7 +29,7 @@ import jadex.agentkeeper.ai.pathfinding.*;
 public class MoveToGridSectorPlan
 {
 	@PlanCapability
-	protected AbstractBeingBDI		capa;
+	protected OrcBDI		capa;
 
 	@PlanPlan
 	protected RPlan					rplan;
@@ -74,7 +68,11 @@ public class MoveToGridSectorPlan
 		// TODO: what to do if not reachable? fail the plan?
 		if(astar.istErreichbar())
 		{
-			Stack<Vector2Int> path = astar.gibPfad();
+			
+			System.out.println("erreichbar!");
+			
+			ArrayList<Vector2Int> path = astar.gibPfadInverted();
+			
 			moveToNextSector(path.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
@@ -111,16 +109,11 @@ public class MoveToGridSectorPlan
 		Future<Void>	ret = new Future<Void>();
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, nextTarget);
-
-		//TODO: how?
-//		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
+		props.put(MoveTask.PROPERTY_SPEED, capa.getMySpeed());
+		props.put(MoveTask.PROPERTY_AGENT, capa);
 		
-		
-//		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-//		myself.getId();
-		
-		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, rplan.getId());
-		capa.getEnvironment().addTaskListener(mtaskid, rplan.getId(),
+		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, capa.getMySpaceObject().getId());
+		capa.getEnvironment().addTaskListener(mtaskid, capa.getMySpaceObject().getId(),
 			new DelegationResultListener<Void>(ret));
 		
 		return ret;

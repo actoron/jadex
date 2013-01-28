@@ -8,7 +8,6 @@ import jadex.agentkeeper.ai.oldai.creatures.KreaturenPlan;
 import jadex.agentkeeper.game.state.missions.Auftrag;
 import jadex.agentkeeper.game.state.missions.Auftragsverwalter;
 import jadex.agentkeeper.game.state.missions.IAuftragsverwalter;
-import jadex.agentkeeper.init.map.MoveAction;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.agentkeeper.util.Neighborhood;
 import jadex.extension.envsupport.environment.ISpaceObject;

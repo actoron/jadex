@@ -4,8 +4,8 @@ import java.util.Map;
 
 
 
+import jadex.agentkeeper.ai.oldai.basic.MoveAction;
 import jadex.agentkeeper.game.state.missions.Auftragsverwalter;
-import jadex.agentkeeper.init.map.MoveAction;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.agentkeeper.view.selection.SelectionArea;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;

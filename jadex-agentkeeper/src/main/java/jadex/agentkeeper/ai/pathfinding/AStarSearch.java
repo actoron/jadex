@@ -3,7 +3,7 @@ package jadex.agentkeeper.ai.pathfinding;
 import java.util.*;
 
 
-import jadex.agentkeeper.init.map.MoveAction;
+import jadex.agentkeeper.ai.oldai.basic.MoveAction;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -319,6 +319,18 @@ public class AStarSearch {
 
 	public Stack<Vector2Int> gibPfad() {
 		return _pfad;
+	}
+	
+	public ArrayList<Vector2Int> gibPfadInverted() {
+		ArrayList<Vector2Int> ret;
+		
+		ret = new ArrayList<Vector2Int>(_pfad);
+		
+		Collections.reverse(ret);
+		
+		ret.remove(0);
+		
+		return ret;
 	}
 
 	public int gibPfadKosten() {

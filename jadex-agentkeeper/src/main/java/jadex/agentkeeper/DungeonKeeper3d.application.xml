@@ -16,6 +16,8 @@
 		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.agentkeeper.ai.*</import>
+		<import>jadex.agentkeeper.ai.base.*</import>
+		<import>jadex.agentkeeper.ai.oldai.basic.*</import>
 		<import>jadex.agentkeeper.state.missions.*</import>
 		<import>jadex.agentkeeper.init.map.*</import>
 		<import>jadex.agentkeeper.init.map.process.*</import>
@@ -181,11 +183,15 @@
 					<env:property name="direction">0.0</env:property>
 				</env:objecttype>
 			</env:objecttypes>
+			
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+			</env:tasktypes>	
 
 			<env:processtypes>
 				<env:processtype name="init" class="InitMapProcess" />
 			</env:processtypes>
-
+			
 			<env:dataviews>
 				<env:dataview name="view_all" class="GeneralDataView2D3D" />
 			</env:dataviews>
@@ -520,7 +526,7 @@
 
 		<componenttype name="Imp" filename="jadex/agentkeeper/ai/creatures/imp/imp.agent.xml" />
 		<componenttype name="Goblin"
-			filename="ai/creatures/goblin/GoblinBDI.class" />
+			filename="ai/creatures/orc/OrcBDI.class" />
 <!-- 		<componenttype name="Warlock" -->
 <!-- 			filename="agentkeeper/monster/warlock.agent.xml" /> -->
 <!-- 		<componenttype name="Paladin" -->

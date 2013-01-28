@@ -20,7 +20,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 import jadex.micro.annotation.Agent;
@@ -52,6 +54,8 @@ public class OrcBDI
 
 	/** The virtual environment of the Dungeon. */
 	protected Grid2D		environment;
+	
+	protected ISpaceObject mySpaceObject;
 
 	/** The position of the "Being". */
 	@Belief
@@ -74,7 +78,8 @@ public class OrcBDI
 			public void customResultAvailable(IExtensionInstance ext)
 			{
 				environment	= (Grid2D)ext;
-				environment.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
+				mySpaceObject = environment.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
+				my_position = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
 				ret.setResult(null);
 			}
 		});
@@ -87,6 +92,7 @@ public class OrcBDI
 	@AgentBody
 	public void body()
 	{
+		agent.dispatchTopLevelGoal(new AchieveMoveToSector(new Vector2Int(9,18)));
 	}
 
 	/**
@@ -116,7 +122,9 @@ public class OrcBDI
 		public boolean checkTarget()
 		{
 			// TODO: Check that
-			return 1 > my_position.getDistance(target).getAsFloat();
+			System.out.println("check");
+//			return false;
+			return 0.001f > my_position.getDistance(target).getAsFloat();
 		}
 
 		/**
@@ -191,6 +199,16 @@ public class OrcBDI
 	public void setEnvironment(Grid2D environment)
 	{
 		this.environment = environment;
+	}
+
+	public ISpaceObject getMySpaceObject()
+	{
+		return mySpaceObject;
+	}
+
+	public void setMySpaceObject(ISpaceObject mySpaceObject)
+	{
+		this.mySpaceObject = mySpaceObject;
 	}
 
 
