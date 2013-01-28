@@ -42,6 +42,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.micro.MicroClassReader;
 import jadex.micro.MicroModel;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.NameValue;
@@ -156,9 +157,15 @@ public class BDIClassReader extends MicroClassReader
 		
 		Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs = new HashMap<ClassInfo, List<Tuple2<MGoal, String>>>();
 		
+		List<Class<?>> agtcls = new ArrayList<Class<?>>();
 		Class<?> clazz = cma;
 		while(clazz!=null && !clazz.equals(Object.class) && !clazz.equals(getClass(BDIAgent.class, cl)))
 		{
+			if(isAnnotationPresent(clazz, Agent.class, cl))
+			{
+				agtcls.add(0, clazz);
+			}
+			
 			// Find external goals
 			if(isAnnotationPresent(clazz, Goals.class, cl))
 			{
@@ -166,6 +173,19 @@ public class BDIClassReader extends MicroClassReader
 				for(Goal goal: goals)
 				{
 					MGoal mgoal = createMGoal(goal, goal.clazz(), cl, pubs);
+					bdimodel.getCapability().addGoal(mgoal);
+				}
+			}
+			
+			// Find goals
+			Class<?>[] cls = clazz.getDeclaredClasses();
+			for(int i=0; i<cls.length; i++)
+			{
+				if(isAnnotationPresent(cls[i], Goal.class, cl))
+				{
+//					System.out.println("found belief: "+fields[i].getName());
+					Goal goal = getAnnotation(cls[i], Goal.class, cl);
+					MGoal mgoal = createMGoal(goal, cls[i], cl, pubs);
 					bdimodel.getCapability().addGoal(mgoal);
 				}
 			}
@@ -375,6 +395,13 @@ public class BDIClassReader extends MicroClassReader
 		// Create enhanced class if not already present.
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		Class<?> genclazz = gen.generateBDIClass(cma.getName(), bdimodel, classloader);
+		
+		for(Class<?> agcl: agtcls)
+		{
+			System.out.println("genclazz: "+agcl);
+			gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
+		}
+		
 //		System.out.println("genclazz: "+genclazz);
 	}
 	

@@ -8,7 +8,9 @@ import jadex.bdiv3.runtime.RPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.Agent;
 
+@Agent
 public class BenchmarkBDI extends SokratesBDI
 {
 	/**
