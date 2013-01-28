@@ -2188,7 +2188,10 @@ public class MessageService extends BasicService implements IMessageService
 												{
 													if(!(e instanceof ContentException))
 													{
-//														logger.severe("ContentException: "+((byte[])value).length);
+														if(((byte[])value).length>3000)
+														{
+															logger.severe("ContentException: "+((byte[])value).length+", "+fmessage);
+														}
 														e = new ContentException(new String((byte[])value), e);
 													}
 													fmessage.put(name, e);

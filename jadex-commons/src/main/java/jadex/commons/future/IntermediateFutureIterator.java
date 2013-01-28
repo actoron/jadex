@@ -6,6 +6,7 @@ import java.util.Iterator;
  *  Helper class for iterating over the results of an intermediate future.
  *  Uses a suspendable for realizing blocking operations.
  */
+// Todo: finish implementation in future.
 public class IntermediateFutureIterator<E> implements Iterator<E>
 {
 	//-------- attributes --------
@@ -34,7 +35,8 @@ public class IntermediateFutureIterator<E> implements Iterator<E>
 	 */
 	public boolean hasNext()
 	{
-		return fut.hasNextIntermediateResult(sus);
+//		return fut.hasNextIntermediateResult(sus);
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -42,7 +44,8 @@ public class IntermediateFutureIterator<E> implements Iterator<E>
 	 */
 	public E next()
 	{
-		return fut.getNextIntermediateResult(sus);
+//		return fut.getNextIntermediateResult(sus);
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
