@@ -2,7 +2,7 @@ package jadex.agentkeeper.ai.creatures.goblin;
 
 
 
-import jadex.agentkeeper.ai.base.MoveToSectorLocationPlan;
+import jadex.agentkeeper.ai.base.MoveToGridSectorPlan;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
@@ -41,7 +41,7 @@ import jadex.rules.eca.annotations.Event;
 @Agent
 @Plans({
 
-@Plan(trigger = @Trigger(goals = GoblinBDI.AchieveMoveToSector.class), body = @Body(MoveToSectorLocationPlan.class))
+@Plan(trigger = @Trigger(goals = GoblinBDI.AchieveMoveToSector.class), body = @Body(MoveToGridSectorPlan.class))
 
 
 })

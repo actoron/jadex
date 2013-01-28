@@ -2,6 +2,8 @@ package jadex.agentkeeper.ai.base;
 
 import jadex.agentkeeper.ai.AbstractBeingBDI;
 import jadex.agentkeeper.ai.AbstractBeingBDI.AchieveMoveToSector;
+import jadex.bdi.planlib.PlanFinishedTaskCondition;
+import jadex.bdi.runtime.Plan.SyncResultListener;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
@@ -11,11 +13,17 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.AbstractTask;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
+
+import com.jme3.audio.Environment;
 
 import jadex.agentkeeper.ai.pathfinding.*;
 
@@ -24,7 +32,7 @@ import jadex.agentkeeper.ai.pathfinding.*;
  * 
  * @author Philip Willuweit p.willuweit@gmx.de
  */
-public class MoveToSectorLocationPlan
+public class MoveToGridSectorPlan
 {
 	@PlanCapability
 	protected AbstractBeingBDI		capa;
@@ -42,7 +50,7 @@ public class MoveToSectorLocationPlan
 	/**
 	 * Create a new plan.
 	 */
-	public MoveToSectorLocationPlan()
+	public MoveToGridSectorPlan()
 	{
 
 		// getLogger().info("Created: "+this);
@@ -77,7 +85,7 @@ public class MoveToSectorLocationPlan
 		return ret;
 	}
 
-	//TODO: Why the Iterator final?
+	
 	private IFuture<Void> moveToNextSector(final Iterator<Vector2Int> it)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -86,8 +94,8 @@ public class MoveToSectorLocationPlan
 			Vector2Int nextTarget = it.next();
 			
 			System.out.println("nextTarget " + nextTarget);
-
 			
+			oneStepToTarget(nextTarget);
 		}
 		else
 		{
@@ -95,6 +103,25 @@ public class MoveToSectorLocationPlan
 		}
 		
 		return ret;
+	}
+	
+	private void oneStepToTarget(Vector2Int nextTarget)
+	{
+		Map props = new HashMap();
+		props.put(MoveTask.PROPERTY_DESTINATION, nextTarget);
+
+		//TODO: how?
+//		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
+		
+		
+//		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+//		myself.getId();
+		SyncResultListener	res	= new SyncResultListener();
+		
+		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, rplan.getId());
+		res	= new SyncResultListener();
+		capa.getEnvironment().addTaskListener(mtaskid, rplan.getId(), res);
+		res.waitForResult();
 	}
 
 
