@@ -163,7 +163,22 @@ public class BDIAgent extends MicroAgent
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 
-			Field f = obj.getClass().getDeclaredField(fieldname);
+			Field f = null;
+			Class<?> cl = obj.getClass();
+			while(f==null && !Object.class.equals(cl))
+			{
+				try
+				{
+					f = cl.getDeclaredField(fieldname);
+				}
+				catch(Exception e)
+				{
+					cl = cl.getSuperclass();
+				}
+			}
+			if(f==null)
+				throw new RuntimeException("Field not found: "+fieldname);
+			
 			f.setAccessible(true);
 			
 			// unobserve old value for property changes
