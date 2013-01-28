@@ -1415,6 +1415,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  The listener result will be the task id.
 	 *  If the task is already finished, the listener will be notified.
 	 */
+	// todo: refactor with generic future 
 	public void addTaskListener(Object taskid, Object objectid, IResultListener listener)
 	{
 		SpaceObject so = (SpaceObject)getSpaceObject(objectid);

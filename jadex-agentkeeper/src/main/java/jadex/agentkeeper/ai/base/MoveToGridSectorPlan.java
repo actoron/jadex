@@ -1,14 +1,16 @@
 package jadex.agentkeeper.ai.base;
 
-import jadex.agentkeeper.ai.creatures.orc.OrcBDI.AchieveMoveToSector;
 import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
+import jadex.agentkeeper.ai.creatures.orc.OrcBDI.AchieveMoveToSector;
 import jadex.agentkeeper.ai.pathfinding.AStarSearch;
+import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.math.Vector2Double;
@@ -17,9 +19,7 @@ import jadex.extension.envsupport.math.Vector2Int;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 
 /**
@@ -40,7 +40,9 @@ public class MoveToGridSectorPlan
 
 	private AStarSearch				astar;
 
-	private Iterator<Vector2Int>				pathit;
+	private Iterator<Vector2Int>	path_iterator;
+
+	Vector2Double					myloc;
 
 	// -------- constructors --------
 
@@ -63,23 +65,18 @@ public class MoveToGridSectorPlan
 	{
 		final Future<Void> ret = new Future<Void>();
 		Vector2Int target = goal.getTarget();
-		Vector2Double myloc = capa.getMyPosition();
-
+		Vector2Double myloc = capa.getUpdatedPosition();
 
 		// TODO: refractor AStar-Search
 		astar = new AStarSearch(myloc, target, capa.getEnvironment(), true);
 
-		// TODO: what to do if not reachable? fail the plan?
 		if(astar.istErreichbar())
 		{
-
-			System.out.println("erreichbar!");
-
 			ArrayList<Vector2Int> path = astar.gibPfadInverted();
 
-			pathit = path.iterator();
+			path_iterator = path.iterator();
 
-			moveToNextSector(pathit).addResultListener(new DelegationResultListener<Void>(ret));
+			moveToNextSector(path_iterator).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -91,22 +88,27 @@ public class MoveToGridSectorPlan
 	}
 
 
+	/**
+	 * Iterative Method
+	 * @param it iterator
+	 * @return empty result when finished
+	 */
 	private IFuture<Void> moveToNextSector(final Iterator<Vector2Int> it)
 	{
+		capa.getUpdatedPosition(); // Hack to Update the Belief-Position to
+									// Trigger the GoalTargetCondition
+
 		final Future<Void> ret = new Future<Void>();
 		if(it.hasNext())
 		{
 			Vector2Int nextTarget = it.next();
 
-			System.out.println("nextTarget " + nextTarget);
-
 			oneStepToTarget(nextTarget).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				
+
 				public void customResultAvailable(Void result)
 				{
-					System.out.println("custom result");
-					moveToNextSector(pathit).addResultListener(new DelegationResultListener<Void>(ret));
+					moveToNextSector(path_iterator).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -118,16 +120,27 @@ public class MoveToGridSectorPlan
 		return ret;
 	}
 
+	/**
+	 * We use the MoveTask for the "moving" in the virtual World.
+	 * 
+	 * @param nextTarget
+	 * @return
+	 */
 	private IFuture<Void> oneStepToTarget(Vector2Int nextTarget)
 	{
-		Future<Void> ret = new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, nextTarget);
 		props.put(MoveTask.PROPERTY_SPEED, capa.getMySpeed());
-		props.put(MoveTask.PROPERTY_AGENT, capa);
 
 		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, capa.getMySpaceObject().getId());
-		capa.getEnvironment().addTaskListener(mtaskid, capa.getMySpaceObject().getId(), new DelegationResultListener<Void>(ret));
+		capa.getEnvironment().addTaskListener(mtaskid, capa.getMySpaceObject().getId(), new ExceptionDelegationResultListener<Object, Void>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(null);
+			}
+		});
 
 		return ret;
 	}

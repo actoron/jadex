@@ -3,6 +3,7 @@ package jadex.agentkeeper.ai.creatures.orc;
 
 
 import jadex.agentkeeper.ai.base.MoveToGridSectorPlan;
+import jadex.agentkeeper.ai.base.PatrolPlan;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
@@ -11,6 +12,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.model.MGoal;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -42,7 +44,8 @@ import jadex.rules.eca.annotations.Event;
 @Agent
 @Plans({
 
-@Plan(trigger = @Trigger(goals = OrcBDI.AchieveMoveToSector.class), body = @Body(MoveToGridSectorPlan.class))
+@Plan(trigger = @Trigger(goals = OrcBDI.AchieveMoveToSector.class), body = @Body(MoveToGridSectorPlan.class)),
+@Plan(trigger=@Trigger(goals=OrcBDI.PerformPatrol.class), body=@Body(PatrolPlan.class))
 
 
 })
@@ -55,12 +58,19 @@ public class OrcBDI
 	/** The virtual environment of the Dungeon. */
 	protected Grid2D		environment;
 	
+	/** The virtual SpaceObject of the "Being" in the virtual environment. */
 	protected ISpaceObject mySpaceObject;
 
 	/** The position of the "Being". */
 	@Belief
 	protected Vector2Double	my_position;
 
+	public Vector2Double getUpdatedPosition()
+	{
+		my_position = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
+		return my_position;
+	}
+	
 	/** The speed of the "Being". */
 	protected float			my_speed	= 1;
 
@@ -92,7 +102,8 @@ public class OrcBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new AchieveMoveToSector(new Vector2Int(9,18)));
+		agent.dispatchTopLevelGoal(new PerformPatrol());
+//		agent.dispatchTopLevelGoal(new AchieveMoveToSector(new Vector2Int(9,18)));
 	}
 
 	/**
@@ -115,16 +126,14 @@ public class OrcBDI
 		}
 
 		/**
-		 * The goal is achieved when the position of the cleaner is near to the
-		 * target position.
+		 * The goal is achieved when the position of the cleaner is on the
+		 * target sector position.
 		 */
 		@GoalTargetCondition(events = "my_position")
 		public boolean checkTarget()
 		{
-			// TODO: Check that
-			System.out.println("check");
-//			return false;
-			return 0.001f > my_position.getDistance(target).getAsFloat();
+			boolean ret = my_position.equals(target);
+			return ret;
 		}
 
 		/**
@@ -136,6 +145,15 @@ public class OrcBDI
 		{
 			return this.target;
 		}
+	}
+	
+	/**
+	 *  Goal that lets the Being perform patrol rounds.
+	 */
+	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
+	public class PerformPatrol
+	{
+		
 	}
 
 

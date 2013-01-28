@@ -463,6 +463,7 @@
 						</env:property>
 						<env:object3d width="0.15" height="0.15" depth="0.15"
 							x="0" y="0" z="0" modelpath="models/kobold/kobold.j3o"
+							materialpath="models/kobold/koboldmat.j3m"
 							hasLightMaterials="true">
 							<env:animation name="Walk" channel="chanA" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
@@ -499,9 +500,10 @@
 
 					<env:drawable3d objecttype="goblin" width="1"
 						height="1" depth="1">
-						<env:object3d width="0.15" height="0.15" depth="0.15"
-							x="0" y="1.5" z="0"
-							modelpath="jadex3d/models/characters/medieval/knight/knight.j3o"
+						<env:object3d width="1" height="1" depth="1"
+							x="0" y="0" z="0"
+							modelpath="models/orc/Orc.j3o"
+							materialpath="models/orc/Orc.j3m"
 							hasLightMaterials="true">
 							<env:animation name="Walk" channel="chanA" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
