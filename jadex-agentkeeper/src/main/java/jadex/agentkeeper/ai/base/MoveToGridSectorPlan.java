@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+
 /**
  * Move to a Location on the Grid
  * 
@@ -29,7 +30,7 @@ import java.util.Stack;
 public class MoveToGridSectorPlan
 {
 	@PlanCapability
-	protected OrcBDI		capa;
+	protected OrcBDI				capa;
 
 	@PlanPlan
 	protected RPlan					rplan;
@@ -38,6 +39,8 @@ public class MoveToGridSectorPlan
 	protected AchieveMoveToSector	goal;
 
 	private AStarSearch				astar;
+
+	private Iterator<Vector2Int>				pathit;
 
 	// -------- constructors --------
 
@@ -61,62 +64,71 @@ public class MoveToGridSectorPlan
 		final Future<Void> ret = new Future<Void>();
 		Vector2Int target = goal.getTarget();
 		Vector2Double myloc = capa.getMyPosition();
-		
+
+
 		// TODO: refractor AStar-Search
 		astar = new AStarSearch(myloc, target, capa.getEnvironment(), true);
-		
+
 		// TODO: what to do if not reachable? fail the plan?
 		if(astar.istErreichbar())
 		{
-			
+
 			System.out.println("erreichbar!");
-			
+
 			ArrayList<Vector2Int> path = astar.gibPfadInverted();
-			
-			moveToNextSector(path.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
+
+			pathit = path.iterator();
+
+			moveToNextSector(pathit).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
-			ret.setException(new RuntimeException("Not reachable: "+target));
+			ret.setException(new RuntimeException("Not reachable: " + target));
 		}
+
 
 		return ret;
 	}
 
-	
+
 	private IFuture<Void> moveToNextSector(final Iterator<Vector2Int> it)
 	{
 		final Future<Void> ret = new Future<Void>();
 		if(it.hasNext())
 		{
 			Vector2Int nextTarget = it.next();
-			
+
 			System.out.println("nextTarget " + nextTarget);
-			
-			oneStepToTarget(nextTarget)
-				.addResultListener(new DelegationResultListener<Void>(ret));
+
+			oneStepToTarget(nextTarget).addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				
+				public void customResultAvailable(Void result)
+				{
+					System.out.println("custom result");
+					moveToNextSector(pathit).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
 		}
 		else
 		{
 			ret.setResult(null);
 		}
-		
+
 		return ret;
 	}
-	
+
 	private IFuture<Void> oneStepToTarget(Vector2Int nextTarget)
 	{
-		Future<Void>	ret = new Future<Void>();
+		Future<Void> ret = new Future<Void>();
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, nextTarget);
 		props.put(MoveTask.PROPERTY_SPEED, capa.getMySpeed());
 		props.put(MoveTask.PROPERTY_AGENT, capa);
-		
+
 		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, capa.getMySpaceObject().getId());
-		capa.getEnvironment().addTaskListener(mtaskid, capa.getMySpaceObject().getId(),
-			new DelegationResultListener<Void>(ret));
-		
+		capa.getEnvironment().addTaskListener(mtaskid, capa.getMySpaceObject().getId(), new DelegationResultListener<Void>(ret));
+
 		return ret;
 	}
 }
-
