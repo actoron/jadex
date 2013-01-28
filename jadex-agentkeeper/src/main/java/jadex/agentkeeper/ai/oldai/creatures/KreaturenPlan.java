@@ -141,7 +141,7 @@ public abstract class KreaturenPlan extends Plan {
 			}
 			catch ( GoalFailureException g )
 			{
-				System.out.println("Ziel fehlgeschlagen: Kann Ziel nicht erreichen" + g.getCause());
+//				System.out.println("Ziel fehlgeschlagen: Kann Ziel nicht erreichen" + g.getCause());
 				fail( g );
 				
 			}
@@ -164,7 +164,7 @@ public abstract class KreaturenPlan extends Plan {
 			}
 			catch ( GoalFailureException g )
 			{
-				System.out.println("Ziel fehlgeschlagen: Kann Ziel nicht erreichen" + g.getCause());
+//				System.out.println("Ziel fehlgeschlagen: Kann Ziel nicht erreichen" + g.getCause());
 				fail( g );
 				
 			}

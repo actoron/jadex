@@ -28,7 +28,7 @@ public class Rumbewegplan extends AbstractRumbewegplan {
 	public Rumbewegplan() { 
 	
 		_gegnerverwalter = (GegnerVerwalter) _avatar.getProperty("auftragsverwalter");
-		System.out.println(_avatar.getId().toString() );
+//		System.out.println(_avatar.getId().toString() );
 		_gegnerverwalter.registriereGegner( _avatar.getId().toString() );
 		
 		_verbrauchsgrad = 0;
@@ -54,7 +54,7 @@ public class Rumbewegplan extends AbstractRumbewegplan {
 				}
 			}
 			catch (GoalFailureException e) {
-				System.out.println("Plan fehlgeschlagen, weiter gehts!!!!!");
+//				System.out.println("Plan fehlgeschlagen, weiter gehts!!!!!");
 			}
 		}
 		

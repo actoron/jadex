@@ -70,7 +70,7 @@ public class SelectionArea
     {
         this.end = end;
         this.worldend = new Vector2Int(Math.round(end.divide(scale).x), Math.round(end.divide(scale).y));
-        System.out.println("worldend " + worldend + " end " + end);
+//        System.out.println("worldend " + worldend + " end " + end);
     }
 	/**
 	 * @return the scale

@@ -505,7 +505,7 @@
 							modelpath="models/orc/Orc.j3o"
 							materialpath="models/orc/Orc.j3m"
 							hasLightMaterials="true">
-							<env:animation name="Walk" channel="chanA" loop="true">
+							<env:animation name="Walk" channel="chanA" loop="true" speed="2">
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
 							</env:animation>
 							<env:animation name="Idle" channel="chanA" loop="true">
@@ -529,10 +529,7 @@
 		<componenttype name="Imp" filename="jadex/agentkeeper/ai/creatures/imp/imp.agent.xml" />
 		<componenttype name="Goblin"
 			filename="ai/creatures/orc/OrcBDI.class" />
-<!-- 		<componenttype name="Warlock" -->
-<!-- 			filename="agentkeeper/monster/warlock.agent.xml" /> -->
-<!-- 		<componenttype name="Paladin" -->
-<!-- 			filename="agentkeeper/gegner/gegner.agent.xml" /> -->
+
 
 <!-- 		<componenttype name="SpielProzesse" -->
 <!-- 			filename="agentkeeper/SpielProzesseAgent.class" /> -->

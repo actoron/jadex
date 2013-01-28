@@ -63,7 +63,7 @@ public class UserEingabenManager {
 	 *            Typ der Aktion
 	 */
 	public String userAktion(int x, int y, int typ) {
-		System.out.println("user aktion mit x/y: x" + x + "y " + y);
+//		System.out.println("user aktion mit x/y: x" + x + "y " + y);
 
 		switch (typ) {
 		case ABREISSEN:

@@ -18,7 +18,7 @@ import jadex.extension.envsupport.math.Vector2Int;
  * optimal(der beste weg) und optimal effizient(kein anderer Algorithmus findet
  * den Weg schneller)
  * 
- * @author 7willuwe
+ * @author Philip Willuweit p.willuweit@gmx.de
  * 
  */
 public class AStarSearch {

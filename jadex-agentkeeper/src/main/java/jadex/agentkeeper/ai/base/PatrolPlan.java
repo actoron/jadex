@@ -54,8 +54,6 @@ public class PatrolPlan
 		final Future<Void> ret = new Future<Void>();
 
 		IVector2 rndpos = environment.getRandomGridPosition(Vector2Int.ZERO);
-		System.out.println("rndpos " + rndpos);
-		System.out.println("rndpos " + rndpos.getClass().getName());
 
 		moveToLocation(rndpos).addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;

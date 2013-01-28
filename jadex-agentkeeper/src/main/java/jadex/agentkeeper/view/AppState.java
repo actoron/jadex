@@ -107,8 +107,8 @@ public class AppState extends AbstractAppState
 	public void setup()
 	{
 		dl = new DirectionalLight();
-		dl.setDirection(new Vector3f(-0.01f, -1.0f, -0.01f).normalizeLocal());
-		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.3f));
+		dl.setDirection(new Vector3f(-0.51f, -1.0f, -0.51f).normalizeLocal());
+		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.5f));
 		this.app.getRootNode().addLight(dl);
 
 		AmbientLight al = new AmbientLight();

@@ -44,7 +44,7 @@ public class BesetzefeldPlan extends ImpPlan {
 		}
 		else
 		{
-			System.out.println("not correct Field BesetzefeldPlan");
+//			System.out.println("not correct Field BesetzefeldPlan");
 		}
 		
 		

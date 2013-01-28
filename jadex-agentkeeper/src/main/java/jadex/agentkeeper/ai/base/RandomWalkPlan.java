@@ -28,7 +28,6 @@ public class RandomWalkPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("RandomWalk: "+getComponentIdentifier());
 		IVector2	dest	= ((Space2D)getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
 		IGoal	moveto	= createGoal("move_dest");
 		moveto.getParameter("destination").setValue(dest);

@@ -39,7 +39,7 @@ public class VerstaerkeWandPlan extends ImpPlan {
 			}
 		}
 		else {
-			 System.out.println("verstaerkewandplan: kein ROCK");
+//			 System.out.println("verstaerkewandplan: kein ROCK");
 		}
 		
 		
@@ -52,6 +52,6 @@ public class VerstaerkeWandPlan extends ImpPlan {
 	 */
 	public void	failed()
 	{
-		System.out.println("Verstaerkewandplan: failed");
+//		System.out.println("Verstaerkewandplan: failed");
 	}
 }
