@@ -1,0 +1,113 @@
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.3.xsd"
+	name="imp" package="jadex.agentkeeper.ai.creatures.imp">
+
+	<imports>
+		<import>jadex.planlib.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.agentkeeper.game.state.missions.*</import>
+		<import>jadex.agentkeeper.old.basic.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.Grid2D</import>
+	</imports>
+
+	<capabilities>
+		<capability name="basis" file="jadex/agentkeeper/ai/oldai/basic/basis.capability.xml" />
+	</capabilities>
+	
+	<beliefs>
+		<belief name="gold" class="int">
+			<fact>0</fact>
+		</belief>
+		<belief name="kapazitaet" class="int">
+			<fact>10</fact>
+		</belief>
+		<belief name="arbeit" class="int">
+			<fact>1</fact>
+		</belief>
+		<beliefref name="environment">
+			<concrete ref="basis.environment"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="goldsammeln">
+			<parameter name="auftrag" class="Auftrag" />
+		</achievegoal>
+
+		<achievegoal name="wandabbau">
+			<parameter name="auftrag" class="Auftrag" />
+		</achievegoal>
+
+		<achievegoal name="besetzefeld">
+			<parameter name="auftrag" class="Auftrag" />
+		</achievegoal>
+
+		<achievegoal name="verstaerkewand">
+			<parameter name="auftrag" class="Auftrag" />
+		</achievegoal>
+	</goals>
+
+	<plans>
+
+		<plan name="goldsammeln">
+			<parameter name="auftrag" class="Auftrag">
+				<goalmapping ref="goldsammeln.auftrag" />
+			</parameter>
+			<body class="GoldsammelnPlan" />
+			<trigger>
+				<goal ref="goldsammeln" />
+			</trigger>
+		</plan>
+
+		<plan name="wandabbauplan">
+			<parameter name="auftrag" class="Auftrag">
+				<goalmapping ref="wandabbau.auftrag" />
+			</parameter>
+			<body class="WandabbauPlan" />
+			<trigger>
+				<goal ref="wandabbau" />
+			</trigger>
+		</plan>
+
+		<plan name="rumbewegen">
+			<body class="RumbewegPlan" />
+		</plan>
+
+		<plan name="besetzefeldplan">
+			<parameter name="auftrag" class="Auftrag">
+				<goalmapping ref="besetzefeld.auftrag" />
+			</parameter>
+			<body class="BesetzefeldPlan" />
+			<trigger>
+				<goal ref="besetzefeld" />
+			</trigger>
+		</plan>
+
+		<plan name="verstaerkewand">
+			<parameter name="auftrag" class="Auftrag">
+				<goalmapping ref="verstaerkwand.auftrag" />
+			</parameter>
+			<body class="VerstaerkeWandPlan" />
+			<trigger>
+				<goal ref="verstaerkewand" />
+			</trigger>
+		</plan>
+
+	</plans>
+
+
+
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="rumbewegen" />
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

@@ -1,0 +1,68 @@
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.3.xsd"
+	name="basis" package="jadex.agentkeeper.ai.oldai.basic">
+	<imports>
+		<import>jadex.planlib.*</import>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.Grid2D</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>agentkeeper.auftragsverwaltung.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="intPos" class="Vector2Int">
+		</belief>
+		<belief name="geschwindigkeit" class="int">
+			<fact>1</fact>
+		</belief>
+		<belief name="staerke" class="int">
+			<fact>2</fact>
+		</belief>
+		 <belief name="environment" class="Grid2D" exported="true">
+             <fact class="IFuture">$scope.getParentAccess().getExtension("mygc2dspace")</fact>
+         </belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="erreicheziel" exported="true">
+			<parameter name="ziel" class="IVector2" />
+			<parameter name="direkt" class="Boolean" />
+		</achievegoal>
+		<achievegoal name="erreicheeinheit" exported="true">
+			<parameter name="ziel" class="ISpaceObject" />
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="erreicheziel" exported="true">
+			<parameter name="ziel" class="IVector2">
+				<goalmapping ref="erreicheziel.ziel" />
+			</parameter>
+			<parameter name="direkt" class="Boolean">
+				<goalmapping ref="erreicheziel.direkt" />
+			</parameter>
+			<body class="Erreichezielplan" />
+			<trigger>
+				<goal ref="erreicheziel" />
+			</trigger>
+		</plan>
+		<plan name="erreicheeinheit" exported="true">
+			<parameter name="ziel" class="ISpaceObject">
+				<goalmapping ref="erreicheeinheit.ziel" />
+			</parameter>
+			<body class="ErreicheEinheitPlan" />
+			<trigger>
+				<goal ref="erreicheeinheit" />
+			</trigger>
+		</plan>
+	</plans>
+</capability>
