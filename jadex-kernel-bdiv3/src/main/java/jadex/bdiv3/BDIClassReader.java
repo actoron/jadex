@@ -394,12 +394,10 @@ public class BDIClassReader extends MicroClassReader
 		
 		// Create enhanced class if not already present.
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
-		Class<?> genclazz = gen.generateBDIClass(cma.getName(), bdimodel, classloader);
-		
 		for(Class<?> agcl: agtcls)
 		{
-			System.out.println("genclazz: "+agcl);
-			gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
+			Class<?> acl = gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
+			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
 		}
 		
 //		System.out.println("genclazz: "+genclazz);

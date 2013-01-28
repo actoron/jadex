@@ -1,7 +1,6 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.actions.AdoptGoalAction;
-import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
@@ -13,12 +12,10 @@ import jadex.bdiv3.runtime.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
@@ -162,7 +159,7 @@ public class BDIAgent extends MicroAgent
 		
 		try
 		{
-//			System.out.println("write: "+val+" "+fieldname+" "+obj);
+			System.out.println("write: "+val+" "+fieldname+" "+obj);
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 

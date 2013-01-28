@@ -37,6 +37,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
+import jadex.micro.annotation.Agent;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -122,16 +123,22 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// Additionally inject agent to hidden agent field
 		if(!(agent instanceof MicroAgent))
 		{
-			try
+			Class<?> agcl = agent.getClass();
+			while(agcl.isAnnotationPresent(Agent.class))
 			{
-				// todo: cannot use fields as they are from the 'not enhanced' class
-				Field field = agent.getClass().getDeclaredField("__agent");
-				field.setAccessible(true);
-				field.set(agent, ret);
-			}
-			catch(Exception e)
-			{
-				getLogger().warning("Hidden agent injection failed: "+e);
+				try
+				{
+					// todo: cannot use fields as they are from the 'not enhanced' class
+					Field field = agcl.getDeclaredField("__agent");
+					field.setAccessible(true);
+					field.set(agent, ret);
+					agcl = agcl.getSuperclass();
+				}
+				catch(Exception e)
+				{
+					getLogger().warning("Hidden agent injection failed: "+e);
+					break;
+				}
 			}
 		}
 		
