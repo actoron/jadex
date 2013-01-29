@@ -1,5 +1,15 @@
 package jadex.android.controlcenter.componentViewer.tree;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
+import jadex.android.controlcenter.componentViewer.properties.PropertyItem;
+import jadex.android.controlcenter.componentViewer.properties.ServicePropertyActivity;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
@@ -7,12 +17,16 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  Node object representing a service.
  */
-public class ProvidedServiceInfoNode	extends AbstractTreeNode
+public class ProvidedServiceInfoNode	extends AbstractTreeNode implements IAndroidTreeNode
 {
 	//-------- constants --------
 	
@@ -127,4 +141,47 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 		IComponentIdentifier	provider	= (IComponentIdentifier)parent.getParent().getId();
 		return ""+provider+":service:"+service.getName();
 	}
+
+	@Override
+	public Class getPropertiesActivityClass()
+	{
+		return ServicePropertyActivity.class;
+	}
+
+	@Override
+	public PropertyItem[] getProperties()
+	{
+		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
+		props.add(new PropertyItem("Name", service.getName()));
+		props.add(new PropertyItem("Type", service.getType().getTypeName()));
+		
+//		if(service.getType().getType(null)==null)
+//		{
+//			SServiceProvider.getService(ea.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
+//			{
+//				public void customResultAvailable(ILibraryService ls)
+//				{
+//					ls.getClassLoader(sid.getResourceIdentifier())
+//						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+//					{
+//						public void customResultAvailable(ClassLoader cl)
+//						{
+//							Class type = service.getType().getType(cl);
+//							internalSetService(type);
+//						}
+//					});
+//				}
+//			});
+//		}
+//		else
+//		{
+//			internalSetService(service.getType().getType(null));
+//		}
+//		
+//		props.add(new PropertyItem("Methods", service.getName()));
+		
+		return props.toArray(new PropertyItem[props.size()]);
+	}
+
 }

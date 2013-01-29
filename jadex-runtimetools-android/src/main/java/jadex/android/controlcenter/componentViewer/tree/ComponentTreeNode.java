@@ -1,11 +1,14 @@
 package jadex.android.controlcenter.componentViewer.tree;
 
+import jadex.android.controlcenter.componentViewer.properties.ComponentPropertyActivity;
+import jadex.android.controlcenter.componentViewer.properties.PropertyItem;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -14,6 +17,7 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -27,7 +31,7 @@ import java.util.Map;
 /**
  * Node object representing a service container.
  */
-public class ComponentTreeNode extends AbstractTreeNode implements IActiveComponentTreeNode {
+public class ComponentTreeNode extends AbstractTreeNode implements IActiveComponentTreeNode, IAndroidTreeNode {
 
 	// -------- attributes --------
 
@@ -563,5 +567,38 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 //			CMSUpdateHandler cmshandler = (CMSUpdateHandler) getTree().getClientProperty(CMSUpdateHandler.class);
 //			cmshandler.removeCMSListener(listenercid, cmslistener);
 		}
+	}
+
+	@Override
+	public Class getPropertiesActivityClass()
+	{
+		return ComponentPropertyActivity.class;
+	}
+	
+	@Override
+	public PropertyItem[] getProperties()
+	{
+		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
+		props.add(new PropertyItem("Name", desc.getName().getName()));
+		
+		String[] addresses = desc.getName().getAddresses();
+		props.add(new PropertyItem("Adresses", (addresses != null ? addresses : SUtil.EMPTY_STRING_ARRAY)));
+		
+		props.add(new PropertyItem("Type", desc.getType()));
+		props.add(new PropertyItem("Model name", desc.getModelName()));
+		props.add(new PropertyItem("Creator", desc.getCreator() != null ? desc.getCreator().getName() : "N/A"));
+		props.add(new PropertyItem("Ownership", desc.getOwnership()));
+		props.add(new PropertyItem("State", desc.getState()));
+		
+		String gid = desc.getResourceIdentifier().getGlobalIdentifier()!=null? desc.getResourceIdentifier().getGlobalIdentifier().getResourceId(): "n/a";
+		ILocalResourceIdentifier lid = desc.getResourceIdentifier().getLocalIdentifier();
+		props.add(new PropertyItem("Resource Identifier", gid==null? "N/A": gid));
+		props.add(new PropertyItem("(global / local)", lid==null? "n/a": lid.toString()));
+		
+		props.add(new PropertyItem("Master", desc.getMaster()==null? false: desc.getMaster().booleanValue()));
+		props.add(new PropertyItem("Daemon", desc.getDaemon()==null? false: desc.getDaemon().booleanValue()));
+		props.add(new PropertyItem("Auto shutdown", (desc.getAutoShutdown()==null? false: desc.getAutoShutdown().booleanValue())));
+		
+		return props.toArray(new PropertyItem[props.size()]);
 	}
 }

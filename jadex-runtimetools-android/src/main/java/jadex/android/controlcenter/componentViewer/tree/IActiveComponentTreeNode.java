@@ -7,7 +7,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 /**
  *  Interface for all active component tree nodes.
  */
-public interface IActiveComponentTreeNode extends ITreeNode
+public interface IActiveComponentTreeNode extends IAndroidTreeNode
 {
 	/**
 	 *  Get the component description.

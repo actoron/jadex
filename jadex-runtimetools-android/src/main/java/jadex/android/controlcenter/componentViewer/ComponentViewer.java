@@ -1,7 +1,12 @@
 package jadex.android.controlcenter.componentViewer;
 
 import jadex.android.controlcenter.JadexAndroidControlCenter;
+import jadex.android.controlcenter.MetaActivity;
+import jadex.android.controlcenter.SubActivity;
+import jadex.android.controlcenter.componentViewer.properties.ComponentPropertyActivity;
 import jadex.android.controlcenter.componentViewer.tree.ComponentTreeNode;
+import jadex.android.controlcenter.componentViewer.tree.IAndroidTreeNode;
+import jadex.android.controlcenter.componentViewer.tree.RequiredServiceNode;
 import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformService;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -28,44 +33,59 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ComponentViewer extends Activity implements ServiceConnection
+public class ComponentViewer extends MetaActivity implements ServiceConnection
 {
 	private IJadexPlatformBinder platformService;
 	private IComponentIdentifier platformId;
 	private TreeNodeAdapter treeAdapter;
 	protected AsyncTreeModel model;
-	private TextView rootLabel;
+	private BreadCrumbView breadCrumbView;
+	
+	public final static String EXTRA_PROPERTIES = "EXTRA_PROPERTIES";
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setTitle("ComponentViewer");
+		if (!isSubActivity()) {
+			
+			Serializable platformId = getIntent().getSerializableExtra(JadexAndroidControlCenter.EXTRA_PLATFORMID);
+			if (platformId != null)
+			{
+				this.platformId = (IComponentIdentifier) platformId;
+			}
+			Intent intent = new Intent(this, JadexPlatformService.class);
+			bindService(intent, this, BIND_AUTO_CREATE);
+		}
 	}
 
 	@Override
-	protected void onResume()
+	public void onResume()
 	{
 		super.onResume();
-
-		Serializable platformId = getIntent().getSerializableExtra(JadexAndroidControlCenter.EXTRA_PLATFORMID);
-		if (platformId != null)
-		{
-			this.platformId = (IComponentIdentifier) platformId;
+		if (!isSubActivity()) {
+			setTitle("ComponentViewer");
 		}
-		Intent intent = new Intent(this, JadexPlatformService.class);
-		bindService(intent, this, BIND_AUTO_CREATE);
 	}
 
 	@Override
-	protected void onPause()
+	public void onPause()
 	{
 		super.onPause();
-		unbindService(this);
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		if (!isSubActivity()) {
+			unbindService(this);
+		}
 	}
 
 	public void onServiceConnected(ComponentName name, IBinder service)
@@ -108,7 +128,8 @@ public class ComponentViewer extends Activity implements ServiceConnection
 					@Override
 					public void run()
 					{
-						rootLabel.setText(treeAdapter.getCurrentNode().toString());
+						
+						breadCrumbView.setCurrentTreeNode(treeAdapter.getCurrentNode());
 					}
 				});
 			}
@@ -117,17 +138,32 @@ public class ComponentViewer extends Activity implements ServiceConnection
 		LinearLayout ll = new LinearLayout(this);
 		ll.setOrientation(LinearLayout.VERTICAL);
 
-		TextView rootLabel = new TextView(this);
-		this.rootLabel = rootLabel;
-		rootLabel.setText(treeAdapter.getCurrentNode().toString());
-		rootLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-		rootLabel.setTextColor(ColorStateList.valueOf(Color.GRAY));
+
+		breadCrumbView = new BreadCrumbView(this);
 		// rootLabel.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 		// LayoutParams.WRAP_CONTENT));
 		// rootLabel.setGravity(Gravity.CENTER_HORIZONTAL);
-		ll.addView(rootLabel);
+		ll.addView(breadCrumbView);
 
 		ListView lv = new ListView(this);
+		lv.setOnItemLongClickListener(new OnItemLongClickListener()
+		{
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				boolean result = false;
+				
+				ITreeNode item = treeAdapter.getItem(position);
+				if (item.hasProperties()) {
+					result = true;
+					openPropertiesPanel(item);
+				}
+				
+				return result;
+			}
+		});
+		
 		lv.setOnItemClickListener(new OnItemClickListener()
 		{
 
@@ -140,7 +176,9 @@ public class ComponentViewer extends Activity implements ServiceConnection
 					treeAdapter.setCurrentNode(item);
 				} else
 				{
-					// show properties
+					if (item.hasProperties()) {
+						openPropertiesPanel(item);
+					}
 				}
 			}
 		});
@@ -150,16 +188,32 @@ public class ComponentViewer extends Activity implements ServiceConnection
 		setContentView(ll);
 	}
 
+	protected void openPropertiesPanel(ITreeNode item)
+	{
+		if (item instanceof IAndroidTreeNode) {
+			IAndroidTreeNode androidNode = (IAndroidTreeNode) item;
+			Class<? extends SubActivity> activityClass = androidNode.getPropertiesActivityClass();
+			// show properties
+			Intent intent = new Intent(ComponentViewer.this, activityClass);
+			intent.putExtra(EXTRA_PROPERTIES, androidNode.getProperties());
+			startActivity(intent);
+		}
+	}
+
 	@Override
 	public void onBackPressed()
 	{
-		ITreeNode parent = treeAdapter.getCurrentNode().getParent();
-		if (parent == null)
-		{
+		if (isSubActivity()) {
 			super.onBackPressed();
-		} else
-		{
-			treeAdapter.setCurrentNode(parent);
+		} else {
+			ITreeNode parent = treeAdapter.getCurrentNode().getParent();
+			if (parent == null)
+			{
+				super.onBackPressed();
+			} else
+			{
+				treeAdapter.setCurrentNode(parent);
+			}
 		}
 	}
 

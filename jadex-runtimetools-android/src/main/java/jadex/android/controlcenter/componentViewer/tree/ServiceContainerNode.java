@@ -1,16 +1,20 @@
 package jadex.android.controlcenter.componentViewer.tree;
 
+import jadex.android.controlcenter.SubActivity;
+import jadex.android.controlcenter.componentViewer.properties.PropertyItem;
+import jadex.android.controlcenter.componentViewer.properties.ServicePropertyActivity;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.service.IServiceContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *  Node object representing a service container.
  */
-public class ServiceContainerNode	extends AbstractTreeNode
+public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTreeNode
 {
 	//-------- constants --------
 	
@@ -107,4 +111,21 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	{
 		this.broken	= broken;
 	}
+
+	@Override
+	public Class<? extends SubActivity> getPropertiesActivityClass()
+	{
+		return ServicePropertyActivity.class;
+	}
+	
+	@Override
+	public PropertyItem[] getProperties()
+	{
+		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
+		props.add(new PropertyItem("Name", getId()));
+		props.add(new PropertyItem("Type", container.getType()));
+		
+		return props.toArray(new PropertyItem[props.size()]);
+	}
+	
 }
