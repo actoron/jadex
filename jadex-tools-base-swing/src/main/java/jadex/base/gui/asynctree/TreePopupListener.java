@@ -31,7 +31,7 @@ public class TreePopupListener	extends MouseAdapter
 			TreePath[]	paths	= tree.getSelectionPaths();
 			if(paths!=null)
 			{
-				AsyncTreeModel	model	= (AsyncTreeModel)tree.getModel();
+				AsyncSwingTreeModel	model	= (AsyncSwingTreeModel)tree.getModel();
 				INodeHandler[]	handlers	= model.getNodeHandlers();
 				if(handlers!=null)
 				{
@@ -40,7 +40,7 @@ public class TreePopupListener	extends MouseAdapter
 						Action	a	= null;
 						for(int j=handlers.length-1; a==null && j>=0; j--)
 						{
-							a	= handlers[j].getDefaultAction((ITreeNode)paths[i].getLastPathComponent());
+							a	= ((ISwingNodeHandler) handlers[j]).getDefaultAction((ISwingTreeNode)paths[i].getLastPathComponent());
 						}
 						if(a!=null)
 						{
@@ -81,18 +81,18 @@ public class TreePopupListener	extends MouseAdapter
 				TreePath[]	paths	= tree.getSelectionPaths();
 				if(paths!=null)
 				{
-					ITreeNode[]	nodes	= new ITreeNode[paths.length];
+					ISwingTreeNode[]	nodes	= new ISwingTreeNode[paths.length];
 					for(int i=0; i<nodes.length; i++)
-						nodes[i]	= (ITreeNode)paths[i].getLastPathComponent();
+						nodes[i]	= (ISwingTreeNode)paths[i].getLastPathComponent();
 					
-					AsyncTreeModel	model	= (AsyncTreeModel)tree.getModel();
+					AsyncSwingTreeModel	model	= (AsyncSwingTreeModel)tree.getModel();
 					INodeHandler[]	handlers	= model.getNodeHandlers();
 					if(handlers!=null)
 					{
 						List	actions	= null;
 						for(int i=handlers.length-1; i>=0; i--)
 						{
-							Action[]	acts	= handlers[i].getPopupActions(nodes);
+							Action[]	acts	= ((ISwingNodeHandler) handlers[i]).getPopupActions(nodes);
 							if(acts!=null && acts.length>0)
 							{
 								if(actions==null)

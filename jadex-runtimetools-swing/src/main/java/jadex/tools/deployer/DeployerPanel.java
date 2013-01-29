@@ -1,7 +1,8 @@
 package jadex.tools.deployer;
 
 import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.RemoteFileNode;
@@ -144,7 +145,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	 *  The deployer node handler that combines
 	 *  both file trees via commands.
 	 */
-	class DeployerNodeHandler implements INodeHandler
+	class DeployerNodeHandler implements ISwingNodeHandler
 	{
 		//-------- attributes --------
 		
@@ -296,10 +297,19 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	
 		//-------- methods --------
 
+		
 		/**
 		 *  Get the overlay for a node if any.
 		 */
-		public Icon	getOverlay(ITreeNode node)
+		public Icon	getSwingOverlay(ISwingTreeNode node)
+		{
+			return null;
+		}
+
+		/**
+		 *  Get the overlay for a node as byte[] if any.
+		 */
+		public byte[] getOverlay(ITreeNode node)
 		{
 			return null;
 		}
@@ -307,7 +317,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		/**
 		 *  Get the popup actions available for all of the given nodes, if any.
 		 */
-		public Action[]	getPopupActions(ITreeNode[] nodes)
+		public Action[]	getPopupActions(ISwingTreeNode[] nodes)
 		{
 			return new Action[]{copy, del, rename, open};
 		}
@@ -315,7 +325,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 		/**
 		 *  Get the default action to be performed after a double click.
 		 */
-		public Action getDefaultAction(ITreeNode node)
+		public Action getDefaultAction(ISwingTreeNode node)
 		{
 			return null;
 		}

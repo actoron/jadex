@@ -3,9 +3,9 @@ package jadex.base.gui.filetree;
 import jadex.base.DefaultFileFilter;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.INodeHandler;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
@@ -63,7 +63,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	protected final IExternalAccess	exta;
 	
 	/** The component tree model. */
-	protected final AsyncTreeModel	model;
+	protected final AsyncSwingTreeModel	model;
 	
 	/** The component tree. */
 	protected final JTree tree;
@@ -103,7 +103,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		this.exta	= exta;
 		this.remote = remote;
 		this.keeproots	= keeproots;
-		this.model	= new AsyncTreeModel();
+		this.model	= new AsyncSwingTreeModel();
 		this.tree	= new JTree(model);
 		this.expansionhandler = new ExpansionHandler(tree);
 		this.iconcache = new DelegationIconCache();
@@ -117,7 +117,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer()
 		{
-			protected String getLabel(ITreeNode node)
+			protected String getLabel(ISwingTreeNode node)
 			{
 				String ret = super.getLabel(node);
 				if(node instanceof IFileNode)
@@ -169,7 +169,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			public void keyReleased(KeyEvent e)
 			{
 				if(KeyEvent.VK_F5==e.getKeyCode())
-					((ITreeNode)getModel().getRoot()).refresh(true);
+					((ISwingTreeNode)getModel().getRoot()).refresh(true);
 			}
 			
 			public void keyPressed(KeyEvent e)
@@ -183,7 +183,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Add a node handler.
 	 */
-	public void	addNodeHandler(INodeHandler handler)
+	public void	addNodeHandler(ISwingNodeHandler handler)
 	{
 		model.addNodeHandler(handler);
 	}
@@ -191,7 +191,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Get the tree model.
 	 */
-	public AsyncTreeModel getModel()
+	public AsyncSwingTreeModel getModel()
 	{
 		return model;
 	}
@@ -317,12 +317,12 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Add a top level node.
 	 */
-	public void	removeTopLevelNode(ITreeNode node)
+	public void	removeTopLevelNode(ISwingTreeNode node)
 	{
 		RootNode root = (RootNode)getModel().getRoot();
 		root.removeChild(node);
 		for(int i=0; i<root.getChildCount(); i++)
-			model.fireNodeChanged((ITreeNode) root.getCachedChildren().get(i));
+			model.fireNodeChanged((ISwingTreeNode) root.getCachedChildren().get(i));
 	}
 
 	
@@ -334,7 +334,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		assert !remote;
 		
 		RootNode root = (RootNode)getModel().getRoot();
-		ITreeNode node = factory.createNode(root, model, tree, file, 
+		ISwingTreeNode node = factory.createNode(root, model, tree, file, 
 			iconcache, exta, factory);
 		addNode(node);
 	}
@@ -347,7 +347,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		assert remote;
 		
 		final RootNode root = (RootNode)getModel().getRoot();
-		ITreeNode node = factory.createNode(root, model, tree, file, 
+		ISwingTreeNode node = factory.createNode(root, model, tree, file, 
 			iconcache, exta, factory);
 		addNode(node);
 	}
@@ -355,7 +355,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/**
 	 *  Add a root node to the tree panel. 
 	 */
-	protected void	addNode(ITreeNode node)
+	protected void	addNode(ISwingTreeNode node)
 	{
 		final RootNode root = (RootNode)getModel().getRoot();
 		root.addChild(node);
@@ -363,7 +363,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		node.refresh(true);
 		
 		for(int i=0; i<root.getChildCount(); i++)
-			model.fireNodeChanged((ITreeNode) root.getCachedChildren().get(i));
+			model.fireNodeChanged((ISwingTreeNode) root.getCachedChildren().get(i));
 		tree.scrollPathToVisible(new TreePath(new Object[]{root, node}));
 	}
 	
@@ -404,7 +404,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			public void customResultAvailable(Object result)
 			{
 				mep.setSelectedNode(getTree().getSelectionPath()==null ? null
-					: NodePath.createNodePath((ITreeNode)getTree().getSelectionPath().getLastPathComponent()));
+					: NodePath.createNodePath((ISwingTreeNode)getTree().getSelectionPath().getLastPathComponent()));
 				List	expanded	= new ArrayList();
 				Enumeration exp = getTree().getExpandedDescendants(new TreePath(root));
 				if(exp!=null)
@@ -414,7 +414,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						TreePath	path	= (TreePath)exp.nextElement();
 						if(path.getLastPathComponent() instanceof IFileNode)
 						{
-							expanded.add(NodePath.createNodePath((ITreeNode)path.getLastPathComponent()));
+							expanded.add(NodePath.createNodePath((ISwingTreeNode)path.getLastPathComponent()));
 						}
 					}
 				}
@@ -483,7 +483,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 								File f = new File(entries[i]);
 								if(f.exists())
 								{
-									ITreeNode node = factory.createNode(root, model, tree, f, iconcache, exta, factory);
+									ISwingTreeNode node = factory.createNode(root, model, tree, f, iconcache, exta, factory);
 									addNode(node);
 								}
 							}
@@ -496,7 +496,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 							{								
 								public void customIntermediateResultAvailable(FileData file)
 								{
-									ITreeNode node = factory.createNode(root, model, tree, file, iconcache, exta, factory);
+									ISwingTreeNode node = factory.createNode(root, model, tree, file, iconcache, exta, factory);
 									addNode(node);
 								}
 								
@@ -685,7 +685,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		/**
 		 *  Get an icon.
 		 */
-		public Icon getIcon(ITreeNode node)
+		public Icon getIcon(ISwingTreeNode node)
 		{
 			return iconcache!=null? iconcache.getIcon(node): null;
 		}

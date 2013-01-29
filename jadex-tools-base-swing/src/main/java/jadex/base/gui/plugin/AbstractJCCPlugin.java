@@ -1,7 +1,8 @@
 package jadex.base.gui.plugin;
 
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ProxyComponentTreeNode;
 import jadex.bridge.IComponentIdentifier;
@@ -287,7 +288,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 *  A node handler allowing to spawn new control center views
 	 *  for remote platforms displayed in component tree using proxy nodes.
 	 */
-	public static class ShowRemoteControlCenterHandler	implements INodeHandler
+	public static class ShowRemoteControlCenterHandler	implements ISwingNodeHandler
 	{
 		//-------- attributes --------
 		
@@ -313,7 +314,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		/**
 		 *  Get the default action to be performed after a double click.
 		 */
-		public Action getDefaultAction(ITreeNode node)
+		public Action getDefaultAction(ISwingTreeNode node)
 		{
 			return null;
 		}
@@ -321,15 +322,20 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		/**
 		 *  Get the overlay for a node if any.
 		 */
-		public Icon getOverlay(ITreeNode node)
+		public Icon getSwingOverlay(ISwingTreeNode node)
 		{
 			return null;
 		}
 		
+		public byte[] getOverlay(ITreeNode node)
+		{
+			return null;
+		}
+
 		/**
 		 *  Get the popup actions available for all of the given nodes, if any.
 		 */
-		public Action[] getPopupActions(final ITreeNode[] nodes)
+		public Action[] getPopupActions(final ISwingTreeNode[] nodes)
 		{
 			Action[]	ret;
 			boolean	allproxy	= true;

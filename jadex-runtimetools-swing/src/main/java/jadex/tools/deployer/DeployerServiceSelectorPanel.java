@@ -1,6 +1,6 @@
 package jadex.tools.deployer;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -27,7 +27,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	//-------- attributes --------
 	
 	/** The node handler. */
-	protected INodeHandler nodehandler;
+	protected ISwingNodeHandler nodehandler;
 	
 	/** The jcc (local). */
 	protected IControlCenter jcc;
@@ -40,7 +40,7 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/**
 	 *  Create a new selector panel.
 	 */
-	public DeployerServiceSelectorPanel(IControlCenter jcc, IExternalAccess platformaccess, INodeHandler nodehandler, String title)
+	public DeployerServiceSelectorPanel(IControlCenter jcc, IExternalAccess platformaccess, ISwingNodeHandler nodehandler, String title)
 	{
 		super(platformaccess, IDeploymentService.class);
 		this.jcc = jcc;

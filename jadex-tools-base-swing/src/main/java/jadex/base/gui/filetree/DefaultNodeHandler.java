@@ -1,6 +1,7 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
@@ -19,7 +20,7 @@ import javax.swing.UIDefaults;
  *  The default node handler offers two refresh actions.
  *  The node handler is responsible for popup menu on nodes.
  */
-public class DefaultNodeHandler implements INodeHandler
+public class DefaultNodeHandler implements ISwingNodeHandler
 {
 	//-------- constants --------
 
@@ -63,12 +64,20 @@ public class DefaultNodeHandler implements INodeHandler
 	
 	//-------- methods --------
 
+	
+	
 	/**
 	 *  Get the overlay.
 	 * 	@param node The node.
 	 * 	@return The icon.
 	 */
-	public Icon getOverlay(ITreeNode node)
+	public Icon getSwingOverlay(ISwingTreeNode node)
+	{
+		return null;
+	}
+
+	@Override
+	public byte[] getOverlay(ITreeNode node)
 	{
 		return null;
 	}
@@ -78,10 +87,10 @@ public class DefaultNodeHandler implements INodeHandler
 	 *  @param nodes The nodes.
 	 *  @return The actions.
 	 */
-	public Action[] getPopupActions(ITreeNode[] nodes)
+	public Action[] getPopupActions(ISwingTreeNode[] nodes)
 	{
 		List ret = new ArrayList();
-		Icon	base	= nodes[0].getIcon();
+		Icon	base	= nodes[0].getSwingIcon();
 		
 		for(int i=0; i<actions.size(); i++)
 		{
@@ -118,7 +127,7 @@ public class DefaultNodeHandler implements INodeHandler
 	 *  @param node The node.
 	 *  @return The action.
 	 */
-	public Action getDefaultAction(final ITreeNode node)
+	public Action getDefaultAction(final ISwingTreeNode node)
 	{
 		Action	ret	= null;
 //		if(node.hasProperties())

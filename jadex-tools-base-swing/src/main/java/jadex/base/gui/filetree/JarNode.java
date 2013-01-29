@@ -1,8 +1,8 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 
 import java.io.File;
 
@@ -18,7 +18,7 @@ public class JarNode extends DirNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public JarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, IIconCache iconcache, INodeFactory factory)
+	public JarNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, File file, IIconCache iconcache, INodeFactory factory)
 	{
 		super(parent, model, tree, file instanceof JarAsDirectory? file: new JarAsDirectory(file.getPath()), iconcache, factory);
 //		System.out.println("node: "+getClass()+" "+desc.getName());

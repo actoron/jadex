@@ -1,7 +1,8 @@
 package jadex.base.gui.componentviewer;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
@@ -167,7 +168,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				JTree tree = comptree.getTree();
 				if(tree.getSelectionPath()!=null)
 				{
-					ITreeNode node = (ITreeNode)tree.getSelectionPath().getLastPathComponent();
+					ISwingTreeNode node = (ISwingTreeNode)tree.getSelectionPath().getLastPathComponent();
 					Object nodeid = node.getId();
 					if(nodeid!=null)
 					{
@@ -185,9 +186,9 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		
 		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
 		
-		comptree.addNodeHandler(new INodeHandler()
+		comptree.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Action[] getPopupActions(ITreeNode[] nodes)
+			public Action[] getPopupActions(ISwingTreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -213,7 +214,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					// Todo: Large icons for popup actions?
 					if(allig)
 					{
-						Icon	base	= nodes[0].getIcon();
+						Icon	base	= nodes[0].getSwingIcon();
 						Action	a	= new AbstractAction((String)START_VIEWER.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_viewed")}) : (Icon)START_VIEWER.getValue(Action.SMALL_ICON))
 						{
@@ -226,7 +227,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					}
 					else if(allob)
 					{
-						Icon	base	= nodes[0].getIcon();
+						Icon	base	= nodes[0].getSwingIcon();
 						Action	a	= new AbstractAction((String)STOP_VIEWER.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_notviewed")}) : (Icon)STOP_VIEWER.getValue(Action.SMALL_ICON))
 						{
@@ -242,7 +243,15 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Icon getOverlay(ITreeNode node)
+			
+			
+			@Override
+			public byte[] getOverlay(ITreeNode node)
+			{
+				return null;
+			}
+
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon ret	= null;
 				if(cards.getComponent(node.getId())!=null)
@@ -256,7 +265,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Action getDefaultAction(ITreeNode node)
+			public Action getDefaultAction(ISwingTreeNode node)
 			{
 				Action	a	= null;
 				if(cards.getComponent(node.getId())!=null)
@@ -323,7 +332,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(isNodeViewable((ITreeNode)paths[i].getLastPathComponent()))
+				if(isNodeViewable((ISwingTreeNode)paths[i].getLastPathComponent()))
 				{
 					final Object tmp = paths[i].getLastPathComponent();
 					
@@ -504,10 +513,10 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(isNodeViewable((ITreeNode)paths[i].getLastPathComponent()))
+				if(isNodeViewable((ISwingTreeNode)paths[i].getLastPathComponent()))
 				{
 					storeCurrentPanelSettings();
-					final ITreeNode node = (ITreeNode)paths[i].getLastPathComponent();
+					final ISwingTreeNode node = (ISwingTreeNode)paths[i].getLastPathComponent();
 					Object nodeid = node.getId();
 					detail.remove(cards.getComponent(nodeid));
 					IAbstractViewerPanel panel = panels.remove(nodeid);
@@ -528,7 +537,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 *  @param node	The node.
 	 *  @return True, if the node is viewable.
 	 */
-	protected boolean isNodeViewable(final ITreeNode node)
+	protected boolean isNodeViewable(final ISwingTreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		

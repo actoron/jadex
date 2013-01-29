@@ -31,17 +31,17 @@ public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 		assert SwingUtilities.isEventDispatchThread();
 		
 		// Change icons depending on node type.
-		ITreeNode node = (ITreeNode)value;
-		Icon icon = node.getIcon();
+		ISwingTreeNode node = (ISwingTreeNode)value;
+		Icon icon = node.getSwingIcon();
 		String tooltip = node.getTooltipText();
 		// Add overlays to icon (if any).
 		if(tree.getModel() instanceof AsyncTreeModel)
 		{
 			List icons = null;
-			INodeHandler[] handlers = ((AsyncTreeModel)tree.getModel()).getNodeHandlers();
+			INodeHandler[] handlers = ((AsyncSwingTreeModel)tree.getModel()).getNodeHandlers();
 			for(int i = 0; handlers != null && i < handlers.length; i++)
 			{
-				Icon overlay = handlers[i].getOverlay(node);
+				Icon overlay = ((ISwingNodeHandler) handlers[i]).getSwingOverlay(node);
 				if(overlay != null)
 				{
 					if(icons == null)

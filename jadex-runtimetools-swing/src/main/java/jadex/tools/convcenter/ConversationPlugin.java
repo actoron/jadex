@@ -1,6 +1,7 @@
 package jadex.tools.convcenter;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
@@ -144,9 +145,9 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		split.add(comptree);
 		convcenter = new ConversationPanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler(), getJCC().getIconCache(), comptree, SFipa.FIPA_MESSAGE_TYPE);
 		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
-		comptree.addNodeHandler(new INodeHandler()
+		comptree.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Action[] getPopupActions(ITreeNode[] nodes)
+			public Action[] getPopupActions(ISwingTreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -171,7 +172,13 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Icon getOverlay(ITreeNode node)
+			public byte[] getOverlay(ITreeNode node)
+			{
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon	ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -186,7 +193,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Action getDefaultAction(ITreeNode node)
+			public Action getDefaultAction(ISwingTreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)

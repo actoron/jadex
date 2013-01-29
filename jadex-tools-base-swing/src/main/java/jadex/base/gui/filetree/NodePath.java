@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
 
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.commons.SUtil;
 
 import java.util.Arrays;
@@ -122,7 +122,7 @@ public class NodePath
 	/**
 	 *  Create a node path for a given node.
 	 */
-	public static NodePath	createNodePath(ITreeNode node)
+	public static NodePath	createNodePath(ISwingTreeNode node)
 	{
 		if(node instanceof RootNode)
 			System.out.println("wurksn");

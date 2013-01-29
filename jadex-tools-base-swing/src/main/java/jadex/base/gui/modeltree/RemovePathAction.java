@@ -1,6 +1,5 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.bridge.IComponentStep;

@@ -1,8 +1,8 @@
 package jadex.base.gui.componenttree;
 
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.service.IServiceContainer;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
@@ -16,7 +16,7 @@ import javax.swing.UIDefaults;
 /**
  *  Node object representing a service container.
  */
-public class ServiceContainerNode	extends AbstractTreeNode
+public class ServiceContainerNode	extends AbstractSwingTreeNode
 {
 	//-------- constants --------
 	
@@ -44,7 +44,7 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceContainerNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IServiceContainer container)
+	public ServiceContainerNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IServiceContainer container)
 	{
 		super(parent, model, tree);
 		this.container = container;
@@ -63,9 +63,17 @@ public class ServiceContainerNode	extends AbstractTreeNode
 	}
 	
 	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
+
+	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		Icon	ret	= icons.getIcon("service-container");
 		if(broken)

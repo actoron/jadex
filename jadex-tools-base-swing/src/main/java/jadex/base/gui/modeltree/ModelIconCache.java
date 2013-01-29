@@ -1,7 +1,7 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.filetree.DirNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.IIconCache;
@@ -76,7 +76,7 @@ public class ModelIconCache implements IIconCache
 	/**
 	 *  Get an icon.
 	 */
-	public Icon	getIcon(final ITreeNode node)
+	public Icon	getIcon(final ISwingTreeNode node)
 	{
 		Icon	ret	= null;
 		
@@ -177,12 +177,12 @@ public class ModelIconCache implements IIconCache
 	/**
 	 * 
 	 */
-	protected void refresh(ITreeNode node)
+	protected void refresh(ISwingTreeNode node)
 	{
 		TreeModel model	= tree.getModel();
-		if(model instanceof AsyncTreeModel)
+		if(model instanceof AsyncSwingTreeModel)
 		{
-			((AsyncTreeModel)model).fireNodeChanged(node);
+			((AsyncSwingTreeModel)model).fireNodeChanged(node);
 		}
 		else
 		{
@@ -193,10 +193,10 @@ public class ModelIconCache implements IIconCache
 //	/**
 //	 *  Create a resource identifier.
 //	 */
-//	public IResourceIdentifier createResourceIdentifier(ITreeNode node)
+//	public IResourceIdentifier createResourceIdentifier(ISwingTreeNode node)
 //	{
 //		// Get the first child of selection path as url
-//		ITreeNode root = node;
+//		ISwingTreeNode root = node;
 //		while(root.getParent()!=null && root.getParent().getParent()!=null)
 //			root = root.getParent();
 //		
@@ -215,10 +215,10 @@ public class ModelIconCache implements IIconCache
 	/**
 	 *  Create a resource identifier.
 	 */
-	public IFuture<IResourceIdentifier> createResourceIdentifier(ITreeNode node)
+	public IFuture<IResourceIdentifier> createResourceIdentifier(ISwingTreeNode node)
 	{
 		// Get the first child of selection path as url
-		ITreeNode root = node;
+		ISwingTreeNode root = node;
 		while(root.getParent()!=null && root.getParent().getParent()!=null)
 			root = root.getParent();
 		

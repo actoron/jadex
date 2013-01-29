@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
@@ -39,7 +39,7 @@ public class DirNode extends FileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, 
+	public DirNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, File file, 
 		IIconCache iconcache, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache);
@@ -76,7 +76,7 @@ public class DirNode extends FileNode
 				for(Iterator it=files.iterator(); it.hasNext();)
 				{
 					File file = (File)it.next();
-					ITreeNode node = getModel().getNode(file);//.getAbsolutePath());
+					ISwingTreeNode node = getModel().getNode(file);//.getAbsolutePath());
 					if(node!=null)
 					{
 //						lis.resultAvailable(node);
@@ -85,7 +85,7 @@ public class DirNode extends FileNode
 					else
 					{
 //						lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
-						nodes.add(factory.createNode(DirNode.this, model, tree, file, iconcache, null, factory));
+						nodes.add(factory.createNode(DirNode.this, getModel(), tree, file, iconcache, null, factory));
 					}
 				}
 

@@ -1,6 +1,6 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.TreeExpansionHandler;
@@ -97,7 +97,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 //			System.out.println("handle path: "+path);
 		
 		// Move from paths (loaded) to expanded nodes (created dynamically).
-		if(expandedpaths!=null && path.getPathCount()>1 && expandedpaths.remove(NodePath.createNodePath((ITreeNode)path.getLastPathComponent())))
+		if(expandedpaths!=null && path.getPathCount()>1 && expandedpaths.remove(NodePath.createNodePath((ISwingTreeNode)path.getLastPathComponent())))
 		{
 //			System.out.println("loaded: "+path.getLastPathComponent());
 			expanded.add(path.getLastPathComponent());
@@ -182,7 +182,7 @@ public class ExpansionHandler extends TreeExpansionHandler
 	 */
 	public boolean	isExpanded(TreePath path)
 	{
-		return super.isExpanded(path) || expandedpaths!=null && expandedpaths.contains(NodePath.createNodePath((ITreeNode)path.getLastPathComponent()));
+		return super.isExpanded(path) || expandedpaths!=null && expandedpaths.contains(NodePath.createNodePath((ISwingTreeNode)path.getLastPathComponent()));
 	}
 
 }

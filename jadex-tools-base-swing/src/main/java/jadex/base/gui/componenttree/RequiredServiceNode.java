@@ -1,9 +1,9 @@
 package jadex.base.gui.componenttree;
 
 
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
@@ -16,7 +16,7 @@ import javax.swing.UIDefaults;
 /**
  *  Node object representing a service container.
  */
-public class RequiredServiceNode extends AbstractTreeNode
+public class RequiredServiceNode extends AbstractSwingTreeNode
 {
 	//-------- constants --------
 	
@@ -43,7 +43,7 @@ public class RequiredServiceNode extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RequiredServiceNode(ITreeNode parent, AsyncTreeModel model, JTree tree, RequiredServiceInfo info, String nid)
+	public RequiredServiceNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, RequiredServiceInfo info, String nid)
 	{
 		super(parent, model, tree);
 		this.info = info;
@@ -70,11 +70,19 @@ public class RequiredServiceNode extends AbstractTreeNode
 	{
 		return nid;
 	}
+	
+	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
 
 	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		return info.isMultiple()? icons.getIcon("services"): icons.getIcon("service");
 	}

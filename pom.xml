@@ -76,6 +76,7 @@
 		<module>jadex-rules-applications</module>
 		<module>jadex-rules-tools</module>
 
+		<module>jadex-tools-base</module>
 		<module>jadex-tools-base-swing</module>
 		<module>jadex-runtimetools-swing</module>
 		<module>jadex-tools-bdi</module>

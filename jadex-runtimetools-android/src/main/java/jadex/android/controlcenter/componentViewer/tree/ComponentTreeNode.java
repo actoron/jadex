@@ -1,6 +1,8 @@
 package jadex.android.controlcenter.componentViewer.tree;
 
 import jadex.base.SRemoteGui;
+import jadex.base.gui.asynctree.AbstractTreeNode;
+import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -94,7 +96,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	}
 
 	/**
-	 * Get the icon for a node.
+	 *  Get the icon as byte[] for a node.
 	 */
 	public byte[] getIcon()
 	{

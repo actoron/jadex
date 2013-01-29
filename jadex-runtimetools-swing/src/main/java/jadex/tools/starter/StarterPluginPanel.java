@@ -2,6 +2,7 @@ package jadex.tools.starter;
 
 import jadex.base.SRemoteGui;
 import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
@@ -103,7 +104,7 @@ public class StarterPluginPanel extends JPanel
 			!SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), 
 			jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
 		{
-			public void removeTopLevelNode(ITreeNode node)
+			public void removeTopLevelNode(ISwingTreeNode node)
 			{
 				super.removeTopLevelNode(node);
 				

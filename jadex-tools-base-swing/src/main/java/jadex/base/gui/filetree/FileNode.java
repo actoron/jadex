@@ -1,9 +1,9 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
 
@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Node object representing a service container.
  */
-public class FileNode	extends AbstractTreeNode	implements IFileNode
+public class FileNode	extends AbstractSwingTreeNode	implements IFileNode
 {
 	//-------- attributes --------
 	
@@ -47,7 +47,7 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public FileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, IIconCache iconcache)
+	public FileNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, File file, IIconCache iconcache)
 	{
 		super(parent, model, tree);
 		
@@ -74,9 +74,17 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	}
 
 	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
+
+	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		return iconcache.getIcon(this);
 	}

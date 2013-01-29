@@ -1,10 +1,10 @@
 package jadex.android.controlcenter.componentViewer;
 
-import jadex.android.controlcenter.componentViewer.tree.AsyncTreeModel;
-import jadex.android.controlcenter.componentViewer.tree.INodeListener;
-import jadex.android.controlcenter.componentViewer.tree.TreeModelEvent;
-import jadex.android.controlcenter.componentViewer.tree.TreeModelListener;
+import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncTreeModelEvent;
+import jadex.base.gui.asynctree.TreeModelListener;
 import android.content.Context;
 import android.os.Handler;
 import android.view.View;
@@ -48,25 +48,25 @@ public class TreeNodeAdapter extends BaseAdapter
 		{
 			
 			@Override
-			public void treeStructureChanged(TreeModelEvent treeModelEvent)
+			public void treeStructureChanged(AsyncTreeModelEvent treeModelEvent)
 			{
 				System.out.println("treeStructureChanged: " +treeModelEvent.toString());				
 			}
 			
 			@Override
-			public void treeNodesRemoved(TreeModelEvent treeModelEvent)
+			public void treeNodesRemoved(AsyncTreeModelEvent treeModelEvent)
 			{
 				System.out.println("treeNodesRemoved: " +treeModelEvent.toString());				
 			}
 			
 			@Override
-			public void treeNodesInserted(TreeModelEvent treeModelEvent)
+			public void treeNodesInserted(AsyncTreeModelEvent treeModelEvent)
 			{
 				System.out.println("treeNodesInserted: " +treeModelEvent.toString());	
 			}
 			
 			@Override
-			public void treeNodesChanged(TreeModelEvent treeModelEvent)
+			public void treeNodesChanged(AsyncTreeModelEvent treeModelEvent)
 			{
 				System.out.println("treeNodesChanged: " +treeModelEvent.toString());
 				uiHandler.post(new Runnable()

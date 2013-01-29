@@ -1,6 +1,6 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.commons.gui.SGUI;
 
 import java.awt.event.ActionEvent;
@@ -58,7 +58,7 @@ public class RefreshAction extends AbstractAction
 		TreePath[] paths = tree.getSelectionPaths();
 		for(int i=0; paths!=null && i<paths.length; i++)
 		{
-			((ITreeNode)paths[i].getLastPathComponent()).refresh(false);
+			((ISwingTreeNode)paths[i].getLastPathComponent()).refresh(false);
 		}
 	}
 	

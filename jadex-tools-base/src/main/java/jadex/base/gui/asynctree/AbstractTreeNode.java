@@ -1,4 +1,4 @@
-package jadex.android.controlcenter.componentViewer.tree;
+package jadex.base.gui.asynctree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.SUtil;
@@ -287,15 +287,13 @@ public abstract class AbstractTreeNode implements ITreeNode
 				childrenfuture = null;
 			}
 
-//			if (dorecurse && TreeExpansionHandler.isTreeExpanded(tree, new TreePath(model.buildTreePath(AbstractTreeNode.this).toArray())))
-//			{
-//				for (int i = 0; children != null && i < children.size(); i++)
-//				{
-//					((ITreeNode) children.get(i)).refresh(dorecurse);
-//				}
-//			}
+			expandChildren(dorecurse, children);
 		}
 	}
+	
+	protected void expandChildren(boolean dorecurse, List<ITreeNode> children) {
+		
+	};
 
 	/**
 	 * Check the children for validity. I.e. it is not allowed to have two equal
@@ -355,7 +353,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	}
 
 	/**
-	 * Add a child and update the tree. Must be called from swing thread.
+	 * Add a child and update the tree. 
 	 */
 	public void addChild(ITreeNode node)
 	{
@@ -366,7 +364,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	}
 
 	/**
-	 * Remove a child and update the tree. Must be called from swing thread.
+	 * Remove a child and update the tree. 
 	 */
 	public void removeChild(ITreeNode node)
 	{

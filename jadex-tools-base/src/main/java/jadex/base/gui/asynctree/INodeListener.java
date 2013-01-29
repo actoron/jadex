@@ -1,4 +1,4 @@
-package jadex.android.controlcenter.componentViewer.tree;
+package jadex.base.gui.asynctree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 

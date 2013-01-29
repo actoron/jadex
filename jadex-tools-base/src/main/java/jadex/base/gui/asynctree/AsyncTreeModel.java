@@ -1,4 +1,4 @@
-package jadex.android.controlcenter.componentViewer.tree;
+package jadex.base.gui.asynctree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.commons.collection.MultiCollection;
@@ -161,7 +161,7 @@ public class AsyncTreeModel
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeStructureChanged(new TreeModelEvent(this, path.toArray()));
+			((TreeModelListener) listeners.get(i)).treeStructureChanged(new AsyncTreeModelEvent(this, path.toArray()));
 		}
 	}
 
@@ -240,7 +240,7 @@ public class AsyncTreeModel
 					{
 						for (int j = 0; j < listeners.size(); j++)
 						{
-							((TreeModelListener) listeners.get(j)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
+							((TreeModelListener) listeners.get(j)).treeNodesChanged(new AsyncTreeModelEvent(this, path.toArray(), indices, nodes));
 						}
 					}
 				}
@@ -266,7 +266,7 @@ public class AsyncTreeModel
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeNodesRemoved(new TreeModelEvent(this, path.toArray(), new int[]
+			((TreeModelListener) listeners.get(i)).treeNodesRemoved(new AsyncTreeModelEvent(this, path.toArray(), new int[]
 			{ index }, new Object[]
 			{ child }));
 		}
@@ -284,7 +284,7 @@ public class AsyncTreeModel
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeNodesRemoved(new TreeModelEvent(this, path.toArray(), indices, childs));
+			((TreeModelListener) listeners.get(i)).treeNodesRemoved(new AsyncTreeModelEvent(this, path.toArray(), indices, childs));
 		}
 	}
 
@@ -302,7 +302,7 @@ public class AsyncTreeModel
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeNodesInserted(new TreeModelEvent(this, path.toArray(), new int[]
+			((TreeModelListener) listeners.get(i)).treeNodesInserted(new AsyncTreeModelEvent(this, path.toArray(), new int[]
 			{ index }, new Object[]
 			{ child }));
 		}

@@ -1,6 +1,6 @@
 package jadex.base.gui.componenttree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -67,7 +67,7 @@ public class ComponentIconCache
 	/**
 	 *  Get an icon.
 	 */
-	public Icon	getIcon(final String type, final IActiveComponentTreeNode node, final AsyncTreeModel model)
+	public Icon	getIcon(final String type, final IActiveComponentTreeNode node, final AsyncSwingTreeModel model)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		

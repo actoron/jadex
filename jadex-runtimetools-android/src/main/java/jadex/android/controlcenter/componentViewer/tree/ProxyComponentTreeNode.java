@@ -1,5 +1,6 @@
 package jadex.android.controlcenter.componentViewer.tree;
 
+import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;

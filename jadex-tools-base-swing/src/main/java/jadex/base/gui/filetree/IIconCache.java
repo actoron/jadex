@@ -1,6 +1,6 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 
 import javax.swing.Icon;
 
@@ -14,5 +14,5 @@ public interface IIconCache
 	 *  @param node The node.
 	 *  @return The icon.
 	 */
-	public Icon	getIcon(final ITreeNode node);
+	public Icon	getIcon(final ISwingTreeNode node);
 }

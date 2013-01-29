@@ -1,9 +1,9 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
@@ -28,7 +28,7 @@ import javax.swing.JTree;
  *  
  *  todo: move to modeltree?!
  */
-public class RIDNode extends AbstractTreeNode implements IFileNode
+public class RIDNode extends AbstractSwingTreeNode implements IFileNode
 {
 	//-------- attributes --------
 	
@@ -54,7 +54,7 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RIDNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IResourceIdentifier rid, IIconCache iconcache, INodeFactory factory)
+	public RIDNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IResourceIdentifier rid, IIconCache iconcache, INodeFactory factory)
 	{
 		super(parent, model, tree);
 		this.rid = rid;
@@ -131,9 +131,17 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 	}
 	
 	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
+
+	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		return iconcache.getIcon(this);
 	}
@@ -171,7 +179,7 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 					for(Iterator it=files.iterator(); it.hasNext();)
 					{
 						File file = (File)it.next();
-						ITreeNode node = getModel().getNode(file);//.getAbsolutePath());
+						ISwingTreeNode node = getModel().getNode(file);//.getAbsolutePath());
 						if(node!=null)
 						{
 //							lis.resultAvailable(node);
@@ -180,7 +188,7 @@ public class RIDNode extends AbstractTreeNode implements IFileNode
 						else
 						{
 //								lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
-							nodes.add(factory.createNode(RIDNode.this, model, tree, file, iconcache, null, factory));
+							nodes.add(factory.createNode(RIDNode.this, getModel(), tree, file, iconcache, null, factory));
 						}
 					}
 

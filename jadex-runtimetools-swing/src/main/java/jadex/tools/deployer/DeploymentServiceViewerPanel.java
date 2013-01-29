@@ -2,7 +2,7 @@ package jadex.tools.deployer;
 
 import jadex.base.DefaultFileFilter;
 import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.filetree.DefaultFileFilterMenuItemConstructor;
@@ -72,7 +72,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	 *  Create a new viewer panel.
 	 */
 	public DeploymentServiceViewerPanel(IExternalAccess exta, IControlCenter jcc, boolean remote, 
-		IDeploymentService service, INodeHandler nodehandler, String title)
+		IDeploymentService service, ISwingNodeHandler nodehandler, String title)
 	{
 		this.jcc = jcc;
 		this.service = service;

@@ -1,8 +1,8 @@
 package jadex.base.gui.componenttree;
 
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -18,7 +18,7 @@ import javax.swing.UIDefaults;
 /**
  *  Node object representing a service.
  */
-public class ProvidedServiceInfoNode	extends AbstractTreeNode
+public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 {
 	//-------- constants --------
 	
@@ -47,7 +47,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProvidedServiceInfoNode(ITreeNode parent, AsyncTreeModel model, JTree tree, 
+	public ProvidedServiceInfoNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, 
 		ProvidedServiceInfo service, IServiceIdentifier sid, IExternalAccess ea)
 	{
 		super(parent, model, tree);
@@ -84,13 +84,21 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	public Object	getId()
 	{
 //		return sid;
-		return getId(parent, service);
+		return getId(getParent(), service);
+	}
+	
+	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
 	}
 
 	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		return icons.getIcon("service");
 	}
@@ -152,7 +160,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	/**
 	 *  Build the node id.
 	 */
-	protected static String	getId(ITreeNode parent, ProvidedServiceInfo service)
+	protected static String	getId(ISwingTreeNode parent, ProvidedServiceInfo service)
 	{
 		IComponentIdentifier	provider	= (IComponentIdentifier)parent.getParent().getId();
 		return ""+provider+":service:"+service.getName();

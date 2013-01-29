@@ -1,10 +1,10 @@
 package jadex.android.controlcenter.componentViewer;
 
 import jadex.android.controlcenter.JadexAndroidControlCenter;
-import jadex.android.controlcenter.componentViewer.tree.AsyncTreeModel;
 import jadex.android.controlcenter.componentViewer.tree.ComponentTreeNode;
 import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformService;
+import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;

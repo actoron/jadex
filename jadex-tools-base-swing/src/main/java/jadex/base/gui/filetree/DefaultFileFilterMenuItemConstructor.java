@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -62,7 +62,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
-	public DefaultFileFilterMenuItemConstructor(AsyncTreeModel treemodel)
+	public DefaultFileFilterMenuItemConstructor(AsyncSwingTreeModel treemodel)
 	{
 		this(null, treemodel);
 	}
@@ -70,7 +70,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
-	public DefaultFileFilterMenuItemConstructor(AsyncTreeModel treemodel, boolean selall)
+	public DefaultFileFilterMenuItemConstructor(AsyncSwingTreeModel treemodel, boolean selall)
 	{
 		this(null, treemodel, selall);
 	}
@@ -78,7 +78,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
-	public DefaultFileFilterMenuItemConstructor(String[] types, final AsyncTreeModel treemodel)
+	public DefaultFileFilterMenuItemConstructor(String[] types, final AsyncSwingTreeModel treemodel)
 	{
 		this(null, treemodel, false);
 	}
@@ -86,7 +86,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
-	public DefaultFileFilterMenuItemConstructor(String[] types, final AsyncTreeModel treemodel, boolean selall)
+	public DefaultFileFilterMenuItemConstructor(String[] types, final AsyncSwingTreeModel treemodel, boolean selall)
 	{
 		this.types = types==null? STANDARD_TYPES: types;
 		this.treemodel = treemodel;
@@ -105,7 +105,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 				{
 					public void run()
 					{
-						((ITreeNode)treemodel.getRoot()).refresh(true);
+						((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 					}
 				});
 			}
@@ -125,7 +125,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 					if(item!=null)
 						item.setEnabled(!isAll());
 				}
-				((ITreeNode)treemodel.getRoot()).refresh(true);
+				((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 			}
 		});
 		
@@ -237,7 +237,7 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 					{
 						public void itemStateChanged(ItemEvent e)
 						{
-							((ITreeNode)treemodel.getRoot()).refresh(true);
+							((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 						}
 					});
 					ff.setEnabled(!all);

@@ -2,11 +2,11 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
-import jadex.base.gui.asynctree.AbstractTreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.INodeHandler;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
@@ -32,6 +32,7 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.base.gui.asynctree.ITreeNode;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -143,7 +144,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected final IExternalAccess	access;
 	
 	/** The component tree model. */
-	protected final AsyncTreeModel	model;
+	protected final AsyncSwingTreeModel	model;
 	
 	/** The component tree. */
 	protected final JTree	tree;
@@ -178,7 +179,7 @@ public class ComponentTreePanel extends JSplitPane
 		
 		this.actions = new HashMap();
 		this.access	= access;
-		this.model	= new AsyncTreeModel();
+		this.model	= new AsyncSwingTreeModel();
 		this.tree	= new JTree(model);
 		tree.setCellRenderer(new AsyncTreeCellRenderer());
 		tree.addMouseListener(new TreePopupListener());
@@ -209,7 +210,7 @@ public class ComponentTreePanel extends JSplitPane
 						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
 //						final IActiveComponentTreeNode sel = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-//						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
+//						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -221,7 +222,7 @@ public class ComponentTreePanel extends JSplitPane
 										// Done by CMS listener?
 //										if(sel.getParent()!=null)
 //										{
-//											((AbstractTreeNode)sel.getParent()).removeChild(sel);
+//											((AbstractSwingTreeNode)sel.getParent()).removeChild(sel);
 //										}
 									}
 									
@@ -261,7 +262,7 @@ public class ComponentTreePanel extends JSplitPane
 									{
 										if(sel.getParent()!=null)
 										{
-											((AbstractTreeNode)sel.getParent()).removeChild(sel);
+											((AbstractSwingTreeNode)sel.getParent()).removeChild(sel);
 										}										
 									}
 								});
@@ -283,7 +284,7 @@ public class ComponentTreePanel extends JSplitPane
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
+						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
 						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -309,7 +310,7 @@ public class ComponentTreePanel extends JSplitPane
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
+						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -335,7 +336,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
-						final ITreeNode sel = (ITreeNode)paths[i].getLastPathComponent();
+						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
 						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -357,7 +358,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((ITreeNode)paths[i].getLastPathComponent()).refresh(false);
+					((ISwingTreeNode)paths[i].getLastPathComponent()).refresh(false);
 				}
 			}
 		};
@@ -370,7 +371,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((ITreeNode)paths[i].getLastPathComponent()).refresh(true);
+					((ISwingTreeNode)paths[i].getLastPathComponent()).refresh(true);
 				}
 			}
 		};
@@ -381,9 +382,9 @@ public class ComponentTreePanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				TreePath	path	= tree.getSelectionPath();
-				if(path!=null && ((ITreeNode)path.getLastPathComponent()).hasProperties())
+				if(path!=null && ((ISwingTreeNode)path.getLastPathComponent()).hasProperties())
 				{
-					showProperties(((ITreeNode)path.getLastPathComponent()).getPropertiesComponent());
+					showProperties(((ISwingTreeNode)path.getLastPathComponent()).getPropertiesComponent());
 				}
 			}
 		};
@@ -417,7 +418,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath path = tree.getSelectionPath();
 				if(path!=null)
 				{
-					final ITreeNode node = (ITreeNode)path.getLastPathComponent();
+					final ISwingTreeNode node = (ISwingTreeNode)path.getLastPathComponent();
 					if(node instanceof ProvidedServiceInfoNode)
 					{
 //						Object obj = ((ProvidedServiceInfoNode)node).getService();
@@ -541,7 +542,7 @@ public class ComponentTreePanel extends JSplitPane
 //				TreePath path = tree.getSelectionPath();
 //				if(path!=null)
 //				{
-//					final ITreeNode node = (ITreeNode)path.getLastPathComponent();
+//					final ISwingTreeNode node = (ISwingTreeNode)path.getLastPathComponent();
 //					
 //					if(ComponentViewerPlugin.)
 //					
@@ -579,17 +580,23 @@ public class ComponentTreePanel extends JSplitPane
 //		actions.put(showobject.getValue(Action.NAME), showobject);
 		
 		// Default overlays and popups.
-		model.addNodeHandler(new INodeHandler()
+		model.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Icon getOverlay(ITreeNode node)
+			@Override
+			public byte[] getOverlay(ITreeNode node)
 			{
 				return null;
 			}
 
-			public Action[] getPopupActions(ITreeNode[] nodes)
+			public Icon getSwingOverlay(ISwingTreeNode node)
+			{
+				return null;
+			}
+
+			public Action[] getPopupActions(ISwingTreeNode[] nodes)
 			{
 				List ret = new ArrayList();
-				Icon	base	= nodes[0].getIcon();
+				Icon	base	= ((ISwingTreeNode) nodes[0]).getSwingIcon();
 				
 				if(nodes.length==1)
 				{
@@ -667,7 +674,7 @@ public class ComponentTreePanel extends JSplitPane
 				return (Action[])ret.toArray(new Action[0]);
 			}
 
-			public Action getDefaultAction(final ITreeNode node)
+			public Action getDefaultAction(final ISwingTreeNode node)
 			{
 				Action	ret	= null;
 				if(node.hasProperties())
@@ -678,9 +685,15 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		});
 		
-		model.addNodeHandler(new INodeHandler()
+		model.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Icon getOverlay(ITreeNode node)
+			@Override
+			public byte[] getOverlay(ITreeNode node)
+			{
+				return null;
+			}
+
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon	ret	= null;
 				
@@ -709,7 +722,7 @@ public class ComponentTreePanel extends JSplitPane
 				return ret;
 			}
 			
-			public Action[] getPopupActions(final ITreeNode[] nodes)
+			public Action[] getPopupActions(final ISwingTreeNode[] nodes)
 			{
 				List ret = new ArrayList();
 				
@@ -738,7 +751,7 @@ public class ComponentTreePanel extends JSplitPane
 					}
 					
 					// Todo: Large icons for popup actions?
-					Icon	base	= nodes[0].getIcon();
+					Icon	base	= (nodes[0]).getSwingIcon();
 					Action	pkill	= new AbstractAction((String)kill.getValue(Action.NAME),
 						base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)kill.getValue(Action.SMALL_ICON))
 					{
@@ -806,7 +819,7 @@ public class ComponentTreePanel extends JSplitPane
 				return (Action[])ret.toArray(new Action[ret.size()]);
 			}
 			
-			public Action getDefaultAction(ITreeNode node)
+			public Action getDefaultAction(ISwingTreeNode node)
 			{
 				return null;
 			}
@@ -875,7 +888,7 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Add a node handler.
 	 */
-	public void	addNodeHandler(INodeHandler handler)
+	public void	addNodeHandler(ISwingNodeHandler handler)
 	{
 		model.addNodeHandler(handler);
 	}
@@ -883,7 +896,7 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Get the tree model.
 	 */
-	public AsyncTreeModel	getModel()
+	public AsyncSwingTreeModel	getModel()
 	{
 		return model;
 	}
@@ -968,7 +981,7 @@ public class ComponentTreePanel extends JSplitPane
 		final Future<JComponent> ret = new Future<JComponent>();
 		final Object tmp = path.getLastPathComponent();
 		
-		if(isNodeViewable2((ITreeNode)path.getLastPathComponent(), viewables, jcc))
+		if(isNodeViewable2((ISwingTreeNode)path.getLastPathComponent(), viewables, jcc))
 		{
 			if(tmp instanceof ProvidedServiceInfoNode)
 			{
@@ -1096,7 +1109,7 @@ public class ComponentTreePanel extends JSplitPane
 	 *  @param node	The node.
 	 *  @return True, if the node is viewable.
 	 */
-	public static boolean isNodeViewable2(final ITreeNode node, final Map<Object, Boolean> viewables, final IControlCenter jcc)
+	public static boolean isNodeViewable2(final ISwingTreeNode node, final Map<Object, Boolean> viewables, final IControlCenter jcc)
 	{
 //		System.out.println("called isVis: "+node.getId());
 		boolean ret = false;

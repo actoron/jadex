@@ -1,6 +1,6 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
@@ -58,7 +58,7 @@ public class CollapseAllAction extends ToolTipAction
 	 */
 	public boolean isEnabled()
 	{
-		ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
+		ISwingTreeNode rm = (ISwingTreeNode)treepanel.getTree().getLastSelectedPathComponent();
 		return rm==null && !treepanel.isRemote();
 	}
 	
@@ -67,7 +67,7 @@ public class CollapseAllAction extends ToolTipAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		final ITreeNode root = (ITreeNode)treepanel.getTree().getModel().getRoot();
+		final ISwingTreeNode root = (ISwingTreeNode)treepanel.getTree().getModel().getRoot();
 		root.getChildren().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
@@ -77,7 +77,7 @@ public class CollapseAllAction extends ToolTipAction
 					List childs = (List)result;
 					for(int i=0; i<childs.size(); i++)
 					{
-						ITreeNode child = (ITreeNode)childs.get(i);
+						ISwingTreeNode child = (ISwingTreeNode)childs.get(i);
 						TreePath tp = new TreePath(new Object[]{root, child});
 						treepanel.getTree().collapsePath(tp);
 					}

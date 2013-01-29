@@ -2,8 +2,9 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.SRemoteGui;
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -37,7 +38,7 @@ import javax.swing.UIDefaults;
 /**
  *  Node object representing a service container.
  */
-public class ComponentTreeNode	extends AbstractTreeNode implements IActiveComponentTreeNode
+public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveComponentTreeNode
 {
 	//-------- constants --------
 
@@ -85,7 +86,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	/**
 	 *  Create a new service container node.
 	 */
-	public ComponentTreeNode(ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
+	public ComponentTreeNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
 	{
 		super(parent, model, tree);
@@ -117,11 +118,19 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	{
 		return desc.getName();
 	}
+	
+	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
 
 	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		Icon	icon	= iconcache.getIcon(desc.getType(), this, getModel());
 		if(busy)
@@ -210,9 +219,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	/**
 	 *  Create a new component node.
 	 */
-	public ITreeNode	createComponentNode(final IComponentDescription desc)
+	public ISwingTreeNode	createComponentNode(final IComponentDescription desc)
 	{
-		ITreeNode	node	= getModel().getNode(desc.getName());
+		ISwingTreeNode	node	= getModel().getNode(desc.getName());
 		if(node==null)
 		{
 			
@@ -323,7 +332,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				
 				for(int i=0; i<achildren.length; i++)
 				{
-					ITreeNode	node	= createComponentNode(achildren[i]);
+					ISwingTreeNode	node	= createComponentNode(achildren[i]);
 					children.add(node);
 				}
 				ready[0]	= true;
@@ -382,7 +391,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	//										System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 											children.add(0, scn);
 													
-											final List<ITreeNode>	subchildren	= new ArrayList<ITreeNode>();
+											final List<ISwingTreeNode>	subchildren	= new ArrayList<ISwingTreeNode>();
 											if(pros!=null)
 											{
 												for(int i=0; i<pros.length; i++)
@@ -401,9 +410,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 													}
 												}
 												
-												Collections.sort(subchildren, new java.util.Comparator<ITreeNode>()
+												Collections.sort(subchildren, new java.util.Comparator<ISwingTreeNode>()
 												{
-													public int compare(ITreeNode t1, ITreeNode t2)
+													public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
 													{
 														ProvidedServiceInfo si1 = ((ProvidedServiceInfoNode)t1).getServiceInfo();
 														ProvidedServiceInfo si2 = ((ProvidedServiceInfoNode)t2).getServiceInfo();
@@ -511,7 +520,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		{
 			public IFuture<Void> componentRemoved(final IComponentDescription desc, Map<String, Object> results)
 			{
-				final ITreeNode node = getModel().getNodeOrAddZombie(desc.getName());
+				final ISwingTreeNode node = getModel().getNodeOrAddZombie(desc.getName());
 //				if(desc.getName().toString().startsWith("ANDTest@"))
 //					System.out.println("Component removed0: "+desc.getName().getName()+", zombie="+(node==null));
 				if(node!=null)
@@ -524,7 +533,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							{
 //								if(desc.getName().toString().startsWith("ANDTest@"))
 //									System.out.println("Component removed: "+desc.getName().getName());
-								((AbstractTreeNode)node.getParent()).removeChild(node);
+								((AbstractSwingTreeNode)node.getParent()).removeChild(node);
 							}
 						}
 					});
@@ -564,7 +573,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 								: (ComponentTreeNode)getModel().getAddedNode(desc.getName().getParent());
 						if(parentnode!=null)
 						{
-							ITreeNode	node = (ITreeNode)parentnode.createComponentNode(desc);
+							ISwingTreeNode	node = (ISwingTreeNode)parentnode.createComponentNode(desc);
 //							System.out.println("addChild: "+parentnode+", "+node);
 							try
 							{
@@ -576,7 +585,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 									boolean ins = false;
 									for(int i=0; i<parentnode.getChildCount() && !ins; i++)
 									{
-										ITreeNode child = parentnode.getChild(i);
+										ISwingTreeNode child = parentnode.getChild(i);
 										if(child instanceof ServiceContainerNode)
 											continue;
 										if(child.toString().toLowerCase().compareTo(node.toString().toLowerCase())>=0)

@@ -1,9 +1,9 @@
 package jadex.base.gui.filetree;
 
 
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
@@ -17,7 +17,7 @@ import javax.swing.JTree;
 /**
  *  The remote file node.
  */
-public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
+public class RemoteFileNode  extends AbstractSwingTreeNode	implements IFileNode
 {
 	//-------- attributes --------
 	
@@ -41,7 +41,7 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RemoteFileNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, IIconCache iconcache, IExternalAccess exta)
+	public RemoteFileNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, FileData file, IIconCache iconcache, IExternalAccess exta)
 	{
 		super(parent, model, tree);
 		
@@ -70,11 +70,19 @@ public class RemoteFileNode  extends AbstractTreeNode	implements IFileNode
 	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		return iconcache.getIcon(this);
 	}
 	
+	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
+
 	/**
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.

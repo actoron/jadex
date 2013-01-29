@@ -1,8 +1,8 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.future.IIntermediateFuture;
@@ -19,7 +19,7 @@ public class RemoteJarNode extends RemoteDirNode
 	/**
 	 *  Create a new jar node.
 	 */
-	public RemoteJarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, 
+	public RemoteJarNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, FileData file, 
 		IIconCache iconcache, IExternalAccess exta, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache, exta, factory);

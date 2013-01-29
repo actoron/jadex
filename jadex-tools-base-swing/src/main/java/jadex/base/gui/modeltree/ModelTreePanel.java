@@ -4,7 +4,7 @@ import jadex.base.ModelFileFilter;
 import jadex.base.SRemoteGui;
 import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -141,7 +141,7 @@ public class ModelTreePanel extends FileTreePanel
 		{
 			public void action(Object node) 
 			{
-				ModelTreePanel.this.removeTopLevelNode((ITreeNode)node);
+				ModelTreePanel.this.removeTopLevelNode((ISwingTreeNode)node);
 				
 				if(getExternalAccess()!=null && node instanceof IFileNode)
 				{
@@ -187,7 +187,7 @@ public class ModelTreePanel extends FileTreePanel
 		{
 			public boolean isEnabled()
 			{
-				ITreeNode rm = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
+				ISwingTreeNode rm = (ISwingTreeNode)treepanel.getTree().getLastSelectedPathComponent();
 				return rm!=null && rm.getParent().equals(treepanel.getTree().getModel().getRoot());
 			}
 		};
@@ -201,7 +201,7 @@ public class ModelTreePanel extends FileTreePanel
 		setIconCache(ic);
 		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree())
 		{
-			public Icon getOverlay(ITreeNode node)
+			public Icon getOverlay(ISwingTreeNode node)
 			{
 				Icon	overlay	= null;
 				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
@@ -223,7 +223,7 @@ public class ModelTreePanel extends FileTreePanel
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer()
 		{
-			protected String getLabel(ITreeNode node)
+			protected String getLabel(ISwingTreeNode node)
 			{
 				String	ret	= null;
 				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
@@ -304,7 +304,7 @@ public class ModelTreePanel extends FileTreePanel
 												{
 													public void run()
 													{
-														removeTopLevelNode((ITreeNode)children.get(res));
+														removeTopLevelNode((ISwingTreeNode)children.get(res));
 													}
 												});
 											}
@@ -364,7 +364,7 @@ public class ModelTreePanel extends FileTreePanel
 	/**
 	 *  Add a root node to the tree panel. 
 	 */
-	protected void	addNode(final ITreeNode node)
+	protected void	addNode(final ISwingTreeNode node)
 	{
 		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
@@ -449,7 +449,7 @@ public class ModelTreePanel extends FileTreePanel
 	public void addTopLevelNode(IResourceIdentifier rid)
 	{
 		final RootNode root = (RootNode)getModel().getRoot();
-		ITreeNode node = factory.createNode(root, model, tree, rid, 
+		ISwingTreeNode node = factory.createNode(root, model, tree, rid, 
 			iconcache, exta, factory);
 		addNode(node);
 	}

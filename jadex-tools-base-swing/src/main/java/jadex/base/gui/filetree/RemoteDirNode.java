@@ -2,8 +2,8 @@ package jadex.base.gui.filetree;
 
 import jadex.base.RemoteJarFile;
 import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -46,7 +46,7 @@ public class RemoteDirNode extends RemoteFileNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, 
+	public RemoteDirNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, FileData file, 
 		IIconCache iconcache, IExternalAccess exta, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache, exta);
@@ -81,7 +81,7 @@ public class RemoteDirNode extends RemoteFileNode
 //					for(Iterator it=files.iterator(); it.hasNext();)
 //					{
 //						FileData file = (FileData)it.next();
-//						ITreeNode node = getModel().getNode(file.toString());
+//						ISwingTreeNode node = getModel().getNode(file.toString());
 //						if(node!=null)
 //						{
 //							lis.resultAvailable(node);
@@ -99,7 +99,7 @@ public class RemoteDirNode extends RemoteFileNode
 				for(Iterator it=files.iterator(); it.hasNext();)
 				{
 					FileData file = (FileData)it.next();
-					ITreeNode node = getModel().getNode(file.toString());//.getAbsolutePath());
+					ISwingTreeNode node = getModel().getNode(file.toString());//.getAbsolutePath());
 					if(node!=null)
 					{
 //						lis.resultAvailable(node);
@@ -108,7 +108,7 @@ public class RemoteDirNode extends RemoteFileNode
 					else
 					{
 //						lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
-						nodes.add(factory.createNode(RemoteDirNode.this, model, tree, file, iconcache, exta, factory));
+						nodes.add(factory.createNode(RemoteDirNode.this, getModel(), tree, file, iconcache, exta, factory));
 					}
 				}
 

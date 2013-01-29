@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IRemoteFilter;
 
@@ -15,7 +15,7 @@ public interface INodeFactory
 	/**
 	 *  Create a new component node.
 	 */
-	public ITreeNode	createNode(ITreeNode parent, AsyncTreeModel model, JTree tree, Object value, 
+	public ISwingTreeNode	createNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, Object value, 
 		IIconCache iconcache, IExternalAccess exta, INodeFactory factory);
 	
 	/**

@@ -1,7 +1,7 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -61,7 +61,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	/**
 	 *  Create a new filter menu item constructor.
 	 */
-	public ModelFileFilterMenuItemConstructor(final AsyncTreeModel treemodel, IExternalAccess exta)
+	public ModelFileFilterMenuItemConstructor(final AsyncSwingTreeModel treemodel, IExternalAccess exta)
 	{
 		this.treemodel = treemodel;
 		this.exta = exta;
@@ -83,7 +83,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 					if(item!=null)
 						item.setEnabled(!isAll());
 				}
-				((ITreeNode)treemodel.getRoot()).refresh(true);
+				((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 			}
 		});
 		
@@ -190,7 +190,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										((ITreeNode)treemodel.getRoot()).refresh(true);
+										((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 									}
 								});
 								filetypes.put(fts[i], ff);
@@ -264,7 +264,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											((ITreeNode)treemodel.getRoot()).refresh(true);
+											((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 										}
 									});
 									filetypes.put(fts[i], ff);

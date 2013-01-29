@@ -12,7 +12,7 @@
 	</parent>
 
 	<description>
-		Reusable classes for starting Jadex, running test cases and building
+		Reusable swing-dependent classes for starting Jadex, running test cases and building
 		JCC plugins.
 	</description>
 
@@ -25,6 +25,11 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-tools-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

@@ -1,6 +1,7 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
@@ -151,9 +152,9 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 		});
 		
 		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
-		comptree.addNodeHandler(new INodeHandler()
+		comptree.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Action[] getPopupActions(ITreeNode[] nodes)
+			public Action[] getPopupActions(ISwingTreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -180,7 +181,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 					// Todo: Large icons for popup actions?
 					if(allig)
 					{
-						Icon	base	= nodes[0].getIcon();
+						Icon	base	= nodes[0].getSwingIcon();
 						Action	a	= new AbstractAction((String)START_PROFILER.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}) : (Icon)START_PROFILER.getValue(Action.SMALL_ICON))
 						{
@@ -193,7 +194,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 					}
 					else if(allob)
 					{
-						Icon	base	= nodes[0].getIcon();
+						Icon	base	= nodes[0].getSwingIcon();
 						Action	a	= new AbstractAction((String)STOP_PROFILER.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}) : (Icon)STOP_PROFILER.getValue(Action.SMALL_ICON))
 						{
@@ -209,7 +210,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				return ret;
 			}
 			
-			public Icon getOverlay(ITreeNode node)
+			public byte[] getOverlay(ITreeNode node)
+			{
+				return null;
+			}
+
+
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -223,7 +230,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				return ret;
 			}
 			
-			public Action getDefaultAction(ITreeNode node)
+			public Action getDefaultAction(ISwingTreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)

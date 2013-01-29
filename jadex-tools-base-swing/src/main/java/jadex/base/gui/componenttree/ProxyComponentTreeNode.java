@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -66,7 +67,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProxyComponentTreeNode(final ITreeNode parent, AsyncTreeModel model, JTree tree, IComponentDescription desc,
+	public ProxyComponentTreeNode(final ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
 	{
 		super(parent, model, tree, desc, cms, iconcache, access);
@@ -111,9 +112,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
-		Icon ret = super.getIcon();
+		Icon ret = super.getSwingIcon();
 		if(ret!=null && !busy)
 		{
 			ret = new CombiIcon(new Icon[]{ret, icons.getIcon(state)});

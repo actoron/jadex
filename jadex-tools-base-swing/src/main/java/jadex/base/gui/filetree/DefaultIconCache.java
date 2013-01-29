@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.filechooser.RemoteFile;
 import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
@@ -35,7 +35,7 @@ public class DefaultIconCache implements IIconCache
 	/**
 	 *  Get an icon.
 	 */
-	public Icon	getIcon(final ITreeNode node)
+	public Icon	getIcon(final ISwingTreeNode node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		

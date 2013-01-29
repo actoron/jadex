@@ -1,13 +1,13 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 
 /**
  *  Common interface for all nodes of the file tree
  *  (except the invisible root node).
  *  Provides unified access to local and remote files.
  */
-public interface IFileNode extends ITreeNode
+public interface IFileNode extends ISwingTreeNode
 {
 	/**
 	 *  Get the file name.

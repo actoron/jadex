@@ -1,7 +1,7 @@
 package jadex.base.gui.filetree;
 
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.deployment.FileData;
@@ -21,10 +21,10 @@ public abstract class DefaultNodeFactory implements INodeFactory
 	/**
 	 *  Create a new component node.
 	 */
-	public ITreeNode createNode(ITreeNode parent, AsyncTreeModel model, JTree tree,
+	public ISwingTreeNode createNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree,
 		Object value, IIconCache iconcache, IExternalAccess exta, INodeFactory factory)
 	{
-		ITreeNode ret = null;
+		ISwingTreeNode ret = null;
 		
 		if(value instanceof File)
 		{

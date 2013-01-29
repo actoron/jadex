@@ -1,6 +1,7 @@
 package jadex.base.gui;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.componenttree.ComponentTreePanel;
@@ -417,14 +418,19 @@ public class ComponentSelectorDialog
 	{
 		final ComponentTreePanel comptree = new ComponentTreePanel(access, cmshandler, iconcache);
 		comptree.setPreferredSize(new Dimension(200, 100));
-		comptree.addNodeHandler(new INodeHandler()
+		comptree.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Action[] getPopupActions(ITreeNode[] nodes)
+			public Action[] getPopupActions(ISwingTreeNode[] nodes)
 			{
 				return null;
 			}
 			
-			public Icon getOverlay(ITreeNode node)
+			public byte[] getOverlay(ITreeNode node)
+			{
+				return null;
+			}
+
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon	ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -438,7 +444,7 @@ public class ComponentSelectorDialog
 				return ret;
 			}
 			
-			public Action getDefaultAction(final ITreeNode node)
+			public Action getDefaultAction(final ISwingTreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)

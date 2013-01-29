@@ -1,7 +1,8 @@
 package jadex.tools.debugger;
 
-import jadex.base.gui.asynctree.INodeHandler;
+import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.INodeListener;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
@@ -166,9 +167,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		
 		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
 		
-		comptree.addNodeHandler(new INodeHandler()
+		comptree.addNodeHandler(new ISwingNodeHandler()
 		{
-			public Action[] getPopupActions(ITreeNode[] nodes)
+			public Action[] getPopupActions(ISwingTreeNode[] nodes)
 			{
 				Action[]	ret	= null;
 				
@@ -194,7 +195,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					// Todo: Large icons for popup actions?
 					if(allig)
 					{
-						Icon	base	= nodes[0].getIcon();
+						Icon	base	= nodes[0].getSwingIcon();
 						Action	a	= new AbstractAction((String)START_DEBUGGER.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}) : (Icon)START_DEBUGGER.getValue(Action.SMALL_ICON))
 						{
@@ -207,7 +208,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					}
 					else if(allob)
 					{
-						Icon	base	= nodes[0].getIcon();
+						Icon	base	= nodes[0].getSwingIcon();
 						Action	a	= new AbstractAction((String)STOP_DEBUGGER.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}) : (Icon)STOP_DEBUGGER.getValue(Action.SMALL_ICON))
 						{
@@ -223,7 +224,12 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Icon getOverlay(ITreeNode node)
+			public byte[] getOverlay(ITreeNode node)
+			{
+				return null;
+			}
+
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon ret	= null;
 				if(node instanceof IActiveComponentTreeNode)
@@ -238,7 +244,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				return ret;
 			}
 			
-			public Action getDefaultAction(ITreeNode node)
+			public Action getDefaultAction(ISwingTreeNode node)
 			{
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)

@@ -1,9 +1,9 @@
 package jadex.base.gui.filetree;
 
 import jadex.base.JarAsDirectory;
-import jadex.base.gui.asynctree.AbstractTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.asynctree.AbstractSwingTreeNode;
+import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.componenttree.ComponentProperties;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 /**
  *  The root node.
  */
-public class RootNode extends AbstractTreeNode
+public class RootNode extends AbstractSwingTreeNode
 {
 	//-------- attributes --------
 	
@@ -32,7 +32,7 @@ public class RootNode extends AbstractTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public RootNode(AsyncTreeModel model, JTree tree)
+	public RootNode(AsyncSwingTreeModel model, JTree tree)
 	{
 		super(null, model, tree);
 		
@@ -63,9 +63,17 @@ public class RootNode extends AbstractTreeNode
 	}
 
 	/**
+	 *  Get the icon as byte[] for a node.
+	 */
+	public byte[] getIcon()
+	{
+		return null;
+	}
+
+	/**
 	 *  Get the icon for a node.
 	 */
-	public Icon	getIcon()
+	public Icon	getSwingIcon()
 	{
 		return null;
 	}
@@ -107,7 +115,7 @@ public class RootNode extends AbstractTreeNode
 	 *  Add a child node.
 	 *  @param child The child node.
 	 */
-	public void addChild(ITreeNode child)
+	public void addChild(ISwingTreeNode child)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -119,7 +127,7 @@ public class RootNode extends AbstractTreeNode
 	 *  Remove a path entry from the tree.
 	 *  @param child The child node.
 	 */
-	public void removeChild(ITreeNode child)
+	public void removeChild(ISwingTreeNode child)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 //		super.removeChild(child);
@@ -135,7 +143,7 @@ public class RootNode extends AbstractTreeNode
 		assert SwingUtilities.isEventDispatchThread();
 		
 //		for(int i=0; i<children.size(); i++)
-//			super.removeChild((ITreeNode)children.get(i));
+//			super.removeChild((ISwingTreeNode)children.get(i));
 		
 		children.clear();
 		setChildren(children);
@@ -199,7 +207,7 @@ public class RootNode extends AbstractTreeNode
 	 *  @param node
 	 *  @return an int.
 	 */
-	public int getIndex(ITreeNode node)
+	public int getIndex(ISwingTreeNode node)
 	{
 		return children!=null ? children.indexOf(node) : -1;
 	}
@@ -212,7 +220,7 @@ public class RootNode extends AbstractTreeNode
 		String[]	ret	= new String[getChildCount()];
 		for(int i=0; i<ret.length; i++)
 		{
-			ITreeNode	node	= getChild(i);
+			ISwingTreeNode	node	= getChild(i);
 			if(node instanceof FileNode)
 			{
 				if(node instanceof JarNode)
