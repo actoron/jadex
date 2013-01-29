@@ -122,6 +122,18 @@ public class KeeperGuiController extends DefaultGuiController
 		TextRenderer impRender = impText.getRenderer(TextRenderer.class);
 		
 		impRender.setText(""+creatureState.getCreatureCount(InitMapProcess.IMP));
+		
+		Element goblinT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("goblin_total");
+		TextRenderer goblinR = goblinT.getRenderer(TextRenderer.class);
+		goblinR.setText(""+creatureState.getCreatureCount(InitMapProcess.GOBLIN));
+		
+		Element warlockT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("warlock_total");
+		TextRenderer warlockR = warlockT.getRenderer(TextRenderer.class);
+		warlockR.setText(""+creatureState.getCreatureCount(InitMapProcess.WARLOCK));
+		
+		Element orcT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("orc_total");
+		TextRenderer orcR = orcT.getRenderer(TextRenderer.class);
+		orcR.setText(""+creatureState.getCreatureCount(InitMapProcess.ORC));
 
 	}
 

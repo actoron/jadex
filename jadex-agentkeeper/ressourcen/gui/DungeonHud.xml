@@ -84,7 +84,7 @@
 							</effect>
 							<text id="imp_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
 							<text id="imp_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
-							<text id="imp_total" style="nifty-label" align="right" color="#777f" text="6" />
+							<text id="imp_total" style="nifty-label" align="right" color="#777f" text="00" />
 						</panel>
 						
 					<panel id="goblin_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/goblin_item.png">
@@ -93,7 +93,7 @@
 						</effect>
 							<text id="goblin_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
 							<text id="goblin_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
-							<text id="goblin_total" style="nifty-label" align="right" color="#333f" text="0" />
+							<text id="goblin_total" style="nifty-label" align="right" color="#777f" text="00" />
 					</panel>
 					<panel id="warlock_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/warlock_item.png">
 						<effect>
@@ -101,7 +101,7 @@
 						</effect>
 							<text id="warlock_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
 							<text id="warlock_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
-							<text id="warlock_total" style="nifty-label" align="right" color="#333f" text="0" />
+							<text id="warlock_total" style="nifty-label" align="right" color="#777f" text="00" />
 					</panel>
 					<panel id="orc_panel" height="75px" width="50px" margin="0px,10px,0px,0px" childLayout="vertical" backgroundImage="/gui/images/monster/orc_item.png">
 						<effect>
@@ -109,7 +109,7 @@
 						</effect>
 							<text id="orc_busy" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
 							<text id="orc_fighting" style="nifty-label" align="right" color="#ffff" text="0" visible="false" />
-							<text id="orc_total" style="nifty-label" align="right" color="#333f" text="0" />
+							<text id="orc_total" style="nifty-label" align="right" color="#777f" text="00" />
 					</panel>
 
 					</panel>

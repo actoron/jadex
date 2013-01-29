@@ -8,6 +8,8 @@ import jadex.extension.envsupport.math.Vector2Int;
 
 /**
  *  Wander around randomly.
+ *  
+ *  @author Philip Willuweit p.willuweit@gmx.de
  */
 public class RandomWalkPlan extends Plan
 {
@@ -28,7 +30,8 @@ public class RandomWalkPlan extends Plan
 	 */
 	public void body()
 	{
-		IVector2	dest	= ((Space2D)getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
+
+		IVector2	dest	= ((Space2D)getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.UNIT);
 		IGoal	moveto	= createGoal("move_dest");
 		moveto.getParameter("destination").setValue(dest);
 		dispatchSubgoalAndWait(moveto);

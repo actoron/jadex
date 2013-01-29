@@ -19,7 +19,9 @@ import jadex.extension.envsupport.math.Vector2Int;
 
 
 /**
- * Patrol along the patrol points.
+ * Patrol to random Points
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  */
 public class PatrolPlan
 {

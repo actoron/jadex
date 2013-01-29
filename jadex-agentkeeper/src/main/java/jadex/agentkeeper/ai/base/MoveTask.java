@@ -22,6 +22,8 @@ import java.util.Set;
 
 /**
  * Move an object towards a destination.
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  */
 public class MoveTask extends AbstractTask
 {

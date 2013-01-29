@@ -499,11 +499,11 @@
 					
 					<env:drawable3d objecttype="warlock" width="1"
 						height="1" depth="1" isDynamic="true">
-						<env:object3d width="0.08" height="0.08" depth="0.08"
+						<env:object3d width="0.06" height="0.06" depth="0.06"
 							x="0" y="1.5" z="0"
 							modelpath="jadex3d/models/characters/medieval/mage/mage.j3o"
 							hasLightMaterials="true">
-							<env:animation name="Walk" channel="chanA" loop="true">
+							<env:animation name="Walk" channel="chanA" loop="true" speed="1.5">
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
 							</env:animation>
 							<env:animation name="Idle" channel="chanA" loop="true">
@@ -519,7 +519,7 @@
 							modelpath="models/goblin/Goblin.j3o"
 							materialpath="models/goblin/Goblin.j3m"
 							hasLightMaterials="true">
-							<env:animation name="Walk" channel="chanA" loop="true" speed="1">
+							<env:animation name="Walk" channel="chanA" loop="true" speed="1.3">
 								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
 							</env:animation>
 							<env:animation name="Idle" channel="chanA" loop="true">
@@ -560,6 +560,9 @@
 		<componenttype name="Goblin"
 			filename="ai/creatures/orc/OrcBDI.class" />
 					<componenttype name="Orc"
+			filename="ai/creatures/orc/OrcBDI.class" />
+			
+								<componenttype name="Warlock"
 			filename="ai/creatures/orc/OrcBDI.class" />
 
 
