@@ -1,6 +1,7 @@
 package jadex.android.controlcenter.settings;
 
 import jadex.bridge.service.IService;
+import jadex.commons.SReflect;
 import android.preference.PreferenceScreen;
 
 /**
@@ -13,7 +14,7 @@ public abstract class AServiceSettings implements ISettings {
 
 	public AServiceSettings(IService service) {
 		this.service = service;
-		title = service.getServiceIdentifier().getServiceType().getType().getSimpleName();
+		title = SReflect.getUnqualifiedTypeName(service.getServiceIdentifier().getServiceType().getTypeName());
 	}
 
 	/**
