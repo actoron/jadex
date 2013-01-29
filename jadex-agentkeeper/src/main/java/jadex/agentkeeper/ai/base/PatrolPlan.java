@@ -1,10 +1,7 @@
 package jadex.agentkeeper.ai.base;
 
-import java.util.Iterator;
-import java.util.List;
-
-import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
-import jadex.agentkeeper.ai.creatures.orc.OrcBDI.AchieveMoveToSector;
+import jadex.agentkeeper.ai.AbstractBeingBDI;
+import jadex.agentkeeper.ai.AbstractBeingBDI.AchieveMoveToSector;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
@@ -26,7 +23,7 @@ import jadex.extension.envsupport.math.Vector2Int;
 public class PatrolPlan
 {
 	@PlanCapability
-	protected OrcBDI	capa;
+	protected AbstractBeingBDI	capa;
 
 	@PlanPlan
 	protected RPlan		rplan;
@@ -71,7 +68,7 @@ public class PatrolPlan
 		Vector2Int posi = new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger());
 
 		rplan.dispatchSubgoal(capa.new AchieveMoveToSector(posi)).addResultListener(
-				new ExceptionDelegationResultListener<OrcBDI.AchieveMoveToSector, Void>(ret)
+				new ExceptionDelegationResultListener<AbstractBeingBDI.AchieveMoveToSector, Void>(ret)
 				{
 					public void customResultAvailable(AchieveMoveToSector mtg)
 					{

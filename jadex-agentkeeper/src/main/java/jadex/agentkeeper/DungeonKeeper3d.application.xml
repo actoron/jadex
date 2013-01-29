@@ -509,6 +509,9 @@
 							<env:animation name="Idle" channel="chanA" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
 							</env:animation>
+							<env:animation name="Hit" channel="chanA" loop="true" speed="0.1">
+								<env:animationcondition>$object.getProperty("status").equals("Dance")</env:animationcondition>
+							</env:animation>
 						</env:object3d>
 					</env:drawable3d>
 
@@ -525,6 +528,9 @@
 							<env:animation name="Idle" channel="chanA" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
 							</env:animation>
+							<env:animation name="Dance" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Dance")</env:animationcondition>
+							</env:animation>
 						</env:object3d>
 					</env:drawable3d>
 					
@@ -540,6 +546,9 @@
 							</env:animation>
 							<env:animation name="Idle" channel="chanA" loop="true">
 								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
+							</env:animation>
+							<env:animation name="Idle" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Dance")</env:animationcondition>
 							</env:animation>
 						</env:object3d>
 					</env:drawable3d>

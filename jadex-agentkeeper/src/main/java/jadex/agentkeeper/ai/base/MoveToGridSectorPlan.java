@@ -1,9 +1,9 @@
 package jadex.agentkeeper.ai.base;
 
-import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
-import jadex.agentkeeper.ai.creatures.orc.OrcBDI.AchieveMoveToSector;
+import jadex.agentkeeper.ai.AbstractBeingBDI;
+import jadex.agentkeeper.ai.AbstractBeingBDI.AchieveMoveToSector;
 import jadex.agentkeeper.ai.pathfinding.AStarSearch;
-import jadex.bdiv3.annotation.GoalTargetCondition;
+import jadex.agentkeeper.util.ISpaceObjectStrings;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
@@ -13,6 +13,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
@@ -30,7 +31,7 @@ import java.util.Map;
 public class MoveToGridSectorPlan
 {
 	@PlanCapability
-	protected OrcBDI				capa;
+	protected AbstractBeingBDI				capa;
 
 	@PlanPlan
 	protected RPlan					rplan;
@@ -43,6 +44,8 @@ public class MoveToGridSectorPlan
 	private Iterator<Vector2Int>	path_iterator;
 
 	Vector2Double					myloc;
+	
+	ISpaceObject spaceObject;
 
 	// -------- constructors --------
 
@@ -66,6 +69,8 @@ public class MoveToGridSectorPlan
 		final Future<Void> ret = new Future<Void>();
 		Vector2Int target = goal.getTarget();
 		Vector2Double myloc = capa.getUpdatedPosition();
+		
+		spaceObject = capa.getMySpaceObject();
 
 		// TODO: refractor AStar-Search
 		astar = new AStarSearch(myloc, target, capa.getEnvironment(), true);
@@ -75,6 +80,8 @@ public class MoveToGridSectorPlan
 			ArrayList<Vector2Int> path = astar.gibPfadInverted();
 
 			path_iterator = path.iterator();
+			
+			spaceObject.setProperty(ISpaceObjectStrings.PROPERTY_STATUS, "Walk");
 
 			moveToNextSector(path_iterator).addResultListener(new DelegationResultListener<Void>(ret));
 		}
