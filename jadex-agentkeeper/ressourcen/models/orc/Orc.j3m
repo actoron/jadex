@@ -12,6 +12,13 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     }
     AdditionalRenderState {
       FaceCull Back
-
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
     }
 }

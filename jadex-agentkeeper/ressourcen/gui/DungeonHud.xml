@@ -9,7 +9,7 @@
 	<useStyles filename="/gui/nifty-style/nifty-default-styles.xml" />
 
 
-	<screen id="hud" controller="view.KeeperGuiController">
+	<screen id="hud" controller="jadex.agentkeeper.view.KeeperGuiController">
 		<layer id="background" childLayout="center">
 
 
