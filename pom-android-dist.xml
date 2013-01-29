@@ -195,17 +195,17 @@
 		
 		<!-- ======== integration test ======== -->
 		
-		<profile>
-			<id>integration-test</id>
-			<activation>
-				<file><exists>jadex-android-integration-test</exists></file>
-			</activation>
-			<modules>
-				<!-- Modules required for integration test -->
-				<module>jadex-android-integration-test</module>
-				<module>docs/android/jadex-android-example-project-maven</module>
-			</modules>
-		</profile>
+<!-- 		<profile> -->
+<!-- 			<id>integration-test</id> -->
+<!-- 			<activation> -->
+<!-- 				<file><exists>jadex-android-integration-test</exists></file> -->
+<!-- 			</activation> -->
+<!-- 			<modules> -->
+<!-- 				Modules required for integration test -->
+<!-- 				<module>jadex-android-integration-test</module> -->
+<!-- 				<module>docs/android/jadex-android-example-project-maven</module> -->
+<!-- 			</modules> -->
+<!-- 		</profile> -->
 		
 	</profiles>
 </project>
