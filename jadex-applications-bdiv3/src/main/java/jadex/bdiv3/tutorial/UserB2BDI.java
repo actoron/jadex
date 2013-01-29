@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities;
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Goals(@Goal(clazz=TranslationGoalB2.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoalB2.class), 
-	body=@Body(service=@ServicePlan(name="transser"))))
+	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapperB2.class))))
 public class UserB2BDI
 {
 
@@ -46,6 +46,11 @@ public class UserB2BDI
 	
 	//-------- methods ---------
 
+//	@Plan(trigger=@Trigger(goals=TranslationGoalB2.class), 
+//		body=@Body(service=@ServicePlan(name="transser")))
+//	public native IFuture<String> translateEnglishGerman(
+//		@GoalMapping(clazz=TranslationGoalB2.class, val="gword") String eword);
+	
 	/**
 	 * 
 	 */

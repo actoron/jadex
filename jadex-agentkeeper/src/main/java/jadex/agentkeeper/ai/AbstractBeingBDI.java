@@ -147,7 +147,6 @@ public abstract class AbstractBeingBDI
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false, randomselection=true)
 	public class PerformIdle
 	{
-		
 	}
 
 

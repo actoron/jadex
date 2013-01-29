@@ -397,7 +397,7 @@ public class BDIClassReader extends MicroClassReader
 		for(Class<?> agcl: agtcls)
 		{
 			Class<?> acl = gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
-			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
+//			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
 		}
 		
 //		System.out.println("genclazz: "+genclazz);
@@ -445,7 +445,22 @@ public class BDIClassReader extends MicroClassReader
 	}
 	
 	/**
-	 *  Create a wrapper service implementation based on 
+	 * 
+	 */
+	protected MPlan createMPlan(BDIModel bdimodel, Plan p, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	{
+		MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
+		
+		Body body = p.body();
+		
+		MPlan mplan = new MPlan(SReflect.getInnerClassName(body.value()), new ClassInfo(body.value().getName()), mtr, p.priority());
+
+		
+		return mplan;
+	}
+	
+	/**
+	 *  Create a wrapper service implementation based on a published goal.
 	 */
 	public static Object createServiceImplementation(BDIAgent agent, Class<?> type, String[] methodnames, String[] goalnames)
 	{

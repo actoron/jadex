@@ -107,6 +107,7 @@ public class RPlan extends RElement
 	{
 		RPlan rplan = new RPlan(mplan, candidate);
 		Object bd = mplan.getBody();
+		
 		IPlanBody body = null;
 		if(bd instanceof MethodInfo)
 		{
@@ -117,6 +118,7 @@ public class RPlan extends RElement
 		{
 			body = new ClassPlanBody(ia, rplan, (Class<?>)((ClassInfo)bd).getType(ia.getClassLoader()));
 		}
+		
 		rplan.setBody(body);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);

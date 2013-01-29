@@ -15,11 +15,11 @@ import jadex.micro.annotation.AgentBody;
 @Agent
 public class ABDI extends AABDI
 {
-	static
-	{
-		System.out.println("abdi1: "+ABDI.class.hashCode()+" "+ABDI.class.getClassLoader());
-		System.out.println("aabdi1: "+AABDI.class.hashCode()+" "+AABDI.class.getClassLoader());
-	}
+//	static
+//	{
+//		System.out.println("abdi1: "+ABDI.class.hashCode()+" "+ABDI.class.getClassLoader());
+//		System.out.println("aabdi1: "+AABDI.class.hashCode()+" "+AABDI.class.getClassLoader());
+//	}
 	
 	@Agent
 	protected BDIAgent agent;

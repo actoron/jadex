@@ -1,12 +1,10 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.BDIClassReader;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bridge.IInternalAccess;
-import jadex.micro.MicroClassReader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

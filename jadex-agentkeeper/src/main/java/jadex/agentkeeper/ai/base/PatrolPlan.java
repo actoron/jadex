@@ -67,15 +67,14 @@ public class PatrolPlan
 
 		Vector2Int posi = new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger());
 
-		rplan.dispatchSubgoal(capa.new AchieveMoveToSector(posi)).addResultListener(
-				new ExceptionDelegationResultListener<AbstractBeingBDI.AchieveMoveToSector, Void>(ret)
-				{
-					public void customResultAvailable(AchieveMoveToSector mtg)
-					{
-						ret.setResult(null);
-					}
-				});
-
+		rplan.dispatchSubgoal(capa.new AchieveMoveToSector(posi))
+			.addResultListener(new ExceptionDelegationResultListener<AbstractBeingBDI.AchieveMoveToSector, Void>(ret)
+		{
+			public void customResultAvailable(AchieveMoveToSector mtg)
+			{
+				ret.setResult(null);
+			}
+		});
 
 		return ret;
 	}

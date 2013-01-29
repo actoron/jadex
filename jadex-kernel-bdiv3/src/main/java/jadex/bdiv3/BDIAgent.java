@@ -159,7 +159,7 @@ public class BDIAgent extends MicroAgent
 		
 		try
 		{
-			System.out.println("write: "+val+" "+fieldname+" "+obj);
+//			System.out.println("write: "+val+" "+fieldname+" "+obj);
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 

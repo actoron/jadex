@@ -6,10 +6,10 @@ import jadex.micro.annotation.Agent;
 @Agent
 public abstract class AABDI
 {
-	static
-	{
-		System.out.println("aabdi: "+AABDI.class.hashCode()+" "+AABDI.class.getClassLoader());
-	}
+//	static
+//	{
+//		System.out.println("aabdi: "+AABDI.class.hashCode()+" "+AABDI.class.getClassLoader());
+//	}
 	
 	@Belief
 	protected int num1;

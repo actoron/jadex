@@ -5,7 +5,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -22,9 +21,6 @@ import org.kohsuke.asm4.ClassWriter;
 import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
-import org.kohsuke.asm4.util.ASMifier;
-import org.kohsuke.asm4.util.CheckClassAdapter;
-import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
  * 

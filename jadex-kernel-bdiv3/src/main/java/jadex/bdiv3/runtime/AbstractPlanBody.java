@@ -6,8 +6,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 
-import java.lang.reflect.Method;
-
 /**
  * 
  */
