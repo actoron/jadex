@@ -1,8 +1,7 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        NormalMap : textures/creatures/orc/Orc2low_nor.png
-        DiffuseMap : textures/creatures/orc/Orc2low_col.png
-        SpecularMap : textures/creatures/orc/Orc2low_spec.png
+        DiffuseMap : Repeat textures/creatures/goblin/Goblin.tga
+        GlowColor : 0.0 0.0 0.0 1.0
         Specular : 0.029424066 0.032931123 0.029213017 1.0
         Diffuse : 0.66282696 0.66282696 0.66282696 1.0
         UseMaterialColors : true
@@ -12,6 +11,13 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     }
     AdditionalRenderState {
       FaceCull Back
-
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
     }
 }

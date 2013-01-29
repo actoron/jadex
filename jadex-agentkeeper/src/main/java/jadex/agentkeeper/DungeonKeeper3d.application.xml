@@ -162,6 +162,20 @@
 					<env:property name="status" class="String">"Walk"
 					</env:property>
 				</env:objecttype>
+				<env:objecttype name="orc">
+					<env:property name="position" />
+					<env:property name="geschlagen">false</env:property>
+					<env:property name="direction">0.0</env:property>
+					<env:property name="level" class="int">1</env:property>
+					<env:property name="maxleben" class="int">50</env:property>
+					<env:property name="leben" class="int">50</env:property>
+					<env:property name="loyalitaet" class="double">5.0
+					</env:property>
+					<env:property name="abklingzeit" class="int">2
+					</env:property>
+					<env:property name="status" class="String">"Walk"
+					</env:property>
+				</env:objecttype>
 				<env:objecttype name="warlock">
 					<env:property name="position" />
 					<env:property name="geschlagen">false</env:property>
@@ -199,8 +213,8 @@
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Imp" objecttype="imp" createcomponent="true"/> 
 				<env:avatarmapping componenttype="Goblin" objecttype="goblin" createcomponent="true"/> 
+				<env:avatarmapping componenttype="Orc" objecttype="orc" createcomponent="true"/> 
 				<env:avatarmapping componenttype="Warlock" objecttype="warlock" createcomponent="true"/>
-				<env:avatarmapping componenttype="Paladin" objecttype="paladin" createcomponent="true"/> 
 <!-- 				<env:avatarmapping componenttype="SpielProzesse" objecttype="spielprozesse" createcomponent="true"/>  -->
 			</env:avatarmappings>
 
@@ -502,6 +516,22 @@
 						height="1" depth="1">
 						<env:object3d width="1" height="1" depth="1"
 							x="0" y="0" z="0"
+							modelpath="models/goblin/Goblin.j3o"
+							materialpath="models/goblin/Goblin.j3m"
+							hasLightMaterials="true">
+							<env:animation name="Walk" channel="chanA" loop="true" speed="1">
+								<env:animationcondition>$object.getProperty("status").equals("Walk")</env:animationcondition>
+							</env:animation>
+							<env:animation name="Idle" channel="chanA" loop="true">
+								<env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
+							</env:animation>
+						</env:object3d>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="orc" width="1"
+						height="1" depth="1">
+						<env:object3d width="1" height="1" depth="1"
+							x="0" y="0" z="0"
 							modelpath="models/orc/Orc.j3o"
 							materialpath="models/orc/Orc.j3m"
 							hasLightMaterials="true">
@@ -528,6 +558,8 @@
 
 		<componenttype name="Imp" filename="jadex/agentkeeper/ai/creatures/imp/imp.agent.xml" />
 		<componenttype name="Goblin"
+			filename="ai/creatures/orc/OrcBDI.class" />
+					<componenttype name="Orc"
 			filename="ai/creatures/orc/OrcBDI.class" />
 
 
