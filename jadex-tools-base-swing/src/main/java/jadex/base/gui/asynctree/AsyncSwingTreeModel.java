@@ -1,6 +1,6 @@
 package jadex.base.gui.asynctree;
 
-import jadex.base.gui.asynctree.adapter.TreeModelListenerAdapter;
+import jadex.base.gui.asynctree.adapter.TreeModelListenerWrapper;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class AsyncSwingTreeModel extends AsyncTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
-		super.addTreeModelListener(TreeModelListenerAdapter.getAdapterFor(l));
+		super.addTreeModelListener(TreeModelListenerWrapper.getWrapperFor(l));
 	}
 	
 	/**
@@ -118,8 +118,8 @@ public class AsyncSwingTreeModel extends AsyncTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
-		super.removeTreeModelListener(TreeModelListenerAdapter.getAdapterFor(l));
-		TreeModelListenerAdapter.deleteAdapterFor(l);
+		super.removeTreeModelListener(TreeModelListenerWrapper.getWrapperFor(l));
+		TreeModelListenerWrapper.deleteWrapperFor(l);
 	}
 	
 	//-------- helper methods --------

@@ -2,10 +2,13 @@ package jadex.base.gui.asynctree.adapter;
 
 import jadex.base.gui.asynctree.AsyncTreeModelEvent;
 
-public class TreeModelEventAdapter extends javax.swing.event.TreeModelEvent
+/**
+ * Wraps a Jadex AsyncTreeModelEvent in a Swing TreeModelEvent.
+ */
+public class TreeModelEventWrapper extends javax.swing.event.TreeModelEvent
 {
 
-	public TreeModelEventAdapter(AsyncTreeModelEvent jadexEvent)
+	public TreeModelEventWrapper(AsyncTreeModelEvent jadexEvent)
 	{
 		super(jadexEvent.getModel(), jadexEvent.getPath(), jadexEvent.getIndices(), jadexEvent.getChildren());
 	}
