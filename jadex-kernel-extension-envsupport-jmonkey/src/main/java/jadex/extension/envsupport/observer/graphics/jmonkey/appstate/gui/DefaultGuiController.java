@@ -25,7 +25,7 @@ public class DefaultGuiController extends AbstractAppState implements ScreenCont
 
     public DefaultGuiController(SimpleApplication app) {
        this.app = app;
-       System.out.println("constructor");
+       
     }
 
     /** Nifty GUI ScreenControl methods */
@@ -36,7 +36,6 @@ public class DefaultGuiController extends AbstractAppState implements ScreenCont
 
     
     public void fireFullscreen() {
-    	System.out.println("firefullscreen aus nifty");
     	 ((MonkeyApp)app).fireFullscreen();
     }
     
@@ -51,6 +50,7 @@ public class DefaultGuiController extends AbstractAppState implements ScreenCont
     }
 
     /** jME3 AppState methods */
+    @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         this.app = (SimpleApplication) app;
@@ -62,9 +62,6 @@ public class DefaultGuiController extends AbstractAppState implements ScreenCont
 
     }
     
-    public void update(float tpf) {
 
-    }
-    
 
 }

@@ -44,7 +44,6 @@ public class SimpleCreatureState
 	public int getCreatureCount(String type)
 	{
 		return creatures.get(type);
-
 	}
 
 	

@@ -118,6 +118,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 							if(type.equals(TREASURY) || type.equals(HATCHERY) || type.equals(LAIR) || type.equals(TRAININGROOM) || type.equals(LIBRARY)
 									|| type.equals(TORTURE) || type.equals(DUNGEONHEART))
 							{
+								
 								gebaeuedeverwalter.machGebaeude(new Vector2Int(x, y), type);
 								if(type == TREASURY)
 								{
@@ -130,6 +131,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 									props.put("huehner", 5.0);
 									props.put("besetzt", "0");
 									complexNPos.add(new SimpleMapType(aktPos, type));
+									playerState.addClaimedSector();
 								}
 								else if(type.equals(DUNGEONHEART))
 								{
@@ -143,6 +145,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 								{
 									props.put("besetzt", "0");
 									complexNPos.add(new SimpleMapType(aktPos, type));
+									playerState.addClaimedSector();
 								}
 
 								else if(type == TRAININGROOM)
@@ -150,6 +153,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
 									complexNPos.add(new SimpleMapType(aktPos, type));
+									playerState.addClaimedSector();
 								}
 
 								else if(type == LIBRARY)
@@ -157,6 +161,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
 									complexNPos.add(new SimpleMapType(aktPos, type));
+									playerState.addClaimedSector();
 								}
 
 								else if(type == TORTURE)
@@ -164,6 +169,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
 									complexNPos.add(new SimpleMapType(aktPos, type));
+									playerState.addClaimedSector();
 								}
 							}
 
@@ -184,9 +190,9 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 							{
 								complexNPos.add(new SimpleMapType(aktPos, type));
 							}
-							else if(type == CLAIMED_PATH || type == DIRT_PATH)
+							else if(type == CLAIMED_PATH )
 							{
-								// pathpos.add(aktPos);
+								playerState.addClaimedSector();
 							}
 
 							props.put("neighborhood", "00000000");
@@ -366,7 +372,6 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 		// grid.setProperty("tortureliste", tortureliste);
 
 		space.removeSpaceProcess(getProperty(ISpaceProcess.ID));
-
 
 	}
 

@@ -1,6 +1,7 @@
 package jadex.agentkeeper.view;
 
 import jadex.agentkeeper.game.state.creatures.SimpleCreatureState;
+import jadex.agentkeeper.game.state.player.SimplePlayerState;
 import jadex.agentkeeper.game.userinput.UserEingabenManager;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.agentkeeper.util.ISpaceStrings;
@@ -23,11 +24,11 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
 
+
 /**
  * The Methods from all GUI Input are implemented here
  * 
  * @author Philip Willuweit p.willuweit@gmx.de
- *
  */
 public class KeeperGuiController extends DefaultGuiController
 {
@@ -42,10 +43,16 @@ public class KeeperGuiController extends DefaultGuiController
 	private ISpaceController	spaceController;
 
 	private UserEingabenManager	usermanager;
+
+	private MonkeyApp			app;
+
+	private SimpleCreatureState	creatureState;
+
+	private SimplePlayerState	playerState;
 	
-	private MonkeyApp app;
+	private TextRenderer manaStatusRenderer;
 	
-	private SimpleCreatureState creatureState;
+	private TextRenderer claimedTilesRender;
 
 	public KeeperGuiController(SimpleApplication app, ISpaceController spacecontroller)
 	{
@@ -55,6 +62,7 @@ public class KeeperGuiController extends DefaultGuiController
 		this.spaceController = spacecontroller;
 		this.usermanager = (UserEingabenManager)spacecontroller.getProperty("uem");
 		this.creatureState = (SimpleCreatureState)spaceController.getProperty(ISpaceStrings.CREATURE_STATE);
+		this.playerState = (SimplePlayerState)spaceController.getProperty(ISpaceStrings.PLAYER_STATE);
 
 
 	}
@@ -116,24 +124,46 @@ public class KeeperGuiController extends DefaultGuiController
 	}
 
 
+    public void update(float tpf) {
+		
+    	
+		String manatext = ""+(int)playerState.getMana();
+		while(manatext.length()<=7)
+		{
+			manatext = "0".concat(manatext);
+		}
+		manaStatusRenderer.setText(manatext);
+		claimedTilesRender.setText("+"+playerState.getClaimedSectors());
+
+    }
+    
+
 	public void onStartScreen()
 	{
+		Element manaT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("manastatus");
+		this.manaStatusRenderer = manaT.getRenderer(TextRenderer.class);
+		
+		Element claimedT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("claimedtiles");
+		this.claimedTilesRender = claimedT.getRenderer(TextRenderer.class);
+		
+		
+
+		
 		Element impText = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("imp_total");
 		TextRenderer impRender = impText.getRenderer(TextRenderer.class);
-		
-		impRender.setText(""+creatureState.getCreatureCount(InitMapProcess.IMP));
-		
+		impRender.setText("" + creatureState.getCreatureCount(InitMapProcess.IMP));
+
 		Element goblinT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("goblin_total");
 		TextRenderer goblinR = goblinT.getRenderer(TextRenderer.class);
-		goblinR.setText(""+creatureState.getCreatureCount(InitMapProcess.GOBLIN));
-		
+		goblinR.setText("" + creatureState.getCreatureCount(InitMapProcess.GOBLIN));
+
 		Element warlockT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("warlock_total");
 		TextRenderer warlockR = warlockT.getRenderer(TextRenderer.class);
-		warlockR.setText(""+creatureState.getCreatureCount(InitMapProcess.WARLOCK));
-		
+		warlockR.setText("" + creatureState.getCreatureCount(InitMapProcess.WARLOCK));
+
 		Element orcT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("orc_total");
 		TextRenderer orcR = orcT.getRenderer(TextRenderer.class);
-		orcR.setText(""+creatureState.getCreatureCount(InitMapProcess.ORC));
+		orcR.setText("" + creatureState.getCreatureCount(InitMapProcess.ORC));
 
 	}
 

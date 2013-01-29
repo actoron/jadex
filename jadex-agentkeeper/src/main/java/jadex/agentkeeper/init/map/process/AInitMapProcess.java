@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.agentkeeper.ai.oldai.heroes.GegnerVerwalter;
+import jadex.agentkeeper.game.state.buildings.SimpleBuildingState;
 import jadex.agentkeeper.game.state.creatures.SimpleCreatureState;
 import jadex.agentkeeper.game.state.missions.Auftragsverwalter;
 import jadex.agentkeeper.game.state.missions.Gebaudeverwalter;
 import jadex.agentkeeper.game.state.missions.MissionsVerwalter;
+import jadex.agentkeeper.game.state.player.SimplePlayerState;
 import jadex.agentkeeper.game.userinput.UserEingabenManager;
 import jadex.agentkeeper.util.ISpaceObjectStrings;
 import jadex.agentkeeper.util.ISpaceStrings;
@@ -38,6 +40,10 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 	public static Vector2Double portalort;
 	
 	public SimpleCreatureState creatureState;
+	
+	public SimpleBuildingState buildingState;
+	
+	public SimplePlayerState playerState;
 	
 	public UserEingabenManager uem;
 	public MissionsVerwalter mv;
@@ -132,13 +138,18 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 			grid.setProperty("auftraege", auftragsverwalter);
 			
 
-			this.creatureState = new SimpleCreatureState();
+			
 			uem = new UserEingabenManager(grid);
 			mv = new MissionsVerwalter();
 
 			grid.setProperty("missionsverwalter", mv);
 			grid.setProperty("uem", uem);
+			
+			this.creatureState = new SimpleCreatureState();
+			this.playerState = new SimplePlayerState(1);
 			grid.setProperty(ISpaceStrings.CREATURE_STATE, this.creatureState);
+			grid.setProperty(ISpaceStrings.BUILDING_STATE, this.buildingState);
+			grid.setProperty(ISpaceStrings.PLAYER_STATE, this.playerState);
 
 		}
 		 catch (Exception e) {
@@ -158,7 +169,7 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 	 *            The space this process is running in.
 	 */
 	public void shutdown(IEnvironmentSpace space) {
-		// System.out.println("create waste process shutdowned.");
+		 System.out.println("- - - Init Map Process done - - -");
 	}
 
 	/**

@@ -2,6 +2,7 @@ package jadex.agentkeeper.ai.base;
 
 import jadex.agentkeeper.ai.AbstractBeingBDI;
 import jadex.agentkeeper.util.ISpaceObjectStrings;
+import jadex.agentkeeper.util.ISpaceStrings;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
@@ -51,7 +52,10 @@ public class IdlePlan
 		
 		spaceObject.setProperty(ISpaceObjectStrings.PROPERTY_STATUS, status);
 		
-		rplan.waitFor(3000).addResultListener(new DelegationResultListener<Void>(ret)
+		long waittime = (long)(5000/(Double)capa.getEnvironment().getProperty(ISpaceStrings.GAME_SPEED) * random);
+		
+		
+		rplan.waitFor(waittime).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void exceptionOccurred(Exception exception)
 			{

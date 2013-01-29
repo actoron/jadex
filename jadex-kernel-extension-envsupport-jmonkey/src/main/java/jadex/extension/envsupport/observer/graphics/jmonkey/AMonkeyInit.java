@@ -27,6 +27,7 @@ import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
+import com.jme3.app.state.AppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.Environment;
 import com.jme3.effect.ParticleEmitter;
@@ -357,6 +358,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 				{
 					System.out.println("nscreen " + nscreen.getName() );
 					nifty.fromXml(nscreen.getPath(), nscreen.getName(), customCreator.getScreenController());
+					stateManager.attach((AppState)customCreator.getScreenController());
 					if(nscreen.isStartScreen()||startScreen==null)
 					{
 						startScreen = nscreen;

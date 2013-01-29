@@ -1,6 +1,8 @@
 package jadex.agentkeeper.ai.creatures.imp;
 
+import jadex.agentkeeper.game.state.player.SimplePlayerState;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
+import jadex.agentkeeper.util.ISpaceStrings;
 import jadex.extension.envsupport.environment.SpaceObject;
 
 @SuppressWarnings("serial")
@@ -39,6 +41,9 @@ public class BesetzefeldPlan extends ImpPlan {
 			bearbeite(_zielpos, BESETZDAUER);
 
 			setze(_zielpos, InitMapProcess.CLAIMED_PATH, false);
+			SimplePlayerState state = (SimplePlayerState)grid.getProperty(ISpaceStrings.PLAYER_STATE);
+			
+			state.addClaimedSector();
 			}
 			
 		}

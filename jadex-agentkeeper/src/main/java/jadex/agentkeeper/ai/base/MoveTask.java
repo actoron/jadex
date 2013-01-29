@@ -1,6 +1,7 @@
 package jadex.agentkeeper.ai.base;
 
 import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
+import jadex.agentkeeper.util.ISpaceStrings;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
@@ -55,8 +56,10 @@ public class MoveTask extends AbstractTask
 		IVector2 idis = (IVector2)getProperty(PROPERTY_DESTINATION);
 
 		double speed = ((Number)getProperty(PROPERTY_SPEED)).doubleValue();
+		
+		double gamespeed = (Double)space.getProperty(ISpaceStrings.GAME_SPEED);
 
-		double maxdist = progress * speed * 0.001;
+		double maxdist = progress * gamespeed * speed * 0.001;
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 
 		double r = 0;

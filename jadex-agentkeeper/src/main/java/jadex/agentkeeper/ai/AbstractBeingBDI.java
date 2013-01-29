@@ -57,16 +57,16 @@ public abstract class AbstractBeingBDI
 
 	/** The position of the "Being". */
 	@Belief
-	protected Vector2Double	my_position;
+	protected Vector2Double	myPosition;
 
 	public Vector2Double getUpdatedPosition()
 	{
-		my_position = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
-		return my_position;
+		myPosition = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
+		return myPosition;
 	}
 	
 	/** The speed of the "Being". */
-	protected float			my_speed	= 1;
+	protected float			mySpeed	= 1;
 
 	/**
 	 *  Initialize the agent.
@@ -83,7 +83,7 @@ public abstract class AbstractBeingBDI
 			{
 				environment	= (Grid2D)ext;
 				mySpaceObject = environment.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
-				my_position = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
+				myPosition = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
 				ret.setResult(null);
 			}
 		});
@@ -126,7 +126,7 @@ public abstract class AbstractBeingBDI
 		@GoalTargetCondition(events = "my_position")
 		public boolean checkTarget()
 		{
-			boolean ret = my_position.equals(target);
+			boolean ret = myPosition.equals(target);
 			return ret;
 		}
 
@@ -143,6 +143,9 @@ public abstract class AbstractBeingBDI
 	
 	/**
 	 *  Goal that lets the Being perform idle.
+	 *  
+	 *  Because the Goal hast two Plans (IdlePlan and PatrolPlan) and we use randomselection
+	 *  the Agent just Idles or Patrols
 	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false, randomselection=true)
 	public class PerformIdle
@@ -155,7 +158,7 @@ public abstract class AbstractBeingBDI
 	 */
 	public Vector2Double getMyPosition()
 	{
-		return my_position;
+		return myPosition;
 	}
 
 
@@ -164,7 +167,7 @@ public abstract class AbstractBeingBDI
 	 */
 	public void setMyPosition(Vector2Double my_position)
 	{
-		this.my_position = my_position;
+		this.myPosition = my_position;
 	}
 
 
@@ -173,7 +176,7 @@ public abstract class AbstractBeingBDI
 	 */
 	public float getMySpeed()
 	{
-		return my_speed;
+		return mySpeed;
 	}
 
 
@@ -182,7 +185,7 @@ public abstract class AbstractBeingBDI
 	 */
 	public void setMySpeed(float my_speed)
 	{
-		this.my_speed = my_speed;
+		this.mySpeed = my_speed;
 	}
 
 

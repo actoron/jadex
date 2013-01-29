@@ -21,6 +21,7 @@
 		<import>jadex.agentkeeper.state.missions.*</import>
 		<import>jadex.agentkeeper.init.map.*</import>
 		<import>jadex.agentkeeper.init.map.process.*</import>
+		<import>jadex.agentkeeper.game.process.*</import>
 	</imports>
 
 	<extensiontypes>
@@ -29,6 +30,7 @@
 
 			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
 			<env:property name="tile" class="Double">0.795</env:property>
+			<env:property name="gameSpeed" class="Double">1.0</env:property>
 			<env:property name="auftraege" />
 			<env:property name="gold" />
 			<env:property name="schatztruhen" />
@@ -204,6 +206,7 @@
 
 			<env:processtypes>
 				<env:processtype name="init" class="InitMapProcess" />
+				<env:processtype name="genmana" class="GenerateManaProcess" />
 			</env:processtypes>
 			
 			<env:dataviews>
@@ -589,6 +592,7 @@
 							<env:property name="mapfile">"level/test.map"
 							</env:property>
 						</env:process>
+						<env:process type="genmana"></env:process>
 					</env:processes>
 
 					<env:observers>

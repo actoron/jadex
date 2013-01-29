@@ -3,16 +3,25 @@ Material My Material : Common/MatDefs/Light/Lighting.j3md {
         DiffuseMap : textures/gold/Gold.png
         NormalMap : textures/gold/Gold_nor6.png
         SpecularMap : textures/gold/Gold_spec2.png
-        Shininess : 2.0
-        Specular : 1.0 1.0 1.0 1.0
+        Shininess : 127.0
+        Specular : 0.0 1.0 0.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0
         Ambient : 1.0 1.0 1.0 1.0
-        GlowColor : 1.0 1.0 1.0 1.0
+        GlowColor : 0.0 0.0 0.0 1.0
         VertexLighting : true
+        ParallaxHeight : 0.05
         UseMaterialColors : true
 
      }
     AdditionalRenderState {
       FaceCull Back
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
     }
 }
