@@ -20,6 +20,17 @@ public interface IJavaWrapperService
 	
 	/**
 	 *  Execute a plain Java program from a jar
+	 *  as given by a file name.
+	 *  Uses the main class name as specified in the manifest.
+	 *  @param jarfile	File name of a jar file.
+	 *  @param args	The arguments to the main method.
+	 *  @return A future indication successful execution (result: null)
+	 *    or failure (exception).
+	 */
+	public IFuture<Void>	executeJava(String jarfile, String[] args);
+	
+	/**
+	 *  Execute a plain Java program from a jar
 	 *  as given by a resource identifier.
 	 *  Uses the main class name as specified in the manifest.
 	 *  @param rid	The resource identifier for the jar

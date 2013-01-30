@@ -35,7 +35,7 @@ public class MultiPlatformsTest extends TestCase
 			{
 				System.out.println("Starting platform "+i);
 			}
-			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i,
+			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i+"*",
 				"-gui", "false", "-printpass", "false", "-cli", "false",
 				"-deftimeout", ""+timeout,
 //				"-logging", "true",
@@ -45,7 +45,7 @@ public class MultiPlatformsTest extends TestCase
 //				"-awamechanisms", "\"Relay\"", 
 //				"-awamechanisms", "\"Broadcast\"", // broadcast 3 times as slow!?
 //				"-awamechanisms", "\"Multicast\"", 
-//				"-awamechanisms", "\"Relay, Multicast, Message\"", 
+				"-awamechanisms", "\"Relay, Multicast, Message\"", 
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
@@ -68,13 +68,7 @@ public class MultiPlatformsTest extends TestCase
 			}
 		}
 		
-//		try
-//		{
-//			Thread.sleep(3000000);
-//		}
-//		catch(InterruptedException e)
-//		{
-//		}
+		Thread.sleep(10000);
 		
 		for(int i=0; i<number; i++)
 		{

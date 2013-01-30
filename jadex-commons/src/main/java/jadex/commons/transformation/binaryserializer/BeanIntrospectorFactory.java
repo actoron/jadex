@@ -28,11 +28,11 @@ public class BeanIntrospectorFactory
 	{
 //		return new BeanReflectionIntrospector(lrusize);
 		
-		if(!SReflect.isAndroid())
-		{
-			return new BeanDelegateReflectionIntrospector(lrusize);
-		}
-		else
+//		if(!SReflect.isAndroid())
+//		{
+//			return new BeanDelegateReflectionIntrospector(lrusize);
+//		}
+//		else
 		{
 			return new BeanReflectionIntrospector(lrusize);
 		}
