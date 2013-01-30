@@ -2,13 +2,12 @@ Material My Material : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
         DiffuseMap : textures/gold/Gold.png
         SpecularMap : textures/gold/Gold_spec2.png
+        NormalMap : textures/gold/Gold_nor6.png
         Shininess : 10.0
-        Specular : 2.0 2.0 2.0 1.0
+        Specular : 2.5 2.5 2.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0
         Ambient : 0.7 0.7 0.7 1.0
         GlowColor : 0.0 0.0 0.0 1.0
-        VertexLighting : false
-        ParallaxHeight : 0.05
         UseMaterialColors : true
 
      }

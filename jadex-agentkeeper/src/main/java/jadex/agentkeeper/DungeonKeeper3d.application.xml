@@ -257,7 +257,6 @@
 							modelpath="models/tilesets/DirtHigher.j3o" 
 							materialpath="models/tilesets/DirtPath.j3m"
 							hasLightMaterials="true">
-							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
 						</env:object3d>
 
 					</env:drawable3d>
@@ -284,6 +283,12 @@
 							x="0" y="0" z="0" 
 							materialpath="models/tilesets/Gold.j3m"
 							modelpath="models/tilesets/dirt/Dirt_?.j3o" />
+							
+						<env:object3d width="0.79998" height="1.0" depth="0.79998" x="0" y="0" z="0" 
+							modelpath="models/tilesets/DirtHigher.j3o" 
+							materialpath="models/tilesets/DirtPath.j3m"
+							hasLightMaterials="true">
+						</env:object3d>
 					</env:drawable3d>
 					
 					
@@ -360,14 +365,12 @@
 					
 					<env:drawable3d objecttype="treasury" width="1.0" height="1.0" depth="1.0" isDynamic="false">
 					<env:property dynamic="true" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>
-					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" modelpath="models/tilesets/claimed/Claimedpath.j3o" 
-						materialpath="models/buildings/treasury/TreasuryPlank.j3m"
-						hasLightMaterials="true" />
+					
 					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
-						materialpath="models/buildings/hatchery/HatcheryGround.j3m"
-						hasLightMaterials="true" />	
-										
+						materialpath="models/buildings/treasury/TreasuryGround.j3m"
+						hasLightMaterials="true" />
+													
 						<env:object3d width="1.65" height="1.65" depth="1.65" x="0" y="0" z="0" 
 						modelpath="models/buildings/treasury/GoldBag.j3o" 
 						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m"
@@ -387,17 +390,18 @@
 
 					
 					<env:drawable3d objecttype="lair" width="1.0" height="1.0" depth="1.0" isDynamic="false">
+					
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
 						materialpath="models/buildings/lair/LairGround.j3m"/>
+						
 						<env:object3d width="0.75" height="0.75" depth="0.75" x="0" y="0" z="0" 
 						modelpath="models/buildings/lair/Bed.j3o" 
 						rotation="rota">
-						<env:materialfile part="Blanket" path="models/buildings/lair/BedBlanket.j3m" />
-						<env:materialfile part="WhiteCloth" path="models/buildings/lair/BedBlanket.j3m" />
-						<env:materialfile part="Wood" path="models/buildings/lair/BedWood.j3m" />
+							<env:materialfile part="Blanket" path="models/buildings/lair/BedBlanket.j3m" />
+							<env:materialfile part="WhiteCloth" path="models/buildings/lair/BedBlanket.j3m" />
+							<env:materialfile part="Wood" path="models/buildings/lair/BedWood.j3m" />
 						</env:object3d>
-						
 						
 						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
 							modelpath="models/tilesets/buildings/border/Default_?.j3o"
@@ -447,7 +451,7 @@
 					<env:drawable3d objecttype="trainingroom" width="1.0" height="1.0" depth="1.0" isDynamic="false">
 					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
-						materialpath="models/buildings/lair/LairGround.j3m"
+						materialpath="models/buildings/training/TrainingGround.j3m"
 						 />				
 						 
 						 
@@ -463,7 +467,7 @@
 					
 					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
-						materialpath="models/buildings/lair/LairGround.j3m"/>
+						materialpath="models/buildings/training/TrainingGround.j3m"/>
 									
 						<env:object3d width="0.3" height="0.3" depth="0.3" x="0" y="0" z="0" 
 						modelpath="models/buildings/training/trainingpole.j3o" 
