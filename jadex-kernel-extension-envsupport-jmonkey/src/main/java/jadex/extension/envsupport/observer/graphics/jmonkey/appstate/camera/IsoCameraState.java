@@ -168,7 +168,7 @@ public class IsoCameraState extends AbstractAppState
 		
 		
 		 Camera cam_map = cam.clone();
-		 cam.setViewPort( 0.0f , 1.0f , 0.15f , 1.0f );
+		 cam.setViewPort( 0.15f , 1.0f , 0.15f , 1.0f );
 		 
 		 
 		 float height = (cam.getWidth()*0.15f)/cam.getHeight();

@@ -36,6 +36,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.BatchNode;
@@ -83,7 +84,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected NiftyJmeDisplay					niftyDisplay;
 
 	// Helper Classes jop
-	public Node								gridNode;
+	public Node									gridNode;
 
 	// Dimensions
 	protected float								appSize;
@@ -117,35 +118,40 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected boolean							ambientOcclusion	= true;
 
-	//TODO: thats crap
-	protected String							cameraSelection				= "Default";
+	// TODO: thats crap
+	protected String							cameraSelection		= "Default";
 
-	protected ArrayList<String>				toDelete			= new ArrayList<String>();
+	protected ArrayList<String>					toDelete			= new ArrayList<String>();
 
 	protected ArrayList<Spatial>				toAdd				= new ArrayList<Spatial>();
-	
-	Vector3Int selectedworldcoord;
-	
-	BatchNode staticbatchgeo = new BatchNode(StringNames.BATCH_NODE);
-	Node staticgeo = new Node(StringNames.STATIC_NODE);
-	
-	protected boolean defaultGui = true;
-	
-	protected String guiCreatorPath;
-	protected ArrayList<NiftyScreen> niftyScreens;
-	
-	protected ISpaceController spaceController;
-	
-	protected Dimension	canvassize;
-		
-	protected DefaultCameraState cameraState;
-	
-	protected SelectionControl selectionControl;
 
-	protected Node	staticNode;
-	
+	Vector3Int									selectedworldcoord;
 
-	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, ISpaceController spaceController)
+	BatchNode									staticbatchgeo		= new BatchNode(StringNames.BATCH_NODE);
+
+	Node										staticgeo			= new Node(StringNames.STATIC_NODE);
+
+	protected boolean							defaultGui			= true;
+
+	protected String							guiCreatorPath;
+
+	protected ArrayList<NiftyScreen>			niftyScreens;
+
+	protected ISpaceController					spaceController;
+
+	protected Dimension							canvassize;
+
+	protected DefaultCameraState				cameraState;
+
+	protected SelectionControl					selectionControl;
+
+	protected Node								staticNode;
+
+	private Nifty								nifty;
+
+
+	public AMonkeyInit(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath,
+			ISpaceController spaceController)
 	{
 		// Set the Variables
 		this.appSize = dim;
@@ -167,16 +173,15 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	protected void simpleInit()
 	{
 		this.fpp = new FilterPostProcessor(assetManager);
-		
+
 		// Base Setup
 		Logger.getLogger("").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
 		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
-		
+
 		viewPort.setBackgroundColor(ColorRGBA.Black);
 		stateManager.getState(StatsAppState.class).toggleStats();
-		
-		
+
 
 		initRoot();
 
@@ -185,6 +190,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		initNifty();
 		initCam();
 		initSelection();
+		initCustom();
 
 
 	}
@@ -209,7 +215,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		this.gridNode = gridHandler.getGrid();
 		this.staticgeo.setLocalScale(appScaled);
 		this.staticbatchgeo.setLocalScale(appScaled);
-		
+
 		this.staticNode.setLocalScale(appScaled);
 		this.rootNode.attachChild(staticgeo);
 		this.rootNode.attachChild(staticbatchgeo);
@@ -221,7 +227,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	{
 		if(cameraSelection.equals("Default"))
 		{
-			cameraState =  new DefaultCameraState();
+			cameraState = new DefaultCameraState();
 			stateManager.attach(cameraState);
 		}
 		else if(cameraSelection.equals("Iso"))
@@ -238,33 +244,31 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	{
 
 
-
 		viewPort.addProcessor(fpp);
-		
 
 
+		// SimpleWaterProcessor waterProcessor = new
+		// SimpleWaterProcessor(assetManager);
+		// waterProcessor.setReflectionScene(geometryNode);
+		//
+		// Vector3f waterLocation=new Vector3f(0,-4,0);
+		// waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y,
+		// waterLocation.dot(Vector3f.UNIT_Y)));
+		//
+		// waterProcessor.setDebug(false);
+		// waterProcessor.setWaveSpeed(0.02f);
+		// // waterProcessor.setRefractionClippingOffset(10.1f);
+		// waterProcessor.setWaterColor(ColorRGBA.Cyan.mult(10.5f));
+		// // waterProcessor.setLightPosition(new Vector3f(-100,20,-100));
+		// waterProcessor.setWaterDepth(40);
+		// waterProcessor.setWaterTransparency(0.1f);
+		// viewPort.addProcessor(waterProcessor);
 
-//		SimpleWaterProcessor waterProcessor = new SimpleWaterProcessor(assetManager);
-//		 waterProcessor.setReflectionScene(geometryNode);
-//		
-//		 Vector3f waterLocation=new Vector3f(0,-4,0);
-//		 waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y,
-//		 waterLocation.dot(Vector3f.UNIT_Y)));
-//		
-//		 waterProcessor.setDebug(false);
-//		 waterProcessor.setWaveSpeed(0.02f);
-//		 // waterProcessor.setRefractionClippingOffset(10.1f);
-//		 waterProcessor.setWaterColor(ColorRGBA.Cyan.mult(10.5f));
-//		 // waterProcessor.setLightPosition(new Vector3f(-100,20,-100));
-//		 waterProcessor.setWaterDepth(40);
-//		 waterProcessor.setWaterTransparency(0.1f);
-//		 viewPort.addProcessor(waterProcessor);
 
+		// BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Scene);
+		// fpp.addFilter(bf);
 
-//		 BloomFilter bf=new BloomFilter(BloomFilter.GlowMode.Objects);
-//		 fpp.addFilter(bf);
-
-//
+		//
 		Vector3f lightDir = new Vector3f(1f, -2f, 1f);
 		WaterFilter water = new WaterFilter(rootNode, lightDir);
 		water.setWaterHeight(-2.5f);
@@ -279,8 +283,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		water.setSpeed(0.1f);
 		water.setShoreHardness(1.0f);
 		water.setRefractionConstant(0.2f);
+
 		water.setShininess(0.3f);
-		water.setSunScale(0.1f);
+		water.setSunScale(1.1f);
+
 		water.setLightColor(ColorRGBA.Red.mult(0.1f).set(ColorRGBA.Orange.mult(0.1f).r, ColorRGBA.Orange.mult(0.1f).g, ColorRGBA.Orange.mult(0.1f).b, 0.01f));
 		water.setColorExtinction(new Vector3f(10.0f, 20.0f, 30.0f));
 		fpp.addFilter(water);
@@ -292,7 +298,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 			// ssaoFilter.setUseAo(false);
 			// ssaoFilter.setUseOnlyAo(true);
-			fpp.addFilter(ssaoFilter);
+//			fpp.addFilter(ssaoFilter);
 
 		}
 		// else
@@ -303,11 +309,12 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		// viewPort.addProcessor(bsr);
 		// }
 
-//		pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-//		pssmRenderer.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal()); // light
-//																					// direction
-//		pssmRenderer.setShadowIntensity(0.6f);
-//		viewPort.addProcessor(pssmRenderer);
+		// pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
+		// pssmRenderer.setDirection(new Vector3f(-.5f, -.5f,
+		// -.5f).normalizeLocal()); // light
+		// // direction
+		// pssmRenderer.setShadowIntensity(0.6f);
+		// viewPort.addProcessor(pssmRenderer);
 		//
 
 
@@ -320,55 +327,39 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		rootNode.setShadowMode(ShadowMode.Off);
 
 	}
-	
-	
 
-	private void initNifty()
+	private void initCustom()
 	{
-		
-		/** Create a new NiftyGUI object */
-		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
-		Nifty nifty = niftyDisplay.getNifty();
-		
-		
-		nifty.setIgnoreKeyboardEvents(true);
-
-
-		/** Read your XML and initialize your custom ScreenController */
-		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new DefaultGuiController(this));
-		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new DefaultGuiController(this));
-		nifty.gotoScreen("hud");
-		
 		System.out.println("guiCreatorPath " + guiCreatorPath);
-		
+
 		if(!guiCreatorPath.equals("None"))
 		{
-			
+
 			System.out.println("guiCreatorPath " + guiCreatorPath);
 			ICustomStateCreator customCreator;
 			try
 			{
-				Constructor con = Class.forName(this.guiCreatorPath, true,
-						Thread.currentThread().getContextClassLoader()).getConstructor(new Class[]{SimpleApplication.class, ISpaceController.class});
+				Constructor con = Class.forName(this.guiCreatorPath, true, Thread.currentThread().getContextClassLoader()).getConstructor(
+						new Class[]{SimpleApplication.class, ISpaceController.class});
 
 				customCreator = (ICustomStateCreator)con.newInstance(new Object[]{this, spaceController});
-				
+
 				NiftyScreen startScreen = null;
 				for(NiftyScreen nscreen : customCreator.getNiftyScreens())
 				{
-					System.out.println("nscreen " + nscreen.getName() );
+					System.out.println("nscreen " + nscreen.getName());
 					nifty.fromXml(nscreen.getPath(), nscreen.getName(), customCreator.getScreenController());
 					stateManager.attach((AppState)customCreator.getScreenController());
-					if(nscreen.isStartScreen()||startScreen==null)
+					if(nscreen.isStartScreen() || startScreen == null)
 					{
 						startScreen = nscreen;
 					}
 				}
 
 				nifty.gotoScreen(startScreen.getName());
-				
-				//TODO: extra class
-				if(customCreator.getCustomAppState()!=null)
+
+				// TODO: extra class
+				if(customCreator.getCustomAppState() != null)
 				{
 					stateManager.attach(customCreator.getCustomAppState());
 				}
@@ -384,11 +375,26 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			{
 				throw new RuntimeException(e);
 			}
-			
 
 
 		}
+	}
 
+	private void initNifty()
+	{
+
+		/** Create a new NiftyGUI object */
+		niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
+		nifty = niftyDisplay.getNifty();
+
+
+		nifty.setIgnoreKeyboardEvents(true);
+
+
+		/** Read your XML and initialize your custom ScreenController */
+		nifty.fromXml("jadex3d/interface/BaseHud.xml", "hud", new DefaultGuiController(this));
+		nifty.fromXml("jadex3d/interface/BaseHud.xml", "default", new DefaultGuiController(this));
+		nifty.gotoScreen("hud");
 
 		guiViewPort.addProcessor(niftyDisplay);
 	}
@@ -839,19 +845,21 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		}
 	}
 
-	public Vector3Int getSelectedworldcoord() {
+	public Vector3Int getSelectedworldcoord()
+	{
 		return selectedworldcoord;
 	}
 
-	public void setSelectedworldcoord(Vector3Int selectedworldcoord) {
+	public void setSelectedworldcoord(Vector3Int selectedworldcoord)
+	{
 		this.selectedworldcoord = selectedworldcoord;
 	}
-	
+
 	public void setCanvassize(Dimension canvasSize)
 	{
 		this.canvassize = canvasSize;
 
-		
+
 	}
 
 	public Dimension getCanvassize()

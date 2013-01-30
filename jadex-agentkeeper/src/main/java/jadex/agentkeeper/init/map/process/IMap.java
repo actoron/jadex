@@ -42,7 +42,7 @@ public interface IMap {
 	public static final String IMP = "imp";
 	public static final String GOBLIN = "goblin";
 	public static final String WARLOCK = "warlock";
-	public static final String ORC = "orc";
+	public static final String TROLL = "troll";
 	
 	public static final String[] FIELD_TYPES = {DIRT_PATH, ROCK, GOLD, REINFORCED_WALL, GOLD2, CLAIMED_PATH,  GEMS, WATER, LAVA, HERO,  IMPENETRABLE_ROCK};
 	
@@ -50,7 +50,7 @@ public interface IMap {
 	
 	public static final String[] MOVE_TYPES = {DIRT_PATH, CLAIMED_PATH, GOLD2, LAVA, HERO, TREASURY, HATCHERY, LAIR, PORTAL, TRAININGROOM, LIBRARY, TORTURE, DUNGEONHEART};
 	
-	public static final String[] CREATURE_TYPES ={IMP, GOBLIN, WARLOCK, ORC};
+	public static final String[] CREATURE_TYPES ={IMP, GOBLIN, WARLOCK, TROLL};
 	
 	static final String[] BREAKABLE_FIELD = {ROCK, REINFORCED_WALL};
 	

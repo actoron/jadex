@@ -14,6 +14,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
@@ -45,7 +46,7 @@ public class MoveToGridSectorPlan
 
 	Vector2Double					myloc;
 	
-	ISpaceObject spaceObject;
+	private ISpaceObject spaceObject;
 
 	// -------- constructors --------
 
@@ -67,16 +68,19 @@ public class MoveToGridSectorPlan
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
-		Vector2Int target = goal.getTarget();
-		Vector2Double myloc = capa.getUpdatedPosition();
 		
 		spaceObject = capa.getMySpaceObject();
+		Vector2Int target = goal.getTarget();
+		Vector2Double myloc = (Vector2Double)spaceObject.getProperty(Space2D.PROPERTY_POSITION);
+		
+		
 
 		// TODO: refractor AStar-Search
-		astar = new AStarSearch(myloc, target, capa.getEnvironment(), true);
+		astar = new AStarSearch(myloc.copy(), target, capa.getEnvironment(), true);
 
 		if(astar.istErreichbar())
 		{
+
 			ArrayList<Vector2Int> path = astar.gibPfadInverted();
 
 			path_iterator = path.iterator();
@@ -102,13 +106,16 @@ public class MoveToGridSectorPlan
 	 */
 	private IFuture<Void> moveToNextSector(final Iterator<Vector2Int> it)
 	{
-		capa.getUpdatedPosition(); // Hack to Update the Belief-Position to
-									// Trigger the GoalTargetCondition
+
 
 		final Future<Void> ret = new Future<Void>();
 		if(it.hasNext())
 		{
 			Vector2Int nextTarget = it.next();
+			
+//			capa.getUpdatedPosition(); 
+			// Hack to Update the Belief-Position to
+			// Trigger the GoalTargetCondition
 
 			oneStepToTarget(nextTarget).addResultListener(new DelegationResultListener<Void>(ret)
 			{
@@ -139,6 +146,7 @@ public class MoveToGridSectorPlan
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, nextTarget);
 		props.put(MoveTask.PROPERTY_SPEED, capa.getMySpeed());
+		props.put(MoveTask.PROPERTY_AGENT, capa);
 
 		Object mtaskid = capa.getEnvironment().createObjectTask(MoveTask.PROPERTY_TYPENAME, props, capa.getMySpaceObject().getId());
 		capa.getEnvironment().addTaskListener(mtaskid, capa.getMySpaceObject().getId(), new ExceptionDelegationResultListener<Object, Void>(ret)

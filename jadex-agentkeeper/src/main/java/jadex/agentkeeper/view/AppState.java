@@ -94,6 +94,7 @@ public class AppState extends AbstractAppState
 	public void update(float tpf)
 	{
 		handler.updateHandler();
+		dl.setDirection(monkeyapp.getCamera().getDirection().setY(-0.018f));
 	}
 
 	public void updateInfoText(String selectedObject)
@@ -107,13 +108,17 @@ public class AppState extends AbstractAppState
 	public void setup()
 	{
 		dl = new DirectionalLight();
-		dl.setDirection(new Vector3f(-0.51f, -1.0f, -0.51f).normalizeLocal());
-		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.5f));
+//		dl.setDirection(new Vector3f(-0.51f, -1.0f, -0.51f).normalizeLocal());
+		
+//		dl.setDirection(new Vector3f(-0.07735026f, -0.97735026f, -0.07735026f));
+		dl.setDirection(new Vector3f(-0.57f, -0.01835026f, -0.57f));
+//		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.5f));
+		dl.setColor(ColorRGBA.White.multLocal(0.9f));
 		this.app.getRootNode().addLight(dl);
-
+		
 		AmbientLight al = new AmbientLight();
 		// al.setColor(new ColorRGBA(1.7f,2.2f,3.2f,1f));
-		al.setColor(ColorRGBA.White.mult(0.5f));
+		al.setColor(ColorRGBA.White.multLocal(0.4f));
 		this.app.getRootNode().addLight(al);
 	}
 

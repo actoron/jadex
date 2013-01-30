@@ -1,6 +1,9 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import jadex.extension.envsupport.environment.ISpaceController;
@@ -21,7 +24,6 @@ import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 
 
-
 /**
  * The Application that renders the 3d output for Jadex in the Jmonkey Engine it
  * get the refreshed Geometry and Static Objects from the Viewport
@@ -31,12 +33,13 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 public class MonkeyApp extends AMonkeyFunctions
 {
 
-	private boolean guiActive = false;
-	
-	private NodeQueue effectStack;
+	private boolean		guiActive	= false;
+
+	private NodeQueue	effectStack;
 
 
-	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath, ISpaceController spaceController)
+	public MonkeyApp(float dim, float appScaled, float spaceSize, boolean isGrid, boolean shader, String camera, String guiCreatorPath,
+			ISpaceController spaceController)
 	{
 		super(dim, appScaled, spaceSize, isGrid, shader, camera, guiCreatorPath, spaceController);
 		this.effectStack = new NodeQueue(10);
@@ -44,7 +47,7 @@ public class MonkeyApp extends AMonkeyFunctions
 
 	public void simpleInitApp()
 	{
-		
+
 		super.simpleInit();
 
 	}
@@ -53,7 +56,7 @@ public class MonkeyApp extends AMonkeyFunctions
 	public void simpleUpdate(float tpf)
 	{
 		super.simpleUpdateAbstract(tpf);
-		
+
 		/**
 		 * Update the Filter if necessary
 		 */
@@ -66,11 +69,11 @@ public class MonkeyApp extends AMonkeyFunctions
 
 
 		/**
-		 * Update the Batchnode 
+		 * Update the Batchnode
 		 */
 		if(!toDelete.isEmpty() || !toAdd.isEmpty())
 		{
-			
+
 			handleBatchNode();
 
 		}
@@ -78,36 +81,56 @@ public class MonkeyApp extends AMonkeyFunctions
 	}
 
 
+	private HashMap<String, ArrayList<String>>	nameMemory		= new HashMap<String, ArrayList<String>>();
+
+	private ArrayList<String>					tmpList			= new ArrayList<String>();
+
+	private ArrayList<String>					tmpListDelete	= new ArrayList<String>();
+
 	private void handleBatchNode()
 	{
 		if(!toAdd.isEmpty())
 		{
+
 			for(Spatial add : toAdd)
 			{
 				if(add instanceof Node)
 				{
 					Node addnode = (Node)add;
-					
+
+					tmpList.clear();
+
+					Node tmpNode = new Node(add.getName());
 					for(Spatial addchild : addnode.getChildren())
 					{
 						if(addchild instanceof Node)
 						{
+
 							if(addchild.getName().startsWith("Type: 6"))
 							{
 								addchild.removeFromParent();
 								addchild.setLocalTranslation(addnode.getLocalTranslation());
 								addchild.setLocalScale(addchild.getLocalScale().multLocal(add.getLocalScale()));
-								addchild.setName(add.getName());
-								staticbatchgeo.attachChild(addchild);
-
-
+								tmpNode.attachChild(addchild);
 							}
+
 
 						}
 					}
-					staticgeo.attachChild(addnode);
-					
-					
+
+					staticgeo.attachChild(add);
+
+
+					staticbatchgeo.attachChild(tmpNode);
+
+
+					if(!tmpList.isEmpty())
+					{
+						nameMemory.put(add.getName(), tmpList);
+					}
+					// staticgeo.attachChild(addnode);
+
+
 					if((Boolean)addnode.getUserData("hasEffect") == true)
 					{
 						startEffect(addnode);
@@ -127,24 +150,40 @@ public class MonkeyApp extends AMonkeyFunctions
 		{
 			for(String id : toDelete)
 			{
-				Spatial delete = staticbatchgeo.getChild(id);
+
 				staticgeo.detachChildNamed(id);
+				Spatial delete = staticbatchgeo.getChild(id);
+
 
 				if(delete != null)
 				{
 					if(delete instanceof Node)
 					{
+						
 						Node delnode = (Node)delete;
-						delnode.detachAllChildren();
+						
+						for(Spatial delspatial : delnode.getChildren())
+						{
+							if(delspatial instanceof Node)
+							{
+								((Node)delspatial).detachAllChildren();
+							}
+							
+							delspatial.removeFromParent();
+							
+						}
+						
+						
+						
+
 					}
+
+
 					staticbatchgeo.detachChild(delete);
 					delete.removeFromParent();
 
 				}
-				else
-				{
-					
-				}
+
 
 			}
 		}
@@ -154,11 +193,12 @@ public class MonkeyApp extends AMonkeyFunctions
 
 		toDelete.clear();
 		toAdd.clear();
-		
+
 	}
 
-	private void startEffect(Node addnode) {
-		
+	private void startEffect(Node addnode)
+	{
+
 		for(Spatial effectspatial : addnode.getChildren())
 		{
 			if(effectspatial instanceof Node)
@@ -166,8 +206,7 @@ public class MonkeyApp extends AMonkeyFunctions
 				Node effectnode = (Node)effectspatial;
 				if(effectnode.getName().startsWith("effectNode"))
 				{
-					
-					
+
 
 					for(Spatial effect : effectnode.getChildren())
 
@@ -177,20 +216,20 @@ public class MonkeyApp extends AMonkeyFunctions
 							ParticleEmitter tmpeffect = ((ParticleEmitter)effect);
 							tmpeffect.emitAllParticles();
 						}
-					
+
 					Node oldnode = effectStack.push(effectnode);
-					
-					if(oldnode!=null)
+
+					if(oldnode != null)
 					{
 						oldnode.removeFromParent();
 					}
-					
+
 				}
 
 
 			}
 		}
-		
+
 	}
 
 	public void setStaticGeometry(Node staticNode)
@@ -254,7 +293,6 @@ public class MonkeyApp extends AMonkeyFunctions
 	{
 		this.guiActive = guiActive;
 	}
-
 
 
 }

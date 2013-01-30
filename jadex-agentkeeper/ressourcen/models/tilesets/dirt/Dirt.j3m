@@ -6,9 +6,9 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Shininess : 127
         Specular : 1.0 1.0 1.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0
-        Ambient : 1.0 1.0 1.0 1.0
-        GlowColor : 1.0 1.0 1.0 1.0
-        VertexLighting : true
+        Ambient : 0.7 0.7 0.7 1.0
+        GlowColor : 0.0 0.0 0.0 1.0
+        VertexLighting : false
         UseMaterialColors : true
     }
      AdditionalRenderState {

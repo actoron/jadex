@@ -43,7 +43,7 @@ import jadex.micro.annotation.AgentCreated;
 
 
 })
-public abstract class AbstractBeingBDI
+public class AbstractBeingBDI
 {
 	/** The bdi agent. Automatically injected */
 	@Agent
@@ -123,7 +123,7 @@ public abstract class AbstractBeingBDI
 		 * The goal is achieved when the position of the cleaner is on the
 		 * target sector position.
 		 */
-		@GoalTargetCondition(events = "my_position")
+		@GoalTargetCondition(events = "myPosition")
 		public boolean checkTarget()
 		{
 			boolean ret = myPosition.equals(target);

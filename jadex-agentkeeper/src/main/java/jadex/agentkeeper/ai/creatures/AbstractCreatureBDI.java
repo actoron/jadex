@@ -8,7 +8,7 @@ import jadex.agentkeeper.ai.AbstractBeingBDI;
  * @author 7willuwe
  *
  */
-public abstract class AbstractCreatureBDI extends AbstractBeingBDI
+public class AbstractCreatureBDI extends AbstractBeingBDI
 {
 
 }

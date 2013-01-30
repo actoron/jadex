@@ -64,7 +64,7 @@
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
-				<env:objecttype name="gold2">
+				<env:objecttype name="golddroped">
 					<env:property name="status" class="String">"Nothing"</env:property>
 					<env:property name="locked" class="boolean">false</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
@@ -164,7 +164,7 @@
 					<env:property name="status" class="String">"Walk"
 					</env:property>
 				</env:objecttype>
-				<env:objecttype name="orc">
+				<env:objecttype name="troll">
 					<env:property name="position" />
 					<env:property name="geschlagen">false</env:property>
 					<env:property name="direction">0.0</env:property>
@@ -216,7 +216,7 @@
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Imp" objecttype="imp" createcomponent="true"/> 
 				<env:avatarmapping componenttype="Goblin" objecttype="goblin" createcomponent="true"/> 
-				<env:avatarmapping componenttype="Orc" objecttype="orc" createcomponent="true"/> 
+				<env:avatarmapping componenttype="Troll" objecttype="troll" createcomponent="true"/> 
 				<env:avatarmapping componenttype="Warlock" objecttype="warlock" createcomponent="true"/>
 <!-- 				<env:avatarmapping componenttype="SpielProzesse" objecttype="spielprozesse" createcomponent="true"/>  -->
 			</env:avatarmappings>
@@ -250,6 +250,13 @@
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 							modelpath="models/tilesets/dirt/Dirt_?.j3o"
 							materialpath="models/tilesets/dirt/Dirt.j3m">
+							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
+						</env:object3d>
+						
+						<env:object3d width="0.79998" height="1.0" depth="0.79998" x="0" y="0" z="0" 
+							modelpath="models/tilesets/DirtHigher.j3o" 
+							materialpath="models/tilesets/DirtPath.j3m"
+							hasLightMaterials="true">
 							<env:drawcondition>!$object.getProperty("clicked")</env:drawcondition>
 						</env:object3d>
 
@@ -325,7 +332,7 @@
 					<env:drawable3d objecttype="dirt_path" width="1.0" height="1.0" depth="1.0" isDynamic="false">
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/dirt/Dirt.j3o" 
-						materialpath="models/tilesets/dirt/Dirt.j3m"
+						materialpath="models/tilesets/DirtPath.j3m"
 						hasLightMaterials="true">
 						</env:object3d>
 						<env:effect x="0" y="1" z="0" predefinedid="debris01" startsize="2.5" endsize="2.5">
@@ -365,6 +372,11 @@
 						modelpath="models/buildings/treasury/GoldBag.j3o" 
 						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m"
 						rotation="rota" />
+						
+<!-- 						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0"  -->
+<!-- 						modelpath="models/props/gold/gold.j3o"  -->
+<!-- 						materialpath="models/props/gold/gold-gold.j3m" -->
+<!-- 						rotation="rota" /> -->
 						
 						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
 							modelpath="models/tilesets/buildings/border/Default_?.j3o"
@@ -537,7 +549,7 @@
 						</env:object3d>
 					</env:drawable3d>
 					
-					<env:drawable3d objecttype="orc" width="1"
+					<env:drawable3d objecttype="troll" width="1"
 						height="1" depth="1">
 						<env:object3d width="1" height="1" depth="1"
 							x="0" y="0" z="0"
@@ -569,19 +581,45 @@
 	<componenttypes>
 
 		<componenttype name="Imp" filename="jadex/agentkeeper/ai/creatures/imp/imp.agent.xml" />
-		<componenttype name="Goblin"
-			filename="ai/creatures/orc/OrcBDI.class" />
-					<componenttype name="Orc"
-			filename="ai/creatures/orc/OrcBDI.class" />
+		
+		<componenttype name="Goblin" filename="ai/creatures/goblin/GoblinBDI.class" />
+		<componenttype name="Troll" filename="ai/creatures/troll/TrollBDI.class" />
+		<componenttype name="Warlock" filename="ai/creatures/warlock/WarlockBDI.class" />
 			
-								<componenttype name="Warlock"
-			filename="ai/creatures/orc/OrcBDI.class" />
+<!-- 		<componenttype name="Goblin" filename="ai/AbstractBeingBDI.class" /> -->
+<!-- 		<componenttype name="Orc" filename="ai/AbstractBeingBDI.class" /> -->
+<!-- 		<componenttype name="Warlock" filename="ai/AbstractBeingBDI.class" /> -->
+			
 
 
 <!-- 		<componenttype name="SpielProzesse" -->
 <!-- 			filename="agentkeeper/SpielProzesseAgent.class" /> -->
 	</componenttypes>
 
+
+		<configuration name="Startmap">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace"
+					width="40" height="40">
+					<env:processes>
+						<env:process type="init">
+							<env:property name="mapfile">"level/startmap.map"
+							</env:property>
+						</env:process>
+					</env:processes>
+					<env:process type="genmana"></env:process>
+
+					<env:observers>
+						<env:observer name="world" dataview="view_all"
+							perspective="main">
+							
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+		
+		
 	<configurations>
 		<configuration name="Test map">
 			<extensions>
@@ -613,6 +651,7 @@
 							<env:property name="mapfile">"level/level1.map"
 							</env:property>
 						</env:process>
+						<env:process type="genmana"></env:process>
 					</env:processes>
 
 					<env:observers>
@@ -634,6 +673,7 @@
 							<env:property name="mapfile">"level/level2.map"
 							</env:property>
 						</env:process>
+						<env:process type="genmana"></env:process>
 					</env:processes>
 
 					<env:observers>
@@ -654,6 +694,7 @@
 							<env:property name="mapfile">"level/level3.map"
 							</env:property>
 						</env:process>
+						<env:process type="genmana"></env:process>
 					</env:processes>
 
 					<env:observers>
@@ -665,46 +706,8 @@
 			</extensions>
 		</configuration>
 		
-		<configuration name="Level 4">
-			<extensions>
-				<env:envspace name="mygc2dspace" type="gc2dspace"
-					width="25" height="100">
-					<env:processes>
-						<env:process type="init">
-							<env:property name="mapfile">"level/level4.map"
-							</env:property>
-						</env:process>
-					</env:processes>
 
-					<env:observers>
-						<env:observer name="world" dataview="view_all"
-							perspective="main">
-							
-						</env:observer>
-					</env:observers>
-				</env:envspace>
-			</extensions>
-		</configuration>
-			<configuration name="Megamap">
-			<extensions>
-				<env:envspace name="mygc2dspace" type="gc2dspace"
-					width="100" height="100">
-					<env:processes>
-						<env:process type="init">
-							<env:property name="mapfile">"level/megamap.map"
-							</env:property>
-						</env:process>
-					</env:processes>
 
-					<env:observers>
-						<env:observer name="world" dataview="view_all"
-							perspective="main">
-							
-						</env:observer>
-					</env:observers>
-				</env:envspace>
-			</extensions>
-		</configuration>
 
 	</configurations>
 

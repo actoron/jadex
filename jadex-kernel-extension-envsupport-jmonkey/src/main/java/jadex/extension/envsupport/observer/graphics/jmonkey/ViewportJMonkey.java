@@ -64,9 +64,7 @@ import com.jme3.water.SimpleWaterProcessor;
  * 
  * @author Flipflop
  */
-/**
- * @author 7willuwe
- */
+
 /**
  * @author 7willuwe
  */
@@ -240,7 +238,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 		{
 			rendering = true;
 			_app.enqueue(new MyCallAction(objectList, staticvisuals));
-//			EventQueue.invokeLater(renderFrame);
 		}
 	}
 

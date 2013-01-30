@@ -161,9 +161,9 @@ public class KeeperGuiController extends DefaultGuiController
 		TextRenderer warlockR = warlockT.getRenderer(TextRenderer.class);
 		warlockR.setText("" + creatureState.getCreatureCount(InitMapProcess.WARLOCK));
 
-		Element orcT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("orc_total");
+		Element orcT = this.app.getNiftyDisplay().getNifty().getCurrentScreen().findElementByName("troll_total");
 		TextRenderer orcR = orcT.getRenderer(TextRenderer.class);
-		orcR.setText("" + creatureState.getCreatureCount(InitMapProcess.ORC));
+		orcR.setText("" + creatureState.getCreatureCount(InitMapProcess.TROLL));
 
 	}
 

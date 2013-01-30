@@ -1,6 +1,7 @@
 package jadex.agentkeeper.ai.base;
 
-import jadex.agentkeeper.ai.creatures.orc.OrcBDI;
+import jadex.agentkeeper.ai.AbstractBeingBDI;
+import jadex.agentkeeper.ai.creatures.troll.TrollBDI;
 import jadex.agentkeeper.util.ISpaceStrings;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -38,6 +39,8 @@ public class MoveTask extends AbstractTask
 
 	/** The speed property of the moving object (units per second). */
 	public static final String	PROPERTY_SPEED			= "speed";
+	
+	public static final String	PROPERTY_AGENT			= "agent";
 
 
 	// -------- IObjectTask methods --------
@@ -58,6 +61,8 @@ public class MoveTask extends AbstractTask
 		double speed = ((Number)getProperty(PROPERTY_SPEED)).doubleValue();
 		
 		double gamespeed = (Double)space.getProperty(ISpaceStrings.GAME_SPEED);
+		
+		AbstractBeingBDI capa = (AbstractBeingBDI)getProperty(PROPERTY_AGENT);
 
 		double maxdist = progress * gamespeed * speed * 0.001;
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
@@ -76,7 +81,7 @@ public class MoveTask extends AbstractTask
 			newloc = (Vector2Double)(dist <= maxdist ? destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc));
 
 			((Space2D)space).setPosition(obj.getId(), newloc);
-			// capa.setMyPosition(new Vector2Double(newloc.getXAsDouble(),
+			 capa.setMyPosition(new Vector2Double(newloc.getXAsDouble(),newloc.getYAsDouble()));
 
 
 		}
