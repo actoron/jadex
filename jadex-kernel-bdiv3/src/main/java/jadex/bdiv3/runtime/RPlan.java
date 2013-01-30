@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
@@ -106,17 +107,30 @@ public class RPlan extends RElement
 	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
 	{
 		RPlan rplan = new RPlan(mplan, candidate);
-		Object bd = mplan.getBody();
+		MBody mbody = mplan.getBody();
 		
 		IPlanBody body = null;
-		if(bd instanceof MethodInfo)
+		if(mbody.getClazz()!=null)
 		{
-			Method mbody = ((MethodInfo)bd).getMethod(ia.getClassLoader());
-			body = new MethodPlanBody(ia, rplan, mbody);
+			body = new ClassPlanBody(ia, rplan, (Class<?>)mbody.getClazz().getType(ia.getClassLoader()));
 		}
-		else if(bd instanceof ClassInfo)
+		else if(mbody.getMethod()!=null)
 		{
-			body = new ClassPlanBody(ia, rplan, (Class<?>)((ClassInfo)bd).getType(ia.getClassLoader()));
+			Method met = mbody.getMethod().getMethod(ia.getClassLoader());
+			body = new MethodPlanBody(ia, rplan, met);
+		}
+		else if(mbody.getServiceName()!=null)
+		{
+			try
+			{
+				IServiceParameterMapper<Object> mapper = (IServiceParameterMapper<Object>)mbody.getMapperClass().getType(ia.getClassLoader()).newInstance();
+				Object plan = new ServiceCallPlan(ia, mbody.getServiceName(), mbody.getServiceMethodName(), mapper);
+				body = new ClassPlanBody(ia, rplan, plan);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 		
 		rplan.setBody(body);

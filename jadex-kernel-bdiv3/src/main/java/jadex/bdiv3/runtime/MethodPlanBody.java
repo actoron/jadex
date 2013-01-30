@@ -12,7 +12,6 @@ public class MethodPlanBody extends AbstractPlanBody
 	/** The method. */
 	protected Method body;
 	
-	
 	/**
 	 * 
 	 */

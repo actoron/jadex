@@ -1,9 +1,9 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.model.MPlan;
 import jadex.bridge.IInternalAccess;
 
 import java.lang.reflect.Field;
@@ -14,13 +14,14 @@ import java.lang.reflect.Method;
  */
 public class ClassPlanBody extends AbstractPlanBody
 {
-	/** The method. */
+	/** The body class. */
 	protected Class<?> body;
+	
+	/** The body instance. */
 	protected Object plan;
 	
 	/** The body method. */
 	protected Method bodymethod;
-	
 	
 	/**
 	 * 
@@ -29,21 +30,20 @@ public class ClassPlanBody extends AbstractPlanBody
 	{
 		super(ia, rplan);
 		this.body = body;
-		
-		Method[] ms = body.getDeclaredMethods();
-		for(Method m: ms)
-		{
-//			if(MicroClassReader.isAnnotationPresent(m, PlanBody.class, ia.getClassLoader()))
-			if(m.isAnnotationPresent(PlanBody.class))
-			{
-				bodymethod = m;
-				break;
-			}
-		}
-		if(bodymethod==null)
-		{
-			throw new RuntimeException("Plan has no body method: "+body);
-		}
+		bodymethod = ((MPlan)rplan.getModelElement()).getBody()
+			.getBodyMethod(body).getMethod(ia.getClassLoader());
+	}
+	
+	/**
+	 * 
+	 */
+	public ClassPlanBody(IInternalAccess ia, RPlan rplan, Object plan)
+	{
+		super(ia, rplan);
+		this.body = plan.getClass();
+		this.plan = plan;
+		bodymethod = ((MPlan)rplan.getModelElement()).getBody()
+			.getBodyMethod(plan.getClass()).getMethod(ia.getClassLoader());
 	}
 	
 	/**
@@ -53,8 +53,11 @@ public class ClassPlanBody extends AbstractPlanBody
 	{
 		try
 		{
-			// create plan class 
-			plan = body.newInstance();
+			// create plan  
+			if(plan==null)
+			{
+				plan = body.newInstance();
+			}
 			
 			// inject plan elements
 			Field[] fields = body.getDeclaredFields();

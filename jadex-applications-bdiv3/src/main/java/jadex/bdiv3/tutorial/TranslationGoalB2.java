@@ -37,7 +37,7 @@ public class TranslationGoalB2
 		return eword;
 	}
 	
-	public void setEword(String eword)
+	public void setEWord(String eword)
 	{
 		this.eword = eword;
 	}

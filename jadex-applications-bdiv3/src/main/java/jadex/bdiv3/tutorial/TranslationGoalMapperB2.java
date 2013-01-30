@@ -14,7 +14,7 @@ public class TranslationGoalMapperB2 implements IServiceParameterMapper<Translat
 	 */
 	public Object[] createServiceParameters(TranslationGoalB2 obj, Method m)
 	{
-		return new Object[]{obj.getGWord()};
+		return new Object[]{obj.getEWord()};
 	}
 	
 	/**
@@ -22,6 +22,6 @@ public class TranslationGoalMapperB2 implements IServiceParameterMapper<Translat
 	 */
 	public void handleServiceResult(TranslationGoalB2 obj, Method m, Object result)
 	{
-		obj.setEword((String)result);
+		obj.setGWord((String)result);
 	}
 }

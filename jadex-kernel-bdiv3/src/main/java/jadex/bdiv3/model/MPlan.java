@@ -10,7 +10,7 @@ public class MPlan extends MElement
 	protected MTrigger trigger;
 	
 	/** The plan body. */
-	protected Object body;
+	protected MBody body;
 	
 	/** The plan priority. */
 	protected int priority;
@@ -18,7 +18,7 @@ public class MPlan extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MPlan(String name, Object body, MTrigger trigger, int priority)
+	public MPlan(String name, MBody body, MTrigger trigger, int priority)
 	{
 		super(name);
 		this.body = body;
@@ -30,7 +30,7 @@ public class MPlan extends MElement
 	 *  Get the body.
 	 *  @return The body.
 	 */
-	public Object getBody()
+	public MBody getBody()
 	{
 		return body;
 	}
@@ -39,7 +39,7 @@ public class MPlan extends MElement
 	 *  Set the body.
 	 *  @param body The body to set.
 	 */
-	public void setBody(Object body)
+	public void setBody(MBody body)
 	{
 		this.body = body;
 	}

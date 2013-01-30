@@ -10,9 +10,11 @@ import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
@@ -21,6 +23,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.GoalDelegationHandler;
+import jadex.bdiv3.runtime.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -213,8 +216,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found plan: "+methods[i].getName());
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
-					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
-					MPlan mplan = new MPlan(methods[i].getName(), new jadex.bdiv3.model.MethodInfo(methods[i]), mtr, p.priority());
+					MPlan mplan = createMPlan(bdimodel, p, new MethodInfo(methods[i]), cl, pubs);
 					bdimodel.getCapability().addPlan(mplan);
 				}
 			}
@@ -225,10 +227,7 @@ public class BDIClassReader extends MicroClassReader
 				Plan[] plans = getAnnotation(clazz, Plans.class, cl).value();
 				for(Plan p: plans)
 				{
-					Body body = p.body();
-					MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
-					MPlan mplan = new MPlan(SReflect.getInnerClassName(body.value()), new ClassInfo(body.value().getName()), mtr, p.priority());
-//					MPlan mplan = new MPlan(SReflect.getInnerClassName(bodycl), new ClassInfo(bodycl.getName()), mtr, p.priority());
+					MPlan mplan = createMPlan(bdimodel, p, null, cl, pubs);
 					bdimodel.getCapability().addPlan(mplan);
 				}
 			}
@@ -392,7 +391,7 @@ public class BDIClassReader extends MicroClassReader
 			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null));
 		}
 		
-		// Create enhanced class if not already present.
+		// Create enhanced classes if not already present.
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		for(Class<?> agcl: agtcls)
 		{
@@ -447,14 +446,17 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MPlan createMPlan(BDIModel bdimodel, Plan p, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	protected MPlan createMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
 		MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
 		
 		Body body = p.body();
-		
-		MPlan mplan = new MPlan(SReflect.getInnerClassName(body.value()), new ClassInfo(body.value().getName()), mtr, p.priority());
-
+		ServicePlan sp = body.service();
+		ClassInfo ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
+		Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
+		MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
+			(Object.class.equals(sp.mapper())? null: new ClassInfo(sp.mapper().getName())));
+		MPlan mplan = new MPlan(SReflect.getInnerClassName(body.value()), mbody, mtr, p.priority());
 		
 		return mplan;
 	}

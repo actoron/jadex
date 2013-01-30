@@ -38,7 +38,6 @@ import javax.swing.SwingUtilities;
 	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapperB2.class))))
 public class UserB2BDI
 {
-
 	//-------- attributes --------
 
 	@Agent
@@ -77,7 +76,7 @@ public class UserB2BDI
 						{
 							public void resultAvailable(TranslationGoalB2 tg) 
 							{
-								tfg.setText(tg.toString());
+								tfg.setText(tg.getGWord());
 							}
 							
 							public void exceptionOccurred(Exception exception)
