@@ -8,6 +8,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Ambient : 1.0 1.0 0.8 1.0
         UseMaterialColors : true
         Shininess : 100.0
+        VertexLighting : true
         NormalMap : textures/props/DragonsBed_normal_1.png
     }
     AdditionalRenderState {

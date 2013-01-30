@@ -6,6 +6,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Ambient : 1.0 1.0 1.0 1.0
         GlowColor : 0.0 0.0 0.0 1.0
         UseMaterialColors : true
+        VertexLighting : true
         Shininess : 21.0
     }
     AdditionalRenderState {

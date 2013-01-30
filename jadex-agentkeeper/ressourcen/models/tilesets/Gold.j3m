@@ -8,6 +8,7 @@ Material My Material : Common/MatDefs/Light/Lighting.j3md {
         Diffuse : 1.0 1.0 1.0 1.0
         Ambient : 0.7 0.7 0.7 1.0
         GlowColor : 0.0 0.0 0.0 1.0
+        VertexLighting : true
         UseMaterialColors : true
 
      }

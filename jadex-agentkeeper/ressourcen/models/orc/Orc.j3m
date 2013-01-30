@@ -9,6 +9,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         ParallaxHeight : 0.05
         Ambient : 0.8285337 0.8285337 0.8285337 1.0
         Shininess : 21.0
+        VertexLighting : true
     }
     AdditionalRenderState {
       FaceCull Back
