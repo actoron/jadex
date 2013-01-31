@@ -2191,9 +2191,9 @@ public class MessageService extends BasicService implements IMessageService
 														// Todo: find out why 50MB sized messages are sent... 
 														if(((byte[])value).length>3000)
 														{
-															logger.severe("ContentException: "+((byte[])value).length+", "+fmessage);
 															byte[]	tmp = new byte[3000];
 															System.arraycopy(value, 0, tmp, 0, tmp.length);
+															logger.severe("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp));
 															value	= tmp;
 														}
 														e = new ContentException(new String((byte[])value), e);
