@@ -967,14 +967,17 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			
 			public void finished()
 			{
+				System.out.println("fin");
 			}
 			
 			public void resultAvailable(Collection<jadex.commons.ChangeEvent<Object>> result)
 			{
+				System.out.println("ra");
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 			}
 		});
 		

@@ -105,6 +105,9 @@ public class SecurityService implements ISecurityService
 	/** Determines if trusted lan was specified during creation. */
 	protected boolean argstrustedlan;
 	
+	/** The default message validity duration. */
+	protected long valdur;
+	
 	
 	/** The path to the keystore. */
 	protected String storepath;
@@ -145,7 +148,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(Boolean.TRUE, true, Boolean.FALSE, null, null, null, null);
+		this(Boolean.TRUE, true, Boolean.FALSE, null, null, null, null, null);
 	}
 
 	/**
@@ -154,15 +157,17 @@ public class SecurityService implements ISecurityService
 	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
 		String[] networknames, String[] networkpasses)
 	{
-		this(usepass, printpass, trustedlan, networknames, networkpasses, null, null);
+		this(usepass, printpass, trustedlan, networknames, networkpasses, null, null, null);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
 	public SecurityService(Boolean usepass, boolean printpass, Boolean trustedlan, 
-		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms, Map<String, Set<String>> namemap)
+		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms, 
+		Map<String, Set<String>> namemap, Long valdur)
 	{
+		this.valdur = valdur==null? 65536: valdur.longValue();
 		this.virtualsmap = namemap==null? new HashMap<String, Set<String>>(): namemap;
 		this.subscribers = new LinkedHashSet<SubscriptionIntermediateFuture<ChangeEvent<Object>>>();
 		this.platformpasses	= new LinkedHashMap<String, String>();
@@ -274,6 +279,9 @@ public class SecurityService implements ISecurityService
 													String kp = props.getStringProperty("keypass");
 													if(kp!=null && kp.length()>0)
 														keypass = kp;
+													long vd = props.getLongProperty("validityduration");
+													if(vd>0)
+														valdur = vd;
 													
 													if(!argsusepass)
 													{
@@ -343,6 +351,7 @@ public class SecurityService implements ISecurityService
 												public IFuture<Properties> execute(IInternalAccess ia)
 												{
 													Properties	ret	= new Properties();
+													ret.addProperty(new Property("validityduration", ""+valdur));
 													ret.addProperty(new Property("usepass", ""+usepass));
 													ret.addProperty(new Property("password", password));
 													ret.addProperty(new Property("selected_mechanism", ""+selmech));
@@ -563,6 +572,24 @@ public class SecurityService implements ISecurityService
 			publishEvent(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the validity duration.
+	 *  @return The validityduration.
+	 */
+	public long getValidityDuration()
+	{
+		return valdur;
+	}
+
+	/**
+	 *  Set the validity duration.
+	 *  @param validityduration The validityduration to set.
+	 */
+	public void setValidityDuration(long validityduration)
+	{
+		this.valdur = validityduration;
 	}
 
 	/**
@@ -873,7 +900,7 @@ public class SecurityService implements ISecurityService
 		long	timestamp	= System.currentTimeMillis();
 //		System.out.println("ts1: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
 //		timestamp = timestamp>>>16<<16; // New digest every minute
-		long vd = request.getValidityDuration()==0? 65536: request.getValidityDuration();
+		long vd = request.getValidityDuration()==0? getValidityDuration(): request.getValidityDuration();
 		int num = SUtil.log2(vd);
 		for(int i=0; i<num; i++)
 		{
@@ -1387,14 +1414,14 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(null);
 		
 		// Signal current state
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
-		ret.addIntermediateResult(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
 		
 		return ret;
 	}
