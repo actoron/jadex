@@ -179,16 +179,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	}
 	
 	//-------- normal --------
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture getChildren()
-	{
-		return getInterpreter().getAgentAdapter().getChildrenIdentifiers();
-	}
-	
+		
 	/**
 	 *  Create a subcomponent.
 	 *  @param component The instance info.

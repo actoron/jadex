@@ -78,13 +78,7 @@ public interface IExternalAccess //extends IRemotable
 	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step, long delay);
 	
 	//-------- normal --------
-	
-	/**
-	 *  Get the children (if any) component identifiers.
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildren();
-	
+		
 	/**
 	 *  Create a subcomponent.
 	 *  @param component The instance info.

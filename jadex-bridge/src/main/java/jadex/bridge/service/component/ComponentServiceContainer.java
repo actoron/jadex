@@ -443,49 +443,57 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
-		adapter.getChildrenIdentifiers().addResultListener(new IResultListener<IComponentIdentifier[]>()
+		if(cms!=null)
 		{
-			public void resultAvailable(IComponentIdentifier[] children)
+			cms.getChildren(adapter.getComponentIdentifier())
+				.addResultListener(new IResultListener<IComponentIdentifier[]>()
 			{
-				if(children!=null)
+				public void resultAvailable(IComponentIdentifier[] children)
 				{
-//					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
-					final IResultListener<IServiceProvider> lis = new CollectionResultListener<IServiceProvider>(
-						children.length, true, new DelegationResultListener<Collection<IServiceProvider>>(ret));
-					for(int i=0; i<children.length; i++)
+					if(children!=null)
 					{
-						if(cms!=null)
+	//					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
+						final IResultListener<IServiceProvider> lis = new CollectionResultListener<IServiceProvider>(
+							children.length, true, new DelegationResultListener<Collection<IServiceProvider>>(ret));
+						for(int i=0; i<children.length; i++)
 						{
-							cms.getExternalAccess(children[i]).addResultListener(new IResultListener<IExternalAccess>()
+							if(cms!=null)
 							{
-								public void resultAvailable(IExternalAccess exta)
+								cms.getExternalAccess(children[i]).addResultListener(new IResultListener<IExternalAccess>()
 								{
-									lis.resultAvailable(exta.getServiceProvider());
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									lis.exceptionOccurred(exception);
-								}
-							});
-						}
-						else
-						{
-							lis.exceptionOccurred(new ComponentTerminatedException(id));
+									public void resultAvailable(IExternalAccess exta)
+									{
+										lis.resultAvailable(exta.getServiceProvider());
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										lis.exceptionOccurred(exception);
+									}
+								});
+							}
+							else
+							{
+								lis.exceptionOccurred(new ComponentTerminatedException(id));
+							}
 						}
 					}
+					else
+					{
+						List<IServiceProvider>	res	= Collections.emptyList();
+						ret.setResult(res);
+					}
 				}
-				else
+				public void exceptionOccurred(Exception exception)
 				{
-					List<IServiceProvider>	res	= Collections.emptyList();
-					ret.setResult(res);
+					ret.setException(exception);
 				}
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+			});
+		}
+		else
+		{
+			ret.setException(new ComponentTerminatedException(id));			
+		}
 		
 		return ret;
 	}

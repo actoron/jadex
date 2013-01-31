@@ -107,15 +107,6 @@ public class ExternalAccess implements IExternalAccess
 //	}
 	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildren()
-	{
-		return adapter.getChildrenIdentifiers();
-	}
-	
-	/**
 	 *  Get the application component.
 	 */
 	public IServiceProvider getServiceProvider()

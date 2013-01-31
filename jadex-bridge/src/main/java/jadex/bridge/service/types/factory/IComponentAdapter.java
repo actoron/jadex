@@ -80,18 +80,6 @@ public interface IComponentAdapter
 	public IExternalAccess getParent();
 	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers();
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<Collection<IExternalAccess>> getChildrenAccesses();
-	
-	/**
 	 *  Get the exception.
 	 *  @return The exception.
 	 */

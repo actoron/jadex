@@ -692,52 +692,6 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	}
 	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getAgentAdapter().getChildrenAccesses();
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getAgentAdapter().getChildrenAccesses();
-		}
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getAgentAdapter().getChildrenIdentifiers();
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getAgentAdapter().getChildrenIdentifiers();
-		}
-	}
-	
-	/**
 	 *  Get the model of the component.
 	 *  @return	The model.
 	 */

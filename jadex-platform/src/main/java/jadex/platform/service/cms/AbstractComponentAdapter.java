@@ -18,13 +18,9 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -32,7 +28,6 @@ import jadex.commons.future.IResultListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -83,13 +78,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected boolean	dostep;
 	
 	/** The listener to be informed, when the requested step is finished. */
-	protected Future stepfuture;
+	protected Future<Void> stepfuture;
 	
 	/** The selected breakpoints (component will change to step mode, when a breakpoint is reached). */
-	protected Set	breakpoints;
-	
-	/** The breakpoint commands (executed, when a breakpoint triggers). */
-	protected ICommand[]	breakpointcommands;
+	protected Set<String>	breakpoints;
 	
 	//-------- external actions --------
 
@@ -99,7 +91,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */
-	protected List	ext_entries;
+	protected List<Runnable>	ext_entries;
 
 	/** The flag if external entries are forbidden. */
 	protected boolean ext_forbidden;
@@ -148,9 +140,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// Do not wake up until component instance is completely instantiated by factory
 		// (to avoid double execution between constructor and executor)
 		if(!instantiated)
+		{
 			return;
-//		System.err.println("wakeup: "+getComponentIdentifier());
-//		Thread.dumpStack();
+		}
 		
 		if(clock==null)
 		{
@@ -175,32 +167,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			wokenup	= true;
 			if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 				throw new ComponentTerminatedException(desc.getName());
-			
-			// Set processing state to ready if not running.
-//			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
-//			{
-//				getCMS().addResultListener(new DefaultResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
-//					}
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						// Might happen during platform init -> ignore
-//					}
-//				});				
-//			}
-//			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
-//			{
-//				getCMS().addResultListener(new DefaultResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
-//					}
-//				});				
-//			}
 			
 			// Resume execution of the component.
 			if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
@@ -230,11 +196,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			// todo: problem: loggers can cause memory leaks
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
-			
 			String name = getLoggerName(getComponentIdentifier());
-
-//			System.out.println("getLogger: "+name);
-			
 			logger = LogManager.getLogManager().getLogger(name);
 			
 			// if logger does not already exists, create it
@@ -263,15 +225,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 	public static String getLoggerName(IComponentIdentifier cid)
 	{
-		//String name = getComponentIdentifier().getLocalName();
-		//String name = getModel().getFullName()+"."+getComponentIdentifier().getLocalName();
 		// Prepend parent names for nested loggers.
 		String	name	= null;
 		for(; cid!=null; cid=cid.getParent())
 		{
 			name	= name==null ? cid.getLocalName() : cid.getLocalName() + "." +name;
 		}
-		// System.out.println("logname: "+name);
 		return name;
 	}
 	
@@ -292,8 +251,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		Level level = prop!=null? (Level)prop : logger.getParent()!=null ? logger.getParent().getLevel() : Level.SEVERE;
 		logger.setLevel(level);
 		
-//		System.out.println("set: "+logger.getName()+" "+level);
-
 		// if logger should use Handlers of parent (global) logger
 		// the global logger has a ConsoleHandler(Level:INFO) by default
 		prop = component.getProperty("logging.useParentHandlers");
@@ -353,7 +310,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			else if(SReflect.isIterable(prop))
 			{
-				for(Iterator it=SReflect.getIterator(prop); it.hasNext(); )
+				for(Iterator<?> it=SReflect.getIterator(prop); it.hasNext(); )
 				{
 					Object obj = it.next();
 					if(obj instanceof Handler)
@@ -389,117 +346,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public IExternalAccess getParent()
 	{
 		return parent;
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 * /
-	public IFuture getChildren()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getChildren(getComponentIdentifier()).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
-						IResultListener	crl	= new CollectionResultListener(childs.length, true, new DelegationResultListener(ret));
-						for(int i=0; !ret.isDone() && i<childs.length; i++)
-						{
-							cms.getExternalAccess(childs[i]).addResultListener(crl);
-						}
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}*/
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 * /
-	public IFuture getChildren()
-	{
-		final Future ret = new Future();
-		
-		getCMS().addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
-	}*/
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
-	{
-		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
-		
-		getCMS().addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				cms.getChildren(getComponentIdentifier()).addResultListener(
-					new DelegationResultListener<IComponentIdentifier[]>(ret));
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
-	{
-		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
-		
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService result)
-			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getChildren(getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier[] children)
-					{
-						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
-							new DelegationResultListener<Collection<IExternalAccess>>(ret));
-						for(int i=0; !ret.isDone() && i<children.length; i++)
-						{
-							cms.getExternalAccess(children[i]).addResultListener(crl);
-						}
-					}
-				});
-			}
-		});
-		
-		return ret;
 	}
 	
 	/**
@@ -651,7 +497,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 										componentthread	= Thread.currentThread();
 										ext_forbidden	= true;
 										if(ext_entries==null)
-											ext_entries	= new ArrayList();
+											ext_entries	= new ArrayList<Runnable>();
 										ext_entries.add(laststep);
 										executeExternalEntries(true);
 										ext_forbidden	= true;
@@ -696,7 +542,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  (Called from message transport).
 	 *  (Is it ok to call on external thread?).
 	 */
-	public void	receiveMessage(Map message, MessageType type)
+	public void	receiveMessage(Map<String, Object> message, MessageType type)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
 			throw new ComponentTerminatedException(desc.getName());
@@ -728,7 +574,74 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	// for testing double execution.
 	boolean executing;
-//	Exception	rte;
+	
+//	/**
+//	 *  Make component ready for an execution step.
+//	 *  @return True, when component can be executed.
+//	 */
+//	protected boolean	prepareExecution()
+//	{
+//		// Note: wakeup() can be called from arbitrary threads (even when the
+//		// component itself is currently running. I.e. it cannot be ensured easily
+//		// that an execution task is enqueued and the component has terminated
+//		// meanwhile.
+//		boolean	ret	= !IComponentDescription.STATE_TERMINATED.equals(desc.getState())
+//			&& exception==null;
+//		
+//		if(ret)
+//		{
+//			if(executing)
+//			{
+//				System.err.println(getComponentIdentifier()+": double execution");
+//				new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+//			}
+//			executing	= true;
+//			wokenup	= false;
+//					
+//			// Remember execution thread.
+//			this.componentthread	= Thread.currentThread();
+//			IComponentIdentifier.LOCAL.set(getComponentIdentifier());
+//			IComponentAdapter.LOCAL.set(this);
+//			
+//			ClassLoader	cl	= componentthread.getContextClassLoader();
+//			componentthread.setContextClassLoader(component.getClassLoader());
+//	
+//			// Copy actions from external threads into the state.
+//			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+//			boolean	extexecuted	= executeExternalEntries(false);
+//				
+//			// Suspend when breakpoint is triggered.
+//			// Necessary because component wakeup could be called anytime even if is at breakpoint..
+//			boolean	breakpoint_triggered	= false;
+//			if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+//			{
+//				if(component.isAtBreakpoint(desc.getBreakpoints()))
+//				{
+//					breakpoint_triggered	= true;
+//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
+//					{
+//						public void resultAvailable(IComponentManagementService cms)
+//						{
+//							cms.suspendComponent(desc.getName());
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							if(!(exception instanceof ComponentTerminatedException))
+//							{
+//								super.exceptionOccurred(exception);
+//							}
+//						}
+//					});
+//				}
+//			}
+//			
+//			if(!breakpoint_triggered && !extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
+//			{
+//				try
+//				{
+//		return ret;
+//	}
 
 	/**
 	 *  Executable code for running the component
@@ -736,31 +649,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
-//		synchronized(AsyncExecutionService.DEBUG)
-//		{
-//			AsyncExecutionService.DEBUG.put(this, "adapter execute()");
-//		}
-		
-//		if(getComponentIdentifier().getLocalName().indexOf("Alex")!=-1)
-//			System.out.println("entering exe: "+getComponentIdentifier());
-		
 		if(executing)
 		{
 			System.err.println(getComponentIdentifier()+": double execution");
-//			List	debug	= (List)AsyncExecutionService.DEBUG.getCollection(this);
-//			for(int i=0; i<debug.size(); i++)
-//				System.err.println(getComponentIdentifier()+": "+debug.get(i));
-//			rte.printStackTrace();
 			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
 		}
-//		rte	= new DebugException("executing: "+getComponentIdentifier());
 		executing	= true;
 		wokenup	= false;	
 		
-//		if(instantiated && Future.STACK.get()!=null)
-//		{
-//			System.out.println("futurestack in adapter!");
-//		}
 		// Note: wakeup() can be called from arbitrary threads (even when the
 		// component itself is currently running. I.e. it cannot be ensured easily
 		// that an execution task is enqueued and the component has terminated
@@ -779,21 +675,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			ClassLoader	cl	= componentthread.getContextClassLoader();
 			componentthread.setContextClassLoader(component.getClassLoader());
 	
-//			getCMS().addResultListener(new DefaultResultListener()
-//			{
-//				public void resultAvailable(Object result)
-//				{
-//					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					// CMS may be null during platform init
-//					if(!(exception instanceof ServiceNotFoundException))
-//						super.exceptionOccurred(exception);
-//				}
-//			});
-			
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 			boolean	extexecuted	= executeExternalEntries(false);
@@ -844,7 +725,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					dostep	= false;
 					if(stepfuture!=null)
 					{
-						stepfuture.setResult(desc);
+						stepfuture.setResult(null);
 					}
 				}
 				
@@ -1078,7 +959,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			else
 			{
 				if(ext_entries==null)
-					ext_entries	= new ArrayList();
+					ext_entries	= new ArrayList<Runnable>();
 				ext_entries.add(action);
 			}
 		}
@@ -1101,9 +982,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Set the step mode.
 	 */
-	public IFuture doStep()
+	public IFuture<Void> doStep()
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
 			ret.setException(new ComponentTerminatedException(desc.getName()));
 		else if(dostep)

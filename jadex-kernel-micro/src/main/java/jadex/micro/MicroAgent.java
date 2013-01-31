@@ -710,24 +710,6 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
-	{
-		return interpreter.getAgentAdapter().getChildrenAccesses();
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
-	{
-		return interpreter.getAgentAdapter().getChildrenIdentifiers();
-	}
-	
-	/**
 	 *  Kill the component.
 	 */
 	public IFuture<Map<String, Object>> killComponent()

@@ -2,12 +2,18 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
@@ -124,5 +130,38 @@ public class DependendServicesAgent extends MicroAgent
         
         return new Future<Void>(); // never kill?
     }
+
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
+	{
+		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
+		
+		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				cms.getChildren(getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier[] children)
+					{
+						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+							new DelegationResultListener<Collection<IExternalAccess>>(ret));
+						for(int i=0; !ret.isDone() && i<children.length; i++)
+						{
+							cms.getExternalAccess(children[i]).addResultListener(crl);
+						}
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
 }
 

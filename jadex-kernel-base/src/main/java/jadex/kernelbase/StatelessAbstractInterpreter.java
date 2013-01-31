@@ -1753,34 +1753,45 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		else
 		{
 			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new DelegationResultListener(ret)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(final IComponentManagementService cms)
 				{
-					IComponentManagementService cms = (IComponentManagementService)result;
 					// Can use the parent resource identifier as child must depend on parent
-					cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(createResultListener(new DelegationResultListener(ret)
+					cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(createResultListener(
+						new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier[]>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IModelInfo model)
 						{
-							IModelInfo model = (IModelInfo)result;
 							final String modelname = model.getFullName();
 						
-							getChildrenAccesses().addResultListener(createResultListener(new DelegationResultListener(ret)
+							final Future<Collection<IExternalAccess>>	childaccesses	= new Future<Collection<IExternalAccess>>();
+							cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(IComponentIdentifier[] children)
 								{
-									Collection col = (Collection)result;
-									List res = new ArrayList();
-									for(Iterator it=col.iterator(); it.hasNext(); )
+									IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+										new DelegationResultListener<Collection<IExternalAccess>>(childaccesses));
+									for(int i=0; !ret.isDone() && i<children.length; i++)
 									{
-										IExternalAccess subcomp = (IExternalAccess)it.next();
+										cms.getExternalAccess(children[i]).addResultListener(crl);
+									}
+								}
+							});
+							childaccesses.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, IComponentIdentifier[]>(ret)
+							{
+								public void customResultAvailable(Collection<IExternalAccess> col)
+								{
+									List<IComponentIdentifier> res = new ArrayList<IComponentIdentifier>();
+									for(Iterator<IExternalAccess> it=col.iterator(); it.hasNext(); )
+									{
+										IExternalAccess subcomp = it.next();
 										if(modelname.equals(subcomp.getModel().getFullName()))
 										{
 											res.add(subcomp.getComponentIdentifier());
 										}
 									}
-									super.customResultAvailable((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
+									ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
 								}
 							}));
 						}
@@ -1790,24 +1801,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
-	{
-		return getComponentAdapter().getChildrenIdentifiers();
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
-	{
-		return getComponentAdapter().getChildrenAccesses();
 	}
 	
 	/**

@@ -10,9 +10,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collection;
@@ -51,7 +54,7 @@ public class AwarenessManagementAgentHelper
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future<Void> ret = new Future<Void>();
-				ia.getChildrenAccesses().addResultListener(
+				getChildrenAccesses().addResultListener(
 						ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
 						{
 							public void customResultAvailable(Collection<IExternalAccess> subs)
@@ -184,7 +187,7 @@ public class AwarenessManagementAgentHelper
 			{
 				final Future<Set<String>> ret = new Future<Set<String>>();
 
-				ia.getChildrenAccesses().addResultListener(
+				getChildrenAccesses().addResultListener(
 						ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
 						{
 							public void customResultAvailable(Collection<IExternalAccess> result)
@@ -269,5 +272,38 @@ public class AwarenessManagementAgentHelper
 				return ret;
 			}
 		});
+	}
+
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
+	{
+		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
+		
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				cms.getChildren(component.getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier[] children)
+					{
+						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+							new DelegationResultListener<Collection<IExternalAccess>>(ret));
+						for(int i=0; !ret.isDone() && i<children.length; i++)
+						{
+							cms.getExternalAccess(children[i]).addResultListener(crl);
+						}
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 }

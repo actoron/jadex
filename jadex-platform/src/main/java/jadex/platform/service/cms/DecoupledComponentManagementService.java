@@ -226,11 +226,11 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	/**
 	 *  Do a step.
 	 */
-	public IFuture doStep(IComponentAdapter adapter)
+	public IFuture<Void> doStep(IComponentAdapter adapter)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		((StandaloneComponentAdapter)adapter).doStep()
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;
 	}
 	
