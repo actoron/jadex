@@ -5,6 +5,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScre
 
 import java.util.ArrayList;
 
+import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
 
 import de.lessvoid.nifty.screen.ScreenController;
@@ -14,7 +15,7 @@ public interface ICustomStateCreator
 
 	ScreenController getScreenController();
 	
-	AppState getCustomAppState();
+	ArrayList<AbstractAppState> getCustomAppStates();
 	
 	ArrayList<NiftyScreen> getNiftyScreens();
 }

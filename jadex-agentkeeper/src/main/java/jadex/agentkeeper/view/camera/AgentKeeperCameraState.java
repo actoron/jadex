@@ -1,4 +1,4 @@
-package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera;
+package jadex.agentkeeper.view.camera;
 
 import java.awt.Dimension;
 
@@ -28,7 +28,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.Arrow;
 
 
-public class IsoCameraState extends AbstractAppState
+public class AgentKeeperCameraState extends AbstractAppState
 {
 
 	private MonkeyApp		app;
@@ -54,7 +54,7 @@ public class IsoCameraState extends AbstractAppState
 	private Node			camNode;
 
 
-	private IsoCamera		isoCam;
+	private AgentKeeperMainCamera		mainCam;
 
 	private Camera			cam_map;
 
@@ -175,8 +175,8 @@ public class IsoCameraState extends AbstractAppState
 
 		app.getFlyByCamera().setEnabled(false);
 
-		this.isoCam = new IsoCamera(cam, inputManager, app);
-		camNode = isoCam.getCamNode();
+		this.mainCam = new AgentKeeperMainCamera(cam, 50, inputManager, app);
+		camNode = mainCam.getCamNode();
 		rootNode.attachChild(camNode);
 
 		cam_map = new Camera(150, 150);
@@ -194,8 +194,8 @@ public class IsoCameraState extends AbstractAppState
 		view_map.setBackgroundColor(ColorRGBA.White);
 
 		cam_map.update();
-		
-		
+
+
 	}
 
 
@@ -205,7 +205,7 @@ public class IsoCameraState extends AbstractAppState
 		Geometry arrowOne = MonkeyHelper.giveArrow(ColorRGBA.Blue, 20, Vector3f.UNIT_X.mult(100), assetManager);
 		vectorNode.attachChild(arrowOne);
 		vectorNode.setLocalTranslation(cam.getLocation());
-//		rootNode.attachChild(vectorNode);
+		// rootNode.attachChild(vectorNode);
 	}
 
 	public void update(float tpf)
@@ -217,6 +217,7 @@ public class IsoCameraState extends AbstractAppState
 			cam_map.resize(150, 150, true);
 
 		}
+		
 		Vector3f dir = cam.getDirection();
 		vectorNode.lookAt(dir, Vector3f.UNIT_Y);
 		dir.setY(-100);
@@ -226,7 +227,6 @@ public class IsoCameraState extends AbstractAppState
 
 		// cam_map.setLocation(loc);
 
-		
 
 	}
 
@@ -234,23 +234,23 @@ public class IsoCameraState extends AbstractAppState
 	{
 
 		// Moving
-		inputManager.addMapping(mappings[0], Triggers.rightTrigger);
-		inputManager.addMapping(mappings[1], Triggers.leftTrigger);
-		inputManager.addMapping(mappings[2], Triggers.upTrigger);
-		inputManager.addMapping(mappings[3], Triggers.downTrigger);
-		inputManager.addMapping(mappings[0], Triggers.rights);
-		inputManager.addMapping(mappings[1], Triggers.lefts);
-		inputManager.addMapping(mappings[2], Triggers.ups);
-		inputManager.addMapping(mappings[3], Triggers.downs);
+		inputManager.addMapping(mappings[0], CameraTriggers.rightTrigger);
+		inputManager.addMapping(mappings[1], CameraTriggers.leftTrigger);
+		inputManager.addMapping(mappings[2], CameraTriggers.upTrigger);
+		inputManager.addMapping(mappings[3], CameraTriggers.downTrigger);
+		inputManager.addMapping(mappings[0], CameraTriggers.rights);
+		inputManager.addMapping(mappings[1], CameraTriggers.lefts);
+		inputManager.addMapping(mappings[2], CameraTriggers.ups);
+		inputManager.addMapping(mappings[3], CameraTriggers.downs);
 
 
-		inputManager.addMapping(mouseMovement, Triggers.downsmouse);
-		inputManager.addMapping(mouseMovement, Triggers.upsmouse);
-		inputManager.addMapping(mouseMovement, Triggers.leftsmouse);
-		inputManager.addMapping(mouseMovement, Triggers.rightsmouse);
+		inputManager.addMapping(mouseMovement, CameraTriggers.downsmouse);
+		inputManager.addMapping(mouseMovement, CameraTriggers.upsmouse);
+		inputManager.addMapping(mouseMovement, CameraTriggers.leftsmouse);
+		inputManager.addMapping(mouseMovement, CameraTriggers.rightsmouse);
 
 
-		inputManager.addMapping("rotate", Triggers.toggleRotate);
+		inputManager.addMapping("rotate", CameraTriggers.toggleRotate);
 
 
 	}
@@ -267,11 +267,11 @@ public class IsoCameraState extends AbstractAppState
 				{
 					if(keyPressed)
 					{
-						isoCam.setRotating(true);
+						mainCam.setRotating(true);
 					}
 					else
 					{
-						isoCam.setRotating(false);
+						mainCam.setRotating(false);
 					}
 				}
 			}
@@ -317,7 +317,7 @@ public class IsoCameraState extends AbstractAppState
 				{
 					direction.addLocal(camDir.negate()).normalizeLocal();
 				}
-				camNode.setLocalTranslation(camNode.getLocalTranslation().addLocal(direction.multLocal(isoCam.getMoveSpeed() * tpf)));
+				camNode.setLocalTranslation(camNode.getLocalTranslation().addLocal(direction.multLocal(mainCam.getMoveSpeed() * tpf)));
 
 			}
 

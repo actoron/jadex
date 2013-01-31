@@ -29,7 +29,7 @@
 				</excludes>
 			</resource>
 			<resource>
-				<directory>ressourcen</directory>
+				<directory>src/main/assets</directory>
 				<excludes>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
@@ -45,15 +45,11 @@
 			<version>${jadex.version}</version>
 		</dependency>
 		
-		<!-- Webservice extension (enable if needed) -->
-		<!--
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-extension-webservice</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
-		-->
-
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-agentkeeper-assets</artifactId> -->
+<!-- 			<version>${jadex.version}</version> -->
+<!-- 		</dependency> -->
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

@@ -27,6 +27,7 @@ import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
+import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.Environment;
@@ -231,11 +232,11 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			cameraState = new DefaultCameraState();
 			stateManager.attach(cameraState);
 		}
-		else if(cameraSelection.equals("Iso"))
-		{
-			IsoCameraState isoState = new IsoCameraState();
-			stateManager.attach(isoState);
-		}
+//		else if(cameraSelection.equals("Iso"))
+//		{
+//			IsoCameraState isoState = new IsoCameraState();
+//			stateManager.attach(isoState);
+//		}
 
 
 	}
@@ -364,9 +365,13 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 				nifty.gotoScreen(startScreen.getName());
 
 				// TODO: extra class
-				if(customCreator.getCustomAppState() != null)
+				if(!customCreator.getCustomAppStates().isEmpty())
 				{
-					stateManager.attach(customCreator.getCustomAppState());
+					for(AbstractAppState state : customCreator.getCustomAppStates())
+					{
+						stateManager.attach(state);
+					}
+					
 				}
 
 			}

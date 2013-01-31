@@ -1,7 +1,7 @@
 package jadex.agentkeeper.view.selection;
 
 import jadex.agentkeeper.game.userinput.UserEingabenManager;
-import jadex.agentkeeper.view.AppState;
+import jadex.agentkeeper.view.GeneralAppState;
 
 import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;

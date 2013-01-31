@@ -45,7 +45,7 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
  * @author Philip Willuweit p.willuweit@gmx.de
  *
  */
-public class AppState extends AbstractAppState
+public class GeneralAppState extends AbstractAppState
 {
 
 	private MonkeyApp			app;

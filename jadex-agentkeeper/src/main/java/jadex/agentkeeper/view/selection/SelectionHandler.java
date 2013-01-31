@@ -1,7 +1,7 @@
 package jadex.agentkeeper.view.selection;
 
 import jadex.agentkeeper.init.map.process.InitMapProcess;
-import jadex.agentkeeper.view.AppState;
+import jadex.agentkeeper.view.GeneralAppState;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
@@ -26,7 +26,7 @@ public class SelectionHandler
 {
 	private MonkeyApp						app;
 
-	private AppState					mystate;
+	private GeneralAppState					mystate;
 
 	private float							appScaled;
 
@@ -52,7 +52,7 @@ public class SelectionHandler
 	private SelectionHandlingKeyListener	selectionListener;
 
 
-	public SelectionHandler(MonkeyApp app, AppState mystate)
+	public SelectionHandler(MonkeyApp app, GeneralAppState mystate)
 	{
 		this.app = app;
 		this.mystate = mystate;

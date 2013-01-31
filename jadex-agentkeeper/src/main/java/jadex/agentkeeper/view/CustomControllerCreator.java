@@ -3,8 +3,10 @@ package jadex.agentkeeper.view;
 import java.util.ArrayList;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AbstractAppState;
 
 import de.lessvoid.nifty.screen.ScreenController;
+import jadex.agentkeeper.view.camera.AgentKeeperCameraState;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
@@ -19,11 +21,16 @@ public class CustomControllerCreator implements ICustomStateCreator
 {
 	KeeperGuiController		controller;
 	
-	AppState customAppState;
+	GeneralAppState generalAppState;
+	
+	AgentKeeperCameraState cameraState;
+	
 
 	SimpleApplication		app;
 
 	ArrayList<NiftyScreen>	niftyScreens = new ArrayList<NiftyScreen>();
+	
+	ArrayList<AbstractAppState> appStates = new ArrayList<AbstractAppState>();
 
 	private NiftyScreen		screen1 = new NiftyScreen("hud", "gui/DungeonHud.xml", true);
 
@@ -33,7 +40,10 @@ public class CustomControllerCreator implements ICustomStateCreator
 	{
 		this.app = app;
 		this.controller = new KeeperGuiController(app, spaceController);
-		this.customAppState = new AppState();
+		this.generalAppState = new GeneralAppState();
+		this.cameraState = new AgentKeeperCameraState();
+		appStates.add(generalAppState);
+		appStates.add(cameraState);
 		this.niftyScreens.add(screen1);
 		this.niftyScreens.add(screen2);
 	}
@@ -53,14 +63,10 @@ public class CustomControllerCreator implements ICustomStateCreator
 		this.niftyScreens = niftyScreens;
 	}
 
-	public AppState getCustomAppState()
+	public ArrayList<AbstractAppState> getCustomAppStates()
 	{
-		return customAppState;
+		return appStates;
 	}
 
-	public void setCustomAppState(AppState customAppState)
-	{
-		this.customAppState = customAppState;
-	}
 
 }
