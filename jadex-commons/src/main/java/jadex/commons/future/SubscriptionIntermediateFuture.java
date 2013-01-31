@@ -41,7 +41,6 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	{
 		super(terminate);
 		this.storeforfirst = true;
-//		this.intermediate = true;
 	}
 	
 	//-------- methods --------
@@ -57,7 +56,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 			super.addResult(result);
 	}
 	
-	 /**
+	/**
      *  Add a result listener.
      *  @param listsner The listener.
      */

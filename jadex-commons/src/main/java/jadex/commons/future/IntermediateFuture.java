@@ -94,14 +94,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         		}
         	}
 	   	
-        	intermediate = true;
-
         	addResult(result);
         	
-//			if(results==null)
-//				results	= new ArrayList<E>();
-//			results.add(result);
-			
 //			if(listener instanceof IIntermediateResultListener)
 //			{
 //				scheduleNotification(listener, true, result);
@@ -128,6 +122,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 	 */
 	protected void addResult(E result)
 	{
+      	intermediate = true;
 		if(results==null)
 			results	= new ArrayList<E>();
 		results.add(result);
@@ -149,12 +144,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         	}
         	else
         	{
-        		intermediate = true;
-        		
         		addResult(result);
-//    			if(results==null)
-//    				results	= new ArrayList<E>();
-//    			results.add(result);
     			
     			if(listeners!=null)
     			{
@@ -305,6 +295,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	{
     		if(intermediate && listener instanceof IIntermediateResultListener)
     		{
+    			if(results==null)
+    				System.out.println("nuup: "+hashCode());
     			Object[]	inter = results.toArray();
 	    		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
 	    		for(int i=0; i<inter.length; i++)

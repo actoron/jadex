@@ -1410,6 +1410,7 @@ public class SecurityService implements ISecurityService
 			}
 		});
 		subscribers.add(ret);
+
 		// signal with null subscription done
 		ret.addIntermediateResultIfUndone(null);
 		
@@ -1422,6 +1423,27 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+
+//		component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+//		{
+//			public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+//			{
+//				// signal with null subscription done
+//				ret.addIntermediateResultIfUndone(null);
+//				
+//				// Signal current state
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
+//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+//
+//				return IFuture.DONE;
+//			}
+//		}, 1000);
 		
 		return ret;
 	}

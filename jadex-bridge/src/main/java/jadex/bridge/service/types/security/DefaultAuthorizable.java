@@ -47,8 +47,8 @@ public class DefaultAuthorizable implements IAuthorizable
 	}
 	
 	/**
-	 *  Get the validityDuration.
-	 *  @return The validityDuration.
+	 *  Get the validity duration (in millis).
+	 *  @return The validity duration (in millis).
 	 */
 	public long getValidityDuration()
 	{
@@ -56,12 +56,13 @@ public class DefaultAuthorizable implements IAuthorizable
 	}
 
 	/**
-	 *  Set the validityDuration.
-	 *  @param validityDuration The validityDuration to set.
+	 *  Set the validity duration (in millis).
+	 *  Will be set to its log2 value. 
+	 *  @param dur The validity duration to set (in millis).
 	 */
-	public void setValidityDuration(long validityDuration)
+	public void setValidityDuration(long dur)
 	{
-		this.dur = validityDuration;
+		this.dur = dur;
 	}
 
 	/**

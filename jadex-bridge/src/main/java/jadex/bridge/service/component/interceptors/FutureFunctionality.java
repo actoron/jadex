@@ -310,7 +310,6 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 */
 	public DelegatingSubscriptionIntermediateDelegationFuture(FutureFunctionality func)
 	{
-		super();
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -321,7 +320,6 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 */
 	public DelegatingSubscriptionIntermediateDelegationFuture(ISubscriptionIntermediateFuture<?> src, FutureFunctionality func)
 	{
-		super();
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -528,7 +526,6 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	 */
 	public DelegatingTerminableIntermediateDelegationFuture(FutureFunctionality func)
 	{
-		super();
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -539,7 +536,6 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	 */
 	public DelegatingTerminableIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src, FutureFunctionality func)
 	{
-		super();
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
@@ -744,7 +740,6 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	 */
 	public DelegatingTerminableDelegationFuture(FutureFunctionality func)
 	{
-		super();
 		this.func = func;
 	}
 	
