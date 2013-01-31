@@ -28,6 +28,8 @@ public class GenerateManaProcess extends SimplePropertyObject implements ISpaceP
 	/** The time that has passed according to the environment executor. */
 	private long				progress;
 
+	private double				onePerSecondDelta;
+
 	public void start(IClockService clock, IEnvironmentSpace space)
 	{
 		this.environment = (Grid2D)space;
@@ -49,7 +51,7 @@ public class GenerateManaProcess extends SimplePropertyObject implements ISpaceP
 
 	private void updateMana()
 	{
-		double onePerSecondDelta = progress * 0.001;
+
 		playerState.setMana((playerState.getMana() + (onePerSecondDelta * 0.1f * playerState.getClaimedSectors())));
 	}
 
@@ -58,6 +60,7 @@ public class GenerateManaProcess extends SimplePropertyObject implements ISpaceP
 		long currenttime = clock.getTime();
 		this.progress = currenttime - timestamp;
 		this.timestamp = currenttime;
+		onePerSecondDelta = progress * 0.001;
 
 	}
 
