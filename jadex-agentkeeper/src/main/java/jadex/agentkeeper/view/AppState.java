@@ -24,6 +24,7 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
@@ -95,6 +96,10 @@ public class AppState extends AbstractAppState
 	{
 		handler.updateHandler();
 		dl.setDirection(monkeyapp.getCamera().getDirection().setY(-0.018f));
+		
+
+		
+		
 	}
 
 	public void updateInfoText(String selectedObject)
@@ -108,10 +113,11 @@ public class AppState extends AbstractAppState
 	public void setup()
 	{
 		dl = new DirectionalLight();
+		dl.setName("sun");
 //		dl.setDirection(new Vector3f(-0.51f, -1.0f, -0.51f).normalizeLocal());
 		
 //		dl.setDirection(new Vector3f(-0.07735026f, -0.97735026f, -0.07735026f));
-		dl.setDirection(new Vector3f(-0.57f, -0.01835026f, -0.57f));
+		dl.setDirection(new Vector3f(-0.57f, -0.01835026f, -0.57f).normalizeLocal());
 //		dl.setColor(new ColorRGBA(0.5f, 0.4f, 0.4f, 1f).multLocal(0.5f));
 		dl.setColor(ColorRGBA.White.multLocal(0.9f));
 		this.app.getRootNode().addLight(dl);

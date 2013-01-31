@@ -15,11 +15,15 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 
 
 public class IsoCameraState extends AbstractAppState
@@ -46,8 +50,11 @@ public class IsoCameraState extends AbstractAppState
 	private String			cameraSelection;
 
 	private Node			camNode;
+	
 
 	private IsoCamera isoCam;
+	
+	private Camera cam_map;
 	
 	private String[] mappings = new String[]{"+X", "-X", "+Y", "-Y"};
 	private String mouseMovement = "mousemovement";
@@ -167,27 +174,61 @@ public class IsoCameraState extends AbstractAppState
 		
 		
 		
-		 Camera cam_map = cam.clone();
-		 cam.setViewPort( 0.15f , 1.0f , 0.15f , 1.0f );
+		 cam_map = new Camera(150,150);
+		 cam_map.setAxes(new Vector3f(1,0,0), new Vector3f(0,1,0), new Vector3f(0,0,0));
+		 cam_map.setFrustumNear(1f);
+		 cam_map.setFrustumFar(appSize * 5);
+		 cam_map.setFrustumPerspective(45f, 1, 1, appSize * 5);
+
+		 cam_map.setLocation(new Vector3f(appSize/2, appSize/1.5f,
+		 appSize/2f));
 		 
+		 cam_map.lookAt(new Vector3f(appSize / 2, 0, appSize / 2), Vector3f.UNIT_Y);
+
+
 		 
-		 float height = (cam.getWidth()*0.15f)/cam.getHeight();
-		 cam_map.setViewPort( 0 , 0.1f , 0.0f , height );
-		
-		 cam_map.setLocation(new Vector3f(appSize/2f, appSize/1.5f,
-		 appSize/1.9f));
-		 cam_map.lookAt(new Vector3f(appSize/2, 0, appSize/2),
-		 Vector3f.UNIT_Y);
-		 
+		 cam_map.update();
 
 		 
 		 ViewPort view_map = this.app.getRenderManager().createMainView("MapView", cam_map);
 		 view_map.setEnabled(true);
 		 view_map.setClearFlags(true, true, true);
 		 view_map.attachScene(rootNode);
-		 view_map.setBackgroundColor(ColorRGBA.Black);
+		 view_map.setBackgroundColor(ColorRGBA.White);
+		 
+
+		 
+//		 rootNode.att
+//		 cam_map.setParallelProjection(true);
+		 cam_map.update();
+
+		 
+//		 mapCamNode.addControl(cam_map);
+		 
+//		 cam_map.
+//		 mapCamNode.attachChild();
+
+		 value = appSize;
 		
+
+	}
+	private float value;
+	public void update(float tpf)
+	{
+		value = value+tpf*0.1f;
+		if(this.app.isCleanupPostFilter())
+		{
+			System.out.println("cleanup! isostate");
+			cam_map.resize(150, 150, true);
+
+		}
+		Vector3f dir = cam.getDirection();
+		dir.setY(-100);
+		Vector3f loc = cam.getLocation();
+		loc.setY(appSize/1.5f);
+		cam_map.lookAtDirection(dir, Vector3f.UNIT_Y);
 		
+//		cam_map.setLocation(loc);
 
 	}
 	

@@ -37,6 +37,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
+import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.BatchNode;
@@ -291,6 +292,10 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		water.setColorExtinction(new Vector3f(10.0f, 20.0f, 30.0f));
 		fpp.addFilter(water);
 
+        
+        //CARTOONFILTER
+//        CartoonEdgeFilter cartoon = new CartoonEdgeFilter();
+//        fpp.addFilter(cartoon);
 
 		if(ambientOcclusion)
 		{
