@@ -167,7 +167,7 @@ public class SecurityService implements ISecurityService
 		String[] networknames, String[] networkpasses, AAcquisitionMechanism[] mechanisms, 
 		Map<String, Set<String>> namemap, Long valdur)
 	{
-		this.valdur = valdur==null? 65536: valdur.longValue();
+		this.valdur = valdur==null? 5*65536: valdur.longValue(); // 5 min default
 		this.virtualsmap = namemap==null? new HashMap<String, Set<String>>(): namemap;
 		this.subscribers = new LinkedHashSet<SubscriptionIntermediateFuture<ChangeEvent<Object>>>();
 		this.platformpasses	= new LinkedHashMap<String, String>();
@@ -578,18 +578,20 @@ public class SecurityService implements ISecurityService
 	 *  Get the validity duration.
 	 *  @return The validityduration.
 	 */
-	public long getValidityDuration()
+	public IFuture<Long> getValidityDuration()
 	{
-		return valdur;
+		return new Future<Long>(new Long(valdur));
 	}
 
 	/**
 	 *  Set the validity duration.
 	 *  @param validityduration The validityduration to set.
 	 */
-	public void setValidityDuration(long validityduration)
+	public IFuture<Void> setValidityDuration(long validityduration)
 	{
 		this.valdur = validityduration;
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
+		return IFuture.DONE;
 	}
 
 	/**
@@ -900,7 +902,7 @@ public class SecurityService implements ISecurityService
 		long	timestamp	= System.currentTimeMillis();
 //		System.out.println("ts1: "+SUtil.arrayToString(SUtil.longToBytes(timestamp)));
 //		timestamp = timestamp>>>16<<16; // New digest every minute
-		long vd = request.getValidityDuration()==0? getValidityDuration(): request.getValidityDuration();
+		long vd = request.getValidityDuration()==0? valdur: request.getValidityDuration();
 		int num = SUtil.log2(vd);
 		for(int i=0; i<num; i++)
 		{
@@ -1423,28 +1425,8 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
 
-//		component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-//		{
-//			public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
-//			{
-//				// signal with null subscription done
-//				ret.addIntermediateResultIfUndone(null);
-//				
-//				// Signal current state
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_KEYSTORESETTINGS, new String[]{storepath, storepass, keypass}));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_KEYSTOREENTRIES, null));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_PLATFORMPASS, platformpasses));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_NETWORKPASS, networkpasses));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_LOCALPASS, password));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
-//				ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
-//
-//				return IFuture.DONE;
-//			}
-//		}, 1000);
-		
 		return ret;
 	}
 	
@@ -1504,6 +1486,7 @@ public class SecurityService implements ISecurityService
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
 	}
 	
 	//-------- static part --------

@@ -59,6 +59,10 @@ public interface ISecurityService
 	/** A mechanism parameter changed. */
 	public static final String PROPERTY_MECHANISMPARAMETER = "mechanismparameter";
 	
+	/** The validity duration changed. */
+	public static final String PROPERTY_VALIDITYDURATION = "validityduration";
+
+	
 	//-------- password management --------
 	
 	/**
@@ -147,14 +151,14 @@ public interface ISecurityService
 	 *  @return The validityduration.
 	 */
 	@SecureTransmission
-	public long getValidityDuration();
+	public IFuture<Long> getValidityDuration();
 
 	/**
 	 *  Set the validity duration.
 	 *  @param validityduration The validityduration to set.
 	 */
 	@SecureTransmission
-	public void setValidityDuration(long validityduration);
+	public IFuture<Void> setValidityDuration(long validityduration);
 	
 	/**
 	 *  Set the trusted lan mode.

@@ -24,7 +24,7 @@ import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.platform.service.security.SSecurity;
 import jadex.tools.jcc.JCCResultListener;
 
@@ -121,6 +121,9 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	/** The keystore update action. */
 	protected Runnable updateact;
 	
+	/** The validity duration textfield. */
+	protected JTextField tfvaldur;
+	
 	//-------- methods --------
 	
 	/**
@@ -147,7 +150,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		tfpass.setToolTipText("The platform password (<enter> to set new password)");
 		buapply.setToolTipText("Set new password");
 		cbshowchars.setToolTipText("Show / hide password characters in gui");
-		buapply.setMargin(new Insets(0, 0, 0, 0));
+//		buapply.setMargin(new Insets(0, 0, 0, 0));
 		
 		cbtrulan = new JCheckBox("Trust platforms from the same network (caution)");
 		cbtrulan.setToolTipText("The trusted networks are not password protected per default. Enter password to disable spoofing.");
@@ -157,6 +160,25 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			{
 				secservice.setTrustedLanMode(cbtrulan.isSelected());
 //				doRefresh();
+			}
+		});
+		
+		tfvaldur = new JTextField(10);
+		tfvaldur.setToolTipText("Default validity duration of messages");
+		JButton buvaldur = new JButton("Apply");
+		buvaldur.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					long val = Long.parseLong(tfvaldur.getText());
+					secservice.setValidityDuration(new Long(val*60000));
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
 			}
 		});
 		
@@ -269,7 +291,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		{
 			public void run()
 			{
-				secservice.getKeystoreDetails().addResultListener(new IResultListener<Map<String,KeyStoreEntry>>()
+				secservice.getKeystoreDetails().addResultListener(new SwingResultListener<Map<String, KeyStoreEntry>>(new IResultListener<Map<String,KeyStoreEntry>>()
 				{
 					public void resultAvailable(Map<String, KeyStoreEntry> infos)
 					{
@@ -283,9 +305,9 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+						jcc.setStatusText("Exception during refresh: "+exception.getMessage());
 					}
-				});
+				}));
 			}
 		};
 		
@@ -715,7 +737,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		JPanel	plocal	= new JPanel(new GridBagLayout());
 		plocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Password Settings"));
 		GridBagConstraints	gbc	= new GridBagConstraints();
-		gbc.insets	= new Insets(0, 3, 0, 3);
+		gbc.insets	= new Insets(2, 2, 2, 2);
 		gbc.weightx	= 0;
 		gbc.weighty	= 0;
 		gbc.anchor	= GridBagConstraints.NORTHWEST;
@@ -730,13 +752,20 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		plocal.add(buapply, gbc);
 		gbc.weightx	= 1;
 		plocal.add(cbshowchars, gbc);
+//		gbc.gridy++;
+//		gbc.gridwidth = GridBagConstraints.REMAINDER;
+//		gbc.weightx = 1;
+//		gbc.weighty = 0;
+//		gbc.fill	= GridBagConstraints.NONE;
+//		plocal.add(cbtrulan, gbc);
 		gbc.gridy++;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill	= GridBagConstraints.NONE;
-		plocal.add(cbtrulan, gbc);
-//		plocal.add(new JButton(), gbc);
+		JLabel l = new JLabel("Validity duration [mins]");
+		l.setToolTipText("Validity duration of messages, i.e. older messages are not accepted.");
+		plocal.add(l, new GridBagConstraints(0, gbc.gridy, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
+		plocal.add(tfvaldur, new GridBagConstraints(1, gbc.gridy, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
+		plocal.add(buvaldur, new GridBagConstraints(2, gbc.gridy, 1, 1, 0, 0,  GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
+		gbc.gridy++;
+		plocal.add(new JPanel(), new GridBagConstraints(0, gbc.gridy, 1, 1, GridBagConstraints.REMAINDER, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, gbc.insets, 0, 0));
 		
 		JPanel slocal	= new JPanel(new GridBagLayout());
 		slocal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Local Keystore Settings"));
@@ -796,6 +825,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		
 		ppp = new PasswordTablePanel("Remote Platform Password Settings", new String[]{"Platform Name", "Password"}, paddrem, paddrem);
 		npp = new PasswordTablePanel("Network Password Settings", new String[]{"Network Name", "Password"}, naddrem, naddrem);
+		npp.add(cbtrulan, BorderLayout.NORTH);
 		
 //		JSplitPanel sp2 = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 //		sp2.setOneTouchExpandable(true);
@@ -923,6 +953,10 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 						else if(ISecurityService.PROPERTY_LOCALPASS.equals(event.getType()))
 						{
 							tfpass.setText((String)event.getValue());
+						}
+						else if(ISecurityService.PROPERTY_VALIDITYDURATION.equals(event.getType()))
+						{
+							tfvaldur.setText(""+((Long)event.getValue()).longValue()/60000);
 						}
 						else if(ISecurityService.PROPERTY_PLATFORMPASS.equals(event.getType()))
 						{
