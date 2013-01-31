@@ -161,7 +161,7 @@
 		<argument name="networkpass" class="String"/>
 		<!-- Virtual names that are used for authentication -->
 		<argument name="virtualnames" class="java.util.Map"/>
-		<!-- The message validity duration -->
+		<!-- The message validity duration (in minutes) -->
 		<argument name="validityduration" class="long"></argument>
 		
 		<!-- Flag if local transport is enabled. -->
