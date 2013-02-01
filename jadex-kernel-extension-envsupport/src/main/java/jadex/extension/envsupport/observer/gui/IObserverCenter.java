@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.observer.gui;
 
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
@@ -28,4 +29,6 @@ public interface IObserverCenter
 	 * @param perspective the perspective
 	 */
 	public IFuture<Void>	addPerspective(final String name, final IPerspective perspective);
+	
+	public AbstractEnvironmentSpace getSpace();
 }
