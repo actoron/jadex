@@ -53,7 +53,7 @@
 
 	<files>
 		<file>
-			<source>jadex-agentkeeper/target/jadex-agentkeeper-${project.version}-jar-with-dependencies.jar</source>
+			<source>target/jadex-agentkeeper-${project.version}-jar-with-dependencies.jar</source>
 			<outputDirectory>/</outputDirectory>
 			<destName>jadex-agentkeeper-${project.version}.jar</destName>
 		</file>
@@ -63,7 +63,11 @@
 			<filtered>true</filtered>
 		</file> -->
 		<file>
-			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt</source>
+			<source>gpl-3.0.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>readme.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 <!-- 		<file> -->
@@ -71,26 +75,26 @@
 <!-- 			<outputDirectory>/</outputDirectory> -->
 <!-- 		</file> -->
 		
+		<!-- ======== files required for building the distribution ======== -->
+		
 		<file>
-			<source>pom-agentkeeper-dist.xml</source>
+			<source>pom.xml</source>
 			<outputDirectory>sources</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
-			
-		<!-- ======== files required for building the distribution ======== -->
-		
 		<file>
 		    <source>src/main/assembly/dist-assembly-agentkeeper.xml</source>
 		    <outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
-		<file>
-			<source>pom-agentkeeper-dist.xml</source>
-			<outputDirectory>sources</outputDirectory>
+				<file>
+			<source>gpl-3.0.txt</source>
+			<outputDirectory>/sources</outputDirectory>
 		</file>
 		<file>
-			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/gpl-3.0.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<source>readme.txt</source>
+			<outputDirectory>/sources</outputDirectory>
 		</file>
+		
 <!-- 		<file> -->
 <!-- 			<source>jadex-editor-bpmn/src/main/java/jadex/bpmn/editor/COPYING</source> -->
 <!-- 			<outputDirectory>sources/docs</outputDirectory> -->
