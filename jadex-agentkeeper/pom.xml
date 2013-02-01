@@ -16,6 +16,11 @@
 			<id>jadex-snapshots</id>
 			<url>http://www2.activecomponents.org/nexus/content/repositories/snapshots</url>
 		</repository>
+		<repository>
+			<id>sonatype-public</id>
+			<name>sonatype public</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+		</repository>
 	</repositories>
 
 	<build>
