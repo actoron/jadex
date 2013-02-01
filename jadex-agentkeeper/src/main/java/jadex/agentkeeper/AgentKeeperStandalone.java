@@ -4,8 +4,10 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
@@ -71,5 +73,17 @@ public class AgentKeeperStandalone
 		CreationInfo ci = new CreationInfo(baargs);
 		cms.createComponent(null, "jadex/agentkeeper/AgentKeeper3d.application.xml", ci, null).get(sus);
 		
+		SServiceProvider.getService(platform.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IClockService>()
+		{
+			public void resultAvailable(IClockService cs)
+			{
+				cs.setDelta(30);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 	}
 }
