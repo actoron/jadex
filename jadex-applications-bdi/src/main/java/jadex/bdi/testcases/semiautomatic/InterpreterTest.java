@@ -182,4 +182,12 @@ class ComponentAdapter implements IComponentAdapter
 	{
 		return null;
 	}
+	
+	public void block(Object monitor)
+	{
+	}
+	
+	public void unblock(Object monitor)
+	{
+	}
 }

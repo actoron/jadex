@@ -1,11 +1,19 @@
 package jadex.commons.future;
 
+
 /**
  *  Interface for suspendable entities.
  *  Is used by the IFuture to suspend callers.
  */
 public interface ISuspendable
 {
+	//-------- constants --------
+	
+	/** The component suspendable for a component thread. */
+	public static final ThreadLocal<ISuspendable>	SUSPENDABLE	= new ThreadLocal<ISuspendable>();
+	
+	//-------- methods --------
+	
 	/**
 	 *  Suspend the execution of the suspendable.
 	 *  @param future	The future to wait for.

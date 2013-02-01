@@ -34,6 +34,7 @@ public interface IFuture<E>
 	/**
 	 *  Get the result - blocking call.
 	 *  @return The future result.
+	 *  @deprecated Use get() instead.
 	 */
 	public E get(ISuspendable caller);
 
@@ -41,8 +42,22 @@ public interface IFuture<E>
 	 *  Get the result - blocking call.
 	 *  @param timeout The timeout in millis.
 	 *  @return The future result.
+	 *  @deprecated Use get(timeout) instead.
 	 */
 	public E get(ISuspendable caller, long timeout);
+
+	/**
+	 *  Get the result - blocking call.
+	 *  @return The future result.
+	 */
+	public E get();
+
+	/**
+	 *  Get the result - blocking call.
+	 *  @param timeout The timeout in millis.
+	 *  @return The future result.
+	 */
+	public E get(long timeout);
 
 	/**
 	 *  Add a result listener.

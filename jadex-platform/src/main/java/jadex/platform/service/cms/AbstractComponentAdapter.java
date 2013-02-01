@@ -12,6 +12,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -19,11 +20,13 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISuspendable;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -72,6 +75,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/** The kill future to be notified in case of fatal error during shutdown. */
 	protected Future<Void>	killfuture;
 	
+	/** Flag for testing double execution. */
+	boolean executing;
+	
 	//-------- steppable attributes --------
 	
 	/** The flag for a scheduled step (true when a step is allowed in stepwise execution). */
@@ -98,9 +104,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	/** Set when wakeup was called. */
 	protected boolean	wokenup;
-	
-	/** Does the instance want to be executed again. */
-	protected boolean	again;
 	
 	/** The cached cms. */
 	protected IFuture<IComponentManagementService>	cms;
@@ -572,83 +575,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	//-------- IExecutable interface --------
 	
-	// for testing double execution.
-	boolean executing;
-	
-//	/**
-//	 *  Make component ready for an execution step.
-//	 *  @return True, when component can be executed.
-//	 */
-//	protected boolean	prepareExecution()
-//	{
-//		// Note: wakeup() can be called from arbitrary threads (even when the
-//		// component itself is currently running. I.e. it cannot be ensured easily
-//		// that an execution task is enqueued and the component has terminated
-//		// meanwhile.
-//		boolean	ret	= !IComponentDescription.STATE_TERMINATED.equals(desc.getState())
-//			&& exception==null;
-//		
-//		if(ret)
-//		{
-//			if(executing)
-//			{
-//				System.err.println(getComponentIdentifier()+": double execution");
-//				new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
-//			}
-//			executing	= true;
-//			wokenup	= false;
-//					
-//			// Remember execution thread.
-//			this.componentthread	= Thread.currentThread();
-//			IComponentIdentifier.LOCAL.set(getComponentIdentifier());
-//			IComponentAdapter.LOCAL.set(this);
-//			
-//			ClassLoader	cl	= componentthread.getContextClassLoader();
-//			componentthread.setContextClassLoader(component.getClassLoader());
-//	
-//			// Copy actions from external threads into the state.
-//			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-//			boolean	extexecuted	= executeExternalEntries(false);
-//				
-//			// Suspend when breakpoint is triggered.
-//			// Necessary because component wakeup could be called anytime even if is at breakpoint..
-//			boolean	breakpoint_triggered	= false;
-//			if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-//			{
-//				if(component.isAtBreakpoint(desc.getBreakpoints()))
-//				{
-//					breakpoint_triggered	= true;
-//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
-//					{
-//						public void resultAvailable(IComponentManagementService cms)
-//						{
-//							cms.suspendComponent(desc.getName());
-//						}
-//						
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							if(!(exception instanceof ComponentTerminatedException))
-//							{
-//								super.exceptionOccurred(exception);
-//							}
-//						}
-//					});
-//				}
-//			}
-//			
-//			if(!breakpoint_triggered && !extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
-//			{
-//				try
-//				{
-//		return ret;
-//	}
-
 	/**
 	 *  Executable code for running the component
 	 *  in the platforms executor service.
 	 */
 	public boolean	execute()
 	{
+		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
+		
 		if(executing)
 		{
 			System.err.println(getComponentIdentifier()+": double execution");
@@ -677,7 +611,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-			boolean	extexecuted	= executeExternalEntries(false);
+			boolean extexecuted	= executeExternalEntries(false);
 				
 			// Suspend when breakpoint is triggered.
 			// Necessary because component wakeup could be called anytime even if is at breakpoint..
@@ -704,7 +638,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					});
 				}
 			}
-			
+			boolean	again	= false;
 			if(!breakpoint_triggered && !extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
 			{
 				try
@@ -787,7 +721,77 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		if(getComponentIdentifier().getLocalName().indexOf("Alex")!=-1)
 //			System.out.println("exiting exe: "+getComponentIdentifier());
 		
+		ISuspendable.SUSPENDABLE.set(null);
+
 		return ret;
+	}
+	
+	/**
+	 *  Block the current thread and allow execution on other threads.
+	 *  @param monitor	The monitor to wait for.
+	 */
+	public void	block(Object monitor)
+	{
+		if(Thread.currentThread()!=componentthread)
+		{
+			throw new RuntimeException("Can only block current component thread: "+componentthread+", "+Thread.currentThread());
+		}
+		
+		// Hack!!! create new thread anyways
+		// Todo: decide if a new thread is needed
+		Executor	exe	= Executor.EXECUTOR.get();
+		if(exe==null)
+		{
+			throw new RuntimeException("Cannot block: no executor");
+		}
+		exe.threadBlocked();
+		
+		this.executing	= false;
+		this.componentthread	= null;
+		synchronized(monitor)
+		{
+			try
+			{
+				monitor.wait();
+			}
+			catch(InterruptedException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		exe.threadUnblocked();
+		if(executing)
+		{
+			System.err.println(getComponentIdentifier()+": double execution");
+			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+		}
+		this.executing	= true;
+		this.componentthread	= Thread.currentThread();
+	}
+	
+	/**
+	 *  Unblock the thread waiting for the given monitor
+	 *  and cease execution on the current thread.
+	 *  @param monitor	The monitor to notify.
+	 */
+	public void	unblock(Object monitor)
+	{
+		if(Thread.currentThread()!=componentthread)
+		{
+			throw new RuntimeException("Can only unblock from current component thread: "+componentthread+", "+Thread.currentThread());
+		}
+		
+		// Terminate current thread as old thread is resumed.
+		if(componentthread==Thread.currentThread())
+		{
+			Executor	exe	= Executor.EXECUTOR.get();
+			if(exe==null)
+			{
+				throw new RuntimeException("Cannot unblock: no executor");
+			}
+			exe.switchThread(monitor);
+		}
 	}
 
 	/**

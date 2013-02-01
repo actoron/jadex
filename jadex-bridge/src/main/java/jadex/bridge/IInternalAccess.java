@@ -144,6 +144,11 @@ public interface IInternalAccess
 	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
 	
+	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(long delay);
+	
 	// todo:?
 //	/**
 //	 *  Wait for some time and execute a component step afterwards.

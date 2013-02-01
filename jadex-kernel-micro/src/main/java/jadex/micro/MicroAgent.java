@@ -682,6 +682,14 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(long delay)
+	{
+		return interpreter.waitForDelay(delay);
+	}
+	
+	/**
 	 *  Start the service provider.
 	 * /
 	public IFuture startServiceProvider()

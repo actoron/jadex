@@ -22,6 +22,14 @@ import java.util.List;
  */
 public class Executor implements Runnable
 {
+	//-------- constants --------
+	
+	/** The executor belonging to a thread. */
+	public static final ThreadLocal<Executor>	EXECUTOR	= new ThreadLocal<Executor>();
+
+	/** The set to a monitor of a blocked thread to perform a context switch. */
+	protected static final ThreadLocal<Object>	SWITCH_TO	= new ThreadLocal<Object>();
+	
 	//-------- attributes --------
 
 	/** Flag indicating if the thread is running. */
@@ -77,41 +85,41 @@ public class Executor implements Runnable
 	 */
 	public void run()
 	{
+		EXECUTOR.set(this);
+		
 		// running is already set to true in execute()
 		
 		boolean	iwanttorun	= true;
 		while(iwanttorun && !shutdown)
 		{
-//			if(executable.toString().indexOf("(Alex")!=-1)
-//				System.out.println("Executor.code(): "+this+", "+executable);
 			iwanttorun	=	code();
-//			if(executable.toString().indexOf("(Alex")!=-1)
-//				System.out.println("Executor.code() finished: "+this+", "+executable);
 
-			// Setting flags in synchronized block assures,
-			// that execute is not called in between.
-			// Separating running and myrunning allows that this thread
-			// may terminate (myrunning==false) while a new thread
-			// is already starting (running==true).
-			synchronized(this)
+			Object	switchto	= SWITCH_TO.get();
+			if(switchto==null)
 			{
-				//if(iwanttorun)	System.out.println("continuing: "+this);
-				//else if(wanttorun)	System.out.println("forced to continue: "+this);
-				iwanttorun	= iwanttorun || wanttorun;
-				running	= iwanttorun;
-				wanttorun	= false;	// reset until execute() is called again.
+				// Setting flags in synchronized block assures,
+				// that execute is not called in between.
+				// Separating running and myrunning allows that this thread
+				// may terminate (myrunning==false) while a new thread
+				// is already starting (running==true).
+				synchronized(this)
+				{
+					//if(iwanttorun)	System.out.println("continuing: "+this);
+					//else if(wanttorun)	System.out.println("forced to continue: "+this);
+					iwanttorun	= iwanttorun || wanttorun;
+					running	= iwanttorun;
+					wanttorun	= false;	// reset until execute() is called again.
+				}
 			}
-//			if(executable.toString().indexOf("(Alex")!=-1)
-//				System.out.println("Executor.code() continuing: "+iwanttorun+", "+this);
-
-//			try
-//			{
-//				Thread.sleep(10);
-//			}
-//			catch(InterruptedException e)
-//			{
-//				throw new RuntimeException(e);
-//			}
+			else
+			{
+				SWITCH_TO.set(null);
+				iwanttorun	= false;
+				synchronized(switchto)
+				{
+					switchto.notify();
+				}
+			}
 		}
 
 		// Notify shutdown listeners when execution has ended.
@@ -135,7 +143,7 @@ public class Executor implements Runnable
 			}
 		}
 		
-//		System.out.println("exited: "+this+", "+executable);
+		EXECUTOR.set(null);
 	}
 
 	/**
@@ -224,21 +232,29 @@ public class Executor implements Runnable
 	{
 		return running;
 	}
-	
-	/**
-	 *  Return true, if already shutowned.
-	 *  @return True, if shutdowned.
-	 * /
-	protected boolean isShutdowned()
-	{
-		return shutdowned;
-	}*/
 
 	/**
-	 *  Create a string representation of this executor.
-	 * /
-	public String	toString()
+	 *  Cease execution of the current thread and
+	 *  switch to another thread waiting for the given monitor.
+	 */
+	public void	switchThread(Object monitor)
 	{
-		return "Executor("+(executable!=null?executable.toString():super.toString())+")";
-	}*/
+		SWITCH_TO.set(monitor);
+	}
+
+	/**
+	 *  Adjust to execution of current thread to be blocked.
+	 */
+	public void	threadBlocked()
+	{
+		running	= false;
+	}
+
+	/**
+	 *  Adjust to execution of a blocked thread to be unblocked.
+	 */
+	public void	threadUnblocked()
+	{
+		running	= true;
+	}
 }

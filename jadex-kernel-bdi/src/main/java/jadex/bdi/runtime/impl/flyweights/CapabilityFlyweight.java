@@ -484,6 +484,28 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	}
 
 	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public IFuture<Void> waitForDelay(final long delay)
+	{
+		if(getInterpreter().getComponentAdapter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().waitForDelay(delay);
+				}
+			};
+			return (IFuture<Void>)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().waitForDelay(delay);
+		}
+	}
+
+	/**
 	 *  Get the classloader.
 	 *  @return The classloader.
 	 */

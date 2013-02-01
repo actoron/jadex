@@ -8,29 +8,8 @@ public class ThreadSuspendable implements ISuspendable
 {
 	//-------- attributes --------
 	
-	/** The monitor. */
-	protected Object monitor;
-	
 	/** The future. */
 	protected IFuture<?>	future;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a new suspendable.
-	 */
-	public ThreadSuspendable()
-	{
-		this(new Object());
-	}
-	
-	/**
-	 *  Create a new suspendable.
-	 */
-	public ThreadSuspendable(Object monitor)
-	{
-		this.monitor = monitor;
-	}
 	
 	//-------- methods --------
 	
@@ -40,18 +19,18 @@ public class ThreadSuspendable implements ISuspendable
 	 */
 	public void suspend(IFuture<?> future, long timeout)
 	{
-		synchronized(monitor)
+		synchronized(this)
 		{
 			this.future	= future;
 			try
 			{
 				if(timeout>0)
 				{
-					monitor.wait(timeout);
+					this.wait(timeout);
 				}
 				else
 				{
-					monitor.wait();
+					this.wait();
 				}
 			}
 			catch(InterruptedException e)
@@ -71,12 +50,12 @@ public class ThreadSuspendable implements ISuspendable
 	 */
 	public void resume(IFuture<?> future)
 	{
-		synchronized(monitor)
+		synchronized(this)
 		{
 			// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 			if(future==this.future)
 			{
-				monitor.notify();
+				this.notify();
 			}
 		}
 	}
@@ -87,6 +66,6 @@ public class ThreadSuspendable implements ISuspendable
 	 */
 	public Object getMonitor()
 	{
-		return monitor;
+		return this;
 	}
 }

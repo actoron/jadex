@@ -1873,6 +1873,39 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	}
 	
 	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(final long delay)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+		{
+			public void customResultAvailable(IClockService cs)
+			{
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								ret.setResult(null);
+								return IFuture.DONE;
+							}
+						});
+					}
+				});
+			}
+		}));
+		
+		return ret;
+	}
+
+	
+	/**
 	 *  Test if current thread is the component thread.
 	 *  @return True if the current thread is the component thread.
 	 */

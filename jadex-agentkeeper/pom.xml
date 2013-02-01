@@ -70,7 +70,7 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform</artifactId>
+			<artifactId>jadex-distribution-standard</artifactId>
 			<version>${jadex.version}</version>
 		</dependency>
 		
@@ -78,36 +78,6 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-extension-envsupport-jmonkey</artifactId>
 			<version>${jadex.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-extension-envsupport</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-application</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-bdibpmn</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-bdiv3</artifactId>
-			<version>${jadex.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>xpp3</groupId>
-			<artifactId>xpp3</artifactId>
-			<version>1.1.4c</version>
 		</dependency>
 		
 	</dependencies>

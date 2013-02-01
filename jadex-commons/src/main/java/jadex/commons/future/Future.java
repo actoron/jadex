@@ -138,6 +138,25 @@ public class Future<E> implements IFuture<E>
 		return exception;
 	}
 	
+	/**
+	 *  Get the result - blocking call.
+	 *  @return The future result.
+	 */
+	public E get()
+	{
+		return get(ISuspendable.SUSPENDABLE.get());
+	}
+
+	/**
+	 *  Get the result - blocking call.
+	 *  @param timeout The timeout in millis.
+	 *  @return The future result.
+	 */
+	public E get(long timeout)
+	{
+		return get(ISuspendable.SUSPENDABLE.get(), timeout);
+	}
+	
     /**
      *  Get the result - blocking call.
      *  @return The future result.

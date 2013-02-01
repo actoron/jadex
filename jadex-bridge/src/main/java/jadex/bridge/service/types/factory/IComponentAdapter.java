@@ -5,9 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.future.IFuture;
 
-import java.util.Collection;
 import java.util.logging.Logger;
 
 
@@ -26,6 +24,19 @@ public interface IComponentAdapter
 	public static final ThreadLocal<IComponentAdapter>	LOCAL	= new ThreadLocal<IComponentAdapter>();
 	
 	//-------- methods --------
+	
+	/**
+	 *  Block the current thread and allow execution on other threads.
+	 *  @param monitor	The monitor to wait for.
+	 */
+	public void	block(Object monitor);
+	
+	/**
+	 *  Unblock the thread waiting for the given monitor
+	 *  and cease execution on the current thread.
+	 *  @param monitor	The monitor to notify.
+	 */
+	public void	unblock(Object monitor);
 	
 	/**
 	 *  Called by the component when it probably awoke from an idle state.
