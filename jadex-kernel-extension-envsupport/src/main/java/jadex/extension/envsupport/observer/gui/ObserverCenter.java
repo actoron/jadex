@@ -6,7 +6,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DuplicateResultException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -24,7 +23,6 @@ import jadex.extension.envsupport.observer.perspective.Perspective3D;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -51,7 +48,7 @@ import javax.swing.event.ChangeListener;
 /** 
  *  The default observer center.
  */
-public class ObserverCenter
+public class ObserverCenter implements IObserverCenter
 {
 	private static final int[] PLUGIN_REFRESH_TIMES = { 0, 50, 100, 250, 500, 1000};
 	
@@ -110,14 +107,18 @@ public class ObserverCenter
 	/** Flag to indicate that observer is disposed. */
 	protected boolean	disposed;
 
-	/** Creates an observer center.
+	public ObserverCenter()
+	{
+	}
+	
+	/** Starts an observer center.
 	 *  
 	 *  @param title title of the observer window
 	 *  @param space the space being observed
 	 *  @param classloader the application class loader for loading resources (images etc.)
 	 *  @param plugins custom plugins used in the observer
 	 */
-	public ObserverCenter(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit)
+	public void startObserver(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit)
 	{
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (AbstractEnvironmentSpace)space;

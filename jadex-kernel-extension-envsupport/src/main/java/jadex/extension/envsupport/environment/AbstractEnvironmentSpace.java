@@ -43,6 +43,7 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
+import jadex.extension.envsupport.observer.gui.IObserverCenter;
 import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.javaparser.IParsedExpression;
@@ -626,8 +627,20 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						}
 					}
 					
-					final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
-						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
+					String classname = (String)MEnvSpaceType.getProperty(observer, "class");
+					IObserverCenter tmpoc = null;
+					if (classname == null)
+					{
+						tmpoc = new ObserverCenter();
+					}
+					else
+					{
+						tmpoc = (IObserverCenter)classloader.loadClass(classname).newInstance();
+					}
+					
+					final IObserverCenter oc = tmpoc;
+					oc.startObserver(title, AbstractEnvironmentSpace.this,
+							ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
 					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)

@@ -6,7 +6,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.3.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.3.xsd"
-	name="DungeonKeeper3d" package="jadex.agentkeeper">
+	name="AgentKeeper3d" package="jadex.agentkeeper">
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
