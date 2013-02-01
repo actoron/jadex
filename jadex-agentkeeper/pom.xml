@@ -1,13 +1,12 @@
-<project	xmlns="http://maven.apache.org/POM/4.0.0"
-			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-agentkeeper</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
 	<properties>
 		<jadex.version> 2.3-SNAPSHOT </jadex.version>
 	</properties>
@@ -18,7 +17,7 @@
 			<url>http://www.activecomponents.org/nexus/content/repositories/snapshots</url>
 		</repository>
 	</repositories>
-	
+
 	<build>
 		<resources>
 			<!-- Allow ADF files (.xml, .bpmn, ...) be placed in source folder -->
@@ -36,12 +35,11 @@
 				</excludes>
 			</resource>
 		</resources>
-		
-		    <plugins>
-		    
-		    <plugin>
-	            <artifactId>maven-assembly-plugin</artifactId>
-	            <executions>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
 					<execution>
 						<id>fatjar</id>
 						<phase>package</phase>
@@ -50,36 +48,67 @@
 						</goals>
 					</execution>
 				</executions>
-	            <configuration>
-	                <archive>
-	                    <manifest>
-	                        <mainClass>jadex.agentkeeper.AgentKeeperStandalone</mainClass>
-	                    </manifest>
-	                </archive>
-	                <descriptorRefs>
-	                    <descriptorRef>jar-with-dependencies</descriptorRef>
-	                </descriptorRefs>
-	            </configuration>
-          	</plugin>
-    </plugins>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>jadex.agentkeeper.AgentKeeperStandalone</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-distribution-standard</artifactId>
 			<version>${jadex.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-extension-envsupport-jmonkey</artifactId>
 			<version>${jadex.version}</version>
 		</dependency>
-		
+
 	</dependencies>
+	
+	<profiles>
+		<!-- ======== Profile for dist assembly ======== -->
+		<profile>
+			<id>dist</id>
+			<build>
+				<finalName>jadex-agentkeeper-${project.version}</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-agentkeeper.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 
 </project>
