@@ -643,9 +643,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				try
 				{
-					System.out.println("Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+//					System.out.println("Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 					again	= component.executeStep();
-					System.out.println("Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+//					System.out.println("Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 				}
 				catch(Exception e)
 				{
