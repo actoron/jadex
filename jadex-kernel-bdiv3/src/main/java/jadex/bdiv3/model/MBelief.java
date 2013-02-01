@@ -23,14 +23,18 @@ public class MBelief extends MElement
 	/** Flag if is multi. */
 	protected Boolean multi;
 	
+	/** The events this belief depends on. */
+	protected String[] events;
+	
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(FieldInfo target, String impl)
+	public MBelief(FieldInfo target, String impl, String[] events)
 	{
 		super(target.getName());
 		this.target = target;
 		this.impl = impl;
+		this.events = events;
 	}
 
 	/**
@@ -67,6 +71,24 @@ public class MBelief extends MElement
 	public void setImplClassName(String impl)
 	{
 		this.impl = impl;
+	}
+	
+	/**
+	 *  Get the events.
+	 *  @return The events.
+	 */
+	public String[] getEvents()
+	{
+		return events;
+	}
+
+	/**
+	 *  Set the events.
+	 *  @param events The events to set.
+	 */
+	public void setEvents(String[] events)
+	{
+		this.events = events;
 	}
 
 	/**

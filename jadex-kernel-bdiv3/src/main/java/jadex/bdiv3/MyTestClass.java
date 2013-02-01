@@ -3,8 +3,9 @@ package jadex.bdiv3;
 
 public class MyTestClass
 {
-	protected int testfield = 3+7;
+	public int testfield = inc();
 
+//	@Belief(dependson="testfield")
 	protected int testfield2 = testfield+3;
 
 	protected int testfield3 = getVal();
@@ -12,7 +13,8 @@ public class MyTestClass
 	public MyTestClass()
 	{
 		System.out.println("hello");
-		testfield = 22;
+		System.out.println(testfield+" "+testfield2+" "+testfield3);
+//		testfield = 22;
 	}
 	
 	public int getVal()
@@ -20,4 +22,18 @@ public class MyTestClass
 		return 99;
 	}
 	
+	public int inc()
+	{
+		return testfield2++;
+	}
+	
+	public int getTestfield()
+	{
+		return testfield;
+	}
+
+	public static void main(String[] args)
+	{
+		MyTestClass tm = new MyTestClass();
+	}
 }

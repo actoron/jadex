@@ -12,6 +12,7 @@ import jadex.bdiv3.runtime.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -163,30 +164,17 @@ public class BDIAgent extends MicroAgent
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 
-			Field f = null;
-			Class<?> cl = obj.getClass();
-			while(f==null && !Object.class.equals(cl))
-			{
-				try
-				{
-					f = cl.getDeclaredField(fieldname);
-				}
-				catch(Exception e)
-				{
-					cl = cl.getSuperclass();
-				}
-			}
-			if(f==null)
-				throw new RuntimeException("Field not found: "+fieldname);
-			
-			f.setAccessible(true);
+			Object oldval = setFieldValue(obj, fieldname, val);
 			
 			// unobserve old value for property changes
-			Object oldval = f.get(obj);
 			rs.unobserveObject(oldval);
 			
-			f.set(obj, val);
-			rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
+			if(!SUtil.equals(val, oldval))
+			{
+				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
+				// execute rulesystem immediately to ensure that variable values are not changed afterwards
+				rs.processAllEvents(); 
+			}
 			
 			// observe new value for property changes
 			if(val!=null)
@@ -225,6 +213,37 @@ public class BDIAgent extends MicroAgent
 	}
 	
 	/**
+	 *  Set the value of a field.
+	 *  @param obj The object.
+	 *  @param fieldname The name of the field.
+	 *  @return The old field value.
+	 */
+	protected static Object setFieldValue(Object obj, String fieldname, Object val) throws IllegalAccessException
+	{
+		Field f = null;
+		Class<?> cl = obj.getClass();
+		while(f==null && !Object.class.equals(cl))
+		{
+			try
+			{
+				f = cl.getDeclaredField(fieldname);
+			}
+			catch(Exception e)
+			{
+				cl = cl.getSuperclass();
+			}
+		}
+		if(f==null)
+			throw new RuntimeException("Field not found: "+fieldname);
+		
+		f.setAccessible(true);
+		Object oldval = f.get(obj);
+		f.set(obj, val);
+	
+		return oldval;
+	}
+	
+	/**
 	 *  Method that is called automatically when a belief 
 	 *  is written as field access.
 	 */
@@ -238,6 +257,15 @@ public class BDIAgent extends MicroAgent
 		}
 		else
 		{
+			try
+			{
+				setFieldValue(obj, fieldname, val);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
 			synchronized(initwrites)
 			{
 				List<Object[]> inits = initwrites.get(obj);
@@ -257,7 +285,7 @@ public class BDIAgent extends MicroAgent
 	/**
 	 * 
 	 */
-	public static void performInitWrites(BDIAgent agent)
+	public static void performInitWrites(final BDIAgent agent)
 	{
 		Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
 
@@ -269,7 +297,29 @@ public class BDIAgent extends MicroAgent
 				for(Object[] write: writes)
 				{
 //					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
-					agent.writeField(write[0], (String)write[1], write[2]);
+//					agent.writeField(write[0], (String)write[1], write[2]);
+					RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
+					final String fieldname = (String)write[1];
+					Object val = write[0];
+					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
+					if(val!=null)
+					{
+						rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+						{
+							public IFuture<IEvent> execute(final PropertyChangeEvent event)
+							{
+								return agent.scheduleStep(new IComponentStep<IEvent>()
+								{
+									public IFuture<IEvent> execute(IInternalAccess ia)
+									{
+			//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+										Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+										return new Future<IEvent>(ev);
+									}
+								});
+							}
+						});
+					}
 				}
 			}
 		}

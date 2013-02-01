@@ -61,4 +61,12 @@ public class Event implements IEvent
 	{
 		this.content = content;
 	}
+
+	/** 
+	 * 
+	 */
+	public String toString()
+	{
+		return "Event(type=" + type + ", content=" + content + ")";
+	}
 }

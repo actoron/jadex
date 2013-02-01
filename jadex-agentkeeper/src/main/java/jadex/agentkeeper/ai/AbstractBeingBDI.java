@@ -53,20 +53,21 @@ public class AbstractBeingBDI
 	protected Grid2D		environment;
 	
 	/** The virtual SpaceObject of the "Being" in the virtual environment. */
+	@Belief
 	protected ISpaceObject mySpaceObject;
 
 	/** The position of the "Being". */
-	@Belief
-	protected Vector2Double	myPosition;
+//	@Belief(dynamic="mySpaceObject")
+	protected Vector2Double	myPosition;// = mySpaceObject==null? null: (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
 
-	public Vector2Double getUpdatedPosition()
-	{
-		myPosition = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
-		return myPosition;
-	}
+//	public Vector2Double getUpdatedPosition()
+//	{
+//		myPosition = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
+//		return myPosition;
+//	}
 	
 	/** The speed of the "Being". */
-	protected float			mySpeed	= 1;
+	protected float	mySpeed	= 1;
 
 	/**
 	 *  Initialize the agent.

@@ -3428,6 +3428,17 @@ public class SUtil
 	}
 	
 	/**
+	 *  Convert a string to the same string with first
+	 *  letter in upper case.
+	 *  @param str The string.
+	 *  @return The string with first letter in uppercase.
+	 */
+	public static String firstToUpperCase(String str)
+	{
+		return str.substring(0, 1).toUpperCase()+str.substring(1);
+	}
+	
+	/**
 	 * Main method for testing.
 	 */
 	public static void main(String[] args)

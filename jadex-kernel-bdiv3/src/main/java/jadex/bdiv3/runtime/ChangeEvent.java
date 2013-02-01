@@ -130,4 +130,12 @@ public class ChangeEvent
 	{
 		this.value = value;
 	}
+
+	/** 
+	 * 
+	 */
+	public String toString()
+	{
+		return "ChangeEvent(type=" + type + ", source=" + source + ", value="+ value + ")";
+	}
 }

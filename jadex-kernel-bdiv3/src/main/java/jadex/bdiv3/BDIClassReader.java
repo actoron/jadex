@@ -202,7 +202,8 @@ public class BDIClassReader extends MicroClassReader
 //					System.out.println("found belief: "+fields[i].getName());
 					Belief bel = getAnnotation(fields[i], Belief.class, cl);
 					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
-						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName()));
+						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
+						bel.dynamic().length==0? null: bel.dynamic()));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
 				}
@@ -395,8 +396,8 @@ public class BDIClassReader extends MicroClassReader
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		for(Class<?> agcl: agtcls)
 		{
-			Class<?> acl = gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
 //			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
+			Class<?> acl = gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
 		}
 		
 //		System.out.println("genclazz: "+genclazz);
@@ -451,7 +452,21 @@ public class BDIClassReader extends MicroClassReader
 		MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
 		
 		Body body = p.body();
+		String name;
 		ServicePlan sp = body.service();
+		if(mi!=null)
+		{
+			mi.getName();
+		}
+		else if(!Object.class.equals(body.value()))
+		{
+			name = SReflect.getInnerClassName(body.value());
+		}
+		else
+		{
+			name = sp.name()+"_"+sp.method();
+		}
+		
 		ClassInfo ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
 		Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
 		MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 

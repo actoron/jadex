@@ -12,5 +12,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Belief
 {
+	/**
+	 *  The implementation type (obsolete?)
+	 */
 	public Class<?> implementation() default Object.class;
+
+	/**
+	 *  A dynamic belief is automatically updated when other beliefs change.
+	 */
+	public String[] dynamic() default {};
+	
 }

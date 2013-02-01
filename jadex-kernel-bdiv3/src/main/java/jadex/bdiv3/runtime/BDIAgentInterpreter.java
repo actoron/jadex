@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -128,7 +129,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				try
 				{
-					// todo: cannot use fields as they are from the 'not enhanced' class
 					Field field = agcl.getDeclaredField("__agent");
 					field.setAccessible(true);
 					field.set(agent, ret);
@@ -342,6 +342,43 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 		}
 
+		// Observe dynamic beliefs
+		List<MBelief> beliefs = bdimodel.getCapability().getBeliefs();
+		
+		for(final MBelief mbel: beliefs)
+		{
+			String[] evs = mbel.getEvents();
+			if(evs!=null)
+			{
+				List<String> events = new ArrayList<String>();
+				for(String ev: evs)
+				{
+					addBeliefEvents(getInternalAccess(), events, ev);
+				}
+				
+				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
+					ICondition.TRUE_CONDITION, new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+//						System.out.println("belief update: "+event);
+						try
+						{
+							Method um = agent.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
+							um.invoke(agent, new Object[0]);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				getRuleSystem().getRulebase().addRule(rule);
+			}
+		}
+		
 		// Observe goal types
 		List<MGoal> goals = bdimodel.getCapability().getGoals();
 		for(final MGoal mgoal: goals)
@@ -349,7 +386,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //			 todo: explicit bdi creation rule
 //			rulesystem.observeObject(goals.get(i).getTargetClass(getClassLoader()));
 		
-			boolean fin = false;
+//			boolean fin = false;
 			
 			final Class<?> gcl = mgoal.getTargetClass(getClassLoader());
 			boolean declarative = false;
