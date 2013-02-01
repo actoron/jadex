@@ -57,8 +57,8 @@ public class AbstractBeingBDI
 	protected ISpaceObject mySpaceObject;
 
 	/** The position of the "Being". */
-//	@Belief(dynamic="mySpaceObject")
-	protected Vector2Double	myPosition;// = mySpaceObject==null? null: (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
+	@Belief(dynamic="mySpaceObject")
+	protected Vector2Double	myPosition = mySpaceObject==null? null: (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
 
 //	public Vector2Double getUpdatedPosition()
 //	{
@@ -83,14 +83,16 @@ public class AbstractBeingBDI
 			public void customResultAvailable(IExtensionInstance ext)
 			{
 				environment	= (Grid2D)ext;
-				mySpaceObject = environment.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
-				myPosition = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
+				setMySpaceObject(environment.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName()));
+//				myPosition = (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
 				ret.setResult(null);
 			}
 		});
 		return ret;
 	}
 
+	
+	
 	/**
 	 * The agent body.
 	 */

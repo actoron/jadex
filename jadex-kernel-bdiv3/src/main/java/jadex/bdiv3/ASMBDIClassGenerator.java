@@ -193,9 +193,12 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				is = SUtil.getResource(fname, cl);
 				ClassReader cr = new ClassReader(is);
 
+//				TraceClassVisitor tcv2 = new TraceClassVisitor(cv, new PrintWriter(System.out));
+//				TraceClassVisitor tcv3 = new TraceClassVisitor(null, new PrintWriter(System.out));
+//				cr.accept(tcv2, 0);
 				cr.accept(cv, 0);
 				transformClassNode(cn, iclname, model);
-//				cn.accept(tcv);
+//				cn.accept(tcv3);
 				cn.accept(cw);
 				byte[] data = cw.toByteArray();
 				
@@ -277,23 +280,32 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				if(mn.name.equals("<init>"))
 				{
 					InsnList l = cn.methods.get(0).instructions;
+					LabelNode begin = null;
+					boolean foundcon = false;
+					
 					for(int i=0; i<l.size() && !todo.isEmpty(); i++)
 					{
 						AbstractInsnNode n = l.get(i);
-//						if(n instanceof LabelNode)
-//						{
-//							LabelNode ln = (LabelNode)n;
-////							System.out.println(ln.getLabel());
-//						}
-//						else 
-						if(n instanceof MethodInsnNode && ((MethodInsnNode)n).name.equals("writeField"))
+						
+						if(begin==null && n instanceof LabelNode)
+						{
+							begin = (LabelNode)n;;
+						}
+						
+						// find first constructor call
+						if(Opcodes.INVOKESPECIAL==n.getOpcode() && !foundcon)
+						{
+							foundcon = true;
+							begin = null;
+						}
+						else if(n instanceof MethodInsnNode && ((MethodInsnNode)n).name.equals("writeField"))
 						{
 							MethodInsnNode min = (MethodInsnNode)n;
 							
 //							System.out.println("found writeField node: "+min.name+" "+min.getOpcode());
 							AbstractInsnNode start = min;
 							String name = null;
-							while(!(start instanceof LabelNode))
+							while(!start.equals(begin))
 							{
 								// find method name via last constant load
 								if(name==null && start instanceof LdcInsnNode)
@@ -306,27 +318,29 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								MethodNode mnode = new MethodNode(mn.access, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
 									+SUtil.firstToUpperCase(name), mn.desc, mn.signature, null);
 								
+								AbstractInsnNode cur = start;
 								Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
-								while(!start.equals(min))
+								while(!cur.equals(min))
 								{
 									AbstractInsnNode clone;
-									if(start instanceof LabelNode)
-									{
-										clone = new LabelNode(new Label());
-										labels.put((LabelNode)start, (LabelNode)clone);
-									}
-									else
-									{
-										clone = start.clone(labels);
-									}
-									mnode.instructions.add(clone);
-									start = start.getNext();
+									if(cur instanceof LabelNode)
+										labels.put((LabelNode)cur, new LabelNode(new Label()));
+									cur = cur.getNext();
 								}
-								mnode.instructions.add(start.clone(labels));
+								cur = start;
+								while(!cur.equals(min))
+								{
+									AbstractInsnNode clone = cur.clone(labels);
+									mnode.instructions.add(clone);
+									cur = cur.getNext();
+								}
+								mnode.instructions.add(cur.clone(labels));
 								mnode.visitInsn(Opcodes.RETURN);
 								
 								cn.methods.add(mnode);
 							}
+							
+							begin = null;
 						}
 //						else if(n instanceof FieldInsnNode)
 //						{
