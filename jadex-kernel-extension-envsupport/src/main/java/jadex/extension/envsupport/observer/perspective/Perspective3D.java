@@ -18,7 +18,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.gui.IObserverCenter;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
@@ -48,7 +48,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	protected String							name;
 
 	/** The ObserverCenter */
-	protected ObserverCenter					obscenter;
+	protected IObserverCenter					obscenter;
 
 	/** The viewport */
 	protected IViewport3d						viewport3d;
@@ -214,7 +214,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	 * 
 	 * @param obscenter the ObserverCenter
 	 */
-	public void setObserverCenter(ObserverCenter obscenter)
+	public void setObserverCenter(IObserverCenter obscenter)
 	{
 		this.obscenter = obscenter;
 	}
@@ -224,7 +224,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	 * 
 	 * @return The observer center.
 	 */
-	public ObserverCenter getObserverCenter()
+	public IObserverCenter getObserverCenter()
 	{
 		return obscenter;
 	}

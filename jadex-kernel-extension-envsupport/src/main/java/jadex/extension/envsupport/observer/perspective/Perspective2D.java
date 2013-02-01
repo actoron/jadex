@@ -16,7 +16,7 @@ import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
 import jadex.extension.envsupport.observer.graphics.java2d.ViewportJ2D;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
+import jadex.extension.envsupport.observer.gui.IObserverCenter;
 import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.javaparser.IParsedExpression;
@@ -57,7 +57,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	protected String name;
 	
 	/** The ObserverCenter */
-	protected ObserverCenter obscenter;
+	protected IObserverCenter obscenter;
 	
 	/** The viewport */
 	protected IViewport viewport;
@@ -212,7 +212,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 * Sets the ObserverCenter.
 	 * @param obscenter the ObserverCenter
 	 */
-	public void setObserverCenter(ObserverCenter obscenter)
+	public void setObserverCenter(IObserverCenter obscenter)
 	{
 		this.obscenter = obscenter;
 	}
@@ -221,7 +221,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 *  Get the ObserverCenter.
 	 *  @return The observer center.
 	 */
-	public ObserverCenter getObserverCenter()
+	public IObserverCenter getObserverCenter()
 	{
 		return obscenter;
 	}

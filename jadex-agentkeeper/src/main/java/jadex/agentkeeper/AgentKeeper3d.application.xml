@@ -615,7 +615,7 @@
 					<env:process type="genmana"></env:process>
 
 					<env:observers>
-						<env:observer name="world" dataview="view_all"
+						<env:observer name="world" dataview="view_all" 
 							perspective="main">
 							
 						</env:observer>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.sourceforge.jadex</groupId>
+	<artifactId>pom-agentkeeper-dist</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>pom-agentkeeper-dist</name>
+	
+	<!-- ======== common plugin configurations ======== -->
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<archiverConfig>
+						<duplicateBehavior>skip</duplicateBehavior>
+					</archiverConfig>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
+
+	<!-- ======== Modules to include in deploy/dist ======== -->
+	
+	<modules>
+<!-- 		<module>jadex-parent</module> -->
+<!-- 		<module>jadex-distribution-standard</module> -->
+		<module>jadex-commons</module>
+		<module>jadex-javaparser</module>
+		<module>jadex-rules-eca</module>
+		<module>jadex-rules</module>
+		<module>jadex-bridge</module>
+		<module>jadex-xml</module>
+		<module>jadex-kernel-base</module>
+		<module>jadex-kernel-component</module>
+		<module>jadex-kernel-application</module>
+		<module>jadex-kernel-micro</module>
+		<module>jadex-model-bpmn</module>
+		<module>jadex-kernel-bpmn</module>
+		<module>jadex-kernel-bdi</module>
+		<module>jadex-kernel-bdibpmn</module>
+		<module>jadex-kernel-bdiv3</module>
+		<module>jadex-kernel-extension-envsupport</module>
+		<module>jadex-kernel-extension-envsupport-jmonkey</module>
+		<module>jadex-platform</module>
+		<module>jadex-agentkeeper</module>
+	</modules>
+	
+	<profiles>
+		<!-- ======== Profile for dist assembly ======== -->
+		<profile>
+			<id>dist</id>
+			<build>
+				<finalName>jadex-agentkeeper-${project.version}</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-agentkeeper.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
+
+ 

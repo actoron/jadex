@@ -1,7 +1,7 @@
 package jadex.extension.envsupport.observer.perspective;
 
-import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.commons.meta.ITypedPropertyObject;
+import jadex.extension.envsupport.observer.gui.IObserverCenter;
 
 import java.awt.Component;
 
@@ -38,13 +38,13 @@ public interface IPerspective extends ITypedPropertyObject
 	 *  Sets the ObserverCenter.
 	 *  @param obscenter the ObserverCenter
 	 */
-	public void setObserverCenter(ObserverCenter obscenter);
+	public void setObserverCenter(IObserverCenter obscenter);
 	
 	/**
 	 *  Get the ObserverCenter.
 	 *  @return The observer center.
 	 */
-	public ObserverCenter getObserverCenter();
+	public IObserverCenter getObserverCenter();
 	
 	/**
 	 *  Adds a new visual object.

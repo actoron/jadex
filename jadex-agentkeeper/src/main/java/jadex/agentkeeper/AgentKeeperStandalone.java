@@ -57,8 +57,8 @@ public class AgentKeeperStandalone
 			"-welcome", "false",
 			"-cli", "false",
 			"-printpass", "false",
-			"-networkname", "\"jadexbackup\"",
-			"-relayaddress", "\"http://jadex.informatik.uni-hamburg.de/relay\""
+			"-networkname", "\"agentkeeper\"",
+			"-kernels", "\"micro,bdibpmn,bdiv3,application,component\""
 		};
 		String[] newargs = new String[defargs.length+jargs.size()];
 		System.arraycopy(defargs, 0, newargs, 0, defargs.length);
@@ -71,6 +71,7 @@ public class AgentKeeperStandalone
 		Map<String, Object> baargs = new HashMap<String, Object>();
 		baargs.put("cmdargs", (String[])bargs.toArray(new String[bargs.size()]));
 		CreationInfo ci = new CreationInfo(baargs);
+		cms.createComponent(null, "jadex/bdiv3/KernelBDIV3.component.xml", null, null).get(sus);
 		cms.createComponent(null, "jadex/agentkeeper/AgentKeeper3d.application.xml", ci, null).get(sus);
 		
 		SServiceProvider.getService(platform.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)

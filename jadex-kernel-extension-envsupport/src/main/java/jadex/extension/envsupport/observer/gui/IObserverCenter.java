@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.observer.gui;
 
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
@@ -30,5 +31,26 @@ public interface IObserverCenter
 	 */
 	public IFuture<Void>	addPerspective(final String name, final IPerspective perspective);
 	
+	/**
+	 * Returns the space.
+	 * @return the space
+	 */
 	public AbstractEnvironmentSpace getSpace();
+	
+	/**
+	 * Fires a selected object change event.
+	 */
+	public void fireSelectedObjectChange();
+	
+	/**
+	 *  Get the class loader.
+	 */
+	public ClassLoader getClassLoader();
+	
+	/**
+	 * Returns the selected dataview.
+	 * 
+	 *  @return the selected dataview
+	 */
+	public IDataView getSelectedDataView();
 }

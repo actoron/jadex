@@ -31,12 +31,12 @@
 	</repositories>
 
 	<!-- ======== Skip deployment (i.e. neither central nor snapshot repo) ======== -->
-		
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-deploy-plugin</artifactId>
+				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
 					<skip>true</skip>
@@ -44,14 +44,14 @@
 			</plugin>
 		</plugins>
 	</build>
-		
+
 	<dependencies>
-	
-	<!-- JMonkey Spezific -->
+
+		<!-- JMonkey Spezific -->
 		<dependency>
-  			<groupId>net.sourceforge.jadex.jme3ext</groupId>
-  			<artifactId>jmonkeyengine3</artifactId>
-  			<version>${jmonkey.version}</version>
+			<groupId>net.sourceforge.jadex.jme3ext</groupId>
+			<artifactId>jmonkeyengine3</artifactId>
+			<version>${jmonkey.version}</version>
 		</dependency>
 
 		<dependency>
@@ -79,13 +79,13 @@
 			<version>${jmonkey.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>jME3-effects</artifactId>
 			<version>${jmonkey.version}</version>
-		</dependency>	
-		
+		</dependency>
+
 		<dependency>
 			<groupId>net.sourceforge.jadex.jme3ext</groupId>
 			<artifactId>lwjgl</artifactId>
@@ -184,7 +184,8 @@
 		</dependency>
 	</dependencies>
 
-	<!-- Set scopes of standard jadex jars to provided for excluding them from dist -->
+	<!-- Set scopes of standard jadex jars to provided for excluding them from 
+		dist -->
 	<profiles>
 		<profile>
 			<id>dist</id>
@@ -195,14 +196,14 @@
 					<version>${project.version}</version>
 					<scope>provided</scope>
 				</dependency>
-		
+
 				<dependency>
 					<groupId>net.sourceforge.jadex</groupId>
 					<artifactId>jadex-kernel-extension-envsupport</artifactId>
 					<version>${project.version}</version>
 					<scope>provided</scope>
 				</dependency>
-		
+
 				<dependency>
 					<groupId>net.sourceforge.jadex</groupId>
 					<artifactId>jadex-commons</artifactId>
@@ -212,5 +213,5 @@
 			</dependencies>
 		</profile>
 	</profiles>
-	
+
 </project>
