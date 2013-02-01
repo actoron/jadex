@@ -93,19 +93,19 @@ public class ObserverCenterWindow extends JFrame
 					
 					menubar = new JMenuBar();
 					// menubar.add(new JMenu("Test"));
-					setJMenuBar(menubar);
+//					setJMenuBar(menubar);
 
 					mainpanel = new JPanel(new BorderLayout());
 
 					toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-					mainpanel.add(toolbar, BorderLayout.NORTH);
+//					mainpanel.add(toolbar, BorderLayout.NORTH);
 
 					splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-					splitpane.setOneTouchExpandable(true);
+//					splitpane.setOneTouchExpandable(true);
 
 					JPanel pluginpanel = new JPanel(new CardLayout());
 
-					splitpane.setLeftComponent(pluginpanel);
+//					splitpane.setLeftComponent(pluginpanel);
 					
 					pluginpanel.setVisible(false);
 
@@ -113,6 +113,7 @@ public class ObserverCenterWindow extends JFrame
 					splitpane.setRightComponent(perspectivepanel);
 
 					mainpanel.add(splitpane, BorderLayout.CENTER);
+//					mainpanel.add(pluginpanel, BorderLayout.CENTER);
 					getContentPane().add(mainpanel, BorderLayout.CENTER);
 
 					setResizable(true);
@@ -122,7 +123,7 @@ public class ObserverCenterWindow extends JFrame
 					setSize(1280, 800);
 					setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 					setVisible(true);
-					splitpane.setDividerLocation(250);
+//					splitpane.setDividerLocation(250);
 					
 					toolbar.setVisible(false);
 					

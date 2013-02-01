@@ -208,7 +208,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_app = new MonkeyApp(_scaleApp, _scale, areaSize_.getXAsFloat(), isGrid, this.shader, this.camera, guiCreatorPath,  spaceController);
 		AppSettings settings = new AppSettings(true);
 //		settings.setResolution(523, 488);
-		settings.setResolution(1280, 768);
+		settings.setResolution(1280, 760);
 		_app.setPauseOnLostFocus(false);
 
 		_app.setSettings(settings);
