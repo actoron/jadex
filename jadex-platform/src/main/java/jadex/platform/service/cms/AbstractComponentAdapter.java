@@ -643,8 +643,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				try
 				{
-//					System.out.println("Executing: "+getComponentIdentifier());
+					System.out.println("Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 					again	= component.executeStep();
+					System.out.println("Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 				}
 				catch(Exception e)
 				{
@@ -688,16 +689,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				}
 			}
 			
-//			final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
-//			getCMS().addResultListener(new DefaultResultListener()
-//			{
-//				public void resultAvailable(Object result)
-//				{
-//					((ComponentManagementService)result).setProcessingState(cid, ready
-//						? IComponentDescription.PROCESSINGSTATE_READY : IComponentDescription.PROCESSINGSTATE_IDLE);
-//				}
-//			});
-
 			// Reset execution thread.
 			IComponentIdentifier.LOCAL.set(null);
 			IComponentAdapter.LOCAL.set(null);
@@ -737,30 +728,17 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			throw new RuntimeException("Can only block current component thread: "+componentthread+", "+Thread.currentThread());
 		}
 		
-		// Hack!!! create new thread anyways
-		// Todo: decide if a new thread is needed
 		Executor	exe	= Executor.EXECUTOR.get();
 		if(exe==null)
 		{
 			throw new RuntimeException("Cannot block: no executor");
 		}
-		exe.threadBlocked();
 		
 		this.executing	= false;
 		this.componentthread	= null;
-		synchronized(monitor)
-		{
-			try
-			{
-				monitor.wait();
-			}
-			catch(InterruptedException e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
 		
-		exe.threadUnblocked();
+		exe.blockThread(monitor);
+		
 		if(executing)
 		{
 			System.err.println(getComponentIdentifier()+": double execution");
@@ -779,19 +757,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		if(Thread.currentThread()!=componentthread)
 		{
-			throw new RuntimeException("Can only unblock from current component thread: "+componentthread+", "+Thread.currentThread());
+			throw new RuntimeException("Can only unblock current component thread: "+componentthread+", "+Thread.currentThread());
 		}
 		
-		// Terminate current thread as old thread is resumed.
-		if(componentthread==Thread.currentThread())
+		Executor	exe	= Executor.EXECUTOR.get();
+		if(exe==null)
 		{
-			Executor	exe	= Executor.EXECUTOR.get();
-			if(exe==null)
-			{
-				throw new RuntimeException("Cannot unblock: no executor");
-			}
-			exe.switchThread(monitor);
+			throw new RuntimeException("Cannot unblock: no executor");
 		}
+		
+		exe.switchThread(monitor);
 	}
 
 	/**

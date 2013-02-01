@@ -52,6 +52,9 @@ public class Executor implements Runnable
 	
 	/** The shutdown futures. */
 	protected List<Future<Void>> shutdownfutures;
+	
+	/** The monitor to synchronize with at thread start (if any). */
+	protected Object monitor; 
 		
 	//--------- constructors --------
 
@@ -85,6 +88,12 @@ public class Executor implements Runnable
 	 */
 	public void run()
 	{
+		if(monitor!=null)
+		{
+			System.out.println("Executor.run"+Thread.currentThread());
+			synchronized(monitor){}
+		}
+		
 		EXECUTOR.set(this);
 		
 		// running is already set to true in execute()
@@ -239,22 +248,36 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor)
 	{
+		System.out.println("Executor.switchThread"+Thread.currentThread());
 		SWITCH_TO.set(monitor);
 	}
 
 	/**
 	 *  Adjust to execution of current thread to be blocked.
 	 */
-	public void	threadBlocked()
+	public void	blockThread(Object monitor)
 	{
+		System.out.println("Executor.threadBlocked "+Thread.currentThread());
 		running	= false;
-	}
+		this.monitor	= monitor;
 
-	/**
-	 *  Adjust to execution of a blocked thread to be unblocked.
-	 */
-	public void	threadUnblocked()
-	{
+		synchronized(monitor)
+		{
+			// Todo: decide if a new thread is needed
+			// Hack!!! create new thread anyways
+			execute();
+			
+			try
+			{
+				monitor.wait();
+			}
+			catch(InterruptedException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		System.out.println("Executor.threadUnBlocked "+Thread.currentThread());
 		running	= true;
 	}
 }
