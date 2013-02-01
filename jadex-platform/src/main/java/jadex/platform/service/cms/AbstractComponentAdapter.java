@@ -702,18 +702,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			ret	= false;
 		}
 		
-//		System.out.println("end: "+getComponentIdentifier()+", "+ret);
 		executing	= false;
-//		synchronized(AsyncExecutionService.DEBUG)
-//		{
-//			AsyncExecutionService.DEBUG.put(this, "adapter execute() finished");
-//		}
-		
-//		if(getComponentIdentifier().getLocalName().indexOf("Alex")!=-1)
-//			System.out.println("exiting exe: "+getComponentIdentifier());
-		
 		ISuspendable.SUSPENDABLE.set(null);
 
+//		System.out.println("Again: "+getComponentIdentifier()+", "+ret+", "+Thread.currentThread());
+		
 		return ret;
 	}
 	

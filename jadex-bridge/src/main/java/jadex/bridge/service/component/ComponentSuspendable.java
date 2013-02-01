@@ -38,7 +38,7 @@ public class ComponentSuspendable implements ISuspendable
 	 */
 	public void suspend(IFuture<?> future, long timeout)
 	{
-		System.out.println("suspend "+Thread.currentThread());
+		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
 		
 		synchronized(this)
 		{
@@ -53,7 +53,7 @@ public class ComponentSuspendable implements ISuspendable
 			adapter.block(this);
 			this.future	= null;
 		}
-		System.out.println("unsuspend "+Thread.currentThread());
+		System.out.println("ComponentSuspendable.unsuspend "+Thread.currentThread());
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class ComponentSuspendable implements ISuspendable
 	 */
 	public void resume(IFuture<?> future)
 	{
-		System.out.println("resume "+Thread.currentThread());
+		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
 		synchronized(this)
 		{
 			// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
@@ -70,7 +70,7 @@ public class ComponentSuspendable implements ISuspendable
 				adapter.unblock(this);
 			}
 		}
-		System.out.println("unresume "+Thread.currentThread());
+		System.out.println("ComponentSuspendable.unresume "+Thread.currentThread());
 	}
 	
 	/**

@@ -21,7 +21,11 @@ public class SimpleBlockingTestAgent
 	@AgentBody(keepalive=false)
 	public void	execute(final IInternalAccess agent)
 	{
+		System.out.println("step 0");
+
 		agent.waitForDelay(500).get();
+		
+		System.out.println("step 1");
 		
 		agent.setResultValue("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));

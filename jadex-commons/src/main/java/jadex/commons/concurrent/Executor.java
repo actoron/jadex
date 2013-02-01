@@ -90,8 +90,9 @@ public class Executor implements Runnable
 	{
 		if(monitor!=null)
 		{
-			System.out.println("Executor.run"+Thread.currentThread());
+			System.out.println("Executor.waitForRun "+Thread.currentThread());
 			synchronized(monitor){}
+			System.out.println("Executor.run "+Thread.currentThread());
 		}
 		
 		EXECUTOR.set(this);
@@ -248,7 +249,7 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor)
 	{
-		System.out.println("Executor.switchThread"+Thread.currentThread());
+		System.out.println("Executor.switchThread "+Thread.currentThread());
 		SWITCH_TO.set(monitor);
 	}
 
@@ -257,7 +258,7 @@ public class Executor implements Runnable
 	 */
 	public void	blockThread(Object monitor)
 	{
-		System.out.println("Executor.threadBlocked "+Thread.currentThread());
+		System.out.println("Executor.blockThread "+Thread.currentThread());
 		running	= false;
 		this.monitor	= monitor;
 
@@ -277,7 +278,7 @@ public class Executor implements Runnable
 			}
 		}
 		
-		System.out.println("Executor.threadUnBlocked "+Thread.currentThread());
+		System.out.println("Executor.blockThreadFinished "+Thread.currentThread());
 		running	= true;
 	}
 }
