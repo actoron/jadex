@@ -22,10 +22,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 /**
- * 
+ *  User agent that presents a gui for using the 
+ *  translation service of the translation agent.
  */
 @Agent
-public class UserBDI
+public class UserB1BDI
 {
 	//-------- attributes --------
 
@@ -55,11 +56,13 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
+						// Search a translation service
 						SServiceProvider.getServices(agent.getServiceProvider(), ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new IIntermediateResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)
 							{
+								// Invoke translate on the service.
 								ts.translateEnglishGerman(tfe.getText())
 									.addResultListener(new SwingResultListener<String>(new IResultListener<String>()
 								{

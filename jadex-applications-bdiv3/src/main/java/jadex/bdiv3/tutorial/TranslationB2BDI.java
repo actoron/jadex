@@ -7,10 +7,8 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,11 +37,10 @@ public class TranslationB2BDI
 	/**
 	 *  Create a new plan.
 	 */
-	@AgentBody
+	@AgentCreated
 	public void body()
 	{
 //		System.out.println("Created: "+this);
-
 		this.wordtable = new HashMap<String, String>();
 		this.wordtable.put("coffee", "Kaffee");
 		this.wordtable.put("milk", "Milch");
@@ -52,57 +49,15 @@ public class TranslationB2BDI
 		this.wordtable.put("dog", "Hund");
 	}
 	
-//	@Goal(publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman"))
-//	public class TranslateGoal
-//	{
-//		protected String gword;
-//		protected String eword;
-//
-//		/**
-//		 *  Create a new TranslateGoal. 
-//		 */
-//		public TranslateGoal(String eword)
-//		{
-//			this.eword = eword;
-//		}
-//
-//		@GoalResult
-//		public String getGWord()
-//		{
-//			return gword;
-//		}
-//		
-//		public void setGWord(String gword)
-//		{
-//			this.gword = gword;
-//		}
-//		
-//		public String getEWord()
-//		{
-//			return eword;
-//		}
-//		
-//		public String getEword()
-//		{
-//			return eword;
-//		}
-//	}
-	
+	/**
+	 *  Plan reacts to the automatically created 
+	 *  translation goal.
+	 *  @param tg The translation goal.
+	 */
 	@Plan(trigger=@Trigger(goals=TranslationGoalB2.class))
 	public void translatePlan(TranslationGoalB2 tg)
 	{
 		String eword = wordtable.get(tg.getEWord());
 		tg.setGWord(eword);
-	}
-	
-	/**
-	 *  Translate an English word to German.
-	 *  @param eword The english word.
-	 *  @return The german translation.
-	 */
-	public IFuture<String> translateEnglishGerman(String eword)
-	{
-		String gword = wordtable.get(eword);
-		return new Future<String>(gword);
 	}
 }
