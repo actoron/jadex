@@ -8,7 +8,7 @@ import jadex.commons.future.IFuture;
 public interface IPlanBody
 {
 	/**
-	 * 
+	 *  Execute the plan body.
 	 */
-	public IFuture<Void> executePlanStep();
+	public IFuture<Void> executePlanBody();
 }

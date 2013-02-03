@@ -14,7 +14,10 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- *  
+ *  Handler used for service-goal delegation.
+ *  Creates specific goal for an incoming service request.
+ *  Goal must have constructor that exactly fits to
+ *  service invocation parameters
  */
 @Service
 public class GoalDelegationHandler  implements InvocationHandler

@@ -53,6 +53,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,10 +61,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  The bdi agent interpreter.
+ *  Its steps consist of two parts
+ *  - execution the activated rules
+ *  - executing the enqueued steps
  */
 public class BDIAgentInterpreter extends MicroAgentInterpreter
 {
+	//-------- attributes --------
+	
 	/** The bdi model. */
 	protected BDIModel bdimodel;
 	
@@ -72,6 +78,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	
 	/** The bdi state. */
 	protected RCapability capa;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new agent.
@@ -347,7 +355,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		for(final MBelief mbel: beliefs)
 		{
-			String[] evs = mbel.getEvents();
+			Collection<String> evs = mbel.getEvents();
 			if(evs!=null)
 			{
 				List<String> events = new ArrayList<String>();
@@ -986,7 +994,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Execute a goal method.
 	 */
 	protected boolean executeGoalMethod(Method m, RGoal goal, IEvent event)
 	{
@@ -1066,7 +1074,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Create belief events from a belief name.
+	 *  For normal beliefs 
+	 *  beliefchanged.belname and factchanged.belname 
+	 *  and for multi beliefs additionally
+	 *  factadded.belname and factremoved 
+	 *  are created.
 	 */
 	public static void addBeliefEvents(IInternalAccess ia, List<String> events, String belname)
 	{
@@ -1083,7 +1096,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Create goal events for a goal name. creates
+	 *  goaladopted, goaldropped
+	 *  goaloption, goalactive, goalsuspended
+	 *  goalinprocess, goalnotinprocess
+	 *  events.
 	 */
 	public static List<String> getGoalEvents()
 	{
@@ -1121,7 +1138,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Condition for checking the lifecycle state of a goal.
 	 */
 	public static class LifecycleStateCondition implements ICondition
 	{
@@ -1132,7 +1149,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		protected boolean allowed;
 		
 		/**
-		 * 
+		 *  Create a new condition.
 		 */
 		public LifecycleStateCondition(String state)
 		{
@@ -1140,7 +1157,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		/**
-		 * 
+		 *  Create a new condition.
 		 */
 		public LifecycleStateCondition(Set<String> states)
 		{
@@ -1148,7 +1165,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		/**
-		 * 
+		 *  Create a new condition.
 		 */
 		public LifecycleStateCondition(String state, boolean allowed)
 		{
@@ -1156,7 +1173,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		/**
-		 * 
+		 *  Create a new condition.
 		 */
 		public LifecycleStateCondition(Set<String> states, boolean allowed)
 		{
@@ -1165,7 +1182,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		/**
-		 * 
+		 *  Evaluate the condition.
 		 */
 		public boolean evaluate(IEvent event)
 		{
@@ -1178,7 +1195,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Condition that tests if goal instances of an mgoal exist.
 	 */
 	public static class GoalsExistCondition implements ICondition
 	{

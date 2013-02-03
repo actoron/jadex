@@ -57,7 +57,7 @@ public class AbstractBeingBDI
 	protected ISpaceObject mySpaceObject;
 
 	/** The position of the "Being". */
-	@Belief(dynamic="mySpaceObject")
+	@Belief(events="mySpaceObject")
 	protected Vector2Double	myPosition = mySpaceObject==null? null: (Vector2Double)mySpaceObject.getProperty(Space2D.PROPERTY_POSITION);
 
 //	public Vector2Double getUpdatedPosition()

@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *  Runtime element for storing goal ans plan instances.
  */
 public class RCapability extends RElement
 {
+	//-------- attributes --------
+	
 //	/** The beliefs. */
 //	protected List<RBelief> beliefs;
 	
@@ -29,6 +31,8 @@ public class RCapability extends RElement
 	/** The plans. */
 	protected List<RPlan> plans;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new bdi state.
 	 */
@@ -36,6 +40,8 @@ public class RCapability extends RElement
 	{
 		super(mcapa);
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the goals.

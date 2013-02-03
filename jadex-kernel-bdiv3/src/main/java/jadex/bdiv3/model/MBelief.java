@@ -4,6 +4,9 @@ import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,21 +23,35 @@ public class MBelief extends MElement
 	/** The collection implementation class. */
 	protected String impl;
 	
+	/** The dynamic flag. */
+	protected boolean dynamic;
+	
 	/** Flag if is multi. */
 	protected Boolean multi;
 	
 	/** The events this belief depends on. */
-	protected String[] events;
+	protected Set<String> events;
 	
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(FieldInfo target, String impl, String[] events)
+	public MBelief(FieldInfo target, String impl, boolean dynamic, String[] events)
 	{
 		super(target.getName());
 		this.target = target;
 		this.impl = impl;
-		this.events = events;
+		this.dynamic = dynamic;
+		this.events = new HashSet<String>();
+		if(events!=null)
+		{
+			// Is dynamic when events are given
+			if(events.length>0)
+				dynamic = true;
+			for(String ev: events)
+			{
+				this.events.add(ev);
+			}
+		}
 	}
 
 	/**
@@ -77,7 +94,7 @@ public class MBelief extends MElement
 	 *  Get the events.
 	 *  @return The events.
 	 */
-	public String[] getEvents()
+	public Collection<String> getEvents()
 	{
 		return events;
 	}
@@ -86,9 +103,28 @@ public class MBelief extends MElement
 	 *  Set the events.
 	 *  @param events The events to set.
 	 */
-	public void setEvents(String[] events)
+	public void setEvents(Collection<String> events)
 	{
-		this.events = events;
+		this.events.clear();
+		this.events.addAll(events);
+	}
+	
+	/**
+	 *  Get the dynamic.
+	 *  @return The dynamic.
+	 */
+	public boolean isDynamic()
+	{
+		return dynamic;
+	}
+
+	/**
+	 *  Set the dynamic.
+	 *  @param dynamic The dynamic to set.
+	 */
+	public void setDynamic(boolean dynamic)
+	{
+		this.dynamic = dynamic;
 	}
 
 	/**

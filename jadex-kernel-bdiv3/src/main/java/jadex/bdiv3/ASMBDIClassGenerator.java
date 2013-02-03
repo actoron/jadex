@@ -16,6 +16,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -260,8 +261,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		List<String> todo = new ArrayList<String>();
 		for(MBelief mbel: mbels)
 		{
-			String[] evs = mbel.getEvents();
-			if(evs!=null)
+			Collection<String> evs = mbel.getEvents();
+			if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
 			{
 				todo.add(mbel.getName());
 			}
@@ -305,28 +306,41 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 //							System.out.println("found writeField node: "+min.name+" "+min.getOpcode());
 							AbstractInsnNode start = min;
 							String name = null;
+							List<String> evs = new ArrayList<String>(); 
 							while(!start.equals(begin))
 							{
 								// find method name via last constant load
 								if(name==null && start instanceof LdcInsnNode)
 									name = (String)((LdcInsnNode)start).cst;
+								if(start.getOpcode()==Opcodes.GETFIELD)
+								{
+									String bn = ((FieldInsnNode)start).name;
+									if(model.getCapability().hasBelief(bn))
+									{
+										evs.add(bn);
+									}
+								}
 								start = start.getPrevious();
 							}
-
+							
 							if(todo.remove(name))
 							{
+								MBelief mbel = model.getCapability().getBelief(name);
+								mbel.getEvents().addAll(evs);
+								
 								MethodNode mnode = new MethodNode(mn.access, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
 									+SUtil.firstToUpperCase(name), mn.desc, mn.signature, null);
 								
+								// First labels are cloned
 								AbstractInsnNode cur = start;
 								Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
 								while(!cur.equals(min))
 								{
-									AbstractInsnNode clone;
 									if(cur instanceof LabelNode)
 										labels.put((LabelNode)cur, new LabelNode(new Label()));
 									cur = cur.getNext();
 								}
+								// Then code is cloned
 								cur = start;
 								while(!cur.equals(min))
 								{

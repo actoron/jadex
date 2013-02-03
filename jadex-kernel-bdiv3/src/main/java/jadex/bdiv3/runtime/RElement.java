@@ -3,20 +3,24 @@ package jadex.bdiv3.runtime;
 import jadex.bdiv3.model.MElement;
 
 /**
- * 
+ *  Base element for all runtime elements.
  */
 public class RElement
 {
 	protected static long cnt;
 	
+	//-------- attributes --------
+
 	/** The model element. */
 	protected MElement modelelement;
 		
 	/** The element id. */
 	protected String id;
+
+	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new runtime element.
 	 */
 	public RElement(MElement modelelement)
 	{
@@ -24,6 +28,8 @@ public class RElement
 		this.id = modelelement.getName()+"_#"+cnt++;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the modelelement.
 	 *  @return The modelelement.

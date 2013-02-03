@@ -70,7 +70,7 @@ public class SecurityService implements ISecurityService
 	
 	/** Properties id for the settings service. */
 	public static final String	PROEPRTIES_ID	= "securityservice";
-		
+
 	//-------- attributes --------
 	
 	/** The component. */
@@ -842,13 +842,13 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Check if there is a shared secret.
 	 */
-	public static String checkDigests(IAuthorizable request, String password, Map<String, String> networkpasses)
+	public String checkDigests(IAuthorizable request, String password, Map<String, String> networkpasses)
 	{
 		String ret = null;
 		
 		List<byte[]> digests = request.getAuthenticationData();
 		long timestamp = request.getTimestamp();
-		long vd = request.getValidityDuration()==0? 65536: request.getValidityDuration();
+		long vd = request.getValidityDuration()==0? valdur: request.getValidityDuration();
 		
 		String prefix = request.getValidityDuration()==0? request.getDigestContent(): 
 			request.getValidityDuration()+request.getDigestContent();

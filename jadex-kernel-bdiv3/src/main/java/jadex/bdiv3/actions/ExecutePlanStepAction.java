@@ -79,6 +79,6 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		}
 		rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_BODY);
 		IPlanBody body = rplan.getBody();
-		return body.executePlanStep();
+		return body.executePlanBody();
 	}
 }

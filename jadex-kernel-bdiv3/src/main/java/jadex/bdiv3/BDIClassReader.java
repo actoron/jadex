@@ -203,7 +203,7 @@ public class BDIClassReader extends MicroClassReader
 					Belief bel = getAnnotation(fields[i], Belief.class, cl);
 					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
 						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-						bel.dynamic().length==0? null: bel.dynamic()));
+						bel.dynamic(), bel.events().length==0? null: bel.events()));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
 				}

@@ -7,18 +7,23 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 
 /**
- * 
+ *  Abstract base class for plan body implementations.
+ *   
  */
 public abstract class AbstractPlanBody implements IPlanBody
 {
+	//-------- attributes --------
+	
 	/** The bdi interpreter. */
 	protected IInternalAccess ia;
 	
 	/** The rplan. */
 	protected RPlan rplan;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new plan body.
 	 */
 	public AbstractPlanBody(IInternalAccess ia, RPlan rplan)
 	{
@@ -26,15 +31,17 @@ public abstract class AbstractPlanBody implements IPlanBody
 		this.rplan = rplan;
 	}
 
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Execute the plan body.
 	 */
-	public IFuture<Void> executePlanStep()
+	public IFuture<Void> executePlanBody()
 	{
 		try
 		{
 			final Object reason = rplan.getReason();
-			Object res = executeBody(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
+			Object res = invokeBody(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
 				guessParameters(getBodyParameterTypes()));
 			if(res instanceof IFuture)
 			{
@@ -75,17 +82,17 @@ public abstract class AbstractPlanBody implements IPlanBody
 	}
 	
 	/**
-	 * 
+	 *  Invoke the plan body.
 	 */
-	public abstract Object executeBody(Object agent, Object[] params);
+	public abstract Object invokeBody(Object agent, Object[] params);
 	
 	/**
-	 * 
+	 *  Get the body parameters.
 	 */
 	public abstract Class<?>[] getBodyParameterTypes();
 	
 	/**
-	 * 
+	 *  Method that tries to guess the parameters for the method call.
 	 */
 	public Object[] guessParameters(Class<?>[] ptypes)
 	{

@@ -10,10 +10,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * 
+ *  Plan body that is represented as complete class.
  */
 public class ClassPlanBody extends AbstractPlanBody
 {
+	//-------- attributes --------
+	
 	/** The body class. */
 	protected Class<?> body;
 	
@@ -23,8 +25,10 @@ public class ClassPlanBody extends AbstractPlanBody
 	/** The body method. */
 	protected Method bodymethod;
 	
+	//--------- constructors ---------
+	
 	/**
-	 * 
+	 *  Create a new plan body.
 	 */
 	public ClassPlanBody(IInternalAccess ia, RPlan rplan, Class<?> body)
 	{
@@ -35,7 +39,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	}
 	
 	/**
-	 * 
+	 *  Create a new plan body.
 	 */
 	public ClassPlanBody(IInternalAccess ia, RPlan rplan, Object plan)
 	{
@@ -46,10 +50,12 @@ public class ClassPlanBody extends AbstractPlanBody
 			.getBodyMethod(plan.getClass()).getMethod(ia.getClassLoader());
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Invoke the body.
 	 */
-	public Object executeBody(Object agent, Object[] params)
+	public Object invokeBody(Object agent, Object[] params)
 	{
 		try
 		{
@@ -99,7 +105,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	}
 	
 	/**
-	 * 
+	 *  Get the body parameter types.
 	 */
 	public Class<?>[] getBodyParameterTypes()
 	{

@@ -20,6 +20,11 @@ public @interface Belief
 	/**
 	 *  A dynamic belief is automatically updated when other beliefs change.
 	 */
-	public String[] dynamic() default {};
+	public boolean dynamic() default false;
+	
+	/**
+	 *  A dynamic belief is automatically updated when other beliefs change.
+	 */
+	public String[] events() default {};
 	
 }

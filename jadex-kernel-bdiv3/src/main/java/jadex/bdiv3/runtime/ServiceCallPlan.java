@@ -1,8 +1,6 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.PlanBody;
-import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -17,7 +15,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 /**
- *  Find and call a service.
+ *  Default plan for realizing a service call.
+ *  Finds and calls a service.
  */
 public class ServiceCallPlan
 {

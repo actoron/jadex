@@ -5,15 +5,19 @@ import jadex.bridge.IInternalAccess;
 import java.lang.reflect.Method;
 
 /**
- * 
+ *  Implementation of a method as a plan body.
  */
 public class MethodPlanBody extends AbstractPlanBody
 {
+	//-------- attributes --------
+	
 	/** The method. */
 	protected Method body;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new plan body.
 	 */
 	public MethodPlanBody(IInternalAccess ia, RPlan rplan, Method body)
 	{
@@ -21,10 +25,12 @@ public class MethodPlanBody extends AbstractPlanBody
 		this.body = body;
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Invoke the body.
 	 */
-	public Object executeBody(Object agent, Object[] params)
+	public Object invokeBody(Object agent, Object[] params)
 	{
 		try
 		{
@@ -38,7 +44,7 @@ public class MethodPlanBody extends AbstractPlanBody
 	}
 	
 	/**
-	 * 
+	 *  Get the body parameter types.
 	 */
 	public Class<?>[] getBodyParameterTypes()
 	{

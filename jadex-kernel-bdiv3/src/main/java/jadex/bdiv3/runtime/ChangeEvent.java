@@ -1,7 +1,7 @@
 package jadex.bdiv3.runtime;
 
 /**
- * 
+ *  Event that is thrown in case of a bdi element change (belief, goal, etc.).
  */
 public class ChangeEvent
 {

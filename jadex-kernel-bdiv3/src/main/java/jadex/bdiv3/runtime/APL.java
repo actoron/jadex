@@ -15,10 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  The APL is the applicable plan list. It stores the
+ *  candidates that can be (and were) executed for a processable element.
  */
 public class APL
 {	
+	//-------- attributes --------
+	
 	/** The processable element. */
 	protected RProcessableElement element;
 	
@@ -37,6 +40,8 @@ public class APL
 //	/** The waitqueue candidates. */
 //	protected List<RPlan> waitqueuecandidates;
 	
+	//-------- constructors --------
+
 	/**
 	 *  Create a new APL.
 	 */
@@ -44,6 +49,8 @@ public class APL
 	{
 		this.element = element;
 	}
+	
+	//-------- methods --------
 	
 //	/**
 //	 *  Get the plancandidates.
