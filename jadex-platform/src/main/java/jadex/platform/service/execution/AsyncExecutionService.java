@@ -153,7 +153,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							{
 								// isRunning() refers to running state of executor!
 								// Do not remove when a new executor has already been added for the task.
-								if(!this.isRunning() && executors!=null && executors.get(task)==this)	
+								if(this.getThreadCount()==0 &&!this.isRunning() && executors!=null && executors.get(task)==this)	
 								{
 									idf	= removeTask(task);
 								}

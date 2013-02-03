@@ -47,10 +47,9 @@ public class StepAgent	implements	IStepService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				for(int i=0; i<steps; i++)
+				for(int i=1; i<=steps; i++)
 				{
 					ia.waitForDelay(millis).get();
-					System.out.println("Performing step: "+i);
 					ret.addIntermediateResult(new Integer(i));
 				}
 				ret.setFinished();

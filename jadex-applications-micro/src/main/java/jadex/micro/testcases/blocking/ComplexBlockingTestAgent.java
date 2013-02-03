@@ -62,7 +62,7 @@ public class ComplexBlockingTestAgent
 		first.get();
 		second.get();
 		
-		if("[1,1,2,2,3,3]".equals(steps.toString()))
+		if("[1, 1, 2, 2, 3, 3]".equals(steps.toString()))
 		{
 			agent.setResultValue("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", true, null)}));

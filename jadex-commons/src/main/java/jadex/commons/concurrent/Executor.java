@@ -55,6 +55,9 @@ public class Executor implements Runnable
 	
 	/** The monitor to synchronize with at thread start (if any). */
 	protected Object monitor; 
+	
+	/** The number of current threads for this executor. */
+	protected int	threadcnt;
 		
 	//--------- constructors --------
 
@@ -79,11 +82,6 @@ public class Executor implements Runnable
 		this.threadpool = threadpool;
 		this.executable = executable;
 		this.shutdownfutures = new ArrayList<Future<Void>>();
-		
-		if(executable.toString().indexOf("SimpleBlocking")!=-1)
-		{
-			System.out.println("created: "+this);
-		}
 	}
 		
 	//-------- methods --------
@@ -93,11 +91,16 @@ public class Executor implements Runnable
 	 */
 	public void run()
 	{
+		synchronized(this)
+		{
+			threadcnt++;
+		}
+		
 		if(monitor!=null)
 		{
-			System.out.println("Executor.waitForRun "+Thread.currentThread());
+//			System.out.println("Executor.waitForRun "+Thread.currentThread());
 			synchronized(monitor){}
-			System.out.println("Executor.run "+Thread.currentThread());
+//			System.out.println("Executor.run "+Thread.currentThread());
 		}
 		
 		EXECUTOR.set(this);
@@ -105,18 +108,18 @@ public class Executor implements Runnable
 		// running is already set to true in execute()
 		
 		boolean	iwanttorun	= true;
-		boolean	doswitch	= false;
+//		boolean	doswitch	= false;
 		while(iwanttorun && !shutdown)
 		{
-			if(executable.toString().indexOf("SimpleBlocking")!=-1)
-			{
-				System.out.println("precode");
-			}
+//			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//			{
+//				System.out.println("precode");
+//			}
 			iwanttorun	=	code();
-			if(executable.toString().indexOf("SimpleBlocking")!=-1)
-			{
-				System.out.println("postcode "+iwanttorun);
-			}
+//			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//			{
+//				System.out.println("postcode "+iwanttorun);
+//			}
 
 			Object	switchto	= SWITCH_TO.get();
 			if(switchto==null)
@@ -134,25 +137,25 @@ public class Executor implements Runnable
 					running	= iwanttorun;
 					wanttorun	= false;	// reset until execute() is called again.
 					
-					if(executable.toString().indexOf("SimpleBlocking")!=-1)
-					{
-						System.out.println("postcode2 "+iwanttorun);
-					}
+//					if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//					{
+//						System.out.println("postcode2 "+iwanttorun);
+//					}
 				}
 			}
 			else
 			{
 				SWITCH_TO.set(null);
 				iwanttorun	= false;
-				doswitch=true;
+//				doswitch=true;
 				synchronized(switchto)
 				{
 					switchto.notify();
 					
-					if(executable.toString().indexOf("SimpleBlocking")!=-1)
-					{
-						System.out.println("switchto "+iwanttorun+", "+wanttorun+", "+running);
-					}
+//					if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//					{
+//						System.out.println("switchto "+iwanttorun+", "+wanttorun+", "+running);
+//					}
 				}
 			}
 		}
@@ -180,9 +183,14 @@ public class Executor implements Runnable
 		
 		EXECUTOR.set(null);
 		
-		if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//		if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//		{
+//			System.out.println("finished: "+doswitch+", "+running+", "+this);
+//		}
+		
+		synchronized(this)
 		{
-			System.out.println("finished: "+doswitch+", "+running+", "+this);
+			threadcnt--;
 		}
 	}
 
@@ -195,12 +203,11 @@ public class Executor implements Runnable
 		
 		synchronized(this)
 		{
-			if(executable.toString().indexOf("SimpleBlocking")!=-1)
-			{
-				System.out.println("preexecute "+wanttorun+", "+running+", "+execute+", "+this);
-			}
+//			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//			{
+//				System.out.println("preexecute "+wanttorun+", "+running+", "+execute+", "+this);
+//			}
 
-//			Thread.dumpStack();
 			if(!shutdown)
 			{		
 				// Indicate that thread should continue to run (if running).
@@ -214,11 +221,10 @@ public class Executor implements Runnable
 					execute	= true;
 				}
 			}
-//			System.out.println("executing: "+this+" "+running+", "+execute);
-			if(executable.toString().indexOf("SimpleBlocking")!=-1)
-			{
-				System.out.println("postexecute "+wanttorun+", "+running+", "+execute);
-			}
+//			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+//			{
+//				System.out.println("postexecute "+wanttorun+", "+running+", "+execute);
+//			}
 		}
 
 		if(execute)
@@ -283,12 +289,21 @@ public class Executor implements Runnable
 	}
 
 	/**
+	 *  Get the number of threads (running blocked)
+	 *  for this executor.
+	 */
+	protected int	getThreadCount()
+	{
+		return threadcnt;
+	}
+
+	/**
 	 *  Cease execution of the current thread and
 	 *  switch to another thread waiting for the given monitor.
 	 */
 	public void	switchThread(Object monitor)
 	{
-		System.out.println("Executor.switchThread "+Thread.currentThread());
+//		System.out.println("Executor.switchThread "+Thread.currentThread());
 		SWITCH_TO.set(monitor);
 	}
 
@@ -297,7 +312,7 @@ public class Executor implements Runnable
 	 */
 	public void	blockThread(Object monitor)
 	{
-		System.out.println("Executor.blockThread "+Thread.currentThread());
+//		System.out.println("Executor.blockThread "+Thread.currentThread());
 		running	= false;
 		this.monitor	= monitor;
 
@@ -317,7 +332,7 @@ public class Executor implements Runnable
 			}
 		}
 		
-		System.out.println("Executor.blockThreadFinished "+Thread.currentThread());
+//		System.out.println("Executor.blockThreadFinished "+Thread.currentThread());
 		running	= true;
 	}
 }
