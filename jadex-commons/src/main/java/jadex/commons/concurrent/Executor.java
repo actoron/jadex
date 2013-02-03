@@ -79,6 +79,11 @@ public class Executor implements Runnable
 		this.threadpool = threadpool;
 		this.executable = executable;
 		this.shutdownfutures = new ArrayList<Future<Void>>();
+		
+		if(executable.toString().indexOf("SimpleBlocking")!=-1)
+		{
+			System.out.println("created: "+this);
+		}
 	}
 		
 	//-------- methods --------
@@ -100,9 +105,18 @@ public class Executor implements Runnable
 		// running is already set to true in execute()
 		
 		boolean	iwanttorun	= true;
+		boolean	doswitch	= false;
 		while(iwanttorun && !shutdown)
 		{
+			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+			{
+				System.out.println("precode");
+			}
 			iwanttorun	=	code();
+			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+			{
+				System.out.println("postcode "+iwanttorun);
+			}
 
 			Object	switchto	= SWITCH_TO.get();
 			if(switchto==null)
@@ -119,15 +133,26 @@ public class Executor implements Runnable
 					iwanttorun	= iwanttorun || wanttorun;
 					running	= iwanttorun;
 					wanttorun	= false;	// reset until execute() is called again.
+					
+					if(executable.toString().indexOf("SimpleBlocking")!=-1)
+					{
+						System.out.println("postcode2 "+iwanttorun);
+					}
 				}
 			}
 			else
 			{
 				SWITCH_TO.set(null);
 				iwanttorun	= false;
+				doswitch=true;
 				synchronized(switchto)
 				{
 					switchto.notify();
+					
+					if(executable.toString().indexOf("SimpleBlocking")!=-1)
+					{
+						System.out.println("switchto "+iwanttorun+", "+wanttorun+", "+running);
+					}
 				}
 			}
 		}
@@ -154,6 +179,11 @@ public class Executor implements Runnable
 		}
 		
 		EXECUTOR.set(null);
+		
+		if(executable.toString().indexOf("SimpleBlocking")!=-1)
+		{
+			System.out.println("finished: "+doswitch+", "+running+", "+this);
+		}
 	}
 
 	/**
@@ -165,6 +195,11 @@ public class Executor implements Runnable
 		
 		synchronized(this)
 		{
+			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+			{
+				System.out.println("preexecute "+wanttorun+", "+running+", "+execute+", "+this);
+			}
+
 //			Thread.dumpStack();
 			if(!shutdown)
 			{		
@@ -180,6 +215,10 @@ public class Executor implements Runnable
 				}
 			}
 //			System.out.println("executing: "+this+" "+running+", "+execute);
+			if(executable.toString().indexOf("SimpleBlocking")!=-1)
+			{
+				System.out.println("postexecute "+wanttorun+", "+running+", "+execute);
+			}
 		}
 
 		if(execute)

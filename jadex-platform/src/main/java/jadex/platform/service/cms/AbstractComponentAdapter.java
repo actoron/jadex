@@ -693,8 +693,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			IComponentIdentifier.LOCAL.set(null);
 			IComponentAdapter.LOCAL.set(null);
 			componentthread.setContextClassLoader(cl);
-			this.componentthread = null;		
-
+			this.componentthread = null;
+			
 			ret	= (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted;
 		}
 		else

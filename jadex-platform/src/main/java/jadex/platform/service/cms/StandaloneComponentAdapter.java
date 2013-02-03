@@ -29,7 +29,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	//-------- attributes --------
 	
 	/** The execution service (cached for speed). */
-	protected IFuture	exeservice;
+	protected IExecutionService	exeservice;
 	
 	//-------- constructors --------
 
@@ -49,57 +49,52 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	doWakeup()
 	{
-//		final Exception de	= new DebugException(""+DecouplingInterceptor.SIC.get());
-		getExecutionService().addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				try
-				{
-//					if(getComponentIdentifier().toString().indexOf("@")==-1)
-//					{
-//						System.err.println("doWakeup: "+getComponentIdentifier());
-//						Thread.dumpStack();
-//					}
-					((IExecutionService)result).execute(StandaloneComponentAdapter.this);
-				}
-				catch(RuntimeException e)
-				{
-					// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
-//					logger.warning("Wakeup failed, execution service is shutting down: "+getComponentIdentifier());
-//					e.printStackTrace();
-//					de.printStackTrace();
-				}
-			}
-		});
-	}
-	
-	/**
-	 *  Get the execution service for waking the agent.
-	 */
-	protected IFuture	getExecutionService()
-	{
 		if(exeservice==null)
 		{
-			exeservice	= SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener<IExecutionService>()
+			{
+				public void resultAvailable(IExecutionService result)
+				{
+					exeservice	= result;
+					try
+					{
+						exeservice.execute(StandaloneComponentAdapter.this);
+					}
+					catch(RuntimeException e)
+					{
+						// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
+					}
+				}
+			});
 		}
-		return exeservice;
+		else
+		{
+			try
+			{
+				exeservice.execute(StandaloneComponentAdapter.this);
+			}
+			catch(RuntimeException e)
+			{
+				// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
+			}
+		}
 	}
 	
-	/**
-	 *  Kill the component.
-	 */
-	public IFuture<Void> killComponent()
-	{
-		Future<Void>	ret	= new Future<Void>();
-		super.killComponent().addResultListener(new DelegationResultListener<Void>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				exeservice	= null;
-				super.customResultAvailable(result);
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Kill the component.
+//	 */
+//	public IFuture<Void> killComponent()
+//	{
+//		Future<Void>	ret	= new Future<Void>();
+//		super.killComponent().addResultListener(new DelegationResultListener<Void>(ret)
+//		{
+//			public void customResultAvailable(Void result)
+//			{
+//				exeservice	= null;
+//				super.customResultAvailable(result);
+//			}
+//		});
+//		return ret;
+//	}
 }
