@@ -33,7 +33,7 @@ public class BenchmarkBDI extends SokratesBDI
 	 *  Overridden to remove waits. 
 	 */
 	@Plan(trigger=@Trigger(goals=MoveGoal.class))
-	public IFuture<Void>	move(final RPlan rplan)
+	public IFuture<Void> move(final RPlan rplan)
 //	public IFuture<Void>	doMove(Move move)
 	{
 		final Future<Void>	ret	= new Future<Void>();

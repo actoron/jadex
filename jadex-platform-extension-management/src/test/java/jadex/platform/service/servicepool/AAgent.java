@@ -35,7 +35,7 @@ public class AAgent implements IAService
 	 */
 	public IFuture<String> ma1(String str)
 	{
-		System.out.println("ma1 called with: "+str+" "+agent.getComponentIdentifier().getLocalName());
+//		System.out.println("ma1 called with: "+str+" "+agent.getComponentIdentifier().getLocalName());
 		return new Future<String>(str+" result of ma1");
 	}
 	
@@ -52,7 +52,7 @@ public class AAgent implements IAService
 			{
 				if(cnt[0]<100)
 				{
-					System.out.println("ma2 called "+cnt[0]+" "+agent.getComponentIdentifier().getLocalName());
+//					System.out.println("ma2 called "+cnt[0]+" "+agent.getComponentIdentifier().getLocalName());
 					ret.addIntermediateResult(new Integer(cnt[0]++));
 					agent.waitForDelay(100, this);
 				}

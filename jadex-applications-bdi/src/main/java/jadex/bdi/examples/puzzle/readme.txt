@@ -103,3 +103,12 @@ none             1091      2363     2.17
 all              691       1322     1.91
 same             210       290      1.38
 alter            5077      13269    2.61
+
+
+Release V3
+Machine A (Lars)
+                 JACK      Jadex    Factor
+none             1156               1.42
+all              800                1.08
+same             450                0.31
+alter                               2.38

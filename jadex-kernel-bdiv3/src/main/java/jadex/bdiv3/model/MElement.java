@@ -13,6 +13,8 @@ public class MElement
 	 */
 	public MElement(String name)
 	{
+		if(name.equals("Object"))
+			System.out.println("gggsdg");
 		this.name = name;
 	}
 

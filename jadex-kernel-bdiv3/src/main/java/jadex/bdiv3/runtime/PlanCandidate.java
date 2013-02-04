@@ -54,6 +54,8 @@ public class PlanCandidate
 	protected void init(RProcessableElement element, RCapability capa)
 	{
 		this.mplan	= ((MCapability)capa.getModelElement()).getPlan(name);
+		if(mplan==null)
+			throw new RuntimeException();
 	}
 	
 	/**
