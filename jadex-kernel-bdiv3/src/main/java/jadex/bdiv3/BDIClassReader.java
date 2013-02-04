@@ -239,9 +239,9 @@ public class BDIClassReader extends MicroClassReader
 //				}
 //			}
 			
-			if(!confdone && isAnnotationPresent(cma, BDIConfigurations.class, cl))
+			if(!confdone && isAnnotationPresent(clazz, BDIConfigurations.class, cl))
 			{
-				BDIConfigurations val = (BDIConfigurations)getAnnotation(cma, BDIConfigurations.class, cl);
+				BDIConfigurations val = (BDIConfigurations)getAnnotation(clazz, BDIConfigurations.class, cl);
 				BDIConfiguration[] configs = val.value();
 				confdone = val.replace();
 				

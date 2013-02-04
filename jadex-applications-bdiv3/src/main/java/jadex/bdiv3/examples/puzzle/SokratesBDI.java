@@ -56,7 +56,7 @@ public class SokratesBDI
 	
 	/** The strategy (none=choose the first applicable, long=prefer jump moves,
 	 * same_long=prefer long moves of same color, alter_long=prefer long move of alternate color). */
-	protected String strategy = agent.getConfiguration();//MoveComparator.STRATEGY_SAME_LONG;
+	protected String strategy; // = MoveComparator.STRATEGY_SAME_LONG;
 	
 	//-------- methods --------
 	
@@ -68,6 +68,7 @@ public class SokratesBDI
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
+		strategy = agent.getConfiguration();
 		createGui(agent);
 		
 		System.out.println("Now puzzling:");
