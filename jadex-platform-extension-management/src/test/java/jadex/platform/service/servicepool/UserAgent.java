@@ -194,8 +194,6 @@ public class UserAgent
 								}
 							}
 						});
-						
-						ret.setResult(null);
 					}
 				});
 				for(int i=0; i<cnt2; i++)
