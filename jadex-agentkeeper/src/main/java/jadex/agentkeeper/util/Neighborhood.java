@@ -14,7 +14,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 
-
+/**
+ * 
+ * Class that implements the Neighborhood calculation
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public class Neighborhood
 {
 

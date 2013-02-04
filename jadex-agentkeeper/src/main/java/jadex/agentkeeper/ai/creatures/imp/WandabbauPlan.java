@@ -7,8 +7,12 @@ import jadex.agentkeeper.game.state.missions.Auftragsverwalter;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.bdi.runtime.IGoal;
 
-
-@SuppressWarnings("serial")
+/**
+ * TODO: Refractor in English and as BDIv3 Agent-Plan
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public class WandabbauPlan extends ImpPlan
 {
 	public static int	ABBAUZEIT	= 45;

@@ -3,6 +3,10 @@ package jadex.agentkeeper.ai.pathfinding;
 import jadex.extension.envsupport.math.IVector2;
 
 /**
+ * 
+ * TODO: refractor in English
+ * 
+ * 
  * Eine Klasse fuer die Datenhaltung der Wegpunkte (nur relevant f�r die
  * Pfadsuche) und dadurch auch die Wegkostenverarbeitung
  * 

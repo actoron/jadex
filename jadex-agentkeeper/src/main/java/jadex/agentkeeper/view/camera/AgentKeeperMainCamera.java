@@ -1,29 +1,17 @@
 package jadex.agentkeeper.view.camera;
 
-import com.jme3.export.JmeExporter;
-import com.jme3.export.JmeImporter;
-import com.jme3.input.InputManager;
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
-import com.jme3.math.FastMath;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.control.Control;
-
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.CustomChaseCamera;
 
-import java.awt.Dimension;
-import java.io.IOException;
+import com.jme3.input.InputManager;
+import com.jme3.math.FastMath;
+import com.jme3.renderer.Camera;
+import com.jme3.scene.Node;
 
 /**
- * The camera for the game
+ * The camera for AgentKeeper
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  *
  */
 public class AgentKeeperMainCamera 

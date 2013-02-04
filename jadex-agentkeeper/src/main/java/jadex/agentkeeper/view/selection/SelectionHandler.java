@@ -21,7 +21,12 @@ import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.debug.WireBox;
 
 
-
+/**
+ * Class that contains the SelectionLogic of the Selection-Helper-Box in the Viewport
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public class SelectionHandler
 {
 	private MonkeyApp						app;

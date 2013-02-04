@@ -16,9 +16,9 @@ import java.util.List;
 
 
 /**
- * Plan f�rs Gold Sammeln
+ * TODO: Refractor in English and as BDIv3 Agent-Plan
  * 
- * @author 8reichel
+ * @author Philip Willuweit p.willuweit@gmx.de
  * @author 7willuwe
  * 
  */

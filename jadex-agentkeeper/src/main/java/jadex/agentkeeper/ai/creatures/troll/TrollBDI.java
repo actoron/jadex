@@ -42,7 +42,7 @@ public class TrollBDI extends AbstractCreatureBDI
 	}
 	
 	/**
-	 *  Goal that lets the ORC perform Patrols.
+	 *  Goal that lets the Troll perform Patrols.
 	 *  
 	 */
 	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)

@@ -48,6 +48,9 @@ import javax.swing.event.ChangeListener;
 
 /** 
  *  The default observer center.
+ * 
+ *  
+ *  TODO: refractor for use without canvas!
  */
 public class AgentKeeperObserverCenter implements IObserverCenter
 {

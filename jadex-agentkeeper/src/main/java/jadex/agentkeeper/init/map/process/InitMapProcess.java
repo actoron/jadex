@@ -41,6 +41,8 @@ import jadex.agentkeeper.ai.pathfinding.*;
 
 /**
  * Environment process for creating wastes.
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  */
 public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IMap, ISpaceObjectStrings
 {
@@ -116,7 +118,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 								complexNPos.add(new SimpleMapType(aktPos, type));
 							}
 							if(type.equals(TREASURY) || type.equals(HATCHERY) || type.equals(LAIR) || type.equals(TRAININGROOM) || type.equals(LIBRARY)
-									|| type.equals(TORTURE) || type.equals(DUNGEONHEART))
+									|| type.equals(TORTURE) || type.equals(DUNGEONHEART) || type.equals(PORTAL))
 							{
 								
 								gebaeuedeverwalter.machGebaeude(new Vector2Int(x, y), type);
@@ -169,6 +171,11 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 									center_building_pos.add(aktPos);
 									props.put("besetzt", "0");
 									complexNPos.add(new SimpleMapType(aktPos, type));
+									playerState.addClaimedSector();
+								}
+								else if(type == PORTAL)
+								{
+									center_building_pos.add(aktPos);
 									playerState.addClaimedSector();
 								}
 							}
@@ -232,7 +239,7 @@ public class InitMapProcess extends AInitMapProcess implements ISpaceProcess, IM
 
 
 					/*
-					 * Calculate Buildings
+					 * Calculate Buildings-centers
 					 */
 					ArrayList<Vector2Int> center_closed_pos = new ArrayList<Vector2Int>();
 					int yline = -1;

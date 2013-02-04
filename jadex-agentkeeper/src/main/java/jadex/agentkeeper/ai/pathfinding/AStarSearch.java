@@ -20,6 +20,8 @@ import jadex.extension.envsupport.math.Vector2Int;
  * 
  * @author Philip Willuweit p.willuweit@gmx.de
  * 
+ * TODO: Refractor in English
+ * 
  */
 public class AStarSearch {
 

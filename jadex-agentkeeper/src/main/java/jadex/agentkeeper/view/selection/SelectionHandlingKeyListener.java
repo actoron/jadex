@@ -8,7 +8,12 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 
 
-
+/**
+ * KeyListener for Selection-Stuff
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public class SelectionHandlingKeyListener implements ActionListener
 {
 

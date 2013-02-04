@@ -27,7 +27,12 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.Arrow;
 
-
+/**
+ * Custom App state for the AgentKeeper Camera
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public class AgentKeeperCameraState extends AbstractAppState
 {
 

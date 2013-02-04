@@ -73,7 +73,7 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 		imagenames.put("1F", HATCHERY);
 		imagenames.put("ZF", HATCHERYCENTER);
 		imagenames.put("1D", LAIR);
-		imagenames.put("1P", PORTAL);
+		imagenames.put("1E", PORTAL);
 		imagenames.put("1I", TRAININGROOM);
 
 		imagenames.put("1L", LIBRARY);
@@ -118,6 +118,7 @@ public abstract class AInitMapProcess extends SimplePropertyObject implements IS
 		CENTER_TYPES.put(PORTAL, PORTALCENTER);
 		CENTER_TYPES.put(TRAININGROOM, TRAININGROOMCENTER);
 		CENTER_TYPES.put(LIBRARY, LIBRARYCENTER);
+		CENTER_TYPES.put(PORTAL, PORTALCENTER);
 
 	}
 

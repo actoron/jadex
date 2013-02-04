@@ -16,7 +16,10 @@ import jadex.bdi.runtime.IGoal;
  * Auftrage generien sofern es etwas zu tun gibt und st�ndig nachfragen ob es
  * neue Auftrage gibt.
  * 
- * @author 7willuwe
+ * 
+ * TODO: Refractor in English and as BDIv3 Agent-Plan
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  * @author 8reichel
  * 
  */

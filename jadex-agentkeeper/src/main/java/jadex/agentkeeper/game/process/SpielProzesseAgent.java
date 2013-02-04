@@ -25,8 +25,6 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 
 
-
-
 /**
  * Dieser Micro Agent steuert die Laufenden Spielprozesse
  * 

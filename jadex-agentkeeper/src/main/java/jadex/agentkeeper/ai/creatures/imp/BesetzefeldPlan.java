@@ -1,5 +1,10 @@
 package jadex.agentkeeper.ai.creatures.imp;
 
+/**
+ * TODO: Refractor in English and as BDIv3 Agent-Plan
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ */
 import jadex.agentkeeper.game.state.player.SimplePlayerState;
 import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.agentkeeper.util.ISpaceStrings;

@@ -26,6 +26,7 @@ public class AgentKeeperStandalone
 	public static final String CFG_FILE = "-cfgfile";
 
 	
+	
 	/**
 	 *  Launch platform and backup components.
 	 */
@@ -48,6 +49,8 @@ public class AgentKeeperStandalone
 				jargs.add(args[i++]);
 				jargs.add(args[i]);
 			}
+			
+			boolean test = Math.random() > 0.5;
 		}
 		
 		String[] defargs = new String[]

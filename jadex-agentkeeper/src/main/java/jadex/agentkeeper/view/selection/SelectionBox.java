@@ -11,6 +11,7 @@ import java.nio.FloatBuffer;
 
 
 /**
+ * @author Philip Willuweit p.willuweit@gmx.de
  * @author Lohnn
  */
 public class SelectionBox extends AbstractBox

@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * Constants for field and creature types.
+ * Constants for field and creature types
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
  */
 public interface IMap {
 	public static final String IMPENETRABLE_ROCK = "impenetrable_rock";

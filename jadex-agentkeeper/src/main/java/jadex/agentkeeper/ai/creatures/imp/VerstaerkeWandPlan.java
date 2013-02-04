@@ -4,6 +4,15 @@ import jadex.agentkeeper.init.map.process.InitMapProcess;
 import jadex.extension.envsupport.environment.SpaceObject;
 
 
+/**
+ * 
+ * 
+ * TODO: Refractor in English and as BDIv3 Agent-Plan
+ * 
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public class VerstaerkeWandPlan extends ImpPlan {
 	public static int VERSTAERKDAUER = 20;
 	

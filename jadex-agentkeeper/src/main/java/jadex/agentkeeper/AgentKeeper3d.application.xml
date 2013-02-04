@@ -122,6 +122,10 @@
 					<env:property name="status" class="String">"Nothing"</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
 				</env:objecttype>
+				<env:objecttype name="portalcenter">
+					<env:property name="status" class="String">"Nothing"</env:property>
+					<env:property name="neighborhood" class="String"></env:property>
+				</env:objecttype>
 				<env:objecttype name="trainingroom">
 					<env:property name="status" class="String">"Nothing"</env:property>
 					<env:property name="neighborhood" class="String"></env:property>
@@ -370,12 +374,12 @@
 					<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/tilesets/claimed/Claimedpath.j3o" 
 						materialpath="models/buildings/treasury/TreasuryGround.j3m"
-						hasLightMaterials="true" />
+						 />
 													
-						<env:object3d width="1.65" height="1.65" depth="1.65" x="0" y="0" z="0" 
-						modelpath="models/buildings/treasury/GoldBag.j3o" 
-						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m"
-						rotation="rota" />
+<!-- 						<env:object3d width="1.65" height="1.65" depth="1.65" x="0" y="0" z="0"  -->
+<!-- 						modelpath="models/buildings/treasury/GoldBag.j3o"  -->
+<!-- 						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m" -->
+<!-- 						rotation="rota" /> -->
 						
 <!-- 						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0"  -->
 <!-- 						modelpath="models/props/gold/gold.j3o"  -->
@@ -411,19 +415,33 @@
 						
 					</env:drawable3d>
 					
-					<env:drawable3d objecttype="dungeonheartcenter" width="2.0" height="2.0" depth="2.0" isDynamic="true">
-						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
-						modelpath="models/buildings/dungeonheart/DungeonTemple.j3o" hasLightMaterials="true" />
-						<env:object3d width="1" height="1" depth="1" x="0" y="1.25" z="0" 
-						modelpath="models/buildings/dungeonheart/Sphere.j3o" hasLightMaterials="true" >
-							<env:animation name="my_animation" channel="chanA" loop="true"/>
+					<env:drawable3d objecttype="dungeonheartcenter" width="1" height="1" depth="1" isDynamic="true">
+						<env:object3d width="0.2" height="0.2" depth="0.2" x="0" y="0" z="0" 
+						modelpath="models/buildings/dungeonheart/dungeonheart.j3o" >
+						 	<env:materialfile part="plate" path="models/buildings/dungeonheart/dungeonheart_ground.j3m" />
+							<env:materialfile part="units" path="models/buildings/dungeonheart/dungeonheart.j3m" />
+							<env:materialfile part="stuff" path="models/buildings/dungeonheart/dungeonheart.j3m" />
+						 </env:object3d>
+						 
+						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
+						modelpath="models/buildings/dungeonheart/border.j3o"/>
+						
+<!-- 						<env:object3d width="1.65" height="1.65" depth="1.65" x="0" y="0" z="0"  -->
+<!-- 						modelpath="models/buildings/treasury/GoldBag.j3o"  -->
+<!-- 						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m" -->
+<!-- 						> -->
+<!-- 						<env:drawcondition>Math.random() > 0.5</env:drawcondition> -->
 						</env:object3d>
+						
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="portalcenter" width="1" height="1" depth="1" isDynamic="true">
+						<env:object3d width="0.2" height="0.2" depth="0.2" x="0" y="0" z="0" 
+						modelpath="models/buildings/portal/portal.j3o" 
+						 />
 
 					</env:drawable3d>
 
-					<env:drawable3d objecttype="dungeonheart" width="1.0" height="1.0" depth="1.0" isDynamic="false">
-						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" modelpath="models/tilesets/claimed/Claimedpath.j3o"/>
-					</env:drawable3d>
 					
 					<env:drawable3d objecttype="hatchery" width="1.0" height="1.0" depth="1.0" isDynamic="false">
 					<env:property dynamic="true" name="rota" class="IVector3">new Vector3Double(0, 6.2*Math.random() , 0)</env:property>	
@@ -435,6 +453,11 @@
 						<env:object3d width="1" height="1" depth="1" x="0" y="0" z="0" 
 							modelpath="models/tilesets/buildings/border/Default_?.j3o"
 							materialpath="models/tilesets/buildings/border/default.j3m">
+						</env:object3d>
+						
+						<env:object3d width="0.3" height="0.3" depth="0.3" x="0" y="0" z="0" 
+							modelpath="models/creatures/chicken/chicken.j3o"
+							materialpath="models/creatures/chicken/chicken-Material.j3m">
 						</env:object3d>
 						
 					</env:drawable3d>
