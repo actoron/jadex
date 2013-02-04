@@ -129,6 +129,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		Object ret = null;
 		
+//		if(method.getName().indexOf("ma1")!=-1)
+//			System.out.println("call ma1");
+		
 		if((args==null || args.length==0) && "getServiceIdentifier".equals(method.getName()))
 		{
 			ret	= getServiceIdentifier();

@@ -11,7 +11,6 @@ import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -34,7 +33,6 @@ import jadex.micro.annotation.Results;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**

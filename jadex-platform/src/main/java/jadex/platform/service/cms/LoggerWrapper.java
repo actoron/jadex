@@ -1175,7 +1175,7 @@ public class LoggerWrapper extends Logger
      */
     public void info(String msg) 
     {
-        if (Level.INFO.intValue() < logger.getLevel().intValue()) 
+        if(Level.INFO.intValue() < logger.getLevel().intValue()) 
         {
             return;
         }

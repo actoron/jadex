@@ -48,7 +48,7 @@ public class Proxy
 			{
 			    for(int i=0; i<methods.length && method==null; i++)
 			    {
-			    	Class[] types = methods[i].getParameterTypes();
+			    	Class<?>[] types = methods[i].getParameterTypes();
 			    	if(types.length==params.length)
 			    	{
 			    		// check param types
@@ -88,7 +88,5 @@ public class Proxy
 	{
 		this.handler = handler;
 	}
-
-	
 	
 }

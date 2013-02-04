@@ -206,8 +206,13 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
+		final Future ret = new Future();
+
 		if(type==null)
-			System.out.println("ttt: "+type);
+		{
+			ret.setException(new IllegalArgumentException("Type must not null."));
+			return ret;
+		}
 		
 //		if(type.toString().indexOf("IComponentM")!=-1 && scope.equals("upwards"))
 //			System.out.println("here22");
@@ -217,7 +222,6 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future ret = new Future();
 		
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();

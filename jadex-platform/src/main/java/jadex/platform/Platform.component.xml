@@ -291,7 +291,7 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
 			<implementation>
-				new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames)
+				new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.message.IMessageService">
