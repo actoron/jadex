@@ -53,7 +53,8 @@ public class MicroCreationTest extends TestCase
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", new Integer(10000));
 //		cms.createComponent(null, "jadex/micro/benchmarks/ParallelAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-		cms.createComponent(null, "jadex/micro/benchmarks/PojoAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+//		cms.createComponent(null, "jadex/micro/benchmarks/PojoAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+		cms.createComponent(null, "jadex/micro/benchmarks/BlockingAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 //		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
 		{

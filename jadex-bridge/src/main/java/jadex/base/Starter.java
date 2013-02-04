@@ -28,6 +28,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISuspendable;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -502,6 +503,8 @@ public class Starter
 										// Execute init steps of root component on main thread (i.e. platform)
 										// until platform is ready to run by itself.
 										boolean again = true;
+										// Remember suspandable as it gets overwritten by adapter.executeStep()
+										ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
 										while(again && !ret.isDone())
 										{
 											again = afac.executeStep(adapter);
@@ -516,6 +519,7 @@ public class Starter
 												IComponentAdapter.LOCAL.set(null);
 											}
 										}
+										ISuspendable.SUSPENDABLE.set(sus);
 										
 										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
 										if(!ret.isDone())
