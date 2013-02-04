@@ -1,6 +1,8 @@
 package jadex.bdiv3.examples.puzzle;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.BDIConfiguration;
+import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPLBuild;
@@ -25,9 +27,19 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 @Agent
+@BDIConfigurations(
+{
+	@BDIConfiguration(name=MoveComparator.STRATEGY_DEFAULT),
+	@BDIConfiguration(name=MoveComparator.STRATEGY_LONG),
+	@BDIConfiguration(name=MoveComparator.STRATEGY_SAME_LONG),
+	@BDIConfiguration(name=MoveComparator.STRATEGY_ALTER_LONG)
+})
 public class SokratesBDI
 {
 	//-------- attributes --------
+	
+	@Agent
+	protected BDIAgent agent;
 	
 	/** The puzzle board. */
 	@Belief
@@ -44,7 +56,7 @@ public class SokratesBDI
 	
 	/** The strategy (none=choose the first applicable, long=prefer jump moves,
 	 * same_long=prefer long moves of same color, alter_long=prefer long move of alternate color). */
-	protected String	strategy	= MoveComparator.STRATEGY_SAME_LONG;
+	protected String strategy = agent.getConfiguration();//MoveComparator.STRATEGY_SAME_LONG;
 	
 	//-------- methods --------
 	
