@@ -425,13 +425,7 @@
 						 
 						<env:object3d width="0.79998" height="1" depth="0.79998" x="0" y="0" z="0" 
 						modelpath="models/buildings/dungeonheart/border.j3o"/>
-						
-<!-- 						<env:object3d width="1.65" height="1.65" depth="1.65" x="0" y="0" z="0"  -->
-<!-- 						modelpath="models/buildings/treasury/GoldBag.j3o"  -->
-<!-- 						materialpath="models/buildings/treasury/GoldBag-GoldBag.j3m" -->
-<!-- 						> -->
-<!-- 						<env:drawcondition>Math.random() > 0.5</env:drawcondition> -->
-						</env:object3d>
+
 						
 					</env:drawable3d>
 					
