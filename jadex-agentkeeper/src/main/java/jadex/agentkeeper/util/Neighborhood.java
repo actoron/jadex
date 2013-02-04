@@ -120,6 +120,8 @@ public class Neighborhood
 		for(int i = 0; i < simpleDirections.length; i++)
 		{
 			IVector2 ziel = zielpos.copy().add(simpleDirections[i]);
+			
+			//TODO: how to handle null pointer?
 			SpaceObject thatsme = InitMapProcess.getSolidTypeAtPos(ziel, grid);
 			if(InitMapProcess.MOVEABLES.contains(thatsme.getType()))
 			{
