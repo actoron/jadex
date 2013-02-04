@@ -169,6 +169,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	public IFuture<Void> agentKilled()
 	{
 		final Future<Void> ret = new Future<Void>();
+
 		invokeMethod(AgentKilled.class, null).addResultListener(
 			createResultListener(new ExceptionDelegationResultListener<Tuple2<Method, Object>, Void>(ret)
 		{

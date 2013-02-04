@@ -1,9 +1,0 @@
-Material MyMaterial : Common/MatDefs/Misc/Particle.j3md {
-    MaterialParameters {
-        Texture : Repeat models/buildings/dungeonheart/flame.png
-        Softness : 20.0
-        PointSprite : false
-    }
-    AdditionalRenderState {
-    }
-}

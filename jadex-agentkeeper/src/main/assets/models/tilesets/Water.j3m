@@ -1,9 +1,0 @@
-Material Water : Common/MatDefs/Light/Lighting.j3md {
-     MaterialParameters {
-        DiffuseMap : textures/water/watertex.jpg
-        UseMaterialColors : false
-     }
-     AdditionalRenderState {
-      FaceCull Back
-    }
-}

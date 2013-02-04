@@ -216,9 +216,9 @@ public class SCollection
 	/**
 	 *  Return a hash set.
 	 */
-	public static HashSet createHashSet()
+	public static <T> HashSet<T> createHashSet()
 	{
-		HashSet ret = new HashSet();
+		HashSet<T> ret = new HashSet<T>();
 		if(DEBUG)
 			addCollection(ret);
 		return ret;

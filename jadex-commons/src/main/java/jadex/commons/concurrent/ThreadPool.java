@@ -319,8 +319,8 @@ public class ThreadPool implements IThreadPool
 				}
 //				catch(Exception e)
 //				{
-//					task = null;
-//					terminate	= true;
+////					task = null;
+////					terminate	= true;
 //					e.printStackTrace();
 //				}
 				

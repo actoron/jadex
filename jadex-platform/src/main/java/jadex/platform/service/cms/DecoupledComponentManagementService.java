@@ -1169,14 +1169,14 @@ public class DecoupledComponentManagementService implements IComponentManagement
 								// Component may be already killed (e.g. when autoshutdown).
 								if(adapter!=null)
 								{
-//										if(cid.toString().indexOf("Mandelbrot")!=-1)
+//										if(cid.toString().indexOf("AutoTerminate")!=-1)
 //											System.out.println("destroy1: "+cid.getName());
 //										
 									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 									// todo: killcomponent should only be called once for each component?
 									if(!ccs.containsKey(cid))
 									{
-//											if(cid.toString().indexOf("Mandelbrot")!=-1)
+//											if(cid.toString().indexOf("AutoTerminate")!=-1)
 //												System.out.println("killing a: "+cid);
 										
 										cc	= new CleanupCommand(cid);
@@ -1187,7 +1187,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 									}
 									else
 									{
-//											if(cid.toString().indexOf("Mandelbrot")!=-1)
+//											if(cid.toString().indexOf("AutoTerminate")!=-1)
 //												System.out.println("killing b: "+cid);
 										
 										cc = (CleanupCommand)ccs.get(cid);

@@ -35,6 +35,8 @@ public class MicroTest	extends ComponentTestSuite
 			"BrokenInitAgent",
 			"BrokenInit.component.xml",
 			"CompositeCalculatorAgent",
+			"blocking/Step",
+			"blocking\\Step",
 			
 			// Manual tests requiring interaction
 			"ExternalAccessInvokerAgent",

@@ -15,16 +15,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The asynchronous executor service that executes all tasks in separate executors.
  */
 public class AsyncExecutionService	extends BasicService implements IExecutionService
 {
-//	//-------- static part --------
-//	
-//	public static MultiCollection	DEBUG	= new MultiCollection();
-	
 	//-------- attributes --------
 	
 	/** The threadpool. */
@@ -33,8 +30,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/** The currently waiting tasks (task->executor). */
 	protected Map<IExecutable, Executor> executors;
 		
-	/** The idle commands. */
-//	protected Set idlecommands;
+	/** The idle future. */
 	protected Future<Void> idlefuture;
 	
 	/** The state. */
@@ -46,21 +42,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/** The provider. */
 	protected IServiceProvider provider;
 	
-	/** The executor cache. */
-//	protected List executorcache;
-	
-	/** The maximum number of cached executors. */
-//	protected int max;
+	/** The running (i.e. non-blocked) executors. */
+	protected Set<Executor>	runningexes;
 	
 	//-------- constructors --------
-	
-	/**
-	 *  Create a new asynchronous executor service. 
-	 * /
-	public AsyncExecutorService(IThreadPool threadpool)
-	{
-		this(threadpool, 100);
-	}*/
 	
 	/**
 	 *  Create a new asynchronous executor service. 
@@ -78,12 +63,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
-//		this.threadpool = threadpool;
-//		this.max = max;
 		this.running	= false;
 		this.executors	= SCollection.createHashMap();
-//		this.executors	= SCollection.createWeakHashMap();
-//		this.executorcache = SCollection.createArrayList();
+		this.runningexes	= SCollection.createHashSet();
 	}
 
 	//-------- methods --------
@@ -95,11 +77,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public synchronized void execute(final IExecutable task)
 	{	
-//		synchronized(DEBUG)
-//		{
-//			DEBUG.put(task, "execute called");
-//		}
-//		System.out.println("execute called: "+task);
 		if(!customIsValid())
 			throw new RuntimeException("Not running: "+task);
 		
@@ -110,81 +87,61 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 
 		if(exe==null)
 		{
-//			synchronized(DEBUG)
-//			{
-//				DEBUG.put(task, "creating executor");
-//			}
-//			System.out.println("Created executor for:"+task);
-//			if(executorcache.size()>0)
-//			{
-//				exe = (Executor)executorcache.remove(0);
-//				exe.setExecutable(task);
-//			}
-//			else
-//			{
-				exe = new Executor(threadpool, task)
+			exe = new Executor(threadpool, task)
+			{
+				// Hack!!! overwritten to know, when executor ends.
+				public void run()
 				{
-//					// Hack!!! overwritten for debugging.
-//					protected boolean code()
-//					{
-//						synchronized(DEBUG)
-//						{
-//							DEBUG.put(task, "executing code(): "+this);
-//						}
-//						boolean	ret	= super.code();
-//						synchronized(DEBUG)
-//						{						
-//							DEBUG.put(task, "code() finished: "+this);
-//						}
-//						return ret;
-//					}
-					
-					// Hack!!! overwritten to know, when executor ends.
-					public void run()
+					synchronized(AsyncExecutionService.this)
 					{
-						super.run();
-						
-//						ICommand[]	commands	= null;
-						Future<Void> idf = null;
-						
-						synchronized(AsyncExecutionService.this)
+						runningexes.add(this);
+					}
+					super.run();
+					
+					Future<Void> idf = null;
+					
+					synchronized(AsyncExecutionService.this)
+					{
+						synchronized(this)
 						{
-							synchronized(this)
+							// Do not remove when a new executor has already been added for the task.
+							// isRunning() refers to running state of executor!
+							if(!this.isRunning() && executors!=null && executors.get(task)==this)	
 							{
-								// isRunning() refers to running state of executor!
-								// Do not remove when a new executor has already been added for the task.
-								if(this.getThreadCount()==0 &&!this.isRunning() && executors!=null && executors.get(task)==this)	
+								if(executors!=null && this.getThreadCount()==0)
 								{
-									idf	= removeTask(task);
+									executors.remove(task);
 								}
+								runningexes.remove(this);
+								
+								idf	= checkIdleFuture();
+							}
+							else if(executors!=null && executors.get(task)!=this)
+							{
+								runningexes.remove(this);								
 							}
 						}
-						
-						if(idf!=null)
-							idf.setResult(null);
-						
-//						for(int i=0; commands!=null && i<commands.length; i++)
-//						{
-//							commands[i].execute(null);
-//						}
-					}					
-				};
-//			}
-//			synchronized(DEBUG)
-//			{
-//				DEBUG.put(task, "new executor: "+exe);
-//			}
+					}
+					
+					if(idf!=null)
+					{
+						idf.setResult(null);
+					}
+				}					
+			};
 			executors.put(task, exe);
 		}
 	
 		if(running)
 		{
-//			synchronized(DEBUG)
-//			{
-//				DEBUG.put(task, "calling execute(): "+exe);
-//			}
-//			System.out.println("Executing for: "+task+", "+exe);
-			exe.execute();
+			synchronized(this)
+			{
+				boolean	exec	= exe.execute();
+				if(exec)
+				{
+					runningexes.add(exe);
+				}
+			}
 		}
 	}
 	
@@ -212,33 +169,31 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				{
 					public void resultAvailable(Void result)
 					{
-						Future<Void>	idf;
 						// todo: do not call listener with holding lock
 						synchronized(AsyncExecutionService.this)
 						{
 							ret.setResult(result);
-							idf	= removeTask(task);
+							if(executors!=null)	
+							{
+								executors.remove(task);
+							}
 						}
-						if(idf!=null)
-							idf.setResult(null);
 					}
 	
 					public void exceptionOccurred(Exception exception)
 					{
-						Future<Void>	idf;
 						// todo: do not call future with holding lock
 						synchronized(AsyncExecutionService.this)
 						{
 							ret.setException(exception);
-							idf	= removeTask(task);
+							if(executors!=null)	
+							{
+								executors.remove(task);
+							}
 						}
-						if(idf!=null)
-							idf.setResult(null);
-						
 					}
 				};
 				exe.shutdown().addResultListener(lis);
-	//			executors.remove(task);
 			}
 			else
 			{
@@ -285,7 +240,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								threadpool = result;
 								
 								running	= true;
-//								new RuntimeException("AsyncExecustionService.start()").printStackTrace();
 								
 								if(!executors.isEmpty())
 								{
@@ -297,16 +251,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								}
 								else
 								{
-//								else if(idlecommands!=null)
-//								{
-//						//			System.out.println("restart: idle");
-//									Iterator it	= idlecommands.iterator();
-//									while(it.hasNext())
-//									{
-//										((ICommand)it.next()).execute(null);
-//									}
-//								}
-								
 									Future<Void> idf = null;
 									synchronized(AsyncExecutionService.this)
 									{
@@ -317,7 +261,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 										idf.setResult(null);
 								}
 								ret.setResult(null);
-//								ret.setResult(getServiceIdentifier());
 							}
 							catch(RuntimeException e)
 							{
@@ -392,16 +335,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		return running && !shutdown;
 	}
 	
-//	/**
-//	 *  Test if the executor is currently idle.
-//	 */
-//	public synchronized boolean	isIdle()
-//	{
-//		return running && !executors.isEmpty();
-//		// todo: should be isEmpty()?
-////		return running && executors.isEmpty();
-//	}
-	
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
@@ -420,70 +353,25 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		}
 		return ret;
 	}
-	
-//	/**
-//	 *  Add a command to be executed whenever the executor
-//	 *  is idle (i.e. no executables running).
-//	 */
-//	public void addIdleCommand(ICommand command)
-//	{
-//		if(idlecommands==null)
-//		{
-//			synchronized(this)
-//			{
-//				if(idlecommands==null)
-//				{
-//					idlecommands	= SCollection.createLinkedHashSet();
-//				}
-//			}
-//		}
-//		
-//		idlecommands.add(command);
-//	}
-//
-//	/**
-//	 *  Remove a previously added idle command.
-//	 */
-//	public synchronized void removeIdleCommand(ICommand command)
-//	{
-//		if(idlecommands!=null)
-//			idlecommands.remove(command);
-//	}
 
 	//-------- helper methods --------
 	
 	/**
-	 *  Remove a task from the execution queue.
+	 *  Get the idle future if any and if service is idle.
 	 *  Must be called while holding service lock.
 	 *  @return	An idle future to be notified (if any) after releasing service lock.
 	 */
-	protected Future<Void>	removeTask(IExecutable task)
+	protected Future<Void>	checkIdleFuture()
 	{
 		Future<Void>	ret	= null;
-		
-//		System.out.println("Removing executor for: "+task+", "+this);
-		if(executors!=null)
+
+		// When no more executable threads, inform idle commands.				
+		if(AsyncExecutionService.this.running && idlefuture!=null && runningexes.isEmpty())
 		{
-			executors.remove(task); // weak for testing
-	//		setExecutable(null);
-	//		if(executorcache.size()<max)
-	//			executorcache.add(this);
-	
-			// When no more executables, inform idle commands.				
-			if(AsyncExecutionService.this.running && idlefuture!=null && executors.isEmpty())
-			{
-	//			System.out.println("idle");
-	//			commands	= (ICommand[])idlecommands.toArray(new ICommand[idlecommands.size()]);
-				ret = idlefuture;
-				idlefuture = null;
-			}
-	//		else if(AsyncExecutionService.this.running && idlecommands!=null)
-	//		{
-	//			System.out.println("not idle: "+executors+", "+idlefuture+", "+AsyncExecutionService.this.running);										
-	//		}
+			ret = idlefuture;
+			idlefuture = null;
 		}
 		
 		return ret;
 	}
 }
-

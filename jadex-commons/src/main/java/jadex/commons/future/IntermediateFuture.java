@@ -293,10 +293,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	
     	synchronized(this)
     	{
-    		if(intermediate && listener instanceof IIntermediateResultListener)
+    		// If results==null its a subscription future and first results are already collected.
+    		if(results!=null && intermediate && listener instanceof IIntermediateResultListener)
     		{
-    			if(results==null)
-    				System.out.println("nuup: "+hashCode());
     			Object[]	inter = results.toArray();
 	    		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
 	    		for(int i=0; i<inter.length; i++)
