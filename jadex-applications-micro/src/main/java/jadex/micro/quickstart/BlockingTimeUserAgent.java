@@ -1,7 +1,9 @@
 package jadex.micro.quickstart;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;
@@ -18,7 +20,7 @@ import java.util.List;
 @Agent
 @RequiredServices(@RequiredService(name="timeservices", type=ITimeService.class, multiple=true,
 	binding=@Binding(scope=Binding.SCOPE_GLOBAL)))
-public class TimeUserAgent
+public class BlockingTimeUserAgent
 {
 	//-------- attributes --------
 	
@@ -32,20 +34,21 @@ public class TimeUserAgent
 	 *  This method is called during agent startup.
 	 */
 	@AgentCreated
-	public void	start()
+	public void	start(IInternalAccess agent)
 	{
-		// Subscribe to all found time services.
+		// Start a parallel component step for each found time service
 		for(final ITimeService timeservice: timeservices)
 		{
-			ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
-			subscription.addResultListener(new IntermediateDefaultResultListener<Date>()
+			agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
-				/**
-				 *  This method gets called for each received time submission.
-				 */
-				public void intermediateResultAvailable(Date time)
+				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia)
 				{
-					System.out.println("New time received from "+timeservice.getName()+": "+time);
+					ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
+					while(subscription.hasNextIntermediateResult())
+					{
+						System.out.println("New time received from "+timeservice.getName()+": "+subscription.getNextIntermediateResult());
+					}
+					return IFuture.DONE;
 				}
 			});
 		}
