@@ -1,16 +1,16 @@
 package jadex.micro.quickstart;
 
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  *  Simple agent that uses globally available time services.
@@ -24,30 +24,33 @@ public class TimeUserAgent
 	
 	/** The time services are searched and set at agent startup. */
 	@AgentService
-	List<ITimeService>	timeservices;
+	IIntermediateFuture<ITimeService>	timeservices;
 	
 	//-------- methods --------
 	
 	/**
-	 *  This method is called during agent startup.
+	 *  This method is called after agent startup.
 	 */
-	@AgentCreated
-	public void	start()
+	@AgentBody
+	public void	body()
 	{
 		// Subscribe to all found time services.
-		for(final ITimeService timeservice: timeservices)
+		timeservices.addResultListener(new IntermediateDefaultResultListener<ITimeService>()
 		{
-			ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
-			subscription.addResultListener(new IntermediateDefaultResultListener<Date>()
+			public void intermediateResultAvailable(final ITimeService timeservice)
 			{
-				/**
-				 *  This method gets called for each received time submission.
-				 */
-				public void intermediateResultAvailable(Date time)
+				ISubscriptionIntermediateFuture<Date> subscription	= timeservice.subscribe();
+				subscription.addResultListener(new IntermediateDefaultResultListener<Date>()
 				{
-					System.out.println("New time received from "+timeservice.getName()+": "+time);
-				}
-			});
-		}
+					/**
+					 *  This method gets called for each received time submission.
+					 */
+					public void intermediateResultAvailable(Date time)
+					{
+						System.out.println("New time received from "+timeservice.getName()+": "+time);
+					}
+				});				
+			}
+		});
 	}	
 }

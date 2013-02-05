@@ -4,15 +4,15 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  *  Runtime element for storing goal ans plan instances.
@@ -21,12 +21,14 @@ public class RCapability extends RElement
 {
 	//-------- attributes --------
 	
-//	/** The beliefs. */
-//	protected List<RBelief> beliefs;
-	
 	/** The goals. */
-//	protected List<RGoal> goals;
-	protected Set<RGoal> goals;
+	protected Collection<RGoal> goals;
+	
+	/** The goals by model element. */
+	protected Map<MGoal, Collection<RGoal>> mgoals;
+	
+	/** The goals by goal class. */
+	protected Map<Class<?>, Collection<RGoal>> cgoals;
 	
 	/** The plans. */
 	protected List<RPlan> plans;
@@ -49,29 +51,11 @@ public class RCapability extends RElement
 	 */
 	public Collection<RGoal> getGoals()
 	{
-		return goals;
-	}
-	
-	/**
-	 *  Get goals of a specific pojo type.
-	 *  @param type The type.
-	 *  @return The goals.
-	 */
-	public List<RGoal> getGoals(MGoal mgoal)
-	{
-		if(goals==null)
-			return Collections.EMPTY_LIST;
-		
-		List<RGoal> ret = new ArrayList<RGoal>();
-		
-		for(RGoal goal: goals)
+		Collection<RGoal>	ret	= goals;
+		if(ret==null)
 		{
-			if(mgoal.equals(goal.getMGoal()))
-			{
-				ret.add(goal);
-			}
+			ret	= Collections.emptySet();
 		}
-		
 		return ret;
 	}
 	
@@ -80,21 +64,28 @@ public class RCapability extends RElement
 	 *  @param type The type.
 	 *  @return The goals.
 	 */
-	public List<RGoal> getGoals(Class<?> type)
+	public Collection<RGoal> getGoals(MGoal mgoal)
 	{
-		if(goals==null)
-			return Collections.EMPTY_LIST;
-		
-		List<RGoal> ret = new ArrayList<RGoal>();
-		
-		for(RGoal goal: goals)
+		Collection<RGoal>	ret	= mgoals!=null ? mgoals.get(mgoal) : null;
+		if(ret==null)
 		{
-			if(type.equals(goal.getPojoElement().getClass()))
-			{
-				ret.add(goal);
-			}
+			ret	= Collections.emptySet();
 		}
-		
+		return ret;
+	}
+	
+	/**
+	 *  Get goals of a specific pojo type.
+	 *  @param type The type.
+	 *  @return The goals.
+	 */
+	public Collection<RGoal> getGoals(Class<?> type)
+	{
+		Collection<RGoal>	ret	= cgoals!=null ? cgoals.get(type) : null;
+		if(ret==null)
+		{
+			ret	= Collections.emptySet();
+		}
 		return ret;
 	}
 	
@@ -112,9 +103,13 @@ public class RCapability extends RElement
 	 *  Set the goals.
 	 *  @param goals The goals to set.
 	 */
-	public void setGoals(Set<RGoal> goals)
+	public void setGoals(Collection<RGoal> goals)
 	{
-		this.goals = goals;
+		this.goals = null;
+		for(RGoal g: goals)
+		{
+			addGoal(g);
+		}
 	}
 
 	/**
@@ -144,16 +139,36 @@ public class RCapability extends RElement
 		if(goals==null)
 		{
 			goals = new LinkedHashSet<RGoal>();
+			mgoals	= new HashMap<MGoal, Collection<RGoal>>();
+			cgoals	= new HashMap<Class<?>, Collection<RGoal>>();
 		}
 		
 		if(goals.contains(goal))
 			throw new RuntimeException("Goal already contained: "+goal);
 		
 		goals.add(goal);
+
+		Collection<RGoal>	mymgoals	= mgoals.get(goal.getModelElement());
+		if(mymgoals==null)
+		{
+			mymgoals	= new LinkedHashSet<RGoal>();
+			mgoals.put((MGoal)goal.getModelElement(), mymgoals);
+		}
+		mymgoals.add(goal);
 		
+		Collection<RGoal>	mycgoals	= cgoals.get(goal.getPojoElement().getClass());
+		if(mycgoals==null)
+		{
+			mycgoals	= new LinkedHashSet<RGoal>();
+			cgoals.put(goal.getPojoElement().getClass(), mycgoals);
+		}
+		mycgoals.add(goal);
+
 //		if(goal.getPojoElement().getClass().getName().indexOf("AchieveCleanup")!=-1)
 //			System.out.println("adopted new goal: "+goal);
 	}
+	
+	protected Map<RGoal, Exception>	ex	= new HashMap<RGoal, Exception>();
 	
 	/**
 	 *  Remove a goal.
@@ -161,9 +176,43 @@ public class RCapability extends RElement
 	 */
 	public void removeGoal(RGoal goal)
 	{
-		if(goal!=null)
+		if(!ex.containsKey(goal))
 		{
-			goals.remove(goal);
+			Exception ex	= new RuntimeException("first");
+			ex.fillInStackTrace();
+			this.ex.put(goal, ex);
+		}
+		if(goal==null)
+		{
+			throw new IllegalArgumentException("Goal is null.");
+		}
+		else if(goals==null)
+		{
+			throw new IllegalStateException("Goals are null.");
+		}
+		else if(!goals.remove(goal))
+		{
+			if(ex.containsKey(goal))
+			{
+				ex.get(goal).printStackTrace();
+			}
+			throw new IllegalStateException("Goal not contained.");			
+		}
+		else
+		{
+			Collection<RGoal>	mymgoals	= mgoals.get(goal.getModelElement());
+			mymgoals.remove(goal);
+			if(mymgoals.isEmpty())
+			{
+				mgoals.remove((MGoal)goal.getModelElement());
+			}
+			
+			Collection<RGoal>	mycgoals	= cgoals.get(goal.getPojoElement().getClass());
+			mycgoals.remove(goal);
+			if(mycgoals.isEmpty())
+			{
+				cgoals.remove(goal.getPojoElement().getClass());
+			}			
 		}
 	}
 	
@@ -186,9 +235,17 @@ public class RCapability extends RElement
 	 */
 	public void removePlan(RPlan plan)
 	{
-		if(plan!=null)
+		if(plan==null)
 		{
-			plans.remove(plan);
+			throw new IllegalArgumentException("Plan is null.");
+		}
+		else if(plans==null)
+		{
+			throw new IllegalStateException("Plans are null.");
+		}
+		else if(!plans.remove(plan))
+		{
+			throw new IllegalStateException("Plan not contained.");			
 		}
 	}
 	

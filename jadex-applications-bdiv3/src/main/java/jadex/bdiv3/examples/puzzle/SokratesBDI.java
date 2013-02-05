@@ -43,7 +43,7 @@ public class SokratesBDI
 	
 	/** The puzzle board. */
 	@Belief
-	protected IBoard	board	= new Board();
+	protected IBoard	board	= new JackBoard();
 	
 	/** The number of tried moves. */
 	protected int	triescnt;

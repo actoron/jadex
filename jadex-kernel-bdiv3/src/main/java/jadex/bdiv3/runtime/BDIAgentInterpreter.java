@@ -53,6 +53,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -535,7 +536,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					events.add(ChangeEvent.GOALADOPTED); // check also initially 
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
-						new GoalsExistCondition(mgoal, capa), 
+						new CombinedCondition(new ICondition[]{
+							new GoalsExistCondition(mgoal, capa)
+//							, new LifecycleStateCondition(SUtil.createHashSet(new String[]
+//							{
+//								RGoal.GOALLIFECYCLESTATE_ACTIVE,
+//								RGoal.GOALLIFECYCLESTATE_ADOPTED,
+//								RGoal.GOALLIFECYCLESTATE_OPTION,
+//								RGoal.GOALLIFECYCLESTATE_SUSPENDED
+//							}))
+						}),
 						new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
@@ -821,148 +831,154 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 		}
 		
-		// add/rem goal inhibitor rule
+		// add/rem goal inhibitor rules
 		if(!goals.isEmpty())
 		{
-			List<String> events = new ArrayList<String>();
-			events.add(ChangeEvent.GOALADOPTED);
-			
-			Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
-				ICondition.TRUE_CONDITION, new IAction<Void>()
+			boolean	usedelib	= false;
+			for(int i=0; !usedelib && i<goals.size(); i++)
 			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-				{
-					// create the complete inhibitorset for a newly adopted goal
-					
-					RGoal goal = (RGoal)event.getContent();
-					for(RGoal other: getCapability().getGoals())
-					{
-//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
-//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
-						if(other.inhibits(goal, getInternalAccess()))
-						{
-							goal.addInhibitor(other, getInternalAccess());
-						}
-					}
-					
-//					if(goal.inhibitors!=null && goal.inhibitors.size()>0)
-//						System.out.println("initial inhibitors of: "+goal+" "+goal.inhibitors);
-					return IFuture.DONE;
-				}
-			});
-			rule.setEvents(events);
-			getRuleSystem().getRulebase().addRule(rule);
+				usedelib	= goals.get(i).getDeliberation()!=null;
+			}
 			
-			events = getGoalEvents();
-			rule = new Rule<Void>("goal_addinhibitor", 
-				new ICondition()
+			if(usedelib)
+			{
+				List<String> events = new ArrayList<String>();
+				events.add(ChangeEvent.GOALADOPTED);
+				Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
+					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
-					public boolean evaluate(IEvent event)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
-//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
-//							System.out.println("maintain");
+						// create the complete inhibitorset for a newly adopted goal
 						
-						// return true when other goal is active and inprocess
-						boolean ret = false;
-						String type = event.getType();
 						RGoal goal = (RGoal)event.getContent();
-						ret = type.startsWith(ChangeEvent.GOALACTIVE) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
-							|| (type.startsWith(ChangeEvent.GOALINPROCESS) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
-						return ret;
-					}
-				}, new IAction<Void>()
-			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-				{
-					RGoal goal = (RGoal)event.getContent();
-//					if(goal.getId().indexOf("AchieveCleanup")!=-1)
-//						System.out.println("addinh: "+goal);
-					MDeliberation delib = goal.getMGoal().getDeliberation();
-					if(delib!=null)
-					{
-						Set<MGoal> inhs = delib.getInhibitions();
-						for(MGoal inh: inhs)
+						for(RGoal other: getCapability().getGoals())
 						{
-							List<RGoal> goals = getCapability().getGoals(inh);
-							for(RGoal other: goals)
+	//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
+	//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
+							if(other.inhibits(goal, getInternalAccess()))
 							{
-								if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
+								goal.addInhibitor(other, getInternalAccess());
+							}
+						}
+						
+	//					if(goal.inhibitors!=null && goal.inhibitors.size()>0)
+	//						System.out.println("initial inhibitors of: "+goal+" "+goal.inhibitors);
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				getRuleSystem().getRulebase().addRule(rule);
+				
+				events = getGoalEvents();
+				rule = new Rule<Void>("goal_addinhibitor", 
+					new ICondition()
+					{
+						public boolean evaluate(IEvent event)
+						{
+	//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
+	//							System.out.println("maintain");
+							
+							// return true when other goal is active and inprocess
+							boolean ret = false;
+							String type = event.getType();
+							RGoal goal = (RGoal)event.getContent();
+							ret = type.startsWith(ChangeEvent.GOALACTIVE) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
+								|| (type.startsWith(ChangeEvent.GOALINPROCESS) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
+							return ret;
+						}
+					}, new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						RGoal goal = (RGoal)event.getContent();
+	//					if(goal.getId().indexOf("AchieveCleanup")!=-1)
+	//						System.out.println("addinh: "+goal);
+						MDeliberation delib = goal.getMGoal().getDeliberation();
+						if(delib!=null)
+						{
+							Set<MGoal> inhs = delib.getInhibitions();
+							for(MGoal inh: inhs)
+							{
+								Collection<RGoal> goals = getCapability().getGoals(inh);
+								for(RGoal other: goals)
 								{
-									other.addInhibitor(goal, getInternalAccess());
+									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
+									{
+										other.addInhibitor(goal, getInternalAccess());
+									}
 								}
 							}
 						}
+						return IFuture.DONE;
 					}
-					return IFuture.DONE;
-				}
-			});
-			rule.setEvents(events);
-			getRuleSystem().getRulebase().addRule(rule);
-			
-			rule = new Rule<Void>("goal_removeinhibitor", 
-				new ICondition()
-				{
-					public boolean evaluate(IEvent event)
+				});
+				rule.setEvents(events);
+				getRuleSystem().getRulebase().addRule(rule);
+				
+				rule = new Rule<Void>("goal_removeinhibitor", 
+					new ICondition()
 					{
-						// return true when other goal is active and inprocess
-						boolean ret = false;
-						String type = event.getType();
-						if(type.startsWith("goal"))
+						public boolean evaluate(IEvent event)
 						{
-							RGoal other = (RGoal)event.getContent();
-							ret = type.startsWith(ChangeEvent.GOALSUSPENDED) || type.startsWith(ChangeEvent.GOALOPTION) 
-								|| !RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(other.getProcessingState());
-						}
-						return ret;
-					}
-				}, new IAction<Void>()
-			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-				{
-					RGoal goal = (RGoal)event.getContent();
-					MDeliberation delib = goal.getMGoal().getDeliberation();
-					if(delib!=null)
-					{
-						Set<MGoal> inhs = delib.getInhibitions();
-						for(MGoal inh: inhs)
-						{
-//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
-//								System.out.println("reminh: "+goal);
-							List<RGoal> goals = getCapability().getGoals(inh);
-							for(RGoal other: goals)
+							// return true when other goal is active and inprocess
+							boolean ret = false;
+							String type = event.getType();
+							if(type.startsWith("goal"))
 							{
-								if(goal.equals(other))
-									continue;
-								
-								if(other.isInhibitedBy(goal))
-									other.removeInhibitor(goal, getInternalAccess());
+								RGoal other = (RGoal)event.getContent();
+								ret = type.startsWith(ChangeEvent.GOALSUSPENDED) || type.startsWith(ChangeEvent.GOALOPTION) 
+									|| !RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(other.getProcessingState());
+							}
+							return ret;
+						}
+					}, new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						RGoal goal = (RGoal)event.getContent();
+						MDeliberation delib = goal.getMGoal().getDeliberation();
+						if(delib!=null)
+						{
+							Set<MGoal> inhs = delib.getInhibitions();
+							for(MGoal inh: inhs)
+							{
+	//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
+	//								System.out.println("reminh: "+goal);
+								Collection<RGoal> goals = getCapability().getGoals(inh);
+								for(RGoal other: goals)
+								{
+									if(goal.equals(other))
+										continue;
+									
+									if(other.isInhibitedBy(goal))
+										other.removeInhibitor(goal, getInternalAccess());
+								}
 							}
 						}
+						return IFuture.DONE;
 					}
-					return IFuture.DONE;
-				}
-			});
-			rule.setEvents(events);
-			getRuleSystem().getRulebase().addRule(rule);
-			
-			
-			rule = new Rule<Void>("goal_inhibit", 
-				new CombinedCondition(new ICondition[]{
-					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_ACTIVE),
-				}), new IAction<Void>()
-			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				});
+				rule.setEvents(events);
+				getRuleSystem().getRulebase().addRule(rule);
+				
+				
+				rule = new Rule<Void>("goal_inhibit", 
+					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_ACTIVE), new IAction<Void>()
 				{
-					RGoal goal = (RGoal)event.getContent();
-//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
-					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
-					return IFuture.DONE;
-				}
-			});
-			rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALINHIBITED}));
-			getRuleSystem().getRulebase().addRule(rule);
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						RGoal goal = (RGoal)event.getContent();
+	//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
+						goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALINHIBITED}));
+				getRuleSystem().getRulebase().addRule(rule);
+			}
 			
-			rule = new Rule<Void>("goal_activate", 
+			Rule<Void> rule = new Rule<Void>("goal_activate", 
 				new CombinedCondition(new ICondition[]{
 					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_OPTION),
 					new ICondition()
