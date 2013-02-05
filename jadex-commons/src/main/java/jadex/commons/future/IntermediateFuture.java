@@ -4,13 +4,23 @@ package jadex.commons.future;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  *  Default implementation of an intermediate future.
  */
 public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIntermediateFuture<E>
 {
+	//-------- constants --------
+	
+	/** The index of the next result for a thread. */
+    protected static final	ThreadLocal<Integer>	INDICES	= new ThreadLocal<Integer>();
+
+	
 	//-------- attributes --------
 	
 	/** The intermediate results. */
@@ -24,7 +34,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 	
 	/** Flag if notifying. */
     protected boolean notifying;
-        
+    
+	/** The blocked intermediate callers (caller->state). */
+	protected Map<ISuspendable, String> icallers;
+    
+           
 	//-------- constructors--------
 	
 	/**
@@ -113,6 +127,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 			}
 		}
 
+	   	resumeIntermediate();
 		startScheduledNotifications();
 	}
 	
@@ -160,6 +175,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     		}
  		}
 
+	   	resumeIntermediate();
     	startScheduledNotifications();
     	return true;
     }
@@ -331,109 +347,140 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
      *  Check if there are more results for iteration for the given caller.
      *  If there are currently no unprocessed results and future is not yet finished,
      *  the caller is blocked until either new results are available and true is returned
-     *  or the future is finished, thus returning true.
+     *  or the future is finished, thus returning false.
      *  
-     *  @param caller	The caller that wants to iterate over intermediate results.
      *  @return	True, when there are more intermediate results for the caller.
      */
-    public boolean hasNextIntermediateResult(ISuspendable caller)
+    public boolean hasNextIntermediateResult()
     {
-    	throw new UnsupportedOperationException();
-    }
+    	boolean	ret;
+    	boolean	suspend;
+    	
+		Integer	index	= INDICES.get();
+		if(index==null)
+		{
+			index	= new Integer(0);
+		}
+		
+		ISuspendable	caller	= null;
+    	synchronized(this)
+    	{
+    		ret	= results!=null && results.size()>index.intValue();
+    		suspend	= !ret && !isDone();
+    		if(suspend)
+    		{
+    	    	caller	= ISuspendable.SUSPENDABLE.get();
+    	    	if(caller==null)
+    	    	{
+    		   		throw new RuntimeException("No suspendable element.");
+    	    	}
+	    	   	if(icallers==null)
+	    	   	{
+	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
+	    	   	}
+	    	   	icallers.put(caller, CALLER_QUEUED);
+    		}
+    	}
+    	
+    	if(suspend)
+    	{
+	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	    	synchronized(mon)
+	    	{
+    			Object	state	= icallers.get(caller);
+    			if(CALLER_QUEUED.equals(state))
+    			{
+    	    	   	icallers.put(caller, CALLER_SUSPENDED);
+    				caller.suspend(this, -1);
+    	    	   	icallers.remove(caller);
+    		    	ret	= hasNextIntermediateResult();
+    			}
+    			// else already resumed.
+    		}
+    	}
+    	
+    	return ret;
+    }	
 	
     /**
      *  Iterate over the intermediate results in a blocking fashion.
      *  Manages results independently for different callers, i.e. when called
-     *  with different suspendables, each suspendable receives all intermediate results.
+     *  from different threads, each thread receives all intermediate results.
      *  
-     *  @param caller	The caller that wants to iterate over intermediate results.
+     *  The operation is guaranteed to be non-blocking, if hasNextIntermediateResult()
+     *  has returned true before for the same caller. Otherwise the caller is blocked
+     *  until a result is available or the future is finished.
+     *  
      *  @return	The next intermediate result.
      *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
      */
-    public E getNextIntermediateResult(ISuspendable caller)
+    public E getNextIntermediateResult()
     {
-    	throw new UnsupportedOperationException();    	
+		Integer	index	= INDICES.get();
+		index	= index==null ? new Integer(1) : new Integer(index.intValue()+1);
+		INDICES.set(index);
+		return doGetNextIntermediateResult(index.intValue());
     }
-
-//    /**
-//     *  Get the result - blocking call.
-//     *  @return The future result.
-//     */
-//    public E getIntermediate(ISuspendable caller)
-//    {
-//    	return getIntermediate(caller, -1);
-//    }
-//
-//    /**
-//     *  Get the result - blocking call.
-//     *  @param timeout The timeout in millis.
-//     *  @return The future result.
-//     */
-//    public E getIntermediate(ISuspendable caller, long timeout)
-//    {
-//    	boolean suspend = false;
-//    	synchronized(this)
-//    	{
-//	    	if(!isDone())
-//	    	{
-//	    	   	if(caller==null)
-//	    	   		throw new RuntimeException("No suspendable element.");
-//	//        		caller = new ThreadSuspendable(this);
-//	     
-////	    	   	System.out.println(this+" suspend: "+caller);
-//	    	   	if(callers==null)
-//	    	   		callers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
-//	    	   	callers.put(caller, CALLER_QUEUED);
-//	    	   	suspend = true;
-//	    	}
-//    	}
-//    	
-//    	if(suspend)
-//		{
-//	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
-//	    	synchronized(mon)
-//	    	{
-//    			Object	state	= callers.get(caller);
-//    			if(CALLER_QUEUED.equals(state))
-//    			{
-//    	    	   	callers.put(caller, CALLER_SUSPENDED);
-////    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
-////    	    	   		System.out.println("caller suspending: "+caller+", "+this);
-//    				caller.suspend(this, timeout);
-////    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
-////    	    	   		System.out.println("caller resumed: "+caller+", "+this);
-//    		    	if(exception!=null)
-//    		    	{
-//    		    		// Nest exception to have both calling and manually set exception stack trace.
-////     		    		exception	= new RuntimeException("Exception when evaluating future", exception);
-//     		    		exception	= new RuntimeException(exception.getMessage(), exception);
-//     		    	}
-////    				System.out.println(this+" caller awoke: "+caller+" "+mon);
-//    			}
-//    			// else already resumed.
-//    		}
-//    	}
-//    	
-////    	if(result==null)
-////    		System.out.println(this+" here: "+caller);
-//    	
-//    	synchronized(this)
-//    	{
-//	    	if(exception!=null)
-//	    	{
-//	    		throw exception instanceof RuntimeException? (RuntimeException)exception 
-//	    			:new RuntimeException(exception);
-//	    	}
-//	    	else if(isDone())
-//	    	{
-//	    	   	return result;
-//	    	}
-//	    	else
-//	    	{
-//	    		throw new TimeoutException("Timeout while waiting for future.");
-//	    	}
-//    	}
-//    }
+    
+    /**
+     *  Perform the get without increasing the index.
+     */
+    protected E doGetNextIntermediateResult(int index)
+    {
+       	E	ret	= null;
+    	boolean	suspend	= false;
+    	
+		ISuspendable	caller	= null;
+    	synchronized(this)
+    	{
+    		if(results!=null && results.size()>=index)
+    		{
+    			// Hack!!! it there a better way to access the i-est element?
+    			Iterator<E>	it	= results.iterator();
+    			for(int i=0; i<index; i++)
+    			{
+    				ret	= it.next();
+    			}
+    		}
+    		else if(isDone())
+    		{
+    			throw new NoSuchElementException("No more intermediate results.");
+    		}
+    		else
+    		{
+    			suspend	= true;
+    	    	caller	= ISuspendable.SUSPENDABLE.get();
+    	    	if(caller==null)
+    	    	{
+    		   		throw new RuntimeException("No suspendable element.");
+    	    	}
+	    	   	if(icallers==null)
+	    	   	{
+	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
+	    	   	}
+	    	   	icallers.put(caller, CALLER_QUEUED);
+    		}
+   		}
+    	
+    	if(suspend)
+    	{
+	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	    	synchronized(mon)
+	    	{
+    			Object	state	= icallers.get(caller);
+    			if(CALLER_QUEUED.equals(state))
+    			{
+    	    	   	icallers.put(caller, CALLER_SUSPENDED);
+    				caller.suspend(this, -1);
+    	    	   	icallers.remove(caller);
+    		    	ret	= doGetNextIntermediateResult(index);
+    			}
+    			// else already resumed.
+    		}
+    	}
+    	
+    	return ret;
+    }	
     
     /**
      *  Notify a result listener.
@@ -571,4 +618,41 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         	}
     	}
     }
+
+    /**
+     *  Resume also intermediate waiters.
+     */
+    protected void resume()
+    {
+    	super.resume();
+    	resumeIntermediate();
+    }
+    
+	/**
+	 *  Resume after intermediate result.
+	 */
+	protected void resumeIntermediate()
+	{
+		synchronized(this)
+		{
+			ISuspendable[]	callers	= icallers!=null ? icallers.keySet().toArray(new ISuspendable[0]) : null;
+		   	if(callers!=null)
+		   	{
+				for(ISuspendable caller: callers)
+		    	{
+		    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+		    		synchronized(mon)
+					{
+		    			String	state	= icallers.get(caller);
+		    			if(CALLER_SUSPENDED.equals(state))
+		    			{
+		    				// Only reactivate thread when previously suspended.
+		    				caller.resume(this);
+		    			}
+		    			icallers.put(caller, CALLER_RESUMED);
+					}
+		    	}
+			}
+		}
+	}
 }

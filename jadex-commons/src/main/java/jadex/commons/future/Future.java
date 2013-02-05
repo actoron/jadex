@@ -179,12 +179,14 @@ public class Future<E> implements IFuture<E>
 	    	if(!isDone())
 	    	{
 	    	   	if(caller==null)
+	    	   	{
 	    	   		throw new RuntimeException("No suspendable element.");
-	//        		caller = new ThreadSuspendable(this);
+	    	   	}
 	     
-//	    	   	System.out.println(this+" suspend: "+caller);
 	    	   	if(callers==null)
+	    	   	{
 	    	   		callers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
+	    	   	}
 	    	   	callers.put(caller, CALLER_QUEUED);
 	    	   	suspend = true;
 	    	}
@@ -199,32 +201,19 @@ public class Future<E> implements IFuture<E>
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	callers.put(caller, CALLER_SUSPENDED);
-//    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
-//    	    	   		System.out.println("caller suspending: "+caller+", "+this);
     				caller.suspend(this, timeout);
-//    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
-//    	    	   		System.out.println("caller resumed: "+caller+", "+this);
-    		    	if(exception!=null)
-    		    	{
-    		    		// Nest exception to have both calling and manually set exception stack trace.
-//     		    		exception	= new RuntimeException("Exception when evaluating future", exception);
-     		    		exception	= new RuntimeException(exception.getMessage(), exception);
-     		    	}
-//    				System.out.println(this+" caller awoke: "+caller+" "+mon);
+    	    	   	callers.remove(caller);
     			}
     			// else already resumed.
     		}
     	}
     	
-//    	if(result==null)
-//    		System.out.println(this+" here: "+caller);
-    	
     	synchronized(this)
     	{
 	    	if(exception!=null)
 	    	{
-	    		throw exception instanceof RuntimeException? (RuntimeException)exception 
-	    			:new RuntimeException(exception);
+	    		// Nest exception to have both calling and manually set exception stack trace.
+	    		throw new RuntimeException(exception.getMessage(), exception);
 	    	}
 	    	else if(isDone())
 	    	{
@@ -400,8 +389,6 @@ public class Future<E> implements IFuture<E>
 		    			if(CALLER_SUSPENDED.equals(state))
 		    			{
 		    				// Only reactivate thread when previously suspended.
-//		    			   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
-//		    			   		System.out.println("resume caller: "+caller+", "+this);
 		    				caller.resume(this);
 		    			}
 		    			callers.put(caller, CALLER_RESUMED);

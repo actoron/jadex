@@ -711,7 +711,7 @@ public class ChatService implements IChatService, IChatGuiService
 							
 							if(--cnt==0 && finished)
 							{
-								ret.setFinished();
+								ret.setFinishedIfUndone();
 							}
 						}
 						
@@ -719,7 +719,7 @@ public class ChatService implements IChatService, IChatGuiService
 						{
 							if(--cnt==0 && finished)
 							{
-								ret.setFinished();
+								ret.setFinishedIfUndone();
 							}
 						}
 					});
@@ -729,7 +729,7 @@ public class ChatService implements IChatService, IChatGuiService
 					finished	= true;
 					if(finished && cnt==0)
 					{
-						ret.setFinished();
+						ret.setFinishedIfUndone();
 					}
 				}
 			});

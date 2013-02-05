@@ -14,18 +14,14 @@ public class IntermediateFutureIterator<E> implements Iterator<E>
 	/** The future. */
 	protected IIntermediateFuture<E>	fut;
 	
-	/** The suspendable. */
-	protected ISuspendable	sus;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an intermediate future iterator.
 	 */
-	public IntermediateFutureIterator(IIntermediateFuture<E> fut, ISuspendable sus)
+	public IntermediateFutureIterator(IIntermediateFuture<E> fut)
 	{
 		this.fut	= fut;
-		this.sus	= sus;
 	}
 	
 	//-------- Iterator interface --------
@@ -35,8 +31,7 @@ public class IntermediateFutureIterator<E> implements Iterator<E>
 	 */
 	public boolean hasNext()
 	{
-//		return fut.hasNextIntermediateResult(sus);
-		throw new UnsupportedOperationException();
+		return fut.hasNextIntermediateResult();
 	}
 
 	/**
@@ -44,8 +39,7 @@ public class IntermediateFutureIterator<E> implements Iterator<E>
 	 */
 	public E next()
 	{
-//		return fut.getNextIntermediateResult(sus);
-		throw new UnsupportedOperationException();
+		return fut.getNextIntermediateResult();
 	}
 	
 	/**

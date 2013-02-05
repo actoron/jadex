@@ -4,6 +4,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -27,9 +28,6 @@ public class Executor implements Runnable
 	/** The executor belonging to a thread. */
 	public static final ThreadLocal<Executor>	EXECUTOR	= new ThreadLocal<Executor>();
 
-	/** The set to a monitor of a blocked thread to perform a context switch. */
-	protected static final ThreadLocal<Object>	SWITCH_TO	= new ThreadLocal<Object>();
-	
 	//-------- attributes --------
 
 	/** Flag indicating if the thread is running. */
@@ -58,6 +56,9 @@ public class Executor implements Runnable
 	
 	/** The number of current threads for this executor. */
 	protected int	exethreadcnt;
+	
+	/** The monitors of blocked threads that need to be reactivated. */
+	protected List<Object>	switchtos;
 		
 	//--------- constructors --------
 
@@ -110,7 +111,19 @@ public class Executor implements Runnable
 		{
 			iwanttorun	=	code();
 
-			Object	switchto	= SWITCH_TO.get();
+			Object	switchto	= null;
+			synchronized(this)
+			{
+				if(switchtos!=null)
+				{
+					switchto	= switchtos.remove(0);
+					if(switchtos.isEmpty())
+					{
+						switchtos	= null;
+					}
+				}
+			}
+			
 			if(switchto==null)
 			{
 				// Setting flags in synchronized block assures,
@@ -129,7 +142,7 @@ public class Executor implements Runnable
 			}
 			else
 			{
-				SWITCH_TO.set(null);
+//				System.out.println("switchto: "+switchto);
 				iwanttorun	= false;
 				synchronized(switchto)
 				{
@@ -273,8 +286,18 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor)
 	{
-//		System.out.println("Executor.switchThread "+Thread.currentThread());
-		SWITCH_TO.set(monitor);
+		
+		synchronized(this)
+		{
+			if(switchtos==null)
+			{
+				switchtos = new LinkedList<Object>();
+			}
+			switchtos.add(monitor);
+		}
+		
+		// Make sure execution is running.
+		execute();
 	}
 
 	/**

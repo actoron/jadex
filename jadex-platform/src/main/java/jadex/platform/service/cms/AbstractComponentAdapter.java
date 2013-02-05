@@ -600,7 +600,20 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-			boolean extexecuted	= executeExternalEntries(false);
+			boolean extexecuted	= false;
+			try
+			{
+
+				extexecuted	= executeExternalEntries(false);
+			}
+			catch(Exception e)
+			{
+				fatalError(e);
+			}
+			catch(Throwable t)
+			{
+				fatalError(new RuntimeException(t));
+			}
 				
 			// Suspend when breakpoint is triggered.
 			// Necessary because component wakeup could be called anytime even if is at breakpoint..
