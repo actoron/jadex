@@ -18,7 +18,6 @@ import jadex.micro.annotation.Results;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  *  Calls the step service and waits for the intermediate results twice.
@@ -33,7 +32,7 @@ import java.util.NoSuchElementException;
 	@Component(type="block"),
 	@Component(type="step")
 }))
-public class IntermediateBlockingTestAgent
+public class SubscriptionBlockingTestAgent
 {
 	/**
 	 *  Execute the agent
@@ -43,7 +42,7 @@ public class IntermediateBlockingTestAgent
 	{
 		IStepService	step	= agent.getServiceContainer().searchService(IStepService.class).get();
 		
-		final IIntermediateFuture<Integer>	fut	= step.performSteps(3, 1000);
+		final IIntermediateFuture<Integer>	fut	=  step.subscribeToSteps(1000);
 
 		final List<Integer>	steps1	= new ArrayList<Integer>();
 		final List<Integer>	steps2	= new ArrayList<Integer>();
@@ -53,7 +52,7 @@ public class IntermediateBlockingTestAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				while(fut.hasNextIntermediateResult())
+				for(int i=0; i<3 && fut.hasNextIntermediateResult(); i++)
 				{
 					Integer	res	= fut.getNextIntermediateResult();
 					steps1.add(res);
@@ -66,20 +65,12 @@ public class IntermediateBlockingTestAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				try
+				for(int i=0; i<3; i++)
 				{
-					while(true)
-					{
-						Integer	res	= fut.getNextIntermediateResult();
-						steps2.add(res);
-						stepsall.add(res);
-					}
+					Integer	res	= fut.getNextIntermediateResult();
+					steps2.add(res);
+					stepsall.add(res);
 				}
-				catch(NoSuchElementException e)
-				{
-					// got all results
-				}
-				
 				return IFuture.DONE;
 			}
 		});
@@ -92,12 +83,12 @@ public class IntermediateBlockingTestAgent
 			&& "[1, 1, 2, 2, 3, 3]".equals(stepsall.toString()))
 		{
 			agent.setResultValue("testresults", new Testcase(1,
-				new TestReport[]{new TestReport("#1", "Test intermediate blocking.", true, null)}));
+				new TestReport[]{new TestReport("#1", "Test subscription blocking.", true, null)}));
 		}
 		else
 		{
 			agent.setResultValue("testresults", new Testcase(1,
-				new TestReport[]{new TestReport("#1", "Test intermediate blocking.", false, "Wrong steps: "+steps1+", "+steps2+", "+stepsall)}));
+				new TestReport[]{new TestReport("#1", "Test subscription blocking.", false, "Wrong steps: "+steps1+", "+steps2+", "+stepsall)}));
 		}
 	}
 }

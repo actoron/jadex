@@ -5,7 +5,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Implementation;
@@ -58,5 +60,28 @@ public class StepAgent	implements	IStepService
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Perform periodical steps and block some milliseconds in between.
+	 */
+	public ISubscriptionIntermediateFuture<Integer>	subscribeToSteps(final long millis)
+	{
+		final SubscriptionIntermediateFuture<Integer>	ret	= new SubscriptionIntermediateFuture<Integer>();
+		
+		agent.waitForDelay(0, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				for(int i=1; !ret.isDone(); i++)
+				{
+					ia.waitForDelay(millis).get();
+					ret.addIntermediateResult(new Integer(i));
+				}
+				return IFuture.DONE;
+			}
+		});
+		
+		return ret;		
 	}
 }
