@@ -73,7 +73,7 @@ public class MGoal extends MClassBasedElement
 		this.unique = unique;
 		this.deliberation = deliberation;
 		
-		System.out.println("create: "+target);
+//		System.out.println("create: "+target);
 	}
 	
 	/**
