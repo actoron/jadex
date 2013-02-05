@@ -785,10 +785,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
-					int idx = event.getType().indexOf(".");
-					String evtype = event.getType().substring(0, idx);
-					String belname = event.getType().substring(idx+1);
-					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(evtype, belname, event.getContent()), getInternalAccess());
+					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), getInternalAccess());
 					RPlan.adoptPlan(rplan, getInternalAccess());
 					return IFuture.DONE;
 				}

@@ -18,7 +18,9 @@ public class WaitAbstraction
 	
 	/** The runtime elements. */
 	protected Set<RElement> runtimeelements;
-	
+
+	/** The event types. */
+	protected Set<String> changeeventtypes;
 	
 	/**
 	 *  Add a message event.
@@ -69,38 +71,51 @@ public class WaitAbstraction
 		addRuntimeElement(rgoal);
 	}
 
-	/**
+//	/**
 //	 *  Add a fact changed.
 //	 *  @param belief The belief or beliefset.
 //	 */
 //	public void addFactChanged(String belief)
 //	{
+//		addChangeEventType()
 //	}
 //
 //	/**
 //	 *  Add a fact added.
 //	 *  @param beliefset The beliefset.
 //	 */
-//	public IWaitAbstraction addFactAdded(String beliefset);
-//
-//
+//	public IWaitAbstraction addFactAdded(String beliefset)
+//	{
+//		
+//	}
+
+
 //	/**
 //	 *  Add a fact removed.
 //	 *  @param beliefset The beliefset.
 //	 */
-//	public IWaitAbstraction addFactRemoved(String beliefset);
+//	public IWaitAbstraction addFactRemoved(String beliefset)
+//	{
+//		
+//	}
 //	
 //	/**
 //	 *  Add a condition.
 //	 *  @param condition the condition name.
 //	 */
-//	public IWaitAbstraction addCondition(String condition);
+//	public IWaitAbstraction addCondition(String condition)
+//	{
+//		
+//	}
 //
 //	/**
 //	 *  Add an external condition.
 //	 *  @param condition the condition.
 //	 */
-//	public IWaitAbstraction addExternalCondition(IExternalCondition condition);
+//	public IWaitAbstraction addExternalCondition(IExternalCondition condition)
+//	{
+//		
+//	}
 
 	//-------- remover methods --------
 
@@ -195,6 +210,17 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
+	protected void removeModelElement(MElement melement)
+	{
+		if(modelelements!=null)
+		{
+			modelelements.remove(melement);
+		}
+	}
+	
+	/**
+	 * 
+	 */
 	public void addRuntimeElement(RElement relement)
 	{
 		if(runtimeelements==null)
@@ -202,17 +228,6 @@ public class WaitAbstraction
 			runtimeelements = new HashSet<RElement>();
 		}
 		runtimeelements.add(relement);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void removeModelElement(MElement melement)
-	{
-		if(modelelements!=null)
-		{
-			modelelements.remove(melement);
-		}
 	}
 	
 	/**
@@ -229,6 +244,29 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
+	protected void addChangeEventType(String eventtype)
+	{
+		if(changeeventtypes==null)
+		{
+			changeeventtypes = new HashSet<String>();
+		}
+		changeeventtypes.add(eventtype);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeChangeEventType(String eventtype)
+	{
+		if(changeeventtypes!=null)
+		{
+			changeeventtypes.remove(eventtype);
+		}
+	}
+	
+	/**
+	 *  Test if this wait abstraction is waiting for the element.
+	 */
 	public boolean isWaitingFor(Object procelem)
 	{
 		boolean ret = false;
@@ -239,6 +277,10 @@ public class WaitAbstraction
 		if(!ret && runtimeelements!=null)
 		{
 			ret = runtimeelements.contains(procelem);
+		}
+		if(!ret && changeeventtypes!=null)
+		{
+			ret = changeeventtypes.contains(procelem);
 		}
 		
 		return ret;

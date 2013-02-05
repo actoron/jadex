@@ -343,6 +343,7 @@ public class TCPTransport implements ITransport
 			}
 		};
 		
+		// Connections will be set to null after transport shutdown
 		if(connections==null)
 		{
 			task.ready(send_failure);

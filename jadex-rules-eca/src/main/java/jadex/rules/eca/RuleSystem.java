@@ -416,7 +416,8 @@ public class RuleSystem
 			
 			if(rules!=null)
 			{
-				processRules(rules.iterator(), event, ret).addResultListener(new IResultListener<Void>()
+				IRule<?>[] rs = rules.toArray(new IRule<?>[rules.size()]);
+				processRules(rs, 0, event, ret).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -445,36 +446,35 @@ public class RuleSystem
 	/**
 	 * 
 	 */
-	protected IFuture<Void> processRules(final Iterator<IRule<?>> it, final IEvent event, final IntermediateFuture<RuleEvent> res)
+	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(it.hasNext())
+		if(i<rules.length)
 		{
-			final IRule rule = it.next();
-			if(rule.getCondition()==null || rule.getCondition().evaluate(event))
+			if(rules[i].getCondition()==null || rules[i].getCondition().evaluate(event))
 			{
-				IFuture<Object> fut = (IFuture<Object>)rule.getAction().execute(event, rule, context);
+				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context);
 				
 				fut.addResultListener(new IResultListener<Object>()
 				{
 					public void resultAvailable(Object result) 
 					{
-						RuleEvent ev = new RuleEvent(rule.getName(), result);
+						RuleEvent ev = new RuleEvent(rules[i].getName(), result);
 						res.addIntermediateResult(ev);
-						processRules(it, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						exception.printStackTrace();
-						processRules(it, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
 			else
 			{
-				processRules(it, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+				processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}
 		else

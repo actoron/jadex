@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime;
 
+import jadex.rules.eca.IEvent;
+
 /**
  *  Event that is thrown in case of a bdi element change (belief, goal, etc.).
  */
@@ -70,12 +72,23 @@ public class ChangeEvent
 	/**
 	 *  Create a new ChangeEvent. 
 	 */
-	public ChangeEvent(String type, Object source, Object value)
+	public ChangeEvent(IEvent event)
 	{
-		this.type = type;
-		this.source = source;
-		this.value = value;
+		int idx = event.getType().indexOf(".");
+		this.type = event.getType().substring(0, idx);
+		this.source = event.getType().substring(idx+1);
+		this.value = event.getContent();
 	}
+	
+//	/**
+//	 *  Create a new ChangeEvent. 
+//	 */
+//	public ChangeEvent(String type, Object source, Object value)
+//	{
+//		this.type = type;
+//		this.source = source;
+//		this.value = value;
+//	}
 
 	/**
 	 *  Get the type.

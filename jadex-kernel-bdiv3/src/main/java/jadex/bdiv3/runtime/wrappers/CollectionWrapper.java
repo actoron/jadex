@@ -105,7 +105,8 @@ public class CollectionWrapper <T> implements Collection<T>
 	public boolean remove(Object o)
 	{
 		boolean ret = delegate.remove(o);
-		rulesystem.addEvent(new Event(remevent, o));
+		if(ret)
+			rulesystem.addEvent(new Event(remevent, o));
 		return ret;
 	}
 

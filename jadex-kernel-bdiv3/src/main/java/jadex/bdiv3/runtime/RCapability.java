@@ -217,8 +217,8 @@ public class RCapability extends RElement
 	}
 	
 	/**
-	 *  Add a new goal.
-	 *  @param goal The goal.
+	 *  Add a new plan.
+	 *  @param plan The plan.
 	 */
 	public void addPlan(RPlan plan)
 	{
@@ -226,6 +226,8 @@ public class RCapability extends RElement
 		{
 			plans = new ArrayList<RPlan>();
 		}
+		if(plans.contains(plan))
+			throw new RuntimeException("Plan already contained: "+plan);
 		plans.add(plan);
 	}
 	
