@@ -15,12 +15,6 @@ import java.util.NoSuchElementException;
  */
 public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIntermediateFuture<E>
 {
-	//-------- constants --------
-	
-	/** The index of the next result for a thread. */
-    protected static final	ThreadLocal<Integer>	INDICES	= new ThreadLocal<Integer>();
-
-	
 	//-------- attributes --------
 	
 	/** The intermediate results. */
@@ -38,6 +32,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 	/** The blocked intermediate callers (caller->state). */
 	protected Map<ISuspendable, String> icallers;
     
+	/** The index of the next result for a thread. */
+    protected Map<Thread, Integer>	indices;
            
 	//-------- constructors--------
 	
@@ -356,15 +352,15 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	boolean	ret;
     	boolean	suspend;
     	
-		Integer	index	= INDICES.get();
-		if(index==null)
-		{
-			index	= new Integer(0);
-		}
-		
 		ISuspendable	caller	= null;
     	synchronized(this)
     	{
+    		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
+    		if(index==null)
+    		{
+    			index	= new Integer(0);
+    		}
+    		
     		ret	= results!=null && results.size()>index.intValue();
     		suspend	= !ret && !isDone();
     		if(suspend)
@@ -416,9 +412,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
      */
     public E getNextIntermediateResult()
     {
-		Integer	index	= INDICES.get();
-		index	= index==null ? new Integer(1) : new Integer(index.intValue()+1);
-		INDICES.set(index);
+    	Integer	index;
+    	synchronized(this)
+    	{
+			index	= indices!=null ? indices.get(Thread.currentThread()) : null;
+			index	= index==null ? new Integer(1) : new Integer(index.intValue()+1);
+			
+			if(indices==null)
+			{
+				indices	= new HashMap<Thread, Integer>();
+			}
+			indices.put(Thread.currentThread(), index);
+    	}
 		return doGetNextIntermediateResult(index.intValue());
     }
     
