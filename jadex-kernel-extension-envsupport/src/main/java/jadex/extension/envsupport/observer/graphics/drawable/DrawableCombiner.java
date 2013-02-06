@@ -198,7 +198,22 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 		}
 		else if(prop instanceof String)
 		{
-			ret = SObjectInspector.getProperty(obj, (String)prop);
+			String name = (String)prop;
+			
+			ret = getProperty(name);
+			if(ret instanceof IParsedExpression)
+			{
+				SimpleValueFetcher fetcher = new SimpleValueFetcher(viewport.getPerspective().getObserverCenter().getSpace().getFetcher());
+				fetcher.setValue("$drawable", this);
+				fetcher.setValue("$object", obj);
+				fetcher.setValue("$perspective", viewport.getPerspective());
+				ret = ((IParsedExpression)ret).getValue(fetcher);
+			}
+			
+			if(ret==null)
+			{
+				ret = SObjectInspector.getProperty(obj, name);
+			}
 		}
 		
 		return ret;

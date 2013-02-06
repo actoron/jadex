@@ -2878,7 +2878,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 */
 	public IFuture<Void> terminate()
 	{
-		System.err.println("terminate space: "+exta.getComponentIdentifier());
+//		System.err.println("terminate space: "+exta.getComponentIdentifier());
 		final Future<Void>	ret	= new Future<Void>();
 		final IObserverCenter[]	ocs	= (IObserverCenter[])observercenters.toArray(new IObserverCenter[observercenters.size()]);
 		SwingUtilities.invokeLater(new Runnable()
@@ -2899,7 +2899,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				}
 			}
 		});
-		System.err.println("terminate space finished: "+ret.isDone());
+//		System.err.println("terminate space finished: "+ret.isDone());
 		return ret;
 	}
 	
