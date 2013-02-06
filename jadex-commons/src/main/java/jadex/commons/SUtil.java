@@ -2077,16 +2077,43 @@ public class SUtil
 	 * catch(ClassNotFoundException e){System.out.println(e);} } catch(Exception
 	 * e) { System.out.println(e); } }
 	 */
+	
+	/**
+	 *  Convert bytes to a short.
+	 */
+	public static short bytesToShort(byte[] buffer)
+	{
+		assert buffer.length == 2;
+
+		short value = (short)((0xFF & buffer[0]) << 8);
+		value |= (0xFF & buffer[1]);
+
+		return value;
+	}
+
+	/**
+	 *  Convert a short to bytes.
+	 */
+	public static byte[] shortToBytes(int val)
+	{
+		byte[] buffer = new byte[2];
+
+		buffer[0] = (byte)((val >>> 8) & 0xFF);
+		buffer[1] = (byte)(val & 0xFF);
+
+		return buffer;
+	}
 
 	/**
 	 *  Convert bytes to an integer.
 	 */
 	public static int bytesToInt(byte[] buffer)
 	{
-		if(buffer.length != 4)
-		{
-			throw new IllegalArgumentException("buffer length must be 4 bytes!");
-		}
+		assert buffer.length == 4;
+//		if(buffer.length != 4)
+//		{
+//			throw new IllegalArgumentException("buffer length must be 4 bytes!");
+//		}
 
 		int value = (0xFF & buffer[0]) << 24;
 		value |= (0xFF & buffer[1]) << 16;
@@ -2133,10 +2160,11 @@ public class SUtil
 	 */
 	public static long bytesToLong(byte[] buffer)
 	{
-		if(buffer.length != 8)
-		{
-			throw new IllegalArgumentException("Buffer length must be 8 bytes: "+arrayToString(buffer));
-		}
+		assert buffer.length == 8;
+//		if(buffer.length != 8)
+//		{
+//			throw new IllegalArgumentException("Buffer length must be 8 bytes: "+arrayToString(buffer));
+//		}
 
 		long value = (0xFFL & buffer[0]) << 56L;
 		value |= (0xFFL & buffer[1]) << 48L;
