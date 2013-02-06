@@ -233,7 +233,7 @@ public class HttpRelayTransport implements ITransport
 		{
 			try
 			{
-				System.out.println("going offline: "+adr+", "+component.getComponentIdentifier().getRoot());
+//				System.out.println("going offline: "+adr+", "+component.getComponentIdentifier().getRoot());
 				this.conman.postMessage(adr, component.getComponentIdentifier().getRoot(), new byte[0][]);
 			}
 			catch(IOException e)

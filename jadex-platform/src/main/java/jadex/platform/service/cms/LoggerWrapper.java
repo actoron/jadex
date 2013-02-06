@@ -1175,6 +1175,12 @@ public class LoggerWrapper extends Logger
      */
     public void info(String msg) 
     {
+    	// Hack!!! Happens on VM shutdown as log manager sets all log levels to null.
+    	if(logger.getLevel()==null)
+    	{
+			return;
+    	}
+    	
         if(Level.INFO.intValue() < logger.getLevel().intValue()) 
         {
             return;

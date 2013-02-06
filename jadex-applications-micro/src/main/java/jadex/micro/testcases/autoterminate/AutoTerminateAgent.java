@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -84,19 +85,19 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	public ISubscriptionIntermediateFuture<String>	subscribe()
 	{
 		final TestReport	report	= new TestReport("#"+reports.size()+1,
-			reports.size()==0 ? "Test local automatic subscription termination."
-			: reports.size()==1 ? "Test remote automatic subscription termination."
-			: "Test remote offline automatic subscription termination.");
+			reports.size()==0 ? "Test local automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller()
+			: reports.size()==1 ? "Test remote automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller()
+			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-		System.out.println("test: "+report.getDescription()+", "+BasicService.DEFAULT_LOCAL);
+//		System.out.println("test: "+report.getDescription()+", "+BasicService.DEFAULT_LOCAL);
 		
 		waitForRealtimeDelay(BasicService.DEFAULT_LOCAL,
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("test1: "+report.getDescription());
+//				System.out.println("test1: "+report.getDescription());
 				
 				if(!report.isSucceeded())
 				{
@@ -111,7 +112,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public void terminated(Exception reason)
 			{
-				System.out.println("test2: "+report.getDescription());
+//				System.out.println("test2: "+report.getDescription());
 				
 				if(report.getReason()==null)
 				{
@@ -125,7 +126,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("test3: "+report.getDescription());
+//				System.out.println("test3: "+report.getDescription());
 				
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
@@ -146,7 +147,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			&& reports.get(1).isFinished()
 			&& reports.get(2).isFinished();
 
-		System.out.println("test4: "+reports.size()+", "+finished);
+//		System.out.println("test4: "+reports.size()+", "+finished);
 
 		if(finished)
 		{

@@ -243,15 +243,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void initLogger(Logger logger)
 	{
-		if(logger==null)
-			System.out.println("gshdfghsdf");
-		
 		// get logging properties (from ADF)
 		// the level of the logger
 		// can be Integer or Level
 		
 		Object prop = component.getProperty("logging.level");
-		Level level = prop!=null? (Level)prop : logger.getParent()!=null ? logger.getParent().getLevel() : Level.SEVERE;
+		Level level = prop!=null? (Level)prop : logger.getParent()!=null && logger.getParent().getLevel()!=null ? logger.getParent().getLevel() : Level.SEVERE;
 		logger.setLevel(level);
 		
 		// if logger should use Handlers of parent (global) logger

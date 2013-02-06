@@ -155,6 +155,7 @@ public class SelectorThread implements Runnable
 				try
 				{
 					((Closeable)con).close();
+//					System.out.println("closed: "+con);
 				}
 				catch(IOException e)
 				{
@@ -325,7 +326,7 @@ public class SelectorThread implements Runnable
 					else
 					{						
 //						System.err.println("writetasks6: "+writetasks.get(con.getSocketChannel()));
-						ret.setException(new RuntimeException("key is nullor invalid!? "+key));
+						ret.setException(new RuntimeException("key is null or invalid!? "+key));
 					}
 				}
 				catch(RuntimeException e)

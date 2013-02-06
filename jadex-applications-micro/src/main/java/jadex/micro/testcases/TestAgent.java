@@ -148,8 +148,8 @@ public abstract class TestAgent
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",
-//			"-niotcptransport", "false",
-//			"-tcptransport", "true",
+			"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
+			"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
 //			"-binarymessages", "false",
 			"-gui", "false",
