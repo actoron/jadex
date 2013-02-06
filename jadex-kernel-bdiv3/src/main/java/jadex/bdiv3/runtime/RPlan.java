@@ -66,37 +66,37 @@ public class RPlan extends RElement
 	
 	
 	/** The plan has a reason. */
-	public Object reason;
+	protected Object reason;
 
 	/** The plan has a dispatched element (current goal/event). */
-	public Object dispatchedelement;
+	protected Object dispatchedelement;
 	
 	/** The plan has subgoals attribute (hack!!! redundancy to goal_has_parentplan). */
-	public List<RGoal> subgoals;
+	protected List<RGoal> subgoals;
 		
 	/** The plan has a wait abstraction attribute. */
-	public WaitAbstraction waitabstraction;
+	protected WaitAbstraction waitabstraction;
 		
 	/** The plan has a waitqueue wait abstraction attribute. */
-	public WaitAbstraction waitqueuewa;
+	protected WaitAbstraction waitqueuewa;
+	
+	/** The waitqueue. */
+	protected List<Object> waitqueue;
 	
 	/** The wait future (to resume execution). */
-	public Future<?> waitfuture;
-	
-//	/** The plan has a waitqueue processable elements attribute. */
-//	public static OAVAttributeType plan_has_waitqueueelements;
+	protected Future<?> waitfuture;
 	
 	/** The plan has exception attribute. */
-	public Exception exception;
+	protected Exception exception;
 	
 	/** The plan has lifecycle state attribute. */
-	public String lifecyclestate;
+	protected String lifecyclestate;
 	
 	/** The plan has processing state attribute (ready or waiting). */
-	public String processingstate;
+	protected String processingstate;
 	
 //	/** The plan has a timer attribute (when waiting). */
-//	public static ? plan_has_timer;
+//	protected static ? plan_has_timer;
 	
 	/** The plan body. */
 	protected IPlanBody body;
@@ -423,7 +423,8 @@ public class RPlan extends RElement
 	{
 		waitfuture = fut;
 	}
-
+	
+	
 	// methods that can be called from pojo plan
 
 	/**
@@ -492,6 +493,24 @@ public class RPlan extends RElement
 		return ret;
 	}
 	
+	/**
+	 *  Get the waitqueue.
+	 *  @return The waitqueue.
+	 */
+	public List<Object> getWaitqueue()
+	{
+		return waitqueue;
+	}
+
+	/**
+	 *  Set the waitqueue.
+	 *  @param waitqueue The waitqueue to set.
+	 */
+	public void setWaitqueue(List<Object> waitqueue)
+	{
+		this.waitqueue = waitqueue;
+	}
+
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
