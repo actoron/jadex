@@ -3282,6 +3282,75 @@ public class SUtil
 	}
 	
 	/**
+	 *  Moves a file to a target location.
+	 *  @param source	The source file.
+	 *  @param target	The target file location (will be deleted first, if it exists).
+	 */
+	public static void	moveFile(File source, File target)	throws IOException
+	{
+		Class filesclazz = null;
+		try
+		{
+			filesclazz = Class.forName("java.nio.file.Files");
+		}
+		catch (ClassNotFoundException e)
+		{
+		}
+		
+		if (filesclazz != null)
+		{
+			// Java 7+ mode
+			try
+			{
+				Class pathclazz = Class.forName("java.nio.file.Path");
+				Class copyoptionclazz = Class.forName("java.nio.file.CopyOption");
+				Class standardcopyoptionclazz = Class.forName("java.nio.file.StandardCopyOption");
+				Object atomicflag = standardcopyoptionclazz.getField("ATOMIC_MOVE").get(null);
+				Object replaceflag = standardcopyoptionclazz.getField("REPLACE_EXISTING").get(null);
+				Object moveoptions = Array.newInstance(copyoptionclazz, 2);
+				Array.set(moveoptions, 0, replaceflag);
+				Array.set(moveoptions, 1, atomicflag);
+				Class copyoptionarrayclazz = moveoptions.getClass();
+				Method movemethod = filesclazz.getMethod("move", pathclazz, pathclazz, copyoptionarrayclazz);
+				
+				Method topathmethod = File.class.getMethod("toPath", (Class<?>[]) null);
+				Object srcpath = topathmethod.invoke(source, (Object[]) null);
+				Object tgtpath = topathmethod.invoke(target, (Object[]) null);
+				
+				try
+				{
+					movemethod.invoke(null, srcpath, tgtpath, moveoptions);
+				}
+				catch (Exception e)
+				{
+					// Try non-atomic move.
+					moveoptions = Array.newInstance(copyoptionclazz, 1);
+					Array.set(moveoptions, 0, replaceflag);
+					movemethod.invoke(null, srcpath, tgtpath, moveoptions);
+				}
+			}
+			catch (Exception e)
+			{
+				// Still try fallback, maybe that works.
+				filesclazz = null;
+			}
+		}
+		
+		if (filesclazz == null)
+		{
+			// Compatability fallback.
+			if (!source.renameTo(target))
+			{
+				copyFile(source, target);
+				if (!source.delete())
+				{
+					throw new IOException("Unable to delete source file after move: " + source.getAbsolutePath());
+				}
+			}
+		}
+	}
+	
+	/**
 	 *  Get the exception stack trace as string. 
 	 *  @param e The exception.
 	 *  @return The string.
