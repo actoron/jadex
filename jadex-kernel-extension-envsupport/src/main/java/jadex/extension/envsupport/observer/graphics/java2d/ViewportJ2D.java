@@ -46,6 +46,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	/** The default transform */
 	private AffineTransform defaultTransform_;
 	
+	/** Flag to indicate that viewport is disposed. */
+	private boolean disposed = false;
+	
 	/** The renderers. */
 	private static final IJ2DRenderer[] RENDERERS = new IJ2DRenderer[6];
 	static
@@ -92,8 +95,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 		{
 			public void run()
 			{
-				rendering	= false;
-				canvas_.repaint();
+				if (!disposed)
+				{
+					rendering	= false;
+					canvas_.repaint();
+				}
 			};
 		};
 	}
@@ -173,7 +179,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	 */
 	public void dispose()
 	{
-		
+		disposed = true;
 	}
 	
 	// Component events
