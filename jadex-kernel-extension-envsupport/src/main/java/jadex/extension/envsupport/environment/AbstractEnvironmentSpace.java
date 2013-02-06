@@ -2880,7 +2880,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 //		System.out.println("terminate space: "+exta.getComponentIdentifier());
 		final Future<Void>	ret	= new Future<Void>();
-		final ObserverCenter[]	ocs	= (ObserverCenter[])observercenters.toArray(new ObserverCenter[observercenters.size()]);
+		final IObserverCenter[]	ocs	= (IObserverCenter[])observercenters.toArray(new IObserverCenter[observercenters.size()]);
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
