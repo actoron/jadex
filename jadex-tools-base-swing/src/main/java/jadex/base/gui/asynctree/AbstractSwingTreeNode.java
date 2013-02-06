@@ -54,6 +54,16 @@ public abstract class AbstractSwingTreeNode	extends AbstractTreeNode implements 
 	}
 	
 	/**
+	 *  Get the child count.
+	 */
+	public int	getChildCount()
+	{
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
+
+		return super.getChildCount();
+	}
+	
+	/**
 	 *  Get the given child.
 	 */
 	@Override

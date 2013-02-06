@@ -1,19 +1,10 @@
 package jadex.base.gui.asynctree;
 
 import jadex.base.gui.asynctree.adapter.TreeModelListenerWrapper;
-import jadex.commons.collection.MultiCollection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.SwingUtilities;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
