@@ -299,9 +299,9 @@ public class RelayHandler
 				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
 				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true);
 			}
-			else
+			else if(platform!=null)
 			{
-				sendPlatformInfo(info);
+				sendPlatformInfo(platform);
 			}
 	//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 			for(int i=0; i<items.size(); i++)
@@ -404,15 +404,31 @@ public class RelayHandler
 		}
 		else
 		{
+			PlatformInfo	platform	= platforms.remove(id);
+			if(platform!=null)
+				platform.disconnect();
+			
+			AwarenessInfo	awainfo	= platform!=null ? platform.getAwarenessInfo() : null;
+			if(awainfo!=null)
+			{
+				awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+				sendAwarenessInfos(awainfo, platform.getPreferredCodecs(), true);
+			}
+			else if(platform!=null)
+			{
+				sendPlatformInfo(platform);
+			}
+			
 			IBlockingQueue<Message>	queue	= map.get(id);
 			if(queue!=null)
 			{
-				List<Message>	msgs	= queue.setClosed(true);
-				for(Message msg: msgs)
+				List<Message>	items	= queue.setClosed(true);
+				map.remove(id);
+				for(int i=0; i<items.size(); i++)
 				{
-					msg.getFuture().setExceptionIfUndone(new RuntimeException("Platform went offline"));
+					items.get(i).getFuture().setException(new RuntimeException("Target disconnected."));
 				}
-			}
+			}			
 		}
 
 	}

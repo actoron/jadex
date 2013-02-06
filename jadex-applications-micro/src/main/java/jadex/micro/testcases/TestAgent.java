@@ -106,7 +106,7 @@ public abstract class TestAgent
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("tests finished: "+agent.getComponentIdentifier());
+//				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
 				agent.setResultValue("testresults", tc);
 				ret.setResult(null);
@@ -115,7 +115,7 @@ public abstract class TestAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("tests failed: "+agent.getComponentIdentifier());
+//				System.out.println("tests failed: "+agent.getComponentIdentifier());
 				
 				exception.printStackTrace();
 				
@@ -151,8 +151,10 @@ public abstract class TestAgent
 //			"-niotcptransport", "false",
 //			"-tcptransport", "true",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
-			"-binarymessages", "false",
-			"-gui", "true", "-simulation", "false", "-printpass", "false"};
+//			"-binarymessages", "false",
+			"-gui", "false",
+			"-cli", "false",
+			"-simulation", "false", "-printpass", "false"};
 		
 		if(args!=null && args.length>0)
 		{
