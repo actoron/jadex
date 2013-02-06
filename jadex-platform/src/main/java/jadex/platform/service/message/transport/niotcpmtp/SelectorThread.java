@@ -250,11 +250,12 @@ public class SelectorThread implements Runnable
 								
 								logger.info("Failed connection to: "+address+": "+cnt);
 								fut.setException(e);
+								Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
 								synchronized(connections)
 								{
 									if(connections.get(address)==fut)
 									{
-										connections.remove(address);
+										connections.put(address, new NIOTCPDeadConnection(cleaner));
 									}
 								}
 							}

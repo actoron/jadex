@@ -39,6 +39,12 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	@Agent
 	protected IInternalAccess	agent;
 	
+	/** The finished future. */
+	protected Future<Void>	ret;
+	
+	/** The test case. */
+	protected Testcase tc;
+	
 	//-------- methods --------
 	
 	/**
@@ -46,19 +52,23 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	 */
 	protected IFuture<Void> performTests(Testcase tc)
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		ret	= new Future<Void>();
+		this.tc	= tc;
+		tc.setTestCount(3);
 		
 		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
+				
 				setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
 						setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null);
+						// keep future open -> is set in check finished.
 					}
 				});
 			}
@@ -79,14 +89,14 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			: "Test remote offline automatic subscription termination.");
 		reports.add(report);
 		
-//		System.out.println("test: "+report.getDescription());
+		System.out.println("test: "+report.getDescription()+", "+BasicService.DEFAULT_LOCAL);
 		
 		waitForRealtimeDelay(BasicService.DEFAULT_LOCAL,
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("test1: "+report.getDescription());
+				System.out.println("test1: "+report.getDescription());
 				
 				if(!report.isSucceeded())
 				{
@@ -101,7 +111,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public void terminated(Exception reason)
 			{
-//				System.out.println("test2: "+report.getDescription());
+				System.out.println("test2: "+report.getDescription());
 				
 				if(report.getReason()==null)
 				{
@@ -115,7 +125,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("test3: "+report.getDescription());
+				System.out.println("test3: "+report.getDescription());
 				
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
@@ -136,12 +146,12 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			&& reports.get(1).isFinished()
 			&& reports.get(2).isFinished();
 
-//		System.out.println("test4: "+reports.size()+", "+finished);
+		System.out.println("test4: "+reports.size()+", "+finished);
 
 		if(finished)
 		{
-			agent.setResultValue("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
-			agent.killComponent();
+			tc.setReports(reports.toArray(new TestReport[reports.size()]));
+			ret.setResult(null);
 		}
 	}
 }

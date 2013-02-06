@@ -19,6 +19,7 @@ import jadex.platform.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -225,7 +226,20 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
+		String adr	= receiver.address==null ? null
+			: receiver.address.endsWith("/") ? receiver.address+"offline" : receiver.address+"/offline";
 		this.receiver.stop();
+		if(adr!=null)
+		{
+			try
+			{
+				this.conman.postMessage(adr, component.getComponentIdentifier().getRoot(), new byte[0][]);
+			}
+			catch(IOException e)
+			{
+				component.getLogger().warning("Exception during relay shutdown: "+e);
+			}
+		}
 		this.conman.dispose();
 		return IFuture.DONE;
 	}

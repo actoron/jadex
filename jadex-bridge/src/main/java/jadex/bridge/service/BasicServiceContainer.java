@@ -661,8 +661,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(String name)
 	{
-		if(shutdowned)
-			return new Future<T>(new ComponentTerminatedException(id));
 		return getRequiredService(name, false);
 	}
 	
@@ -673,8 +671,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(String name)
 	{
-		if(shutdowned)
-			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 		return getRequiredServices(name, false);
 	}
 	
@@ -684,8 +680,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		if(shutdowned)
-			return new Future<T>(new ComponentTerminatedException(id));
 		return getRequiredService(info, binding, false, null);
 	}
 	
@@ -695,8 +689,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		if(shutdowned)
-			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 		return getRequiredServices(info, binding, false, null);
 	}
 	
@@ -706,8 +698,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, IFilter<T> filter)
 	{
-		if(shutdowned)
-			return new Future<T>(new ComponentTerminatedException(id));
 		IFuture<T> ret = getRequiredService(info, binding, false, filter);
 		return ret;
 //		return getRequiredService(info, binding, false, filter);
@@ -798,8 +788,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
-		if(shutdowned)
-			return new Future<T>(new ComponentTerminatedException(id));
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
 		return fetcher.getService(info, binding, rebind, filter);
@@ -817,8 +805,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
-		if(shutdowned)
-			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
 		return fetcher.getServices(info, binding, rebind, filter);

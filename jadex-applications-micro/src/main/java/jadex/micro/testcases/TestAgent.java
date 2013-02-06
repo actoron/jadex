@@ -106,7 +106,7 @@ public abstract class TestAgent
 		{
 			public void resultAvailable(Void result)
 			{
-//				System.out.println("tests finished");
+				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
 				agent.setResultValue("testresults", tc);
 				ret.setResult(null);
@@ -115,6 +115,8 @@ public abstract class TestAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("tests failed: "+agent.getComponentIdentifier());
+				
 				exception.printStackTrace();
 				
 				agent.setResultValue("testresults", tc);

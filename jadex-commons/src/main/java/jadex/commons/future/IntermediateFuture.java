@@ -287,7 +287,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         		}
         	}
 		}
-    	super.setResult(res);
+    	super.setResultIfUndone(res);
     	return true;
     }
     

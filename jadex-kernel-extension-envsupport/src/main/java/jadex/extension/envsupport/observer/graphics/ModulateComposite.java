@@ -39,6 +39,11 @@ public abstract class ModulateComposite implements Composite
 		
 		public void compose(Raster src, Raster dstIn, WritableRaster dstOut)
 		{
+			if(getColor()==null)
+			{
+				System.err.println("color is null");
+			}
+			
 			float[] clrPx = getColor().getComponents(null);
 			
 			int maxX = Math.min(src.getWidth(), dstIn.getWidth());

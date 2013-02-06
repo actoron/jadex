@@ -382,6 +382,42 @@ public class RelayHandler
 	}
 	
 	/**
+	 *  Called when an offline status change is posted by a platform.
+	 */
+	public void handleOffline(String hostip, InputStream in) throws Exception
+	{
+		// Read platform id
+		String	id	= readString(in);
+
+		// Read total message length.	should be 0
+		readData(in, 4);
+		
+		// Only accept status if from same IP
+		PlatformInfo	pi	= platforms.get(id);
+		if(pi==null)
+		{
+			throw new RuntimeException("No such platform: "+id);
+		}
+		else if(!hostip.equals(pi.getHostIP()))
+		{
+			throw new RuntimeException("Offline request from wrong IP: "+id+", "+hostip+", "+pi.getHostIP());			
+		}
+		else
+		{
+			IBlockingQueue<Message>	queue	= map.get(id);
+			if(queue!=null)
+			{
+				List<Message>	msgs	= queue.setClosed(true);
+				for(Message msg: msgs)
+				{
+					msg.getFuture().setExceptionIfUndone(new RuntimeException("Platform went offline"));
+				}
+			}
+		}
+
+	}
+	
+	/**
 	 *  Called when a single platform info is received from a peer relay server.
 	 */
 	public void handlePlatform(InputStream in) throws Exception

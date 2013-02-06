@@ -222,15 +222,16 @@ public class Executor implements Runnable
 		boolean directnotify = false;
 		synchronized(this)
 		{
-			shutdown = true;
 			if(!shutdowned)
 			{
 				shutdownfutures.add(ret);
+				execute();
 			}
 			else
 			{
 				directnotify = true;
 			}
+			shutdown = true;
 		}
 		
 		if(directnotify)

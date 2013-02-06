@@ -160,6 +160,10 @@ public class RelayServlet extends HttpServlet
 			{
 				handler.handleAwareness(request.getInputStream());
 			}
+			if(request.getServletPath().startsWith("/offline"))
+			{
+				handler.handleOffline(request.getRemoteAddr(), request.getInputStream());
+			}
 			else if(request.getServletPath().startsWith("/platforminfos"))
 			{
 				handler.handlePlatforms(request.getInputStream());

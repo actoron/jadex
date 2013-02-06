@@ -311,7 +311,13 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 						{
 							Executor exe = (Executor)executors.get(keys[i]);
 							if(exe!=null)
+							{
 								exe.shutdown().addResultListener(lis);
+							}
+							else
+							{
+								lis.resultAvailable(null);
+							}
 						}
 					}
 					else

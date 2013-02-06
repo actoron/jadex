@@ -44,12 +44,14 @@ public class SubscriberAgent
 	@AgentBody
 	public void	body(final IInternalAccess agent)
 	{
-//		System.out.println("subscribe "+agent.getComponentIdentifier());
+		System.out.println("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
 		sub.subscribe().addResultListener(new IntermediateDefaultResultListener<String>()
 		{
 			public void intermediateResultAvailable(String result)
 			{
+				System.out.println("subscribed "+agent.getComponentIdentifier());
+				
 				if("platform".equals(agent.getConfiguration()))
 				{
 					cms.destroyComponent(agent.getComponentIdentifier().getRoot());

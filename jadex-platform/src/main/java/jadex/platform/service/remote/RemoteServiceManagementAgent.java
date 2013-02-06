@@ -300,7 +300,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 									public void resultAvailable(Void v)
 									{
-										Map reply = createReply(msg, mt);
+										final Map reply = createReply(msg, mt);
 										if(rid[0]!=null)
 										{
 //											System.out.println("rid: "+rid+" "+result.getClass());
@@ -317,18 +317,18 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										{
 											public void resultAvailable(Void res)
 											{
-//												System.out.println("result: "+result);
+//												System.out.println("result: "+result+", "+getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
-//												System.out.println("exception: "+result+", "+exception);
-//												exception.printStackTrace();
+//												System.out.println("exception: "+result+", "+exception+", "+getComponentIdentifier()+", "+reply.get(SFipa.RECEIVERS));
+//												exception.printStackTrace();v
 												// Could not send message -> terminate future, if terminable.
 												if(result instanceof RemoteIntermediateResultCommand
 													&& ((RemoteIntermediateResultCommand)result).getOriginalFuture() instanceof ITerminableFuture)
 												{
-													((ITerminableFuture<?>)((RemoteIntermediateResultCommand)result).getOriginalFuture()).terminate();
+													((ITerminableFuture<?>)((RemoteIntermediateResultCommand)result).getOriginalFuture()).terminate(exception);
 												}
 											}
 										});
