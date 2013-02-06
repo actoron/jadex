@@ -42,6 +42,15 @@ public class TexturedRectangleJ2DRenderer extends AbstractJ2DRenderer
 			return;
 		
 		final Color currentColor = (Color) dc.getBoundValue(obj, primitive.getColor(), vp);
+		if (currentColor == null)
+		{
+			System.out.println("Null Color appeared:");
+			System.out.println("Object: " + obj);
+			System.out.println("Primitive: " + primitive);
+			System.out.println("getColor: " + primitive.getColor());
+			System.out.println("getColorClass: " + (primitive.getColor() != null? primitive.getColor().getClass(): "null"));
+			System.out.println("Viewport: " + vp);
+		}
 		
 		if (!Color.WHITE.equals(currentColor))
 		{
