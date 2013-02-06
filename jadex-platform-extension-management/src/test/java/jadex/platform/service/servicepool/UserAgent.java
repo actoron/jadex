@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -11,7 +12,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -23,9 +23,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.platform.service.servicepool.IServicePoolService;
-import jadex.platform.service.servicepool.ServicePoolStrategy;
-import jadex.platform.service.wrapper.TestMain;
 
 import java.util.Collection;
 
@@ -91,12 +88,12 @@ public class UserAgent
 		{
 			public void customResultAvailable(final IServicePoolService sps)
 			{
-				sps.addServiceType(IAService.class, new ServicePoolStrategy("jadex.platform.service.servicepool.example.AAgent.class", 10))
+				sps.addServiceType(IAService.class, new DefaultPoolStrategy(5, 35000, 10), "jadex.platform.service.servicepool.example.AAgent.class")
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						sps.addServiceType(IBService.class, new ServicePoolStrategy("jadex.platform.service.servicepool.example.BAgent.class", 3))
+						sps.addServiceType(IBService.class, new DefaultPoolStrategy(3, 10), "jadex.platform.service.servicepool.example.BAgent.class")
 							.addResultListener(new DelegationResultListener<Void>(ret));
 					}	
 				});

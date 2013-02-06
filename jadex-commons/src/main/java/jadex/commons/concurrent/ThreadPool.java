@@ -1,5 +1,7 @@
 package jadex.commons.concurrent;
 
+import jadex.commons.DefaultPoolStrategy;
+import jadex.commons.IPoolStrategy;
 import jadex.commons.SReflect;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
@@ -84,7 +86,7 @@ public class ThreadPool implements IThreadPool
 	protected ThreadGroup group;
 	
 	/** The strategy. */
-	protected IThreadPoolStrategy strategy;
+	protected IPoolStrategy strategy;
 	
 	/** The pool of service threads. */
 	protected List	pool;
@@ -110,13 +112,13 @@ public class ThreadPool implements IThreadPool
 	 */
 	public ThreadPool()
 	{
-		this(new DefaultThreadPoolStrategy(0, 20, 30000, 0));
+		this(new DefaultPoolStrategy(0, 20, 30000, 0));
 	}
 	
 	/**
 	 *  Create a new thread pool.
 	 */
-	public ThreadPool(IThreadPoolStrategy strategy)
+	public ThreadPool(IPoolStrategy strategy)
 	{
 		this(false, strategy);
 	}
@@ -124,7 +126,7 @@ public class ThreadPool implements IThreadPool
 	/**
 	 *  Create a new thread pool.
 	 */
-	public ThreadPool(boolean daemon, IThreadPoolStrategy strategy)
+	public ThreadPool(boolean daemon, IPoolStrategy strategy)
 	{		
 		this.daemon = daemon;
 		this.strategy = strategy;
@@ -135,7 +137,7 @@ public class ThreadPool implements IThreadPool
 		this.pool = new ArrayList();
 //		this.threads = new Hashtable();
 		
-		addThreads(strategy.getThreadCount());
+		addThreads(strategy.getWorkerCount());
 	
 //		System.out.println("Creating: "+this);
 	}
@@ -289,7 +291,7 @@ public class ThreadPool implements IThreadPool
 			{
 				try
 				{
-					this.task = ((Runnable)tasks.dequeue(strategy.getThreadTimeout()));
+					this.task = ((Runnable)tasks.dequeue(strategy.getWorkerTimeout()));
 //					this.task = ((Runnable)tasks.poll(strategy.getThreadTimeout(), TimeUnit.MILLISECONDS));
 //					threads.put(task, this);
 //					this.start = System.currentTimeMillis();
@@ -315,7 +317,7 @@ public class ThreadPool implements IThreadPool
 				catch(TimeoutException e)
 				{
 					task = null;
-					terminate = strategy.threadTimeoutOccurred();
+					terminate = strategy.workerTimeoutOccurred();
 				}
 //				catch(Exception e)
 //				{
@@ -400,7 +402,7 @@ public class ThreadPool implements IThreadPool
 //			}
 //		}
 		
-		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(10, 100, 10000, 4));
+		final ThreadPool tp	= new ThreadPool(new DefaultPoolStrategy(10, 100, 10000, 4));
 		int max = 10000;
 		todo = max;
 		final long start = System.currentTimeMillis();

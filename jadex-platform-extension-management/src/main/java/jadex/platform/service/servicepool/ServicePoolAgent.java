@@ -5,6 +5,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.commons.IPoolStrategy;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
@@ -44,11 +45,11 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, ServicePoolStrategy strategy)
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentname)
 	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
-		ServiceHandler handler = new ServiceHandler(this, servicetype, strategy);
+		ServiceHandler handler = new ServiceHandler(this, servicetype, strategy, componentname);
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy

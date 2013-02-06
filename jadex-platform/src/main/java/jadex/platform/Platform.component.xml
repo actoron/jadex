@@ -249,14 +249,14 @@
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
-					new jadex.commons.concurrent.ThreadPool(new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+					new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IDaemonThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
-					new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+					new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
