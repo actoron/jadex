@@ -15,7 +15,8 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.platform.service.servicepool.IServicePoolService;
 
 /**
- * 
+ *  Implementation of the service that uses divide and
+ *  conquer to distribute tasks to a subordinated service.
  */
 @Service
 public class MappingService implements IParallelService
