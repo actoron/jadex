@@ -33,23 +33,13 @@ public class MappingService implements IParallelService
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
 		
 		IFuture<IServicePoolService> fut = agent.getServiceContainer().getRequiredService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)
 			{
-				sps.addServiceType(ISequentialService.class, new DefaultPoolStrategy(10, 20), 
+				sps.addServiceType(ISequentialService.class, new DefaultPoolStrategy(10, 10000, 20), 
 					"jadex.platform.service.parallelizer.SeqAgent.class")
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
