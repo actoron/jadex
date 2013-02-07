@@ -96,11 +96,11 @@ public class MatcherNode
 		{
 			if(ret!=null)
 			{
-				ret.addAll(internalGetRules("*"));
+				ret.addAll(tmp);
 			}
 			else
 			{
-				ret = internalGetRules("*");
+				ret = tmp;
 			}
 		}
 		
@@ -182,6 +182,8 @@ public class MatcherNode
 			rules.put(subtype, rs);
 		}
 		rs.add(rule);
+		if(subtype.equals("d"))
+			System.out.println("add: "+subtype+" "+rs);
 	}
 	
 	/**
@@ -228,7 +230,7 @@ public class MatcherNode
 	 */
 	protected List<IRule<?>> internalGetRules(String type)
 	{
-		return rules==null? null: rules.get(type);
+		return rules==null || rules.get(type)==null? null: new ArrayList<IRule<?>>(rules.get(type));
 	}
 	
 	/** 
@@ -265,9 +267,9 @@ public class MatcherNode
 //		System.out.println("a.*: "+node.getRules("a.*"));
 //		System.out.println("a.b.*: "+node.getRules("a.b.*"));
 		
-		System.out.println("a.b: "+node.getRules("a.b"));
+//		System.out.println("a.b: "+node.getRules("a.b"));
 		System.out.println("a.b.c: "+node.getRules("a.b.c"));
-//		System.out.println("a.b.c.d: "+node.getRules("a.b.c.d"));
+		System.out.println("a.b.c.d: "+node.getRules("a.b.c.d"));
 //		System.out.println("a.b.c.d: "+node.getRules("a.b.c.d"));
 		
 		node.removeRule(r1);
