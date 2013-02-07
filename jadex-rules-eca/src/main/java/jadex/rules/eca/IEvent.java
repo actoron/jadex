@@ -9,7 +9,7 @@ public interface IEvent
 	 *  Get the type.
 	 *  @return the type.
 	 */
-	public String getType(); //EventType
+	public EventType getType();
 
 	/**
 	 *  Get the content.

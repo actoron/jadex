@@ -19,7 +19,7 @@ public class Rule<T> implements IRule<T>
 	protected String name;
 	
 	/** The event types. */
-	protected List<String> events;
+	protected List<EventType> events;
 	
 	/** The condition. */
 	protected ICondition condition;
@@ -50,9 +50,22 @@ public class Rule<T> implements IRule<T>
 	 */
 	public Rule(String name, ICondition condition, IAction<T> action)
 	{
+		this(name, condition, action, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public Rule(String name, ICondition condition, IAction<T> action, EventType[] events)
+	{
 		this.name = name;
 		this.condition = condition;
 		this.action = action;
+		if(events!=null)
+		{
+			for(EventType type: events)
+				addEvent(type);
+		}
 	}
 
 	//-------- methods --------
@@ -115,16 +128,32 @@ public class Rule<T> implements IRule<T>
 	 *  Set the event types.
 	 *  @param events The event types.
 	 */
-	public void setEvents(List<String> events)
+	public void setEvents(List<EventType> events)
 	{
 		this.events = events;
+	}
+	
+	/**
+	 *  Set the event types.
+	 *  @param events The event types.
+	 */
+	public void setEventNames(List<String> events)
+	{
+		this.events = new ArrayList<EventType>();
+		if(events!=null)
+		{
+			for(String ev: events)
+			{
+				this.events.add(new EventType(ev));
+			}
+		}
 	}
 	
 	/**
 	 *  Get the event types.
 	 *  @retur The event types.
 	 */
-	public List<String> getEvents()
+	public List<EventType> getEvents()
 	{
 		return events;
 	}
@@ -133,10 +162,18 @@ public class Rule<T> implements IRule<T>
 	 *  Set the event types.
 	 *  @param events The event types.
 	 */
-	public void addEvent(String event)
+	public void addEvent(EventType event)
 	{
 		if(events==null)
-			events = new ArrayList<String>();
+			events = new ArrayList<EventType>();
 		events.add(event);
+	}
+
+	/** 
+	 * 
+	 */
+	public String toString()
+	{
+		return "Rule(name="+name+")";
 	}
 }

@@ -20,6 +20,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -90,6 +91,7 @@ public class BDIAgent extends MicroAgent
 		});
 
 //		System.out.println("adopt goal");
+		ip.getCapability().addGoal(rgoal);
 		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	
 		return ret;
@@ -102,7 +104,7 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void addBeliefListener(final String name, final IBeliefListener listener)
 	{
-		List<String> events = new ArrayList<String>();
+		List<EventType> events = new ArrayList<EventType>();
 		BDIAgentInterpreter.addBeliefEvents(this, events, name);
 
 		final boolean multi = ((MCapability)getCapability().getModelElement()).getBelief(name).isMulti(getClassLoader());
@@ -119,11 +121,11 @@ public class BDIAgent extends MicroAgent
 				}
 				else
 				{
-					if(event.getType().startsWith(ChangeEvent.FACTADDED))
+					if(ChangeEvent.FACTADDED.equals(event.getType().getType(0)))
 					{
 						listener.factAdded(event.getContent());
 					}
-					else if(event.getType().startsWith(ChangeEvent.FACTREMOVED))
+					else if(ChangeEvent.FACTREMOVED.equals(event.getType().getType(0)))
 					{
 						listener.factAdded(event.getContent());
 					}
@@ -156,6 +158,8 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void writeField(Object val, final String fieldname, Object obj)
 	{
+		assert isComponentThread();
+		
 		// todo: support for belief sets (un/observe values? insert mappers when setting value etc.
 		
 		try
@@ -187,8 +191,7 @@ public class BDIAgent extends MicroAgent
 						{
 							public IFuture<IEvent> execute(IInternalAccess ia)
 							{
-	//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-								Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+								Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, fieldname}), event.getNewValue());
 								return new Future<IEvent>(ev);
 							}
 						});

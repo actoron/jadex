@@ -133,6 +133,7 @@ public class RGoal extends RProcessableElement
 	public static void adoptGoal(RGoal rgoal, IInternalAccess ia)
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		ip.getCapability().addGoal(rgoal);
 		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	}
 	
@@ -290,7 +291,15 @@ public class RGoal extends RProcessableElement
 	{
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
-
+		
+//		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+//		if(RGoal.GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState()))
+//			Thread.dumpStack();
+//		if(RGoal.GOALLIFECYCLESTATE_ADOPTED.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_DROPPING.equals(getLifecycleState()))
+//			Thread.dumpStack();
+//		if(RGoal.GOALLIFECYCLESTATE_DROPPED.equals(getLifecycleState()))
+//			Thread.dumpStack();
+		
 //		if(getId().indexOf("QueryCharging")!=-1 && GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(getId().indexOf("Battery")!=-1 && GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
@@ -323,7 +332,8 @@ public class RGoal extends RProcessableElement
 		else if(GOALLIFECYCLESTATE_OPTION.equals(lifecyclestate))
 		{
 			// ready to be activated via deliberation
-//			System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
+			if(getId().indexOf("AchieveCleanup")!=-1)
+				System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALOPTION, this));
 			abortPlans();
 		}
@@ -345,7 +355,7 @@ public class RGoal extends RProcessableElement
 //				System.out.println("dropping: "+getId());
 			
 //			System.out.println("dropping: "+getId());
-
+			
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 			abortPlans();
@@ -522,7 +532,8 @@ public class RGoal extends RProcessableElement
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALINHIBITED, this));
 		}
 		
-//		System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
+		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
+			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 	}
 	
 	/**
@@ -532,8 +543,8 @@ public class RGoal extends RProcessableElement
 	{
 //		System.out.println("rem inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 		
-//		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-//			System.out.println("kokoko");
+		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
+			System.out.println("kokoko: "+inhibitor);
 		
 		if(inhibitors!=null)
 		{
@@ -635,10 +646,10 @@ public class RGoal extends RProcessableElement
 						setException(new GoalFailureException("No canditates."));
 						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
 					}
-					else
-					{
-						System.out.println("??? "+getState());
-					}
+//					else
+//					{
+//						System.out.println("??? "+getState());
+//					}
 				}
 				else
 				{

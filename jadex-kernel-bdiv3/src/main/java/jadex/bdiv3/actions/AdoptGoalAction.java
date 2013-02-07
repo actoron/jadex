@@ -30,7 +30,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		return true;
+		return RGoal.GOALLIFECYCLESTATE_NEW.equals(goal.getLifecycleState());
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
 //			goal.observeGoal(ia);
-			ip.getCapability().addGoal(goal);
+//			ip.getCapability().addGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_ADOPTED);
 			ret.setResult(null);
 		}

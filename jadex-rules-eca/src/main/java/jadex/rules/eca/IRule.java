@@ -22,7 +22,7 @@ public interface IRule<T>
 	 *  Get the event types this rule reactes to.
 	 *  @return The event types.
 	 */
-	public List<String> getEvents();
+	public List<EventType> getEvents();
 	
 	/**
 	 *  Get the condition of the rule.

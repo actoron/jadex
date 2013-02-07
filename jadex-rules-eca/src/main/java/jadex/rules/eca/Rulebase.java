@@ -1,6 +1,5 @@
 package jadex.rules.eca;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +14,7 @@ public class Rulebase implements IRulebase
 	/** The rules per name. */
 	protected Map<String, IRule<?>> rules;
 	
-	/** The rules (Event name -> {rules}). */
-	protected Map<String, List<IRule<?>>>evrules;
+	protected MatcherNode matcher;
 
 	//-------- methods --------
 	
@@ -28,26 +26,17 @@ public class Rulebase implements IRulebase
 	{
 		if(rules==null)
 			rules = new HashMap<String, IRule<?>>();
-		if(evrules==null)
-			evrules = new HashMap<String, List<IRule<?>>>();
+		if(matcher==null)
+			matcher = new MatcherNode();
 		
 		if(rules.containsKey(rule.getName()))
 			throw new IllegalArgumentException("Rule names must be unique: "+rule.getName());
 		
 		rules.put(rule.getName(), rule);
 		
-		List<String> events = rule.getEvents();
-		for(int i=0; i<events.size(); i++)
-		{
-			String event = events.get(i);
-			List<IRule<?>> rs = evrules.get(event);
-			if(rs==null)
-			{
-				rs = new ArrayList<IRule<?>>();
-				evrules.put(event, rs);
-			}
-			rs.add(rule);
-		}
+		matcher.addRule(rule);
+		
+		System.out.println("added rule: "+rule+" "+rule.getEvents());
 		
 //		System.out.println("evrules: "+evrules);
 	}
@@ -66,20 +55,8 @@ public class Rulebase implements IRulebase
 				throw new RuntimeException("Rule not contained: "+rulename);
 		}
 		
-		if(evrules!=null)
-		{
-			List<String> events = rule.getEvents();
-			for(int i=0; i<events.size(); i++)
-			{
-				String event = events.get(i);
-				List<IRule<?>> rs = evrules.get(event);
-				rs.remove(rule);
-				if(rs.size()==0)
-				{
-					evrules.remove(event);
-				}
-			}
-		}
+		if(matcher!=null)
+			matcher.removeRule(rule);
 	}
 	
 	/**
@@ -87,12 +64,12 @@ public class Rulebase implements IRulebase
 	 *  @param event The event type.
 	 *  @return The rules.
 	 */
-	public List<IRule<?>> getRules(String event)
+	public List<IRule<?>> getRules(EventType event)
 	{
 //		if(event.equals("factchanged.environment"))
 //			System.out.println("ff");
 		
-		return evrules!=null? evrules.get(event): null;
+		return matcher==null? null: matcher.getRules(event);
 	}
 	
 	/**

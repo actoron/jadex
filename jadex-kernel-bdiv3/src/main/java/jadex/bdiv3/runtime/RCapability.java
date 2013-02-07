@@ -196,7 +196,7 @@ public class RCapability extends RElement
 			{
 				ex.get(goal).printStackTrace();
 			}
-			throw new IllegalStateException("Goal not contained.");			
+			throw new IllegalStateException("Goal not contained: "+goal.getId());			
 		}
 		else
 		{

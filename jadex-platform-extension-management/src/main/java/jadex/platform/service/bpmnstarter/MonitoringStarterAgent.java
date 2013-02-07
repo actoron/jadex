@@ -230,7 +230,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 										// todo multiple events
 										List<String> events = new ArrayList<String>();
 										events.add(type);
-										rule.setEvents(events);
+										rule.setEventNames(events);
 										if(cond!=null)
 										{
 											UnparsedExpression up = new UnparsedExpression(null, Boolean.class, cond, null);

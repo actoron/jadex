@@ -30,7 +30,7 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		return true;
+		return RGoal.GOALLIFECYCLESTATE_DROPPING.equals(goal.getLifecycleState());
 	}
 	
 	/**

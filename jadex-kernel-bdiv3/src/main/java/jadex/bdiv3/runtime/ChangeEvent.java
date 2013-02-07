@@ -74,9 +74,8 @@ public class ChangeEvent
 	 */
 	public ChangeEvent(IEvent event)
 	{
-		int idx = event.getType().indexOf(".");
-		this.type = event.getType().substring(0, idx);
-		this.source = event.getType().substring(idx+1);
+		this.type = event.getType().getType(0);
+		this.source = event.getType().getType(1);
 		this.value = event.getContent();
 	}
 	

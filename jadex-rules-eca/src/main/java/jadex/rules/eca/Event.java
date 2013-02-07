@@ -8,7 +8,7 @@ public class Event implements IEvent
 	//-------- attributes --------
 	
 	/** The event type. */
-	protected String type; //EventType
+	protected EventType type;
 	
 	/** The event content. */
 	protected Object content;
@@ -18,7 +18,15 @@ public class Event implements IEvent
 	/**
 	 *  Create a new event.
 	 */
-	public Event(String type, Object content) //EventType
+	public Event(String type, Object content)
+	{
+		this(new EventType(type), content);
+	}
+	
+	/**
+	 *  Create a new event.
+	 */
+	public Event(EventType type, Object content)
 	{
 		this.type = type;
 		this.content = content;
@@ -30,7 +38,7 @@ public class Event implements IEvent
 	 *  Get the type.
 	 *  @return the type.
 	 */
-	public String getType() // EventType
+	public EventType getType()
 	{
 		return type;
 	}
@@ -39,7 +47,7 @@ public class Event implements IEvent
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(String type)
+	public void setType(EventType type)
 	{
 		this.type = type;
 	}

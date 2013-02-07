@@ -25,7 +25,7 @@ public interface IRulebase
 	 *  @param event The event type.
 	 *  @return The rules.
 	 */
-	public List<IRule<?>> getRules(String event);
+	public List<IRule<?>> getRules(EventType event);
 	
 	/**
 	 *  Get the rule.

@@ -39,6 +39,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -357,9 +358,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		for(final MBelief mbel: beliefs)
 		{
 			Collection<String> evs = mbel.getEvents();
-			if(evs!=null)
+			if(evs!=null && !evs.isEmpty())
 			{
-				List<String> events = new ArrayList<String>();
+				List<EventType> events = new ArrayList<EventType>();
 				for(String ev: evs)
 				{
 					addBeliefEvents(getInternalAccess(), events, ev);
@@ -407,7 +408,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(c.isAnnotationPresent(GoalCreationCondition.class))
 				{
 					String[] evs = c.getAnnotation(GoalCreationCondition.class).events();
-					List<String> events = readAnnotationEvents(getInternalAccess(), c.getParameterAnnotations());
+					List<EventType> events = readAnnotationEvents(getInternalAccess(), c.getParameterAnnotations());
 					for(String ev: evs)
 					{
 						addBeliefEvents(getInternalAccess(), events, ev);
@@ -481,7 +482,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				if(m.isAnnotationPresent(GoalCreationCondition.class))
 				{
-					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					List<EventType> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
 					Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 						new MethodCondition(null, m), new IAction<Void>()
 					{
@@ -528,12 +529,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(m.isAnnotationPresent(GoalTargetCondition.class))
 				{			
 					String[] evs = m.getAnnotation(GoalTargetCondition.class).events();
-					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					List<EventType> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
 					for(String ev: evs)
 					{
 						addBeliefEvents(getInternalAccess(), events, ev);
 					}
-					events.add(ChangeEvent.GOALADOPTED); // check also initially 
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED})); // check also initially 
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_target", 
 						new CombinedCondition(new ICondition[]{
@@ -567,7 +568,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(m.isAnnotationPresent(GoalDropCondition.class))
 				{			
 					String[] evs = m.getAnnotation(GoalDropCondition.class).events();
-					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					List<EventType> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
 					for(String ev: evs)
 					{
 						addBeliefEvents(getInternalAccess(), events, ev);
@@ -601,18 +602,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(m.isAnnotationPresent(GoalContextCondition.class))
 				{			
 					String[] evs = m.getAnnotation(GoalContextCondition.class).events();
-					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					List<EventType> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
 					for(String ev: evs)
 					{
 						addBeliefEvents(getInternalAccess(), events, ev);
 					}
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED})); // check state for initial goals
 					
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_suspend", 
 						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-//						new CombinedCondition(new ICondition[]{
-//							new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED, false),
-//							new MethodCondition(getPojoElement(), m, true),
-//						}), new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
@@ -622,7 +620,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{	
 									if(!executeGoalMethod(m, goal, event))
 									{
-//										System.out.println("Goal suspended: "+goal);
+										if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+											System.out.println("Goal suspended: "+goal);
 										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_SUSPENDED);
 										goal.setState(RGoal.PROCESSABLEELEMENT_INITIAL);
 									}
@@ -636,10 +635,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					
 					rule = new Rule<Void>(mgoal.getName()+"_goal_option", 
 						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
-//						new CombinedCondition(new ICondition[]{
-//							new LifecycleStateCondition(GOALLIFECYCLESTATE_SUSPENDED),
-//							new MethodCondition(getPojoElement(), m),
-//						}), new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
@@ -649,7 +644,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{	
 									if(executeGoalMethod(m, goal, event))
 									{
-//										System.out.println("Goal made option: "+goal);
+										if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+											System.out.println("Goal made option: "+goal);
 										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
 //										setState(ia, PROCESSABLEELEMENT_INITIAL);
 									}
@@ -666,7 +662,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(m.isAnnotationPresent(GoalRecurCondition.class))
 				{			
 					String[] evs = m.getAnnotation(GoalRecurCondition.class).events();
-					List<String> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
+					List<EventType> events = readAnnotationEvents(getInternalAccess(), m.getParameterAnnotations());
 					for(String ev: evs)
 					{
 						addBeliefEvents(getInternalAccess(), events, ev);
@@ -708,7 +704,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				final Method m = mcond;
 				
 				String[] evs = mcond.getAnnotation(GoalMaintainCondition.class).events();
-				List<String> events = readAnnotationEvents(getInternalAccess(), mcond.getParameterAnnotations());
+				List<EventType> events = readAnnotationEvents(getInternalAccess(), mcond.getParameterAnnotations());
 				for(String ev: evs)
 				{
 					addBeliefEvents(getInternalAccess(), events, ev);
@@ -799,7 +795,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 				for(String fa: fas)
 				{
-					rule.addEvent(ChangeEvent.FACTADDED+"."+fa);
+					rule.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, fa}));
 				}
 				rulesystem.getRulebase().addRule(rule);
 			}
@@ -810,7 +806,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>("create_plan_factremoved_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 				for(String fr: frs)
 				{
-					rule.addEvent(ChangeEvent.FACTREMOVED+"."+fr);
+					rule.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, fr}));
 				}
 				rulesystem.getRulebase().addRule(rule);
 			}
@@ -821,8 +817,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>("create_plan_factchanged_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
 				for(String fc: fcs)
 				{
-					rule.addEvent(ChangeEvent.FACTCHANGED+"."+fc);
-					rule.addEvent(ChangeEvent.BELIEFCHANGED+"."+fc);
+					rule.addEvent(new EventType(new String[]{ChangeEvent.FACTCHANGED, fc}));
+					rule.addEvent(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, fc}));
 				}
 				rulesystem.getRulebase().addRule(rule);
 			}
@@ -839,8 +835,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			if(usedelib)
 			{
-				List<String> events = new ArrayList<String>();
-				events.add(ChangeEvent.GOALADOPTED);
+				List<EventType> events = new ArrayList<EventType>();
+				events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
 				Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
@@ -878,10 +874,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							
 							// return true when other goal is active and inprocess
 							boolean ret = false;
-							String type = event.getType();
+							EventType type = event.getType();
 							RGoal goal = (RGoal)event.getContent();
-							ret = type.startsWith(ChangeEvent.GOALACTIVE) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
-								|| (type.startsWith(ChangeEvent.GOALINPROCESS) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
+							ret = ChangeEvent.GOALACTIVE.equals(type.getType(0)) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
+								|| (ChangeEvent.GOALINPROCESS.equals(type.getType(0)) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
 							return ret;
 						}
 					}, new IAction<Void>()
@@ -889,8 +885,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
 						RGoal goal = (RGoal)event.getContent();
-	//					if(goal.getId().indexOf("AchieveCleanup")!=-1)
-	//						System.out.println("addinh: "+goal);
+//						if(goal.getId().indexOf("PerformPatrol")!=-1)
+//							System.out.println("addinh: "+goal);
 						MDeliberation delib = goal.getMGoal().getDeliberation();
 						if(delib!=null)
 						{
@@ -920,12 +916,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							// return true when other goal is active and inprocess
 							boolean ret = false;
-							String type = event.getType();
-							if(type.startsWith("goal"))
+							EventType type = event.getType();
+							if(event.getContent() instanceof RGoal)
 							{
-								RGoal other = (RGoal)event.getContent();
-								ret = type.startsWith(ChangeEvent.GOALSUSPENDED) || type.startsWith(ChangeEvent.GOALOPTION) 
-									|| !RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(other.getProcessingState());
+								RGoal goal = (RGoal)event.getContent();
+								ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) || ChangeEvent.GOALOPTION.equals(type.getType(0))
+									|| !RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState());
 							}
 							return ret;
 						}
@@ -933,6 +929,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
+						// Remove inhibitions of this goal 
 						RGoal goal = (RGoal)event.getContent();
 						MDeliberation delib = goal.getMGoal().getDeliberation();
 						if(delib!=null)
@@ -971,7 +968,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						return IFuture.DONE;
 					}
 				});
-				rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALINHIBITED}));
+				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALINHIBITED}));
 				getRuleSystem().getRulebase().addRule(rule);
 			}
 			
@@ -991,12 +988,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RGoal goal = (RGoal)event.getContent();
-//					System.out.println("reactivating: "+goal);
+					if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+						System.out.println("reactivating: "+goal);
 					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_ACTIVE);
 					return IFuture.DONE;
 				}
 			});
-			rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
+			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED}));
+			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALOPTION}));
+//			rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
 			getRuleSystem().getRulebase().addRule(rule);
 		}
 		
@@ -1040,6 +1040,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public boolean executeStep()
 	{
+		assert isComponentThread();
+		
 		// Evaluate condition before executing step.
 		boolean aborted = false;
 //		if(rulesystem!=null)
@@ -1094,17 +1096,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 *  factadded.belname and factremoved 
 	 *  are created.
 	 */
-	public static void addBeliefEvents(IInternalAccess ia, List<String> events, String belname)
+	public static void addBeliefEvents(IInternalAccess ia, List<EventType> events, String belname)
 	{
-		events.add(ChangeEvent.BELIEFCHANGED+"."+belname); // the whole value was changed
-		events.add(ChangeEvent.FACTCHANGED+"."+belname); // property change of a value
+		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
+		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
 		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		MBelief mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
 		if(mbel!=null && mbel.isMulti(ia.getClassLoader()))
 		{
-			events.add(ChangeEvent.FACTADDED+"."+belname);
-			events.add(ChangeEvent.FACTREMOVED+"."+belname);
+			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 		}
 	}
 	
@@ -1115,27 +1117,27 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 *  goalinprocess, goalnotinprocess
 	 *  events.
 	 */
-	public static List<String> getGoalEvents()
+	public static List<EventType> getGoalEvents()
 	{
-		List<String> events = new ArrayList<String>();
-		events.add(ChangeEvent.GOALADOPTED);
-		events.add(ChangeEvent.GOALDROPPED);
+		List<EventType> events = new ArrayList<EventType>();
+		events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+		events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED}));
 		
-		events.add(ChangeEvent.GOALOPTION);
-		events.add(ChangeEvent.GOALACTIVE);
-		events.add(ChangeEvent.GOALSUSPENDED);
+		events.add(new EventType(new String[]{ChangeEvent.GOALOPTION}));
+		events.add(new EventType(new String[]{ChangeEvent.GOALACTIVE}));
+		events.add(new EventType(new String[]{ChangeEvent.GOALSUSPENDED}));
 		
-		events.add(ChangeEvent.GOALINPROCESS);
-		events.add(ChangeEvent.GOALNOTINPROCESS);
+		events.add(new EventType(new String[]{ChangeEvent.GOALINPROCESS}));
+		events.add(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS}));
 		return events;
 	}
 	
 	/**
 	 *  Read the annotation events from method annotations.
 	 */
-	public static List<String> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
+	public static List<EventType> readAnnotationEvents(IInternalAccess ia, Annotation[][] annos)
 	{
-		List<String> events = new ArrayList<String>();
+		List<EventType> events = new ArrayList<EventType>();
 		for(Annotation[] ana: annos)
 		{
 			for(Annotation an: ana)

@@ -16,6 +16,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -464,6 +465,7 @@ public class RPlan extends RElement
 		addSubgoal(rgoal);
 		
 //		System.out.println("adopt goal");
+		ip.getCapability().addGoal(rgoal);
 		ip.scheduleStep(new AdoptGoalAction(rgoal));
 	
 		return ret;
@@ -556,7 +558,7 @@ public class RPlan extends RElement
 				return IFuture.DONE;
 			}
 		});
-		rule.setEvents(SUtil.createArrayList(new String[]{evtype+"."+belname}));
+		rule.addEvent(new EventType(new String[]{evtype, belname}));
 		ip.getRuleSystem().getRulebase().addRule(rule);
 		
 //		WaitAbstraction wa = new WaitAbstraction();
@@ -596,9 +598,8 @@ public class RPlan extends RElement
 				return IFuture.DONE;
 			}
 		});
-		rule.setEvents(SUtil.createArrayList(new String[]{
-			ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname}));
-		ip.getRuleSystem().getRulebase().addRule(rule);
+		rule.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+		rule.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 		
 		return (Future<ChangeEvent>)getWaitFuture();
 	}
@@ -624,8 +625,10 @@ public class RPlan extends RElement
 				return IFuture.DONE;
 			}
 		});
-		List<String> evs = SUtil.arrayToList(events);
-		rule.setEvents(evs);
+		for(String ev: events)
+		{
+			rule.addEvent(new EventType(new String[]{ev}));
+		}
 		ip.getRuleSystem().getRulebase().addRule(rule);
 		
 		final Future<Void> ret = new Future<Void>();

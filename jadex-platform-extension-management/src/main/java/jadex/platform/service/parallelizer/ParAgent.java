@@ -15,7 +15,8 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.servicepool.IServicePoolService;
 
 /**
- * 
+ *  Agent that wants to offer a service that delegates
+ *  calls to workers for parallel execution.
  */
 @Agent
 @Service

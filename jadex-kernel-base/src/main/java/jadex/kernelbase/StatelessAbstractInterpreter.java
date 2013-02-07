@@ -1863,7 +1863,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
 				});
 			}

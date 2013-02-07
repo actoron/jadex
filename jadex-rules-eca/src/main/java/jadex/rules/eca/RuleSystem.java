@@ -275,7 +275,7 @@ public class RuleSystem
 			if(events.size()==0)
 				throw new RuntimeException("Event type not found: "+method);
 			
-			rule.setEvents(events);
+			rule.setEventNames(events);
 			
 			rule.setCondition(new jadex.rules.eca.MethodCondition(object, m));
 		}
