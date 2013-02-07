@@ -147,8 +147,6 @@ public abstract class AbstractTreeNode implements ITreeNode
 			this.recurse = this.recurse || recurse;
 			dirty = true;
 		}
-//		tree.repaint();
-		// TODO : REFRESH
 	}
 
 	/**

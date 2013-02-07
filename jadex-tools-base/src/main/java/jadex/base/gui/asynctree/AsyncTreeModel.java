@@ -23,22 +23,22 @@ public class AsyncTreeModel
 	protected ITreeNode root;
 
 	/** The tree listeners. */
-	protected final List listeners;
+	protected final List<TreeModelListener> listeners;
 
 	/** The node listeners. */
-	protected final List nodelisteners;
+	protected final List<INodeListener> nodelisteners;
 
 	/** The node lookup table. */
-	protected final Map nodes;
+	protected final Map<Object, ITreeNode> nodes;
 
 	/** The added nodes. */
-	protected final Map added;
+	protected final Map<Object, ITreeNode> added;
 
 	/** The zombie node ids (id->remove counter). */
-	protected final Map zombies;
+	protected final Map<Object, Integer> zombies;
 
 	/** The icon overlays. */
-	protected final List overlays;
+	protected final List<INodeHandler> overlays;
 
 	/** The changed nodes (delayed update for improving perceived speed). */
 	protected MultiCollection changed;
@@ -50,12 +50,12 @@ public class AsyncTreeModel
 	 */
 	public AsyncTreeModel()
 	{
-		this.listeners = new ArrayList();
-		this.nodelisteners = new ArrayList();
-		this.nodes = new HashMap();
-		this.added = new HashMap();
-		this.zombies = new HashMap();
-		this.overlays = new ArrayList();
+		this.listeners = new ArrayList<TreeModelListener>();
+		this.nodelisteners = new ArrayList<INodeListener>();
+		this.nodes = new HashMap<Object, ITreeNode>();
+		this.added = new HashMap<Object, ITreeNode>();
+		this.zombies = new HashMap<Object, Integer>();
+		this.overlays = new ArrayList<INodeHandler>();
 	}
 
 	// -------- TreeModel interface --------
@@ -155,13 +155,13 @@ public class AsyncTreeModel
 	public void fireTreeChanged(ITreeNode node)
 	{
 
-		List path = buildTreePath(node);
+		List<ITreeNode> path = buildTreePath(node);
 
 		// System.err.println(""+hashCode()+" Path changed: "+node+", "+path+", "+node.getCachedChildren());
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeStructureChanged(new AsyncTreeModelEvent(this, path.toArray()));
+			listeners.get(i).treeStructureChanged(new AsyncTreeModelEvent(this, path.toArray()));
 		}
 	}
 
@@ -189,7 +189,7 @@ public class AsyncTreeModel
 					Set set = (Set) changed.get(parents[i]);
 					int[] indices;
 					Object[] nodes;
-					List path = null;
+					List<ITreeNode> path = null;
 					if (parents[i] != null)
 					{
 						int cnt = 0;
@@ -240,7 +240,7 @@ public class AsyncTreeModel
 					{
 						for (int j = 0; j < listeners.size(); j++)
 						{
-							((TreeModelListener) listeners.get(j)).treeNodesChanged(new AsyncTreeModelEvent(this, path.toArray(), indices, nodes));
+							listeners.get(j).treeNodesChanged(new AsyncTreeModelEvent(this, path.toArray(), indices, nodes));
 						}
 					}
 				}
@@ -260,13 +260,13 @@ public class AsyncTreeModel
 	public void fireNodeRemoved(ITreeNode parent, ITreeNode child, int index)
 	{
 
-		List path = buildTreePath(parent);
+		List<ITreeNode> path = buildTreePath(parent);
 
 		// System.err.println(""+hashCode()+" Node removed: "+child+", "+index+", "+path);
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeNodesRemoved(new AsyncTreeModelEvent(this, path.toArray(), new int[]
+			listeners.get(i).treeNodesRemoved(new AsyncTreeModelEvent(this, path.toArray(), new int[]
 			{ index }, new Object[]
 			{ child }));
 		}
@@ -278,13 +278,13 @@ public class AsyncTreeModel
 	public void fireNodesRemoved(ITreeNode parent, ITreeNode[] childs, int[] indices)
 	{
 
-		List path = buildTreePath(parent);
+		List<ITreeNode> path = buildTreePath(parent);
 
 		// System.err.println(""+hashCode()+" Node removed: "+child+", "+index+", "+path);
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeNodesRemoved(new AsyncTreeModelEvent(this, path.toArray(), indices, childs));
+			listeners.get(i).treeNodesRemoved(new AsyncTreeModelEvent(this, path.toArray(), indices, childs));
 		}
 	}
 
@@ -296,13 +296,13 @@ public class AsyncTreeModel
 		// if(child.toString().indexOf("A:")!=-1)
 		// System.out.println("here4");
 
-		List path = buildTreePath(parent);
+		List<ITreeNode> path = buildTreePath(parent);
 
 		// System.err.println(""+hashCode()+" Node added: "+child+", "+index+", "+path);
 
 		for (int i = 0; i < listeners.size(); i++)
 		{
-			((TreeModelListener) listeners.get(i)).treeNodesInserted(new AsyncTreeModelEvent(this, path.toArray(), new int[]
+			listeners.get(i).treeNodesInserted(new AsyncTreeModelEvent(this, path.toArray(), new int[]
 			{ index }, new Object[]
 			{ child }));
 		}
@@ -315,10 +315,10 @@ public class AsyncTreeModel
 	 *            The node.
 	 * @return The path items.
 	 */
-	public List buildTreePath(ITreeNode node)
+	public List<ITreeNode> buildTreePath(ITreeNode node)
 	{
 
-		List path = new LinkedList();
+		List<ITreeNode> path = new LinkedList<ITreeNode>();
 		ITreeNode pnode = node;
 		while (pnode != null)
 		{
@@ -350,7 +350,7 @@ public class AsyncTreeModel
 
 		added.put(node.getId(), node);
 
-		INodeListener[] lis = (INodeListener[]) nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
+		INodeListener[] lis = nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 		for (int i = 0; i < lis.length; i++)
 		{
 			lis[i].nodeAdded(node);
@@ -371,7 +371,7 @@ public class AsyncTreeModel
 		ITreeNode ret;
 		synchronized (nodes)
 		{
-			ret = (ITreeNode) nodes.get(id);
+			ret = nodes.get(id);
 		}
 		return ret;
 	}
@@ -382,7 +382,7 @@ public class AsyncTreeModel
 	public ITreeNode getAddedNode(Object id)
 	{
 
-		return (ITreeNode) added.get(id);
+		return added.get(id);
 	}
 
 	/**
@@ -410,7 +410,7 @@ public class AsyncTreeModel
 
 		if (notify)
 		{
-			INodeListener[] lis = (INodeListener[]) nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
+			INodeListener[] lis = nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 			for (int i = 0; i < lis.length; i++)
 			{
 				lis[i].nodeRemoved(node);
@@ -438,7 +438,7 @@ public class AsyncTreeModel
 	public INodeHandler[] getNodeHandlers()
 	{
 
-		return (INodeHandler[]) overlays.toArray(new INodeHandler[overlays.size()]);
+		return overlays.toArray(new INodeHandler[overlays.size()]);
 	}
 
 	/**
@@ -482,7 +482,7 @@ public class AsyncTreeModel
 		ITreeNode[] anodes;
 		synchronized (nodes)
 		{
-			anodes = (ITreeNode[]) nodes.values().toArray(new ITreeNode[nodes.values().size()]);
+			anodes = nodes.values().toArray(new ITreeNode[nodes.values().size()]);
 		}
 
 		for (int i = 0; i < anodes.length; i++)
@@ -499,7 +499,7 @@ public class AsyncTreeModel
 		ITreeNode ret;
 		synchronized (nodes)
 		{
-			ret = (ITreeNode) nodes.get(id);
+			ret = nodes.get(id);
 			if (ret == null)
 			{
 				addZombieNode(id);
@@ -515,7 +515,7 @@ public class AsyncTreeModel
 	{
 		synchronized (nodes)
 		{
-			Integer num = (Integer) zombies.get(id);
+			Integer num = zombies.get(id);
 			num = new Integer(num != null ? num.intValue() + 1 : 1);
 			zombies.put(id, num);
 			// if(id.toString().startsWith("ANDTest@"))
@@ -530,7 +530,7 @@ public class AsyncTreeModel
 	{
 		synchronized (nodes)
 		{
-			Integer num = (Integer) zombies.get(node.getId());
+			Integer num = zombies.get(node.getId());
 			if (num.intValue() > 1)
 			{
 				num = new Integer(num != null ? num.intValue() - 1 : 1);
