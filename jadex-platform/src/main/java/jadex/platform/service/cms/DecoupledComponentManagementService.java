@@ -1865,13 +1865,13 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			
 			if(adapter==null)
 			{
-				// Hack? Allows components to getExternalAccess in init phase
+				// Hack? Allows components to getExternalAccess in init phase from parent but also from component itself
 				InitInfo ii = getInitInfo(cid);
 				if(ii!=null)
 				{
 //					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
 					IComponentIdentifier caller = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getCaller() : null;
-					if(internal || (ii.getAdapter()!=null && caller!=null && cid.equals(caller.getParent())))
+					if(internal || (ii.getAdapter()!=null && caller!=null && (cid.equals(caller.getParent()) || cid.equals(caller))))
 					{
 //						System.out.println("getExternalAccess: not delayed");
 						adapter = ii.getAdapter();

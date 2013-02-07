@@ -44,17 +44,17 @@ public class MappingService implements IParallelService
 			}
 		});
 		
-//		IFuture<IServicePoolService> fut = agent.getServiceContainer().getRequiredService("poolser");
-//		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
-//		{
-//			public void customResultAvailable(final IServicePoolService sps)
-//			{
-//				sps.addServiceType(ISequentialService.class, new DefaultPoolStrategy(10, 20), 
-//					"jadex.platform.service.parallelizer.SeqAgent.class")
-//					.addResultListener(new DelegationResultListener<Void>(ret)
-//				{
-//					public void customResultAvailable(Void result)
-//					{
+		IFuture<IServicePoolService> fut = agent.getServiceContainer().getRequiredService("poolser");
+		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
+		{
+			public void customResultAvailable(final IServicePoolService sps)
+			{
+				sps.addServiceType(ISequentialService.class, new DefaultPoolStrategy(10, 20), 
+					"jadex.platform.service.parallelizer.SeqAgent.class")
+					.addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
 						IFuture<ISequentialService> fut = agent.getServiceContainer().getRequiredService("seqser");
 						fut.addResultListener(new ExceptionDelegationResultListener<ISequentialService, Void>(ret)
 						{
@@ -64,10 +64,10 @@ public class MappingService implements IParallelService
 								ret.setResult(null);
 							}
 						});
-//					}
-//				});
-//			}
-//		});
+					}
+				});
+			}
+		});
 		
 		return ret;
 	}
