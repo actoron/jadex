@@ -627,7 +627,7 @@ public class RPlan extends RElement
 		});
 		for(String ev: events)
 		{
-			rule.addEvent(new EventType(new String[]{ev}));
+			rule.addEvent(new EventType(ev));
 		}
 		ip.getRuleSystem().getRulebase().addRule(rule);
 		

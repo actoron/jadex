@@ -7,12 +7,16 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -24,10 +28,22 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.examples.ping.IEchoService;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *  Test message performance. 
@@ -44,6 +60,7 @@ import java.util.Random;
 @Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
 @Configurations(
 {
+	@Configuration(name="select"),
 	@Configuration(name="local"),
 	@Configuration(name="remote", arguments=@NameValue(name="echo",
 		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\"relay-http://jadex.informatik.uni-hamburg.de/relay/\"})"))
@@ -67,6 +84,85 @@ public class MessagePerformanceAgent extends MicroAgent
 	protected Future<Void> future;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Called once after agent creation.
+	 */
+	public IFuture<Void> agentCreated()
+	{
+		final Future<Void> ret = new Future<Void>();
+		if("select".equals(getConfiguration()))
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{				
+				public void run()
+				{
+					final JFrame f = new JFrame();
+					final JComboBox selcb = new JComboBox();
+					JPanel p = new JPanel(new BorderLayout());
+					p.add(selcb, BorderLayout.CENTER);
+					
+					JButton bu = new JButton("OK");
+					p.add(bu, BorderLayout.EAST);
+					bu.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							getArguments().put("echo", (IComponentIdentifier)selcb.getSelectedItem());
+							f.setVisible(false);
+							f.dispose();
+							ret.setResult(null);
+						}
+					});
+				
+					f.add(p, BorderLayout.CENTER);
+					f.pack();
+					f.setLocation(SGUI.calculateMiddlePosition(f));
+					f.setVisible(true);
+					
+					SServiceProvider.getServices(getServiceProvider(), IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IIntermediateResultListener<IEchoService>()
+					{
+						boolean first = true;
+						public void intermediateResultAvailable(IEchoService result)
+						{
+							reset();
+							selcb.addItem(((IService)result).getServiceIdentifier().getProviderId());
+						}
+						public void finished()
+						{
+							reset();
+						}
+						public void resultAvailable(Collection<IEchoService> result)
+						{
+							reset();
+							for(Iterator<IEchoService> it=result.iterator(); it.hasNext(); )
+							{
+								selcb.addItem(((IService)it.next()).getServiceIdentifier().getProviderId());
+							}
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+						
+						protected void reset()
+						{
+							if(first)
+							{
+								first = false;
+								selcb.removeAllItems();
+							}
+						}
+					}));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Execute an agent step.
