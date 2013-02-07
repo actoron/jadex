@@ -5,6 +5,9 @@ package jadex.xml;
  */
 public interface IPostProcessor
 {
+	/** If this object is returned by the post-processor, the object will be discarded by the reader. */
+	public static final Object DISCARD_OBJECT = new Object();
+	
 	//-------- methods --------
 	
 	/**

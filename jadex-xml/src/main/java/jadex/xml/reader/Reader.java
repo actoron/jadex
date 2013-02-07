@@ -568,8 +568,15 @@ public class Reader extends AReader
 						try
 						{
 							Object changed = postprocs[i].postProcess(readcontext, topse.getObject());
-							if(changed!=null)
+							
+							if (changed == IPostProcessor.DISCARD_OBJECT)
+							{
+								topse.setObject(null);
+							}
+							else if(changed!=null)
+							{
 								topse.setObject(changed);
+							}
 						}
 						catch(RuntimeException e)
 						{
