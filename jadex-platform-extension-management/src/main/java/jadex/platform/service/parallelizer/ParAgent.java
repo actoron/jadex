@@ -2,7 +2,6 @@ package jadex.platform.service.parallelizer;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
@@ -30,52 +29,6 @@ import jadex.platform.service.servicepool.IServicePoolService;
 	@RequiredService(name="seqser", type=ISequentialService.class)
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
-//@Configurations(@Configuration(name="def", components=@Component(type="spa")))
-public class ParAgent //implements IParallelService
+public class ParAgent 
 {
-	//-------- attributes --------
-	
-	@Agent
-	protected MicroAgent agent;
-	
-//	@AgentCreated 
-//	public IFuture<Void> init()
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		IFuture<IServicePoolService> fut = agent.getServiceContainer().getRequiredService("poolser");
-//		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
-//		{
-//			public void customResultAvailable(final IServicePoolService sps)
-//			{
-//				sps.addServiceType(ISequentialService.class, new DefaultPoolStrategy(10, 20), 
-//					"jadex.platform.service.parallelizer.SeqAgent.class")
-//					.addResultListener(new DelegationResultListener<Void>(ret)
-//				{
-//					public void customResultAvailable(Void result)
-//					{
-//						ret.setResult(null);
-////						IFuture<ISequentialService> fut = agent.getServiceContainer().getRequiredService("seqser");
-////						fut.addResultListener(new ExceptionDelegationResultListener<ISequentialService, Void>(ret)
-////						{
-////							public void customResultAvailable(ISequentialService result)
-////							{
-////								seqser = result;
-////								ret.setResult(null);
-////							}
-////						});
-//					}
-//				});
-//			}
-//		});
-//		
-//		return ret;
-//	}
-	
-//	/**
-//	 * 
-//	 */
-//	public IIntermediateFuture<String> doParallel(String[] files)
-//	{
-//	}
 }

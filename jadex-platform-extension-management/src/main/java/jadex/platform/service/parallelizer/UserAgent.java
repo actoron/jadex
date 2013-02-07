@@ -28,7 +28,7 @@ import java.util.Collection;
 	@RequiredService(name="paser", type=IParallelService.class, binding=@Binding(
 		create=true, creationinfo=@CreationInfo(type="pa"))),
 })
-@ComponentTypes(@ComponentType(name="pa", filename="jadex.platform.service.parallelizer.ParAgent.class"))
+@ComponentTypes(@ComponentType(name="pa", filename="jadex.platform.service.parallelizer.Par2Agent.class"))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {
