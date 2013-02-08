@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Mit XMLSpy v2012 rel. 2 sp1 (http://www.altova.com) von Philip Wil (Universität Hamburg) bearbeitet -->
+<!-- Mit XMLSpy v2013 sp1 (x64) (http://www.altova.com) von Philip x (Uni HH) bearbeitet -->
 <xs:schema xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
 	<xs:element name="envspacetype" type="envspacetype">
 		<xs:annotation>
@@ -431,6 +431,7 @@
 							<xs:documentation>Skymap. </xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="effect" type="effect" minOccurs="0" maxOccurs="unbounded"/>
 				</xs:choice>
 				<xs:attribute name="objecttype" type="xs:string" use="required"/>
 				<xs:attribute name="width" type="xs:string" use="required"/>
@@ -438,7 +439,8 @@
 				<xs:attribute name="depth" type="xs:string" use="required"/>
 				<xs:attribute name="rotation3d" type="xs:string"/>
 				<xs:attribute name="hasSpaceobject" type="xs:boolean"/>
-				<xs:attribute name="autoRotation"/>
+				<xs:attribute name="autoRotation" type="xs:boolean" use="optional" default="true"/>
+				<xs:attribute name="isDynamic" type="xs:boolean" use="optional" default="true"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -486,8 +488,9 @@
 		<xs:attribute name="rotation" type="xs:string"/>
 		<xs:attribute name="size" type="xs:string"/>
 		<xs:attribute name="color" type="xs:string"/>
-		<xs:attribute name="shadowtype"/>
-		<xs:attribute name="texturepath"/>
+		<xs:attribute name="shadowtype" type="xs:string"/>
+		<xs:attribute name="texturepath" type="xs:string"/>
+		<xs:attribute name="materialpath" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="texturedrectangle">
 		<xs:annotation>
@@ -631,6 +634,7 @@
 							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="materialfile" type="materialfile" minOccurs="0" maxOccurs="unbounded"/>
 				</xs:sequence>
 				<xs:attribute name="modelpath" type="xs:string"/>
 				<xs:attribute name="hasLightMaterials" type="xs:string"/>
@@ -654,6 +658,26 @@
 				<xs:attribute name="name" type="xs:string"/>
 				<xs:attribute name="channel" type="xs:string"/>
 				<xs:attribute name="loop" type="xs:string"/>
+				<xs:attribute name="speed" type="xs:double"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="effect">
+		<xs:annotation>
+			<xs:documentation>A animation ONLY for an complex object3d</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="predefinedid" type="xs:string" use="optional"/>
+				<xs:attribute name="startsize" type="xs:double" use="required"/>
+				<xs:attribute name="endsize" type="xs:double" use="required"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -785,6 +809,22 @@
 		<xs:attribute name="continuosly" type="xs:string"/>
 		<xs:attribute name="positional" type="xs:string"/>
 		<xs:attribute name="volume" type="xs:string"/>
+		<xs:attribute name="numRndFiles" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="materialfile">
+		<xs:annotation>
+			<xs:documentation>Materialfiles can be played here</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="soundcondition" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="path" type="xs:string" use="required"/>
+		<xs:attribute name="part" type="xs:string" use="required"/>
+		<xs:attribute name="useAlpha" type="xs:boolean" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="layers">
 		<xs:annotation>
@@ -1062,6 +1102,9 @@
 				</xs:sequence>
 				<xs:attribute name="name" type="xs:string" use="required"/>
 				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="camera" type="xs:string" use="optional"/>
+				<xs:attribute name="ambientOcclusion" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="guiCreatorPath" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
