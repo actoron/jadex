@@ -97,12 +97,12 @@
 			<version>${jmonkey.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>net.sourceforge.jadex.jme3ext</groupId>
-			<artifactId>jME3-testdata</artifactId>
-			<version>${jmonkey.version}</version>
-			<scope>runtime</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex.jme3ext</groupId> -->
+<!-- 			<artifactId>jME3-testdata</artifactId> -->
+<!-- 			<version>${jmonkey.version}</version> -->
+<!-- 			<scope>runtime</scope> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>net.sourceforge.jadex.jme3ext</groupId>
