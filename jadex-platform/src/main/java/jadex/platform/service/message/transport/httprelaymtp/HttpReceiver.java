@@ -410,6 +410,7 @@ public class HttpReceiver
 							public void run()
 							{
 								HttpURLConnection	con	= null;
+								Timer	timeout	= null;
 								try
 								{
 									con	= transport.getConnectionManager().openReceiverConnection(adr,
@@ -419,10 +420,24 @@ public class HttpReceiver
 									address	= RelayConnectionManager.relayAddress(adr);
 									transport.connected(address, false);
 //									System.out.println("connected to: "+address);
+									
+									// Start a read timeout timer.
+									final long[]	time	= new long[]{System.currentTimeMillis()};
+									timeout	= new Timer(true);
+									timeout.schedule(new TimeoutTask(time, con), (long)(SRelay.PING_DELAY*1.5));
+									
 									while(true)
 									{
 										// Read message type.
 										int	b	= in.read();
+										
+										// Update timer
+										long	newtime	= System.currentTimeMillis();
+										if(newtime/1000>time[0]/1000)
+										{
+											time[0]	= newtime;
+											timeout.schedule(new TimeoutTask(time, con), (long)(SRelay.PING_DELAY*1.5));
+										}
 										if(b==-1)
 										{
 											throw new IOException("Stream closed");
@@ -462,6 +477,11 @@ public class HttpReceiver
 								{
 									transport.getConnectionManager().remove(con);
 								}
+								
+								if(timeout!=null)
+								{
+									timeout.cancel();
+								}
 							}
 						});						
 					}
@@ -469,5 +489,40 @@ public class HttpReceiver
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  The timeout task
+	 */
+	public static class TimeoutTask	extends TimerTask
+	{
+		/** The time of the last message (connection alive if different from start time). */
+		protected long[]	time;
+		
+		/** The time at creation. */
+		protected long	starttime;
+		
+		/** The url connection. */
+		protected HttpURLConnection	con;
+		
+		public TimeoutTask(long[] time, HttpURLConnection con)
+		{
+			this.time	= time;
+			this.starttime	= time[0];
+			this.con	= con;
+		}
+		
+		public void run()
+		{
+			if(time[0]!=starttime)
+			{
+				System.out.println("relay alive");
+			}
+			else
+			{
+				System.out.println("relay timeout");
+				RelayConnectionManager.closeConnection(con);
+			}
+		}
 	}
 }

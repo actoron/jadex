@@ -179,7 +179,7 @@ public class RelayServlet extends HttpServlet
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			// Set content length to avoid error page being sent.
 			response.setStatus(404);
 			response.setContentLength(0);
