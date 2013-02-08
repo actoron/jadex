@@ -342,6 +342,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					{
 						dif.setTime(getClockTime());
 						dif.setDelay(info.getDelay());
+						informListeners(dif);
 					}
 				}
 				else

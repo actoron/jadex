@@ -1877,6 +1877,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			public void run()
 			{
+				System.out.println("start sound: "+type);
 				try
 				{
 					String filename = getNotificationSound(type);
@@ -1888,12 +1889,18 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							url = f.toURI().toURL();
 					}
 					// Cannot use stream due to jar starter bug.
+					System.out.println("fetch ais: "+type);
 					AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
+					System.out.println("fetch format: "+type);
 					AudioFormat	format	= ais.getFormat();
+					System.out.println("create dataline.info: "+type);
 					DataLine.Info	info	= new DataLine.Info(Clip.class, format);
+					System.out.println("fetch line: "+type);
 					Clip	clip	= (Clip)AudioSystem.getLine(info);
 					// OpenJDK hangs below :-(
+					System.out.println("open clip: "+type);
 					clip.open(ais);
+					System.out.println("add listener: "+type);
 					clip.addLineListener(new LineListener()
 					{
 						public void update(LineEvent event)
@@ -1905,6 +1912,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							}
 						}
 					});
+					System.out.println("start clip: "+type);
 					clip.start();
 //					while(clip.isRunning())
 //					{
@@ -1913,12 +1921,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				}
 				catch(Throwable e)	// AssertionError in org.classpath.icedtea.pulseaudio.Stream.disconnect(Stream.java:557) grrr...
 				{
+					System.out.println("exception: "+type+", "+e);
 					if(verbose)
 					{
 						System.err.println("Couldn't play notification sound '"+type+"': "+e);
 						e.printStackTrace();
 					}
 				}
+				System.out.println("end sound: "+type);
 			}
 		}).start();
 	}

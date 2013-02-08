@@ -128,7 +128,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 		
 		// Update time
 		long	old	= announcements.containsKey(cid) ? announcements.get(cid).longValue() : Long.MIN_VALUE;
-		if(old!=-1 && time>old)
+		if(old!=-1 && (time>old || time==-1))
 		{
 //			System.out.println("set to time: "+cid+", "+time);
 			announcements.put(cid, new Long(time));
