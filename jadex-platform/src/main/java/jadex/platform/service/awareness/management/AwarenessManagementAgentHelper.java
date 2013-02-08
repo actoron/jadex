@@ -54,7 +54,7 @@ public class AwarenessManagementAgentHelper
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future<Void> ret = new Future<Void>();
-				getChildrenAccesses().addResultListener(
+				getChildrenAccesses(ia).addResultListener(
 						ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
 						{
 							public void customResultAvailable(Collection<IExternalAccess> subs)
@@ -187,7 +187,7 @@ public class AwarenessManagementAgentHelper
 			{
 				final Future<Set<String>> ret = new Future<Set<String>>();
 
-				getChildrenAccesses().addResultListener(
+				getChildrenAccesses(ia).addResultListener(
 						ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
 						{
 							public void customResultAvailable(Collection<IExternalAccess> result)
@@ -278,11 +278,11 @@ public class AwarenessManagementAgentHelper
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
+	public static IFuture<Collection<IExternalAccess>> getChildrenAccesses(final IInternalAccess component)
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
-		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getServiceUpwards(component.getServiceContainer(), IComponentManagementService.class)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService result)
