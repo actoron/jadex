@@ -30,7 +30,7 @@ public class MatcherNode
 	 */
 	public List<IRule<?>> getRules(String type)
 	{
-		return getRules(new EventType(type), 0);
+		return getRules(new EventType(type));
 	}
 	
 	/**
@@ -40,7 +40,9 @@ public class MatcherNode
 	 */
 	public List<IRule<?>> getRules(EventType type)
 	{
-		return getRules(type, 0);
+		List<IRule<?>> ret = new ArrayList<IRule<?>>();
+		getRules(type, 0, ret);
+		return ret;
 	}
 	
 	/**
@@ -75,36 +77,25 @@ public class MatcherNode
 	 *  @param i The level.
 	 *  @return The list of relevant rules.
 	 */
-	protected List<IRule<?>> getRules(EventType type, int i)
+	protected void getRules(EventType type, int i, List<IRule<?>> ret)
 	{
-		List<IRule<?>> ret = null;
-		
 		String[] subtypes = type.getTypes();
 		if(i+1==subtypes.length)
 		{
-			ret = internalGetRules(subtypes[i]);
+			List<IRule<?>> tmp = internalGetRules(subtypes[i]);
+			if(tmp!=null)
+				ret.addAll(tmp);
 		}
 		else
 		{
 			MatcherNode node = getChild(subtypes[i]);
 			if(node!=null)
-				ret = node.getRules(type, i+1);
+				node.getRules(type, i+1, ret);
 			
 		}
 		List<IRule<?>> tmp = internalGetRules("*");
 		if(tmp!=null)
-		{
-			if(ret!=null)
-			{
-				ret.addAll(tmp);
-			}
-			else
-			{
-				ret = tmp;
-			}
-		}
-		
-		return ret;
+			ret.addAll(tmp);
 	}
 	
 	/**
@@ -230,7 +221,7 @@ public class MatcherNode
 	 */
 	protected List<IRule<?>> internalGetRules(String type)
 	{
-		return rules==null || rules.get(type)==null? null: new ArrayList<IRule<?>>(rules.get(type));
+		return rules==null? null: rules.get(type);
 	}
 	
 	/** 
