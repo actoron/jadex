@@ -9,6 +9,9 @@ public class MPlan extends MElement
 	/** The trigger. */
 	protected MTrigger trigger;
 	
+	/** The waitqueue trigger. */
+	protected MTrigger waitqueue;
+	
 	/** The plan body. */
 	protected MBody body;
 	
@@ -18,11 +21,12 @@ public class MPlan extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MPlan(String name, MBody body, MTrigger trigger, int priority)
+	public MPlan(String name, MBody body, MTrigger trigger, MTrigger waitqueue, int priority)
 	{
 		super(name);
 		this.body = body;
 		this.trigger = trigger;
+		this.waitqueue = waitqueue;
 		this.priority = priority;
 	}
 
@@ -60,6 +64,24 @@ public class MPlan extends MElement
 	public void setTrigger(MTrigger trigger)
 	{
 		this.trigger = trigger;
+	}
+	
+	/**
+	 *  Get the waitqueue.
+	 *  @return The waitqueue.
+	 */
+	public MTrigger getWaitqueue()
+	{
+		return waitqueue;
+	}
+
+	/**
+	 *  Set the waitqueue.
+	 *  @param waitqueue The waitqueue to set.
+	 */
+	public void setWaitqueue(MTrigger waitqueue)
+	{
+		this.waitqueue = waitqueue;
 	}
 
 	/**

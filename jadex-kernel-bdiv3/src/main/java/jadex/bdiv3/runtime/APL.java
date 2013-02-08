@@ -143,43 +143,48 @@ public class APL
 				}
 			}
 			
-			Collection<RPlan> rplans = capa.getPlans();
-			if(rplans!=null)
-			{
-				for(RPlan rplan: rplans)
-				{
-					if(rplan.isWaitingFor(element))
-					{
-						candidates.add(rplan);
-					}
-				}
-			}
-			// todo waitqueue
+			// both aspects are dealt with dispatchToAll() via rules
+			// if we want to support disptach of goals, internal or message events to running plans
+			// we need to reintrodcue this
+			
+			// todo: plan to running?
+//			Collection<RPlan> rplans = capa.getPlans();
+//			if(rplans!=null)
+//			{
+//				for(RPlan rplan: rplans)
+//				{
+//					if(rplan.isWaitingFor(element))
+//					{
+//						candidates.add(rplan);
+//					}
+//				}
+//			}
+			// todo waitqueue ?
 		}
-		else
-		{
-			// check rplans and waitqueues
-			// first remove all rplans that do not wait
-			for(Object cand: candidates)
-			{
-				if(cand instanceof RPlan && !((RPlan)cand).isWaitingFor(element))
-				{
-					candidates.remove(cand);
-				}
-			}
-			// add new rplans that are not contained already
-			Collection<RPlan> rplans = capa.getPlans();
-			if(rplans!=null)
-			{
-				for(RPlan rplan: rplans)
-				{
-					if(!candidates.contains(rplan) && rplan.isWaitingFor(element))
-					{
-						candidates.add(rplan);
-					}
-				}
-			}
-		}
+//		else
+//		{
+//			// check rplans and waitqueues
+//			// first remove all rplans that do not wait
+//			for(Object cand: candidates)
+//			{
+//				if(cand instanceof RPlan && !((RPlan)cand).isWaitingFor(element))
+//				{
+//					candidates.remove(cand);
+//				}
+//			}
+//			// add new rplans that are not contained already
+//			Collection<RPlan> rplans = capa.getPlans();
+//			if(rplans!=null)
+//			{
+//				for(RPlan rplan: rplans)
+//				{
+//					if(!candidates.contains(rplan) && rplan.isWaitingFor(element))
+//					{
+//						candidates.add(rplan);
+//					}
+//				}
+//			}
+//		}
 	}
 	
 	//-------- helper methods --------

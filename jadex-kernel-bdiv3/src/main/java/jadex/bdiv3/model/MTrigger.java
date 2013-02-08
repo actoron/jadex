@@ -11,9 +11,9 @@ import java.util.List;
  */
 public class MTrigger
 {
-	protected List<MInternalEvent> internalevents;
-	
-	protected List<MMessageEvent> messageevents;
+//	protected List<MInternalEvent> internalevents;
+//	
+//	protected List<MMessageEvent> messageevents;
 	
 	protected List<MGoal> goals;
 	
@@ -30,21 +30,21 @@ public class MTrigger
 	{
 	}
 	
-	/**
-	 *  Get the internal events.
-	 */
-	public List<MInternalEvent>	getInternalEvents()
-	{
-		return internalevents;
-	}
-	
-	/**
-	 *  Get the message events.
-	 */
-	public List<MMessageEvent> getMessageEvents()
-	{
-		return messageevents;
-	}
+//	/**
+//	 *  Get the internal events.
+//	 */
+//	public List<MInternalEvent>	getInternalEvents()
+//	{
+//		return internalevents;
+//	}
+//	
+//	/**
+//	 *  Get the message events.
+//	 */
+//	public List<MMessageEvent> getMessageEvents()
+//	{
+//		return messageevents;
+//	}
 	
 	/**
 	 *  Get the goals.
@@ -64,25 +64,25 @@ public class MTrigger
 		goals.add(goal);
 	}
 	
-	/**
-	 * 
-	 */
-	public void addInternalEvent(MInternalEvent event)
-	{
-		if(internalevents==null)
-			this.internalevents = new ArrayList<MInternalEvent>();
-		internalevents.add(event);
-	}
-	
-	/**
-	 * 
-	 */
-	public void addMessageEvent(MMessageEvent event)
-	{
-		if(messageevents==null)
-			this.messageevents = new ArrayList<MMessageEvent>();
-		messageevents.add(event);
-	}
+//	/**
+//	 * 
+//	 */
+//	public void addInternalEvent(MInternalEvent event)
+//	{
+//		if(internalevents==null)
+//			this.internalevents = new ArrayList<MInternalEvent>();
+//		internalevents.add(event);
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	public void addMessageEvent(MMessageEvent event)
+//	{
+//		if(messageevents==null)
+//			this.messageevents = new ArrayList<MMessageEvent>();
+//		messageevents.add(event);
+//	}
 	
 	
 //	/**
@@ -143,5 +143,4 @@ public class MTrigger
 	{
 		return factchangeds==null? Collections.EMPTY_LIST: factchangeds;
 	}
-
 }

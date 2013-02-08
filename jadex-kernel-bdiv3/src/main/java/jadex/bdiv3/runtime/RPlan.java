@@ -7,10 +7,10 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MTrigger;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,6 +23,7 @@ import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 
+import java.io.ObjectInputStream.GetField;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,9 +78,9 @@ public class RPlan extends RElement
 		
 	/** The plan has a wait abstraction attribute. */
 	protected WaitAbstraction waitabstraction;
-		
-	/** The plan has a waitqueue wait abstraction attribute. */
-	protected WaitAbstraction waitqueuewa;
+//		
+//	/** The plan has a waitqueue wait abstraction attribute. */
+//	protected WaitAbstraction waitqueuewa;
 	
 	/** The waitqueue. */
 	protected List<Object> waitqueue;
@@ -114,7 +115,7 @@ public class RPlan extends RElement
 	 */
 	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
 	{
-		RPlan rplan = new RPlan(mplan, candidate);
+		final RPlan rplan = new RPlan(mplan, candidate);
 		MBody mbody = mplan.getBody();
 		
 		IPlanBody body = null;
@@ -138,6 +139,54 @@ public class RPlan extends RElement
 			catch(Exception e)
 			{
 				throw new RuntimeException(e);
+			}
+		}
+		
+		MTrigger wqtr = mplan.getWaitqueue();
+		if(wqtr!=null)
+		{
+			List<EventType> events = new ArrayList<EventType>();
+			
+			List<String> fas = wqtr.getFactAddeds();
+			if(fas!=null && !fas.isEmpty())
+			{
+				for(String belname: fas)
+				{
+					events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+				}
+			}
+			List<String> frs = wqtr.getFactRemoveds();
+			if(frs!=null && !frs.isEmpty())
+			{
+				for(String belname: frs)
+				{
+					events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+				}
+			}
+			List<String> fcs = wqtr.getFactChangeds();
+			if(fcs!=null && !fcs.isEmpty())
+			{
+				for(String belname: fcs)
+				{
+					events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}));
+				}
+			}
+			
+			if(!events.isEmpty())
+			{
+				final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+				final String rulename = rplan.getId()+"_waitqueue";
+				Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						System.out.println("Added to waitqueue: "+event);
+						rplan.addToWaitqueue(new ChangeEvent(event));				
+						return IFuture.DONE;
+					}
+				});
+				rule.setEvents(events);
+				ip.getRuleSystem().getRulebase().addRule(rule);
 			}
 		}
 		
@@ -313,15 +362,15 @@ public class RPlan extends RElement
 		this.ia = ia;
 	}
 
-	/**
-	 *  Test if the plan is waiting for a process element.
-	 */
-	public boolean isWaitingFor(Object procelem)
-	{
-		return RPlan.PLANPROCESSINGTATE_WAITING.equals(getProcessingState()) 
-			&& waitabstraction!=null && waitabstraction.isWaitingFor(procelem);
-	}
-	
+//	/**
+//	 *  Test if the plan is waiting for a process element.
+//	 */
+//	public boolean isWaitingFor(Object procelem)
+//	{
+//		return RPlan.PLANPROCESSINGTATE_WAITING.equals(getProcessingState()) 
+//			&& waitabstraction!=null && waitabstraction.isWaitingFor(procelem);
+//	}
+//	
 	/**
 	 *  Get the waitabstraction.
 	 *  @return The waitabstraction.
@@ -335,11 +384,43 @@ public class RPlan extends RElement
 	 *  Set the waitabstraction.
 	 *  @param waitabstraction The waitabstraction to set.
 	 */
-	public void setWaitabstraction(WaitAbstraction waitabstraction)
+	public void setWaitAbstraction(WaitAbstraction waitabstraction)
 	{
 		this.waitabstraction = waitabstraction;
 	}
 
+	/**
+	 * 
+	 */
+	protected void addToWaitqueue(Object obj)
+	{
+		if(waitqueue==null)
+			waitqueue = new ArrayList<Object>();
+		waitqueue.add(obj);
+	}
+	
+	/**
+	 * 
+	 */
+	protected Object getFromWaitqueue()
+	{
+		Object ret = null;
+		if(waitqueue!=null)
+		{
+			for(int i=0; i<waitqueue.size(); i++)
+			{
+				Object obj = waitqueue.get(i);
+				if(waitabstraction.isWaitingFor(obj))
+				{
+					ret = obj;
+					waitqueue.remove(i);
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
 	/**
 	 * 
 	 */
@@ -551,29 +632,43 @@ public class RPlan extends RElement
 	public IFuture<Object> waitForFactX(String belname, String evtype)//, long delay)
 	{
 		assert getWaitFuture()==null;
-		setWaitFuture(new Future<Void>());
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
-		
-		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		final String rulename = getId()+"_wait";
-		Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
-		{
-			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-			{
-				ip.getRuleSystem().getRulebase().removeRule(rulename);
-				setDispatchedElement(new ChangeEvent(event));
-				RPlan.adoptPlan(RPlan.this, ia);
-				return IFuture.DONE;
-			}
-		});
-		rule.addEvent(new EventType(new String[]{evtype, belname}));
-		ip.getRuleSystem().getRulebase().addRule(rule);
-		
-//		WaitAbstraction wa = new WaitAbstraction();
-//		wa.addChangeEventType(ChangeEvent.FACTADDED+"."+belname);
-		
 		Future<Object> ret = new Future<Object>();
-		((Future<Object>)getWaitFuture()).addResultListener(new DelegationResultListener<Object>(ret)
+		
+		// Also set waitabstraction to know what the plan is waiting for
+		EventType et = new EventType(new String[]{evtype, belname});
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addChangeEventType(et.toString());
+		setWaitAbstraction(wa);
+		
+		Object obj = getFromWaitqueue();
+		if(obj!=null)
+		{
+			ret = new Future<Object>(obj);
+		}
+		else
+		{
+			setWaitFuture(ret);
+			setProcessingState(PLANPROCESSINGTATE_WAITING);
+			
+			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+			final String rulename = getId()+"_wait";
+			Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					ip.getRuleSystem().getRulebase().removeRule(rulename);
+					setDispatchedElement(new ChangeEvent(event));
+					RPlan.adoptPlan(RPlan.this, ia);
+					return IFuture.DONE;
+				}
+			});
+			
+			rule.addEvent(et);
+			ip.getRuleSystem().getRulebase().addRule(rule);
+		}
+		
+		Future<Object> fut = new Future<Object>();
+		ret.addResultListener(new DelegationResultListener<Object>(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -582,7 +677,7 @@ public class RPlan extends RElement
 			}
 		});
 		
-		return ret;//(Future<Object>)getWaitFuture();
+		return fut;
 	}
 	
 	/**
@@ -591,23 +686,42 @@ public class RPlan extends RElement
 	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname)//, long delay)
 	{
 		assert getWaitFuture()==null;
-		setWaitFuture(new Future<Void>());
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
+		Future<Object> ret = new Future<Object>();
 		
-		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		final String rulename = getId()+"_wait";
-		Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+		// Also set waitabstraction to know what the plan is waiting for
+		WaitAbstraction wa = new WaitAbstraction();
+		EventType eta = new EventType(new String[]{ChangeEvent.FACTADDED, belname});
+		EventType etb = new EventType(new String[]{ChangeEvent.FACTREMOVED, belname});
+		wa.addChangeEventType(eta.toString());
+		wa.addChangeEventType(etb.toString());
+		setWaitAbstraction(wa);
+		
+		Object obj = getFromWaitqueue();
+		if(obj!=null)
 		{
-			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+			ret = new Future<Object>(obj);
+		}
+		else
+		{
+			setWaitFuture(ret);
+			setProcessingState(PLANPROCESSINGTATE_WAITING);
+			
+			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+			final String rulename = getId()+"_wait";
+			Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 			{
-				ip.getRuleSystem().getRulebase().removeRule(rulename);
-				setDispatchedElement(new ChangeEvent(event));
-				RPlan.adoptPlan(RPlan.this, ia);
-				return IFuture.DONE;
-			}
-		});
-		rule.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
-		rule.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					ip.getRuleSystem().getRulebase().removeRule(rulename);
+					setDispatchedElement(new ChangeEvent(event));
+					RPlan.adoptPlan(RPlan.this, ia);
+					return IFuture.DONE;
+				}
+			});
+			rule.addEvent(eta);
+			rule.addEvent(etb);
+			ip.getRuleSystem().getRulebase().addRule(rule);
+		}
 		
 		return (Future<ChangeEvent>)getWaitFuture();
 	}
@@ -618,35 +732,45 @@ public class RPlan extends RElement
 	public IFuture<Void> waitForCondition(ICondition cond, String[] events)
 	{
 		assert getWaitFuture()==null;
-		setWaitFuture(new Future<Void>());
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
+		Future<Object> ret = new Future<Object>();
 		
-		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		final String rulename = getId()+"_wait";
-		Rule<Void> rule = new Rule<Void>(rulename, cond!=null? cond: ICondition.TRUE_CONDITION, new IAction<Void>()
+		Object obj = getFromWaitqueue();
+		if(obj!=null)
 		{
-			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-			{
-				ip.getRuleSystem().getRulebase().removeRule(rulename);
-				setDispatchedElement(new ChangeEvent(event));
-				RPlan.adoptPlan(RPlan.this, ia);
-				return IFuture.DONE;
-			}
-		});
-		for(String ev: events)
-		{
-			rule.addEvent(new EventType(ev));
+			ret = new Future<Object>(obj);
 		}
-		ip.getRuleSystem().getRulebase().addRule(rule);
+		else
+		{
+			setWaitFuture(ret);
+			setProcessingState(PLANPROCESSINGTATE_WAITING);
+			
+			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+			final String rulename = getId()+"_wait";
+			Rule<Void> rule = new Rule<Void>(rulename, cond!=null? cond: ICondition.TRUE_CONDITION, new IAction<Void>()
+			{
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				{
+					ip.getRuleSystem().getRulebase().removeRule(rulename);
+					setDispatchedElement(new ChangeEvent(event));
+					RPlan.adoptPlan(RPlan.this, ia);
+					return IFuture.DONE;
+				}
+			});
+			for(String ev: events)
+			{
+				rule.addEvent(new EventType(ev));
+			}
+			ip.getRuleSystem().getRulebase().addRule(rule);
+		}
 		
-		final Future<Void> ret = new Future<Void>();
-		((Future<Object>)getWaitFuture()).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		final Future<Void> fut = new Future<Void>();
+		ret.addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
-				ret.setResult(null);
+				fut.setResult(null);
 			}
 		});
-		return ret;
+		return fut;
 	}
 }

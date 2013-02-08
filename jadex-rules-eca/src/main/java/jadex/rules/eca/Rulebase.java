@@ -24,6 +24,9 @@ public class Rulebase implements IRulebase
 	 */
 	public void addRule(IRule<?> rule)
 	{
+		if(rule.getEvents()==null)
+			throw new RuntimeException("Rule must have events: "+rule);
+		
 		if(rules==null)
 			rules = new HashMap<String, IRule<?>>();
 		if(matcher==null)

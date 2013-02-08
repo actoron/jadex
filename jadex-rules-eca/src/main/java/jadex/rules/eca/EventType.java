@@ -59,6 +59,17 @@ public class EventType
 	 */
 	public String toString()
 	{
-		return "EventType(types="+Arrays.toString(types)+")";
+		if(typename==null)
+		{
+			StringBuffer buf = new StringBuffer();
+			for(int i=0; i<types.length; i++)
+			{
+				buf.append(types[i]);
+				if(i+1<types.length)
+					buf.append(".");
+			}
+			typename = buf.toString();
+		}
+		return typename;
 	}
 }

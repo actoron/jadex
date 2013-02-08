@@ -18,6 +18,11 @@ public @interface Plan
 	public Trigger trigger() default @Trigger();
 
 	/**
+	 *  The waitqueue.
+	 */
+	public Trigger waitqueue() default @Trigger();
+	
+	/**
 	 *  The plan priority. 
 	 */
 	public int priority() default 0;

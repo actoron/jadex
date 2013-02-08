@@ -402,31 +402,40 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Plan p, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Trigger trigger, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
-		MTrigger tr = new MTrigger();
-		Trigger trigger = p.trigger();
+		MTrigger tr = null;
+		
 		Class<?>[] gs = trigger.goals();
-		for(int j=0; j<gs.length; j++)
-		{
-			Goal ga = getAnnotation(gs[j], Goal.class, cl);
-			MGoal mgoal = getMGoal(bdimodel, ga, gs[j], cl, pubs);
-			tr.addGoal(mgoal);
-		}
 		String[] fas = trigger.factaddeds();
-		for(int j=0; j<fas.length; j++)
-		{
-			tr.addFactAdded(fas[j]);
-		}
 		String[] frs = trigger.factremoveds();
-		for(int j=0; j<frs.length; j++)
-		{
-			tr.addFactRemoved(frs[j]);
-		}
 		String[] fcs = trigger.factchangeds();
-		for(int j=0; j<fcs.length; j++)
+		
+		if(gs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0)
 		{
-			tr.addFactChangeds(fcs[j]);
+			tr = new MTrigger();
+			
+			for(int j=0; j<gs.length; j++)
+			{
+				Goal ga = getAnnotation(gs[j], Goal.class, cl);
+				MGoal mgoal = getMGoal(bdimodel, ga, gs[j], cl, pubs);
+				tr.addGoal(mgoal);
+			}
+			
+			for(int j=0; j<fas.length; j++)
+			{
+				tr.addFactAdded(fas[j]);
+			}
+			
+			for(int j=0; j<frs.length; j++)
+			{
+				tr.addFactRemoved(frs[j]);
+			}
+			
+			for(int j=0; j<fcs.length; j++)
+			{
+				tr.addFactChangeds(fcs[j]);
+			}
 		}
 		
 		return tr;
@@ -489,13 +498,14 @@ public class BDIClassReader extends MicroClassReader
 		
 		if(mplan==null)
 		{
-			MTrigger mtr = buildPlanTrigger(bdimodel, p, cl, pubs);
+			MTrigger mtr = buildPlanTrigger(bdimodel, p.trigger(), cl, pubs);
+			MTrigger wmtr = buildPlanTrigger(bdimodel, p.waitqueue(), cl, pubs);
 			
 			ClassInfo ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
 			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
 			MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
 				(Object.class.equals(sp.mapper())? null: new ClassInfo(sp.mapper().getName())));
-			mplan = new MPlan(name, mbody, mtr, p.priority());
+			mplan = new MPlan(name, mbody, mtr, wmtr, p.priority());
 		}
 		
 		return mplan;
