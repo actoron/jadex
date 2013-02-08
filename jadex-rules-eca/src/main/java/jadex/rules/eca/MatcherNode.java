@@ -106,9 +106,6 @@ public class MatcherNode
 	 */
 	protected void addRule(EventType type, IRule<?> rule, int i)
 	{
-		if(rule.getEvents()==null || rule.getEvents().isEmpty())
-			throw new RuntimeException("No events defined in rule: "+rule);
-		
 		String[] subtypes = type.getTypes();
 		if(i+1==subtypes.length)
 		{

@@ -39,7 +39,7 @@ public class Rulebase implements IRulebase
 		
 		matcher.addRule(rule);
 		
-		System.out.println("added rule: "+rule+" "+rule.getEvents());
+//		System.out.println("added rule: "+rule+" "+rule.getEvents());
 		
 //		System.out.println("evrules: "+evrules);
 	}

@@ -789,38 +789,41 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			MTrigger trigger = mplan.getTrigger();
 			
-			List<String> fas = trigger.getFactAddeds();
-			if(fas!=null && fas.size()>0)
+			if(trigger!=null)
 			{
-				Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
-				for(String fa: fas)
+				List<String> fas = trigger.getFactAddeds();
+				if(fas!=null && fas.size()>0)
 				{
-					rule.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, fa}));
+					Rule<Void> rule = new Rule<Void>("create_plan_factadded_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
+					for(String fa: fas)
+					{
+						rule.addEvent(new EventType(new String[]{ChangeEvent.FACTADDED, fa}));
+					}
+					rulesystem.getRulebase().addRule(rule);
 				}
-				rulesystem.getRulebase().addRule(rule);
-			}
-
-			List<String> frs = trigger.getFactRemoveds();
-			if(frs!=null && frs.size()>0)
-			{
-				Rule<Void> rule = new Rule<Void>("create_plan_factremoved_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
-				for(String fr: frs)
+	
+				List<String> frs = trigger.getFactRemoveds();
+				if(frs!=null && frs.size()>0)
 				{
-					rule.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, fr}));
+					Rule<Void> rule = new Rule<Void>("create_plan_factremoved_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
+					for(String fr: frs)
+					{
+						rule.addEvent(new EventType(new String[]{ChangeEvent.FACTREMOVED, fr}));
+					}
+					rulesystem.getRulebase().addRule(rule);
 				}
-				rulesystem.getRulebase().addRule(rule);
-			}
-			
-			List<String> fcs = trigger.getFactChangeds();
-			if(fcs!=null && fcs.size()>0)
-			{
-				Rule<Void> rule = new Rule<Void>("create_plan_factchanged_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
-				for(String fc: fcs)
+				
+				List<String> fcs = trigger.getFactChangeds();
+				if(fcs!=null && fcs.size()>0)
 				{
-					rule.addEvent(new EventType(new String[]{ChangeEvent.FACTCHANGED, fc}));
-					rule.addEvent(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, fc}));
+					Rule<Void> rule = new Rule<Void>("create_plan_factchanged_"+mplan.getName(), ICondition.TRUE_CONDITION, createplan);
+					for(String fc: fcs)
+					{
+						rule.addEvent(new EventType(new String[]{ChangeEvent.FACTCHANGED, fc}));
+						rule.addEvent(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, fc}));
+					}
+					rulesystem.getRulebase().addRule(rule);
 				}
-				rulesystem.getRulebase().addRule(rule);
 			}
 		}
 		
@@ -1004,7 +1007,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	
 //		getCapability().dumpGoalsPeriodically(getInternalAccess());
-		getCapability().dumpPlansPeriodically(getInternalAccess());
+//		getCapability().dumpPlansPeriodically(getInternalAccess());
 	}
 	
 	/**

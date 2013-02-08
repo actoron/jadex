@@ -5,7 +5,7 @@ import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -23,8 +23,8 @@ import java.util.List;
  *  Agent that tests plan waiting.
  */
 @Agent
-//@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitPlan")))
-@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitqueuePlan")))
+@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitPlan")))
+//@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitqueuePlan")))
 public class WaitBDI
 {
 	@Agent
@@ -78,15 +78,15 @@ public class WaitBDI
 		names.remove(name);
 	}
 	
-//	/**
-//	 *  Plan that waits for addition and removal of a name.
-//	 */
-//	@Plan
-//	protected IFuture<Void> waitPlan(final RPlan rplan)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		System.out.println("plan waiting: "+rplan.getId());
-//		
+	/**
+	 *  Plan that waits for addition and removal of a name.
+	 */
+	@Plan
+	protected IFuture<Void> waitPlan(final RPlan rplan)
+	{
+		final Future<Void> ret = new Future<Void>();
+		System.out.println("plan waiting: "+rplan.getId());
+		
 //		rplan.waitForCondition(null, new String[]{ChangeEvent.FACTADDED+".names"}).addResultListener(new DelegationResultListener<Void>(ret)
 //		{
 //			public void customResultAvailable(Void result)
@@ -94,7 +94,7 @@ public class WaitBDI
 //				System.out.println("continued");
 //			}
 //		});
-//		
+		
 //		rplan.waitForFactAdded("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 //		{
 //			public void customResultAvailable(Object result)
@@ -111,48 +111,48 @@ public class WaitBDI
 //			}
 //		});
 		
-//		rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
-//		{
-//			public void customResultAvailable(ChangeEvent result)
-//			{
-//				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
-//				rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
-//				{
-//					public void customResultAvailable(ChangeEvent result)
-//					{
-//						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
-//						ret.setResult(null);
-//					}
-//				});
-//			}
-//		});
-//		
-//		return ret;
-//	}
-	
-	/**
-	 *  Plan that waits with waitqueue for addition of a name.
-	 */
-	@Plan(waitqueue=@Trigger(factaddeds="names"))
-	protected IFuture<Void> waitqueuePlan(final RPlan rplan)
-	{
-		final Future<Void> ret = new Future<Void>();
-		System.out.println("plan waiting: "+rplan.getId());
-		
-		rplan.waitFor(3000).addResultListener(new DelegationResultListener<Void>(ret)
+		rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
 		{
-			public void customResultAvailable(Void result)
+			public void customResultAvailable(ChangeEvent result)
 			{
-				rplan.waitForFactAdded("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
+				rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(ChangeEvent result)
 					{
-						System.out.println("continued: "+result);
+						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
+						ret.setResult(null);
 					}
 				});
 			}
 		});
 		
 		return ret;
-	}	
+	}
+	
+//	/**
+//	 *  Plan that waits with waitqueue for addition of a name.
+//	 */
+//	@Plan(waitqueue=@Trigger(factaddeds="names"))
+//	protected IFuture<Void> waitqueuePlan(final RPlan rplan)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		System.out.println("plan waiting: "+rplan.getId());
+//		
+//		rplan.waitFor(3000).addResultListener(new DelegationResultListener<Void>(ret)
+//		{
+//			public void customResultAvailable(Void result)
+//			{
+//				rplan.waitForFactAdded("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						System.out.println("continued: "+result);
+//					}
+//				});
+//			}
+//		});
+//		
+//		return ret;
+//	}	
 }
