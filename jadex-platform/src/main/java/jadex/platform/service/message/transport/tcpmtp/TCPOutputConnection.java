@@ -73,7 +73,7 @@ public class TCPOutputConnection
 	{
 		boolean ret = false;
 		
-//		long start = System.currentTimeMillis();
+//		long start = System.nanoTime();
 		
 		try
 		{
@@ -104,14 +104,16 @@ public class TCPOutputConnection
 			ret = true;
 			cleaner.refresh();
 		}
-		catch(IOException e)
+		catch(Throwable e)
 		{
 //			e.printStackTrace();
 			close();
 		}
 		
-//		if(System.currentTimeMillis()-start>150)
+//		if(System.nanoTime()-start>150000000)
+//		{
 //			System.out.println("laaaaaaaangsam");
+//		}
 		
 		return ret;
 	}

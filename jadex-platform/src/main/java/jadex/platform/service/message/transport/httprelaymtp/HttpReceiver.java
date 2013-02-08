@@ -516,11 +516,11 @@ public class HttpReceiver
 		{
 			if(time[0]!=starttime)
 			{
-				System.out.println("relay alive");
+//				System.out.println("relay alive");
 			}
 			else
 			{
-				System.out.println("relay timeout");
+//				System.out.println("relay timeout");
 				RelayConnectionManager.closeConnection(con);
 			}
 		}

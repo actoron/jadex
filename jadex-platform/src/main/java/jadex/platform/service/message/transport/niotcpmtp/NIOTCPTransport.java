@@ -239,7 +239,7 @@ public class NIOTCPTransport implements ITransport
 		};
 		IFuture<NIOTCPOutputConnection>	con	= selectorthread.getConnection(parseAddress(address));
 		
-		// Inform listener immediately if future is done (avoids that niotcp drops behind other transports due to stack unwindind).
+		// Inform listener immediately if future is done (avoids that niotcp drops behind other transports due to stack unwinding).
 		if(con.isDone())
 		{
 			NIOTCPOutputConnection	res	= null;

@@ -53,7 +53,7 @@ public class TreeStressTestAgent extends MicroAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+//				exception.printStackTrace();
 			}
 		});
 		

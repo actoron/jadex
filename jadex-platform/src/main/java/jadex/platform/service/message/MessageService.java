@@ -1976,28 +1976,8 @@ public class MessageService extends BasicService implements IMessageService
 			final MessageType	messagetype	= getMessageType(type);
 			
 			// Announce receiver to message awareness
-			final IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
-			component.scheduleStep(new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					SServiceProvider.getService(ia.getServiceContainer(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(ia.createResultListener(new IResultListener<IMessageAwarenessService>()
-					{
-						public void resultAvailable(IMessageAwarenessService mws)
-						{
-							mws.announceComponentIdentifier(sender);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// ignore if message awareness service not found
-						}
-					}));
-					
-					return IFuture.DONE; 
-				}
-			});
+			IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
+			announceComponentIdentifier(sender);
 			
 			final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 
@@ -2503,6 +2483,47 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	long mwstime;
+	IMessageAwarenessService	mws;
+	
+	/**
+	 *  Announce a component identifier to message awareness.
+	 */
+	protected void announceComponentIdentifier(final IComponentIdentifier cid)
+	{
+		// Search for mws only every 5 seconds.
+		if(System.currentTimeMillis()-mwstime>5000)
+		{
+			mwstime	= System.currentTimeMillis();
+			component.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					SServiceProvider.getService(ia.getServiceContainer(), IMessageAwarenessService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(ia.createResultListener(new IResultListener<IMessageAwarenessService>()
+					{
+						public void resultAvailable(IMessageAwarenessService result)
+						{
+							mws	= result;
+							announceComponentIdentifier(cid);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// ignore if message awareness service not found
+						}
+					}));
+					
+					return IFuture.DONE; 
+				}
+			});
+		}
+		else if(mws!=null)
+		{
+			mws.announceComponentIdentifier(cid);
 		}
 	}
 }

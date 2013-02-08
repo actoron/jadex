@@ -979,7 +979,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			clock	= null;
 			cms	= null;
 //			component	= null;	// Required by getResults()
-			model	= null;
+//			model	= null;	// Required by message service?
 //			desc	= null;	// Required by toString()
 			parent	= null;
 			killfuture.setResult(null);

@@ -350,39 +350,61 @@ public class TCPTransport implements ITransport
 		}
 		else
 		{
-			threadpool.execute(new Runnable()
+			// Report immediately, if connection is already available.
+			final IFuture<TCPOutputConnection> fut = getConnection(address, false);
+			if(fut.isDone())
 			{
-				public void run()
+				task.ready(new IResultCommand<IFuture<Void>, Void>()
 				{
-					IFuture<TCPOutputConnection> fut = getConnection(address, true);
-					fut.addResultListener(new IResultListener<TCPOutputConnection>()
+					public IFuture<Void> execute(Void args)
 					{
-						public void resultAvailable(final TCPOutputConnection con)
+						if(fut.get(null).send(task.getProlog(), task.getData(), task))
 						{
-							task.ready(new IResultCommand<IFuture<Void>, Void>()
+							return IFuture.DONE;
+						}
+						else
+						{
+							return new Future<Void>(new RuntimeException("Send failed: "+fut.get(null)));
+						}
+					}
+				});
+			}
+			else
+			{
+				threadpool.execute(new Runnable()
+				{
+					public void run()
+					{
+						IFuture<TCPOutputConnection> fut = getConnection(address, true);
+						fut.addResultListener(new IResultListener<TCPOutputConnection>()
+						{
+							public void resultAvailable(final TCPOutputConnection con)
 							{
-								public IFuture<Void> execute(Void args)
+								task.ready(new IResultCommand<IFuture<Void>, Void>()
 								{
-									if(con.send(task.getProlog(), task.getData(), task))
+									public IFuture<Void> execute(Void args)
 									{
-										return IFuture.DONE;
+										if(con.send(task.getProlog(), task.getData(), task))
+										{
+											return IFuture.DONE;
+										}
+										else
+										{
+											return new Future<Void>(new RuntimeException("Send failed: "+con));
+										}
 									}
-									else
-									{
-										return new Future<Void>(new RuntimeException("Send failed: "+con));
-									}
-								}
-							});
-						}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								task.ready(send_failure);
+							}
+						});
 						
-						public void exceptionOccurred(Exception exception)
-						{
-							task.ready(send_failure);
-						}
-					});
-					
-				}
-			});
+					}
+				});
+			}
 		}
 		
 //		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()

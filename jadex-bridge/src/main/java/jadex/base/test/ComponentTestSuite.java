@@ -67,7 +67,7 @@ public class ComponentTestSuite extends TestSuite
 		this(new String[]
 		{
 			"-platformname", "testcases_*",
-			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
+//			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
@@ -81,6 +81,8 @@ public class ComponentTestSuite extends TestSuite
 			"-autoshutdown", "false",
 			"-opengl", "false",
 			"-cli", "false",
+//			"-niotcptransport", "false",
+//			"-tcptransport", "true",
 //			"-deftimeout", "-1",
 			"-printpass", "false"
 		}, path, root, excludes, timeout, broken, start);

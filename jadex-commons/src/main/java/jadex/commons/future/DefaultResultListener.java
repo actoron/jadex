@@ -42,6 +42,10 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 	public DefaultResultListener(Logger logger)
 	{
 		this.logger = logger;
+		if(logger==null)
+		{
+			this.logger = Logger.getLogger("default-result-listener");
+		}
 	}
 	
 //	/**
