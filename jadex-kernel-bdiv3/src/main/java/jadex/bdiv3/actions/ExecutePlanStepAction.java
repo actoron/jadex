@@ -85,7 +85,14 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		{
 			Future<Object> fut = (Future<Object>)rplan.getWaitFuture();
 			rplan.setWaitFuture(null);
-			fut.setResult(rplan.getDispatchedElement());
+			if(rplan.getException()!=null)
+			{
+				fut.setException(rplan.getException());
+			}
+			else
+			{
+				fut.setResult(rplan.getDispatchedElement());
+			}
 		}
 		else
 		{

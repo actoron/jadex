@@ -23,9 +23,10 @@ public interface IPlan
 	public Object getDispatchedElement();
 	
 	/**
-	 *  Dispatch a goal wait for its result.
+	 *  Get the waitqueue.
+	 *  @return The waitqueue.
 	 */
-	public <T> IFuture<T> dispatchSubgoal(final T goal);
+	public List<Object> getWaitqueue();
 	
 	/**
 	 *  Wait for a delay.
@@ -33,33 +34,62 @@ public interface IPlan
 	public IFuture<Void> waitFor(long delay);
 	
 	/**
-	 *  Get the waitqueue.
-	 *  @return The waitqueue.
+	 *  Dispatch a goal wait for its result.
 	 */
-	public List<Object> getWaitqueue();
-
+	public <T> IFuture<T> dispatchSubgoal(T goal);
+	
+	/**
+	 *  Dispatch a goal wait for its result.
+	 */
+	public <T> IFuture<T> dispatchSubgoal(T goal, long timeout);
+	
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public IFuture<Object> waitForFactChanged(String belname);//, long delay)
+	public IFuture<Object> waitForFactChanged(String belname);
+	
+	/**
+	 *  Wait for a fact change of a belief.
+	 */
+	public IFuture<Object> waitForFactChanged(String belname, long timeout);
 	
 	/**
 	 *  Wait for a fact being added to a belief.
 	 */
-	public IFuture<Object> waitForFactAdded(String belname);//, long delay)
+	public IFuture<Object> waitForFactAdded(String belname);
+	
+	/**
+	 *  Wait for a fact being added to a belief.
+	 */
+	public IFuture<Object> waitForFactAdded(String belname, long timeout);
 
 	/**
 	 *  Wait for a fact being removed from a belief.
 	 */
-	public IFuture<Object> waitForFactRemoved(String belname);//, long delay)
+	public IFuture<Object> waitForFactRemoved(String belname);
+	
+	/**
+	 *  Wait for a fact being removed from a belief.
+	 */
+	public IFuture<Object> waitForFactRemoved(String belname, long timeout);
 	
 	/**
 	 *  Wait for a fact being added or removed to a belief.
 	 */
-	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname);//, long delay)
+	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname);
+	
+	/**
+	 *  Wait for a fact being added or removed to a belief.
+	 */
+	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname, long timeout);
 	
 	/**
 	 *  Wait for a condition.
 	 */
 	public IFuture<Void> waitForCondition(ICondition cond, String[] events);
+	
+	/**
+	 *  Wait for a condition.
+	 */
+	public IFuture<Void> waitForCondition(ICondition cond, String[] events, long timeout);
 }

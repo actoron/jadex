@@ -95,14 +95,35 @@ public class WaitBDI
 //			}
 //		});
 		
-//		rplan.waitForFactAdded("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		rplan.waitForFactAdded("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
+				rplan.waitForFactRemoved("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
+						ret.setResult(null);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
+		
+//		rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
 //		{
-//			public void customResultAvailable(Object result)
+//			public void customResultAvailable(ChangeEvent result)
 //			{
 //				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
-//				rplan.waitForFactRemoved("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+//				rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
 //				{
-//					public void customResultAvailable(Object result)
+//					public void customResultAvailable(ChangeEvent result)
 //					{
 //						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
 //						ret.setResult(null);
@@ -110,22 +131,6 @@ public class WaitBDI
 //				});
 //			}
 //		});
-		
-		rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
-		{
-			public void customResultAvailable(ChangeEvent result)
-			{
-				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
-				rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
-				{
-					public void customResultAvailable(ChangeEvent result)
-					{
-						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
-						ret.setResult(null);
-					}
-				});
-			}
-		});
 		
 		return ret;
 	}

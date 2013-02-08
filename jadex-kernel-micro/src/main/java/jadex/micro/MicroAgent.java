@@ -319,13 +319,13 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param time The time.
 	 *  @param step The runnable.
 	 */
-	public IFuture<TimerWrapper> waitFor(final long time, final IComponentStep<Void> step)
+	public IFuture<ITimer> waitFor(final long time, final IComponentStep<Void> step)
 	{
 //		longtime	= Math.max(longtime, time);
-		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
+		final Future<ITimer> ret = new Future<ITimer>();
 		
 		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IClockService, TimerWrapper>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IClockService, ITimer>(ret)
 		{
 			public void customResultAvailable(IClockService cs)
 			{

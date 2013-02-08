@@ -91,4 +91,14 @@ public class Rulebase implements IRulebase
 		
 		return ret;
 	}
+	
+	/**
+	 *  Test if a rule is contained in the rule base.
+	 *  @param name The rule name.
+	 *  @return True, if contained.
+	 */
+	public boolean containsRule(String name)
+	{
+		return rules!=null && rules.containsKey(name);
+	}
 }

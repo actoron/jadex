@@ -33,4 +33,11 @@ public interface IRulebase
 	 *  @return The rule.
 	 */
 	public IRule<?> getRule(String name);
+	
+	/**
+	 *  Test if a rule is contained in the rule base.
+	 *  @param name The rule name.
+	 *  @return True, if contained.
+	 */
+	public boolean containsRule(String name);
 }
