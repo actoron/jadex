@@ -1004,6 +1004,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	
 //		getCapability().dumpGoalsPeriodically(getInternalAccess());
+		getCapability().dumpPlansPeriodically(getInternalAccess());
 	}
 	
 	/**

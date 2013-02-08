@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -52,6 +53,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
+//						BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//						ip.getCapability().removePlan(rplan);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -60,6 +63,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						rplan.setException(exception);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
+//						BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//						ip.getCapability().removePlan(rplan);
 					}
 				});
 			}
@@ -68,6 +73,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
 				if(reason instanceof RProcessableElement)
 					((RProcessableElement)reason).planFinished(ia, rplan);
+//				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//				ip.getCapability().removePlan(rplan);
 			}
 		}
 		catch(Exception e)

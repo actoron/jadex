@@ -2,16 +2,16 @@ package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +19,12 @@ import java.util.Map;
  */
 public class RCapability extends RElement
 {
+	/** Flag to save first exceptions. */
+	protected final static boolean DEBUG = false;
+	
+	/** The map of exceptions. */
+	protected Map<RElement, Exception>	ex	= DEBUG? new HashMap<RElement, Exception>(): null;
+
 	//-------- attributes --------
 	
 	/** The goals. */
@@ -30,8 +36,12 @@ public class RCapability extends RElement
 	/** The goals by goal class. */
 	protected Map<Class<?>, Collection<RGoal>> cgoals;
 	
+	
 	/** The plans. */
-	protected List<RPlan> plans;
+	protected Collection<RPlan> plans;
+	
+	/** The plans by model element. */
+	protected Map<MPlan, Collection<RPlan>> mplans;
 
 	//-------- constructors --------
 	
@@ -111,24 +121,6 @@ public class RCapability extends RElement
 			addGoal(g);
 		}
 	}
-
-	/**
-	 *  Get the plans.
-	 *  @return The plans.
-	 */
-	public List<RPlan> getPlans()
-	{
-		return plans;
-	}
-
-	/**
-	 *  Set the plans.
-	 *  @param plans The plans to set.
-	 */
-	public void setPlans(List<RPlan> plans)
-	{
-		this.plans = plans;
-	}
 	
 	/**
 	 *  Add a new goal.
@@ -168,7 +160,6 @@ public class RCapability extends RElement
 //			System.out.println("adopted new goal: "+goal);
 	}
 	
-	protected Map<RGoal, Exception>	ex	= new HashMap<RGoal, Exception>();
 	
 	/**
 	 *  Remove a goal.
@@ -176,11 +167,11 @@ public class RCapability extends RElement
 	 */
 	public void removeGoal(RGoal goal)
 	{
-		if(!ex.containsKey(goal))
+		if(DEBUG && !ex.containsKey(goal))
 		{
-			Exception ex	= new RuntimeException("first");
-			ex.fillInStackTrace();
-			this.ex.put(goal, ex);
+			Exception e	= new RuntimeException("first");
+			e.fillInStackTrace();
+			ex.put(goal, e);
 		}
 		if(goal==null)
 		{
@@ -192,7 +183,7 @@ public class RCapability extends RElement
 		}
 		else if(!goals.remove(goal))
 		{
-			if(ex.containsKey(goal))
+			if(DEBUG && ex.containsKey(goal))
 			{
 				ex.get(goal).printStackTrace();
 			}
@@ -217,17 +208,65 @@ public class RCapability extends RElement
 	}
 	
 	/**
+	 *  Get the plans.
+	 *  @return The plans.
+	 */
+	public Collection<RPlan> getPlans()
+	{
+		return plans!=null? plans: Collections.EMPTY_SET;
+	}
+
+	/**
+	 *  Set the plans.
+	 *  @param plans The plans to set.
+	 */
+	public void setPlans(Collection<RPlan> plans)
+	{
+		this.plans = null;
+		for(RPlan p: plans)
+		{
+			addPlan(p);
+		}
+	}
+	
+	/**
+	 *  Get goals of a specific pojo type.
+	 *  @param type The type.
+	 *  @return The goals.
+	 */
+	public Collection<RPlan> getPlans(MPlan mplan)
+	{
+		Collection<RPlan>	ret	= mplans!=null ? mplans.get(mplan) : null;
+		if(ret==null)
+		{
+			ret	= Collections.emptySet();
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Add a new plan.
 	 *  @param plan The plan.
 	 */
 	public void addPlan(RPlan plan)
 	{
+//		System.out.println("add plan: "+plan);
 		if(plans==null)
 		{
-			plans = new ArrayList<RPlan>();
+			plans = new HashSet<RPlan>();
+			mplans = new HashMap<MPlan, Collection<RPlan>>();
 		}
 		if(plans.contains(plan))
 			throw new RuntimeException("Plan already contained: "+plan);
+		
+		Collection<RPlan>	mymplans	= mplans.get(plan.getModelElement());
+		if(mymplans==null)
+		{
+			mymplans	= new LinkedHashSet<RPlan>();
+			mplans.put((MPlan)plan.getModelElement(), mymplans);
+		}
+		mymplans.add(plan);
+		
 		plans.add(plan);
 	}
 	
@@ -237,6 +276,12 @@ public class RCapability extends RElement
 	 */
 	public void removePlan(RPlan plan)
 	{
+		if(DEBUG && !ex.containsKey(plan))
+		{
+			Exception e = new RuntimeException("first");
+			e.fillInStackTrace();
+			ex.put(plan, e);
+		}
 		if(plan==null)
 		{
 			throw new IllegalArgumentException("Plan is null.");
@@ -247,7 +292,18 @@ public class RCapability extends RElement
 		}
 		else if(!plans.remove(plan))
 		{
-			throw new IllegalStateException("Plan not contained.");			
+			if(DEBUG && ex.containsKey(plan))
+			{
+				ex.get(plan).printStackTrace();
+			}
+			throw new IllegalStateException("Plan not contained: "+plan);			
+		}
+		
+		Collection<RPlan>	mymplans	= mplans.get(plan.getModelElement());
+		mymplans.remove(plan);
+		if(mymplans.isEmpty())
+		{
+			mplans.remove((MPlan)plan.getModelElement());
 		}
 	}
 	
@@ -271,6 +327,23 @@ public class RCapability extends RElement
 	/**
 	 * 
 	 */
+	protected void dumpPlansPeriodically(IInternalAccess ia)
+	{
+		IComponentStep<Void> step = new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				dumpPlans();
+				ia.waitForDelay(500, this);
+				return IFuture.DONE;
+			}
+		};
+		ia.getExternalAccess().scheduleStep(step);
+	}
+	
+	/**
+	 * 
+	 */
 	protected void dumpGoals()
 	{
 		if(goals!=null)
@@ -282,6 +355,23 @@ public class RCapability extends RElement
 				System.out.println(goal.inhibitors);
 				System.out.println("--------");
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void dumpPlans()
+	{
+		if(plans!=null)
+		{
+			System.out.println("plans: "+plans.size());
+//			System.out.println("--------");
+//			for(RPlan plan: plans)
+//			{
+//				System.out.println(plan+" "+plan.getLifecycleState()+" "+plan.getProcessingState());
+//				System.out.println("--------");
+//			}
 		}
 	}
 }

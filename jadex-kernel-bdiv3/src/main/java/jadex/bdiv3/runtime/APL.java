@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -142,7 +143,7 @@ public class APL
 				}
 			}
 			
-			List<RPlan> rplans = capa.getPlans();
+			Collection<RPlan> rplans = capa.getPlans();
 			if(rplans!=null)
 			{
 				for(RPlan rplan: rplans)
@@ -167,7 +168,7 @@ public class APL
 				}
 			}
 			// add new rplans that are not contained already
-			List<RPlan> rplans = capa.getPlans();
+			Collection<RPlan> rplans = capa.getPlans();
 			if(rplans!=null)
 			{
 				for(RPlan rplan: rplans)
