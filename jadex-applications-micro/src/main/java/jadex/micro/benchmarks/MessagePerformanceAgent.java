@@ -29,7 +29,6 @@ import jadex.micro.annotation.Results;
 import jadex.micro.examples.ping.IEchoService;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
@@ -60,8 +59,8 @@ import javax.swing.SwingUtilities;
 @Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
 @Configurations(
 {
-	@Configuration(name="select"),
 	@Configuration(name="local"),
+	@Configuration(name="select"),
 	@Configuration(name="remote", arguments=@NameValue(name="echo",
 		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\"relay-http://jadex.informatik.uni-hamburg.de/relay/\"})"))
 //		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
