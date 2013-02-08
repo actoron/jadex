@@ -15,6 +15,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SReflect;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
@@ -84,7 +85,9 @@ public class ComponentTestSuite extends TestSuite
 //			"-niotcptransport", "false",
 //			"-tcptransport", "true",
 //			"-deftimeout", "-1",
-			"-printpass", "false"
+			"-printpass", "false",
+			// Hack!!! include ssl transport if available
+			"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
 		}, path, root, excludes, timeout, broken, start);
 	}
 	

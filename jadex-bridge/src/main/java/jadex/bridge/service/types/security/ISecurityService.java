@@ -76,6 +76,7 @@ public interface ISecurityService
 	 *  @param enable	If true, password protection is enabled, otherwise disabled.
 	 *  @throws Exception, when enable is true and no password is set.
 	 */
+	@SecureTransmission
 	public IFuture<Void>	setUsePassword(boolean enable);
 
 	/**
@@ -164,6 +165,7 @@ public interface ISecurityService
 	 *  Set the trusted lan mode.
 	 *  @param allowed The flag if it is allowed.
 	 */
+	@SecureTransmission
 	public IFuture<Void> setTrustedLanMode(boolean allowed);
 	
 	/**
@@ -184,6 +186,7 @@ public interface ISecurityService
 	 *  @param storepass The password of the store.
 	 *  @param keypass The password of the key.
 	 */
+	@SecureTransmission
 	public IFuture<Void> setKeystoreInfo(String path, String storepass, String keypass);
 	
 	//-------- request validation --------
@@ -218,6 +221,7 @@ public interface ISecurityService
 	 *  @param signed The desired output hash.
 	 *  @param name The callers name (used to find the certificate and public key). 
 	 */
+	@SecureTransmission
 	public IFuture<Void> verifyCall(final byte[] content, final byte[] signed, final String name);
 	
 	/**
@@ -226,7 +230,24 @@ public interface ISecurityService
 	 *  @param virtuals The virtual names.
 	 *  @param name The name to check.
 	 */
+	@SecureTransmission
 	public IFuture<Void> checkVirtual(String[] virtuals, String name);
+	
+	/**
+	 *  Add a name to the mappings of a virtual name.
+	 *  @param virtual The virtual name.
+	 *  @param name The name to add.
+	 */
+	@SecureTransmission
+	public IFuture<Void> addVirtual(String virtual, String name);
+	
+	/**
+	 *  Remove a name from the mappings of a virtual name.
+	 *  @param virtual The virtual name.
+	 *  @param name The name to remove.
+	 */
+	@SecureTransmission
+	public IFuture<Void> removeVirtual(String virtual, String name);
 	
 	//-------- keystore handling --------
 	

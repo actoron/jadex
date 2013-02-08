@@ -17,9 +17,9 @@ public class SSLTest	extends ComponentTestSuite
 	public SSLTest()	throws Exception
 	{
 		// Use micro application classes directory as classpath root,
-		super(new File("target/classes/"),
+		super(new File("target/test-classes/"),
 //		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/intermediate/InvokerAgent.class"),
-			new File("target/classes"),
+			new File("target/test-classes"),
 			// Exclude failing tests to allow maven build.
 			new String[]
 		{

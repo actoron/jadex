@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -62,14 +63,28 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno)
-			.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		agent.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
 		{
-			public void customResultAvailable(final TestReport result)
+			public void customResultAvailable(ISecurityService sec)
 			{
-				ret.setResult(result);
+				sec.addVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix())
+					.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						performTest(agent.getComponentIdentifier().getRoot(), testno)
+							.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+						{
+							public void customResultAvailable(final TestReport result)
+							{
+								ret.setResult(result);
+							}
+						}));
+					}
+				});
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -81,7 +96,9 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.createResultListener(
+		createPlatform(new String[]{"-virtualnames",
+			"jadex.commons.SUtil.createHashMap(new String[]{\"testuser\"}, new Object[]{jadex.commons.SUtil.createHashSet(new String[]{\"testcases\"})})"})
+			.addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

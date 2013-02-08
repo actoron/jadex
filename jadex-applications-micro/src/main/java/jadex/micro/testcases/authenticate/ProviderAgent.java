@@ -3,7 +3,6 @@ package jadex.micro.testcases.authenticate;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Authenticated;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
@@ -20,8 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
 public class ProviderAgent implements ITestService
 {
 	/**
-	 *  Call a method that must use a secure
-	 *  transport under the hood.
+	 *  Allow calling a method only from an authenticated user.
 	 */
 //	@Authenticated(names={"VSISSTAFF17", "Alex-PC-neu", "Lars-PC", "willi", "hans"})
 	@Authenticated(virtuals="testuser")

@@ -1026,6 +1026,45 @@ public class SecurityService implements ISecurityService
 	}
 	
 	/**
+	 *  Add a name to the mappings of a virtual name.
+	 *  @param virtual The virtual name.
+	 *  @param name The name to add.
+	 */
+	public IFuture<Void> addVirtual(String virtual, String name)
+	{
+		Set<String> names = virtualsmap.get(virtual);
+		if(names==null)
+		{
+			names	= new HashSet<String>();
+			virtualsmap.put(virtual, names);
+		}
+		names.add(name);
+
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Remove a name from the mappings of a virtual name.
+	 *  @param virtual The virtual name.
+	 *  @param name The name to remove.
+	 */
+	public IFuture<Void> removeVirtual(String virtual, String name)
+	{
+		Set<String> names = virtualsmap.get(virtual);
+		if(names!=null)
+		{
+			names.remove(name);
+			if(names.isEmpty())
+			{
+				virtualsmap.remove(virtual);
+			}
+		}
+
+		return IFuture.DONE;		
+	}
+
+	
+	/**
 	 *  Verify an authenticated service call.
 	 *  @param content The content that should be checked.
 	 *  @param signed The desired output hash.

@@ -1,6 +1,4 @@
-package jadex.micro.testcases.stream;
-
-import java.util.Map;
+package jadex.platform.service.message.transport.ssltcpmtp.stream;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -24,7 +22,9 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.micro.testcases.TestAgent;
+import jadex.platform.service.message.transport.ssltcpmtp.TestAgent;
+
+import java.util.Map;
 
 /**
  *  Agent that provides a service with a stream.
@@ -85,7 +85,7 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		createPlatform(null).addResultListener(agent.createResultListener(
+		createPlatform(sec ? new String[]{"-ssltcptransport", "true"} : null).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -143,7 +143,7 @@ public class StreamUserAgent extends TestAgent
 		
 		final int[] cnt = new int[]{testcnt};
 		
-		createComponent("jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
+		createComponent("jadex/platform/service/message/transport/ssltcpmtp/stream/StreamProviderAgent.class", root, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Integer>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
@@ -205,7 +205,7 @@ public class StreamUserAgent extends TestAgent
 		
 		final int[] cnt = new int[]{testcnt};
 		
-		createComponent("jadex/micro/testcases/stream/StreamProviderAgent.class", root, null)
+		createComponent("jadex/platform/service/message/transport/ssltcpmtp/stream/StreamProviderAgent.class", root, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Integer>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 

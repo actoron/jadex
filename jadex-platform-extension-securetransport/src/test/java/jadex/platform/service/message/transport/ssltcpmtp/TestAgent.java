@@ -144,7 +144,7 @@ public abstract class TestAgent
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		// Start platform
-		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
+		String url	= "new String[]{\"target/test-classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
@@ -153,7 +153,6 @@ public abstract class TestAgent
 //			"-relaytransport", "false",
 			"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
 			"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
-			"-ssltcptransport", "true",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
 //			"-binarymessages", "false",
 			"-gui", "false",

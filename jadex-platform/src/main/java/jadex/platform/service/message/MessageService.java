@@ -849,6 +849,8 @@ public class MessageService extends BasicService implements IMessageService
 					addrs.add(traddrs[j]);
 			}
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
+			
+//			System.out.println("addresses: "+SUtil.arrayToString(addresses));
 		}
 
 		return addresses;
