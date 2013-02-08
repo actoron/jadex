@@ -241,7 +241,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOK8qnEeGMw45mLbta0w" key="3:0" value="name1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2HOLMqnEeGMw45mLbta0w" key="3:1" value="jadex.bridge.service.types.threadpool.IThreadPoolService"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2H1MMqnEeGMw45mLbta0w" key="3:2" value="raw"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2H1McqnEeGMw45mLbta0w" key="3:3" value="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2H1McqnEeGMw45mLbta0w" key="3:3" value="new ThreadPoolService(new ThreadPool(new DefaultPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2H1MsqnEeGMw45mLbta0w" key="3:4" value="jadex_providedservices_table_Initial-Impl_e067cf85-0d0a-4617-8676-3981662db127_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2H1M8qnEeGMw45mLbta0w" key="4:0" value="name14"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X2H1NMqnEeGMw45mLbta0w" key="4:1" value="jadex.bridge.service.types.threadpool.IDaemonThreadPoolService"/>
