@@ -3,7 +3,7 @@ package jadex.bdiv3.model;
 import java.lang.reflect.Method;
 
 import jadex.bdiv3.annotation.PlanBody;
-import jadex.bdiv3.runtime.IServiceParameterMapper;
+import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
 
 /**

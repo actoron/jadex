@@ -6,7 +6,7 @@ import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.PlanFailureException;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;

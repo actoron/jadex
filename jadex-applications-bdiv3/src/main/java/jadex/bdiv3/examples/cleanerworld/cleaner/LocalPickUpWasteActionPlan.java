@@ -7,8 +7,8 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.PickupWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
-import jadex.bdiv3.runtime.PlanFailureException;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -23,7 +23,7 @@ public class LocalPickUpWasteActionPlan
 	protected CleanerBDI capa;
 	
 	@PlanPlan
-	protected RPlan rplan;
+	protected IPlan rplan;
 	
 	@PlanReason
 	protected PickupWasteAction goal;

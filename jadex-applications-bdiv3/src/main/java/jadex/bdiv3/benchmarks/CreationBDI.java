@@ -5,7 +5,7 @@ import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;

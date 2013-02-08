@@ -241,7 +241,7 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
-	protected void addChangeEventType(String eventtype)
+	public void addChangeEventType(String eventtype)
 	{
 		if(changeeventtypes==null)
 		{
@@ -253,7 +253,7 @@ public class WaitAbstraction
 	/**
 	 * 
 	 */
-	protected void removeChangeEventType(String eventtype)
+	public void removeChangeEventType(String eventtype)
 	{
 		if(changeeventtypes!=null)
 		{

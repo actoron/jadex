@@ -4,11 +4,12 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.runtime.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.RCapability;
-import jadex.bdiv3.runtime.RGoal;
+import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.impl.RCapability;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
@@ -43,29 +44,10 @@ public class BDIAgent extends MicroAgent
 	 *  Get the capability.
 	 *  @return the capability.
 	 */
-	public RCapability getCapability()
+	public ICapability getCapability()
 	{
 		return ((BDIAgentInterpreter)getInterpreter()).getCapability();
 	}
-	
-//	/**
-//	 *  Adopt a new goal.
-//	 *  @param goal The goal.
-//	 */
-//	public void adoptGoal(final Object goal)
-//	{
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-//		ip.getRuleSystem().observeObject(goal);
-//
-//		BDIModel bdim = ip.getBDIModel();
-//		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass());
-//		if(mgoal==null)
-//			throw new RuntimeException("Unknown goal type: "+goal);
-//		final RGoal rgoal = new RGoal(mgoal, goal);
-//
-////		System.out.println("adopt goal");
-//		ip.scheduleStep(new AdoptGoalAction(rgoal));
-//	}
 	
 	/**
 	 *  Dispatch a goal wait for its result.
@@ -91,9 +73,7 @@ public class BDIAgent extends MicroAgent
 		});
 
 //		System.out.println("adopt goal");
-		ip.getCapability().addGoal(rgoal);
-		ip.scheduleStep(new AdoptGoalAction(rgoal));
-	
+		RGoal.adoptGoal(rgoal, getInterpreter().getInternalAccess());
 		return ret;
 	}
 	
@@ -156,7 +136,7 @@ public class BDIAgent extends MicroAgent
 	 *  Method that is called automatically when a belief 
 	 *  is written as field access.
 	 */
-	public void writeField(Object val, final String fieldname, Object obj)
+	protected void writeField(Object val, final String fieldname, Object obj)
 	{
 		assert isComponentThread();
 		

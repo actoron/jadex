@@ -1,10 +1,10 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.PlanCandidate;
-import jadex.bdiv3.runtime.RGoal;
-import jadex.bdiv3.runtime.RPlan;
-import jadex.bdiv3.runtime.RProcessableElement;
+import jadex.bdiv3.runtime.impl.PlanCandidate;
+import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;

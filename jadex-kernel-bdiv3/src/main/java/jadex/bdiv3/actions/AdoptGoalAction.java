@@ -1,8 +1,8 @@
 package jadex.bdiv3.actions;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.runtime.BDIAgentInterpreter;
-import jadex.bdiv3.runtime.RGoal;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -46,7 +46,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
 //			goal.observeGoal(ia);
-//			ip.getCapability().addGoal(goal);
+			ip.getCapability().addGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_ADOPTED);
 			ret.setResult(null);
 		}

@@ -11,8 +11,9 @@ import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.DropWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
-import jadex.bdiv3.runtime.PlanFailureException;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -27,7 +28,7 @@ public class DropWastePlan
 	protected CleanerBDI capa;
 	
 	@PlanPlan
-	protected RPlan rplan;
+	protected IPlan rplan;
 	
 	@PlanReason
 	protected AchieveDropWaste goal;

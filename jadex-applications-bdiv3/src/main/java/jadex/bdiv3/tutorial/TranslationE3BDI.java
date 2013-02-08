@@ -10,7 +10,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;

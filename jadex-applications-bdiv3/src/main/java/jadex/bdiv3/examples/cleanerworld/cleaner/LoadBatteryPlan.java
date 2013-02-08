@@ -7,7 +7,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.MaintainBatteryLoaded;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
@@ -25,7 +25,7 @@ public class LoadBatteryPlan
 	protected CleanerBDI capa;
 	
 	@PlanPlan
-	protected RPlan rplan;
+	protected IPlan rplan;
 	
 	@PlanReason
 	protected MaintainBatteryLoaded goal;

@@ -6,7 +6,7 @@ import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
-import jadex.bdiv3.runtime.RGoal;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;

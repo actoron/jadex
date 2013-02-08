@@ -6,7 +6,7 @@ import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,7 +28,7 @@ public class LeastSeenWalkPlan
 	protected CleanerBDI capa;
 	
 	@PlanPlan
-	protected RPlan rplan;
+	protected IPlan rplan;
 	
 	//-------- constructors --------
 

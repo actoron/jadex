@@ -6,7 +6,7 @@ import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DelegationResultListener;

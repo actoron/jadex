@@ -6,8 +6,8 @@ import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.examples.cleanerworld.world.Vision;
-import jadex.bdiv3.runtime.RGoal;
-import jadex.bdiv3.runtime.RPlan;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.RGoal;
 
 
 
@@ -20,7 +20,7 @@ public class LocalGetVisionActionPlan
 	protected CleanerBDI capa;
 	
 	@PlanPlan
-	protected RPlan rplan;
+	protected IPlan rplan;
 
 	//-------- methods --------
 

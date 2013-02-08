@@ -1,6 +1,6 @@
 package jadex.bdiv3.annotation;
 
-import jadex.bdiv3.runtime.IServiceParameterMapper;
+import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 
 /**
  * 
