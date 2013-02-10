@@ -100,7 +100,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			ip.getCapability().addPlan(rplan);
 			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_BODY);
 			IPlanBody body = rplan.getBody();
-			body.executePlanBody().addResultListener(new IResultListener<Void>()
+			body.executePlan().addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{

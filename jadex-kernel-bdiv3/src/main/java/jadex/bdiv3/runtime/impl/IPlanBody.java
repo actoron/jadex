@@ -10,5 +10,5 @@ public interface IPlanBody
 	/**
 	 *  Execute the plan body.
 	 */
-	public IFuture<Void> executePlanBody();
+	public IFuture<Void> executePlan();
 }

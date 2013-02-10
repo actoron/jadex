@@ -1,8 +1,12 @@
 package jadex.bdiv3.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanFailed;
+import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
 
@@ -11,6 +15,8 @@ import jadex.bridge.ClassInfo;
  */
 public class MBody
 {
+	protected static final MethodInfo MI_NOTFOUND = new MethodInfo();
+	
 	/** The body as seperate class. */
 	protected MethodInfo method;
 	
@@ -30,6 +36,14 @@ public class MBody
 	/** The body method cached for speed. */
 	protected MethodInfo bodymethod;
 
+	/** The passed method cached for speed. */
+	protected MethodInfo passedmethod;
+
+	/** The failed method cached for speed. */
+	protected MethodInfo failedmethod;
+
+	/** The aborted method cached for speed. */
+	protected MethodInfo abortedmethod;
 	
 	/**
 	 *  Create a new mbody.
@@ -145,23 +159,96 @@ public class MBody
 			{
 				if(bodymethod==null)
 				{
-					Method[] ms = body.getDeclaredMethods();
-					for(Method m: ms)
-					{
-						if(m.isAnnotationPresent(PlanBody.class))
-						{
-							bodymethod = new MethodInfo(m);
-							break;
-						}
-					}
+					bodymethod = getMethod(body, PlanBody.class);
 					if(bodymethod==null)
-					{
 						throw  new RuntimeException("Plan has no body method: "+body);
-					}
 				}
 			}
 		}
 		
 		return bodymethod;
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getPassedMethod(Class<?> body)
+	{
+		if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
+		{
+			synchronized(this)
+			{
+				if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
+				{
+					passedmethod = getMethod(body, PlanPassed.class);
+					if(passedmethod==null)
+						passedmethod = MI_NOTFOUND;
+				}
+			}
+		}
+		
+		return MI_NOTFOUND.equals(passedmethod)? null: passedmethod;
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getFailedMethod(Class<?> body)
+	{
+		if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
+		{
+			synchronized(this)
+			{
+				if(failedmethod==null)
+				{
+					failedmethod = getMethod(body, PlanFailed.class);
+					if(failedmethod==null)
+						failedmethod = MI_NOTFOUND;
+				}
+			}
+		}
+		
+		return MI_NOTFOUND.equals(failedmethod)? null: failedmethod;
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getAbortedMethod(Class<?> body)
+	{
+		if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
+		{
+			synchronized(this)
+			{
+				if(abortedmethod==null)
+				{
+					abortedmethod = getMethod(body, PlanAborted.class);
+					if(abortedmethod==null)
+						abortedmethod = MI_NOTFOUND;
+				}
+			}
+		}
+		
+		return MI_NOTFOUND.equals(abortedmethod)? null: abortedmethod;
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type)
+	{
+		MethodInfo ret = null;
+		
+		Method[] ms = body.getDeclaredMethods();
+		for(Method m: ms)
+		{
+			if(m.isAnnotationPresent(type))
+			{
+				ret = new MethodInfo(m);
+				break;
+			}
+		}
+		
+		return ret;
 	}
 }

@@ -189,6 +189,12 @@ public class BDIClassReader extends MicroClassReader
 					Goal goal = getAnnotation(cls[i], Goal.class, cl);
 					getMGoal(bdimodel, goal, cls[i], cl, pubs);
 				}
+				if(isAnnotationPresent(cls[i], Plan.class, cl))
+				{
+//					System.out.println("found belief: "+fields[i].getName());
+					Plan plan = getAnnotation(cls[i], Plan.class, cl);
+					getMPlan(bdimodel, plan, null, new ClassInfo(cls[i].getName()), cl, pubs);
+				}
 			}
 			
 			// Find beliefs
@@ -215,7 +221,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found plan: "+methods[i].getName());
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
-					getMPlan(bdimodel, p, new MethodInfo(methods[i]), cl, pubs);
+					getMPlan(bdimodel, p, new MethodInfo(methods[i]), null, cl, pubs);
 				}
 			}
 			
@@ -225,7 +231,7 @@ public class BDIClassReader extends MicroClassReader
 				Plan[] plans = getAnnotation(clazz, Plans.class, cl).value();
 				for(Plan p: plans)
 				{
-					getMPlan(bdimodel, p, null, cl, pubs);
+					getMPlan(bdimodel, p, null, null, cl, pubs);
 				}
 			}
 			
@@ -444,7 +450,8 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MPlan getMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	protected MPlan getMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, ClassInfo ci,
+		ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
 		String name = null;
 		Body body = p.body();
@@ -453,20 +460,28 @@ public class BDIClassReader extends MicroClassReader
 		{
 			name = mi.getName();
 		}
+		else if(ci!=null)
+		{
+			name = ci.getTypeName();
+		}
 		else if(!Object.class.equals(body.value()))
 		{
 			name = SReflect.getInnerClassName(body.value());
 		}
-		else
+		else if(sp.name().length()>0)
 		{
 			name = sp.name()+"_"+sp.method();
+		}
+		else
+		{
+			throw new RuntimeException("Plan body not found: "+p);
 		}
 		
 		MPlan mplan = bdimodel.getCapability().getPlan(name);
 		
 		if(mplan==null)
 		{
-			mplan = createMPlan(bdimodel, p, mi, cl, pubs);
+			mplan = createMPlan(bdimodel, p, mi, name, ci, cl, pubs);
 			bdimodel.getCapability().addPlan(mplan);
 		}
 		
@@ -476,23 +491,11 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MPlan createMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	protected MPlan createMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, String name,
+		ClassInfo ci, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
-		String name = null;
 		Body body = p.body();
 		ServicePlan sp = body.service();
-		if(mi!=null)
-		{
-			name = mi.getName();
-		}
-		else if(!Object.class.equals(body.value()))
-		{
-			name = SReflect.getInnerClassName(body.value());
-		}
-		else
-		{
-			name = sp.name()+"_"+sp.method();
-		}
 		
 		MPlan mplan = bdimodel.getCapability().getPlan(name);
 		
@@ -501,7 +504,8 @@ public class BDIClassReader extends MicroClassReader
 			MTrigger mtr = buildPlanTrigger(bdimodel, p.trigger(), cl, pubs);
 			MTrigger wmtr = buildPlanTrigger(bdimodel, p.waitqueue(), cl, pubs);
 			
-			ClassInfo ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
+			if(ci==null)
+				ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
 			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
 			MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
 				(Object.class.equals(sp.mapper())? null: new ClassInfo(sp.mapper().getName())));

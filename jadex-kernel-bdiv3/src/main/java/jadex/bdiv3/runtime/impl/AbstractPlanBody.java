@@ -1,9 +1,10 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
@@ -38,24 +39,26 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 *  Execute the plan body.
 	 */
-	public IFuture<Void> executePlanBody()
+	public IFuture<Void> executePlan()
 	{
-		try
+		final Future<Void> ret = new Future<Void>();
+		
+		final Object reason = rplan.getReason();
+		
+		final Object agent = ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia;
+		internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 0).addResultListener(new IResultListener<Void>()
 		{
-			final Object reason = rplan.getReason();
-			Object res = invokeBody(ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia, 
-				guessParameters(getBodyParameterTypes()));
-			if(res instanceof IFuture)
+			public void resultAvailable(Void result)
 			{
-				((IFuture)res).addResultListener(new IResultListener()
+				internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 1)
+					.addResultListener(new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
-//						BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-//						ip.getCapability().removePlan(rplan);
+						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -64,35 +67,127 @@ public abstract class AbstractPlanBody implements IPlanBody
 						rplan.setException(exception);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
-//						BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-//						ip.getCapability().removePlan(rplan);
+						ret.setException(exception);
 					}
+				});
+			}
+			
+			public void exceptionOccurred(final Exception exception)
+			{
+				internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 2)
+					.addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+						rplan.setException(exception);
+						if(reason instanceof RProcessableElement)
+							((RProcessableElement)reason).planFinished(ia, rplan);
+						ret.setException(exception);
+					}
+					
+					public void exceptionOccurred(Exception ex)
+					{
+						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+						rplan.setException(exception);
+						if(reason instanceof RProcessableElement)
+							((RProcessableElement)reason).planFinished(ia, rplan);
+						ret.setException(exception);
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> internalInvokePart(Object agent, Object[] params, int part)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		try
+		{			
+			Object res = null;
+			if(part==0) 
+			{
+				res = invokeBody(agent, guessParameters(getBodyParameterTypes()));
+			}
+			else if(part==1)
+			{
+				res = invokePassed(agent, guessParameters(getPassedParameterTypes()));
+			}
+			else if(part==2)
+			{
+				res = invokeFailed(agent, guessParameters(getFailedParameterTypes()));
+			}
+			else if(part==3)
+			{
+				res = invokeAborted(agent, guessParameters(getAbortedParameterTypes()));
+			}
+			
+			if(res instanceof IFuture)
+			{
+				((IFuture)res).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(null);
+//						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
+//						if(reason instanceof RProcessableElement)
+//							((RProcessableElement)reason).planFinished(ia, rplan);
+					}
+					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+//						rplan.setException(exception);
+//						if(reason instanceof RProcessableElement)
+//							((RProcessableElement)reason).planFinished(ia, rplan);
+//					}
 				});
 			}
 			else
 			{
-				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
-				if(reason instanceof RProcessableElement)
-					((RProcessableElement)reason).planFinished(ia, rplan);
-//				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-//				ip.getCapability().removePlan(rplan);
+				ret.setResult(null);
+//				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
+//				if(reason instanceof RProcessableElement)
+//					((RProcessableElement)reason).planFinished(ia, rplan);
 			}
 		}
 		catch(Exception e)
 		{
-			rplan.setException(e);
-			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
-			if(rplan.getReason() instanceof RProcessableElement)
-				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
+			ret.setException(e);
+//			rplan.setException(e);
+//			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+//			if(rplan.getReason() instanceof RProcessableElement)
+//				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
 		}
 		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**
 	 *  Invoke the plan body.
 	 */
 	public abstract Object invokeBody(Object agent, Object[] params);
+
+	/**
+	 *  Invoke the plan passed method.
+	 */
+	public abstract Object invokePassed(Object agent, Object[] params);
+
+	/**
+	 *  Invoke the plan failed method.
+	 */
+	public abstract Object invokeFailed(Object agent, Object[] params);
+
+	/**
+	 *  Invoke the plan aborted method.
+	 */
+	public abstract Object invokeAborted(Object agent, Object[] params);
 	
 	/**
 	 *  Get the body parameters.
@@ -100,10 +195,27 @@ public abstract class AbstractPlanBody implements IPlanBody
 	public abstract Class<?>[] getBodyParameterTypes();
 	
 	/**
+	 *  Get the passed parameters.
+	 */
+	public abstract Class<?>[] getPassedParameterTypes();
+
+	/**
+	 *  Get the failed parameters.
+	 */
+	public abstract Class<?>[] getFailedParameterTypes();
+
+	/**
+	 *  Get the aborted parameters.
+	 */
+	public abstract Class<?>[] getAbortedParameterTypes();
+
+	/**
 	 *  Method that tries to guess the parameters for the method call.
 	 */
 	public Object[] guessParameters(Class<?>[] ptypes)
 	{
+		if(ptypes==null)
+			return null;
 		// Guess parameters
 //		Class<?>[] ptypes = body.getParameterTypes();
 		

@@ -172,7 +172,9 @@ public class Traverser
 				ITraverseProcessor proc = processors.get(i);
 				if(proc.isApplicable(processed, clazz, clone, targetcl))
 				{
-//						System.out.println("traverse: "+object+" "+proc.getClass());
+					if(object.getClass().getName().indexOf("MicroAgentViewPanel")!=-1)
+						System.out.println("traverse: "+object+" "+proc.getClass());
+					
 					processed = proc.process(processed, clazz, processors, this, traversed, clone, targetcl, context);
 					ret	= processed;
 					fin = true;

@@ -43,6 +43,21 @@ public class MethodPlanBody extends AbstractPlanBody
 		}
 	}
 	
+	public Object invokePassed(Object agent, Object[] params)
+	{
+		return null;
+	}
+
+	public Object invokeFailed(Object agent, Object[] params)
+	{
+		return null;
+	}
+
+	public Object invokeAborted(Object agent, Object[] params)
+	{
+		return null;
+	}
+
 	/**
 	 *  Get the body parameter types.
 	 */
@@ -51,4 +66,18 @@ public class MethodPlanBody extends AbstractPlanBody
 		return body.getParameterTypes();
 	}
 
+	public Class<?>[] getPassedParameterTypes()
+	{
+		return null;
+	}
+
+	public Class<?>[] getFailedParameterTypes()
+	{
+		return null;
+	}
+
+	public Class<?>[] getAbortedParameterTypes()
+	{
+		return null;
+	}
 }

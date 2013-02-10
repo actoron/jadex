@@ -3,9 +3,13 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MethodInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SReflect;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -25,6 +29,15 @@ public class ClassPlanBody extends AbstractPlanBody
 	/** The body method. */
 	protected Method bodymethod;
 	
+	/** The passed method. */
+	protected Method passedmethod;
+
+	/** The failed method. */
+	protected Method failedmethod;
+
+	/** The aborted method. */
+	protected Method abortedmethod;
+	
 	//--------- constructors ---------
 	
 	/**
@@ -32,10 +45,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	 */
 	public ClassPlanBody(IInternalAccess ia, RPlan rplan, Class<?> body)
 	{
-		super(ia, rplan);
-		this.body = body;
-		bodymethod = ((MPlan)rplan.getModelElement()).getBody()
-			.getBodyMethod(body).getMethod(ia.getClassLoader());
+		this(ia, rplan, body, null);
 	}
 	
 	/**
@@ -43,11 +53,30 @@ public class ClassPlanBody extends AbstractPlanBody
 	 */
 	public ClassPlanBody(IInternalAccess ia, RPlan rplan, Object plan)
 	{
+		this(ia, rplan, plan.getClass(), plan);
+	}
+	
+	/**
+	 *  Create a new plan body.
+	 */
+	public ClassPlanBody(IInternalAccess ia, RPlan rplan, Class<?> body, Object plan)
+	{
 		super(ia, rplan);
-		this.body = plan.getClass();
+		this.body = body;
 		this.plan = plan;
+		Class<?> mbd = body!=null? body: plan.getClass();
+		MBody bo=((MPlan)rplan.getModelElement()).getBody();
 		bodymethod = ((MPlan)rplan.getModelElement()).getBody()
-			.getBodyMethod(plan.getClass()).getMethod(ia.getClassLoader());
+			.getBodyMethod(mbd).getMethod(ia.getClassLoader());
+		MethodInfo mi = ((MPlan)rplan.getModelElement()).getBody().getPassedMethod(mbd);
+		if(mi!=null)
+			passedmethod = mi.getMethod(ia.getClassLoader());
+		mi = ((MPlan)rplan.getModelElement()).getBody().getFailedMethod(mbd);
+		if(mi!=null)
+			failedmethod = mi.getMethod(ia.getClassLoader());
+		mi = ((MPlan)rplan.getModelElement()).getBody().getAbortedMethod(mbd);
+		if(mi!=null)
+			abortedmethod = mi.getMethod(ia.getClassLoader());
 	}
 	
 	//-------- methods --------
@@ -62,7 +91,35 @@ public class ClassPlanBody extends AbstractPlanBody
 			// create plan  
 			if(plan==null)
 			{
-				plan = body.newInstance();
+				Constructor<?>[] cons = body.getConstructors();
+				for(Constructor<?> c: cons)
+				{
+					Class<?>[] ptypes = c.getParameterTypes();
+					if(ptypes.length==0)
+					{
+						try
+						{
+							plan = c.newInstance(new Object[0]);
+							break;
+						}
+						catch(Exception e)
+						{
+						}
+					}
+					if(ptypes.length==1 && SReflect.isSupertype(ptypes[0], agent.getClass()))
+					{
+						try
+						{
+							plan = c.newInstance(new Object[]{agent});
+							break;
+						}
+						catch(Exception e)
+						{
+						}
+					}
+				}
+				if(plan==null)
+					throw new RuntimeException("Plan body has no empty constructor: "+body);
 			}
 			
 			// inject plan elements
@@ -97,11 +154,118 @@ public class ClassPlanBody extends AbstractPlanBody
 			bodymethod.setAccessible(true);
 			return bodymethod.invoke(plan, params);
 		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Invoke the plan passed method.
+	 */
+	public Object invokePassed(Object agent, Object[] params)
+	{
+		Object ret = null;
+		if(passedmethod!=null)
+		{
+			try
+			{
+				passedmethod.setAccessible(true);
+				ret = passedmethod.invoke(plan, params);			
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 *  Invoke the plan failed method.
+	 */
+	public Object invokeFailed(Object agent, Object[] params)
+	{
+		Object ret = null;
+		if(failedmethod!=null)
+		{
+			try
+			{
+				failedmethod.setAccessible(true);
+				ret = failedmethod.invoke(plan, params);			
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 *  Invoke the plan aborted method.
+	 */
+	public Object invokeAborted(Object agent, Object[] params)
+	{
+		Object ret = null;
+		if(abortedmethod!=null)
+		{
+			try
+			{
+				abortedmethod.setAccessible(true);
+				ret = abortedmethod.invoke(plan, params);			
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the passed parameters.
+	 */
+	public Class<?>[] getPassedParameterTypes()
+	{
+		return passedmethod==null? null: passedmethod.getParameterTypes();
+	}
+
+	/**
+	 *  Get the failed parameters.
+	 */
+	public Class<?>[] getFailedParameterTypes()
+	{
+		return failedmethod==null? null: failedmethod.getParameterTypes();
+		
+	}
+
+	/**
+	 *  Get the aborted parameters.
+	 */
+	public Class<?>[] getAbortedParameterTypes()
+	{
+		return abortedmethod==null? null: abortedmethod.getParameterTypes();		
 	}
 	
 	/**
