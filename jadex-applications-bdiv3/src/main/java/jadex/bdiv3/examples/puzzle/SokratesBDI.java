@@ -74,8 +74,8 @@ public class SokratesBDI
 		System.out.println("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
 //		final long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-		agent.dispatchTopLevelGoal(new MoveGoal())
-			.addResultListener(new IResultListener<MoveGoal>()
+		IFuture<MoveGoal> fut = agent.dispatchTopLevelGoal(new MoveGoal());
+		fut.addResultListener(new IResultListener<MoveGoal>()
 		{
 			public void resultAvailable(MoveGoal movegoal)
 			{

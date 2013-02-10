@@ -199,7 +199,7 @@ public class MBody
 		{
 			synchronized(this)
 			{
-				if(failedmethod==null)
+				if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
 				{
 					failedmethod = getMethod(body, PlanFailed.class);
 					if(failedmethod==null)
@@ -220,7 +220,7 @@ public class MBody
 		{
 			synchronized(this)
 			{
-				if(abortedmethod==null)
+				if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
 				{
 					abortedmethod = getMethod(body, PlanAborted.class);
 					if(abortedmethod==null)
@@ -235,7 +235,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type)
+	public static MethodInfo getMethod(Class<?> body, Class<? extends Annotation> type)
 	{
 		MethodInfo ret = null;
 		

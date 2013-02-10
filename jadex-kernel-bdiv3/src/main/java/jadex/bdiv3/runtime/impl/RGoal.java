@@ -736,7 +736,7 @@ public class RGoal extends RProcessableElement
 	 */
 	public static Object getGoalResult(Object pojo, MGoal mgoal, ClassLoader cl)
 	{
-		Object ret = null;
+		Object ret = pojo;
 		Object pac = mgoal.getPojoResultAccess(cl);
 		if(pac instanceof Field)
 		{

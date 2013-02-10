@@ -123,7 +123,8 @@ public class RecurBDI
 	
 		BuyItemsGoal goal = new BuyItemsGoal(5);
 		
-		agent.dispatchTopLevelGoal(goal).addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
+		IFuture<BuyItemsGoal> fut = agent.dispatchTopLevelGoal(goal);
+		fut.addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
 		{
 			public void resultAvailable(BuyItemsGoal result)
 			{

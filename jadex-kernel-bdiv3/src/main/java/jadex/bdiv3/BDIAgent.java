@@ -49,31 +49,57 @@ public class BDIAgent extends MicroAgent
 		return ((BDIAgentInterpreter)getInterpreter()).getCapability();
 	}
 	
+//	/**
+//	 *  Dispatch a goal wait for its result.
+//	 */
+//	public <T> IFuture<T> dispatchTopLevelGoal(final T goal)
+//	{
+//		final Future<T> ret = new Future<T>();
+//		
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+//		BDIModel bdim = ip.getBDIModel();
+//		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
+//		if(mgoal==null)
+//			throw new RuntimeException("Unknown goal type: "+goal);
+//		final RGoal rgoal = new RGoal(mgoal, goal, null);
+//		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
+//		{
+//			public void customResultAvailable(Void result)
+//			{
+//				ret.setResult(goal);
+//			}
+//		});
+//
+////		System.out.println("adopt goal");
+//		RGoal.adoptGoal(rgoal, getInterpreter().getInternalAccess());
+//		return ret;
+//	}
+	
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchTopLevelGoal(final T goal)
+	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
 	{
-		final Future<T> ret = new Future<T>();
+		final Future<E> ret = new Future<E>();
 		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-//		ip.getRuleSystem().observeObject(goal);
-
 		BDIModel bdim = ip.getBDIModel();
-		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
+		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(mgoal, goal, null);
-		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				ret.setResult(goal);
+				Object res = RGoal.getGoalResult(goal, mgoal, getClassLoader());
+				ret.setResult((E)res);
 			}
 		});
 
 //		System.out.println("adopt goal");
 		RGoal.adoptGoal(rgoal, getInterpreter().getInternalAccess());
+		
 		return ret;
 	}
 	

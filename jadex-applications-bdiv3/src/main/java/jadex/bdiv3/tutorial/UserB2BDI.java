@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -72,12 +73,12 @@ public class UserB2BDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.dispatchTopLevelGoal(new TranslationGoalB2(tfe.getText()))
-							.addResultListener(new IResultListener<TranslationGoalB2>()
+						IFuture<String> fut = agent.dispatchTopLevelGoal(new TranslationGoalB2(tfe.getText()));
+						fut.addResultListener(new IResultListener<String>()
 						{
-							public void resultAvailable(TranslationGoalB2 tg) 
+							public void resultAvailable(String res) 
 							{
-								tfg.setText(tg.getGWord());
+								tfg.setText(res);
 							}
 							
 							public void exceptionOccurred(Exception exception)

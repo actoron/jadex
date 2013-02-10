@@ -50,8 +50,8 @@ public class ABDI extends AABDI
 	@AgentBody
 	public IFuture<Void> body()
 	{
-		agent.dispatchTopLevelGoal(new Cnt1Goal())
-			.addResultListener(new IResultListener<ABDI.Cnt1Goal>()
+		IFuture<Cnt1Goal> fut1 = agent.dispatchTopLevelGoal(new Cnt1Goal());
+		fut1.addResultListener(new IResultListener<ABDI.Cnt1Goal>()
 		{
 			public void resultAvailable(Cnt1Goal result)
 			{
@@ -64,8 +64,8 @@ public class ABDI extends AABDI
 			}
 		});
 		
-		agent.dispatchTopLevelGoal(new Cnt2Goal())
-			.addResultListener(new IResultListener<ABDI.Cnt2Goal>()
+		IFuture<Cnt2Goal> fut2 = agent.dispatchTopLevelGoal(new Cnt2Goal());
+		fut2.addResultListener(new IResultListener<ABDI.Cnt2Goal>()
 		{
 			public void resultAvailable(Cnt2Goal result)
 			{

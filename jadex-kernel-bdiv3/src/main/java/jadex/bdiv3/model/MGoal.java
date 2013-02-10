@@ -1,6 +1,7 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.annotation.PlanAborted;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -54,7 +55,6 @@ public class MGoal extends MClassBasedElement
 	
 	// hack?!
 	protected boolean maintain;
-	
 	
 	
 	/**
