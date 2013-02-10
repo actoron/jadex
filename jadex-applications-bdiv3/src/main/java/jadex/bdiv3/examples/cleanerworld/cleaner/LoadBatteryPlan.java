@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.PlanPlan;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.MaintainBatteryLoaded;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.QueryChargingStation;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
@@ -51,13 +52,14 @@ public class LoadBatteryPlan
 		final Future<Void> ret = new Future<Void>();
 		
 		// Move to station.
-		rplan.dispatchSubgoal(capa.new QueryChargingStation()).addResultListener(new ExceptionDelegationResultListener<CleanerBDI.QueryChargingStation, Void>(ret)
+		IFuture<QueryChargingStation> fut = rplan.dispatchSubgoal(capa.new QueryChargingStation());
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.QueryChargingStation, Void>(ret)
 		{
 			public void customResultAvailable(CleanerBDI.QueryChargingStation qcs)
 			{
 				final Chargingstation station = qcs.getStation();
-				rplan.dispatchSubgoal(capa.new AchieveMoveTo(station.getLocation()))
-					.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+				IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(station.getLocation()));
+				fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 				{
 					public void customResultAvailable(AchieveMoveTo amt)
 					{

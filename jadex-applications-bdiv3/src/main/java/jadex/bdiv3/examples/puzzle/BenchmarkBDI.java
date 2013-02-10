@@ -44,8 +44,8 @@ public class BenchmarkBDI extends SokratesBDI
 		depth++;
 		board.move(move);
 				
-		rplan.dispatchSubgoal(new MoveGoal())
-			.addResultListener(new ExceptionDelegationResultListener<MoveGoal, Void>(ret)
+		IFuture<MoveGoal> fut = rplan.dispatchSubgoal(new MoveGoal());
+		fut.addResultListener(new ExceptionDelegationResultListener<MoveGoal, Void>(ret)
 		{
 			public void customResultAvailable(MoveGoal result)
 			{

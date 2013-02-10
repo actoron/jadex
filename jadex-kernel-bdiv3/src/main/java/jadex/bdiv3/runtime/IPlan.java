@@ -36,12 +36,12 @@ public interface IPlan
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchSubgoal(T goal);
+	public <T, E> IFuture<E> dispatchSubgoal(T goal);
 	
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchSubgoal(T goal, long timeout);
+	public <T, E> IFuture<E> dispatchSubgoal(T goal, long timeout);
 	
 	/**
 	 *  Wait for a fact change of a belief.

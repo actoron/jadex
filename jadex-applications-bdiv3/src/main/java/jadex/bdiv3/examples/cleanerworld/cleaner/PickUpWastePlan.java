@@ -53,13 +53,13 @@ public class PickUpWastePlan
 		// Move to the waste position when necessary
 //		getLogger().info("Moving to waste!");
 		
-		rplan.dispatchSubgoal(capa.new AchieveMoveTo(waste.getLocation()))
-			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(waste.getLocation()));
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{
-				rplan.dispatchSubgoal(capa.new PickupWasteAction(waste))
-					.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.PickupWasteAction, Void>(ret)
+				IFuture<PickupWasteAction> fut = rplan.dispatchSubgoal(capa.new PickupWasteAction(waste));
+				fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.PickupWasteAction, Void>(ret)
 				{
 					public void customResultAvailable(PickupWasteAction pwa)
 					{

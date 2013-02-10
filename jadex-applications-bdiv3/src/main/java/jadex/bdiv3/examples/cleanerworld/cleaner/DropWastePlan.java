@@ -65,13 +65,13 @@ public class DropWastePlan
 
 		Location location = wastebin.getLocation();
 		
-		rplan.dispatchSubgoal(capa.new AchieveMoveTo(location))
-			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(location));
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{
-				rplan.dispatchSubgoal(capa.new DropWasteAction(waste, wastebin))
-					.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.DropWasteAction, Void>(ret)
+				IFuture<DropWasteAction> fut = rplan.dispatchSubgoal(capa.new DropWasteAction(waste, wastebin));
+				fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.DropWasteAction, Void>(ret)
 				{
 					public void customResultAvailable(DropWasteAction result)
 					{

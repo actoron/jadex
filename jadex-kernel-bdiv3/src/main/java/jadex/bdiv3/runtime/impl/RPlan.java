@@ -564,7 +564,7 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchSubgoal(final T goal)
+	public <T, E> IFuture<E> dispatchSubgoal(final T goal)
 	{
 		return dispatchSubgoal(goal, -1);
 	}
@@ -572,14 +572,14 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> IFuture<T> dispatchSubgoal(final T goal, long timeout)
+	public <T, E> IFuture<E> dispatchSubgoal(final T goal, long timeout)
 	{
-		final Future<T> ret = new Future<T>();
+		final Future<E> ret = new Future<E>();
 		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 
 		BDIModel bdim = ip.getBDIModel();
-		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
+		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(mgoal, goal, this);
@@ -595,7 +595,8 @@ public class RPlan extends RElement implements IPlan
 				}
 				else
 				{
-					ret.setResult(goal);
+					Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
+					ret.setResult((E)o);
 				}
 			}
 			

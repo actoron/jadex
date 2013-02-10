@@ -66,8 +66,8 @@ public class ExploreMapPlan
 //		MapPoint[]	mps = (MapPoint[])getBeliefbase().getBeliefSet("visited_positions").getFacts();
 //		MapPoint mp = mps[(int)(Math.random()*mps.length)];
 
-		rplan.dispatchSubgoal(capa.new AchieveMoveTo(mp.getLocation()))
-			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(mp.getLocation()));
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{

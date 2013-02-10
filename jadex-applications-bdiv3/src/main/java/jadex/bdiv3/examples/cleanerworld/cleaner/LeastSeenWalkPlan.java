@@ -67,8 +67,8 @@ public class LeastSeenWalkPlan
 
 		Location dest = mp.getLocation();
 		
-		rplan.dispatchSubgoal(capa.new AchieveMoveTo(dest))
-			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(dest));
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{

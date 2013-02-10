@@ -47,8 +47,8 @@ public class RandomWalkPlan
 		double y_dest = Math.random();
 		Location dest = new Location(x_dest, y_dest);
 		
-		rplan.dispatchSubgoal(capa.new AchieveMoveTo(dest))
-			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(dest));
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{

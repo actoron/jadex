@@ -177,8 +177,8 @@ public class SokratesBDI
 		{
 			public void customResultAvailable(Void result)
 			{
-				rplan.dispatchSubgoal(new MoveGoal())
-					.addResultListener(new ExceptionDelegationResultListener<MoveGoal, Void>(ret)
+				IFuture<MoveGoal> fut = rplan.dispatchSubgoal(new MoveGoal());
+				fut.addResultListener(new ExceptionDelegationResultListener<MoveGoal, Void>(ret)
 				{
 					public void customResultAvailable(MoveGoal result)
 					{

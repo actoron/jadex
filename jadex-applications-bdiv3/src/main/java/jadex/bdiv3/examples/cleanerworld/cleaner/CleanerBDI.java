@@ -643,8 +643,8 @@ public class CleanerBDI
 			getCarriedWaste(), getMyVision(),
 			getMyChargestate());
 
-		rplan.dispatchSubgoal(new GetVisionAction())
-			.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.GetVisionAction, Void>(ret)
+		IFuture<GetVisionAction> fut = rplan.dispatchSubgoal(new GetVisionAction());
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.GetVisionAction, Void>(ret)
 		{
 			public void customResultAvailable(GetVisionAction gva)
 			{

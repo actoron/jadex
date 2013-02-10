@@ -70,7 +70,8 @@ public class CleanUpWastePlan
 			// todo: hack, depends on goal type
 			Waste waste = goal.getWaste();
 			
-			rplan.dispatchSubgoal(capa.new AchievePickupWaste(waste)).addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchievePickupWaste, Void>(ret)
+			IFuture<AchievePickupWaste> fut = rplan.dispatchSubgoal(capa.new AchievePickupWaste(waste));
+			fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchievePickupWaste, Void>(ret)
 			{
 				public void customResultAvailable(AchievePickupWaste apw)
 				{
@@ -95,12 +96,14 @@ public class CleanUpWastePlan
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		rplan.dispatchSubgoal(capa.new QueryWastebin()).addResultListener(new ExceptionDelegationResultListener<CleanerBDI.QueryWastebin, Void>(ret)
+		IFuture<QueryWastebin> fut = rplan.dispatchSubgoal(capa.new QueryWastebin());
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.QueryWastebin, Void>(ret)
 		{
 			public void customResultAvailable(QueryWastebin qw)
 			{
 //				System.out.println("found wastebin: "+goal.getWaste());
-				rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getWastebin())).addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
+				IFuture<AchieveDropWaste> fut = rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getWastebin()));
+				fut.addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
 				{
 					public void resultAvailable(AchieveDropWaste result)
 					{
