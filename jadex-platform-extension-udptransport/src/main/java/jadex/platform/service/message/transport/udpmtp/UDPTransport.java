@@ -14,12 +14,18 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
-import jadex.platform.service.message.transport.udpmtp.receiving.PacketDecoder;
+import jadex.platform.service.message.transport.udpmtp.receiving.PacketDispatcher;
 import jadex.platform.service.message.transport.udpmtp.receiving.RxMessage;
+import jadex.platform.service.message.transport.udpmtp.receiving.handlers.IPacketHandler;
+import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgAckFinHandler;
+import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgPacketHandler;
+import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgResendHandler;
+import jadex.platform.service.message.transport.udpmtp.receiving.handlers.ProbeHandler;
 import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
 import jadex.platform.service.message.transport.udpmtp.sending.SendingThreadTask;
 import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
 import jadex.platform.service.message.transport.udpmtp.sending.TxShutdownTask;
+import jadex.platform.service.message.transport.udpmtp.timed.PeerProber;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -43,14 +49,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class UDPTransport implements ITransport
 {
-	/** Random port seek cycles before starting systematic search.  */
-	public final static int RANDOM_PORT_CYCLES = 20;
-	
-	/** Address parse cache size. */
-	public final static int PARSE_CACHE_SIZE = 500;
-	
 	/** The direct connect schema */
-	public final static String DIRECT_SCHEMA = "udpdirect-mtp://";
+	public final static String DIRECT_SCHEMA = "udp-mtp://";
 	
 	/** The schema names. */
 	public final static String[] SCHEMAS = new String[] { DIRECT_SCHEMA };
@@ -61,8 +61,8 @@ public class UDPTransport implements ITransport
 	/** The service provider. */
 	protected IServiceProvider provider;
 	
-	/** The address parse cache. */
-	protected Map<String, ParsedAddress> parseecache;
+	/** The resolve address cache. */
+	protected Map<String, InetSocketAddress> resolvecache;
 	
 	/** The thread pool. */
 	protected IDaemonThreadPoolService threadpool;
@@ -85,6 +85,9 @@ public class UDPTransport implements ITransport
 	/** Upper bound of the port range. */
 	protected int highport;
 	
+	/** Information about known peers. */
+	protected Map<InetSocketAddress, PeerInfo> peerinfos;
+	
 	/** Messages in-flight. */
 	protected Map<Integer, TxMessage> inflightmessages;
 	
@@ -93,6 +96,9 @@ public class UDPTransport implements ITransport
 	
 	/** Send task queue. */
 	protected Queue<ISendTask> sendtaskqueue;
+	
+	/** Handlers for incoming packets. */
+	protected List<IPacketHandler> packethandlers;
 	
 	/** Message ID counter. */
 	protected int idcounter;
@@ -112,7 +118,7 @@ public class UDPTransport implements ITransport
 	 */
 	public UDPTransport(IServiceProvider provider, int lowport, int highport)
 	{
-		this(provider, lowport, highport, PARSE_CACHE_SIZE);
+		this(provider, lowport, highport, STunables.PARSE_CACHE_SIZE);
 	}
 	
 	/**
@@ -121,11 +127,12 @@ public class UDPTransport implements ITransport
 	 * 	@param provider The service provider.
 	 * 	@param lowport The lowest port in the usable port range.
 	 * 	@param highport The highest port in the usable port range.
-	 *  @param parsecachesize The size of the address parse cache.
+	 *  @param resolvecachesize The size of the address resolve cache.
 	 */
-	public UDPTransport(IServiceProvider provider, int lowport, int highport, int parsecachesize)
+	public UDPTransport(IServiceProvider provider, int lowport, int highport, int resolvecachesize)
 	{
-		usedids = Collections.synchronizedSet(new HashSet<Integer>());
+		this.peerinfos = Collections.synchronizedMap(new HashMap<InetSocketAddress, PeerInfo>());
+		this.usedids = Collections.synchronizedSet(new HashSet<Integer>());
 		this.incomingmessages = Collections.synchronizedMap(new HashMap<InetSocketAddress, Map<Integer, RxMessage>>());
 		this.inflightmessages = Collections.synchronizedMap(new HashMap<Integer, TxMessage>());
 		this.txqueue = new PriorityBlockingQueue<ITxTask>(11, new Comparator<ITxTask>()
@@ -138,7 +145,7 @@ public class UDPTransport implements ITransport
 		
 		this.sendtaskqueue = new ConcurrentLinkedQueue<ISendTask>();
 		
-		this.parseecache = Collections.synchronizedMap((new LRU<String, ParsedAddress>(parsecachesize)));
+		this.resolvecache = Collections.synchronizedMap((new LRU<String, InetSocketAddress>(resolvecachesize)));
 		this.lowport = lowport;
 		this.highport = highport;
 		if (lowport > highport)
@@ -161,7 +168,7 @@ public class UDPTransport implements ITransport
 		Random r = new Random();
 		int randrange = highport - lowport + 1;
 		
-		int cycles = RANDOM_PORT_CYCLES;
+		int cycles = STunables.RANDOM_PORT_CYCLES;
 		while (socket == null && cycles > 0)
 		{
 			int port = r.nextInt(randrange) + lowport;
@@ -202,10 +209,7 @@ public class UDPTransport implements ITransport
 					for(int j=0; j<getServiceSchemas().length; j++)
 					{
 						String ad = getServiceSchemas()[j] + addresses[i] + ":" + socket.getLocalPort();
-						if (!ad.contains("fe80"))
-						{
-							addr.add(ad);
-						}
+						addr.add(ad);
 					}
 				}
 				
@@ -222,6 +226,7 @@ public class UDPTransport implements ITransport
 				public void customResultAvailable(IDaemonThreadPoolService tp)
 				{
 					threadpool = tp;
+					timedtaskdispatcher = new TimedTaskDispatcher(threadpool);
 					
 					SServiceProvider.getService(provider, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
@@ -232,6 +237,14 @@ public class UDPTransport implements ITransport
 							
 							// Sender Thread.
 							threadpool.execute(new SendingThreadTask(socket, txqueue, threadpool));
+							
+							// Message handlers, the order has a purpose.
+							packethandlers = Collections.synchronizedList(new ArrayList<IPacketHandler>());
+							packethandlers.add(new ProbeHandler(peerinfos, txqueue));
+							packethandlers.add(new MsgPacketHandler(msgservice, incomingmessages, txqueue));
+							packethandlers.add(new MsgAckFinHandler(incomingmessages, inflightmessages, txqueue, usedids));
+							packethandlers.add(new MsgResendHandler(incomingmessages, inflightmessages, txqueue));
+							
 							
 							// Receiver Thread.
 							threadpool.execute(new Runnable()
@@ -252,14 +265,8 @@ public class UDPTransport implements ITransport
 											System.arraycopy(dgp.getData(), 0, packet, 0, packet.length);
 											
 											InetSocketAddress sender = new InetSocketAddress(dgp.getAddress(), dgp.getPort());
-											Map<Integer, RxMessage> incomingsendermessages = incomingmessages.get(sender);
-											if (incomingsendermessages == null)
-											{
-												incomingsendermessages = Collections.synchronizedMap(new HashMap<Integer, RxMessage>());
-												incomingmessages.put(sender, incomingsendermessages);
-											}
 											
-											threadpool.execute(new PacketDecoder(sender, packet, inflightmessages, usedids, incomingsendermessages, txqueue, msgservice));
+											threadpool.execute(new PacketDispatcher(sender, packet, packethandlers, threadpool));
 										}
 										catch (IOException e)
 										{
@@ -292,7 +299,7 @@ public class UDPTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
-		txqueue.offer(new TxShutdownTask());
+		txqueue.put(new TxShutdownTask());
 		return IFuture.DONE;
 	}
 	
@@ -302,7 +309,7 @@ public class UDPTransport implements ITransport
 	 */
 	public boolean	isApplicable(String address)
 	{
-		return parseAddress(address) != null;
+		return resolvecache.containsKey(address) || ParsedAddress.parseAddress(address) != null;
 	}
 	
 	/**
@@ -331,44 +338,141 @@ public class UDPTransport implements ITransport
 	 */
 	public void	sendMessage(final String address, final ISendTask task)
 	{
-		final ParsedAddress parsedaddress = parseAddress(address);
-		
-		if (parsedaddress != null)
+		threadpool.execute(new Runnable()
 		{
-			final int msgid = allocateMsgId();
-			task.ready(new IResultCommand<IFuture<Void>, Void>()
+			public void run()
 			{
-				public IFuture<Void> execute(Void args)
+				ParsedAddress parsedaddress = ParsedAddress.parseAddress(address);
+				
+				if (parsedaddress != null)
 				{
-					final Future<Void> ret = new Future<Void>();
-					
-					threadpool.execute(new Runnable()
+					InetSocketAddress receiver = resolvecache.get(address);
+					if (receiver == null)
 					{
-						public void run()
+						try
 						{
-							TxMessage msg = createTxMessage(msgid, address, task, ret);
-							if (msg != null)
+							InetAddress resolvedaddr = InetAddress.getByName(parsedaddress.getHostname());
+							receiver = new InetSocketAddress(resolvedaddr, parsedaddress.getPort());
+							resolvecache.put(address, receiver);
+						}
+						catch (final UnknownHostException e)
+						{
+							task.ready(new IResultCommand<IFuture<Void>, Void>()
 							{
-								inflightmessages.put(msgid, msg);
-								txqueue.offer(msg);
+								public IFuture<Void> execute(Void args)
+								{
+									return new Future<Void>(new IOException("Resolver error: " + e.getMessage()));
+								}
+							});
+							return;
+						}
+					}
+					
+					final InetSocketAddress resolvedreceiver = receiver;
+					PeerInfo info = peerinfos.get(resolvedreceiver);
+					int state = info != null ? info.getState() : PeerInfo.STATE_UNKNOWN;
+					if (state == PeerInfo.STATE_OK)
+					{
+						final int msgid = allocateMsgId();
+						task.ready(new IResultCommand<IFuture<Void>, Void>()
+						{
+							public IFuture<Void> execute(Void args)
+							{
+								final Future<Void> ret = new Future<Void>();
+								
+								threadpool.execute(new Runnable()
+								{
+									public void run()
+									{
+										TxMessage msg = TxMessage.createTxMessage(resolvedreceiver, msgid, task, ret);
+										if (msg != null)
+										{
+											inflightmessages.put(msgid, msg);
+											txqueue.put(msg);
+										}
+									}
+								});
+								
+								return ret;
+							}
+						});
+					}
+					else
+					{
+						final IResultCommand<IFuture<Void>, Void> lostconn = new IResultCommand<IFuture<Void>, Void>()
+								{
+							public IFuture<Void> execute(Void args)
+							{
+								return new Future<Void>(new IOException("Connection to peer lost: " + address));
+							}
+						};
+						
+						if (state == PeerInfo.STATE_LOST)
+						{
+							task.ready(lostconn);
+						}
+						else
+						{
+							// Untested connection, probe first.
+							
+							synchronized (peerinfos)
+							{
+								info = peerinfos.get(resolvedreceiver);
+								if (info == null)
+								{
+									info = new PeerInfo(resolvedreceiver);
+									peerinfos.put(resolvedreceiver, info);
+									
+									TimedTask peerprober = new PeerProber(peerinfos, info, timedtaskdispatcher, txqueue);
+									timedtaskdispatcher.scheduleTask(peerprober);
+								}
+							}
+								
+							if (info.getState() == PeerInfo.STATE_OK)
+							{
+								threadpool.execute(new Runnable()
+								{
+									public void run()
+									{
+										sendMessage(address, task);
+									}
+								});
+								return;
+							}
+							else
+							{
+								final PeerInfo peerinfo = info;
+								info.getStateWaiters().offer(new Runnable()
+								{
+									public void run()
+									{
+										if (peerinfo.getState() == PeerInfo.STATE_OK)
+										{
+											sendMessage(address, task);
+										}
+										else
+										{
+											task.ready(lostconn);
+										}
+									}
+								});
 							}
 						}
-					});
-					
-					return ret;
-				}
-			});
-		}
-		else
-		{
-			task.ready(new IResultCommand<IFuture<Void>, Void>()
-				{
-					public IFuture<Void> execute(Void args)
-					{
-						return new Future<Void>(new RuntimeException("Unparsable address: " + address));
+						
 					}
-				});
-		}
+				}
+				else
+				{
+					task.ready(new IResultCommand<IFuture<Void>, Void>()
+						{
+							public IFuture<Void> execute(Void args)
+							{
+								return new Future<Void>(new RuntimeException("Unparsable address: " + address));
+							}
+						});
+				}
+			}
+		});
 	}
 	
 	/**
@@ -388,82 +492,6 @@ public class UDPTransport implements ITransport
 	public String[] getAddresses()
 	{
 		return addresses;
-	}
-	
-	/**
-	 *  Parses an address string using a cache.
-	 *  
-	 *  @param address The address string.
-	 *  @return The parsed address.
-	 */
-	public ParsedAddress parseAddress(String address)
-	{
-		ParsedAddress ret = parseecache.get(address);
-		if (ret == null)
-		{
-			ret = ParsedAddress.parseAddress(address);
-			if (ret != null)
-			{
-				parseecache.put(address, ret);
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Creates a message for transmission.
-	 *  
-	 *  @param msgid The allocated message ID.
-	 *  @param address
-	 *  @param task
-	 *  @param conffuture
-	 *  @return
-	 */
-	protected TxMessage createTxMessage(int msgid, String address, ISendTask task, Future<Void> conffuture)
-	{
-		int payloadsize = task.getProlog().length + task.getData().length;
-		int priority = STunables.LARGE_MESSAGES_DEFAULT_PRIORITY;
-		
-		// Packet size for medium and large mode.
-		int packetsize = 8192;
-		
-		if (STunables.ENABLE_TINY_MODE && payloadsize < 131073)
-		{
-			// Tiny mode
-			packetsize = 512;
-			priority = STunables.TINY_MESSAGES_DEFAULT_PRIORITY;
-		}
-		else if (STunables.ENABLE_SMALL_MODE && payloadsize < 262145)
-		{
-			// Small mode
-			packetsize = 1024;
-			priority = STunables.SMALL_MESSAGES_DEFAULT_PRIORITY;
-		}
-		else if (payloadsize < 2097153)
-		{
-			// Medium mode
-			priority = STunables.MEDIUM_MESSAGES_DEFAULT_PRIORITY;
-		}
-		
-		byte[][] packets = TxMessage.fragmentMessage(msgid, task.getProlog(), task.getData(), packetsize);
-		
-		ParsedAddress receiver = parseAddress(address);
-		
-		TxMessage ret = new TxMessage(receiver, conffuture, priority, packets);
-		
-		try
-		{
-			InetAddress resolvedaddr = InetAddress.getByName(ret.getReceiver().hostname);
-			InetSocketAddress resolvedreceiver = new InetSocketAddress(resolvedaddr, ret.getReceiver().getPort());
-			ret.setResolvedReceiver(resolvedreceiver);
-		}
-		catch (UnknownHostException e)
-		{
-			ret.transmissionFailed("Resolver error: " + e.getMessage());
-			ret = null;
-		}
-		
-		return ret;
 	}
 	
 	/**

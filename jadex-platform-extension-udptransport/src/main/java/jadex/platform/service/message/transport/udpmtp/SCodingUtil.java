@@ -70,4 +70,48 @@ public class SCodingUtil
 		
 		return val;
 	}
+
+	/**
+	 *  Writes a long value into a byte array buffer in network byte order.
+	 *  
+	 *  @param buffer The buffer.
+	 *  @param offset The offset.
+	 *  @param val The value.
+	 */
+	public static final void longIntoByteArray(byte[] buffer, int offset, long val)
+	{
+		assert offset + 7 < buffer.length;
+		
+		buffer[offset] = (byte)((val >>> 56) & 0xFF);
+		buffer[offset + 1] = (byte)((val >>> 48) & 0xFF);
+		buffer[offset + 2] = (byte)((val >>> 40) & 0xFF);
+		buffer[offset + 3] = (byte)((val >>> 32) & 0xFF);
+		buffer[offset + 4] = (byte)((val >>> 24) & 0xFF);
+		buffer[offset + 5] = (byte)((val >>> 16) & 0xFF);
+		buffer[offset + 6] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset + 7] = (byte)(val & 0xFF);
+	}
+	
+	/**
+	 *  Reads a long value from a byte array buffer in network byte order.
+	 *  
+	 *  @param buffer The buffer.
+	 *  @param offset The offset.
+	 *  @return The value.
+	 */
+	public static final long longFromByteArray(byte[] buffer, int offset)
+	{
+		assert offset + 7 < buffer.length;
+
+		long value = (0xFFL & buffer[offset]) << 56L;
+		value |= (0xFFL & buffer[offset + 1]) << 48L;
+		value |= (0xFFL & buffer[offset + 2]) << 40L;
+		value |= (0xFFL & buffer[offset + 3]) << 32L;
+		value |= (0xFFL & buffer[offset + 4]) << 24L;
+		value |= (0xFFL & buffer[offset + 5]) << 16L;
+		value |= (0xFFL & buffer[offset + 6]) << 8L;
+		value |= (0xFFL & buffer[offset + 7]);
+
+		return value;
+	}
 }

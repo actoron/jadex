@@ -1,180 +1,77 @@
-package jadex.platform.service.message.transport.udpmtp.receiving;
+package jadex.platform.service.message.transport.udpmtp.receiving.handlers;
 
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.Tuple3;
 import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.L_MSG;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
+import jadex.platform.service.message.transport.udpmtp.receiving.PacketDispatcher;
+import jadex.platform.service.message.transport.udpmtp.receiving.RxMessage;
 import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
-import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
 import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
 
 import java.net.InetSocketAddress;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class PacketDecoder implements Runnable
+public class MsgPacketHandler implements IPacketHandler
 {
-	/** The packet sender. */
-	protected InetSocketAddress sender;
-	
-	/** The incoming packet. */
-	protected byte[] packet;
-	
-	/** Messages in-flight. */
-	protected Map<Integer, TxMessage> inflightmessages;
-	
-	/** Currently used message IDs */
-	protected Set<Integer> usedids;
+	/** The message service. */
+	protected IMessageService msgservice;
 	
 	/** Incoming Message pool. */
-	protected Map<Integer, RxMessage> incomingsendermessages;
+	protected Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages;
 	
 	/** Queue for scheduled transmissions */
 	protected PriorityBlockingQueue<ITxTask> txqueue;
 	
-	/** The thread pool. */
-	//protected IDaemonThreadPoolService threadpool;
-	
-	/** The message service . */
-	protected IMessageService msgservice;
-	
-	/** Delated last packet */
-	protected Tuple3<Integer, byte[], Integer> delayedlastpacket;
-	
-	public PacketDecoder(InetSocketAddress sender, byte[] packet, Map<Integer, TxMessage> inflightmessages, Set<Integer> usedids, Map<Integer, RxMessage> incomingsendermessages, PriorityBlockingQueue<ITxTask> txqueue, IMessageService msgservice)
-	{
-		this.sender = sender;
-		this.packet = packet;
-		this.inflightmessages = inflightmessages;
-		this.usedids = usedids;
-		this.incomingsendermessages = incomingsendermessages;
-		this.txqueue = txqueue;
-		this.msgservice = msgservice;
-	}
-	
 	/**
-	 *  Runs the message decoding.
-	 */
-	public void run()
-	{
-//		System.out.println("Executing packet dispatch task");
-		// Check if packet contains anything at all.
-		if (packet.length > 0)
-		{
-			byte packettypeid = packet[0];
-//			System.out.println("packetid" + packettypeid);
-			switch(packettypeid)
-			{
-				case S_MSG.PACKET_TYPE_ID:
-				case L_MSG.PACKET_TYPE_ID:
-					handleMessagePacket(packettypeid, packet);
-					break;
-					
-				case S_MSG.RESEND_REQ_ID:
-				case L_MSG.RESEND_REQ_ID:
-					handleResendRequest(packettypeid, packet);
-					
-				case SPacketDefs.MSG_ACK:
-					if (packet.length == 5)
-					{
-						int msgid = SCodingUtil.intFromByteArray(packet, 1);
-						inflightmessages.remove(msgid);
-						//TODO: Delay if re-sent?
-						usedids.remove(msgid);
-						txqueue.offer(TxPacket.createMsgFin(sender, msgid));
-					}
-					else
-					{
-						packetSanityCheckFailed();
-					}
-					
-				case SPacketDefs.MSG_FIN:
-					if (packet.length == 5)
-					{
-						short msgid = SCodingUtil.shortFromByteArray(packet, 1);
-						incomingsendermessages.remove(msgid);
-					}
-					else
-					{
-						packetSanityCheckFailed();
-					}
-					break;
-				
-				default:
-					unknownPacketTypeError();
-			}
-		}
-		else
-		{
-			// Empty packet.
-			packetSanityCheckFailed();
-		}
-	}
-	
-	/**
-	 *  Method handling re-send requests.
-	 */
-	protected void handleResendRequest(byte packettypeid, byte[] packet)
-	{
-		if (packet.length >= 5)
-		{
-			int msgid = SCodingUtil.intFromByteArray(packet, 1);
-			
-			TxMessage msg = inflightmessages.get(msgid);
-			if (msg != null)
-			{
-				if (packet.length == 5)
-				{
-					// Full resend
-					txqueue.offer(msg);
-				}
-				else
-				{
-					if (packettypeid == L_MSG.RESEND_REQ_ID)
-					{
-						if ((packet.length - 5) % 2 == 0)
-						{
-							short[] resendpackets = new short[(packet.length - 5) / 2];
-							for (int i = 5; i < packet.length; i = i + 2)
-							{
-								resendpackets[i] = SCodingUtil.shortFromByteArray(packet, i);
-							}
-						}
-						else
-						{
-							packetSanityCheckFailed();
-						}
-					}
-					else
-					{
-						short[] resendpackets = new short[packet.length - 5];
-						for (int i = 5; i < packet.length; ++i)
-						{
-							resendpackets[i] = packet[i];
-						}
-					}
-				}
-			}
-			else
-			{
-				//TODO Re-send error.
-			}
-		}
-		else
-		{
-			packetSanityCheckFailed();
-		}
-	}
-	
-	/**
-	 *  Method handling message packets.
+	 *  Creates the handler.
 	 *  
-	 *  @param packet The packet.
+	 *  @param msgservice The message service.
+	 *  @param incomingsendermessages Incoming Messages pool.
+	 *  @param txqueue Queue for scheduled transmissions.
 	 */
-	protected void handleMessagePacket(byte packettypeid, byte[] packet)
+	public MsgPacketHandler(IMessageService msgservice, 
+							Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages,
+							PriorityBlockingQueue<ITxTask> txqueue)
+	{
+		this.msgservice = msgservice;
+		this.txqueue = txqueue;
+		this.incomingmessages = incomingmessages;
+	}
+	
+	/**
+	 *  Returns if the handler is applicable for this packet type.
+	 *  
+	 *  @param packettype The packet type.
+	 *  @return True, if the handler is applicable.
+	 */
+	public boolean isApplicable(byte packettype)
+	{
+		return S_MSG.PACKET_TYPE_ID== packettype || L_MSG.PACKET_TYPE_ID == packettype;
+	}
+	
+	/**
+	 *  Returns if the handler is done and should be removed.
+	 *  
+	 *  @return True, if the handler is done.
+	 */
+	public boolean isDone()
+	{
+		return false;
+	}
+	
+	/**
+	 *  Handles the packet
+	 *  
+	 *  @param sender The sender of the packet.
+	 *  @param packettype The packet type.
+	 *  @param packet The raw packet.
+	 */
+	public void handlePacket(InetSocketAddress sender, byte packettype, byte[] packet)
 	{
 		// Check if packet contains any payload.
 //		System.out.println("Decoding a new packet");
@@ -185,7 +82,7 @@ public class PacketDecoder implements Runnable
 		int packetnumberoffset = 0;
 		int totalpacketsoffset = 0;
 		
-		switch (packettypeid)
+		switch (packettype)
 		{
 			case L_MSG.PACKET_TYPE_ID:
 				baseheadersize = L_MSG.HEADER_SIZE;
@@ -223,17 +120,17 @@ public class PacketDecoder implements Runnable
 				else
 				{
 					// No payload.
-					packetSanityCheckFailed();
+					PacketDispatcher.packetSanityCheckFailed();
 					return;
 				}
 			}
 			
-			writeMessagePacket(packettypeid, msgid, msgsize, packetnum, totalpackets, packet, headersize, checksum);
+			writeMessagePacket(sender, packettype, msgid, msgsize, packetnum, totalpackets, packet, headersize, checksum);
 		}
 		else
 		{
 			// No payload.
-			packetSanityCheckFailed();
+			PacketDispatcher.packetSanityCheckFailed();
 		}
 	}
 	
@@ -249,8 +146,22 @@ public class PacketDecoder implements Runnable
 	 *  @param dataoffset The offset where the packet payload starts.
 	 *  @param checksum The checksum, only needed for first packet.
 	 */
-	protected void writeMessagePacket(byte packettypeid, int msgid, int msgsize, int packetnum, int totalpackets, byte[] packet, int dataoffset, int checksum)
+	protected void writeMessagePacket(InetSocketAddress sender, byte packettypeid, int msgid, int msgsize, int packetnum, int totalpackets, byte[] packet, int dataoffset, int checksum)
 	{
+		Map<Integer, RxMessage> incomingsendermessages = incomingmessages.get(sender);
+		if (incomingsendermessages == null)
+		{
+			synchronized (incomingmessages)
+			{
+				incomingsendermessages = incomingmessages.get(sender);
+				if (incomingsendermessages == null)
+				{
+					incomingsendermessages = Collections.synchronizedMap(new HashMap<Integer, RxMessage>());
+					incomingmessages.put(sender, incomingsendermessages);
+				}
+			}
+		}
+		
 //		System.out.println("Writing packet with msgid: " + msgid);
 		RxMessage msg = incomingsendermessages.get(msgid);
 		
@@ -302,13 +213,23 @@ public class PacketDecoder implements Runnable
 				SCodingUtil.intIntoByteArray(ackmsgpacket, 1, msgid);
 				
 				TxPacket ackpacket = new TxPacket(sender, ackmsgpacket);
-				txqueue.offer(ackpacket);
+				txqueue.put(ackpacket);
 				
 				msgservice.deliverMessage(msg.getData());
 			}
 		}
 	}
 	
+	/**
+	 *  Resets a message in case of a major problem (checksum failed, size mismatch)
+	 *  
+	 *  @param packettypeid Packet type of the packet that triggered the problem.
+	 *  @param sender The sender of the message.
+	 *  @param msgid The message ID.
+	 *  @param msgsize The message size as indicated in the packet.
+	 *  @param totalpackets The total packets as indicated in the packet.
+	 *  @param msg The message.
+	 */
 	protected void resetMessage(byte packettypeid, InetSocketAddress sender, int msgid, int msgsize, int totalpackets, RxMessage msg)
 	{
 		synchronized (msg)
@@ -325,22 +246,7 @@ public class PacketDecoder implements Runnable
 				resendreq = TxPacket.createLargeResendRequest(sender, msgid, new int[0]);
 			}
 			
-			txqueue.offer(resendreq);
+			txqueue.put(resendreq);
 		}
-	}
-	
-	protected void packetSanityCheckFailed()
-	{
-		System.err.println("Packet sanity failed!");
-	}
-	
-	protected void unknownPacketTypeError()
-	{
-		System.err.println("Unknown Packet!");
-	}
-	
-	protected void checksumError()
-	{
-		System.err.println("Checksum failed!");
 	}
 }

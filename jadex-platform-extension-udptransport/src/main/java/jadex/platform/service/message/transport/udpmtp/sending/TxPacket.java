@@ -1,9 +1,9 @@
 package jadex.platform.service.message.transport.udpmtp.sending;
 
 import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
-import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.L_MSG;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
+import jadex.platform.service.message.transport.udpmtp.STunables;
 
 import java.net.InetSocketAddress;
 
@@ -22,6 +22,9 @@ public class TxPacket implements ITxTask
 	/** The packets being transmitted, in this case one. */
 	protected byte[][] packets;
 	
+	/** The priority of the packet. */
+	protected int priority;
+	
 	/**
 	 *  Creates a new packet.
 	 *  
@@ -30,7 +33,19 @@ public class TxPacket implements ITxTask
 	 */
 	public TxPacket(InetSocketAddress resolvedreceiver, byte[] packet)
 	{
-		this(resolvedreceiver, packet, null);
+		this(resolvedreceiver, packet, STunables.CONTROL_PACKETS_DEFAULT_PRIORITY, null);
+	}
+	
+	/**
+	 *  Creates a new packet.
+	 *  
+	 *  @param resolvedreceiver The receiver.
+	 *  @param priority The packet priority.
+	 *  @param packet The packet.
+	 */
+	public TxPacket(InetSocketAddress resolvedreceiver, int priority, byte[] packet)
+	{
+		this(resolvedreceiver, packet, priority, null);
 	}
 	
 	/**
@@ -38,12 +53,14 @@ public class TxPacket implements ITxTask
 	 *  
 	 *  @param resolvedreceiver The receiver.
 	 *  @param packet The packet.
+	 *  @param priority The packet priority.
 	 *  @param sendfailuretask Callback for send failures.
 	 */
-	public TxPacket(InetSocketAddress resolvedreceiver, byte[] packet, Runnable sendfailuretask)
+	public TxPacket(InetSocketAddress resolvedreceiver, byte[] packet, int priority, Runnable sendfailuretask)
 	{
 		this.resolvedreceiver = resolvedreceiver;
 		this.packets = new byte[][] { packet };
+		this.priority = priority;
 		this.sendfailuretask = sendfailuretask;
 	}
 	
@@ -86,7 +103,7 @@ public class TxPacket implements ITxTask
 	 */
 	public int getPriority()
 	{
-		return -1;
+		return priority;
 	}
 	
 	/**
@@ -146,12 +163,61 @@ public class TxPacket implements ITxTask
 		return new TxPacket(receiver, packetarray);
 	}
 	
-	public static final TxPacket createMsgFin(InetSocketAddress receiver, int msgid)
+	/**
+	 *  Creates a message re-send error packet, used when an invalid re-send request was received.
+	 *  
+	 *  @param receiver The packet receiver.
+	 *  @param msgid The message ID.
+	 *  @return The created packet.
+	 */
+//	public static final TxPacket createMsgResendError(InetSocketAddress receiver, int msgid)
+//	{
+//		return createGenericMsgIdPacket(SPacketDefs.MSG_RESEND_ERROR, receiver, msgid);
+//	}
+	
+	/**
+	 *  Creates a message fin packet, confirming an acknowledgment.
+	 *  
+	 *  @param receiver The packet receiver.
+	 *  @param msgid The message ID.
+	 *  @return The created packet.
+	 */
+//	public static final TxPacket createMsgFin(InetSocketAddress receiver, int msgid)
+//	{
+//		return createGenericMsgIdPacket(SPacketDefs.MSG_FIN, receiver, msgid);
+//	}
+	
+	/**
+	 *  Creates a packet containing only the packet type ID and a time stamp.
+	 *  
+	 *  @param packettype The packet type.
+	 *  @param receiver The packet receiver.
+	 *  @param timestamp1 The time stamp.
+	 *  @return The created packet.
+	 */
+	public static final TxPacket createGenericTimestampPacket(byte packettype, InetSocketAddress receiver,
+															  long timestamp)
 	{
-		byte[] finmsgpacket = new byte[5];
-		finmsgpacket[0] = SPacketDefs.MSG_FIN;
-		SCodingUtil.intIntoByteArray(finmsgpacket, 1, msgid);
+		byte[] rawpacket = new byte[9];
+		rawpacket[0] = packettype;
+		SCodingUtil.longIntoByteArray(rawpacket, 1, timestamp);
+		return new TxPacket(receiver, rawpacket);
+	}
+	
+	/**
+	 *  Creates a packet containing only the packet type ID and a message ID.
+	 *  
+	 *  @param packettype The packet type.
+	 *  @param receiver The packet receiver.
+	 *  @param msgid The message ID.
+	 *  @return The created packet.
+	 */
+	public static final TxPacket createGenericMsgIdPacket(byte packettype, InetSocketAddress receiver, int msgid)
+	{
+		byte[] rawpacket = new byte[5];
+		rawpacket[0] = packettype;
+		SCodingUtil.intIntoByteArray(rawpacket, 1, msgid);
 		
-		return new TxPacket(receiver, finmsgpacket);
+		return new TxPacket(receiver, rawpacket);
 	}
 }

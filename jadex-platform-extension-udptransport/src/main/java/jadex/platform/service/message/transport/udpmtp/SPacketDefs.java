@@ -74,11 +74,14 @@ public class SPacketDefs
 	/** Echo reply. */
 	public static final byte ECHO_REPLY   = 1;
 	
-	/** Ping request. */
-	public static final byte PING_REQUEST = 2;
+	/** Probe request. */
+	public static final byte PROBE = 2;
 	
-	/** Ping reply. */
-	public static final byte PING_REPLY   = 3;
+	/** Probe acknowledgment. */
+	public static final byte PROBE_ACK   = 3;
+	
+	/** Probe finished. */
+	public static final byte PROBE_FIN   = 4;
 	
 	/** Message acknowledged. */
 	public static final byte MSG_ACK = 16;

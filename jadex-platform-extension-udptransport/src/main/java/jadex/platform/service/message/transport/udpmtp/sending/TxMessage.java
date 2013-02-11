@@ -1,15 +1,16 @@
 package jadex.platform.service.message.transport.udpmtp.sending;
 
+import jadex.commons.future.Future;
+import jadex.platform.service.message.ISendTask;
+import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
+import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
+import jadex.platform.service.message.transport.udpmtp.STunables;
+import jadex.platform.service.message.transport.udpmtp.SPacketDefs.L_MSG;
+import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.zip.CRC32;
-
-import jadex.commons.future.Future;
-import jadex.platform.service.message.transport.udpmtp.ParsedAddress;
-import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
-import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
-import jadex.platform.service.message.transport.udpmtp.SPacketDefs.L_MSG;
-import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
 
 /**
  *  Class representing a message being send.
@@ -17,9 +18,6 @@ import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
  */
 public class TxMessage implements ITxTask
 {
-	/** The receiver of the message. */
-	protected ParsedAddress receiver;
-	
 	/** The resolved receiver. */
 	protected InetSocketAddress resolvedreceiver;
 	
@@ -43,22 +41,12 @@ public class TxMessage implements ITxTask
 	 *  @param priority Initial priority of the message.
 	 *  @param packets The packets of the message.
 	 */
-	public TxMessage(ParsedAddress receiver, Future<Void> conffuture, int priority, byte[][] packets)
+	protected TxMessage(InetSocketAddress receiver, Future<Void> conffuture, int priority, byte[][] packets)
 	{
-		this.receiver = receiver;
 		confirmationfuture = conffuture;
+		resolvedreceiver = receiver;
 		this.priority = priority;
 		this.packets = packets;
-	}
-	
-	/**
-	 *  Gets the receiver.
-	 *
-	 *  @return The receiver.
-	 */
-	public ParsedAddress getReceiver()
-	{
-		return receiver;
 	}
 	
 	/**
@@ -147,6 +135,48 @@ public class TxMessage implements ITxTask
 	public void transmissionFailed(String reason)
 	{
 		confirmationfuture.setException(new IOException(reason));
+	}
+	
+	/**
+	 *  Creates a message for transmission.
+	 *  
+	 *  @param msgid The allocated message ID.
+	 *  @param address
+	 *  @param task
+	 *  @param conffuture
+	 *  @return
+	 */
+	public static final TxMessage createTxMessage(InetSocketAddress receiver, int msgid, ISendTask task, Future<Void> conffuture)
+	{
+		int payloadsize = task.getProlog().length + task.getData().length;
+		int priority = STunables.LARGE_MESSAGES_DEFAULT_PRIORITY;
+		
+		// Packet size for medium and large mode.
+		int packetsize = 8192;
+		
+		if (STunables.ENABLE_TINY_MODE && payloadsize < 131073)
+		{
+			// Tiny mode
+			packetsize = 512;
+			priority = STunables.TINY_MESSAGES_DEFAULT_PRIORITY;
+		}
+		else if (STunables.ENABLE_SMALL_MODE && payloadsize < 262145)
+		{
+			// Small mode
+			packetsize = 1024;
+			priority = STunables.SMALL_MESSAGES_DEFAULT_PRIORITY;
+		}
+		else if (payloadsize < 2097153)
+		{
+			// Medium mode
+			priority = STunables.MEDIUM_MESSAGES_DEFAULT_PRIORITY;
+		}
+		
+		byte[][] packets = TxMessage.fragmentMessage(msgid, task.getProlog(), task.getData(), packetsize);
+		
+		TxMessage ret = new TxMessage(receiver, conffuture, priority, packets);
+		
+		return ret;
 	}
 	
 	/**

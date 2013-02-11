@@ -2,7 +2,10 @@ package jadex.platform.service.message.transport.udpmtp;
 
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
@@ -11,10 +14,17 @@ import java.util.PriorityQueue;
  */
 public class TimedTaskDispatcher implements Runnable
 {
+	/** The thread pool. */
 	protected IDaemonThreadPoolService threadpool;
 	
 	/** The task queue. */
 	protected PriorityQueue<TimedTask> taskqueue;
+	
+	/** Tasks with a key */
+	protected Map<Object, TimedTask> keyedtasks;
+	
+	/** Flag if the dispatcher is running */
+	protected volatile boolean running;
 	
 	/**
 	 *  Creates the dispatched
@@ -23,6 +33,8 @@ public class TimedTaskDispatcher implements Runnable
 	 */
 	public TimedTaskDispatcher(IDaemonThreadPoolService threadpool)
 	{
+		this.threadpool = threadpool;
+		keyedtasks = Collections.synchronizedMap(new HashMap<Object, TimedTask>());
 		taskqueue = new PriorityQueue<TimedTask>(11, new Comparator<TimedTask>()
 		{
 			/**
@@ -35,6 +47,9 @@ public class TimedTaskDispatcher implements Runnable
 				return ret;
 			}
 		});
+		
+		running = true;
+		threadpool.execute(this);
 	}
 	
 	/**
@@ -42,47 +57,98 @@ public class TimedTaskDispatcher implements Runnable
 	 */
 	public void run()
 	{
-		synchronized(taskqueue)
+		while (running)
 		{
-			TimedTask task = taskqueue.poll();
-			
-			if (task != null)
+			synchronized(taskqueue)
 			{
-				long delta = task.getExecutionTime() - System.currentTimeMillis();
-				if (delta <= 0)
+				TimedTask task = taskqueue.peek();
+				
+				if (task != null)
 				{
-					threadpool.execute(task);
+					long current = System.currentTimeMillis();
+					if (current >= task.getExecutionTime())
+					{
+						taskqueue.poll();
+						keyedtasks.remove(task.getKey());
+						threadpool.execute(task);
+					}
+					else
+					{
+						try
+						{
+							long delta = task.getExecutionTime() - current;
+							taskqueue.wait(delta);
+						}
+						catch (InterruptedException e)
+						{
+						}
+					}
 				}
 				else
 				{
 					try
 					{
-						taskqueue.wait(delta);
+						taskqueue.wait();
 					}
 					catch (InterruptedException e)
 					{
 					}
 				}
 			}
-			else
-			{
-				try
-				{
-					taskqueue.wait();
-				}
-				catch (InterruptedException e)
-				{
-				}
-			}
 		}
 	}
 	
+	/**
+	 *  Schedules a task.
+	 *  
+	 *  @param task The task.
+	 */
 	public void scheduleTask(TimedTask task)
 	{
+		if (task.getKey() != null)
+		{
+			keyedtasks.put(task.getKey(), task);
+		}
+		
 		synchronized(taskqueue)
 		{
-			taskqueue.add(task);
+			taskqueue.offer(task);
 			taskqueue.notify();
 		}
+	}
+	
+	/**
+	 *  Attempts to cancel a task, there is no guarantee
+	 *  that this will intercept the task in time before execution.
+	 *  
+	 *  @param task The task.
+	 */
+	public void cancelTask(TimedTask task)
+	{
+		synchronized (taskqueue)
+		{
+			taskqueue.remove(task);
+		}
+	}
+	
+	/**
+	 *  Attempts to cancel a task, there is no guarantee
+	 *  that this will intercept the task in time before execution.
+	 *  
+	 *  @param key The key identifying the task.
+	 */
+	public void cancelTask(Object key)
+	{
+		TimedTask task = keyedtasks.remove(key);
+		cancelTask(task);
+	}
+	
+	/**
+	 *  Stops the dispatcher.
+	 */
+	public void stop()
+	{
+		running = false;
+		taskqueue.notify();
 	}
 }
