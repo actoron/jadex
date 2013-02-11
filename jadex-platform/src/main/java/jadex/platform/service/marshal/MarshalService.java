@@ -344,7 +344,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		{
 			boolean localret = ret;
 			boolean remoteret = ret;
-			
+		
 			Class cl = object.getClass();
 			// Avoid creating list for frequent case that class is already contained
 			boolean[] isref = (boolean[])references.get(cl);

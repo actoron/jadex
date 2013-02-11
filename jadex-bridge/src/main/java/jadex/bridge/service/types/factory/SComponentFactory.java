@@ -335,9 +335,9 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getProperty(IExternalAccess exta, final String type, final String key)
+	public static IFuture<Object> getProperty(IExternalAccess exta, final String type, final String key)
 	{
-		final Future ret = new Future();
+		final Future<Object> ret = new Future<Object>();
 		
 		exta.scheduleStep(new IComponentStep<Object>()
 		{
