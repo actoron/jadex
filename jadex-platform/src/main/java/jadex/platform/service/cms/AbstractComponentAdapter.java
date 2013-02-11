@@ -24,6 +24,7 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
@@ -719,6 +720,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			throw new RuntimeException("Can only block current component thread: "+componentthread+", "+Thread.currentThread());
 		}
+		
+		// Notify remaining listeners on this thread.
+		FutureHelper.notifyStackedListeners();
 		
 		Executor	exe	= Executor.EXECUTOR.get();
 		if(exe==null)
