@@ -401,7 +401,7 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void run()
 			{
-				System.out.println("update: "+desc);
+//				System.out.println("update: "+desc);
 				pause.setEnabled(!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 //					&& IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()));

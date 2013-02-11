@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Excludes swing elements from being processed by traverser in clone mode.
+ *  Excludes swing elements from being processed by traverser in !clone mode.
  *  Otherwise the processor is not applicable.
  */
 public class ExcludeSwingProcessor implements ITraverseProcessor
@@ -18,7 +18,7 @@ public class ExcludeSwingProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return clone && object.getClass().getName().startsWith("javax.swing");
+		return !clone && object.getClass().getName().startsWith("javax.swing");
 	}
 	
 	/**
