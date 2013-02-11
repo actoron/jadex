@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.annotation.GoalAPLBuild;
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
@@ -12,7 +13,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ public class APL
 	protected RProcessableElement element;
 	
 	/** The list of candidates. */
-	protected List<Object> candidates;
+	protected List<?> candidates;
 	
 	/** The metagoal. */
 //	protected Object apl_has_metagoal;
@@ -109,11 +109,7 @@ public class APL
 								done	= true;
 								try
 								{
-									candidates	= (List<Object>)ms[i].invoke(pojo, null);
-									for(Object cand: candidates)
-									{
-										((PlanCandidate)cand).init(element, capa);
-									}
+									candidates	= (List<?>)ms[i].invoke(pojo, new Object[0]);
 								}
 								catch(InvocationTargetException e)
 								{
@@ -200,7 +196,7 @@ public class APL
 	/**
 	 * 
 	 */
-	public List<Object> selectCandidates()
+	public List<Object> selectCandidates(MCapability mcapa)
 	{
 		List<Object> ret = new ArrayList<Object>();
 		
@@ -214,7 +210,7 @@ public class APL
 		
 		for(int i=0; i<numcandidates && candidates.size()>0; i++)
 		{
-			ret.add(getNextCandidate());
+			ret.add(getNextCandidate(mcapa));
 		}
 		
 		return ret;
@@ -260,11 +256,9 @@ public class APL
 	/**
 	 *  Get the next candidate with respect to the plan
 	 *  priority and the rank of the candidate.
-	 *  @param candidatelist The candidate list.
-	 *  @param random The random selection flag.
 	 *  @return The next candidate.
 	 */
-	protected Object getNextCandidate()
+	protected Object getNextCandidate(MCapability mcapa)
 	{
 		// Use the plan priorities to sort the candidates.
 		// If the priority is the same use the following rank order:
@@ -275,11 +269,11 @@ public class APL
 		
 		List<Object> finals = new ArrayList<Object>();
 		finals.add(candidates.get(0));
-		int candprio = getPriority(finals.get(0));
+		int candprio = getPriority(finals.get(0), mcapa);
 		for(int i=1; i<candidates.size(); i++)
 		{
 			Object tmp = candidates.get(i);
-			int tmpprio = getPriority(tmp);
+			int tmpprio = getPriority(tmp, mcapa);
 			if(tmpprio>candprio || (tmpprio == candprio && getRank(tmp)>getRank(finals.get(0))))
 			{
 				finals.clear();
@@ -313,7 +307,7 @@ public class APL
 	 *  Get the priority of a candidate.
 	 *  @return The priority of a candidate.
 	 */
-	protected static int getPriority(Object cand)
+	protected static int getPriority(Object cand, MCapability mcapa)
 	{
 		MPlan mplan;
 //		if(cand instanceof RWaitqueuePlan)
@@ -325,9 +319,9 @@ public class APL
 		{
 			mplan = (MPlan)((RPlan)cand).getModelElement();
 		}
-		else if(cand instanceof PlanCandidate)
+		else if(cand.getClass().isAnnotationPresent(Plan.class))
 		{
-			mplan = ((PlanCandidate)cand).getMPlan();
+			mplan = mcapa.getPlan(cand.getClass().getName());
 		}
 		else 
 		{

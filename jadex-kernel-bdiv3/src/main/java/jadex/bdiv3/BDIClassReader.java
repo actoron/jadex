@@ -179,7 +179,7 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			// Find goals
+			// Find inner goal and plan classes
 			Class<?>[] cls = clazz.getDeclaredClasses();
 			for(int i=0; i<cls.length; i++)
 			{

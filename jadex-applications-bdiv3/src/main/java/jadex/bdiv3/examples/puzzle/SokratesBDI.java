@@ -8,10 +8,11 @@ import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanFailed;
+import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.impl.PlanCandidate;
-import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.commons.SUtil;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -26,6 +27,10 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+/**
+ *  Puzzle agent tries to solve a solitair board game
+ *  by recursiveky applying means-end-reasoning.
+ */
 @Agent
 @BDIConfigurations(
 {
@@ -37,9 +42,6 @@ import javax.swing.SwingUtilities;
 public class SokratesBDI
 {
 	//-------- attributes --------
-	
-	@Agent
-	protected BDIAgent agent;
 	
 	/** The puzzle board. */
 	@Belief
@@ -73,7 +75,6 @@ public class SokratesBDI
 		
 		System.out.println("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
-//		final long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		IFuture<MoveGoal> fut = agent.dispatchTopLevelGoal(new MoveGoal());
 		fut.addResultListener(new IResultListener<MoveGoal>()
 		{
@@ -81,16 +82,6 @@ public class SokratesBDI
 			{
 				long end = System.currentTimeMillis();
 				System.out.println("Needed: "+(end-start)+" millis.");
-				
-//				if(getBeliefbase().containsBelief("endmem"))
-//				{
-//					Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
-//					if(endmem!=null)
-//					{
-//						System.out.println("Needed: "+(((endmem.longValue()-startmem)*10/1024)/1024)/10.0+" Mb.");
-//					}
-//				}
-				
 				ret.setResult(null);
 			}
 			
@@ -140,15 +131,15 @@ public class SokratesBDI
 		 *  Sorts moves according to strategy.
 		 */
 		@GoalAPLBuild
-		public List<PlanCandidate>	buildAPL()
+		public List<MovePlan>	buildAPL()
 		{
-			List<PlanCandidate>	ret	= new ArrayList<PlanCandidate>();
+			List<MovePlan>	ret	= new ArrayList<MovePlan>();
 			List<Move>	moves	= board.getPossibleMoves();
 			Collections.sort(moves, new MoveComparator(board, strategy));
 			
 			for(Move move: moves)
 			{
-				ret.add(new PlanCandidate("move", SUtil.createHashMap(new String[]{"move"}, new Object[]{move})));
+				ret.add(new MovePlan(move));
 			}
 		
 			return ret;
@@ -161,42 +152,105 @@ public class SokratesBDI
 	 *  Plan to make a move.
 	 */
 	@Plan(trigger=@Trigger(goals=MoveGoal.class))
-	public IFuture<Void>	move(final RPlan rplan)
-//	public IFuture<Void>	doMove(Move move)
+	public class MovePlan
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		//-------- attributes --------
 		
-		final Move	move	= (Move)((PlanCandidate)rplan.getCandidate()).getParameters().get("move");
-		triescnt++;
-		print("Trying "+move+" ("+triescnt+") ", depth);
-		depth++;
-		board.move(move);
-				
-		rplan.waitFor(delay)
-			.addResultListener(new DelegationResultListener<Void>(ret)
+		/** The move. */
+		protected Move	move;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a move plan-
+		 */
+		public MovePlan(Move move)
 		{
-			public void customResultAvailable(Void result)
+			this.move	= move;
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  The plan body.
+		 */
+		@PlanBody
+		public IFuture<Void>	move(final IPlan plan)
+		{
+			final Future<Void>	ret	= new Future<Void>();
+			
+			triescnt++;
+			print("Trying "+move+" ("+triescnt+") ", depth);
+			depth++;
+			board.move(move);
+					
+			if(delay>0)
 			{
-				IFuture<MoveGoal> fut = rplan.dispatchSubgoal(new MoveGoal());
+				plan.waitFor(delay)
+					.addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						IFuture<MoveGoal> fut = plan.dispatchSubgoal(new MoveGoal());
+						fut.addResultListener(new ExceptionDelegationResultListener<MoveGoal, Void>(ret)
+						{
+							public void customResultAvailable(MoveGoal result)
+							{
+								ret.setResult(null);
+							}
+						});
+					}
+				});
+			}
+			else
+			{
+				IFuture<MoveGoal> fut = plan.dispatchSubgoal(new MoveGoal());
 				fut.addResultListener(new ExceptionDelegationResultListener<MoveGoal, Void>(ret)
 				{
 					public void customResultAvailable(MoveGoal result)
 					{
 						ret.setResult(null);
 					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						print("Failed "+move, depth);
-						board.takeback();
-						depth--;
-						rplan.waitFor(delay).addResultListener(new DelegationResultListener<Void>(ret));
-					}
 				});
 			}
-		});
+			
+			return ret;
+		}
 		
-		return ret;
+		/**
+		 *  The plan failure code.
+		 */
+		@PlanFailed
+		public IFuture<Void> failed(IPlan plan)
+		{
+			assert board.getLastMove().equals(move): "Tries to takeback wrong move.";
+			
+			Future<Void>	ret	= new Future<Void>();
+			
+			depth--;
+			print("Failed "+move, depth);
+			board.takeback();
+			if(delay>0)
+			{
+				plan.waitFor(delay).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+			
+			return ret;
+		}
+
+		/**
+		 *  The plan passed code.
+		 */
+		@PlanPassed
+		public void passed()
+		{
+			depth--;
+			print("Succeeded "+move, depth);
+		}
 	}
 
 

@@ -1,7 +1,10 @@
 package jadex.bdiv3.actions;
 
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.impl.PlanCandidate;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
@@ -60,7 +63,10 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		
 		Future<Void> ret = new Future<Void>();
 
-		List<Object> cands = element.getApplicablePlanList().selectCandidates();
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		MCapability	mcapa = (MCapability)ip.getCapability().getModelElement();
+
+		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
 		if(cands!=null && !cands.isEmpty())
 		{
 			element.setState(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED);
@@ -73,21 +79,21 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					RPlan.adoptPlan(rplan, ia);
 					ret.setResult(null);
 				}
-				if(cand instanceof PlanCandidate)
+				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{
-					MPlan mplan = ((PlanCandidate)cand).getMPlan();
+					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
 					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
 					RPlan.adoptPlan(rplan, ia);
 					ret.setResult(null);
 				}
-				else if(cand instanceof RPlan)
-				{
-					// dispatch to running plan
-					RPlan rplan = (RPlan)cand;
-					rplan.setDispatchedElement(element);
-					RPlan.adoptPlan(rplan, ia);
-					ret.setResult(null);
-				}
+//				else if(cand instanceof RPlan)
+//				{
+//					// dispatch to running plan
+//					RPlan rplan = (RPlan)cand;
+//					rplan.setDispatchedElement(element);
+//					RPlan.adoptPlan(rplan, ia);
+//					ret.setResult(null);
+//				}
 				else
 				{
 					// todo: dispatch to waitqueue

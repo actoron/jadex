@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MGoal;
@@ -125,7 +126,11 @@ public class RPlan extends RElement implements IPlan
 		MBody mbody = mplan.getBody();
 		
 		IPlanBody body = null;
-		if(mbody.getClazz()!=null)
+		if(candidate.getClass().isAnnotationPresent(Plan.class))
+		{
+			body = new ClassPlanBody(ia, rplan, candidate);
+		}
+		else if(mbody.getClazz()!=null)
 		{
 			body = new ClassPlanBody(ia, rplan, (Class<?>)mbody.getClazz().getType(ia.getClassLoader()));
 		}
