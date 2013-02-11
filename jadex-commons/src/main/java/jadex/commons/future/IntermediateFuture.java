@@ -424,7 +424,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 			}
 			indices.put(Thread.currentThread(), index);
     	}
-		return doGetNextIntermediateResult(index.intValue());
+		return doGetNextIntermediateResult(index.intValue()-1);
     }
     
     /**
@@ -438,11 +438,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 		ISuspendable	caller	= null;
     	synchronized(this)
     	{
-    		if(results!=null && results.size()>=index)
+    		if(results!=null && results.size()>index)
     		{
     			// Hack!!! it there a better way to access the i-est element?
     			Iterator<E>	it	= results.iterator();
-    			for(int i=0; i<index; i++)
+    			for(int i=0; i<=index; i++)
     			{
     				ret	= it.next();
     			}

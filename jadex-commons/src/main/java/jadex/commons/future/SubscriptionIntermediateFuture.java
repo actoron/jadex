@@ -196,22 +196,22 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	synchronized(this)
     	{
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
-    		if(ownres!=null && ownres.size()>=index)
+    		if(ownres!=null && ownres.size()>index)
     		{
     			ret	= ownres.get(index);
     			
-    			// shrink last by removing notified elements.
+    			// shrink list by removing notified elements.
     			for(int i=0; i<=index; i++)
     			{
     				ownres.remove(0);
     			}
     			indices.remove(Thread.currentThread());
     		}
-    		if(results!=null && results.size()>=index)
+    		else if(results!=null && results.size()>index)
     		{
     			// Hack!!! it there a better way to access the i-est element?
     			Iterator<E>	it	= results.iterator();
-    			for(int i=0; i<index; i++)
+    			for(int i=0; i<=index; i++)
     			{
     				ret	= it.next();
     			}
