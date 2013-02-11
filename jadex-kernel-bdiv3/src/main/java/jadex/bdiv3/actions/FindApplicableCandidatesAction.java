@@ -8,6 +8,7 @@ import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -53,27 +54,34 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture<Void> execute(IInternalAccess ia)
+	public IFuture<Void> execute(final IInternalAccess ia)
 	{
 //		System.out.println("find applicable candidates: "+element);
+		final Future<Void> ret = new Future<Void>();
 		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		RCapability rcapa = ip.getCapability();
 		
-		APL apl = element.getApplicablePlanList();
-		apl.build(rcapa);
-		if(apl.isEmpty())
+		final APL apl = element.getApplicablePlanList();
+		apl.build(ia).addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			element.setState(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES);
-			element.planFinished(ia, null);
-//			element.reason(ia);
-		}
-		else
-		{
-			element.setState(RProcessableElement.PROCESSABLEELEMENT_APLAVAILABLE);
-			ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
-		}
+			public void customResultAvailable(Void result)
+			{
+				if(apl.isEmpty())
+				{
+					element.setState(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES);
+					element.planFinished(ia, null);
+//					element.reason(ia);
+				}
+				else
+				{
+					element.setState(RProcessableElement.PROCESSABLEELEMENT_APLAVAILABLE);
+					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
+				}
+				ret.setResult(null);
+			}
+		}));
 		
-		return IFuture.DONE;
+		return ret;
 	}
 }

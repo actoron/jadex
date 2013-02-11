@@ -1,9 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bridge.IInternalAccess;
@@ -25,6 +24,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	
 	/** The body instance. */
 	protected Object plan;
+	
 	
 	/** The body method. */
 	protected Method bodymethod;
@@ -64,22 +64,110 @@ public class ClassPlanBody extends AbstractPlanBody
 		super(ia, rplan);
 		this.body = body;
 		this.plan = plan;
-		Class<?> mbd = body!=null? body: plan.getClass();
-		MBody bo=((MPlan)rplan.getModelElement()).getBody();
+//		Class<?> mbd = body!=null? body: plan.getClass();
 		bodymethod = ((MPlan)rplan.getModelElement()).getBody()
-			.getBodyMethod(mbd).getMethod(ia.getClassLoader());
-		MethodInfo mi = ((MPlan)rplan.getModelElement()).getBody().getPassedMethod(mbd);
+			.getBodyMethod(ia.getClassLoader()).getMethod(ia.getClassLoader());
+		MethodInfo mi = ((MPlan)rplan.getModelElement()).getBody().getPassedMethod(ia.getClassLoader());
 		if(mi!=null)
 			passedmethod = mi.getMethod(ia.getClassLoader());
-		mi = ((MPlan)rplan.getModelElement()).getBody().getFailedMethod(mbd);
+		mi = ((MPlan)rplan.getModelElement()).getBody().getFailedMethod(ia.getClassLoader());
 		if(mi!=null)
 			failedmethod = mi.getMethod(ia.getClassLoader());
-		mi = ((MPlan)rplan.getModelElement()).getBody().getAbortedMethod(mbd);
+		mi = ((MPlan)rplan.getModelElement()).getBody().getAbortedMethod(ia.getClassLoader());
 		if(mi!=null)
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 * 
+	 */
+	public Object getBody(Object agent)
+	{
+		if(plan==null)
+		{
+			try
+			{
+				// create plan  
+				if(plan==null)
+				{
+					Constructor<?>[] cons = body.getDeclaredConstructors();
+					for(Constructor<?> c: cons)
+					{
+						Class<?>[] ptypes = c.getParameterTypes();
+						if(ptypes.length==0)
+						{
+							try
+							{
+								c.setAccessible(true);
+								plan = c.newInstance(new Object[0]);
+								break;
+							}
+							catch(Exception e)
+							{
+							}
+						}
+						if(ptypes.length==1 && SReflect.isSupertype(ptypes[0], agent.getClass()))
+						{
+							try
+							{
+								c.setAccessible(true);
+								plan = c.newInstance(new Object[]{agent});
+								break;
+							}
+							catch(Exception e)
+							{
+							}
+						}
+					}
+					if(plan==null)
+						throw new RuntimeException("Plan body has no empty constructor: "+body);
+				}
+				
+				// inject plan elements
+				Field[] fields = body.getDeclaredFields();
+				for(Field f: fields)
+				{
+					if(f.isAnnotationPresent(PlanAPI.class))
+					{
+						f.setAccessible(true);
+						f.set(plan, getRPlan());
+					}
+					else if(f.isAnnotationPresent(PlanCapability.class))
+					{
+						f.setAccessible(true);
+						f.set(plan, agent);
+					}
+					else if(f.isAnnotationPresent(PlanReason.class))
+					{
+						Object r = getRPlan().getReason();
+						if(r instanceof RProcessableElement)
+						{
+							Object reason = ((RProcessableElement)r).getPojoElement();
+							if(reason!=null)
+							{
+								f.setAccessible(true);
+								f.set(plan, reason);
+							}
+						}
+					}
+				}
+				
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+	//			e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return plan;
+	}
 	
 	/**
 	 *  Invoke the body.
@@ -88,69 +176,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	{
 		try
 		{
-			// create plan  
-			if(plan==null)
-			{
-				Constructor<?>[] cons = body.getConstructors();
-				for(Constructor<?> c: cons)
-				{
-					Class<?>[] ptypes = c.getParameterTypes();
-					if(ptypes.length==0)
-					{
-						try
-						{
-							plan = c.newInstance(new Object[0]);
-							break;
-						}
-						catch(Exception e)
-						{
-						}
-					}
-					if(ptypes.length==1 && SReflect.isSupertype(ptypes[0], agent.getClass()))
-					{
-						try
-						{
-							plan = c.newInstance(new Object[]{agent});
-							break;
-						}
-						catch(Exception e)
-						{
-						}
-					}
-				}
-				if(plan==null)
-					throw new RuntimeException("Plan body has no empty constructor: "+body);
-			}
-			
-			// inject plan elements
-			Field[] fields = body.getDeclaredFields();
-			for(Field f: fields)
-			{
-				if(f.isAnnotationPresent(PlanAPI.class))
-				{
-					f.setAccessible(true);
-					f.set(plan, getRPlan());
-				}
-				else if(f.isAnnotationPresent(PlanCapability.class))
-				{
-					f.setAccessible(true);
-					f.set(plan, agent);
-				}
-				else if(f.isAnnotationPresent(PlanReason.class))
-				{
-					Object r = getRPlan().getReason();
-					if(r instanceof RProcessableElement)
-					{
-						Object reason = ((RProcessableElement)r).getPojoElement();
-						if(reason!=null)
-						{
-							f.setAccessible(true);
-							f.set(plan, reason);
-						}
-					}
-				}
-			}
-			
+			getBody(agent);
 			bodymethod.setAccessible(true);
 			return bodymethod.invoke(plan, params);
 		}

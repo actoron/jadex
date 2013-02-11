@@ -37,6 +37,14 @@ public abstract class AbstractPlanBody implements IPlanBody
 	//-------- methods --------
 	
 	/**
+	 * 
+	 */
+	public Object getBody(Object agent)
+	{
+		return null;
+	}
+	
+	/**
 	 *  Execute the plan body.
 	 */
 	public IFuture<Void> executePlan()
@@ -139,35 +147,17 @@ public abstract class AbstractPlanBody implements IPlanBody
 					public void customResultAvailable(Object result)
 					{
 						ret.setResult(null);
-//						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
-//						if(reason instanceof RProcessableElement)
-//							((RProcessableElement)reason).planFinished(ia, rplan);
 					}
-					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
-//						rplan.setException(exception);
-//						if(reason instanceof RProcessableElement)
-//							((RProcessableElement)reason).planFinished(ia, rplan);
-//					}
 				});
 			}
 			else
 			{
 				ret.setResult(null);
-//				rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
-//				if(reason instanceof RProcessableElement)
-//					((RProcessableElement)reason).planFinished(ia, rplan);
 			}
 		}
 		catch(Exception e)
 		{
 			ret.setException(e);
-//			rplan.setException(e);
-//			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
-//			if(rplan.getReason() instanceof RProcessableElement)
-//				((RProcessableElement)rplan.getReason()).planFinished(ia, rplan);
 		}
 		
 		return ret;

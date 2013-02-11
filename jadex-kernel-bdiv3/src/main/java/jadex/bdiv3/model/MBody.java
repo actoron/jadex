@@ -1,14 +1,15 @@
 package jadex.bdiv3.model;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
-import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
+import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bridge.ClassInfo;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 /**
  *  The plan mbody.
@@ -44,6 +45,13 @@ public class MBody
 
 	/** The aborted method cached for speed. */
 	protected MethodInfo abortedmethod;
+	
+	/** The precondition method cached for speed. */
+	protected MethodInfo preconditionmethod;
+
+	/** The precondition method cached for speed. */
+	protected MethodInfo contextconditionmethod;
+
 	
 	/**
 	 *  Create a new mbody.
@@ -151,7 +159,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public MethodInfo getBodyMethod(Class<?> body)
+	public MethodInfo getBodyMethod(ClassLoader cl)
 	{
 		if(bodymethod==null)
 		{
@@ -159,6 +167,7 @@ public class MBody
 			{
 				if(bodymethod==null)
 				{
+					Class<?> body = clazz.getType(cl);
 					bodymethod = getMethod(body, PlanBody.class);
 					if(bodymethod==null)
 						throw  new RuntimeException("Plan has no body method: "+body);
@@ -172,7 +181,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public MethodInfo getPassedMethod(Class<?> body)
+	public MethodInfo getPassedMethod(ClassLoader cl)
 	{
 		if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
 		{
@@ -180,6 +189,7 @@ public class MBody
 			{
 				if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
 				{
+					Class<?> body = clazz.getType(cl);
 					passedmethod = getMethod(body, PlanPassed.class);
 					if(passedmethod==null)
 						passedmethod = MI_NOTFOUND;
@@ -193,7 +203,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public MethodInfo getFailedMethod(Class<?> body)
+	public MethodInfo getFailedMethod(ClassLoader cl)
 	{
 		if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
 		{
@@ -201,6 +211,7 @@ public class MBody
 			{
 				if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
 				{
+					Class<?> body = clazz.getType(cl);
 					failedmethod = getMethod(body, PlanFailed.class);
 					if(failedmethod==null)
 						failedmethod = MI_NOTFOUND;
@@ -214,7 +225,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public MethodInfo getAbortedMethod(Class<?> body)
+	public MethodInfo getAbortedMethod(ClassLoader cl)
 	{
 		if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
 		{
@@ -222,6 +233,7 @@ public class MBody
 			{
 				if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
 				{
+					Class<?> body = clazz.getType(cl);
 					abortedmethod = getMethod(body, PlanAborted.class);
 					if(abortedmethod==null)
 						abortedmethod = MI_NOTFOUND;
@@ -230,6 +242,49 @@ public class MBody
 		}
 		
 		return MI_NOTFOUND.equals(abortedmethod)? null: abortedmethod;
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getPreconditionMethod(ClassLoader cl)
+	{
+		if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
+		{
+			synchronized(this)
+			{
+				if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
+				{
+					Class<?> body = clazz.getType(cl);
+					preconditionmethod = getMethod(body, PlanPrecondition.class);
+					if(preconditionmethod==null)
+						preconditionmethod = MI_NOTFOUND;
+				}
+			}
+		}
+		
+		return MI_NOTFOUND.equals(preconditionmethod)? null: preconditionmethod;
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getContextConditionMethod(Class<?> body)
+	{
+		if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
+		{
+			synchronized(this)
+			{
+				if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
+				{
+					contextconditionmethod = getMethod(body, PlanContextCondition.class);
+					if(contextconditionmethod==null)
+						contextconditionmethod = MI_NOTFOUND;
+				}
+			}
+		}
+		
+		return MI_NOTFOUND.equals(contextconditionmethod)? null: contextconditionmethod;
 	}
 	
 	/**

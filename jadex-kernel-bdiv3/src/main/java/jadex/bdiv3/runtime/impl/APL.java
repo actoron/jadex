@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.GoalAPLBuild;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.model.MCapability;
@@ -7,12 +8,21 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.model.MethodInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.micro.IPojoMicroAgent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -88,8 +98,10 @@ public class APL
 	/**
 	 * 
 	 */
-	public void build(RCapability capa)
+	public IFuture<Void> build(IInternalAccess ia)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(candidates==null || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
 			if(candidates==null)
@@ -135,8 +147,19 @@ public class APL
 				
 				if(!done)
 				{
-					candidates	= doBuild(capa);
+					doBuild(ia).addResultListener(new ExceptionDelegationResultListener<List<Object>, Void>(ret)
+					{
+						public void customResultAvailable(List<Object> result)
+						{
+							candidates = result;
+							ret.setResult(null);
+						}
+					});
 				}
+			}
+			else
+			{
+				ret.setResult(null);
 			}
 			
 			// both aspects are dealt with dispatchToAll() via rules
@@ -181,6 +204,8 @@ public class APL
 //				}
 //			}
 //		}
+		
+		return ret;
 	}
 	
 	//-------- helper methods --------
@@ -216,9 +241,14 @@ public class APL
 		return ret;
 	}
 	
-	protected List<Object>	doBuild(RCapability capa)
+	/**
+	 * 
+	 */
+	protected IFuture<List<Object>>	doBuild(IInternalAccess ia)
 	{
-		List<Object>	ret = new ArrayList<Object>();
+		final Future<List<Object>> ret = new Future<List<Object>>();
+		
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		
 //		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		
@@ -226,31 +256,127 @@ public class APL
 		if(precandidates==null)
 		{
 			precandidates = new ArrayList<MPlan>();
-			List<MPlan> mplans = ((MCapability)capa.getModelElement()).getPlans();
+			List<MPlan> mplans = ((MCapability)ip.getCapability().getModelElement()).getPlans();
 			if(mplans!=null)
 			{
 				for(int i=0; i<mplans.size(); i++)
 				{
 					MPlan mplan = mplans.get(i);
 					MTrigger mtrigger = mplan.getTrigger();
+					
 					if(element instanceof RGoal)
 					{
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
 						{
 							precandidates.add(mplan);
-							ret.add(mplan);
+//							res.add(mplan);
 						}
 					}
 				}
 			}
 		}
-		else
+
+		final CollectionResultListener<MPlan> lis = new CollectionResultListener<MPlan>(precandidates.size(), true, new IResultListener<Collection<MPlan>>()
 		{
-			ret.addAll(precandidates);
+			public void resultAvailable(Collection<MPlan> result) 
+			{
+				ret.setResult((List)result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
+		for(final MPlan mplan: precandidates)
+		{
+			// check precondition
+			MethodInfo mi = mplan.getBody().getPreconditionMethod(ia.getClassLoader());
+			if(mi!=null)
+			{
+				Method m = mi.getMethod(ia.getClassLoader());
+				Object pojo = null;
+				if(!Modifier.isStatic(m.getModifiers()))
+				{
+					RPlan rp = RPlan.createRPlan(mplan, mplan, element, ia);
+					final Object agent = ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia;
+					pojo = rp.getBody().getBody(agent);
+				}
+				try
+				{
+					m.setAccessible(true);
+					Object app = m.invoke(pojo, guessParameters(m.getParameterTypes()));
+					if(app instanceof Boolean)
+					{
+						if(((Boolean)app).booleanValue())
+						{
+							lis.resultAvailable(mplan);
+						}
+					}
+					else if(app instanceof IFuture)
+					{
+						((IFuture<Boolean>)app).addResultListener(new IResultListener<Boolean>()
+						{
+							public void resultAvailable(Boolean result)
+							{
+								if(result.booleanValue())
+								{
+									lis.resultAvailable(mplan);
+								}
+								else
+								{
+									lis.exceptionOccurred(null);
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								lis.exceptionOccurred(exception);
+							}
+						});
+					}
+				}
+				catch(Exception e)
+				{
+					lis.exceptionOccurred(e);
+				}
+			}
+			else
+			{
+				lis.resultAvailable(mplan);
+			}
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Method that tries to guess the parameters for the method call.
+	 */
+	public Object[] guessParameters(Class<?>[] ptypes)
+	{
+		if(ptypes==null)
+			return null;
+		// Guess parameters
+//		Class<?>[] ptypes = body.getParameterTypes();
+		
+		Object pojope = ((RProcessableElement)element).getPojoElement();
+		
+		Object[] params = new Object[ptypes.length];
+		
+		for(int i=0; i<ptypes.length; i++)
+		{
+			if(SReflect.isSupertype(element.getClass(), ptypes[i]))
+			{
+				params[i] = element;
+			}
+			else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))
+			{
+				params[i] = pojope;
+			}
+		}
+				
+		return params;
 	}
 	
 	/**

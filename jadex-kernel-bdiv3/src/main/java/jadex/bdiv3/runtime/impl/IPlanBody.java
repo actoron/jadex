@@ -8,6 +8,11 @@ import jadex.commons.future.IFuture;
 public interface IPlanBody
 {
 	/**
+	 *  Get the plan body.
+	 */
+	public Object getBody(Object agent);
+	
+	/**
 	 *  Execute the plan body.
 	 */
 	public IFuture<Void> executePlan();
