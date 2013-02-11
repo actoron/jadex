@@ -1,7 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
@@ -126,7 +126,7 @@ public class ClassPlanBody extends AbstractPlanBody
 			Field[] fields = body.getDeclaredFields();
 			for(Field f: fields)
 			{
-				if(f.isAnnotationPresent(PlanPlan.class))
+				if(f.isAnnotationPresent(PlanAPI.class))
 				{
 					f.setAccessible(true);
 					f.set(plan, getRPlan());

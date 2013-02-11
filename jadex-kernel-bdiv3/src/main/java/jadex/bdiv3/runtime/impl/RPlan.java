@@ -456,6 +456,14 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
+	public boolean isFinished()
+	{
+		return isPassed() || isFailed() || isAborted();
+	}
+	
+	/**
+	 * 
+	 */
 	public void addSubgoal(RGoal subgoal)
 	{
 		if(subgoals==null)
@@ -481,7 +489,7 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public void abortPlan()
 	{
-		if(!isAborted() && !isFailed() && !isPassed())
+		if(!isFinished())
 		{
 			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
 			
@@ -489,7 +497,7 @@ public class RPlan extends RElement implements IPlan
 			{
 				for(RGoal subgoal: subgoals)
 				{
-					subgoal.dropGoal(ia);
+					subgoal.drop();
 				}
 			}
 			
@@ -582,14 +590,14 @@ public class RPlan extends RElement implements IPlan
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(mgoal, goal, this);
+		final RGoal rgoal = new RGoal(ia, mgoal, goal, this);
 		
 		rgoal.addGoalListener(new TimeoutResultListener<Void>(
 			timeout, ia.getExternalAccess(), new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				if(!rgoal.isFinished() && isAborted() || isFailed())
+				if(!rgoal.isFinished() && (isAborted() || isFailed()))
 				{
 					ret.setException(new PlanFailureException());
 				}
@@ -604,7 +612,7 @@ public class RPlan extends RElement implements IPlan
 			{
 				if(exception instanceof TimeoutException)
 				{
-					rgoal.dropGoal(ia);
+					rgoal.drop();
 				}
 				ret.setException(exception);
 			}

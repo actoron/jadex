@@ -74,12 +74,15 @@ public abstract class AbstractPlanBody implements IPlanBody
 			
 			public void exceptionOccurred(final Exception exception)
 			{
-				internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 2)
+				int next = RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState())? 3: 2; 
+				
+				internalInvokePart(agent, guessParameters(getBodyParameterTypes()), next)
 					.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+						if(!rplan.isFinished())
+							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 						rplan.setException(exception);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
@@ -88,7 +91,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 					
 					public void exceptionOccurred(Exception ex)
 					{
-						rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+						if(!rplan.isFinished())
+							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 						rplan.setException(exception);
 						if(reason instanceof RProcessableElement)
 							((RProcessableElement)reason).planFinished(ia, rplan);
@@ -239,6 +243,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 			else if(SReflect.isSupertype(IPlan.class, ptypes[i]))
 			{
 				params[i] = rplan;
+			}
+			else if(SReflect.isSupertype(Exception.class, ptypes[i]))
+			{
+				params[i] = rplan.getException();
 			}
 		}
 				

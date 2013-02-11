@@ -2,7 +2,7 @@ package jadex.bdiv3.examples.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.PickupWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.IEnvironment;
@@ -22,7 +22,7 @@ public class LocalPickUpWasteActionPlan
 	@PlanCapability
 	protected CleanerBDI capa;
 	
-	@PlanPlan
+	@PlanAPI
 	protected IPlan rplan;
 	
 	@PlanReason

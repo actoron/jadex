@@ -2,7 +2,7 @@ package jadex.bdiv3.examples.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.examples.cleanerworld.world.Vision;
@@ -19,7 +19,7 @@ public class LocalGetVisionActionPlan
 	@PlanCapability
 	protected CleanerBDI capa;
 	
-	@PlanPlan
+	@PlanAPI
 	protected IPlan rplan;
 
 	//-------- methods --------

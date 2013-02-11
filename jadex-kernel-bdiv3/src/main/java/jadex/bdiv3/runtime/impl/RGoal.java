@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
@@ -27,7 +28,7 @@ import java.util.Set;
 /**
  * 
  */
-public class RGoal extends RProcessableElement
+public class RGoal extends RProcessableElement implements IGoal
 {
 	//-------- goal lifecycle states --------
 	
@@ -117,12 +118,16 @@ public class RGoal extends RProcessableElement
 	/** The set of inhibitors. */
 	protected Set<RGoal> inhibitors;
 
+	/** The internal access. */
+	protected IInternalAccess ia;
+	
 	/**
 	 *  Create a new rgoal. 
 	 */
-	public RGoal(MGoal mgoal, Object goal, RPlan parentplan)
+	public RGoal(IInternalAccess ia, MGoal mgoal, Object goal, RPlan parentplan)
 	{
 		super(mgoal, goal);
+		this.ia = ia;
 		this.parentplan = parentplan;
 		this.lifecyclestate = GOALLIFECYCLESTATE_NEW;
 		this.processingstate = GOALPROCESSINGSTATE_IDLE;
@@ -770,7 +775,7 @@ public class RGoal extends RProcessableElement
 	/**
 	 * 
 	 */
-	public void dropGoal(IInternalAccess ia)
+	public void drop()
 	{
 		if(!RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState())
 			&& !RGoal.GOALLIFECYCLESTATE_DROPPING.equals(getLifecycleState()) 

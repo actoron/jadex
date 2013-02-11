@@ -1,8 +1,15 @@
 package jadex.bdiv3.actions;
 
+import java.lang.reflect.Field;
+
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.GoalAPI;
+import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -46,6 +53,19 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			// todo: observe class and goal itself!
 //			goal.observeGoal(ia);
+			
+			// inject goal elements
+			Class<?> cl = goal.getPojoElement().getClass();
+			Field[] fields = cl.getDeclaredFields();
+			for(Field f: fields)
+			{
+				if(f.isAnnotationPresent(GoalAPI.class))
+				{
+					f.setAccessible(true);
+					f.set(goal.getPojoElement(), goal);
+				}
+			}
+			
 			ip.getCapability().addGoal(goal);
 			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_ADOPTED);
 			ret.setResult(null);

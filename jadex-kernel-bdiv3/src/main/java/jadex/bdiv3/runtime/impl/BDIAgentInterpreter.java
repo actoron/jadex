@@ -272,7 +272,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					if(mgoal==null || goal==null)
 						throw new RuntimeException("Could not create initial goal: ");
 					
-					RGoal rgoal = new RGoal(mgoal, goal, null);
+					RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
 					RGoal.adoptGoal(rgoal, getInternalAccess());
 				}
 			}

@@ -2,7 +2,7 @@ package jadex.bdiv3.examples.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanPlan;
+import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.runtime.IPlan;
@@ -24,7 +24,7 @@ public class PatrolPlan
 	@PlanCapability
 	protected CleanerBDI capa;
 	
-	@PlanPlan
+	@PlanAPI
 	protected IPlan rplan;
 
 	//-------- constructors --------

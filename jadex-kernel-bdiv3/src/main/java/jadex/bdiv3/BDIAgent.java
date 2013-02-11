@@ -87,7 +87,7 @@ public class BDIAgent extends MicroAgent
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(mgoal, goal, null);
+		final RGoal rgoal = new RGoal(ip.getInternalAccess(), mgoal, goal, null);
 		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
