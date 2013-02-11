@@ -77,6 +77,17 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	}
 	
 	/**
+	 *  Add a listener which is only informed about new results,
+	 *  i.e. the initial results are not posted to this listener,
+	 *  even if it is the first listener to be added to this future.
+	 */
+	public void	addQuietListener(IResultListener<Collection<E>> listener)
+	{
+    	super.addResultListener(listener);		
+	}
+
+	
+	/**
      *  Add a result listener.
      *  @param listsner The listener.
      */

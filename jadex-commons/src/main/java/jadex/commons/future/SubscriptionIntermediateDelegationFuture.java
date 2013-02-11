@@ -1,6 +1,13 @@
 package jadex.commons.future;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -10,6 +17,9 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	implements ISubscriptionIntermediateFuture<E>
 {
 	//-------- attributes --------
+	
+	/** The local results for a single thread. */
+    protected Map<Thread, List<E>>	ownresults;
 	
     /** Flag if results should be stored till first listener is. */
     protected boolean storeforfirst;
@@ -32,17 +42,39 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 		storeforfirst = true;
 	}
 	
-	//-------- methods --------
+	//-------- methods (hack!!! copied from subscription future) --------
 	
 	/**
-	 *  Don't store results.
+	 *  Add a result.
+	 *  @param result The result.
 	 */
 	protected void addResult(E result)
 	{
-		if(storeforfirst && (listeners==null || listeners.size()==0))
+		// Store results only if necessary for first listener.
+		if(storeforfirst)
 			super.addResult(result);
+		
+		if(ownresults!=null)
+		{
+			for(List<E> res: ownresults.values())
+			{
+				res.add(result);
+			}
+		}
+		
+		resumeIntermediate();
 	}
 	
+	/**
+	 *  Add a listener which is only informed about new results,
+	 *  i.e. the initial results are not posted to this listener,
+	 *  even if it is the first listener to be added to this future.
+	 */
+	public void	addQuietListener(IResultListener<Collection<E>> listener)
+	{
+    	super.addResultListener(listener);		
+	}
+
 	/**
      *  Add a result listener.
      *  @param listsner The listener.
@@ -53,14 +85,175 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	boolean first;
     	synchronized(this)
 		{
-			first = listeners==null || listeners.size()==0;
+			first = storeforfirst;
+			storeforfirst	= false;
 		}
     	super.addResultListener(listener);
     	
-    	synchronized(this)
+		if(first)
 		{
-			if(first)
-				results=null;
+			results=null;
 		}
     }
+    
+    /**
+     *  Check if there are more results for iteration for the given caller.
+     *  If there are currently no unprocessed results and future is not yet finished,
+     *  the caller is blocked until either new results are available and true is returned
+     *  or the future is finished, thus returning false.
+     *  
+     *  @return	True, when there are more intermediate results for the caller.
+     */
+    public boolean hasNextIntermediateResult()
+    {
+    	boolean	ret;
+    	boolean	suspend;
+    	
+		ISuspendable	caller	= null;
+		List<E>	ownres;
+    	synchronized(this)
+    	{
+    		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
+    		if(index==null)
+    		{
+    			index	= new Integer(0);
+    		}
+    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+    		
+    		ret	= results!=null && results.size()>index.intValue()
+    			|| ownres!=null && ownres.size()>index.intValue();
+    		suspend	= !ret && !isDone();
+    		if(suspend)
+    		{
+    	    	caller	= ISuspendable.SUSPENDABLE.get();
+    	    	if(caller==null)
+    	    	{
+    		   		throw new RuntimeException("No suspendable element.");
+    	    	}
+	    	   	if(icallers==null)
+	    	   	{
+	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
+	    	   	}
+	    	   	icallers.put(caller, CALLER_QUEUED);
+    		}
+    	}
+    	
+    	if(suspend)
+    	{
+    		synchronized(this)
+    		{
+    			if(ownres==null)
+    			{
+	    			ownres	= new LinkedList<E>();
+	    			if(ownresults==null)
+	    			{
+	    				ownresults	= new HashMap<Thread, List<E>>();
+	    			}
+	    			ownresults.put(Thread.currentThread(), ownres);
+    			}
+    		}
+    		
+	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	    	synchronized(mon)
+	    	{
+    			Object	state	= icallers.get(caller);
+    			if(CALLER_QUEUED.equals(state))
+    			{
+    	    	   	icallers.put(caller, CALLER_SUSPENDED);
+    				caller.suspend(this, -1);
+    	    	   	icallers.remove(caller);
+    		    	ret	= hasNextIntermediateResult();
+    			}
+    			// else already resumed.
+    		}
+    	}
+    	
+    	return ret;
+    }	
+	
+    /**
+     *  Perform the get without increasing the index.
+     */
+    protected E doGetNextIntermediateResult(int index)
+    {
+       	E	ret	= null;
+    	boolean	suspend	= false;
+    	
+    	List<E>	ownres;
+		ISuspendable	caller	= null;
+    	synchronized(this)
+    	{
+    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+    		if(ownres!=null && ownres.size()>=index)
+    		{
+    			ret	= ownres.get(index);
+    			
+    			// shrink last by removing notified elements.
+    			for(int i=0; i<=index; i++)
+    			{
+    				ownres.remove(0);
+    			}
+    			indices.remove(Thread.currentThread());
+    		}
+    		if(results!=null && results.size()>=index)
+    		{
+    			// Hack!!! it there a better way to access the i-est element?
+    			Iterator<E>	it	= results.iterator();
+    			for(int i=0; i<index; i++)
+    			{
+    				ret	= it.next();
+    			}
+    		}
+    		else if(isDone())
+    		{
+    			throw new NoSuchElementException("No more intermediate results.");
+    		}
+    		else
+    		{
+    			suspend	= true;
+    	    	caller	= ISuspendable.SUSPENDABLE.get();
+    	    	if(caller==null)
+    	    	{
+    		   		throw new RuntimeException("No suspendable element.");
+    	    	}
+	    	   	if(icallers==null)
+	    	   	{
+	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
+	    	   	}
+	    	   	icallers.put(caller, CALLER_QUEUED);
+    		}
+   		}
+    	
+    	if(suspend)
+    	{
+    		synchronized(this)
+    		{
+    			if(ownres==null)
+    			{
+	    			ownres	= new LinkedList<E>();
+	    			if(ownresults==null)
+	    			{
+	    				ownresults	= new HashMap<Thread, List<E>>();
+	    			}
+	    			ownresults.put(Thread.currentThread(), ownres);
+    			}
+    		}
+
+	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	    	synchronized(mon)
+	    	{
+    			Object	state	= icallers.get(caller);
+    			if(CALLER_QUEUED.equals(state))
+    			{
+    	    	   	icallers.put(caller, CALLER_SUSPENDED);
+    				caller.suspend(this, -1);
+    	    	   	icallers.remove(caller);
+    		    	ret	= doGetNextIntermediateResult(index);
+    			}
+    			// else already resumed.
+    		}
+    	}
+    	
+    	return ret;
+    }	
 }

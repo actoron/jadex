@@ -27,6 +27,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -502,7 +503,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					{
 						if(fut instanceof IIntermediateFuture)
 						{
-							fut.addResultListener(new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IIntermediateResultListener()
+							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IIntermediateResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -530,7 +531,15 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								public void finished()
 								{
 								}
-							}));
+							});
+							if(fut instanceof ISubscriptionIntermediateFuture)
+							{
+								((ISubscriptionIntermediateFuture)fut).addQuietListener(tirl);
+							}
+							else
+							{
+								fut.addResultListener(tirl);
+							}
 						}
 						else
 						{
