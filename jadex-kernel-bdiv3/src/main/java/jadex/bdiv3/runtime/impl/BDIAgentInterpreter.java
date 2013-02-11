@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
+import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
@@ -17,6 +18,7 @@ import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
@@ -826,6 +828,33 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					rulesystem.getRulebase().addRule(rule);
 				}
 			}
+			
+			// context condition
+			
+//			MethodInfo mi = mplan.getBody().getContextConditionMethod(getClassLoader());
+//			if(mi!=null)
+//			{
+//				PlanContextCondition pcc = mi.getMethod(getClassLoader()).getAnnotation(PlanContextCondition.class);
+//				String[] evs = pcc.events();
+//				List<EventType> events = new ArrayList<EventType>();
+//				for(String ev: evs)
+//				{
+//					addBeliefEvents(getInternalAccess(), events, ev);
+//				}
+//				
+//				IAction<Void> abortplans = new IAction<Void>()
+//				{
+//					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+//					{
+//						
+//						return IFuture.DONE;
+//					}
+//				};
+//				
+//				Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
+//					, abortplans);
+//				rulesystem.getRulebase().addRule(rule);
+//			}
 		}
 		
 		// add/rem goal inhibitor rules

@@ -269,7 +269,7 @@ public class MBody
 	/**
 	 * 
 	 */
-	public MethodInfo getContextConditionMethod(Class<?> body)
+	public MethodInfo getContextConditionMethod(ClassLoader cl)
 	{
 		if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
 		{
@@ -277,6 +277,7 @@ public class MBody
 			{
 				if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
 				{
+					Class<?> body = clazz.getType(cl);
 					contextconditionmethod = getMethod(body, PlanContextCondition.class);
 					if(contextconditionmethod==null)
 						contextconditionmethod = MI_NOTFOUND;

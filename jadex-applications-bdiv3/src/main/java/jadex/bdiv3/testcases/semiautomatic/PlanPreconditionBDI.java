@@ -1,7 +1,6 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
@@ -20,10 +19,6 @@ public class PlanPreconditionBDI
 	/** The agent. */
 	@Agent
 	protected BDIAgent agent;
-	
-	/** The counter belief. */
-	@Belief
-	private int counter;
 	
 	@Goal
 	protected class SomeGoal
