@@ -5,6 +5,9 @@ Release 2.3 (BDI V3 preview release 09/2012)
 	- preview of on-demand threaded (synchronous) components
 	- new jadex-based game AgentKeeper, available from https://code.google.com/p/jadex-agentkeeper/
 	- remote jcc support for jadex-minimal platform
+	- standalone relay (Pro feature)
+	- cron service (Pro feature)
+	- service pool (Pro feature)
 	- lots of improvements and bug fixes
 
 Release 2.2.1 (Bugfix release 09/2012)
