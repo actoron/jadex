@@ -250,9 +250,9 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 		final IntermediateFuture<InformationEntry> ret = new IntermediateFuture<InformationEntry>();
 		
-		IFuture<Collection<IHelpline>> fut = agent.scheduleStep(new IComponentStep<Collection<IHelpline>>()
+		IIntermediateFuture<IHelpline> fut = (IIntermediateFuture<IHelpline>)agent.scheduleStep(new IComponentStep<Collection<IHelpline>>()
 		{
-			public IFuture<Collection<IHelpline>> execute(IInternalAccess ia)
+			public IIntermediateFuture<IHelpline> execute(IInternalAccess ia)
 			{
 				IIntermediateFuture<IHelpline> ret;
 				if(remote)
