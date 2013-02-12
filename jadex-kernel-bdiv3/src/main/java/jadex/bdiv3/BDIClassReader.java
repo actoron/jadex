@@ -235,16 +235,6 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-//			Class[] classes = cl.getDeclaredClasses();
-//			for(int i=0; i<classes.length; i++)
-//			{
-//				if(classes[i].isAnnotationPresent(Goal.class))
-//				{
-////					System.out.println("found goal: "+classes[i].getName());
-//					goals.add(classes[i]);
-//				}
-//			}
-			
 			if(!confdone && isAnnotationPresent(clazz, BDIConfigurations.class, cl))
 			{
 				BDIConfigurations val = (BDIConfigurations)getAnnotation(clazz, BDIConfigurations.class, cl);

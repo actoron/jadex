@@ -33,6 +33,7 @@ import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -831,30 +832,53 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			// context condition
 			
-//			MethodInfo mi = mplan.getBody().getContextConditionMethod(getClassLoader());
-//			if(mi!=null)
-//			{
-//				PlanContextCondition pcc = mi.getMethod(getClassLoader()).getAnnotation(PlanContextCondition.class);
-//				String[] evs = pcc.events();
-//				List<EventType> events = new ArrayList<EventType>();
-//				for(String ev: evs)
-//				{
-//					addBeliefEvents(getInternalAccess(), events, ev);
-//				}
-//				
-//				IAction<Void> abortplans = new IAction<Void>()
-//				{
-//					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
-//					{
-//						
-//						return IFuture.DONE;
-//					}
-//				};
-//				
-//				Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
-//					, abortplans);
-//				rulesystem.getRulebase().addRule(rule);
-//			}
+			final MethodInfo mi = mplan.getBody().getContextConditionMethod(getClassLoader());
+			if(mi!=null)
+			{
+				PlanContextCondition pcc = mi.getMethod(getClassLoader()).getAnnotation(PlanContextCondition.class);
+				String[] evs = pcc.events();
+				List<EventType> events = new ArrayList<EventType>();
+				for(String ev: evs)
+				{
+					addBeliefEvents(getInternalAccess(), events, ev);
+				}
+				
+				IAction<Void> abortplans = new IAction<Void>()
+				{
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					{
+						Collection<RPlan> coll = capa.getPlans(mplan);
+						
+						for(final RPlan plan: coll)
+						{
+							Set<Object> vals = new HashSet<Object>();
+							vals.add(agent);
+							vals.add(plan);
+							invokeBooleanMethod(plan.getBody().getBody(agent), mi.getMethod(getClassLoader()), vals)
+								.addResultListener(new IResultListener<Boolean>()
+							{
+								public void resultAvailable(Boolean result)
+								{
+									if(!result.booleanValue())
+									{
+										plan.abortPlan();
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							});
+						}
+						return IFuture.DONE;
+					}
+				};
+				
+				Rule<Void> rule = new Rule<Void>("plan_context_abort_"+mplan.getName(), 
+					new PlansExistCondition(mplan, capa), abortplans);
+				rule.setEvents(events);
+				rulesystem.getRulebase().addRule(rule);
+			}
 		}
 		
 		// add/rem goal inhibitor rules
@@ -1123,6 +1147,57 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
+	 *  Method that tries to guess the parameters for the method call.
+	 */
+	public Object[] guessMethodParameters(Object pojo, Class<?>[] ptypes, Set<Object> values)
+	{
+		if(ptypes==null || values==null)
+			return null;
+		
+		Object[] params = new Object[ptypes.length];
+		
+		for(int i=0; i<ptypes.length; i++)
+		{
+			for(Object val: values)
+			{
+				if(SReflect.isSupertype(val.getClass(), ptypes[i]))
+				{
+					params[i] = val;
+					break;
+				}
+			}
+		}
+				
+		return params;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, Set<Object> vals)
+	{
+		final Future<Boolean> ret = new Future<Boolean>();
+		try
+		{
+			m.setAccessible(true);
+			Object app = m.invoke(pojo, guessMethodParameters(pojo, m.getParameterTypes(), vals));
+			if(app instanceof Boolean)
+			{
+				ret.setResult((Boolean)app);
+			}
+			else if(app instanceof IFuture)
+			{
+				((IFuture<Boolean>)app).addResultListener(new DelegationResultListener<Boolean>(ret));
+			}
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Create belief events from a belief name.
 	 *  For normal beliefs 
 	 *  beliefchanged.belname and factchanged.belname 
@@ -1264,6 +1339,30 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		public boolean evaluate(IEvent event)
 		{
 			return !capa.getGoals(mgoal).isEmpty();
+		}
+	}
+	
+	/**
+	 *  Condition that tests if goal instances of an mplan exist.
+	 */
+	public static class PlansExistCondition implements ICondition
+	{
+		protected MPlan mplan;
+		
+		protected RCapability capa;
+		
+		public PlansExistCondition(MPlan mplan, RCapability capa)
+		{
+			this.mplan = mplan;
+			this.capa = capa;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean evaluate(IEvent event)
+		{
+			return !capa.getPlans(mplan).isEmpty();
 		}
 	}
 }

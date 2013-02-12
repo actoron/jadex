@@ -48,7 +48,8 @@ public class PlanContextConditionBDI
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				System.out.println("fail: "+exception);
+//				exception.printStackTrace();
 			}
 		});
 		
