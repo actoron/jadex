@@ -516,6 +516,7 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
+//		System.out.println("added: "+event);
 		events.add(event);
 	}
 	

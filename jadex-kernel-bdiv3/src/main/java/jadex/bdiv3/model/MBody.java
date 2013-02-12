@@ -161,16 +161,19 @@ public class MBody
 	 */
 	public MethodInfo getBodyMethod(ClassLoader cl)
 	{
-		if(bodymethod==null)
+		if(clazz!=null)
 		{
-			synchronized(this)
+			if(bodymethod==null)
 			{
-				if(bodymethod==null)
+				synchronized(this)
 				{
-					Class<?> body = clazz.getType(cl);
-					bodymethod = getMethod(body, PlanBody.class);
 					if(bodymethod==null)
-						throw  new RuntimeException("Plan has no body method: "+body);
+					{
+						Class<?> body = clazz.getType(cl);
+						bodymethod = getMethod(body, PlanBody.class);
+						if(bodymethod==null)
+							throw  new RuntimeException("Plan has no body method: "+body);
+					}
 				}
 			}
 		}
@@ -183,16 +186,19 @@ public class MBody
 	 */
 	public MethodInfo getPassedMethod(ClassLoader cl)
 	{
-		if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
+		if(clazz!=null)
 		{
-			synchronized(this)
+			if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
 			{
-				if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
+				synchronized(this)
 				{
-					Class<?> body = clazz.getType(cl);
-					passedmethod = getMethod(body, PlanPassed.class);
-					if(passedmethod==null)
-						passedmethod = MI_NOTFOUND;
+					if(passedmethod==null && !MI_NOTFOUND.equals(passedmethod))
+					{
+						Class<?> body = clazz.getType(cl);
+						passedmethod = getMethod(body, PlanPassed.class);
+						if(passedmethod==null)
+							passedmethod = MI_NOTFOUND;
+					}
 				}
 			}
 		}
@@ -205,16 +211,19 @@ public class MBody
 	 */
 	public MethodInfo getFailedMethod(ClassLoader cl)
 	{
-		if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
+		if(clazz!=null)
 		{
-			synchronized(this)
+			if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
 			{
-				if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
+				synchronized(this)
 				{
-					Class<?> body = clazz.getType(cl);
-					failedmethod = getMethod(body, PlanFailed.class);
-					if(failedmethod==null)
-						failedmethod = MI_NOTFOUND;
+					if(failedmethod==null && !MI_NOTFOUND.equals(failedmethod))
+					{
+						Class<?> body = clazz.getType(cl);
+						failedmethod = getMethod(body, PlanFailed.class);
+						if(failedmethod==null)
+							failedmethod = MI_NOTFOUND;
+					}
 				}
 			}
 		}
@@ -227,16 +236,19 @@ public class MBody
 	 */
 	public MethodInfo getAbortedMethod(ClassLoader cl)
 	{
-		if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
+		if(clazz!=null)
 		{
-			synchronized(this)
+			if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
 			{
-				if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
+				synchronized(this)
 				{
-					Class<?> body = clazz.getType(cl);
-					abortedmethod = getMethod(body, PlanAborted.class);
-					if(abortedmethod==null)
-						abortedmethod = MI_NOTFOUND;
+					if(abortedmethod==null && !MI_NOTFOUND.equals(abortedmethod))
+					{
+						Class<?> body = clazz.getType(cl);
+						abortedmethod = getMethod(body, PlanAborted.class);
+						if(abortedmethod==null)
+							abortedmethod = MI_NOTFOUND;
+					}
 				}
 			}
 		}
@@ -249,16 +261,19 @@ public class MBody
 	 */
 	public MethodInfo getPreconditionMethod(ClassLoader cl)
 	{
-		if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
+		if(clazz!=null)
 		{
-			synchronized(this)
+			if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
 			{
-				if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
+				synchronized(this)
 				{
-					Class<?> body = clazz.getType(cl);
-					preconditionmethod = getMethod(body, PlanPrecondition.class);
-					if(preconditionmethod==null)
-						preconditionmethod = MI_NOTFOUND;
+					if(preconditionmethod==null && !MI_NOTFOUND.equals(preconditionmethod))
+					{
+						Class<?> body = clazz.getType(cl);
+						preconditionmethod = getMethod(body, PlanPrecondition.class);
+						if(preconditionmethod==null)
+							preconditionmethod = MI_NOTFOUND;
+					}
 				}
 			}
 		}
@@ -271,20 +286,22 @@ public class MBody
 	 */
 	public MethodInfo getContextConditionMethod(ClassLoader cl)
 	{
-		if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
+		if(clazz!=null)
 		{
-			synchronized(this)
+			if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
 			{
-				if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
+				synchronized(this)
 				{
-					Class<?> body = clazz.getType(cl);
-					contextconditionmethod = getMethod(body, PlanContextCondition.class);
-					if(contextconditionmethod==null)
-						contextconditionmethod = MI_NOTFOUND;
+					if(contextconditionmethod==null && !MI_NOTFOUND.equals(contextconditionmethod))
+					{
+						Class<?> body = clazz.getType(cl);
+						contextconditionmethod = getMethod(body, PlanContextCondition.class);
+						if(contextconditionmethod==null)
+							contextconditionmethod = MI_NOTFOUND;
+					}
 				}
 			}
 		}
-		
 		return MI_NOTFOUND.equals(contextconditionmethod)? null: contextconditionmethod;
 	}
 	

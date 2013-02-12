@@ -35,7 +35,7 @@ public class HelloWorldBDI
 	
 	/** The text that is printed. */
 	@Belief
-	private String sayhello = "wurst";
+	private String sayhello = "initial value";
 	
 	/**
 	 *  Simple hello world goal.
