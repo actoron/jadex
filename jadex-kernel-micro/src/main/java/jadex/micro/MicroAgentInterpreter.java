@@ -541,6 +541,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					if(!done)
 					{
 						IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
+//						if(step[0].toString().indexOf("ListFiles")!=-1)
+//						{
+//							System.out.println("children: "+step[0]+", "+res.getClass());
+//						}
 						FutureFunctionality.connectDelegationFuture(future, res);
 					}
 				}

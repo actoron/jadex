@@ -41,7 +41,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -598,21 +597,21 @@ public class SRemoteGui
 	 *  @param dir	The directory.
 	 *  @param filter	The filter or null for all files.
 	 */
-	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
+	public static IFuture<Collection<FileData>>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
 	{
-		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		return exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 		{
 			@Classname("listFiles")
-			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
+			public IFuture<Collection<FileData>> execute(IInternalAccess ia)
 			{
-				IntermediateFuture<FileData>	ret	= new IntermediateFuture<FileData>();
+				Future<Collection<FileData>>	ret	= new Future<Collection<FileData>>();
 				try
 				{
 					File f = new File(dir.getPath());
 					final File[] files = f.listFiles();
 					if(files!=null)
 					{
-						final CollectionResultListener<FileData> lis = new CollectionResultListener<FileData>(files.length, true, new IntermediateDelegationResultListener<FileData>(ret));
+						final CollectionResultListener<FileData> lis = new CollectionResultListener<FileData>(files.length, true, new DelegationResultListener<Collection<FileData>>(ret));
 						for(final File file: files)
 						{
 							if(filter==null)
@@ -645,7 +644,7 @@ public class SRemoteGui
 					}
 					else
 					{
-						ret.setFinished();
+						ret.setResult(null);
 					}
 				}
 				catch(Exception e)
@@ -657,6 +656,12 @@ public class SRemoteGui
 				}
 
 				return ret;
+			}
+			
+			// For debugging intermediate future bug. Used in MicroAgentInterpreter
+			public String toString()
+			{
+				return "ListFiles("+dir+")";
 			}
 		});
 	}

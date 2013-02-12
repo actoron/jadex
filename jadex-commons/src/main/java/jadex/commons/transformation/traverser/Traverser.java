@@ -173,8 +173,8 @@ public class Traverser
 				ITraverseProcessor proc = processors.get(i);
 				if(proc.isApplicable(processed, clazz, clone, targetcl))
 				{
-					if(object.getClass().getName().indexOf("awt")!=-1)
-						System.out.println("traverse: "+object+" "+proc.getClass());
+//					if(object.getClass().getName().indexOf("awt")!=-1)
+//						System.out.println("traverse: "+object+" "+proc.getClass());
 					
 					processed = proc.process(processed, clazz, processors, this, traversed, clone, targetcl, context);
 					ret	= processed;
