@@ -75,6 +75,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	super.addResultListener(listener);		
 	}
 
+	
 	/**
      *  Add a result listener.
      *  @param listsner The listener.
@@ -121,7 +122,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
     		
     		ret	= results!=null && results.size()>index.intValue()
-    			|| ownres!=null && ownres.size()>index.intValue();
+    			|| ownres!=null && !ownres.isEmpty();
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -184,16 +185,9 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	synchronized(this)
     	{
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
-    		if(ownres!=null && ownres.size()>index)
+    		if(ownres!=null && !ownres.isEmpty())
     		{
-    			ret	= ownres.get(index);
-    			
-    			// shrink list by removing notified elements.
-    			for(int i=0; i<=index; i++)
-    			{
-    				ownres.remove(0);
-    			}
-    			indices.remove(Thread.currentThread());
+    			ret	= ownres.remove(0);
     		}
     		else if(results!=null && results.size()>index)
     		{
@@ -255,5 +249,5 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	}
     	
     	return ret;
-    }	
-}
+    }
+   }

@@ -133,7 +133,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
     		
     		ret	= results!=null && results.size()>index.intValue()
-    			|| ownres!=null && ownres.size()>index.intValue();
+    			|| ownres!=null && !ownres.isEmpty();
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -196,16 +196,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	synchronized(this)
     	{
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
-    		if(ownres!=null && ownres.size()>index)
+    		if(ownres!=null && !ownres.isEmpty())
     		{
-    			ret	= ownres.get(index);
-    			
-    			// shrink list by removing notified elements.
-    			for(int i=0; i<=index; i++)
-    			{
-    				ownres.remove(0);
-    			}
-    			indices.remove(Thread.currentThread());
+    			ret	= ownres.remove(0);
     		}
     		else if(results!=null && results.size()>index)
     		{

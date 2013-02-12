@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.SecureTransmission;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.ChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -320,6 +321,7 @@ public interface ISecurityService
 	 *  Subscribe to changes.
 	 */
 	@SecureTransmission // Sends configuration changes with passwords etc.
+	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subcribeToEvents();
 	
 }

@@ -1,5 +1,12 @@
 Jadex Releases Overview
 
+Release 2.3 (BDI V3 preview release 09/2012)
+	- preview of new BDI V3 kernel (80% finished)
+	- preview of on-demand threaded (synchronous) components
+	- new jadex-based game AgentKeeper, available from https://code.google.com/p/jadex-agentkeeper/
+	- remote jcc support for jadex-minimal platform
+	- lots of improvements and bug fixes
+
 Release 2.2.1 (Bugfix release 09/2012)
 	- fixed problems with spaces in path names
 	- fixed problems with duration of timestamps (timestamp too old)
