@@ -76,11 +76,21 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	 */
 	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl)
 	{
+		return generateBDIClass(clname, model, cl, new HashSet<String>());
+	}
+	
+	/**
+	 *  Generate class.
+	 */
+	public Class<?> generateBDIClass(final String clname, final BDIModel model, 
+		final ClassLoader cl, final Set<String> done)
+	{
 		Class<?> ret = null;
 		
 //		System.out.println("Generating with cl: "+cl+" "+clname);
 		
-		final List<String> iclasses = new ArrayList<String>();
+		final List<String> todo = new ArrayList<String>();
+		done.add(clname);
 		
 		try
 		{
@@ -175,7 +185,9 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
 //					System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
-					iclasses.add(name);
+					String icln = name.replace("/", ".");
+					if(!done.contains(icln))
+						todo.add(icln);
 					super.visitInnerClass(name, outerName, innerName, access);//Opcodes.ACC_PUBLIC); does not work
 				}
 				
@@ -241,6 +253,11 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				catch(Exception e)
 				{
 				}
+			}
+			
+			for(String icl: todo)
+			{
+				generateBDIClass(icl, model, cl, done);
 			}
 		}
 		catch(Exception e)
