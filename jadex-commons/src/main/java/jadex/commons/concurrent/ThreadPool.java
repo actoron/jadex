@@ -7,6 +7,7 @@ import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,9 @@ public class ThreadPool implements IThreadPool
 	
 	/** The pool of service threads. */
 	protected List	pool;
+	
+	/** The list of threads not used. */
+	protected List<Thread> parked;
 
 	/** The tasks to execute. */
 	// Todo: fix blocking queue.
@@ -104,7 +108,13 @@ public class ThreadPool implements IThreadPool
 	
 //	/** The task - thread mapping. */
 //	protected Map	threads;
-
+	
+	/** The current throughput of the pool (average of waiting times). */
+	protected Map<Runnable, Long> enqueuetimes;
+	
+	/** The maximum number of parked threads. */
+	protected int maxparked;
+	
 	//-------- constructors --------
 
 	/**
@@ -136,6 +146,9 @@ public class ThreadPool implements IThreadPool
 //		this.tasks = new java.util.concurrent.LinkedBlockingQueue();
 		this.pool = new ArrayList();
 //		this.threads = new Hashtable();
+		this.enqueuetimes = Collections.synchronizedMap(new HashMap<Runnable, Long>());
+		this.maxparked = 100;
+		this.parked = new ArrayList<Thread>();
 		
 		addThreads(strategy.getWorkerCount());
 	
@@ -166,8 +179,8 @@ public class ThreadPool implements IThreadPool
 		if(this.strategy.taskAdded())
 			addThreads(1);
 		
-		this.tasks.enqueue(task);
-//		this.tasks.add(task);
+		enqueuetimes.put(task, System.currentTimeMillis());
+		tasks.enqueue(task);
 	}
 
 	/**
@@ -220,6 +233,28 @@ public class ThreadPool implements IThreadPool
 	{
 		for(int i=0; i<num; i++)
 		{
+			addThread();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected synchronized void addThread()
+	{
+//		System.out.println("parked: "+parked.size());
+		if(!parked.isEmpty())
+		{
+			Thread thread = parked.remove(0);
+			pool.add(thread);
+			synchronized(thread)
+			{
+				((ServiceThread)thread).notified = true;
+				thread.notify();
+			}
+		}
+		else
+		{
 			Thread thread = new ServiceThread();
 			// Thread gets daemon state of parent, i.e. thread daemon state would
 			// depend on called thread, which is not desired.
@@ -266,6 +301,10 @@ public class ThreadPool implements IThreadPool
 
 //		/** The start time. */
 //		protected long start;
+		
+		protected boolean terminated;
+		
+		protected boolean notified;
 
 		//-------- constructors --------
 
@@ -285,13 +324,17 @@ public class ThreadPool implements IThreadPool
 		 */
 		public void run()
 		{
-			boolean terminate = false;
-			
-			while(running && !terminate)
+			while(running && !terminated)
 			{
+				boolean exit = false;
 				try
 				{
 					this.task = ((Runnable)tasks.dequeue(strategy.getWorkerTimeout()));
+					Long start = enqueuetimes.remove(task);
+					strategy.taskServed(System.currentTimeMillis()-start);
+					
+//					System.out.println("throuput: "+throughput);
+					
 //					this.task = ((Runnable)tasks.poll(strategy.getThreadTimeout(), TimeUnit.MILLISECONDS));
 //					threads.put(task, this);
 //					this.start = System.currentTimeMillis();
@@ -300,7 +343,8 @@ public class ThreadPool implements IThreadPool
 
 					try
 					{
-						this.task.run();
+						if(task!=null)
+							this.task.run();
 					}
 					catch(ThreadDeath e){}
 //					catch(Throwable e)
@@ -312,12 +356,12 @@ public class ThreadPool implements IThreadPool
 				catch(IBlockingQueue.ClosedException e)
 				{
 					task = null;
-					terminate	= true;
+					exit	= true;
 				}
 				catch(TimeoutException e)
 				{
 					task = null;
-					terminate = strategy.workerTimeoutOccurred();
+					exit = strategy.workerTimeoutOccurred();
 				}
 //				catch(Exception e)
 //				{
@@ -330,12 +374,59 @@ public class ThreadPool implements IThreadPool
 				{
 //					threads.remove(task);
 					this.task = null;
-					terminate = strategy.taskFinished();
+					exit = strategy.taskFinished();
+				}
+				
+				if(exit)
+				{
+					try
+					{
+						if(running && parked.size()<maxparked)
+						{
+							synchronized(ThreadPool.this)
+							{
+//								System.out.println("removed: "+this);
+								pool.remove(this);
+								parked.add(this);
+							}
+							synchronized(this)
+							{
+//								System.out.println("waiting for: "+strategy.getWorkerTimeout()*10);
+								wait(strategy.getWorkerTimeout());
+								if(notified)
+								{
+									notified = false;
+									synchronized(ThreadPool.this)
+									{
+	//									System.out.println("readded: "+this);
+										pool.add(this);
+									}
+								}
+								else
+								{
+									terminated = true;
+									parked.remove(this);
+//									System.out.println("thread removed (nothing to do): "+parked.size());
+								}
+							}
+						}
+						else
+						{
+							terminated = true;
+						}
+					}
+					catch(InterruptedException e)
+					{
+						terminated = true;
+						parked.remove(this);
+//						System.out.println("thread removed (nothing to do): "+parked.size());
+					}
 				}
 			}
 			
 			synchronized(ThreadPool.this)
 			{
+//				System.out.println("removed: "+this);
 				pool.remove(this);
 			}
 		}

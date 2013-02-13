@@ -12,6 +12,12 @@ public interface IPoolStrategy
 	public boolean taskAdded();
 	
 	/**
+	 *  Called when a new task was served from the pool.
+	 *  @param waitdur The waiting time of the task.
+	 */
+	public void taskServed(long waitdur);
+	
+	/**
 	 *  Called when a task is finished.
 	 *  @return True, if executing worker should be removed from the pool. 
 	 */

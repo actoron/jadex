@@ -1,5 +1,8 @@
 package jadex.commons;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *  This strategy has two parameters:
  *  - The desired number of free workers in the pool.
@@ -23,6 +26,17 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	
 	/** The maximum number of allowed workers. */
 	protected int maxcnt;
+
+	/** The defer factor to slow down thread creation. */
+	protected int deferinc;
+	protected int deferinctarget; 
+	
+	/** The defer factor to slow down thread deletion. */
+	protected int deferdec;
+	protected int deferdectarget; 
+	
+	/** The waiting times of the pool. */
+	protected List<Double> waitings;
 	
 	//-------- constructors --------
 	
@@ -59,6 +73,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		this.desfree = desfree;
 		this.maxwait = maxwait;
 		this.maxcnt = maxcnt;
+		this.waitings = new LinkedList<Double>();
 	}
 
 	//-------- methods --------
@@ -72,7 +87,32 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		boolean ret = false;
 		
 		// Create a new worker if capacity is lower than desired capacity.
+//		double wt = waitings.size()>0? waitings.get(waitings.size()-1): 1;
+		boolean ok = false;
 		if(capacity<=0 && (maxcnt<=0 || workercnt<maxcnt))
+		{
+			int dt = workercnt/desfree;
+			if(dt>2)
+			{
+				if(deferinc==0)
+				{
+					deferinctarget = dt*10;
+				}
+				deferinc++;
+				if(deferinc==deferinctarget)
+				{
+					deferinc=0;
+					ok = true;
+				}
+			}
+			else
+			{
+				ok = true;
+				deferinc = 0;
+			}
+		}
+		
+		if(ok)
 		{
 			ret = true;
 			workercnt++;
@@ -88,6 +128,21 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	}
 	
 	/**
+	 *  Called when a new task was served from the pool.
+	 *  @param waitdur The waiting time of the task.
+	 */
+	public synchronized void taskServed(long waitdur)
+	{
+		long dur = Math.max(1, waitdur);
+		double last = waitings.isEmpty()? 1: waitings.get(waitings.size()-1);
+		waitings.add(new Double(last*0.4+dur*0.6));
+		if(waitings.size()>10)
+			waitings.remove(0);
+		
+//		System.out.println("waiting times: "+waitings);
+	}
+	
+	/**
 	 *  Called when a task is finished.
 	 *  @return True, if executing worker be excluded from the pool. 
 	 */
@@ -95,8 +150,32 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	{
 		boolean ret = false;
 
-		// If more free workers than desired capacity let worker end.
+		boolean ok = false;
 		if(capacity>=desfree)
+		{
+			int dt = workercnt/desfree;
+			if(dt>2)
+			{
+				if(deferdec==0)
+				{
+					deferdectarget = Math.max(10, 1/dt*500);
+				}
+				deferdec++;
+				if(deferdec==deferinctarget)
+				{
+					deferdec=0;
+					ok = true;
+				}
+			}
+			else
+			{
+				ok = true;
+				deferinc = 0;
+			}
+		}
+		
+//		If more free workers than desired capacity let worker end.
+		if(ok)//(capacity>=desfree)
 		{
 			ret = true;
 			workercnt--;
@@ -107,6 +186,8 @@ public class DefaultPoolStrategy implements IPoolStrategy
 			capacity++;
 //			System.out.println("Capacity(tF2): "+capacity+" "+workercnt);
 		}
+		
+//		System.out.println("Capacity: "+capacity+" "+workercnt);
 		
 		return ret;
 	}
@@ -128,7 +209,9 @@ public class DefaultPoolStrategy implements IPoolStrategy
 			// negative e^x used to get maximum wait time when
 			// few free workers and high capacity
 			double ratio = Math.exp(-3.0*(((double)capacity)/desfree));
-			ret = (long)(ratio*maxwait);
+			ret = Math.max((long)(ratio*maxwait), maxwait/10);  // must have lower bound otherwise could be 0
+//			System.out.println("waittime: "+ret);
+//			ret = maxwait;
 //			if(maxwait==35000)
 //				System.out.println("Wait time: "+ret+" "+capacity+" "+desfree);
 		}
@@ -145,8 +228,42 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	{
 		workercnt--;
 		capacity--;
-//		System.out.println("Capacity(tTO): "+capacity+" "+workercnt);
 		return true;
+		
+//		boolean ret = false;
+//		
+//		boolean ok = false;
+//		if(capacity>=desfree)
+//		{
+//			int dt = workercnt/desfree;
+//			if(dt>2)
+//			{
+//				if(deferdec==0)
+//				{
+//					deferdectarget = Math.max(10, 1/dt*500);
+//				}
+//				deferdec++;
+//				if(deferdec==deferinctarget)
+//				{
+//					deferdec=0;
+//					ok = true;
+//				}
+//			}
+//			else
+//			{
+//				ok = true;
+//				deferinc = 0;
+//			}
+//		}
+//		
+//		if(ok)
+//		{
+//			workercnt--;
+//			capacity--;
+//			ret = true;
+//		}
+////		System.out.println("Capacity(tTO): "+capacity+" "+workercnt);
+//		return ret;
 		
 //		boolean ret = false;
 //		
