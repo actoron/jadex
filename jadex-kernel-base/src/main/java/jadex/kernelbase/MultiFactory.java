@@ -29,6 +29,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CallMultiplexer;
@@ -817,7 +818,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findKernelInCache(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
 	{
-//		if(model.toString().indexOf("RemoteServiceManagementAgent")!=-1)
+//		if(model.toString().indexOf("BDI")!=-1)
 //			System.out.println("findKernelInCache0: "+model);
 		final Future ret = new Future();
 		
@@ -927,15 +928,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 												{
 													public void resultAvailable(Object result)
 													{
-//														System.out.println("Starting kernel4: " + kernelmodel);
+//														System.out.println("Killed kernel4: " + kernelmodel);
 														for(int i = 0; i < kexts.length; ++i)
 															factorycache.remove(kexts[i]);
 													}
 													
 													public void exceptionOccurred(Exception exception)
 													{
-//														System.out.println("Starting kernel5: " + kernelmodel);
-//														exception.printStackTrace();
+//														System.out.println("Killed kernel5: " + kernelmodel);
+														exception.printStackTrace();
 														resultAvailable(null);
 													}
 												})).addResultListener(ia.createResultListener(new IResultListener()
@@ -1140,7 +1141,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					    !kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1)))
 						return true;
 				}
-				
+				//System.out.println("Decided it's not a kernel: " + obj);
 				return false;
 			}
 		});
@@ -1188,6 +1189,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				public void resultAvailable(final IModelInfo modelinfo)
 				{
+//					System.out.println("Tried to load model for kernel: " + kernelloc + " model " + modelinfo);
 					if(modelinfo!=null)
 					{
 						potentialkernellocations.remove(kernelloc);
@@ -1199,6 +1201,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //								if(modellocs.toString().indexOf("KernelApplication.component.xml")!=-1)
 //									System.out.println("examineKernelModels2: "+modellocs);
 								String[] exts = (String[])modelinfo.getProperty(KERNEL_EXTENSIONS, result);
+//								System.out.println("Kernel extensions for kernel " + kernelloc + " " + SUtil.arrayToString(exts));
 								if(exts!=null)
 								{
 									for (int i = 0; i < exts.length; ++i)
@@ -1266,6 +1269,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected List searchDirectory(File dir, IFilter filter, boolean prependDir)
 	{
+//		System.out.println("Searching dir: " + dir.getAbsolutePath());
 		List ret = new ArrayList();
 		File[] content = dir.listFiles();
 		for (int i = 0; i < content.length; ++i)
@@ -1284,12 +1288,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 			else if (filter.filter(content[i].getName()))
 			{
+//				System.out.println("May be a kernel: " + content[i].getName());
 				if (prependDir)
 					ret.add(dir.getName().concat(File.separator).concat(
 							content[i].getName()));
 				else
 					ret.add(content[i].getName());
 			}
+//			else
+//			{
+//				System.out.println("Not a kernel: " + content[i].getName());
+//			}
 		}
 
 		return ret;
@@ -1304,6 +1313,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected List searchJar(File jar, IFilter filter)
 	{
+//		System.out.println("Searching jar: " + jar.getAbsolutePath());
 		List ret = new ArrayList();
 		try
 		{

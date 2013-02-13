@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -39,7 +37,7 @@ import org.kohsuke.asm4.tree.LabelNode;
 import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
-import org.kohsuke.asm4.util.ASMifier;
+import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -100,7 +98,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			ClassNode cn = new ClassNode();
 			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
-//			CheckClassAdapter cc = new CheckClassAdapter(cw);
+//			CheckClassAdapter cc = new CheckClassAdapter(tcw);
 			
 			final String iclname = clname.replace(".", "/");
 			
@@ -152,11 +150,14 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
 								
 								visitInsn(Opcodes.SWAP);
-//								visitInsn(Opcodes.POP);
 								
 								// fetch bdi agent value from field
-//								visitVarInsn(Opcodes.ALOAD, 0);
+
+								// this pop aload is necessary in inner classes!
+								visitInsn(Opcodes.POP);
+								visitVarInsn(Opcodes.ALOAD, 0);
 								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+//								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", "L"+iclname+";");
 //								visitInsn(Opcodes.SWAP);
 								
 								// add field name	
@@ -211,9 +212,13 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 //				cr.accept(tcv2, 0);
 				cr.accept(cv, 0);
 				transformClassNode(cn, iclname, model);
-//				cn.accept(tcv3);
 				cn.accept(cw);
+//				CheckClassAdapter cc = new CheckClassAdapter(tcv);
+//				cn.accept(cc);
 				byte[] data = cw.toByteArray();
+				
+//				CheckClassAdapter.verify(new ClassReader(data), false, new PrintWriter(System.out));
+
 				
 				// Find correct cloader for injecting the class.
 				// Probes to load class without loading class.
@@ -260,7 +265,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				generateBDIClass(icl, model, cl, done);
 			}
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			e.printStackTrace();
 		}

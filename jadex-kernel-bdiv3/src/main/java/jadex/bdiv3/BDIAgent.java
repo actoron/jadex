@@ -230,26 +230,55 @@ public class BDIAgent extends MicroAgent
 	protected static Object setFieldValue(Object obj, String fieldname, Object val) throws IllegalAccessException
 	{
 		Field f = null;
-		Class<?> cl = obj.getClass();
-		while(f==null && !Object.class.equals(cl))
+		Object tmp = obj;
+		while(f==null && tmp!=null)
 		{
-			try
+			f = findField(tmp.getClass(), fieldname);
+			if(f==null)
 			{
-				f = cl.getDeclaredField(fieldname);
-			}
-			catch(Exception e)
-			{
-				cl = cl.getSuperclass();
+				try
+				{
+					Field fi = tmp.getClass().getDeclaredField("this$0");
+					fi.setAccessible(true);
+					tmp = fi.get(tmp);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 		if(f==null)
 			throw new RuntimeException("Field not found: "+fieldname);
 		
 		f.setAccessible(true);
-		Object oldval = f.get(obj);
-		f.set(obj, val);
+		Object oldval = f.get(tmp);
+		f.set(tmp, val);
 	
 		return oldval;
+	}
+	
+	/**
+	 * 
+	 * @param cl
+	 * @param fieldname
+	 * @return
+	 */
+	protected static Field findField(Class<?> cl, String fieldname)
+	{
+		Field ret = null;
+		while(ret==null && !Object.class.equals(cl))
+		{
+			try
+			{
+				ret = cl.getDeclaredField(fieldname);
+			}
+			catch(Exception e)
+			{
+				cl = cl.getSuperclass();
+			}
+		}
+		return ret;
 	}
 	
 	/**
