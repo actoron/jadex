@@ -1509,6 +1509,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			
 			// Prepare properties (runtime props override type props).
 			MObjectType mObjectType = (MObjectType)objecttypes.get(typename);
+			if(properties!=null)
+				properties = new HashMap(properties);
 			properties = mergeProperties(mObjectType, properties);
 			
 			// Create the object.
