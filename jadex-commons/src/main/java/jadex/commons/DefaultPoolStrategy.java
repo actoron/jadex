@@ -27,6 +27,9 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	/** The maximum number of allowed workers. */
 	protected int maxcnt;
 
+	/** Defer the creation and deletion of threads according to their distance from desfree. */ 
+	protected boolean defer;
+	
 	/** The defer factor to slow down thread creation. */
 	protected int deferinc;
 	protected int deferinctarget; 
@@ -68,11 +71,20 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public DefaultPoolStrategy(int workercnt, int desfree, long maxwait, int maxcnt)
 	{
+		this(workercnt, desfree, maxwait, maxcnt, true);
+	}
+	
+	/**
+	 *  Create a new default pool strategy.
+	 */
+	public DefaultPoolStrategy(int workercnt, int desfree, long maxwait, int maxcnt, boolean defer)
+	{
 		this.workercnt = workercnt;
 		this.capacity = workercnt;
 		this.desfree = desfree;
 		this.maxwait = maxwait;
 		this.maxcnt = maxcnt;
+		this.defer = defer;
 		this.waitings = new LinkedList<Double>();
 	}
 
@@ -91,24 +103,31 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		boolean ok = false;
 		if(capacity<=0 && (maxcnt<=0 || workercnt<maxcnt))
 		{
-			int dt = workercnt/desfree;
-			if(dt>2)
+			if(defer)
 			{
-				if(deferinc==0)
+				int dt = workercnt/desfree;
+				if(dt>2)
 				{
-					deferinctarget = dt*10;
+					if(deferinc==0)
+					{
+						deferinctarget = dt*10;
+					}
+					deferinc++;
+					if(deferinc==deferinctarget)
+					{
+						deferinc=0;
+						ok = true;
+					}
 				}
-				deferinc++;
-				if(deferinc==deferinctarget)
+				else
 				{
-					deferinc=0;
 					ok = true;
+					deferinc = 0;
 				}
 			}
 			else
 			{
 				ok = true;
-				deferinc = 0;
 			}
 		}
 		
@@ -124,6 +143,8 @@ public class DefaultPoolStrategy implements IPoolStrategy
 //			System.out.println("Capacity(tA2): "+capacity+" "+workercnt);
 		}
 		
+		System.out.println("Capacity: "+capacity+" "+workercnt);
+		
 		return ret;
 	}
 	
@@ -133,11 +154,11 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public synchronized void taskServed(long waitdur)
 	{
-		long dur = Math.max(1, waitdur);
-		double last = waitings.isEmpty()? 1: waitings.get(waitings.size()-1);
-		waitings.add(new Double(last*0.4+dur*0.6));
-		if(waitings.size()>10)
-			waitings.remove(0);
+//		long dur = Math.max(1, waitdur);
+//		double last = waitings.isEmpty()? 1: waitings.get(waitings.size()-1);
+//		waitings.add(new Double(last*0.4+dur*0.6));
+//		if(waitings.size()>10)
+//			waitings.remove(0);
 		
 //		System.out.println("waiting times: "+waitings);
 	}
@@ -153,29 +174,39 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		boolean ok = false;
 		if(capacity>=desfree)
 		{
-			int dt = workercnt/desfree;
-			if(dt>2)
+			if(defer)
 			{
-				if(deferdec==0)
+				int dt = workercnt/desfree;
+				if(dt>2)
 				{
-					deferdectarget = Math.max(10, 1/dt*500);
+					if(deferdec==0)
+					{
+						int max = maxcnt>0? maxcnt: 1000;
+						deferdectarget = Math.max(10, (int)(1.0/dt*max));
+//						System.out.println("defertarget: "+deferdectarget+" "+workercnt+" "+desfree);
+					}
+					deferdec++;
+					if(deferdec==deferinctarget)
+					{
+						deferdec=0;
+						ok = true;
+					}
 				}
-				deferdec++;
-				if(deferdec==deferinctarget)
+				else
 				{
-					deferdec=0;
 					ok = true;
+					deferdec = 0;
 				}
 			}
 			else
 			{
 				ok = true;
-				deferinc = 0;
 			}
 		}
 		
 //		If more free workers than desired capacity let worker end.
-		if(ok)//(capacity>=desfree)
+		if(ok)
+//		if(capacity>=desfree)
 		{
 			ret = true;
 			workercnt--;

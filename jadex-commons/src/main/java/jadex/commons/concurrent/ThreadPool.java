@@ -147,7 +147,7 @@ public class ThreadPool implements IThreadPool
 		this.pool = new ArrayList();
 //		this.threads = new Hashtable();
 		this.enqueuetimes = Collections.synchronizedMap(new HashMap<Runnable, Long>());
-		this.maxparked = 100;
+		this.maxparked = 500;
 		this.parked = new ArrayList<Thread>();
 		
 		addThreads(strategy.getWorkerCount());
