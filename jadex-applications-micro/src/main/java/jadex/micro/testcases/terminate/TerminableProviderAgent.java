@@ -56,6 +56,8 @@ public class TerminableProviderAgent implements ITerminableService
 				{
 					if(agent.getAgentAdapter().isExternalThread())
 					{
+						System.err.println("adapter0: "+agent.getAgentAdapter().getComponentIdentifier());
+						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
 					}
 					else
@@ -98,6 +100,8 @@ public class TerminableProviderAgent implements ITerminableService
 				{
 					if(agent.getAgentAdapter().isExternalThread())
 					{
+						System.err.println("adapter: "+agent.getAgentAdapter().getComponentIdentifier());
+						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
 					}
 					else
