@@ -14,13 +14,17 @@ public class Materialfile {
 	protected IParsedExpression cond;
 	
 	protected boolean useAlpha;
+	
+	protected SpecialAction specialAction;
 
-	public Materialfile(String part, String path, boolean useAlpha, IParsedExpression cond) {
+	public Materialfile(String part, String path, boolean useAlpha, SpecialAction specialaction, IParsedExpression cond) {
 		super();
 		this.part = part;
 		this.useAlpha = useAlpha;
 		this.path = path;
 		this.cond = cond;
+		this.specialAction = specialaction;
+		
 	}
 
 	/**
@@ -63,6 +67,22 @@ public class Materialfile {
 	 */
 	public void setUseAlpha(boolean useAlpha) {
 		this.useAlpha = useAlpha;
+	}
+
+	/**
+	 * @return the specialAction
+	 */
+	public SpecialAction getSpecialAction()
+	{
+		return specialAction;
+	}
+
+	/**
+	 * @param specialAction the specialAction to set
+	 */
+	public void setSpecialAction(SpecialAction specialAction)
+	{
+		this.specialAction = specialAction;
 	}
 
 }

@@ -3,6 +3,7 @@ package jadex.extension.envsupport.observer.graphics.jmonkey;
 import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.DefaultCameraState;
 import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera.IsoCameraState;
@@ -271,27 +272,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		// fpp.addFilter(bf);
 
 		//
-		Vector3f lightDir = new Vector3f(1f, -2f, 1f);
-		WaterFilter water = new WaterFilter(rootNode, lightDir);
-		water.setWaterHeight(-2.5f);
-		water.setUseFoam(false);
-		water.setUseRipples(true);
-		water.setDeepWaterColor(ColorRGBA.Black.mult(0.1f));
-		water.setWaterColor(ColorRGBA.Black.mult(0.15f));
-		water.setWaterTransparency(0.001f);
-		water.setMaxAmplitude(0.3f);
-		water.setReflectionDisplace(0.2f);
-		water.setWaveScale(0.008f);
-		water.setSpeed(0.1f);
-		water.setShoreHardness(1.0f);
-		water.setRefractionConstant(0.2f);
 
-		water.setShininess(0.3f);
-		water.setSunScale(1.1f);
-
-		water.setLightColor(ColorRGBA.Red.mult(0.1f).set(ColorRGBA.Orange.mult(0.1f).r, ColorRGBA.Orange.mult(0.1f).g, ColorRGBA.Orange.mult(0.1f).b, 0.01f));
-		water.setColorExtinction(new Vector3f(10.0f, 20.0f, 30.0f));
-		fpp.addFilter(water);
 
         
         //CARTOONFILTER
@@ -345,6 +326,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 			ICustomStateCreator customCreator;
 			try
 			{
+				
 				Constructor con = Class.forName(this.guiCreatorPath, true, Thread.currentThread().getContextClassLoader()).getConstructor(
 						new Class[]{SimpleApplication.class, ISpaceController.class});
 
@@ -916,6 +898,22 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 	public void setSpaceController(ISpaceController spaceController)
 	{
 		this.spaceController = spaceController;
+	}
+
+	/**
+	 * @return the fpp
+	 */
+	public FilterPostProcessor getFpp()
+	{
+		return fpp;
+	}
+
+	/**
+	 * @param fpp the fpp to set
+	 */
+	public void setFpp(FilterPostProcessor fpp)
+	{
+		this.fpp = fpp;
 	}
 
 

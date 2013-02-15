@@ -1,39 +1,20 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry;
 
 import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-import jadex.extension.envsupport.observer.gui.SObjectInspector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TreeSet;
 
-import javax.swing.border.MatteBorder;
-
-import com.jme3.animation.AnimChannel;
-import com.jme3.animation.AnimControl;
-import com.jme3.effect.ParticleEmitter;
-import com.jme3.effect.ParticleMesh.Type;
-import com.jme3.effect.shapes.EmitterSphereShape;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.debug.SkeletonDebugger;
-import com.jme3.scene.shape.Quad;
 import com.jme3.water.SimpleWaterProcessor;
 
 
@@ -106,8 +87,11 @@ public class Object3dJMonkeyRenderer extends AObject3dRenderer
 								s.setQueueBucket(Bucket.Transparent);
 
 								// IF WATER FILTER!
+							}
+							
+							if(mat.getSpecialAction()==SpecialAction.DELETE)
+							{
 								((Node)object).detachChild(s);
-
 							}
 
 						}

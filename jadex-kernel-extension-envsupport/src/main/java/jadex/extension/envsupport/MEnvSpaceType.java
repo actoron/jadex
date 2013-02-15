@@ -17,25 +17,26 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Cylinder3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Dome3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Torus3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.PointLight3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Torus3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
@@ -63,6 +64,7 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.reader.AReadContext;
+import jadex.xml.stax.QName;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -73,8 +75,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.xml.stax.QName;
 
 /**
  *  Java representation of environment space type for xml description.
@@ -1456,6 +1456,7 @@ public class MEnvSpaceType
 				new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("part", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("path", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("specialAction", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("useAlpha", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
@@ -1463,6 +1464,7 @@ public class MEnvSpaceType
 					{
 						String part = (String)getProperty(args, "part");
 						String path = (String)getProperty(args, "path");
+						String actionStr = (String)getProperty(args, "specialAction");
 						if(part==null)
 						{
 							part = "defaultpart";
@@ -1472,9 +1474,15 @@ public class MEnvSpaceType
 						{
 							useAlpha = false;
 						}
+						if(actionStr==null)
+						{
+							actionStr = SpecialAction.NOTHING.toString().toLowerCase();
+						}
+						SpecialAction action = actionStr.equals("nothing")? SpecialAction.NOTHING : SpecialAction.DELETE;
+						
 
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "materialcondition");
-						return new Materialfile(part, path, useAlpha, exp);
+						return new Materialfile(part, path, useAlpha, action, exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				}, 
