@@ -139,9 +139,9 @@ public class FutureFunctionality
 	/**
 	 *  Terminate the future.
 	 */
-	public IFuture<Void>	terminate(Exception reason)
+	public void	terminate(Exception reason, IResultListener<Void> terminate)
 	{
-		return IFuture.DONE;
+		terminate.resultAvailable(null);
 	}
 	
 //	/**
@@ -155,7 +155,7 @@ public class FutureFunctionality
 	/**
 	 *  Notify the listener.
 	 */
-	public void notifyListener(final IResultListener<Void> notify)
+	public void notifyListener(IResultListener<Void> notify)
 	{
 		notify.resultAvailable(null);
 	}
@@ -489,7 +489,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	 */
 	public void terminate(final Exception reason)
 	{
-		func.terminate(reason).addResultListener(new IResultListener<Void>()
+		func.terminate(reason, new IResultListener<Void>()
 		{
 			public void resultAvailable(Void v)
 			{
@@ -704,7 +704,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	 */
 	public void terminate(final Exception reason)
 	{
-		func.terminate(reason).addResultListener(new IResultListener<Void>()
+		func.terminate(reason, new IResultListener<Void>()
 		{
 			public void resultAvailable(Void v)
 			{
@@ -841,7 +841,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	 */
 	public void terminate(final Exception reason)
 	{
-		func.terminate(reason).addResultListener(new IResultListener<Void>()
+		func.terminate(reason, new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{

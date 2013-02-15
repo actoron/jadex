@@ -461,9 +461,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 					
 					// Switch terminate() calls back to component thread.
-					public IFuture<Void> terminate(Exception reason)
+					public void terminate(Exception reason, final IResultListener<Void> terminate)
 					{
-						final Future<Void> ret = new Future<Void>();
 						if(adapter.isExternalThread())
 						{
 							try
@@ -472,22 +471,20 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										ret.setResult(null);
+										terminate.resultAvailable(null);
 										return IFuture.DONE;
 									}
 								});
 							}
 							catch(ComponentTerminatedException e)
 							{
-								ret.setException(e);
+								terminate.exceptionOccurred(e);
 							}				
 						}
 						else
 						{
-							ret.setResult(null);
-						}
-						
-						return ret;
+							terminate.resultAvailable(null);
+						}						
 					}
 				};
 				

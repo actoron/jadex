@@ -3,6 +3,7 @@ package jadex.micro.testcases.terminate;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -57,6 +58,7 @@ public class TerminableProviderAgent implements ITerminableService
 					if(agent.getAgentAdapter().isExternalThread())
 					{
 						System.err.println("adapter0: "+agent.getAgentAdapter().getComponentIdentifier());
+						System.err.println("adapter0a: "+IComponentAdapter.LOCAL.get());
 						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
 					}
@@ -100,7 +102,8 @@ public class TerminableProviderAgent implements ITerminableService
 				{
 					if(agent.getAgentAdapter().isExternalThread())
 					{
-						System.err.println("adapter: "+agent.getAgentAdapter().getComponentIdentifier());
+						System.err.println("adapter1: "+agent.getAgentAdapter().getComponentIdentifier());
+						System.err.println("adapter1a: "+IComponentAdapter.LOCAL.get());
 						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
 					}

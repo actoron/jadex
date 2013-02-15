@@ -85,6 +85,12 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					FutureFunctionality func = new FutureFunctionality(ada!=null ? ada.getLogger() : null)
 					{
+						public void terminate(Exception reason, IResultListener<Void> terminate)
+						{
+							// As termination is done in listener, can use same decoupling code as for listener notification.
+							notifyListener(terminate);
+						}
+						
 						public void notifyListener(final IResultListener<Void> listener)
 						{
 							// Don't reschedule if already on correct thread or called from remote.

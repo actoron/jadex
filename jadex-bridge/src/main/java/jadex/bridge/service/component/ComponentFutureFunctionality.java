@@ -33,6 +33,15 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 		this.ea	= ea;
 		this.adapter	= adapter;
 	}
+
+	/**
+	 *  Schedule termination on component thread.
+	 */
+	public void terminate(Exception reason, IResultListener<Void> terminate)
+	{
+		// As termination is done in listener, can use same decoupling code as for listener notification.
+		notifyListener(terminate);
+	}
 	
 	/**
 	 *  Schedule listener notification on component thread. 
