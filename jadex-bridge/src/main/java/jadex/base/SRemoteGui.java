@@ -597,14 +597,14 @@ public class SRemoteGui
 	 *  @param dir	The directory.
 	 *  @param filter	The filter or null for all files.
 	 */
-	public static IFuture<Collection<FileData>>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
+	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
 	{
-		return exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+		return (IIntermediateFuture<FileData>)exta.scheduleStep(new IComponentStep<Collection<FileData>>()
 		{
 			@Classname("listFiles")
-			public IFuture<Collection<FileData>> execute(IInternalAccess ia)
+			public IIntermediateFuture<FileData> execute(IInternalAccess ia)
 			{
-				Future<Collection<FileData>>	ret	= new Future<Collection<FileData>>();
+				IntermediateFuture<FileData>	ret	= new IntermediateFuture<FileData>();
 				try
 				{
 					File f = new File(dir.getPath());
@@ -665,6 +665,80 @@ public class SRemoteGui
 			}
 		});
 	}
+	
+//	/**
+//	 *  List files in a directory matching a filter (if any).
+//	 *  @param dir	The directory.
+//	 *  @param filter	The filter or null for all files.
+//	 */
+//	public static IFuture<Collection<FileData>>	listFiles(final FileData dir, final IRemoteFilter filter, IExternalAccess exta)
+//	{
+//		return exta.scheduleStep(new IComponentStep<Collection<FileData>>()
+//		{
+//			@Classname("listFiles")
+//			public IFuture<Collection<FileData>> execute(IInternalAccess ia)
+//			{
+//				Future<Collection<FileData>>	ret	= new Future<Collection<FileData>>();
+//				try
+//				{
+//					File f = new File(dir.getPath());
+//					final File[] files = f.listFiles();
+//					if(files!=null)
+//					{
+//						final CollectionResultListener<FileData> lis = new CollectionResultListener<FileData>(files.length, true, new DelegationResultListener<Collection<FileData>>(ret));
+//						for(final File file: files)
+//						{
+//							if(filter==null)
+//							{
+//								lis.resultAvailable(new FileData(file));
+//							}
+//							else
+//							{
+//								filter.filter(file).addResultListener(new IResultListener<Boolean>()
+//								{
+//									public void resultAvailable(Boolean result)
+//									{
+//										if(result.booleanValue())
+//										{
+//											lis.resultAvailable(new FileData(file));
+//										}
+//										else
+//										{
+//											lis.exceptionOccurred(null);
+//										}
+//									}
+//									
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										lis.exceptionOccurred(null);
+//									}
+//								});
+//							}
+//						}
+//					}
+//					else
+//					{
+//						ret.setResult(null);
+//					}
+//				}
+//				catch(Exception e)
+//				{
+//					// Protect remote platform from execution errors.
+//					Thread.dumpStack();
+//					e.printStackTrace();
+//					ret.setException(e);
+//				}
+//
+//				return ret;
+//			}
+//			
+//			// For debugging intermediate future bug. Used in MicroAgentInterpreter
+//			public String toString()
+//			{
+//				return "ListFiles("+dir+")";
+//			}
+//		});
+//	}
 
 	/**
 	 *	List files of a remote jar file

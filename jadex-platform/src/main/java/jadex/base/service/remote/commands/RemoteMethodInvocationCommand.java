@@ -271,18 +271,19 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				((IIntermediateFuture)res).addResultListener(new IIntermediateResultListener()
 				{
+					int cnt = 0;
 					public void intermediateResultAvailable(Object result)
 					{
 //						System.out.println("inter: "+result);
 						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, result, callid, 
-							returnisref, methodname, false, getNonFunctionalProperties(), (IFuture<?>)res));
+							returnisref, methodname, false, getNonFunctionalProperties(), (IFuture<?>)res, cnt++));
 					}
 					
 					public void finished()
 					{
 //						System.out.println("fin");
 						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, null, callid, 
-							returnisref, methodname, true, getNonFunctionalProperties(), (IFuture<?>)res));
+							returnisref, methodname, true, getNonFunctionalProperties(), (IFuture<?>)res, cnt));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}

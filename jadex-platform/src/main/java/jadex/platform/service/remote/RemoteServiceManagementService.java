@@ -19,6 +19,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.AnyResultSelector;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
@@ -44,8 +45,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
@@ -723,11 +726,19 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public static class WaitingCallInfo
 	{
+		final static Object FINISHED = new Object();
+		
 		/** The future. */
 		protected Future<Object> future;
 		
 		/** The timer task. */
 		protected TimeoutTimerTask timertask;
+		
+		/** The intermediate result cnt. */
+		protected int cnt;
+		
+		/** The results per cnt. */
+		protected Map<Integer, Object> results;
 
 		/**
 		 *  Create a new info.
@@ -772,6 +783,74 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		public void setTimerTask(TimeoutTimerTask timertask)
 		{
 			this.timertask = timertask;
+		}
+		
+		/**
+		 *  Get the cnt.
+		 *  @return The cnt.
+		 */
+		public int getCnt()
+		{
+			return cnt;
+		}
+
+		/**
+		 *  Set the cnt.
+		 *  @param cnt The cnt to set.
+		 */
+		public void setCnt(int cnt)
+		{
+			this.cnt = cnt;
+		}
+
+		/**
+		 */
+		public void addIntermediateResult(Integer num, Object res, boolean fini)
+		{
+			if(cnt==num)
+			{
+				IntermediateFuture ifut = (IntermediateFuture)future;
+				cnt++;
+				if(fini)
+				{
+					ifut.setFinishedIfUndone();
+				}
+				else
+				{
+					ifut.addIntermediateResultIfUndone(res);
+				}
+				
+				if(results!=null)
+				{
+					while(results.containsKey(new Integer(cnt)))
+					{
+						Object nres = results.remove(new Integer(cnt++));
+						if(nres==FINISHED)
+						{
+							ifut.setFinishedIfUndone();
+						}
+						else
+						{
+							ifut.addIntermediateResultIfUndone(nres);
+						}
+					}
+				}
+			}
+			else
+			{
+				if(results==null)
+				{
+					results = new HashMap<Integer, Object>();
+				}
+				if(fini)
+				{
+					results.put(new Integer(num), FINISHED);
+				}
+				else
+				{
+					results.put(num, res);
+				}
+			}
 		}
 		
 		/**

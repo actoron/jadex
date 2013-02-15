@@ -203,7 +203,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			String name = getLoggerName(getComponentIdentifier());
 			logger = LogManager.getLogManager().getLogger(name);
 			
-			// if logger does not already exists, create it
+			// if logger does not already exist, create it
 			if(logger==null)
 			{
 				// Hack!!! Might throw exception in applet / webstart.

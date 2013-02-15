@@ -20,8 +20,11 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	protected boolean finished;
 	
 	/** The original future (not transmitted). */
-	protected IFuture<?>	orig;
+	protected IFuture<?> orig;
 	
+	/** The result cnt. */
+	protected int cnt;
+		
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
@@ -41,11 +44,12 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	 *  Create a new remote intermediate result command.
 	 */
 	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, 
-		String methodname, boolean finished, Map<String, Object> nonfunc, IFuture<?> orig)
+		String methodname, boolean finished, Map<String, Object> nonfunc, IFuture<?> orig, int cnt)
 	{
 		super(realreceiver, result, null, callid, isref, methodname, nonfunc);
 		this.finished = finished;
 		this.orig	= orig;
+		this.cnt = cnt;
 	}
 	
 	/**
@@ -84,15 +88,17 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 		{
 			wci.refresh();
 			
-			IntermediateFuture future = (IntermediateFuture)wci.getFuture();
-			if(finished)
-			{
-				future.setFinished();
-			}
-			else
-			{
-				future.addIntermediateResult(result);
-			}
+			wci.addIntermediateResult(cnt, result, finished);
+			
+//			IntermediateFuture future = (IntermediateFuture)wci.getFuture();
+//			if(finished)
+//			{
+//				future.setFinishedIfUndone();
+//			}
+//			else
+//			{
+//				future.addIntermediateResultIfUndone(result);
+//			}
 		}
 		
 		return IIntermediateFuture.DONE;
@@ -115,7 +121,25 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	{
 		this.finished = finished;
 	}
+	
+	/**
+	 *  Get the cnt.
+	 *  @return The cnt.
+	 */
+	public int getCount()
+	{
+		return cnt;
+	}
 
+	/**
+	 *  Set the cnt.
+	 *  @param cnt The cnt to set.
+	 */
+	public void setCount(int cnt)
+	{
+		this.cnt = cnt;
+	}
+	
 	/**
 	 *  Get as string.
 	 */
