@@ -522,7 +522,6 @@ public class RPlan extends RElement implements IPlan
 	
 	/**
 	 *  Get the waitfuture.
-	 *  @return The waitfuture.
 	 */
 	public void setWaitFuture(Future<?> fut)
 	{

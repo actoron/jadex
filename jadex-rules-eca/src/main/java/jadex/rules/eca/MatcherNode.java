@@ -75,7 +75,6 @@ public class MatcherNode
 	 *  Get the rules for an event type at level i.
 	 *  @param type The event type.
 	 *  @param i The level.
-	 *  @return The list of relevant rules.
 	 */
 	protected void getRules(EventType type, int i, List<IRule<?>> ret)
 	{
