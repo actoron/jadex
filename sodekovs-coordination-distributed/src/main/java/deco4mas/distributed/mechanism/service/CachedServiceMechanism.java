@@ -71,7 +71,7 @@ public class CachedServiceMechanism extends ServiceMechanism {
 		// only search for new services if it is the initial search or if perceiveCount == interval and interval != 0.
 		// if a interval of 0 is specified the mechanism searches for the services only once at the initial perceived coordination event.
 		if (perceiveCount <= 0 || (perceiveCount == interval && interval != 0)) {
-			services = SServiceProvider.getServices(applicationInterpreter.getServiceProvider(), ICoordinationService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable(this));
+			services = SServiceProvider.getServices(applicationInterpreter.getServiceProvider(), ICoordinationService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable());
 			perceiveCount = 0;
 
 			for (ICoordinationService service : services) {
