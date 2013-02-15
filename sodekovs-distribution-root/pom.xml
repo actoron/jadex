@@ -78,6 +78,7 @@
 
 		<module>../jadex-tools-base-swing</module>
 		<module>../jadex-runtimetools-swing</module>
+		<module>../jadex-tools-base</module>
 		<module>../jadex-tools-bdi</module>
 		<module>../jadex-tools-bpmn</module>
 		<module>../jadex-tools-comanalyzer</module>
@@ -470,6 +471,7 @@
 				<module>jadex-runtimetools-swing</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
+				<module>jadex-tools-base</module>
 				<module>jadex-tools-comanalyzer</module>
 				<module>jadex-platform-standalone</module>
 				<module>jadex-platform-standalone-launch</module>
