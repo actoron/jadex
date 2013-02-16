@@ -317,12 +317,9 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	private void initCustom()
 	{
-		System.out.println("guiCreatorPath " + guiCreatorPath);
-
 		if(!guiCreatorPath.equals("None"))
 		{
 
-			System.out.println("guiCreatorPath " + guiCreatorPath);
 			ICustomStateCreator customCreator;
 			try
 			{
