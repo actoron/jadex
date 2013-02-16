@@ -26,6 +26,11 @@
 			<password>laxlax</password>
 		</server>
 		<server>
+			<id>jadex-public-releases</id>
+			<username>deployment</username>
+			<password>laxlax</password>
+		</server>
+		<server>
 			<id>private-snapshots</id>
 			<username>deployment</username>
 			<password>laxlax</password>
