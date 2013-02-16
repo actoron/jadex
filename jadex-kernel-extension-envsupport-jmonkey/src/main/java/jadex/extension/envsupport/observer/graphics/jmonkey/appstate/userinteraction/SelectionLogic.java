@@ -84,7 +84,6 @@ public class SelectionLogic
 			Spatial parent = contact;
 			while(parent!=null&&parent.getParent()!=null&&parent.getName()!=null&&!Character.isDigit(parent.getName().charAt(0)))
 			{
-				
 				parent = parent.getParent();
 			}
 			
