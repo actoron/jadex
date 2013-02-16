@@ -41,7 +41,7 @@
 			<source>src/main/assembly/dist-assembly-mvndepssrczip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
-		<!-- <file>
+				<!-- <file>
 			<source>docs/readme-building-3d.txt</source>
 			<outputDirectory>sources</outputDirectory>
 		</file>

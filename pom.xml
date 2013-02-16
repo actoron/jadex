@@ -6,7 +6,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex</artifactId>
 	<packaging>pom</packaging>
-	<version> 2.3-SNAPSHOT </version>
+	<version> 2.3 </version>
 	<name>jadex</name>
 	
 	<!-- ======== common plugin configurations ======== -->
@@ -70,7 +70,6 @@
 		<module>jadex-applications-gpmn</module>
 		<module>jadex-applications-web</module>
 		
-
 		<module>jadex-rules</module>
 		<module>jadex-rules-eca</module>
 		<module>jadex-rules-applications</module>
@@ -85,6 +84,9 @@
 		<module>jadex-platform-standalone-launch</module>
 		<module>jadex-platform-extension-relay</module>
 		<module>jadex-platform-relay-web</module>
+		
+		<module>jadex-distribution-minimal</module>
+		<module>jadex-distribution-standard</module>
 	</modules>
 			
 	<profiles>	    
@@ -221,7 +223,7 @@
 		    <id>jadex-full-pro</id>
 	        <activation>
 	            <file>
-	                <exists>jadex-platform-extension-maven</exists>
+	                <exists>jadex-distribution-pro</exists>
 	            </file>
 	        </activation>
 			<build>
@@ -265,7 +267,7 @@
 			</build>
  	        <modules>
 				<module>jadex-parent-pro</module>
-				<module>jadex-platform-extension-maven</module>
+				<module>jadex-distribution-pro</module>
 		    </modules>
 		</profile>
 
@@ -610,63 +612,6 @@
 				<module>jadex-android-integration-test</module>
 				<module>docs/android/jadex-android-example-project-maven</module>
 			</modules>
-		</profile>
-		
-		<!-- ======== Minimal launch config ======== -->
-		
-		<profile>
-		    <id>jadex-distribution-minimal-launch</id>
-	        <activation>
-	            <file>
-	                <exists>jadex-distribution-minimal-launch</exists>
-	            </file>
-	        </activation>
- 	        <modules>
-				<module>jadex-distribution-minimal-launch</module>
-		    </modules>
-		</profile>
-		
-		<!-- ======== Minimal distribution ======== -->
-		
-		<profile>
-		    <id>jadex-distribution-minimal</id>
-	        <activation>
-	            <file>
-	                <exists>jadex-distribution-minimal</exists>
-	            </file>
-	        </activation>
- 	        <modules>
-				<module>jadex-distribution-minimal</module>
-		    </modules>
-		</profile>
-		
-				<!-- ======== Standard distribution ======== -->
-		
-		<profile>
-		    <id>jadex-distribution-standard</id>
-	        <activation>
-	            <file>
-	                <exists>jadex-distribution-standard</exists>
-	            </file>
-	        </activation>
- 	        <modules>
-				<module>jadex-distribution-standard</module>
-		    </modules>
-		</profile>
-		
-		<!-- ======== Pro distribution ======== -->
-		
-		<profile>
-		    <id>jadex-distribution-pro</id>
-	        <activation>
-	            <file>
-	                <exists>jadex-distribution-pro</exists>
-	            </file>
-	        </activation>
- 	        <modules>
- 	        	<module>jadex-parent-pro</module>
-				<module>jadex-distribution-pro</module>
-		    </modules>
 		</profile>
 		
 	</profiles>

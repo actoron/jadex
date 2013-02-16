@@ -6,7 +6,7 @@ FOR /F "usebackq" %%i IN (`hostname`) DO SET HOSTNAME=%%i
 :start
 	echo Please wait while connecting to service...
 	cd ..
-	java -jar "%CD%\lib\jadex-platform-standalone-launch-2.3-SNAPSHOT.jar" ^
+	java -jar "%CD%\lib\jadex-platform-standalone-launch-2.3.jar" ^
 		-ssltcptransport true ^
 		-printpass false ^
 		-welcome false ^

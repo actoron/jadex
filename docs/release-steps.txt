@@ -6,10 +6,10 @@ Make sure that:
 - ADF checker works and is released
 
 Bump Revision:
-- set version number in poms (search '<version> 2.3-SNAPSHOT </version>')
-- set version number in example pom (search '<jadex.version> 2.3-SNAPSHOT </jadex.version>')
-- set version number in bats, shs, settings, txts (search '-2.3-SNAPSHOT.jar')
-- set javadoc link in platform xml (search 'docs/jadex-2.3-SNAPSHOT-javadoc') 
+- set version number in poms (search '<version> 2.3 </version>')
+- set version number in example pom (search '<jadex.version> 2.3 </jadex.version>')
+- set version number in bats, shs, settings, txts (search '-2.3.jar')
+- set javadoc link in platform xml (search 'docs/jadex-2.3-javadoc') 
 - set version number in XMLs, XSDs (search '-2.3.xsd')
 - rename XSDs to reflect version number (search 'jadex' in *.xsd)
 - Add tag in SVN

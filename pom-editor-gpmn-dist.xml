@@ -6,7 +6,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>pom-editor-gpmn-dist</artifactId>
 	<packaging>pom</packaging>
-	<version> 2.3-SNAPSHOT </version>
+	<version> 2.3 </version>
 	<name>pom-editor-gpmn-dist</name>
 	
 	<!-- ======== common plugin configurations ======== -->

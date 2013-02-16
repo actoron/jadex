@@ -5,9 +5,7 @@ import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -19,7 +17,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -29,7 +26,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -40,8 +36,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -1336,9 +1331,10 @@ public class StarterPanel extends JLayeredPane
 		JLabel namel = new JLabel(arg.getName());
 		final JValidatorTextField valt = new JValidatorTextField(loadargs!=null && loadargs.length>y ? loadargs[y] : "", 15);
 		
-		jcc.getClassLoader(model.getResourceIdentifier()).addResultListener(new SwingDefaultResultListener<ClassLoader>()
+		jcc.getClassLoader(model.getResourceIdentifier())
+			.addResultListener(new SwingResultListener<ClassLoader>(new IResultListener<ClassLoader>()
 		{
-			public void customResultAvailable(ClassLoader result)
+			public void resultAvailable(ClassLoader result)
 			{
 				try
 				{
@@ -1349,7 +1345,12 @@ public class StarterPanel extends JLayeredPane
 					// ignore, currently validator does not work remotely
 				}
 			}
-		});
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// ignore, e.g. component terminated
+			}
+		}));
 	
 		String configname = (String)config.getSelectedItem();
 		JTextField mvalt = new JTextField(getDefaultValue(model, arg.getName(), configname));

@@ -17,8 +17,8 @@
 			<excludes>
 			    <!-- Exclude JMonkey support from normal dist to save space. -->
 				<exclude>*:*-jmonkey</exclude>
-				<!-- Exclude all maven distribution modules -->
-				<exclude>*:*-distribution-*</exclude>
+				<!-- Exclude all maven distribution modules - ->
+				<exclude>*:*-distribution-*</exclude> -->
 				<!-- Exclude all backup modules -->
 				<exclude>*:*-backup</exclude>
 			</excludes>
@@ -76,6 +76,14 @@
 		</file>
 		<file>
 			<source>src/main/assembly/dist-assembly-mvndepssrczip.xml</source>
+			<outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/assembly/dist-assembly-mgmt.xml</source>
+			<outputDirectory>sources/src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/assembly/dist-assembly-mgmtsrczip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
 		<file>

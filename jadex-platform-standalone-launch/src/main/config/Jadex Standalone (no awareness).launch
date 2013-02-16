@@ -7,7 +7,7 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-configname fixed&#13;&#10;-awareness false"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-awareness false"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-platform-standalone-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dswing.defaultllaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#10;-DXbootclasspath/a:C:\Programme\jprofiler5\bin\agent.jar&#13;&#10;-Dagentlib:jprofilerti"/>
