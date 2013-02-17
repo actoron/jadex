@@ -673,7 +673,7 @@ public class RGoal extends RProcessableElement implements IGoal
 					}
 					else
 					{
-						setException(new GoalFailureException("No canditates 2."));
+						setException(new GoalFailureException("No canditates."));
 						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
 					}
 				}

@@ -186,8 +186,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					try
 					{
 						MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-						Object val = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
-						mbel.getTarget().getField(getClassLoader()).set(agent, val);
+						Object val = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader()).getValue(null);
+						Field f = mbel.getTarget().getField(getClassLoader());
+						f.setAccessible(true);
+						f.set(agent, val);
 					}
 					catch(RuntimeException e)
 					{

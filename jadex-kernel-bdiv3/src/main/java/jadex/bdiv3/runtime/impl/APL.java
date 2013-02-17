@@ -312,6 +312,10 @@ public class APL
 						{
 							lis.resultAvailable(mplan);
 						}
+						else
+						{
+							lis.exceptionOccurred(null);
+						}
 					}
 					else if(app instanceof IFuture)
 					{

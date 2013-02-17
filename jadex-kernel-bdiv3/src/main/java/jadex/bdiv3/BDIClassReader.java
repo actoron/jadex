@@ -250,7 +250,7 @@ public class BDIClassReader extends MicroClassReader
 							
 						List<UnparsedExpression> ibels = createUnparsedExpressionsList(configs[i].initialbeliefs());
 						if(ibels!=null)
-							bdiconf.setInitialGoals(ibels);
+							bdiconf.setInitialBeliefs(ibels);
 						List<UnparsedExpression> iplans = createUnparsedExpressionsList(configs[i].initialplans());
 						if(iplans!=null)
 							bdiconf.setInitialPlans(iplans);
