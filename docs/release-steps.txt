@@ -6,11 +6,11 @@ Make sure that:
 - ADF checker works and is released
 
 Bump Revision:
-- set version number in poms (search '<version> 2.3 </version>')
-- set version number in example pom (search '<jadex.version> 2.3 </jadex.version>')
-- set version number in bats, shs, settings, txts (search '-2.3.jar')
-- set javadoc link in platform xml (search 'docs/jadex-2.3-javadoc') 
-- set version number in XMLs, XSDs (search '-2.3.xsd')
+- set version number in poms (search '<version> 2.4-SNAPSHOT </version>')
+- set version number in example pom (search '<jadex.version> 2.4-SNAPSHOT </jadex.version>')
+- set version number in bats, shs, settings, txts (search '-2.4-SNAPSHOT.jar')
+- set javadoc link in platform xml (search 'docs/jadex-2.4-SNAPSHOT-javadoc') 
+- set version number in XMLs, XSDs (search '-2.4.xsd')
 - rename XSDs to reflect version number (search 'jadex' in *.xsd)
 - Add tag in SVN
 - After release: set version to <next revision>-SNAPSHOT (w/o SNAPSHOT for XSDs)
@@ -20,8 +20,7 @@ Build Distribution:
 
 Upload stuff:
 - upload distribution to sourceforge
-- upload schema documents
-- update Jadex download website(s)
+- upload schema documents to sourceforge web
 
 Communicate stuff:
 - email to JADE list

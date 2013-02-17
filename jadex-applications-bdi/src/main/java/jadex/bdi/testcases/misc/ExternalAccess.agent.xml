@@ -5,7 +5,7 @@
 <agent xmlns="http://jadex.sourceforge.net/jadex"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
-	                    http://jadex.sourceforge.net/jadex-bdi-2.3.xsd"
+	                    http://jadex.sourceforge.net/jadex-bdi-2.4.xsd"
 	name="ExternalAccess"
 	package="jadex.bdi.testcases.misc">
 
