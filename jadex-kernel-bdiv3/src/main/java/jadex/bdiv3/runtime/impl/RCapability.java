@@ -367,12 +367,12 @@ public class RCapability extends RElement implements ICapability
 		if(plans!=null)
 		{
 			System.out.println("plans: "+plans.size());
-//			System.out.println("--------");
-//			for(RPlan plan: plans)
-//			{
-//				System.out.println(plan+" "+plan.getLifecycleState()+" "+plan.getProcessingState());
-//				System.out.println("--------");
-//			}
+			System.out.println("--------");
+			for(RPlan plan: plans)
+			{
+				System.out.println(plan+" "+plan.getLifecycleState()+" "+plan.getProcessingState());
+				System.out.println("--------");
+			}
 		}
 	}
 }

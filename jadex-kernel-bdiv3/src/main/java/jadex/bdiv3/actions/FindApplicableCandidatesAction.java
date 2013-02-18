@@ -59,9 +59,6 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 //		System.out.println("find applicable candidates: "+element);
 		final Future<Void> ret = new Future<Void>();
 		
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		RCapability rcapa = ip.getCapability();
-		
 		final APL apl = element.getApplicablePlanList();
 		apl.build(ia).addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
 		{

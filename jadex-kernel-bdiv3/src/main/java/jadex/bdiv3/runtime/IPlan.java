@@ -11,6 +11,31 @@ import java.util.List;
 public interface IPlan
 {
 	/**
+	 *  Get the id.
+	 */
+	public String getId();
+	
+	/**
+	 *  Test if plan is passed.
+	 */
+	public boolean isPassed();
+	
+	/**
+	 *  Test if plan is failed.
+	 */
+	public boolean isFailed();
+	
+	/**
+	 *  Test if plan is aborted.
+	 */
+	public boolean isAborted();
+	
+	/**
+	 *  Test if plan is finished.
+	 */
+	public boolean isFinished();
+	
+	/**
 	 *  Get the reason.
 	 *  @return The reason.
 	 */

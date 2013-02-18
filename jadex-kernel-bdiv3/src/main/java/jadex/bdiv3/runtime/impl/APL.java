@@ -104,63 +104,65 @@ public class APL
 		
 		if(candidates==null || ((MProcessableElement)element.getModelElement()).isRebuild())
 		{
-			if(candidates==null)
+			boolean	done	= false;
+			Object	pojo	= element.getPojoElement();
+			if(pojo!=null)
 			{
-				boolean	done	= false;
-				Object	pojo	= element.getPojoElement();
-				if(pojo!=null)
+				Class<?>	clazz	= pojo.getClass();
+				
+				// todo: this causes poor performance -> should be moved to model level
+				Method[]	ms	= SReflect.getAllMethods(clazz);
+				for(int i=0; !done && i<ms.length; i++)
 				{
-					Class<?>	clazz	= pojo.getClass();
-					Method[]	ms	= SReflect.getAllMethods(clazz);
-					for(int i=0; !done && i<ms.length; i++)
+					if(ms[i].isAnnotationPresent(GoalAPLBuild.class))
 					{
-						if(ms[i].isAnnotationPresent(GoalAPLBuild.class))
+						if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
 						{
-							if((ms[i].getModifiers()&Modifier.PUBLIC)!=0)
+							done	= true;
+							try
 							{
-								done	= true;
-								try
-								{
-									candidates	= (List<?>)ms[i].invoke(pojo, new Object[0]);
-								}
-								catch(InvocationTargetException e)
-								{
-									throw e.getTargetException() instanceof RuntimeException
-										? (RuntimeException)e.getTargetException()
-										: new RuntimeException(e.getTargetException());
-								}
-								catch(Exception e)
-								{
-									throw e instanceof RuntimeException
-										? (RuntimeException)e
-										: new RuntimeException(e);
-								}
-								
+								candidates	= (List<?>)ms[i].invoke(pojo, new Object[0]);
 							}
-							else
+							catch(InvocationTargetException e)
 							{
-								throw new RuntimeException("Method not public: "+ms[i]);
+								throw e.getTargetException() instanceof RuntimeException
+									? (RuntimeException)e.getTargetException()
+									: new RuntimeException(e.getTargetException());
 							}
+							catch(Exception e)
+							{
+								throw e instanceof RuntimeException
+									? (RuntimeException)e
+									: new RuntimeException(e);
+							}
+							
+						}
+						else
+						{
+							throw new RuntimeException("Method not public: "+ms[i]);
 						}
 					}
 				}
-				
-				if(!done)
-				{
-					doBuild(ia).addResultListener(new ExceptionDelegationResultListener<List<Object>, Void>(ret)
-					{
-						public void customResultAvailable(List<Object> result)
-						{
-							candidates = result;
-							ret.setResult(null);
-						}
-					});
-				}
 			}
-			else
+			
+			if(!done)
 			{
-				ret.setResult(null);
+				doBuild(ia).addResultListener(new ExceptionDelegationResultListener<List<Object>, Void>(ret)
+				{
+					public void customResultAvailable(List<Object> result)
+					{
+						candidates = result;
+						ret.setResult(null);
+					}
+				});
 			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+		
 			
 			// both aspects are dealt with dispatchToAll() via rules
 			// if we want to support disptach of goals, internal or message events to running plans
@@ -179,7 +181,7 @@ public class APL
 //				}
 //			}
 			// todo waitqueue ?
-		}
+//		}
 //		else
 //		{
 //			// check rplans and waitqueues
@@ -204,8 +206,7 @@ public class APL
 //				}
 //			}
 //		}
-		
-		return ret;
+	
 	}
 	
 	//-------- helper methods --------
