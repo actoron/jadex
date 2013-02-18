@@ -52,7 +52,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 					&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
 				// todo: hack, how to avoid side effect
 				if(!ret)
-					rplan.abortPlan();
+					rplan.abort();
 			}
 		}
 			
@@ -83,18 +83,19 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		
 		if(RPlan.PLANPROCESSINGTATE_WAITING.equals(rplan.getProcessingState()))
 		{
-			Future<Object> fut = (Future<Object>)rplan.getWaitFuture();
-			rplan.setWaitFuture(null);
-			if(rplan.getException()!=null)
-			{
-				fut.setException(rplan.getException());
-			}
-			else
-			{
-				fut.setResult(rplan.getDispatchedElement());
-			}
+			rplan.continueAfterWait();
+//			Future<Object> fut = (Future<Object>)rplan.getWaitFuture();
+//			rplan.setWaitFuture(null);
+//			if(rplan.getException()!=null)
+//			{
+//				fut.setException(rplan.getException());
+//			}
+//			else
+//			{
+//				fut.setResult(rplan.getDispatchedElement());
+//			}
 		}
-		else
+		else if(RPlan.PLANLIFECYCLESTATE_NEW.equals(rplan.getLifecycleState()))
 		{
 			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			ip.getCapability().addPlan(rplan);

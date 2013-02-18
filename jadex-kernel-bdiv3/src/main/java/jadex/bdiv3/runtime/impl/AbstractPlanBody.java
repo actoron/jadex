@@ -58,9 +58,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 		{
 			public void resultAvailable(Void result)
 			{
-				if(RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState()))
+//				if(RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState()))
+				if(rplan.getException()!=null)
 				{
-					exceptionOccurred(new PlanFailureException());
+					exceptionOccurred(rplan.getException());
 				}
 				else
 				{
@@ -89,7 +90,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 			
 			public void exceptionOccurred(final Exception exception)
 			{
-				int next = RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState())? 3: 2; 
+//				int next = RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState())? 3: 2; 
+//				int next = rplan.getException() instanceof PlanAbortedException? 3: 2;
+				int next = exception instanceof PlanAbortedException? 3: 2;
 				
 				internalInvokePart(agent, guessParameters(getBodyParameterTypes()), next)
 					.addResultListener(new IResultListener<Void>()

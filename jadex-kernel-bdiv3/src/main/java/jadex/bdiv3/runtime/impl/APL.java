@@ -156,6 +156,10 @@ public class APL
 					}
 				});
 			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		else
 		{

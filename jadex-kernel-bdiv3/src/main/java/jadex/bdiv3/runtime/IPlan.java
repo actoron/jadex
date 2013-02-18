@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime;
 
+import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.ICondition;
 
@@ -14,6 +15,11 @@ public interface IPlan
 	 *  Get the id.
 	 */
 	public String getId();
+	
+	/**
+	 *  Abort the plan.
+	 */
+	public void abort();
 	
 	/**
 	 *  Test if plan is passed.
@@ -117,4 +123,10 @@ public interface IPlan
 	 *  Wait for a condition.
 	 */
 	public IFuture<Void> waitForCondition(ICondition cond, String[] events, long timeout);
+	
+	/**
+	 * 
+	 */
+	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command);
+
 }

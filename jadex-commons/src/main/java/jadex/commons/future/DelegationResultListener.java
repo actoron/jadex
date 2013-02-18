@@ -11,6 +11,9 @@ public class DelegationResultListener<E> implements IResultListener<E>
 	/** The future to which calls are delegated. */
 	protected Future<E> future;
 	
+	/** Flag if undone methods should be used. */
+	protected boolean undone;
+	
 //	protected DebugException	ex;
 	
 	//-------- constructors --------
@@ -20,8 +23,17 @@ public class DelegationResultListener<E> implements IResultListener<E>
 	 */
 	public DelegationResultListener(Future<E> future)
 	{
+		this(future, false);
+	}
+	
+	/**
+	 *  Create a new listener.
+	 */
+	public DelegationResultListener(Future<E> future, boolean undone)
+	{
 		this.future = future;
 //		this.ex	= new DebugException();
+		this.undone = undone;
 	}
 	
 	//-------- methods --------
@@ -63,7 +75,14 @@ public class DelegationResultListener<E> implements IResultListener<E>
 	 */
 	public void customResultAvailable(E result)
 	{
-		future.setResult(result);
+		if(undone)
+		{
+			future.setResultIfUndone(result);
+		}
+		else
+		{
+			future.setResult(result);
+		}
 	}
 
 	/**
@@ -73,6 +92,13 @@ public class DelegationResultListener<E> implements IResultListener<E>
 	public void exceptionOccurred(Exception exception)
 	{
 //		System.err.println("Problem: "+exception);
-		future.setException(exception);
+		if(undone)
+		{
+			future.setExceptionIfUndone(exception);
+		}
+		else
+		{
+			future.setException(exception);
+		}
 	}
 }

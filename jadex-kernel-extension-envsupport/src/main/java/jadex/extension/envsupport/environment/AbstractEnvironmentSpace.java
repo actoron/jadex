@@ -1445,6 +1445,30 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	}
 	
 	/**
+	 *  Add a result listener to an object task.
+	 *  The listener result will be the task id.
+	 *  If the task is already finished, the listener will be notified.
+	 */
+	public IFuture<Void> waitForTask(Object taskid, Object objectid)
+	{
+		final Future<Void> ret = new Future<Void>(); 
+		SpaceObject so = (SpaceObject)getSpaceObject(objectid);
+		so.addTaskListener(taskid, new IResultListener<Object>()
+		{
+			public void resultAvailable(Object result)
+			{
+				ret.setResultIfUndone(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+		});
+		return ret;
+	}
+	
+	/**
 	 * Returns then names of the space processes.
 	 * @return the names of the space processes
 	 */

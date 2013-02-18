@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IPropertyObject;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 
@@ -164,6 +165,13 @@ public interface IEnvironmentSpace extends IPropertyObject, IExtensionInstance
 	 */
 	public void removeTaskListener(Object taskid, Object objectid, IResultListener listener);
 
+	/**
+	 *  Add a result listener to an object task.
+	 *  The listener result will be the task id.
+	 *  If the task is already finished, the listener will be notified.
+	 */
+	public IFuture<Void> waitForTask(Object taskid, Object objectid);
+	
 	/**
 	 * Adds an space action.
 	 * @param name the action ID

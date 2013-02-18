@@ -392,7 +392,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	protected void abortPlans()
 	{
 		if(childplan!=null)
-			childplan.abortPlan();
+			childplan.abort();
 	}
 	
 	/**

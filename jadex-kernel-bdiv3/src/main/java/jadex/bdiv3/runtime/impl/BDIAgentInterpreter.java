@@ -293,7 +293,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 				
 					RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getInternalAccess());
-					RPlan.adoptPlan(rplan, getInternalAccess());
+					RPlan.executePlan(rplan, getInternalAccess());
 				}
 			}
 		}
@@ -788,7 +788,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 				{
 					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), getInternalAccess());
-					RPlan.adoptPlan(rplan, getInternalAccess());
+					RPlan.executePlan(rplan, getInternalAccess());
 					return IFuture.DONE;
 				}
 			};
@@ -863,7 +863,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{
 									if(!result.booleanValue())
 									{
-										plan.abortPlan();
+										plan.abort();
 									}
 								}
 								

@@ -17,6 +17,8 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -93,7 +95,8 @@ public class RPlan extends RElement implements IPlan
 	protected List<Object> waitqueue;
 	
 	/** The wait future (to resume execution). */
-	protected Future<?> waitfuture;
+//	protected Future<?> waitfuture;
+	protected ICommand<Void> resumecommand;
 	
 	/** The plan has exception attribute. */
 	protected Exception exception;
@@ -213,9 +216,9 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
-	public static void adoptPlan(RPlan rplan, IInternalAccess ia)
+	public static void executePlan(RPlan rplan, IInternalAccess ia)
 	{
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 //		ip.getCapability().addPlan(rplan);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
 		ia.getExternalAccess().scheduleStep(action);
@@ -492,11 +495,12 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
-	public void abortPlan()
+	public void abort()
 	{
 		if(!isFinished())
 		{
-			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
+//			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
+			setException(new PlanAbortedException());
 			
 			if(subgoals!=null)
 			{
@@ -505,27 +509,75 @@ public class RPlan extends RElement implements IPlan
 					subgoal.drop();
 				}
 			}
-			
-//			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-//			ip.getCapability().removePlan(this);
+
+			// If plan is waiting interrupt waiting
+			if(PLANPROCESSINGTATE_WAITING.equals(getProcessingState()))
+			{
+				RPlan.executePlan(this, ia);
+			}
 		}
 	}
 	
+//	/**
+//	 *  Get the waitfuture.
+//	 *  @return The waitfuture.
+//	 */
+//	public Future<?> getWaitFuture()
+//	{
+//		return waitfuture;
+//	}
+//	
+//	/**
+//	 *  Get the waitfuture.
+//	 */
+//	public void setWaitFuture(Future<?> fut)
+//	{
+//		assert waitfuture==null;
+//		
+//		waitfuture = fut;
+//	}
+	
 	/**
-	 *  Get the waitfuture.
-	 *  @return The waitfuture.
+	 * 
 	 */
-	public Future<?> getWaitFuture()
+	public void continueAfterWait()
 	{
-		return waitfuture;
+		assert resumecommand!=null;
+		ICommand<Void> com = resumecommand;
+		resumecommand = null;
+		com.execute(null);
 	}
 	
 	/**
-	 *  Get the waitfuture.
+	 *  Get the resumecommand.
+	 *  @return The resumecommand.
 	 */
-	public void setWaitFuture(Future<?> fut)
+	public ICommand<Void> getResumeCommand()
 	{
-		waitfuture = fut;
+		return resumecommand;
+	}
+
+//	Exception first = null;
+	/**
+	 * 
+	 */
+	public void setResumeCommand(ICommand<Void> com)
+	{
+//		if(resumecommand!=null)
+//		{
+//			System.out.println("res com not null: "+resumecommand+" "+com);
+//				
+//			first.printStackTrace();
+//			
+//			Thread.dumpStack();
+//		}
+//		else
+//		{
+//			first = new RuntimeException();
+//		}
+		
+		assert resumecommand==null;
+		resumecommand = com;
 	}
 	
 	/**
@@ -549,13 +601,38 @@ public class RPlan extends RElement implements IPlan
 	
 	// methods that can be called from pojo plan
 
+//	/**
+//	 *  Wait for a delay.
+//	 */
+//	public IFuture<Void> waitFor(long delay)
+//	{
+//		setProcessingState(PLANPROCESSINGTATE_WAITING);
+//		final Future<Void> ret = new Future<Void>();
+//		ia.waitForDelay(delay, new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				if(isAborted() || isFailed())
+//				{
+//					return new Future<Void>(new PlanFailureException());
+//				}
+//				else
+//				{
+//					return IFuture.DONE;
+//				}
+//			}
+//		}).addResultListener(new DelegationResultListener<Void>(ret));
+//		return ret;
+//	}
+	
 	/**
 	 *  Wait for a delay.
 	 */
 	public IFuture<Void> waitFor(long delay)
 	{
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
 		final Future<Void> ret = new Future<Void>();
+		
+		setProcessingState(PLANPROCESSINGTATE_WAITING);
 		ia.waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -569,7 +646,8 @@ public class RPlan extends RElement implements IPlan
 					return IFuture.DONE;
 				}
 			}
-		}).addResultListener(new DelegationResultListener<Void>(ret));
+		}).addResultListener(new DelegationResultListener<Void>(ret, true));
+		
 		return ret;
 	}
 	
@@ -588,7 +666,7 @@ public class RPlan extends RElement implements IPlan
 	{
 		final Future<E> ret = new Future<E>();
 		
-		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 
 		BDIModel bdim = ip.getBDIModel();
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
@@ -596,37 +674,64 @@ public class RPlan extends RElement implements IPlan
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(ia, mgoal, goal, this);
 		
-		rgoal.addGoalListener(new TimeoutResultListener<Void>(
-			timeout, ia.getExternalAccess(), new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				if(!rgoal.isFinished() && (isAborted() || isFailed()))
-				{
-					ret.setException(new PlanFailureException());
-				}
-				else
-				{
-					Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
-					ret.setResult((E)o);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(exception instanceof TimeoutException)
-				{
-					rgoal.drop();
-				}
-				ret.setException(exception);
-			}
-		}));
-
-		addSubgoal(rgoal);
+		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret);
+		setResumeCommand(rescom);
+		setProcessingState(PLANPROCESSINGTATE_WAITING);
 		
-//		System.out.println("adopt goal");
-//		ip.getCapability().addGoal(rgoal);
-		ip.scheduleStep(new AdoptGoalAction(rgoal));
+		IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
+		cont.addResultListener(new DefaultResultListener<ITimer>()
+		{
+			public void resultAvailable(final ITimer timer)
+			{
+				if(timer!=null)
+					rescom.setTimer(timer);
+				
+//				rgoal.addGoalListener(new TimeoutResultListener<Void>(
+//					timeout, ia.getExternalAccess(), new IResultListener<Void>()
+				rgoal.addGoalListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						if(rescom.equals(getResumeCommand()))
+						{
+							if(rgoal.isFinished() && (!isAborted() || !isFailed()))
+							{
+								Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
+								setDispatchedElement(o);
+							}
+							else if(getException()==null)
+							{
+								setException(new PlanAbortedException());
+							}
+							RPlan.executePlan(RPlan.this, ia);
+							
+	//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
+	//						{
+	//							setException(new PlanFailureException());
+	//						}
+	//						else
+	//						{
+	//							Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
+	//							ret.setResult((E)o);
+	//						}
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(rescom.equals(getResumeCommand()))
+						{
+							setException(exception);
+							RPlan.executePlan(RPlan.this, ia);
+						}
+					}
+				});
+
+				addSubgoal(rgoal);
+				
+				ip.scheduleStep(new AdoptGoalAction(rgoal));
+			}
+		});
 		
 		return ret;
 	}
@@ -684,7 +789,6 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public IFuture<Object> waitForFactX(String belname, String evtype, long timeout)
 	{
-		assert getWaitFuture()==null;
 		Future<Object> ret = new Future<Object>();
 		
 		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
@@ -702,26 +806,29 @@ public class RPlan extends RElement implements IPlan
 		}
 		else
 		{
-			setWaitFuture(ret);
-			setProcessingState(PLANPROCESSINGTATE_WAITING);
-			
 			final String rulename = getId()+"_wait";
 			
-			IFuture<ITimer> cont = createTimer(timeout, rulename, ip);
+			final ResumeCommand<Object> rescom = new ResumeCommand<Object>(ret, rulename);
+			setResumeCommand(rescom);
+			setProcessingState(PLANPROCESSINGTATE_WAITING);
+			
+			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
 			{
 				public void resultAvailable(final ITimer timer)
 				{
+					if(timer!=null)
+						rescom.setTimer(timer);
+					
 					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
-							ip.getRuleSystem().getRulebase().removeRule(rulename);
-							setDispatchedElement(new ChangeEvent(event));
-							RPlan.adoptPlan(RPlan.this, ia);
-							
-							if(timer!=null)
-								timer.cancel();
+							if(rescom.equals(getResumeCommand()))
+							{
+								setDispatchedElement(new ChangeEvent(event));
+								RPlan.executePlan(RPlan.this, ia);
+							}
 							return IFuture.DONE;
 						}
 					});
@@ -758,8 +865,7 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname, long timeout)
 	{
-		assert getWaitFuture()==null;
-		Future<Object> ret = new Future<Object>();
+		Future<ChangeEvent> ret = new Future<ChangeEvent>();
 		
 		// Also set waitabstraction to know what the plan is waiting for
 		WaitAbstraction wa = new WaitAbstraction();
@@ -772,31 +878,34 @@ public class RPlan extends RElement implements IPlan
 		Object obj = getFromWaitqueue();
 		if(obj!=null)
 		{
-			ret = new Future<Object>(obj);
+			ret = new Future<ChangeEvent>((ChangeEvent)obj);
 		}
 		else
 		{
-			setWaitFuture(ret);
-			setProcessingState(PLANPROCESSINGTATE_WAITING);
-
-			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			final String rulename = getId()+"_wait";
-		
-			IFuture<ITimer> cont = createTimer(timeout, rulename, ip);
+			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+			
+			final ResumeCommand<ChangeEvent> rescom = new ResumeCommand<ChangeEvent>(ret, rulename);
+			setResumeCommand(rescom);
+			setProcessingState(PLANPROCESSINGTATE_WAITING);
+			
+			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
 			{
 				public void resultAvailable(final ITimer timer)
 				{
+					if(timer!=null)
+						rescom.setTimer(timer);
+					
 					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
-							ip.getRuleSystem().getRulebase().removeRule(rulename);
-							setDispatchedElement(new ChangeEvent(event));
-							RPlan.adoptPlan(RPlan.this, ia);
-							
-							if(timer!=null)
-								timer.cancel();
+							if(rescom.equals(getResumeCommand()))
+							{
+								setDispatchedElement(new ChangeEvent(event));
+								RPlan.executePlan(RPlan.this, ia);
+							}
 							return IFuture.DONE;
 						}
 					});
@@ -807,7 +916,7 @@ public class RPlan extends RElement implements IPlan
 			});
 		}
 		
-		return (Future<ChangeEvent>)getWaitFuture();
+		return (Future<ChangeEvent>)ret;
 	}
 	
 	/**
@@ -823,7 +932,6 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public IFuture<Void> waitForCondition(final ICondition cond, final String[] events, long timeout)
 	{
-		assert getWaitFuture()==null;
 		Future<Object> ret = new Future<Object>();
 
 		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
@@ -835,26 +943,29 @@ public class RPlan extends RElement implements IPlan
 		}
 		else
 		{
-			setWaitFuture(ret);
-			setProcessingState(PLANPROCESSINGTATE_WAITING);
-			
 			final String rulename = getId()+"_wait";
 			
-			IFuture<ITimer> cont = createTimer(timeout, rulename, ip);
+			final ResumeCommand<Object> rescom = new ResumeCommand<Object>(ret, rulename);
+			setResumeCommand(rescom);
+			setProcessingState(PLANPROCESSINGTATE_WAITING);
+			
+			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
 			{
 				public void resultAvailable(final ITimer timer)
 				{
+					if(timer!=null)
+						rescom.setTimer(timer);
+					
 					Rule<Void> rule = new Rule<Void>(rulename, cond!=null? cond: ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 						{
-							ip.getRuleSystem().getRulebase().removeRule(rulename);
-							setDispatchedElement(new ChangeEvent(event));
-							RPlan.adoptPlan(RPlan.this, ia);
-							
-							if(timer!=null)
-								timer.cancel();
+							if(rescom.equals(getResumeCommand()))
+							{
+								setDispatchedElement(new ChangeEvent(event));
+								RPlan.executePlan(RPlan.this, ia);
+							}
 							return IFuture.DONE;
 						}
 					});
@@ -881,7 +992,7 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
-	protected IFuture<ITimer> createTimer(long timeout, final String rulename, final BDIAgentInterpreter ip)
+	protected IFuture<ITimer> createTimer(long timeout, final BDIAgentInterpreter ip, final ICommand<Void> rescom)
 	{
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
@@ -890,11 +1001,10 @@ public class RPlan extends RElement implements IPlan
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					if(ip.getRuleSystem().getRulebase().containsRule(rulename))
+					if(rescom.equals(getResumeCommand()))
 					{
-						ip.getRuleSystem().getRulebase().removeRule(rulename);
 						setException(new TimeoutException());
-						RPlan.adoptPlan(RPlan.this, ia);
+						RPlan.executePlan(RPlan.this, ia);
 					}
 					return IFuture.DONE;
 				}
@@ -913,4 +1023,120 @@ public class RPlan extends RElement implements IPlan
 		}
 		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		final ICommand<Void> rescom = new ResumeCommand<T>(ret, null);
+		setResumeCommand(rescom);
+		setProcessingState(PLANPROCESSINGTATE_WAITING);
+		
+		command.execute(null).addResultListener(ia.createResultListener(new IResultListener<T>()
+		{
+			public void resultAvailable(T result)
+			{
+				if(rescom.equals(getResumeCommand()))
+				{
+					setDispatchedElement(result);
+					RPlan.executePlan(RPlan.this, ia);
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(rescom.equals(getResumeCommand()))
+				{
+					setException(exception);
+					RPlan.executePlan(RPlan.this, ia);
+				}
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	class ResumeCommand<T> implements ICommand<Void>
+	{
+		protected Future<T> waitfuture;
+		protected String rulename;
+		protected ITimer timer;
+		
+		public ResumeCommand(Future<T> waitfuture)
+		{
+			this(waitfuture, null);
+		}
+		
+		public ResumeCommand(Future<T> waitfuture, String rulename)
+		{
+//			System.out.println("created: "+this+" "+RPlan.this.getId());
+			this.waitfuture = waitfuture;
+			this.rulename = rulename;
+		}
+		
+		public void setTimer(ITimer timer)
+		{
+			this.timer = timer;
+		}
+
+		public void execute(Void args)
+		{
+//			System.out.println("exe: "+this+" "+RPlan.this.getId());
+			
+			if(getException()!=null)
+			{
+				waitfuture.setException(getException());
+			}
+			else
+			{
+				waitfuture.setResult((T)getDispatchedElement());
+			}
+			
+			if(rulename!=null)
+			{
+				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+				ip.getRuleSystem().getRulebase().removeRule(rulename);
+			}
+			if(timer!=null)
+			{
+				timer.cancel();
+			}
+		}
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	class DefaultResumeCommand<T> implements ICommand<Void>
+//	{
+//		protected Future<T> waitfuture;
+//		protected ICommand<Void> cleancom;
+//		
+//		public DefaultResumeCommand(Future<T> waitfuture, ICommand<Void> cleancom)
+//		{
+//			this.waitfuture = waitfuture;
+//			this.cleancom = cleancom;
+//		}
+//		
+//		public void execute(Void args)
+//		{
+//			if(getException()!=null)
+//			{
+//				waitfuture.setException(getException());
+//			}
+//			else
+//			{
+//				waitfuture.setResult((T)getDispatchedElement());
+//			}
+//			
+//			if(cleancom!=null)
+//				cleancom.execute(null);
+//		}
+//	}
 }
