@@ -37,7 +37,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		return RGoal.GOALLIFECYCLESTATE_NEW.equals(goal.getLifecycleState());
+		return RGoal.GoalLifecycleState.NEW.equals(goal.getLifecycleState());
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 			}
 			
 			ip.getCapability().addGoal(goal);
-			goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_ADOPTED);
+			goal.setLifecycleState(ia, RGoal.GoalLifecycleState.ADOPTED);
 			ret.setResult(null);
 		}
 		catch(Exception e)

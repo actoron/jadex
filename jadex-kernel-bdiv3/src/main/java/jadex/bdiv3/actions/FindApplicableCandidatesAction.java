@@ -39,8 +39,8 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;
-			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
-				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+			ret = RGoal.GoalLifecycleState.ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState());
 		}
 			
 //		if(!ret)
@@ -66,13 +66,13 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 			{
 				if(apl.isEmpty())
 				{
-					element.setState(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES);
+					element.setState(RProcessableElement.State.NOCANDIDATES);
 					element.planFinished(ia, null);
 //					element.reason(ia);
 				}
 				else
 				{
-					element.setState(RProcessableElement.PROCESSABLEELEMENT_APLAVAILABLE);
+					element.setState(RProcessableElement.State.APLAVAILABLE);
 					ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(element));
 				}
 				ret.setResult(null);

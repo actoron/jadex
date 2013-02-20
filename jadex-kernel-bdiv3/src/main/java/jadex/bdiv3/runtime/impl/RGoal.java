@@ -32,69 +32,31 @@ public class RGoal extends RProcessableElement implements IGoal
 {
 	//-------- goal lifecycle states --------
 	
-	/** The lifecycle state "new" (just created). */
-	public static final String	GOALLIFECYCLESTATE_NEW	= "new";
-
-	/** The lifecycle state "adopted" (adopted, but not active). */
-	public static final String	GOALLIFECYCLESTATE_ADOPTED	= "adopted";
-
-	/** The lifecycle state "option" (adopted, but not active). */
-	public static final String	GOALLIFECYCLESTATE_OPTION	= "option";
-
-	/** The lifecycle state "active" (adopted and processed or monitored). */
-	public static final String	GOALLIFECYCLESTATE_ACTIVE	= "active";
-
-	/** The lifecycle state "active" (adopted and processed or monitored). */
-	public static final String	GOALLIFECYCLESTATE_SUSPENDED	= "suspended";
-
-	/** The lifecycle state "dropping" (just before finished, but still dropping its subgoals). */
-	public static final String	GOALLIFECYCLESTATE_DROPPING	= "dropping";
-
-	/** The lifecycle state "dropped" (goal and all subgoals finished). */
-	public static final String	GOALLIFECYCLESTATE_DROPPED	= "dropped";
-	
-	public static Set<String> GOALLIFECYCLE_STATES = SUtil.createHashSet(new String[]
+	public static enum GoalLifecycleState
 	{
-		GOALLIFECYCLESTATE_NEW,
-		GOALLIFECYCLESTATE_ADOPTED,
-		GOALLIFECYCLESTATE_OPTION,
-		GOALLIFECYCLESTATE_ACTIVE,
-		GOALLIFECYCLESTATE_SUSPENDED,
-		GOALLIFECYCLESTATE_DROPPING,
-		GOALLIFECYCLESTATE_DROPPED
-	});
+		NEW, 
+		ADOPTED,
+		OPTION,
+		ACTIVE,
+		SUSPENDED,
+		DROPPING,
+		DROPPED
+	};
 	
-	//-------- goal processing states --------
-	
-	/** The goal idle state. */
-	public static final String	GOALPROCESSINGSTATE_IDLE	= "idle";
-	
-	/** The goal in-process state. */
-	public static final String	GOALPROCESSINGSTATE_INPROCESS	= "in-process";
-
-	/** The goal paused state. */
-	public static final String	GOALPROCESSINGSTATE_PAUSED	= "paused";
-	
-	/** The goal succeeded state. */
-	public static final String	GOALPROCESSINGSTATE_SUCCEEDED	= "succeeded";
-	
-	/** The goal failed state. */
-	public static final String	GOALPROCESSINGSTATE_FAILED	= "failed";
-
-	public static Set<String> GOALPROCESSINGSTATE_STATES = SUtil.createHashSet(new String[]
+	public static enum GoalProcessingState
 	{
-		GOALPROCESSINGSTATE_IDLE,
-		GOALPROCESSINGSTATE_INPROCESS,
-		GOALPROCESSINGSTATE_PAUSED,
-		GOALPROCESSINGSTATE_SUCCEEDED,
-		GOALPROCESSINGSTATE_FAILED
-	});
+		IDLE, 
+		INPROCESS,
+		PAUSED,
+		SUCCEEDED,
+		FAILED,
+	};
 	
 	/** The lifecycle state. */
-	protected String lifecyclestate;
+	protected GoalLifecycleState lifecyclestate;
 
 	/** The processing state. */
-	protected String processingstate;
+	protected GoalProcessingState processingstate;
 
 	/** The exception. */
 	protected Exception exception;
@@ -129,8 +91,8 @@ public class RGoal extends RProcessableElement implements IGoal
 		super(mgoal, goal);
 		this.ia = ia;
 		this.parentplan = parentplan;
-		this.lifecyclestate = GOALLIFECYCLESTATE_NEW;
-		this.processingstate = GOALPROCESSINGSTATE_IDLE;
+		this.lifecyclestate = GoalLifecycleState.NEW;
+		this.processingstate = GoalProcessingState.IDLE;
 	}
 
 	/**
@@ -155,7 +117,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 *  Get the lifecycleState.
 	 *  @return The lifecycleState.
 	 */
-	public String getLifecycleState()
+	public GoalLifecycleState getLifecycleState()
 	{
 		return lifecyclestate;
 	}
@@ -164,11 +126,8 @@ public class RGoal extends RProcessableElement implements IGoal
 	 *  Set the lifecycleState.
 	 *  @param lifecycleState The lifecycleState to set.
 	 */
-	public void setLifecycleState(String lifecyclestate)
+	public void setLifecycleState(GoalLifecycleState lifecyclestate)
 	{
-		if(!GOALLIFECYCLE_STATES.contains(lifecyclestate))
-			throw new IllegalArgumentException("Unknown state: "+lifecyclestate);
-
 		this.lifecyclestate = lifecyclestate;
 	}
 
@@ -176,7 +135,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 *  Get the processingState.
 	 *  @return The processingState.
 	 */
-	public String getProcessingState()
+	public GoalProcessingState getProcessingState()
 	{
 		return processingstate;
 	}
@@ -185,11 +144,8 @@ public class RGoal extends RProcessableElement implements IGoal
 	 *  Set the processingState.
 	 *  @param processingState The processingState to set.
 	 */
-	public void setProcessingState(String processingstate)
+	public void setProcessingState(GoalProcessingState processingstate)
 	{
-		if(!GOALPROCESSINGSTATE_STATES.contains(processingstate))
-			throw new IllegalArgumentException("Unknown state: "+processingstate);
-		
 		this.processingstate = processingstate;
 	}
 	
@@ -197,7 +153,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 *  Set the processingState.
 	 *  @param processingState The processingState to set.
 	 */
-	public void setProcessingState(IInternalAccess ia, String processingstate)
+	public void setProcessingState(IInternalAccess ia, GoalProcessingState processingstate)
 	{
 		if(getProcessingState().equals(processingstate))
 			return;
@@ -208,11 +164,11 @@ public class RGoal extends RProcessableElement implements IGoal
 //		Object	curstate	= state.getAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_processingstate);
 //		System.out.println("changeprocstate: "+rgoal+" "+newstate+" "+curstate);
 
-		if(!RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(processingstate))
+		if(!RGoal.GoalProcessingState.INPROCESS.equals(processingstate))
 		{
 			// todo: introduce some state for finished?!
 //			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_state, null);
-			setState(PROCESSABLEELEMENT_INITIAL);
+			setState(State.INITIAL);
 			
 			// Remove finished plans that would otherwise interfere with next goal processing (if any).
 //			Collection	fplans	= state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans);
@@ -271,22 +227,22 @@ public class RGoal extends RProcessableElement implements IGoal
 //		state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_processingstate, newstate);
 		
 		// If now is inprocess -> start processing
-		if(RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(processingstate))
+		if(RGoal.GoalProcessingState.INPROCESS.equals(processingstate))
 		{
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("activating: "+this);
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALINPROCESS, this));
-			setState(ia, RProcessableElement.PROCESSABLEELEMENT_UNPROCESSED);
+			setState(ia, RProcessableElement.State.UNPROCESSED);
 		}
 		else
 		{
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINPROCESS, this));
 		}
 		
-		if(RGoal.GOALPROCESSINGSTATE_SUCCEEDED.equals(processingstate)
-			|| RGoal.GOALPROCESSINGSTATE_FAILED.equals(processingstate))
+		if(RGoal.GoalProcessingState.SUCCEEDED.equals(processingstate)
+			|| RGoal.GoalProcessingState.FAILED.equals(processingstate))
 		{
-			setLifecycleState(ia, GOALLIFECYCLESTATE_DROPPING);
+			setLifecycleState(ia, GoalLifecycleState.DROPPING);
 		}
 		
 //		System.out.println("exit: "+rgoal+" "+state.getAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_state));
@@ -296,7 +252,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 *  Set the lifecycle state.
 	 *  @param processingState The processingState to set.
 	 */
-	public void setLifecycleState(IInternalAccess ia, String lifecyclestate)
+	public void setLifecycleState(IInternalAccess ia, GoalLifecycleState lifecyclestate)
 	{
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
@@ -319,47 +275,47 @@ public class RGoal extends RProcessableElement implements IGoal
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		setLifecycleState(lifecyclestate);
 		
-		if(GOALLIFECYCLESTATE_ADOPTED.equals(lifecyclestate))
+		if(GoalLifecycleState.ADOPTED.equals(lifecyclestate))
 		{
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALADOPTED, this));
-			setLifecycleState(ia, GOALLIFECYCLESTATE_OPTION);
+			setLifecycleState(ia, GoalLifecycleState.OPTION);
 		}
-		else if(GOALLIFECYCLESTATE_ACTIVE.equals(lifecyclestate))
+		else if(GoalLifecycleState.ACTIVE.equals(lifecyclestate))
 		{
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALACTIVE, this));
 
 			// start means-end reasoning
 			if(onActivate())
 			{
-				setProcessingState(ia, GOALPROCESSINGSTATE_INPROCESS);
+				setProcessingState(ia, GoalProcessingState.INPROCESS);
 			}
 			else
 			{
-				setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+				setProcessingState(ia, GoalProcessingState.IDLE);
 			}
 		}
-		else if(GOALLIFECYCLESTATE_OPTION.equals(lifecyclestate))
+		else if(GoalLifecycleState.OPTION.equals(lifecyclestate))
 		{
 			// ready to be activated via deliberation
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
 			abortPlans();
-			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			setProcessingState(ia, GoalProcessingState.IDLE);
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALOPTION, this));
 			
 		}
-		else if(GOALLIFECYCLESTATE_SUSPENDED.equals(lifecyclestate))
+		else if(GoalLifecycleState.SUSPENDED.equals(lifecyclestate))
 		{
 			// goal is suspended (no more plan executions)
 //			if(getId().indexOf("PerformLook")==-1)
 //				System.out.println("suspending: "+getId());
 			
 			abortPlans();
-			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			setProcessingState(ia, GoalProcessingState.IDLE);
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALSUSPENDED, this));
 		}
 		
-		if(GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
+		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
 		{
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("dropping achievecleanup");
@@ -375,13 +331,13 @@ public class RGoal extends RProcessableElement implements IGoal
 			abortPlans();
 			ia.getExternalAccess().scheduleStep(new DropGoalAction(this));
 		}
-		else if(GOALLIFECYCLESTATE_DROPPED.equals(lifecyclestate))
+		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
 		{
 			if(listeners!=null)
 			{
 				if(!isFinished())
 				{
-					setProcessingState(GOALPROCESSINGSTATE_FAILED);
+					setProcessingState(GoalProcessingState.FAILED);
 					setException(new GoalFailureException());
 				}
 				for(IResultListener<Void> lis: listeners)
@@ -421,7 +377,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public boolean isSucceeded()
 	{
-		return RGoal.GOALPROCESSINGSTATE_SUCCEEDED.equals(processingstate);
+		return GoalProcessingState.SUCCEEDED.equals(processingstate);
 	}
 	
 	/**
@@ -429,7 +385,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public boolean isFailed()
 	{
-		return RGoal.GOALPROCESSINGSTATE_FAILED.equals(processingstate);
+		return GoalProcessingState.FAILED.equals(processingstate);
 	}
 	
 	/**
@@ -650,17 +606,17 @@ public class RGoal extends RProcessableElement implements IGoal
 		// Check procedural success semantics
 		if(isProceduralSucceeded())
 		{
-			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
+			setProcessingState(ia, GoalProcessingState.SUCCEEDED);
 		}
 		
-		if(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(getLifecycleState()))
+		if(GoalLifecycleState.ACTIVE.equals(getLifecycleState()))
 		{
 			if(!isSucceeded() && !isFailed())
 			{
 				// Test if is retry
 				if(isRetry() && rplan!=null)
 				{
-					if(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED.equals(getState()))
+					if(RProcessableElement.State.CANDIDATESSELECTED.equals(getState()))
 					{
 						if(getMGoal().getRetryDelay()>-1)
 						{
@@ -671,10 +627,10 @@ public class RGoal extends RProcessableElement implements IGoal
 							ia.getExternalAccess().scheduleStep(new SelectCandidatesAction(this));
 						}
 					}
-					else if(RProcessableElement.PROCESSABLEELEMENT_NOCANDIDATES.equals(getState()))
+					else if(RProcessableElement.State.NOCANDIDATES.equals(getState()))
 					{
 						setException(new GoalFailureException("No canditates."));
-						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
 //					else
 //					{
@@ -685,12 +641,12 @@ public class RGoal extends RProcessableElement implements IGoal
 				{
 					if(isRecur())
 					{
-						setProcessingState(ia, GOALPROCESSINGSTATE_PAUSED);
+						setProcessingState(ia, GoalProcessingState.PAUSED);
 					}
 					else
 					{
 						setException(new GoalFailureException("No canditates."));
-						setProcessingState(ia, GOALPROCESSINGSTATE_FAILED);
+						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
 				}
 			}
@@ -793,11 +749,11 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public void drop()
 	{
-		if(!RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState())
-			&& !RGoal.GOALLIFECYCLESTATE_DROPPING.equals(getLifecycleState()) 
-			&& !RGoal.GOALLIFECYCLESTATE_DROPPED.equals(getLifecycleState()))
+		if(!GoalLifecycleState.NEW.equals(getLifecycleState())
+			&& !GoalLifecycleState.DROPPING.equals(getLifecycleState()) 
+			&& !GoalLifecycleState.DROPPED.equals(getLifecycleState()))
 		{
-			setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPING);
+			setLifecycleState(ia, GoalLifecycleState.DROPPING);
 		}
 	}
 	
@@ -809,11 +765,11 @@ public class RGoal extends RProcessableElement implements IGoal
 //		System.out.println("Goal target triggered: "+RGoal.this);
 		if(getMGoal().isMaintain())
 		{
-			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_IDLE);
+			setProcessingState(ia, GoalProcessingState.IDLE);
 		}
 		else
 		{
-			setProcessingState(ia, RGoal.GOALPROCESSINGSTATE_SUCCEEDED);
+			setProcessingState(ia, GoalProcessingState.SUCCEEDED);
 		}
 	}
 	
@@ -829,7 +785,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		
 		boolean ret = false;
 		
-		if(getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) && getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS))
+		if(getLifecycleState().equals(GoalLifecycleState.ACTIVE) && getProcessingState().equals(GoalProcessingState.INPROCESS))
 		{
 			MDeliberation delib = getMGoal().getDeliberation();
 			if(delib!=null)

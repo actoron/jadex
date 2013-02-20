@@ -30,7 +30,7 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		return RGoal.GOALLIFECYCLESTATE_DROPPING.equals(goal.getLifecycleState());
+		return RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState());
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 //		goal.unobserveGoal(ia);
 		ip.getCapability().removeGoal(goal);
-		goal.setLifecycleState(ia, RGoal.GOALLIFECYCLESTATE_DROPPED);
+		goal.setLifecycleState(ia, RGoal.GoalLifecycleState.DROPPED);
 		ret.setResult(null);
 		return ret;
 	}

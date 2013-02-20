@@ -20,6 +20,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -593,7 +594,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 									if(!goal.isFinished())
 									{
 										goal.setException(new GoalFailureException("drop condition: "+m.getName()));
-										goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_FAILED);
+										goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
 									}
 								}
 							}
@@ -622,14 +623,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
-								if(!RGoal.GOALLIFECYCLESTATE_SUSPENDED.equals(goal.getLifecycleState()))
+								if(!RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
 								{	
 									if(!executeGoalMethod(m, goal, event))
 									{
 //										if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //											System.out.println("Goal suspended: "+goal);
-										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_SUSPENDED);
-										goal.setState(RGoal.PROCESSABLEELEMENT_INITIAL);
+										goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.SUSPENDED);
+										goal.setState(RGoal.State.INITIAL);
 									}
 								}
 							}
@@ -646,13 +647,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
-								if(RGoal.GOALLIFECYCLESTATE_SUSPENDED.equals(goal.getLifecycleState()))
+								if(RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
 								{	
 									if(executeGoalMethod(m, goal, event))
 									{
 //										if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //											System.out.println("Goal made option: "+goal);
-										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
+										goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.OPTION);
 //										setState(ia, PROCESSABLEELEMENT_INITIAL);
 									}
 								}
@@ -685,14 +686,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
-								if(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState())
-									&& RGoal.GOALPROCESSINGSTATE_PAUSED.equals(goal.getProcessingState()))
+								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
+									&& RGoal.GoalProcessingState.PAUSED.equals(goal.getProcessingState()))
 								{	
 									if(executeGoalMethod(m, goal, event))
 									{
 										goal.setTriedPlans(null);
 										goal.setApplicablePlanList(null);
-										goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_INPROCESS);
+										goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
 									}
 								}
 							}
@@ -728,14 +729,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						for(RGoal goal: getCapability().getGoals(mgoal))
 						{
-							if(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState())
-								&& RGoal.GOALPROCESSINGSTATE_IDLE.equals(goal.getProcessingState()))
+							if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
+								&& RGoal.GoalProcessingState.IDLE.equals(goal.getProcessingState()))
 							{	
 								if(!executeGoalMethod(m, goal, event))
 								{
 //									System.out.println("Goal maintain triggered: "+goal);
 //									System.out.println("state was: "+getProcessingState());
-									goal.setProcessingState(getInternalAccess(), RGoal.GOALPROCESSINGSTATE_INPROCESS);
+									goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
 								}
 							}
 						}
@@ -935,8 +936,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							boolean ret = false;
 							EventType type = event.getType();
 							RGoal goal = (RGoal)event.getContent();
-							ret = ChangeEvent.GOALACTIVE.equals(type.getType(0)) && RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState())
-								|| (ChangeEvent.GOALINPROCESS.equals(type.getType(0)) && RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(goal.getLifecycleState()));
+							ret = ChangeEvent.GOALACTIVE.equals(type.getType(0)) && RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState())
+								|| (ChangeEvent.GOALINPROCESS.equals(type.getType(0)) && RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState()));
 							return ret;
 						}
 					}, new IAction<Void>()
@@ -980,7 +981,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							{
 								RGoal goal = (RGoal)event.getContent();
 								ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) || ChangeEvent.GOALOPTION.equals(type.getType(0))
-									|| !RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(goal.getProcessingState());
+									|| !RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState());
 							}
 							return ret;
 						}
@@ -1017,13 +1018,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				
 				
 				rule = new Rule<Void>("goal_inhibit", 
-					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_ACTIVE), new IAction<Void>()
+					new LifecycleStateCondition(RGoal.GoalLifecycleState.ACTIVE), new IAction<Void>()
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 					{
 						RGoal goal = (RGoal)event.getContent();
 	//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
-						goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_OPTION);
+						goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.OPTION);
 						return IFuture.DONE;
 					}
 				});
@@ -1033,7 +1034,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			Rule<Void> rule = new Rule<Void>("goal_activate", 
 				new CombinedCondition(new ICondition[]{
-					new LifecycleStateCondition(RGoal.GOALLIFECYCLESTATE_OPTION),
+					new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
 					new ICondition()
 					{
 						public boolean evaluate(IEvent event)
@@ -1049,7 +1050,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					RGoal goal = (RGoal)event.getContent();
 //					if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //						System.out.println("reactivating: "+goal);
-					goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_ACTIVE);
+					goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.ACTIVE);
 					return IFuture.DONE;
 				}
 			});
@@ -1269,7 +1270,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public static class LifecycleStateCondition implements ICondition
 	{
 		/** The allowed states. */
-		protected Set<String> states;
+		protected Set<GoalLifecycleState> states;
 		
 		/** The flag if state is allowed or disallowed. */
 		protected boolean allowed;
@@ -1277,15 +1278,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 *  Create a new condition.
 		 */
-		public LifecycleStateCondition(String state)
+		public LifecycleStateCondition(GoalLifecycleState state)
 		{
-			this(SUtil.createHashSet(new String[]{state}));
+			this(SUtil.createHashSet(new GoalLifecycleState[]{state}));
 		}
 		
 		/**
 		 *  Create a new condition.
 		 */
-		public LifecycleStateCondition(Set<String> states)
+		public LifecycleStateCondition(Set<GoalLifecycleState> states)
 		{
 			this(states, true);
 		}
@@ -1293,15 +1294,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 *  Create a new condition.
 		 */
-		public LifecycleStateCondition(String state, boolean allowed)
+		public LifecycleStateCondition(GoalLifecycleState state, boolean allowed)
 		{
-			this(SUtil.createHashSet(new String[]{state}), allowed);
+			this(SUtil.createHashSet(new GoalLifecycleState[]{state}), allowed);
 		}
 		
 		/**
 		 *  Create a new condition.
 		 */
-		public LifecycleStateCondition(Set<String> states, boolean allowed)
+		public LifecycleStateCondition(Set<GoalLifecycleState> states, boolean allowed)
 		{
 			this.states = states;
 			this.allowed = allowed;

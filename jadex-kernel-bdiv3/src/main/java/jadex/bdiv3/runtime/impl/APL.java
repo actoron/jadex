@@ -9,6 +9,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
+import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -512,10 +513,10 @@ public class APL
 		}
 		else
 		{
-			String state = rplan.getLifecycleState();
-			if(state.equals(RPlan.PLANLIFECYCLESTATE_PASSED)
+			PlanLifecycleState state = rplan.getLifecycleState();
+			if(state.equals(RPlan.PlanLifecycleState.PASSED)
 				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED)
-				|| (state.equals(RPlan.PLANLIFECYCLESTATE_FAILED) 
+				|| (state.equals(RPlan.PlanLifecycleState.FAILED) 
 				&& exclude.equals(MProcessableElement.EXCLUDE_WHEN_FAILED)))
 			{
 				candidates.remove(rplan.getCandidate());

@@ -43,37 +43,23 @@ public class RPlan extends RElement implements IPlan
 {
 	//-------- plan states --------
 	
-	/** The plan ready state. */
-	public static final String	PLANPROCESSINGTATE_READY	= "ready";
+	public static enum PlanProcessingState
+	{
+		READY, 
+		RUNNING,
+		WAITING,
+		GOALCLEANUP,
+		FINISHED,
+	};
 	
-	/** The plan running state. */
-	public static final String	PLANPROCESSINGTATE_RUNNING	= "running";
-	
-	/** The plan waiting state. */
-	public static final String	PLANPROCESSINGTATE_WAITING	= "waiting";
-	
-	/** The plan goalcleanup state (wait for subgoals being dropped
-	 *  after body is exited and before passed/failed/aborted is called). */
-	public static final String	PLANPROCESSINGTATE_GOALCLEANUP	= "goalcleanup";
-	
-	/** The plan finished state. */
-	public static final String	PLANPROCESSINGTATE_FINISHED	= "finished";
-	
-	/** The lifecycle state "new" (just created). */
-	public static final String	PLANLIFECYCLESTATE_NEW	= "new";
-	
-	/** The state, indicating the execution of the plan body. */
-	public static final String	PLANLIFECYCLESTATE_BODY	= "body";
-	
-	/** The state, indicating the execution of the passed code. */
-	public static final String	PLANLIFECYCLESTATE_PASSED	= "passed";
-	
-	/** The state, indicating the execution of the failed code. */
-	public static final String	PLANLIFECYCLESTATE_FAILED	= "failed";
-	
-	/** The state, indicating the execution of the aborted. */
-	public static final String	PLANLIFECYCLESTATE_ABORTED	= "aborted";
-	
+	public static enum PlanLifecycleState
+	{
+		NEW, 
+		BODY,
+		PASSED,
+		FAILED,
+		ABORTED,
+	};
 	
 	/** The plan has a reason. */
 	protected Object reason;
@@ -101,10 +87,10 @@ public class RPlan extends RElement implements IPlan
 	protected Exception exception;
 	
 	/** The plan has lifecycle state attribute. */
-	protected String lifecyclestate;
+	protected PlanLifecycleState lifecyclestate;
 	
 	/** The plan has processing state attribute (ready or waiting). */
-	protected String processingstate;
+	protected PlanProcessingState processingstate;
 	
 //	/** The plan has a timer attribute (when waiting). */
 //	protected static ? plan_has_timer;
@@ -244,14 +230,14 @@ public class RPlan extends RElement implements IPlan
 	{
 		super(mplan);
 		this.candidate = candidate;
-		setLifecycleState(PLANLIFECYCLESTATE_NEW);
+		setLifecycleState(PlanLifecycleState.NEW);
 	}
 
 	/**
 	 *  Get the processingState.
 	 *  @return The processingState.
 	 */
-	public String getProcessingState()
+	public PlanProcessingState getProcessingState()
 	{
 		return processingstate;
 	}
@@ -260,7 +246,7 @@ public class RPlan extends RElement implements IPlan
 	 *  Set the processingState.
 	 *  @param processingState The processingState to set.
 	 */
-	public void setProcessingState(String processingstate)
+	public void setProcessingState(PlanProcessingState processingstate)
 	{
 		this.processingstate = processingstate;
 	}
@@ -269,7 +255,7 @@ public class RPlan extends RElement implements IPlan
 	 *  Get the lifecycleState.
 	 *  @return The lifecycleState.
 	 */
-	public String getLifecycleState()
+	public PlanLifecycleState getLifecycleState()
 	{
 		return lifecyclestate;
 	}
@@ -278,7 +264,7 @@ public class RPlan extends RElement implements IPlan
 	 *  Set the lifecycleState.
 	 *  @param lifecycleState The lifecycleState to set.
 	 */
-	public void setLifecycleState(String lifecyclestate)
+	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 		this.lifecyclestate = lifecyclestate;
 	}
@@ -455,7 +441,7 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public boolean isPassed()
 	{
-		return RPlan.PLANLIFECYCLESTATE_PASSED.equals(lifecyclestate);
+		return RPlan.PlanLifecycleState.PASSED.equals(lifecyclestate);
 	}
 	
 	/**
@@ -463,7 +449,7 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public boolean isFailed()
 	{
-		return RPlan.PLANLIFECYCLESTATE_FAILED.equals(lifecyclestate);
+		return RPlan.PlanLifecycleState.FAILED.equals(lifecyclestate);
 	}
 	
 	/**
@@ -471,7 +457,7 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public boolean isAborted()
 	{
-		return RPlan.PLANLIFECYCLESTATE_ABORTED.equals(lifecyclestate);
+		return RPlan.PlanLifecycleState.ABORTED.equals(lifecyclestate);
 	}
 	
 	/**
@@ -528,7 +514,7 @@ public class RPlan extends RElement implements IPlan
 			}
 
 			// If plan is waiting interrupt waiting
-			if(PLANPROCESSINGTATE_WAITING.equals(getProcessingState()))
+			if(PlanProcessingState.WAITING.equals(getProcessingState()))
 			{
 				RPlan.executePlan(this, ia);
 			}
@@ -575,7 +561,7 @@ public class RPlan extends RElement implements IPlan
 		assert resumecommand!=null;
 		ICommand<Void> com = resumecommand;
 		resumecommand = null;
-		setProcessingState(PLANPROCESSINGTATE_RUNNING);
+		setProcessingState(PlanProcessingState.RUNNING);
 		com.execute(null);
 	}
 	
@@ -609,7 +595,7 @@ public class RPlan extends RElement implements IPlan
 		
 		assert resumecommand==null;
 		setDispatchedElement(null);
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
+		setProcessingState(PlanProcessingState.WAITING);
 		resumecommand = com;
 	}
 	

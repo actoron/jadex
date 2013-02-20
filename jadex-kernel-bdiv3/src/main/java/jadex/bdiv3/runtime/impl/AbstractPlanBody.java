@@ -68,7 +68,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 					{
 						public void resultAvailable(Void result)
 						{
-							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
+							rplan.setLifecycleState(RPlan.PlanLifecycleState.PASSED);
 //							if(reason instanceof RProcessableElement)
 //								((RProcessableElement)reason).planFinished(ia, rplan);
 							ret.setResult(null);
@@ -76,7 +76,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 							rplan.setException(exception);
 //							if(reason instanceof RProcessableElement)
 //								((RProcessableElement)reason).planFinished(ia, rplan);
@@ -98,7 +98,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 					public void resultAvailable(Void result)
 					{
 						if(!rplan.isFinished())
-							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 						rplan.setException(exception);
 //						if(reason instanceof RProcessableElement)
 //							((RProcessableElement)reason).planFinished(ia, rplan);
@@ -108,7 +108,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 					public void exceptionOccurred(Exception ex)
 					{
 						if(!rplan.isFinished())
-							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
+							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 						rplan.setException(exception);
 //						if(reason instanceof RProcessableElement)
 //							((RProcessableElement)reason).planFinished(ia, rplan);

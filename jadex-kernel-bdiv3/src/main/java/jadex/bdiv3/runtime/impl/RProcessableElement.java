@@ -3,44 +3,25 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 
  */
 public abstract class RProcessableElement extends RElement
 {
-	/** The processable element state initial. */
-	public static final String	PROCESSABLEELEMENT_INITIAL	= "initial";
-	
-	/** The processable element state unprocessed. */
-	public static final String	PROCESSABLEELEMENT_UNPROCESSED	= "unprocessed";
-
-	/** The processable element state apl available. */
-	public static final String	PROCESSABLEELEMENT_APLAVAILABLE	= "aplavailable";
-	
-	/** The processable element state meta-level reasoning. */
-	public static final String	PROCESSABLEELEMENT_METALEVELREASONING	= "metalevelreasoning";
-	
-	/** The processable element state no candidates. */
-	public static final String	PROCESSABLEELEMENT_NOCANDIDATES	= "nocandidates";
-
-	/** The processable element state candidate selected. */
-	public static final String	PROCESSABLEELEMENT_CANDIDATESSELECTED	= "candidatesselected";
-
-	public static Set<String> PROCESSABLEELEMENT_STATES = SUtil.createHashSet(new String[]
+	/** The allowed states. */
+	public static enum State
 	{
-		PROCESSABLEELEMENT_INITIAL,
-		PROCESSABLEELEMENT_UNPROCESSED,
-		PROCESSABLEELEMENT_APLAVAILABLE,
-		PROCESSABLEELEMENT_METALEVELREASONING,
-		PROCESSABLEELEMENT_NOCANDIDATES,
-		PROCESSABLEELEMENT_CANDIDATESSELECTED,
-	});
+		INITIAL, 
+		UNPROCESSED,
+		APLAVAILABLE,
+		METALEVELREASONING,
+		NOCANDIDATES,
+		CANDIDATESSELECTED
+	};
 	
 	/** The pojo element. */
 	protected Object pojoelement;
@@ -52,7 +33,7 @@ public abstract class RProcessableElement extends RElement
 	protected List<RPlan> triedplans;
 	
 	/** The state. */
-	protected String state;
+	protected State state;
 	
 	/**
 	 *  Create a new element.
@@ -61,7 +42,7 @@ public abstract class RProcessableElement extends RElement
 	{
 		super(modelelement);
 		this.pojoelement = pojoelement;
-		this.state = PROCESSABLEELEMENT_INITIAL;
+		this.state = State.INITIAL;
 	}
 
 	/**
@@ -136,7 +117,7 @@ public abstract class RProcessableElement extends RElement
 	 *  Get the state.
 	 *  @return The state.
 	 */
-	public String getState()
+	public State getState()
 	{
 		return state;
 	}
@@ -145,7 +126,7 @@ public abstract class RProcessableElement extends RElement
 	 *  Set the state.
 	 *  @param state The state to set.
 	 */
-	public void setState(String state)
+	public void setState(State state)
 	{
 		this.state = state;
 	}
@@ -153,17 +134,15 @@ public abstract class RProcessableElement extends RElement
 	/**
 	 * 
 	 */
-	public void setState(IInternalAccess ia, String state)
+	public void setState(IInternalAccess ia, State state)
 	{
-		if(!PROCESSABLEELEMENT_STATES.contains(state))
-			throw new IllegalArgumentException("Invalid state: "+state);
 		if(getState().equals(state))
 			return;
 			
 		setState(state);
 		
 		// start MR when state gets to unprocessed
-		if(PROCESSABLEELEMENT_UNPROCESSED.equals(state))
+		if(State.UNPROCESSED.equals(state))
 		{
 			ia.getExternalAccess().scheduleStep(new FindApplicableCandidatesAction(this));
 		}

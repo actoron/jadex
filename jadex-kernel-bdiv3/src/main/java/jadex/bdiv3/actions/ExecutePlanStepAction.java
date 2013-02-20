@@ -39,8 +39,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	public boolean isValid()
 	{
 		// todo: abort execution
-		boolean ret = RPlan.PLANLIFECYCLESTATE_NEW.equals(rplan.getLifecycleState())
-			|| RPlan.PLANLIFECYCLESTATE_BODY.equals(rplan.getLifecycleState());
+		boolean ret = RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState())
+			|| RPlan.PlanLifecycleState.BODY.equals(rplan.getLifecycleState());
 		
 //		if(ret)
 //		{
@@ -78,19 +78,19 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;
-			if(!(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
-				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState())) && !rplan.aborted)
+			if(!(RGoal.GoalLifecycleState.ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState())) && !rplan.aborted)
 			{
 				// todo: hack, how to avoid side effect
 				rplan.abort();
 			}
 		}
 		
-		if(RPlan.PLANPROCESSINGTATE_WAITING.equals(rplan.getProcessingState()))
+		if(RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
 		{
 			rplan.continueAfterWait();
 		}
-		else if(RPlan.PLANLIFECYCLESTATE_NEW.equals(rplan.getLifecycleState()))
+		else if(RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
 		{
 			// Set plan as child of goal
 			if(element instanceof RGoal)
@@ -101,7 +101,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			
 			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			ip.getCapability().addPlan(rplan);
-			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_BODY);
+			rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 			IPlanBody body = rplan.getBody();
 			body.executePlan().addResultListener(new IResultListener<Void>()
 			{

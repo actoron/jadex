@@ -42,8 +42,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;
-			ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
-				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+			ret = RGoal.GoalLifecycleState.ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GoalProcessingState.INPROCESS.equals(rgoal.getProcessingState());
 		}
 			
 //		if(!ret)
@@ -69,7 +69,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		List<Object> cands = element.getApplicablePlanList().selectCandidates(mcapa);
 		if(cands!=null && !cands.isEmpty())
 		{
-			element.setState(RProcessableElement.PROCESSABLEELEMENT_CANDIDATESSELECTED);
+			element.setState(RProcessableElement.State.CANDIDATESSELECTED);
 			for(Object cand: cands)
 			{
 				if(cand instanceof MPlan)
