@@ -155,13 +155,13 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
-			<version>2.3-SNAPSHOT</version>
+			<version>[2.3-SNAPSHOT, )</version>
 		</dependency>
 	
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-model-bpmn</artifactId>
-			<version>2.3-SNAPSHOT</version>
+			<version>[2.3-SNAPSHOT, )</version>
 		</dependency>
 		
 		<dependency>
