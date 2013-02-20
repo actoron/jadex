@@ -22,6 +22,12 @@ public interface IPlan
 	public void abort();
 	
 	/**
+	 *  Get the exception.
+	 *  @return The exception.
+	 */
+	public Exception getException();
+	
+	/**
 	 *  Test if plan is passed.
 	 */
 	public boolean isPassed();

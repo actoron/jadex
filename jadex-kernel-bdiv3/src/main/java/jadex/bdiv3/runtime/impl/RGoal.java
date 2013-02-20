@@ -626,6 +626,9 @@ public class RGoal extends RProcessableElement implements IGoal
 		super.planFinished(ia, rplan);
 		childplan = null;
 		
+		if(rplan!=null)
+			System.out.println("plan finished: "+rplan.getId());
+		
 //		if(getPojoElement().getClass().getName().indexOf("PatrolPlan")!=-1)
 //			System.out.println("pips");
 		

@@ -1,8 +1,10 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
@@ -113,6 +115,15 @@ public class MoveToLocationPlan
 		
 		return ret;
 	}
+	
+//	@PlanFailed
+//	@PlanAborted
+//	public void failedaborted()
+//	{
+//		System.out.println("failed+aborted: "+rplan.getId());
+//		rplan.getException().printStackTrace();
+//	}
+	
 	
 	//-------- helper methods --------
 

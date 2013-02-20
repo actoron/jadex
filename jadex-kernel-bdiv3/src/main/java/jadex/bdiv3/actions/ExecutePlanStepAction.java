@@ -42,19 +42,19 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		boolean ret = RPlan.PLANLIFECYCLESTATE_NEW.equals(rplan.getLifecycleState())
 			|| RPlan.PLANLIFECYCLESTATE_BODY.equals(rplan.getLifecycleState());
 		
-		if(ret)
-		{
-			Object element = rplan.getReason();
-			if(element instanceof RGoal)
-			{
-				RGoal rgoal = (RGoal)element;
-				ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
-					&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
-				// todo: hack, how to avoid side effect
-				if(!ret)
-					rplan.abort();
-			}
-		}
+//		if(ret)
+//		{
+//			Object element = rplan.getReason();
+//			if(element instanceof RGoal)
+//			{
+//				RGoal rgoal = (RGoal)element;
+//				ret = RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
+//					&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState());
+//				// todo: hack, how to avoid side effect
+//				if(!ret)
+//					rplan.abort();
+//			}
+//		}
 			
 //		if(!ret)
 //			System.out.println("not valid: "+this+" "+element);
@@ -78,25 +78,27 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		if(element instanceof RGoal)
 		{
 			RGoal rgoal = (RGoal)element;
-			rgoal.setChildPlan(rplan);
+			if(!(RGoal.GOALLIFECYCLESTATE_ACTIVE.equals(rgoal.getLifecycleState())
+				&& RGoal.GOALPROCESSINGSTATE_INPROCESS.equals(rgoal.getProcessingState())) && !rplan.aborted)
+			{
+				// todo: hack, how to avoid side effect
+				rplan.abort();
+			}
 		}
 		
 		if(RPlan.PLANPROCESSINGTATE_WAITING.equals(rplan.getProcessingState()))
 		{
 			rplan.continueAfterWait();
-//			Future<Object> fut = (Future<Object>)rplan.getWaitFuture();
-//			rplan.setWaitFuture(null);
-//			if(rplan.getException()!=null)
-//			{
-//				fut.setException(rplan.getException());
-//			}
-//			else
-//			{
-//				fut.setResult(rplan.getDispatchedElement());
-//			}
 		}
 		else if(RPlan.PLANLIFECYCLESTATE_NEW.equals(rplan.getLifecycleState()))
 		{
+			// Set plan as child of goal
+			if(element instanceof RGoal)
+			{
+				RGoal rgoal = (RGoal)element;
+				rgoal.setChildPlan(rplan);
+			}
+			
 			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			ip.getCapability().addPlan(rplan);
 			rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_BODY);

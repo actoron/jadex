@@ -370,8 +370,35 @@ public class RCapability extends RElement implements ICapability
 			System.out.println("--------");
 			for(RPlan plan: plans)
 			{
-				System.out.println(plan+" "+plan.getLifecycleState()+" "+plan.getProcessingState()+" "+plan.getReason());
+				StringBuffer buf = new StringBuffer();
+				determineValid(plan, plan, buf);
+				if(plan.aborted)
+					System.out.println("aborted zombie plan: "+plan.getId());
+				
+				System.out.println(buf.toString());
+				System.out.println(plan.getId()+" "+plan.getLifecycleState()+" "+plan.getProcessingState());
 				System.out.println("--------");
+			}
+		}
+	}
+	
+	protected void determineValid(RPlan plan, RPlan orig, StringBuffer buf)
+	{
+		buf.append(plan.getId()+plan.aborted);
+		Object reason = plan.getReason();
+		if(reason instanceof RGoal)
+		{
+			RGoal rg = (RGoal)reason;
+			if(rg.isFinished())
+				System.out.println("fini goal"+" "+reason+" "+orig);
+			RPlan pp = rg.getParentPlan();
+			buf.append(" reason is: "+((RGoal)reason).getId()+rg.lifecyclestate);
+			if(pp!=null)
+			{
+				if(pp.isFinished())
+					System.out.println("fini plan"+" "+pp+" "+orig);
+				buf.append(" parent plan is: ");
+				determineValid(pp, orig, buf);
 			}
 		}
 	}

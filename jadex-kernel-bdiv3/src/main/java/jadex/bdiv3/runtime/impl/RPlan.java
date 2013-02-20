@@ -15,7 +15,6 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -210,6 +209,20 @@ public class RPlan extends RElement implements IPlan
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
 		rplan.setInternalAccess(ia);
+		
+//		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//		Collection<RPlan> pls = ip.getCapability().getPlans(mplan);
+//		if(pls!=null && pls.size()>0)
+//		{
+//			if(mplan.getName().indexOf("CleanUpWastePlan")!=-1)
+//				System.out.println("doubel plan");
+//			for(RPlan pl: pls)
+//			{
+//				if(pl.getReason()!=null && pl.getReason().equals(reason))
+//					System.out.println("double plan");
+//			}
+//		}
+		
 		return rplan;
 	}
 	
@@ -492,6 +505,8 @@ public class RPlan extends RElement implements IPlan
 		}
 	}
 	
+	public boolean aborted;
+	
 	/**
 	 * 
 	 */
@@ -499,6 +514,8 @@ public class RPlan extends RElement implements IPlan
 	{
 		if(!isFinished())
 		{
+			aborted = true;
+			
 //			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
 			setException(new PlanAbortedException());
 			
@@ -542,9 +559,23 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public void continueAfterWait()
 	{
+//		if(resumecommand==null)
+//		{
+//			System.out.println("res com null: "+resumecommand);
+//				
+//			first.printStackTrace();
+//			
+//			Thread.dumpStack();
+//		}
+//		else
+//		{
+//			first = new RuntimeException();
+//		}
+		
 		assert resumecommand!=null;
 		ICommand<Void> com = resumecommand;
 		resumecommand = null;
+		setProcessingState(PLANPROCESSINGTATE_RUNNING);
 		com.execute(null);
 	}
 	
@@ -577,6 +608,8 @@ public class RPlan extends RElement implements IPlan
 //		}
 		
 		assert resumecommand==null;
+		setDispatchedElement(null);
+		setProcessingState(PLANPROCESSINGTATE_WAITING);
 		resumecommand = com;
 	}
 	
@@ -632,21 +665,29 @@ public class RPlan extends RElement implements IPlan
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
+		final ResumeCommand<Void> rescom = new ResumeCommand<Void>(ret);
+		setResumeCommand(rescom);
+
 		ia.waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if(getException()!=null)
+				if(rescom.equals(getResumeCommand()))
 				{
-					return new Future<Void>(getException());
+					RPlan.executePlan(RPlan.this, ia);
 				}
-				else
-				{
-					return IFuture.DONE;
-				}
+				
+//				if(getException()!=null)
+//				{
+//					return new Future<Void>(getException());
+//				}
+//				else
+//				{
+//					return IFuture.DONE;
+//				}
+				return IFuture.DONE;
 			}
-		}).addResultListener(new DelegationResultListener<Void>(ret, true));
+		});//.addResultListener(new DelegationResultListener<Void>(ret, true));
 		
 		return ret;
 	}
@@ -676,7 +717,6 @@ public class RPlan extends RElement implements IPlan
 		
 		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret);
 		setResumeCommand(rescom);
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
 		
 		IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 		cont.addResultListener(new DefaultResultListener<ITimer>()
@@ -811,7 +851,6 @@ public class RPlan extends RElement implements IPlan
 			
 			final ResumeCommand<Object> rescom = new ResumeCommand<Object>(ret, rulename);
 			setResumeCommand(rescom);
-			setProcessingState(PLANPROCESSINGTATE_WAITING);
 			
 			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
@@ -888,7 +927,6 @@ public class RPlan extends RElement implements IPlan
 			
 			final ResumeCommand<ChangeEvent> rescom = new ResumeCommand<ChangeEvent>(ret, rulename);
 			setResumeCommand(rescom);
-			setProcessingState(PLANPROCESSINGTATE_WAITING);
 			
 			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
@@ -948,7 +986,6 @@ public class RPlan extends RElement implements IPlan
 			
 			final ResumeCommand<Object> rescom = new ResumeCommand<Object>(ret, rulename);
 			setResumeCommand(rescom);
-			setProcessingState(PLANPROCESSINGTATE_WAITING);
 			
 			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 			cont.addResultListener(new DefaultResultListener<ITimer>()
@@ -1034,7 +1071,6 @@ public class RPlan extends RElement implements IPlan
 		
 		final ICommand<Void> rescom = new ResumeCommand<T>(ret, null);
 		setResumeCommand(rescom);
-		setProcessingState(PLANPROCESSINGTATE_WAITING);
 		
 		command.execute(null).addResultListener(ia.createResultListener(new IResultListener<T>()
 		{
