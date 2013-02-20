@@ -52,18 +52,18 @@ public class CleanUpWastePlan
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception) 
-			{
-				if(!(exception instanceof PlanAbortedException))
-					exception.printStackTrace();
-			}
-		});
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//			}
+//			
+//			public void exceptionOccurred(Exception exception) 
+//			{
+//				if(!(exception instanceof PlanAbortedException))
+//					exception.printStackTrace();
+//			}
+//		});
 		
 //		System.out.println("Clean-up waste plan started: "+goal.getWaste());
 

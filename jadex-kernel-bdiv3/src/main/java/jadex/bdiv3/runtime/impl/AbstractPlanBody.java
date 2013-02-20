@@ -51,8 +51,6 @@ public abstract class AbstractPlanBody implements IPlanBody
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final Object reason = rplan.getReason();
-		
 		final Object agent = ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia;
 		internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 0).addResultListener(new IResultListener<Void>()
 		{
@@ -71,8 +69,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						public void resultAvailable(Void result)
 						{
 							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_PASSED);
-							if(reason instanceof RProcessableElement)
-								((RProcessableElement)reason).planFinished(ia, rplan);
+//							if(reason instanceof RProcessableElement)
+//								((RProcessableElement)reason).planFinished(ia, rplan);
 							ret.setResult(null);
 						}
 						
@@ -80,8 +78,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						{
 							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 							rplan.setException(exception);
-							if(reason instanceof RProcessableElement)
-								((RProcessableElement)reason).planFinished(ia, rplan);
+//							if(reason instanceof RProcessableElement)
+//								((RProcessableElement)reason).planFinished(ia, rplan);
 							ret.setException(exception);
 						}
 					});
@@ -102,8 +100,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						if(!rplan.isFinished())
 							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 						rplan.setException(exception);
-						if(reason instanceof RProcessableElement)
-							((RProcessableElement)reason).planFinished(ia, rplan);
+//						if(reason instanceof RProcessableElement)
+//							((RProcessableElement)reason).planFinished(ia, rplan);
 						ret.setException(exception);
 					}
 					
@@ -112,8 +110,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 						if(!rplan.isFinished())
 							rplan.setLifecycleState(RPlan.PLANLIFECYCLESTATE_FAILED);
 						rplan.setException(exception);
-						if(reason instanceof RProcessableElement)
-							((RProcessableElement)reason).planFinished(ia, rplan);
+//						if(reason instanceof RProcessableElement)
+//							((RProcessableElement)reason).planFinished(ia, rplan);
 						ret.setException(exception);
 					}
 				});

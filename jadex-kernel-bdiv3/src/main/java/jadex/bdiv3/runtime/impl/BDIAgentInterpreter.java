@@ -626,8 +626,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{	
 									if(!executeGoalMethod(m, goal, event))
 									{
-										if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-											System.out.println("Goal suspended: "+goal);
+//										if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+//											System.out.println("Goal suspended: "+goal);
 										goal.setLifecycleState(getInternalAccess(), RGoal.GOALLIFECYCLESTATE_SUSPENDED);
 										goal.setState(RGoal.PROCESSABLEELEMENT_INITIAL);
 									}
@@ -1062,8 +1062,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	
-		getCapability().dumpGoalsPeriodically(getInternalAccess());
-		getCapability().dumpPlansPeriodically(getInternalAccess());
+//		getCapability().dumpGoalsPeriodically(getInternalAccess());
+//		getCapability().dumpPlansPeriodically(getInternalAccess());
 	}
 	
 	/**

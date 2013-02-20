@@ -78,7 +78,7 @@ public class DropWastePlan
 					{
 						wastebin.addWaste(waste);
 						capa.setCarriedwaste(null);
-						System.out.println("carried waste set null: "+rplan.getId()+" "+((IGoal)rplan.getReason()).getId());
+//						System.out.println("carried waste set null: "+rplan.getId()+" "+((IGoal)rplan.getReason()).getId());
 						ret.setResult(null);
 					}
 				});

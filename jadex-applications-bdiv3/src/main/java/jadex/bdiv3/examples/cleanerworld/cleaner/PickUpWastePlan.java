@@ -65,7 +65,7 @@ public class PickUpWastePlan
 					public void customResultAvailable(PickupWasteAction pwa)
 					{
 						capa.setCarriedwaste(waste);
-						System.out.println("carried waste set to: "+waste+rplan.getId()+" "+((IGoal)rplan.getReason()).getId());
+//						System.out.println("carried waste set to: "+waste+rplan.getId()+" "+((IGoal)rplan.getReason()).getId());
 						capa.getWastes().remove(waste);
 						ret.setResult(null);
 					}

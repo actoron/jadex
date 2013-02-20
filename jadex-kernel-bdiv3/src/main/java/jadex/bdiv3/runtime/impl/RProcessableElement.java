@@ -61,7 +61,7 @@ public abstract class RProcessableElement extends RElement
 	{
 		super(modelelement);
 		this.pojoelement = pojoelement;
-//		this.state = PROCESSABLEELEMENT_UNPROCESSED;
+		this.state = PROCESSABLEELEMENT_INITIAL;
 	}
 
 	/**
@@ -157,6 +157,8 @@ public abstract class RProcessableElement extends RElement
 	{
 		if(!PROCESSABLEELEMENT_STATES.contains(state))
 			throw new IllegalArgumentException("Invalid state: "+state);
+		if(getState().equals(state))
+			return;
 			
 		setState(state);
 		

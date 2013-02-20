@@ -199,6 +199,9 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public void setProcessingState(IInternalAccess ia, String processingstate)
 	{
+		if(getProcessingState().equals(processingstate))
+			return;
+		
 //		this.processingstate = processingstate;
 	
 		// If was inprocess -> now stop processing.
@@ -231,6 +234,7 @@ public class RGoal extends RProcessableElement implements IGoal
 			
 			// Clean tried plans if necessary.
 			setTriedPlans(null);
+			
 //			Collection coll = state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_triedmplans);
 //			if(coll!=null)
 //			{
@@ -339,16 +343,20 @@ public class RGoal extends RProcessableElement implements IGoal
 			// ready to be activated via deliberation
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALOPTION, this));
 			abortPlans();
+			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALOPTION, this));
+			
 		}
 		else if(GOALLIFECYCLESTATE_SUSPENDED.equals(lifecyclestate))
 		{
 			// goal is suspended (no more plan executions)
 //			if(getId().indexOf("PerformLook")==-1)
 //				System.out.println("suspending: "+getId());
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALSUSPENDED, this));
+			
 			abortPlans();
+			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
+			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALSUSPENDED, this));
 		}
 		
 		if(GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
@@ -363,14 +371,19 @@ public class RGoal extends RProcessableElement implements IGoal
 			
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
+//			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
 			abortPlans();
-			setState(PROCESSABLEELEMENT_INITIAL);
 			ia.getExternalAccess().scheduleStep(new DropGoalAction(this));
 		}
 		else if(GOALLIFECYCLESTATE_DROPPED.equals(lifecyclestate))
 		{
 			if(listeners!=null)
 			{
+				if(!isFinished())
+				{
+					setProcessingState(GOALPROCESSINGSTATE_FAILED);
+					setException(new GoalFailureException());
+				}
 				for(IResultListener<Void> lis: listeners)
 				{
 					if(isSucceeded())
@@ -626,8 +639,8 @@ public class RGoal extends RProcessableElement implements IGoal
 		super.planFinished(ia, rplan);
 		childplan = null;
 		
-		if(rplan!=null)
-			System.out.println("plan finished: "+rplan.getId());
+//		if(rplan!=null)
+//			System.out.println("plan finished: "+rplan.getId());
 		
 //		if(getPojoElement().getClass().getName().indexOf("PatrolPlan")!=-1)
 //			System.out.println("pips");
