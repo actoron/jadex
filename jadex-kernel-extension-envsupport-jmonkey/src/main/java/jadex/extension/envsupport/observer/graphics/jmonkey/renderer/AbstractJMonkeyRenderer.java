@@ -306,22 +306,27 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 		
 		if(draw)
 		{
+			
+			if(primitive.getControler() == null)
+			{
+		
 			Vector3Double rotationD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getRotation(), vp));
 			rotation = new Vector3f(rotationD.getXAsFloat(), rotationD.getYAsFloat(), rotationD.getZAsFloat());	
+			float[] angles = {rotation.x, rotation.y, rotation.z};
+			quatation = sp.getLocalRotation().fromAngles(angles);
+			
+			sp.setLocalRotation(quatation);
+			
+			}
 			
 			Vector3Double  sizelocalD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getSize(), vp));	
 			sizelocal =   new Vector3f(sizelocalD.getXAsFloat(), sizelocalD.getYAsFloat(), sizelocalD.getZAsFloat());	
 			
 			Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getPosition(), vp));	
 			positionlocal =   new Vector3f(positionlocalD.getXAsFloat(), positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());	
-
-			float[] angles = {rotation.x, rotation.y, rotation.z};
-			quatation = sp.getLocalRotation().fromAngles(angles);
 			
 			sp.setLocalScale(sizelocal);
 			sp.setLocalTranslation(positionlocal);
-			sp.setLocalRotation(quatation);
-			
 			
 //			 Special Case 01: 3d-Text
 			if(primitive.getType() == Primitive3d.PRIMITIVE_TYPE_TEXT3D)
