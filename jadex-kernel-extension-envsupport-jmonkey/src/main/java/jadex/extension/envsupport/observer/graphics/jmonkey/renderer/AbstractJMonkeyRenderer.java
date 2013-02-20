@@ -324,9 +324,9 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			
 			Vector3Double  positionlocalD = ((Vector3Double)dc.getBoundValue(sobj, primitive.getPosition(), vp));	
 			positionlocal =   new Vector3f(positionlocalD.getXAsFloat(), positionlocalD.getYAsFloat(), positionlocalD.getZAsFloat());	
-			
-			sp.setLocalScale(sizelocal);
 			sp.setLocalTranslation(positionlocal);
+			sp.setLocalScale(sizelocal);
+			
 			
 //			 Special Case 01: 3d-Text
 			if(primitive.getType() == Primitive3d.PRIMITIVE_TYPE_TEXT3D)
